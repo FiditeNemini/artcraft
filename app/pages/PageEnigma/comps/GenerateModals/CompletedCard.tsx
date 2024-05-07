@@ -9,6 +9,14 @@ import { environmentVariables } from "~/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
 import { ToasterContext } from "~/contexts/ToasterContext";
+import { styleList } from "~/pages/PageEnigma/styleList";
+
+function getStyleName(typeInput: string){
+  const foundStyle = styleList.find((style)=>{
+    return style.type === typeInput;
+  });
+  return foundStyle ? foundStyle.label : "Unknown Style";
+}
 
 interface Props {
   movie: MediaInfo;
@@ -17,6 +25,7 @@ interface Props {
 
 export function CompletedCard({ movie, setMovieId }: Props) {
   useSignals();
+  // console.log(movie);
   const { addToast } = useContext(ToasterContext);
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
@@ -27,10 +36,10 @@ export function CompletedCard({ movie, setMovieId }: Props) {
     360,
     20,
   );
-
+  const styleName = movie.maybe_style_name && getStyleName(movie.maybe_style_name);
   return (
-    <button
-      className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150 hover:bg-brand-secondary/40"
+    <div
+      className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150 hover:bg-brand-secondary/40 hover:cursor-pointer"
       onClick={() => {
         setMovieId(movie.token);
       }}>
@@ -50,7 +59,11 @@ export function CompletedCard({ movie, setMovieId }: Props) {
         <div className="flex flex-col justify-center gap-1">
           <div className="font-medium">{movie.maybe_title || "Untitled"}</div>
           <div>
-            <div className="text-sm text-white/60">Anime 2D</div>
+            {styleName &&
+              <div className="text-sm text-white/60">
+                {styleName}
+              </div>
+            }
             <div className="text-sm text-white/60">
               {dayjs(movie.updated_at).format("MMM D, YYYY HH:mm:ss")}
             </div>
@@ -70,6 +83,6 @@ export function CompletedCard({ movie, setMovieId }: Props) {
           </button>
         </Tooltip>
       </div>
-    </button>
+    </div>
   );
 }

@@ -221,17 +221,27 @@ export class APIManager {
     return file;
   }
 
-  public async uploadMedia(blob: any, fileName: string) {
+  public async uploadMedia({
+    blob, fileName, title, styleName
+  }:{
+    blob: Blob,
+    fileName: string,
+    title: string,
+    styleName?: string,
+  }) {
     // Promise<APIManagerResponseSuccess>
-    const url = `${this.baseUrl}/v1/media_files/upload`;
+    //TODO: UPDATE ENDPOINT!!!!
+    const url = `${this.baseUrl}/v1/media_files/upload/new_video`;
     const uuid = uuidv4();
 
     const formData = new FormData();
     formData.append("uuid_idempotency_token", uuid);
+
     formData.append("file", blob, fileName);
-    formData.append("source", "file");
-    formData.append("type", "video");
-    formData.append("source", "file");
+    // formData.append("source", "file");
+    // formData.append("type", "video");
+    if (styleName) formData.append("maybe_style_name", styleName);
+    formData.append("maybe_title", title);
 
     const response = await fetch(url, {
       method: "POST",

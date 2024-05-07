@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useContext, useState } from "react";
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { EngineContext } from "./EngineContext";
-import { signalScene } from "~/store";
+import { signalScene, getSceneSignals } from "~/store";
 
 import Editor from "~/pages/PageEnigma/js/editor";
 
@@ -30,6 +30,7 @@ export const EngineProvider = ({
           dispatchAppUiState,
           authState,
           signalScene,
+          getSceneSignals
         });
       }
       return curr;

@@ -93,7 +93,7 @@ export function GetCompletedMovies(username?: string) {
           JSON.stringify(movies.value) !==
           JSON.stringify({ movies: res.results })
         ) {
-          console.log("movies", res.results);
+          // console.log("movies", res.results);
           movies.value = { movies: res.results };
         }
       }

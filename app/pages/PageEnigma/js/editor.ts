@@ -42,12 +42,14 @@ import {
 } from "~/pages/PageEnigma/store/engine";
 import { AuthState } from "~/contexts/Authentication/types";
 import { hotkeysStatus } from "~/pages/PageEnigma/store";
+import { SceneSignal } from "~/store";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 
 export type EditorConstructorConfig = {
   dispatchAppUiState: React.Dispatch<AppUiAction>;
   signalScene: (data: any) => void;
+  getSceneSignals: ()=>SceneSignal
   authState: AuthState;
 };
 
@@ -121,6 +123,7 @@ class Editor {
   dispatchAppUiState: React.Dispatch<AppUiAction>;
   authState: AuthState;
   signalScene: (data: any) => void;
+  getSceneSignals: () => SceneSignal;
   render_width: number;
   render_height: number;
 
@@ -144,6 +147,7 @@ class Editor {
   constructor({
     dispatchAppUiState,
     signalScene,
+    getSceneSignals,
     authState,
   }: EditorConstructorConfig) {
     console.log(
@@ -253,6 +257,7 @@ class Editor {
     //setup reactland Callbacks
     this.dispatchAppUiState = dispatchAppUiState;
     this.signalScene = signalScene;
+    this.getSceneSignals = getSceneSignals;
     this.authState = authState;
 
     // Scene State
@@ -567,7 +572,7 @@ class Editor {
         if (c instanceof THREE.Mesh) {
           if (c.morphTargetInfluences && c.morphTargetDictionary) {
             const blendShapeIndexE = c.morphTargetDictionary["E"];
-            console.log(c.morphTargetDictionary, blendShapeIndexE);
+            // console.log(c.morphTargetDictionary, blendShapeIndexE)
             if (blendShapeIndexE !== null) {
               hasLipsync = true;
             }
@@ -1201,7 +1206,13 @@ class Editor {
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
-    const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
+    const title = this.getSceneSignals().title || "Untitled";
+
+    const data: any = await this.api_manager.uploadMedia({
+      blob,
+      fileName: `${title}.mp4`,
+      title,
+    });
 
     if (data == null) {
       return;

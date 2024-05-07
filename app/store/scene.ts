@@ -25,3 +25,7 @@ export const signalScene = (data:SceneSignal)=>{
     // from editor side, and take this out after
   };
 }
+
+export const getSceneSignals = ():SceneSignal=>{
+  return scene.value;
+}

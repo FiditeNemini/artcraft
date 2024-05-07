@@ -27,6 +27,7 @@ export interface MediaInfo {
   maybe_origin_model_type: null | string;
   maybe_origin_model_token: null | string;
   maybe_duration_millis: number | null;
+  maybe_style_name: null | string;
   public_bucket_path: string;
   cover_image: {
     maybe_cover_image_public_bucket_path: null | string;
