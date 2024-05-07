@@ -143,7 +143,8 @@ export const ControlPanelSceneObject = () => {
   useEffect(() => {
     const isCurrentObj =
       (editorEngine?.selected?.uuid || "") === initializedObj ||
-      appUiState.controlPanel.currentSceneObject.object_uuid === initializedObj;
+      (appUiState?.controlPanel?.currentSceneObject?.object_uuid || "") ===
+        initializedObj;
     // TODO this causes a subtle bug because it renders way too many times.
     if (!appUiState.controlPanel.currentSceneObject) {
       return;
