@@ -1,15 +1,14 @@
-
 import { useLocation, useParams } from "@remix-run/react";
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonLink } from "~/components";
 import { AuthButtons } from "./AuthButtons";
 import { SceneTitleInput } from "./SceneTitleInput";
 import { MyMoviesButton } from "~/modules/TopBar/MyMoviesButton";
-import { getCurrentLocationWithoutParams } from '~/utilities';
+import { getCurrentLocationWithoutParams } from "~/utilities";
 
-function isEditorPath(path:string){
-  if ( path === "/" ) return true;
-  if ( path === "/idealenigma/" ) return true;
+function isEditorPath(path: string) {
+  if (path === "/") return true;
+  if (path === "/idealenigma/") return true;
   return false;
 }
 interface Props {
@@ -17,7 +16,10 @@ interface Props {
 }
 
 export const TopBar = ({ pageName }: Props) => {
-  const currentLocation = getCurrentLocationWithoutParams(useLocation().pathname, useParams());
+  const currentLocation = getCurrentLocationWithoutParams(
+    useLocation().pathname,
+    useParams(),
+  );
 
   return (
     <header className="fixed left-0 top-0 z-30 w-full border-b border-ui-panel-border bg-ui-panel">
@@ -40,10 +42,8 @@ export const TopBar = ({ pageName }: Props) => {
           )}
         </div>
 
-        <div className="flex items-center justify-center font-medium gap-2">
-          <span className="opacity-60 text-nowrap">{pageName}</span>
-          <span className="opacity-60">/</span>
-          <SceneTitleInput />
+        <div className="flex items-center justify-center gap-2 font-medium">
+          <SceneTitleInput pageName={pageName} />
         </div>
 
         <div className="flex justify-end gap-2">

@@ -1,30 +1,37 @@
-import { useState, useContext } from 'react';
-import { twMerge } from 'tailwind-merge';
+import { useState, useContext } from "react";
+import { twMerge } from "tailwind-merge";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AuthenticationContext } from "~/contexts/Authentication";
-import { faSpinnerThird } from '@fortawesome/pro-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { faPencil, faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { scene, signalScene } from "~/store";
 import {
   showErrorDialog,
   errorDialogMessage,
   errorDialogTitle,
 } from "~/pages/PageEnigma/store";
+import { Input } from "~/components";
+import { renameScene } from "./utilities";
 
-import { Input } from '~/components';
-import { renameScene } from './utilities';
+interface Props {
+  pageName: string;
+}
 
-export const SceneTitleInput = ()=>{
+export const SceneTitleInput = ({ pageName }: Props) => {
   useSignals();
   const { authState } = useContext(AuthenticationContext);
+  const [showInput, setShowInput] = useState(false);
+  const [previousTitle, setPreviousTitle] = useState(scene.value.title);
 
-  const [{isValid, isSaving}, setState] = useState<{isValid:boolean; isSaving:boolean}>({isValid:true, isSaving:false});
-  const setIsValid = (val:boolean)=>{
-    setState((curr)=>({...curr, isValid:val}));
+  const [{ isValid, isSaving }, setState] = useState<{
+    isValid: boolean;
+    isSaving: boolean;
+  }>({ isValid: true, isSaving: false });
+  const setIsValid = (val: boolean) => {
+    setState((curr) => ({ ...curr, isValid: val }));
   };
-  const setIsSaving = (val:boolean)=>{
-    setState((curr)=>({...curr, isSaving:val}));
+  const setIsSaving = (val: boolean) => {
+    setState((curr) => ({ ...curr, isSaving: val }));
   };
 
   const handleShowErrorDialog = () => {
@@ -33,27 +40,30 @@ export const SceneTitleInput = ()=>{
     showErrorDialog.value = true;
   };
 
-  const handleChangeSceneTitle = (e: React.ChangeEvent<HTMLInputElement>)=>{
+  const handleChangeSceneTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     signalScene({
       ...scene.value,
-      title : e.target.value,
+      title: e.target.value,
     });
     if (scene.value.title !== "") {
       setIsValid(true);
     }
-  }
-  const validateSceneTitle = (e: React.FocusEvent<HTMLInputElement>)=>{
+  };
+
+  const validateSceneTitle = (e: React.FocusEvent<HTMLInputElement>) => {
+    setShowInput(false);
     if (scene.value.title === "") {
       setIsValid(false);
       handleShowErrorDialog();
-      e.target.focus();
-    }else if(scene.value.token && authState.sessionToken){
+      resetPreviousTitle();
+      e.currentTarget.focus();
+    } else if (scene.value.token && authState.sessionToken) {
       setIsSaving(true);
       renameScene(
         scene.value.title!, //guarunteed by input
         scene.value.token,
         authState.sessionToken,
-      ).then((res)=>{
+      ).then((res) => {
         // console.log(res);
         //TODO: HANDLE ERROR
         setIsSaving(false);
@@ -61,26 +71,71 @@ export const SceneTitleInput = ()=>{
     }
   };
 
-  return(
-    <div className={twMerge(
-      "flex gap-3 justify-between items-center",
-      isSaving && "ml-3"
-    )}>
-      <Input
-        disabled={scene.value.ownerToken !== authState.userInfo?.user_token}
-        className="-ml-2 w-96"
-        inputClassName={twMerge(
-          "bg-ui-panel focus:bg-brand-secondary text-ellipsis",
-          isSaving ? "outline-brand-secondary" : "focus:ml-3",
-        )}
-        isError={!isValid}
-        value={scene.value.title || ""}
-        onChange={handleChangeSceneTitle}
-        onBlur={validateSceneTitle}
-      />
-      {isSaving &&
-        <FontAwesomeIcon icon={faSpinnerThird} spin/>
-      }
+  const resetPreviousTitle = () => {
+    signalScene({
+      ...scene.value,
+      title: previousTitle,
+    });
+  };
+
+  const handleShowInput = () => {
+    setShowInput(true);
+  };
+
+  return (
+    <div
+      className={twMerge(
+        "mr-[74px] flex w-full items-center justify-center gap-1.5",
+        isSaving && "ml-3",
+      )}>
+      {!showInput && (
+        <div className="flex items-center">
+          <span className="mr-2 text-nowrap opacity-60">{pageName}</span>
+          <span className="opacity-60">/</span>
+
+          <button
+            className="ml-0.5 rounded-md px-2 py-1 transition-all hover:cursor-text hover:bg-white/[8%]"
+            onClick={handleShowInput}>
+            {scene.value.title || ""}
+            <FontAwesomeIcon
+              icon={faPencil}
+              className="ml-2 text-sm opacity-50"
+            />
+          </button>
+        </div>
+      )}
+
+      {showInput && (
+        <div className="relative">
+          <Input
+            disabled={scene.value.ownerToken !== authState.userInfo?.user_token}
+            className="w-[420px]"
+            inputClassName={twMerge(
+              "text-center h-8 focus:outline-brand-primary",
+              isSaving && "outline-brand-secondary",
+            )}
+            isError={!isValid}
+            value={scene.value.title || ""}
+            onChange={handleChangeSceneTitle}
+            onBlur={validateSceneTitle}
+            onFocus={(e) => {
+              setPreviousTitle(scene.value.title);
+              e.target.select();
+            }}
+            autoFocus={true}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") {
+                (e.target as HTMLInputElement).blur();
+              } else if (e.key === "Escape") {
+                resetPreviousTitle();
+                setShowInput(false);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {isSaving && <FontAwesomeIcon icon={faSpinnerThird} spin />}
     </div>
-);
-}
+  );
+};

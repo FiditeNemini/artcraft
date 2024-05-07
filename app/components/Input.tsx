@@ -11,16 +11,27 @@ import {
 } from "~/pages/PageEnigma/store";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  inputClassName ?: string,
+  inputClassName?: string;
   label?: string;
   icon?: IconDefinition;
   isError?: boolean;
   errorMessage?: string;
 }
 
-export const Input = React.forwardRef(({
-    label, icon, inputClassName, className, id, isError, errorMessage, ...rest 
-  } : InputProps,
+export const Input = React.forwardRef(
+  (
+    {
+      label,
+      icon,
+      inputClassName,
+      className,
+      id,
+      isError,
+      onBlur,
+      onFocus,
+      errorMessage,
+      ...rest
+    }: InputProps,
     ref: React.ForwardedRef<HTMLInputElement>,
   ) => {
     return (
@@ -38,19 +49,25 @@ export const Input = React.forwardRef(({
               "h-10 w-full rounded-md bg-brand-secondary px-3 py-2.5 text-white outline-none outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary",
               icon && "pl-12",
               isError && "outline-red focus:outline-red",
-              inputClassName
+              inputClassName,
             )}
-            onFocus={(e: React.FocusEvent<HTMLInputElement>) => { 
-              if (rest.onFocus) rest.onFocus(e);
-              disableHotkeyInput(DomLevels.INPUT)
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+              if (onFocus) {
+                onFocus(e);
+              }
+              disableHotkeyInput(DomLevels.INPUT);
             }}
             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-              if (rest.onBlur) rest.onBlur(e);
-              enableHotkeyInput(DomLevels.INPUT)
+              if (onBlur) {
+                onBlur(e);
+              }
+              enableHotkeyInput(DomLevels.INPUT);
             }}
             {...rest}
           />
-          {errorMessage && <H6 className="absolute text-red z-10">{errorMessage}</H6>}
+          {errorMessage && (
+            <H6 className="absolute z-10 text-red">{errorMessage}</H6>
+          )}
         </div>
       </div>
     );
