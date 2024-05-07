@@ -17,9 +17,27 @@ SHORT_SHA=$(echo "${COMMIT_REF}" | cut -c1-8)
 
 echo "Baking current git SHA to code";
 
-find . -type f -exec sed -i "s/CURRENT_STORYTELLER_GIT_VERSION/${SHORT_SHA}/g" {} +
+find . -type f -exec sed -i "s/%CURRENT_STORYTELLER_GIT_VERSION%/${SHORT_SHA}/g" {} +
 
-echo "Baking ENV configs to code";
+####
+# Expressions hack
+####
+
+echo "Baking expressions feature flag ENV to code";
+
+echo "Value of EXPRESSIONS env var is: ${EXPRESSIONS}"
+
+if [ "$EXPRESSIONS" = "TRUE" ] || [ "$EXPRESSIONS" = "true" ] ; then
+    expressions_value="true"
+else
+    expressions_value="false"
+fi
+
+echo "Value of expressions is: ${expressions_value}"
+
+find . -type f -exec sed -i "s/%EXPRESSIONS_VALUE%/${expressions_value}/g" {} +
+
+echo "Baking URL/API ENV configs to code";
 
 # NB: We can't use slashes as the sed escape character: 
 # https://stackoverflow.com/a/27787551

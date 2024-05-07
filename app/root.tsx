@@ -65,7 +65,7 @@ export async function loader() {
       GOOGLE_API: process.env.GOOGLE_API || "%BUILD_GOOGLE_API%",
       FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
       CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
-      EXPRESSIONS: process.env.EXPRESSIONS === "true",
+      EXPRESSIONS: process.env.EXPRESSIONS === "true" || "%EXPRESSIONS_VALUE%" === "true",
     } as Record<string, string | boolean>,
   });
   return env;

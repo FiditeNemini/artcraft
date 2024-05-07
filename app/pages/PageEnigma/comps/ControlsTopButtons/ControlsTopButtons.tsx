@@ -252,7 +252,7 @@ export const ControlsTopButtons = () => {
             <>
               Help
               <span className="text-sm font-medium opacity-60">
-                @CURRENT_STORYTELLER_GIT_VERSION
+                @%CURRENT_STORYTELLER_GIT_VERSION%
               </span>
             </>
           }>
