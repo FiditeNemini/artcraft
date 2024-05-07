@@ -1,6 +1,6 @@
 import { enumToKeyArr } from "resources";
 import { UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
-import { UploadEngineAssetResponse }from "@storyteller/components/src/api/media_files/UploadEngineAsset";
+import { UploadEngineAssetResponse } from "@storyteller/components/src/api/media_files/UploadEngineAsset";
 
 // 1
 
@@ -10,7 +10,7 @@ import { UploadEngineAssetResponse }from "@storyteller/components/src/api/media_
 export enum EntityType {
   unknown,
   media,
-  weights
+  weights,
 }
 
 // 2
@@ -23,14 +23,14 @@ export enum MediaFilters {
   audio,
   image,
   video,
-  engine_asset
+  engine_asset,
 }
 
 export enum WeightsCategories {
   all,
   faceAnimation,
   tts,
-  voiceConversion
+  voiceConversion,
 }
 
 // 3
@@ -49,7 +49,7 @@ export enum WeightsFilters {
   so_vits_svc,
   tt2,
   loRA,
-  vall_e
+  vall_e,
 }
 
 // media file types
@@ -60,17 +60,17 @@ export enum EngineTypes {
   glb,
   gltf,
   obj,
-  ron
+  ron,
 }
 
 export enum AudioTypes {
   mp3,
-  wav
+  wav,
 }
 
 export enum ImageTypes {
   jpg,
-  png
+  png,
 }
 
 export enum VideoTypes {
@@ -128,15 +128,19 @@ export type JobSelection = WeightCategoriesProp | WeightFilterProp;
 export type UploaderResponse = UploadEngineAssetResponse | UploadMediaResponse;
 
 export const ListEntityFilters = (mode?: EntityInputMode) => {
-
   // this an object of all types
   // in most cases it is better to have granular caterogization of types
   // but because any entity can/could(?) be bookmarked all types are agregated here
   // this is condensed because typescript didn't like when I broke it apart.
   // Will clean up soon, I promise
-  const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});
+  const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters })
+    .filter(val => isNaN(Number(val)))
+    .reduce((obj, current) => ({ ...obj, [current]: current }), {});
 
-  const selectedFilters = mode !== undefined ? [bookmarkFilters,MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
+  const selectedFilters =
+    mode !== undefined
+      ? [bookmarkFilters, MediaFilters, WeightsFilters, WeightsFilters][mode]
+      : EntityInputMode;
 
   return Object.values(selectedFilters).filter(val => isNaN(Number(val)));
 };
@@ -145,36 +149,59 @@ export const ListEntityFilters = (mode?: EntityInputMode) => {
 // note the use t() to translate labels
 // this allows easily maintained translations for inputs
 
-export const EntityFilterOptions = (mode?: EntityInputMode, t = (v:string) => v) => {
-  return ListEntityFilters(mode).map((value) => {
-    if (typeof value === "string") return { value, label: t(value) }
-    return { label: "all", value: "all" };
+export const EntityFilterOptions = (
+  mode?: EntityInputMode,
+  t = (v: string) => v
+) => {
+  const translationNamespaces = [
+    "BookmarksCategories",
+    "MediaCategoriesPlural",
+    "WeightsCategories",
+    "WeightsCategories",
+  ];
+  const selectedNamespace = translationNamespaces[mode || -1];
+  return ListEntityFilters(mode).map(value => {
+    if (typeof value === "string")
+      return {
+        value,
+        label:
+          selectedNamespace !== undefined
+            ? t(`${selectedNamespace}.${value}`)
+            : value,
+      };
+    return { label: t(`${selectedNamespace}.all`), value: "all" };
   });
 };
 
-export const getMediaTypesByCategory = (mediaCategory: MediaFilters) => enumToKeyArr([
-  { ...AudioTypes, ...ImageTypes, ...VideoTypes, ...EngineTypes },
-  AudioTypes,
-  ImageTypes,
-  VideoTypes,
-  EngineTypes
-][mediaCategory]);
+export const getMediaTypesByCategory = (mediaCategory: MediaFilters) =>
+  enumToKeyArr(
+    [
+      { ...AudioTypes, ...ImageTypes, ...VideoTypes, ...EngineTypes },
+      AudioTypes,
+      ImageTypes,
+      VideoTypes,
+      EngineTypes,
+    ][mediaCategory]
+  );
 
-export const isSelectedType = (mediaCategory: MediaFilters, fileExtension: string) =>
-  getMediaTypesByCategory(mediaCategory).includes(fileExtension);
+export const isSelectedType = (
+  mediaCategory: MediaFilters,
+  fileExtension: string
+) => getMediaTypesByCategory(mediaCategory).includes(fileExtension);
 
-export const mediaCategoryfromString = (categoryStr: string) => enumToKeyArr(MediaFilters).indexOf(categoryStr);
+export const mediaCategoryfromString = (categoryStr: string) =>
+  enumToKeyArr(MediaFilters).indexOf(categoryStr);
 
 //renaming to getMediaCatgoryByType
 export const getMediaCategory = (fileExtension: string) => {
-  isSelectedType(MediaFilters.image,fileExtension);
-  if (isSelectedType(MediaFilters.engine_asset, fileExtension)) return MediaFilters.engine_asset;
-  if (isSelectedType(MediaFilters.audio, fileExtension)) return MediaFilters.audio;
-  if (isSelectedType(MediaFilters.image, fileExtension)) return MediaFilters.image;
-  if (isSelectedType(MediaFilters.video, fileExtension)) return MediaFilters.video;
+  isSelectedType(MediaFilters.image, fileExtension);
+  if (isSelectedType(MediaFilters.engine_asset, fileExtension))
+    return MediaFilters.engine_asset;
+  if (isSelectedType(MediaFilters.audio, fileExtension))
+    return MediaFilters.audio;
+  if (isSelectedType(MediaFilters.image, fileExtension))
+    return MediaFilters.image;
+  if (isSelectedType(MediaFilters.video, fileExtension))
+    return MediaFilters.video;
   return MediaFilters.all; // will change to "unknown" eventually
-}
-
-
-
-
+};
