@@ -28,7 +28,6 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const downloadLink = `${environmentVariables.value.GOOGLE_API}/vocodes-public${mediaFile?.public_bucket_path}`;
-  const openUrl = `/media/${mediaFile.token}`;
 
   const handleCopyLink = () => {
     if (navigator.clipboard) {
@@ -130,7 +129,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
             <Button
               className="h-10 w-full"
               onClick={() => {
-                window.open(openUrl, "_blank");
+                window.open(shareUrl, "_blank");
               }}
               icon={faArrowRight}
               iconFlip={true}
