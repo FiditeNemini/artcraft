@@ -2,7 +2,6 @@ import { ItemElement } from "./ItemElement";
 import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
 import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
 import { LoadingDots } from "~/components";
-import "./ItemElements.scss";
 
 interface Props {
   busy?: boolean;

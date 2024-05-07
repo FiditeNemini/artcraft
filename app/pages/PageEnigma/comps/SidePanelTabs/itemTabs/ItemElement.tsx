@@ -15,7 +15,7 @@ export const ItemElement = ({ item }: Props) => {
 
   return (
     <div
-      className="sidebar-object-item relative w-full cursor-pointer rounded-lg transition-all duration-200"
+      className="relative w-full cursor-pointer rounded-xl bg-[#A0A0A0] transition-all duration-200"
       onPointerDown={(event) => DndAsset.onPointerDown(event, item)}>
       <img
         {...{

@@ -31,7 +31,7 @@ export const DragComponent = () => {
               "rounded-lg",
               !canDrop.value
                 ? "bg-brand-primary"
-                : "bg-dnd-canDrop border-dnd-canDropBorder border border-dashed",
+                : "border border-dashed border-dnd-canDropBorder bg-dnd-canDrop",
               "block",
             ].join(" ")}
             style={{
@@ -47,7 +47,7 @@ export const DragComponent = () => {
             className={[
               "absolute p-2",
               "rounded opacity-60",
-              "bg-dnd-timeGrid border-2-dnd-timeGridBorder border",
+              "border-2-dnd-timeGridBorder border bg-dnd-timeGrid",
             ].join(" ")}
             style={{
               bottom: timelineHeight.value - 60,
@@ -81,7 +81,7 @@ export const DragComponent = () => {
 
   return (
     <div
-      className="bg-dnd-wrapper/50 absolute rounded-lg backdrop-blur-sm"
+      className="absolute rounded-lg bg-[#A0A0A0] bg-dnd-wrapper/50"
       style={{
         width: 91,
         height: 114,
