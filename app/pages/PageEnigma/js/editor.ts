@@ -41,6 +41,7 @@ import {
   previewSrc,
 } from "~/pages/PageEnigma/store/engine";
 import { AuthState } from "~/contexts/Authentication/types";
+import { hotkeysStatus } from "~/pages/PageEnigma/store";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 
@@ -559,14 +560,14 @@ class Editor {
   }
 
   isObjectLipsync(object_uuid: string) {
-    let object = this.activeScene.get_object_by_uuid(object_uuid);
+    const object = this.activeScene.get_object_by_uuid(object_uuid);
     let hasLipsync = false;
-    if(object){
+    if (object) {
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
           if (c.morphTargetInfluences && c.morphTargetDictionary) {
             const blendShapeIndexE = c.morphTargetDictionary["E"];
-            console.log(c.morphTargetDictionary, blendShapeIndexE)
+            console.log(c.morphTargetDictionary, blendShapeIndexE);
             if (blendShapeIndexE !== null) {
               hasLipsync = true;
             }
@@ -578,9 +579,9 @@ class Editor {
   }
 
   isObjectLocked(object_uuid: string) {
-    let object = this.activeScene.get_object_by_uuid(object_uuid);
-    if(object){
-      if(object.userData["locked"] == undefined){
+    const object = this.activeScene.get_object_by_uuid(object_uuid);
+    if (object) {
+      if (object.userData["locked"] == undefined) {
         object.userData["locked"] = false;
       }
       return object.userData["locked"];
@@ -590,21 +591,20 @@ class Editor {
   }
 
   lockUnlockObject(object_uuid: string) {
-    let object = this.activeScene.get_object_by_uuid(object_uuid);
-    if(object){
-      if(object.userData["locked"] == undefined){
+    const object = this.activeScene.get_object_by_uuid(object_uuid);
+    if (object) {
+      if (object.userData["locked"] == undefined) {
         object.userData["locked"] = false;
       }
       object.userData["locked"] = !object.userData["locked"];
 
-      if(object.userData["locked"]){
+      if (object.userData["locked"]) {
         this.removeTransformControls(false);
-      }
-      else if (this.control) {
+      } else if (this.control) {
         this.activeScene.scene.add(this.control);
         this.control.attach(this.selected);
       }
-      
+
       return object.userData["locked"];
     }
     console.log("No object found.");
@@ -635,9 +635,9 @@ class Editor {
   public async saveScene({
     sceneTitle,
     sceneToken,
-  }:{
-    sceneTitle: string,
-    sceneToken?: string
+  }: {
+    sceneTitle: string;
+    sceneToken?: string;
   }): Promise<string> {
     // remove controls when saving scene.
     this.removeTransformControls();
@@ -681,7 +681,7 @@ class Editor {
       saveJson: JSON.stringify(save_data),
       sceneTitle,
       sceneToken,
-      sceneThumbnail
+      sceneThumbnail,
     });
 
     this.dispatchAppUiState({
@@ -697,22 +697,21 @@ class Editor {
    * Doesn't retain those controls.
    * @returns
    */
-  private removeTransformControls(remove_outline:boolean=true) {
-      if (this.control == undefined) {
-        return;
-      }
-      if (this.outlinePass == undefined) {
-        return;
-      }
-    if(remove_outline){
+  private removeTransformControls(remove_outline: boolean = true) {
+    if (this.control == undefined) {
+      return;
+    }
+    if (this.outlinePass == undefined) {
+      return;
+    }
+    if (remove_outline) {
       this.last_selected = this.selected;
       this.selected = undefined;
       this.publishSelect();
     }
     this.control.detach();
     this.activeScene.scene.remove(this.control);
-    if(remove_outline)
-      this.outlinePass.selectedObjects = [];
+    if (remove_outline) this.outlinePass.selectedObjects = [];
   }
 
   switchCameraView() {
@@ -1477,6 +1476,9 @@ class Editor {
   }
 
   onkeydown(event: KeyboardEvent) {
+    if (hotkeysStatus.value.disabled) {
+      return;
+    }
     console.log("down");
     if (event.key === "f" && this.selected && this.orbitControls) {
       this.orbitControls.target.copy(this.selected.position);

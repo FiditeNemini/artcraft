@@ -15,7 +15,6 @@ import { EngineContext } from "~/contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
-import { ACTION_TYPES } from "~/reducers/appUiReducer/types";
 
 import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
@@ -143,7 +142,8 @@ export const ControlPanelSceneObject = () => {
 
   useEffect(() => {
     const isCurrentObj =
-      (editorEngine?.selected?.uuid || "") === initializedObj;
+      (editorEngine?.selected?.uuid || "") === initializedObj ||
+      appUiState.controlPanel.currentSceneObject.object_uuid === initializedObj;
     // TODO this causes a subtle bug because it renders way too many times.
     if (!appUiState.controlPanel.currentSceneObject) {
       return;
