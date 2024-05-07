@@ -39,7 +39,6 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
       },
     )
       .then((res: GetMediaListResponse) => {
-        // console.log(res);
         if (res.success && res.results) {
           setScenes(
             res.results.map((scene) => ({
@@ -48,7 +47,7 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
               updated_at: dayjs(scene.updated_at).format(
                 "MMM D, YYYY HH:mm:ss",
               ),
-              thumbnail: scene.public_bucket_path,
+              thumbnail: scene.cover_image.maybe_cover_image_public_bucket_path ? scene.cover_image.maybe_cover_image_public_bucket_path : undefined,
             })),
           );
           setIsSceneLoading(false);

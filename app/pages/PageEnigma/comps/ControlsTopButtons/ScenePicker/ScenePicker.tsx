@@ -5,7 +5,7 @@ export type SceneTypes = {
   token: string;
   name: string;
   updated_at?: string;
-  thumbnail: string;
+  thumbnail: string | undefined;
 };
 
 interface ScenePickerProps {

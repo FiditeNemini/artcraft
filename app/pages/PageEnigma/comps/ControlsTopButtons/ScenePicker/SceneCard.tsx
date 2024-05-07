@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import { BucketConfig } from "~/api/BucketConfig";
 import { twMerge } from "tailwind-merge";
 
 export type SceneTypes = {
@@ -21,16 +22,19 @@ export const SceneCard: React.FC<SceneCardProps> = ({
   selectedSceneId,
   showDate,
 }) => {
+  // console.log(scene);
+  const [loadError, setLoadError] = useState(false);
+
   const handleSelected = (scene: SceneTypes) => {
     onSceneSelect(scene);
   };
 
-  // const bucketConfig = useRef(new BucketConfig());
-  // const imageUrl = bucketConfig.current.getCdnUrl(
-  //   scene.thumbnail + "-thumb.gif",
-  //   360,
-  //   20,
-  // );
+  const bucketConfig = useRef(new BucketConfig());
+  const imageThumbnailUrl = scene.thumbnail &&  bucketConfig.current.getCdnUrl(
+    scene.thumbnail,
+    360,
+    20,
+  );
   // thumbnail will be replaced with 3d scene screenshots
   const tempThumbnail = "/resources/placeholders/scene_placeholder.png";
 
@@ -45,9 +49,12 @@ export const SceneCard: React.FC<SceneCardProps> = ({
       )}
       onClick={() => handleSelected(scene)}>
       <img
+        src={imageThumbnailUrl && !loadError ? imageThumbnailUrl:  tempThumbnail}
         className="aspect-video object-cover"
-        src={tempThumbnail}
+        crossOrigin="anonymous"
         alt={scene.name}
+        onError={() => setLoadError(true)}
+        loading="lazy"
       />
       <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-ui-panel to-transparent" />
       <div className="absolute bottom-[8px] left-[10px] text-start text-sm drop-shadow-md">
