@@ -118,7 +118,7 @@ export default function UploadModal({
 
               let maxSize = 0;
               if (scene.children.length > 0) {
-                scene.children.forEach(child => {
+                scene.children.forEach((child) => {
                   child.traverse((object: THREE.Object3D) => {
                     // Assuming `object` is your Three.js object and you know it's a Mesh
                     if (object instanceof THREE.Mesh) {
@@ -128,8 +128,12 @@ export default function UploadModal({
                       boundingBox.getCenter(center);
                       const dimensions = new THREE.Vector3();
                       boundingBox.getSize(dimensions);
-                      const maxDim = Math.max(dimensions.x, dimensions.y, dimensions.z);
-                      if (maxSize < maxDim){
+                      const maxDim = Math.max(
+                        dimensions.x,
+                        dimensions.y,
+                        dimensions.z,
+                      );
+                      if (maxSize < maxDim) {
                         maxSize = maxDim;
                         camera.position.set(-maxDim, maxDim, maxDim);
                         camera.lookAt(center);
@@ -143,7 +147,7 @@ export default function UploadModal({
               }
             });
           },
-          () => { },
+          () => {},
           (loaderError) => {
             console.log("loader error:", loaderError);
             objUploadStatusSet(UploaderState.loaderError);
@@ -418,7 +422,7 @@ export default function UploadModal({
                   },
                   variant: "primary",
                 }}>
-                Cancel
+                Try another
               </Button>
             </div>
           </>

@@ -67,7 +67,7 @@ export const RowHeaders = () => {
                 Animation
               </div>
               <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                Movement
+                Position
               </div>
               {environmentVariables.value.EXPRESSIONS && (
                 <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
@@ -116,7 +116,7 @@ export const RowHeaders = () => {
               </div>
             </div>
             <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-              Movement
+              Position
             </div>
           </div>
         )}
