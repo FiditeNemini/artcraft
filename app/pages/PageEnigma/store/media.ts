@@ -525,6 +525,13 @@ export const characterItems = signal<MediaItem[]>([
     name: "Story Girl",
     thumbnail: "/resources/characters/img13.png",
   },
+  {
+    version: 1,
+    media_id: "m_ja13tz27cqqvy366tsed4z4kh4gg0m",
+    type: AssetType.CHARACTER,
+    name: "Roko",
+    thumbnail: "/resources/placeholders/placeholder.png",
+  },
 ]);
 
 // TODO: CHANGE TO THIS FOR DEV MODE:
@@ -584,14 +591,7 @@ export const devCharacterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Pop",
     thumbnail: "/resources/placeholders/placeholder.png",
-  },
-  {
-    version: 1,
-    media_id: "m_ja13tz27cqqvy366tsed4z4kh4gg0m",
-    type: AssetType.CHARACTER,
-    name: "Roko",
-    thumbnail: "/resources/placeholders/placeholder.png",
-  },
+  }
 ]);
 
 export const objectItems = signal<MediaItem[]>([
