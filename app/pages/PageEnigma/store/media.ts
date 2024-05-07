@@ -1,5 +1,9 @@
 import { signal } from "@preact/signals-core";
-import { AssetType, MediaItem, AudioMediaItem } from "~/pages/PageEnigma/models";
+import {
+  AssetType,
+  MediaItem,
+  AudioMediaItem,
+} from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 
 export const updateDemoAudioItemLength = (
@@ -156,7 +160,7 @@ export const animationItems = signal<MediaItem[]>([
     media_id: "m_6cre8q6csjj6cs41esa3qjt3kb0aen",
     type: AssetType.ANIMATION,
     length: 100,
-    name: "Female Laying Pose",
+    name: "Laying Pose",
     thumbnail: "/resources/characters_gif/Female Laying Pose.gif",
   },
   {
@@ -172,7 +176,7 @@ export const animationItems = signal<MediaItem[]>([
     media_id: "m_9ejtr55r3s84gpek5wxn1v4apcjff7",
     type: AssetType.ANIMATION,
     length: 100,
-    name: "Femme Peek Around Corner",
+    name: "Peek Around Corner",
     thumbnail: "/resources/characters_gif/Femme Peek Around Corner.gif",
   },
   {
@@ -212,7 +216,7 @@ export const animationItems = signal<MediaItem[]>([
     media_id: "m_y5q63v1j8k0r72zc18ppnpgw1gga4n",
     type: AssetType.ANIMATION,
     length: 100,
-    name: "Female Standing Pose",
+    name: "Standing Pose",
     thumbnail: "/resources/characters_gif/Female Standing Pose.gif",
   },
   {
@@ -284,7 +288,7 @@ export const animationItems = signal<MediaItem[]>([
     media_id: "m_t4nhndxppb8807pq5d5t2y3ck2dzws",
     type: AssetType.ANIMATION,
     length: 100,
-    name: "Female Dance Pose",
+    name: "Dance Pose",
     thumbnail: "/resources/characters_gif/Female Dance Pose.gif",
   },
   {
