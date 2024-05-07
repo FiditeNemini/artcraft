@@ -81,4 +81,89 @@ export const styleList = [
     type: ArtStyle.AnimeStandard,
     image: "/resources/styles/gif/anime.gif",
   },
+  {
+    label: "H.R. Giger",
+    type: ArtStyle.HRGiger,
+    image: "/resources/styles/gif/hr_giger.gif",
+  },
+  {
+    label: "Simpsons",
+    type: ArtStyle.Simpsons,
+    image: "/resources/styles/gif/simpsons.gif",
+  },
+  {
+    label: "Carnage",
+    type: ArtStyle.Carnage,
+    image: "/resources/styles/gif/carnage.gif",
+  },
+  {
+    label: "Anime Pastel Cute",
+    type: ArtStyle.PastelCuteAnime,
+    image: "/resources/styles/gif/pastel_cute_anime.gif",
+  },
+  {
+    label: "Bloom Lighting",
+    type: ArtStyle.Bloom,
+    image: "/resources/styles/gif/bloom_lighting.gif",
+  },
+  {
+    label: "Horror 2.5D",
+    type: ArtStyle.Horror2_5D,
+    image: "/resources/styles/gif/2_5d_horror.gif",
+  },
+  {
+    label: "Creepy",
+    type: ArtStyle.Creepy,
+    image: "/resources/styles/gif/creepy.gif",
+  },
+  {
+    label: "Creepy VHS",
+    type: ArtStyle.CreepyVHS,
+    image: "/resources/styles/gif/creepy_vhs.gif",
+  },
+  {
+    label: "Trail Cam Footage",
+    type: ArtStyle.TrailCamFootage,
+    image: "/resources/styles/gif/trail_cam_footage.gif",
+  },
+  {
+    label: "Old B&W Movie",
+    type: ArtStyle.OldBWMovie,
+    image: "/resources/styles/gif/old_bw_movie.gif",
+  },
+  {
+    label: "Horror Noir B&W",
+    type: ArtStyle.HorrorNoirBW,
+    image: "/resources/styles/gif/horror_noir_bw.gif",
+  },
+  {
+    label: "Techno Noir B&W",
+    type: ArtStyle.TechnoNoirBW,
+    image: "/resources/styles/gif/techno_noir_bw.gif",
+  },
+  {
+    label: "B&W 20s",
+    type: ArtStyle.BW20s,
+    image: "/resources/styles/gif/bw_20s.gif",
+  },
+  {
+    label: "Anime Cyberpunk",
+    type: ArtStyle.AnimeCyberpunk,
+    image: "/resources/styles/gif/anime_cyberpunk.gif",
+  },
+  {
+    label: "Dragonball",
+    type: ArtStyle.Dragonball,
+    image: "/resources/styles/gif/dragonball.gif",
+  },
+  {
+    label: "Realistic Matrix",
+    type: ArtStyle.RealisticMatrix,
+    image: "/resources/styles/gif/realistic_matrix.gif",
+  },
+  {
+    label: "Realistic Cyberpunk",
+    type: ArtStyle.RealisticCyberpunk,
+    image: "/resources/styles/gif/realistic_cyberpunk.gif",
+  },
 ];

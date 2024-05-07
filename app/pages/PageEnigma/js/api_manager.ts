@@ -3,10 +3,7 @@ import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 import { environmentVariables, scene } from "~/store";
-import {
-  updateExistingScene,
-  uploadNewScene
-} from "./api_fetchers";
+import { updateExistingScene, uploadNewScene } from "./api_fetchers";
 import { uploadThumbnail } from "~/api";
 
 /**
@@ -46,6 +43,23 @@ export enum ArtStyle {
   Realistic2 = "realistic_2",
   AnimeRetroNeon = "anime_retro_neon",
   AnimeStandard = "anime_standard",
+  HRGiger = "hr_giger",
+  Simpsons = "simpsons",
+  Carnage = "carnage",
+  PastelCuteAnime = "pastel_cute_anime",
+  Bloom = "bloom_lighting",
+  Horror2_5D = "25d_horror",
+  Creepy = "creepy",
+  CreepyVHS = "creepy_vhs",
+  TrailCamFootage = "trail_cam_footage",
+  OldBWMovie = "old_black_white_movie",
+  HorrorNoirBW = "horror_noir_black_white",
+  TechnoNoirBW = "techno_noir_black_white",
+  BW20s = "black_white_20s",
+  AnimeCyberpunk = "cyberpunk_anime",
+  Dragonball = "dragonball",
+  RealisticMatrix = "realistic_matrix",
+  RealisticCyberpunk = "realistic_cyberpunk",
 }
 
 export enum Visibility {
@@ -94,44 +108,47 @@ export class APIManager {
    * @returns APIManagerResponseMessage
    */
   public async saveSceneState({
-    saveJson, sceneTitle, sceneToken, sceneThumbnail
-  }:{
-    saveJson: string,
-    sceneTitle: string,
-    sceneToken?: string,
-    sceneThumbnail: Blob | undefined
+    saveJson,
+    sceneTitle,
+    sceneToken,
+    sceneThumbnail,
+  }: {
+    saveJson: string;
+    sceneTitle: string;
+    sceneToken?: string;
+    sceneThumbnail: Blob | undefined;
   }): Promise<string> {
     const file = new File([saveJson], `${sceneTitle}.glb`, {
       type: "application/json",
     });
 
-    const uploadSceneResponse = sceneToken 
+    const uploadSceneResponse = sceneToken
       ? await updateExistingScene(file, sceneToken, this.sessionToken)
       : await uploadNewScene(file, sceneTitle, this.sessionToken);
 
     if (sceneThumbnail) {
       let image_resp = await this.uploadMedia(sceneThumbnail, "render.png");
-      if (image_resp["media_file_token"]){
+      if (image_resp["media_file_token"]) {
         let image_token = image_resp["media_file_token"];
-        await fetch(uploadThumbnail+uploadSceneResponse["media_file_token"], {
-          method: 'POST',
+        await fetch(uploadThumbnail + uploadSceneResponse["media_file_token"], {
+          method: "POST",
           headers: {
-            Accept: 'application/json',
+            Accept: "application/json",
             "Content-Type": "application/json",
             session: this.sessionToken,
           },
-          body: JSON.stringify({"cover_image_media_file_token": image_token}),
-        })
+          body: JSON.stringify({ cover_image_media_file_token: image_token }),
+        });
       }
     }
 
-    console.log(uploadSceneResponse)
+    console.log(uploadSceneResponse);
     return uploadSceneResponse["media_file_token"];
   }
 
   public async loadSceneState(
     scene_media_file_token: string | null,
-    signalScene: ((data:any)=>void )| null,
+    signalScene: ((data: any) => void) | null,
   ): Promise<any> {
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
@@ -141,8 +158,8 @@ export class APIManager {
     }
 
     const json = await JSON.parse(await response.text());
-    if(json && json.media_file && signalScene !== null){ 
-      if(json.media_file.maybe_title === null){
+    if (json && json.media_file && signalScene !== null) {
+      if (json.media_file.maybe_title === null) {
         console.warn(`Scene /w Token: ${scene_media_file_token} has no title`);
       }
       signalScene({
@@ -204,10 +221,8 @@ export class APIManager {
     return file;
   }
 
-  public async uploadMedia(
-    blob: any,
-    fileName: string,
-  ) { // Promise<APIManagerResponseSuccess>
+  public async uploadMedia(blob: any, fileName: string) {
+    // Promise<APIManagerResponseSuccess>
     const url = `${this.baseUrl}/v1/media_files/upload`;
     const uuid = uuidv4();
 
@@ -279,7 +294,7 @@ export class APIManager {
     const result = await fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        const result = data["media_files"].map((element:any) => {
+        const result = data["media_files"].map((element: any) => {
           return new MediaFile(
             element["public_bucket_path"],
             element["media_type"],

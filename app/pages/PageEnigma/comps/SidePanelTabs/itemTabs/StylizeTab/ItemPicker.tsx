@@ -50,7 +50,7 @@ export const ItemPicker = ({
         }}
       />
       <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
-      <H4 className="absolute bottom-[1px] left-[6px] max-w-[100px] truncate text-start text-[13px] drop-shadow-md">
+      <H4 className="absolute bottom-[1px] left-[6px] truncate text-start text-[13px] drop-shadow-md">
         {label}
       </H4>
       <svg
