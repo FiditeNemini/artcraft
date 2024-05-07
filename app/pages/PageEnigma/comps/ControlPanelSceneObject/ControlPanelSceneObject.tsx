@@ -53,6 +53,7 @@ const defaultAxises = {
 
 export const ControlPanelSceneObject = () => {
   const editorEngine = useContext(EngineContext);
+
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -169,12 +170,13 @@ export const ControlPanelSceneObject = () => {
     const scaleMismatch = objMatch(vectors.scale, scaleSanitized);
 
     if (
-      appUiState.controlPanel.isShowing &&
-      // if the current object isn't the cached object: update local
-      (!isCurrentObj ||
-        // if the inputs are not in focus, and local state does not match the selected engine object values: update local
-        (!inputsFocused &&
-          (positionMismatch || rotationMismatch || scaleMismatch)))
+      (editorEngine?.switchPreviewToggle === false &&
+        appUiState.controlPanel.isShowing &&
+        // if the current object isn't the cached object: update local
+        !isCurrentObj) ||
+      // if the inputs are not in focus, and local state does not match the selected engine object values: update local
+      (!inputsFocused &&
+        (positionMismatch || rotationMismatch || scaleMismatch))
     ) {
       // update cached object
       initializedObjSet(appUiState.controlPanel.currentSceneObject.object_uuid);

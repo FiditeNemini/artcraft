@@ -10,6 +10,7 @@ import { H1, H2, H3, H4, H5, H6, P, Label, Link } from "./Typography";
 import { ItemPicker } from "./ItemPicker";
 import { Textarea } from "./Textarea";
 import { TransitionDialogue } from "./TransitionDialogue";
+import { Select } from "./Select";
 import { ListDropdown } from "./ListDropdown";
 import { ListSearchDropdown } from "./ListSearchDropdown";
 import { LoadingBar } from "./LoadingBar";
@@ -56,6 +57,7 @@ export {
   LoadingSpinner,
   Pagination,
   Pill,
+  Select,
   WaveformPlayer,
   UploadModal,
 };

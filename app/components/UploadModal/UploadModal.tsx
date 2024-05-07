@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useId, useState } from "react";
-import { Button, Input, TransitionDialogue, LoadingDots } from "~/components";
 import {
-  UploadEngineAsset,
-  UploadEngineAssetResponse,
-} from "~/api/media_files/UploadEngineAsset";
+  Button,
+  Input,
+  Select,
+  TransitionDialogue,
+  LoadingDots,
+} from "~/components";
+import {
+  UploadNewEngineAsset,
+  UploadNewEngineAssetResponse,
+  MediaFileAnimationType,
+  MediaFileEngineCategory,
+} from "~/api/media_files/UploadNewEngineAsset";
 import {
   UploadMedia,
   UploadMediaResponse,
@@ -14,7 +22,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import "./UploadModal.scss";
 import { fitCameraToCenteredObject } from "./fitCameraToCenteredObject";
 import { EditCoverImage } from "~/api/media_files/EditCoverImage";
-import { Visibility } from "~/pages/PageEnigma/js/api_manager";
+// import { Visibility } from "~/pages/PageEnigma/js/api_manager";
 import { AssetType } from "~/pages/PageEnigma/models";
 
 interface Props {
@@ -56,6 +64,10 @@ export default function UploadModal({
   const [assetToken, assetTokenSet] = useState("");
   const [coverToken, coverTokenSet] = useState("");
   const [targetNode, targetNodeSet] = useState(null);
+  const [animationType, animationTypeSet] = useState("");
+
+  const isCharacter = type === AssetType.CHARACTER;
+
   const objPreviewRef = useCallback((node) => {
     if (node !== null) {
       targetNodeSet(node);
@@ -69,6 +81,7 @@ export default function UploadModal({
     objUploadStatusSet(UploaderState.ready);
     assetTokenSet("");
     coverTokenSet("");
+    animationTypeSet();
   }, [resetModalSet]);
 
   useEffect(() => {
@@ -87,10 +100,7 @@ export default function UploadModal({
         canvas: targetNode,
         preserveDrawingBuffer: true,
       });
-      renderer.setSize(
-        targetNode?.clientWidth || 0,
-        targetNode?.clientWidth || 0,
-      );
+      renderer.setSize(300 || 0, 300 || 0);
 
       const color = 0xfcece7;
       const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
@@ -194,15 +204,21 @@ export default function UploadModal({
 
   const uploadAsset = () => {
     objUploadStatusSet(UploaderState.uploadingAsset);
-    UploadEngineAsset({
-      engine_category: type === AssetType.CHARACTER ? "character" : "object",
+    UploadNewEngineAsset({
+      engine_category: isCharacter
+        ? MediaFileEngineCategory.Character
+        : MediaFileEngineCategory.Object,
       file,
-      media_file_subtype: "mixamo",
       title,
       visibility,
       uuid_idempotency_token: uuidv4(),
+      ...(isCharacter && animationType
+        ? {
+            maybe_animation_type: animationType,
+          }
+        : {}),
     })
-      .then((assetRes: UploadEngineAssetResponse) => {
+      .then((assetRes: UploadNewEngineAssetResponse) => {
         if ("media_file_token" in assetRes) {
           assetTokenSet(assetRes.media_file_token);
           createCoverImage(assetRes.media_file_token);
@@ -213,6 +229,38 @@ export default function UploadModal({
       });
   };
 
+  const animationOptions = [
+    { label: "ARKit", value: MediaFileAnimationType.ArKit },
+    {
+      label: "MikuMikuDance",
+      value: MediaFileAnimationType.MikuMikuDance,
+    },
+    {
+      label: "MikuMikuDance ARKit",
+      value: MediaFileAnimationType.MikuMikuDanceArKit,
+    },
+    { label: "Mixamo", value: MediaFileAnimationType.Mixamo },
+    {
+      label: "Mixamo ARKit",
+      value: MediaFileAnimationType.MixamoArKit,
+    },
+    { label: "MocapNet", value: MediaFileAnimationType.MocapNet },
+    {
+      label: "MocapNet ARKit",
+      value: MediaFileAnimationType.MocapNetArKit,
+    },
+    { label: "Move AI", value: MediaFileAnimationType.MoveAi },
+    {
+      label: "Move AI ARKit",
+      value: MediaFileAnimationType.MoveAiArKit,
+    },
+    { label: "Rigify", value: MediaFileAnimationType.MoveAi },
+    {
+      label: "Rigify ARKit",
+      value: MediaFileAnimationType.MoveAiArKit,
+    },
+  ];
+
   const objUploaderContent = () => {
     switch (objUploadStatus) {
       case UploaderState.ready:
@@ -220,7 +268,7 @@ export default function UploadModal({
           <>
             <canvas
               {...{
-                className: "object-preview-canvas",
+                className: "object-preview-canvas m-auto",
                 ref: objPreviewRef,
               }}></canvas>
             <Input
@@ -232,6 +280,27 @@ export default function UploadModal({
                 value: title,
               }}
             />
+
+            {isCharacter ? (
+              <>
+                <label
+                  className="mb-2 mt-3 block"
+                  htmlFor="upload-modal-animation-type-select">
+                  Animation type
+                </label>
+                <Select
+                  {...{
+                    id: "upload-modal-animation-type-select",
+                    options: animationOptions,
+                    onChange: (value: string) => {
+                      animationTypeSet(value);
+                    },
+                    placeholder: "Select an animation type (optional)",
+                    value: animationType,
+                  }}
+                />
+              </>
+            ) : null}
             <div className="mt-6 flex justify-end gap-2">
               <Button
                 {...{
@@ -245,7 +314,7 @@ export default function UploadModal({
               </Button>
               <Button
                 {...{
-                  onClick: () => uploadAsset(targetNode),
+                  onClick: () => uploadAsset(),
                 }}>
                 Upload
               </Button>
@@ -361,8 +430,12 @@ export default function UploadModal({
     <TransitionDialogue
       {...{
         isOpen,
-        onClose,
-        title: "Upload",
+        onClose: () => {
+          closeModal();
+          onClose();
+          resetModalState();
+        },
+        title: `Upload ${isCharacter ? "Character" : "Object"}`,
       }}>
       {objUploaderContent()}
     </TransitionDialogue>
