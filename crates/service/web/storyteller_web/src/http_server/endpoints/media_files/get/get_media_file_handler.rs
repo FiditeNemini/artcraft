@@ -128,6 +128,9 @@ pub struct MediaFileInfo {
   /// the media file APIs.
   pub is_emulated_media_file: bool,
 
+  /// Whether the media file is featured by staff (the featured_items API) or not.
+  pub is_featured: bool,
+
   /// Statistics about the media file
   pub stats: SimpleEntityStats,
 
@@ -368,6 +371,7 @@ async fn modern_media_file_lookup(
       maybe_original_filename: result.maybe_origin_filename,
       maybe_duration_millis: result.maybe_duration_millis,
       is_emulated_media_file: false,
+      is_featured: result.is_featured,
       stats: SimpleEntityStats {
         positive_rating_count: result.maybe_ratings_positive_count.unwrap_or(0),
         bookmark_count: result.maybe_bookmark_count.unwrap_or(0),
@@ -455,6 +459,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_original_filename: None,
       maybe_duration_millis: None,
       is_emulated_media_file: true,
+      is_featured: false,
       stats: SimpleEntityStats {
         positive_rating_count: 0,
         bookmark_count: 0,

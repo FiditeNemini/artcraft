@@ -22,6 +22,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
+use crate::helpers::boolean_converters::i64_to_bool;
 
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
@@ -87,6 +88,8 @@ pub struct MediaFile {
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
+
+  pub is_featured: bool,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -169,6 +172,8 @@ pub struct MediaFileRaw {
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
 
+  pub is_featured: i64,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -242,6 +247,7 @@ pub async fn get_media_file(
     maybe_ratings_positive_count: record.maybe_ratings_positive_count,
     maybe_ratings_negative_count: record.maybe_ratings_negative_count,
     maybe_bookmark_count: record.maybe_bookmark_count,
+    is_featured: i64_to_bool(record.is_featured),
     created_at: record.created_at,
     updated_at: record.updated_at,
   }))
@@ -312,6 +318,8 @@ SELECT
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
     entity_stats.bookmark_count as maybe_bookmark_count,
 
+    featured_items.entity_token IS NOT NULL AS is_featured,
+
     m.created_at,
     m.updated_at
 
@@ -331,6 +339,10 @@ LEFT OUTER JOIN entity_stats
     AND entity_stats.entity_token = m.token
 LEFT OUTER JOIN prompts
     ON prompts.token = m.maybe_prompt_token
+LEFT OUTER JOIN featured_items
+    ON featured_items.entity_type = 'media_file'
+    AND featured_items.entity_token = m.token
+    AND featured_items.deleted_at IS NULL
 WHERE
     m.token = ?
         "#,
@@ -405,6 +417,8 @@ SELECT
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
     entity_stats.bookmark_count as maybe_bookmark_count,
 
+    featured_items.entity_token IS NOT NULL AS is_featured,
+
     m.created_at,
     m.updated_at
 
@@ -424,6 +438,10 @@ LEFT OUTER JOIN entity_stats
     AND entity_stats.entity_token = m.token
 LEFT OUTER JOIN prompts
     ON prompts.token = m.maybe_prompt_token
+LEFT OUTER JOIN featured_items
+    ON featured_items.entity_type = 'media_file'
+    AND featured_items.entity_token = m.token
+    AND featured_items.deleted_at IS NULL
 WHERE
     m.token = ?
     AND m.user_deleted_at IS NULL
