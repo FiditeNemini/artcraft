@@ -19,8 +19,7 @@ export interface MediaFile {
   maybe_creator_user: UserDetailsLight | null;
   maybe_prompt_token: string | null;
   creator_set_visibility: string;
-  created_at: Date;
-  updated_at: Date;
+  is_featured: boolean;
   maybe_model_weight_info: {
     title: string;
     weight_token: string;
@@ -36,6 +35,8 @@ export interface MediaFile {
     },
     maybe_cover_image_public_bucket_path: string | null
   };
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface GetMediaRequest {}

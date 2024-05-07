@@ -37,6 +37,7 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
+import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
@@ -104,7 +105,7 @@ export default function MediaPage() {
   const deleteMedia = () => remove(!!user?.can_ban_users);
 
   const handleFeatureMedia = async () => {
-    setFeatureMedia(true);
+    setFeatureMedia(!mediaFile?.is_featured);
   }
 
   const setFeatureMedia = async (setFeatured: boolean) => {
@@ -116,7 +117,16 @@ export default function MediaPage() {
       entity_type: "media_file",
       entity_token: mediaFile.token
     }
-    await CreateFeaturedItem("", request);
+
+    // NB: Victor, I don't know how to re-query media with the media context thing. :(
+    // Sorry, I'm forcing a page reload instead. I know this sucks.
+    if (setFeatured) {
+      await CreateFeaturedItem("", request);
+      window.location.reload();
+    } else {
+      await DeleteFeaturedItem("", request);
+      window.location.reload();
+    }
   }
 
   const copyToClipboard = async (
@@ -859,7 +869,7 @@ export default function MediaPage() {
                       full={true}
                       variant="secondary"
                       icon={faStarShooting}
-                      label="Set Featured"
+                      label={mediaFile?.is_featured ? "Remove Featured" : "Set Featured"}
                       onClick={handleFeatureMedia}
                     />
                   </div>
