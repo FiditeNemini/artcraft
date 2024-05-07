@@ -178,7 +178,13 @@ pub async fn upload_new_engine_asset_media_file_handler(
   let maybe_duration_millis = form.maybe_duration_millis
       .map(|duration| duration.0);
 
-  let maybe_animation_type = form.maybe_animation_type.map(|t| t.0);
+  let mut maybe_animation_type = form.maybe_animation_type
+      .map(|t| t.0);
+
+  if engine_category == MediaFileEngineCategory::Expression {
+    // NB: Expressions are exclusively ArKit for now (and probably well into the future).
+    maybe_animation_type = Some(MediaFileAnimationType::ArKit);
+  }
 
   let maybe_title = form.maybe_title
       .map(|title| title.trim().to_string())
@@ -226,6 +232,16 @@ pub async fn upload_new_engine_asset_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
+  match maybe_file_extension {
+    Some("csv") => {
+      let category = form.engine_category.0;
+      if category != MediaFileEngineCategory::Expression {
+        return Err(MediaFileUploadError::BadInput("CSV files are only allowed for expressions.".to_string()));
+      }
+    }
+    _ => {} // Allowed
+  }
+
   let (suffix, media_file_type, mimetype) = match maybe_file_extension {
     None => {
       return Err(MediaFileUploadError::BadInput("no file extension".to_string()));
@@ -239,7 +255,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
     Some("csv") => (".csv", MediaFileType::Vmd, "application/octet-stream"),
     _ => {
       return Err(MediaFileUploadError::BadInput(
-        "unsupported file extension. Must be bvh, glb, csv, gltf, or fbx.".to_string()));
+        "unsupported file extension. Must be bvh, glb, gltf, fbx, or csv (for expressions).".to_string()));
     }
   };
 
