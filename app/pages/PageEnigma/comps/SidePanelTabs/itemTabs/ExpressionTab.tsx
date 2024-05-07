@@ -126,7 +126,7 @@ export const ExpressionTab = () => {
         onClose={() => setOpen(false)}
         onSuccess={refetchExpressions}
         isOpen={open}
-        fileTypes={["GLB"]}
+        fileTypes={["CSV"]}
         title="Upload Expression"
         typeOptions={[{ ARKit: MediaFileAnimationType.ArKit }]}
         type={MediaFileEngineCategory.Expression}
