@@ -17,6 +17,7 @@ import { CameraHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/Camer
 import { ObjectsHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/ObjectsHeader";
 import { CharacterHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CharacterHeader";
 import { environmentVariables } from "~/store";
+import { LipSyncSubHeader } from "./LipSyncSubHeader";
 
 export const RowHeaders = () => {
   useSignals();
@@ -50,10 +51,11 @@ export const RowHeaders = () => {
           return (
             <div
               key={character.object_uuid}
-              className="mb-4 w-full rounded-l-lg bg-character-groupBg"
-              style={{
-                height: environmentVariables.value.EXPRESSIONS ? 247 : 199,
-              }}>
+              className="mb-4 w-full rounded-l-lg bg-character-groupBg pb-2"
+              // style={{
+              //   height: environmentVariables.value.EXPRESSIONS ? 247 : 199,
+              // }}
+            >
               <div className="h-[47px] text-xs font-medium text-white">
                 <div
                   className={[
@@ -74,23 +76,7 @@ export const RowHeaders = () => {
                   Expression
                 </div>
               )}
-              <div className="flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                <div className="flex gap-3">
-                  Lip Sync
-                  <button
-                    className="text-md text-white transition-colors duration-100 hover:text-white/80"
-                    onClick={() => toggleLipSyncMute(character.object_uuid)}>
-                    {character.muted ? (
-                      <FontAwesomeIcon
-                        icon={faVolumeSlash}
-                        className="text-brand-primary transition-colors duration-100 hover:text-brand-primary/80"
-                      />
-                    ) : (
-                      <FontAwesomeIcon icon={faVolume} />
-                    )}
-                  </button>
-                </div>
-              </div>
+              <LipSyncSubHeader character={character}/>
             </div>
           );
         })}

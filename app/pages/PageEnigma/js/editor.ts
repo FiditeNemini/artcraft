@@ -558,6 +558,25 @@ class Editor {
     });
   }
 
+  isObjectLipsync(object_uuid: string) {
+    let object = this.activeScene.get_object_by_uuid(object_uuid);
+    let hasLipsync = false;
+    if(object){
+      object.traverse((c: THREE.Object3D) => {
+        if (c instanceof THREE.Mesh) {
+          if (c.morphTargetInfluences && c.morphTargetDictionary) {
+            const blendShapeIndexE = c.morphTargetDictionary["E"];
+            console.log(c.morphTargetDictionary, blendShapeIndexE)
+            if (blendShapeIndexE !== null) {
+              hasLipsync = true;
+            }
+          }
+        }
+      });
+    }
+    return hasLipsync;
+  }
+
   isObjectLocked(object_uuid: string) {
     let object = this.activeScene.get_object_by_uuid(object_uuid);
     if(object){

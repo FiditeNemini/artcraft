@@ -11,6 +11,7 @@ import { CharacterTrack, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 import { AddToast, ToasterContext } from "~/contexts/ToasterContext";
+import { EngineContext } from "~/contexts/EngineContext";
 import { environmentVariables } from "~/store";
 
 function buildUpdaters(
@@ -69,6 +70,8 @@ interface Props {
 
 export const Character = ({ character }: Props) => {
   const { addToast } = useContext(ToasterContext);
+  const editorEngine = useContext(EngineContext);
+
   const {
     updateClipLipSync,
     updateClipPosition,
@@ -148,13 +151,15 @@ export const Character = ({ character }: Props) => {
             type={ClipType.EXPRESSION}
           />
         )}
-        <TrackClips
-          id={character.object_uuid}
-          clips={lipSyncClips}
-          updateClip={updateClipLipSync}
-          group={ClipGroup.CHARACTER}
-          type={ClipType.AUDIO}
-        />
+        {editorEngine && editorEngine.isObjectLipsync(character.object_uuid) && 
+          <TrackClips
+            id={character.object_uuid}
+            clips={lipSyncClips}
+            updateClip={updateClipLipSync}
+            group={ClipGroup.CHARACTER}
+            type={ClipType.AUDIO}
+          />
+        }
       </div>
     </div>
   );
