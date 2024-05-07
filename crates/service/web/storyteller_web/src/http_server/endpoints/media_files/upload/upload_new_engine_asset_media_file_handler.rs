@@ -236,6 +236,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
     Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
     Some("pmd") => (".pmd", MediaFileType::Pmd, "application/octet-stream"),
     Some("vmd") => (".vmd", MediaFileType::Vmd, "application/octet-stream"),
+    Some("csv") => (".csv", MediaFileType::Vmd, "application/octet-stream"),
     _ => {
       return Err(MediaFileUploadError::BadInput(
         "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
