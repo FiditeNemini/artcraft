@@ -20,32 +20,41 @@ export const Prompts = ({ selection }: Props) => {
   const [textBufferPositive, setTextBufferPositive] = useState("");
   const [textBufferNegative, setTextBufferNegative] = useState("");
 
+  const [isUserInputPositive, setIsUserInputPositive] = useState(false);
+  const [isUserInputNegative, setIsUserInputNegative] = useState(false);
+
   useEffect(() => {
     if (editorEngine === null) {
       return;
     }
-    const randomIndexPositive = Math.floor(
-      Math.random() * RandomTextsPositive[selection].length,
-    );
-    const randomTextPositive =
-      RandomTextsPositive[selection][randomIndexPositive];
-    editorEngine.positive_prompt = randomTextPositive;
-    setTextBufferPositive(randomTextPositive);
 
-    const randomIndexNegative = Math.floor(
-      Math.random() * RandomTextsNegative[selection].length,
-    );
-    const randomTextNegative =
-      RandomTextsNegative[selection][randomIndexNegative];
-    editorEngine.negative_prompt = randomTextNegative;
-    setTextBufferNegative(randomTextNegative);
-  }, [selection, editorEngine]);
+    if (!isUserInputPositive) {
+      const randomIndexPositive = Math.floor(
+        Math.random() * RandomTextsPositive[selection].length,
+      );
+      const randomTextPositive =
+        RandomTextsPositive[selection][randomIndexPositive];
+      editorEngine.positive_prompt = randomTextPositive;
+      setTextBufferPositive(randomTextPositive);
+    }
+
+    if (!isUserInputNegative) {
+      const randomIndexNegative = Math.floor(
+        Math.random() * RandomTextsNegative[selection].length,
+      );
+      const randomTextNegative =
+        RandomTextsNegative[selection][randomIndexNegative];
+      editorEngine.negative_prompt = randomTextNegative;
+      setTextBufferNegative(randomTextNegative);
+    }
+  }, [selection, editorEngine, isUserInputPositive, isUserInputNegative]);
 
   const onChangeHandlerNegative = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (editorEngine === null) {
       console.log("Editor is null");
       return;
     }
+    setIsUserInputNegative(true);
     editorEngine.negative_prompt = event.target.value;
     setTextBufferNegative(event.target.value);
   };
@@ -55,6 +64,7 @@ export const Prompts = ({ selection }: Props) => {
       console.log("Editor is null");
       return;
     }
+    setIsUserInputPositive(true);
     editorEngine.positive_prompt = event.target.value;
     setTextBufferPositive(event.target.value);
   };
@@ -67,6 +77,7 @@ export const Prompts = ({ selection }: Props) => {
     if (editorEngine !== null) {
       editorEngine.positive_prompt = randomText;
     }
+    setIsUserInputPositive(false);
     setTextBufferPositive(randomText);
   };
 
@@ -78,6 +89,7 @@ export const Prompts = ({ selection }: Props) => {
     if (editorEngine !== null) {
       editorEngine.negative_prompt = randomText;
     }
+    setIsUserInputNegative(false);
     setTextBufferNegative(randomText);
   };
 
