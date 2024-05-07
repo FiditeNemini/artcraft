@@ -19,6 +19,7 @@ use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCat
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
 use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
@@ -37,10 +38,10 @@ use crate::validations::validate_idempotency_token_format::validate_idempotency_
 
 /// Form-multipart request fields.
 ///
-/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadAudioMediaFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
+/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadNewVideoMediaFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
-pub struct UploadAudioMediaFileForm {
+pub struct UploadNewVideoMediaFileForm {
   /// UUID for request idempotency
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = String, format = Binary)]
@@ -57,6 +58,11 @@ pub struct UploadAudioMediaFileForm {
   #[schema(value_type = Option<String>, format = Binary)]
   maybe_title: Option<Text<String>>,
 
+  /// Optional: Style transfer style used. See `StyleTransferName` for possible values.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<StyleTransferName>, format = Binary)]
+  maybe_style_name: Option<Text<StyleTransferName>>,
+
   /// Optional: Visibility of the scene
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<Visibility>, format = Binary)]
@@ -65,36 +71,25 @@ pub struct UploadAudioMediaFileForm {
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
 #[derive(Serialize, ToSchema)]
-pub struct UploadAudioMediaFileSuccessResponse {
+pub struct UploadNewVideoMediaFileSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
 
 static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   HashSet::from([
-    // Audio
-    "audio/aac",
-    "audio/m4a",
-    "audio/mpeg",
-    "audio/ogg",
-    "audio/opus",
-    "audio/x-flac",
-    "audio/x-wav",
-    // Mixed
-    "audio/mp4", // iPhone seems to upload these as audio
     // Video
-    "video/mp4", // TODO(bt,2024-05-01): Do we want to allow these as audio?
-    "video/webm", // TODO(bt,2024-05-01): Do we want to allow these as audio?
+    "video/mp4", // NB: Only mp4 for now.
   ])
 });
 
-/// This endpoint is for uploading audio files.
+/// This endpoint is for uploading video files.
 #[utoipa::path(
   post,
   tag = "Media Files",
-  path = "/v1/media_files/upload/audio",
+  path = "/v1/media_files/upload/new_video",
   responses(
-    (status = 200, description = "Success Update", body = UploadAudioMediaFileSuccessResponse),
+    (status = 200, description = "Success Update", body = UploadNewVideoMediaFileSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileUploadError),
     (status = 401, description = "Not authorized", body = MediaFileUploadError),
     (status = 429, description = "Too many requests", body = MediaFileUploadError),
@@ -102,15 +97,15 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   ),
   params(
     (
-      "request" = UploadAudioMediaFileForm,
-      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadAudioMediaFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
+      "request" = UploadNewVideoMediaFileForm,
+      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadNewVideoMediaFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
     ),
   )
 )]
-pub async fn upload_audio_media_file_handler(
+pub async fn upload_new_video_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
-  MultipartForm(mut form): MultipartForm<UploadAudioMediaFileForm>,
+  MultipartForm(mut form): MultipartForm<UploadNewVideoMediaFileForm>,
 ) -> Result<HttpResponse, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
@@ -220,57 +215,11 @@ pub async fn upload_audio_media_file_handler(
 
   // ==================== DURATION DETECTION ==================== //
 
-  let do_audio_decode = match mimetype.as_ref() {
-    // TODO: Revisit when Safari can send us this metadata consistently
-    "audio/mp4" | "video/mp4" => false,
-    "audio/opus" => {
-      // TODO/FIXME(bt, 2023-05-19): Symphonia is currently broken for Firefox's opus.
-      //  We're on an off-master branch that may resolve the problem in the future, but for now
-      //  it panics as follows:
-      //
-      //   [2023-05-19T10:25:34Z INFO  symphonia_core::probe] found a possible format marker within [4f, 67, 67, 53, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, d4, c5] @ 0+2 bytes.
-      //   [2023-05-19T10:25:34Z INFO  symphonia_core::probe] found the format marker [4f, 67, 67, 53] @ 0+2 bytes.
-      //   [2023-05-19T10:25:34Z DEBUG symphonia_format_ogg::page] grow page buffer to 8192 bytes
-      //   [2023-05-19T10:25:34Z INFO  symphonia_format_ogg::demuxer] starting new physical stream
-      //   [2023-05-19T10:25:34Z INFO  symphonia_format_ogg::demuxer] selected opus mapper for stream with serial=0x19aac5d4
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Probed!
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Find audio track...
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Found audio track (maybe)
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Maybe track duration: None
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Maybe codec short name: Some("opus")
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Opus handler
-      //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Media source stream
-      //   [2023-05-19T10:25:34Z INFO  media::decode_webm_opus_info] decode_mkv : options...
-      //   [2023-05-19T10:25:34Z INFO  media::decode_webm_opus_info] decode_mkv : try_read...
-      //   [2023-05-19T10:25:34Z DEBUG symphonia_format_mkv::ebml] element with tag: 4F67
-      //   thread 'actix-rt|system:0|arbiter:1' panicked at 'assertion failed: `(left == right)`
-      //     left: `Unknown`,
-      //    right: `Ebml`: EBML element type must be checked before calling this function', /Users/bt/.cargo/git/checkouts/symphonia-8fbe6c90fc095688/e1a7009/symphonia-format-mkv/src/ebml.rs:335:9
-      false
-    }
-    // Also, don't decode images
-    "image/jpeg" => false,
-    "image/png" => false,
-    "image/webp" => false,
-    _ => true,
-  };
-
-  let mut maybe_duration_millis = None;
-  let mut maybe_codec_name = None;
-
-  if do_audio_decode {
-    let basic_info = decode_basic_audio_bytes_info(
-      file_bytes.as_ref(),
-      Some(&mimetype),
-      None
-    ).map_err(|e| {
-      warn!("file decoding error: {:?}", e);
-      MediaFileUploadError::BadInput("could not decode file".to_string())
-    })?;
-
-    maybe_duration_millis = basic_info.duration_millis;
-    maybe_codec_name = basic_info.codec_name;
-  }
+  let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
+      .map_err(|err| {
+        warn!("Error reading mp4 info: {:?}", err);
+        MediaFileUploadError::ServerError
+      })?;
 
   // ==================== OTHER FILE METADATA ==================== //
 
@@ -302,7 +251,7 @@ pub async fn upload_audio_media_file_handler(
 
   // ==================== UPLOAD AND SAVE ==================== //
 
-  const PREFIX : Option<&str> = Some("aud_");
+  const PREFIX : Option<&str> = Some("video_");
 
   let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(&extension));
 
@@ -319,8 +268,8 @@ pub async fn upload_audio_media_file_handler(
       })?;
 
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: Some(MediaFileClass::Audio),
-    media_file_type: MediaFileType::Audio,
+    maybe_media_class: Some(MediaFileClass::Video),
+    media_file_type: MediaFileType::Video,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
@@ -330,7 +279,7 @@ pub async fn upload_audio_media_file_handler(
     maybe_animation_type: None,
     maybe_mime_type: Some(&mimetype),
     file_size_bytes: file_size_bytes as u64,
-    maybe_duration_millis,
+    maybe_duration_millis:  Some(mp4_info.duration_millis as u64),
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
@@ -346,7 +295,7 @@ pub async fn upload_audio_media_file_handler(
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  let response = UploadAudioMediaFileSuccessResponse {
+  let response = UploadNewVideoMediaFileSuccessResponse {
     success: true,
     media_file_token: token,
   };

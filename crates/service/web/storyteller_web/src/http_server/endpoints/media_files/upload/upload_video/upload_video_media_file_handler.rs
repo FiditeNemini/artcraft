@@ -40,6 +40,8 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   ])
 });
 
+/// DEPRECATED: Use the "new video" endpoint instead.
+#[deprecated]
 #[utoipa::path(
   post,
   tag = "Media Files",

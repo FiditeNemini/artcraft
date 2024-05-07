@@ -42,6 +42,8 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   ])
 });
 
+/// DEPRECATED: Use one of the various specialized upload endpoints instead.
+#[deprecated]
 #[utoipa::path(
   post,
   tag = "Media Files",
