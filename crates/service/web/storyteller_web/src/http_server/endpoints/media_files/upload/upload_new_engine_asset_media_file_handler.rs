@@ -239,7 +239,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
     Some("csv") => (".csv", MediaFileType::Vmd, "application/octet-stream"),
     _ => {
       return Err(MediaFileUploadError::BadInput(
-        "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
+        "unsupported file extension. Must be bvh, glb, csv, gltf, or fbx.".to_string()));
     }
   };
 
