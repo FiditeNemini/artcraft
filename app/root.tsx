@@ -100,7 +100,6 @@ export default function App() {
 
   useEffect(() => {
     environmentVariables.value = data.ENV;
-    console.log(data.ENV);
   }, [data]);
 
   return (

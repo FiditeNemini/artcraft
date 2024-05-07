@@ -19,7 +19,8 @@ export interface GetMediaParams {
     | "character"
     | "animation"
     | "object"
-    | "skybox";
+    | "skybox"
+    | "expression";
 }
 
 export const GetMediaByUser = MakeRequest<

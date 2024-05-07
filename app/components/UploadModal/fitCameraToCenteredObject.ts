@@ -3,10 +3,10 @@ import * as THREE from "three";
 // from here https://wejn.org/2020/12/cracking-the-threejs-object-fitting-nut/
 
 export const fitCameraToCenteredObject = function (
-  camera,
-  object,
-  offset,
-  orbitControls,
+  camera: THREE.PerspectiveCamera,
+  object: THREE.Object3D<THREE.Object3DEventMap>,
+  offset?: number,
+  orbitControls?,
 ) {
   const boundingBox = new THREE.Box3();
   boundingBox.setFromObject(object);

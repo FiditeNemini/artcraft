@@ -119,6 +119,7 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     );
 
     if (clipOffset + (dragItem.value!.length ?? 0) > filmLength.value * 60) {
+      DndAsset.notDropText = "Item is longer than the film length";
       canDrop.value = false;
       return;
     }

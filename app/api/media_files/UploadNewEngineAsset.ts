@@ -21,6 +21,7 @@ export enum MediaFileAnimationType {
   MoveAiArKit = "move_ai_ar_kit",
   Rigify = "rigify",
   RigifyArKit = "rigify_ar_kit",
+  Rokoko = "rokoko",
 }
 
 export interface UploadNewEngineAssetRequest {
@@ -29,6 +30,7 @@ export interface UploadNewEngineAssetRequest {
   maybe_animation_type: MediaFileAnimationType;
   maybe_title?: string;
   maybe_visibility?: "public" | "private";
+  maybe_duration_millis?: number;
   uuid_idempotency_token?: string;
 }
 

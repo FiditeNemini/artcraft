@@ -6,6 +6,21 @@ export enum MediaFileEngineCategory {
   Animation = "animation",
   Object = "object",
   Skybox = "skybox",
+  Expression = "expression",
+}
+
+export enum MediaFileAnimationType {
+  ar_kit = "ar_kit",
+  miku_miku_dance = "miku_miku_dance",
+  miku_miku_dance_ar_kit = "miku_miku_dance_ar_kit",
+  mixamo = "mixamo",
+  mixamo_ar_kit = "mixamo_ar_kit",
+  mocap_net = "mocap_net",
+  mocap_net_ar_kit = "mocap_net_ar_kit",
+  move_ai = "move_ai",
+  move_ai_ar_kit = "move_ai_ar_kit",
+  rigify = "rigify",
+  rigify_ar_kit = "rigify_ar_kit",
 }
 
 export enum MediaFileSubtype {
@@ -35,15 +50,17 @@ export enum MediaFileSubtype {
 }
 
 export interface UploadEngineAssetRequest {
-  file: File;
-  media_file_subtype?: MediaFileSubtype;
-  title?: string;
   engine_category: MediaFileEngineCategory;
+  file: File;
+  maybe_animation_type: MediaFileAnimationType | null;
+  maybe_title?: string;
+  maybe_visibility?: string;
   uuid_idempotency_token?: string;
 }
 
 export interface UploadEngineAssetResponse {
   media_file_token: string;
+  engine_category: string;
   success: boolean;
 }
 

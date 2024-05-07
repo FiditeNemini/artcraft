@@ -484,26 +484,7 @@ export const audioItems = signal<AudioMediaItem[]>([
   },
 ]);
 
-export const expressionItems = signal<MediaItem[]>([
-  {
-    version: 1,
-    media_id: "m_yzreg1494d08aepezj74607d2ascep",
-    type: AssetType.EXPRESSION,
-    length: 100,
-    name: "Smile",
-    thumbnail: "/resources/characters/img04.png",
-    isMine: true,
-  },
-  {
-    version: 1,
-    media_id: "m_qepzjytd4ahd5askdt2ngrwzj2aa3f",
-    type: AssetType.EXPRESSION,
-    length: 100,
-    name: "Frown",
-    thumbnail: "/resources/characters/img07.png",
-    isBookmarked: true,
-  },
-]);
+export const expressionItems = signal<MediaItem[]>([]);
 
 export const cameraItems = signal<MediaItem[]>([
   {
