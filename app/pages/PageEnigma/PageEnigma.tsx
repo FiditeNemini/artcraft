@@ -23,7 +23,7 @@ export const PageEnigma = ({
       </EngineProvider>
       <LoadingBar
         id="editor-loading-bar"
-        wrapperClassName="absolute top-0 left-0"
+        wrapperClassName="absolute top-0 left-0 z-20"
         innerWrapperClassName="max-w-screen-sm"
       />
     </TrackProvider>
