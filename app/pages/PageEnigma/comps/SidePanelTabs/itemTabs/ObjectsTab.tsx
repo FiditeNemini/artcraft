@@ -18,6 +18,10 @@ import {
   GetMediaListResponse,
 } from "~/api/media_files/GetMediaByUser";
 import {
+  ListFeaturedMediaFiles,
+  ListFeaturedMediaFilesResponse,
+} from "~/api/media_files/ListFeaturedMediaFiles";
+import {
   AssetFilterOption,
   AssetType,
   MediaItem,
@@ -41,6 +45,12 @@ export enum FetchStatus {
   error,
 }
 
+export enum Filters {
+  Featured,
+  Mine,
+  Bookmarked,
+}
+
 export const ObjectsTab = ({ type }: Props) => {
   useSignals();
   const currentTab = selectedTab?.value?.value || "";
@@ -57,6 +67,7 @@ export const ObjectsTab = ({ type }: Props) => {
   });
   const [page, pageSet] = useState(0);
   const [pageCount, pageCountSet] = useState(0);
+  const [selectedFilter, selectedFilterSet] = useState(Filters.Featured);
 
   const { authState } = useContext(AuthenticationContext);
 
@@ -71,6 +82,10 @@ export const ObjectsTab = ({ type }: Props) => {
     statusSet(FetchStatus.ready);
   };
 
+  const selectedFetcher = [ListFeaturedMediaFiles, GetMediaByUser][
+    selectedFilter
+  ];
+
   useEffect(() => {
     // we need to cache the current tab because we don't unmount components
     if (cachedTab !== currentTab) {
@@ -80,7 +95,7 @@ export const ObjectsTab = ({ type }: Props) => {
     }
     if (status === FetchStatus.ready) {
       statusSet(FetchStatus.in_progress);
-      GetMediaByUser(
+      selectedFetcher(
         authState?.userInfo?.username || "",
         {},
         {
@@ -89,7 +104,7 @@ export const ObjectsTab = ({ type }: Props) => {
           page_index: page,
           // page_size: 5,
         },
-      ).then((res: GetMediaListResponse) => {
+      ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
         if (res.success && res.results) {
           statusSet(FetchStatus.success);
           objectsSet({
@@ -140,43 +155,25 @@ export const ObjectsTab = ({ type }: Props) => {
               />
               <div>
                 <div className="flex gap-2 overflow-x-auto overflow-y-hidden px-4">
-                  <button
-                    className={twMerge(
-                      "filter-tab",
-                      assetFilter.value === AssetFilterOption.ALL
-                        ? "active"
-                        : "",
-                      "disabled",
-                    )}
-                    onClick={() => (assetFilter.value = AssetFilterOption.ALL)}>
-                    All
-                  </button>
-                  <button
-                    className={twMerge(
-                      "filter-tab",
-                      assetFilter.value === AssetFilterOption.MINE
-                        ? "active"
-                        : "",
-                      "disabled",
-                    )}
-                    onClick={() => (assetFilter.value = AssetFilterOption.MINE)}
-                    disabled={!items.value.some((item) => item.isMine)}>
-                    My {type === AssetType.CHARACTER ? "Characters" : "Objects"}
-                  </button>
-                  <button
-                    className={twMerge(
-                      "filter-tab",
-                      assetFilter.value === AssetFilterOption.BOOKMARKED
-                        ? "active"
-                        : "",
-                      "disabled",
-                    )}
-                    onClick={() =>
-                      (assetFilter.value = AssetFilterOption.BOOKMARKED)
-                    }
-                    disabled={!items.value.some((item) => item.isBookmarked)}>
-                    Bookmarked
-                  </button>
+                  {Object.keys(Filters)
+                    .filter((filterKey) => isNaN(Number(filterKey)))
+                    .map((filterKey, key) => {
+                      const isBookmarks = key === Filters.Bookmarked;
+                      return (
+                        <button
+                          key={key}
+                          {...{
+                            className: `filter-tab${selectedFilter === key ? " active" : ""}`,
+                            ...(isBookmarks ? { disabled: true } : {}),
+                            onClick: () => {
+                              reFetchList();
+                              selectedFilterSet(key);
+                            },
+                          }}>
+                          {filterKey}
+                        </button>
+                      );
+                    })}
                 </div>
               </div>
               <div {...{ className: "w-full px-4" }}>
@@ -203,9 +200,11 @@ export const ObjectsTab = ({ type }: Props) => {
                   }}
                   debug="objects tab"
                   items={[
-                    ...(type !== AssetType.CHARACTER
-                      ? shapeItems.value
-                      : characterItems.value),
+                    ...(selectedFilter === Filters.Featured
+                      ? type !== AssetType.CHARACTER
+                        ? shapeItems.value
+                        : characterItems.value
+                      : []),
                     ...items.value,
                   ]}
                   assetFilter={assetFilter.value}
