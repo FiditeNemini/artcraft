@@ -36,7 +36,7 @@ export default function MediaTab() {
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [mediaType, mediaTypeSet] = useState(
-    urlQueries.get("filter_media_type") || "all"
+    urlQueries.get("filter_media_type") || "video"
   );
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
