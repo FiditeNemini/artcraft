@@ -1330,6 +1330,10 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...", this.frame_buffer);
+    this.timeline.is_playing = false;
+    this.timeline.scrubber_frame_position = 0;
+    this.timeline.current_time = 0;
+
     if (this.rendering || this.generating_preview) {
       return;
     }
