@@ -49,7 +49,7 @@ import { SceneSignal } from "~/store";
 export type EditorConstructorConfig = {
   dispatchAppUiState: React.Dispatch<AppUiAction>;
   signalScene: (data: any) => void;
-  getSceneSignals: ()=>SceneSignal
+  getSceneSignals: () => SceneSignal;
   authState: AuthState;
 };
 
@@ -510,6 +510,11 @@ class Editor {
       token: undefined,
       ownerToken: this.authState.userInfo?.user_token,
       isModified: false,
+    });
+    Queue.publish({
+      queueName: QueueNames.FROM_ENGINE,
+      action: fromEngineActions.RESET_TIMELINE,
+      data: null,
     });
   }
 

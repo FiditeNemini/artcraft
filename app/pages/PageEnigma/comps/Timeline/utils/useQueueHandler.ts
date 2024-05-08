@@ -58,6 +58,9 @@ export function useQueueHandler() {
         case fromEngineActions.DESELECT_OBJECT:
           selectedObject.value = null;
           break;
+        case fromEngineActions.RESET_TIMELINE:
+          clearExistingData();
+          break;
         case fromEngineActions.SELECT_OBJECT:
           selectedObject.value = {
             type: (data as MediaItem).type,
