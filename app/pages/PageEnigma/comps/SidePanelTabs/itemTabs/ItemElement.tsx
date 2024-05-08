@@ -9,9 +9,8 @@ interface Props {
 
 export const ItemElement = ({ item }: Props) => {
   useSignals();
-  const thumbnail = item.thumbnail
-    ? item.thumbnail
-    : `/resources/images/default-covers/${item.imageIndex || 0}.webp`;
+  const defaultThumb = `/resources/images/default-covers/${item.imageIndex || 0}.webp`;
+  const thumbnail = item.thumbnail ? item.thumbnail : defaultThumb;
 
   return (
     <div
@@ -21,6 +20,9 @@ export const ItemElement = ({ item }: Props) => {
         {...{
           crossOrigin: "anonymous",
           src: thumbnail,
+        }}
+        onError={(e: SyntheticEvent<HTMLDivElement>) => {
+          e.currentTarget.src = defaultThumb;
         }}
         alt={item.name}
         className="aspect-[4.5/5] w-full rounded-t-lg object-cover object-center"
