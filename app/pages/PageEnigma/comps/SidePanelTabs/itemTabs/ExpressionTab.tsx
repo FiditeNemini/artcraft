@@ -6,7 +6,7 @@ import {
 } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button } from "~/components";
+import { Button, FilterButtons } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import UploadModalMovement from "~/components/UploadModalMovement";
@@ -19,11 +19,38 @@ import {
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
+import {
+  ListFeaturedMediaFiles,
+  ListFeaturedMediaFilesResponse,
+} from "~/api/media_files/ListFeaturedMediaFiles";
+
+import { BucketConfig } from "~/api/BucketConfig";
+
+// I know these enums are duplicates, I know they should live elsewhere. They live here for right now -V
+
+export enum Filters {
+  Featured,
+  Mine,
+  Bookmarked,
+}
+
+export enum FetchStatus {
+  paused,
+  // ready triggers a new fetch
+  ready,
+  in_progress,
+  success,
+  error,
+}
 
 export const ExpressionTab = () => {
   useSignals();
   const [open, setOpen] = useState(false);
   const { authState } = useContext(AuthenticationContext);
+  const [selectedFilter, selectedFilterSet] = useState(Filters.Featured);
+
+  const [featured, featuredSet] = useState({ value: [] });
+  const [status, statusSet] = useState(FetchStatus.ready);
 
   const refetchExpressions = useCallback(async () => {
     if (!authState?.userInfo) {
@@ -64,46 +91,65 @@ export const ExpressionTab = () => {
     if (authState?.userInfo && !expressionItems.value.length) {
       refetchExpressions();
     }
-  }, [authState?.userInfo, refetchExpressions]);
+    if (status === FetchStatus.ready) {
+      statusSet(FetchStatus.in_progress);
+      ListFeaturedMediaFiles(
+        "",
+        {},
+        {
+          filter_engine_categories: "expression",
+          // page_index: page,
+          page_size: 100,
+        },
+      ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
+        if (res.success && res.results) {
+          statusSet(FetchStatus.success);
+          featuredSet({
+            value: res.results.map((item) => {
+              const bucketConfig = new BucketConfig();
+              const itemThumb = bucketConfig.getCdnUrl(
+                item.cover_image.maybe_cover_image_public_bucket_path,
+                600,
+                100,
+              );
+              return {
+                colorIndex: item.cover_image.default_cover.color_index,
+                imageIndex: item.cover_image.default_cover.image_index,
+                media_id: item.token,
+                name: item.maybe_title,
+                type: AssetType.OBJECT,
+                version: 1,
+                ...(item.cover_image.maybe_cover_image_public_bucket_path
+                  ? {
+                      thumbnail: itemThumb,
+                    }
+                  : {}),
+              };
+            }),
+            // .filter((item,i) => (item.thumbnail)) disabled for testing for now
+          });
+          // if (res.pagination) {
+          //   pageCountSet(res.pagination.total_page_count);
+          // }
+        }
+      });
+    }
+  }, [authState?.userInfo, refetchExpressions, status]);
 
   return (
     <>
       <TabTitle title="Expressions" />
       <div className="w-full overflow-x-auto overflow-y-hidden">
         <div className="mb-4 flex justify-start gap-2 px-4">
-          <button
-            className={twMerge(
-              "filter-tab",
-              expressionFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (expressionFilter.value = AssetFilterOption.ALL)}>
-            All
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              expressionFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (expressionFilter.value = AssetFilterOption.MINE)}
-            disabled={!expressionItems.value.some((item) => item.isMine)}>
-            My Expressions
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              expressionFilter.value === AssetFilterOption.BOOKMARKED
-                ? "active"
-                : "",
-              "disabled",
-            )}
-            onClick={() =>
-              (expressionFilter.value = AssetFilterOption.BOOKMARKED)
-            }
-            disabled={!expressionItems.value.some((item) => item.isBookmarked)}>
-            Bookmarked
-          </button>
+          <FilterButtons
+            {...{
+              value: selectedFilter,
+              onClick: (e) => {
+                // reFetchList();
+                selectedFilterSet(Number(e.target.value));
+              },
+            }}
+          />
         </div>
       </div>
       <div className="w-full px-4 pb-4">
@@ -117,7 +163,11 @@ export const ExpressionTab = () => {
       </div>
       <div className="h-full w-full overflow-y-auto px-4">
         <ItemElements
-          items={expressionItems.value}
+          items={
+            selectedFilter === Filters.Featured
+              ? featured.value
+              : expressionItems.value
+          }
           assetFilter={expressionFilter.value}
         />
       </div>

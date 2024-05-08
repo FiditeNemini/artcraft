@@ -4,6 +4,7 @@ import { ButtonIcon } from "./ButtonIcon";
 import { ButtonLink } from "./ButtonLink";
 import { ButtonIconSelect } from "./ButtonIconSelect";
 import FileWrapper from "./FileWrapper";
+import FilterButtons from "./FilterButtons";
 import { Input } from "./Input";
 import { InputVector } from "./InputVector";
 import { H1, H2, H3, H4, H5, H6, P, Label, Link } from "./Typography";
@@ -34,6 +35,7 @@ export {
   ButtonIconSelect,
   ErrorDialog,
   FileWrapper,
+  FilterButtons,
   H1,
   H2,
   H3,

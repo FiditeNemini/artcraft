@@ -7,7 +7,7 @@ import {
   shapeItems,
 } from "~/pages/PageEnigma/store";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FileWrapper, Pagination } from "~/components";
+import { Button, FilterButtons, FileWrapper, Pagination } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 // TODO : add in
@@ -102,7 +102,7 @@ export const ObjectsTab = ({ type }: Props) => {
           filter_engine_categories:
             type === AssetType.CHARACTER ? "character" : "object",
           page_index: page,
-          // page_size: 5,
+          page_size: 24,
         },
       ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
         if (res.success && res.results) {
@@ -155,25 +155,15 @@ export const ObjectsTab = ({ type }: Props) => {
               />
               <div>
                 <div className="flex gap-2 overflow-x-auto overflow-y-hidden px-4">
-                  {Object.keys(Filters)
-                    .filter((filterKey) => isNaN(Number(filterKey)))
-                    .map((filterKey, key) => {
-                      const isBookmarks = key === Filters.Bookmarked;
-                      return (
-                        <button
-                          key={key}
-                          {...{
-                            className: `filter-tab${selectedFilter === key ? " active" : ""}`,
-                            ...(isBookmarks ? { disabled: true } : {}),
-                            onClick: () => {
-                              reFetchList();
-                              selectedFilterSet(key);
-                            },
-                          }}>
-                          {filterKey}
-                        </button>
-                      );
-                    })}
+                  <FilterButtons
+                    {...{
+                      value: selectedFilter,
+                      onClick: (e) => {
+                        reFetchList();
+                        selectedFilterSet(Number(e.target.value));
+                      },
+                    }}
+                  />
                 </div>
               </div>
               <div {...{ className: "w-full px-4" }}>
