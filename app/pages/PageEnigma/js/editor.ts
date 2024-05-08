@@ -1280,7 +1280,7 @@ class Editor {
           this.switchCameraView();
         }
         this.activeScene.renderMode(false);
-      }, 0);
+      }, 10);
     }
   }
 
