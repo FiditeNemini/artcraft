@@ -644,6 +644,7 @@ class Editor {
     sceneTitle: string;
     sceneToken?: string;
   }): Promise<string> {
+    this.generating_preview = true; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
@@ -692,6 +693,8 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
+
+    this.generating_preview = false; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
 
     return result;
   }

@@ -109,6 +109,7 @@ export class StoryTellerProxyScene {
           obj.userData["metalness"] = json_object.metalness;
           obj.userData["shininess"] = json_object.shininess;
           obj.userData["specular"] = json_object.specular;
+          this.scene.setColor(obj.uuid, json_object.color);
         }
       }
       this.scene._createGrid();

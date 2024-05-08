@@ -127,7 +127,7 @@ export class APIManager {
       : await uploadNewScene(file, sceneTitle, this.sessionToken);
 
     if (sceneThumbnail) {
-      let image_resp = await this.uploadMedia(sceneThumbnail, "render.png");
+      let image_resp = await this.uploadMediaSceneThumbnail(sceneThumbnail, "render.png");
       if (image_resp["media_file_token"]) {
         let image_token = image_resp["media_file_token"];
         await fetch(uploadThumbnail + uploadSceneResponse["media_file_token"], {
@@ -219,6 +219,37 @@ export class APIManager {
       type: "application/json",
     });
     return file;
+  }
+
+  public async uploadMediaSceneThumbnail(
+    blob: any,
+    fileName: string,
+  ) {
+    const url = `${this.baseUrl}/v1/media_files/upload`;
+    const uuid = uuidv4();
+
+    const formData = new FormData();
+    formData.append("uuid_idempotency_token", uuid);
+    formData.append("file", blob, fileName);
+    formData.append("source", "file");
+    formData.append("type", "video");
+    formData.append("source", "file");
+    const response = await fetch(url, {
+      method: "POST",
+      // credentials: "include",
+      headers: {
+        Accept: "application/json",
+        session: this.sessionToken,
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new APIManagerResponseError("Upload Media Failed to send file");
+    } else {
+      const json_data = await response.json();
+      console.log(`uploadMedia: ${JSON.stringify(json_data)}`);
+      return json_data;
+    }
   }
 
   public async uploadMedia({
