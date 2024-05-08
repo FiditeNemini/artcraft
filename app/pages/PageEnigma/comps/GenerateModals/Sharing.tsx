@@ -23,7 +23,9 @@ interface Props {
 
 export function Sharing({ mediaFile, setMediaFile }: Props) {
   useSignals();
+  console.log(mediaFile);
   const { addToast } = useContext(ToasterContext);
+  const mediaTitle = mediaFile?.maybe_title ?? mediaFile?.token;
   const shareUrl = `https://storyteller.ai/media/${mediaFile?.token || ""}`;
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
@@ -41,7 +43,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
     return (
       <div className="flex items-center gap-2.5">
         <span className="font-xl font-bold">
-          {mediaFile?.maybe_title ?? mediaFile?.token}
+          {mediaTitle}
         </span>
         <span className="text-sm font-medium text-white/60">
           {dayjs(mediaFile?.updated_at).format("MMM DD, YYYY HH:mm:ss")}
@@ -121,7 +123,11 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                downloadFile(downloadLink, addToast);
+                downloadFile({
+                  url: downloadLink,
+                  addToast,
+                  title: mediaTitle
+                });
               }}
               variant="secondary">
               Download
