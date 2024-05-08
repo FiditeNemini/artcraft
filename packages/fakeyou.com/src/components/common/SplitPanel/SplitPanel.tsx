@@ -7,7 +7,7 @@ interface HeaderProps {
   padding?: boolean;
 }
 const Header: React.FC<HeaderProps> = ({ children, padding }) => {
-  const headerClassName = `${padding ? "p-3 p-md-4 py-md-3" : ""}`.trim();
+  const headerClassName = `${padding ? "padding" : ""}`.trim();
   return <div className={headerClassName}>{children}</div>;
 };
 
@@ -16,7 +16,7 @@ interface BodyProps {
   padding?: boolean;
 }
 const Body: React.FC<BodyProps> = ({ children, padding }) => {
-  const bodyClassName = `${padding ? "p-3 p-md-4" : ""}`.trim();
+  const bodyClassName = `${padding ? "padding" : ""}`.trim();
   return <div className={bodyClassName}>{children}</div>;
 };
 
@@ -25,7 +25,7 @@ interface FooterProps {
   padding?: boolean;
 }
 const Footer: React.FC<FooterProps> = ({ children, padding }) => {
-  const footerClassName = `${padding ? "p-3 p-md-4" : ""}`.trim();
+  const footerClassName = `${padding ? "padding" : ""}`.trim();
   return <div className={footerClassName}>{children}</div>;
 };
 

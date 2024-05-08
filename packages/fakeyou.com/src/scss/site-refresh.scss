@@ -46,9 +46,11 @@ styles with important tags:
   .icon-close-button {
     cursor: pointer;
     height: 1.5rem;
-    opacity: .33;
+    opacity: 0.33;
 
-    &:hover { opacity: 1; }
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 
@@ -227,7 +229,7 @@ styles with important tags:
   }
 
   .container {
-    max-width: 1280px !important;
+    max-width: 1600px !important;
   }
 
   .container,
@@ -433,6 +435,37 @@ styles with important tags:
     border: none;
     border-color: transparent !important;
     box-shadow: none !important;
+  }
+
+  //Set Paddings
+  .padding {
+    padding: 1.4rem;
+  }
+
+  .padding-y {
+    padding-top: 1.4rem;
+    padding-bottom: 1.4rem;
+  }
+
+  .padding-x {
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
+  }
+
+  .padding-top {
+    padding-top: 1.4rem;
+  }
+
+  .padding-bottom {
+    padding-bottom: 1.4rem;
+  }
+
+  .padding-left {
+    padding-left: 1.4rem;
+  }
+
+  .padding-right {
+    padding-right: 1.4rem;
   }
 
   .menu {
@@ -1471,7 +1504,7 @@ styles with important tags:
     transition: 0.2s all;
     border-radius: 0.5rem !important;
     border-width: 2px !important;
-    height: 280px;
+    height: 320px;
     overflow: hidden;
     z-index: 2;
 
@@ -1567,6 +1600,39 @@ styles with important tags:
         background-color: $primary;
         opacity: 1;
       }
+    }
+  }
+
+  @media (max-width: 768px) {
+    //Set Paddings
+    .padding {
+      padding: 1rem;
+    }
+
+    .padding-y {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .padding-x {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .padding-top {
+      padding-top: 1rem;
+    }
+
+    .padding-bottom {
+      padding-bottom: 1rem;
+    }
+
+    .padding-left {
+      padding-left: 1rem;
+    }
+
+    .padding-right {
+      padding-right: 1rem;
     }
   }
 }
@@ -1740,7 +1806,16 @@ textarea {
       padding-left: var(--bs-gutter-x, 1.75rem);
       margin-right: auto;
       margin-left: auto;
-      max-width: 1280px;
+      max-width: 1600px;
+      border-radius: 0.5rem;
+    }
+
+    .container-panel-full {
+      padding-right: var(--bs-gutter-x, 1.75rem);
+      padding-left: var(--bs-gutter-x, 1.75rem);
+      width: 100%;
+      margin-right: auto;
+      margin-left: auto;
       border-radius: 0.5rem;
     }
 

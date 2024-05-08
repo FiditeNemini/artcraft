@@ -12,7 +12,7 @@ import Pagination from "components/common/Pagination";
 interface SelectMediaListProps {
   mediaType: string;
   listKey: string;
-  onResultSelect?: (data:{token:string, title:string}) => void;
+  onResultSelect?: (data: { token: string; title: string }) => void;
 }
 
 export default function SelectMediaList({
@@ -35,7 +35,7 @@ export default function SelectMediaList({
     list,
     listSet,
     requestList: true,
-    urlParam: user?.username || ""
+    urlParam: user?.username || "",
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -50,47 +50,48 @@ export default function SelectMediaList({
 
   return (
     <div className="searcher-container in-modal" id={listKey}>
-        <Pagination {...paginationProps} />
-        {media.isLoading ? (
-          <div className="row gx-3 gy-3">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        ) : (
-          <>
-            {media.list.length === 0 && media.status === 3 ? (
-              <div className="text-center mt-4 opacity-75">
-                No media created yet.
-              </div>
-            ) : (
-              <MasonryGrid
-                gridRef={gridContainerRef}
-                onLayoutComplete={() => console.log("Layout complete!")}
-              >
-                {media.list.map((data: MediaFile, key: number) => {
-                  let props = {
-                    data,
-                    showCreator: true,
-                    type: "media",
-                    inSelectModal: true,
-                    onResultSelect,
-                  };
-                  return (
-                    <div
-                      {...{
-                        className: "col-12 col-sm-6 col-xl-4 grid-item",
-                        key,
-                      }}
-                    >
-                      <MediaCards {...{ type: data.media_type, props }} />
-                    </div>
-                  );
-                })}
-              </MasonryGrid>
-            )}
-          </>
-        )}
+      <Pagination {...paginationProps} />
+      {media.isLoading ? (
+        <div className="row gx-3 gy-3">
+          {Array.from({ length: 12 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      ) : (
+        <>
+          {media.list.length === 0 && media.status === 3 ? (
+            <div className="text-center mt-4 opacity-75">
+              No media created yet.
+            </div>
+          ) : (
+            <MasonryGrid
+              gridRef={gridContainerRef}
+              onLayoutComplete={() => console.log("Layout complete!")}
+            >
+              {media.list.map((data: MediaFile, key: number) => {
+                let props = {
+                  data,
+                  showCreator: true,
+                  type: "media",
+                  inSelectModal: true,
+                  onResultSelect,
+                };
+                return (
+                  <div
+                    {...{
+                      className:
+                        "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
+                      key,
+                    }}
+                  >
+                    <MediaCards {...{ type: data.media_type, props }} />
+                  </div>
+                );
+              })}
+            </MasonryGrid>
+          )}
+        </>
+      )}
 
       <div className="d-flex justify-content-end mt-4">
         <Pagination {...paginationProps} />

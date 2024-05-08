@@ -217,22 +217,29 @@ export default function BookmarksTab({ username }: { username: string }) {
                     ratings,
                     showCreator: true,
                     source,
-                    type: data.details?.entity_type === "media_file" ?
-                      "media" : "weights", // this is gross, but I'm replacing all of this anyway -V
+                    type:
+                      data.details?.entity_type === "media_file"
+                        ? "media"
+                        : "weights", // this is gross, but I'm replacing all of this anyway -V
                   };
 
                   return (
                     <div
                       {...{
-                        className: "col-12 col-sm-6 col-xl-4 grid-item",
+                        className:
+                          "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
                         key,
                       }}
                     >
-                     <BookmarksCards {...{
-                        entityType: data.details?.entity_type,
-                        type: data.details.maybe_weight_data?.weight_category || data.details.maybe_media_file_data?.media_type,
-                        props,
-                      }} />
+                      <BookmarksCards
+                        {...{
+                          entityType: data.details?.entity_type,
+                          type:
+                            data.details.maybe_weight_data?.weight_category ||
+                            data.details.maybe_media_file_data?.media_type,
+                          props,
+                        }}
+                      />
                     </div>
                   );
                 })}

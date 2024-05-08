@@ -37,7 +37,7 @@ function Tab({
     <li className="nav-item">
       <NavLink
         to={to}
-        className={"nav-link fs-6 px-3 px-lg-4" + (disabled ? " disabled" : "")}
+        className={"nav-link fs-6 padding" + (disabled ? " disabled" : "")}
         activeClassName="active"
         onClick={onClick}
       >
@@ -54,7 +54,7 @@ function Tab({
 }
 
 function TabContent({ children, padding }: TabContentProps) {
-  const paddingClasses = padding ? "p-3 py-4 p-md-4" : "";
+  const paddingClasses = padding ? "padding" : "";
   return <div className={`tab-content ${paddingClasses}`}>{children}</div>;
 }
 

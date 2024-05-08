@@ -44,7 +44,7 @@ export default function WeightsTab({ username }: { username: string }) {
     addQueries: {
       page_size: urlQueries.get("page_size") || "24",
       ...prepFilter(weightType, "maybe_scoped_weight_type"),
-      ...prepFilter(weightCategory, "maybe_scoped_weight_category")
+      ...prepFilter(weightCategory, "maybe_scoped_weight_category"),
     },
     addSetters: { sdSet, ttsSet, vcSet, weightCategorySet, weightTypeSet },
     debug: "Weights tab",
@@ -220,7 +220,8 @@ export default function WeightsTab({ username }: { username: string }) {
                     return (
                       <div
                         {...{
-                          className: "col-12 col-sm-6 col-xl-4 grid-item",
+                          className:
+                            "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
                           key,
                         }}
                       >
