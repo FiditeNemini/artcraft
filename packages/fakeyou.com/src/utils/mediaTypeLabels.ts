@@ -9,6 +9,7 @@ export const mediaTypeLabels = {
   [MediaFileType.GLB]: "GLB",
   [MediaFileType.GLTF]: "glTF",
   [MediaFileType.SceneRon]: "RON",
+  [MediaFileType.SceneJson]: "Scene",
   [MediaFileType.FBX]: "FBX",
   [MediaFileType.None]: "Unknown",
 };

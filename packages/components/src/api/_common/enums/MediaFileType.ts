@@ -24,5 +24,8 @@ export enum MediaFileType {
   // This is a temporary format that will eventually go away.
   SceneRon = "scene_ron",
 
+  // Engine scene
+  SceneJson = "scene_json",
+
   None = "none",
 }

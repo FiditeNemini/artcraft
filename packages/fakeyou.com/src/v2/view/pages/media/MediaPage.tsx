@@ -106,7 +106,7 @@ export default function MediaPage() {
 
   const handleFeatureMedia = async () => {
     setFeatureMedia(!mediaFile?.is_featured);
-  }
+  };
 
   const setFeatureMedia = async (setFeatured: boolean) => {
     if (mediaFile === undefined) {
@@ -115,8 +115,8 @@ export default function MediaPage() {
 
     const request = {
       entity_type: "media_file",
-      entity_token: mediaFile.token
-    }
+      entity_token: mediaFile.token,
+    };
 
     // NB: Victor, I don't know how to re-query media with the media context thing. :(
     // Sorry, I'm forcing a page reload instead. I know this sucks.
@@ -127,7 +127,7 @@ export default function MediaPage() {
       await DeleteFeaturedItem("", request);
       window.location.reload();
     }
-  }
+  };
 
   const copyToClipboard = async (
     text: string,
@@ -197,16 +197,15 @@ export default function MediaPage() {
           {prompt?.maybe_style_name && (
             <>
               <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                <h6 className="fw-semibold mb-0 flex-grow-1">
-                  Style Name
-                </h6>
+                <h6 className="fw-semibold mb-0 flex-grow-1">Style Name</h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">{STYLES_BY_KEY.get(prompt.maybe_style_name)?.label}</p>
+                <p className="fs-7">
+                  {STYLES_BY_KEY.get(prompt.maybe_style_name)?.label}
+                </p>
               </div>
             </>
           )}
-
         </Panel>
       )}
     </>
@@ -300,8 +299,24 @@ export default function MediaPage() {
             </div>
           </Panel>
         );
+      case MediaFileType.SceneJson:
+        return (
+          <div
+            {...{
+              className:
+                "rounded w-100 h-100 panel d-flex align-items-center justify-content-center p-3",
+            }}
+          >
+            <Button
+              {...{
+                label: "View in engine",
+                href: `https://studio.storyteller.ai/${mediaFile.token}`,
+              }}
+            />
+          </div>
+        );
       default:
-        return <div>Unsupported media type</div>;
+        return <div>Unsupported media typeaaa</div>;
     }
   }
 
@@ -505,30 +520,37 @@ export default function MediaPage() {
   const title = GetMediaFileTitle(mediaFile);
 
   const showEngineCover = () => {
-    const coverMediaPath = mediaFile?.cover_image?.maybe_cover_image_public_bucket_path || "";
+    const coverMediaPath =
+      mediaFile?.cover_image?.maybe_cover_image_public_bucket_path || "";
     if (mediaFile) {
       switch (mediaFile.media_type) {
-         case MediaFileType.BVH:
-         case MediaFileType.GLB:
-         case MediaFileType.GLTF:
-         case MediaFileType.SceneRon: return <WeightCoverImage {...{
-          ...coverMediaPath ? { src: bucketConfig.getGcsUrl(coverMediaPath) } : {},
-          ...viewerCanEdit ? { to: `/edit-cover-image/${ token }` } : {},
-          coverIndex: mediaFile.cover_image.default_cover.image_index,
-         }}/>;
-         default: return null;
+        case MediaFileType.BVH:
+        case MediaFileType.GLB:
+        case MediaFileType.GLTF:
+        case MediaFileType.SceneRon:
+          return (
+            <WeightCoverImage
+              {...{
+                ...(coverMediaPath
+                  ? { src: bucketConfig.getGcsUrl(coverMediaPath) }
+                  : {}),
+                ...(viewerCanEdit ? { to: `/edit-cover-image/${token}` } : {}),
+                coverIndex: mediaFile.cover_image.default_cover.image_index,
+              }}
+            />
+          );
+        default:
+          return null;
       }
     }
-  }
+  };
 
   return (
     <div>
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
-            {
-              showEngineCover()
-            }
+            {showEngineCover()}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">{title}</h1>
@@ -608,7 +630,8 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                { canAccessStudio() && mediaFile?.media_type === MediaFileType.Video ? (
+                {canAccessStudio() &&
+                mediaFile?.media_type === MediaFileType.Video ? (
                   <Button
                     {...{
                       icon: faArrowRightArrowLeft,
@@ -843,7 +866,7 @@ export default function MediaPage() {
                 </div>
               </Panel>
 
-              { viewerCanEdit && (
+              {viewerCanEdit && (
                 <>
                   <div className="d-flex gap-2">
                     <Button
@@ -862,14 +885,18 @@ export default function MediaPage() {
                   </div>
                 </>
               )}
-              { viewerCanMakeFeatured && (
+              {viewerCanMakeFeatured && (
                 <>
                   <div className="d-flex gap-2">
                     <Button
                       full={true}
                       variant="secondary"
                       icon={faStarShooting}
-                      label={mediaFile?.is_featured ? "Remove Featured" : "Set Featured"}
+                      label={
+                        mediaFile?.is_featured
+                          ? "Remove Featured"
+                          : "Set Featured"
+                      }
                       onClick={handleFeatureMedia}
                     />
                   </div>
