@@ -156,12 +156,12 @@ export class TimeLine {
         break;
       case toEngineActions.ADD_OBJECT: {
         const newObject = await this.addObject(data);
-        this.queueNewObjectMessage(newObject, data.media_id);
+        this.queueNewObjectMessage(newObject, data);
         break;
       }
       case toEngineActions.ADD_SHAPE: {
         const newShape = await this.addShape(data);
-        this.queueNewObjectMessage(newShape, data.media_id);
+        this.queueNewObjectMessage(newShape, data);
         break;
       }
       case toEngineActions.ENTER_PREVIEW_STATE:
@@ -244,19 +244,35 @@ export class TimeLine {
 
   queueNewObjectMessage(
     item: THREE.Object3D<THREE.Object3DEventMap>,
-    media_id: string,
+    data: MediaItem,
   ) {
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.ADD_OBJECT,
       data: {
-        media_id: media_id,
+        media_id: data.media_id,
         type: AssetType.OBJECT,
         name: item.name,
         object_uuid: item.uuid,
         version: 1,
       } as MediaItem,
     });
+
+    this.addPlayableClip(
+      new ClipUI(
+        data["version"],
+        ClipType.FAKE,
+        ClipGroup.OBJECT,
+        "Default",
+        data.media_id,
+        item.uuid,
+        item.uuid,
+        item.name,
+        0,
+        0,
+        0,
+      ),
+    );
   }
 
   public getPos() {
@@ -370,9 +386,12 @@ export class TimeLine {
     if (object?.name === this.camera_name) {
       return;
     }
-    this.timeline_items.forEach(element => {
-      if(element.type == ClipType.TRANSFORM && element.object_uuid == object_uuid){
-        console.log(element)
+    this.timeline_items.forEach((element) => {
+      if (
+        element.type == ClipType.TRANSFORM &&
+        element.object_uuid == object_uuid
+      ) {
+        console.log(element);
         this.scene.deletePoint(element.clip_uuid);
       }
     });
@@ -462,7 +481,13 @@ export class TimeLine {
         element.clip_uuid === keyframe_uuid &&
         element.object_uuid === object_uuid
       ) {
-        this.timeline_items = this.timeline_items.filter(element => !(element.clip_uuid === keyframe_uuid && element.object_uuid === object_uuid));
+        this.timeline_items = this.timeline_items.filter(
+          (element) =>
+            !(
+              element.clip_uuid === keyframe_uuid &&
+              element.object_uuid === object_uuid
+            ),
+        );
         break;
       }
     }
@@ -488,7 +513,12 @@ export class TimeLine {
       keyframe_rot,
       keyframe_scl,
     );
-    this.scene.updatePoint(keyframe_uuid, keyframe_pos, keyframe_rot, keyframe_scl);
+    this.scene.updatePoint(
+      keyframe_uuid,
+      keyframe_pos,
+      keyframe_rot,
+      keyframe_scl,
+    );
     this.checkEditorCanPlay();
   }
 
@@ -611,8 +641,7 @@ export class TimeLine {
         this.lipSync_engine.clips[
           element.object_uuid + element.media_id
         ].reset();
-      } 
-      else if (element.type === ClipType.EXPRESSION) {
+      } else if (element.type === ClipType.EXPRESSION) {
         const object = this.scene.get_object_by_uuid(element.object_uuid);
         if (object)
           this.emotion_engine.clips[
@@ -633,15 +662,17 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update(isRendering = false, delta_time: number = 0): Promise<boolean> {
+  public async update(
+    isRendering = false,
+    delta_time: number = 0,
+  ): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {
       // When rendering we want to increase it by 1 but when in playback we want it dynamic based on deltatime.
       if (isRendering) {
         this.current_time += 1;
-      }
-      else {
+      } else {
         this.current_time += delta_time * this.editorEngine.cap_fps;
       }
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
@@ -649,7 +680,6 @@ export class TimeLine {
       });
       this.scrubber_frame_position = this.current_time;
     }
-
 
     if (this.scrubber_frame_position <= 0) {
       await this.resetScene();
@@ -692,7 +722,11 @@ export class TimeLine {
           //   this.scrubber_frame_position, element.offset);
           // }
           await this.audio_engine.playClip(element.media_id);
-          await this.audio_engine.step(element.media_id, this.scrubber_frame_position, element.offset);
+          await this.audio_engine.step(
+            element.media_id,
+            this.scrubber_frame_position,
+            element.offset,
+          );
         } else if (
           element.type === ClipType.AUDIO &&
           element.group === ClipGroup.CHARACTER &&
@@ -702,7 +736,9 @@ export class TimeLine {
             await this.lipSync_engine.clips[
               element.object_uuid + element.media_id
             ].play(object);
-            this.lipSync_engine.clips[element.object_uuid + element.media_id].step(this.scrubber_frame_position, element.offset, isRendering);
+            this.lipSync_engine.clips[
+              element.object_uuid + element.media_id
+            ].step(this.scrubber_frame_position, element.offset, isRendering);
           }
         } else if (element.type === ClipType.ANIMATION) {
           if (object) {
@@ -711,7 +747,7 @@ export class TimeLine {
             ].play(object);
             const fps = 60;
             this.animation_engine.clips[object.uuid + element.media_id].step(
-              (this.scrubber_frame_position-element.offset) / fps, // Double FPS for best result.
+              (this.scrubber_frame_position - element.offset) / fps, // Double FPS for best result.
             );
           }
         } else if (element.type === ClipType.EXPRESSION) {
