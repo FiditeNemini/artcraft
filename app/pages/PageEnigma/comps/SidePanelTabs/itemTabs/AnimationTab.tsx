@@ -24,7 +24,7 @@ export const AnimationTab = () => {
   useSignals();
   const { authState } = useContext(AuthenticationContext);
   const [open, setOpen] = useState(false);
-  const [userAnimations, setUserAnimations] = useState<MediaItem[]>([]);
+  const [userAnimations, setUserAnimations] = useState<MediaItem[] | null>();
 
   const refetchAnimations = useCallback(async () => {
     if (!authState?.userInfo) {
@@ -64,7 +64,7 @@ export const AnimationTab = () => {
   }, [authState?.userInfo]);
 
   useEffect(() => {
-    if (authState?.userInfo && !userAnimations.length) {
+    if (authState?.userInfo && !userAnimations) {
       refetchAnimations();
     }
   }, [authState?.userInfo, refetchAnimations, userAnimations]);
@@ -119,7 +119,7 @@ export const AnimationTab = () => {
       </div>
       <div className="w-full grow overflow-y-auto px-4 pb-4">
         <ItemElements
-          items={[...userAnimations, ...animationItems.value]}
+          items={[...(userAnimations ?? []), ...animationItems.value]}
           assetFilter={animationFilter.value}
         />
       </div>
