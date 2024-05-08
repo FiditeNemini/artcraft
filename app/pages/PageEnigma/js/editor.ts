@@ -567,6 +567,7 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
+    this.timeline.scrub({data: {currentTime: 0}})
   }
 
   isObjectLipsync(object_uuid: string) {
