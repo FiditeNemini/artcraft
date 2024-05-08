@@ -530,7 +530,7 @@ export const characterItems = signal<MediaItem[]>([
     media_id: "m_ja13tz27cqqvy366tsed4z4kh4gg0m",
     type: AssetType.CHARACTER,
     name: "Roko",
-    thumbnail: "/resources/placeholders/placeholder.png",
+    thumbnail: "/resources/characters/roko.png",
   },
 ]);
 
@@ -591,7 +591,7 @@ export const devCharacterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Pop",
     thumbnail: "/resources/placeholders/placeholder.png",
-  }
+  },
 ]);
 
 export const objectItems = signal<MediaItem[]>([
