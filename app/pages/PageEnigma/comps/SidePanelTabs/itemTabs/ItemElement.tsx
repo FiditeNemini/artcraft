@@ -18,7 +18,7 @@ export const ItemElement = ({ item }: Props) => {
       onPointerDown={(event) => DndAsset.onPointerDown(event, item)}>
       <img
         {...{
-          crossOrigin: "anonymous",
+          //crossOrigin: "anonymous",
           src: thumbnail,
         }}
         onError={(e: SyntheticEvent<HTMLDivElement>) => {
