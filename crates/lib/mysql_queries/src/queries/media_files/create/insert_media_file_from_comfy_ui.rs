@@ -26,6 +26,8 @@ pub struct InsertArgs<'a> {
     // TODO: Media duration.
     //pub duration_millis: u64,
 
+    pub maybe_title: Option<&'a str>,
+
     pub maybe_prompt_token: Option<&'a PromptToken>,
 
     pub public_bucket_directory_hash: &'a str,
@@ -90,6 +92,7 @@ SET
 
   checksum_sha2 = ?,
 
+  maybe_title = ?,
   maybe_prompt_token = ?,
 
   public_bucket_directory_hash = ?,
@@ -125,6 +128,7 @@ SET
 
       args.sha256_checksum,
 
+      args.maybe_title,
       args.maybe_prompt_token.map(|e| e.as_str()),
 
       args.public_bucket_directory_hash,

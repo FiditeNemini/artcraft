@@ -286,7 +286,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Querying input media file by token: {:?} ...", &input_media_file_token);
 
-    let retrieved_input_record =  get_media_file(
+    let input_media_file =  get_media_file(
         &input_media_file_token,
         false,
         &deps.db.mysql_pool
@@ -296,9 +296,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })?;
 
     let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
-        &retrieved_input_record.public_bucket_directory_hash,
-        retrieved_input_record.maybe_public_bucket_prefix.as_deref(),
-        retrieved_input_record.maybe_public_bucket_extension.as_deref());
+        &input_media_file.public_bucket_directory_hash,
+        input_media_file.maybe_public_bucket_prefix.as_deref(),
+        input_media_file.maybe_public_bucket_extension.as_deref());
 
     info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
@@ -656,6 +656,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         pool: &args.job_dependencies.db.mysql_pool,
         job: &job,
         maybe_mime_type: Some(&mimetype),
+        maybe_title: input_media_file.maybe_title.as_deref(),
         file_size_bytes,
         sha256_checksum: &file_checksum,
         maybe_prompt_token: Some(&prompt_token),
