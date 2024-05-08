@@ -1242,7 +1242,16 @@ class Editor {
     if (this.rawRenderer) {
       this.rawRenderer.setSize(this.startRenderWidth, this.startRenderHeight);
     }
+
+    this.canvasRenderCamReference = document.getElementById("camera-view");
+    this.rawRenderer = new THREE.WebGLRenderer({
+      antialias: false,
+      canvas: this.canvasRenderCamReference,
+      preserveDrawingBuffer: true,
+    });
     this.activeScene.renderMode(false);
+
+    this.switchEdit();
   }
 
   async switchPreview() {
