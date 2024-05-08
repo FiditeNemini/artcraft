@@ -157,14 +157,6 @@ export const animationItems = signal<MediaItem[]>([
   },
   {
     version: 1,
-    media_id: "m_6cre8q6csjj6cs41esa3qjt3kb0aen",
-    type: AssetType.ANIMATION,
-    length: 100,
-    name: "Laying Pose",
-    thumbnail: "/resources/characters_gif/Female Laying Pose.gif",
-  },
-  {
-    version: 1,
     media_id: "m_m27a9jwh96xe270pgxcjwg88c0a01j",
     type: AssetType.ANIMATION,
     length: 100,
@@ -210,14 +202,6 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Uppercut",
     thumbnail: "/resources/characters_gif/Uppercut.gif",
-  },
-  {
-    version: 1,
-    media_id: "m_y5q63v1j8k0r72zc18ppnpgw1gga4n",
-    type: AssetType.ANIMATION,
-    length: 100,
-    name: "Standing Pose",
-    thumbnail: "/resources/characters_gif/Female Standing Pose.gif",
   },
   {
     version: 1,
@@ -282,14 +266,6 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Skinning Test",
     thumbnail: "/resources/characters_gif/Skinning Test.gif",
-  },
-  {
-    version: 1,
-    media_id: "m_t4nhndxppb8807pq5d5t2y3ck2dzws",
-    type: AssetType.ANIMATION,
-    length: 100,
-    name: "Dance Pose",
-    thumbnail: "/resources/characters_gif/Female Dance Pose.gif",
   },
   {
     version: 1,
