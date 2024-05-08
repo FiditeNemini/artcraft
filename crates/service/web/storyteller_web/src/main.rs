@@ -20,6 +20,7 @@
 
 use std::sync::Arc;
 use std::time::Duration;
+use actix_multipart::form::MultipartFormConfig;
 
 use actix_web::{App, HttpServer, middleware, web};
 use actix_web::middleware::{DefaultHeaders, Logger};
@@ -77,6 +78,7 @@ use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupIm
 use crate::configs::app_startup::redis_rate_limiters::configure_redis_rate_limiters;
 use crate::configs::static_api_tokens::StaticApiTokenSet;
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
+use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
 use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::routes::add_routes::add_routes;
 use crate::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans, TwitchOauth, TwitchOauthSecrets};
@@ -614,6 +616,13 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(session_cache_purge)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
+      .app_data(
+        // NB: https://stackoverflow.com/a/78399675
+        MultipartFormConfig::default()
+            .total_limit(10 *1024 * 1024 * 1024) // 10 GB
+            .memory_limit(10 * 1024 * 1024) // 10 MB
+            .error_handler(handle_multipart_error)
+      )
       .wrap(build_cors_config(old_server_environment))
       .wrap(shared_array_buffer_cors())
       .wrap(DefaultHeaders::new()
