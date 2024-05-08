@@ -8,7 +8,7 @@ export interface Pagination {}
 export interface ListFeaturedMediaFilesResponse {
   pagination?: Pagination; // does not currently exist on this endpoint but is being added
   success: boolean;
-  media_files: MediaInfo[];
+  results: MediaInfo[];
 }
 
 export interface ListFeaturedMediaFilesQueries {}

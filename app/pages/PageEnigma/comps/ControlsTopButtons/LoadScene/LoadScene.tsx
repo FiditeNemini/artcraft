@@ -11,7 +11,11 @@ import {
   GetMediaByUser,
   GetMediaListResponse,
 } from "~/api/media_files/GetMediaByUser";
-import { MediaFileType } from "~/pages/PageEnigma/models";
+import {
+  ListFeaturedMediaFiles,
+  ListFeaturedMediaFilesResponse,
+} from "~/api/media_files/ListFeaturedMediaFiles";
+import { MediaInfo, MediaFileType } from "~/pages/PageEnigma/models";
 import { AuthenticationContext } from "~/contexts/Authentication";
 import dayjs from "dayjs";
 
@@ -19,17 +23,44 @@ interface LoadSceneProps {
   onSceneSelect: (token: string) => void;
 }
 
+export enum FetchStatus {
+  paused,
+  // ready triggers a new fetch
+  ready,
+  in_progress,
+  success,
+  error,
+}
+
+export enum Filters {
+  Featured,
+  Mine,
+  Bookmarked,
+}
+
 export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
   const [scenes, setScenes] = useState<SceneTypes[]>([]);
+  const [featured, featuredSet] = useState<SceneTypes[]>([]);
   const { authState } = useContext(AuthenticationContext);
   const sceneLoading = useRef(false);
   const [isSceneLoading, setIsSceneLoading] = useState(true);
+  const [featuredStatus, featuredStatusSet] = useState(FetchStatus.ready);
 
   useEffect(() => {
     if (!authState.userInfo || scenes.length || sceneLoading.current) {
       return;
     }
     sceneLoading.current = true;
+
+    const updateScenes = (results: MediaInfo[]) =>
+      results.map((scene: MediaInfo) => ({
+        token: scene.token,
+        name: scene.maybe_title ?? "Untitled",
+        updated_at: dayjs(scene.updated_at).format("MMM D, YYYY HH:mm:ss"),
+        thumbnail: scene.cover_image.maybe_cover_image_public_bucket_path
+          ? scene.cover_image.maybe_cover_image_public_bucket_path
+          : undefined,
+      }));
     // console.log("load scene");
     GetMediaByUser(
       authState.userInfo.username,
@@ -40,16 +71,7 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
     )
       .then((res: GetMediaListResponse) => {
         if (res.success && res.results) {
-          setScenes(
-            res.results.map((scene) => ({
-              token: scene.token,
-              name: scene.maybe_title ?? "Untitled",
-              updated_at: dayjs(scene.updated_at).format(
-                "MMM D, YYYY HH:mm:ss",
-              ),
-              thumbnail: scene.cover_image.maybe_cover_image_public_bucket_path ? scene.cover_image.maybe_cover_image_public_bucket_path : undefined,
-            })),
-          );
+          setScenes(updateScenes(res.results));
           setIsSceneLoading(false);
         }
       })
@@ -59,7 +81,24 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
           error_reason: "Unknown error",
         };
       });
-  }, [scenes, authState.userInfo]);
+    if (featuredStatus === FetchStatus.ready) {
+      featuredStatusSet(FetchStatus.in_progress);
+      ListFeaturedMediaFiles(
+        "",
+        {},
+        {
+          filter_engine_categories: "scene",
+          // page_index: page,
+          page_size: 100,
+        },
+      ).then((res: ListFeaturedMediaFilesResponse) => {
+        if (res.success && res.results) {
+          featuredStatusSet(FetchStatus.success);
+          featuredSet(updateScenes(res.results));
+        }
+      });
+    }
+  }, [featuredStatus, scenes, authState.userInfo]);
 
   const handleSceneSelect = (selectedScene: SceneTypes) => {
     onSceneSelect(selectedScene.token);
@@ -101,12 +140,12 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
           </div>
         ) : (
           <>
-            {scenes.length !== 0 ? (
+            {scenes.length !== 0 || featured.length !== 0 ? (
               <div
                 className="overflow-y-auto overflow-x-hidden"
                 ref={scrollContainerRef}>
                 <ScenePicker
-                  scenes={scenes}
+                  scenes={[...scenes, ...featured]}
                   onSceneSelect={handleSceneSelect}
                   showDate={true}
                 />
