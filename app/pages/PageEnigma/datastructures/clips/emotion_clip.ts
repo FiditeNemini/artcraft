@@ -8,14 +8,14 @@ interface CsvJson {
 export class EmotionClip {
   version: number;
   media_id: string;
-  type: "emotion" = "emotion";
+  type: "expression" = "expression";
   emotion_json: any;
   faces: THREE.Mesh[];
 
   constructor(version: number, media_id: string) {
     this.version = version;
     this.media_id = media_id;
-    this.type = "emotion";
+    this.type = "expression";
     this.faces = [];
     this.download_csv().then((data) => {
       this.emotion_json = data;
@@ -120,10 +120,10 @@ export class EmotionClip {
     }
     const keys: { [key: string]: number } = {};
     Object.keys(this.emotion_json).forEach((key) => {
-      if (frame > this.emotion_json[key].length) {
+      if (Math.floor(frame) > this.emotion_json[key].length) {
         return;
       }
-      keys[key] = this.emotion_json[key][frame];
+      keys[key] = this.emotion_json[key][Math.floor(frame)];
     });
     this.setBlends(keys);
   }

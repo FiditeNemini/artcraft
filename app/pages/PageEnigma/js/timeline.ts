@@ -227,7 +227,7 @@ export class TimeLine {
     //this.addPlayableClip(
     //  new ClipUI(
     //    data.data["version"],
-    //    ClipType.EMOTION,
+    //    ClipType.EXPRESSION,
     //    ClipGroup.CHARACTER,
     //    "Test",
     //    "m_c0g50khzpg99rq8chjn8zgvxcwebc7",
@@ -405,7 +405,7 @@ export class TimeLine {
       case "transform":
         this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
         break;
-      case "emotion":
+      case "expression":
         this.emotion_engine.loadClip(object_uuid, media_id);
         break;
       case "audio":
@@ -611,7 +611,8 @@ export class TimeLine {
         this.lipSync_engine.clips[
           element.object_uuid + element.media_id
         ].reset();
-      } else if (element.type === ClipType.EMOTION) {
+      } 
+      else if (element.type === ClipType.EXPRESSION) {
         const object = this.scene.get_object_by_uuid(element.object_uuid);
         if (object)
           this.emotion_engine.clips[
@@ -713,7 +714,7 @@ export class TimeLine {
               (this.scrubber_frame_position-element.offset) / fps, // Double FPS for best result.
             );
           }
-        } else if (element.type === ClipType.EMOTION) {
+        } else if (element.type === ClipType.EXPRESSION) {
           if (object) {
             await this.emotion_engine.clips[
               object.uuid + element.media_id
