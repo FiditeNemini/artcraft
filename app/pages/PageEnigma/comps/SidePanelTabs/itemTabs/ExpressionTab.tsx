@@ -63,7 +63,13 @@ export const ExpressionTab = () => {
         // page_size: 5,
       },
     ).then((res: GetMediaListResponse) => {
+
+      console.log("HELLO!")
+      console.log(res)
+      console.log("RESULT")
+
       if (res.success && res.results) {
+
         expressionItems.value = res.results.map((item, index: number) => {
           return {
             version: 1,
@@ -105,25 +111,22 @@ export const ExpressionTab = () => {
           statusSet(FetchStatus.success);
           featuredSet({
             value: res.results.map((item) => {
-              const bucketConfig = new BucketConfig();
-              const itemThumb = bucketConfig.getCdnUrl(
-                item.cover_image.maybe_cover_image_public_bucket_path,
-                600,
-                100,
-              );
               return {
-                colorIndex: item.cover_image.default_cover.color_index,
-                imageIndex: item.cover_image.default_cover.image_index,
+                version: 1,
+                type: AssetType.EXPRESSION,
                 media_id: item.token,
                 name: item.maybe_title,
-                type: AssetType.OBJECT,
-                version: 1,
-                ...(item.cover_image.maybe_cover_image_public_bucket_path
-                  ? {
-                      thumbnail: itemThumb,
-                    }
-                  : {}),
-              };
+                publicBucketPath: item.public_bucket_path,
+                length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
+                thumbnail: item.cover_image?.maybe_cover_image_public_bucket_path
+                  ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
+                    item.cover_image?.maybe_cover_image_public_bucket_path
+                  : undefined,
+                isMine:
+                  item.maybe_creator_user?.user_token ===
+                  authState?.userInfo?.user_token,
+                imageIndex: 0,
+              } as MediaItem;
             }),
             // .filter((item,i) => (item.thumbnail)) disabled for testing for now
           });
