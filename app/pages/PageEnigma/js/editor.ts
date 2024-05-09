@@ -43,6 +43,7 @@ import {
 import { AuthState } from "~/contexts/Authentication/types";
 import { hotkeysStatus } from "~/pages/PageEnigma/store";
 import { SceneSignal } from "~/store";
+import { ToastTypes } from "~/contexts/ToasterContext";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 
@@ -1333,11 +1334,18 @@ class Editor {
         );
 
         previewSrc.value = url;
-
         return Promise.resolve(url);
+
       } catch (err: any) {
-        console.log(err.message);
-        return Promise.resolve("");
+        Queue.publish({
+          queueName: QueueNames.FROM_ENGINE,
+          action: fromEngineActions.POP_A_TOAST,
+          data: {
+            type: ToastTypes.ERROR,
+            message: err.message
+          },
+        })
+        // return Promise.resolve("");
       }
     }
   }

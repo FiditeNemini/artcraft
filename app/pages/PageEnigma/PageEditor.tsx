@@ -1,40 +1,37 @@
 import React, { useContext, useEffect } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
 
 import { LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
+import { TopBar } from "~/modules/TopBar";
 
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
+import { PreviewFrameImage } from "./comps/PreviewFrameImage";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
 import { Timeline } from "./comps/Timeline";
 
+// import { AssetType } from "~/pages/PageEnigma/models";
+import { AppUiContext } from "~/contexts/AppUiContext";
 import { APPUI_VIEW_MODES } from "../../reducers";
+import { pageHeight, pageWidth } from "~/store";
 import {
   timelineHeight,
   sidePanelWidth,
   sidePanelVisible,
   dndSidePanelWidth,
   dndTimelineHeight,
-  dragItem,
-  canDrop,
+  // dragItem,
+  // canDrop,
 } from "~/pages/PageEnigma/store";
-import { useSignals } from "@preact/signals-react/runtime";
-import { AppUiContext } from "~/contexts/AppUiContext";
-import { pageHeight, pageWidth } from "~/store";
-import { TopBar } from "~/modules/TopBar";
-import {
-  editorState,
-  EditorStates,
-  previewSrc,
-} from "~/pages/PageEnigma/store/engine";
-import { AssetType } from "~/pages/PageEnigma/models";
+
+
 
 export const PageEditor = () => {
   useSignals();
-
   const [appUiState] = useContext(AppUiContext);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
@@ -92,20 +89,7 @@ export const PageEditor = () => {
                   height: pageHeight.value - timelineHeight.value - 68,
                 }}>
                 <canvas id="video-scene" width="1280px" height="720px" />
-                {editorState.value === EditorStates.PREVIEW && (
-                  <img
-                    className="absolute inset-0"
-                    src={previewSrc.value}
-                    id="video-scene"
-                    style={{
-                      width:
-                        pageWidth.value -
-                        (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                        84,
-                      height: pageHeight.value - timelineHeight.value - 68,
-                    }}
-                  />
-                )}
+                <PreviewFrameImage />
               </div>
 
               {/* Top controls */}

@@ -11,7 +11,7 @@ import {
   loadObjectData,
   selectedObject,
 } from "~/pages/PageEnigma/store";
-import Queue from "~/pages/PageEnigma/Queue/Queue";
+import Queue, { ToastDataType } from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import {
@@ -22,12 +22,14 @@ import {
   UpdateTime,
 } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { ToasterContext } from "~/contexts/ToasterContext";
+import { ToastTypes } from "~/contexts/ToasterContext";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 
 interface Arguments {
   action: fromEngineActions | toEngineActions | toTimelineActions;
-  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem | null;
+  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem | ToastDataType | null;
 }
 
 const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
@@ -41,6 +43,7 @@ export function useQueueHandler() {
   useSignals();
   const { addKeyframe, clearExistingData, deleteObjectOrCharacter } =
     useContext(TrackContext);
+  const { addToast } = useContext(ToasterContext);
 
   const handleFromEngineActions = useCallback(
     ({ action, data }: Arguments) => {
@@ -79,6 +82,11 @@ export function useQueueHandler() {
             LOADING_FUNCTIONS[item.group](item);
           });
           break;
+        case fromEngineActions.POP_A_TOAST:{
+          const message = (data as ToastDataType).message;
+          addToast(ToastTypes.ERROR, message);
+          break;
+        }
         default:
           throw new Error(`Unknown action ${action}`);
       }

@@ -7,5 +7,6 @@ export enum fromEngineActions {
   UPDATE_CHARACTER_ID = "update_character_id",
   UPDATE_TIME = "update_time",
   UPDATE_TIME_LINE = "update_timeline",
+  POP_A_TOAST = "pop_a_toast",
   // data={currentTime: number}
 }

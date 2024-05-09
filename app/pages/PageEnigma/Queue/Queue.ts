@@ -9,23 +9,33 @@ import {
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
 
+import { ClipUI } from "../datastructures/clips/clip_ui";
+import { ToastTypes } from "~/contexts/ToasterContext";
+
+export type ToastDataType = {
+  type: ToastTypes;
+  message: string;
+}
+
 type UnionedActionTypes =
   | fromEngineActions
   | toEngineActions
   | toTimelineActions;
+
 type UnionedDataTypes =
   | QueueClip
   | UpdateTime
   | QueueKeyframe
   | ClipUI[]
   | MediaItem
+  | ToastDataType
   | null;
 
 export type QueueSubscribeType = {
   action: UnionedActionTypes;
   data: UnionedDataTypes;
 };
-import { ClipUI } from "../datastructures/clips/clip_ui";
+
 class Queue {
   private _queue: Record<
     string,
