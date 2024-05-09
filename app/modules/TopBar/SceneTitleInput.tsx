@@ -22,6 +22,8 @@ export const SceneTitleInput = ({ pageName }: Props) => {
   const { authState } = useContext(AuthenticationContext);
   const [showInput, setShowInput] = useState(false);
   const [previousTitle, setPreviousTitle] = useState(scene.value.title);
+  const isSceneOwner =
+    scene.value.ownerToken === authState.userInfo?.user_token;
 
   const [{ isValid, isSaving }, setState] = useState<{
     isValid: boolean;
@@ -93,15 +95,21 @@ export const SceneTitleInput = ({ pageName }: Props) => {
           <span className="mr-2 text-nowrap opacity-60">{pageName}</span>
           <span className="opacity-60">/</span>
 
-          <button
-            className="ml-0.5 rounded-md px-2 py-1 transition-all hover:cursor-text hover:bg-white/[8%]"
-            onClick={handleShowInput}>
-            {scene.value.title || ""}
-            <FontAwesomeIcon
-              icon={faPencil}
-              className="ml-2 text-sm opacity-50"
-            />
-          </button>
+          {isSceneOwner ? (
+            <button
+              className="ml-0.5 rounded-md px-2 py-1 transition-all hover:cursor-text hover:bg-white/[8%]"
+              onClick={handleShowInput}>
+              {scene.value.title || ""}
+              <FontAwesomeIcon
+                icon={faPencil}
+                className="ml-2 text-sm opacity-50"
+              />
+            </button>
+          ) : (
+            <div className="ml-0.5 rounded-md px-2 py-1">
+              {scene.value.title || ""}
+            </div>
+          )}
         </div>
       )}
 
