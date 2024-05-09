@@ -302,6 +302,7 @@ pub async fn process_upload_media_file(
     MediaFileType::SceneJson => MediaFileClass::Dimensional,
     MediaFileType::Pmd => MediaFileClass::Dimensional,
     MediaFileType::Vmd => MediaFileClass::Dimensional,
+    MediaFileType::Csv => MediaFileClass::Dimensional,
   };
 
   let upload_type = match upload_media_request.media_source {

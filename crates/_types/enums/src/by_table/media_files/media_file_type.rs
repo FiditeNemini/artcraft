@@ -52,6 +52,9 @@ pub enum MediaFileType {
   /// "Vocaloid Motion Data", animation data for MikuMikuDance
   /// See: https://mikumikudance.fandom.com/wiki/VMD_file_format
   Vmd,
+
+  /// CSV format. (We use these for ArKit)
+  Csv,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -74,6 +77,7 @@ impl MediaFileType {
       Self::SceneJson => "scene_json",
       Self::Pmd => "pmd",
       Self::Vmd => "vmd",
+      Self::Csv => "csv",
     }
   }
 
@@ -90,6 +94,7 @@ impl MediaFileType {
       "scene_json" => Ok(Self::SceneJson),
       "pmd" => Ok(Self::Pmd),
       "vmd" => Ok(Self::Vmd),
+      "csv" => Ok(Self::Csv),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -109,6 +114,7 @@ impl MediaFileType {
       Self::SceneJson,
       Self::Pmd,
       Self::Vmd,
+      Self::Csv,
     ])
   }
 }
@@ -134,6 +140,7 @@ mod tests {
       assert_serialization(MediaFileType::SceneJson, "scene_json");
       assert_serialization(MediaFileType::Pmd, "pmd");
       assert_serialization(MediaFileType::Vmd, "vmd");
+      assert_serialization(MediaFileType::Csv, "csv");
     }
   }
 
@@ -153,6 +160,7 @@ mod tests {
       assert_eq!(MediaFileType::SceneJson.to_str(), "scene_json");
       assert_eq!(MediaFileType::Pmd.to_str(), "pmd");
       assert_eq!(MediaFileType::Vmd.to_str(), "vmd");
+      assert_eq!(MediaFileType::Csv.to_str(), "csv");
     }
 
     #[test]
@@ -168,6 +176,7 @@ mod tests {
       assert_eq!(MediaFileType::from_str("scene_json").unwrap(), MediaFileType::SceneJson);
       assert_eq!(MediaFileType::from_str("pmd").unwrap(), MediaFileType::Pmd);
       assert_eq!(MediaFileType::from_str("vmd").unwrap(), MediaFileType::Vmd);
+      assert_eq!(MediaFileType::from_str("csv").unwrap(), MediaFileType::Csv);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -190,6 +199,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::SceneJson));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Pmd));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Vmd));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Csv));
       assert_eq!(variants.pop_first(), None);
     }
   }

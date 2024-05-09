@@ -159,6 +159,7 @@ impl RawUserBookmarkRecord {
               MediaFileType::SceneJson => Some("3d scene".to_string()),
               MediaFileType::Pmd => Some("polygon data".to_string()),
               MediaFileType::Vmd => Some("motion data".to_string()),
+              MediaFileType::Csv => Some("animation data".to_string()),
             }),
         UserBookmarkEntityType::VoiceConversionModel => self.maybe_descriptive_text_voice_conversion_model_title,
         UserBookmarkEntityType::ZsVoice => self.maybe_descriptive_text_zs_voice_title,
