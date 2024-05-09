@@ -120,7 +120,7 @@ export const ObjectsTab = ({ type }: Props) => {
                 imageIndex: item.cover_image.default_cover.image_index,
                 media_id: item.token,
                 name: item.maybe_title,
-                type: AssetType.OBJECT,
+                type,
                 version: 1,
                 ...(item.cover_image.maybe_cover_image_public_bucket_path
                   ? {
