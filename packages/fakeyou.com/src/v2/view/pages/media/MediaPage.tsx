@@ -315,6 +315,17 @@ export default function MediaPage() {
             />
           </div>
         );
+      case MediaFileType.Vmd:
+        return (
+          <div
+            {...{
+              className:
+                "rounded w-100 h-100 panel d-flex align-items-center justify-content-center p-3",
+            }}
+          >
+            (Expression)
+          </div>
+        );
       default:
         return <div>Unsupported media typeaaa</div>;
     }

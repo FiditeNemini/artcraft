@@ -8,6 +8,7 @@ import GLTFCard from "./GLTFCard";
 import FBXCard from "./FBXCard";
 import SceneRonCard from "./SceneRonCard";
 import SceneJSONCard from "./SceneJSONCard";
+import ArKitCard from "./ArKitCard";
 
 interface Props {
   props: any;
@@ -32,6 +33,9 @@ export default function MediaCards({ props, type }: Props) {
       return <SceneRonCard {...props} />;
     case "scene_json":
       return <SceneJSONCard {...props} />;
+    case "vmd":
+      // TODO(bt,2024-05-09): This is a temporary hack. ARKit files are uploaded as these
+      return <ArKitCard {...props} />;
     case "video":
       return <VideoCard {...props} />;
     default:

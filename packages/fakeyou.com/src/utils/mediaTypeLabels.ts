@@ -11,5 +11,6 @@ export const mediaTypeLabels = {
   [MediaFileType.SceneRon]: "RON",
   [MediaFileType.SceneJson]: "Scene",
   [MediaFileType.FBX]: "FBX",
+  [MediaFileType.Vmd]: "Expression", // TODO(bt,2024-05-09): This is a hack. ARKit are mistakenly vmd
   [MediaFileType.None]: "Unknown",
 };

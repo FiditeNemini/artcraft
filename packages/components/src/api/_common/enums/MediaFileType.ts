@@ -27,5 +27,8 @@ export enum MediaFileType {
   // Engine scene
   SceneJson = "scene_json",
 
+  // TODO(bt, 2024-05-09): The ARKit expressions are being uploaded as these. FIX!
+  Vmd = "vmd",
+
   None = "none",
 }
