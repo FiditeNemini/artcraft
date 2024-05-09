@@ -44,7 +44,7 @@ export default function LoginScreen() {
       style={{height: "calc(100% - 72px)"}}
     >
       <div className="w-10/12 max-w-2xl mx-auto my-6">
-        <H1 className="text-center">Login to FakeYou</H1>
+        <H1 className="text-center">Login to Storyteller</H1>
       </div>
       <div
         className='relative bg-ui-panel w-10/12 max-w-2xl mx-auto my-6 rounded-lg p-6 border border-ui-panel-border overflow-hidden'
