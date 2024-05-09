@@ -8,7 +8,6 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import { Button, FilterButtons } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
-import { twMerge } from "tailwind-merge";
 import UploadModalMovement from "~/components/UploadModalMovement";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
@@ -139,8 +138,9 @@ export const ExpressionTab = () => {
   return (
     <>
       <TabTitle title="Expressions" />
-      <div className="w-full overflow-x-auto overflow-y-hidden">
-        <div className="mb-4 flex justify-start gap-2 px-4">
+
+      <div>
+        <div className="flex gap-2 overflow-x-auto overflow-y-hidden px-4">
           <FilterButtons
             {...{
               value: selectedFilter,
@@ -152,7 +152,8 @@ export const ExpressionTab = () => {
           />
         </div>
       </div>
-      <div className="w-full px-4 pb-4">
+
+      <div className="w-full px-4">
         <Button
           icon={faCirclePlus}
           variant="action"
