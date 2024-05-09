@@ -17,6 +17,24 @@ export type VstStyle
 	| "pop_art"
 	| "realistic_1"
 	| "realistic_2"
+
+	| "hr_giger"
+	| "simpsons"
+	| "carnage"
+	| "pastel_cute_anime"
+	| "bloom_lighting"
+	| "25d_horror"
+	| "creepy"
+	| "creepy_vhs"
+	| "trail_cam_footage"
+	| "old_black_white_movie"
+	| "horror_noir_black_white"
+	| "techno_noir_black_white"
+	| "black_white_20s"
+	| "cyberpunk_anime"
+	| "dragonball"
+	| "realistic_matrix"
+	| "realistic_cyberpunk"
 	;
 
 // Definition of the different options.
@@ -102,6 +120,80 @@ export const STYLE_OPTIONS: readonly StyleOption[] = [
 		label: "Realistic 2",
 		value: "realistic_2",
 	},
+
+
+	{
+		label: "HR Giger",
+		value: "hr_giger",
+	},
+	{
+		label: "Simpsons",
+		value: "simpsons",
+	},
+	{
+		label: "Carnage",
+		value: "carnage",
+	},
+	{
+		label: "Anime Pastel Cute",
+		value: "pastel_cute_anime",
+	},
+	{
+		label: "iBloom Lighting",
+		value: "bloom_lighting",
+	},
+	{
+		label: "Horror 2.5D",
+		value: "25d_horror",
+	},
+	{
+		label: "Creepy",
+		value: "creepy",
+	},
+	{
+		label: "Creepy VHS",
+		value: "creepy_vhs",
+	},
+	{
+		label: "Trail Cam Footage",
+		value: "trail_cam_footage",
+	},
+	{
+		label: "Old Black and White Movie",
+		value: "old_black_white_movie",
+	},
+	{
+		label: "Horror Noir Black and White",
+		value: "horror_noir_black_white",
+	},
+	{
+		label: "Techno Noir Black and White",
+		value: "techno_noir_black_white",
+	},
+	{
+		label: "Black White 20s",
+		value: "black_white_20s",
+	},
+	{
+		label: "Cyberpunk Anime",
+		value: "cyberpunk_anime",
+	},
+	{
+		label: "Dragonball",
+		value: "dragonball",
+	},
+	{
+		label: "Realistic Matrix",
+		value: "realistic_matrix",
+	},
+	{
+		label: "Realistic Cyberpunk",
+		value: "realistic_cyberpunk",
+	},
+
+
+
+
 ];
 
 export const STYLES_BY_KEY : Map<string, StyleOption> = new Map(STYLE_OPTIONS.map((opt) => [opt.value, opt]));

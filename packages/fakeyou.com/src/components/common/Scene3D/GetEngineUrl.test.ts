@@ -75,6 +75,7 @@ describe('media files', () => {
       updated_at: new Date(),
       maybe_creator_user: null,
       creator_set_visibility: "public",
+      is_featured: false,
       // TODO(bt,2024-03-11): Make these fields optional
       maybe_model_weight_info: {
         title: "title",

@@ -2,11 +2,18 @@ import React, { useState } from "react";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 import { useInferenceJobs, useSession } from "hooks";
-import { Button, Container, Panel, TextArea, TempSelect as Select } from "components/common";
+import {
+  Button,
+  Container,
+  Panel,
+  SegmentButtons,
+  TextArea,
+  TempSelect as Select,
+} from "components/common";
 import { EntityInput } from "components/entities";
 import {
   EnqueueVST,
-  EnqueueVSTResponse
+  EnqueueVSTResponse,
 } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";
@@ -19,24 +26,28 @@ export default function StyleVideo() {
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [prompt, promptSet] = useState("");
   const [negativePrompt, negativePromptSet] = useState("");
+  const [length, lengthSet] = useState(3000);
   const { enqueue } = useInferenceJobs();
 
   const onClick = () => {
     if (mediaToken) {
-      EnqueueVST("",{
+      EnqueueVST("", {
         creator_set_visibility: "private",
         enable_lipsync: true,
         input_file: mediaToken,
         negative_prompt: negativePrompt,
         prompt,
         style,
-        trim_end_millis: 3000,
+        trim_end_millis: length,
         trim_start_millis: 0,
-        uuid_idempotency_token: uuidv4()
-      })
-      .then((res: EnqueueVSTResponse) => {
+        uuid_idempotency_token: uuidv4(),
+      }).then((res: EnqueueVSTResponse) => {
         if (res.success && res.inference_job_token) {
-          enqueue(res.inference_job_token,true,FrontendInferenceJobType.VideoStyleTransfer);
+          enqueue(
+            res.inference_job_token,
+            true,
+            FrontendInferenceJobType.VideoStyleTransfer
+          );
         } else {
           console.log("Failed to enqueue job", res);
         }
@@ -44,55 +55,92 @@ export default function StyleVideo() {
     }
   };
 
-  const options = STYLE_OPTIONS.map((option) => {
+  const styleOptions = STYLE_OPTIONS.map(option => {
     return {
-      label: option.label, 
+      label: option.label,
       value: option.value,
-    }
+    };
   });
 
-  return studioAccessCheck(<Container {...{ className: "fy-style-video-page mt-5", type: "panel" }}>
+  const lengthOptions = [
+    { label: 3, value: 3000 },
+    { label: 5, value: 5000 },
+    { label: 7, value: 7000 },
+  ];
+
+  return studioAccessCheck(
+    <Container {...{ className: "fy-style-video-page mt-5", type: "panel" }}>
       <Panel {...{ padding: true }}>
         <header className="d-flex gap-3 flex-wrap">
-          <h1 className="fw-semibold">
-            Style a Video
-          </h1>
+          <h1 className="fw-semibold">Style a Video</h1>
         </header>
-        <EntityInput {...{
-          accept: ["video"],
-          aspectRatio: "landscape",
-          label: "Choose a video",
-          name: "mediaToken",
-          value: pageMediaToken,
-          onChange: ({ target }: { target: any }) => { mediaTokenSet(target.value) },
-          type: "media"
-        }}/>
-        <Select {...{
-          label: "Style",
-          onChange: ({ target }: { target: any }) => { styleSet(target.value) },
-          options,
-          value: style
-        }}/>
+        <EntityInput
+          {...{
+            accept: ["video"],
+            aspectRatio: "landscape",
+            label: "Choose a video",
+            name: "mediaToken",
+            value: pageMediaToken,
+            onChange: ({ target }: { target: any }) => {
+              mediaTokenSet(target.value);
+            },
+            type: "media",
+          }}
+        />
+        <Select
+          {...{
+            label: "Style",
+            onChange: ({ target }: { target: any }) => {
+              styleSet(target.value);
+            },
+            options: styleOptions,
+            value: style,
+          }}
+        />
         <div {...{ className: "prompt-row" }}>
-          <TextArea {...{
-            label: "Positive prompt",
-            rows: 5,
-            onChange: ({ target }: { target: any }) => { promptSet(target.value) },
-          }}/>
-          <TextArea {...{
-            label: "Negative prompt",
-            rows: 5,
-            onChange: ({ target }: { target: any }) => { negativePromptSet(target.value) },
-          }}/>
+          <TextArea
+            {...{
+              label: "Positive prompt",
+              rows: 5,
+              onChange: ({ target }: { target: any }) => {
+                promptSet(target.value);
+              },
+            }}
+          />
+          <TextArea
+            {...{
+              label: "Negative prompt",
+              rows: 5,
+              onChange: ({ target }: { target: any }) => {
+                negativePromptSet(target.value);
+              },
+            }}
+          />
+        </div>
+        <div {...{ className: "prompt-row" }}>
+          <SegmentButtons
+            {...{
+              className: "fy-style-video-length",
+              label: "Final video length (seconds)",
+              onChange: ({ target }: { target: any }) => {
+                lengthSet(target.value);
+              },
+              options: lengthOptions,
+              value: length,
+            }}
+          />
         </div>
         <div {...{ className: "d-flex justify-content-center mt-3" }}>
-          <Button {...{
-            disabled: !mediaToken,
-            label: "Style",
-            onClick,
-            variant: "primary"
-          }} />
+          <Button
+            {...{
+              disabled: !mediaToken,
+              label: "Style",
+              onClick,
+              variant: "primary",
+            }}
+          />
         </div>
       </Panel>
-   </Container>);
-};
+    </Container>
+  );
+}

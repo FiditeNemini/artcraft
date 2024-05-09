@@ -36,13 +36,16 @@ import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
+import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
+import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { STYLES_BY_KEY } from "common/StyleOptions";
+import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 
 export default function MediaPage() {
-  const { canAccessStudio, canEditMediaFile, user } = useSession();
+  const { canAccessStudio, canEditMediaFile, canBanUsers, user } = useSession();
   const { token } = useParams<{ token: string }>();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -69,6 +72,8 @@ export default function MediaPage() {
   const viewerCanEdit = canEditMediaFile(
     mediaFile?.maybe_creator_user?.user_token || ""
   );
+
+  const viewerCanMakeFeatured = canBanUsers() || false;
 
   // Inside MediaPage.tsx
 
@@ -98,6 +103,31 @@ export default function MediaPage() {
   const openDeleteModal = () => setIsDeleteModalOpen(true);
 
   const deleteMedia = () => remove(!!user?.can_ban_users);
+
+  const handleFeatureMedia = async () => {
+    setFeatureMedia(!mediaFile?.is_featured);
+  };
+
+  const setFeatureMedia = async (setFeatured: boolean) => {
+    if (mediaFile === undefined) {
+      return;
+    }
+
+    const request = {
+      entity_type: "media_file",
+      entity_token: mediaFile.token,
+    };
+
+    // NB: Victor, I don't know how to re-query media with the media context thing. :(
+    // Sorry, I'm forcing a page reload instead. I know this sucks.
+    if (setFeatured) {
+      await CreateFeaturedItem("", request);
+      window.location.reload();
+    } else {
+      await DeleteFeaturedItem("", request);
+      window.location.reload();
+    }
+  };
 
   const copyToClipboard = async (
     text: string,
@@ -167,16 +197,15 @@ export default function MediaPage() {
           {prompt?.maybe_style_name && (
             <>
               <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                <h6 className="fw-semibold mb-0 flex-grow-1">
-                  Style Name
-                </h6>
+                <h6 className="fw-semibold mb-0 flex-grow-1">Style Name</h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">{STYLES_BY_KEY.get(prompt.maybe_style_name)?.label}</p>
+                <p className="fs-7">
+                  {STYLES_BY_KEY.get(prompt.maybe_style_name)?.label}
+                </p>
               </div>
             </>
           )}
-
         </Panel>
       )}
     </>
@@ -270,8 +299,24 @@ export default function MediaPage() {
             </div>
           </Panel>
         );
+      case MediaFileType.SceneJson:
+        return (
+          <div
+            {...{
+              className:
+                "rounded w-100 h-100 panel d-flex align-items-center justify-content-center p-3",
+            }}
+          >
+            <Button
+              {...{
+                label: "View in engine",
+                href: `https://studio.storyteller.ai/${mediaFile.token}`,
+              }}
+            />
+          </div>
+        );
       default:
-        return <div>Unsupported media type</div>;
+        return <div>Unsupported media typeaaa</div>;
     }
   }
 
@@ -475,30 +520,37 @@ export default function MediaPage() {
   const title = GetMediaFileTitle(mediaFile);
 
   const showEngineCover = () => {
-    const coverMediaPath = mediaFile?.cover_image?.maybe_cover_image_public_bucket_path || "";
+    const coverMediaPath =
+      mediaFile?.cover_image?.maybe_cover_image_public_bucket_path || "";
     if (mediaFile) {
       switch (mediaFile.media_type) {
-         case MediaFileType.BVH:
-         case MediaFileType.GLB:
-         case MediaFileType.GLTF:
-         case MediaFileType.SceneRon: return <WeightCoverImage {...{
-          ...coverMediaPath ? { src: bucketConfig.getGcsUrl(coverMediaPath) } : {},
-          ...viewerCanEdit ? { to: `/edit-cover-image/${ token }` } : {},
-          coverIndex: mediaFile.cover_image.default_cover.image_index,
-         }}/>;
-         default: return null;
+        case MediaFileType.BVH:
+        case MediaFileType.GLB:
+        case MediaFileType.GLTF:
+        case MediaFileType.SceneRon:
+          return (
+            <WeightCoverImage
+              {...{
+                ...(coverMediaPath
+                  ? { src: bucketConfig.getGcsUrl(coverMediaPath) }
+                  : {}),
+                ...(viewerCanEdit ? { to: `/edit-cover-image/${token}` } : {}),
+                coverIndex: mediaFile.cover_image.default_cover.image_index,
+              }}
+            />
+          );
+        default:
+          return null;
       }
     }
-  }
+  };
 
   return (
     <div>
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
-            {
-              showEngineCover()
-            }
+            {showEngineCover()}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">{title}</h1>
@@ -578,7 +630,8 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                { canAccessStudio() && mediaFile?.media_type === MediaFileType.Video ? (
+                {canAccessStudio() &&
+                mediaFile?.media_type === MediaFileType.Video ? (
                   <Button
                     {...{
                       icon: faArrowRightArrowLeft,
@@ -813,7 +866,7 @@ export default function MediaPage() {
                 </div>
               </Panel>
 
-              { viewerCanEdit && (
+              {viewerCanEdit && (
                 <>
                   <div className="d-flex gap-2">
                     <Button
@@ -828,6 +881,23 @@ export default function MediaPage() {
                       label="Rename File"
                       onClick={openDeleteModal}
                       to={`/media/rename/${mediaFile?.token || ""}`}
+                    />
+                  </div>
+                </>
+              )}
+              {viewerCanMakeFeatured && (
+                <>
+                  <div className="d-flex gap-2">
+                    <Button
+                      full={true}
+                      variant="secondary"
+                      icon={faStarShooting}
+                      label={
+                        mediaFile?.is_featured
+                          ? "Remove Featured"
+                          : "Set Featured"
+                      }
+                      onClick={handleFeatureMedia}
                     />
                   </div>
                 </>
