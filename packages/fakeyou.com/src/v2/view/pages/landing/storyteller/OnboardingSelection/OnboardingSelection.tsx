@@ -12,7 +12,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { maxHeight, opacity, transform } = useSpring({
-    maxHeight: isExpanded ? "1000px" : "0px",
+    maxHeight: isExpanded ? "2000px" : "0px",
     opacity: isExpanded ? 1 : 0,
     transform: isExpanded ? "scale(1)" : "scale(0.9)",
     config: { tension: 170, friction: 26 },
@@ -28,7 +28,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
     } else {
       history.push(url);
     }
-  }
+  };
 
   const cards = [
     {
@@ -224,7 +224,9 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
                 canHover={true}
                 borderWidth="2px"
                 hoverPrimaryColor={true}
-                onClick={() => { visitUrl(card.url) }}
+                onClick={() => {
+                  visitUrl(card.url);
+                }}
                 bottomText={card.text}
               />
             </div>
@@ -243,7 +245,9 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
                   canHover={true}
                   borderWidth="2px"
                   hoverPrimaryColor={true}
-                  onClick={() => { visitUrl(card.url) }}
+                  onClick={() => {
+                    visitUrl(card.url);
+                  }}
                   bottomText={card.text}
                 />
               </div>
@@ -251,7 +255,10 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
           </div>
           <hr className="my-5" />
           <h4>Developer Scenes</h4>
-          <p>These scenes work, but you'll have to build your own animation timeline.</p>
+          <p>
+            These scenes work, but you'll have to build your own animation
+            timeline.
+          </p>
           <div className="row gy-3 gx-3 gx-lg-4 mt-0 centered-row">
             {devCards.map((card, index) => (
               <div className="col-6 col-lg-3" key={index}>

@@ -164,7 +164,8 @@ export default function MediaTab() {
                       return (
                         <div
                           {...{
-                            className: "col-12 col-sm-6 col-xl-4 grid-item",
+                            className:
+                              "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
                             key,
                           }}
                         >

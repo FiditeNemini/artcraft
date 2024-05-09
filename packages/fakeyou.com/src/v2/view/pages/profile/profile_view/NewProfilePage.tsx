@@ -389,7 +389,7 @@ function NewProfilePage(this: any, props: Props) {
   ];
 
   return (
-    <Container type="panel">
+    <Container type="panel-full">
       <Panel clear={true}>
         <div className="d-flex flex-column flex-lg-row py-4">
           <div className="mb-3 me-lg-4 mb-lg-0">

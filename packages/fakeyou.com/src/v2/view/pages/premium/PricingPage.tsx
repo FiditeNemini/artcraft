@@ -89,7 +89,7 @@ function PricingPage(props: Props) {
 
   let proButtonText = "Buy Pro";
   let proButtonDisabled = false;
-  let proBorderCss = "rounded panel p-4 h-100";
+  let proBorderCss = "rounded panel padding h-100";
 
   let eliteButtonText = "Buy Elite";
   let eliteButtonDisabled = false;
@@ -144,7 +144,7 @@ function PricingPage(props: Props) {
 
   // Highlight the mid-tier plan if nothing is subscribed
   if (!userHasPaidPremium) {
-    proBorderCss = "rounded panel p-4 h-100  pricing-border";
+    proBorderCss = "rounded panel padding h-100  pricing-border";
   }
 
   return (
@@ -219,7 +219,7 @@ function PricingPage(props: Props) {
 
           {/* Plus Tier */}
           <div className="col-12 col-sm-6 col-lg-4">
-            <div className="rounded panel p-4 h-100">
+            <div className="rounded panel padding h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
                 onClick={() =>
@@ -457,7 +457,7 @@ function PricingPage(props: Props) {
 
           {/* Elite Tier */}
           <div className="col-12 col-sm-6 col-lg-4">
-            <div className="rounded panel p-4 h-100">
+            <div className="rounded panel padding h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.elite.tier}
               </h2>

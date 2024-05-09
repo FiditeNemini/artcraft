@@ -2,7 +2,7 @@ import React from "react";
 
 interface ContainerProps {
   children: React.ReactNode;
-  type?: "full" | "padded" | "panel";
+  type?: "full" | "padded" | "panel" | "panel-full";
   className?: string;
 }
 
@@ -22,6 +22,9 @@ export default function PageContainer({
       break;
     case "panel":
       containerClass = "container-panel";
+      break;
+    case "panel-full":
+      containerClass = "container-panel-full";
       break;
     default:
       containerClass = "container-fluid";

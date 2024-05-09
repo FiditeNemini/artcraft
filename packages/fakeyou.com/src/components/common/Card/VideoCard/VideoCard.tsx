@@ -146,7 +146,7 @@ export default function VideoCard({
             className="card-video"
             loading="lazy"
           />
-          <div className="card-img-overlay">
+          <div className="card-video-overlay">
             <div className="card-img-gradient" />
 
             <div className="d-flex align-items-center">
