@@ -7,6 +7,7 @@ import GLBCard from "./GLBCard";
 import GLTFCard from "./GLTFCard";
 import FBXCard from "./FBXCard";
 import SceneRonCard from "./SceneRonCard";
+import SceneJSONCard from "./SceneJSONCard";
 
 interface Props {
   props: any;
@@ -29,6 +30,8 @@ export default function MediaCards({ props, type }: Props) {
       return <FBXCard {...props} />;
     case "scene_ron":
       return <SceneRonCard {...props} />;
+    case "scene_json":
+      return <SceneJSONCard {...props} />;
     case "video":
       return <VideoCard {...props} />;
     default:
