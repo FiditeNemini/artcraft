@@ -1,5 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::web::Json;
+use utoipa::{IntoParams, ToSchema};
 
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
@@ -13,7 +14,7 @@ use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 
 // =============== Request ===============
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct CreateCheckoutSessionRequest {
   /// The (non-Stripe) internal identifier for the product or subscription.
   /// This will be translated into a Stripe identifier.
@@ -26,12 +27,27 @@ pub struct CreateCheckoutSessionRequest {
 
 // =============== Success Response ===============
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct CreateCheckoutSessionSuccessResponse {
   pub success: bool,
   pub stripe_checkout_redirect_url: String,
 }
 
+/// Create a Stripe Checkout session and return the redirect URL in Json.
+#[utoipa::path(
+  get,
+  tag = "Stripe Billing",
+  path = "/v1/billing/stripe/checkout/create_redirect",
+  params(
+    ("request" = CreateCheckoutSessionRequest, description = "Payload for Request"),
+  ),
+  responses(
+    (status = 200, description = "Success Delete", body = CreateCheckoutSessionSuccessResponse),
+    (status = 400, description = "Bad input", body = CreateCheckoutSessionError),
+    (status = 401, description = "Not authorized", body = CreateCheckoutSessionError),
+    (status = 500, description = "Server error", body = CreateCheckoutSessionError),
+  ),
+)]
 pub async fn stripe_create_checkout_session_json_handler(
   http_request: HttpRequest,
   request: Json<CreateCheckoutSessionRequest>,

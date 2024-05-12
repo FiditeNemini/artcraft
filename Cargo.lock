@@ -910,6 +910,8 @@ dependencies = [
  "toml 0.5.11",
  "url_config",
  "user_traits_component",
+ "utoipa",
+ "utoipa-swagger-ui",
 ]
 
 [[package]]

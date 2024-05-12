@@ -2,10 +2,11 @@ use std::fmt;
 
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
+use utoipa::ToSchema;
 
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
-#[derive(Debug, Serialize, Eq, PartialEq)]
+#[derive(Debug, Serialize, Eq, PartialEq, ToSchema)]
 pub enum CreateCheckoutSessionError {
     BadRequest { reason: String },
     InvalidSession,
