@@ -384,8 +384,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/media/rename/:media_file_token">
-                    <MediaRenamePage 
-                    />
+                    <MediaRenamePage />
                   </Route>
 
                   <Route path="/media/:token">
@@ -681,7 +680,9 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/moderation">
-                    <ModerationPage sessionWrapper={this.props.sessionWrapper} />
+                    <ModerationPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
                   </Route>
 
                   <Route exact={true} path="/clone">

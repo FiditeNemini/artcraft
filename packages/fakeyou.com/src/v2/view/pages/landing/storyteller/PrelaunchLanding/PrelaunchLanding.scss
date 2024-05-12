@@ -1,0 +1,57 @@
+@import "scss/colours.scss";
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, calc(100vw / 6 * 9 / 16));
+  gap: 16px;
+  padding: 10px;
+  position: relative;
+
+  .logo {
+    position: absolute;
+    margin-left: 4%;
+    top: 46%;
+    width: 40%;
+  }
+
+  .waitlist-button {
+    position: absolute;
+    margin-left: 4%;
+    top: 63%;
+    padding: 1%;
+    width: 25%;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+    background-color: $primary;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: lighten($primary, 5%);
+    }
+  }
+}
+
+.grid-item {
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.2s;
+  pointer-events: all;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.grid-item.blank {
+  background-color: transparent;
+  border: none;
+}

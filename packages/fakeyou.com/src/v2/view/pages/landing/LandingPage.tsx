@@ -7,7 +7,7 @@ import { Container } from "components/common";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import { useDomainConfig } from "context/DomainConfigContext";
-import LandingVideoReel from "./components/LandingVideoReel/LandingVideoReel";
+// import LandingVideoReel from "./components/LandingVideoReel/LandingVideoReel";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -17,9 +17,13 @@ import "./LandingPage.scss";
 // import VstSectionV1 from "./components/VstSectionV1";
 import VstSectionV2 from "./components/VstSectionV2";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
-import { WebsiteConfig, Website } from "@storyteller/components/src/env/GetWebsite";
+import {
+  WebsiteConfig,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 import OnboardingSelection from "./storyteller/OnboardingSelection";
-import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
+// import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
+import PrelaunchLanding from "./storyteller/PrelaunchLanding/PrelaunchLanding";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -62,56 +66,58 @@ function LandingPage(props: Props) {
   return (
     <>
       {domain.website === Website.StorytellerAi && (
-        <LandingVideoReel sessionWrapper={props.sessionWrapper} />
+        // <LandingVideoReel sessionWrapper={props.sessionWrapper} />
+        <PrelaunchLanding />
       )}
       <Container type="panel">
-        {domain.website === Website.FakeYou ? (
-          <>
-            {/* FAKEYOU.COM */}
-            {!isLoggedIn && (
-              <>
-                <FakeYouLandingHeader
-                  sessionWrapper={props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    props.sessionSubscriptionsWrapper
-                  }
-                  inferenceJobs={props.inferenceJobs}
-                  ttsInferenceJobs={props.ttsInferenceJobs}
-                  enqueueInferenceJob={props.enqueueInferenceJob}
-                  inferenceJobsByCategory={props.inferenceJobsByCategory}
-                  enqueueTtsJob={props.enqueueTtsJob}
-                />
-                {/* <VstSectionV1 /> */}
-                <VstSectionV2 />
-              </>
-            )}
+        {
+          domain.website === Website.FakeYou ? (
+            <>
+              {/* FAKEYOU.COM */}
+              {!isLoggedIn && (
+                <>
+                  <FakeYouLandingHeader
+                    sessionWrapper={props.sessionWrapper}
+                    sessionSubscriptionsWrapper={
+                      props.sessionSubscriptionsWrapper
+                    }
+                    inferenceJobs={props.inferenceJobs}
+                    ttsInferenceJobs={props.ttsInferenceJobs}
+                    enqueueInferenceJob={props.enqueueInferenceJob}
+                    inferenceJobsByCategory={props.inferenceJobsByCategory}
+                    enqueueTtsJob={props.enqueueTtsJob}
+                  />
+                  {/* <VstSectionV1 /> */}
+                  <VstSectionV2 />
+                </>
+              )}
 
-            <Dashboard sessionWrapper={props.sessionWrapper} />
+              <Dashboard sessionWrapper={props.sessionWrapper} />
 
-            {!isLoggedIn && <FakeYouLandingBody />}
-          </>
-        ) : (
-          <>
-            {/* STORYTELLER,AI */}
+              {!isLoggedIn && <FakeYouLandingBody />}
+            </>
+          ) : null
+          // <>
+          //   {/* STORYTELLER,AI */}
 
-            {protectedStudioOnboarding}
+          //   {protectedStudioOnboarding}
 
-            <VstSectionV2 />
-            <TtsDemoSection
-              sessionWrapper={props.sessionWrapper}
-              sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-              inferenceJobs={props.inferenceJobs}
-              ttsInferenceJobs={props.ttsInferenceJobs}
-              enqueueInferenceJob={props.enqueueInferenceJob}
-              inferenceJobsByCategory={props.inferenceJobsByCategory}
-              enqueueTtsJob={props.enqueueTtsJob}
-            />
+          //   <VstSectionV2 />
+          //   <TtsDemoSection
+          //     sessionWrapper={props.sessionWrapper}
+          //     sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+          //     inferenceJobs={props.inferenceJobs}
+          //     ttsInferenceJobs={props.ttsInferenceJobs}
+          //     enqueueInferenceJob={props.enqueueInferenceJob}
+          //     inferenceJobsByCategory={props.inferenceJobsByCategory}
+          //     enqueueTtsJob={props.enqueueTtsJob}
+          //   />
 
-            <Dashboard sessionWrapper={props.sessionWrapper} />
+          //   <Dashboard sessionWrapper={props.sessionWrapper} />
 
-            <FakeYouLandingBody />
-          </>
-        )}
+          //   <FakeYouLandingBody />
+          // </>
+        }
       </Container>
     </>
   );

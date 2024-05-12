@@ -188,6 +188,21 @@ export default function TopNav({
     // { id: 4, name: "Text to Image", link: "/text-to-image" },
   ];
 
+  useEffect(() => {
+    const pageContentWrapper = document.getElementById("page-content-wrapper");
+    if (pageContentWrapper) {
+      if (domain.titlePart === "Storyteller AI") {
+        pageContentWrapper.style.padding = "0px";
+      } else {
+        pageContentWrapper.style.padding = "";
+      }
+    }
+  }, [domain.titlePart]);
+
+  if (domain.titlePart === "Storyteller AI") {
+    return null;
+  }
+
   return (
     <div
       id="topbar-wrapper"
