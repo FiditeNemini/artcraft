@@ -8,7 +8,7 @@ use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, Create
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
-use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
+use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_TOLT_REFERRAL, METADATA_USER_TOKEN, METADATA_USERNAME};
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use crate::stripe::stripe_config::{FullUrlOrPath, StripeConfig};
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
@@ -23,6 +23,10 @@ pub struct CreateStripeCheckoutSessionArgs<'a> {
   pub url_redirector: &'a ThirdPartyUrlRedirector,
   pub internal_product_to_stripe_lookup: &'a dyn InternalProductToStripeLookup,
   pub internal_user_lookup: &'a dyn InternalUserLookup,
+
+  /// Optional Tolt referral code
+  /// See: https://help.tolt.io/en/articles/6843411-how-to-set-up-stripe-with-tolt
+  pub maybe_tolt_referral: Option<&'a str>,
 }
 
 /// Create a checkout session and return the URL
@@ -115,8 +119,13 @@ pub async fn stripe_create_checkout_session_shared(
     if let Some(username) = user_metadata.username.as_deref() {
       metadata.insert(METADATA_USERNAME.to_string(), username.to_string());
     }
+
     if let Some(user_email) = user_metadata.user_email.as_deref() {
       metadata.insert(METADATA_EMAIL.to_string(), user_email.to_string());
+    }
+
+    if let Some(tolt_referral) = args.maybe_tolt_referral.as_deref() {
+      metadata.insert(METADATA_TOLT_REFERRAL.to_string(), tolt_referral.to_string());
     }
 
     // NB: This metadata attaches to Stripe's Checkout Session object.
@@ -260,6 +269,7 @@ mod tests {
       url_redirector: &url_redirector,
       internal_product_to_stripe_lookup: &internal_product_to_stripe_lookup_mock,
       internal_user_lookup: &internal_user_lookup_mock,
+      maybe_tolt_referral: None,
     }).await;
 
     // TODO: Sort of throwing my hands up over testing this.

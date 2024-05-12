@@ -18,6 +18,10 @@ pub struct CreateCheckoutSessionRequest {
   /// The (non-Stripe) internal identifier for the product or subscription.
   /// This will be translated into a Stripe identifier.
   internal_plan_key: Option<String>,
+
+  /// Optional Tolt referral code
+  /// See: https://help.tolt.io/en/articles/6843411-how-to-set-up-stripe-with-tolt
+  maybe_tolt_referral: Option<String>,
 }
 
 // =============== Success Response ===============
@@ -51,6 +55,7 @@ pub async fn stripe_create_checkout_session_json_handler(
     url_redirector: &url_redirector,
     internal_product_to_stripe_lookup: internal_product_to_stripe_lookup.get_ref(),
     internal_user_lookup: internal_user_lookup.get_ref(),
+    maybe_tolt_referral: request.maybe_tolt_referral.as_deref()
   }).await?;
 
   // Best effort to delete Redis session cache
