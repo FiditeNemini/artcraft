@@ -14,34 +14,38 @@ use crate::stripe::stripe_config::{FullUrlOrPath, StripeConfig};
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 
+pub struct CreateStripeCheckoutSessionArgs<'a> {
+  pub maybe_internal_product_key: Option<&'a str>,
+  pub http_request: &'a HttpRequest,
+  pub stripe_config: &'a StripeConfig,
+  pub server_environment: ServerEnvironment,
+  pub stripe_client: &'a stripe::Client,
+  pub url_redirector: &'a ThirdPartyUrlRedirector,
+  pub internal_product_to_stripe_lookup: &'a dyn InternalProductToStripeLookup,
+  pub internal_user_lookup: &'a dyn InternalUserLookup,
+}
+
 /// Create a checkout session and return the URL
 /// If anything fails, treat it as a 500 server error.
 pub async fn stripe_create_checkout_session_shared(
-  maybe_internal_product_key: Option<&str>,
-  http_request: &HttpRequest,
-  stripe_config: &StripeConfig,
-  server_environment: ServerEnvironment,
-  stripe_client: &stripe::Client,
-  url_redirector: &ThirdPartyUrlRedirector,
-  internal_product_to_stripe_lookup: &dyn InternalProductToStripeLookup,
-  internal_user_lookup: &dyn InternalUserLookup,
+  args: CreateStripeCheckoutSessionArgs<'_>,
 
 ) -> Result<String, CreateCheckoutSessionError> {
-  let internal_product_key = match maybe_internal_product_key {
+  let internal_product_key = match args.maybe_internal_product_key {
     None => return Err(CreateCheckoutSessionError::BadRequest { reason: "no product key supplied".to_string() }),
     Some(internal_product_key) => internal_product_key,
   };
 
-  let stripe_product = internal_product_to_stripe_lookup
-      .lookup_stripe_product_from_internal_product_key(server_environment, internal_product_key)
+  let stripe_product = args.internal_product_to_stripe_lookup
+      .lookup_stripe_product_from_internal_product_key(args.server_environment, internal_product_key)
       .map_err(|err| {
         error!("Error looking up product: {:?}", err);
         CreateCheckoutSessionError::ServerError // NB: This was probably *our* fault.
       })?
       .ok_or(CreateCheckoutSessionError::PlanNotFound)?; // Non-existing product
 
-  let maybe_user_metadata = internal_user_lookup
-      .lookup_user_from_http_request(http_request)
+  let maybe_user_metadata = args.internal_user_lookup
+      .lookup_user_from_http_request(args.http_request)
       .await
       .map_err(|err| {
         error!("Error looking up user: {:?}", err);
@@ -62,15 +66,15 @@ pub async fn stripe_create_checkout_session_shared(
     return Err(CreateCheckoutSessionError::UserAlreadyHasPlan)
   }
 
-  let success_url = match &stripe_config.checkout.success_url {
+  let success_url = match &args.stripe_config.checkout.success_url {
     FullUrlOrPath::FullUrl(url) => url.to_string(),
-    FullUrlOrPath::Path(path) => url_redirector.frontend_redirect_url_for_path(http_request, &path)
+    FullUrlOrPath::Path(path) => args.url_redirector.frontend_redirect_url_for_path(args.http_request, &path)
         .map_err(|_e| CreateCheckoutSessionError::ServerError)?,
   };
 
-  let cancel_url = match &stripe_config.checkout.cancel_url {
+  let cancel_url = match &args.stripe_config.checkout.cancel_url {
     FullUrlOrPath::FullUrl(url) => url.to_string(),
-    FullUrlOrPath::Path(path) => url_redirector.frontend_redirect_url_for_path(http_request, &path)
+    FullUrlOrPath::Path(path) => args.url_redirector.frontend_redirect_url_for_path(args.http_request, &path)
         .map_err(|_e| CreateCheckoutSessionError::ServerError)?,
   };
 
@@ -170,7 +174,7 @@ pub async fn stripe_create_checkout_session_shared(
       }
     }
 
-    CheckoutSession::create(&stripe_client, params)
+    CheckoutSession::create(&args.stripe_client, params)
         .await
         .map_err(|e| {
           error!("Error: {:?}", e);
@@ -190,7 +194,7 @@ mod tests {
   use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
   use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
-  use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
+  use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::{CreateStripeCheckoutSessionArgs, stripe_create_checkout_session_shared};
   use crate::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
   use crate::stripe::traits::internal_product_to_stripe_lookup::{MockInternalProductToStripeLookup, StripeProduct};
   use crate::stripe::traits::internal_user_lookup::{MockInternalUserLookup, UserMetadata};
@@ -247,16 +251,16 @@ mod tests {
           maybe_loyalty_program_key: None,
         })));
 
-    let result = stripe_create_checkout_session_shared(
+    let result = stripe_create_checkout_session_shared(CreateStripeCheckoutSessionArgs {
       maybe_internal_product_key,
-      &http_request,
-      &stripe_config,
-      ServerEnvironment::Development,
-      &stripe_client,
-      &url_redirector,
-      &internal_product_to_stripe_lookup_mock,
-      &internal_user_lookup_mock,
-    ).await;
+      http_request: &http_request,
+      stripe_config: &stripe_config,
+      server_environment: ServerEnvironment::Development,
+      stripe_client: &stripe_client,
+      url_redirector: &url_redirector,
+      internal_product_to_stripe_lookup: &internal_product_to_stripe_lookup_mock,
+      internal_user_lookup: &internal_user_lookup_mock,
+    }).await;
 
     // TODO: Sort of throwing my hands up over testing this.
     //  There's no convenient way to test which arguments get sent.

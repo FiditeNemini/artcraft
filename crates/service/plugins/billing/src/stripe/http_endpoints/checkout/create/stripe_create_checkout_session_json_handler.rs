@@ -6,7 +6,7 @@ use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
 
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
-use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
+use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::{CreateStripeCheckoutSessionArgs, stripe_create_checkout_session_shared};
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
@@ -42,16 +42,16 @@ pub async fn stripe_create_checkout_session_json_handler(
 {
   let maybe_internal_product_key = request.internal_plan_key.as_deref();
 
-  let url = stripe_create_checkout_session_shared(
+  let url = stripe_create_checkout_session_shared(CreateStripeCheckoutSessionArgs {
     maybe_internal_product_key,
-    &http_request,
-    &stripe_config,
-    *server_environment.as_ref(),
-    &stripe_client,
-    &url_redirector,
-    internal_product_to_stripe_lookup.get_ref(),
-    internal_user_lookup.get_ref(),
-  ).await?;
+    http_request: &http_request,
+    stripe_config: &stripe_config,
+    server_environment: *server_environment.as_ref(),
+    stripe_client: &stripe_client,
+    url_redirector: &url_redirector,
+    internal_product_to_stripe_lookup: internal_product_to_stripe_lookup.get_ref(),
+    internal_user_lookup: internal_user_lookup.get_ref(),
+  }).await?;
 
   // Best effort to delete Redis session cache
   internal_session_cache_purge.best_effort_purge_session_cache(&http_request);
