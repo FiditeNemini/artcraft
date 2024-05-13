@@ -15,7 +15,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-crockford = { path = "../../lib/crockford" }
+crockford = { path = "../../lib/data/crockford" }
 errors = { path = "../../lib/errors" }
 
 

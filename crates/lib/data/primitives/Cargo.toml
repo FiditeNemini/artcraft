@@ -18,13 +18,13 @@ path = "src/lib.rs"
 # Consider the dependencies here wisely.
 
 # Internal
-errors = { path = "../errors" }
+errors = { path = "../../errors" }
 
 # External
 # (None)
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

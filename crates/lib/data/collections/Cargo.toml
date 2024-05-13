@@ -1,5 +1,5 @@
 [package]
-name = "crockford"
+name = "collections"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,19 +9,19 @@ authors = [
 publish = false
 
 [lib]
-# NB: Public "crockford" crate is non-sensically only for encoding and decoding u64s (wtf?)
-# Our crate is for generating entropy and crockford encoding it.
-name = "crockford"
+# NB: Public "collections" crate is not yet taken (!!), so we're fine to use this internally for now.
+name = "collections"
 path = "src/lib.rs"
 
 [dependencies]
 # Internal
-# (None yet)
+errors = { path = "../../errors" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
+# KEEP THIS TO A MINIMUM OR NIL.
 rand = "0.8.5"
 
 [dev-dependencies]

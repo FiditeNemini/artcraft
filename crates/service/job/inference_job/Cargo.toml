@@ -19,7 +19,7 @@ actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
-collections = { path = "../../../lib/collections" }
+collections = { path = "../../../lib/data/collections" }
 composite_identifiers = { path = "../../../_types/composite_identifiers" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }

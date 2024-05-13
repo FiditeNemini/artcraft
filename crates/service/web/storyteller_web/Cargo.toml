@@ -29,12 +29,12 @@ actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
-collections = { path = "../../../lib/collections" }
+collections = { path = "../../../lib/data/collections" }
 composite_identifiers = { path = "../../../_types/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 cookies = { path = "../../../lib/cookies" }
-datetimes = { path = "../../../lib/datetimes" }
+datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
@@ -48,7 +48,7 @@ memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
-primitives = { path = "../../../lib/primitives" }
+primitives = { path = "../../../lib/data/primitives" }
 prompt_engineering = { path = "../../../lib/prompt_engineering" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }

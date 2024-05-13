@@ -16,7 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 buckets = { path = "../../../_types/buckets" }
-crockford = { path = "../../../lib/crockford" }
+crockford = { path = "../../../lib/data/crockford" }
 errors = { path = "../../../lib/errors" }
 easyenv = { path = "../../../lib/easyenv" }
 filesys = { path = "../../../lib/files/filesys" }
