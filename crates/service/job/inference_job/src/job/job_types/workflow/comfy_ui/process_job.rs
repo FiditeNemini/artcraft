@@ -376,12 +376,39 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let prompt_path = PathBuf::from(&workflow_path);
 
+    let positive_prompt_file = work_temp_dir.path().join("positive_prompt.txt");
+    let negative_prompt_file = work_temp_dir.path().join("negative_prompt.txt");
+
+    let mut maybe_style = None;
+    let mut maybe_positive_prompt_filename = None;
+    let mut maybe_negative_prompt_filename = None;
+
+    // NB: We're rolling forward to a world where the JSON modifications are performed on the Python side.
+    let python_side_orchestration = comfy_args.rollout_python_workflow_args.unwrap_or(false);
+
+    if python_side_orchestration {
+        maybe_style = comfy_args.style_name;
+
+        if let Some(positive_prompt) = comfy_args.positive_prompt.as_deref() {
+            std::fs::write(&positive_prompt_file, positive_prompt).map_err(|e| ProcessSingleJobError::IoError(e))?;
+            maybe_positive_prompt_filename = Some(positive_prompt_file.as_path());
+        }
+
+        if let Some(negative_prompt) = comfy_args.negative_prompt.as_deref() {
+            std::fs::write(&negative_prompt_file, negative_prompt).map_err(|e| ProcessSingleJobError::IoError(e))?;
+            maybe_negative_prompt_filename = Some(negative_prompt_file.as_path());
+        }
+    }
+
     let command_exit_status = model_dependencies
         .inference_command
         .execute_inference(InferenceArgs {
             stderr_output_file: &stderr_output_file,
             stdout_output_file: &stdout_output_file,
             prompt_location: &prompt_path,
+            maybe_positive_prompt_filename,
+            maybe_negative_prompt_filename,
+            maybe_style,
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);

@@ -9,6 +9,7 @@ use anyhow::anyhow;
 use log::info;
 use once_cell::sync::Lazy;
 use subprocess::{Popen, PopenConfig};
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
@@ -80,7 +81,24 @@ pub enum ExecutableOrCommand {
 pub struct InferenceArgs<'s> {
     pub stderr_output_file: &'s Path,
     pub stdout_output_file: &'s Path,
+
+    /// Location of the prompt JSON file
     pub prompt_location: &'s Path,
+
+    /// Positive prompt file.
+    /// If set, Python will be in charge of overwriting the prompt JSON file
+    /// with the correct workflow args.
+    pub maybe_positive_prompt_filename: Option<&'s Path>,
+
+    /// Negative prompt file.
+    /// If set, Python will be in charge of overwriting the prompt JSON file
+    /// with the correct workflow args.
+    pub maybe_negative_prompt_filename: Option<&'s Path>,
+
+    /// Style name
+    /// If set, Python will be in charge of overwriting the prompt JSON file
+    /// with the correct workflow args.
+    pub maybe_style: Option<StyleTransferName>,
 }
 
 impl ComfyInferenceCommand {
@@ -197,6 +215,24 @@ impl ComfyInferenceCommand {
         command.push_str(" --prompt ");
         command.push_str(&path_to_string(args.prompt_location));
         command.push_str(" ");
+
+        if let Some(positive_prompt_filename) = args.maybe_positive_prompt_filename {
+            command.push_str(" --positive_prompt_filename ");
+            command.push_str(&path_to_string(positive_prompt_filename));
+            command.push_str(" ");
+        }
+
+        if let Some(negative_prompt_filename) = args.maybe_negative_prompt_filename {
+            command.push_str(" --negative_prompt_filename ");
+            command.push_str(&path_to_string(negative_prompt_filename));
+            command.push_str(" ");
+        }
+
+        if let Some(style) = args.maybe_style {
+            command.push_str(" --style ");
+            command.push_str(style.to_str());
+            command.push_str(" ");
+        }
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {
             command = docker_options.to_command_string(&command);
