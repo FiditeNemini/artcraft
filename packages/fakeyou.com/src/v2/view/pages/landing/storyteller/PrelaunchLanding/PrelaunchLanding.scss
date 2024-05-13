@@ -2,42 +2,30 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(5, calc(100vw / 6 * 9 / 16));
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, calc(100vw / 7 * (9 / 16)));
   gap: 16px;
-  padding: 10px;
+  padding: 16px;
   position: relative;
 
-  .logo {
-    position: absolute;
-    margin-left: 4%;
-    top: 46%;
-    width: 40%;
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, calc(100vw / 5 * (9 / 16)));
+    gap: 16px;
+    padding: 16px;
   }
 
-  .waitlist-button {
-    position: absolute;
-    margin-left: 4%;
-    top: 63%;
-    padding: 1%;
-    width: 25%;
-    font-size: 20px;
-    font-weight: 500;
-    color: #fff;
-    background-color: $primary;
-    border-radius: 50px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background-color: lighten($primary, 5%);
-    }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, calc(100vw / 3 * (9 / 16)));
+    gap: 12px;
+    padding: 12px;
   }
 }
 
 .grid-item {
-  background-color: #ccc;
+  position: relative;
+  background-color: rgba($white, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,9 +33,84 @@
   overflow: hidden;
   transition: transform 0.2s;
   pointer-events: all;
+  border: none;
 
   &:hover {
     transform: scale(1.1);
+  }
+
+  &.double-grid {
+    grid-column: span 2;
+  }
+
+  &.triple-grid {
+    grid-column: span 3;
+  }
+
+  &.grid-item-custom {
+    overflow: visible;
+    position: relative;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  img {
+    cursor: pointer;
+  }
+
+  .logo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-left: 20%;
+    margin-top: 10%;
+    width: 270%;
+    cursor: default;
+
+    @media (max-width: 992px) {
+      margin-left: 22%;
+      margin-top: 15%;
+    }
+  }
+
+  .waitlist-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-left: 10%;
+    margin-top: 4%;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+    background-color: $primary;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 84%;
+    padding: 2.5%;
+    border: 4px solid lighten($primary, 12%);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); // Soft white glow
+    animation: glow 1.5s infinite alternate;
+
+    &:hover {
+      background-color: lighten($primary, 5%);
+    }
+
+    @media (max-width: 992px) {
+      margin-left: 8%;
+      margin-top: 2%;
+    }
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 50px rgba(255, 170, 168, 0.25);
+    }
+    to {
+      box-shadow: 0 0 25px rgba(255, 170, 168, 0.5);
+    }
   }
 }
 
