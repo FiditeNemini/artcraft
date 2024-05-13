@@ -17,10 +17,10 @@ import { pageHeight, pageWidth } from "~/store";
 
 import { H3 } from "~/components";
 
-export const PreviewFrameImage = ()=>{
+export const PreviewFrameImage = () => {
   useSignals();
-  if( editorState.value === EditorStates.PREVIEW ){
-    if ( previewSrc.value === "" ){
+  if (editorState.value === EditorStates.PREVIEW) {
+    if (previewSrc.value === "") {
       return (
         <div
           className="absolute inset-0"
@@ -30,20 +30,18 @@ export const PreviewFrameImage = ()=>{
               (sidePanelVisible.value ? sidePanelWidth.value : 0) -
               84,
             height: pageHeight.value - timelineHeight.value - 68,
-          }}
-        >
-          <div
-            className="relative w-full h-full flex flex-col justify-center items-center gap-8">
-            <span className="absolute w-full h-full bg-black opacity-50"/>
-            <FontAwesomeIcon icon={faSpinnerThird} spin size="9x" />
-            <H3 className="text-white z-20">Generating Preview...</H3>
+          }}>
+          <div className="relative flex h-full w-full flex-col items-center justify-center gap-5">
+            <span className="absolute h-full w-full bg-black opacity-50" />
+            <FontAwesomeIcon icon={faSpinnerThird} spin size="4x" />
+            <H3 className="z-20 text-white">Generating Preview...</H3>
           </div>
         </div>
       );
-    }else{
-      return(
+    } else {
+      return (
         <img
-          className="absolute inset-0"
+          className="absolute inset-0 object-cover"
           src={previewSrc.value}
           id="video-scene"
           style={{
@@ -58,4 +56,4 @@ export const PreviewFrameImage = ()=>{
     }
   }
   return null;
-}
+};
