@@ -3,12 +3,14 @@
 -- noinspection SqlResolveForFile
 
 -- Staff
---   * teddanson - victor's alt
+--   * coliphant - chris
 --   * printrman - miles
+--   * teddanson - victor's alt
 -- SELECT token, username FROM users WHERE username IN (
 UPDATE users SET user_role_slug = "admin" WHERE username IN (
   'bflat',
   'brandon',
+  'coliphant',
   'crossproduct',
   'crossproduct1',
   'echelon',
