@@ -4765,6 +4765,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "primitives"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "my-workspace-hack",
+]
+
+[[package]]
 name = "proc-macro-error"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6389,6 +6397,7 @@ dependencies = [
  "native-tls",
  "once_cell",
  "pin-project-lite",
+ "primitives",
  "prompt_engineering",
  "pulldown-cmark",
  "r2d2_redis",

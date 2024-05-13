@@ -166,7 +166,7 @@ CREATE TABLE generic_inference_jobs (
   -- The tag is typically added via a special HTTP header when the work
   -- is enqueued. In practice, this means we can canary deploy or cordon
   -- off special workers to handle certain jobs.
-  maybe_routing_tag VARCHAR(32) DEFAULT NULL,
+  maybe_routing_tag VARCHAR(64) DEFAULT NULL, -- TODO(bt,2024-05-13): Widen column 32 --> 64 !!!
 
   -- ========== JOB SYSTEM DETAILS ==========
 

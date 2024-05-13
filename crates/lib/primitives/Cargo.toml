@@ -1,0 +1,30 @@
+[package]
+name = "primitives"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "primitives" crate does not exist, so we're fine to use this internally.
+name = "primitives"
+path = "src/lib.rs"
+
+[dependencies]
+# NB: This is designed to be a central crate with few dependencies.
+# Consider the dependencies here wisely.
+
+# Internal
+errors = { path = "../errors" }
+
+# External
+# (None)
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+[dev-dependencies]
+# None yet

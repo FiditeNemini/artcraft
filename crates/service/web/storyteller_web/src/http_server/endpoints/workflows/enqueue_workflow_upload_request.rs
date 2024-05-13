@@ -32,6 +32,7 @@ use mysql_queries::queries::generic_inference::web::insert_generic_inference_job
     InsertGenericInferenceArgs,
 };
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use primitives::str_to_bool::str_to_bool;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -245,6 +246,8 @@ pub async fn enqueue_workflow_upload_request(
         positive_prompt: None,
         negative_prompt: None,
         enable_lipsync: None,
+        rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
+            .map(|value| str_to_bool(&value)),
     };
    
     // create the inference args here

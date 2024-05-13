@@ -22,6 +22,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use primitives::str_to_bool::str_to_bool;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::session::lookup::user_session_extended::UserSessionExtended;
@@ -287,6 +288,8 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
+        rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
+            .map(|value| str_to_bool(&value)),
     };
 
     info!("Creating ComfyUI job record...");

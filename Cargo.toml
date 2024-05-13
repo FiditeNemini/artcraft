@@ -56,6 +56,7 @@ members = [
   "crates/lib/migration",
   "crates/lib/mysql_queries",
   "crates/lib/password",
+  "crates/lib/primitives",
   "crates/lib/prompt_engineering",
   "crates/lib/redis_common",
   "crates/lib/server_environment",

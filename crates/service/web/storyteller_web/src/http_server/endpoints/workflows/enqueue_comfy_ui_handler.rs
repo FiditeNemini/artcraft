@@ -22,6 +22,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use primitives::str_to_bool::str_to_bool;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -276,6 +277,8 @@ pub async fn enqueue_comfy_ui_handler(
         positive_prompt: None,
         negative_prompt: None,
         enable_lipsync: None,
+        rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
+            .map(|value| str_to_bool(&value)),
     };
 
     info!("Creating ComfyUI job record...");
