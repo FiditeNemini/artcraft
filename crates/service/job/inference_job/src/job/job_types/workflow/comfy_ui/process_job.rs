@@ -409,6 +409,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             maybe_positive_prompt_filename,
             maybe_negative_prompt_filename,
             maybe_style,
+            face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
+            upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);

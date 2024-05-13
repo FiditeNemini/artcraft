@@ -99,6 +99,9 @@ pub struct InferenceArgs<'s> {
     /// If set, Python will be in charge of overwriting the prompt JSON file
     /// with the correct workflow args.
     pub maybe_style: Option<StyleTransferName>,
+
+    pub face_detailer_enabled: bool,
+    pub upscaler_enabled: bool,
 }
 
 impl ComfyInferenceCommand {
@@ -232,6 +235,14 @@ impl ComfyInferenceCommand {
             command.push_str(" --style ");
             command.push_str(style.to_str());
             command.push_str(" ");
+        }
+
+        if args.face_detailer_enabled {
+            command.push_str(" --face-detailer-enabled=true ");
+        }
+
+        if args.upscaler_enabled {
+            command.push_str(" --upscaler-enabled=true ");
         }
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {

@@ -279,6 +279,8 @@ pub async fn enqueue_comfy_ui_handler(
         enable_lipsync: None,
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
             .map(|value| str_to_bool(&value)),
+        use_face_detailer: None,
+        use_upscaler: None,
     };
 
     info!("Creating ComfyUI job record...");

@@ -134,4 +134,12 @@ pub struct WorkflowArgs {
     #[serde(rename = "pa")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rollout_python_workflow_args: Option<bool>,
+
+    #[serde(rename = "fd")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub use_face_detailer: Option<bool>,
+
+    #[serde(rename = "up")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub use_upscaler: Option<bool>,
 }

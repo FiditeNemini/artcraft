@@ -78,6 +78,14 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Only for premium accounts
     remove_watermark: Option<bool>,
 
+    /// Use face detailer
+    /// Only for premium accounts
+    use_face_detailer: Option<bool>,
+
+    /// Use video upscaler
+    /// Only for premium accounts
+    use_upscaler: Option<bool>,
+
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
 }
@@ -290,6 +298,8 @@ pub async fn enqueue_video_style_transfer_handler(
         target_fps: None,
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
             .map(|value| str_to_bool(&value)),
+        use_face_detailer: request.use_face_detailer,
+        use_upscaler: request.use_upscaler,
     };
 
     info!("Creating ComfyUI job record...");
