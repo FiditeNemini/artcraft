@@ -19,7 +19,7 @@ export class AnimationEngine {
       1.0,
       clip_name,
     );
-    this.clips[object_uuid + media_id]._load_animation();
+    //this.clips[object_uuid + media_id]._load_animation();
   }
 }
 

@@ -746,9 +746,10 @@ export class TimeLine {
               object.uuid + element.media_id
             ].play(object);
             const fps = 60;
-            this.animation_engine.clips[object.uuid + element.media_id].step(
-              (this.scrubber_frame_position - element.offset) / fps, // Double FPS for best result.
+            await this.animation_engine.clips[object.uuid + element.media_id].step(
+              (this.scrubber_frame_position-element.offset) / fps, this.is_playing, this.scrubber_frame_position// Double FPS for best result.
             );
+            //this.animation_engine.clips[object.uuid + element.media_id].update_bones();
           }
         } else if (element.type === ClipType.EXPRESSION) {
           if (object) {
