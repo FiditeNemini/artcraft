@@ -56,7 +56,7 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// The name of the style to invoke (required)
     style: StyleTransferName,
 
-    // The input file (required)
+    /// The input video media file (required)
     input_file: MediaFileToken,
 
     /// The positive prompt (optional)
@@ -88,6 +88,11 @@ pub struct EnqueueVideoStyleTransferRequest {
 
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
+
+    // TODO(bt,2024-05-13): Plumb this through to jobs.
+    /// Optional Global IP-Adapter image.
+    /// The underlying media file must be an image.
+    ipa_media_token: Option<MediaFileToken>,
 }
 
 #[derive(Serialize, ToSchema)]
