@@ -14,13 +14,19 @@ CREATE TABLE beta_keys (
   -- ========== KEY INFO ==========
 
   -- Name of the product the key applies to
-  product_name VARCHAR(32) NOT NULL,
+  product VARCHAR(32) NOT NULL,
 
-  -- The actual key value that the user inputs.
+  -- The actual key value that the user inputs
   -- Crockford-encoded.
-  key_value VARCHAR(32) DEFAULT NULL,
+  key_value VARCHAR(32) NOT NULL,
 
-  -- ========== USERS ==========
+  -- ========== REFERRER USER ==========
+
+  -- The user that offers the beta key to other users.
+  -- We can show a dashboard of unredeemed tokens for these users.
+  maybe_referrer_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- ========== REDEEMER USER ==========
 
   -- The user that redeems the beta key.
   -- If set, the key has been redeemed.
@@ -42,9 +48,10 @@ CREATE TABLE beta_keys (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
-  UNIQUE KEY (product_name, key_value),
   UNIQUE KEY (key_value),
 
+  KEY index_maybe_referrer_user_token (maybe_referrer_user_token),
+  KEY index_maybe_redeemer_user_token (maybe_redeemer_user_token),
   KEY index_created_at (created_at),
   KEY index_maybe_redeemed_at (maybe_redeemed_at)
 
