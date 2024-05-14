@@ -56,7 +56,7 @@ const PrelaunchLanding: React.FC = () => {
   const fetchMediaItems = async () => {
     try {
       const response = await fetch(
-        "https://api.storyteller.ai/v1/media_files/list_featured?page_size=63&filter_media_classes=video"
+        "https://api.storyteller.ai/v1/media_files/list_featured?page_size=1000&filter_media_classes=video"
       );
       const data = await response.json();
       if (data.success) {
