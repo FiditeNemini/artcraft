@@ -27,6 +27,8 @@ pub struct InsertArgs<'a> {
     //pub duration_millis: u64,
 
     pub maybe_title: Option<&'a str>,
+    pub maybe_style_transfer_source_media_file_token: Option<&'a MediaFileToken>,
+    pub maybe_scene_source_media_file_token: Option<&'a MediaFileToken>,
 
     pub maybe_prompt_token: Option<&'a PromptToken>,
 
@@ -92,6 +94,9 @@ SET
 
   checksum_sha2 = ?,
 
+  maybe_style_transfer_source_media_file_token = ?,
+  maybe_scene_source_media_file_token = ?,
+
   maybe_title = ?,
   maybe_prompt_token = ?,
 
@@ -127,6 +132,9 @@ SET
       args.file_size_bytes,
 
       args.sha256_checksum,
+
+      args.maybe_style_transfer_source_media_file_token.map(|t| t.as_str()),
+      args.maybe_scene_source_media_file_token.map(|t| t.as_str()),
 
       args.maybe_title,
       args.maybe_prompt_token.map(|e| e.as_str()),

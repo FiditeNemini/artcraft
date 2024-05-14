@@ -43,6 +43,9 @@ pub struct MediaFile {
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
+  pub maybe_style_transfer_source_media_file_token: Option<MediaFileToken>,
+  pub maybe_scene_source_media_file_token: Option<MediaFileToken>,
+
   pub maybe_title: Option<String>,
   pub maybe_text_transcript: Option<String>,
 
@@ -122,6 +125,9 @@ pub struct MediaFileRaw {
   pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
+
+  pub maybe_style_transfer_source_media_file_token: Option<MediaFileToken>,
+  pub maybe_scene_source_media_file_token: Option<MediaFileToken>,
 
   pub maybe_title: Option<String>,
   pub maybe_text_transcript: Option<String>,
@@ -215,6 +221,8 @@ pub async fn get_media_file(
     media_class: record.media_class,
     maybe_media_subtype: record.maybe_media_subtype,
     maybe_batch_token: record.maybe_batch_token,
+    maybe_style_transfer_source_media_file_token: record.maybe_style_transfer_source_media_file_token,
+    maybe_scene_source_media_file_token: record.maybe_scene_source_media_file_token,
     maybe_title: record.maybe_title,
     maybe_text_transcript: record.maybe_text_transcript,
     maybe_origin_filename: record.maybe_origin_filename,
@@ -279,6 +287,9 @@ SELECT
     m.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
 
     m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
+
+    m.maybe_style_transfer_source_media_file_token as `maybe_style_transfer_source_media_file_token: tokens::tokens::media_files::MediaFileToken`,
+    m.maybe_scene_source_media_file_token as `maybe_scene_source_media_file_token: tokens::tokens::media_files::MediaFileToken`,
 
     m.maybe_title,
     m.maybe_text_transcript,
@@ -378,6 +389,10 @@ SELECT
     m.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
 
     m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
+
+    m.maybe_style_transfer_source_media_file_token as `maybe_style_transfer_source_media_file_token: tokens::tokens::media_files::MediaFileToken`,
+    m.maybe_scene_source_media_file_token as `maybe_scene_source_media_file_token: tokens::tokens::media_files::MediaFileToken`,
+
 
     m.maybe_title,
     m.maybe_text_transcript,

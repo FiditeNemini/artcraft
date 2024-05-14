@@ -40,6 +40,7 @@ use tokens::tokens::prompts::PromptToken;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
+use crate::job::job_types::workflow::comfy_ui::download_input_video::{download_input_video, DownloadInputVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::job_outputs::JobOutputs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
@@ -279,35 +280,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== DOWNLOAD VIDEO ==================== //
 
-    let input_media_file_token = match job_args.maybe_input_file {
-        None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("No input video file provided"))),
-        Some(token) => token.clone(),
-    };
-
-    info!("Querying input media file by token: {:?} ...", &input_media_file_token);
-
-    let input_media_file =  get_media_file(
-        &input_media_file_token,
-        false,
-        &deps.db.mysql_pool
-    ).await?.ok_or_else(|| {
-        error!("input media_file not found: {:?}", &input_media_file_token);
-        ProcessSingleJobError::Other(anyhow!("input media_file not found: {:?}", &input_media_file_token))
-    })?;
-
-    let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
-        &input_media_file.public_bucket_directory_hash,
-        input_media_file.maybe_public_bucket_prefix.as_deref(),
-        input_media_file.maybe_public_bucket_extension.as_deref());
-
-    info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
-
-    info!("Downloading input file to {:?}", videos.original_video_path);
-
-    remote_cloud_file_client.download_media_file(
-        &media_file_bucket_path,
-        path_to_string(&videos.original_video_path)
-    ).await?;
+    let download_video = download_input_video(DownloadInputVideoArgs {
+        job_args: &job_args,
+        videos: &videos,
+        mysql_pool: &deps.db.mysql_pool,
+        remote_cloud_file_client: &remote_cloud_file_client,
+    }).await?;
 
     info!("Downloaded video!");
 
@@ -694,7 +672,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         pool: &args.job_dependencies.db.mysql_pool,
         job: &job,
         maybe_mime_type: Some(&mimetype),
-        maybe_title: input_media_file.maybe_title.as_deref(),
+        maybe_title: download_video.input_video_media_file.maybe_title.as_deref(),
+        maybe_style_transfer_source_media_file_token: download_video.input_video_media_file.maybe_style_transfer_source_media_file_token.as_ref(),
+        maybe_scene_source_media_file_token: download_video.input_video_media_file.maybe_scene_source_media_file_token.as_ref(),
         file_size_bytes,
         sha256_checksum: &file_checksum,
         maybe_prompt_token: Some(&prompt_token),
