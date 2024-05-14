@@ -12,6 +12,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
+use utoipa::ToSchema;
 
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
@@ -26,19 +27,19 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct ListCommentsPathInfo {
   entity_type: CommentEntityType,
   entity_token: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ListCommentsSuccessResponse {
   pub success: bool,
   pub comments: Vec<Comment>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct Comment {
   pub token: CommentToken,
 
@@ -81,7 +82,7 @@ pub struct Comment {
 //  pub maybe_object_owner_deleted_at: Option<DateTime<Utc>>,
 //}
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum ListCommentsError {
   ServerError,
 }
@@ -109,6 +110,21 @@ impl fmt::Display for ListCommentsError {
   }
 }
 
+/// List comments for an entity of a given type.
+///
+/// You need to supply the entity type (media files, model weights, users, etc.) and the token of the entity.
+#[utoipa::path(
+  get,
+  tag = "Comments",
+  path = "/v1/comments/list/{entity_type}/{entity_token}",
+  params(
+    ("path" = ListCommentsPathInfo, description = "Path for Request"),
+  ),
+  responses(
+    (status = 200, description = "List Media Files by Batch", body = ListCommentsSuccessResponse),
+    (status = 500, description = "Server error", body = ListCommentsError),
+  ),
+)]
 pub async fn list_comments_handler(
   _http_request: HttpRequest,
   path: Path<ListCommentsPathInfo>,

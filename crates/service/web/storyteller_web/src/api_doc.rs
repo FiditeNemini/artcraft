@@ -2,6 +2,7 @@ use utoipa::OpenApi;
 
 use billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::*;
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
@@ -22,6 +23,7 @@ use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::batch_generations::*;
+use tokens::tokens::comments::*;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
 use tokens::tokens::model_weights::*;
@@ -43,6 +45,10 @@ use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::weights_cover_image_details::*;
+use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
+use crate::http_server::endpoints::comments::create_comment_handler::*;
+use crate::http_server::endpoints::comments::delete_comment_handler::*;
+use crate::http_server::endpoints::comments::list_comments_handler::*;
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
 use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::featured_items::create_featured_item_handler::*;
@@ -106,6 +112,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
 #[openapi(
   paths(
     billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler,
+    crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler,
+    crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler,
+    crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler,
+    crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler,
     crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
     crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
     crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler,
@@ -169,6 +179,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
   components(schemas(
     // Tokens
     BatchGenerationToken,
+    CommentToken,
     InferenceJobToken,
     MediaFileToken,
     ModelWeightToken,
@@ -178,6 +189,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ZsVoiceDatasetToken,
 
     // Enums
+    CommentEntityType,
     FrontendFailureCategory,
     InferenceCategory,
     JobStatusPlus,
@@ -238,9 +250,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityPathInfo,
     ChangeMediaFileVisibilityRequest,
+    CreateBetaKeysError,
+    CreateBetaKeysRequest,
+    CreateBetaKeysSuccessResponse,
     CreateCheckoutSessionError,
     CreateCheckoutSessionRequest,
     CreateCheckoutSessionSuccessResponse,
+    CreateCommentError,
+    CreateCommentRequest,
+    CreateCommentSuccessResponse,
     CreateFeaturedItemError,
     CreateFeaturedItemRequest,
     CreateFeaturedItemSuccessResponse,
@@ -249,6 +267,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     CreateUserBookmarkError,
     CreateUserBookmarkRequest,
     CreateUserBookmarkSuccessResponse,
+    DeleteCommentError,
+    DeleteCommentPathInfo,
+    DeleteCommentRequest,
     DeleteFeaturedItemError,
     DeleteFeaturedItemRequest,
     DeleteMediaFileError,
@@ -306,6 +327,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     InferTtsSuccessResponse,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
+    ListCommentsError,
+    ListCommentsPathInfo,
+    ListCommentsSuccessResponse,
     ListDatasetsByUserError,
     ListDatasetsByUserPathInfo,
     ListDatasetsByUserSuccessResponse,

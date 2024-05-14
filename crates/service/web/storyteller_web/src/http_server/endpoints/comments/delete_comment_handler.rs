@@ -11,6 +11,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::{error, warn};
+use utoipa::ToSchema;
 
 use mysql_queries::queries::comments::delete_comment::{delete_comment, DeleteCommentAs};
 use mysql_queries::queries::comments::get_comment::get_comment;
@@ -21,18 +22,18 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct DeleteCommentPathInfo {
   comment_token: CommentToken,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct DeleteCommentRequest {
   /// NB: this is only to disambiguate when a user is both a mod and an author.
   as_mod: Option<bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum DeleteCommentError {
   BadInput(String),
   NotAuthorized,
@@ -69,6 +70,22 @@ impl fmt::Display for DeleteCommentError {
   }
 }
 
+/// Delete a comment.
+#[utoipa::path(
+  post,
+  tag = "Comments",
+  path = "/v1/comments/delete/{comment_token}",
+  params(
+    ("request" = DeleteCommentRequest, description = "Payload for Request"),
+    ("path" = DeleteCommentPathInfo, description = "Path for Request"),
+  ),
+  responses(
+    (status = 200, description = "Success", body = SimpleGenericJsonSuccess),
+    (status = 400, description = "Bad input", body = DeleteCommentError),
+    (status = 401, description = "Not authorized", body = DeleteCommentError),
+    (status = 500, description = "Server error", body = DeleteCommentError),
+  ),
+)]
 pub async fn delete_comment_handler(
   http_request: HttpRequest,
   path: Path<DeleteCommentPathInfo>,

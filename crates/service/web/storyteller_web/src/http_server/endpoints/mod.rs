@@ -1,5 +1,6 @@
 pub mod animation;
 pub mod api_tokens;
+pub mod beta_keys;
 pub mod categories;
 pub mod comments;
 pub mod conversion;

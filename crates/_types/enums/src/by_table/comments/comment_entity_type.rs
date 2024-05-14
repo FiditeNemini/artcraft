@@ -4,10 +4,11 @@ use serde::Serialize;
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+use utoipa::ToSchema;
 
 /// Used in the `comments` table in a `VARCHAR(32)` field named `entity_type`.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize, ToSchema)]
 pub enum CommentEntityType {
   /// User
   #[serde(rename = "user")]
