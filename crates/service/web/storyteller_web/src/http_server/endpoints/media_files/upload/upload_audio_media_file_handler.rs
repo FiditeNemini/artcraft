@@ -333,6 +333,8 @@ pub async fn upload_audio_media_file_handler(
     maybe_duration_millis,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
+    maybe_scene_source_media_file_token: None,
+    is_intermediate_system_file: false,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
     maybe_public_bucket_extension: Some(&extension),

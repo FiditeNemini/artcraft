@@ -67,6 +67,11 @@ pub struct UploadNewVideoMediaFileForm {
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<Visibility>, format = Binary)]
   maybe_visibility: Option<Text<Visibility>>,
+
+  /// Optional: If an engine scene was used to generate this video, provide it here to create a link.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<MediaFileToken>, format = Binary)]
+  maybe_scene_source_media_file_token: Option<Text<MediaFileToken>>,
 }
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
@@ -267,6 +272,12 @@ pub async fn upload_new_video_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
+  let maybe_scene_source_media_file_token = form.maybe_scene_source_media_file_token
+      .as_ref()
+      .map(|token| &token.0);
+
+  let is_intermediate_system_file = maybe_scene_source_media_file_token.is_some();
+
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
     maybe_media_class: Some(MediaFileClass::Video),
     media_file_type: MediaFileType::Video,
@@ -282,6 +293,8 @@ pub async fn upload_new_video_media_file_handler(
     maybe_duration_millis:  Some(mp4_info.duration_millis as u64),
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
+    maybe_scene_source_media_file_token: maybe_scene_source_media_file_token,
+    is_intermediate_system_file,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
     maybe_public_bucket_extension: Some(&extension),

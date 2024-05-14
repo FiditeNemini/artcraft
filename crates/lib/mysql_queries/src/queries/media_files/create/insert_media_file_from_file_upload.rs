@@ -47,6 +47,9 @@ pub struct InsertMediaFileFromUploadArgs<'a> {
   pub maybe_title: Option<&'a str>,
   pub maybe_duration_millis: Option<u64>,
 
+  pub maybe_scene_source_media_file_token: Option<&'a MediaFileToken>,
+  pub is_intermediate_system_file: bool,
+
   pub public_bucket_directory_hash: &'a str,
   pub maybe_public_bucket_prefix: Option<&'a str>,
   pub maybe_public_bucket_extension: Option<&'a str>,
@@ -123,6 +126,9 @@ SET
 
   creator_set_visibility = ?,
 
+  maybe_scene_source_media_file_token = ?,
+  is_intermediate_system_file = ?,
+
   maybe_creator_file_synthetic_id = ?,
   maybe_creator_category_synthetic_id = ?,
 
@@ -160,6 +166,9 @@ SET
       args.creator_ip_address,
 
       args.creator_set_visibility.to_str(),
+
+      args.maybe_scene_source_media_file_token.map(|t| t.as_str()),
+      args.is_intermediate_system_file,
 
       maybe_creator_file_synthetic_id,
       maybe_creator_category_synthetic_id,
