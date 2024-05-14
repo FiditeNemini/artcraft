@@ -41,12 +41,11 @@ CREATE TABLE beta_keys (
 
   -- INDICES --
   PRIMARY KEY (id),
-  UNIQUE KEY (entity_type, entity_token),
-
-  KEY index_maybe_sort_order_asc (maybe_sort_order ASC),
-  KEY index_maybe_sort_order_desc (maybe_sort_order DESC),
+  UNIQUE KEY (token),
+  UNIQUE KEY (product_name, key_value),
+  UNIQUE KEY (key_value),
 
   KEY index_created_at (created_at),
-  KEY index_deleted_at (deleted_at)
+  KEY index_maybe_redeemed_at (maybe_redeemed_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
