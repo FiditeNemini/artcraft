@@ -298,14 +298,14 @@ export class APIManager {
     fileName: string,
     style: string = "comic_book",
     positive_prompt: string,
-    negative_prompt: string,
+    negative_prompt: string
   ): Promise<string> {
     const url = `${environmentVariables.value.FUNNEL_API}/preview/`;
 
     const payload = {
       style: style,
       positive_prompt: positive_prompt,
-      negative_prompt: negative_prompt,
+      negative_prompt: negative_prompt
     };
 
     const formData = new FormData();
@@ -354,7 +354,10 @@ export class APIManager {
     positive_prompt: string,
     negative_prompt: string,
     visibility: Visibility,
+    use_face_detailer: boolean = false,
+    use_upscaler: boolean = false
   ) {
+
     const uuid = uuidv4();
 
     const data = {
@@ -367,6 +370,8 @@ export class APIManager {
       trim_end_millis: 3000,
       enable_lipsync: true,
       creator_set_visibility: visibility,
+      use_face_detailer: use_face_detailer,
+      use_upscaler: use_upscaler,
     };
 
     const json_data = JSON.stringify(data);

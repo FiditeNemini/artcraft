@@ -44,6 +44,7 @@ import { AuthState } from "~/contexts/Authentication/types";
 import { hotkeysStatus } from "~/pages/PageEnigma/store";
 import { SceneSignal } from "~/store";
 import { ToastTypes } from "~/contexts/ToasterContext";
+import { GenerationOptions } from "../models/generationOptions";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 
@@ -145,6 +146,9 @@ class Editor {
 
   // global names of scene entities
   camera_name: string;
+
+  generation_options: GenerationOptions;
+
   constructor({
     dispatchAppUiState,
     signalScene,
@@ -270,6 +274,8 @@ class Editor {
       "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
+
+    this.generation_options = { faceDetail: false, upscale:false }
   }
 
   isEmpty(value: string) {
@@ -1236,6 +1242,8 @@ class Editor {
         this.positive_prompt,
         this.negative_prompt,
         Visibility.Public,
+        this.generation_options.faceDetail,
+        this.generation_options.upscale
       )
       .catch((error) => {
         console.log(error);

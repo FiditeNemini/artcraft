@@ -64,10 +64,6 @@ export const ExpressionTab = () => {
       },
     ).then((res: GetMediaListResponse) => {
 
-      console.log("HELLO!")
-      console.log(res)
-      console.log("RESULT")
-
       if (res.success && res.results) {
 
         expressionItems.value = res.results.map((item, index: number) => {

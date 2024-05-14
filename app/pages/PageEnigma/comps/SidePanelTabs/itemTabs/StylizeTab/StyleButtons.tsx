@@ -5,11 +5,17 @@ import { useSignals } from "@preact/signals-react/runtime";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-
+import { Switch } from '@headlessui/react'
+import { useState } from "react";
+import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 export function StyleButtons() {
   useSignals();
 
+  const [upscale, setUpscale] = useState(false)
+  const [faceDetail, setFaceDetail] = useState(false)
+
   const switchPreview = async () => {
+
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.ENTER_PREVIEW_STATE,
@@ -18,6 +24,7 @@ export function StyleButtons() {
   };
 
   const switchEdit = async () => {
+   
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.ENTER_EDIT_STATE,
@@ -26,11 +33,18 @@ export function StyleButtons() {
   };
 
   const generateMovie = async () => {
+
+    const options:GenerationOptions = { 
+      upscale:upscale,
+      faceDetail:faceDetail,
+    }
+
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.GENERATE_VIDEO,
-      data: null,
+      data: options,
     });
+
   };
 
   return (
@@ -62,6 +76,41 @@ export function StyleButtons() {
         )}
       </div>
       <div className="w-full">
+      <Switch.Group>
+
+      <div className="flex items-center">
+        <Switch.Label className="mr-4">Upscale</Switch.Label>
+        <Switch
+          checked={upscale}
+          onChange={setUpscale}
+          className={`${
+            upscale ? 'bg-blue-600' : 'bg-gray-200'
+          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+        >
+          <span
+            className={`${
+              upscale ? 'translate-x-6' : 'translate-x-1'
+            } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+          />
+        </Switch>
+      </div>
+      <div className="flex items-center">
+        <Switch.Label className="mr-4">Face Detail</Switch.Label>
+        <Switch
+          checked={faceDetail}
+          onChange={setFaceDetail}
+          className={`${
+            faceDetail ? 'bg-blue-600' : 'bg-gray-200'
+          } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+        >
+          <span
+            className={`${
+              faceDetail ? 'translate-x-6' : 'translate-x-1'
+            } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+          />
+        </Switch>
+      </div>
+    </Switch.Group>
         <Label>
           When you&apos;re done, render your entire animation with AI
         </Label>

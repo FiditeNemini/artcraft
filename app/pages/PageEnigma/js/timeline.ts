@@ -16,6 +16,7 @@ import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/js/editor";
 import EmotionEngine from "./emotion_engine";
+import { GenerationOptions } from '../models/generationOptions';
 
 // Every object uuid / entity has a track.
 export class TimelineDataState {
@@ -61,7 +62,6 @@ export class TimeLine {
 
   camera_name: string;
   // ensure that the elements are loaded first.
-
   constructor(
     editor: Editor,
     audio_engine: AudioEngine,
@@ -102,6 +102,7 @@ export class TimeLine {
     this.current_time = 0;
 
     this.camera_name = camera_name;
+   
   }
 
   public async updateUI() {
@@ -174,6 +175,7 @@ export class TimeLine {
         this.editorEngine.switchCameraView();
         break;
       case toEngineActions.GENERATE_VIDEO:
+        this.editorEngine.generation_options = data;
         this.editorEngine.generateVideo();
         break;
       default:

@@ -11,6 +11,7 @@ import { toTimelineActions } from "./toTimelineActions";
 
 import { ClipUI } from "../datastructures/clips/clip_ui";
 import { ToastTypes } from "~/contexts/ToasterContext";
+import { GenerationOptions } from "../models/generationOptions";
 
 export type ToastDataType = {
   type: ToastTypes;
@@ -29,6 +30,7 @@ type UnionedDataTypes =
   | ClipUI[]
   | MediaItem
   | ToastDataType
+  | GenerationOptions
   | null;
 
 export type QueueSubscribeType = {
