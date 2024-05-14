@@ -86,7 +86,7 @@ const PrelaunchLanding: React.FC = () => {
           gridItems.push(
             <div
               key="10-12"
-              className={`grid-item triple-grid grid-item-custom ${
+              className={`prelaunch-grid-item triple-grid prelaunch-grid-item-custom ${
                 isBlank ? "blank" : ""
               }`}
             >
@@ -104,7 +104,7 @@ const PrelaunchLanding: React.FC = () => {
           gridItems.push(
             <div
               key="17-19"
-              className={`grid-item triple-grid grid-item-custom ${
+              className={`prelaunch-grid-item triple-grid prelaunch-grid-item-custom ${
                 isBlank ? "blank" : ""
               }`}
             >
@@ -122,7 +122,7 @@ const PrelaunchLanding: React.FC = () => {
           gridItems.push(
             <div
               key="22-23"
-              className={`grid-item double-grid grid-item-custom ${
+              className={`prelaunch-grid-item double-grid prelaunch-grid-item-custom ${
                 isBlank ? "blank" : ""
               }`}
             >
@@ -151,8 +151,8 @@ const PrelaunchLanding: React.FC = () => {
       gridItems.push(
         <div
           key={i}
-          className={`grid-item ${isBlank ? "blank" : ""} ${
-            i === customGridItemIndex ? "grid-item-custom" : ""
+          className={`prelaunch-grid-item ${isBlank ? "blank" : ""} ${
+            i === customGridItemIndex ? "prelaunch-grid-item-custom" : ""
           }`.trim()}
         >
           {isBlank ? (
@@ -179,7 +179,7 @@ const PrelaunchLanding: React.FC = () => {
     return gridItems;
   };
 
-  return <div className="grid-container">{renderGridItems()}</div>;
+  return <div className="prelaunch-grid-container">{renderGridItems()}</div>;
 };
 
 export default PrelaunchLanding;
