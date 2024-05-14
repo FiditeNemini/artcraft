@@ -82,26 +82,34 @@ pub struct InferenceArgs<'s> {
     pub stderr_output_file: &'s Path,
     pub stdout_output_file: &'s Path,
 
-    /// Location of the prompt JSON file
-    pub prompt_location: &'s Path,
-
-    /// Positive prompt file.
-    /// If set, Python will be in charge of overwriting the prompt JSON file
-    /// with the correct workflow args.
-    pub maybe_positive_prompt_filename: Option<&'s Path>,
-
-    /// Negative prompt file.
-    /// If set, Python will be in charge of overwriting the prompt JSON file
-    /// with the correct workflow args.
-    pub maybe_negative_prompt_filename: Option<&'s Path>,
-
-    /// Style name
-    /// If set, Python will be in charge of overwriting the prompt JSON file
-    /// with the correct workflow args.
-    pub maybe_style: Option<StyleTransferName>,
+    pub inference_details: InferenceDetails<'s>,
 
     pub face_detailer_enabled: bool,
     pub upscaler_enabled: bool,
+}
+
+pub enum InferenceDetails<'s> {
+    OldRustArgs {
+        /// Location of the prompt JSON file
+        /// Optional: This is used if the Rust side controls this prompt JSON construction.
+        prompt_location: PathBuf,
+    },
+    NewPythonArgs {
+        /// Positive prompt file.
+        /// Optional: If set, Python will be in charge of overwriting the prompt JSON file
+        /// with the correct workflow args.
+        maybe_positive_prompt_filename: Option<&'s Path>,
+
+        /// Negative prompt file.
+        /// Optional: If set, Python will be in charge of overwriting the prompt JSON file
+        /// with the correct workflow args.
+        maybe_negative_prompt_filename: Option<&'s Path>,
+
+        /// Style name
+        /// Optional: If set, Python will be in charge of overwriting the prompt JSON file
+        /// with the correct workflow args.
+        maybe_style: Option<StyleTransferName>,
+    },
 }
 
 impl ComfyInferenceCommand {
@@ -215,26 +223,35 @@ impl ComfyInferenceCommand {
             }
         }
 
-        command.push_str(" --prompt ");
-        command.push_str(&path_to_string(args.prompt_location));
-        command.push_str(" ");
+        match args.inference_details {
+            InferenceDetails::OldRustArgs { ref prompt_location } => {
+                command.push_str(" --prompt ");
+                command.push_str(&path_to_string(prompt_location));
+                command.push_str(" ");
+            }
+            InferenceDetails::NewPythonArgs {
+                maybe_positive_prompt_filename,
+                maybe_negative_prompt_filename,
+                maybe_style
+            } => {
+                if let Some(positive_prompt_filename) = maybe_positive_prompt_filename {
+                    command.push_str(" --positive_prompt_filename ");
+                    command.push_str(&path_to_string(positive_prompt_filename));
+                    command.push_str(" ");
+                }
 
-        if let Some(positive_prompt_filename) = args.maybe_positive_prompt_filename {
-            command.push_str(" --positive_prompt_filename ");
-            command.push_str(&path_to_string(positive_prompt_filename));
-            command.push_str(" ");
-        }
+                if let Some(negative_prompt_filename) = maybe_negative_prompt_filename {
+                    command.push_str(" --negative_prompt_filename ");
+                    command.push_str(&path_to_string(negative_prompt_filename));
+                    command.push_str(" ");
+                }
 
-        if let Some(negative_prompt_filename) = args.maybe_negative_prompt_filename {
-            command.push_str(" --negative_prompt_filename ");
-            command.push_str(&path_to_string(negative_prompt_filename));
-            command.push_str(" ");
-        }
-
-        if let Some(style) = args.maybe_style {
-            command.push_str(" --style ");
-            command.push_str(style.to_str());
-            command.push_str(" ");
+                if let Some(style) = maybe_style {
+                    command.push_str(" --style ");
+                    command.push_str(style.to_str());
+                    command.push_str(" ");
+                }
+            }
         }
 
         if args.face_detailer_enabled {

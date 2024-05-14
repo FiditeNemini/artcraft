@@ -39,7 +39,7 @@ use tokens::tokens::prompts::PromptToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
+use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::job_outputs::JobOutputs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
@@ -374,29 +374,41 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let inference_start_time = Instant::now();
 
-    let prompt_path = PathBuf::from(&workflow_path);
-
     let positive_prompt_file = work_temp_dir.path().join("positive_prompt.txt");
     let negative_prompt_file = work_temp_dir.path().join("negative_prompt.txt");
 
-    let mut maybe_style = None;
-    let mut maybe_positive_prompt_filename = None;
-    let mut maybe_negative_prompt_filename = None;
+    let inference_details;
 
     // NB: We're rolling forward to a world where the JSON modifications are performed on the Python side.
     let python_side_orchestration = comfy_args.rollout_python_workflow_args.unwrap_or(false);
 
     if python_side_orchestration {
-        maybe_style = comfy_args.style_name;
+        let maybe_positive_prompt_filename = comfy_args.positive_prompt
+            .as_deref()
+            .map(|prompt| {
+                std::fs::write(&positive_prompt_file, prompt)
+                    .map(|_| positive_prompt_file.as_path())
+                    .map_err(|e| ProcessSingleJobError::IoError(e))
+            })
+            .transpose()?;
 
-        if let Some(positive_prompt) = comfy_args.positive_prompt.as_deref() {
-            std::fs::write(&positive_prompt_file, positive_prompt).map_err(|e| ProcessSingleJobError::IoError(e))?;
-            maybe_positive_prompt_filename = Some(positive_prompt_file.as_path());
+        let maybe_negative_prompt_filename = comfy_args.negative_prompt
+            .as_deref()
+            .map(|prompt| {
+                std::fs::write(&negative_prompt_file, prompt)
+                    .map(|_| negative_prompt_file.as_path())
+                    .map_err(|e| ProcessSingleJobError::IoError(e))
+            })
+            .transpose()?;
+
+        inference_details = InferenceDetails::NewPythonArgs {
+            maybe_style: comfy_args.style_name,
+            maybe_positive_prompt_filename,
+            maybe_negative_prompt_filename,
         }
-
-        if let Some(negative_prompt) = comfy_args.negative_prompt.as_deref() {
-            std::fs::write(&negative_prompt_file, negative_prompt).map_err(|e| ProcessSingleJobError::IoError(e))?;
-            maybe_negative_prompt_filename = Some(negative_prompt_file.as_path());
+    } else {
+        inference_details = InferenceDetails::OldRustArgs {
+            prompt_location: PathBuf::from(&workflow_path),
         }
     }
 
@@ -405,10 +417,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .execute_inference(InferenceArgs {
             stderr_output_file: &stderr_output_file,
             stdout_output_file: &stdout_output_file,
-            prompt_location: &prompt_path,
-            maybe_positive_prompt_filename,
-            maybe_negative_prompt_filename,
-            maybe_style,
+            inference_details,
             face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
             upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
         });
