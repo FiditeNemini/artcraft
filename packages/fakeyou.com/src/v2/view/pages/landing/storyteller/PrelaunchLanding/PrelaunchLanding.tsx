@@ -1,10 +1,8 @@
-// Grid.tsx
 import React, { useEffect, useState } from "react";
 import "./PrelaunchLanding.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { set } from "date-fns";
 
 interface MediaItem {
   token: string;
@@ -25,6 +23,7 @@ const PrelaunchLanding: React.FC = () => {
     updateGridsForScreenSize();
     window.addEventListener("resize", updateGridsForScreenSize);
     return () => window.removeEventListener("resize", updateGridsForScreenSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateGridsForScreenSize = () => {

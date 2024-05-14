@@ -190,16 +190,17 @@ export default function TopNav({
 
   useEffect(() => {
     const pageContentWrapper = document.getElementById("page-content-wrapper");
+
     if (pageContentWrapper) {
-      if (domain.titlePart === "Storyteller AI") {
+      if (domain.titlePart === "Storyteller AI" && isOnLandingPage) {
         pageContentWrapper.style.padding = "0px";
       } else {
         pageContentWrapper.style.padding = "";
       }
     }
-  }, [domain.titlePart]);
+  }, [domain.titlePart, isOnLandingPage]);
 
-  if (domain.titlePart === "Storyteller AI") {
+  if (domain.titlePart === "Storyteller AI" && isOnLandingPage) {
     return null;
   }
 
