@@ -61,11 +61,19 @@ const PrelaunchLanding: React.FC = () => {
       );
       const data = await response.json();
       if (data.success) {
-        setMediaItems(data.results);
+        setMediaItems(shuffleArray(data.results));
       }
     } catch (error) {
       console.error("Error fetching media items:", error);
     }
+  };
+
+  const shuffleArray = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   };
 
   const renderGridItems = () => {
@@ -89,7 +97,7 @@ const PrelaunchLanding: React.FC = () => {
               </button>
             </div>
           );
-          i++;
+          i += 2;
           continue;
         }
       } else if (screenSize === "md") {
