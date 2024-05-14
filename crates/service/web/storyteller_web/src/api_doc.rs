@@ -75,6 +75,7 @@ use crate::http_server::endpoints::media_files::upload::upload_audio_media_file_
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_video_media_file_handler::*;
@@ -155,6 +156,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
     crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
+    crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::upload_image_media_file_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler,
@@ -249,6 +251,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchMediaFileInfo,
     BatchRequestDetailsResponse,
     BatchResultDetailsResponse,
+    UploadImageMediaFileSuccessResponse,
+    UploadImageMediaFileForm,
     BatchStatusDetailsResponse,
     BookmarkRow,
     ChangeMediaFileVisibilityError,

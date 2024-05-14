@@ -255,11 +255,11 @@ impl ComfyInferenceCommand {
         }
 
         if args.face_detailer_enabled {
-            command.push_str(" --face-detailer-enabled=true ");
+            command.push_str(" --face-detailer-enabled ");
         }
 
         if args.upscaler_enabled {
-            command.push_str(" --upscaler-enabled=true ");
+            command.push_str(" --upscaler-enabled ");
         }
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {
