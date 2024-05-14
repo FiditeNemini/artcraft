@@ -21,7 +21,7 @@ import {
   WebsiteConfig,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
-import OnboardingSelection from "./storyteller/OnboardingSelection";
+// import OnboardingSelection from "./storyteller/OnboardingSelection";
 // import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
 import PrelaunchLanding from "./storyteller/PrelaunchLanding/PrelaunchLanding";
 
@@ -52,16 +52,16 @@ function LandingPage(props: Props) {
 
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
-  // DO NOT LEAK THIS YET!!
-  let protectedStudioOnboarding = <></>;
+  //// DO NOT LEAK THIS YET!!
+  //let protectedStudioOnboarding = <></>;
 
-  if (props.sessionWrapper.canAccessStudio()) {
-    protectedStudioOnboarding = (
-      <>
-        <OnboardingSelection />
-      </>
-    );
-  }
+  //if (props.sessionWrapper.canAccessStudio()) {
+  //  protectedStudioOnboarding = (
+  //    <>
+  //      <OnboardingSelection />
+  //    </>
+  //  );
+  //}
 
   return (
     <>

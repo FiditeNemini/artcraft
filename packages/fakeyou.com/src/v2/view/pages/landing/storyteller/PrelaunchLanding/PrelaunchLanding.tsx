@@ -126,10 +126,11 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <button className="waitlist-button">
+              <a href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha" 
+                className="btn waitlist-button">
                 Join the Waitlist
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
-              </button>
+              </a>
             </div>
           );
           i++;
