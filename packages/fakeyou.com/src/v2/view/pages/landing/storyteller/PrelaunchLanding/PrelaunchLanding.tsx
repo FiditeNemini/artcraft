@@ -90,10 +90,13 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <button className="waitlist-button">
+              <a
+                href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
+                className="waitlist-button text-center"
+              >
                 Join the Waitlist
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
-              </button>
+              </a>
             </div>
           );
           i += 2;
@@ -108,10 +111,13 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <button className="waitlist-button">
+              <a
+                href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
+                className="waitlist-button text-center"
+              >
                 Join the Waitlist
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
-              </button>
+              </a>
             </div>
           );
           i += 2;
@@ -126,8 +132,10 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <a href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha" 
-                className="btn waitlist-button">
+              <a
+                href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
+                className="waitlist-button text-center"
+              >
                 Join the Waitlist
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
               </a>
