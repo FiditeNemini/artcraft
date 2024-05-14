@@ -276,6 +276,8 @@ pub async fn upload_new_video_media_file_handler(
       .as_ref()
       .map(|token| &token.0);
 
+  // NB: If we're uploading a video file that references an engine scene, then this is an engine
+  // render video, and we should mark it as a system (hidden) file.
   let is_intermediate_system_file = maybe_scene_source_media_file_token.is_some();
 
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
