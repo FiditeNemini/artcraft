@@ -97,6 +97,7 @@
 
     &:hover {
       background-color: lighten($primary, 5%);
+      color: #fff;
     }
 
     @media (max-width: 992px) {
