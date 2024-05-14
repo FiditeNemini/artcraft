@@ -666,6 +666,16 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Saving ComfyUI result (media_files table record) ...");
 
+    // NB: We do this to avoid deep-frying the video.
+    // This also lets us hide the engine renders from users.
+    // This shouldn't ever become a deeply nested tree of children, but rather a single root
+    // with potentially many direct children.
+    let style_transfer_source_media_file_token = download_video
+        .input_video_media_file
+        .maybe_style_transfer_source_media_file_token
+        .as_ref()
+        .unwrap_or_else(|| &download_video.input_video_media_file.token);
+
     let prompt_token = PromptToken::generate();
 
     let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
@@ -673,7 +683,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         job: &job,
         maybe_mime_type: Some(&mimetype),
         maybe_title: download_video.input_video_media_file.maybe_title.as_deref(),
-        maybe_style_transfer_source_media_file_token: download_video.input_video_media_file.maybe_style_transfer_source_media_file_token.as_ref(),
+        maybe_style_transfer_source_media_file_token: Some(&style_transfer_source_media_file_token),
         maybe_scene_source_media_file_token: download_video.input_video_media_file.maybe_scene_source_media_file_token.as_ref(),
         file_size_bytes,
         sha256_checksum: &file_checksum,
