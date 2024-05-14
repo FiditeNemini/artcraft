@@ -68,7 +68,7 @@ pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) 
   let maybe_routing_tag = args.maybe_routing_tag
       .map(|routing_tag| {
         let mut routing_tag = routing_tag.trim().to_string();
-        routing_tag.truncate(32);
+        routing_tag.truncate(64);
         routing_tag
       });
 
