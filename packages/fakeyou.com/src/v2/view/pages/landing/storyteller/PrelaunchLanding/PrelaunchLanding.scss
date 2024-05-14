@@ -1,6 +1,6 @@
 @import "scss/colours.scss";
 
-.grid-container {
+.prelaunch-grid-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(7, calc(100vw / 7 * (9 / 16)));
@@ -23,7 +23,7 @@
   }
 }
 
-.grid-item {
+.prelaunch-grid-item {
   position: relative;
   background-color: rgba($white, 0.06);
   display: flex;
@@ -48,7 +48,7 @@
     height: 6rem;
   }
 
-  &.grid-item-custom {
+  &.prelaunch-grid-item-custom {
     overflow: visible;
     position: relative;
 
@@ -86,7 +86,7 @@
     font-weight: 500;
     color: #fff;
     background-color: $primary;
-    border-radius: 50px;
+    border-radius: 1rem;
     cursor: pointer;
     transition: all 0.2s;
     width: 84%;
@@ -115,7 +115,7 @@
   }
 }
 
-.grid-item.blank {
+.prelaunch-grid-item.blank {
   background-color: transparent;
   border: none;
 }
