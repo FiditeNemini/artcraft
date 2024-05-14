@@ -46,6 +46,7 @@ use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::weights_cover_image_details::*;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
+use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::*;
 use crate::http_server::endpoints::comments::create_comment_handler::*;
 use crate::http_server::endpoints::comments::delete_comment_handler::*;
 use crate::http_server::endpoints::comments::list_comments_handler::*;
@@ -113,6 +114,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
   paths(
     billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler,
     crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler,
+    crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler,
     crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler,
     crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler,
     crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler,
@@ -239,8 +241,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchGetUserBookmarksQueryParams,
     BatchGetUserBookmarksResponse,
     BatchGetUserRatingError,
+    ListBetaKeysQueryParams,
     BatchGetUserRatingQueryParams,
     BatchGetUserRatingResponse,
+    ListBetaKeysSuccessResponse,
+    ListBetaKeysError,
     BatchInferenceJobStatusResponsePayload,
     BatchMediaFileInfo,
     BatchRequestDetailsResponse,

@@ -121,7 +121,7 @@ impl fmt::Display for ListCommentsError {
     ("path" = ListCommentsPathInfo, description = "Path for Request"),
   ),
   responses(
-    (status = 200, description = "List Media Files by Batch", body = ListCommentsSuccessResponse),
+    (status = 200, description = "Success", body = ListCommentsSuccessResponse),
     (status = 500, description = "Server error", body = ListCommentsError),
   ),
 )]
