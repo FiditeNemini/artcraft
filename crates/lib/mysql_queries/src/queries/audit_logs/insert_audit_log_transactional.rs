@@ -1,5 +1,6 @@
 //! Audit logs are for entities that can be *edited* where we might lose the IP / edit history.
 
+use std::marker::PhantomData;
 use anyhow::anyhow;
 use sqlx::{Executor, MySql, Transaction};
 
@@ -10,7 +11,7 @@ use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::audit_logs::AuditLogToken;
 use tokens::tokens::users::UserToken;
 
-pub struct TransactionalInsertAuditLogArgs<'a, 'b> {
+pub struct InsertAuditLogTransactionalArgs<'a, 'b> {
   pub entity: &'a AuditLogEntity,
   pub entity_action: AuditLogEntityAction,
 
@@ -23,8 +24,8 @@ pub struct TransactionalInsertAuditLogArgs<'a, 'b> {
 }
 
 
-pub async fn transactional_insert_audit_log<'a, 'b>(
-  args: TransactionalInsertAuditLogArgs<'a, 'b>,
+pub async fn insert_audit_log_transactional<'a, 'b>(
+  args: InsertAuditLogTransactionalArgs<'a, 'b>,
 ) -> AnyhowResult<AuditLogToken> {
 
   let audit_log_token = AuditLogToken::generate();

@@ -15,7 +15,7 @@ use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
 use enums::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::audit_logs::insert_audit_log::{insert_audit_log, InsertAuditLogArgs};
-use mysql_queries::queries::audit_logs::transactional_insert_audit_log::{transactional_insert_audit_log, TransactionalInsertAuditLogArgs};
+use mysql_queries::queries::audit_logs::insert_audit_log_transactional::{insert_audit_log_transactional, InsertAuditLogTransactionalArgs};
 use mysql_queries::queries::entity_stats::stats_entity_token::StatsEntityToken;
 use mysql_queries::queries::entity_stats::upsert_entity_stats_on_bookmark_event::{BookmarkAction, upsert_entity_stats_on_bookmark_event, UpsertEntityStatsArgs};
 use mysql_queries::queries::featured_items::delete_featured_item::delete_featured_item;
@@ -158,7 +158,7 @@ pub async fn delete_featured_item_handler(
   let ip_address = get_request_ip(&http_request);
 
   // NB: fail open
-  let _r = transactional_insert_audit_log(TransactionalInsertAuditLogArgs {
+  let _r = insert_audit_log_transactional(InsertAuditLogTransactionalArgs {
     entity: &AuditLogEntity::User(user_session.user_token.clone()),
     entity_action: AuditLogEntityAction::FeaturedItemDelete,
     maybe_actor_user_token: Some(&user_session.user_token),
