@@ -1,24 +1,12 @@
-use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
-use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
-use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 
-use enums::by_table::media_files::media_file_class::MediaFileClass;
-use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
-use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
-use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
-use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
-use enums::by_table::media_files::media_file_type::MediaFileType;
-use enums::common::view_as::ViewAs;
-use enums::common::visibility::Visibility;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::beta_keys::BetaKeyToken;
-use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
-use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct BetaKeyListPage {
   pub records: Vec<BetaKeyListItem>,
@@ -143,6 +131,8 @@ SELECT
 
   b.created_at,
   b.maybe_redeemed_at
+
+FROM beta_keys AS b
 
 LEFT OUTER JOIN users AS referrer
     ON b.maybe_referrer_user_token = referrer.token

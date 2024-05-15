@@ -31,10 +31,12 @@ use crate::http_server::common_responses::media_file_origin_details::MediaFileOr
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::CreateBetaKeysError;
+use crate::http_server::endpoints::events::list_events::ListEventsError;
 use crate::http_server::endpoints::media_files::list::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::list::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::list::helpers::get_scoped_media_types::get_scoped_media_types;
 use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
+use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
 use crate::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
@@ -112,26 +114,14 @@ pub async fn list_beta_keys_handler(
   query: Query<ListBetaKeysQueryParams>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListBetaKeysError> {
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+  let user_session = require_user_session(&http_request, &server_state)
       .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        ListBetaKeysError::ServerError
+      .map_err(|err| match err {
+        RequireUserSessionError::ServerError => ListBetaKeysError::ServerError,
+        RequireUserSessionError::NotAuthorized => ListBetaKeysError::NotAuthorized,
       })?;
 
-  let mut is_mod = false;
-
-  let user_session = match maybe_user_session {
-    None => {
-      return Err(ListBetaKeysError::NotAuthorized);
-    },
-    Some(session) => {
-      is_mod = session.can_ban_users;
-      session
-    },
-  };
+  let mut is_mod = user_session.can_ban_users;
 
   let mut maybe_scope_user_token = None;
 

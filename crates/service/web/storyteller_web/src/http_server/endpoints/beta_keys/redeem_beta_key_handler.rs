@@ -9,6 +9,7 @@ use utoipa::ToSchema;
 
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::beta_keys::get_beta_key_by_value::get_beta_key_by_value;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use tokens::tokens::comments::CommentToken;
@@ -22,7 +23,10 @@ use tokens::tokens::w2l_templates::W2lTemplateToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
+use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::ListBetaKeysError;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
+use crate::http_server::web_utils::require_moderator::RequireModeratorError;
+use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -40,6 +44,7 @@ pub struct RedeemBetaKeySuccessResponse {
 pub enum RedeemBetaKeyError {
   BadInput(String),
   NotAuthorized,
+  NotFound,
   ServerError,
 }
 
@@ -48,6 +53,7 @@ impl ResponseError for RedeemBetaKeyError {
     match *self {
       RedeemBetaKeyError::BadInput(_) => StatusCode::BAD_REQUEST,
       RedeemBetaKeyError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      RedeemBetaKeyError::NotFound => StatusCode::NOT_FOUND,
       RedeemBetaKeyError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
@@ -56,6 +62,7 @@ impl ResponseError for RedeemBetaKeyError {
     let error_reason = match self {
       RedeemBetaKeyError::BadInput(reason) => reason.to_string(),
       RedeemBetaKeyError::NotAuthorized => "unauthorized".to_string(),
+      RedeemBetaKeyError::NotFound => "not found".to_string(),
       RedeemBetaKeyError::ServerError => "server error".to_string(),
     };
 
@@ -79,6 +86,7 @@ impl fmt::Display for RedeemBetaKeyError {
     (status = 200, description = "Success", body = RedeemBetaKeySuccessResponse),
     (status = 400, description = "Bad input", body = RedeemBetaKeyError),
     (status = 401, description = "Not authorized", body = RedeemBetaKeyError),
+    (status = 404, description = "Not found", body = RedeemBetaKeyError),
     (status = 500, description = "Server error", body = RedeemBetaKeyError),
   ),
   params(
@@ -91,37 +99,28 @@ pub async fn redeem_beta_key_handler(
   server_state: web::Data<Arc<ServerState>>,
 ) -> Result<HttpResponse, RedeemBetaKeyError>
 {
-  let mut mysql_connection = server_state.mysql_pool
-      .acquire()
+  let user_session = require_user_session(&http_request, &server_state)
+      .await
+      .map_err(|err| match err {
+        RequireUserSessionError::ServerError => RedeemBetaKeyError::ServerError,
+        RequireUserSessionError::NotAuthorized => RedeemBetaKeyError::NotAuthorized,
+      })?;
+
+  let maybe_beta_key = get_beta_key_by_value(&request.beta_key, &server_state.mysql_pool)
       .await
       .map_err(|err| {
-        warn!("MySql pool error: {:?}", err);
+        warn!("Error getting beta key by value: {:?}", &err);
         RedeemBetaKeyError::ServerError
       })?;
 
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
-      .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        RedeemBetaKeyError::ServerError
-      })?;
-
-  let user_session = match maybe_user_session {
-    Some(session) => session,
-    None => {
-      warn!("not logged in");
-      return Err(RedeemBetaKeyError::NotAuthorized);
-    }
+  let beta_key = match maybe_beta_key {
+    Some(beta_key) => beta_key,
+    None => return Err(RedeemBetaKeyError::NotFound),
   };
 
-  if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {:?}", user_session.user_token.as_str());
-    return Err(RedeemBetaKeyError::NotAuthorized);
+  if beta_key.maybe_redeemed_at.is_some() || beta_key.maybe_redeemer_user_token.is_some() {
+    return Err(RedeemBetaKeyError::BadInput("beta key already redeemed".to_string()));
   }
-
-  // TODO(bt,2024-05-13): Create beta key records
 
   let response = RedeemBetaKeySuccessResponse {
     success: true,
