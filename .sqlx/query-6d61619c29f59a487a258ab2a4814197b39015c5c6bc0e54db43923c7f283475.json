@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    maybe_feature_flags,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
+  "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    email_address,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    maybe_feature_flags,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -15,6 +15,16 @@
       },
       {
         "ordinal": 1,
+        "name": "email_address",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 2,
         "name": "username",
         "type_info": {
           "type": "VarString",
@@ -24,7 +34,7 @@
         }
       },
       {
-        "ordinal": 2,
+        "ordinal": 3,
         "name": "display_name",
         "type_info": {
           "type": "VarString",
@@ -34,7 +44,7 @@
         }
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "email_gravatar_hash",
         "type_info": {
           "type": "String",
@@ -44,7 +54,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "profile_markdown",
         "type_info": {
           "type": "Blob",
@@ -54,7 +64,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "profile_rendered_html",
         "type_info": {
           "type": "Blob",
@@ -64,7 +74,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "user_role_slug",
         "type_info": {
           "type": "VarString",
@@ -74,7 +84,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "disable_gravatar",
         "type_info": {
           "type": "Tiny",
@@ -84,7 +94,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "preferred_tts_result_visibility: enums::common::visibility::Visibility",
         "type_info": {
           "type": "String",
@@ -94,7 +104,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "preferred_w2l_result_visibility: enums::common::visibility::Visibility",
         "type_info": {
           "type": "String",
@@ -104,7 +114,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "discord_username",
         "type_info": {
           "type": "VarString",
@@ -114,7 +124,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "twitch_username",
         "type_info": {
           "type": "VarString",
@@ -124,7 +134,7 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "twitter_username",
         "type_info": {
           "type": "VarString",
@@ -134,7 +144,7 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "patreon_username",
         "type_info": {
           "type": "VarString",
@@ -144,7 +154,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "github_username",
         "type_info": {
           "type": "VarString",
@@ -154,7 +164,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "cashapp_username",
         "type_info": {
           "type": "VarString",
@@ -164,7 +174,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "website_url",
         "type_info": {
           "type": "VarString",
@@ -174,7 +184,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "is_banned",
         "type_info": {
           "type": "Tiny",
@@ -184,7 +194,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "maybe_mod_comments",
         "type_info": {
           "type": "VarString",
@@ -194,7 +204,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "maybe_mod_user_token",
         "type_info": {
           "type": "VarString",
@@ -204,7 +214,7 @@
         }
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "maybe_feature_flags",
         "type_info": {
           "type": "VarString",
@@ -214,7 +224,7 @@
         }
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -228,6 +238,7 @@
       "Right": 1
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -252,5 +263,5 @@
       false
     ]
   },
-  "hash": "0094fbe30590b24420db8f85726d04fbbe6ac080325c8fe874ffe19b6ef565a2"
+  "hash": "6d61619c29f59a487a258ab2a4814197b39015c5c6bc0e54db43923c7f283475"
 }

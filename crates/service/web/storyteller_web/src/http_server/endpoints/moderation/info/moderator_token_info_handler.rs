@@ -170,7 +170,8 @@ async fn get_entity_from_token(mysql_pool: &MySqlPool, token: &str) -> AnyhowRes
   }
 
   // If nothing else works, try username lookup
-  let maybe_result = get_user_profile_by_username(token, mysql_pool)
+  let username = token.to_lowercase();
+  let maybe_result = get_user_profile_by_username(&username, mysql_pool)
       .await?;
 
   maybe_to_string(maybe_result)

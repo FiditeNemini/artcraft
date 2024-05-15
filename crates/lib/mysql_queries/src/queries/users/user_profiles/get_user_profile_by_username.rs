@@ -50,6 +50,7 @@ pub struct UserProfileResult {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserProfileModeratorFields {
   pub is_banned: bool,
+  pub email_address: String,
   pub maybe_mod_comments: Option<String>,
   pub maybe_mod_user_token: Option<String>,
   pub maybe_feature_flags: Option<String>,
@@ -57,6 +58,7 @@ pub struct UserProfileModeratorFields {
 
 struct RawUserProfileRecord {
   user_token: UserToken,
+  email_address: String,
   username: String,
   email_gravatar_hash: String,
   display_name: String,
@@ -102,6 +104,7 @@ pub async fn get_user_profile_by_username_from_connection<'a>(
         r#"
 SELECT
     users.token as `user_token: tokens::tokens::users::UserToken`,
+    email_address,
     username,
     display_name,
     email_gravatar_hash,
@@ -171,6 +174,7 @@ WHERE
     created_at: profile_record.created_at,
     maybe_moderator_fields: Some(UserProfileModeratorFields {
       is_banned: i8_to_bool(profile_record.is_banned),
+      email_address: profile_record.email_address,
       maybe_mod_comments: profile_record.maybe_mod_comments,
       maybe_mod_user_token: profile_record.maybe_mod_user_token,
       maybe_feature_flags: profile_record.maybe_feature_flags,
