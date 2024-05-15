@@ -1235,6 +1235,7 @@ class Editor {
     }
     const upload_token = data["media_file_token"];
 
+
     const result = await this.api_manager
       .stylizeVideo(
         upload_token,

@@ -175,7 +175,8 @@ export class TimeLine {
         this.editorEngine.switchCameraView();
         break;
       case toEngineActions.GENERATE_VIDEO:
-        this.editorEngine.generation_options = data;
+        const options = data["data"]; // super overloaded talk to the devs about this. TODO... refactor
+        this.editorEngine.generation_options = options;
         this.editorEngine.generateVideo();
         break;
       default:
