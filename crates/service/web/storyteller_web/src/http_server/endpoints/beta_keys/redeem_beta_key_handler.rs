@@ -8,10 +8,12 @@ use log::warn;
 use utoipa::ToSchema;
 
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::beta_keys::get_beta_key_by_value::get_beta_key_by_value;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
+use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -22,6 +24,7 @@ use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
+use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::ListBetaKeysError;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
@@ -121,6 +124,28 @@ pub async fn redeem_beta_key_handler(
   if beta_key.maybe_redeemed_at.is_some() || beta_key.maybe_redeemer_user_token.is_some() {
     return Err(RedeemBetaKeyError::BadInput("beta key already redeemed".to_string()));
   }
+
+  let mut user_feature_flags =
+      UserSessionFeatureFlags::new(user_session.maybe_feature_flags.as_deref());
+
+  user_feature_flags.add_flags([
+    UserFeatureFlag::Studio,
+    UserFeatureFlag::VideoStyleTransfer,
+  ]);
+
+  let ip_address = get_request_ip(&http_request);
+
+  set_user_feature_flags(SetUserFeatureFlagArgs {
+    subject_user_token: &user_session.user_token,
+    maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
+    maybe_mod_user_token: None,
+    ip_address: &ip_address,
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|e| {
+        warn!("Could not set flags: {:?}", e);
+        RedeemBetaKeyError::ServerError
+      })?;
 
   let response = RedeemBetaKeySuccessResponse {
     success: true,

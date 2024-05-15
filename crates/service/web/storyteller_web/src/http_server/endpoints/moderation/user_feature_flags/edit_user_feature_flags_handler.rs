@@ -198,25 +198,14 @@ pub async fn edit_user_feature_flags_handler(
   set_user_feature_flags(SetUserFeatureFlagArgs {
     subject_user_token: &user_profile.user_token,
     maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
-    mod_user_token: &user_session.user_token,
+    maybe_mod_user_token: Some(&user_session.user_token),
+    ip_address: &ip_address,
     mysql_pool: &server_state.mysql_pool,
   }).await
     .map_err(|e| {
       warn!("Could not set flags: {:?}", e);
       EditUserFeatureFlagsError::ServerError
     })?;
-
-  // NB: fail open
-  let _r = insert_audit_log(InsertAuditLogArgs {
-    entity: &AuditLogEntity::User(user_profile.user_token),
-    entity_action: AuditLogEntityAction::EditFeatures,
-    maybe_actor_user_token: Some(&user_session.user_token),
-    maybe_actor_anonymous_visitor_token: None,
-    actor_ip_address: &ip_address,
-    is_actor_moderator: true,
-    mysql_executor: &server_state.mysql_pool,
-    phantom: Default::default(),
-  }).await;
 
   //if let Ok(mut redis) = redis_ttl_cache.get_connection() {
   //  // TODO(bt,2024-04-20): This should be coordinated with other code.
