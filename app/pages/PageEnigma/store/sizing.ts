@@ -51,6 +51,13 @@ export const minimizeIconPosition = computed(() => {
   );
 });
 
+export const timelinePremiumLockPosition = computed(() => {
+  return Math.min(
+    pageWidth.value - 2000 + timelineScrollX.value,
+    fullWidth.value - 24,
+  );
+});
+
 export const fullWidth = computed(() => {
   return filmLength.value * 60 * 4 * scale.value;
 });

@@ -31,6 +31,7 @@ import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHead
 import { pageWidth } from "~/store";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import { DoNotShow } from "~/pages/PageEnigma/constants/misc";
+import PremiumLockTimeline from "./PremiumLockTimeline";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -156,7 +157,9 @@ export const Timeline = () => {
               height: timelineHeight.value - 54,
             }}>
             <div
+              className="relative"
               style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}>
+              <PremiumLockTimeline locked={false} />
               <Characters />
               <div className="pb-4 pr-8">
                 <Camera />

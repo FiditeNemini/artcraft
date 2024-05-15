@@ -26,7 +26,7 @@ export const Scrubber = ({ page }: Props) => {
 
   return (
     <div
-      className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
+      className="absolute z-20 flex cursor-ew-resize flex-col items-center"
       style={{
         top: 16,
         left: displayTime * 4 * scale.value + 199 - scrollX,
