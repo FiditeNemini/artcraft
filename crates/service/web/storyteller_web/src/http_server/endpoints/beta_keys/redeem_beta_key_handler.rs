@@ -11,6 +11,7 @@ use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::beta_keys::get_beta_key_by_value::get_beta_key_by_value;
+use mysql_queries::queries::beta_keys::redeem_beta_key::redeem_beta_key;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
@@ -144,6 +145,13 @@ pub async fn redeem_beta_key_handler(
   }).await
       .map_err(|e| {
         warn!("Could not set flags: {:?}", e);
+        RedeemBetaKeyError::ServerError
+      })?;
+
+  redeem_beta_key(&request.beta_key, &user_session.user_token, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Could not redeem beta key: {:?}", e);
         RedeemBetaKeyError::ServerError
       })?;
 
