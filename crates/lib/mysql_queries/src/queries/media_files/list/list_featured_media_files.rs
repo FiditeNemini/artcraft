@@ -381,6 +381,9 @@ LEFT OUTER JOIN prompts
     query_builder.push_bind(offset as i64);
   }
 
+  // TODO: Argument to control
+  query_builder.push(" AND NOT m.is_intermediate_system_file ");
+
   query_builder.push(" GROUP BY m.id ");
 
   if sort_ascending {

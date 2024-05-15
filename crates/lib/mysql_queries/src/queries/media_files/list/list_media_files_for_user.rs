@@ -265,6 +265,9 @@ LEFT OUTER JOIN prompts
   //  query_builder.push_bind(media_type.to_str());
   //}
 
+  // TODO: Argument to control
+  query_builder.push(" AND NOT m.is_intermediate_system_file ");
+
   if let Some(media_types) = maybe_filter_media_types {
     // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
     // We'll skip the predicate if the list isn't empty.
