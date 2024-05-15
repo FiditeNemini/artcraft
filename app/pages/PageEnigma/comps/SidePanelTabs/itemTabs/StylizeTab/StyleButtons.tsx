@@ -17,8 +17,8 @@ export function StyleButtons() {
 
   const [value, setStyleStrength] = useState(0.7);
 
-  const sliderChanged = (event:React.ChangeEvent<HTMLInputElement>) => {
-     setStyleStrength(parseFloat(event.target.value));
+  const sliderChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStyleStrength(parseFloat(event.target.value));
   };
 
   const switchPreview = async () => {
@@ -38,7 +38,6 @@ export function StyleButtons() {
   };
 
   const generateMovie = async () => {
-    
     const options: GenerationOptions = {
       upscale: upscale,
       faceDetail: faceDetail,
@@ -81,27 +80,39 @@ export function StyleButtons() {
         )}
       </div>
       <div className="w-full">
-
-      <Label>
-          <div className="mb-1 leading-tight">
-            Set the Style Strength, the higher the value the more the style will be applied,
-            the lower the value the closer to source.
-          </div>
-        </Label>
-
-      <input 
-        type="range" 
-        value={value} min="0" 
-        max="1.0"
-        step="0.1"
-        onChange={sliderChanged} 
-        style={{width: "100%"}}
-        ></input>
         <Label>
-          <div className="mb-1 leading-tight">
-            Currently set to {value}
-          </div>
+          <div className="mb-1 leading-tight">Set the Style Strength</div>
         </Label>
+        <div className="mb-2 text-xs text-white/70">
+          (The higher the value the more the style will be applied, the lower
+          the value the closer to source.)
+        </div>
+
+        <div className="mb-3.5 flex gap-2">
+          <div className="rounde w-8 py-0.5 text-center font-medium">
+            {value}
+          </div>
+          <input
+            className="
+             active:accent-red-700 
+             w-full 
+             cursor-pointer 
+             accent-brand-primary 
+             outline-none 
+             transition-all 
+             duration-150 
+             hover:accent-brand-primary-400
+             focus:outline-none
+           "
+            type="range"
+            value={value}
+            min="0"
+            max="1.0"
+            step="0.1"
+            onChange={sliderChanged}
+          />
+        </div>
+
         <PremiumLock requiredPlan="any" plural={true}>
           <Switch.Group>
             <div className="mt-1 flex gap-6">
@@ -112,7 +123,6 @@ export function StyleButtons() {
                 <Switch
                   checked={upscale}
                   onChange={setUpscale}
-
                   className={`${
                     upscale
                       ? "bg-brand-primary"
