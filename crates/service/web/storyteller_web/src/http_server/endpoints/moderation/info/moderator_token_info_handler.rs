@@ -9,13 +9,13 @@ use log::{log, warn};
 use serde::Serialize;
 use sqlx::MySqlPool;
 use utoipa::ToSchema;
+
 use errors::AnyhowResult;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::model_weights::model_weight_info_lite::get_model_weight_info_lite::get_model_weight_info_lite;
 use mysql_queries::queries::prompts::get_prompt::get_prompt;
-
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_detailed_stats::{get_pending_tts_inference_job_detailed_stats, PendingCountResult};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_token::get_user_profile_by_token;
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
@@ -26,6 +26,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
+use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 
@@ -86,28 +87,12 @@ pub async fn moderator_get_token_info_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ModeratorTokenInfoError> {
 
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+  let user_session = require_moderator(&http_request, &server_state)
       .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        ModeratorTokenInfoError::ServerError
+      .map_err(|err| match err {
+        RequireModeratorError::ServerError => ModeratorTokenInfoError::ServerError,
+        RequireModeratorError::NotAuthorized => ModeratorTokenInfoError::Unauthorized,
       })?;
-
-  let user_session = match maybe_user_session {
-    Some(session) => session,
-    None => {
-      warn!("not logged in");
-      return Err(ModeratorTokenInfoError::Unauthorized);
-    }
-  };
-
-  // TODO: Not a good fit for this permission.
-  if !user_session.can_ban_users {
-    warn!("user is not allowed to view bans: {:?}", user_session.user_token);
-    return Err(ModeratorTokenInfoError::Unauthorized);
-  }
 
   let token = path.token.trim();
   let maybe_result = get_entity_from_token(&server_state.mysql_pool, &path.token)

@@ -23,6 +23,7 @@ use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
+use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -30,6 +31,7 @@ use crate::server_state::ServerState;
 pub struct CreateBetaKeysRequest {
   uuid_idempotency_token: String,
   maybe_referrer_username: Option<String>,
+  number_of_keys: u32,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -93,35 +95,12 @@ pub async fn create_beta_keys_handler(
   server_state: web::Data<Arc<ServerState>>,
 ) -> Result<HttpResponse, CreateBetaKeysError>
 {
-  let mut mysql_connection = server_state.mysql_pool
-      .acquire()
+  let user_session = require_moderator(&http_request, &server_state)
       .await
-      .map_err(|err| {
-        warn!("MySql pool error: {:?}", err);
-        CreateBetaKeysError::ServerError
+      .map_err(|err| match err {
+        RequireModeratorError::ServerError => CreateBetaKeysError::ServerError,
+        RequireModeratorError::NotAuthorized => CreateBetaKeysError::NotAuthorized,
       })?;
-
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
-      .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        CreateBetaKeysError::ServerError
-      })?;
-
-  let user_session = match maybe_user_session {
-    Some(session) => session,
-    None => {
-      warn!("not logged in");
-      return Err(CreateBetaKeysError::NotAuthorized);
-    }
-  };
-
-  if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {:?}", user_session.user_token.as_str());
-    return Err(CreateBetaKeysError::NotAuthorized);
-  }
 
   // TODO(bt,2024-05-13): Create beta key records
 
@@ -137,3 +116,4 @@ pub async fn create_beta_keys_handler(
       .content_type("application/json")
       .body(body))
 }
+

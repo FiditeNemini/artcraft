@@ -2,6 +2,7 @@ pub mod get_host_header;
 pub mod handle_multipart_error;
 pub mod read_multipart_field_bytes;
 pub mod redis_rate_limiter;
+pub mod require_moderator;
 pub mod response_error_helpers;
 pub mod response_success_helpers;
 pub mod serialize_as_json_error;
