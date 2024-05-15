@@ -8,6 +8,7 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { Switch } from "@headlessui/react";
 import { useState } from "react";
 import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
+import PremiumLock from "~/components/PremiumLock";
 export function StyleButtons() {
   useSignals();
 
@@ -72,46 +73,50 @@ export function StyleButtons() {
         )}
       </div>
       <div className="w-full">
-        <Switch.Group>
-          <div className="mt-1 flex gap-6">
-            <div className="flex items-center">
-              <Switch.Label className="mr-3 text-sm font-medium">
-                Upscale
-              </Switch.Label>
-              <Switch
-                checked={upscale}
-                onChange={setUpscale}
-                className={`${
-                  upscale ? "bg-brand-primary" : "bg-gray-500 hover:bg-gray-400"
-                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}>
-                <span
+        <PremiumLock requiredPlan="any" plural={true}>
+          <Switch.Group>
+            <div className="mt-1 flex gap-6">
+              <div className="flex items-center">
+                <Switch.Label className="mr-3 text-sm font-medium">
+                  Upscale
+                </Switch.Label>
+                <Switch
+                  checked={upscale}
+                  onChange={setUpscale}
                   className={`${
-                    upscale ? "translate-x-6" : "translate-x-1"
-                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                />
-              </Switch>
-            </div>
-            <div className="flex items-center">
-              <Switch.Label className="mr-3 text-sm font-medium">
-                Face Detail
-              </Switch.Label>
-              <Switch
-                checked={faceDetail}
-                onChange={setFaceDetail}
-                className={`${
-                  faceDetail
-                    ? "bg-brand-primary"
-                    : "bg-gray-500 hover:bg-gray-400"
-                } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}>
-                <span
+                    upscale
+                      ? "bg-brand-primary"
+                      : "bg-gray-500 hover:bg-gray-400"
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}>
+                  <span
+                    className={`${
+                      upscale ? "translate-x-6" : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </div>
+              <div className="flex items-center">
+                <Switch.Label className="mr-3 text-sm font-medium">
+                  Face Detail
+                </Switch.Label>
+                <Switch
+                  checked={faceDetail}
+                  onChange={setFaceDetail}
                   className={`${
-                    faceDetail ? "translate-x-6" : "translate-x-1"
-                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                />
-              </Switch>
+                    faceDetail
+                      ? "bg-brand-primary"
+                      : "bg-gray-500 hover:bg-gray-400"
+                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}>
+                  <span
+                    className={`${
+                      faceDetail ? "translate-x-6" : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </div>
             </div>
-          </div>
-        </Switch.Group>
+          </Switch.Group>
+        </PremiumLock>
 
         <hr className="my-3 opacity-10" />
 
