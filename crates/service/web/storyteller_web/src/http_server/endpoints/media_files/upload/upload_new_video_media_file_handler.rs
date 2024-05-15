@@ -72,6 +72,11 @@ pub struct UploadNewVideoMediaFileForm {
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<MediaFileToken>, format = Binary)]
   maybe_scene_source_media_file_token: Option<Text<MediaFileToken>>,
+
+  /// Optional: Whether this is a system file (eg. cover files we should hide)
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<bool>, format = Binary)]
+  is_intermediate_system_file: Option<Text<bool>>,
 }
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
@@ -278,7 +283,9 @@ pub async fn upload_new_video_media_file_handler(
 
   // NB: If we're uploading a video file that references an engine scene, then this is an engine
   // render video, and we should mark it as a system (hidden) file.
-  let is_intermediate_system_file = maybe_scene_source_media_file_token.is_some();
+  let is_intermediate_system_file =
+      maybe_scene_source_media_file_token.is_some() ||
+      form.is_intermediate_system_file.map(|b| b.0).unwrap_or(false);
 
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
     maybe_media_class: Some(MediaFileClass::Video),
