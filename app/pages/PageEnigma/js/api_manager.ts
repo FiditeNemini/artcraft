@@ -225,15 +225,18 @@ export class APIManager {
     blob: any,
     fileName: string,
   ) {
-    const url = `${this.baseUrl}/v1/media_files/upload`;
+    const url = `${this.baseUrl}/v1/media_files/upload/image`;
     const uuid = uuidv4();
 
     const formData = new FormData();
     formData.append("uuid_idempotency_token", uuid);
+    formData.append("is_intermediate_system_file", "true");
+    formData.append("maybe_title", "Screenshot");
     formData.append("file", blob, fileName);
-    formData.append("source", "file");
-    formData.append("type", "video");
-    formData.append("source", "file");
+    //formData.append("source", "file");
+    //formData.append("type", "video");
+    //formData.append("source", "file");
+
     const response = await fetch(url, {
       method: "POST",
       // credentials: "include",
