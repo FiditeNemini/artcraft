@@ -3,6 +3,7 @@ pub mod api_tokens_external;
 pub mod api_tokens_internal;
 pub mod audit_logs;
 pub mod batch_generations;
+pub mod beta_keys;
 pub mod comments;
 pub mod email_sender_job_token;
 pub mod firehose_entries;

@@ -7,8 +7,11 @@ use actix_web::http::StatusCode;
 use log::warn;
 use utoipa::ToSchema;
 
+use crockford::crockford_entropy_lower;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::beta_keys::insert_batch_beta_keys::{insert_batch_beta_keys, InsertBatchArgs};
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use tokens::tokens::comments::CommentToken;
@@ -26,6 +29,8 @@ use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_fea
 use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+
+const MAXIMUM_KEYS : u32 = 100;
 
 #[derive(Deserialize, ToSchema)]
 pub struct CreateBetaKeysRequest {
@@ -102,11 +107,25 @@ pub async fn create_beta_keys_handler(
         RequireModeratorError::NotAuthorized => CreateBetaKeysError::NotAuthorized,
       })?;
 
-  // TODO(bt,2024-05-13): Create beta key records
+  let number_of_keys = request.number_of_keys.min(MAXIMUM_KEYS);
+
+  let beta_keys = (0..number_of_keys).map(|_| {
+    crockford_entropy_lower(8)
+  }).collect::<Vec::<String>>();
+
+  insert_batch_beta_keys(InsertBatchArgs {
+    product: BetaKeyProduct::Studio,
+    maybe_referrer_user_token: None,
+    beta_keys: &beta_keys,
+    mysql_pool: &server_state.mysql_pool,
+  }).await.map_err(|err| {
+    warn!("Error inserting beta keys: {:?}", err);
+    CreateBetaKeysError::ServerError
+  })?;
 
   let response = CreateBetaKeysSuccessResponse {
     success: true,
-    beta_keys: Vec::new(),
+    beta_keys,
   };
 
   let body = serde_json::to_string(&response)
