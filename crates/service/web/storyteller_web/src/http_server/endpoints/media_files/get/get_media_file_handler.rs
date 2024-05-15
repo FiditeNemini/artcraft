@@ -111,6 +111,12 @@ pub struct MediaFileInfo {
   /// the name of the selected style.
   pub maybe_style_name: Option<StyleTransferName>,
 
+  /// For Comfy / Video Style Transfer jobs, this indicates use of face detailer.
+  pub used_face_detailer: bool,
+
+  /// For Comfy / Video Style Transfer jobs, this indicates use of upscaling.
+  pub used_upscaler: bool,
+
   /// The foreign key to the prompt used to generate the media, if applicable.
   pub maybe_prompt_token: Option<PromptToken>,
 
@@ -342,6 +348,14 @@ async fn modern_media_file_lookup(
           .as_ref()
           .and_then(|args| args.style_name.as_ref())
           .and_then(|style| style.to_style_name()),
+      used_face_detailer: result.maybe_prompt_args
+          .as_ref()
+          .and_then(|args| args.used_face_detailer)
+          .unwrap_or(false),
+      used_upscaler: result.maybe_prompt_args
+          .as_ref()
+          .and_then(|args| args.used_upscaler)
+          .unwrap_or(false),
       maybe_model_weight_info: match result.maybe_model_weights_token {
         None => None,
         Some(weight_token) => Some(GetMediaFileModelInfo {
@@ -453,6 +467,8 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       ),
       maybe_prompt_token: None,
       maybe_style_name: None,
+      used_face_detailer: false,
+      used_upscaler: false,
       creator_set_visibility: result.creator_set_visibility,
       maybe_title: None,
       maybe_text_transcript: Some(result.raw_inference_text),
