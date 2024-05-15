@@ -1,15 +1,16 @@
-use sqlx::{Executor, MySql};
+use sqlx::{Executor, MySql, Transaction};
 
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
 
-pub async fn redeem_beta_key<'e, 'c, E>(
-  key_value: &'e str,
-  redeemer_user_token: &'e UserToken,
-  mysql_executor: E
+pub async fn redeem_beta_key<'a, 'b>(
+  key_value: &'a str,
+  redeemer_user_token: &'a UserToken,
+  //mysql_executor: E
+  transaction: &'a mut Transaction<'b, MySql>,
 )
   -> AnyhowResult<()>
-  where E: 'e + Executor<'c, Database = MySql>
+  //where E: 'e + Executor<'c, Database = MySql>
 {
       sqlx::query!(
         r#"
@@ -24,7 +25,7 @@ LIMIT 1
        redeemer_user_token.as_str(),
        key_value
       )
-      .execute(mysql_executor)
+      .execute(&mut **transaction)
       .await?;
 
   Ok(())

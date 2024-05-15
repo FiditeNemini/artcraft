@@ -5,6 +5,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
+use r2d2_redis::redis::transaction;
 use utoipa::ToSchema;
 
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
@@ -136,6 +137,13 @@ pub async fn redeem_beta_key_handler(
 
   let ip_address = get_request_ip(&http_request);
 
+  let mut transaction = server_state.mysql_pool.begin()
+      .await
+      .map_err(|e| {
+        warn!("Could not open transaction: {:?}", e);
+        RedeemBetaKeyError::ServerError
+      })?;
+
   set_user_feature_flags(SetUserFeatureFlagArgs {
     subject_user_token: &user_session.user_token,
     maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
@@ -148,10 +156,17 @@ pub async fn redeem_beta_key_handler(
         RedeemBetaKeyError::ServerError
       })?;
 
-  redeem_beta_key(&request.beta_key, &user_session.user_token, &server_state.mysql_pool)
+  redeem_beta_key(&request.beta_key, &user_session.user_token, &mut transaction)
       .await
       .map_err(|e| {
         warn!("Could not redeem beta key: {:?}", e);
+        RedeemBetaKeyError::ServerError
+      })?;
+
+  transaction.commit()
+      .await
+      .map_err(|e| {
+        warn!("Could not commit transaction: {:?}", e);
         RedeemBetaKeyError::ServerError
       })?;
 
