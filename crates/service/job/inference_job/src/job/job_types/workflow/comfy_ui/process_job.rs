@@ -358,9 +358,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let inference_details;
 
     // NB: We're rolling forward to a world where the JSON modifications are performed on the Python side.
-    let python_side_orchestration = comfy_args.rollout_python_workflow_args.unwrap_or(false);
+    //let python_side_orchestration = comfy_args.rollout_python_workflow_args.unwrap_or(false);
+    const PYTHON_SIDE_ORCHESTRATION: bool = true;
 
-    if python_side_orchestration {
+    if PYTHON_SIDE_ORCHESTRATION {
         let maybe_positive_prompt_filename = comfy_args.positive_prompt
             .as_deref()
             .map(|prompt| {
