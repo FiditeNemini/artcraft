@@ -15,6 +15,12 @@ export function StyleButtons() {
   const [upscale, setUpscale] = useState(false);
   const [faceDetail, setFaceDetail] = useState(false);
 
+  const [value, setStyleStrength] = useState(0.7);
+
+  const sliderChanged = (event:React.ChangeEvent<HTMLInputElement>) => {
+     setStyleStrength(parseFloat(event.target.value));
+  };
+
   const switchPreview = async () => {
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
@@ -32,9 +38,11 @@ export function StyleButtons() {
   };
 
   const generateMovie = async () => {
+    
     const options: GenerationOptions = {
       upscale: upscale,
       faceDetail: faceDetail,
+      styleStrength: value,
     };
 
     Queue.publish({
@@ -73,6 +81,27 @@ export function StyleButtons() {
         )}
       </div>
       <div className="w-full">
+
+      <Label>
+          <div className="mb-1 leading-tight">
+            Set the Style Strength, the higher the value the more the style will be applied,
+            the lower the value the closer to source.
+          </div>
+        </Label>
+
+      <input 
+        type="range" 
+        value={value} min="0" 
+        max="1.0"
+        step="0.1"
+        onChange={sliderChanged} 
+        style={{width: "100%"}}
+        ></input>
+        <Label>
+          <div className="mb-1 leading-tight">
+            Currently set to {value}
+          </div>
+        </Label>
         <PremiumLock requiredPlan="any" plural={true}>
           <Switch.Group>
             <div className="mt-1 flex gap-6">
@@ -83,6 +112,7 @@ export function StyleButtons() {
                 <Switch
                   checked={upscale}
                   onChange={setUpscale}
+
                   className={`${
                     upscale
                       ? "bg-brand-primary"

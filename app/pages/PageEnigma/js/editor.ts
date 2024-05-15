@@ -275,7 +275,7 @@ class Editor {
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
 
-    this.generation_options = { faceDetail: false, upscale:false }
+    this.generation_options = { faceDetail: false, upscale:false, styleStrength: 1.0 };
   }
 
   isEmpty(value: string) {
@@ -1243,7 +1243,8 @@ class Editor {
         this.negative_prompt,
         Visibility.Public,
         this.generation_options.faceDetail,
-        this.generation_options.upscale
+        this.generation_options.upscale,
+        this.generation_options.styleStrength,
       )
       .catch((error) => {
         console.log(error);

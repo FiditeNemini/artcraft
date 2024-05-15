@@ -361,7 +361,8 @@ export class APIManager {
     negative_prompt: string,
     visibility: Visibility,
     use_face_detailer: boolean = false,
-    use_upscaler: boolean = false
+    use_upscaler: boolean = false,
+    style_strength: number = 1.0,
   ) {
 
     const uuid = uuidv4();
@@ -378,6 +379,7 @@ export class APIManager {
       creator_set_visibility: visibility,
       use_face_detailer: use_face_detailer,
       use_upscaler: use_upscaler,
+      style_strength: style_strength,
     };
 
     const json_data = JSON.stringify(data);
