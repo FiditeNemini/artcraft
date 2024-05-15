@@ -274,6 +274,9 @@ export class APIManager {
     if (styleName) formData.append("maybe_style_name", styleName);
     formData.append("maybe_title", title);
 
+    // This signals to the backend to hide the video from view
+    formData.append("is_intermediate_system_file", "true");
+
     const response = await fetch(url, {
       method: "POST",
       // credentials: "include",
