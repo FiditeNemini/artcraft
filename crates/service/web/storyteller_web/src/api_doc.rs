@@ -2,6 +2,7 @@ use utoipa::OpenApi;
 
 use billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::*;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
@@ -23,6 +24,7 @@ use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::batch_generations::*;
+use tokens::tokens::beta_keys::*;
 use tokens::tokens::comments::*;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
@@ -185,6 +187,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
   components(schemas(
     // Tokens
     BatchGenerationToken,
+    BetaKeyToken,
     CommentToken,
     InferenceJobToken,
     MediaFileToken,
@@ -195,6 +198,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ZsVoiceDatasetToken,
 
     // Enums
+    BetaKeyProduct,
     CommentEntityType,
     FrontendFailureCategory,
     InferenceCategory,
@@ -251,9 +255,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchMediaFileInfo,
     BatchRequestDetailsResponse,
     BatchResultDetailsResponse,
-    UploadImageMediaFileSuccessResponse,
-    UploadImageMediaFileForm,
     BatchStatusDetailsResponse,
+    BetaKeyItem,
     BookmarkRow,
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityPathInfo,
@@ -438,6 +441,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     UploadAudioMediaFileForm,
     UploadAudioMediaFileSuccessResponse,
     UploadEngineAssetMediaSuccessResponse,
+    UploadImageMediaFileForm,
+    UploadImageMediaFileSuccessResponse,
     UploadMediaSuccessResponse,
     UploadNewEngineAssetFileForm,
     UploadNewEngineAssetSuccessResponse,

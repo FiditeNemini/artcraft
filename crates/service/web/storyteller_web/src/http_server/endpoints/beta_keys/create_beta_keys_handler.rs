@@ -14,6 +14,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::beta_keys::insert_batch_beta_keys::{insert_batch_beta_keys, InsertBatchArgs};
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -107,6 +108,27 @@ pub async fn create_beta_keys_handler(
         RequireModeratorError::NotAuthorized => CreateBetaKeysError::NotAuthorized,
       })?;
 
+  let mut maybe_referrer_user_token = None;
+
+  if let Some(username) = &request.maybe_referrer_username {
+    let username = username.to_lowercase();
+    let maybe_user = get_user_profile_by_username(&username, &server_state.mysql_pool)
+        .await
+        .map_err(|err| {
+          warn!("Error inserting beta keys: {:?}", err);
+          CreateBetaKeysError::ServerError
+        })?;
+
+    let user = match maybe_user {
+      Some(user) => user,
+      None => {
+        return Err(CreateBetaKeysError::BadInput("referrer user not found".to_string()));
+      }
+    };
+
+    maybe_referrer_user_token = Some(user.user_token);
+  }
+
   let number_of_keys = request.number_of_keys.min(MAXIMUM_KEYS);
 
   let beta_keys = (0..number_of_keys).map(|_| {
@@ -115,7 +137,7 @@ pub async fn create_beta_keys_handler(
 
   insert_batch_beta_keys(InsertBatchArgs {
     product: BetaKeyProduct::Studio,
-    maybe_referrer_user_token: None,
+    maybe_referrer_user_token: maybe_referrer_user_token.as_ref(),
     beta_keys: &beta_keys,
     mysql_pool: &server_state.mysql_pool,
   }).await.map_err(|err| {

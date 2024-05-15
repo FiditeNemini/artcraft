@@ -10,6 +10,7 @@ use r2d2_redis::redis::Commands;
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
@@ -19,6 +20,9 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use mysql_queries::queries::beta_keys::list_beta_keys::{list_beta_keys, ListBetaKeysArgs};
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use tokens::tokens::beta_keys::BetaKeyToken;
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
@@ -26,9 +30,11 @@ use crate::http_server::common_responses::media_file_cover_image_details::{Media
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::CreateBetaKeysError;
 use crate::http_server::endpoints::media_files::list::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::list::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::list::helpers::get_scoped_media_types::get_scoped_media_types;
+use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
 use crate::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
@@ -38,17 +44,35 @@ pub struct ListBetaKeysQueryParams {
   pub page_size: Option<usize>,
   pub cursor: Option<String>,
   pub cursor_is_reversed: Option<bool>,
+
+  /// Scope the beta keys to a referrer user.
+  pub maybe_referrer_username: Option<String>,
+
+  /// Only return un-redeemed, un-expired keys.
+  pub only_list_remaining: Option<bool>,
 }
 
 #[derive(Serialize, ToSchema)]
 pub struct ListBetaKeysSuccessResponse {
   pub success: bool,
-  pub beta_keys: Vec<String>,
+  pub beta_keys: Vec<BetaKeyItem>,
   pub pagination: PaginationCursors,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct BetaKeyItem {
+  pub token: BetaKeyToken,
+  pub product: BetaKeyProduct,
+  pub key_value: String,
+  pub maybe_referrer: Option<UserDetailsLight>,
+  pub maybe_redeemer: Option<UserDetailsLight>,
+  pub created_at: DateTime<Utc>,
+  pub maybe_redeemed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, ToSchema)]
 pub enum ListBetaKeysError {
+  BadRequest(String),
   NotAuthorized,
   ServerError,
 }
@@ -62,6 +86,7 @@ impl std::fmt::Display for ListBetaKeysError {
 impl ResponseError for ListBetaKeysError {
   fn status_code(&self) -> StatusCode {
     match *self {
+      ListBetaKeysError::BadRequest(_)=> StatusCode::BAD_REQUEST,
       ListBetaKeysError::NotAuthorized => StatusCode::UNAUTHORIZED,
       ListBetaKeysError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
@@ -87,7 +112,6 @@ pub async fn list_beta_keys_handler(
   query: Query<ListBetaKeysQueryParams>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListBetaKeysError> {
-
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -99,12 +123,38 @@ pub async fn list_beta_keys_handler(
 
   let mut is_mod = false;
 
-  match maybe_user_session {
-    None => {},
+  let user_session = match maybe_user_session {
+    None => {
+      return Err(ListBetaKeysError::NotAuthorized);
+    },
     Some(session) => {
       is_mod = session.can_ban_users;
+      session
     },
   };
+
+  let mut maybe_scope_user_token = None;
+
+  if !is_mod {
+    // Non-mods are always scoped to themselves.
+    maybe_scope_user_token = Some(user_session.user_token.clone());
+  } else if let Some(referrer_username) = query.maybe_referrer_username.as_deref() {
+    // Mods can optionally scope to a different user by username.
+    let referrer_username = referrer_username.to_lowercase();
+    let maybe_referrer_user = get_user_profile_by_username(&referrer_username, &server_state.mysql_pool)
+        .await
+        .map_err(|e| {
+          warn!("get user profile error: {:?}", e);
+          ListBetaKeysError::ServerError
+        })?;
+
+    match maybe_referrer_user {
+      None => return Err(ListBetaKeysError::BadRequest("referrer user not found".to_string())),
+      Some(user) => {
+        maybe_scope_user_token = Some(user.user_token.clone());
+      },
+    }
+  }
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
   let limit = query.page_size.unwrap_or(25);
@@ -123,119 +173,75 @@ pub async fn list_beta_keys_handler(
     None
   };
 
-  let view_as = if is_mod {
-    ViewAs::Moderator
-  } else {
-    ViewAs::AnotherUser
+  let query_results = list_beta_keys(ListBetaKeysArgs {
+    filter_to_referrer_user_token: maybe_scope_user_token.as_ref(),
+    filter_to_remaining_keys: query.only_list_remaining.unwrap_or(false),
+    limit,
+    maybe_offset: cursor,
+    cursor_is_reversed,
+    sort_ascending,
+    mysql_pool: &server_state.mysql_pool,
+  }).await;
+
+  let results_page = match query_results {
+    Ok(results) => results,
+    Err(err) => {
+      warn!("Query error: {:?}", err);
+      return Err(ListBetaKeysError::ServerError);
+    }
   };
 
-  //let mut maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
-  //let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
-  //let mut maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
+  let cursor_next = if let Some(id) = results_page.last_id {
+    let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
+        .map_err(|e| {
+          warn!("crypto error: {:?}", e);
+          ListBetaKeysError::ServerError
+        })?;
+    Some(cursor)
+  } else {
+    None
+  };
 
-  //let query_results =
-  //    list_featured_media_files(ListBetaKeysArgs {
-  //      limit,
-  //      maybe_offset: cursor,
-  //      cursor_is_reversed,
-  //      sort_ascending,
-  //      view_as,
-  //      maybe_filter_media_types: maybe_filter_media_types.as_ref(),
-  //      maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
-  //      maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
-  //      mysql_pool: &server_state.mysql_pool,
-  //    }).await;
+  let cursor_previous = if let Some(id) = results_page.first_id {
+    let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
+        .map_err(|e| {
+          warn!("crypto error: {:?}", e);
+          ListBetaKeysError::ServerError
+        })?;
+    Some(cursor)
+  } else {
+    None
+  };
 
-  //let results_page = match query_results {
-  //  Ok(results) => results,
-  //  Err(e) => {
-  //    warn!("Query error: {:?}", e);
-  //    return Err(ListBetaKeysError::ServerError);
-  //  }
-  //};
-
-  //let cursor_next = if let Some(id) = results_page.last_id {
-  //  let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
-  //      .map_err(|e| {
-  //        warn!("crypto error: {:?}", e);
-  //        ListBetaKeysError::ServerError
-  //      })?;
-  //  Some(cursor)
-  //} else {
-  //  None
-  //};
-
-  //let cursor_previous = if let Some(id) = results_page.first_id {
-  //  let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
-  //      .map_err(|e| {
-  //        warn!("crypto error: {:?}", e);
-  //        ListBetaKeysError::ServerError
-  //      })?;
-  //  Some(cursor)
-  //} else {
-  //  None
-  //};
-
-  //let results = results_page.records.into_iter()
-  //    .map(|m| {
-  //      let public_bucket_path = MediaFileBucketPath::from_object_hash(
-  //        &m.public_bucket_directory_hash,
-  //        m.maybe_public_bucket_prefix.as_deref(),
-  //        m.maybe_public_bucket_extension.as_deref())
-  //          .get_full_object_path_str()
-  //          .to_string();
-
-  //      FeaturedMediaFile {
-  //        token: m.token.clone(),
-  //        media_class: m.media_class,
-  //        media_type: m.media_type,
-  //        maybe_engine_category: m.maybe_engine_category,
-  //        maybe_animation_type: m.maybe_animation_type,
-  //        public_bucket_path,
-  //        cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
-  //          &m.token,
-  //          m.maybe_file_cover_image_public_bucket_hash.as_deref(),
-  //          m.maybe_file_cover_image_public_bucket_prefix.as_deref(),
-  //          m.maybe_file_cover_image_public_bucket_extension.as_deref(),
-  //        ),
-  //        origin: MediaFileOriginDetails::from_db_fields_str(
-  //          m.origin_category,
-  //          m.origin_product_category,
-  //          m.maybe_origin_model_type,
-  //          m.maybe_origin_model_token.as_deref(),
-  //          m.maybe_origin_model_title.as_deref()),
-  //        origin_category: m.origin_category,
-  //        origin_product_category: m.origin_product_category,
-  //        maybe_origin_model_type: m.maybe_origin_model_type,
-  //        maybe_origin_model_token: m.maybe_origin_model_token,
-  //        maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
-  //          m.maybe_creator_user_token,
-  //          m.maybe_creator_username,
-  //          m.maybe_creator_display_name,
-  //          m.maybe_creator_gravatar_hash
-  //        ),
-  //        maybe_title: m.maybe_title,
-  //        maybe_text_transcript: m.maybe_text_transcript,
-  //        maybe_style_name: m.maybe_prompt_args
-  //            .as_ref()
-  //            .and_then(|args| args.style_name.as_ref())
-  //            .and_then(|style| style.to_style_name()),
-  //        maybe_duration_millis: m.maybe_duration_millis,
-  //        stats: SimpleEntityStats {
-  //          positive_rating_count: m.maybe_ratings_positive_count.unwrap_or(0),
-  //          bookmark_count: m.maybe_bookmark_count.unwrap_or(0),
-  //        },
-  //        created_at: m.created_at,
-  //        updated_at: m.updated_at,
-  //      }
-  //    }).collect::<Vec<_>>();
+  let results = results_page.records.into_iter()
+      .map(|beta_key| {
+        BetaKeyItem {
+          token: beta_key.token.clone(),
+          product: beta_key.product,
+          key_value: beta_key.key_value,
+          maybe_referrer: UserDetailsLight::from_optional_db_fields_owned(
+            beta_key.maybe_referrer_user_token,
+            beta_key.maybe_referrer_username,
+            beta_key.maybe_referrer_display_name,
+            beta_key.maybe_referrer_gravatar_hash
+          ),
+          maybe_redeemer: UserDetailsLight::from_optional_db_fields_owned(
+            beta_key.maybe_redeemer_user_token,
+            beta_key.maybe_redeemer_username,
+            beta_key.maybe_redeemer_display_name,
+            beta_key.maybe_redeemer_gravatar_hash
+          ),
+          created_at: beta_key.created_at,
+          maybe_redeemed_at: beta_key.maybe_redeemed_at,
+        }
+      }).collect::<Vec<_>>();
 
   let response = ListBetaKeysSuccessResponse {
     success: true,
     beta_keys: Vec::new(),
     pagination: PaginationCursors {
-      maybe_next: None,
-      maybe_previous: None,
+      maybe_next: cursor_next,
+      maybe_previous: cursor_previous,
       cursor_is_reversed,
     }
   };
