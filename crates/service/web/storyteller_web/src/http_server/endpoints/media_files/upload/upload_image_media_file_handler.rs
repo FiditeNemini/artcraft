@@ -29,7 +29,6 @@ use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
-use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::server_state::ServerState;
@@ -214,14 +213,6 @@ pub async fn upload_image_media_file_handler(
     return Err(MediaFileUploadError::BadInput(format!("unpermitted mime type: {}", &filtered_mimetype)));
   }
 
-  // ==================== DURATION DETECTION ==================== //
-
-  let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
-      .map_err(|err| {
-        warn!("Error reading mp4 info: {:?}", err);
-        MediaFileUploadError::ServerError
-      })?;
-
   // ==================== OTHER FILE METADATA ==================== //
 
   let maybe_filename = form.file.file_name.as_deref()
@@ -284,7 +275,7 @@ pub async fn upload_image_media_file_handler(
     maybe_animation_type: None,
     maybe_mime_type: Some(&mimetype),
     file_size_bytes: file_size_bytes as u64,
-    maybe_duration_millis:  Some(mp4_info.duration_millis as u64),
+    maybe_duration_millis: None,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     maybe_scene_source_media_file_token: None,
