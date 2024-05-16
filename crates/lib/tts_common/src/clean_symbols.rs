@@ -175,7 +175,7 @@ mod tests {
 
   use crate::clean_symbols::clean_symbols;
 
-  const TIME_BOMB_EPOCH_STR : &str = "2024-04-01T00:00:00.00Z";
+  const TIME_BOMB_EPOCH_STR : &str = "2025-04-01T00:00:00.00Z";
 
   static TIME_BOMB_EPOCH: Lazy<DateTime<Utc>> = Lazy::new(|| {
     let datetime = DateTime::parse_from_rfc3339(TIME_BOMB_EPOCH_STR)
