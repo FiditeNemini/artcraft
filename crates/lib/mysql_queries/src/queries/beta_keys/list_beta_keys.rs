@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use log::info;
-use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
+use sqlx::{Execute, FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
 use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
@@ -67,7 +67,11 @@ pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyL
     args.sort_ascending,
   );
 
+  info!("query_builder query (wip): {:?}", query.sql());
+
   let query = query.build_query_as::<MediaFileListItemInternal>();
+
+  info!("query dsl query (wip): {:?}", query.sql());
 
   let results = query.fetch_all(args.mysql_pool).await?;
 
@@ -159,8 +163,6 @@ LEFT OUTER JOIN users AS redeemer
     ON b.maybe_redeemer_user_token = redeemer.token
     "#
   );
-
-  info!("query_builder query (wip): {:?}", query_builder.sql());
 
   let mut first_predicate_added = false;
 
