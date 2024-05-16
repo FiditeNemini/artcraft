@@ -12,6 +12,9 @@ publish = false
 name = "web_scrapers"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # Internal
 enums = { path = "../../_types/enums" }

@@ -12,6 +12,9 @@ publish = false
 name = "sqlx_mysql_helpers"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # Internal
 errors = { path = "../errors" }

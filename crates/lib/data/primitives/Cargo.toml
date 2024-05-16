@@ -13,6 +13,9 @@ publish = false
 name = "primitives"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # NB: This is designed to be a central crate with few dependencies.
 # Consider the dependencies here wisely.
