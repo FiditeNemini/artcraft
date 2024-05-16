@@ -78,6 +78,8 @@ pub struct MediaFileInfo {
   /// If the file was generated as part of a batch, this is the token for the batch.
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
+  pub maybe_scene_source_media_file_token: Option<MediaFileToken>,
+
   /// URL to the media file
   pub public_bucket_path: String,
 
@@ -143,16 +145,18 @@ pub struct MediaFileInfo {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
-  //pub maybe_moderator_fields: Option<ModeratorFields>,
+  pub maybe_moderator_fields: Option<GetMediaFileModeratorFields>,
 }
 
-//#[derive(Serialize)]
-//pub struct ModeratorFields {
-//  pub creator_ip_address: String,
-//  pub creator_is_banned_if_user: bool,
-//  pub maybe_creator_deleted_at: Option<DateTime<Utc>>,
-//  pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
-//}
+#[derive(Serialize, ToSchema)]
+pub struct GetMediaFileModeratorFields {
+  /// This may become public in the future.
+  pub maybe_style_transfer_source_media_file_token: Option<MediaFileToken>,
+  //pub creator_ip_address: String,
+  //pub creator_is_banned_if_user: bool,
+  //pub maybe_creator_deleted_at: Option<DateTime<Utc>>,
+  //pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
+}
 
 #[derive(Serialize, ToSchema)]
 pub struct GetMediaFileModelInfo {
@@ -267,6 +271,8 @@ async fn modern_media_file_lookup(
   server_state: &ServerState,
 ) -> Result<GetMediaFileSuccessResponse, GetMediaFileError> {
 
+  let is_mod = show_deleted_results;
+
   let result = get_media_file(
     media_file_token,
     show_deleted_results,
@@ -335,6 +341,7 @@ async fn modern_media_file_lookup(
       maybe_media_subtype: result.maybe_media_subtype,
       maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
+      maybe_scene_source_media_file_token: result.maybe_scene_source_media_file_token,
       public_bucket_path,
       cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
         &result.token,
@@ -392,6 +399,13 @@ async fn modern_media_file_lookup(
       },
       created_at: result.created_at,
       updated_at: result.updated_at,
+      maybe_moderator_fields: if is_mod {
+        Some(GetMediaFileModeratorFields {
+          maybe_style_transfer_source_media_file_token: result.maybe_style_transfer_source_media_file_token,
+        })
+      } else {
+        None
+      },
     },
   })
 }
@@ -448,6 +462,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_media_subtype: None,
       maybe_engine_extension: None,
       maybe_batch_token: None,
+      maybe_scene_source_media_file_token: None,
       public_bucket_path,
       cover_image: MediaFileCoverImageDetails::from_token_str(&result.tts_result_token),
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
@@ -482,6 +497,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       },
       created_at: result.created_at,
       updated_at: result.updated_at,
+      maybe_moderator_fields: None,
     },
   })
 }

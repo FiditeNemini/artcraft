@@ -253,6 +253,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchGetUserRatingResponse,
     BatchInferenceJobStatusResponsePayload,
     BatchMediaFileInfo,
+    GetMediaFileModeratorFields,
     BatchRequestDetailsResponse,
     BatchResultDetailsResponse,
     BatchStatusDetailsResponse,
