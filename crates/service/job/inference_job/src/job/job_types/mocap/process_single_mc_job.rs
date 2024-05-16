@@ -1,4 +1,5 @@
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::mocap::mocap_net;

@@ -1,4 +1,5 @@
-use anyhow::{Ok};
+use anyhow::Ok;
+
 use errors::AnyhowResult;
 
 use crate::job::job_types::image_generation::sd::model_downloaders::StableDiffusionDownloaders;

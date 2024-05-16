@@ -1,6 +1,8 @@
 use std::fs::File;
 use std::path::Path;
+
 use serde_json::Value;
+
 use errors::AnyhowResult;
 
 pub fn load_json<P: AsRef<Path>>(filename: P) -> AnyhowResult<Value> {
@@ -12,6 +14,7 @@ pub fn load_json<P: AsRef<Path>>(filename: P) -> AnyhowResult<Value> {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use crate::util::comfy_workflows::load_json::load_json;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {

@@ -29,7 +29,6 @@ use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeight
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
-
 pub struct JobDependencies {
   /// Database dependencies.
   pub db: DatabaseDependencies,

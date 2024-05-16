@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::videofilter_payload::{VideofilterVideoSource};
+use mysql_queries::payloads::generic_inference_args::videofilter_payload::VideofilterVideoSource;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use tokens::tokens::model_weights::ModelWeightToken;
 

@@ -1,11 +1,11 @@
 use std::time::Duration;
+
 use log::{info, warn};
 use opentelemetry::KeyValue;
 use opentelemetry::metrics::{Counter, Histogram, Meter, Unit};
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::metrics::reader::{DefaultAggregationSelector, DefaultTemporalitySelector};
 use opentelemetry_sdk::Resource;
-
 
 pub struct JobInstrumentLabels {
     pub service_name: String,

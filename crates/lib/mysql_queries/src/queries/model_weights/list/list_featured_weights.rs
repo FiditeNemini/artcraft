@@ -186,7 +186,7 @@ fn select_result_fields() -> String {
 }
 
 fn query_builder<'a>(
-  limit: usize,
+  _limit: usize, // TODO(bt,2024-05-16): This seems wrong. Why is this unused?
   maybe_offset: Option<usize>,
   cursor_is_reversed: bool,
   sort_ascending: bool,

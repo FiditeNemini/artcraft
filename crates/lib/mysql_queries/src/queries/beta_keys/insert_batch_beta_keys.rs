@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use log::error;
-use sqlx::{MySql, MySqlPool, QueryBuilder, Transaction};
+use sqlx::{MySqlPool, QueryBuilder};
 
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;

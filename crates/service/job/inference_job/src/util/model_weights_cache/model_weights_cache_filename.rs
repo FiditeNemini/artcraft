@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+
 use enums::by_table::model_weights::weights_types::WeightsType;
 use mysql_queries::queries::model_weights::get::get_weight::RetrievedModelWeight;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -50,8 +51,10 @@ impl ModelWeightsCacheMapping {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use enums::by_table::model_weights::weights_types::WeightsType;
   use tokens::tokens::model_weights::ModelWeightToken;
+
   use crate::util::model_weights_cache::model_weights_cache_filename::ModelWeightsCacheMapping;
 
   #[test]

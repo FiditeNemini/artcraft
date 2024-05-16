@@ -9,8 +9,8 @@ use anyhow::anyhow;
 use log::info;
 use once_cell::sync::Lazy;
 use subprocess::{Popen, PopenConfig};
-use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::command_exit_status::CommandExitStatus;

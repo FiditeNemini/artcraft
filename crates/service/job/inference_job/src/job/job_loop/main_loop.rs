@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
-use opentelemetry::KeyValue as OtelAttribute;
 use log::{error, info, warn};
+use opentelemetry::KeyValue as OtelAttribute;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use errors::AnyhowResult;

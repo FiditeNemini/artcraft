@@ -1,7 +1,7 @@
 //! Audit logs are for entities that can be *edited* where we might lose the IP / edit history.
 
 use anyhow::anyhow;
-use sqlx::{Executor, MySql, Transaction};
+use sqlx::{MySql, Transaction};
 
 use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;

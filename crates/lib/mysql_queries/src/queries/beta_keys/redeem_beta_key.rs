@@ -1,4 +1,4 @@
-use sqlx::{Executor, MySql, Transaction};
+use sqlx::{MySql, Transaction};
 
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
