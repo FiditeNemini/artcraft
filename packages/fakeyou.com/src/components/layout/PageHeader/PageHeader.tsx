@@ -116,7 +116,10 @@ export default function PageHeader({
             >
               <div>
                 {titleH2 ? (
-                  <h2 className="fw-bold">{title}</h2>
+                  <h2 className="fw-bold d-flex align-items-center">
+                    {icon}
+                    {title}
+                  </h2>
                 ) : (
                   <h1 className="fw-bold d-flex align-items-center">
                     {icon}
