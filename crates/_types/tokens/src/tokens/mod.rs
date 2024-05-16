@@ -38,3 +38,4 @@ pub mod w2l_templates;
 pub mod zs_voice_dataset_samples;
 pub mod zs_voice_datasets;
 pub mod zs_voices;
+mod tags;

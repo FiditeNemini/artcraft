@@ -36,6 +36,7 @@ pub(crate) enum TokenPrefix {
   NewsStory, // NB: aichatbot / sqlite
   PasswordReset,
   Prompt,
+  Tag,
   TtsRenderTask, // NB: aichatbot / sqlite
   User,
   UserBookmark,
@@ -105,6 +106,7 @@ impl PrefixGenerator for TokenPrefix {
       Self::NewsStory => "news_story_",
       Self::PasswordReset => "pw_reset_",
       Self::Prompt => "prompt_",
+      Self::Tag => "tag_",
       Self::TtsRenderTask => "tts_task_",
       Self::User => "user_", // NB: Previously "U:"
       Self::UserBookmark => "ub_",
