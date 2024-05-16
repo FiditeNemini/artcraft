@@ -8,8 +8,8 @@ use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloud
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsWorkflowDescriptor};
 use enums::by_table::model_weights::{
-    weights_category::WeightsCategory,
-    weights_types::WeightsType,
+  weights_category::WeightsCategory,
+  weights_types::WeightsType,
 };
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};

@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+
 use crate::util::netlify_branch_domain_matches::netlify_branch_domain_matches;
 
 pub fn add_gotta_go_fast_test_branches(cors: Cors, _is_production: bool) -> Cors {

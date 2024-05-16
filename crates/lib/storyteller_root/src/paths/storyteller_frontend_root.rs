@@ -32,8 +32,8 @@ mod tests {
 
   use serial_test::serial;
 
-  use crate::paths::storyteller_root::TEST_HOME;
   use crate::paths::storyteller_frontend_root::{get_storyteller_frontend_root, TEST_STORYTELLER_FRONTEND_ROOT};
+  use crate::paths::storyteller_root::TEST_HOME;
 
   #[test]
   #[serial]

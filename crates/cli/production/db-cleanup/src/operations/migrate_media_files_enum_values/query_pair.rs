@@ -1,5 +1,6 @@
 use std::thread;
 use std::time::Duration;
+
 use itertools::Itertools;
 use log::info;
 use sqlx::{FromRow, MySql, MySqlPool, Pool, QueryBuilder, Row};

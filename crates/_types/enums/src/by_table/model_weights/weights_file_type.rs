@@ -4,6 +4,7 @@ use std::collections::BTreeSet;
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+
 // TODO we will need to scan the checkpoints for malicious code.  We can't just trust the file extension.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
@@ -43,9 +44,9 @@ impl_mysql_enum_coders!(WeightsFileType);
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+  use super::*;
 
-    #[test]
+  #[test]
     fn test_to_str() {
         assert_eq!(WeightsFileType::Checkpoint.to_str(), "checkpoint");
         assert_eq!(WeightsFileType::SafeTensors.to_str(), "safetensors");

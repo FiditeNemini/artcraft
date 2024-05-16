@@ -2,7 +2,6 @@
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
-
 /// Visibility
 ///
 /// Used in various database tables (as enums! careful!) and the HTTP API to convey
@@ -17,6 +16,7 @@ use strum::EnumIter;
 /// *DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY!*
 
 use utoipa::ToSchema;
+
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize, sqlx::Type,ToSchema)]
 #[serde(rename_all = "lowercase")]

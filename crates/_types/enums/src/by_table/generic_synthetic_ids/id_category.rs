@@ -132,7 +132,7 @@ mod tests {
   mod explicit_checks {
     use super::*;
 
-  #[test]
+    #[test]
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
     assert_serialization(IdCategory::LipsyncAnimationResult, "lipsync_animation");

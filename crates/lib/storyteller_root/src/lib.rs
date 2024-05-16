@@ -29,12 +29,13 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-mod paths;
-mod substituted_path;
-
 pub use paths::seed_tool_data_root::get_seed_tool_data_root;
 pub use paths::storyteller_frontend_root::get_storyteller_frontend_root;
 pub use paths::storyteller_ml_root::get_storyteller_ml_root;
 pub use paths::storyteller_root::get_storyteller_root;
 pub use paths::storyteller_rust_root::get_storyteller_rust_root;
 pub use substituted_path::get_substituted_path;
+
+mod paths;
+mod substituted_path;
+

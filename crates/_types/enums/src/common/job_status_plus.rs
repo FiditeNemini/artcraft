@@ -1,10 +1,10 @@
 use std::collections::BTreeSet;
-use utoipa::ToSchema;
 
 #[cfg(test)]
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+use utoipa::ToSchema;
 
 /// This is used in newer jobs (that add additional enum states)
 ///

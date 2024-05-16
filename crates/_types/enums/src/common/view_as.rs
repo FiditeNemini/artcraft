@@ -2,9 +2,8 @@
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
-
-
 use utoipa::ToSchema;
+
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize, sqlx::Type,ToSchema)]
 #[serde(rename_all = "snake_case")]
@@ -51,10 +50,10 @@ impl ViewAs {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::view_as::ViewAs;
-    use crate::test_helpers::assert_serialization;
+  use crate::common::view_as::ViewAs;
+  use crate::test_helpers::assert_serialization;
 
-    #[test]
+  #[test]
     fn test_default() {
         assert_eq!(ViewAs::default(), ViewAs::AnotherUser);
 
@@ -83,9 +82,9 @@ mod tests {
     }
 
     mod traits {
-        use crate::common::view_as::ViewAs;
+      use crate::common::view_as::ViewAs;
 
-        #[test]
+      #[test]
         fn display() {
             let view_as = ViewAs::Moderator;
             assert_eq!(format!("{}", view_as), "moderator".to_string());
@@ -105,11 +104,11 @@ mod tests {
     }
 
     mod serde_serialization {
-        use crate::common::view_as::ViewAs;
+      use crate::common::view_as::ViewAs;
 
-        use super::CompositeType;
+      use super::CompositeType;
 
-        #[test]
+      #[test]
         fn serialize() {
             let expected = "\"author\"".to_string(); // NB: Quoted
 
@@ -128,11 +127,11 @@ mod tests {
     }
 
     mod serde_deserialization {
-        use crate::common::view_as::ViewAs;
+      use crate::common::view_as::ViewAs;
 
-        use super::CompositeType;
+      use super::CompositeType;
 
-        #[test]
+      #[test]
         fn deserialize() {
             let payload = "\"another_user\""; // NB: Quoted
             let value: ViewAs = serde_json::from_str(payload).unwrap();

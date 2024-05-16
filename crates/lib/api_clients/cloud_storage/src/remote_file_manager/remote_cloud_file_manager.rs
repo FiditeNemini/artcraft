@@ -1,6 +1,6 @@
 use anyhow::anyhow;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
@@ -112,15 +112,15 @@ impl RemoteCloudFileClient {
 
 #[cfg(test)]
 mod tests {
-    use async_trait::async_trait;
-    use env_logger;
+  use async_trait::async_trait;
+  use env_logger;
 
-    use errors::AnyhowResult;
+  use errors::AnyhowResult;
 
-    use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
-    use crate::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
+  use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
+  use crate::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
 
-    struct BucketOrchestrationMock {}
+  struct BucketOrchestrationMock {}
 
     #[async_trait]
     impl BucketOrchestrationCore for BucketOrchestrationMock {

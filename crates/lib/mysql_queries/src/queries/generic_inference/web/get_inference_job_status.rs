@@ -1,5 +1,4 @@
 use anyhow::anyhow;
-
 use chrono::{DateTime, Utc};
 use log::warn;
 use sqlx::{MySql, MySqlPool};
@@ -345,6 +344,7 @@ struct RawGenericInferenceJobStatus {
 #[cfg(test)]
 mod tests {
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+
   use crate::queries::generic_inference::web::get_inference_job_status::{raw_record_to_public_result, RawGenericInferenceJobStatus};
 
   #[test]

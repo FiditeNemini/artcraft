@@ -1,7 +1,7 @@
+use async_trait::async_trait;
 use log::info;
 use tokio::time::Duration;
 
-use async_trait::async_trait;
 use errors::AnyhowResult;
 
 use crate::bucket_client::BucketClient;

@@ -5,9 +5,9 @@
 
 /// Public re-exports
 pub mod letter_exports {
-    pub use lettre::Message;
-    pub use lettre::message::header::ContentType;
-    pub use lettre::message::Mailbox;
+  pub use lettre::Message;
+  pub use lettre::message::header::ContentType;
+  pub use lettre::message::Mailbox;
 }
 
 pub mod smtp_email_sender;

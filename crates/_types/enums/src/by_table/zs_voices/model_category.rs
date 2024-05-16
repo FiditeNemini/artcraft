@@ -48,8 +48,8 @@ impl ZsVoiceModelCategory {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_helpers::assert_serialization;
   use crate::by_table::zs_voices::model_category::ZsVoiceModelCategory;
+  use crate::test_helpers::assert_serialization;
 
   mod serde {
     use super::*;

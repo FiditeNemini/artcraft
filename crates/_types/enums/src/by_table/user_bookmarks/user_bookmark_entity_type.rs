@@ -86,13 +86,13 @@ impl UserBookmarkEntityType {
 
 #[cfg(test)]
 mod tests {
-    use crate::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-    use crate::test_helpers::assert_serialization;
+  use crate::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+  use crate::test_helpers::assert_serialization;
 
-    mod serde {
-        use super::*;
+  mod serde {
+    use super::*;
 
-        #[test]
+    #[test]
         fn test_serialization() {
             assert_serialization(UserBookmarkEntityType::User, "user");
             assert_serialization(UserBookmarkEntityType::TtsModel, "tts_model");
@@ -107,9 +107,9 @@ mod tests {
     }
 
     mod impl_methods {
-        use super::*;
+      use super::*;
 
-        #[test]
+      #[test]
         fn test_to_str() {
             assert_eq!(UserBookmarkEntityType::User.to_str(), "user");
             assert_eq!(UserBookmarkEntityType::TtsModel.to_str(), "tts_model");

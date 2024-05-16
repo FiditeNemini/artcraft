@@ -1,12 +1,10 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::{Executor, MySql};
-use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 
-use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use errors::AnyhowResult;
 use tokens::tokens::beta_keys::BetaKeyToken;
-use tokens::tokens::comments::CommentToken;
 use tokens::tokens::users::UserToken;
 
 pub struct BetaKey {

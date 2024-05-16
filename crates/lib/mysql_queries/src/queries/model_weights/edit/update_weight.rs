@@ -88,15 +88,14 @@ SET
 
 #[cfg(test)]
 mod tests {
+  // Template
+  use sqlx::mysql::MySqlPoolOptions;
+  use tokio;
 
-    // Template
-    use sqlx::mysql::MySqlPoolOptions;
-    use tokio;
+  use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+  use errors::AnyhowResult;
 
-    use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-    use errors::AnyhowResult;
-
-    #[ignore]
+  #[ignore]
     #[tokio::test]
     async fn test_update_weights() -> AnyhowResult<()> {
         let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;

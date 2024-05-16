@@ -1,12 +1,13 @@
-use container_common::anyhow_result::AnyhowResult;
-use sqlx::MySqlPool;
-use enums::by_table::model_weights::{
-    weights_types::WeightsType,
-    weights_category::WeightsCategory,
-};
 use log::warn;
+use sqlx::MySqlPool;
+
+use container_common::anyhow_result::AnyhowResult;
+use enums::by_table::model_weights::{
+  weights_category::WeightsCategory,
+  weights_types::WeightsType,
+};
 use enums::common::visibility::Visibility;
-use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
+use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 use tokens::tokens::media_files::MediaFileToken;
 
 pub struct CreateModelWeightsArgs<'a> {

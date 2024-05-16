@@ -81,9 +81,9 @@ impl_mysql_from_row!(WeightsType);
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+  use super::*;
 
-    #[test]
+  #[test]
     fn test_to_str() {
         assert_eq!(WeightsType::HifiganTacotron2.to_str(), "hifigan_tt2");
         assert_eq!(WeightsType::RvcV2.to_str(), "rvc_v2");

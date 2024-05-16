@@ -1,6 +1,5 @@
 use std::env;
 
-
 /// Name of the environment variable Rust's env logger uses
 pub const ENV_RUST_LOG : &str = "RUST_LOG";
 

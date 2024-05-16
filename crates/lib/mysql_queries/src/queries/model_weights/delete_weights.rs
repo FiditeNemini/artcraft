@@ -1,8 +1,7 @@
-
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
-
 
 pub async fn delete_weights_as_user(
     weight_token: &ModelWeightToken,

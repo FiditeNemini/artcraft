@@ -10,8 +10,8 @@ use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 use tokens::tokens::users::UserToken;
+use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 
 use crate::helpers::boolean_converters::nullable_i8_to_bool;
 

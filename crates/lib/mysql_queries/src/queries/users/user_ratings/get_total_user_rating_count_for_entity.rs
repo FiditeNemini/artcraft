@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use log::warn;
-use sqlx::{MySql};
+use sqlx::MySql;
 use sqlx::pool::PoolConnection;
 
 use errors::AnyhowResult;

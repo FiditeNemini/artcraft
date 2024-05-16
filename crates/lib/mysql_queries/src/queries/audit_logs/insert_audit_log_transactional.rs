@@ -1,6 +1,5 @@
 //! Audit logs are for entities that can be *edited* where we might lose the IP / edit history.
 
-use std::marker::PhantomData;
 use anyhow::anyhow;
 use sqlx::{Executor, MySql, Transaction};
 

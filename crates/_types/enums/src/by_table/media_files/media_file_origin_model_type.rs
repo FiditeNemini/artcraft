@@ -113,7 +113,7 @@ mod tests {
   mod explicit_checks {
     use super::*;
 
-  #[test]
+    #[test]
   fn test_serialization() {
     assert_serialization(MediaFileOriginModelType::SadTalker, "sad_talker");
   }

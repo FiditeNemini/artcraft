@@ -1,18 +1,18 @@
 use log::info;
 use sqlx::{MySql, Pool};
+
 use cloud_storage::remote_file_manager::media_descriptor::MediaVideoMp4Descriptor;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::media_files::create::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
 use errors::{anyhow, AnyhowResult};
+use mysql_queries::queries::media_files::create::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
 use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
+
 use crate::seeding::users::HANASHI_USERNAME;
-
-
 
 pub async fn seed_test_videos(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()> {
     let model_weight_token1 = MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();

@@ -1,10 +1,11 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
+
 use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
-
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
+
 use crate::queries::audit_logs::insert_audit_log::{insert_audit_log, InsertAuditLogArgs};
 
 pub struct SetUserFeatureFlagArgs<'a> {

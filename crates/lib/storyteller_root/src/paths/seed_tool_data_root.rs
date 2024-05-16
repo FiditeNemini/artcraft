@@ -32,8 +32,8 @@ mod tests {
 
   use serial_test::serial;
 
-  use crate::paths::storyteller_root::TEST_HOME;
   use crate::paths::seed_tool_data_root::{get_seed_tool_data_root, TEST_SEED_TOOL_DATA_ROOT};
+  use crate::paths::storyteller_root::TEST_HOME;
 
   #[test]
   #[serial]

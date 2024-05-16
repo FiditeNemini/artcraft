@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+
 use serde::Deserialize;
 use serde::Serialize;
 #[cfg(test)]
@@ -61,13 +62,13 @@ impl FeaturedItemEntityType {
 
 #[cfg(test)]
 mod tests {
-    use crate::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
-    use crate::test_helpers::assert_serialization;
+  use crate::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
+  use crate::test_helpers::assert_serialization;
 
-    mod serde {
-        use super::*;
+  mod serde {
+    use super::*;
 
-        #[test]
+    #[test]
         fn test_serialization() {
             assert_serialization(FeaturedItemEntityType::MediaFile, "media_file");
             assert_serialization(FeaturedItemEntityType::ModelWeight, "model_weight");
@@ -76,9 +77,9 @@ mod tests {
     }
 
     mod impl_methods {
-        use super::*;
+      use super::*;
 
-        #[test]
+      #[test]
         fn test_to_str() {
             assert_eq!(FeaturedItemEntityType::MediaFile.to_str(), "media_file");
             assert_eq!(FeaturedItemEntityType::ModelWeight.to_str(), "model_weight");
@@ -95,9 +96,9 @@ mod tests {
     }
 
     mod mechanical_checks {
-        use super::*;
+      use super::*;
 
-        #[test]
+      #[test]
         fn variant_length() {
             use strum::IntoEnumIterator;
             assert_eq!(FeaturedItemEntityType::all_variants().len(), FeaturedItemEntityType::iter().len());

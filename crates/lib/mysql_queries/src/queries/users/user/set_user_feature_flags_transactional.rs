@@ -1,11 +1,11 @@
 use anyhow::anyhow;
-use sqlx::{MySql, MySqlPool, Transaction};
+use sqlx::{MySql, Transaction};
+
 use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
-
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
-use crate::queries::audit_logs::insert_audit_log::{insert_audit_log, InsertAuditLogArgs};
+
 use crate::queries::audit_logs::insert_audit_log_transactional::{insert_audit_log_transactional, InsertAuditLogTransactionalArgs};
 
 pub struct SetUserFeatureFlagTransactionalArgs<'a, 'b> {

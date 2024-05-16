@@ -7,8 +7,8 @@ use sqlx::{MySql, Pool};
 
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::{
-    by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType},
-    common::visibility::Visibility,
+  by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType},
+  common::visibility::Visibility,
 };
 use errors::{anyhow, AnyhowResult};
 use filesys::file_read_bytes::file_read_bytes;
@@ -17,8 +17,8 @@ use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::queries::model_weights::create::create_weight::{
-    create_weight,
-    CreateModelWeightsArgs,
+  create_weight,
+  CreateModelWeightsArgs,
 };
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::model_weights::ModelWeightToken;

@@ -11,7 +11,6 @@ use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
-
 #[derive(Serialize)]
 pub struct ZsVoiceListPage {
     pub voices: Vec<ZsVoice>,
@@ -302,9 +301,9 @@ struct RawInternalVoiceRecordForList {
 
 #[cfg(test)]
 mod tests {
-    use crate::queries::voice_designer::voices::list_voices_query_builder::ListVoicesQueryBuilder;
+  use crate::queries::voice_designer::voices::list_voices_query_builder::ListVoicesQueryBuilder;
 
-    #[test]
+  #[test]
     fn predicates_without_scoping() {
         let query_builder = ListVoicesQueryBuilder::new();
 

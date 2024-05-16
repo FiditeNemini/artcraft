@@ -1,6 +1,7 @@
+use std::error::Error;
 use std::path::Path;
 use std::time::Duration;
-use errors::AnyhowResult;
+
 use anyhow::anyhow;
 use anyhow::bail;
 use log::info;
@@ -10,8 +11,9 @@ use s3::creds::Credentials;
 use s3::region::Region;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
- use std::error::Error;
- 
+
+use errors::AnyhowResult;
+
 #[derive(Clone)]
 pub struct BucketClient {
   bucket: Bucket,

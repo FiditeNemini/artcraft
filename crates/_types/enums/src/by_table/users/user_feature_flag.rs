@@ -63,8 +63,8 @@ impl UserFeatureFlag {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_helpers::assert_serialization;
   use crate::by_table::users::user_feature_flag::UserFeatureFlag;
+  use crate::test_helpers::assert_serialization;
 
   mod explicit_checks {
     use super::*;

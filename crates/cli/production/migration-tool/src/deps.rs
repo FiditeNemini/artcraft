@@ -1,4 +1,5 @@
 use sqlx::{MySql, Pool};
+
 use cloud_storage::bucket_client::BucketClient;
 
 pub struct Deps {

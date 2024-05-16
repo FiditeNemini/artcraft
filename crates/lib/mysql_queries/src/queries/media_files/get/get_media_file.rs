@@ -22,8 +22,8 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
-use crate::helpers::boolean_converters::i64_to_bool;
 
+use crate::helpers::boolean_converters::i64_to_bool;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 #[derive(Serialize, Debug)]

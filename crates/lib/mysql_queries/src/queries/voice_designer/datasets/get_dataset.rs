@@ -8,7 +8,6 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
-
 pub struct ZsDataset {
     pub token: ZsVoiceDatasetToken,
     pub title: String,

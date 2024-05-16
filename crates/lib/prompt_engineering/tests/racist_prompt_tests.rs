@@ -1,5 +1,5 @@
-
 use speculoos::asserting;
+
 use prompt_engineering::classify_prompt::classify_prompt;
 
 #[test]

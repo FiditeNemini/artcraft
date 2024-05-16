@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+
 use anyhow::anyhow;
 use log::error;
 use sqlx::{MySql, QueryBuilder};

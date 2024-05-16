@@ -9,6 +9,7 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
+
 use crate::column_types::vocoder_type::VocoderType;
 
 #[derive(Serialize, Deserialize, Clone)]

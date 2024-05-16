@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+
 use serde::Deserialize;
 use serde::Serialize;
 #[cfg(test)]
@@ -61,13 +62,13 @@ impl StatsEntityType {
 
 #[cfg(test)]
 mod tests {
-    use crate::by_table::entity_stats::stats_entity_type::StatsEntityType;
-    use crate::test_helpers::assert_serialization;
+  use crate::by_table::entity_stats::stats_entity_type::StatsEntityType;
+  use crate::test_helpers::assert_serialization;
 
-    mod explicit_checks {
-        use super::*;
+  mod explicit_checks {
+    use super::*;
 
-        #[test]
+    #[test]
         fn test_serialization() {
             assert_serialization(StatsEntityType::Comment, "comment");
             assert_serialization(StatsEntityType::MediaFile, "media_file");
@@ -101,9 +102,9 @@ mod tests {
     }
 
     mod mechanical_checks {
-        use super::*;
+      use super::*;
 
-        #[test]
+      #[test]
         fn variant_length() {
             use strum::IntoEnumIterator;
             assert_eq!(StatsEntityType::all_variants().len(), StatsEntityType::iter().len());

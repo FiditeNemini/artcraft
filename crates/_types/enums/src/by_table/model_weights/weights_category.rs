@@ -59,9 +59,9 @@ impl_mysql_from_row!(WeightsCategory);
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+  use super::*;
 
-    #[test]
+  #[test]
     fn test_to_str() {
         assert_eq!(WeightsCategory::ImageGeneration.to_str(), "image_generation");
         assert_eq!(WeightsCategory::TextToSpeech.to_str(), "text_to_speech");
