@@ -15,7 +15,7 @@ export function StyleButtons() {
   const [upscale, setUpscale] = useState(false);
   const [faceDetail, setFaceDetail] = useState(false);
 
-  const [value, setStyleStrength] = useState(1.0);
+  const [strength, setStyleStrength] = useState(1.0);
 
   const sliderChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStyleStrength(parseFloat(event.target.value));
@@ -38,7 +38,7 @@ export function StyleButtons() {
   };
 
   const generateMovie = async () => {
-    const options = new GenerationOptions(upscale, faceDetail, value);
+    const options = new GenerationOptions(upscale, faceDetail, strength);
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.GENERATE_VIDEO,
