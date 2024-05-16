@@ -256,12 +256,13 @@ export class APIManager {
   }
 
   public async uploadMedia({
-    blob, fileName, title, styleName
+    blob, fileName, title, styleName,maybe_scene_source_media_file_token
   }:{
     blob: Blob,
     fileName: string,
     title: string,
     styleName?: string,
+    maybe_scene_source_media_file_token: string | undefined
   }) {
     // Promise<APIManagerResponseSuccess>
     //TODO: UPDATE ENDPOINT!!!!
@@ -279,7 +280,9 @@ export class APIManager {
 
     // This signals to the backend to hide the video from view
     formData.append("is_intermediate_system_file", "true");
-
+    if (maybe_scene_source_media_file_token !== undefined) { 
+      formData.append("maybe_scene_source_media_file_token",maybe_scene_source_media_file_token)
+    }
     const response = await fetch(url, {
       method: "POST",
       // credentials: "include",

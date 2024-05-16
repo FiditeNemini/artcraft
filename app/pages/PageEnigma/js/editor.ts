@@ -1224,10 +1224,16 @@ class Editor {
 
     const title = this.getSceneSignals().title || "Untitled";
 
+
+    const style_name = this.art_style.toString()
+    const media_token = this.current_scene_media_token || undefined;
+
     const data: any = await this.api_manager.uploadMedia({
       blob,
       fileName: `${title}.mp4`,
       title,
+      styleName: style_name,
+      maybe_scene_source_media_file_token: media_token,
     });
 
     if (data == null) {
