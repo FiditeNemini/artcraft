@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use log::info;
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
@@ -25,6 +26,11 @@ pub struct BetaKeyListItem {
 
   pub product: BetaKeyProduct,
   pub key_value: String,
+
+  pub creator_user_token: UserToken,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub maybe_referrer_user_token: Option<UserToken>,
   pub maybe_referrer_username: Option<String>,
@@ -77,6 +83,10 @@ pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyL
           token: record.token,
           product: record.product,
           key_value: record.key_value,
+          creator_user_token: record.creator_user_token,
+          creator_username: record.creator_username,
+          creator_display_name: record.creator_display_name,
+          creator_gravatar_hash: record.creator_gravatar_hash,
           maybe_referrer_user_token: record.maybe_referrer_user_token,
           maybe_referrer_username: record.maybe_referrer_username,
           maybe_referrer_display_name: record.maybe_referrer_display_name,
@@ -119,6 +129,11 @@ SELECT
   b.product,
   b.key_value,
 
+  b.creator_user_token,
+  creator.username as creator_username,
+  creator.display_name as creator_display_name,
+  creator.email_gravatar_hash as creator_gravatar_hash,
+
   b.maybe_referrer_user_token,
   referrer.username as maybe_referrer_username,
   referrer.display_name as maybe_referrer_display_name,
@@ -134,6 +149,9 @@ SELECT
 
 FROM beta_keys AS b
 
+JOIN users AS creator
+    ON b.creator_user_token = creator.token
+
 LEFT OUTER JOIN users AS referrer
     ON b.maybe_referrer_user_token = referrer.token
 
@@ -141,6 +159,8 @@ LEFT OUTER JOIN users AS redeemer
     ON b.maybe_redeemer_user_token = redeemer.token
     "#
   );
+
+  info!("query_builder query (wip): {:?}", query_builder.sql());
 
   let mut first_predicate_added = false;
 
@@ -213,6 +233,11 @@ struct MediaFileListItemInternal {
   product: BetaKeyProduct,
   key_value: String,
 
+  creator_user_token: UserToken,
+  creator_username: String,
+  creator_display_name: String,
+  creator_gravatar_hash: String,
+
   maybe_referrer_user_token: Option<UserToken>,
   maybe_referrer_username: Option<String>,
   maybe_referrer_display_name: Option<String>,
@@ -229,6 +254,9 @@ struct MediaFileListItemInternal {
 
 impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+    let creator_user_token : String = row.try_get("creator_user_token")?;
+    let creator_user_token = UserToken::new(creator_user_token);
+
     let maybe_referrer_user_token : Option<String> = row.try_get("maybe_referrer_user_token")?;
     let maybe_referrer_user_token = maybe_referrer_user_token.map(|user_token| UserToken::new(user_token));
 
@@ -240,6 +268,10 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       token: BetaKeyToken::new(row.try_get("token")?),
       product: BetaKeyProduct::try_from_mysql_row(row, "product")?,
       key_value: row.try_get("key_value")?,
+      creator_user_token,
+      creator_username: row.try_get("creator_username")?,
+      creator_display_name: row.try_get("creator_display_name")?,
+      creator_gravatar_hash: row.try_get("creator_gravatar_hash")?,
       maybe_referrer_user_token,
       maybe_referrer_username: row.try_get("maybe_referrer_username")?,
       maybe_referrer_display_name: row.try_get("maybe_referrer_display_name")?,

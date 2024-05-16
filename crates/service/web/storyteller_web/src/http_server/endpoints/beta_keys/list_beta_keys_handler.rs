@@ -66,6 +66,7 @@ pub struct BetaKeyItem {
   pub token: BetaKeyToken,
   pub product: BetaKeyProduct,
   pub key_value: String,
+  pub creator: UserDetailsLight,
   pub maybe_referrer: Option<UserDetailsLight>,
   pub maybe_redeemer: Option<UserDetailsLight>,
   pub created_at: DateTime<Utc>,
@@ -209,6 +210,11 @@ pub async fn list_beta_keys_handler(
           token: beta_key.token.clone(),
           product: beta_key.product,
           key_value: beta_key.key_value,
+          creator: UserDetailsLight::from_db_fields(
+            &beta_key.creator_user_token,
+            &beta_key.creator_username,
+            &beta_key.creator_display_name,
+            &beta_key.creator_gravatar_hash),
           maybe_referrer: UserDetailsLight::from_optional_db_fields_owned(
             beta_key.maybe_referrer_user_token,
             beta_key.maybe_referrer_username,
