@@ -2,9 +2,11 @@
 
 set -euxo pipefail
 
-echo 'Updating hakari (dependency graph build optimization)'
+echo 'Updating and checking hakari (dependency graph build optimization)'
 
 cargo hakari generate
+cargo hakari manage-deps
+cargo hakari verify
 
 echo 'Looking for unused dependencies'
 
