@@ -145,6 +145,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::endpoints::workflows::enqueue_comfy_ui_handler::enqueue_comfy_ui_handler;
 use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler;
 use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
+use crate::routes::beta_key_routes::add_beta_key_routes;
 use crate::routes::job_routes::add_job_routes;
 use crate::routes::media_files_routes::add_media_file_routes;
 use crate::routes::moderation_routes::add_moderator_routes;
@@ -182,6 +183,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_featured_item_routes(app); /* /v1/featured_item/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
+  app = add_beta_key_routes(app); /* /v1/beta_keys */
   app = add_image_gen_routes(app);
   app = add_weights_routes(app);
   app = add_workflow_routes(app);
@@ -191,14 +193,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   // if server_environment == ServerEnvironment::Development {
   //
   // }
-
-  // ==================== Beta keys ====================
-
-  let mut app = RouteBuilder::from_app(app)
-      .add_get("/v1/beta_keys/list", list_beta_keys_handler)
-      .add_post("/v1/beta_keys/create", create_beta_keys_handler)
-      .add_post("/v1/beta_keys/redeem", redeem_beta_key_handler)
-      .into_app();
 
   // ==================== Comments ====================
 

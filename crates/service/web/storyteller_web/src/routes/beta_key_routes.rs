@@ -1,0 +1,35 @@
+use actix_http::body::MessageBody;
+use actix_service::ServiceFactory;
+use actix_web::{App, Error, HttpResponse, web};
+use actix_web::dev::{ServiceRequest, ServiceResponse};
+
+use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler;
+use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler;
+use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::redeem_beta_key_handler;
+
+pub fn add_beta_key_routes<T, B> (app: App<T>) -> App<T>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/v1/beta_keys")
+      .service(web::resource("/list")
+          .route(web::get().to(list_beta_keys_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/create")
+          .route(web::post().to(create_beta_keys_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/redeem")
+          .route(web::post().to(redeem_beta_key_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
