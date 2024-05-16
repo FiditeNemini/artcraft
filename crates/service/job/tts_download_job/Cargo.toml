@@ -12,6 +12,9 @@ publish = false
 name = "tts-download-job"
 path = "src/main.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Internal

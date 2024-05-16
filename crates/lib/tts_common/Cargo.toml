@@ -12,6 +12,9 @@ publish = false
 name = "tts_common"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Internal

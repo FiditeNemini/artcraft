@@ -12,6 +12,9 @@ publish = false
 name = "dummy-service"
 path = "src/main.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Internal

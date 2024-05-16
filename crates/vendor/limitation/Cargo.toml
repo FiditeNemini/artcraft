@@ -17,6 +17,9 @@ Redis.
 [badges]
 cirrus-ci = { repository = "fnichol/limitation" }
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 chrono = "0.4.9"
 futures = "0.1.29"

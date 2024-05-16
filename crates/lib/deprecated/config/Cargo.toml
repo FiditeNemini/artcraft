@@ -12,6 +12,9 @@ publish = false
 name = "config"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 # TODO: Remove these dependencies.
 #  These were introduced in refactoring. Config should have few, if any, dependencies.
 [dependencies]

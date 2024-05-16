@@ -21,6 +21,9 @@ path = "src/api_doc_server.rs"
 name = "docs-cli"
 path = "src/api_doc_cli.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Internal
@@ -41,7 +44,6 @@ elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
-google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 media = { path = "../../../lib/files/media" }

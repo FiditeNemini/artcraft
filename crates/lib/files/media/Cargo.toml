@@ -12,6 +12,9 @@ publish = false
 name = "media" # NB: Public "media" crate was squatted, so we're good to use this name internally.
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Internal
