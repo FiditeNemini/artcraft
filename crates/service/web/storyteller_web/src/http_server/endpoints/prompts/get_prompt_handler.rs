@@ -60,6 +60,16 @@ pub struct PromptInfo {
   /// and typically only applies to video style transfer.
   pub maybe_style_name: Option<StyleTransferName>,
 
+  /// If a face detailer was used.
+  /// This might not be present for all types of inference
+  /// and typically only applies to video style transfer.
+  pub used_face_detailer: bool,
+
+  /// If an upscaling pass was used.
+  /// This might not be present for all types of inference
+  /// and typically only applies to video style transfer.
+  pub used_upscaler: bool,
+
   // TODO: Author of prompt info
 
   pub created_at: DateTime<Utc>,
@@ -131,11 +141,15 @@ pub async fn get_prompt_handler(
   };
 
   let mut maybe_style_name = None;
+  let mut used_face_detailer = false;
+  let mut used_upscaler = false;
 
   if let Some(inner_payload) = &result.maybe_other_args {
     if let Some(encoded_style_name) = &inner_payload.style_name {
       maybe_style_name = encoded_style_name.to_style_name();
     }
+    used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
+    used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
   }
 
   let response = GetPromptSuccessResponse {
@@ -145,6 +159,8 @@ pub async fn get_prompt_handler(
       maybe_positive_prompt: result.maybe_positive_prompt,
       maybe_negative_prompt: result.maybe_negative_prompt,
       maybe_style_name,
+      used_face_detailer,
+      used_upscaler,
       prompt_type: result.prompt_type,
       created_at: result.created_at,
     },

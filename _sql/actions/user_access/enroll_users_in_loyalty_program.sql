@@ -42,6 +42,7 @@ where token IN (
 UPDATE users SET maybe_loyalty_program_key = 'fakeyou_contributor' WHERE username IN (
   'bflat',
   'brandon',
+  'coliphant',
   'crossproduct',
   'crossproduct1',
   'devdude123',
