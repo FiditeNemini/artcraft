@@ -16,6 +16,7 @@ pub struct BatchEntry {
 
 pub struct InsertBatchArgs<'a> {
   pub product: BetaKeyProduct,
+  pub creator_user_token: &'a UserToken,
   pub maybe_referrer_user_token: Option<&'a UserToken>,
   pub beta_keys: &'a Vec<String>,
   pub mysql_pool: &'a MySqlPool,
@@ -28,6 +29,7 @@ pub async fn insert_batch_beta_keys<'a, 'b>(args: InsertBatchArgs<'a>) -> Anyhow
       token,
       product,
       key_value,
+      creator_user_token,
       maybe_referrer_user_token
     ) VALUES
   "#);
@@ -44,6 +46,9 @@ pub async fn insert_batch_beta_keys<'a, 'b>(args: InsertBatchArgs<'a>) -> Anyhow
     query_builder.push(",");
 
     query_builder.push_bind(beta_key);
+    query_builder.push(",");
+
+    query_builder.push_bind(args.creator_user_token.as_str());
     query_builder.push(",");
 
     query_builder.push_bind(args.maybe_referrer_user_token.map(|t| t.as_str()));

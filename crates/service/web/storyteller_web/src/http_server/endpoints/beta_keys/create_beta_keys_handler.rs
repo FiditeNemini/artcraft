@@ -137,6 +137,7 @@ pub async fn create_beta_keys_handler(
 
   insert_batch_beta_keys(InsertBatchArgs {
     product: BetaKeyProduct::Studio,
+    creator_user_token: &user_session.user_token,
     maybe_referrer_user_token: maybe_referrer_user_token.as_ref(),
     beta_keys: &beta_keys,
     mysql_pool: &server_state.mysql_pool,
