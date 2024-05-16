@@ -234,7 +234,7 @@ pub async fn list_beta_keys_handler(
 
   let response = ListBetaKeysSuccessResponse {
     success: true,
-    beta_keys: Vec::new(),
+    beta_keys: results,
     pagination: PaginationCursors {
       maybe_next: cursor_next,
       maybe_previous: cursor_previous,
