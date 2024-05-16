@@ -20,6 +20,11 @@ CREATE TABLE beta_keys (
   -- Crockford-encoded.
   key_value VARCHAR(32) NOT NULL,
 
+  -- ========== CREATOR USER ==========
+
+  -- This is a member on our team
+  creator_user_token VARCHAR(32) NOT NULL,
+
   -- ========== REFERRER USER ==========
 
   -- The user that offers the beta key to other users.
@@ -50,6 +55,7 @@ CREATE TABLE beta_keys (
   UNIQUE KEY (token),
   UNIQUE KEY (key_value),
 
+  KEY index_creator_user_token (creator_user_token),
   KEY index_maybe_referrer_user_token (maybe_referrer_user_token),
   KEY index_maybe_redeemer_user_token (maybe_redeemer_user_token),
   KEY index_created_at (created_at),
