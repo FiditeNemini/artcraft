@@ -33,7 +33,7 @@ build_shared_mysql_database_library() {
 #  popd
 #}
 
-echo 'mysql prepare'
+echo 'mysql prepare (if this takes a while, it may need to rebuild all the rust code)'
 build_shared_mysql_database_library
 
 #echo 'sqlite prepare'
