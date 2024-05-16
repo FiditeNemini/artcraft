@@ -136,6 +136,8 @@ import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 import StyleVideo from "./pages/style-video";
 import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
+import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
+import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -1127,6 +1129,14 @@ class PageContainer extends React.Component<
 
                   <Route path="/beta-key/create">
                     <CreateBetaKeyPage />
+                  </Route>
+
+                  <Route path="/beta-key/redeem/success">
+                    <RedeemSuccessPage />
+                  </Route>
+
+                  <Route path="/beta-key/redeem">
+                    <RedeemBetaKeyPage />
                   </Route>
 
                   {/*

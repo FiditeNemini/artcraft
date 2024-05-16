@@ -18,5 +18,5 @@ export const CreateBetaKey = MakeRequest<
   {}
 >({
   method: "POST",
-  routingFunction: () => "/v1/beta_keys/new",
+  routingFunction: () => "/v1/beta_keys/create",
 });

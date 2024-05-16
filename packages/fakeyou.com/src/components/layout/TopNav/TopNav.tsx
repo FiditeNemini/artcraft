@@ -48,6 +48,8 @@ export default function TopNav({
   const isOnLoginPage = window.location.pathname.includes("/login");
   const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
+  const isOnBetaKeyRedeemPage =
+    window.location.pathname.includes("/beta-key/redeem");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -192,15 +194,21 @@ export default function TopNav({
     const pageContentWrapper = document.getElementById("page-content-wrapper");
 
     if (pageContentWrapper) {
-      if (domain.titlePart === "Storyteller AI" && isOnLandingPage) {
+      if (
+        (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
+        isOnBetaKeyRedeemPage
+      ) {
         pageContentWrapper.style.padding = "0px";
       } else {
         pageContentWrapper.style.padding = "";
       }
     }
-  }, [domain.titlePart, isOnLandingPage]);
+  }, [domain.titlePart, isOnLandingPage, isOnBetaKeyRedeemPage]);
 
-  if (domain.titlePart === "Storyteller AI" && isOnLandingPage) {
+  if (
+    (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
+    isOnBetaKeyRedeemPage
+  ) {
     return null;
   }
 

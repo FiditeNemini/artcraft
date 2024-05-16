@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import {
   CreateSession,
   CreateSessionIsError,
@@ -29,6 +29,9 @@ function LoginPage(props: Props) {
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  let location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const redirectUrl = queryParams.get("redirect") || "/";
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push("/");
@@ -72,7 +75,7 @@ function LoginPage(props: Props) {
       props.querySessionAction();
       props.querySessionSubscriptionsAction();
       Analytics.accountLoginSuccess();
-      history.push("/");
+      history.push(redirectUrl);
     }
 
     return false;
