@@ -2,6 +2,10 @@
 
 set -euxo pipefail
 
+echo 'Updating hakari (dependency graph build optimization)'
+
+cargo hakari generate
+
 echo 'Looking for unused dependencies'
 
 # https://github.com/est31/cargo-udeps

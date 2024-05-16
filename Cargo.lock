@@ -3483,7 +3483,6 @@ dependencies = [
  "my-workspace-hack",
  "redis 0.13.0",
  "time 0.1.45",
- "tokio",
  "version-sync",
 ]
 
@@ -3930,6 +3929,7 @@ dependencies = [
  "clap",
  "combine 4.6.6",
  "crossbeam-utils 0.8.16",
+ "crypto-common",
  "deranged",
  "derive_more",
  "digest 0.10.7",
@@ -3945,7 +3945,6 @@ dependencies = [
  "futures-task",
  "futures-util",
  "generic-array",
- "getrandom 0.1.16",
  "getrandom 0.2.11",
  "hashbrown 0.12.3",
  "hashbrown 0.14.5",
@@ -3966,7 +3965,6 @@ dependencies = [
  "num-iter",
  "num-rational",
  "num-traits",
- "once_cell",
  "openssl",
  "openssl-sys",
  "proc-macro2",
