@@ -12,31 +12,23 @@ authors = [
 name = "es-update-job"
 path = "src/main.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Internal
-actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
-concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
-filesys = { path = "../../../lib/files/filesys" }
-hashing = { path = "../../../lib/files/hashing" }
-jobs_common = { path = "../../../lib/jobs_common" }
-media = { path = "../../../lib/files/media" }
-memory_caching = { path = "../../../lib/caching/memory_caching" }
-mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
-redis_common = { path = "../../../lib/redis_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
-subprocess_common = { path = "../../../lib/subprocess_common" }
-testing = { path = "../../../lib/testing" }
 tokens = { path = "../../../_types/tokens" }
 
 # Workspace hack (faster compile times)
@@ -50,7 +42,6 @@ hostname = "0.3.1"
 log = "0.4.14"
 once_cell = "1.18.0"
 rand = "0.8.5"
-subprocess = "0.2.9"
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 

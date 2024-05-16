@@ -13,9 +13,12 @@ publish = false
 name = "actix_cors_configs"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # Internal
-errors = { path = "../../lib/errors" }
+#errors = { path = "../../lib/errors" }
 reusable_types = { path = "../../_types/reusable_types" }
 
 # Workspace hack (faster compile times)

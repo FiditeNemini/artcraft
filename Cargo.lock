@@ -358,7 +358,6 @@ dependencies = [
  "actix-http",
  "actix-rt",
  "actix-web",
- "errors",
  "log",
  "my-workspace-hack",
  "reusable_types",
@@ -879,7 +878,6 @@ dependencies = [
 name = "billing_component"
 version = "0.0.1"
 dependencies = [
- "actix-cors",
  "actix-http",
  "actix-web",
  "anyhow",
@@ -906,7 +904,6 @@ dependencies = [
  "url_config",
  "user_traits_component",
  "utoipa",
- "utoipa-swagger-ui",
 ]
 
 [[package]]
@@ -1014,7 +1011,6 @@ name = "buckets"
 version = "0.0.1"
 dependencies = [
  "crockford",
- "errors",
  "my-workspace-hack",
 ]
 
@@ -1256,7 +1252,6 @@ dependencies = [
 name = "collections"
 version = "0.0.1"
 dependencies = [
- "errors",
  "my-workspace-hack",
  "rand 0.8.5",
 ]
@@ -1319,9 +1314,7 @@ dependencies = [
  "sqlx",
  "sqlx-core",
  "sqlx-mysql",
- "strum",
  "tokens",
- "toml 0.5.11",
  "utoipa",
 ]
 
@@ -1368,7 +1361,6 @@ name = "container_common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "log",
  "my-workspace-hack",
  "once_cell",
  "rand 0.8.5",
@@ -2056,7 +2048,6 @@ dependencies = [
  "hyper",
  "jobs_common",
  "log",
- "migration",
  "mimetypes",
  "my-workspace-hack",
  "mysql_queries",
@@ -2231,11 +2222,9 @@ dependencies = [
  "actix-web",
  "actix_helpers",
  "anyhow",
- "async-trait",
  "bootstrap",
  "buckets",
  "chrono",
- "cloud_storage",
  "concurrency",
  "config",
  "container_common",
@@ -2245,16 +2234,9 @@ dependencies = [
  "enums",
  "errors",
  "filesys",
- "hashing",
  "hostname",
- "hyper",
- "images",
  "jobs_common",
- "lfu",
  "log",
- "media",
- "memory_caching",
- "mimetypes",
  "my-workspace-hack",
  "mysql_queries",
  "once_cell",
@@ -2265,13 +2247,8 @@ dependencies = [
  "serde_json",
  "server_environment",
  "sqlx",
- "subprocess",
- "subprocess_common",
- "tempdir",
- "testing",
  "tokens",
  "tokio",
- "tts_common",
 ]
 
 [[package]]
@@ -2355,11 +2332,9 @@ dependencies = [
 name = "es-update-job"
 version = "0.0.1"
 dependencies = [
- "actix_helpers",
  "anyhow",
  "bootstrap",
  "chrono",
- "concurrency",
  "config",
  "container_common",
  "dotenv",
@@ -2368,19 +2343,12 @@ dependencies = [
  "elasticsearch_schema",
  "enums",
  "errors",
- "filesys",
- "hashing",
  "hostname",
- "jobs_common",
  "log",
- "media",
- "memory_caching",
- "mimetypes",
  "my-workspace-hack",
  "mysql_queries",
  "once_cell",
  "rand 0.8.5",
- "redis_common",
  "reusable_types",
  "serde",
  "serde_derive",
@@ -2388,9 +2356,6 @@ dependencies = [
  "server_environment",
  "sqlx",
  "storyteller_root",
- "subprocess",
- "subprocess_common",
- "testing",
  "tokens",
  "tokio",
 ]
@@ -2980,18 +2945,15 @@ dependencies = [
  "actix-web",
  "anyhow",
  "base64 0.21.5",
- "chrono",
  "errors",
  "language-tags",
  "log",
  "my-workspace-hack",
  "once_cell",
  "regex",
- "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",
- "speculoos",
 ]
 
 [[package]]
@@ -3592,7 +3554,6 @@ checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
 name = "logging"
 version = "0.0.1"
 dependencies = [
- "dotenv",
  "env_logger",
  "log",
  "my-workspace-hack",
@@ -3775,7 +3736,6 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "serial_test 2.0.0",
  "sqlx",
  "tokens",
  "tokio",
@@ -4753,7 +4713,6 @@ dependencies = [
 name = "primitives"
 version = "0.0.1"
 dependencies = [
- "errors",
  "my-workspace-hack",
 ]
 
@@ -4794,7 +4753,6 @@ dependencies = [
 name = "prompt_engineering"
 version = "0.1.0"
 dependencies = [
- "errors",
  "my-workspace-hack",
  "once_cell",
  "regex",
@@ -6424,7 +6382,6 @@ version = "0.0.1"
 dependencies = [
  "my-workspace-hack",
  "serial_test 2.0.0",
- "tempdir",
 ]
 
 [[package]]
@@ -7315,7 +7272,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "subprocess",
  "tempdir",
  "tokio",
  "tts_common",
@@ -7600,7 +7556,6 @@ name = "user_traits_component"
 version = "0.0.1"
 dependencies = [
  "actix-web",
- "errors",
  "mockall",
  "my-workspace-hack",
 ]
@@ -7651,7 +7606,6 @@ dependencies = [
  "user_input_common",
  "user_traits_component",
  "utoipa",
- "utoipa-swagger-ui",
 ]
 
 [[package]]

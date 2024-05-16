@@ -12,6 +12,9 @@ authors = [
 name = "component_subsystem_inference_workloads"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 
 # Workspace hack (faster compile times)

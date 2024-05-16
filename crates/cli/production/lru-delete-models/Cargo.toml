@@ -12,6 +12,9 @@ publish = false
 name = "lru-delete-models"
 path = "src/main.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # Internal
 errors = { path = "../../../lib/errors" }

@@ -19,7 +19,7 @@ normal = ["my-workspace-hack"]
 
 # Internal
 crockford = { path = "../../lib/data/crockford" }
-errors = { path = "../../lib/errors" }
+#errors = { path = "../../lib/errors" }
 
 
 # Workspace hack (faster compile times)

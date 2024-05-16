@@ -40,7 +40,6 @@ dotenv = "0.15.0"
 hostname = "0.3.1"
 lfu = "0.2.5"
 log = "0.4.14"
-subprocess = "0.2.9"
 tempdir = "0.3.7"
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }

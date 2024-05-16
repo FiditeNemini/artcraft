@@ -21,7 +21,7 @@ normal = ["my-workspace-hack"]
 # Consider the dependencies here wisely.
 
 # Internal
-errors = { path = "../../errors" }
+#errors = { path = "../../errors" }
 
 # External
 # (None)

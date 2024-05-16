@@ -32,7 +32,6 @@ filesys = { path = "../../../lib/files/filesys" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
-migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 reusable_types = { path = "../../../_types/reusable_types" }

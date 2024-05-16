@@ -12,6 +12,9 @@ publish = false
 name = "easyenv"
 path = "src/lib.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # Internal
 storyteller_root = { path = "../storyteller_root" }

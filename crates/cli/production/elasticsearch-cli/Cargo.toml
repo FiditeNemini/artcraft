@@ -12,6 +12,9 @@ publish = false
 name = "elasticsearch-cli"
 path = "src/main.rs"
 
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
 [dependencies]
 # Internal
 buckets = { path = "../../../_types/buckets" }
