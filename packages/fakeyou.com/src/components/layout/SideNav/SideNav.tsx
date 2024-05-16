@@ -31,7 +31,10 @@ import { useInferenceJobs, useLocalize } from "hooks";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Button } from "components/common";
 import { WebUrl } from "common/WebUrl";
-import { WebsiteConfig, Website } from "@storyteller/components/src/env/GetWebsite";
+import {
+  WebsiteConfig,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 import { useDomainConfig } from "context/DomainConfigContext";
 
 interface SideNavProps {
@@ -59,6 +62,8 @@ export default function SideNav({
   const isOnLoginPage = window.location.pathname.includes("/login");
   const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
+  const isOnBetaKeyRedeemPage =
+    window.location.pathname.includes("/beta-key/redeem");
   const domain: WebsiteConfig = useDomainConfig();
 
   let history = useHistory();
@@ -112,7 +117,8 @@ export default function SideNav({
   const shouldNotShowSidebar =
     (!isLoggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
     isOnStudioPage ||
-    (domain.website === Website.StorytellerAi && isOnLandingPage);
+    (domain.website === Website.StorytellerAi && isOnLandingPage) ||
+    isOnBetaKeyRedeemPage;
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${
     shouldShowSidebar ? "visible" : ""
@@ -277,36 +283,35 @@ export default function SideNav({
             {t("videoWorkflow")}
           </NavLink>
         </li>
-{
-        // <li>
-        //   <NavLink
-        //     to="/studio"
-        //     activeClassName="active-link"
-        //     onClick={handleNavLinkClick}
-        //   >
-        //     <FontAwesomeIcon
-        //       icon={faCameraMovie}
-        //       className="sidebar-heading-icon"
-        //     />
-        //     Storyteller Studio
-        //     {/* {t("videoStorytellerStudio")} */}
-        //   </NavLink>
-        // </li>
-
-        // <li>
-        //   <NavLink
-        //     to="/engine-compositor"
-        //     activeClassName="active-link"
-        //     onClick={handleNavLinkClick}
-        //   >
-        //     <FontAwesomeIcon
-        //       icon={faTransporter}
-        //       className="sidebar-heading-icon"
-        //     />
-        //     Engine Compositor
-        //     {/* {t("videoStorytellerStudio")} */}
-        //   </NavLink>
-        // </li>
+        {
+          // <li>
+          //   <NavLink
+          //     to="/studio"
+          //     activeClassName="active-link"
+          //     onClick={handleNavLinkClick}
+          //   >
+          //     <FontAwesomeIcon
+          //       icon={faCameraMovie}
+          //       className="sidebar-heading-icon"
+          //     />
+          //     Storyteller Studio
+          //     {/* {t("videoStorytellerStudio")} */}
+          //   </NavLink>
+          // </li>
+          // <li>
+          //   <NavLink
+          //     to="/engine-compositor"
+          //     activeClassName="active-link"
+          //     onClick={handleNavLinkClick}
+          //   >
+          //     <FontAwesomeIcon
+          //       icon={faTransporter}
+          //       className="sidebar-heading-icon"
+          //     />
+          //     Engine Compositor
+          //     {/* {t("videoStorytellerStudio")} */}
+          //   </NavLink>
+          // </li>
         }
       </>
     );
@@ -479,11 +484,7 @@ export default function SideNav({
               </NavLink>
             </li>
             <li className="mb-3">
-              <a
-                href={GetDiscordLink()}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href={GetDiscordLink()} target="_blank" rel="noreferrer">
                 <FontAwesomeIcon
                   icon={faDiscord}
                   className="sidebar-heading-icon"

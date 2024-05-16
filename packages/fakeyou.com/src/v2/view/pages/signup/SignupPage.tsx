@@ -8,7 +8,7 @@ import {
 } from "@storyteller/components/src/api/user/CreateAccount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 import { Analytics } from "../../../../common/Analytics";
@@ -35,6 +35,8 @@ interface Props {
 function SignupPage(props: Props) {
   let history = useHistory();
   const domain = useDomainConfig();
+  let location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
 
   const parsedQueryString = queryString.parse(window.location.search);
 
@@ -264,7 +266,9 @@ function SignupPage(props: Props) {
       return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
     }
 
-    let redirectUrl = WebUrl.pricingPageWithReferer("signup");
+    const redirectLink = queryParams.get("redirect");
+
+    let redirectUrl = redirectLink || WebUrl.pricingPageWithReferer("signup");
     history.push(redirectUrl);
 
     return true;
