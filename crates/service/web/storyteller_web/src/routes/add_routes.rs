@@ -19,6 +19,7 @@ use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_ha
 use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler;
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler;
+use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::redeem_beta_key_handler;
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
 use crate::http_server::endpoints::categories::tts::assign_tts_category::assign_tts_category_handler;
@@ -195,7 +196,8 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/beta_keys/list", list_beta_keys_handler)
-      .add_post("/v1/beta_keys/new", create_beta_keys_handler)
+      .add_post("/v1/beta_keys/create", create_beta_keys_handler)
+      .add_post("/v1/beta_keys/redeem", redeem_beta_key_handler)
       .into_app();
 
   // ==================== Comments ====================
