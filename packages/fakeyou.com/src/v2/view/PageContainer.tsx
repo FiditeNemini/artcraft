@@ -135,6 +135,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 import StyleVideo from "./pages/style-video";
+import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -1122,6 +1123,10 @@ class PageContainer extends React.Component<
                     <CreateCategoryPage
                       sessionWrapper={this.props.sessionWrapper}
                     />
+                  </Route>
+
+                  <Route path="/beta-key/create">
+                    <CreateBetaKeyPage />
                   </Route>
 
                   {/*

@@ -244,6 +244,10 @@ styles with important tags:
     padding-left: var(--bs-gutter-x, 1rem);
   }
 
+  .narrow-container {
+    max-width: 900px !important;
+  }
+
   .py-6 {
     padding-top: 1.6rem !important;
     padding-bottom: 0.4rem !important;
