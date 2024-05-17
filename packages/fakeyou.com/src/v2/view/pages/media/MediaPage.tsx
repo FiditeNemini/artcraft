@@ -147,7 +147,20 @@ export default function MediaPage() {
     setActiveSlide(image);
   };
 
-  usePrefixedDocumentTitle(mediaFile?.maybe_title || "Media");
+  let pageTitle;
+
+  switch (mediaFile?.media_type) {
+    case MediaFileType.Audio: 
+      pageTitle = mediaFile?.maybe_title || "Audio File";
+    case MediaFileType.Video: 
+      pageTitle = mediaFile?.maybe_title || "Video File";
+    case MediaFileType.Image: 
+      pageTitle = mediaFile?.maybe_title || "Image File";
+    default:
+      pageTitle = mediaFile?.maybe_title || "Media File";
+  }
+
+  usePrefixedDocumentTitle(pageTitle);
 
   const promptSection = (
     <>
