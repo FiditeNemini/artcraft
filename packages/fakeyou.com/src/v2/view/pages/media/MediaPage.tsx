@@ -43,6 +43,7 @@ import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { STYLES_BY_KEY } from "common/StyleOptions";
 import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export default function MediaPage() {
   const { canAccessStudio, canEditMediaFile, canBanUsers, user } = useSession();
@@ -145,6 +146,8 @@ export default function MediaPage() {
   const handleActiveSlideChange = (image: any) => {
     setActiveSlide(image);
   };
+
+  usePrefixedDocumentTitle(mediaFile?.maybe_title || "Media");
 
   const promptSection = (
     <>
