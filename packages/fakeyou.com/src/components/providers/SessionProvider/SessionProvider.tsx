@@ -14,7 +14,8 @@ export enum ModalView { // ignore this modal stuff for now -V
   Login,
 }
 
-interface ModalProps { // this too
+interface ModalProps {
+  // this too
   close: () => void;
   open: () => void;
   view: ModalView;
@@ -32,7 +33,7 @@ interface SessionContextType {
   querySubscriptions?: any;
   sessionFetched: boolean;
   sessionSubscriptions?: any;
-  studioAccessCheck: (x:any) => any,
+  studioAccessCheck: (x: any) => any;
   user?: any;
   userTokenMatch: (token: string) => boolean;
 }
@@ -75,12 +76,18 @@ export default function SessionProvider({
   sessionSubscriptions,
   sessionWrapper,
 }: Props) {
-  const sessionResponse = sessionWrapper?.sessionStateResponse || { logged_in: false, user: null };
+  const sessionResponse = sessionWrapper?.sessionStateResponse || {
+    logged_in: false,
+    user: null,
+  };
   const { logged_in: loggedIn, user } = sessionResponse;
   const [view, viewSet] = useState(ModalView.Closed);
   const open = () => viewSet(ModalView.Signup);
-  const close = () => { viewSet(ModalView.Closed); };
-  const viewSwitch = () => viewSet(view === ModalView.Signup ? ModalView.Login : ModalView.Signup);
+  const close = () => {
+    viewSet(ModalView.Closed);
+  };
+  const viewSwitch = () =>
+    viewSet(view === ModalView.Signup ? ModalView.Login : ModalView.Signup);
   const check = () => {
     if (user) {
       return true;
@@ -90,7 +97,9 @@ export default function SessionProvider({
     }
   };
   const userTokenMatch = (otherUserToken: string) =>
-    !otherUserToken || !user?.user_token ? false : user.user_token === otherUserToken;
+    !otherUserToken || !user?.user_token
+      ? false
+      : user.user_token === otherUserToken;
   const canEditTtsModel = (userToken: string) =>
     user?.can_delete_other_users_tts_models || userTokenMatch(userToken);
   const canEditMediaFile = (userToken: string) =>
@@ -98,11 +107,14 @@ export default function SessionProvider({
   const canBanUsers = () => user?.can_ban_users || false;
   const canAccessStudio = () => {
     const hostnameAllowed = StudioRolloutHostnameAllowed();
-    const userAllowed = !!user?.can_access_studio || !!user?.maybe_feature_flags.includes("studio");
+    const userAllowed =
+      !!user?.can_access_studio ||
+      !!user?.maybe_feature_flags.includes("studio");
     return hostnameAllowed && userAllowed;
-  }
+  };
 
-  const studioAccessCheck = (content: React.ElementType) => canAccessStudio() ? content : <StudioNotAvailable />;
+  const studioAccessCheck = (content: React.ElementType) =>
+    canAccessStudio() ? content : <StudioNotAvailable />;
 
   const modal = { close, open, view };
 

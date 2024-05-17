@@ -1,11 +1,11 @@
 import MakeRequest from "../MakeRequest";
 import { MediaFile } from "./GetMedia";
-import { LazyPagination } from "../_common/SharedFetchTypes";
+import { Pagination } from "../_common/SharedFetchTypes";
 
 export interface ListMediaFilesRequest {}
 
 export interface ListMediaFilesResponse {
-  pagination: LazyPagination;
+  pagination: Pagination;
   success: boolean;
   results: MediaFile[];
 }

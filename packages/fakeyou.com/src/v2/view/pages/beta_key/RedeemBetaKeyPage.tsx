@@ -12,7 +12,7 @@ export default function RedeemBetaKeyPage() {
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const history = useHistory();
-  const { loggedIn } = useSession();
+  const { user, loggedIn } = useSession();
 
   const handleGoToSuccess = () => {
     history.push("/beta-key/redeem/success");
@@ -77,6 +77,8 @@ export default function RedeemBetaKeyPage() {
       </Container>
     );
   }
+
+  console.log(user);
 
   return (
     <>

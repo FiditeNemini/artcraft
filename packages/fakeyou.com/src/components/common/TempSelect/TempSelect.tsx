@@ -23,6 +23,7 @@ export interface SelectProps extends ReactSelectProps {
   options: Option[];
   onChange?: (value: any) => void;
   required?: boolean;
+  className?: string;
 }
 
 export default function Select({
@@ -40,13 +41,13 @@ export default function Select({
   const isMulti = Array.isArray(value);
   const findVal = (opts: Option[], nest = 0): Option | undefined => {
     let val: Option | undefined;
-    opts.forEach((option) => {
+    opts.forEach(option => {
       if (!val) {
         if (option.options) {
-          val = findVal(option.options,++nest);
+          val = findVal(option.options, ++nest);
         } else if (option.value === value) {
-          val = option
-        } 
+          val = option;
+        }
       }
     });
     return val;
@@ -55,11 +56,17 @@ export default function Select({
   const valueLabel = findVal(options)?.label || "";
   const onChange = (option: any, x: any) => {
     if (Array.isArray(option)) {
-      inChange({ target: {value: option.map(({ value = "" }) => value), name, type: "select" } });
+      inChange({
+        target: {
+          value: option.map(({ value = "" }) => value),
+          name,
+          type: "select",
+        },
+      });
     } else {
-      inChange({ target: {value: option.value, name, type: "select" } });
+      inChange({ target: { value: option.value, name, type: "select" } });
     }
-  }
+  };
   const className = `${icon ? " input-icon" : ""}${
     small ? " select-small" : ""
   }`;
@@ -97,9 +104,14 @@ export default function Select({
               name,
               onChange,
               options,
-              ...value && (isMulti ? { 
-                value: Array.isArray(value) ? value.map((val: any) => ({ label: val, value: val })) : [] 
-              } : { value: { label: valueLabel, value } }),
+              ...(value &&
+                (isMulti
+                  ? {
+                      value: Array.isArray(value)
+                        ? value.map((val: any) => ({ label: val, value: val }))
+                        : [],
+                    }
+                  : { value: { label: valueLabel, value } })),
               ...rest,
             }}
           />

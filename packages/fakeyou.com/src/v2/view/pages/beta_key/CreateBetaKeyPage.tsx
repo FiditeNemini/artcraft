@@ -101,11 +101,10 @@ export default function CreateBetaKeyPage() {
       <Panel padding={true}>
         <div className="d-flex flex-column gap-3">
           <TempInput
-            label="Username"
-            placeholder="Username of key owner"
+            label="Username of Referrer"
+            placeholder="Username of referrer (optional)"
             value={username}
             onChange={e => setUsername(e.target.value)}
-            required={true}
           />
           <TempInput
             label="Number of Keys"

@@ -138,6 +138,7 @@ import StyleVideo from "./pages/style-video";
 import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
 import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
+import BetaKeysListPage from "./pages/beta_key/BetaKeysListPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -1137,6 +1138,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/beta-key/redeem">
                     <RedeemBetaKeyPage />
+                  </Route>
+
+                  <Route path="/beta-key/list">
+                    <BetaKeysListPage />
                   </Route>
 
                   {/*

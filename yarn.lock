@@ -4472,6 +4472,7 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
+    "@tanstack/react-table": ^8.17.3
     "@typeform/embed": ^4.8.1
     "@typeform/embed-react": ^3.15.0
     craco: ^0.0.3
@@ -4754,6 +4755,25 @@ __metadata:
     "@svgr/plugin-svgo": ^5.5.0
     loader-utils: ^2.0.0
   checksum: 540391bd63791625d26d6b5e0dd3c716ef51176bfba53bf0979a1ac4781afd2672f4bef2d76cf3d9cdc8e9ee61bda6863ed405a237b10406633ede4cd524f1cc
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-table@npm:^8.17.3":
+  version: 8.17.3
+  resolution: "@tanstack/react-table@npm:8.17.3"
+  dependencies:
+    "@tanstack/table-core": 8.17.3
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: ec635f9c6e66bc5655e71ef5bb5087c78fca79e619d8cf80ba395152d88e72ef78e87cbb3e4b9e0b4d86504068c8bf5ba320309529ef9d3dd1ee4630bf75067a
+  languageName: node
+  linkType: hard
+
+"@tanstack/table-core@npm:8.17.3":
+  version: 8.17.3
+  resolution: "@tanstack/table-core@npm:8.17.3"
+  checksum: 4f7115d6198f63bea6a00a1c8f33288453463afbede716365b99b3ffa565c46861eb2903c26d3d1de35211ad85fa13bc1e0f35b3546b8f7fc46218441cf06700
   languageName: node
   linkType: hard
 
