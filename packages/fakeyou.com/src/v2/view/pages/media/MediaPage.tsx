@@ -223,6 +223,30 @@ export default function MediaPage() {
               </div>
             </>
           )}
+          {prompt?.used_face_detailer && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Used Face Detailer</h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  {prompt?.used_face_detailer}
+                </p>
+              </div>
+            </>
+          )}
+          {prompt?.used_upscaler && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Used Upscaler</h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  {prompt?.used_upscaler}
+                </p>
+              </div>
+            </>
+          )}
         </Panel>
       )}
     </>
