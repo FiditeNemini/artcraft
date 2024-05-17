@@ -230,7 +230,7 @@ export default function MediaPage() {
               </div>
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
-                  {prompt?.used_face_detailer}
+                  {prompt?.used_face_detailer ? "Yes" : "No"}
                 </p>
               </div>
             </>
@@ -242,7 +242,7 @@ export default function MediaPage() {
               </div>
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
-                  {prompt?.used_upscaler}
+                  {prompt?.used_upscaler ? "Yes" : "No"}
                 </p>
               </div>
             </>
