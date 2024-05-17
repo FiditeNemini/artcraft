@@ -1,5 +1,5 @@
-import { AssetType } from "~/pages/PageEnigma/models/assets";
 import { ReactNode } from "react";
+import { AssetType } from "~/enums";
 
 export interface Tab {
   icon: string;

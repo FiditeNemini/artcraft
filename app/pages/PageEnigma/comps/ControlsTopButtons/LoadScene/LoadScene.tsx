@@ -1,12 +1,11 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useLayoutEffect,
-} from "react";
-import { ScenePicker, SceneTypes } from "../ScenePicker";
-import { Label, LoadingSpinner } from "~/components";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
+import dayjs from "dayjs";
+
+import { MediaInfo } from "~/pages/PageEnigma/models";
+import { MediaFileType } from "~/pages/PageEnigma/enums";
+import { authentication } from "~/signals";
+
 import {
   GetMediaByUser,
   GetMediaListResponse,
@@ -15,9 +14,9 @@ import {
   ListFeaturedMediaFiles,
   ListFeaturedMediaFilesResponse,
 } from "~/api/media_files/ListFeaturedMediaFiles";
-import { MediaInfo, MediaFileType } from "~/pages/PageEnigma/models";
-import { AuthenticationContext } from "~/contexts/Authentication";
-import dayjs from "dayjs";
+
+import { ScenePicker, SceneTypes } from "../ScenePicker";
+import { Label, LoadingSpinner } from "~/components";
 
 interface LoadSceneProps {
   onSceneSelect: (token: string) => void;
@@ -39,15 +38,17 @@ export enum Filters {
 }
 
 export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
+  useSignals();
+  const { userInfo } = authentication;
+
   const [scenes, setScenes] = useState<SceneTypes[]>([]);
   const [featured, featuredSet] = useState<SceneTypes[]>([]);
-  const { authState } = useContext(AuthenticationContext);
+
   const sceneLoading = useRef(false);
   const [isSceneLoading, setIsSceneLoading] = useState(true);
   const [featuredStatus, featuredStatusSet] = useState(FetchStatus.ready);
-
   useEffect(() => {
-    if (!authState.userInfo || scenes.length || sceneLoading.current) {
+    if (!userInfo.value || scenes.length || sceneLoading.current) {
       return;
     }
     sceneLoading.current = true;
@@ -63,7 +64,7 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
       }));
     // console.log("load scene");
     GetMediaByUser(
-      authState.userInfo.username,
+      userInfo.value.username,
       {},
       {
         filter_engine_categories: MediaFileType.Scene,
@@ -88,7 +89,6 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
         {},
         {
           filter_engine_categories: "scene",
-          // page_index: page,
           page_size: 100,
         },
       ).then((res: ListFeaturedMediaFilesResponse) => {
@@ -98,7 +98,7 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
         }
       });
     }
-  }, [featuredStatus, scenes, authState.userInfo]);
+  }, [featuredStatus, scenes, userInfo.value]);
 
   const handleSceneSelect = (selectedScene: SceneTypes) => {
     onSceneSelect(selectedScene.token);
@@ -143,7 +143,8 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
             {scenes.length !== 0 || featured.length !== 0 ? (
               <div
                 className="overflow-y-auto overflow-x-hidden"
-                ref={scrollContainerRef}>
+                ref={scrollContainerRef}
+              >
                 <ScenePicker
                   scenes={[...scenes, ...featured]}
                   onSceneSelect={handleSceneSelect}

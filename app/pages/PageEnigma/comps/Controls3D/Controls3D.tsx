@@ -4,7 +4,7 @@ import {
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIconSelect } from "~/components";
-import { EngineContext } from "~/contexts/EngineContext";
+import { EngineContext } from "../../contexts/EngineContext";
 import { useContext } from "react";
 
 export const Controls3D = () => {

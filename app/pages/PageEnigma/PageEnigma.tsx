@@ -1,17 +1,12 @@
 import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
-import { EngineProvider } from "~/contexts/EngineProvider";
+import { EngineProvider } from "./contexts/EngineContext";
 import { useInferenceJobManager } from "~/hooks";
-import { LoadingBar } from "~/components";
+import { ErrorDialog, LoadingBar } from "~/components";
 import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
-import { ErrorDialog } from "~/components/ErrorDialog";
 
-export const PageEnigma = ({
-  sceneToken
-}:{
-  sceneToken?:string
-}) => {
+export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useInferenceJobManager();
   return (
     <TrackProvider>

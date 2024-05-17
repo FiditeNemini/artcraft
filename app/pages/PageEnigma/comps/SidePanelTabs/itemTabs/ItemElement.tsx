@@ -1,6 +1,7 @@
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
+import { SyntheticEvent } from "react";
 
 interface Props {
   debug?: string;
@@ -15,13 +16,11 @@ export const ItemElement = ({ item }: Props) => {
   return (
     <div
       className="relative w-full cursor-pointer rounded-xl bg-[#A0A0A0] transition-all duration-200"
-      onPointerDown={(event) => DndAsset.onPointerDown(event, item)}>
+      onPointerDown={(event) => DndAsset.onPointerDown(event, item)}
+    >
       <img
-        {...{
-          //crossOrigin: "anonymous",
-          src: thumbnail,
-        }}
-        onError={(e: SyntheticEvent<HTMLDivElement>) => {
+        src={thumbnail}
+        onError={(e: SyntheticEvent<HTMLImageElement>) => {
           e.currentTarget.src = defaultThumb;
         }}
         alt={item.name}
@@ -29,7 +28,8 @@ export const ItemElement = ({ item }: Props) => {
       />
       <div
         className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
-        style={{ backgroundColor: "#39394D" }}>
+        style={{ backgroundColor: "#39394D" }}
+      >
         {item.name || item.media_id}
       </div>
     </div>

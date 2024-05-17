@@ -1,15 +1,17 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
-import {
-  AssetType,
-  Clip,
-  ClipGroup,
-  ClipType,
-} from "~/pages/PageEnigma/models";
+import { Clip } from "~/pages/PageEnigma/models";
 import { PointerEvent } from "react";
-import { canDrop, dragItem, filmLength, scale } from "~/pages/PageEnigma/store";
+import {
+  canDrop,
+  dragItem,
+  filmLength,
+  scale,
+} from "~/pages/PageEnigma/signals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp } from "@fortawesome/pro-solid-svg-icons";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
+import { AssetType } from "~/enums";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
 
 interface Props {
   id: string;
@@ -153,7 +155,8 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
         "relative block h-9 w-full rounded-lg",
         `bg-${group}-unselected`,
         clips.length === 0 ? "border-2 border-dashed border-white/30" : "",
-      ].join(" ")}>
+      ].join(" ")}
+    >
       <div
         className={[
           "absolute inset-0 rounded-lg",

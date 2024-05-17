@@ -1,4 +1,4 @@
-import { characterGroup } from "~/pages/PageEnigma/store";
+import { characterGroup } from "~/pages/PageEnigma/signals";
 import { Character } from "~/pages/PageEnigma/comps/Timeline/Character";
 import { useSignals } from "@preact/signals-react/runtime";
 

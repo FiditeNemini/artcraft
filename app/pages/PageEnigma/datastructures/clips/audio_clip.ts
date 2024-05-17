@@ -1,4 +1,4 @@
-import { environmentVariables } from "~/store";
+import { environmentVariables } from "~/signals";
 
 interface AudioData {
   audioContext: AudioContext;

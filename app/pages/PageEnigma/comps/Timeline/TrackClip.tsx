@@ -5,8 +5,9 @@ import {
   dragItem,
   scale,
   selectedItem,
-} from "~/pages/PageEnigma/store";
-import { Clip, ClipGroup } from "~/pages/PageEnigma/models";
+} from "~/pages/PageEnigma/signals";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { Clip } from "~/pages/PageEnigma/models";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 interface Props {
@@ -66,7 +67,8 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           event.stopPropagation();
           event.preventDefault();
           selectedItem.value = clip;
-        }}>
+        }}
+      >
         <div className="flex h-full items-center justify-end">
           <div className="block h-[10px] w-[2px] bg-white opacity-60" />
         </div>
@@ -95,10 +97,12 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           event.stopPropagation();
           event.preventDefault();
           selectedItem.value = clip;
-        }}>
+        }}
+      >
         <div
           className="ml-2 w-full overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs text-white"
-          style={{ width: length * 4 * scale.value - 46 }}>
+          style={{ width: length * 4 * scale.value - 46 }}
+        >
           {clip.name}
         </div>
       </button>
@@ -125,7 +129,8 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           event.stopPropagation();
           event.preventDefault();
           selectedItem.value = clip;
-        }}>
+        }}
+      >
         <div className="flex h-full items-center">
           <div className="block h-[10px] w-[2px] bg-white opacity-60" />
         </div>

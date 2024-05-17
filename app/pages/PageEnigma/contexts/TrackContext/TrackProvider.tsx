@@ -8,11 +8,9 @@ import {
   audioGroup,
   objectGroup,
   deleteCharacter,
-  addShape,
-  addCharacterExpression,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
-import { deleteObject } from "~/pages/PageEnigma/store/objectGroup/deleteObject";
+import { deleteObject } from "~/pages/PageEnigma/signals/objectGroup/deleteObject";
 
 interface Props {
   children: ReactNode;

@@ -1,9 +1,7 @@
 import MakeRequest from "../MakeRequest";
-import { MediaInfo } from "~/pages/PageEnigma/models";
+import { MediaInfo, Pagination } from "~/pages/PageEnigma/models";
 
 export interface ListFeaturedMediaFilesRequest {}
-
-export interface Pagination {}
 
 export interface ListFeaturedMediaFilesResponse {
   pagination?: Pagination; // does not currently exist on this endpoint but is being added
@@ -11,7 +9,11 @@ export interface ListFeaturedMediaFilesResponse {
   results: MediaInfo[];
 }
 
-export interface ListFeaturedMediaFilesQueries {}
+export interface ListFeaturedMediaFilesQueries {
+  filter_engine_categories: string;
+  page_index?: number;
+  page_size: number;
+}
 
 export const ListFeaturedMediaFiles = MakeRequest<
   string,

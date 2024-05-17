@@ -1,37 +1,39 @@
-import { animationFilter, animationItems } from "~/pages/PageEnigma/store";
-import {
-  AssetFilterOption,
-  AssetType,
-  MediaItem,
-} from "~/pages/PageEnigma/models";
+import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button } from "~/components";
-import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
-import UploadModalMovement from "~/components/UploadModalMovement";
+import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
+
+import { MediaItem } from "~/pages/PageEnigma/models";
+import { AssetFilterOption, AssetType } from "~/enums";
+
+import { animationFilter, animationItems } from "~/pages/PageEnigma/signals";
+import { authentication } from "~/signals";
+
 import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
 import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
-import { useCallback, useContext, useEffect, useState } from "react";
 import {
   GetMediaByUser,
   GetMediaListResponse,
 } from "~/api/media_files/GetMediaByUser";
-import { AuthenticationContext } from "~/contexts/Authentication";
+
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
+import { Button, UploadModalMovement } from "~/components";
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
 export const AnimationTab = () => {
   useSignals();
-  const { authState } = useContext(AuthenticationContext);
+  const { userInfo } = authentication;
+
   const [open, setOpen] = useState(false);
   const [userAnimations, setUserAnimations] = useState<MediaItem[] | null>();
 
   const refetchAnimations = useCallback(async () => {
-    if (!authState?.userInfo) {
+    if (!userInfo.value) {
       return;
     }
+    const { username, user_token } = userInfo.value;
     return GetMediaByUser(
-      authState?.userInfo?.username || "",
+      username,
       {},
       {
         filter_engine_categories: MediaFileEngineCategory.Animation,
@@ -52,22 +54,20 @@ export const AnimationTab = () => {
                 ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
                   item.cover_image?.maybe_cover_image_public_bucket_path
                 : undefined,
-              isMine:
-                item.maybe_creator_user?.user_token ===
-                authState?.userInfo?.user_token,
+              isMine: item.maybe_creator_user?.user_token === user_token,
               imageIndex: index,
             } as MediaItem;
           }),
         );
       }
     });
-  }, [authState?.userInfo]);
+  }, [userInfo.value]);
 
   useEffect(() => {
-    if (authState?.userInfo && !userAnimations) {
+    if (userInfo.value && !userAnimations) {
       refetchAnimations();
     }
-  }, [authState?.userInfo, refetchAnimations, userAnimations]);
+  }, [userInfo.value, refetchAnimations, userAnimations]);
 
   return (
     <>
@@ -80,7 +80,8 @@ export const AnimationTab = () => {
               "filter-tab",
               animationFilter.value === AssetFilterOption.ALL ? "active" : "",
             )}
-            onClick={() => (animationFilter.value = AssetFilterOption.ALL)}>
+            onClick={() => (animationFilter.value = AssetFilterOption.ALL)}
+          >
             All
           </button>
           <button
@@ -89,7 +90,8 @@ export const AnimationTab = () => {
               animationFilter.value === AssetFilterOption.MINE ? "active" : "",
             )}
             onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
-            disabled={!animationItems.value.some((item) => item.isMine)}>
+            disabled={!animationItems.value.some((item) => item.isMine)}
+          >
             My Animations
           </button>
           <button
@@ -102,7 +104,8 @@ export const AnimationTab = () => {
             onClick={() =>
               (animationFilter.value = AssetFilterOption.BOOKMARKED)
             }
-            disabled={!animationItems.value.some((item) => item.isBookmarked)}>
+            disabled={!animationItems.value.some((item) => item.isBookmarked)}
+          >
             Bookmarked
           </button>
         </div>
@@ -113,7 +116,8 @@ export const AnimationTab = () => {
           icon={faCirclePlus}
           variant="action"
           onClick={() => setOpen(true)}
-          className="w-full py-3 text-sm font-medium">
+          className="w-full py-3 text-sm font-medium"
+        >
           Upload Animation
         </Button>
       </div>

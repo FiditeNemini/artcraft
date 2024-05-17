@@ -1,18 +1,22 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import { twMerge } from "tailwind-merge";
+
+import { AssetType } from "~/enums";
+import { EditorStates } from "~/pages/PageEnigma/enums";
+import { environmentVariables } from "~/signals";
+import { editorState } from "~/pages/PageEnigma/signals/engine";
 import {
   selectedTab,
   sidePanelHeight,
   sidePanelVisible,
-} from "~/pages/PageEnigma/store/sidePanel";
-import { TabItem, tabList } from "./tabList";
-import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+} from "~/pages/PageEnigma/signals/sidePanel";
+
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { twMerge } from "tailwind-merge";
-import { AssetType } from "../../models";
-import { environmentVariables } from "~/store";
+
+import { TabItem, tabList } from "./tabList";
 
 export const SidePanelMenu = () => {
   useSignals();
@@ -40,7 +44,8 @@ export const SidePanelMenu = () => {
         maxWidth: 84,
         right: 0,
         top: 64,
-      }}>
+      }}
+    >
       <div className="flex w-full flex-col gap-2">
         {(tabs ?? []).map((tab) => (
           <button
@@ -69,7 +74,8 @@ export const SidePanelMenu = () => {
                   data: null,
                 });
               }
-            }}>
+            }}
+          >
             <div>
               <img src={tab.icon} alt={tab.title} width={20} height={20} />
             </div>

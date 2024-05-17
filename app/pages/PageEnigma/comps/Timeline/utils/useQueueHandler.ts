@@ -10,26 +10,33 @@ import {
   loadCharacterData,
   loadObjectData,
   selectedObject,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import Queue, { ToastDataType } from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import {
-  ClipGroup,
   MediaItem,
   QueueClip,
   QueueKeyframe,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { ToasterContext } from "~/contexts/ToasterContext";
-import { ToastTypes } from "~/contexts/ToasterContext";
+import { addToast } from "~/signals";
+import { ToastTypes } from "~/enums";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
 
 interface Arguments {
   action: fromEngineActions | toEngineActions | toTimelineActions;
-  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem | ToastDataType | null;
+  data:
+    | QueueClip
+    | UpdateTime
+    | QueueKeyframe
+    | ClipUI[]
+    | MediaItem
+    | ToastDataType
+    | null;
 }
 
 const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
@@ -43,7 +50,6 @@ export function useQueueHandler() {
   useSignals();
   const { addKeyframe, clearExistingData, deleteObjectOrCharacter } =
     useContext(TrackContext);
-  const { addToast } = useContext(ToasterContext);
 
   const handleFromEngineActions = useCallback(
     ({ action, data }: Arguments) => {
@@ -82,7 +88,7 @@ export function useQueueHandler() {
             LOADING_FUNCTIONS[item.group](item);
           });
           break;
-        case fromEngineActions.POP_A_TOAST:{
+        case fromEngineActions.POP_A_TOAST: {
           const message = (data as ToastDataType).message;
           addToast(ToastTypes.ERROR, message);
           break;

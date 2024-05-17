@@ -5,7 +5,7 @@ import {
   overTimeline,
   scale,
   timelineHeight,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
@@ -73,7 +73,8 @@ export const DragComponent = () => {
           top: currY - 16,
           left: currX + 1,
           zIndex: 10000,
-        }}>
+        }}
+      >
         {DndAsset.notDropText || "Cannot drop here"}
       </div>
     );
@@ -88,7 +89,8 @@ export const DragComponent = () => {
         top: currY - 57,
         left: currX + 1,
         zIndex: 10000,
-      }}>
+      }}
+    >
       <img
         {...{
           crossOrigin: "anonymous",
@@ -99,7 +101,8 @@ export const DragComponent = () => {
       />
       <div
         className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
-        style={{ backgroundColor: "#39394D" }}>
+        style={{ backgroundColor: "#39394D" }}
+      >
         {dragItem.value.name || dragItem.value.media_id}
       </div>
     </div>

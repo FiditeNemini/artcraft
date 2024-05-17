@@ -5,8 +5,8 @@ import {
   fullWidth,
   minimizeIconPosition,
   updateAudio,
-} from "~/pages/PageEnigma/store";
-import { ClipGroup } from "~/pages/PageEnigma/models";
+} from "~/pages/PageEnigma/signals";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -20,7 +20,8 @@ export const Audio = () => {
       <div
         id="track-global-audio"
         className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-global_audio-groupBg pr-4"
-        style={{ width: fullWidth.value + 16 }}>
+        style={{ width: fullWidth.value + 16 }}
+      >
         <button
           className="absolute"
           style={{
@@ -30,7 +31,8 @@ export const Audio = () => {
             event.stopPropagation();
             event.preventDefault();
             audioMinimized.value = !audioMinimized.value;
-          }}>
+          }}
+        >
           <FontAwesomeIcon icon={faAngleDown} />
         </button>
       </div>
@@ -41,7 +43,8 @@ export const Audio = () => {
     <div
       id="track-global-audio"
       className="relative block rounded-r-lg bg-global_audio-groupBg pb-5 pr-4"
-      style={{ width: fullWidth.value + 16 }}>
+      style={{ width: fullWidth.value + 16 }}
+    >
       <button
         className="absolute"
         style={{
@@ -51,7 +54,8 @@ export const Audio = () => {
           event.stopPropagation();
           event.preventDefault();
           audioMinimized.value = !audioMinimized.value;
-        }}>
+        }}
+      >
         <FontAwesomeIcon icon={faAngleUp} />
       </button>
       <div className="pt-[47px]">

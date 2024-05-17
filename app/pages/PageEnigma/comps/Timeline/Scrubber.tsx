@@ -4,7 +4,7 @@ import {
   stylizeScrollX,
   timelineHeight,
   timelineScrollX,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Pages } from "~/pages/PageEnigma/constants/page";
@@ -31,14 +31,16 @@ export const Scrubber = ({ page }: Props) => {
         top: 16,
         left: displayTime * 4 * scale.value + 199 - scrollX,
       }}
-      onPointerDown={onPointerDown}>
+      onPointerDown={onPointerDown}
+    >
       <div>
         <svg
           width="14"
           height="21"
           viewBox="0 0 14 21"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path
             d="M7 19.5858L1.58578 14.1715C1.21071 13.7965 0.999999 13.2878 0.999999 12.7573L1 2C1 1.44772 1.44771 1 2 1L12 1C12.5523 1 13 1.44772 13 2L13 12.7573C13 13.2878 12.7893 13.7965 12.4142 14.1715L7 19.5858Z"
             fill="white"

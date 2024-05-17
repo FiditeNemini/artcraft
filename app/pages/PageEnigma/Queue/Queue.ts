@@ -10,13 +10,13 @@ import {
 import { toTimelineActions } from "./toTimelineActions";
 
 import { ClipUI } from "../datastructures/clips/clip_ui";
-import { ToastTypes } from "~/contexts/ToasterContext";
 import { GenerationOptions } from "../models/generationOptions";
+import { ToastTypes } from "~/enums";
 
 export type ToastDataType = {
   type: ToastTypes;
   message: string;
-}
+};
 
 type UnionedActionTypes =
   | fromEngineActions

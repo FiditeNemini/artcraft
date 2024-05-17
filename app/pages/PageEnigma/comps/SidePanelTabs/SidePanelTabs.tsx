@@ -1,12 +1,12 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { selectedTab, sidePanelHeight } from "~/pages/PageEnigma/store";
+import { selectedTab, sidePanelHeight } from "~/pages/PageEnigma/signals";
 import {
   TabItem,
   tabList,
 } from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
 import { useMouseEventsSidePanel } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsSidePanel";
 import { useLayoutEffect, useState } from "react";
-import { environmentVariables } from "~/store";
+import { environmentVariables } from "~/signals";
 
 export const SidePanelTabs = () => {
   useSignals();
@@ -26,7 +26,8 @@ export const SidePanelTabs = () => {
               tab.value === selectedTab.value?.value
                 ? "flex h-full flex-col gap-3.5 overflow-y-auto"
                 : "hidden"
-            }>
+            }
+          >
             {tab.component}
           </div>
         ))}

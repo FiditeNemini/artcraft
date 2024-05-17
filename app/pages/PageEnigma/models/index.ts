@@ -5,4 +5,6 @@ export * from "./movies";
 export * from "./pagination";
 export * from "./sidePanel";
 export * from "./track";
+export * from "./tts";
 export * from "./types";
+export * from "./voice";

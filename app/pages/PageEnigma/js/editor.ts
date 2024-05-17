@@ -24,8 +24,8 @@ import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { APPUI_ACTION_TYPES, AppUiAction } from "../../../reducers";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
+// import { APPUI_ACTION_TYPES, AppUiAction } from "~/contexts/reducers";
+import { ClipGroup, ClipType, EditorStates } from "~/pages/PageEnigma/enums";
 
 import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
@@ -33,26 +33,34 @@ import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
-import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
-import { loadingBarData, loadingBarIsShowing } from "~/store/loadingBar";
-import {
-  editorState,
-  EditorStates,
-  previewSrc,
-} from "~/pages/PageEnigma/store/engine";
-import { AuthState } from "~/contexts/Authentication/types";
-import { hotkeysStatus } from "~/pages/PageEnigma/store";
-import { SceneSignal } from "~/store";
-import { ToastTypes } from "~/contexts/ToasterContext";
+import { MediaItem } from "~/pages/PageEnigma/models";
+import { editorState, previewSrc } from "~/pages/PageEnigma/signals/engine";
+
 import { GenerationOptions } from "../models/generationOptions";
+import {
+  hotkeysStatus,
+  showEditorLoader,
+  hideEditorLoader,
+  showObjectPanel,
+  hideObjectPanel,
+  updateObjectPanel,
+} from "~/pages/PageEnigma/signals";
+import {
+  authentication,
+  loadingBarData,
+  loadingBarIsShowing,
+  getSceneSignals,
+  signalScene,
+} from "~/signals";
+import { ToastTypes, AssetType } from "~/enums";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 
 export type EditorConstructorConfig = {
-  dispatchAppUiState: React.Dispatch<AppUiAction>;
-  signalScene: (data: any) => void;
-  getSceneSignals: () => SceneSignal;
-  authState: AuthState;
+  // dispatchAppUiState: React.Dispatch<AppUiAction>;
+  // signalScene: (data: any) => void;
+  // getSceneSignals: () => SceneSignal;
+  // userToken: string;
 };
 
 export type EditorInitializeConfig = {
@@ -122,10 +130,10 @@ class Editor {
   can_initialize: boolean;
   switchPreviewToggle: boolean;
 
-  dispatchAppUiState: React.Dispatch<AppUiAction>;
-  authState: AuthState;
-  signalScene: (data: any) => void;
-  getSceneSignals: () => SceneSignal;
+  // dispatchAppUiState: React.Dispatch<AppUiAction>;
+  // userToken: string;
+  // signalScene: (data: any) => void;
+  // getSceneSignals: () => SceneSignal;
   render_width: number;
   render_height: number;
 
@@ -149,12 +157,7 @@ class Editor {
 
   generation_options: GenerationOptions;
 
-  constructor({
-    dispatchAppUiState,
-    signalScene,
-    getSceneSignals,
-    authState,
-  }: EditorConstructorConfig) {
+  constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
@@ -260,10 +263,10 @@ class Editor {
     this.current_frame = 0;
 
     //setup reactland Callbacks
-    this.dispatchAppUiState = dispatchAppUiState;
-    this.signalScene = signalScene;
-    this.getSceneSignals = getSceneSignals;
-    this.authState = authState;
+    // this.dispatchAppUiState = dispatchAppUiState;
+    // this.signalScene = signalScene;
+    // this.getSceneSignals = getSceneSignals;
+    // this.userToken = userToken;
 
     // Scene State
     this.current_scene_media_token = null;
@@ -275,7 +278,11 @@ class Editor {
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
 
-    this.generation_options = { faceDetail: false, upscale:false, styleStrength: 1.0 };
+    this.generation_options = {
+      faceDetail: false,
+      upscale: false,
+      styleStrength: 1.0,
+    };
   }
 
   isEmpty(value: string) {
@@ -452,11 +459,11 @@ class Editor {
     if (this.isEmpty(sceneToken) == false) {
       this.loadScene(sceneToken);
     } else {
-      this.signalScene({
+      signalScene({
+        isModified: false,
         title: "Untitled New Scene",
         token: undefined,
-        ownerToken: this.authState.userInfo?.user_token,
-        isModified: false,
+        ownerToken: authentication.userInfo.value?.user_token,
       });
     }
 
@@ -512,11 +519,11 @@ class Editor {
       sceneTitleInput && sceneTitleInput !== ""
         ? sceneTitleInput
         : "Untitled New Scene";
-    this.signalScene({
+    signalScene({
+      isModified: false,
       title: sceneTitle,
       token: undefined,
-      ownerToken: this.authState.userInfo?.user_token,
-      isModified: false,
+      ownerToken: authentication.userInfo.value?.user_token,
     });
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
@@ -536,18 +543,16 @@ class Editor {
   public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
-    });
+    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
+    showEditorLoader();
 
     this.current_scene_media_token = scene_media_token;
 
     const scene_json = await this.api_manager
-      .loadSceneState(this.current_scene_media_token, this.signalScene)
+      .loadSceneState(this.current_scene_media_token)
       .catch((err) => {
-        this.dispatchAppUiState({
-          type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
-        });
+        //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
+        hideEditorLoader();
         throw err;
       });
     const proxyScene = new StoryTellerProxyScene(
@@ -571,10 +576,9 @@ class Editor {
 
     this.timeline.checkEditorCanPlay();
 
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
-    });
-    this.timeline.scrub({data: {currentTime: 0}})
+    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
+    hideEditorLoader();
+    this.timeline.scrub({ data: { currentTime: 0 } });
   }
 
   isObjectLipsync(object_uuid: string) {
@@ -660,9 +664,8 @@ class Editor {
     this.generating_preview = true; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
     // remove controls when saving scene.
     this.removeTransformControls();
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
-    });
+    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
+    showEditorLoader();
 
     const proxyScene = new StoryTellerProxyScene(
       this.version,
@@ -703,9 +706,8 @@ class Editor {
       sceneThumbnail,
     });
 
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
-    });
+    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
+    hideEditorLoader();
 
     this.generating_preview = false; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
 
@@ -761,9 +763,10 @@ class Editor {
         this.selected = this.cam_obj;
         this.publishSelect();
 
-        this.dispatchAppUiState({
-          type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        });
+        // this.dispatchAppUiState({
+        //   type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        // });
+        // showObjectPanel();
         this.updateSelectedUI();
         editorState.value = EditorStates.CAMERA_VIEW;
         if (this.activeScene.hot_items) {
@@ -790,9 +793,10 @@ class Editor {
           });
         }
 
-        this.dispatchAppUiState({
-          type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-        });
+        // this.dispatchAppUiState({
+        //   type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
+        // });
+        hideObjectPanel();
         editorState.value = EditorStates.EDIT;
       }
     }
@@ -895,9 +899,10 @@ class Editor {
     });
     this.selected = undefined;
     this.publishSelect();
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-    });
+    // this.dispatchAppUiState({
+    //   type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
+    // });
+    hideObjectPanel();
     this.timeline.deleteObject(uuid);
   }
 
@@ -1222,10 +1227,9 @@ class Editor {
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
-    const title = this.getSceneSignals().title || "Untitled";
+    const title = getSceneSignals().title || "Untitled";
 
-
-    const style_name = this.art_style.toString()
+    const style_name = this.art_style.toString();
     const media_token = this.current_scene_media_token || undefined;
 
     const data: any = await this.api_manager.uploadMedia({
@@ -1240,7 +1244,6 @@ class Editor {
       return;
     }
     const upload_token = data["media_file_token"];
-
 
     const result = await this.api_manager
       .stylizeVideo(
@@ -1351,16 +1354,15 @@ class Editor {
 
         previewSrc.value = url;
         return Promise.resolve(url);
-
       } catch (err: any) {
         Queue.publish({
           queueName: QueueNames.FROM_ENGINE,
           action: fromEngineActions.POP_A_TOAST,
           data: {
             type: ToastTypes.ERROR,
-            message: err.message
+            message: err.message,
           },
-        })
+        });
         // return Promise.resolve("");
       }
     }
@@ -1433,35 +1435,61 @@ class Editor {
     const scale = this.selected.scale;
 
     // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-      payload: {
-        group:
-          this.selected.name === this.camera_name
-            ? ClipGroup.CAMERA
-            : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-        object_uuid: this.selected.uuid,
-        object_name: this.selected.name,
-        version: String(this.version),
-        objectVectors: {
-          position: {
-            x: parseFloat(pos.x.toFixed(2)),
-            y: parseFloat(pos.y.toFixed(2)),
-            z: parseFloat(pos.z.toFixed(2)),
-          },
-          rotation: {
-            x: parseFloat(THREE.MathUtils.radToDeg(rot.x).toFixed(2)),
-            y: parseFloat(THREE.MathUtils.radToDeg(rot.y).toFixed(2)),
-            z: parseFloat(THREE.MathUtils.radToDeg(rot.z).toFixed(2)),
-          },
-          scale: {
-            x: parseFloat(scale.x.toFixed(6)),
-            y: parseFloat(scale.y.toFixed(6)),
-            z: parseFloat(scale.z.toFixed(6)),
-          },
+    // this.dispatchAppUiState({
+    //   type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+    //   payload: {
+    //     group:
+    //       this.selected.name === this.camera_name
+    //         ? ClipGroup.CAMERA
+    //         : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+    //     object_uuid: this.selected.uuid,
+    //     object_name: this.selected.name,
+    //     version: String(this.version),
+    //     objectVectors: {
+    //       position: {
+    //         x: parseFloat(pos.x.toFixed(2)),
+    //         y: parseFloat(pos.y.toFixed(2)),
+    //         z: parseFloat(pos.z.toFixed(2)),
+    //       },
+    //       rotation: {
+    //         x: parseFloat(THREE.MathUtils.radToDeg(rot.x).toFixed(2)),
+    //         y: parseFloat(THREE.MathUtils.radToDeg(rot.y).toFixed(2)),
+    //         z: parseFloat(THREE.MathUtils.radToDeg(rot.z).toFixed(2)),
+    //       },
+    //       scale: {
+    //         x: parseFloat(scale.x.toFixed(6)),
+    //         y: parseFloat(scale.y.toFixed(6)),
+    //         z: parseFloat(scale.z.toFixed(6)),
+    //       },
+    //     },
+    //   },
+    // }); //end dispatch
+    updateObjectPanel({
+      group:
+        this.selected.name === this.camera_name
+          ? ClipGroup.CAMERA
+          : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+      object_uuid: this.selected.uuid,
+      object_name: this.selected.name,
+      version: String(this.version),
+      objectVectors: {
+        position: {
+          x: parseFloat(pos.x.toFixed(2)),
+          y: parseFloat(pos.y.toFixed(2)),
+          z: parseFloat(pos.z.toFixed(2)),
+        },
+        rotation: {
+          x: parseFloat(THREE.MathUtils.radToDeg(rot.x).toFixed(2)),
+          y: parseFloat(THREE.MathUtils.radToDeg(rot.y).toFixed(2)),
+          z: parseFloat(THREE.MathUtils.radToDeg(rot.z).toFixed(2)),
+        },
+        scale: {
+          x: parseFloat(scale.x.toFixed(6)),
+          y: parseFloat(scale.y.toFixed(6)),
+          z: parseFloat(scale.z.toFixed(6)),
         },
       },
-    });
+    }); //end updateObjectPanel
   }
 
   // Automaticly resize scene.
@@ -1633,16 +1661,18 @@ class Editor {
         this.outlinePass.selectedObjects = [this.selected];
         this.transform_interaction = true;
         // Contact react land
-        this.dispatchAppUiState({
-          type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        });
+        // this.dispatchAppUiState({
+        //   type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        // });
+        showObjectPanel();
         this.updateSelectedUI();
       }
     } else {
       this.removeTransformControls();
-      this.dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-      });
+      // this.dispatchAppUiState({
+      //   type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
+      // });
+      hideObjectPanel();
     }
   }
 

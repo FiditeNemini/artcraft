@@ -1,11 +1,7 @@
-// import GetApiHost from "./GetApiHost";
-
-// const { formatUrl, host = "" } = GetApiHost();
-
-import { STORAGE_KEYS } from "~/contexts/Authentication/types";
+import { authentication } from "~/signals";
 
 const MakeMultipartRequest = (endpoint = "", body: any) => {
-  const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+  const { sessionToken } = authentication;
   const formData = new FormData();
 
   Object.keys(body).forEach((key) => formData.append(key, body[key]));
@@ -17,7 +13,7 @@ const MakeMultipartRequest = (endpoint = "", body: any) => {
     credentials: "include",
     headers: {
       Accept: "application/json",
-      session: sessionToken,
+      session: sessionToken.value || "",
     },
     body: formData,
   })

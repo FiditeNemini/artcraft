@@ -2,11 +2,11 @@ import { useContext, useState } from "react";
 
 import { ButtonIcon } from "~/components";
 
-import { EngineContext } from "~/contexts/EngineContext";
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
 import { faAngleLeft, faAngleRight } from "@fortawesome/pro-solid-svg-icons";
 import { styleList } from "~/pages/PageEnigma/styleList";
-import { sidePanelHeight, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { sidePanelHeight, sidePanelWidth } from "~/pages/PageEnigma/signals";
 import { ItemPicker } from "./ItemPicker";
 import { useSignals } from "@preact/signals-react/runtime";
 
@@ -50,14 +50,16 @@ export const StyleSelection = ({ setSelection, selection }: Props) => {
             style={{
               width: sidePanelWidth.value - 32,
               height: imageHeight * imageRows + 8 * imageRows,
-            }}>
+            }}
+          >
             <div
               className="absolute flex flex-col gap-1 transition-all duration-300 ease-in-out"
               style={{
                 width: styleList.length * 54,
                 left: scrollPosition * (imageWidth + 8) * -1,
                 top: 0,
-              }}>
+              }}
+            >
               {[...Array(imageRows).keys()].map((_, rowCount) => (
                 <div key={rowCount} className="flex gap-1">
                   {styleList

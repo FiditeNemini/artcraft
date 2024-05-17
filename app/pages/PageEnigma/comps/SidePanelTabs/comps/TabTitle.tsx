@@ -4,7 +4,7 @@ import {
   lastSelectedTab,
   selectedTab,
   sidePanelVisible,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 
 interface Props {
   title: string;

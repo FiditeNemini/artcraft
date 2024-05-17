@@ -1,6 +1,7 @@
 import { Button, Label } from "~/components";
 import { faArrowsRotate, faFilm } from "@fortawesome/pro-solid-svg-icons";
-import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import { editorState } from "~/pages/PageEnigma/signals/engine";
+import { EditorStates } from "~/pages/PageEnigma/enums";
 import { useSignals } from "@preact/signals-react/runtime";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -59,7 +60,8 @@ export function StyleButtons() {
               icon={faArrowsRotate}
               variant="primary"
               className="mt-1.5 w-full"
-              onClick={switchPreview}>
+              onClick={switchPreview}
+            >
               Preview Frame
             </Button>
           </>
@@ -69,7 +71,8 @@ export function StyleButtons() {
             icon={faArrowsRotate}
             variant="action"
             className="w-full"
-            onClick={switchEdit}>
+            onClick={switchEdit}
+          >
             Return to Edit
           </Button>
         )}
@@ -85,7 +88,7 @@ export function StyleButtons() {
 
         <div className="mb-3.5 flex gap-2">
           <div className="rounde w-8 py-0.5 text-center font-medium">
-            {value}
+            {strength}
           </div>
           <input
             className="
@@ -100,7 +103,7 @@ export function StyleButtons() {
              focus:outline-none
            "
             type="range"
-            value={value}
+            value={strength}
             min="0"
             max="1.0"
             step="0.1"
@@ -122,7 +125,8 @@ export function StyleButtons() {
                     upscale
                       ? "bg-brand-primary"
                       : "bg-gray-500 hover:bg-gray-400"
-                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}>
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                >
                   <span
                     className={`${
                       upscale ? "translate-x-6" : "translate-x-1"
@@ -141,7 +145,8 @@ export function StyleButtons() {
                     faceDetail
                       ? "bg-brand-primary"
                       : "bg-gray-500 hover:bg-gray-400"
-                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}>
+                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                >
                   <span
                     className={`${
                       faceDetail ? "translate-x-6" : "translate-x-1"
@@ -167,7 +172,8 @@ export function StyleButtons() {
           icon={faFilm}
           variant="primary"
           className="w-full"
-          onClick={generateMovie}>
+          onClick={generateMovie}
+        >
           Generate Movie
         </Button>
       </div>

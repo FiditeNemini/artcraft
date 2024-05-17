@@ -1,20 +1,14 @@
 import { useContext, useState, useCallback } from "react";
-import { useParams, useLocation, useNavigate, } from "@remix-run/react";
-
-import { useSignalEffect } from "@preact/signals-react/runtime";
-import { scene, signalScene } from "~/store";
-
-import { EngineContext } from "~/contexts/EngineContext";
-import { AuthenticationContext } from "~/contexts/Authentication";
-import {ToasterContext, ToastTypes } from "~/contexts/ToasterContext";
-
+import { useParams, useLocation, useNavigate } from "@remix-run/react";
+import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import { faFile } from "@fortawesome/pro-solid-svg-icons";
-import { 
-  ButtonDropdown,
-  Input,
-  H4,
-} from "~/components";
-import { ButtonDialogue } from "~/modules/ButtonDialogue";
+
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import { ToastTypes } from "~/enums";
+import { scene, signalScene, authentication, addToast } from "~/signals";
+
+import { ButtonDialogue, ButtonDropdown, Input, H4 } from "~/components";
+
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
 import { LoadScene } from "./LoadScene";
@@ -23,56 +17,57 @@ import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
 import { getCurrentLocationWithoutParams } from "~/utilities";
 
 export const ControlsTopButtons = () => {
+  useSignals();
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
   const editorEngine = useContext(EngineContext);
-  const {authState} = useContext(AuthenticationContext);
 
   const [sceneTitleInput, setSceneTitleInput] = useState<string>("");
   const [sceneTokenSelected, setSceneTokenSelected] = useState<string>("");
-  const { addToast } = useContext(ToasterContext);
 
-  const handleChangeSceneTitleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeSceneTitleInput = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setSceneTitleInput(e.target.value);
-  }
-  const clearSceneTitleInput = ()=>{
+  };
+  const clearSceneTitleInput = () => {
     setSceneTitleInput("");
-  }
+  };
 
-  const handleButtonNew = ()=>{
+  const handleButtonNew = () => {
     editorEngine?.newScene(sceneTitleInput);
   };
 
   const handleButtonSave = async () => {
     // console.log(`SceneName is ${scene.value.title}`);
     const retSceneMediaToken = await editorEngine?.saveScene({
-      sceneTitle : scene.value.title || "",
-      sceneToken : scene.value.token
+      sceneTitle: scene.value.title || "",
+      sceneToken: scene.value.token,
     });
     if (retSceneMediaToken) {
       addToast(ToastTypes.SUCCESS, retSceneMediaToken);
-      if(!scene.value.token){
+      if (!scene.value.token) {
         signalScene({
           ...scene.value,
-          token: retSceneMediaToken
+          token: retSceneMediaToken,
         });
       }
     }
   };
 
-  const handleButtonSaveAsCopy =  useCallback(async() => {
+  const handleButtonSaveAsCopy = useCallback(async () => {
     const retSceneMediaToken = await editorEngine?.saveScene({
-      sceneTitle : sceneTitleInput,
-      sceneToken : undefined
+      sceneTitle: sceneTitleInput,
+      sceneToken: undefined,
     });
     if (retSceneMediaToken) {
       addToast(ToastTypes.SUCCESS, retSceneMediaToken);
       signalScene({
         ...scene.value,
         token: retSceneMediaToken,
-        ownerToken: authState.userInfo?.user_token,
+        ownerToken: authentication.userInfo.value?.user_token,
         title: sceneTitleInput,
       });
     }
@@ -83,35 +78,37 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonLoadScene = () => {
-    editorEngine?.loadScene(sceneTokenSelected)
-      .catch((err) => {
-        addToast(ToastTypes.ERROR, err.message);
-      });
+    editorEngine?.loadScene(sceneTokenSelected).catch((err) => {
+      addToast(ToastTypes.ERROR, err.message);
+    });
   };
 
   const handleSceneSelection = (token: string) => {
     setSceneTokenSelected(token);
   };
 
-  useSignalEffect(()=>{
-    if (!scene.value.isInitializing){
+  useSignalEffect(() => {
+    if (!scene.value.isInitializing) {
       setSceneTitleInput(scene.value.title || "");
-      const currentLocation = getCurrentLocationWithoutParams(location.pathname, params);
-      if(scene.value.token === undefined){
-        if(params.sceneToken){
+      const currentLocation = getCurrentLocationWithoutParams(
+        location.pathname,
+        params,
+      );
+      if (scene.value.token === undefined) {
+        if (params.sceneToken) {
           //case of create new scene from existing scene
-          history.pushState({}, "",currentLocation);
+          history.pushState({}, "", currentLocation);
         }
         //case of create new scene from unsaved scene
-        navigate(currentLocation, {replace:true});
-      }else if (scene.value.token){
-        if(params.sceneToken && scene.value.token !== params.sceneToken){
+        navigate(currentLocation, { replace: true });
+      } else if (scene.value.token) {
+        if (params.sceneToken && scene.value.token !== params.sceneToken) {
           //case of loading existing scene from existing scene
-          history.pushState({}, "",currentLocation+scene.value.token);
+          history.pushState({}, "", currentLocation + scene.value.token);
         }
         //case of loading existing scene from unsaved new scene
         //or case of updating existing scene
-        navigate(currentLocation+scene.value.token, {replace:true});
+        navigate(currentLocation + scene.value.token, { replace: true });
       }
     }
   });
@@ -126,7 +123,7 @@ export const ControlsTopButtons = () => {
             {
               label: "New scene",
               description: "Ctrl+N",
-              onDialogOpen: ()=>{
+              onDialogOpen: () => {
                 setSceneTitleInput("Untitled New Scene");
               },
               dialogProps: {
@@ -190,14 +187,19 @@ export const ControlsTopButtons = () => {
               },
             },
             {
-              disabled: !scene.value.isModified || (scene.value.ownerToken !== authState.userInfo?.user_token),
+              disabled:
+                !scene.value.isModified ||
+                scene.value.ownerToken !==
+                  authentication.userInfo.value?.user_token,
               // save scene should be disabled if there are no changes
               label: "Save scene",
               description: "Ctrl+S",
               dialogProps: {
                 title: "Save Scene",
                 content: (
-                  <H4>Save scene to <b>{scene.value.title}</b>?</H4>
+                  <H4>
+                    Save scene to <b>{scene.value.title}</b>?
+                  </H4>
                 ),
                 confirmButtonProps: {
                   label: "Save",
@@ -214,7 +216,7 @@ export const ControlsTopButtons = () => {
               disabled: !scene.value.isModified || !scene.value.token,
               label: "Save scene as copy",
               description: "Ctrl+Shift+S",
-              onDialogOpen: ()=>{
+              onDialogOpen: () => {
                 setSceneTitleInput("Copy of " + sceneTitleInput);
               },
               dialogProps: {
@@ -255,7 +257,8 @@ export const ControlsTopButtons = () => {
                 @%CURRENT_STORYTELLER_GIT_VERSION%
               </span>
             </>
-          }>
+          }
+        >
           <Help />
         </ButtonDialogue>
       </div>

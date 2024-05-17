@@ -1,5 +1,5 @@
 import MakeRequest from "../MakeRequest";
-import { MediaInfo } from "~/pages/PageEnigma/models";
+import { MediaInfo, Pagination } from "~/pages/PageEnigma/models";
 
 export interface GetMediaRequest {}
 
@@ -8,8 +8,6 @@ export interface GetMediaListResponse {
   success: boolean;
   results: MediaInfo[];
 }
-
-export interface Pagination {}
 
 export interface GetMediaParams {
   page_index?: number;

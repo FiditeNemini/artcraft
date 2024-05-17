@@ -1,38 +1,30 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 
-import { LoadingDots } from "~/components";
-import { SidePanel } from "~/modules/SidePanel";
-import { TopBar } from "~/modules/TopBar";
+import { LoadingDots, TopBar } from "~/components";
+import { SidePanel } from "~/pages/PageEnigma/comps/SidePanel";
 
+import { Timeline } from "./comps/Timeline";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { PreviewFrameImage } from "./comps/PreviewFrameImage";
-import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { Timeline } from "./comps/Timeline";
 
-// import { AssetType } from "~/pages/PageEnigma/models";
-import { AppUiContext } from "~/contexts/AppUiContext";
-import { APPUI_VIEW_MODES } from "../../reducers";
-import { pageHeight, pageWidth } from "~/store";
+import { pageHeight, pageWidth } from "~/signals";
+
 import {
   timelineHeight,
   sidePanelWidth,
   sidePanelVisible,
   dndSidePanelWidth,
   dndTimelineHeight,
-  // dragItem,
-  // canDrop,
-} from "~/pages/PageEnigma/store";
-
-
+  editorLoader,
+} from "~/pages/PageEnigma/signals";
 
 export const PageEditor = () => {
   useSignals();
-  const [appUiState] = useContext(AppUiContext);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -40,6 +32,8 @@ export const PageEditor = () => {
   };
 
   useEffect(() => {
+    timelineHeight.value = window.innerHeight * 0.25;
+    sidePanelWidth.value = 340;
     window.onbeforeunload = () => {
       return "You may have unsaved changes.";
     };
@@ -62,7 +56,8 @@ export const PageEditor = () => {
       <TopBar pageName="Edit Scene" />
       <div
         className="relative flex w-screen"
-        style={{ height: "calc(100vh - 68px)" }}>
+        style={{ height: "calc(100vh - 68px)" }}
+      >
         {/* Engine section/side panel */}
         <div
           id="engine-n-panels-wrapper"
@@ -70,61 +65,56 @@ export const PageEditor = () => {
           style={{
             height,
             width,
-          }}>
+          }}
+        >
           <div className="relative w-full overflow-hidden bg-transparent">
             <div
-              className={
-                appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE
-                  ? "invisible"
-                  : ""
-              }>
-              <div
-                id="video-scene-container"
-                className="relative"
-                style={{
-                  width:
-                    pageWidth.value -
-                    (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                    84,
-                  height: pageHeight.value - timelineHeight.value - 68,
-                }}>
-                <canvas id="video-scene" width="1280px" height="720px" />
-                <PreviewFrameImage />
-              </div>
+              id="video-scene-container"
+              className="relative"
+              style={{
+                width:
+                  pageWidth.value -
+                  (sidePanelVisible.value ? sidePanelWidth.value : 0) -
+                  84,
+                height: pageHeight.value - timelineHeight.value - 68,
+              }}
+            >
+              <canvas id="video-scene" width="1280px" height="720px" />
+              <PreviewFrameImage />
+            </div>
 
-              {/* Top controls */}
-              <div
-                className="absolute left-0 top-0 w-full"
-                onClick={handleOverlayClick}>
-                <div className="grid grid-cols-3 gap-4">
-                  <ControlsTopButtons />
-                  <Controls3D />
-                </div>
-              </div>
-
-              {/* Bottom controls */}
-              <div
-                className="absolute bottom-0 left-0"
-                style={{
-                  width:
-                    pageWidth.value -
-                    (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                    84,
-                }}
-                onClick={handleOverlayClick}>
-                <PreviewEngineCamera />
-                <ControlsVideo />
-                <ControlPanelSceneObject />
+            {/* Top controls */}
+            <div
+              className="absolute left-0 top-0 w-full"
+              onClick={handleOverlayClick}
+            >
+              <div className="grid grid-cols-3 gap-4">
+                <ControlsTopButtons />
+                <Controls3D />
               </div>
             </div>
-            {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (
-              <ViewSideBySide />
-            )}
+
+            {/* Bottom controls */}
+            <div
+              className="absolute bottom-0 left-0"
+              style={{
+                width:
+                  pageWidth.value -
+                  (sidePanelVisible.value ? sidePanelWidth.value : 0) -
+                  84,
+              }}
+              onClick={handleOverlayClick}
+            >
+              <PreviewEngineCamera />
+              <ControlsVideo />
+              <ControlPanelSceneObject />
+            </div>
+
             <LoadingDots
               className="absolute left-0 top-0"
-              isShowing={appUiState.showEditorLoader.isShowing}
+              isShowing={editorLoader.value.isShowing}
               type="bricks"
-              message={appUiState.showEditorLoader.message}
+              message={editorLoader.value.message}
             />
           </div>
         </div>

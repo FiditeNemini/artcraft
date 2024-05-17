@@ -1,14 +1,9 @@
-import {
-  AssetType,
-  ClipGroup,
-  ClipType,
-  Keyframe,
-} from "~/pages/PageEnigma/models";
+import { Keyframe } from "~/pages/PageEnigma/models";
 import { TrackKeyFrame } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrame";
-import { AddToast } from "~/contexts/ToasterContext";
-import { PointerEvent } from "react";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
-import { dragItem } from "~/pages/PageEnigma/store";
+import { dragItem } from "~/pages/PageEnigma/signals";
+import { AssetType } from "~/enums";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
 
 interface Props {
   id: string;
@@ -21,7 +16,6 @@ interface Props {
     id: string;
     offset: number;
     force?: boolean;
-    addToast: AddToast;
   }) => void;
 }
 
@@ -74,7 +68,8 @@ export const TrackKeyFrames = ({
     <div
       id={`track-${group}-${id}`}
       className={`relative block h-9 w-full rounded-lg bg-${group}-unselected`}
-      onPointerMove={onPointerMove}>
+      onPointerMove={onPointerMove}
+    >
       {keyframes.map((keyframe) => (
         <TrackKeyFrame
           key={keyframe.keyframe_uuid}

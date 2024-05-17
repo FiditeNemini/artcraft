@@ -1,11 +1,11 @@
-import { cameraFilter, cameraItems } from "~/pages/PageEnigma/store";
-import { AssetFilterOption } from "~/pages/PageEnigma/models";
+import { cameraFilter, cameraItems } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
+import { AssetFilterOption } from "~/enums";
 
 export const CameraTab = () => {
   useSignals();
@@ -20,7 +20,8 @@ export const CameraTab = () => {
               "filter-tab",
               cameraFilter.value === AssetFilterOption.ALL ? "active" : "",
             )}
-            onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}>
+            onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}
+          >
             All
           </button>
           <button
@@ -29,7 +30,8 @@ export const CameraTab = () => {
               cameraFilter.value === AssetFilterOption.MINE ? "active" : "",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
-            disabled={!cameraItems.value.some((item) => item.isMine)}>
+            disabled={!cameraItems.value.some((item) => item.isMine)}
+          >
             My Cameras
           </button>
           <button
@@ -40,7 +42,8 @@ export const CameraTab = () => {
                 : "",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!cameraItems.value.some((item) => item.isBookmarked)}>
+            disabled={!cameraItems.value.some((item) => item.isBookmarked)}
+          >
             Bookmarked
           </button>
         </div>
@@ -49,7 +52,8 @@ export const CameraTab = () => {
         <Button
           icon={faCirclePlus}
           variant="action"
-          className="w-full py-3 text-sm font-medium">
+          className="w-full py-3 text-sm font-medium"
+        >
           Create Camera Movement
         </Button>
       </div>

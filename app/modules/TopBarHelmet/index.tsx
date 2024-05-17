@@ -1,1 +1,0 @@
-export { TopBarHelmet } from "./TopBarHelmet";

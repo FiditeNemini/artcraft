@@ -1,11 +1,11 @@
+import { UserDetailsLight } from "./voice";
 import {
   MediaFileClass,
   MediaFileSubtype,
   MediaFileType,
-  UserDetailsLight,
   WeightCategory,
   WeightType,
-} from "./types";
+} from "~/pages/PageEnigma/enums";
 
 export interface MediaInfo {
   token: string;

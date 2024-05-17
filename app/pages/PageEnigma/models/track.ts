@@ -1,4 +1,5 @@
 import { XYZ } from "../datastructures/common";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
 
 export interface Clip {
   version: number;
@@ -11,21 +12,6 @@ export interface Clip {
   offset: number;
   length: number;
   selected?: boolean;
-}
-
-export enum ClipType {
-  TRANSFORM = "transform",
-  AUDIO = "audio",
-  ANIMATION = "animation",
-  EXPRESSION = "expression",
-  FAKE = "fake",
-}
-
-export enum ClipGroup {
-  CHARACTER = "character",
-  CAMERA = "camera",
-  GLOBAL_AUDIO = "global_audio",
-  OBJECT = "object",
 }
 
 export interface Keyframe {

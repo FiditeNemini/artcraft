@@ -1,6 +1,6 @@
 import { LipSync } from "../../js/lipsync";
 import * as THREE from "three";
-import { environmentVariables } from "~/store";
+import { environmentVariables } from "~/signals";
 interface AudioData {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;

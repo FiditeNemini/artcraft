@@ -1,5 +1,5 @@
 import React from "react";
-import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
+import { MediaItem } from "~/pages/PageEnigma/models";
 import {
   addCharacter,
   addCharacterAnimation,
@@ -13,9 +13,10 @@ import {
   overTimeline,
   sidePanelWidth,
   timelineHeight,
-} from "~/pages/PageEnigma/store";
-import { pageHeight, pageWidth } from "~/store";
-import { addShape } from "~/pages/PageEnigma/store/shape";
+} from "~/pages/PageEnigma/signals";
+import { pageHeight, pageWidth } from "~/signals";
+import { addShape } from "~/pages/PageEnigma/signals/shape";
+import { AssetType } from "~/enums";
 
 class DndAsset {
   public dropId: string = "";

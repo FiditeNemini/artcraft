@@ -1,4 +1,5 @@
-import { useContext, useEffect, useId, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useId, useState } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
 import { Transition } from "@headlessui/react";
 import {
   faChevronDown,
@@ -10,20 +11,23 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { AppUiContext } from "~/contexts/AppUiContext";
-import { EngineContext } from "~/contexts/EngineContext";
+import {
+  objectPanel as objectPanelSignals,
+  sidePanelHeight,
+} from "../../signals";
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
-
-import { XYZ } from "../../datastructures/common";
 
 import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
 import { QueueKeyframe } from "~/pages/PageEnigma/models";
-import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
-import { sidePanelHeight } from "../../store";
+import { editorState } from "~/pages/PageEnigma/signals/engine";
 import { twMerge } from "tailwind-merge";
-// import { current } from "tailwindcss/colors";
+import { EditorStates } from "~/pages/PageEnigma/enums";
+import { sanitize } from "./utils/sanitize";
+import { objectMismatch } from "~/pages/PageEnigma/comps/ControlPanelSceneObject/utils/objectMismatch";
+import { XYZ } from "~/pages/PageEnigma/datastructures/common";
 
 // TODO this will be useful later to fix the bug on leading zeros
 // const formatNumber = (input: string): number => {
@@ -34,323 +38,148 @@ import { twMerge } from "tailwind-merge";
 //   return parseFloat(str);
 // };
 
-const defaultAxises = {
+const defaultAxises: Record<string, string> = {
   x: "0",
   y: "0",
   z: "0",
 };
 
-// interface Axises {
-//   x: number | string;
-//   y: number | string;
-//   z: number | string;
-// }
-
-// console.log(formatNumber("000123.4567"));  // Outputs: "123.46"
-// console.log(formatNumber("000123.4"));     // Outputs: "123.40"
-// console.log(formatNumber("000123"));       // Outputs: "123.00"
-// console.log(formatNumber("0000.00"));      // Outputs: "0.00"
-// console.log(formatNumber("0000.000001"));  // Outputs: "0.00"
-
 export const ControlPanelSceneObject = () => {
+  useSignals();
+  const { isShowing, currentObject } = objectPanelSignals;
+
   const editorEngine = useContext(EngineContext);
 
-  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+  // const [appUiState] = useContext(AppUiContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // obj token to track what is selected
-  const [initializedObj, initializedObjSet] = useState("");
-
   // local translation axises to allow for validation before handing them to the engine
-  const [localPosition, localPositionSet] = useState(defaultAxises);
-  const [localRotation, localRotationSet] = useState(defaultAxises);
-  const [localScale, localScaleSet] = useState(defaultAxises);
+  const [localPosition, setLocalPosition] = useState(defaultAxises);
+  const [localRotation, setLocalRotation] = useState(defaultAxises);
+  const [localScale, setLocalScale] = useState(defaultAxises);
 
   // used to update engine object
-  const [inputsUpdated, inputsUpdatedSet] = useState(false);
-  const [inputsFocused, inputsFocusedSet] = useState(false);
+  const [inputsUpdated, setInputsUpdated] = useState(false);
 
-  const [locked, lockedSet] = useState(false);
+  const [locked, setLocked] = useState(false);
 
-  const [color, colorSet] = useState("#ffffff");
+  const [color, setColor] = useState("#ffffff");
+
+  console.log("color", color);
 
   const colorInputId = useId();
-
-  // clears leading and trailing zeros
-  const sanitizeNumericInput = (input: string): number => {
-    const regex = /(\-?\d+)(\.\d+)?/;
-    const matches = input.match(regex) || [];
-    const integerPart = matches[1];
-    const decimalPart = matches[2];
-
-    const decimal = decimalPart !== undefined ? parseFloat(decimalPart) : 0.0;
-
-    if (integerPart === undefined) {
-      return decimal;
-    }
-
-    const integer = parseInt(integerPart);
-
-    if (decimalPart === undefined) {
-      return integer;
-    }
-
-    if (Number(input) > 0) {
-      return integer + decimal;
-    } else {
-      return integer - decimal;
-    }
-  };
-
-  // runs sanitizeNumericInput on each axis, creating a new object of sanitized values
-
-  const sanitize = (xyz: { [i: string]: string }) => {
-    return Object.keys(xyz).reduce((obj, currentKey) => {
-      return {
-        ...obj,
-        [currentKey]: sanitizeNumericInput(xyz[currentKey].toString()),
-      };
-    }, {});
-  };
-
-  // checks if *ANY* number within a translation object is NaN and therefore will not be sent to the engine
-
-  const isValid = (xyz: { [i: string]: string }) =>
-    !Object.values(xyz).some((n) => {
-      return isNaN(n);
-    });
-
-  const positionSanitized = sanitize(localPosition);
-  const rotationSanitized = sanitize(localRotation);
-  const scaleSanitized = sanitize(localScale);
-
-  const positionValid = isValid(positionSanitized);
-  const rotationValid = isValid(rotationSanitized);
-  const scaleValid = isValid(scaleSanitized);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
 
-  const position =
-    appUiState.controlPanel.currentSceneObject?.objectVectors?.position;
-  const rotation =
-    appUiState.controlPanel.currentSceneObject?.objectVectors?.rotation;
-  const scale =
-    appUiState.controlPanel.currentSceneObject?.objectVectors?.scale;
-  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
+  const currentSceneObject = currentObject.value;
+  const position = currentSceneObject?.objectVectors?.position;
+  const rotation = currentSceneObject?.objectVectors?.rotation;
+  const scale = currentSceneObject?.objectVectors?.scale;
+
+  function localToEngine(xyz: Record<string, string>) {
+    return {
+      x: parseFloat(xyz.x),
+      y: parseFloat(xyz.y),
+      z: parseFloat(xyz.z),
+    };
+  }
+  function engineToLocal(xyz: XYZ) {
+    return {
+      x: xyz.x.toString(),
+      y: xyz.y.toString(),
+      z: xyz.z.toString(),
+    };
+  }
 
   useEffect(() => {
-    const isCurrentObj =
-      (editorEngine?.selected?.uuid || "") === initializedObj;
-    // TODO this causes a subtle bug because it renders way too many times.
-    if (!appUiState.controlPanel.currentSceneObject) {
+    if (!inputsUpdated || !editorEngine) {
       return;
     }
-    const vectors = appUiState.controlPanel.currentSceneObject.objectVectors;
 
-    const numsToStrings = (inputObj: { [i: string]: number }) =>
-      Object.keys(inputObj).reduce(
-        (obj, currentKey) => ({
-          ...obj,
-          [currentKey]: Number(inputObj[currentKey]).toString(),
-        }),
-        defaultAxises,
-      );
+    setInputsUpdated(false);
+    editorEngine.setSelectedObject(
+      localToEngine(localPosition),
+      localToEngine(localRotation),
+      localToEngine(localScale),
+    );
+  }, [inputsUpdated, localPosition, localRotation, localScale, editorEngine]);
 
-    const objMatch = (
-      inputObj: { [i: string]: number },
-      refObj: { [i: string]: number },
-    ) =>
-      Object.keys(inputObj).some(
-        (currentKey: string) => inputObj[currentKey] !== refObj[currentKey],
-      );
-
-    const positionMismatch = objMatch(vectors.position, positionSanitized);
-    const rotationMismatch = objMatch(vectors.rotation, rotationSanitized);
-    const scaleMismatch = objMatch(vectors.scale, scaleSanitized);
-
-    if (
-      (editorEngine?.switchPreviewToggle === false &&
-        appUiState.controlPanel.isShowing &&
-        // if the current object isn't the cached object: update local
-        !isCurrentObj) ||
-      // if the inputs are not in focus, and local state does not match the selected engine object values: update local
-      (!inputsFocused &&
-        (positionMismatch || rotationMismatch || scaleMismatch))
-    ) {
-      // update cached object
-      initializedObjSet(appUiState.controlPanel.currentSceneObject.object_uuid);
-
-      // local state relies on strings
-      localPositionSet(numsToStrings(vectors.position));
-      localRotationSet(numsToStrings(vectors.rotation));
-      localScaleSet(numsToStrings(vectors.scale));
-
-      lockedSet(
-        editorEngine.isObjectLocked(editorEngine?.selected?.uuid || ""),
-      );
-      colorSet(editorEngine?.selected?.userData.color);
-    } else if (!appUiState.controlPanel.isShowing && isCurrentObj) {
-      initializedObjSet("");
-      localPositionSet(defaultAxises);
-      localRotationSet(defaultAxises);
-      localScaleSet(defaultAxises);
-
-      lockedSet(false);
-      colorSet("#ffffff");
+  useEffect(() => {
+    if (!editorEngine || !currentSceneObject) {
+      return;
     }
 
-    // updating engine if values originate from the inputs and are valid
+    console.log("44");
 
-    if (inputsUpdated && positionValid && rotationValid && scaleValid) {
-      inputsUpdatedSet(false);
-      editorEngine?.setSelectedObject(
-        positionSanitized,
-        rotationSanitized,
-        scaleSanitized,
-      );
-    }
-  }, [
-    appUiState.controlPanel,
-    editorEngine,
-    initializedObj,
-    inputsFocused,
-    inputsUpdated,
-    positionSanitized,
-    positionValid,
-    rotationSanitized,
-    rotationValid,
-    scaleSanitized,
-    scaleValid,
-  ]);
+    const vectors = currentSceneObject.objectVectors;
 
-  if (
-    !appUiState.controlPanel.currentSceneObject ||
-    editorState.value === EditorStates.PREVIEW
-  ) {
+    // local state relies on strings
+    setLocalPosition(engineToLocal(vectors.position));
+    setLocalRotation(engineToLocal(vectors.rotation));
+    setLocalScale(engineToLocal(vectors.scale));
+
+    setLocked(editorEngine.isObjectLocked(editorEngine?.selected?.uuid || ""));
+    setColor(editorEngine?.selected?.userData.color);
+  }, [currentSceneObject, editorEngine]);
+
+  if (!currentSceneObject || editorState.value === EditorStates.PREVIEW) {
     return null;
   }
 
+  const isInvalid = (xyz: Record<string, string>) =>
+    Object.values(xyz).some((value) => {
+      if (value === "" || value === "-" || value === ".") {
+        return true;
+      }
+      return !/^-?[0-9]*(.[0-9]*)?$/.test(value);
+    });
+
   const toggleLock = () => {
-    lockedSet((lockState: boolean) => !lockState);
-    editorEngine.lockUnlockObject(editorEngine?.selected?.uuid || "");
+    setLocked((lockState: boolean) => !lockState);
+    editorEngine?.lockUnlockObject(editorEngine?.selected?.uuid || "");
   };
 
-  const handlePositionChange = (xyz: XYZ) => {
-    localPositionSet(xyz);
-    inputsUpdatedSet(true);
-
-    // onChange functions no longer update the engine directly. Commented out for future reference.
-
-    // if (!currentSceneObject) {
-    //   console.log("Missing Scene Object Position");
-    //   return;
-    // }
-
-    // dispatchAppUiState({
-    //   type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-    //   payload: {
-    //     group: currentSceneObject.group,
-    //     object_uuid: currentSceneObject.object_uuid,
-    //     object_name: currentSceneObject.object_name,
-    //     version: currentSceneObject.version,
-    //     objectVectors: {
-    //       ...appUiState.controlPanel.currentSceneObject.objectVectors,
-    //       position: {
-    //         ...stringsToNums(xyz),
-    //       },
-    //     },
-    //   },
-    // });
-  };
-
-  const handleRotationChange = (xyz: XYZ) => {
-    localRotationSet(xyz);
-    inputsUpdatedSet(true);
-    // if (appUiState) {
-    //   if (currentSceneObject == null) {
-    //     console.log("Missing Scene Object Rotation");
-    //     return;
-    //   }
-
-    //   dispatchAppUiState({
-    //     type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-    //     payload: {
-    //       group: currentSceneObject.group,
-    //       object_uuid: currentSceneObject.object_uuid,
-    //       object_name: currentSceneObject.object_name,
-    //       version: currentSceneObject.version,
-    //       objectVectors: {
-    //         ...appUiState.controlPanel.currentSceneObject.objectVectors,
-    //         rotation: {
-    //           ...stringsToNums(xyz),
-    //         },
-    //       },
-    //     },
-    //   });
-    // }
-  };
-
-  const handleScaleChange = (xyz: XYZ) => {
-    localScaleSet(xyz);
-    inputsUpdatedSet(true);
-    // if (appUiState) {
-    //   if (currentSceneObject == null) {
-    //     console.log("Missing Scene Object Scale");
-    //     return;
-    //   }
-    //   dispatchAppUiState({
-    //     type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-    //     payload: {
-    //       group: currentSceneObject.group,
-    //       object_uuid: currentSceneObject.object_uuid,
-    //       object_name: currentSceneObject.object_name,
-    //       version: currentSceneObject.version,
-    //       objectVectors: {
-    //         ...appUiState.controlPanel.currentSceneObject.objectVectors,
-    //         scale: {
-    //           ...stringsToNums(xyz),
-    //         },
-    //       },
-    //     },
-    //   });
-    // }
-  };
-
-  const onFocus = () => {
-    inputsFocusedSet(true);
-  };
-
-  const onPositionBlur = () => {
-    inputsFocusedSet(false);
-    if (positionValid) {
-      localPositionSet(positionSanitized);
+  const handlePositionChange = (xyz: Record<string, string>) => {
+    if (isInvalid(xyz)) {
+      setLocalPosition(xyz);
+      return;
     }
+    const cleanXyz = sanitize(xyz);
+    if (objectMismatch(localPosition, cleanXyz)) {
+      setInputsUpdated(true);
+    }
+    setLocalPosition(xyz);
   };
 
-  const onRotationBlur = () => {
-    inputsFocusedSet(false);
-    if (rotationValid) {
-      localRotationSet(rotationSanitized);
+  const handleRotationChange = (xyz: Record<string, string>) => {
+    if (isInvalid(xyz)) {
+      setLocalRotation(xyz);
+      return;
     }
+    const cleanXyz = sanitize(xyz);
+    if (objectMismatch(localRotation, cleanXyz)) {
+      setInputsUpdated(true);
+    }
+    setLocalRotation(xyz);
   };
 
-  const onScaleBlur = () => {
-    inputsFocusedSet(false);
-    if (scaleValid) {
-      localScaleSet(scaleSanitized);
+  const handleScaleChange = (xyz: Record<string, string>) => {
+    if (isInvalid(xyz)) {
+      setLocalScale(xyz);
+      return;
     }
+    const cleanXyz = sanitize(xyz);
+    if (objectMismatch(localScale, cleanXyz)) {
+      setInputsUpdated(true);
+    }
+    setLocalScale(xyz);
   };
 
   const handleOnAddKeyFrame = () => {
-    if (appUiState) {
-      if (
-        position == null ||
-        rotation == null ||
-        scale == null ||
-        currentSceneObject == null
-      ) {
+    if (currentSceneObject) {
+      if (position == null || rotation == null || scale == null) {
         return;
       }
 
@@ -390,7 +219,7 @@ export const ControlPanelSceneObject = () => {
 
   return (
     <Transition
-      show={appUiState?.controlPanel.isShowing}
+      show={isShowing.value}
       className={twMerge(
         "absolute bottom-0 right-0 m-3 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel p-3.5 text-white shadow-lg",
       )}
@@ -400,12 +229,13 @@ export const ControlPanelSceneObject = () => {
       leave="transition-opacity duration-150"
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
-      style={{ transform: `scale(${getScale()})` }}>
+      style={{ transform: `scale(${getScale()})` }}
+    >
       <div className="mb-1 flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
           <p className="max-w-36 truncate font-semibold">
-            {appUiState.controlPanel.currentSceneObject.object_name}
+            {currentSceneObject.object_name}
           </p>
         </div>
         <FontAwesomeIcon
@@ -423,14 +253,16 @@ export const ControlPanelSceneObject = () => {
         leave="transition-all duration-200 ease-in-out"
         leaveFrom="opacity-100 max-h-96"
         leaveTo="opacity-0 max-h-0"
-        className={"flex flex-col gap-2 overflow-y-auto"}>
+        className={"flex flex-col gap-2 overflow-y-auto"}
+      >
         <Button
           variant="secondary"
           icon={locked ? faLock : faLockOpen}
           onClick={toggleLock}
           className={
             locked ? "bg-brand-primary/20 hover:bg-brand-primary/40" : ""
-          }>
+          }
+        >
           {locked ? "Unlock" : "Lock"} object
         </Button>
 
@@ -439,12 +271,12 @@ export const ControlPanelSceneObject = () => {
           <input
             className="h-0 w-0 cursor-pointer opacity-0"
             id={colorInputId}
-            onChange={(e: React.ChangeEvent) => {
-              editorEngine.setColor(
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              editorEngine?.setColor(
                 editorEngine?.selected?.uuid || "",
                 e.target.value,
               );
-              colorSet(e.target.value);
+              setColor(e.target.value);
             }}
             type="color"
             value={color}
@@ -454,12 +286,15 @@ export const ControlPanelSceneObject = () => {
             htmlFor={colorInputId}
             style={{
               backgroundColor: color,
-            }}></Button>
+            }}
+          ></Button>
         </div>
         <div className="flex flex-col gap-1">
           <H5>Location</H5>
           <InputVector
-            {...{ ...localPosition, onBlur: onPositionBlur, onFocus }}
+            x={localPosition.x.toString()}
+            y={localPosition.y.toString()}
+            z={localPosition.z.toString()}
             onChange={handlePositionChange}
           />
         </div>
@@ -467,7 +302,9 @@ export const ControlPanelSceneObject = () => {
         <div className="flex flex-col gap-1">
           <H5>Rotation</H5>
           <InputVector
-            {...{ ...localRotation, onBlur: onRotationBlur, onFocus }}
+            x={localRotation.x.toString()}
+            y={localRotation.y.toString()}
+            z={localRotation.z.toString()}
             onChange={handleRotationChange}
             increment={1}
           />
@@ -476,7 +313,9 @@ export const ControlPanelSceneObject = () => {
         <div className="flex flex-col gap-1">
           <H5>Scale</H5>
           <InputVector
-            {...{ ...localScale, onBlur: onScaleBlur, onFocus }}
+            x={localScale.x.toString()}
+            y={localScale.y.toString()}
+            z={localScale.z.toString()}
             onChange={handleScaleChange}
           />
         </div>
@@ -486,7 +325,8 @@ export const ControlPanelSceneObject = () => {
         <Button
           variant="secondary"
           className="grow"
-          onClick={handleOnAddKeyFrame}>
+          onClick={handleOnAddKeyFrame}
+        >
           Add Keyframe (K)
         </Button>
         <Button

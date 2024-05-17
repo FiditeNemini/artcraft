@@ -1,15 +1,14 @@
-import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
+import { ToastTypes } from "~/enums";
+import { addToast } from "~/signals";
 
 export const downloadFile = ({
   url,
-  addToast,
   title,
-}:{
-  url: string,
-  addToast: AddToast,
-  title: string
+}: {
+  url: string;
+  title: string;
 }) => {
-  console.log(url);
+  // console.log(url);
   fetch(url)
     .then((resp) => resp.blob())
     .then((blob) => {
@@ -26,4 +25,3 @@ export const downloadFile = ({
 };
 
 //check
-

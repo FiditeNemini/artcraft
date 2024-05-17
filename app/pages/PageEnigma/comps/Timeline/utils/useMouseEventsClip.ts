@@ -1,6 +1,6 @@
 import React, { Dispatch, useCallback, useEffect, useRef } from "react";
 import { Clip } from "~/pages/PageEnigma/models";
-import { canDrop, scale } from "~/pages/PageEnigma/store";
+import { canDrop, scale } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const useMouseEventsClip = (

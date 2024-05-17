@@ -1,3 +1,5 @@
+import { AssetType } from "~/enums";
+
 export interface MediaItem {
   version: number;
   type: AssetType;
@@ -11,23 +13,6 @@ export interface MediaItem {
   isMine?: boolean;
   isBookmarked?: boolean;
   imageIndex?: number;
-}
-
-export enum AssetType {
-  ANIMATION = "animation",
-  AUDIO = "audio",
-  CAMERA = "camera",
-  CHARACTER = "character",
-  EXPRESSION = "expression",
-  OBJECT = "object",
-  SHAPE = "shape",
-  STYLE = "style", // TODO Remove
-}
-
-export enum AssetFilterOption {
-  ALL,
-  MINE,
-  BOOKMARKED,
 }
 
 export interface AudioMediaItem extends MediaItem {

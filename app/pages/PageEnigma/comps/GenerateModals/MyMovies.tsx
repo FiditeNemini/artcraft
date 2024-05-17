@@ -3,7 +3,7 @@ import {
   generateMovieId,
   movies,
   viewMyMovies,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { CompletedCard } from "~/pages/PageEnigma/comps/GenerateModals/CompletedCard";
 import { InProgressCard } from "~/pages/PageEnigma/comps/GenerateModals/InProgressCard";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -27,7 +27,8 @@ export function MyMovies({ setMovieId }: Props) {
       onClose={() => {
         setMovieId("");
         viewMyMovies.value = false;
-      }}>
+      }}
+    >
       <div className="h-[560px] overflow-y-auto overflow-x-hidden rounded-b-lg">
         {activeJobs.value.jobs.length > 0 && (
           <div className="mb-3">

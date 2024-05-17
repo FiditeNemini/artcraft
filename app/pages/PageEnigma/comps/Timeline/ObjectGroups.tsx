@@ -4,7 +4,7 @@ import {
   objectGroup,
   objectsMinimized,
   selectedObject,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ObjectTrackComponent } from "~/pages/PageEnigma/comps/Timeline/ObjectTrack";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,7 +22,8 @@ export const ObjectGroups = () => {
       <div
         id="track-objects"
         className="relative mb-4 flex h-[35px] items-center justify-end rounded-r-lg bg-object-groupBg pr-4"
-        style={{ width: fullWidth.value + 16 }}>
+        style={{ width: fullWidth.value + 16 }}
+      >
         <button
           className="absolute"
           style={{
@@ -32,7 +33,8 @@ export const ObjectGroups = () => {
             event.stopPropagation();
             event.preventDefault();
             objectsMinimized.value = !objectsMinimized.value;
-          }}>
+          }}
+        >
           <FontAwesomeIcon icon={faAngleDown} />
         </button>
       </div>
@@ -43,7 +45,8 @@ export const ObjectGroups = () => {
     <div
       id="track-objects"
       className="relative mb-5 block rounded-r-lg  bg-object-groupBg pr-4"
-      style={{ width: fullWidth.value + 16 }}>
+      style={{ width: fullWidth.value + 16 }}
+    >
       <button
         className="absolute"
         style={{
@@ -53,7 +56,8 @@ export const ObjectGroups = () => {
           event.stopPropagation();
           event.preventDefault();
           objectsMinimized.value = !objectsMinimized.value;
-        }}>
+        }}
+      >
         <FontAwesomeIcon icon={faAngleUp} />
       </button>
       <div className="pt-[47px]">
@@ -61,7 +65,8 @@ export const ObjectGroups = () => {
           <div
             key={object.object_uuid}
             className="pb-4 pr-4"
-            id={`track-object-${selectedObject.value?.id}`}>
+            id={`track-object-${selectedObject.value?.id}`}
+          >
             <ObjectTrackComponent object={object} />
           </div>
         ))}

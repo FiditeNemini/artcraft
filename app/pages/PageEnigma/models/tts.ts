@@ -2,6 +2,8 @@
  * Types for Listing TTS Models
  */
 
+import { GenerateTtsAudioErrorType } from "~/pages/PageEnigma/enums";
+
 export interface TtsModelListResponsePayload {
   success: boolean;
   models: Array<TtsModelListItem>;
@@ -50,14 +52,6 @@ export interface GenerateTtsAudioResponse {
   // Which queue to poll
   inference_job_token_type?: string;
   error?: GenerateTtsAudioErrorType;
-}
-
-export enum GenerateTtsAudioErrorType {
-  BadRequest,
-  NotFound,
-  TooManyRequests,
-  ServerError,
-  UnknownError,
 }
 
 export interface EndpointSuccessResponse {

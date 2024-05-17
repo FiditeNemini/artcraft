@@ -1,9 +1,4 @@
-import GetApiHost from "./GetApiHost";
-import { environmentVariables } from "~/store";
-import { useSignals } from "@preact/signals-react/runtime";
-import { STORAGE_KEYS } from "~/contexts/Authentication/types";
-
-// const { formatUrl } = GetApiHost();
+import { environmentVariables, authentication } from "~/signals";
 
 type UrlRoutingFunction<UrlRouteArgs> = (urlRouteArgs: UrlRouteArgs) => string;
 
@@ -38,7 +33,7 @@ const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(
     request: Request,
     queries?: any,
   ): Promise<Response> {
-    const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+    const { sessionToken } = authentication;
     const newQueries = queries
       ? Object.keys(queries)
           .map((key, i) => {
@@ -57,7 +52,7 @@ const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(
       headers: {
         Accept: "application/json",
         ...(methodOmitsBody ? {} : { "Content-Type": "application/json" }),
-        session: sessionToken,
+        session: sessionToken.value || "",
       },
       credentials: "include",
       ...(methodOmitsBody ? {} : { body: JSON.stringify(request) }),

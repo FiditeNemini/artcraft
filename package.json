@@ -10,7 +10,10 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "netlify serve",
     "typecheck": "tsc",
-    "update:icons": "npm update @awesome.me/kit-fde2be5eb0"
+    "update:icons": "npm update @awesome.me/kit-fde2be5eb0",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "chromatic": "npx chromatic --project-token=chpt_0945f90d5d3626c"
   },
   "dependencies": {
     "@awesome.me/kit-fde2be5eb0": "^1.0.7",
@@ -46,13 +49,24 @@
     "webm-writer": "^1.0.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^1.3.5",
     "@remix-run/dev": "^2.8.1",
+    "@storybook/addon-actions": "^8.0.10",
+    "@storybook/addon-essentials": "^8.0.10",
+    "@storybook/addon-interactions": "^8.0.10",
+    "@storybook/addon-links": "^8.0.10",
+    "@storybook/addon-onboarding": "^8.0.10",
+    "@storybook/blocks": "^8.0.10",
+    "@storybook/react": "^8.0.10",
+    "@storybook/react-vite": "^8.0.10",
+    "@storybook/test": "^8.0.10",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/three": "^0.162.0",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "autoprefixer": "^10.4.18",
+    "chromatic": "^11.3.2",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -60,12 +74,14 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-storybook": "^0.8.0",
     "node-sass": "^9.0.0",
     "postcss": "^8.4.37",
     "postcss-import": "^16.0.1",
     "postcss-nesting": "^12.1.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.12",
+    "storybook": "^8.0.10",
     "tailwindcss": "^3.4.1",
     "terser": "^5.30.3",
     "typescript": "^5.1.6",
@@ -74,5 +90,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "version": ""
 }

@@ -1,25 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Keyframe } from "~/pages/PageEnigma/models";
-import { canDrop, scale } from "~/pages/PageEnigma/store";
+import { canDrop, scale } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
-import { AddToast } from "~/contexts/ToasterContext";
 
 export const useMouseEventsKeyframe = ({
   keyframe,
   max,
   min,
   updateKeyframe,
-  addToast,
 }: {
   keyframe: Keyframe;
   max: number;
   min: number;
-  updateKeyframe: (args: {
-    id: string;
-    offset: number;
-    addToast: AddToast;
-  }) => void;
-  addToast: AddToast;
+  updateKeyframe: (args: { id: string; offset: number }) => void;
 }) => {
   useSignals();
   const [offset, setOffset] = useState(-1);
@@ -36,14 +29,13 @@ export const useMouseEventsKeyframe = ({
         updateKeyframe({
           id: keyframe.keyframe_uuid,
           offset: Math.round(currOffset.current),
-          addToast,
         });
         isActive.current = "";
         canDrop.value = false;
         setOffset(-1);
       }
     },
-    [updateKeyframe, keyframe.keyframe_uuid, setOffset, addToast],
+    [updateKeyframe, keyframe.keyframe_uuid, setOffset],
   );
 
   const onMouseMove = useCallback(

@@ -4,10 +4,10 @@ import {
   fullWidth,
   minimizeIconPosition,
   updateCamera,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { useSignals } from "@preact/signals-react/runtime";
-import { ClipGroup } from "~/pages/PageEnigma/models";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 
@@ -20,7 +20,8 @@ export const Camera = () => {
       <div
         id="track-camera"
         className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-camera-groupBg pr-4"
-        style={{ width: fullWidth.value + 16 }}>
+        style={{ width: fullWidth.value + 16 }}
+      >
         <button
           className="absolute"
           style={{
@@ -30,7 +31,8 @@ export const Camera = () => {
             event.stopPropagation();
             event.preventDefault();
             cameraMinimized.value = !cameraMinimized.value;
-          }}>
+          }}
+        >
           <FontAwesomeIcon icon={faAngleDown} />
         </button>
       </div>
@@ -41,7 +43,8 @@ export const Camera = () => {
     <div
       id="track-camera"
       className="relative block rounded-r-lg bg-camera-groupBg pb-5 pr-4"
-      style={{ width: fullWidth.value + 16 }}>
+      style={{ width: fullWidth.value + 16 }}
+    >
       <div className="flex justify-end">
         <button
           className="absolute"
@@ -52,7 +55,8 @@ export const Camera = () => {
             event.stopPropagation();
             event.preventDefault();
             cameraMinimized.value = !cameraMinimized.value;
-          }}>
+          }}
+        >
           <FontAwesomeIcon icon={faAngleUp} />
         </button>
       </div>

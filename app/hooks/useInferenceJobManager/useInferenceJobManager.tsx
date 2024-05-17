@@ -1,21 +1,21 @@
 import { useCallback, useContext, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import {
-  inferenceJobs,
-  updateInferenceJob,
-} from "~/pages/PageEnigma/store/inferenceJobs";
+
 import {
   ActiveJob,
   ErrorResponse,
   GetJobStatusResponse,
-  JobState,
-  MediaFileType,
 } from "~/pages/PageEnigma/models";
-import { ToasterContext, ToastTypes } from "~/contexts/ToasterContext";
-import { activeJobs, movies } from "~/pages/PageEnigma/store";
-import { listMediaByUser } from "~/api";
-import { AuthenticationContext } from "~/contexts/Authentication";
-import { STORAGE_KEYS } from "~/contexts/Authentication/types";
+import { JobState, MediaFileType } from "~/pages/PageEnigma/enums";
+import { ToastTypes } from "~/enums";
+
+import { authentication, addToast } from "~/signals";
+import {
+  inferenceJobs,
+  updateInferenceJob,
+} from "~/pages/PageEnigma/signals/inferenceJobs";
+import { activeJobs, movies } from "~/pages/PageEnigma/signals";
+
 import {
   GetMediaByUser,
   GetMediaListResponse,
@@ -49,13 +49,12 @@ export async function GetInferenceJobStatus(
 export function GetActiveJobs() {
   const endpoint =
     "https://api.fakeyou.com/v1/jobs/session?exclude_states=complete_success,dead";
-  const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
 
   fetch(endpoint, {
     method: "GET",
     headers: {
       Accept: "application/json",
-      session: sessionToken,
+      session: authentication.sessionToken.value || "",
     },
     // credentials: 'include',
   })
@@ -112,8 +111,6 @@ function shouldKeepPolling(currStatus: string) {
 
 export const useInferenceJobManager = () => {
   useSignals();
-  const { addToast } = useContext(ToasterContext);
-  const { authState } = useContext(AuthenticationContext);
 
   const pollInferenceJobs = useCallback(() => {
     if (inferenceJobs.value.length > 0) {
@@ -137,15 +134,15 @@ export const useInferenceJobManager = () => {
         }
       });
     }
-  }, [addToast]);
-
-  const pollActiveJobs = useCallback(() => {
-    GetActiveJobs();
   }, []);
 
+  const pollActiveJobs = useCallback(() => {
+    if (authentication.sessionToken.value) GetActiveJobs();
+  }, [authentication.sessionToken.value]);
+
   const pollMovies = useCallback(() => {
-    GetCompletedMovies(authState.userInfo?.username);
-  }, [authState.userInfo]);
+    GetCompletedMovies(authentication.userInfo.value?.username);
+  }, [authentication.userInfo.value]);
 
   useEffect(() => {
     const intervalTimer = setInterval(() => {

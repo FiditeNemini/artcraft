@@ -6,7 +6,7 @@ import {
   selectedItem,
   stylizeScrollX,
   timelineScrollX,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";

@@ -2,7 +2,7 @@ import { ChangeEvent, useContext, useEffect, useState } from "react";
 
 import { Textarea } from "~/components";
 
-import { EngineContext } from "~/contexts/EngineContext";
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRandom } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -110,7 +110,8 @@ export const Prompts = ({ selection }: Props) => {
         <div className="absolute right-0 top-[2px]">
           <button
             className="flex items-center text-xs font-medium text-[#FC6B68] transition-colors duration-100 hover:text-[#FC6B68]/85 "
-            onClick={generateRandomTextPositive}>
+            onClick={generateRandomTextPositive}
+          >
             <FontAwesomeIcon icon={faRandom} className="me-2" />
             Randomize
           </button>
@@ -130,7 +131,8 @@ export const Prompts = ({ selection }: Props) => {
         <div className="absolute right-0 top-[2px]">
           <button
             className="flex items-center text-xs font-medium text-[#FC6B68] transition-colors duration-100 hover:text-[#FC6B68]/85"
-            onClick={generateRandomTextNegative}>
+            onClick={generateRandomTextNegative}
+          >
             <FontAwesomeIcon icon={faRandom} className="me-2" />
             Randomize
           </button>

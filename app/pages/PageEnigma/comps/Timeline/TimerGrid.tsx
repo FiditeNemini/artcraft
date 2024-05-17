@@ -4,7 +4,7 @@ import {
   scale,
   stylizeScrollX,
   timelineScrollX,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { Fragment } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Pages } from "~/pages/PageEnigma/constants/page";
@@ -25,7 +25,8 @@ export const TimerGrid = ({ page }: Props) => {
         "relative flex h-7 overflow-hidden",
         "border-t border-t-ui-panel-border",
         "text-xs text-white opacity-75",
-      ].join(" ")}>
+      ].join(" ")}
+    >
       <div className="absolute" style={{ left: scrollX * -1 }}>
         {Array(filmLength.value)
           .fill(0)
@@ -33,7 +34,8 @@ export const TimerGrid = ({ page }: Props) => {
             <Fragment key={index}>
               <div
                 className="absolute ps-1 pt-2"
-                style={{ left: index * sectionWidth + 4 }}>
+                style={{ left: index * sectionWidth + 4 }}
+              >
                 00:{index < 10 ? "0" + index.toString() : index.toString()}
               </div>
               <div
@@ -62,7 +64,8 @@ export const TimerGrid = ({ page }: Props) => {
           ))}
         <div
           className="absolute pt-2"
-          style={{ left: filmLength.value * sectionWidth + 4 }}>
+          style={{ left: filmLength.value * sectionWidth + 4 }}
+        >
           00:
           {filmLength.value < 10
             ? "0" + filmLength.value.toString()

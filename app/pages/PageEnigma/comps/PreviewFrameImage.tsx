@@ -3,17 +3,15 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import {
-  editorState,
-  EditorStates,
-  previewSrc,
-} from "~/pages/PageEnigma/store/engine";
+import { EditorStates } from "~/pages/PageEnigma/enums";
+
+import { pageHeight, pageWidth } from "~/signals";
+import { editorState, previewSrc } from "~/pages/PageEnigma/signals/engine";
 import {
   timelineHeight,
   sidePanelWidth,
   sidePanelVisible,
-} from "~/pages/PageEnigma/store";
-import { pageHeight, pageWidth } from "~/store";
+} from "~/pages/PageEnigma/signals";
 
 import { H3 } from "~/components";
 
@@ -30,7 +28,8 @@ export const PreviewFrameImage = () => {
               (sidePanelVisible.value ? sidePanelWidth.value : 0) -
               84,
             height: pageHeight.value - timelineHeight.value - 68,
-          }}>
+          }}
+        >
           <div className="relative flex h-full w-full flex-col items-center justify-center gap-5">
             <span className="absolute h-full w-full bg-black opacity-50" />
             <FontAwesomeIcon icon={faSpinnerThird} spin size="4x" />

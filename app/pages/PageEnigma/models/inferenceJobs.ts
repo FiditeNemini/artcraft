@@ -1,4 +1,4 @@
-import { InferenceJobType } from "~/pages/PageEnigma/models/types";
+import { InferenceJobType } from "~/pages/PageEnigma/enums";
 
 export interface InferenceJob {
   version: number;
@@ -8,16 +8,6 @@ export interface InferenceJob {
   result?: any;
 }
 
-export enum JobState {
-  UNKNOWN = "unknown", // Only on frontend.
-  PENDING = "pending",
-  STARTED = "started",
-  COMPLETE_SUCCESS = "complete_success",
-  COMPLETE_FAILURE = "complete_failure",
-  ATTEMPT_FAILED = "attempt_failed",
-  DEAD = "dead",
-  CANCELED_BY_USER = "canceled_by_user",
-}
 export interface RequestDetails {
   inference_category: string;
   maybe_model_type?: string;

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader, GLTF } from "three/addons/loaders/GLTFLoader.js";
-import { environmentVariables } from "~/store";
+import { environmentVariables } from "~/signals";
 
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { generateUUID } from "three/src/math/MathUtils.js";
@@ -127,7 +127,7 @@ class Scene {
   }
 
   deletePoint(keyframe_uuid: string) {
-    this.scene.children.forEach(object => {
+    this.scene.children.forEach((object) => {
       if (object.userData.media_id) {
         const obj_keyframe_uuid = object.userData.media_id.replace(
           "Point::",
@@ -230,7 +230,7 @@ class Scene {
 
   setColor(object_uuid: string, hex_color: string) {
     let object = this.get_object_by_uuid(object_uuid);
-    if(object) {
+    if (object) {
       object.userData["color"] = hex_color;
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
@@ -311,7 +311,6 @@ class Scene {
     if (child_result == undefined) {
       throw Error("GLB Did not contain an object or children.");
     }
-
 
     return child_result;
   }

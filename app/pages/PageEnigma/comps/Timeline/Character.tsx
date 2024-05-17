@@ -5,14 +5,15 @@ import {
   minimizeIconPosition,
   toggleCharacterMinimized,
   updateCharacters,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { CharacterTrack, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
+import { CharacterTrack } from "~/pages/PageEnigma/models";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
-import { AddToast, ToasterContext } from "~/contexts/ToasterContext";
-import { EngineContext } from "~/contexts/EngineContext";
-import { environmentVariables } from "~/store";
+
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import { environmentVariables } from "~/signals";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -20,16 +21,14 @@ function buildUpdaters(
     id: string;
     length: number;
     offset: number;
-    addToast: AddToast;
   }) => void,
-  addToast: AddToast,
 ) {
   function updateClipAnimations(options: {
     id: string;
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: ClipType.ANIMATION, addToast });
+    updateCharacters({ ...options, type: ClipType.ANIMATION });
   }
 
   function updateClipPosition(options: { id: string; offset: number }) {
@@ -37,7 +36,6 @@ function buildUpdaters(
       ...options,
       length: 0,
       type: ClipType.TRANSFORM,
-      addToast,
     });
   }
 
@@ -46,7 +44,7 @@ function buildUpdaters(
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: ClipType.EXPRESSION, addToast });
+    updateCharacters({ ...options, type: ClipType.EXPRESSION });
   }
 
   function updateClipLipSync(options: {
@@ -54,7 +52,7 @@ function buildUpdaters(
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: ClipType.AUDIO, addToast });
+    updateCharacters({ ...options, type: ClipType.AUDIO });
   }
   return {
     updateClipLipSync,
@@ -69,7 +67,6 @@ interface Props {
 }
 
 export const Character = ({ character }: Props) => {
-  const { addToast } = useContext(ToasterContext);
   const editorEngine = useContext(EngineContext);
 
   const {
@@ -77,7 +74,7 @@ export const Character = ({ character }: Props) => {
     updateClipPosition,
     updateClipAnimations,
     updateClipEmotions,
-  } = useMemo(() => buildUpdaters(updateCharacters, addToast), [addToast]);
+  } = useMemo(() => buildUpdaters(updateCharacters), []);
 
   const {
     animationClips,
@@ -92,7 +89,8 @@ export const Character = ({ character }: Props) => {
       <div
         id={`track-character-${character.object_uuid}`}
         className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4"
-        style={{ width: fullWidth.value + 16 }}>
+        style={{ width: fullWidth.value + 16 }}
+      >
         <button
           className="absolute"
           style={{
@@ -102,7 +100,8 @@ export const Character = ({ character }: Props) => {
             event.stopPropagation();
             event.preventDefault();
             toggleCharacterMinimized(character.object_uuid);
-          }}>
+          }}
+        >
           <FontAwesomeIcon icon={faAngleDown} />
         </button>
       </div>
@@ -113,7 +112,8 @@ export const Character = ({ character }: Props) => {
     <div
       id={`track-character-${character.object_uuid}`}
       className="relative block rounded-r-lg bg-character-groupBg pb-5 pr-4"
-      style={{ width: fullWidth.value + 16 }}>
+      style={{ width: fullWidth.value + 16 }}
+    >
       <div className="flex h-[35px] items-center justify-end">
         <button
           className="absolute"
@@ -124,7 +124,8 @@ export const Character = ({ character }: Props) => {
             event.stopPropagation();
             event.preventDefault();
             toggleCharacterMinimized(character.object_uuid);
-          }}>
+          }}
+        >
           <FontAwesomeIcon icon={faAngleUp} />
         </button>
       </div>
@@ -151,15 +152,16 @@ export const Character = ({ character }: Props) => {
             type={ClipType.EXPRESSION}
           />
         )}
-        {editorEngine && editorEngine.isObjectLipsync(character.object_uuid) && 
-          <TrackClips
-            id={character.object_uuid}
-            clips={lipSyncClips}
-            updateClip={updateClipLipSync}
-            group={ClipGroup.CHARACTER}
-            type={ClipType.AUDIO}
-          />
-        }
+        {editorEngine &&
+          editorEngine.isObjectLipsync(character.object_uuid) && (
+            <TrackClips
+              id={character.object_uuid}
+              clips={lipSyncClips}
+              updateClip={updateClipLipSync}
+              group={ClipGroup.CHARACTER}
+              type={ClipType.AUDIO}
+            />
+          )}
       </div>
     </div>
   );

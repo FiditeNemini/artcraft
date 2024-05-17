@@ -27,7 +27,7 @@ export enum MediaFileAnimationType {
 export interface UploadNewEngineAssetRequest {
   engine_category: MediaFileEngineCategory;
   file: File;
-  maybe_animation_type: MediaFileAnimationType;
+  maybe_animation_type?: MediaFileAnimationType;
   maybe_title?: string;
   maybe_visibility?: "public" | "private";
   maybe_duration_millis?: number;

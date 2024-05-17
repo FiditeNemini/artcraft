@@ -1,5 +1,5 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { MediaFile } from "~/pages/PageEnigma/models";
 import { Button, Input, Label, TransitionDialogue } from "~/components";
 import {
@@ -10,11 +10,10 @@ import {
   faLink,
 } from "@fortawesome/pro-solid-svg-icons";
 import SocialButton from "./SocialButton";
-import { generateMovieId, viewMyMovies } from "~/pages/PageEnigma/store";
+import { generateMovieId, viewMyMovies } from "~/pages/PageEnigma/signals";
 import dayjs from "dayjs";
-import { environmentVariables } from "~/store";
+import { environmentVariables } from "~/signals";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
-import { ToasterContext } from "~/contexts/ToasterContext";
 
 interface Props {
   mediaFile: MediaFile;
@@ -23,8 +22,8 @@ interface Props {
 
 export function Sharing({ mediaFile, setMediaFile }: Props) {
   useSignals();
-  console.log(mediaFile);
-  const { addToast } = useContext(ToasterContext);
+  // console.log(mediaFile);
+
   const mediaTitle = mediaFile?.maybe_title ?? mediaFile?.token;
   const shareUrl = `https://storyteller.ai/media/${mediaFile?.token || ""}`;
   const shareText = "Check out this media on StoryTeller.ai";
@@ -42,9 +41,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   const generateTitle = () => {
     return (
       <div className="flex items-center gap-2.5">
-        <span className="font-xl font-bold">
-          {mediaTitle}
-        </span>
+        <span className="font-xl font-bold">{mediaTitle}</span>
         <span className="text-sm font-medium text-white/60">
           {dayjs(mediaFile?.updated_at).format("MMM DD, YYYY HH:mm:ss")}
         </span>
@@ -67,7 +64,8 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
       onClose={() => {
         viewMyMovies.value = false;
         setMediaFile(null);
-      }}>
+      }}
+    >
       <div className="flex gap-6 px-5 pb-5">
         <div className="max-h-[420px] w-full overflow-hidden rounded-lg">
           <video controls crossOrigin="anonymous" width="100%">
@@ -125,11 +123,11 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
                 event.stopPropagation();
                 downloadFile({
                   url: downloadLink,
-                  addToast,
-                  title: mediaTitle
+                  title: mediaTitle,
                 });
               }}
-              variant="secondary">
+              variant="secondary"
+            >
               Download
             </Button>
             <Button
@@ -139,7 +137,8 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
               }}
               icon={faArrowRight}
               iconFlip={true}
-              variant="secondary">
+              variant="secondary"
+            >
               View on Media Page
             </Button>
           </div>

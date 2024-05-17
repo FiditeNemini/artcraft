@@ -1,37 +1,27 @@
-import { expressionFilter, expressionItems } from "~/pages/PageEnigma/store";
-import {
-  AssetFilterOption,
-  AssetType,
-  MediaItem,
-} from "~/pages/PageEnigma/models";
+import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FilterButtons } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
-import UploadModalMovement from "~/components/UploadModalMovement";
-import { useCallback, useContext, useEffect, useState } from "react";
+
+import { MediaItem } from "~/pages/PageEnigma/models";
+import { AssetFilterOption, AssetType } from "~/enums";
+
+import { expressionFilter, expressionItems } from "~/pages/PageEnigma/signals";
+import { authentication } from "~/signals";
+
 import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
 import {
   GetMediaByUser,
   GetMediaListResponse,
 } from "~/api/media_files/GetMediaByUser";
-import { AuthenticationContext } from "~/contexts/Authentication";
-import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
 import {
   ListFeaturedMediaFiles,
   ListFeaturedMediaFilesResponse,
 } from "~/api/media_files/ListFeaturedMediaFiles";
 
-import { BucketConfig } from "~/api/BucketConfig";
-
-// I know these enums are duplicates, I know they should live elsewhere. They live here for right now -V
-
-export enum Filters {
-  Featured,
-  Mine,
-  Bookmarked,
-}
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
+import { Button, FilterButtons, UploadModalMovement } from "~/components";
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
 export enum FetchStatus {
   paused,
@@ -44,28 +34,33 @@ export enum FetchStatus {
 
 export const ExpressionTab = () => {
   useSignals();
-  const [open, setOpen] = useState(false);
-  const { authState } = useContext(AuthenticationContext);
-  const [selectedFilter, selectedFilterSet] = useState(Filters.Featured);
+  const { userInfo } = authentication;
 
-  const [featured, featuredSet] = useState({ value: [] });
-  const [status, statusSet] = useState(FetchStatus.ready);
+  const [open, setOpen] = useState(false);
+
+  const [selectedFilter, setSelectedFilter] = useState(
+    AssetFilterOption.FEATURED,
+  );
+
+  const [featured, setFeatured] = useState<{ value: MediaItem[] }>({
+    value: [],
+  });
+  const [status, setStatus] = useState(FetchStatus.ready);
 
   const refetchExpressions = useCallback(async () => {
-    if (!authState?.userInfo) {
+    if (!userInfo.value) {
       return;
     }
+    const { username, user_token } = userInfo.value;
     return GetMediaByUser(
-      authState?.userInfo?.username || "",
+      username,
       {},
       {
         filter_engine_categories: MediaFileEngineCategory.Expression,
         // page_size: 5,
       },
     ).then((res: GetMediaListResponse) => {
-
       if (res.success && res.results) {
-
         expressionItems.value = res.results.map((item, index: number) => {
           return {
             version: 1,
@@ -78,22 +73,20 @@ export const ExpressionTab = () => {
               ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
                 item.cover_image?.maybe_cover_image_public_bucket_path
               : undefined,
-            isMine:
-              item.maybe_creator_user?.user_token ===
-              authState?.userInfo?.user_token,
+            isMine: item.maybe_creator_user?.user_token === user_token,
             imageIndex: index,
           } as MediaItem;
         });
       }
     });
-  }, [authState?.userInfo]);
+  }, [userInfo.value]);
 
   useEffect(() => {
-    if (authState?.userInfo && !expressionItems.value.length) {
+    if (userInfo.value && !expressionItems.value.length) {
       refetchExpressions();
     }
     if (status === FetchStatus.ready) {
-      statusSet(FetchStatus.in_progress);
+      setStatus(FetchStatus.in_progress);
       ListFeaturedMediaFiles(
         "",
         {},
@@ -104,8 +97,8 @@ export const ExpressionTab = () => {
         },
       ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
         if (res.success && res.results) {
-          statusSet(FetchStatus.success);
-          featuredSet({
+          setStatus(FetchStatus.success);
+          setFeatured({
             value: res.results.map((item) => {
               return {
                 version: 1,
@@ -114,13 +107,14 @@ export const ExpressionTab = () => {
                 name: item.maybe_title,
                 publicBucketPath: item.public_bucket_path,
                 length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
-                thumbnail: item.cover_image?.maybe_cover_image_public_bucket_path
+                thumbnail: item.cover_image
+                  ?.maybe_cover_image_public_bucket_path
                   ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
                     item.cover_image?.maybe_cover_image_public_bucket_path
                   : undefined,
                 isMine:
                   item.maybe_creator_user?.user_token ===
-                  authState?.userInfo?.user_token,
+                  userInfo.value?.user_token,
                 imageIndex: 0,
               } as MediaItem;
             }),
@@ -132,24 +126,20 @@ export const ExpressionTab = () => {
         }
       });
     }
-  }, [authState?.userInfo, refetchExpressions, status]);
+  }, [userInfo.value, refetchExpressions, status]);
 
   return (
     <>
       <TabTitle title="Expressions" />
 
       <div>
-        <div className="flex gap-2 overflow-x-auto overflow-y-hidden px-4">
-          <FilterButtons
-            {...{
-              value: selectedFilter,
-              onClick: (e) => {
-                // reFetchList();
-                selectedFilterSet(Number(e.target.value));
-              },
-            }}
-          />
-        </div>
+        <FilterButtons
+          value={selectedFilter}
+          onClick={(button) => {
+            // reFetchList();
+            setSelectedFilter(button);
+          }}
+        />
       </div>
 
       <div className="w-full px-4">
@@ -157,14 +147,15 @@ export const ExpressionTab = () => {
           icon={faCirclePlus}
           variant="action"
           onClick={() => setOpen(true)}
-          className="w-full py-3 text-sm font-medium">
+          className="w-full py-3 text-sm font-medium"
+        >
           Upload Expression
         </Button>
       </div>
       <div className="h-full w-full overflow-y-auto px-4">
         <ItemElements
           items={
-            selectedFilter === Filters.Featured
+            selectedFilter === AssetFilterOption.FEATURED
               ? featured.value
               : expressionItems.value
           }

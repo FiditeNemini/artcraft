@@ -1,9 +1,9 @@
 import { UIEvent, useCallback, useEffect, useRef, useState } from "react";
-import { LowerPanel } from "~/modules/LowerPanel";
+import { LowerPanel } from "~/pages/PageEnigma/comps/LowerPanel";
 
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
-import { ConfirmationModal } from "~/components/ConfirmationModal";
+import { ConfirmationModal } from "~/components";
 import {
   characterGroup,
   deleteAudioClip,
@@ -18,7 +18,7 @@ import {
   timelineHeight,
   timelineScrollX,
   timelineScrollY,
-} from "~/pages/PageEnigma/store";
+} from "~/pages/PageEnigma/signals";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
 import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
@@ -26,12 +26,12 @@ import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
-import { AssetType, Clip, Keyframe } from "~/pages/PageEnigma/models";
+import { Clip, Keyframe } from "~/pages/PageEnigma/models";
 import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHeaders";
-import { pageWidth } from "~/store";
+import { pageWidth } from "~/signals";
 import { Pages } from "~/pages/PageEnigma/constants/page";
-import { DoNotShow } from "~/pages/PageEnigma/constants/misc";
 import PremiumLockTimeline from "./PremiumLockTimeline";
+import { AssetType, DoNotShow } from "~/enums";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -146,7 +146,8 @@ export const Timeline = () => {
             className="ml-[60px] mt-2 w-[144px] overflow-hidden"
             style={{
               height: timelineHeight.value - 54,
-            }}>
+            }}
+          >
             <RowHeaders />
           </div>
           <div
@@ -155,10 +156,12 @@ export const Timeline = () => {
             style={{
               width: pageWidth.value - 204,
               height: timelineHeight.value - 54,
-            }}>
+            }}
+          >
             <div
               className="relative"
-              style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}>
+              style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}
+            >
               <PremiumLockTimeline locked={false} />
               <Characters />
               <div className="pb-4 pr-8">

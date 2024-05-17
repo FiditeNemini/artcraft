@@ -1,7 +1,8 @@
 import { ItemElement } from "./ItemElement";
-import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
-import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { MediaItem } from "~/pages/PageEnigma/models";
+import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/signals";
 import { LoadingDots } from "~/components";
+import { AssetFilterOption } from "~/enums";
 
 interface Props {
   busy?: boolean;
@@ -53,7 +54,8 @@ export const ItemElements = ({
     </div>
   ) : (
     <div
-      className={`grid ${gridColumnsClass} gap-3 ${className ? " " + className : ""}`}>
+      className={`grid ${gridColumnsClass} gap-3 ${className ? " " + className : ""}`}
+    >
       {displayItems.map((item) => (
         <ItemElement debug={debug} key={item.media_id} item={item} />
       ))}

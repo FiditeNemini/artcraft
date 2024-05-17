@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { useSignals } from "@preact/signals-react/runtime";
-import { pageHeight, pageWidth } from "~/store";
+import { pageHeight, pageWidth } from "~/signals";
 
 export const PreviewImages = () => {
   useSignals();
@@ -26,8 +26,7 @@ export const PreviewImages = () => {
         <div className={textClasses}>Raw Preview</div>
         <div
           className="block w-full overflow-hidden rounded-b-lg"
-          style={{ height: imageHeight }}
-        >
+          style={{ height: imageHeight }}>
           <canvas id="raw-preview" width={imageWidth} height={imageHeight} />
         </div>
       </div>
@@ -38,8 +37,7 @@ export const PreviewImages = () => {
         <div className={textClasses}>Styled Preview</div>
         <div
           className="block w-full overflow-hidden rounded-b-lg"
-          style={{ height: imageHeight }}
-        >
+          style={{ height: imageHeight }}>
           <img id="styled-preview" width={imageWidth} height={imageHeight} />
         </div>
       </div>

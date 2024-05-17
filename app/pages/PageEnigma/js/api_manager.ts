@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import { STORAGE_KEYS } from "~/contexts/Authentication/types";
-import { environmentVariables, scene } from "~/store";
+import { STORAGE_KEYS } from "~/enums";
+import { environmentVariables, signalScene } from "~/signals";
 import { updateExistingScene, uploadNewScene } from "./api_fetchers";
 import { uploadThumbnail } from "~/api";
 
@@ -127,7 +127,10 @@ export class APIManager {
       : await uploadNewScene(file, sceneTitle, this.sessionToken);
 
     if (sceneThumbnail) {
-      let image_resp = await this.uploadMediaSceneThumbnail(sceneThumbnail, "render.png");
+      let image_resp = await this.uploadMediaSceneThumbnail(
+        sceneThumbnail,
+        "render.png",
+      );
       if (image_resp["media_file_token"]) {
         let image_token = image_resp["media_file_token"];
         await fetch(uploadThumbnail + uploadSceneResponse["media_file_token"], {
@@ -148,7 +151,6 @@ export class APIManager {
 
   public async loadSceneState(
     scene_media_file_token: string | null,
-    signalScene: ((data: any) => void) | null,
   ): Promise<any> {
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
@@ -158,13 +160,13 @@ export class APIManager {
     }
 
     const json = await JSON.parse(await response.text());
-    if (json && json.media_file && signalScene !== null) {
+    if (json && json.media_file) {
       if (json.media_file.maybe_title === null) {
         console.warn(`Scene /w Token: ${scene_media_file_token} has no title`);
       }
       signalScene({
         title: json.media_file.maybe_title || "Untitled Scene",
-        token: scene_media_file_token,
+        token: scene_media_file_token || undefined,
         ownerToken: json.media_file.maybe_creator_user.user_token,
         isModified: false,
       });
@@ -221,10 +223,7 @@ export class APIManager {
     return file;
   }
 
-  public async uploadMediaSceneThumbnail(
-    blob: any,
-    fileName: string,
-  ) {
+  public async uploadMediaSceneThumbnail(blob: any, fileName: string) {
     const url = `${this.baseUrl}/v1/media_files/upload/image`;
     const uuid = uuidv4();
 
@@ -256,13 +255,17 @@ export class APIManager {
   }
 
   public async uploadMedia({
-    blob, fileName, title, styleName,maybe_scene_source_media_file_token
-  }:{
-    blob: Blob,
-    fileName: string,
-    title: string,
-    styleName?: string,
-    maybe_scene_source_media_file_token: string | undefined
+    blob,
+    fileName,
+    title,
+    styleName,
+    maybe_scene_source_media_file_token,
+  }: {
+    blob: Blob;
+    fileName: string;
+    title: string;
+    styleName?: string;
+    maybe_scene_source_media_file_token: string | undefined;
   }) {
     // Promise<APIManagerResponseSuccess>
     //TODO: UPDATE ENDPOINT!!!!
@@ -280,8 +283,11 @@ export class APIManager {
 
     // This signals to the backend to hide the video from view
     formData.append("is_intermediate_system_file", "true");
-    if (maybe_scene_source_media_file_token !== undefined) { 
-      formData.append("maybe_scene_source_media_file_token",maybe_scene_source_media_file_token)
+    if (maybe_scene_source_media_file_token !== undefined) {
+      formData.append(
+        "maybe_scene_source_media_file_token",
+        maybe_scene_source_media_file_token,
+      );
     }
     const response = await fetch(url, {
       method: "POST",
@@ -307,14 +313,14 @@ export class APIManager {
     fileName: string,
     style: string = "comic_book",
     positive_prompt: string,
-    negative_prompt: string
+    negative_prompt: string,
   ): Promise<string> {
     const url = `${environmentVariables.value.FUNNEL_API}/preview/`;
 
     const payload = {
       style: style,
       positive_prompt: positive_prompt,
-      negative_prompt: negative_prompt
+      negative_prompt: negative_prompt,
     };
 
     const formData = new FormData();
@@ -367,7 +373,6 @@ export class APIManager {
     use_upscaler: boolean = false,
     use_strength: number = 1.0,
   ) {
-
     const uuid = uuidv4();
 
     const data = {

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { environmentVariables } from "~/store";
+import { environmentVariables } from "~/signals";
 
 interface CsvJson {
   [key: string]: string[];

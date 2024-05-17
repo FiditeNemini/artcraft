@@ -1,6 +1,7 @@
-import { fullWidth, updateObject } from "~/pages/PageEnigma/store";
+import { updateObject } from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { ClipGroup, ObjectTrack } from "~/pages/PageEnigma/models";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { ObjectTrack } from "~/pages/PageEnigma/models";
 
 interface Props {
   object: ObjectTrack;

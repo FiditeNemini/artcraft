@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/signals";
 
 export const useMouseEventsSidePanel = () => {
   const [isActive, setIsActive] = useState(false);

@@ -5,9 +5,10 @@ import { faCameraViewfinder } from "@fortawesome/pro-solid-svg-icons";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import { editorState } from "~/pages/PageEnigma/signals/engine";
 import { useSignals } from "@preact/signals-react/runtime";
-import { sidePanelHeight } from "../../store";
+import { sidePanelHeight } from "../../signals";
+import { EditorStates } from "~/pages/PageEnigma/enums";
 
 export const PreviewEngineCamera = () => {
   useSignals();
@@ -39,7 +40,8 @@ export const PreviewEngineCamera = () => {
     <div
       id="preview-engine-camera"
       className="absolute bottom-0 m-3 origin-bottom-left shadow-lg"
-      style={{ transform: `scale(${getScale()})` }}>
+      style={{ transform: `scale(${getScale()})` }}
+    >
       <div className="relative">
         <div className="-z-10 flex w-full items-center justify-between rounded-t-lg bg-ui-controls p-1.5 text-white">
           <div className="ms-1 flex grow items-center gap-2">
@@ -50,7 +52,8 @@ export const PreviewEngineCamera = () => {
           <Button
             variant="action"
             onClick={handleButtonCameraView}
-            className="rounded-md px-2 py-1 text-sm">
+            className="rounded-md px-2 py-1 text-sm"
+          >
             {editorState.value === EditorStates.EDIT
               ? "Enter Camera View"
               : "Exit Camera View"}
