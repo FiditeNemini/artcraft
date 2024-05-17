@@ -44,6 +44,7 @@ import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { STYLES_BY_KEY } from "common/StyleOptions";
 import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
 
 export default function MediaPage() {
   const { canAccessStudio, canEditMediaFile, canBanUsers, user } = useSession();
@@ -354,9 +355,10 @@ export default function MediaPage() {
   let downloadLink =
     activeSlide.url || bucketConfig.getGcsUrl(mediaFile?.public_bucket_path);
 
-  const shareUrl = `https://fakeyou.com/media/${
-    activeSlide.token || mediaFile?.token || ""
-  }`;
+  const sharePath = `/media/${activeSlide.token || mediaFile?.token || ""}`;
+
+  const shareUrl = GetWebsiteLink(sharePath);
+
   const shareText = "Check out this media on FakeYou.com!";
 
   if (status < 3)
