@@ -30,6 +30,7 @@ use users_component::session::lookup::user_session_feature_flags::UserSessionFea
 
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::ListBetaKeysError;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
+use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::EnqueueTTSRequestError;
 use crate::http_server::web_utils::require_moderator::RequireModeratorError;
 use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -50,6 +51,7 @@ pub enum RedeemBetaKeyError {
   BadInput(String),
   NotAuthorized,
   NotFound,
+  RateLimited,
   ServerError,
 }
 
@@ -59,6 +61,7 @@ impl ResponseError for RedeemBetaKeyError {
       RedeemBetaKeyError::BadInput(_) => StatusCode::BAD_REQUEST,
       RedeemBetaKeyError::NotAuthorized => StatusCode::UNAUTHORIZED,
       RedeemBetaKeyError::NotFound => StatusCode::NOT_FOUND,
+      RedeemBetaKeyError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
       RedeemBetaKeyError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
@@ -68,6 +71,7 @@ impl ResponseError for RedeemBetaKeyError {
       RedeemBetaKeyError::BadInput(reason) => reason.to_string(),
       RedeemBetaKeyError::NotAuthorized => "unauthorized".to_string(),
       RedeemBetaKeyError::NotFound => "not found".to_string(),
+      RedeemBetaKeyError::RateLimited => "rate limited".to_string(),
       RedeemBetaKeyError::ServerError => "server error".to_string(),
     };
 
@@ -92,6 +96,7 @@ impl fmt::Display for RedeemBetaKeyError {
     (status = 400, description = "Bad input", body = RedeemBetaKeyError),
     (status = 401, description = "Not authorized", body = RedeemBetaKeyError),
     (status = 404, description = "Not found", body = RedeemBetaKeyError),
+    (status = 429, description = "Rate limited", body = RedeemBetaKeyError),
     (status = 500, description = "Server error", body = RedeemBetaKeyError),
   ),
   params(
@@ -110,6 +115,12 @@ pub async fn redeem_beta_key_handler(
         RequireUserSessionError::ServerError => RedeemBetaKeyError::ServerError,
         RequireUserSessionError::NotAuthorized => RedeemBetaKeyError::NotAuthorized,
       })?;
+
+  let rate_limiter = &server_state.redis_rate_limiters.logged_out;
+
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(RedeemBetaKeyError::RateLimited);
+  }
 
   let maybe_beta_key = get_beta_key_by_value(&request.beta_key, &server_state.mysql_pool)
       .await
