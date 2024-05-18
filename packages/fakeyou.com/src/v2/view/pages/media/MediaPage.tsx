@@ -153,12 +153,16 @@ export default function MediaPage() {
   switch (mediaFile?.media_type) {
     case MediaFileType.Audio: 
       pageTitle = mediaFile?.maybe_title || "Audio File";
+      break;
     case MediaFileType.Video: 
       pageTitle = mediaFile?.maybe_title || "Video File";
+      break;
     case MediaFileType.Image: 
       pageTitle = mediaFile?.maybe_title || "Image File";
+      break;
     default:
       pageTitle = mediaFile?.maybe_title || "Media File";
+      break;
   }
 
   usePrefixedDocumentTitle(pageTitle);
