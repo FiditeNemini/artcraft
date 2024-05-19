@@ -1,7 +1,7 @@
-import { useEffect, ComponentType } from "react";
+import { useEffect, ComponentType, useState } from "react";
 import { useNavigate, useLocation } from "@remix-run/react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { LoadingDots } from "~/components";
+import { ConfirmationModal, LoadingDots } from "~/components";
 import { authentication } from "~/signals";
 import { AUTH_STATUS } from "~/enums";
 
@@ -9,14 +9,39 @@ export const withProtectionRoute =
   <P extends {}>(Component: ComponentType<P>) =>
   (rest: P) => {
     useSignals();
-    const { status } = authentication;
+    const { status, userInfo } = authentication;
+    const [auth, setAuth] = useState("init");
+
+    useEffect(() => {
+      if (auth === "redirect") {
+        window.open("https://storyteller.ai", "_self");
+      }
+    }, [auth]);
 
     //render according to auth status
     if (status.value === AUTH_STATUS.LOGGED_OUT) {
       return <RedirectToLogin />;
     }
-    if (status.value === AUTH_STATUS.LOGGED_IN) {
-      return <Component {...rest} />;
+    if (auth === "init") {
+      if (status.value === AUTH_STATUS.LOGGED_IN) {
+        if (userInfo.value?.can_access_studio) {
+          return <Component {...rest} />;
+        }
+        setAuth("confirm");
+      }
+    }
+
+    if (auth === "confirm") {
+      return (
+        <ConfirmationModal
+          text="We're in a closed beta and you'll need a beta key to use this app."
+          title="Unauthorized"
+          open={true}
+          onClose={() => setAuth("redirect")}
+          okText="Okay"
+          onOk={() => setAuth("redirect")}
+        />
+      );
     }
     return (
       <div className="fixed flex h-full w-full flex-col  items-center justify-center">
