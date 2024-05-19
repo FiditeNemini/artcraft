@@ -58,6 +58,23 @@ export function loadCharacterData(item: ClipUI) {
       (clipA, clipB) => clipA.offset - clipB.offset,
     );
   }
+  if (item.type === ClipType.EXPRESSION) {
+    const newItem = {
+      version: item.version,
+      clip_uuid: item.clip_uuid,
+      type: item.type,
+      group: item.group,
+      object_uuid: item.object_uuid,
+      media_id: item.media_id,
+      name: item.name,
+      offset: item.offset,
+      length: item.length,
+    } as Clip;
+    existingCharacter.expressionClips.push(newItem);
+    existingCharacter.expressionClips.sort(
+      (clipA, clipB) => clipA.offset - clipB.offset,
+    );
+  }
   if (item.type === ClipType.TRANSFORM) {
     const newKeyframe = {
       version: item.version,
