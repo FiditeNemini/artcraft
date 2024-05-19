@@ -8,6 +8,7 @@ import {
   Panel,
   SegmentButtons,
   TextArea,
+  Slider,
   TempSelect as Select,
 } from "components/common";
 import { EntityInput } from "components/entities";
@@ -29,6 +30,7 @@ export default function StyleVideo() {
   const [length, lengthSet] = useState(3000);
   const [useFaceDetailer, setUseFaceDetailer] = useState(false);
   const [useUpscaler, setUseUpscaler] = useState(false);
+  const [strength, setStrength] = useState(1.0);
   const { enqueue } = useInferenceJobs();
 
   const onClick = () => {
@@ -44,6 +46,7 @@ export default function StyleVideo() {
         trim_start_millis: 0,
         use_face_detailer: useFaceDetailer,
         use_upscaler: useUpscaler,
+        use_strength: strength,
         uuid_idempotency_token: uuidv4(),
       }).then((res: EnqueueVSTResponse) => {
         if (res.success && res.inference_job_token) {
@@ -121,6 +124,21 @@ export default function StyleVideo() {
             }}
           />
         </div>
+
+        <h6>Strength ({strength})</h6>
+        <div {...{ className: "prompt-row" }}>
+          <Slider
+            min={0.0}
+            max={1.0}
+            step={0.1}
+            onChange={({ target }: { target: any }) => {
+              setStrength(parseFloat(target.value));
+            }}
+            value={strength}
+          />
+        </div>
+
+        <br />
 
         <h6>Quality Options</h6>
         <div {...{ className: "prompt-row" }}>
