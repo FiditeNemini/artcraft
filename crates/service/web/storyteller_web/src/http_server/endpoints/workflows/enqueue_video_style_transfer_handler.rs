@@ -96,6 +96,8 @@ pub struct EnqueueVideoStyleTransferRequest {
     use_upscaler: Option<bool>,
 
     /// Use Strength of the style transfer
+    /// Must be between 0.0 (match source) and 1.0 (maximum dreaming).
+    /// The default, if not sent, is 1.0.
     use_strength: Option<f32>,
 
     /// Optional visibility setting override.
