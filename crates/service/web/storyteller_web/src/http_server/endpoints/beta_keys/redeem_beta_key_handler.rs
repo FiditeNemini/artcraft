@@ -7,8 +7,8 @@ use actix_web::http::StatusCode;
 use log::warn;
 use r2d2_redis::redis::transaction;
 use utoipa::ToSchema;
-use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use http_server_common::request::get_request_ip::get_request_ip;
