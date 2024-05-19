@@ -20,6 +20,7 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
@@ -200,6 +201,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     // Enums
     BetaKeyProduct,
     CommentEntityType,
+    FeaturedItemEntityType,
     FrontendFailureCategory,
     InferenceCategory,
     JobStatusPlus,
@@ -210,10 +212,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileOriginModelType,
     MediaFileOriginProductCategory,
     MediaFileSubtype,
-    FeaturedItemEntityType,
     MediaFileType,
     PromptType,
     StyleTransferName,
+    UserFeatureFlag,
     WeightsCategory,
     WeightsType,
 
