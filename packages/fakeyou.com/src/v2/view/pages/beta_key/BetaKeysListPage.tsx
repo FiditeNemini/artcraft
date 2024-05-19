@@ -119,6 +119,17 @@ export default function BetaKeysListPage() {
         return true;
       },
     }),
+    columnHelper.accessor("created_at", {
+      header: "Created Date",
+      cell: info => new Date(info.getValue()).toLocaleDateString(),
+    }),
+    columnHelper.accessor("maybe_redeemed_at", {
+      header: "Redemption Date",
+      cell: info => {
+        const value = info.getValue();
+        return value ? new Date(value).toLocaleDateString() : "-";
+      },
+    }),
     columnHelper.accessor("key_value", {
       header: "Key",
       cell: info => {
@@ -129,6 +140,26 @@ export default function BetaKeysListPage() {
         } else {
           return "********";
         }
+      },
+    }),
+    columnHelper.accessor("creator.username", {
+      header: "Key Creator",
+      cell: info => {
+        const username = info.getValue();
+        const userData = info.row.original.creator;
+        const userEmailHash = userData?.gravatar_hash || "";
+        return (
+          <div className="d-flex gap-1 align-items-center">
+            <Gravatar
+              size={18}
+              username={username}
+              email_hash={userEmailHash}
+              avatarIndex={userData?.default_avatar.image_index}
+              backgroundIndex={userData?.default_avatar.color_index}
+            />
+            <Link to={`/profile/${username}`}>{username}</Link>
+          </div>
+        );
       },
     }),
     columnHelper.accessor("maybe_referrer.username", {
@@ -173,37 +204,6 @@ export default function BetaKeysListPage() {
           </div>
         ) : (
           "-"
-        );
-      },
-    }),
-    columnHelper.accessor("created_at", {
-      header: "Created Date",
-      cell: info => new Date(info.getValue()).toLocaleDateString(),
-    }),
-    columnHelper.accessor("maybe_redeemed_at", {
-      header: "Redemption Date",
-      cell: info => {
-        const value = info.getValue();
-        return value ? new Date(value).toLocaleDateString() : "-";
-      },
-    }),
-    columnHelper.accessor("creator.username", {
-      header: "Key Creator",
-      cell: info => {
-        const username = info.getValue();
-        const userData = info.row.original.creator;
-        const userEmailHash = userData?.gravatar_hash || "";
-        return (
-          <div className="d-flex gap-1 align-items-center">
-            <Gravatar
-              size={18}
-              username={username}
-              email_hash={userEmailHash}
-              avatarIndex={userData?.default_avatar.image_index}
-              backgroundIndex={userData?.default_avatar.color_index}
-            />
-            <Link to={`/profile/${username}`}>{username}</Link>
-          </div>
         );
       },
     }),
