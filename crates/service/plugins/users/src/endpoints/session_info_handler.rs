@@ -53,8 +53,9 @@ pub struct SessionUserInfo {
   #[deprecated(note = "DO NOT USE. Use `maybe_feature_flags` instead! The flag you're looking for is `studio`.")]
   pub can_access_studio: bool,
 
-  // Collection of feature / rollout flags
-  // NB: The BTreeSet maintains order so React doesn't introduce re-render state bugs when order changes
+  /// Collection of feature / rollout flags
+  /// This is the proper place to detect if a user has access to some rollout (non-paywall) feature.
+  /// NB: The BTreeSet maintains order so React doesn't introduce re-render state bugs when order changes
   pub maybe_feature_flags: BTreeSet<UserFeatureFlag>,
 
   // Premium plans:
