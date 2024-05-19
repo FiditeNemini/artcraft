@@ -27,6 +27,8 @@ export default function StyleVideo() {
   const [prompt, promptSet] = useState("");
   const [negativePrompt, negativePromptSet] = useState("");
   const [length, lengthSet] = useState(3000);
+  const [useFaceDetailer, setUseFaceDetailer] = useState(false);
+  const [useUpscaler, setUseUpscaler] = useState(false);
   const { enqueue } = useInferenceJobs();
 
   const onClick = () => {
@@ -117,6 +119,7 @@ export default function StyleVideo() {
             }}
           />
         </div>
+
         <div {...{ className: "prompt-row" }}>
           <SegmentButtons
             {...{
@@ -130,6 +133,33 @@ export default function StyleVideo() {
             }}
           />
         </div>
+
+        <br />
+
+        <h6>Quality Options</h6>
+        <div {...{ className: "prompt-row" }}>
+          <div className="form-check form-switch w-100">
+            <input 
+              className="form-check-input" 
+              type="checkbox" 
+              id="useFaceDetailer" 
+              checked={useFaceDetailer}
+              />
+            <label className="form-check-label" htmlFor="useFaceDetailer">Use Face Detailer</label>
+          </div>
+        </div>
+        <div {...{ className: "prompt-row" }}>
+          <div className="form-check form-switch w-100">
+            <input 
+              className="form-check-input" 
+              type="checkbox" 
+              id="useUpscaler" 
+              checked={useUpscaler}
+              />
+            <label className="form-check-label" htmlFor="useUpscaler">Use Upscaler</label>
+          </div>
+        </div>
+
         <div {...{ className: "d-flex justify-content-center mt-3" }}>
           <Button
             {...{
