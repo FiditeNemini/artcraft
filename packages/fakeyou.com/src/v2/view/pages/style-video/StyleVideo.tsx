@@ -42,6 +42,8 @@ export default function StyleVideo() {
         style,
         trim_end_millis: length,
         trim_start_millis: 0,
+        use_face_detailer: useFaceDetailer,
+        use_upscaler: useUpscaler,
         uuid_idempotency_token: uuidv4(),
       }).then((res: EnqueueVSTResponse) => {
         if (res.success && res.inference_job_token) {
@@ -65,9 +67,9 @@ export default function StyleVideo() {
   });
 
   const lengthOptions = [
-    { label: 3, value: 3000 },
-    { label: 5, value: 5000 },
-    { label: 7, value: 7000 },
+    { label: "3 seconds", value: 3000 },
+    { label: "5 seconds", value: 5000 },
+    { label: "7 seconds", value: 7000 },
   ];
 
   return studioAccessCheck(
@@ -120,22 +122,6 @@ export default function StyleVideo() {
           />
         </div>
 
-        <div {...{ className: "prompt-row" }}>
-          <SegmentButtons
-            {...{
-              className: "fy-style-video-length",
-              label: "Final video length (seconds)",
-              onChange: ({ target }: { target: any }) => {
-                lengthSet(target.value);
-              },
-              options: lengthOptions,
-              value: length,
-            }}
-          />
-        </div>
-
-        <br />
-
         <h6>Quality Options</h6>
         <div {...{ className: "prompt-row" }}>
           <div className="form-check form-switch w-100">
@@ -144,6 +130,7 @@ export default function StyleVideo() {
               type="checkbox" 
               id="useFaceDetailer" 
               checked={useFaceDetailer}
+              onChange={() => setUseFaceDetailer(!useFaceDetailer)}
               />
             <label className="form-check-label" htmlFor="useFaceDetailer">Use Face Detailer</label>
           </div>
@@ -155,9 +142,26 @@ export default function StyleVideo() {
               type="checkbox" 
               id="useUpscaler" 
               checked={useUpscaler}
+              onChange={() => setUseUpscaler(!useUpscaler)}
               />
             <label className="form-check-label" htmlFor="useUpscaler">Use Upscaler</label>
           </div>
+        </div>
+
+        <br />
+
+        <div {...{ className: "prompt-row" }}>
+          <SegmentButtons
+            {...{
+              className: "fy-style-video-length",
+              label: "Final video length",
+              onChange: ({ target }: { target: any }) => {
+                lengthSet(target.value);
+              },
+              options: lengthOptions,
+              value: length,
+            }}
+          />
         </div>
 
         <div {...{ className: "d-flex justify-content-center mt-3" }}>
