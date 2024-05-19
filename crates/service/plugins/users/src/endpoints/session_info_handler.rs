@@ -50,6 +50,7 @@ pub struct SessionUserInfo {
   pub email_gravatar_hash: String,
 
   // TODO(bt,2024-03-30): Remove legacy feature flag
+  #[deprecated(note = "DO NOT USE. Use `maybe_feature_flags` instead! The flag you're looking for is `studio`.")]
   pub can_access_studio: bool,
 
   // Collection of feature / rollout flags
@@ -57,7 +58,10 @@ pub struct SessionUserInfo {
   pub maybe_feature_flags: BTreeSet<UserFeatureFlag>,
 
   // Premium plans:
+  #[deprecated(note = "DO NOT USE. This was never used and is 100% meaningless.")]
   pub fakeyou_plan: FakeYouPlan,
+
+  #[deprecated(note = "DO NOT USE. This was never used and is 100% meaningless.")]
   pub storyteller_stream_plan: StorytellerStreamPlan,
 
   // Usage permissions:
@@ -177,7 +181,7 @@ pub async fn session_info_handler(
           email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
 
           // Rollout / feature flags:
-          can_access_studio: session_data.can_access_studio,
+          can_access_studio: feature_flags.has_flag(UserFeatureFlag::Studio),
           maybe_feature_flags: feature_flags.clone_flags(),
 
           // Premium plans:
