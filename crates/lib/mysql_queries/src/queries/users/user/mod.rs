@@ -4,6 +4,7 @@ pub mod list_users_query_builder;
 pub mod lookup_user_for_login_by_email;
 pub mod lookup_user_for_login_by_username;
 pub mod lookup_user_for_login_result;
+pub mod set_can_access_studio_transactional;
 pub mod set_user_ban_status;
 pub mod set_user_feature_flags;
 pub mod set_user_feature_flags_transactional;

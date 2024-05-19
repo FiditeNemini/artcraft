@@ -7,6 +7,7 @@ use actix_web::http::StatusCode;
 use log::warn;
 use r2d2_redis::redis::transaction;
 use utoipa::ToSchema;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
@@ -15,7 +16,9 @@ use mysql_queries::queries::beta_keys::get_beta_key_by_value::get_beta_key_by_va
 use mysql_queries::queries::beta_keys::redeem_beta_key::redeem_beta_key;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
+use mysql_queries::queries::users::user::set_can_access_studio_transactional::{set_can_access_studio_transactional, SetCanAccessStudioArgs};
 use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -138,6 +141,37 @@ pub async fn redeem_beta_key_handler(
     return Err(RedeemBetaKeyError::BadInput("beta key already redeemed".to_string()));
   }
 
+  let ip_address = get_request_ip(&http_request);
+
+  match beta_key.product {
+    BetaKeyProduct::Studio => {
+      enroll_in_studio(&request, &server_state, &user_session, &ip_address)
+          .await
+          .map_err(|err| {
+            warn!("Error enrolling in studio: {:?}", &err);
+            RedeemBetaKeyError::ServerError
+          })?;
+    }
+  }
+
+  let response = RedeemBetaKeySuccessResponse {
+    success: true,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|_e| RedeemBetaKeyError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
+
+async fn enroll_in_studio(
+  request: &RedeemBetaKeyRequest,
+  server_state: &ServerState,
+  user_session: &SessionUserRecord,
+  ip_address: &str,
+) -> Result<(), RedeemBetaKeyError> {
   let mut user_feature_flags =
       UserSessionFeatureFlags::new(user_session.maybe_feature_flags.as_deref());
 
@@ -145,8 +179,6 @@ pub async fn redeem_beta_key_handler(
     UserFeatureFlag::Studio,
     UserFeatureFlag::VideoStyleTransfer,
   ]);
-
-  let ip_address = get_request_ip(&http_request);
 
   let mut transaction = server_state.mysql_pool.begin()
       .await
@@ -167,6 +199,17 @@ pub async fn redeem_beta_key_handler(
         RedeemBetaKeyError::ServerError
       })?;
 
+  // NB: This isn't a necessary field, but can be useful for analytics.
+  set_can_access_studio_transactional(SetCanAccessStudioArgs {
+    subject_user_token: &user_session.user_token,
+    can_access_studio: true,
+    transaction: &mut transaction,
+  }).await
+      .map_err(|e| {
+        warn!("Could not set can_access_studio: {:?}", e);
+        RedeemBetaKeyError::ServerError
+      })?;
+
   redeem_beta_key(&request.beta_key, &user_session.user_token, &mut transaction)
       .await
       .map_err(|e| {
@@ -181,14 +224,5 @@ pub async fn redeem_beta_key_handler(
         RedeemBetaKeyError::ServerError
       })?;
 
-  let response = RedeemBetaKeySuccessResponse {
-    success: true,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|_e| RedeemBetaKeyError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  Ok(())
 }
