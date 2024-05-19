@@ -18,6 +18,7 @@ use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use mysql_queries::queries::users::user::set_can_access_studio_transactional::{set_can_access_studio_transactional, SetCanAccessStudioArgs};
 use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
+use mysql_queries::queries::users::user::set_user_feature_flags_transactional::{set_user_feature_flags_transactional, SetUserFeatureFlagTransactionalArgs};
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::media_files::MediaFileToken;
@@ -187,12 +188,12 @@ async fn enroll_in_studio(
         RedeemBetaKeyError::ServerError
       })?;
 
-  set_user_feature_flags(SetUserFeatureFlagArgs {
+  set_user_feature_flags_transactional(SetUserFeatureFlagTransactionalArgs {
     subject_user_token: &user_session.user_token,
     maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
     maybe_mod_user_token: None,
     ip_address: &ip_address,
-    mysql_pool: &server_state.mysql_pool,
+    transaction: &mut transaction,
   }).await
       .map_err(|e| {
         warn!("Could not set flags: {:?}", e);
