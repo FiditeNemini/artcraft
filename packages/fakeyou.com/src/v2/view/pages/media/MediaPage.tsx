@@ -75,6 +75,7 @@ export default function MediaPage() {
     mediaFile?.maybe_creator_user?.user_token || ""
   );
 
+  const isModerator = canBanUsers() || false;
   const viewerCanMakeFeatured = canBanUsers() || false;
 
   // Inside MediaPage.tsx
@@ -247,6 +248,20 @@ export default function MediaPage() {
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
                   {prompt?.used_upscaler ? "Yes" : "No"}
+                </p>
+              </div>
+            </>
+          )}
+          {isModerator && mediaFile?.maybe_moderator_fields?.maybe_style_transfer_source_media_file_token && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Source Video</h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  <Link 
+                    to={`/media/${mediaFile?.maybe_moderator_fields?.maybe_style_transfer_source_media_file_token}`} 
+                    >Link to source (staff only)</Link>
                 </p>
               </div>
             </>

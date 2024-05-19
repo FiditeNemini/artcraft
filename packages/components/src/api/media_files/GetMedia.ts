@@ -35,8 +35,13 @@ export interface MediaFile {
     },
     maybe_cover_image_public_bucket_path: string | null
   };
+  maybe_moderator_fields?: MediaFileModeratorFields;
   created_at: Date;
   updated_at: Date;
+}
+
+export interface MediaFileModeratorFields {
+  maybe_style_transfer_source_media_file_token?: string;
 }
 
 export interface GetMediaRequest {}
