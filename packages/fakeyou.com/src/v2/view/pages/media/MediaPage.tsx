@@ -42,7 +42,7 @@ import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { STYLES_BY_KEY } from "common/StyleOptions";
-import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
+import { faCube, faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
 
@@ -971,6 +971,16 @@ export default function MediaPage() {
                       }
                       onClick={handleFeatureMedia}
                     />
+                  </div>
+                </>
+              )}
+              {mediaFile?.maybe_scene_source_media_file_token && (
+                <>
+                  <div className="d-flex gap-2">
+                    <a 
+                      className="btn btn-success w-100"
+                      href={`https://studio.storyteller.ai/${mediaFile?.maybe_scene_source_media_file_token}`}
+                    ><FontAwesomeIcon icon={faCube} /> &nbsp; Open in Studio Editor</a>
                   </div>
                 </>
               )}
