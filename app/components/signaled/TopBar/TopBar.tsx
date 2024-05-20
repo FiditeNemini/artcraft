@@ -33,7 +33,7 @@ export const TopBar = ({ pageName }: Props) => {
             <img
               className="h-9 w-auto"
               src="/resources/images/Storyteller-Logo-1.png"
-              alt="Logo FakeYou StoryTeller.ai"
+              alt="Logo StoryTeller.ai"
             />
           </a>
           {!isEditorPath(currentLocation) && (

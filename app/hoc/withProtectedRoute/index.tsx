@@ -14,7 +14,7 @@ export const withProtectionRoute =
 
     useEffect(() => {
       if (auth === "redirect") {
-        window.open("https://storyteller.ai", "_self");
+        window.open("https://storyteller.ai/beta-key/redeem", "_self");
       }
     }, [auth]);
 
