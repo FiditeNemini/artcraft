@@ -10,19 +10,30 @@ import {
   faClipboardList,
   faChevronLeft,
   faMessageImage,
+  faPortalEnter,
+  faHome,
+  faCompass,
+  faCloudUpload,
+  faTrophy,
+  faBookOpen,
+  faFilms,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { useModal, useSession } from "hooks";
+import { useLocalize, useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
 import "./TopNav.scss";
+import { Website } from "@storyteller/components/src/env/GetWebsite";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -43,7 +54,7 @@ export default function TopNav({
   const [isFocused, setIsFocused] = useState(false);
   const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
-  // const { t } = useLocalize("TopNav");
+  const { t } = useLocalize("SideNav");
   const isOnLandingPage = window.location.pathname === "/";
   const isOnLoginPage = window.location.pathname.includes("/login");
   const isOnSignUpPage = window.location.pathname.includes("/signup");
@@ -56,20 +67,10 @@ export default function TopNav({
   const [isScrolled, setIsScrolled] = useState(false);
   const loggedIn = sessionWrapper.isLoggedIn();
   const showNavItem =
-    !loggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage);
+    (!loggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
+    domain.titlePart === "Storyteller AI";
 
-  const handleMenuButtonClick = () => {
-    if (window.innerWidth < 1200) {
-      if (wrapper) {
-        wrapper.classList.toggle("toggled");
-        if (menuButtonIcon === faBars) {
-          setMenuButtonIcon(faXmark);
-        } else {
-          setMenuButtonIcon(faBars);
-        }
-      }
-    }
-  };
+  const [mobileMenu, setMobileMenu] = useState("d-none");
 
   const handleSearchButtonClick = () => {
     setIsMobileSearchBarVisible(true);
@@ -212,6 +213,21 @@ export default function TopNav({
     return null;
   }
 
+  const handleNavLinkClick = () => {
+    setMobileMenu("d-none");
+    setMenuButtonIcon(faBars);
+  };
+
+  const handleMenuButtonClick = () => {
+    if (mobileMenu === "d-none") {
+      setMobileMenu("d-block");
+      setMenuButtonIcon(faXmark);
+    } else {
+      setMobileMenu("d-none");
+      setMenuButtonIcon(faBars);
+    }
+  };
+
   return (
     <div
       id="topbar-wrapper"
@@ -225,8 +241,8 @@ export default function TopNav({
     >
       <div className="topbar-nav">
         <div className="topbar-nav-left">
-          <div className="d-flex gap-3 align-items-center">
-            <Link to="/">
+          <div className="d-flex gap-1 align-items-center">
+            <Link to="/" className="me-3">
               <img
                 src={domain.logo}
                 alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
@@ -240,15 +256,20 @@ export default function TopNav({
                 className="mb-0 d-block d-lg-none"
               />
             </Link>
-            {showNavItem && (
-              <div className="d-none d-lg-block">
-                <NavItem
-                  isHoverable={true}
-                  label="AI Tools"
-                  dropdownItems={aiToolsDropdown}
-                />
-              </div>
-            )}
+
+            <div className="d-none d-lg-block">
+              <NavItem
+                isHoverable={true}
+                label="AI Tools"
+                dropdownItems={aiToolsDropdown}
+              />
+            </div>
+            <NavItem
+              icon={faStar}
+              label="Pricing"
+              link="/pricing"
+              className="me-3 d-none d-lg-block"
+            />
             {isOnStudioPage && loggedIn && (
               <Button
                 icon={faChevronLeft}
@@ -265,36 +286,43 @@ export default function TopNav({
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            {(!isOnLandingPage &&
-              !isOnLoginPage &&
-              !isOnSignUpPage &&
-              !isOnStudioPage) ||
-            (loggedIn &&
-              !isOnLoginPage &&
-              !isOnSignUpPage &&
-              !isOnStudioPage) ||
-            (isOnLandingPage &&
-              isScrolled &&
-              !isOnLoginPage &&
-              !isOnSignUpPage &&
-              !isOnStudioPage) ? (
-              <SearchBar
-                onFocus={onFocusHandler}
-                onBlur={onBlurHandler}
-                isFocused={isFocused}
-              />
-            ) : null}
+            {domain.titlePart === "FakeYou" && (
+              <>
+                {(!isOnLandingPage &&
+                  !isOnLoginPage &&
+                  !isOnSignUpPage &&
+                  !isOnStudioPage) ||
+                (loggedIn &&
+                  !isOnLoginPage &&
+                  !isOnSignUpPage &&
+                  !isOnStudioPage) ||
+                (isOnLandingPage &&
+                  isScrolled &&
+                  !isOnLoginPage &&
+                  !isOnSignUpPage &&
+                  !isOnStudioPage) ? (
+                  <SearchBar
+                    onFocus={onFocusHandler}
+                    onBlur={onBlurHandler}
+                    isFocused={isFocused}
+                  />
+                ) : null}
+              </>
+            )}
           </div>
         </div>
 
         <div className="topbar-nav-right">
-          {showNavItem && (
-            <NavItem
-              icon={faStar}
-              label="Pricing"
-              link="/pricing"
-              className="me-3 d-none d-lg-block"
-            />
+          {domain.titlePart === "Storyteller AI" && (
+            <div className="d-none d-lg-block">
+              <Button
+                icon={faPortalEnter}
+                label="Enter Storyteller Studio"
+                href="https://studio.storyteller.ai/"
+                small={true}
+                className="me-3"
+              />
+            </div>
           )}
 
           <div className="d-flex align-items-center gap-2">
@@ -366,7 +394,176 @@ export default function TopNav({
         </div>
       </div>
 
-      {/* <div className="topbar-nav bg-panel">test</div> */}
+      <div className={`${mobileMenu} d-lg-none`} style={{ height: "100vh" }}>
+        <ul className="sidebar-nav">
+          <li>
+            <NavLink
+              exact={true}
+              to={domain.website === Website.FakeYou ? "/" : "/dashboard"}
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon icon={faHome} className="sidebar-heading-icon" />
+              {domain.website === Website.FakeYou ? "Home" : "Dashboard"}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/pricing"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon icon={faStar} className="sidebar-heading-icon" />
+              {t("infoPricing")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/explore"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faCompass}
+                className="sidebar-heading-icon"
+              />
+              Explore
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/inference-jobs-list"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faClipboardList}
+                className="sidebar-heading-icon"
+              />
+              My Jobs
+            </NavLink>
+          </li>
+          <li className="sidebar-heading">{t("speechTitle")}</li>
+          <li>
+            <NavLink
+              to="/tts"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faMessageDots}
+                className="sidebar-heading-icon"
+              />
+              {t("speechTts")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/voice-conversion"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faWaveformLines}
+                className="sidebar-heading-icon"
+              />
+              {t("speechVc")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/voice-designer"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faWandMagicSparkles}
+                className="sidebar-heading-icon"
+              />
+              {"Voice Designer"}
+            </NavLink>
+          </li>
+          <li className="sidebar-heading">{t("videoTitle")}</li>
+
+          <li>
+            <NavLink
+              to="/video-styletransfer"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faFilms}
+                className="sidebar-heading-icon"
+              />
+              {t("videoStyleTransfer")}
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/face-animator"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faFaceViewfinder}
+                className="sidebar-heading-icon"
+              />
+              {t("videoFaceAnimator")}
+            </NavLink>
+          </li>
+
+          {/* {maybeImageGeneration}
+
+          {maybeBetaFeatures} */}
+
+          <li className="sidebar-heading">{t("communityTitle")}</li>
+          <li>
+            <NavLink
+              to="/contribute"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faCloudUpload}
+                className="sidebar-heading-icon"
+              />
+              {t("communityUploadModels")}
+            </NavLink>
+          </li>
+          <li className="mb-3">
+            <a href={GetDiscordLink()} target="_blank" rel="noreferrer">
+              <FontAwesomeIcon
+                icon={faDiscord}
+                className="sidebar-heading-icon"
+              />
+              {t("communityDiscord")}
+            </a>
+            <NavLink
+              to="/leaderboard"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faTrophy}
+                className="sidebar-heading-icon"
+              />
+              {t("communityLeaderboard")}
+            </NavLink>
+            <NavLink
+              to="/guide"
+              activeClassName="active-link"
+              onClick={handleNavLinkClick}
+            >
+              <FontAwesomeIcon
+                icon={faBookOpen}
+                className="sidebar-heading-icon"
+              />
+              {t("communityGuide")}
+            </NavLink>
+          </li>
+        </ul>
+      </div>
 
       {/* Mobile Searchbar */}
       {isMobileSearchBarVisible && (

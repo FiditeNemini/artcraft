@@ -1,4 +1,4 @@
-@import "./colours.scss";
+@import "scss/colours.scss";
 
 /* Toggle Styles */
 
@@ -12,13 +12,13 @@
 
 $topbar-height: 66px;
 
-#sidebar-wrapper {
+#profile-sidebar-wrapper {
   z-index: 999;
   position: fixed;
-  left: 260px;
+  left: 340px;
   width: 0;
   height: calc(100% - $topbar-height);
-  margin-left: -260px;
+  margin-left: -340px;
   overflow-x: hidden;
   -webkit-transition: all 0.2s ease;
   -moz-transition: all 0.2s ease;
@@ -46,8 +46,14 @@ $topbar-height: 66px;
   }
 }
 
-#wrapper.toggled #sidebar-wrapper {
-  width: 260px;
+.profile-sidebar-panel {
+  background-color: #39394d;
+  height: 100%;
+  border-radius: 0.8rem;
+}
+
+#wrapper.toggled #profile-sidebar-wrapper {
+  width: 340px;
   margin-left: 0;
 }
 
@@ -58,7 +64,7 @@ $topbar-height: 66px;
   flex-direction: column;
   width: 100%;
   position: relative;
-  // padding-left: 260px;
+  padding-left: 340px;
   padding-top: $topbar-height;
   transition: all 0.2s ease;
 
@@ -69,8 +75,8 @@ $topbar-height: 66px;
 
 /* Sidebar Styles */
 
-.sidebar-nav {
-  width: 260px;
+.profile-sidebar-nav {
+  width: 340px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -81,7 +87,7 @@ $topbar-height: 66px;
   padding-top: 1rem;
 }
 
-.sidebar-nav li a {
+.profile-sidebar-nav li a {
   display: block;
   text-decoration: none;
   color: rgba($white, 0.7);
@@ -96,28 +102,28 @@ $topbar-height: 66px;
   transition: all 0.2s ease;
 }
 
-.sidebar-nav li a:hover {
+.profile-sidebar-nav li a:hover {
   text-decoration: none;
   color: $white;
 }
 
-.sidebar-nav li a:active,
-.sidebar-nav li a:focus {
+.profile-sidebar-nav li a:active,
+.profile-sidebar-nav li a:focus {
   text-decoration: none;
 }
 
-.sidebar-brand {
+.profile-sidebar-brand {
   font-size: 18px;
   padding-top: 1.5rem;
   line-height: 0;
   margin-left: 1.5rem;
 }
 
-.sidebar-buttons {
+.profile-sidebar-buttons {
   margin-left: 1.5rem;
 }
 
-.sidebar-heading {
+.profile-sidebar-heading {
   margin-left: 1.5rem;
   margin-bottom: 0.25rem;
   margin-top: 0.75rem;
@@ -125,7 +131,7 @@ $topbar-height: 66px;
   font-size: 13px;
 }
 
-.sidebar-heading-icon {
+.profile-sidebar-heading-icon {
   margin-right: 0.75rem;
 }
 
@@ -252,7 +258,7 @@ $topbar-height: 66px;
   border-top: 1px solid lighten($panel-inner, 5%) !important;
   font-size: 11px;
 
-  .sidebar-heading {
+  .profile-sidebar-heading {
     margin-top: 0;
     font-size: 13px;
   }
@@ -260,18 +266,18 @@ $topbar-height: 66px;
 
 @media (min-width: 992px) {
   #wrapper {
-    padding-left: 260px;
+    padding-left: 340px;
   }
 
   #wrapper.toggled {
     padding-left: 0;
   }
 
-  #sidebar-wrapper {
-    width: 260px;
+  #profile-sidebar-wrapper {
+    width: 340px;
   }
 
-  #wrapper.toggled #sidebar-wrapper {
+  #wrapper.toggled #profile-sidebar-wrapper {
     width: 0;
   }
 
@@ -286,16 +292,16 @@ $topbar-height: 66px;
 }
 
 @media (max-width: 992px) {
-  #wrapper.toggled #sidebar-wrapper {
+  #wrapper.toggled #profile-sidebar-wrapper {
     width: 100%;
   }
 
-  #sidebar-wrapper {
+  #profile-sidebar-wrapper {
     left: 100%;
     margin-left: 0;
   }
 
-  .sidebar-nav {
+  .profile-sidebar-nav {
     width: 100%;
   }
 }

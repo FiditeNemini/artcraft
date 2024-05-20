@@ -3,9 +3,13 @@
 .nav-tabs {
   border-bottom: 2px solid #ffffff15;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   -webkit-overflow-scrolling: touch;
+
+  @media screen and (max-width: 768px) {
+    width: 100vw;
+  }
 
   .nav-link {
     border: none;

@@ -62,6 +62,7 @@ export default function SideNav({
   const isOnLoginPage = window.location.pathname.includes("/login");
   const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
+  const isOnProfilePage = window.location.pathname.includes("/profile/");
   const isOnBetaKeyRedeemPage =
     window.location.pathname.includes("/beta-key/redeem");
   const domain: WebsiteConfig = useDomainConfig();
@@ -115,9 +116,13 @@ export default function SideNav({
   }, []);
 
   const shouldNotShowSidebar =
-    (!isLoggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
+    (!isLoggedIn &&
+      (isOnLandingPage ||
+        isOnLoginPage ||
+        isOnSignUpPage ||
+        isOnProfilePage)) ||
     isOnStudioPage ||
-    (domain.website === Website.StorytellerAi && isOnLandingPage) ||
+    isOnProfilePage ||
     isOnBetaKeyRedeemPage;
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${
@@ -336,6 +341,10 @@ export default function SideNav({
       </li>
     </>
   );
+
+  if (domain.website === Website.StorytellerAi) {
+    return null;
+  }
 
   return (
     <>

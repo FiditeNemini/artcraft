@@ -4,12 +4,14 @@ interface ContainerProps {
   children: React.ReactNode;
   type?: "full" | "padded" | "panel" | "panel-full";
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function PageContainer({
   children,
   type = "full",
   className = "",
+  style,
 }: ContainerProps) {
   let containerClass = "";
 
@@ -34,5 +36,9 @@ export default function PageContainer({
   // Merge the classNames
   const mergedClassNames = `${containerClass} ${className}`.trim();
 
-  return <div className={mergedClassNames}>{children}</div>;
+  return (
+    <div className={mergedClassNames} style={style}>
+      {children}
+    </div>
+  );
 }

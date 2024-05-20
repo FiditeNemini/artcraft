@@ -98,7 +98,6 @@ import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 // import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
 import TopNav from "components/layout/TopNav/TopNav";
-import SideNav from "components/layout/SideNav/SideNav";
 import MediaPage from "./pages/media/MediaPage";
 import EditCoverImage from "./pages/media/EditCoverImage";
 import MediaRenamePage from "./pages/media/MediaRenamePage";
@@ -110,7 +109,7 @@ import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmai
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 // import EngineCompositor from "./pages/EngineCompositor/EngineCompositor";
 import InferenceJobsPage from "./pages/inference_jobs_page/InferenceJobsPage";
-import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
+// import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
@@ -140,6 +139,8 @@ import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
 import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
 import BetaKeysListPage from "./pages/beta_key/BetaKeysListPage";
+import { ProfilePageV3 } from "./pages/profile/profile_view/ProfilePageV3";
+import ProfileSidePanel from "components/layout/ProfileSidePanel/ProfileSidePanel";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -262,12 +263,11 @@ class PageContainer extends React.Component<
                 this.props.querySessionSubscriptionsAction
               }
             />
-            <SideNav
+
+            <ProfileSidePanel
               sessionWrapper={this.props.sessionWrapper}
-              logoutHandler={this.logout}
-              querySessionCallback={this.props.querySessionAction}
-              querySessionSubscriptionsCallback={
-                this.props.querySessionSubscriptionsAction
+              sessionSubscriptionsWrapper={
+                this.props.sessionSubscriptionsWrapper
               }
             />
 
@@ -343,9 +343,18 @@ class PageContainer extends React.Component<
                     <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
                   </Route>
 
-                  {/* New Profile Page */}
-                  <Route path="/profile/:username">
+                  {/* Old Profile Page */}
+                  {/* <Route path="/profile/:username">
                     <NewProfilePage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route> */}
+
+                  <Route path="/profile/:username">
+                    <ProfilePageV3
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper

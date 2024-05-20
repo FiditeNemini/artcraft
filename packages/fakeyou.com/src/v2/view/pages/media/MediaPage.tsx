@@ -152,13 +152,13 @@ export default function MediaPage() {
   let pageTitle;
 
   switch (mediaFile?.media_type) {
-    case MediaFileType.Audio: 
+    case MediaFileType.Audio:
       pageTitle = mediaFile?.maybe_title || "Audio File";
       break;
-    case MediaFileType.Video: 
+    case MediaFileType.Video:
       pageTitle = mediaFile?.maybe_title || "Video File";
       break;
-    case MediaFileType.Image: 
+    case MediaFileType.Image:
       pageTitle = mediaFile?.maybe_title || "Image File";
       break;
     default:
@@ -231,7 +231,9 @@ export default function MediaPage() {
           {prompt?.used_face_detailer && (
             <>
               <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                <h6 className="fw-semibold mb-0 flex-grow-1">Used Face Detailer</h6>
+                <h6 className="fw-semibold mb-0 flex-grow-1">
+                  Used Face Detailer
+                </h6>
               </div>
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
@@ -246,26 +248,28 @@ export default function MediaPage() {
                 <h6 className="fw-semibold mb-0 flex-grow-1">Used Upscaler</h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">
-                  {prompt?.used_upscaler ? "Yes" : "No"}
-                </p>
+                <p className="fs-7">{prompt?.used_upscaler ? "Yes" : "No"}</p>
               </div>
             </>
           )}
-          {isModerator && mediaFile?.maybe_moderator_fields?.maybe_style_transfer_source_media_file_token && (
-            <>
-              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                <h6 className="fw-semibold mb-0 flex-grow-1">Source Video</h6>
-              </div>
-              <div className="panel-inner p-2 rounded">
-                <p className="fs-7">
-                  <Link 
-                    to={`/media/${mediaFile?.maybe_moderator_fields?.maybe_style_transfer_source_media_file_token}`} 
-                    >Link to source (staff only)</Link>
-                </p>
-              </div>
-            </>
-          )}
+          {isModerator &&
+            mediaFile?.maybe_moderator_fields
+              ?.maybe_style_transfer_source_media_file_token && (
+              <>
+                <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                  <h6 className="fw-semibold mb-0 flex-grow-1">Source Video</h6>
+                </div>
+                <div className="panel-inner p-2 rounded">
+                  <p className="fs-7">
+                    <Link
+                      to={`/media/${mediaFile?.maybe_moderator_fields?.maybe_style_transfer_source_media_file_token}`}
+                    >
+                      Link to source (staff only)
+                    </Link>
+                  </p>
+                </div>
+              </>
+            )}
         </Panel>
       )}
     </>
@@ -977,10 +981,13 @@ export default function MediaPage() {
               {mediaFile?.maybe_scene_source_media_file_token && (
                 <>
                   <div className="d-flex gap-2">
-                    <a 
+                    <a
                       className="btn btn-success w-100"
                       href={`https://studio.storyteller.ai/${mediaFile?.maybe_scene_source_media_file_token}`}
-                    ><FontAwesomeIcon icon={faCube} /> &nbsp; Open in Studio Editor</a>
+                    >
+                      <FontAwesomeIcon icon={faCube} /> &nbsp; Open in Studio
+                      Editor
+                    </a>
                   </div>
                 </>
               )}

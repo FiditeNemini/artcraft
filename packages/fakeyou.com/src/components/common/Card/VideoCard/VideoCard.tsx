@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faPlayCircle } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import Badge from "components/common/Badge";
 import Button from "components/common/Button";
-import { CardFooter } from "components/entities";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Link } from "react-router-dom";
 import getCardUrl from "../getCardUrl";
@@ -164,14 +162,13 @@ export default function VideoCard({
                 />
               )}
             </div>
-            <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
             <div className="card-img-overlay-text">
               <div>
                 <h6 className="fw-semibold text-white mb-1">
                   {data.weight_name}
                 </h6>
                 <p className="fs-7 opacity-75">{timeAgo}</p>
-                <CardFooter
+                {/* <CardFooter
                   {...{
                     creator: data?.maybe_creator,
                     entityToken: data.token,
@@ -180,7 +177,7 @@ export default function VideoCard({
                     makeRatingsProps: ratings?.makeProps,
                     showCreator,
                   }}
-                />
+                /> */}
               </div>
             </div>
           </div>

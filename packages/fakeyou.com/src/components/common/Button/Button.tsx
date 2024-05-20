@@ -28,8 +28,15 @@ export default function Button({
 }: ButtonProps) {
   let variant = variantProps;
   if (isActive !== undefined) {
-    if (isActive) variant = "primary";
-    else variant = "secondary";
+    if (isActive) {
+      variant = "primary";
+    } else variant = "secondary";
+  }
+  if (variant === "action") {
+    variant = "action";
+  }
+  if (variant === "danger") {
+    variant = "danger";
   }
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
   let IconComponent = icon ? (

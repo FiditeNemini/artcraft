@@ -11,6 +11,7 @@ interface NavItemProps {
   label: string;
   isHoverable?: boolean;
   link?: string;
+  externalLink?: string;
   className?: string;
   dropdownItems?: {
     id: number;
@@ -27,6 +28,7 @@ export default function NavItem({
   isHoverable,
   link,
   className,
+  externalLink,
 }: NavItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -54,6 +56,13 @@ export default function NavItem({
               {icon && <FontAwesomeIcon icon={icon} className="me-2 fs-7" />}
               {label}
             </Link>
+          )}
+          {externalLink && (
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
+            <a href={externalLink} className={textHover}>
+              {icon && <FontAwesomeIcon icon={icon} className="me-2 fs-7" />}
+              {label}
+            </a>
           )}
         </>
       );
