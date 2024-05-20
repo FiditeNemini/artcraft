@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./PrelaunchLanding.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { MainButton } from "./MainButton";
