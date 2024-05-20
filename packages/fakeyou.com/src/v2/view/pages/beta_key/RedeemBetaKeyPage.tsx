@@ -1,10 +1,10 @@
 import { Button, Container, Label, Panel, TempInput } from "components/common";
 import React, { useState } from "react";
 import "./BetaKey.scss";
-import { faKey } from "@fortawesome/pro-solid-svg-icons";
+import { faKey, faPersonWalkingArrowLoopLeft } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { RedeemBetaKey } from "@storyteller/components/src/api/beta_key/RedeemBetaKey";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useSession } from "hooks";
 
 export default function RedeemBetaKeyPage() {
@@ -134,6 +134,7 @@ export default function RedeemBetaKeyPage() {
               />
             </div>
           </Panel>
+          <p><Link to="/"><FontAwesomeIcon icon={faPersonWalkingArrowLoopLeft} /> Back Home</Link></p>
         </div>
       </Container>
     </>
