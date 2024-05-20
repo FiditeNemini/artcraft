@@ -293,12 +293,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Downloaded video!");
 
-    info!(r#"Downstream video paths:\n
-      - original video path: {:?}\n
-      - original video path (exists): {:?}\n
-      - trimmed video path: {:?}\n
-      - trimmed video path (exists): {:?}\n
-      - comfy output path: {:?}\n
+    info!(r#"Downstream video paths:
+      - original video path: {:?}
+      - original video path (exists): {:?}
+      - trimmed video path: {:?}
+      - trimmed video path (exists): {:?}
+      - comfy output path: {:?}
       - comfy output path (exists): {:?}
     "#,
         &videos.original_video_path,
@@ -363,12 +363,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Finished video trim / resample.");
     }
 
-    info!(r#"After resampling, video paths:\n
-      - original video path: {:?}\n
-      - original video path (exists): {:?}\n
-      - trimmed video path: {:?}\n
-      - trimmed video path (exists): {:?}\n
-      - comfy output path: {:?}\n
+    info!(r#"After resampling, video paths:
+      - original video path: {:?}
+      - original video path (exists): {:?}
+      - trimmed video path: {:?}
+      - trimmed video path (exists): {:?}
+      - comfy output path: {:?}
       - comfy output path (exists): {:?}
     "#,
         &videos.original_video_path,
@@ -462,12 +462,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Captured stduout output: {}", contents);
     }
 
-    info!(r#"After comfy, video paths:\n
-      - original video path: {:?}\n
-      - original video path (exists): {:?}\n
-      - trimmed video path: {:?}\n
-      - trimmed video path (exists): {:?}\n
-      - comfy output path: {:?}\n
+    info!(r#"After comfy, video paths:
+      - original video path: {:?}
+      - original video path (exists): {:?}
+      - trimmed video path: {:?}
+      - trimmed video path (exists): {:?}
+      - comfy output path: {:?}
       - comfy output path (exists): {:?}
     "#,
         &videos.original_video_path,
