@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./PrelaunchLanding.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { MainButton } from "./MainButton";
 
 interface MediaItem {
   token: string;
@@ -12,7 +14,11 @@ interface MediaItem {
   };
 }
 
-const PrelaunchLanding: React.FC = () => {
+interface Props {
+  sessionWrapper: SessionWrapper;
+}
+
+function PrelaunchLanding(props: Props) {
   const totalGrids = 63;
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [blankGrids, setBlankGrids] = useState<number[]>([15, 16, 17, 22, 23]);
@@ -90,13 +96,7 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <a
-                href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
-                className="waitlist-button text-center"
-              >
-                Join the Waitlist
-                <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
-              </a>
+              <MainButton sessionWrapper={props.sessionWrapper} />
             </div>
           );
           i += 2;
@@ -111,13 +111,7 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <a
-                href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
-                className="waitlist-button text-center"
-              >
-                Join the Waitlist
-                <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
-              </a>
+              <MainButton sessionWrapper={props.sessionWrapper} />
             </div>
           );
           i += 2;
@@ -132,13 +126,7 @@ const PrelaunchLanding: React.FC = () => {
                 isBlank ? "blank" : ""
               }`}
             >
-              <a
-                href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
-                className="waitlist-button text-center"
-              >
-                Join the Waitlist
-                <FontAwesomeIcon icon={faArrowRight} className="ms-2 fs-6" />
-              </a>
+              <MainButton sessionWrapper={props.sessionWrapper} />
             </div>
           );
           i++;

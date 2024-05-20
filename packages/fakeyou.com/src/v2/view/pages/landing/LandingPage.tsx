@@ -67,7 +67,7 @@ function LandingPage(props: Props) {
     <>
       {domain.website === Website.StorytellerAi && (
         // <LandingVideoReel sessionWrapper={props.sessionWrapper} />
-        <PrelaunchLanding />
+        <PrelaunchLanding sessionWrapper={props.sessionWrapper} />
       )}
       <Container type="panel">
         {

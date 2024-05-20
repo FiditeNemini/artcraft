@@ -20,6 +20,7 @@ import {
 import { useLocalize } from "hooks";
 import { Container } from "components/common";
 import { useDomainConfig } from "context/DomainConfigContext";
+import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -98,7 +99,7 @@ function FooterNav(props: Props) {
                 <div className="d-flex gap-3">
                   <a
                     className="social-icon"
-                    href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                    href={GetDiscordLink()}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Join our Discord Server"
@@ -135,13 +136,46 @@ function FooterNav(props: Props) {
                 </div>
               </div>
               <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-                <p className="fw-bold">{t("productsTitle")}</p>
+                <p className="fw-bold">Studio Engine</p>
+
+                <li>
+                  <a href="https://studio.storyteller.ai">Studio</a>
+                </li>
+
+                <li>
+                  <Link to="/welcome-to-studio">Studio Tutorial</Link>
+                </li>
+
+                <p className="fw-bold">{t("communityTitle")}</p>
+
+                <li>
+                  <a
+                    href={GetDiscordLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t("communityDiscord")}
+                  </a>
+                </li>
+
+                <li>
+                  <Link to="/contribute">{t("productUploadModels")}</Link>
+                </li>
+
+              </div>
+              <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+                <p className="fw-bold">AI Tools</p>
+
                 <li>
                   <Link to="/tts">{t("productTts")}</Link>
                 </li>
 
                 <li>
                   <Link to="/voice-conversion">{t("productVc")}</Link>
+                </li>
+
+                <li>
+                  <Link to="/video-styletransfer">Video Style Transfer</Link>
                 </li>
 
                 <li>
@@ -152,38 +186,7 @@ function FooterNav(props: Props) {
                   <Link to="/face-animator">{t("productFaceAnimator")}</Link>
                 </li>
 
-                <li>
-                  <Link to="/video-styletransfer">Video Style Transfer</Link>
-                </li>
 
-                <li>
-                  <Link to="/contribute">{t("productUploadModels")}</Link>
-                </li>
-              </div>
-              <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-                <p className="fw-bold">{t("communityTitle")}</p>
-
-                <li>
-                  <a
-                    href={ThirdPartyLinks.FAKEYOU_DISCORD}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t("communityDiscord")}
-                  </a>
-                </li>
-
-                <li>
-                  <Link to="/leaderboard">{t("communityLeaderboard")}</Link>
-                </li>
-
-                <li>
-                  <Link to="/guide">{t("communityGuide")}</Link>
-                </li>
-
-                <li>
-                  <Link to={myDataLink}>{t("communityProfile")}</Link>
-                </li>
               </div>
               <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
                 <p className="fw-bold">{t("infoTitle")}</p>
@@ -204,9 +207,6 @@ function FooterNav(props: Props) {
                   <Link to={WebUrl.privacyPage()}>
                     {t("infoPrivacyPolicy")}
                   </Link>
-                </li>
-                <li>
-                  <a href={WebUrl.developerDocs()}>{t("infoApiDocs")}</a>
                 </li>
               </div>
             </div>
