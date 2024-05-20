@@ -294,7 +294,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Downloaded video!");
 
-    info!(r#"Downstream video paths:
+    info!(r#"[debugging] Downstream video paths:
       - original video path: {:?}
       - original video path (exists): {:?}
       - trimmed video path: {:?}
@@ -364,7 +364,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Finished video trim / resample.");
     }
 
-    info!(r#"After resampling, video paths:
+    info!(r#"[debugging] After resampling, video paths:
       - original video path: {:?}
       - original video path (exists): {:?}
       - trimmed video path: {:?}
@@ -463,7 +463,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Captured stduout output: {}", contents);
     }
 
-    info!(r#"After comfy, video paths:
+    info!(r#"[debugging] After comfy, video paths:
       - original video path: {:?}
       - original video path (exists): {:?}
       - trimmed video path: {:?}
@@ -550,6 +550,27 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     }
 
+    info!(r#"[debugging] After restored audio, video paths:
+      - original video path: {:?}
+      - original video path (exists): {:?}
+      - trimmed video path: {:?}
+      - trimmed video path (exists): {:?}
+      - comfy output path: {:?}
+      - comfy output path (exists): {:?}
+      - restored audio output path: {:?}
+      - restored audio output path (exists): {:?}
+    "#,
+        &videos.original_video_path,
+        file_exists(&videos.original_video_path),
+        &videos.trimmed_resampled_video_path,
+        file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_output_video_path,
+        file_exists(&videos.comfy_output_video_path),
+        &videos.audio_restored_video_path,
+        videos.audio_restored_video_path.as_ref()
+          .map(|path| file_exists(path)).unwrap_or(false),
+    );
+
     // ==================== OPTIONAL WATERMARK ==================== //
 
     // TODO(bt, 2024-03-01): Interrogate account for premium
@@ -590,6 +611,31 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     }
 
+    info!(r#"[debugging] After watermarking video, video paths:
+      - original video path: {:?}
+      - original video path (exists): {:?}
+      - trimmed video path: {:?}
+      - trimmed video path (exists): {:?}
+      - comfy output path: {:?}
+      - comfy output path (exists): {:?}
+      - restored audio output path: {:?}
+      - restored audio output path (exists): {:?}
+      - watermarking output path: {:?}
+      - watermarking output path (exists): {:?}
+    "#,
+        &videos.original_video_path,
+        file_exists(&videos.original_video_path),
+        &videos.trimmed_resampled_video_path,
+        file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_output_video_path,
+        file_exists(&videos.comfy_output_video_path),
+        &videos.audio_restored_video_path,
+        videos.audio_restored_video_path.as_ref()
+          .map(|path| file_exists(path)).unwrap_or(false),
+        &videos.watermarked_video_path,
+        videos.watermarked_video_path.as_ref()
+          .map(|path| file_exists(path)).unwrap_or(false),
+    );
 
     // ==================== GET METADATA ==================== //
 
@@ -700,7 +746,14 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         error!("Failed to upload non-watermarked copy: {:?}", err);
     }
 
+    if let Some(sleep_millis) = comfy_args.sleep_millis {
+        info!("Sleeping for millis: {sleep_millis}");
+        thread::sleep(Duration::from_millis(sleep_millis));
+    }
+
     // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
+
+    info!("Cleaning up temporary files...");
 
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_file(&stdout_output_file);
@@ -817,11 +870,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
         job.id, id, &media_file_token);
-
-    if let Some(sleep_millis) = comfy_args.sleep_millis {
-        info!("Sleeping for millis: {sleep_millis}");
-        thread::sleep(Duration::from_millis(sleep_millis));
-    }
 
     Ok(JobSuccessResult {
         maybe_result_entity: Some(ResultEntity {
