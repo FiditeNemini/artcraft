@@ -72,6 +72,7 @@ import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRe
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
 
 import { PricingPage } from "./pages/premium/PricingPage";
+import { WelcomePage } from "./pages/welcome/WelcomePage";
 import { CheckoutSuccessPage } from "./pages/premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./pages/premium/PortalSuccessPage";
@@ -756,6 +757,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/dashboard">
                     <DashboardPage sessionWrapper={this.props.sessionWrapper} />
+                  </Route>
+
+                  <Route path="/welcome-to-studio">
+                    <WelcomePage sessionWrapper={this.props.sessionWrapper} />
                   </Route>
 
                   <Route path="/about">
