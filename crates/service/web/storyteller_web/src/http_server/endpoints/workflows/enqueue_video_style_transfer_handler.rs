@@ -327,6 +327,8 @@ pub async fn enqueue_video_style_transfer_handler(
         target_fps: None,
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
             .map(|value| str_to_bool(&value)),
+        skip_process_video: get_request_header_optional(&http_request, "SKIP-PROCESS-VIDEO")
+            .map(|value| str_to_bool(&value)),
         use_face_detailer: request.use_face_detailer,
         use_upscaler: request.use_upscaler,
         strength: maybe_strength,

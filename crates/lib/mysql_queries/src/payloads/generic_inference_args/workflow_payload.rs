@@ -136,6 +136,11 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rollout_python_workflow_args: Option<bool>,
 
+    // TODO(bt,2024-05-13): This is a temporary rollout flag to enable us to do Python-side mapping of job args
+    #[serde(rename = "sv")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub skip_process_video: Option<bool>,
+
     #[serde(rename = "fd")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub use_face_detailer: Option<bool>,

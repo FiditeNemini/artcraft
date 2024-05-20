@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::time::Instant;
 
 use anyhow::{anyhow, Result};
@@ -17,6 +17,7 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::prompts::prompt_type::PromptType;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
+use filesys::file_exists::file_exists;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
@@ -274,6 +275,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
 
     // Keep track of all the video files we generate
+    info!("Root comfy path: {:?}", &root_comfy_path);
+    info!("Job output path will be (fix this code! the job shouldn't set this path!): {:?}", &job_args.output_path);
+
     let mut videos = JobOutputs::new(&root_comfy_path, job_args.output_path);
 
     // TODO(bt,2024-04-20): Clean up this mess.
@@ -288,6 +292,22 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }).await?;
 
     info!("Downloaded video!");
+
+    info!(r#"Downstream video paths:\n
+      - original video path: {:?}\n
+      - original video path (exists): {:?}\n
+      - trimmed video path: {:?}\n
+      - trimmed video path (exists): {:?}\n
+      - comfy output path: {:?}\n
+      - comfy output path (exists): {:?}
+    "#,
+        &videos.original_video_path,
+        file_exists(&videos.original_video_path),
+        &videos.trimmed_resampled_video_path,
+        file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_output_video_path,
+        file_exists(&videos.comfy_output_video_path),
+    );
 
     // ========================= PROCESS VIDEO ======================== //
 
@@ -305,31 +325,59 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     info!("trim end millis: {trim_end_millis}");
     info!("target FPS: {target_fps}");
 
-    info!("Calling video trim / resample...");
+    let skip_process_video = comfy_args.skip_process_video.unwrap_or(false);
 
-    let video_processing_script = model_dependencies.inference_command.processing_script.clone();
+    if skip_process_video {
+        info!("Skipping video trim / resample...");
+        info!("(This might break if we need to copy the video path. Salt's code implicitly expects videos to be in certain places, but doesn't allow passing of config, and that's horrible.)");
+    } else {
+        info!("Calling video trim / resample...");
+        info!("Script: {:?}", &model_dependencies.inference_command.processing_script);
 
-    // shell out to python script
-    let output = Command::new("python3")
-        .arg(video_processing_script)
-        .arg(path_to_string(&videos.original_video_path))
-        .arg(format!("{:?}", trim_start_millis))
-        .arg(format!("{:?}", trim_end_millis))
-        .arg(format!("{:?}", target_fps))
-        .output()
-        .map_err(|e| {
-            error!("Error running inference: {:?}", e);
-            ProcessSingleJobError::Other(e.into())
-        })?;
+        let video_processing_script = model_dependencies.inference_command.processing_script.clone();
 
-    // check if the command was successful
-    if !output.status.success() {
-        // print stdout and stderr
-        error!("Video processing failed: {:?}", output.status);
-        error!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-        return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
+        // shell out to python script
+        let output = Command::new("python3")
+            .stdout(Stdio::inherit()) // NB: This should emit to the rust job's stdout
+            .stderr(Stdio::inherit()) // NB: This should emit to the rust job's stderr
+            .arg(video_processing_script)
+            .arg(path_to_string(&videos.original_video_path))
+            .arg(format!("{:?}", trim_start_millis))
+            .arg(format!("{:?}", trim_end_millis))
+            .arg(format!("{:?}", target_fps))
+            .output()
+            .map_err(|e| {
+                error!("Error running inference: {:?}", e);
+                ProcessSingleJobError::Other(e.into())
+            })?;
+
+        // check if the command was successful
+        if !output.status.success() {
+            // print stdout and stderr
+            error!("Video processing failed: {:?}", output.status);
+            error!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+            error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+            return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
+        }
+
+        info!("Finished video trim / resample.");
     }
+
+    info!(r#"After resampling, video paths:\n
+      - original video path: {:?}\n
+      - original video path (exists): {:?}\n
+      - trimmed video path: {:?}\n
+      - trimmed video path (exists): {:?}\n
+      - comfy output path: {:?}\n
+      - comfy output path (exists): {:?}
+    "#,
+        &videos.original_video_path,
+        file_exists(&videos.original_video_path),
+        &videos.trimmed_resampled_video_path,
+        file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_output_video_path,
+        file_exists(&videos.comfy_output_video_path),
+    );
 
     // make outputs dir if not exist
     let output_dir = root_comfy_path.join("output");
@@ -413,6 +461,22 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     if let Ok(contents) = read_to_string(&stdout_output_file) {
         info!("Captured stduout output: {}", contents);
     }
+
+    info!(r#"After comfy, video paths:\n
+      - original video path: {:?}\n
+      - original video path (exists): {:?}\n
+      - trimmed video path: {:?}\n
+      - trimmed video path (exists): {:?}\n
+      - comfy output path: {:?}\n
+      - comfy output path (exists): {:?}
+    "#,
+        &videos.original_video_path,
+        file_exists(&videos.original_video_path),
+        &videos.trimmed_resampled_video_path,
+        file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_output_video_path,
+        file_exists(&videos.comfy_output_video_path),
+    );
 
     // ==================== CHECK OUTPUT FILE ======================== //
 
