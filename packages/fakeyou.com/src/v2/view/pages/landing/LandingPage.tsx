@@ -46,7 +46,7 @@ function LandingPage(props: Props) {
   const webpageTitle =
     domain.website === Website.FakeYou
       ? "FakeYou Celebrity Voice Generator"
-      : "";
+      : "AI Creation Engine";
 
   usePrefixedDocumentTitle(webpageTitle);
 
