@@ -22,5 +22,3 @@ export class AnimationEngine {
     //this.clips[object_uuid + media_id]._load_animation();
   }
 }
-
-export default AnimationEngine;

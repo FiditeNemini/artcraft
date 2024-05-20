@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
 import { TransformControls } from "./TransformControls.js";
 import Scene from "./scene.js";
-import { APIManager, ArtStyle, Visibility } from "./api_manager.js";
+import { APIManager, ArtStyle } from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -11,57 +11,33 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
-
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import EmotionEngine from "./emotion_engine";
-
 import { TimeLine } from "./timeline.js";
-import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
-
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-// import { APPUI_ACTION_TYPES, AppUiAction } from "~/contexts/reducers";
-import { ClipGroup, ClipType, EditorStates } from "~/pages/PageEnigma/enums";
-
+import { ClipGroup, EditorStates } from "~/pages/PageEnigma/enums";
+import { AssetType } from "~/enums";
 import { XYZ } from "../datastructures/common";
-import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
-import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { MediaItem } from "~/pages/PageEnigma/models";
-import { editorState, previewSrc } from "~/pages/PageEnigma/signals/engine";
-
-import { GenerationOptions } from "../models/generationOptions";
-import {
-  hotkeysStatus,
-  showEditorLoader,
-  hideEditorLoader,
-  showObjectPanel,
-  hideObjectPanel,
-  updateObjectPanel,
-} from "~/pages/PageEnigma/signals";
+import { editorState } from "../signals/engine";
+import { Utils } from "./helper";
+import { VideoGeneration } from "./video_generation";
+import { MouseControls } from "./keybinds_controls";
+import { SaveManager } from "./save_manager";
 import {
   authentication,
   loadingBarData,
   loadingBarIsShowing,
-  getSceneSignals,
   signalScene,
 } from "~/signals";
-import { ToastTypes, AssetType } from "~/enums";
-
-// Main editor class that will call everything else all you need to call is " initialize() ".
-
-export type EditorConstructorConfig = {
-  // dispatchAppUiState: React.Dispatch<AppUiAction>;
-  // signalScene: (data: any) => void;
-  // getSceneSignals: () => SceneSignal;
-  // userToken: string;
-};
+import { updateObjectPanel } from "../signals";
+import { GenerationOptions } from "../models/generationOptions";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -70,15 +46,14 @@ export type EditorInitializeConfig = {
 class Editor {
   version: number;
   activeScene: Scene;
-  camera: any;
-  render_camera: any;
+  camera: THREE.PerspectiveCamera | null = null;
+  render_camera: THREE.PerspectiveCamera | null = null;
   renderer: THREE.WebGLRenderer | undefined;
   rawRenderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
-  canvReference: any;
-  canvasRenderCamReference: any;
+  canvReference: HTMLCanvasElement | undefined = undefined;
+  canvasRenderCamReference: HTMLElement | undefined = undefined;
   composer: EffectComposer | undefined;
-  effectFXAA: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
   last_cam_pos: THREE.Vector3;
   last_cam_rot: THREE.Euler;
@@ -86,29 +61,24 @@ class Editor {
   outputPass: OutputPass | undefined;
   bloomPass: UnrealBloomPass | undefined;
   smaaPass: SMAAPass | undefined;
-  bokehPass: BokehPass | undefined;
   control: TransformControls | undefined;
   raycaster: THREE.Raycaster | undefined;
   mouse: THREE.Vector2 | undefined;
   selected: THREE.Object3D | undefined;
   last_selected: THREE.Object3D | undefined;
   last_selected_sum: number | undefined;
-  transform_interaction: any;
+  transform_interaction = false;
   rendering: boolean;
   api_manager: APIManager;
-  stats: any;
   cameraViewControls: FreeCam | undefined;
   orbitControls: OrbitControls | undefined;
   locked: boolean;
-  capturer: any;
-  frame_buffer: any;
+  frame_buffer: string[] = [];
   render_timer: number;
   fps_number: number;
   cap_fps: number;
   can_playback: boolean;
-  playback: boolean;
   playback_location: number;
-  max_length: number;
   audio_engine: AudioEngine;
   transform_engine: TransformEngine;
   emotion_engine: EmotionEngine;
@@ -142,9 +112,8 @@ class Editor {
   art_style: ArtStyle;
 
   last_scrub: number;
-  record_stream: any | undefined;
   recorder: MediaRecorder | undefined;
-  container: any | undefined;
+  container: HTMLElement | null = null;
 
   selectedCanvas: boolean;
   startRenderHeight: number;
@@ -155,8 +124,12 @@ class Editor {
   // global names of scene entities
   camera_name: string;
 
-  generation_options: GenerationOptions;
+  utils: Utils;
+  videoGeneration: VideoGeneration;
+  mouse_controls: MouseControls;
+  save_manager: SaveManager;
 
+  generation_options: GenerationOptions;
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
@@ -180,56 +153,26 @@ class Editor {
     this.activeScene = new Scene("" + this.version, this.camera_name);
     this.activeScene.initialize();
     this.generating_preview = false;
-    this.camera;
-    this.render_camera;
-    this.renderer;
-    this.rawRenderer;
-    this.clock;
-    this.canvReference = null;
-    this.cam_obj;
-    this.composer;
-    this.effectFXAA;
-    this.outlinePass;
     this.last_cam_pos = new THREE.Vector3(0, 0, 0);
     this.last_cam_rot = new THREE.Euler(0, 0, 0);
     this.camera_last_pos = new THREE.Vector3(0, 0, 0);
     this.startRenderWidth = 0;
     this.startRenderHeight = 0;
-    this.lockControls;
-    this.saoPass;
-    this.outputPass;
-    this.bloomPass;
-    this.smaaPass;
-    this.bokehPass;
-    // Transform control and selection.
-    this.control;
-    this.raycaster;
-    this.mouse;
-    this.selected;
-    this.last_selected;
-    this.transform_interaction;
     this.rendering = false;
     this.lastCanvasSize = 0;
     this.switchPreviewToggle = false;
     // API.
     this.api_manager = new APIManager();
     // Debug & Movement.
-    this.stats = null;
-    this.cameraViewControls;
-    this.orbitControls;
     this.camera_person_mode = false;
     this.locked = false;
     // Recording params.
-    this.capturer = null;
-    this.frame_buffer = [];
     this.render_timer = 0;
     this.fps_number = 60;
     this.cap_fps = 60;
     // Timeline settings.
     this.can_playback = false;
-    this.playback = false;
     this.playback_location = 0;
-    this.max_length = 10;
     this.last_scrub = 0;
     this.frames = 0;
     this.last_selected_sum = 0;
@@ -238,8 +181,6 @@ class Editor {
 
     this.render_width = 1280;
     this.render_height = 720;
-
-    this.canvasRenderCamReference;
 
     this.audio_engine = new AudioEngine();
     this.emotion_engine = new EmotionEngine(this.version);
@@ -260,13 +201,12 @@ class Editor {
       this.camera_name,
     );
 
-    this.current_frame = 0;
+    this.utils = new Utils(this, this.activeScene);
+    this.videoGeneration = new VideoGeneration(this);
+    this.mouse_controls = new MouseControls(this);
+    this.save_manager = new SaveManager(this);
 
-    //setup reactland Callbacks
-    // this.dispatchAppUiState = dispatchAppUiState;
-    // this.signalScene = signalScene;
-    // this.getSceneSignals = getSceneSignals;
-    // this.userToken = userToken;
+    this.current_frame = 0;
 
     // Scene State
     this.current_scene_media_token = null;
@@ -285,22 +225,22 @@ class Editor {
     };
   }
 
-  isEmpty(value: string) {
-    return (
-      value == null || (typeof value === "string" && value.trim().length === 0)
-    );
+  isEmpty(value: string | null) {
+    return value === null || value.trim().length === 0;
   }
 
   initialize({ sceneToken }: EditorInitializeConfig) {
-    if (this.can_initialize == false) {
+    if (!this.can_initialize) {
       console.log("Editor Already Initialized");
       return;
     }
     this.can_initialize = false;
 
     // Gets the canvas.
-    this.canvReference = document.getElementById("video-scene");
-    this.canvasRenderCamReference = document.getElementById("camera-view");
+    this.canvReference = (document.getElementById("video-scene") ??
+      undefined) as HTMLCanvasElement | undefined;
+    this.canvasRenderCamReference =
+      document.getElementById("camera-view") ?? undefined;
 
     // Find the container element
     const container = document.getElementById("video-scene-container");
@@ -400,9 +340,21 @@ class Editor {
     console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
-    window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
-    window.addEventListener("click", this.onMouseClick.bind(this), false);
-    window.addEventListener("keydown", this.onkeydown.bind(this), false);
+    window.addEventListener(
+      "mousemove",
+      this.mouse_controls.onMouseMove.bind(this.mouse_controls),
+      false,
+    );
+    window.addEventListener(
+      "click",
+      this.mouse_controls.onMouseClick.bind(this.mouse_controls),
+      false,
+    );
+    window.addEventListener(
+      "keydown",
+      this.mouse_controls.onkeydown.bind(this.mouse_controls),
+      false,
+    );
     // Base control and debug stuff remove debug in prod.
     if (this.control == undefined) {
       return;
@@ -432,16 +384,14 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    //this._test_demo();
-
     this.renderer.domElement.addEventListener(
       "mousedown",
-      this.onMouseDown.bind(this),
+      this.mouse_controls.onMouseDown.bind(this.mouse_controls),
       false,
     );
     this.renderer.domElement.addEventListener(
       "mouseup",
-      this.onMouseUp.bind(this),
+      this.mouse_controls.onMouseUp.bind(this.mouse_controls),
       false,
     );
 
@@ -456,14 +406,14 @@ class Editor {
 
     this.updateLoop();
 
-    if (this.isEmpty(sceneToken) == false) {
+    if (!this.utils.isEmpty(sceneToken)) {
       this.loadScene(sceneToken);
     } else {
       signalScene({
-        isModified: false,
         title: "Untitled New Scene",
         token: undefined,
         ownerToken: authentication.userInfo.value?.user_token,
+        isModified: false,
       });
     }
 
@@ -520,10 +470,10 @@ class Editor {
         ? sceneTitleInput
         : "Untitled New Scene";
     signalScene({
-      isModified: false,
       title: sceneTitle,
       token: undefined,
       ownerToken: authentication.userInfo.value?.user_token,
+      isModified: false,
     });
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
@@ -532,105 +482,20 @@ class Editor {
     });
   }
 
-  // Token comes in from the front end to load the scene from the site.
-  public async testBatchRequest() {
-    const result = await this.api_manager.getMediaBatch([
-      "m_8fmp9hrvsqcryzka1fra597kg42s50",
-      "m_z4jzbst3xfh64h0qn4bqh4afenfps9",
-    ]);
-  }
-
-  public async testTestTimelineEvents() {}
-
   public async loadScene(scene_media_token: string) {
-    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
-    showEditorLoader();
-
-    this.current_scene_media_token = scene_media_token;
-
-    const scene_json = await this.api_manager
-      .loadSceneState(this.current_scene_media_token)
-      .catch((err) => {
-        //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
-        hideEditorLoader();
-        throw err;
-      });
-    const proxyScene = new StoryTellerProxyScene(
-      this.version,
-      this.activeScene,
-    );
-    await proxyScene.loadFromSceneJson(scene_json["scene"]);
-    this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
-    this.cam_obj?.layers.set(1);
-
-    const proxyTimeline = new StoryTellerProxyTimeline(
-      this.version,
-      this.timeline,
-      this.transform_engine,
-      this.animation_engine,
-      this.audio_engine,
-      this.lipsync_engine,
-      this.emotion_engine,
-    );
-    await proxyTimeline.loadFromJson(scene_json["timeline"]);
-
-    this.timeline.checkEditorCanPlay();
-
-    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
-    hideEditorLoader();
-    this.timeline.scrub({ data: { currentTime: 0 } });
+    this.save_manager.loadScene(scene_media_token);
   }
 
   isObjectLipsync(object_uuid: string) {
-    const object = this.activeScene.get_object_by_uuid(object_uuid);
-    let hasLipsync = false;
-    if (object) {
-      object.traverse((c: THREE.Object3D) => {
-        if (c instanceof THREE.Mesh) {
-          if (c.morphTargetInfluences && c.morphTargetDictionary) {
-            const blendShapeIndexE = c.morphTargetDictionary["E"];
-            // console.log(c.morphTargetDictionary, blendShapeIndexE)
-            if (blendShapeIndexE !== null) {
-              hasLipsync = true;
-            }
-          }
-        }
-      });
-    }
-    return hasLipsync;
+    return this.utils.isObjectLipsync(object_uuid);
   }
 
-  isObjectLocked(object_uuid: string) {
-    const object = this.activeScene.get_object_by_uuid(object_uuid);
-    if (object) {
-      if (object.userData["locked"] == undefined) {
-        object.userData["locked"] = false;
-      }
-      return object.userData["locked"];
-    }
-    console.log("No object found.");
-    return false;
+  isObjectLocked(object_uuid: string): boolean {
+    return this.utils.isObjectLocked(object_uuid);
   }
 
-  lockUnlockObject(object_uuid: string) {
-    const object = this.activeScene.get_object_by_uuid(object_uuid);
-    if (object) {
-      if (object.userData["locked"] == undefined) {
-        object.userData["locked"] = false;
-      }
-      object.userData["locked"] = !object.userData["locked"];
-
-      if (object.userData["locked"]) {
-        this.removeTransformControls(false);
-      } else if (this.control) {
-        this.activeScene.scene.add(this.control);
-        this.control.attach(this.selected);
-      }
-
-      return object.userData["locked"];
-    }
-    console.log("No object found.");
-    return false;
+  lockUnlockObject(object_uuid: string): boolean {
+    return this.utils.lockUnlockObject(object_uuid);
   }
 
   setColor(object_uuid: string, hex_color: string) {
@@ -639,19 +504,7 @@ class Editor {
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
-    if (this.selected != undefined || this.selected != null) {
-      this.selected.position.x = position.x;
-      this.selected.position.y = position.y;
-      this.selected.position.z = position.z;
-
-      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x);
-      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y);
-      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z);
-
-      this.selected.scale.x = scale.x;
-      this.selected.scale.y = scale.y;
-      this.selected.scale.z = scale.z;
-    }
+    this.utils.setSelectedObject(position, rotation, scale);
   }
 
   public async saveScene({
@@ -661,57 +514,7 @@ class Editor {
     sceneTitle: string;
     sceneToken?: string;
   }): Promise<string> {
-    this.generating_preview = true; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
-    // remove controls when saving scene.
-    this.removeTransformControls();
-    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
-    showEditorLoader();
-
-    const proxyScene = new StoryTellerProxyScene(
-      this.version,
-      this.activeScene,
-    );
-    const scene_json = await proxyScene.saveToScene();
-
-    const proxyTimeline = new StoryTellerProxyTimeline(
-      this.version,
-      this.timeline,
-      this.transform_engine,
-      this.animation_engine,
-      this.audio_engine,
-      this.lipsync_engine,
-      this.emotion_engine,
-    );
-    const timeline_json = await proxyTimeline.saveToJson();
-
-    const save_data = {
-      version: this.version,
-      scene: scene_json,
-      timeline: timeline_json,
-    };
-
-    // TODO turn scene information into and object ...
-    let sceneThumbnail = undefined;
-
-    if (this.renderer) {
-      const imgData = this.renderer.domElement.toDataURL();
-      const response = await fetch(imgData); // Fetch the data URL
-      sceneThumbnail = await response.blob(); // Convert to Blob
-    }
-
-    const result = await this.api_manager.saveSceneState({
-      saveJson: JSON.stringify(save_data),
-      sceneTitle,
-      sceneToken,
-      sceneThumbnail,
-    });
-
-    //TODO: DECOUPLE and use QUEUE in next REFACTOR STAGE
-    hideEditorLoader();
-
-    this.generating_preview = false; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
-
-    return result;
+    return await this.save_manager.saveScene({ sceneTitle, sceneToken });
   }
 
   /**
@@ -720,7 +523,7 @@ class Editor {
    * Doesn't retain those controls.
    * @returns
    */
-  private removeTransformControls(remove_outline: boolean = true) {
+  removeTransformControls(remove_outline: boolean = true) {
     if (this.control == undefined) {
       return;
     }
@@ -738,68 +541,7 @@ class Editor {
   }
 
   switchCameraView() {
-    this.camera_person_mode = !this.camera_person_mode;
-    this.cameraViewControls?.reset();
-    if (this.cam_obj) {
-      if (this.camera_person_mode) {
-        this.last_cam_pos.copy(this.camera.position);
-        this.last_cam_rot.copy(this.camera.rotation);
-
-        this.camera.position.copy(this.cam_obj.position);
-        this.camera.rotation.copy(this.cam_obj.rotation);
-
-        if (this.orbitControls) {
-          this.orbitControls.enabled = false;
-        }
-        if (this.lockControls) {
-          this.activeScene.scene.add(this.lockControls.getObject());
-        }
-        if (this.cameraViewControls) {
-          this.cameraViewControls.enabled = true;
-        }
-        this.cam_obj.scale.set(0, 0, 0);
-
-        this.removeTransformControls();
-        this.selected = this.cam_obj;
-        this.publishSelect();
-
-        // this.dispatchAppUiState({
-        //   type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        // });
-        // showObjectPanel();
-        this.updateSelectedUI();
-        editorState.value = EditorStates.CAMERA_VIEW;
-        if (this.activeScene.hot_items) {
-          this.activeScene.hot_items.forEach((element) => {
-            element.visible = false;
-          });
-        }
-      } else {
-        this.camera.position.copy(this.last_cam_pos);
-        this.camera.rotation.copy(this.last_cam_rot);
-        if (this.orbitControls) {
-          this.orbitControls.enabled = true;
-        }
-        if (this.lockControls) {
-          this.activeScene.scene.remove(this.lockControls.getObject());
-        }
-        if (this.cameraViewControls) {
-          this.cameraViewControls.enabled = false;
-        }
-        this.cam_obj.scale.set(1, 1, 1);
-        if (this.activeScene.hot_items) {
-          this.activeScene.hot_items.forEach((element) => {
-            element.visible = true;
-          });
-        }
-
-        // this.dispatchAppUiState({
-        //   type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-        // });
-        hideObjectPanel();
-        editorState.value = EditorStates.EDIT;
-      }
-    }
+    this.utils.switchCameraView();
   }
 
   async showLoading() {
@@ -815,14 +557,13 @@ class Editor {
   }
 
   async endLoading() {
-    console.log("stop loading");
     loadingBarIsShowing.value = false;
   }
 
   // Configure post processing.
   _configurePostProcessing() {
-    const width = this.canvReference.width;
-    const height = this.canvReference.height;
+    const width = this.canvReference?.width ?? 0;
+    const height = this.canvReference?.height ?? 0;
 
     if (this.renderer == undefined || this.camera == undefined) {
       return;
@@ -877,64 +618,29 @@ class Editor {
   }
 
   deleteObject(uuid: string) {
-    const obj = this.activeScene.get_object_by_uuid(uuid);
-    this.removeTransformControls();
-    if (obj?.name === this.camera_name) {
-      return;
-    }
-    if (obj) {
-      this.activeScene.scene.remove(obj);
-    }
-    this.timeline.deleteObject(uuid);
-    Queue.publish({
-      queueName: QueueNames.FROM_ENGINE,
-      action: fromEngineActions.DELETE_OBJECT,
-      data: {
-        version: 1,
-        type: AssetType.OBJECT,
-        media_id: "",
-        object_uuid: uuid,
-        name: "",
-      } as MediaItem,
-    });
-    this.selected = undefined;
-    this.publishSelect();
-    // this.dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-    // });
-    hideObjectPanel();
-    this.timeline.deleteObject(uuid);
+    this.utils.deleteObject(uuid);
   }
 
   create_parim(name: string, pos: THREE.Vector3) {
     return this.activeScene.instantiate(name, pos);
   }
 
-  renderMode() {
-    this.rendering = !this.rendering;
-    this.activeScene.renderMode(this.rendering);
-  }
-
-  stepFrame(frames: number) {
-    this.timeline.stepFrame(frames);
-  }
-
   // Render the scene to the camera, this is called in the update.
   async renderScene() {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
-      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
     } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
     } else if (this.rendering && this.rawRenderer) {
-      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
     } else {
       console.error("Could not render to canvas no render or composer!");
     }
 
     if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
-      if (this.recorder == undefined) {
+      if (this.recorder === undefined && this.render_camera) {
         this.rawRenderer.setSize(1024, 576);
         this.render_camera.aspect = 1024 / 576;
       }
@@ -942,32 +648,15 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
+      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // High quality png.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
-      if (this.timeline.is_playing == false) {
+      if (!this.timeline.is_playing) {
         //this.recorder.stop();
         this.playback_location = 0;
         this.stopPlaybackAndUploadVideo();
       }
     }
-  }
-
-  getselectedSum() {
-    if (this.selected === undefined) {
-      return 0;
-    }
-    const posCombo =
-      this.selected.position.x +
-      this.selected.position.y +
-      this.selected.position.z;
-    const rotCombo =
-      this.selected.rotation.x +
-      this.selected.rotation.y +
-      this.selected.rotation.z;
-    const sclCombo =
-      this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
-    return posCombo + rotCombo + sclCombo;
   }
 
   // Basicly Unity 3D's update loop.
@@ -982,7 +671,7 @@ class Editor {
     if (this.container === undefined) {
       this.container = document.getElementById("video-scene-container");
     }
-    if (!this.rendering && this.container !== undefined) {
+    if (!this.rendering && this.container) {
       if (
         this.container.clientWidth + this.container.clientHeight !==
         this.lastCanvasSize
@@ -997,11 +686,6 @@ class Editor {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
     }
 
-    // Updates debug stats.
-    if (this.stats != null) {
-      this.stats.update();
-    }
-
     if (this.clock == undefined || this.renderer == undefined) {
       return;
     }
@@ -1010,11 +694,11 @@ class Editor {
 
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
-      if (this.cam_obj) {
+      if (this.cam_obj && this.camera) {
         if (this.last_scrub != this.timeline.scrubber_frame_position) {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
-        } else if (this.timeline.is_playing == false) {
+        } else if (!this.timeline.is_playing) {
           this.cam_obj.position.copy(this.camera.position);
           this.cam_obj.rotation.copy(this.camera.rotation);
         } else {
@@ -1045,17 +729,17 @@ class Editor {
       }
     } else if (
       this.last_scrub === this.timeline.scrubber_frame_position &&
-      this.getselectedSum() !== this.last_selected_sum
+      this.utils.getselectedSum() !== this.last_selected_sum
     ) {
       this.updateSelectedUI();
     }
-    this.last_selected_sum = this.getselectedSum();
+    this.last_selected_sum = this.utils.getselectedSum();
 
     await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
   }
 
-  change_mode(type: any) {
+  change_mode(type: "translate" | "rotate" | "scale") {
     if (this.control == undefined) {
       return;
     }
@@ -1063,221 +747,8 @@ class Editor {
     this.transform_interaction = true;
   }
 
-  async convertAudioClip(itteration: number, ffmpeg: FFmpeg, clip: ClipUI) {
-    const video_og = itteration + "tmp.mp4";
-    const wav_name = itteration + "tmp.wav";
-    const new_video = itteration + 1 + "tmp.mp4";
-    let startFrame = clip.offset;
-    let endFrame = clip.length;
-
-    if (endFrame > this.timeline.timeline_limit) {
-      endFrame = this.timeline.timeline_limit;
-    }
-    if (startFrame > this.timeline.timeline_limit) {
-      startFrame = this.timeline.timeline_limit - 1;
-    }
-
-    const startTime = startFrame / this.cap_fps;
-    const endTime = endFrame / this.cap_fps;
-    const end = endTime - startTime;
-
-    const audioSegment = "as_" + wav_name;
-    await ffmpeg.FS(
-      "writeFile",
-      wav_name,
-      await fetchFile(await this.api_manager.getMediaFile(clip.media_id)),
-    );
-    await ffmpeg.run(
-      "-i",
-      wav_name,
-      "-ss",
-      "0",
-      "-to",
-      "" + end,
-      "-max_muxing_queue_size",
-      "999999",
-      audioSegment,
-    );
-
-    await ffmpeg.run(
-      "-i",
-      video_og,
-      "-max_muxing_queue_size",
-      "999999",
-      `${itteration}empty_tmp.wav`,
-    );
-
-    await ffmpeg.run(
-      "-i",
-      `${itteration}empty_tmp.wav`,
-      "-i",
-      audioSegment,
-      "-filter_complex",
-      "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
-      "-map",
-      "[a]",
-      `${itteration}final_tmp.wav`,
-    );
-
-    await ffmpeg.run(
-      "-i",
-      video_og,
-      "-i",
-      `${itteration}final_tmp.wav`,
-      "-c:v",
-      "copy",
-      "-c:a",
-      "aac",
-      "-map",
-      "0:v:0",
-      "-map",
-      "1:a:0",
-      "-strict",
-      "experimental",
-      new_video,
-    );
-  }
-
-  async _debugDownloadVideo(videoURL: string) {
-    // DEBUG ONLY to download the video
-
-    const a = document.createElement("a");
-    a.href = videoURL;
-    a.download = "video.mp4"; // Name of the downloaded file
-    document.body.appendChild(a);
-    a.click(); // Trigger the download
-  }
-
   async stopPlaybackAndUploadVideo(compile_audio: boolean = true) {
-    this.playback = false;
-    this.rendering = false;
-
-    //const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
-    //const videoURL = URL.createObjectURL(videoBlob);
-
-    this.generating_preview = true;
-    const ffmpeg = createFFmpeg({ log: false });
-    await ffmpeg.load();
-
-    this.updateLoad(50, "Processing ...");
-
-    // Write the Uint8Array to the FFmpeg file system
-    //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
-
-    for (let index = 0; index < this.frame_buffer.length; index++) {
-      const element = this.frame_buffer[index];
-      await ffmpeg.FS(
-        "writeFile",
-        `image${index}.png`,
-        await fetchFile(element),
-      );
-    }
-
-    await ffmpeg.run(
-      "-framerate",
-      "" + this.cap_fps,
-      "-i",
-      "image%d.png",
-      "input.mp4",
-    );
-
-    await ffmpeg.run(
-      "-i",
-      "input.mp4",
-      "-f",
-      "lavfi",
-      "-i",
-      "anullsrc", // This adds a silent audio track
-      "-max_muxing_queue_size",
-      "999999",
-      "-vf",
-      "select=gte(n\\,1),scale=1024:576", // scale=1024:576
-      "-c:v",
-      "libx264", // Specify video codec (optional, but recommended for MP4)
-      "-c:a",
-      "aac", // Specify audio codec (optional, but recommended for MP4)
-      "-shortest", // Ensure output duration matches the shortest stream (video or audio)
-      "-pix_fmt",
-      "yuv420p",
-      "-f",
-      "mp4",
-      "0tmp.mp4",
-    );
-
-    let itteration = 0;
-
-    if (compile_audio) {
-      for (const clip of this.timeline.timeline_items) {
-        if (clip.type == ClipType.AUDIO) {
-          await this.convertAudioClip(itteration, ffmpeg, clip);
-          itteration += 1;
-        }
-      }
-    }
-
-    const output = ffmpeg.FS("readFile", itteration + "tmp.mp4");
-
-    ffmpeg.exit();
-    this.generating_preview = false;
-
-    // Create a Blob from the output file for downloading
-    const blob = new Blob([output.buffer], { type: "video/mp4" });
-
-    const title = getSceneSignals().title || "Untitled";
-
-    const style_name = this.art_style.toString();
-    const media_token = this.current_scene_media_token || undefined;
-
-    const data: any = await this.api_manager.uploadMedia({
-      blob,
-      fileName: `${title}.mp4`,
-      title,
-      styleName: style_name,
-      maybe_scene_source_media_file_token: media_token,
-    });
-
-    if (data == null) {
-      return;
-    }
-    const upload_token = data["media_file_token"];
-
-    const result = await this.api_manager
-      .stylizeVideo(
-        upload_token,
-        this.art_style,
-        this.positive_prompt,
-        this.negative_prompt,
-        Visibility.Public,
-        this.generation_options.faceDetail,
-        this.generation_options.upscale,
-        this.generation_options.styleStrength,
-      )
-      .catch((error) => {
-        console.log(error);
-      });
-
-    // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
-    this.updateLoad(100, "Done Check Your Media Tab On Profile.");
-    this.endLoading();
-
-    this.recorder = undefined;
-    if (this.rawRenderer) {
-      this.rawRenderer.setSize(this.startRenderWidth, this.startRenderHeight);
-    }
-
-    this.canvasRenderCamReference = document.getElementById("camera-view");
-    this.rawRenderer = new THREE.WebGLRenderer({
-      antialias: false,
-      canvas: this.canvasRenderCamReference,
-      preserveDrawingBuffer: true,
-    });
-    this.activeScene.renderMode(false);
-
-    this.switchEdit();
+    this.videoGeneration.stopPlaybackAndUploadVideo(compile_audio);
   }
 
   async switchPreview() {
@@ -1292,11 +763,12 @@ class Editor {
   }
 
   switchEdit() {
-    if (this.switchPreviewToggle) {
+    if (this.switchPreviewToggle && this.canvasRenderCamReference) {
       this.switchPreviewToggle = false;
       editorState.value = EditorStates.EDIT;
       setTimeout(() => {
-        this.canvasRenderCamReference = document.getElementById("camera-view");
+        this.canvasRenderCamReference =
+          document.getElementById("camera-view") ?? undefined;
         this.rawRenderer = new THREE.WebGLRenderer({
           antialias: false,
           canvas: this.canvasRenderCamReference,
@@ -1311,61 +783,7 @@ class Editor {
   }
 
   async generateFrame() {
-    if (!this.generating_preview && this.rawRenderer) {
-      this.generating_preview = true;
-      this.removeTransformControls();
-      this.activeScene.renderMode(true);
-      if (this.activeScene.hot_items) {
-        this.activeScene.hot_items.forEach((element) => {
-          element.visible = false;
-        });
-      }
-
-      if (this.render_camera && this.cam_obj) {
-        this.render_camera.position.copy(this.cam_obj.position);
-        this.render_camera.rotation.copy(this.cam_obj.rotation);
-      }
-
-      previewSrc.value = "";
-
-      this.rawRenderer.setSize(this.render_width, this.render_height);
-      this.render_camera.aspect = this.render_width / this.render_height;
-      this.render_camera.updateProjectionMatrix();
-      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
-      const imgData = this.rawRenderer.domElement.toDataURL();
-      const response = await fetch(imgData); // Fetch the data URL
-      const blob = await response.blob(); // Convert to Blob
-
-      if (!this.camera_person_mode) {
-        this.switchCameraView();
-        editorState.value = EditorStates.PREVIEW;
-      }
-
-      this.generating_preview = false;
-
-      try {
-        const url = await this.api_manager.uploadMediaFrameGeneration(
-          blob,
-          "render.png",
-          this.art_style,
-          this.positive_prompt,
-          this.negative_prompt,
-        );
-
-        previewSrc.value = url;
-        return Promise.resolve(url);
-      } catch (err: any) {
-        Queue.publish({
-          queueName: QueueNames.FROM_ENGINE,
-          action: fromEngineActions.POP_A_TOAST,
-          data: {
-            type: ToastTypes.ERROR,
-            message: err.message,
-          },
-        });
-        // return Promise.resolve("");
-      }
-    }
+    this.videoGeneration.generateFrame();
   }
 
   // This initializes the generation of a video render scene is where the core work happens
@@ -1435,35 +853,6 @@ class Editor {
     const scale = this.selected.scale;
 
     // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
-    // this.dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-    //   payload: {
-    //     group:
-    //       this.selected.name === this.camera_name
-    //         ? ClipGroup.CAMERA
-    //         : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-    //     object_uuid: this.selected.uuid,
-    //     object_name: this.selected.name,
-    //     version: String(this.version),
-    //     objectVectors: {
-    //       position: {
-    //         x: parseFloat(pos.x.toFixed(2)),
-    //         y: parseFloat(pos.y.toFixed(2)),
-    //         z: parseFloat(pos.z.toFixed(2)),
-    //       },
-    //       rotation: {
-    //         x: parseFloat(THREE.MathUtils.radToDeg(rot.x).toFixed(2)),
-    //         y: parseFloat(THREE.MathUtils.radToDeg(rot.y).toFixed(2)),
-    //         z: parseFloat(THREE.MathUtils.radToDeg(rot.z).toFixed(2)),
-    //       },
-    //       scale: {
-    //         x: parseFloat(scale.x.toFixed(6)),
-    //         y: parseFloat(scale.y.toFixed(6)),
-    //         z: parseFloat(scale.z.toFixed(6)),
-    //       },
-    //     },
-    //   },
-    // }); //end dispatch
     updateObjectPanel({
       group:
         this.selected.name === this.camera_name
@@ -1524,156 +913,23 @@ class Editor {
 
   setupResizeObserver() {
     const container = document.getElementById("video-scene-container");
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
+        if (this.camera) {
+          this.camera.aspect = width / height;
+          this.camera.updateProjectionMatrix();
+        }
         this.renderer?.setSize(width, height);
         this.renderer?.setPixelRatio(window.devicePixelRatio);
       }
     });
 
     resizeObserver.observe(container);
-  }
-
-  onMouseDown(event: any) {
-    if (event.button === 1 && this.camera_person_mode) {
-      this.lockControls?.lock();
-    }
-  }
-
-  onMouseUp(event: any) {
-    if (event.button === 1) {
-      this.lockControls?.unlock();
-    }
-
-    if (event.button !== 0) {
-      const camera_pos = new THREE.Vector3(
-        parseFloat(this.camera.position.x.toFixed(2)),
-        parseFloat(this.camera.position.y.toFixed(2)),
-        parseFloat(this.camera.position.z.toFixed(2)),
-      );
-      this.camera_last_pos.copy(camera_pos);
-    }
-  }
-
-  onkeydown(event: KeyboardEvent) {
-    if (hotkeysStatus.value.disabled) {
-      return;
-    }
-    console.log("down");
-    if (event.key === "f" && this.selected && this.orbitControls) {
-      this.orbitControls.target.copy(this.selected.position);
-      this.orbitControls.maxDistance = 4;
-      this.orbitControls.update();
-      this.orbitControls.maxDistance = 999;
-      return;
-    }
-    if (event.key === " ") {
-      if (!this.rendering && !this.switchPreviewToggle && this.selectedCanvas) {
-        this.togglePlayback();
-      }
-      return;
-    }
-    if (event.key === "Backspace" || event.key === "Delete") {
-      if (this.selected) {
-        this.deleteObject(this.selected.uuid);
-      }
-      return;
-    }
-  }
-
-  // Sets new mouse location usually used in raycasts.
-  onMouseMove(event: any) {
-    const rect = this.canvReference.getBoundingClientRect();
-    if (this.mouse == undefined) {
-      return;
-    }
-    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    this.timeline.mouse = this.mouse;
-  }
-
-  // When the mouse clicks the screen.
-  onMouseClick() {
-    const camera_pos = new THREE.Vector3(
-      parseFloat(this.camera.position.x.toFixed(2)),
-      parseFloat(this.camera.position.y.toFixed(2)),
-      parseFloat(this.camera.position.z.toFixed(2)),
-    );
-    if (this.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
-      this.camera_last_pos.copy(camera_pos);
-    }
-
-    if (
-      this.raycaster == undefined ||
-      this.mouse == undefined ||
-      this.control == undefined ||
-      this.outlinePass == undefined ||
-      this.camera_person_mode ||
-      !this.camera_last_pos.equals(camera_pos)
-    ) {
-      this.camera_last_pos.copy(camera_pos);
-      return;
-    }
-    this.camera_last_pos.copy(camera_pos);
-
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    const interactable: any[] = [];
-    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-      // console.log(child);
-      if (child.name != "") {
-        if (
-          child.type == "Mesh" ||
-          child.type == "Object3D" ||
-          child.type == "Group"
-        ) {
-          interactable.push(child);
-        }
-      }
-    });
-    const intersects = this.raycaster.intersectObjects(interactable, true);
-
-    if (intersects.length > 0) {
-      if (intersects[0].object.type != "GridHelper") {
-        let currentObject = intersects[0].object;
-        while (currentObject.parent && currentObject.parent.type !== "Scene") {
-          currentObject = currentObject.parent;
-        }
-        this.selected = currentObject;
-        // Show panel here
-
-        if (this.selected.type == "Scene") {
-          this.selected = intersects[0].object;
-        }
-        this.activeScene.selected = this.selected;
-        this.publishSelect();
-
-        // this.update_properties()
-        if (this.selected.userData["locked"] !== true) {
-          this.activeScene.scene.add(this.control);
-          this.control.attach(this.selected);
-        }
-
-        this.outlinePass.selectedObjects = [this.selected];
-        this.transform_interaction = true;
-        // Contact react land
-        // this.dispatchAppUiState({
-        //   type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        // });
-        showObjectPanel();
-        this.updateSelectedUI();
-      }
-    } else {
-      this.removeTransformControls();
-      // this.dispatchAppUiState({
-      //   type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-      // });
-      hideObjectPanel();
-    }
   }
 
   getAssetType(selected: THREE.Object3D<THREE.Object3DEventMap>): AssetType {

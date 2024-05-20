@@ -5,32 +5,23 @@ import { ClipUI } from "../datastructures/clips/clip_ui";
 import Scene from "./scene.js";
 import AudioEngine from "./audio_engine";
 import TransformEngine from "./transform_engine";
-import LipSyncEngine from "./lip_sync_engine";
-import AnimationEngine from "./animation_engine";
+import { LipSyncEngine } from "./lip_sync_engine";
+import { AnimationEngine } from "./animation_engine";
 
-import Queue from "~/pages/PageEnigma/Queue/Queue";
+import Queue, {
+  UnionedActionTypes,
+  UnionedDataTypes,
+} from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
 import { AssetType } from "~/enums";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
-import { MediaItem } from "~/pages/PageEnigma/models";
-import Editor from "~/pages/PageEnigma/js/editor";
+import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
+import Editor from "~/pages/PageEnigma/Editor/editor";
 import EmotionEngine from "./emotion_engine";
-import { GenerationOptions } from '../models/generationOptions';
-
-// Every object uuid / entity has a track.
-export class TimelineDataState {
-  timeline_items: ClipUI[];
-  scrubber_frame_position: number;
-  constructor(
-    timeline_items: ClipUI[] = [],
-    scrubber_frame_position: number = 0,
-  ) {
-    this.timeline_items = timeline_items;
-    this.scrubber_frame_position = scrubber_frame_position;
-  }
-}
+import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
+import { Vector3 } from "three";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -56,7 +47,7 @@ export class TimeLine {
   characters: { [key: string]: ClipGroup };
 
   scene: Scene;
-  camera: THREE.Camera;
+  camera: THREE.Camera | null;
   mouse: THREE.Vector2 | undefined;
 
   current_time: number;
@@ -71,7 +62,7 @@ export class TimeLine {
     animation_engine: AnimationEngine,
     emotion_engine: EmotionEngine,
     scene: Scene,
-    camera: THREE.Camera,
+    camera: THREE.Camera | null,
     mouse: THREE.Vector2 | undefined,
     camera_name: string,
   ) {
@@ -103,7 +94,6 @@ export class TimeLine {
     this.current_time = 0;
 
     this.camera_name = camera_name;
-   
   }
 
   public async updateUI() {
@@ -114,7 +104,7 @@ export class TimeLine {
     });
   }
 
-  public async pushEvent(action: fromEngineActions, data: any) {
+  public async pushEvent(action: fromEngineActions, data: UnionedDataTypes) {
     //this.current_time += 0.75;
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
@@ -123,47 +113,50 @@ export class TimeLine {
     });
   }
 
-  public async handleTimelineActions(data: any) {
-    const action = data["action"];
+  public async handleTimelineActions(data: {
+    action: UnionedActionTypes;
+    data: UnionedDataTypes;
+  }) {
+    const action = data.action;
     switch (action) {
       case toEngineActions.ADD_KEYFRAME:
-        await this.addKeyFrame(data);
+        await this.addKeyFrame(data.data as Keyframe);
         break;
       case toEngineActions.UPDATE_KEYFRAME:
-        await this.updateKeyFrame(data);
+        await this.updateKeyFrame(data.data as Keyframe);
         break;
       case toEngineActions.DELETE_KEYFRAME:
-        await this.deleteKeyFrame(data);
+        await this.deleteKeyFrame(data.data as Keyframe);
         break;
       case toEngineActions.ADD_CLIP:
-        await this.addClip(data);
+        await this.addClip(data.data as ClipUI);
         break;
       case toEngineActions.DELETE_CLIP:
-        await this.deleteClip(data);
+        await this.deleteClip(data.data as ClipUI);
         break;
       case toEngineActions.UPDATE_CLIP:
-        await this.updateClip(data);
+        await this.updateClip(data.data as ClipUI);
         break;
       case toEngineActions.UPDATE_TIME:
-        await this.scrub(data);
+        await this.scrub(data.data as UpdateTime);
         break;
       case toEngineActions.MUTE:
-        await this.mute(data, false);
+        await this.mute(data.data as ClipUI, false);
         break;
       case toEngineActions.UNMUTE:
-        await this.mute(data, true);
+        await this.mute(data.data as ClipUI, true);
         break;
       case toEngineActions.ADD_CHARACTER:
-        this.addCharacter(data);
+        this.addCharacter(data.data as MediaItem);
         break;
       case toEngineActions.ADD_OBJECT: {
-        const newObject = await this.addObject(data);
-        this.queueNewObjectMessage(newObject, data);
+        const newObject = await this.addObject(data.data as MediaItem);
+        this.queueNewObjectMessage(newObject, data.data as MediaItem);
         break;
       }
       case toEngineActions.ADD_SHAPE: {
-        const newShape = await this.addShape(data);
-        this.queueNewObjectMessage(newShape, data);
+        const newShape = await this.addShape(data.data as MediaItem);
+        this.queueNewObjectMessage(newShape, data.data as MediaItem);
         break;
       }
       case toEngineActions.ENTER_PREVIEW_STATE:
@@ -175,21 +168,22 @@ export class TimeLine {
       case toEngineActions.TOGGLE_CAMERA_STATE:
         this.editorEngine.switchCameraView();
         break;
-      case toEngineActions.GENERATE_VIDEO:
-        const options = data["data"]; // super overloaded talk to the devs about this. TODO... refactor
-        this.editorEngine.generation_options = options;
+      case toEngineActions.GENERATE_VIDEO: {
+        const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
+        this.editorEngine.generation_options = options as GenerationOptions;
         this.editorEngine.generateVideo();
         break;
+      }
       default:
         console.log("Action Not Wired", action);
     }
   }
 
-  public async addCharacter(data: { data: MediaItem }) {
-    const media_id = data.data.media_id;
-    const name = data.data.name;
+  public async addCharacter(data: MediaItem) {
+    const media_id = data.media_id;
+    const name = data.name;
     const pos = this.getPos();
-    const new_data = { ...data.data };
+    const new_data = { ...data };
 
     const obj = await this.scene.loadGlbWithPlaceholder(
       media_id,
@@ -214,7 +208,7 @@ export class TimeLine {
 
     this.addPlayableClip(
       new ClipUI(
-        data.data["version"],
+        data.version,
         ClipType.FAKE,
         ClipGroup.CHARACTER,
         "Default",
@@ -297,10 +291,10 @@ export class TimeLine {
     return new THREE.Vector3(0, 0, 0);
   }
 
-  public async addObject(data: { data: MediaItem }) {
+  public async addObject(data: MediaItem) {
     const pos = this.getPos();
-    const media_id = data.data.media_id;
-    const name = data.data.name;
+    const media_id = data.media_id;
+    const name = data.name;
     const obj = await this.scene.loadGlbWithPlaceholder(
       media_id,
       name,
@@ -313,12 +307,12 @@ export class TimeLine {
     return obj;
   }
 
-  public async addShape({ data }: { data: MediaItem }) {
+  public async addShape(data: MediaItem) {
     const pos = this.getPos();
     return this.editorEngine.create_parim(data.media_id, pos);
   }
 
-  public async addKeyFrame(data: any) {
+  public async addKeyFrame(data: Keyframe) {
     // KeyFrame Object
     // version: number;
     // clip_uuid: string;
@@ -329,9 +323,9 @@ export class TimeLine {
     // rotation: XYZ;
     // scale: XYZ;
     // selected?: boolean;
-    const data_json = data["data"];
-    const uuid = data_json["object_uuid"];
-    const keyframe_uuid = data_json["keyframe_uuid"];
+    const data_json = data;
+    const uuid = data_json.object_uuid;
+    const keyframe_uuid = data_json.keyframe_uuid;
 
     let object_name = this.scene.get_object_by_uuid(uuid)?.name;
     if (object_name === undefined) {
@@ -340,12 +334,12 @@ export class TimeLine {
 
     this.transform_engine.addFrame(
       uuid,
-      data_json["offset"],
-      data_json["position"],
-      data_json["rotation"],
-      data_json["scale"],
-      data_json["offset"],
-      data_json["keyframe_uuid"],
+      data_json.offset,
+      data_json.position as Vector3,
+      data_json.rotation as Vector3,
+      data_json.scale as Vector3,
+      data_json.offset,
+      data_json.keyframe_uuid,
     );
 
     await this.addPlayableClip(
@@ -365,10 +359,10 @@ export class TimeLine {
     );
 
     const point = this.scene.createPoint(
-      data_json["position"],
-      data_json["rotation"],
-      data_json["scale"],
-      data_json["keyframe_uuid"],
+      data_json.position as Vector3,
+      data_json.rotation as Vector3,
+      data_json.scale as Vector3,
+      data_json.keyframe_uuid,
     );
     if (this.editorEngine.camera_person_mode) {
       point.visible = false;
@@ -377,11 +371,7 @@ export class TimeLine {
   }
 
   public checkEditorCanPlay() {
-    if (this.getEndPoint() <= 1) {
-      this.editorEngine.can_playback = false;
-    } else {
-      this.editorEngine.can_playback = true;
-    }
+    this.editorEngine.can_playback = this.getEndPoint() > 1;
     this.editorEngine.updateSelectedUI();
   }
 
@@ -405,28 +395,25 @@ export class TimeLine {
     // Update react land here.
   }
 
-  public async addClip(data: any) {
-    const object_uuid = data["data"]["object_uuid"];
-    const media_id = data["data"]["media_id"];
-    const name = data["data"]["name"];
-    const group = data["data"]["group"];
-    const version = data["data"]["group"];
-    const type = data["data"]["type"];
-    const offset = data["data"]["offset"];
-    const end_offset = data["data"]["length"] + offset;
-    let object_name = this.scene.get_object_by_uuid(object_uuid)?.name;
-    const clip_uuid = data["data"]["clip_uuid"];
-
-    if (object_name === undefined) {
-      object_name = "Undefined.";
-    }
+  public async addClip(data: ClipUI) {
+    const object_uuid = data.object_uuid;
+    const media_id = data.media_id;
+    const name = data.name;
+    const group = data.group;
+    const version = 1;
+    const type = data.type;
+    const offset = data.offset;
+    const end_offset = data.length + offset;
+    const object_name =
+      this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
+    const clip_uuid = data.clip_uuid;
 
     switch (type) {
       case "animation":
         this.animation_engine.load_object(object_uuid, media_id, name);
         break;
       case "transform":
-        this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
+        this.transform_engine.loadObject(object_uuid, data.length);
         break;
       case "expression":
         this.emotion_engine.loadClip(object_uuid, media_id);
@@ -475,9 +462,9 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public async deleteKeyFrame(data: any) {
-    const keyframe_uuid = data["data"]["keyframe_uuid"];
-    const object_uuid = data["data"]["object_uuid"];
+  public async deleteKeyFrame(data: Keyframe) {
+    const keyframe_uuid = data.keyframe_uuid;
+    const object_uuid = data.object_uuid;
     this.transform_engine.clips[object_uuid].removeKeyframe(keyframe_uuid);
     this.scene.deletePoint(keyframe_uuid);
     for (const element of this.timeline_items) {
@@ -498,14 +485,14 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public async updateKeyFrame(data: any) {
-    const keyframe_uuid = data["data"]["keyframe_uuid"];
-    const keyframe_offset = data["data"]["offset"];
-    const object_uuid = data["data"]["object_uuid"];
+  public async updateKeyFrame(data: Keyframe) {
+    const keyframe_uuid = data.keyframe_uuid;
+    const keyframe_offset = data.offset;
+    const object_uuid = data.object_uuid;
 
-    const keyframe_pos = data["data"]["position"];
-    const keyframe_rot = data["data"]["rotation"];
-    const keyframe_scl = data["data"]["scale"];
+    const keyframe_pos = data.position;
+    const keyframe_rot = data.rotation;
+    const keyframe_scl = data.scale;
 
     this.transform_engine.clips[object_uuid].setOffset(
       keyframe_uuid,
@@ -513,26 +500,26 @@ export class TimeLine {
     );
     this.transform_engine.clips[object_uuid].setTransform(
       keyframe_uuid,
-      keyframe_pos,
-      keyframe_rot,
-      keyframe_scl,
+      keyframe_pos as Vector3,
+      keyframe_rot as Vector3,
+      keyframe_scl as Vector3,
     );
     this.scene.updatePoint(
       keyframe_uuid,
-      keyframe_pos,
-      keyframe_rot,
-      keyframe_scl,
+      keyframe_pos as Vector3,
+      keyframe_rot as Vector3,
+      keyframe_scl as Vector3,
     );
     this.checkEditorCanPlay();
   }
 
-  public async updateClip(data: any) {
+  public async updateClip(data: ClipUI) {
     // only length and offset changes here.
-    const object_uuid = data["data"]["object_uuid"];
-    const media_id = data["data"]["media_id"];
-    const offset = data["data"]["offset"];
-    const length = data["data"]["length"] + offset;
-    const clip_uuid = data["data"]["clip_uuid"];
+    const object_uuid = data.object_uuid;
+    const media_id = data.media_id;
+    const offset = data.offset;
+    const length = data.length + offset;
+    const clip_uuid = data.clip_uuid;
 
     for (const element of this.timeline_items) {
       if (
@@ -547,12 +534,10 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public async deleteClip(data: any) {
-    //const json_data = data["data"];
-    const object_uuid = data["data"]["object_uuid"];
-    const media_id = data["data"]["media_id"];
-    //const type = data["type"];
-    const clip_uuid = data["data"]["clip_uuid"];
+  public async deleteClip(data: ClipUI) {
+    const object_uuid = data.object_uuid;
+    const media_id = data.media_id;
+    const clip_uuid = data.clip_uuid;
 
     for (let i = 0; i < this.timeline_items.length; i++) {
       const element = this.timeline_items[i];
@@ -569,13 +554,9 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public async scrubberUpdate(data: any) {
-    console.log(data);
-  }
-
-  public async mute(data: any, isMute: boolean) {
+  public async mute(data: ClipUI, isMute: boolean) {
     this.timeline_items.forEach((element) => {
-      if (element.group === data.data["group"]) {
+      if (element.group === data.group) {
         element.should_play = isMute;
       }
     });
@@ -585,26 +566,18 @@ export class TimeLine {
     this.timeline_items.push(clip);
   }
 
-  public async scrub(data: any): Promise<void> {
+  public async scrub(data: UpdateTime): Promise<void> {
     if (this.is_playing) {
       return;
     }
-    const value = Math.floor(data["data"]["currentTime"]);
-    this.setScrubberPosition(value);
+    const value = Math.floor(data.currentTime);
+    await this.setScrubberPosition(value);
     this.current_time = value;
-    this.update();
+    await this.update();
 
     if (this.editorEngine.switchPreviewToggle) {
-      this.editorEngine.generateFrame();
+      await this.editorEngine.generateFrame();
     }
-  }
-
-  public async stepFrame(frames: number) {
-    this.update();
-    this.scrubber_frame_position += frames;
-    this.pushEvent(fromEngineActions.UPDATE_TIME, {
-      currentTime: this.scrubber_frame_position,
-    });
   }
 
   // public streaming events into the timeline from
@@ -696,7 +669,7 @@ export class TimeLine {
       if (
         element.offset <= this.scrubber_frame_position &&
         this.scrubber_frame_position <= element.length &&
-        element.should_play === true
+        element.should_play
       ) {
         // run async
         // element.play()
@@ -750,8 +723,12 @@ export class TimeLine {
               object.uuid + element.media_id
             ].play(object);
             const fps = 60;
-            await this.animation_engine.clips[object.uuid + element.media_id].step(
-              (this.scrubber_frame_position-element.offset) / fps, this.is_playing, this.scrubber_frame_position// Double FPS for best result.
+            await this.animation_engine.clips[
+              object.uuid + element.media_id
+            ].step(
+              (this.scrubber_frame_position - element.offset) / fps,
+              this.is_playing,
+              this.scrubber_frame_position, // Double FPS for best result.
             );
             //this.animation_engine.clips[object.uuid + element.media_id].update_bones();
           }

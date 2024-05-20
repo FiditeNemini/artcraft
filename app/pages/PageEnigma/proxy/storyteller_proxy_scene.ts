@@ -4,7 +4,7 @@ import {
   StoryTellerProxy3DObject,
   ObjectJSON,
 } from "./storyteller_proxy_3d_object";
-import Scene from "../js/scene";
+import Scene from "../Editor/scene";
 
 interface LookUpDictionary {
   [key: string]: StoryTellerProxy3DObject;
@@ -70,7 +70,9 @@ export class StoryTellerProxyScene {
         let obj;
         switch (token) {
           case "Parim":
-            let prim_uuid = this.scene.instantiate(json_object.object_name).uuid;
+            let prim_uuid = this.scene.instantiate(
+              json_object.object_name,
+            ).uuid;
             obj = this.scene.get_object_by_uuid(prim_uuid);
             break;
           case "DirectionalLight":
@@ -78,7 +80,10 @@ export class StoryTellerProxyScene {
             break;
           default:
             if (token.includes("m_")) {
-              obj = await this.scene.loadGlbWithPlaceholder(token, json_object.object_name);
+              obj = await this.scene.loadGlbWithPlaceholder(
+                token,
+                json_object.object_name,
+              );
             } else if (token.includes("Point::")) {
               let keyframe_uuid = token.replace("Point::", "");
               obj = this.scene.createPoint(

@@ -1,4 +1,5 @@
-import { UserDetailsLight } from "./voice";
+import { UserDetailsLight } from "./types";
+
 import {
   MediaFileClass,
   MediaFileSubtype,

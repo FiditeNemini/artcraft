@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
+import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 import { H4 } from "~/components";
 import { ImgHTMLAttributes } from "react";
 
@@ -37,7 +37,8 @@ export const ItemPicker = ({
         maxWidth: (width as number) + 4,
         maxHeight: (height as number) + 4,
       }}
-      onClick={handleSelected}>
+      onClick={handleSelected}
+    >
       <img
         className="object-fill"
         {...imgProps}
@@ -58,7 +59,8 @@ export const ItemPicker = ({
         viewBox="0 0 512 512"
         className={`absolute right-[5px] top-[5px] h-[18px] w-[18px] shadow-xl transition-opacity duration-200 ease-in-out ${
           selected ? "opacity-100" : "opacity-0"
-        }`}>
+        }`}
+      >
         <path
           opacity="1"
           d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"

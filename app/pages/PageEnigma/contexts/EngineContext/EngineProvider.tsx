@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { EngineContext } from "./EngineContext";
 
-import Editor from "~/pages/PageEnigma/js/editor";
+import Editor from "~/pages/PageEnigma/Editor/editor";
 
 interface Props {
   sceneToken?: string;

@@ -20,6 +20,7 @@ import {
   QueueKeyframe,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
+import { ClipGroup } from "~/pages/PageEnigma/enums";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { addToast } from "~/signals";
 import { ToastTypes } from "~/enums";

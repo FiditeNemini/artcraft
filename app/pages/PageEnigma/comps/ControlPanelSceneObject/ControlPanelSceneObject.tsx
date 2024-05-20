@@ -65,8 +65,6 @@ export const ControlPanelSceneObject = () => {
 
   const [color, setColor] = useState("#ffffff");
 
-  console.log("color", color);
-
   const colorInputId = useId();
 
   const toggleCollapse = () => {
@@ -110,8 +108,6 @@ export const ControlPanelSceneObject = () => {
     if (!editorEngine || !currentSceneObject) {
       return;
     }
-
-    console.log("44");
 
     const vectors = currentSceneObject.objectVectors;
 
@@ -179,7 +175,12 @@ export const ControlPanelSceneObject = () => {
 
   const handleOnAddKeyFrame = () => {
     if (currentSceneObject) {
-      if (position == null || rotation == null || scale == null) {
+      if (
+        position == null ||
+        rotation == null ||
+        scale == null ||
+        currentSceneObject == null
+      ) {
         return;
       }
 

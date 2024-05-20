@@ -18,12 +18,12 @@ export type ToastDataType = {
   message: string;
 };
 
-type UnionedActionTypes =
+export type UnionedActionTypes =
   | fromEngineActions
   | toEngineActions
   | toTimelineActions;
 
-type UnionedDataTypes =
+export type UnionedDataTypes =
   | QueueClip
   | UpdateTime
   | QueueKeyframe

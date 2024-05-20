@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/Addons.js";
 
-import { MoveAIResult, Retarget } from "../../js/retargeting";
+import { MoveAIResult, Retarget } from "../../Editor/retargeting";
 import { environmentVariables } from "~/signals";
 
 export class AnimationClip {

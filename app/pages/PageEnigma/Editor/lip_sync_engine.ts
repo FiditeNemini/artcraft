@@ -20,5 +20,3 @@ export class LipSyncEngine {
     );
   }
 }
-
-export default LipSyncEngine;

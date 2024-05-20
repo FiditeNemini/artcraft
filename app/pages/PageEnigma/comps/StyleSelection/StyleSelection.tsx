@@ -4,7 +4,7 @@ import { faAngleLeft, faAngleRight } from "@fortawesome/pro-solid-svg-icons";
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 
 import { styleList } from "~/pages/PageEnigma/styleList";
-import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
+import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 
 import { ButtonIcon, Label, Textarea } from "~/components";
 import { ItemPicker } from "./ItemPicker";

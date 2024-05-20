@@ -1,4 +1,4 @@
-import { LipSync } from "../../js/lipsync";
+import { LipSync } from "../../Editor/lipsync";
 import * as THREE from "three";
 import { environmentVariables } from "~/signals";
 interface AudioData {

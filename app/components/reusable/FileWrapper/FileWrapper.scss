@@ -1,0 +1,48 @@
+.fy-file-wrapper {
+  // flex-grow: 1;
+  // height: calc(100% - 4px);
+
+  .file-picker-button {
+    cursor: pointer;
+  }
+
+  .fy-file-wrapper-input {
+    visibility: hidden;
+    height: 0;
+    width: 0;
+    // overflow: hidden;
+    position: absolute;
+
+    + label {
+      cursor: pointer;
+    }
+  }
+  .fy-uploader-layout {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .fy-uploader-layout-icon {
+      font-size: 2.625rem;
+      margin-right: 1rem;
+    }
+  }
+}
+
+.fy-file-dragging {
+  background: rgba(#676781, 0.25);
+  border-color: rgba(#fff, 0.33);
+}
+
+.fy-uploader {
+  [type="file"] {
+    + label {
+      border: dashed 2px rgba(255, 255, 255, 0.12) !important;
+      border-radius: 0.5rem;
+      transition: 0.1s all;
+      &:hover {
+        // background-color: lighten($panel, 6%);
+      }
+    }
+  }
+}

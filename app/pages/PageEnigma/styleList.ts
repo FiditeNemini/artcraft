@@ -1,4 +1,4 @@
-import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
+import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 
 export const styleList = [
   {

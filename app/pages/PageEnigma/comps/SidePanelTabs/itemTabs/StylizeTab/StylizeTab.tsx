@@ -5,7 +5,7 @@ import { StyleButtons } from "./StyleButtons";
 import { sidePanelHeight } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useState } from "react";
-import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
+import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 import { styleList } from "~/pages/PageEnigma/styleList";
 
 export function StylizeTab() {
