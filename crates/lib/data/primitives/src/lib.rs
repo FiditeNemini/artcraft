@@ -19,3 +19,4 @@
 #![allow(non_snake_case)]
 
 pub mod str_to_bool;
+pub mod try_str_to_num;

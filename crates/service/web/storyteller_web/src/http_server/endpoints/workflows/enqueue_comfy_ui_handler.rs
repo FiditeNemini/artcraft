@@ -23,6 +23,7 @@ use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::str_to_bool::str_to_bool;
+use primitives::try_str_to_num::try_str_to_num;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -281,6 +282,8 @@ pub async fn enqueue_comfy_ui_handler(
             .map(|value| str_to_bool(&value)),
         skip_process_video: get_request_header_optional(&http_request, "SKIP-PROCESS-VIDEO")
             .map(|value| str_to_bool(&value)),
+        sleep_millis: get_request_header_optional(&http_request, "SLEEP-MILLIS")
+            .and_then(|value| try_str_to_num(&value).ok()),
         use_face_detailer: None,
         use_upscaler: None,
         strength: None,

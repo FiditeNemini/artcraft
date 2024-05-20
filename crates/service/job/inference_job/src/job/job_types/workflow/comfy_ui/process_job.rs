@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::time::Instant;
+use std::thread;
+use std::time::{Duration, Instant};
 
 use anyhow::{anyhow, Result};
 use log::{debug, error, info, warn};
@@ -816,6 +817,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
         job.id, id, &media_file_token);
+
+    if let Some(sleep_millis) = comfy_args.sleep_millis {
+        info!("Sleeping for millis: {sleep_millis}");
+        thread::sleep(Duration::from_millis(sleep_millis));
+    }
 
     Ok(JobSuccessResult {
         maybe_result_entity: Some(ResultEntity {
