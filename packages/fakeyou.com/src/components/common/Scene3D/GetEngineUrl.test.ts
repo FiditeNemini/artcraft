@@ -94,6 +94,7 @@ describe('media files', () => {
           }
         },
       },
+      maybe_scene_source_media_file_token: null,
       cover_image: {
         default_cover: {
           color_index: 1,
