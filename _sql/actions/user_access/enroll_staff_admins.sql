@@ -14,6 +14,7 @@ UPDATE users SET user_role_slug = "admin" WHERE username IN (
   'crossproduct',
   'crossproduct1',
   'echelon',
+  'endtimes',
   'fyscott',
   'mrvintage',
   'olivicmic',
