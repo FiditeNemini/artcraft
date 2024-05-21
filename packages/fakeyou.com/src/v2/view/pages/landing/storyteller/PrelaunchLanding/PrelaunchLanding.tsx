@@ -160,7 +160,7 @@ function PrelaunchLanding(props: Props) {
           ) : mediaItem ? (
             <img
               onClick={() =>
-                window.open(`https://storyteller.ai/media/${mediaItem.token}`)
+                window.location.href = `/media/${mediaItem.token}`
               }
               src={gifUrl}
               className="w-100 h-100 object-fit-cover"
