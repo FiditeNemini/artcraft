@@ -49,7 +49,7 @@ app.use(
 app.use(
   "/cdn",
   createProxyMiddleware({
-    target: "https://cdn.fakeyou.com",
+    target: "https://cdn.storyteller.ai",
     changeOrigin: true,
     secure: true,
     logger: console,

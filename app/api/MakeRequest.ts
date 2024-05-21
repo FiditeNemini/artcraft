@@ -2,10 +2,6 @@ import { environmentVariables, authentication } from "~/signals";
 
 type UrlRoutingFunction<UrlRouteArgs> = (urlRouteArgs: UrlRouteArgs) => string;
 
-interface RequestHeaders {
-  [name: string]: string;
-}
-
 interface RouteSetup<UrlRouteArgs> {
   method: string;
   multipart?: boolean;
@@ -54,7 +50,7 @@ const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(
         ...(methodOmitsBody ? {} : { "Content-Type": "application/json" }),
         session: sessionToken.value || "",
       },
-      credentials: "include",
+      // credentials: "include",
       ...(methodOmitsBody ? {} : { body: JSON.stringify(request) }),
     })
       .then((res) => res.json())
@@ -65,7 +61,7 @@ const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(
           return res;
         } else Promise.reject();
       })
-      .catch((e) => ({ success: false }));
+      .catch(() => ({ success: false }));
   };
 };
 

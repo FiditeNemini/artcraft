@@ -12,6 +12,7 @@ interface InputVectorProps {
   z: string;
   onChange: (v: Record<string, string>) => void;
   increment?: number;
+  disabled?: boolean;
 }
 
 export const InputVector = ({
@@ -20,6 +21,7 @@ export const InputVector = ({
   z,
   onChange,
   increment = 0.1,
+  disabled,
 }: InputVectorProps) => {
   const xRef = useRef<HTMLInputElement>(null);
   const yRef = useRef<HTMLInputElement>(null);
@@ -135,6 +137,7 @@ export const InputVector = ({
           onChange={handleOnChange}
           ref={xRef}
           value={x}
+          disabled={disabled}
           onFocus={() => {
             disableHotkeyInput(DomLevels.INPUT);
           }}
@@ -156,6 +159,7 @@ export const InputVector = ({
           onChange={handleOnChange}
           ref={yRef}
           value={y}
+          disabled={disabled}
           onFocus={() => {
             disableHotkeyInput(DomLevels.INPUT);
           }}
@@ -177,6 +181,7 @@ export const InputVector = ({
           onChange={handleOnChange}
           ref={zRef}
           value={z}
+          disabled={disabled}
           onFocus={() => {
             disableHotkeyInput(DomLevels.INPUT);
           }}

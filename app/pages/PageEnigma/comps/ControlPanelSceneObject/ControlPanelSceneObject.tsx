@@ -281,6 +281,7 @@ export const ControlPanelSceneObject = () => {
             }}
             type="color"
             value={color}
+            disabled={locked}
           />
           <Button
             className="cursor-pointer p-3.5"
@@ -297,6 +298,7 @@ export const ControlPanelSceneObject = () => {
             y={localPosition.y.toString()}
             z={localPosition.z.toString()}
             onChange={handlePositionChange}
+            disabled={locked}
           />
         </div>
 
@@ -308,6 +310,7 @@ export const ControlPanelSceneObject = () => {
             z={localRotation.z.toString()}
             onChange={handleRotationChange}
             increment={1}
+            disabled={locked}
           />
         </div>
 
@@ -318,6 +321,7 @@ export const ControlPanelSceneObject = () => {
             y={localScale.y.toString()}
             z={localScale.z.toString()}
             onChange={handleScaleChange}
+            disabled={locked}
           />
         </div>
       </Transition>

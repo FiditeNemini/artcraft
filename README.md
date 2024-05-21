@@ -19,6 +19,12 @@ if (condition) {
 No use of any type.
 If you can use chat gpt to create the interface.
 ```
+# Local Testing
+use the .env file that directs all requests to localhost:3000
+from folder /proxy run
+
+```node proxy.js```
+
 
 # IF YOU ARE WORKING ON THIS PROJECT PLEASE ASK THE TEAM MEMBERS HOW TO SET UP THIS IS OUTDATED INFORMATION
 # GottaGoFast-SS
