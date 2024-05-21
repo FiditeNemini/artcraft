@@ -483,7 +483,7 @@ class Editor {
   }
 
   public async loadScene(scene_media_token: string) {
-    this.save_manager.loadScene(scene_media_token);
+    await this.save_manager.loadScene(scene_media_token);
 
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
