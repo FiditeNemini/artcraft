@@ -1,2 +1,4 @@
 pub mod set_media_file_cover_image;
 pub mod update_media_file_stored_cloud_contents;
+pub mod update_media_file_visibility;
+pub mod update_media_file_visibility_transactional;

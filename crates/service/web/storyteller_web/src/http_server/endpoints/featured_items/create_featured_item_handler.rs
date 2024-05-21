@@ -13,12 +13,14 @@ use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntit
 use composite_identifiers::by_table::featured_items::featured_item_entity::FeaturedItemEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
 use enums::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
+use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::audit_logs::insert_audit_log::{insert_audit_log, InsertAuditLogArgs};
 use mysql_queries::queries::audit_logs::insert_audit_log_transactional::{insert_audit_log_transactional, InsertAuditLogTransactionalArgs};
 use mysql_queries::queries::entity_stats::stats_entity_token::StatsEntityToken;
 use mysql_queries::queries::entity_stats::upsert_entity_stats_on_bookmark_event::{BookmarkAction, upsert_entity_stats_on_bookmark_event, UpsertEntityStatsArgs};
 use mysql_queries::queries::featured_items::upsert_featured_item::{upsert_featured_item, UpsertFeaturedItemArgs};
+use mysql_queries::queries::media_files::edit::update_media_file_visibility_transactional::{update_media_file_visibility_transactional, UpdateMediaFileTransactionalArgs};
 use mysql_queries::queries::users::user_bookmarks::get_total_bookmark_count_for_entity::get_total_bookmark_count_for_entity;
 use mysql_queries::queries::users::user_bookmarks::get_user_bookmark_transactional_locking::{BookmarkIdentifier, get_user_bookmark_transactional_locking};
 use mysql_queries::queries::users::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
@@ -155,6 +157,24 @@ pub async fn create_featured_item_handler(
         CreateFeaturedItemError::ServerError
       })?;
 
+  match request.entity_type {
+    FeaturedItemEntityType::MediaFile => {
+      let token = MediaFileToken::new_from_str(&request.entity_token);
+      let result = update_media_file_visibility_transactional(UpdateMediaFileTransactionalArgs {
+        media_file_token: &token,
+        creator_set_visibility: Visibility::Public,
+        transaction: &mut transaction,
+      }).await;
+
+      if let Err(err) = result {
+        warn!("error modifying visibility: {:?}", err);
+        return Err(CreateFeaturedItemError::ServerError);
+      }
+    }
+    FeaturedItemEntityType::ModelWeight => {} // TODO
+    FeaturedItemEntityType::User => {} // No-op
+  }
+
   let upsert_result = upsert_featured_item(UpsertFeaturedItemArgs {
     entity: &entity,
     mysql_executor: &mut *transaction,
@@ -162,7 +182,7 @@ pub async fn create_featured_item_handler(
   }).await;
 
   if let Err(err) = upsert_result {
-    warn!("error upserting user_bookmark: {:?}", err);
+    warn!("error setting featured: {:?}", err);
     return Err(CreateFeaturedItemError::ServerError);
   }
 

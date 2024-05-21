@@ -13,7 +13,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
-use mysql_queries::queries::media_files::update_media_file::{update_media_file, UpdateMediaFileArgs};
+use mysql_queries::queries::media_files::edit::update_media_file_visibility::{update_media_file_visibility, UpdateMediaFileArgs};
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::server_state::ServerState;
@@ -145,7 +145,7 @@ pub async fn change_media_file_visibility_handler(
     if is_mod {
         maybe_mod_user_token = Some(user_session.user_token.as_str().to_string());
     }
-    let query_result = update_media_file(
+    let query_result = update_media_file_visibility(
         UpdateMediaFileArgs {
             media_file_token: &media_file_token.clone(),
             creator_set_visibility: &creator_set_visibility,

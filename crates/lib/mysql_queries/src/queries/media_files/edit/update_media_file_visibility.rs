@@ -12,7 +12,7 @@ pub struct UpdateMediaFileArgs<'a> {
     pub mysql_pool: &'a MySqlPool
 }
 
-pub async fn update_media_file(args: UpdateMediaFileArgs<'_>) -> AnyhowResult<()>{
+pub async fn update_media_file_visibility(args: UpdateMediaFileArgs<'_>) -> AnyhowResult<()>{
     // TODO: enforce checks for idempotency token
     let transaction = args.mysql_pool.begin().await?;
     let query_result = sqlx::query!(

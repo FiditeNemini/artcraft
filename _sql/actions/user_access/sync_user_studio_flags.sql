@@ -2,9 +2,6 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
--- Find users with studio flags.
-select username from users where maybe_feature_flags  like '%studio%';
-
 -- Sync the top-level boolean with the authoritative feature flags field.
 -- Performs a full table scan and string search, but is relatively quick.
 -- NB: Can't use users in the subquery:
