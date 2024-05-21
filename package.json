@@ -13,7 +13,8 @@
     "update:icons": "npm update @awesome.me/kit-fde2be5eb0",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "npx chromatic --project-token=chpt_0945f90d5d3626c"
+    "chromatic": "npx chromatic --project-token=chpt_0945f90d5d3626c",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@awesome.me/kit-fde2be5eb0": "^1.0.7",
@@ -75,6 +76,8 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-storybook": "^0.8.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "node-sass": "^9.0.0",
     "postcss": "^8.4.37",
     "postcss-import": "^16.0.1",
@@ -91,5 +94,9 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "version": ""
+  "version": "",
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write"
+  }
 }
