@@ -362,13 +362,26 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
 
         info!("Finished video trim / resample.");
+
+        // NB: The process video script implicitly saves the above video as "input.mp4"
+        // Comfy sometimes overwrites this, so we need to make a copy.
+        std::fs::copy(&videos.comfy_input_video_path, &videos.trimmed_resampled_video_path)
+            .map_err(|err| {
+                error!("Error copying trimmed video: {:?}", err);
+                ProcessSingleJobError::IoError(err)
+            })?;
     }
+
+    // TODO: I think comfy overwrites the original stripped video !
+    //  To fix it, we just need a copy.
 
     info!(r#"[debugging] After resampling, video paths:
       - original video path: {:?}
       - original video path (exists): {:?}
       - trimmed video path: {:?}
       - trimmed video path (exists): {:?}
+      - comfy input path: {:?}
+      - comfy input path (exists): {:?}
       - comfy output path: {:?}
       - comfy output path (exists): {:?}
     "#,
@@ -376,6 +389,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         file_exists(&videos.original_video_path),
         &videos.trimmed_resampled_video_path,
         file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_input_video_path,
+        file_exists(&videos.comfy_input_video_path),
         &videos.comfy_output_video_path,
         file_exists(&videos.comfy_output_video_path),
     );
@@ -451,7 +466,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             maybe_strength: comfy_args.strength,
         });
 
-
     let inference_duration = Instant::now().duration_since(inference_start_time);
 
     info!("Inference command exited with status: {:?}", command_exit_status);
@@ -468,6 +482,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
       - original video path (exists): {:?}
       - trimmed video path: {:?}
       - trimmed video path (exists): {:?}
+      - comfy input path: {:?}
+      - comfy input path (exists): {:?}
       - comfy output path: {:?}
       - comfy output path (exists): {:?}
     "#,
@@ -475,6 +491,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         file_exists(&videos.original_video_path),
         &videos.trimmed_resampled_video_path,
         file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_input_video_path,
+        file_exists(&videos.comfy_input_video_path),
         &videos.comfy_output_video_path,
         file_exists(&videos.comfy_output_video_path),
     );
@@ -500,6 +518,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             safe_delete_temp_file(&lora_path);
         }
 
+        safe_delete_temp_file(&videos.comfy_input_video_path);
         safe_delete_temp_file(&videos.trimmed_resampled_video_path);
         safe_delete_temp_file(&videos.original_video_path);
 
@@ -555,6 +574,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
       - original video path (exists): {:?}
       - trimmed video path: {:?}
       - trimmed video path (exists): {:?}
+      - comfy input path: {:?}
+      - comfy input path (exists): {:?}
       - comfy output path: {:?}
       - comfy output path (exists): {:?}
       - restored audio output path: {:?}
@@ -564,6 +585,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         file_exists(&videos.original_video_path),
         &videos.trimmed_resampled_video_path,
         file_exists(&videos.trimmed_resampled_video_path),
+        &videos.comfy_input_video_path,
+        file_exists(&videos.comfy_input_video_path),
         &videos.comfy_output_video_path,
         file_exists(&videos.comfy_output_video_path),
         &videos.audio_restored_video_path,
@@ -874,6 +897,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     job_progress_reporter.log_status("done")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    info!("Result video media token: {:?}", &media_file_token);
 
     info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
         job.id, id, &media_file_token);

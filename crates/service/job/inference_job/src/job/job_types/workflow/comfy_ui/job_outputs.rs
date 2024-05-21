@@ -10,6 +10,12 @@ pub struct JobOutputs {
   /// We'll use this downstream once it's available.
   pub trimmed_resampled_video_path: PathBuf,
 
+  /// This is the input into Comfy.
+  /// This is typically the `trimmed_resampled_video_path`, but since Comfy
+  /// can overwrite the source, we'll keep a separate copy of that file for
+  /// later downstream sound restoration (since comfy wipes sound).
+  pub comfy_input_video_path: PathBuf,
+
   /// Filesystem path of the style transfer output
   /// This is the main purpose of the job, and the second output we generate.
   pub comfy_output_video_path: PathBuf,
@@ -36,12 +42,14 @@ impl JobOutputs {
     let output_dir = root_comfy_path.join("output");
 
     let original_video_path = input_dir.join("video.mp4");
-    let trimmed_resampled_video_path = input_dir.join("input.mp4");
+    let trimmed_resampled_video_path = input_dir.join("trimmed.mp4");
+    let comfy_input_video_path = input_dir.join("input.mp4");
     let comfy_output_video_path = output_dir.join(job_output_path); // TODO: This sucks.
 
     Self {
       original_video_path,
       trimmed_resampled_video_path,
+      comfy_input_video_path,
       comfy_output_video_path,
       audio_restored_video_path: None,
       watermarked_video_path: None,
