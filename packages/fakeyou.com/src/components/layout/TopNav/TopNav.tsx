@@ -354,21 +354,17 @@ export default function TopNav({
               />
             </div>
             <NavItem
+              icon={faCompass}
+              label="Explore"
+              link="/explore"
+              className="d-none d-lg-block"
+            />
+            <NavItem
               icon={faStar}
               label="Pricing"
               link="/pricing"
               className="me-3 d-none d-lg-block"
             />
-            {isOnStudioPage && loggedIn && (
-              <Button
-                icon={faChevronLeft}
-                label="Back to Dashboard"
-                small={true}
-                variant="secondary"
-                to="/"
-                className="ms-2"
-              />
-            )}
           </div>
         </div>
 
@@ -409,24 +405,22 @@ export default function TopNav({
                 label="Enter Storyteller Studio"
                 href="https://studio.storyteller.ai/"
                 small={true}
-                className="me-3"
+                className="me-2"
               />
             </div>
           )}
 
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
-              {!showNavItem && (
-                <Button
-                  {...{
-                    icon: faClipboardList,
-                    label: "My Jobs",
-                    onClick: openModal,
-                    variant: "secondary",
-                    small: true,
-                  }}
-                />
-              )}
+              <Button
+                {...{
+                  icon: faClipboardList,
+                  label: "My Jobs",
+                  onClick: openModal,
+                  variant: "secondary",
+                  small: true,
+                }}
+              />
 
               {loggedIn ? (
                 profileDropdown
