@@ -17,6 +17,8 @@ import {
   faTrophy,
   faBookOpen,
   faFilms,
+  faUser,
+  faSignOutAlt,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -34,6 +36,7 @@ import { Website } from "@storyteller/components/src/env/GetWebsite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
+import { WebUrl } from "common/WebUrl";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -228,6 +231,92 @@ export default function TopNav({
     }
   };
 
+  let userOrLoginButton = (
+    <>
+      <Button
+        label="Login"
+        small
+        variant="secondary"
+        onClick={() => {
+          history.push("/login");
+          handleNavLinkClick();
+        }}
+      />
+    </>
+  );
+
+  let signupOrLogOutButton = (
+    <>
+      <Button
+        label="Sign Up"
+        small
+        onClick={() => {
+          history.push("/signup");
+          handleNavLinkClick();
+        }}
+      />
+    </>
+  );
+
+  if (loggedIn) {
+    let displayName = sessionWrapper.getDisplayName();
+    // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+    // let gravatar = <span />;
+
+    if (displayName === undefined) {
+      displayName = "My Account";
+    }
+
+    let url = WebUrl.userProfilePage(displayName);
+    userOrLoginButton = (
+      <>
+        <Button
+          icon={faUser}
+          label="My Profile"
+          small
+          variant="secondary"
+          onClick={() => {
+            history.push(url);
+            handleNavLinkClick();
+          }}
+        />
+      </>
+    );
+
+    signupOrLogOutButton = (
+      <>
+        <Button
+          icon={faSignOutAlt}
+          label="Logout"
+          small
+          variant="danger"
+          onClick={async () => {
+            await logoutHandler();
+            handleNavLinkClick();
+          }}
+        />
+      </>
+    );
+  }
+
+  if (sessionWrapper.isLoggedIn()) {
+    let displayName = sessionWrapper.getDisplayName();
+    if (displayName === undefined) {
+      displayName = "My Account";
+    }
+    let url = WebUrl.userProfilePage(displayName);
+    userOrLoginButton = (
+      <Button
+        icon={faUser}
+        label="My Profile"
+        small
+        variant="secondary"
+        onClick={() => history.push(url)}
+        className="d-block d-lg-none"
+      />
+    );
+  }
+
   return (
     <div
       id="topbar-wrapper"
@@ -394,6 +483,7 @@ export default function TopNav({
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <div className={`${mobileMenu} d-lg-none`} style={{ height: "100vh" }}>
         <ul className="sidebar-nav">
           <li>
@@ -562,6 +652,11 @@ export default function TopNav({
               {t("communityGuide")}
             </NavLink>
           </li>
+
+          <div className="px-4 d-flex d-lg-none gap-2 mb-2">
+            {userOrLoginButton}
+            {signupOrLogOutButton}
+          </div>
         </ul>
       </div>
 

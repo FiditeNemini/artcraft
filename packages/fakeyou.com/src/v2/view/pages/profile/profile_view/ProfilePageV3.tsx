@@ -155,10 +155,6 @@ function ProfilePageV3(this: any, props: Props) {
             </div>
           </Panel>
 
-          <Panel clear={true}>
-            <h1 className="fw-bold mb-3">Creations</h1>
-          </Panel>
-
           <Panel>
             <Tabs tabs={tabs} />
           </Panel>
