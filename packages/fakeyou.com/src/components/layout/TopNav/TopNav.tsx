@@ -8,7 +8,6 @@ import {
   faWaveformLines,
   faXmark,
   faClipboardList,
-  faChevronLeft,
   faMessageImage,
   faPortalEnter,
   faHome,
