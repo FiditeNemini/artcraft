@@ -8,7 +8,6 @@ import {
   faWaveformLines,
   faXmark,
   faClipboardList,
-  faMessageImage,
   faPortalEnter,
   faHome,
   faCompass,
@@ -18,6 +17,7 @@ import {
   faFilms,
   faUser,
   faSignOutAlt,
+  faScrewdriverWrench,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -164,34 +164,34 @@ export default function TopNav({
     );
   }
 
-  const aiToolsDropdown = [
-    { id: 1, name: "Text to Speech", link: "/tts", icon: faMessageDots },
-    {
-      id: 2,
-      name: "Voice to Voice",
-      link: "/voice-conversion",
-      icon: faWaveformLines,
-    },
-    {
-      id: 3,
-      name: "Face Animator",
-      link: "/face-animator",
-      icon: faFaceViewfinder,
-    },
-    {
-      id: 4,
-      name: "Voice Designer",
-      link: "/voice-designer",
-      icon: faWandMagicSparkles,
-    },
-    {
-      id: 5,
-      name: "Text to Image",
-      link: "/text-to-image",
-      icon: faMessageImage,
-    },
-    // { id: 4, name: "Text to Image", link: "/text-to-image" },
-  ];
+  // const aiToolsDropdown = [
+  //   { id: 1, name: "Text to Speech", link: "/tts", icon: faMessageDots },
+  //   {
+  //     id: 2,
+  //     name: "Voice to Voice",
+  //     link: "/voice-conversion",
+  //     icon: faWaveformLines,
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Face Animator",
+  //     link: "/face-animator",
+  //     icon: faFaceViewfinder,
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Voice Designer",
+  //     link: "/voice-designer",
+  //     icon: faWandMagicSparkles,
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Text to Image",
+  //     link: "/text-to-image",
+  //     icon: faMessageImage,
+  //   },
+  //   // { id: 4, name: "Text to Image", link: "/text-to-image" },
+  // ];
 
   useEffect(() => {
     const pageContentWrapper = document.getElementById("page-content-wrapper");
@@ -347,9 +347,9 @@ export default function TopNav({
 
             <div className="d-none d-lg-block">
               <NavItem
-                isHoverable={true}
-                label="AI Tools"
-                dropdownItems={aiToolsDropdown}
+                icon={faScrewdriverWrench}
+                label="Creator Tools"
+                link="/tools"
               />
             </div>
             <NavItem

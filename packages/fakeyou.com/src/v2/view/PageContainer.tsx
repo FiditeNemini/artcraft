@@ -141,6 +141,7 @@ import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
 import BetaKeysListPage from "./pages/beta_key/BetaKeysListPage";
 import { ProfilePageV3 } from "./pages/profile/profile_view/ProfilePageV3";
 import ProfileSidePanel from "components/layout/ProfileSidePanel/ProfileSidePanel";
+import CreatorToolsPage from "./pages/creator_tools/CreatorToolsPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -1156,6 +1157,12 @@ class PageContainer extends React.Component<
 
                   <Route path="/beta-key/list">
                     <BetaKeysListPage />
+                  </Route>
+
+                  <Route path="/tools">
+                    <CreatorToolsPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
                   </Route>
 
                   {/*

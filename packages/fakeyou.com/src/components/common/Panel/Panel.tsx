@@ -7,6 +7,7 @@ interface PanelProps {
   mt?: boolean;
   className?: string;
   clear?: boolean;
+  style?: React.CSSProperties;
 }
 
 export default function Panel({
@@ -16,6 +17,7 @@ export default function Panel({
   mt,
   className,
   clear,
+  style,
 }: PanelProps) {
   return (
     <div
@@ -24,6 +26,7 @@ export default function Panel({
       }${mb ? " mb-4" : ""}${mt ? " mt-4" : ""}${
         className ? " " + className : ""
       }`}
+      style={style}
     >
       {children}
     </div>

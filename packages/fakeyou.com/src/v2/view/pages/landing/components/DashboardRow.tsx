@@ -68,24 +68,34 @@ export function DashboardItem({
 
 interface DashboardRowProps {
   items: DashboardItemProps[];
+  bgDotsLeft?: boolean;
+  bgDotsRight?: boolean;
 }
 
-export function DashboardRow({ items }: DashboardRowProps) {
+export function DashboardRow({
+  items,
+  bgDotsLeft,
+  bgDotsRight,
+}: DashboardRowProps) {
   return (
     <div className="row g-4 position-relative">
       {items.map((item, index) => (
         <DashboardItem key={index} {...item} />
       ))}
-      <img
-        src="/images/landing/bg-dots.webp"
-        alt="background dots"
-        className="dots-right-top"
-      />
-      <img
-        src="/images/landing/bg-dots.webp"
-        alt="background dots"
-        className="dots-left-bottom"
-      />
+      {bgDotsLeft && (
+        <img
+          src="/images/landing/bg-dots.webp"
+          alt="background dots"
+          className="dots-right-top"
+        />
+      )}
+      {bgDotsRight && (
+        <img
+          src="/images/landing/bg-dots.webp"
+          alt="background dots"
+          className="dots-left-bottom"
+        />
+      )}
     </div>
   );
 }

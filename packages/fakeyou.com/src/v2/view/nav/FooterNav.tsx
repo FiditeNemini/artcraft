@@ -171,7 +171,6 @@ function FooterNav(props: Props) {
                 <li>
                   <Link to="/contribute">{t("productUploadModels")}</Link>
                 </li>
-
               </div>
               <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
                 <p className="fw-bold">AI Tools</p>
@@ -195,7 +194,6 @@ function FooterNav(props: Props) {
                 <li>
                   <Link to="/face-animator">{t("productFaceAnimator")}</Link>
                 </li>
-
               </div>
               <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
                 <p className="fw-bold">{t("infoTitle")}</p>
