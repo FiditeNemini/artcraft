@@ -399,8 +399,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let stdout_output_file = work_temp_dir.path().join("stdout.txt");
 
-    let inference_start_time = Instant::now();
-
     let positive_prompt_file = work_temp_dir.path().join("positive_prompt.txt");
     let negative_prompt_file = work_temp_dir.path().join("negative_prompt.txt");
 
@@ -439,6 +437,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             prompt_location: PathBuf::from(&workflow_path),
         }
     }
+
+    let inference_start_time = Instant::now();
 
     let command_exit_status = model_dependencies
         .inference_command
@@ -842,6 +842,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
 
         other_args_builder.set_strength(comfy_args.strength);
+
+        if let Ok(duration) = chrono::Duration::from_std(inference_duration) {
+            // NB: Fail open.
+            other_args_builder.set_inference_duration(Some(duration));
+        }
 
         let maybe_other_args = other_args_builder.build();
 

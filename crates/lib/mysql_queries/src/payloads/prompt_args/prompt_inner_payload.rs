@@ -1,3 +1,4 @@
+use chrono::Duration;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
 
@@ -10,6 +11,7 @@ pub struct PromptInnerPayloadBuilder {
   pub used_face_detailer: Option<bool>,
   pub used_upscaler: Option<bool>,
   pub strength: Option<f32>,
+  pub inference_duration: Option<Duration>,
 }
 
 /// Used to encode extra state for the `prompts` table in the `maybe_other_args` column.
@@ -36,6 +38,11 @@ pub struct PromptInnerPayload {
   #[serde(alias = "strength")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub strength: Option<f32>,
+
+  #[serde(rename = "d")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "inference_duration")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub inference_duration_millis: Option<u64>,
 }
 
 impl PromptInnerPayloadBuilder {
@@ -45,6 +52,7 @@ impl PromptInnerPayloadBuilder {
       used_face_detailer: None,
       used_upscaler: None,
       strength: None,
+      inference_duration: None,
     }
   }
 
@@ -53,6 +61,7 @@ impl PromptInnerPayloadBuilder {
         && self.used_face_detailer.is_none()
         && self.used_upscaler.is_none()
         && self.strength.is_none()
+        && self.inference_duration.is_none()
     {
       return None;
     }
@@ -62,6 +71,10 @@ impl PromptInnerPayloadBuilder {
       used_face_detailer: self.used_face_detailer,
       used_upscaler: self.used_upscaler,
       strength: self.strength,
+      inference_duration_millis: self.inference_duration
+          .map(|duration| duration.num_milliseconds()
+              .max(0)
+              .unsigned_abs()), // NB: Why does chrono return i64 ? That's crazy!
     })
   }
 
@@ -87,6 +100,10 @@ impl PromptInnerPayloadBuilder {
 
   pub fn set_strength(&mut self, strength: Option<f32>) {
       self.strength = strength;
+  }
+
+  pub fn set_inference_duration(&mut self, duration: Option<Duration>) {
+    self.inference_duration = duration;
   }
 }
 
