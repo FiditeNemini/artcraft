@@ -1,9 +1,13 @@
+# Storyteller GGF
+
+## Coding Rules and Styles
+
 ```
 Short Style Guide TS React and Engine:
 
 No use of lets
 
-No basic for loop operators. 
+No basic for loop operators.
 Use the collection operators and array operators.
 
 React Side / No modules over 200 lines. ( loose rule )
@@ -19,23 +23,38 @@ if (condition) {
 No use of any type.
 If you can use chat gpt to create the interface.
 ```
-# Local Testing
-use the .env file that directs all requests to localhost:3000
-from folder /proxy run
 
-```node proxy.js```
+## Local Testing & Development
 
+### Set up `.env` and the Proxy Server
 
-# IF YOU ARE WORKING ON THIS PROJECT PLEASE ASK THE TEAM MEMBERS HOW TO SET UP THIS IS OUTDATED INFORMATION
-# GottaGoFast-SS
-Fast Prototyping with Better Netlify Pipeline:
+Copy & paste the env settings from `.env-local-proxy` to `.env`, (if the file `.env` do not exist, simply create one at the root of this project's folder beside the other env settings files).
 
-- [Remix Docs](https://remix.run/docs)
-- [Netlify Functions Overview](https://docs.netlify.com/functions/overview)
-- [Tailwind Docs](https://tailwindcss.com/docs)
+The settings from `.env-local-proxy` directs all requests to `localhost:3000`, this relieve us from having to deal with CORS between various services.
 
-Setup
+Then, start the proxy server in the folder `/proxy`
+
+```
+node proxy.js
+
+```
+
+### Run the Code Locally
+
+To setup and run this project's code locally:
+
 ```
 npm install
 npm run dev
 ```
+
+## Other Documentation
+
+This project uses Remix for routing and Tailwind for styling:
+
+- [Remix Docs](https://remix.run/docs)
+- [Tailwind Docs](https://tailwindcss.com/docs)
+
+On Netlify, we use functions:
+
+- [Netlify Functions Overview](https://docs.netlify.com/functions/overview)
