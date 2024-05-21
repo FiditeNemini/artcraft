@@ -38,7 +38,7 @@ import {
 } from "~/signals";
 import { updateObjectPanel } from "../signals";
 import { GenerationOptions } from "../models/generationOptions";
-
+import { toEngineActions } from "../Queue/toEngineActions";
 export type EditorInitializeConfig = {
   sceneToken: string;
 };
@@ -484,6 +484,12 @@ class Editor {
 
   public async loadScene(scene_media_token: string) {
     this.save_manager.loadScene(scene_media_token);
+
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.UPDATE_TIME,
+      data: { currentTime: 1 },
+    });
   }
 
   isObjectLipsync(object_uuid: string) {
