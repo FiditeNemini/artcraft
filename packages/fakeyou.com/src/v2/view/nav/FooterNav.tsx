@@ -136,7 +136,7 @@ function FooterNav(props: Props) {
                   </a>
                   <a
                     className="social-icon"
-                    href={ThirdPartyLinks.FAKEYOU_TWITCH}
+                    href={ThirdPartyLinks.STORYTELLER_TWITCH}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Subscribe to our Twitch Channel"
