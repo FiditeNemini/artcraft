@@ -10,6 +10,7 @@ import {
   faDiscord,
   faTwitter,
   faTiktok,
+  faRedditAlien,
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import {
@@ -105,6 +106,15 @@ function FooterNav(props: Props) {
                     title="Join our Discord Server"
                   >
                     <FontAwesomeIcon icon={faDiscord} className="me-2" />
+                  </a>
+                  <a
+                    className="social-icon"
+                    href={ThirdPartyLinks.STORYTELLER_REDDIT}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Join our subreddit"
+                  >
+                    <FontAwesomeIcon icon={faRedditAlien} className="me-2" />
                   </a>
                   <a
                     className="social-icon"

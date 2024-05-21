@@ -24,6 +24,8 @@ class ThirdPartyLinks {
 
     // NB: We should rely on this less
     public static readonly FAKEYOU_PATREON = "https://www.patreon.com/fakeyou";
+
+    public static readonly STORYTELLER_REDDIT = "https://www.reddit.com/r/StoryTeller";
 }
 
 export { ThirdPartyLinks }
