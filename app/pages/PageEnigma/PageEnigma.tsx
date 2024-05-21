@@ -3,11 +3,15 @@ import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackPro
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 import { EngineProvider } from "./contexts/EngineContext";
 import { useInferenceJobManager } from "~/hooks";
+import { useQueueHandler } from "./hooks/useQueueHandler";
 import { ErrorDialog, LoadingBar } from "~/components";
 import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
 
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useInferenceJobManager();
+  // implement the code to handle incoming messages from the Engine
+  useQueueHandler();
+
   return (
     <TrackProvider>
       <EngineProvider sceneToken={sceneToken}>

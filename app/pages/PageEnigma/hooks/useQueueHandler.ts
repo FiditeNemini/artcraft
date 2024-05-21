@@ -26,7 +26,6 @@ import { addToast } from "~/signals";
 import { ToastTypes } from "~/enums";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
 
 interface Arguments {
   action: fromEngineActions | toEngineActions | toTimelineActions;

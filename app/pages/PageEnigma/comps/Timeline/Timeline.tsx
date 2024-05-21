@@ -19,7 +19,6 @@ import {
   timelineScrollX,
   timelineScrollY,
 } from "~/pages/PageEnigma/signals";
-import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
 import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
@@ -89,9 +88,6 @@ export const Timeline = () => {
     timelineScrollX.value = event.currentTarget.scrollLeft;
     timelineScrollY.value = event.currentTarget.scrollTop;
   }, []);
-
-  // implement the code to handle incoming messages from the Engine
-  useQueueHandler();
 
   useEffect(() => {
     timelineHeight.value = window.outerHeight * 0.25;
