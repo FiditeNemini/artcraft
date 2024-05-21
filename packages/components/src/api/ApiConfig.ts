@@ -46,8 +46,7 @@ class ApiConfig {
         break;
       case "storyteller.ai":
       case "staging.storyteller.ai":
-        //apiHost = "api.storyteller.ai";
-        apiHost = "api.fakeyou.com";
+        apiHost = "api.storyteller.ai";
         break;
       case "storyteller.stream":
         // Storyteller.stream is deprecated and will be decommissioned in the future.
