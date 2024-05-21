@@ -9,6 +9,7 @@ pub struct PromptInnerPayloadBuilder {
   pub style_name: Option<EncodedStyleTransferName>,
   pub used_face_detailer: Option<bool>,
   pub used_upscaler: Option<bool>,
+  pub strength: Option<f32>,
 }
 
 /// Used to encode extra state for the `prompts` table in the `maybe_other_args` column.
@@ -30,6 +31,11 @@ pub struct PromptInnerPayload {
   #[serde(alias = "used_upscaler")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub used_upscaler: Option<bool>,
+
+  #[serde(rename = "st")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "strength")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub strength: Option<f32>,
 }
 
 impl PromptInnerPayloadBuilder {
@@ -38,13 +44,16 @@ impl PromptInnerPayloadBuilder {
       style_name: None,
       used_face_detailer: None,
       used_upscaler: None,
+      strength: None,
     }
   }
 
   pub fn build(self) -> Option<PromptInnerPayload> {
     if self.style_name.is_none()
         && self.used_face_detailer.is_none()
-        && self.used_upscaler.is_none() {
+        && self.used_upscaler.is_none()
+        && self.strength.is_none()
+    {
       return None;
     }
 
@@ -52,6 +61,7 @@ impl PromptInnerPayloadBuilder {
       style_name: self.style_name,
       used_face_detailer: self.used_face_detailer,
       used_upscaler: self.used_upscaler,
+      strength: self.strength,
     })
   }
 
@@ -73,6 +83,10 @@ impl PromptInnerPayloadBuilder {
     } else {
       self.used_upscaler = None;
     }
+  }
+
+  pub fn set_strength(&mut self, strength: Option<f32>) {
+      self.strength = strength;
   }
 }
 

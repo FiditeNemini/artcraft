@@ -841,6 +841,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             other_args_builder.set_used_upscaler(true);
         }
 
+        other_args_builder.set_strength(comfy_args.strength);
+
         let maybe_other_args = other_args_builder.build();
 
         info!("maybe other prompt args: {:?}", maybe_other_args);
