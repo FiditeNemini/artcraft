@@ -89,7 +89,7 @@
   "scripts": {
     "start": "BROWSER=none craco start",
     "start-w": "cross-env BROWSER=none HTTPS=false PORT=7000 craco start",
-    "start-ws": "cross-env BROWSER=none HTTPS=true PORT=7001 craco start",
+    "start-ws": "cross-env BROWSER=none HTTPS=true PORT=443 craco start",
     "start7000": "BROWSER=none PORT=7000 craco start",
     "start8000": "BROWSER=none PORT=8000 craco start",
     "start8080": "BROWSER=none PORT=8080 craco start",
