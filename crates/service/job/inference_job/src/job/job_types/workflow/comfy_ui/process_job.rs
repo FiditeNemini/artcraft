@@ -168,6 +168,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         _ => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
     };
 
+    info!("Workflow args: {:?}", comfy_args);
+
     let mut should_insert_prompt_record = false;
     let mut maybe_style_name = None;
     let mut maybe_positive_prompt = None;

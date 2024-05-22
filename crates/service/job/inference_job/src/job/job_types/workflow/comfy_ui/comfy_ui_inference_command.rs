@@ -78,6 +78,7 @@ pub enum ExecutableOrCommand {
     Command(String),
 }
 
+#[derive(Debug)]
 pub struct InferenceArgs<'s> {
     pub stderr_output_file: &'s Path,
     pub stdout_output_file: &'s Path,
@@ -93,6 +94,7 @@ pub struct InferenceArgs<'s> {
     pub maybe_strength: Option<f32>,
 }
 
+#[derive(Debug)]
 pub enum InferenceDetails<'s> {
     OldRustArgs {
         /// Location of the prompt JSON file
