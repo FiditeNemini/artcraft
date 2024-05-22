@@ -9,6 +9,7 @@ import { editorState } from "~/pages/PageEnigma/signals/engine";
 import { useSignals } from "@preact/signals-react/runtime";
 import { sidePanelHeight } from "../../signals";
 import { EditorStates } from "~/pages/PageEnigma/enums";
+import { CameraViewCanvas } from "../EngineCanvases";
 
 export const PreviewEngineCamera = () => {
   useSignals();
@@ -60,7 +61,7 @@ export const PreviewEngineCamera = () => {
           </Button>
         </div>
         <div className="box relative overflow-hidden rounded-b-lg border border-gray-600">
-          <canvas className="aspect-video" id="camera-view"></canvas>
+          <CameraViewCanvas />
           <div className="absolute left-0 top-0 h-full w-full">
             <LoadingDotsTyping isShowing={showLoader} />
           </div>

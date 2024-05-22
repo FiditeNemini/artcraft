@@ -1,5 +1,5 @@
 import Editor from "./editor";
-import { EditorStates } from "~/pages/PageEnigma/enums";
+import { EditorStates, ClipType } from "~/pages/PageEnigma/enums";
 import { editorState, previewSrc } from "../signals/engine";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -7,7 +7,6 @@ import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { ToastTypes } from "~/enums";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
-import { ClipType } from "~/pages/PageEnigma/enums";
 import { Visibility } from "./api_manager.js";
 import * as THREE from "three";
 import { getSceneSignals } from "~/signals";
@@ -70,13 +69,17 @@ export class VideoGeneration {
 
         previewSrc.value = url;
         return Promise.resolve(url);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Unknown Error in Generate Frame";
         Queue.publish({
           queueName: QueueNames.FROM_ENGINE,
           action: fromEngineActions.POP_A_TOAST,
           data: {
             type: ToastTypes.ERROR,
-            message: err.message,
+            message: errorMessage,
           },
         });
       }
@@ -259,7 +262,7 @@ export class VideoGeneration {
     }
     const upload_token = data["media_file_token"];
 
-    const result = await this.editor.api_manager
+    await this.editor.api_manager
       .stylizeVideo(
         upload_token,
         this.editor.art_style,
@@ -287,11 +290,11 @@ export class VideoGeneration {
       );
     }
 
-    this.editor.canvasRenderCamReference =
-      document.getElementById("camera-view");
+    this.editor.camViewCanvasMayReset();
+
     this.editor.rawRenderer = new THREE.WebGLRenderer({
       antialias: false,
-      canvas: this.editor.canvasRenderCamReference,
+      canvas: this.editor.canvasRenderCamReference || undefined,
       preserveDrawingBuffer: true,
     });
     this.editor.activeScene.renderMode(false);

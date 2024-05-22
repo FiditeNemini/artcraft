@@ -40,9 +40,9 @@ export const PreviewFrameImage = () => {
     } else {
       return (
         <img
+          alt="preview of the art style that renders over the 3d scene"
           className="absolute inset-0 object-cover"
           src={previewSrc.value}
-          id="video-scene"
           style={{
             width:
               pageWidth.value -

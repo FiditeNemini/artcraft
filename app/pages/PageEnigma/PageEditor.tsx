@@ -23,6 +23,9 @@ import {
   editorLoader,
 } from "~/pages/PageEnigma/signals";
 
+import { EditorCanvas } from "./comps/EngineCanvases";
+import { SceneContainer } from "./comps/SceneContainer";
+
 export const PageEditor = () => {
   useSignals();
 
@@ -68,20 +71,10 @@ export const PageEditor = () => {
           }}
         >
           <div className="relative w-full overflow-hidden bg-transparent">
-            <div
-              id="video-scene-container"
-              className="relative"
-              style={{
-                width:
-                  pageWidth.value -
-                  (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                  84,
-                height: pageHeight.value - timelineHeight.value - 68,
-              }}
-            >
-              <canvas id="video-scene" width="1280px" height="720px" />
+            <SceneContainer>
+              <EditorCanvas />
               <PreviewFrameImage />
-            </div>
+            </SceneContainer>
 
             {/* Top controls */}
             <div

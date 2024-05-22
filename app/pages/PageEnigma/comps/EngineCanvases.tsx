@@ -1,0 +1,44 @@
+import { useCallback, useContext, useEffect } from "react";
+import { EngineContext } from "../contexts/EngineContext";
+
+export const EditorCanvas = () => {
+  const editorEngine = useContext(EngineContext);
+
+  const canvasCallbackRef = useCallback(
+    (node: HTMLCanvasElement) => {
+      if (node && editorEngine && editorEngine.setEditorCanvas) {
+        editorEngine.setEditorCanvas(node);
+      }
+    },
+    [editorEngine],
+  );
+
+  return (
+    <canvas
+      ref={canvasCallbackRef}
+      id="video-scene"
+      width="1280px"
+      height="720px"
+    />
+  );
+};
+
+export const CameraViewCanvas = () => {
+  const editorEngine = useContext(EngineContext);
+
+  const canvasCallbackRef = useCallback(
+    (node: HTMLCanvasElement) => {
+      if (node && editorEngine) {
+        if (!editorEngine.canvasRenderCamReference) {
+          editorEngine.setCamViewCanvas(node);
+        } else {
+          editorEngine.updateCamViewCanvas(node);
+        }
+      }
+      //else just do nothing
+    },
+    [editorEngine],
+  );
+
+  return <canvas ref={canvasCallbackRef} id="camera-view" />;
+};

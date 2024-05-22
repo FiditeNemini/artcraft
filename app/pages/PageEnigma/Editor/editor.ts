@@ -39,8 +39,12 @@ import {
 import { updateObjectPanel } from "../signals";
 import { GenerationOptions } from "../models/generationOptions";
 import { toEngineActions } from "../Queue/toEngineActions";
+
 export type EditorInitializeConfig = {
   sceneToken: string;
+  editorCanvasEl: HTMLCanvasElement;
+  camViewCanvasEl: HTMLCanvasElement;
+  sceneContainerEl: HTMLDivElement;
 };
 
 class Editor {
@@ -51,8 +55,9 @@ class Editor {
   renderer: THREE.WebGLRenderer | undefined;
   rawRenderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
-  canvReference: HTMLCanvasElement | undefined = undefined;
-  canvasRenderCamReference: HTMLElement | undefined = undefined;
+  canvReference: HTMLCanvasElement | null = null;
+  canvasRenderCamReference: HTMLCanvasElement | null = null;
+
   composer: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
   last_cam_pos: THREE.Vector3;
@@ -229,7 +234,43 @@ class Editor {
     return value === null || value.trim().length === 0;
   }
 
-  initialize({ sceneToken }: EditorInitializeConfig) {
+  containerMayReset() {
+    if (!this.container) {
+      console.warn(
+        "Editor - Container does not exist, querying from DOM via document.getElementById",
+      );
+      this.container = document.getElementById("video-scene-container");
+    }
+  }
+  engineCanvasMayReset() {
+    if (!this.canvReference) {
+      console.warn(
+        "Editor - Engine Canbas does not exist, querying from DOM via document.getElementById",
+      );
+      this.canvReference = document.getElementById(
+        "video-scene",
+      ) as HTMLCanvasElement;
+    }
+  }
+  camViewCanvasMayReset() {
+    if (!this.canvasRenderCamReference) {
+      console.warn(
+        "Editor - Cam View Canvas does not exist, querying from DOM via document.getElementById",
+      );
+      this.canvasRenderCamReference = document.getElementById(
+        "camera-view",
+      ) as HTMLCanvasElement;
+    }
+  }
+  updateCamViewCanvas(newCanvas: HTMLCanvasElement) {
+    this.canvasRenderCamReference = newCanvas;
+  }
+  initialize({
+    sceneToken,
+    editorCanvasEl,
+    camViewCanvasEl,
+    sceneContainerEl,
+  }: EditorInitializeConfig) {
     if (!this.can_initialize) {
       console.log("Editor Already Initialized");
       return;
@@ -237,21 +278,15 @@ class Editor {
     this.can_initialize = false;
 
     // Gets the canvas.
-    this.canvReference = (document.getElementById("video-scene") ??
-      undefined) as HTMLCanvasElement | undefined;
-    this.canvasRenderCamReference =
-      document.getElementById("camera-view") ?? undefined;
+    this.canvReference = editorCanvasEl;
+    this.canvasRenderCamReference = camViewCanvasEl;
 
     // Find the container element
-    const container = document.getElementById("video-scene-container");
-
-    if (container == null) {
-      return;
-    }
+    this.container = sceneContainerEl;
 
     // Use the container's dimensions
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
+    const width = this.container.offsetWidth;
+    const height = this.container.offsetHeight;
 
     // Sets up camera and base position.
     this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 200);
@@ -674,9 +709,8 @@ class Editor {
       1000 / (this.cap_fps * 2),
     ); // Get the most FPS we can out of the renderer.
 
-    if (this.container === undefined) {
-      this.container = document.getElementById("video-scene-container");
-    }
+    this.containerMayReset();
+
     if (!this.rendering && this.container) {
       if (
         this.container.clientWidth + this.container.clientHeight !==
@@ -773,11 +807,14 @@ class Editor {
       this.switchPreviewToggle = false;
       editorState.value = EditorStates.EDIT;
       setTimeout(() => {
-        this.canvasRenderCamReference =
-          document.getElementById("camera-view") ?? undefined;
+        // if (!this.canvasRenderCamReference) {
+        //   this.canvasRenderCamReference =
+        //     document.getElementById("camera-view");
+        // }
+        this.camViewCanvasMayReset();
         this.rawRenderer = new THREE.WebGLRenderer({
           antialias: false,
-          canvas: this.canvasRenderCamReference,
+          canvas: this.canvasRenderCamReference || undefined,
           preserveDrawingBuffer: true,
         });
         if (this.camera_person_mode) {
@@ -889,7 +926,7 @@ class Editor {
 
   // Automaticly resize scene.
   onWindowResize() {
-    this.container = document.getElementById("video-scene-container");
+    this.containerMayReset();
     if (!this.container) return;
 
     const width = this.container.clientWidth;
@@ -918,8 +955,8 @@ class Editor {
   }
 
   setupResizeObserver() {
-    const container = document.getElementById("video-scene-container");
-    if (!container) {
+    this.containerMayReset();
+    if (!this.container) {
       return;
     }
 
@@ -935,7 +972,7 @@ class Editor {
       }
     });
 
-    resizeObserver.observe(container);
+    resizeObserver.observe(this.container);
   }
 
   getAssetType(selected: THREE.Object3D<THREE.Object3DEventMap>): AssetType {
