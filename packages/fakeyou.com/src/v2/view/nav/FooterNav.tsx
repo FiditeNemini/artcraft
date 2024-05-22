@@ -83,13 +83,63 @@ function FooterNav(props: Props) {
 
   const isOnStudioPage = window.location.pathname.includes("/studio");
 
+  const footerSections = [
+    {
+      title: "Create",
+      items: [
+        {
+          link: "https://studio.storyteller.ai",
+          text: "Creation Engine",
+          icon: null,
+        },
+        { link: "/explore", text: "Explore Videos", icon: null },
+        { link: "/tools", text: "AI Tools", icon: null },
+        // { link: "/upload-assets", text: "Upload Assets", icon: null },
+      ],
+      condition: true,
+    },
+    {
+      title: "Community",
+      items: [
+        { link: "/beta-key/list", text: "Share Beta Keys", icon: null },
+        { link: "/beta-key/redeem", text: "Redeem Beta Key", icon: null },
+        {
+          link: GetDiscordLink(),
+          text: "Discord",
+          icon: faDiscord,
+        },
+        // { link: "/forums", text: "Forums", icon: null },
+      ],
+      condition: true,
+    },
+    // {
+    //   title: "New",
+    //   items: [
+    //     { link: "/news-updates", text: "News and Updates", icon: null },
+    //     { link: "/feature-requests", text: "Feature Requests", icon: null },
+    //     { link: "/bug-reports", text: "Bug Reports", icon: null },
+    //   ],
+    //   condition: true,
+    // },
+    {
+      title: "Info",
+      items: [
+        { link: "/pricing", text: "Pricing", icon: null },
+        { link: "/about", text: "About", icon: null },
+        { link: "/terms", text: "ToS", icon: null },
+        { link: "/privacy", text: "Privacy", icon: null },
+      ],
+      condition: true,
+    },
+  ];
+
   return (
     <>
       {!isOnStudioPage && (
         <footer id="footer">
           <Container type="panel" className="py-5">
             <div className="row g-5">
-              <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
+              <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center pb-2">
                 <Link to="/">
                   <img
                     src={domain.logo}
@@ -97,7 +147,7 @@ function FooterNav(props: Props) {
                     height="34"
                   />
                 </Link>
-                <div className="d-flex gap-3">
+                <div className="d-flex gap-3 mt-1">
                   <a
                     className="social-icon"
                     href={GetDiscordLink()}
@@ -145,77 +195,29 @@ function FooterNav(props: Props) {
                   </a>
                 </div>
               </div>
-              <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-                <p className="fw-bold">Studio Engine</p>
 
-                <li>
-                  <a href="https://studio.storyteller.ai">Studio</a>
-                </li>
-
-                <li>
-                  <Link to="/welcome-to-studio">Studio Tutorial</Link>
-                </li>
-
-                <p className="fw-bold">{t("communityTitle")}</p>
-
-                <li>
-                  <a
-                    href={GetDiscordLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t("communityDiscord")}
-                  </a>
-                </li>
-
-                <li>
-                  <Link to="/contribute">{t("productUploadModels")}</Link>
-                </li>
-              </div>
-              <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-                <p className="fw-bold">AI Tools</p>
-
-                <li>
-                  <Link to="/tts">{t("productTts")}</Link>
-                </li>
-
-                <li>
-                  <Link to="/voice-conversion">{t("productVc")}</Link>
-                </li>
-
-                <li>
-                  <Link to="/video-styletransfer">Video Style Transfer</Link>
-                </li>
-
-                <li>
-                  <Link to="/voice-designer">Voice Designer</Link>
-                </li>
-
-                <li>
-                  <Link to="/face-animator">{t("productFaceAnimator")}</Link>
-                </li>
-              </div>
-              <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-                <p className="fw-bold">{t("infoTitle")}</p>
-                <li>
-                  <Link to={WebUrl.pricingPageWithReferer("footer")}>
-                    {t("infoPricing")}
-                  </Link>
-                </li>
-                <li>
-                  <Link to={WebUrl.aboutUsPage()}>{t("infoAbout")}</Link>
-                </li>
-
-                <li>
-                  <Link to={WebUrl.termsPage()}>{t("infoTerms")}</Link>
-                </li>
-
-                <li>
-                  <Link to={WebUrl.privacyPage()}>
-                    {t("infoPrivacyPolicy")}
-                  </Link>
-                </li>
-              </div>
+              {footerSections.map((section, index) => (
+                <div
+                  key={index}
+                  className={`py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start ${
+                    section.condition ? "" : "d-none"
+                  }`}
+                >
+                  <p className="fw-bold">{t(section.title)}</p>
+                  {section.items.map((item, itemIndex) => (
+                    <li key={itemIndex}>
+                      <a href={item.link}>
+                        {item.icon ? (
+                          <FontAwesomeIcon icon={item.icon} className="me-2" />
+                        ) : (
+                          ""
+                        )}
+                        {item.text}
+                      </a>
+                    </li>
+                  ))}
+                </div>
+              ))}
             </div>
 
             <div className="pt-4">
