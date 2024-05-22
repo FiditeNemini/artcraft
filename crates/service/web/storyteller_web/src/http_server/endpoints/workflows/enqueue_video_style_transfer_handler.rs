@@ -334,6 +334,8 @@ pub async fn enqueue_video_style_transfer_handler(
             .and_then(|value| try_str_to_num(&value).ok()),
         use_face_detailer: request.use_face_detailer,
         use_upscaler: request.use_upscaler,
+        lipsync_enabled: get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
+            .map(|value| str_to_bool(&value)),
         strength: maybe_strength,
     };
 

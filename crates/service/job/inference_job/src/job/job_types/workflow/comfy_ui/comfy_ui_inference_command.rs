@@ -85,7 +85,11 @@ pub struct InferenceArgs<'s> {
     pub inference_details: InferenceDetails<'s>,
 
     pub face_detailer_enabled: bool,
+
     pub upscaler_enabled: bool,
+
+    pub lipsync_enabled: bool,
+
     pub maybe_strength: Option<f32>,
 }
 
@@ -261,6 +265,10 @@ impl ComfyInferenceCommand {
 
         if args.upscaler_enabled {
             command.push_str(" --upscaler-enabled ");
+        }
+
+        if args.lipsync_enabled {
+            command.push_str(" --lipsync-enabled ");
         }
 
         if let Some(strength) = args.maybe_strength {

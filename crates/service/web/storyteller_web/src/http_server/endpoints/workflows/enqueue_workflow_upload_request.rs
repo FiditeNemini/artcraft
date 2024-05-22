@@ -255,6 +255,7 @@ pub async fn enqueue_workflow_upload_request(
             .and_then(|value| try_str_to_num(&value).ok()),
         use_face_detailer: None,
         use_upscaler: None,
+        lipsync_enabled: None,
         strength: None,
     };
    
