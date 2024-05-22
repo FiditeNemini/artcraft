@@ -208,6 +208,8 @@ impl ComfyInferenceCommand {
         args: InferenceArgs,
     ) -> AnyhowResult<CommandExitStatus> {
 
+        info!("InferenceArgs: {:?}", &args);
+
         let mut command = String::new();
         command.push_str(&format!("cd {}", path_to_string(&self.comfy_root_code_directory)));
 
