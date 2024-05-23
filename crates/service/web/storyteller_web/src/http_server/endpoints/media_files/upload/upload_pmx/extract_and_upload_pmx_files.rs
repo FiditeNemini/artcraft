@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::{BufReader, Cursor};
 use std::path::{Path, PathBuf};
 
@@ -9,6 +9,7 @@ use zip::ZipArchive;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
+use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
@@ -73,13 +74,13 @@ pub async fn extract_and_upload_pmx_files(
 
   info!("Reading archive contents...");
 
-  let result = get_pmx_entries(&mut archive);
+  let entries = get_pmx_entries(&mut archive)?;
 
+  for entry in entries.iter() {
+    info!("Entry: {:?}", entry);
 
-  for i in 0..(archive.len()) {
-    info!("Reading file {}...", i);
-
-    let mut file = archive.by_index(i)
+    let enclosed_name = path_to_string(&entry.enclosed_name);
+    let mut file = archive.by_name(&enclosed_name)
         .map_err(|err| {
           error!("Problem reading file from archive: {:?}", err);
           PmxError::InvalidArchive
@@ -88,20 +89,7 @@ pub async fn extract_and_upload_pmx_files(
     let filename = file.name();
     let filename_lowercase = filename.to_lowercase();
 
-    info!("File {} is {:?} - is file = {}", i, filename, file.is_file());
-
-    info!("Enclosed name: {:?}", file.enclosed_name());
-
-    if file.is_dir() {
-      continue;
-    }
-
-    if filename_lowercase.starts_with("__macosx/") {
-      // Mac users sometimes have a bogus __MACOSX directory, which may double the file count.
-      continue;
-    }
-
-    if filename_lowercase.ends_with(".pmx") {
+    if entry.is_pmx {
       bucket_client.upload_file_with_content_type(
         pmx_public_upload_path.get_full_object_path_str(),
         file_bytes.as_ref(),
@@ -118,10 +106,14 @@ pub async fn extract_and_upload_pmx_files(
             PmxError::FileError
           })?;
 
-      let file_size_bytes = file_bytes.len();
+      file_size_bytes = file_bytes.len();
 
     } else {
-      let path = format!("{}/{}", pmx_public_upload_directory, filename);
+      let name = entry.alternative_output_name.as_ref()
+          .unwrap_or_else(|| &entry.enclosed_name);
+      let name = path_to_string(name);
+
+      let path = format!("{}/{}", pmx_public_upload_directory, name);
 
       let mimetype = get_mimetype_for_bytes(file_bytes)
           .unwrap_or("application/octet-stream");
@@ -147,7 +139,8 @@ pub async fn extract_and_upload_pmx_files(
 
 #[derive(Debug)]
 struct PmxEntryDetail {
-  path: PathBuf,
+  enclosed_name: PathBuf,
+  alternative_output_name: Option<PathBuf>,
   is_pmx: bool,
 }
 
@@ -185,18 +178,31 @@ fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result
 
     if filename_lowercase.ends_with(".pmx") {
       entries.push(PmxEntryDetail {
-        path: enclosed_name.to_path_buf(),
+        enclosed_name: enclosed_name.to_path_buf(),
+        alternative_output_name: None,
         is_pmx: true,
       });
     } else {
       // TODO(bt): Check type
       entries.push(PmxEntryDetail {
-        path: enclosed_name.to_path_buf(),
+        enclosed_name: enclosed_name.to_path_buf(),
+        alternative_output_name: None,
         is_pmx: false,
       })
     }
   }
 
+  let entries = remove_useless_leading_directories(entries)?;
+
+  for entry in entries.iter() {
+    info!("Entry: {:?}", entry);
+  }
+
+  Ok(entries)
+}
+
+// Some zip files have entries with useless leading directories. This will remove them.
+fn remove_useless_leading_directories(mut entries: Vec<PmxEntryDetail>) -> Result<Vec<PmxEntryDetail>, PmxError> {
   let mut maybe_parent_directory_to_remove = None;
 
   {
@@ -211,38 +217,31 @@ fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result
     match pmx_entry.get(0) {
       None => return Err(PmxError::NoPmxFile),
       Some(pmx_file) => {
-        maybe_parent_directory_to_remove = pmx_file.path.parent().map(|p| p.to_path_buf());
+        maybe_parent_directory_to_remove = pmx_file.enclosed_name.parent().map(|p| p.to_path_buf());
       }
     }
-  }
-
-  for entry in entries.iter() {
-    info!("Entry: {:?}", entry);
   }
 
   if let Some(parent) = maybe_parent_directory_to_remove {
     info!("Common parent: {:?}", parent);
 
     let remove_parent = entries.iter()
-        .all(|entry| entry.path.starts_with(&parent));
+        .all(|entry| entry.enclosed_name.starts_with(&parent));
 
     if remove_parent {
       entries = entries.into_iter()
           .map(|entry| {
-            let new_path = entry.path.strip_prefix(&parent)
+            let new_path = entry.enclosed_name.strip_prefix(&parent)
                 .map(|path| path.to_path_buf())
-                .unwrap_or_else(|_err| entry.path.clone());
+                .unwrap_or_else(|_err| entry.enclosed_name.clone());
             PmxEntryDetail {
-              path: new_path,
+              enclosed_name: entry.enclosed_name,
+              alternative_output_name: Some(new_path),
               is_pmx: entry.is_pmx,
             }
           })
           .collect::<Vec<PmxEntryDetail>>();
     }
-  }
-
-  for entry in entries.iter() {
-    info!("Entry: {:?}", entry);
   }
 
   Ok(entries)
