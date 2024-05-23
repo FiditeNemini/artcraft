@@ -175,7 +175,7 @@ export default function BetaKeysListPage() {
       <PageHeader title="Beta Keys List" subText="List of beta keys created" />
       <Panel padding={true}>
         <div>
-          <div className="d-flex flex-column flex-lg-row">
+          <div className="d-flex flex-column flex-lg-row gap-3">
             <div className="d-flex gap-1 flex-grow-1">
               <TempInput
                 placeholder="Search by Referrer Username"
