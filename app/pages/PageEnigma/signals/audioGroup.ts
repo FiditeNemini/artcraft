@@ -6,6 +6,8 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { filmLength } from "~/pages/PageEnigma/signals/sizing";
+import { publishClip } from "~/pages/PageEnigma/signals/utils/publishClip";
 
 export const audioGroup = signal<AudioGroup>({
   id: "AG-1",
@@ -69,17 +71,13 @@ export function addGlobalAudio({
     clip_uuid,
   } as Clip;
 
+  publishClip(newClip, dragItem, offset);
+
   const oldAudioGroup = audioGroup.value;
   audioGroup.value = {
     ...oldAudioGroup,
     clips: [...oldAudioGroup.clips, newClip],
   };
-
-  Queue.publish({
-    queueName: QueueNames.TO_ENGINE,
-    action: toEngineActions.ADD_CLIP,
-    data: newClip,
-  });
 }
 
 export function toggleAudioMute() {

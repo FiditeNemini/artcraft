@@ -13,6 +13,8 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { ToastTypes } from "~/enums";
 import { addToast } from "~/signals";
+import { filmLength } from "~/pages/PageEnigma/signals";
+import { publishClip } from "~/pages/PageEnigma/signals/utils/publishClip";
 
 export const characterGroup = signal<CharacterGroup>({
   id: "CG1",
@@ -49,11 +51,7 @@ export function addCharacterAnimation({
         return { ...character };
       }
 
-      Queue.publish({
-        queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.ADD_CLIP,
-        data: newClip,
-      });
+      publishClip(newClip, dragItem, offset);
 
       return {
         ...character,
@@ -95,11 +93,7 @@ export function addCharacterExpression({
         return { ...character };
       }
 
-      Queue.publish({
-        queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.ADD_CLIP,
-        data: newClip,
-      });
+      publishClip(newClip, dragItem, offset);
 
       return {
         ...character,
@@ -141,11 +135,7 @@ export function addCharacterAudio({
         return { ...character };
       }
 
-      Queue.publish({
-        queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.ADD_CLIP,
-        data: newClip,
-      });
+      publishClip(newClip, dragItem, offset);
 
       return {
         ...character,
