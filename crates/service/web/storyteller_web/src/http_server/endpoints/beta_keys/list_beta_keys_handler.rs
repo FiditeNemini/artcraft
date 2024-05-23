@@ -69,6 +69,8 @@ pub struct BetaKeyItem {
   pub creator: UserDetailsLight,
   pub maybe_referrer: Option<UserDetailsLight>,
   pub maybe_redeemer: Option<UserDetailsLight>,
+  pub is_distributed: bool,
+  pub maybe_note: Option<String>,
   pub created_at: DateTime<Utc>,
   pub maybe_redeemed_at: Option<DateTime<Utc>>,
 }
@@ -227,6 +229,8 @@ pub async fn list_beta_keys_handler(
             beta_key.maybe_redeemer_display_name,
             beta_key.maybe_redeemer_gravatar_hash
           ),
+          is_distributed: beta_key.is_distributed,
+          maybe_note: beta_key.maybe_notes,
           created_at: beta_key.created_at,
           maybe_redeemed_at: beta_key.maybe_redeemed_at,
         }

@@ -8,6 +8,7 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::beta_keys::BetaKeyToken;
 use tokens::tokens::users::UserToken;
+use crate::helpers::boolean_converters::i8_to_bool;
 
 pub struct BetaKeyListPage {
   pub records: Vec<BetaKeyListItem>,
@@ -41,6 +42,9 @@ pub struct BetaKeyListItem {
   pub maybe_redeemer_username: Option<String>,
   pub maybe_redeemer_display_name: Option<String>,
   pub maybe_redeemer_gravatar_hash: Option<String>,
+
+  pub is_distributed: bool,
+  pub maybe_notes: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub maybe_redeemed_at: Option<DateTime<Utc>>,
@@ -99,6 +103,8 @@ pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyL
           maybe_redeemer_username: record.maybe_redeemer_username,
           maybe_redeemer_display_name: record.maybe_redeemer_display_name,
           maybe_redeemer_gravatar_hash: record.maybe_redeemer_gravatar_hash,
+          is_distributed: i8_to_bool(record.is_distributed),
+          maybe_notes: record.maybe_notes,
           created_at: record.created_at,
           maybe_redeemed_at: record.maybe_redeemed_at,
         }
@@ -147,6 +153,9 @@ SELECT
   redeemer.username as maybe_redeemer_username,
   redeemer.display_name as maybe_redeemer_display_name,
   redeemer.email_gravatar_hash as maybe_redeemer_gravatar_hash,
+
+  b.is_distributed,
+  b.maybe_notes,
 
   b.created_at,
   b.maybe_redeemed_at
@@ -250,6 +259,9 @@ struct MediaFileListItemInternal {
   maybe_redeemer_display_name: Option<String>,
   maybe_redeemer_gravatar_hash: Option<String>,
 
+  is_distributed: i8,
+  maybe_notes: Option<String>,
+
   created_at: DateTime<Utc>,
   maybe_redeemed_at: Option<DateTime<Utc>>,
 }
@@ -282,6 +294,8 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_redeemer_username: row.try_get("maybe_redeemer_username")?,
       maybe_redeemer_display_name: row.try_get("maybe_redeemer_display_name")?,
       maybe_redeemer_gravatar_hash: row.try_get("maybe_redeemer_gravatar_hash")?,
+      is_distributed: row.try_get("is_distributed")?,
+      maybe_notes: row.try_get("maybe_notes")?,
       created_at: row.try_get("created_at")?,
       maybe_redeemed_at: row.try_get("maybe_redeemed_at")?,
     })
