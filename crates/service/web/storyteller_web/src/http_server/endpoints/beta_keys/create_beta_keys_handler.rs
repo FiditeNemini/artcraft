@@ -36,7 +36,14 @@ const MAXIMUM_KEYS : u32 = 100;
 #[derive(Deserialize, ToSchema)]
 pub struct CreateBetaKeysRequest {
   uuid_idempotency_token: String,
+
+  /// The username these keys will be assigned to (as the "referrer" that hands out the keys)
   maybe_referrer_username: Option<String>,
+
+  /// A note that will be assigned to each key, if present. This can be edited later.
+  maybe_note: Option<String>,
+
+  /// The number of keys to generate. Between 1 and 100.
   number_of_keys: u32,
 }
 
@@ -139,6 +146,7 @@ pub async fn create_beta_keys_handler(
     product: BetaKeyProduct::Studio,
     creator_user_token: &user_session.user_token,
     maybe_referrer_user_token: maybe_referrer_user_token.as_ref(),
+    maybe_note: request.maybe_note.as_deref(),
     beta_keys: &beta_keys,
     mysql_pool: &server_state.mysql_pool,
   }).await.map_err(|err| {
