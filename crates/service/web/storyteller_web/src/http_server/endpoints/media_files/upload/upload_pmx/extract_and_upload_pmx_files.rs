@@ -1,9 +1,10 @@
 use std::collections::HashSet;
-use std::io::Cursor;
+use std::io::{BufReader, Cursor};
 use std::path::{Path, PathBuf};
 
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
+use zip::ZipArchive;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
@@ -70,6 +71,9 @@ pub async fn extract_and_upload_pmx_files(
 
   info!("Reading archive contents...");
 
+  let result = get_pmx_entries(&mut archive);
+
+
   for i in 0..(archive.len()) {
     info!("Reading file {}...", i);
 
@@ -79,20 +83,23 @@ pub async fn extract_and_upload_pmx_files(
           PmxError::InvalidArchive
         })?;
 
-    let filename = file.name().to_lowercase();
+    let filename = file.name();
+    let filename_lowercase = filename.to_lowercase();
 
     info!("File {} is {:?} - is file = {}", i, filename, file.is_file());
+
+    info!("Enclosed name: {:?}", file.enclosed_name());
 
     if file.is_dir() {
       continue;
     }
 
-    if filename.starts_with("__macosx/") {
+    if filename_lowercase.starts_with("__macosx/") {
       // Mac users sometimes have a bogus __MACOSX directory, which may double the file count.
       continue;
     }
 
-    if filename.ends_with(".pmx") {
+    if filename_lowercase.ends_with(".pmx") {
       bucket_client.upload_file_with_content_type(
         pmx_public_upload_path.get_full_object_path_str(),
         file_bytes.as_ref(),
@@ -135,3 +142,64 @@ pub async fn extract_and_upload_pmx_files(
     maybe_mime_type: Some("application/octet-stream".to_string()),
   })
 }
+
+#[derive(Debug)]
+struct PmxEntryDetail {
+  path: PathBuf,
+  is_pmx: bool,
+}
+
+fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result<Vec<PmxEntryDetail>, PmxError> {
+  let mut entries = Vec::new();
+
+  for i in 0..(archive.len()) {
+    info!("Reading file {}...", i);
+
+    let mut file = archive.by_index(i)
+        .map_err(|err| {
+          error!("Problem reading file from archive: {:?}", err);
+          PmxError::InvalidArchive
+        })?;
+
+    let filename = file.name();
+    let filename_lowercase = filename.to_lowercase();
+
+    info!("File {} is {:?} - is file = {}", i, filename, file.is_file());
+    info!("Enclosed name: {:?}", file.enclosed_name());
+
+    if file.is_dir() {
+      continue;
+    }
+
+    if filename_lowercase.starts_with("__macosx/") {
+      // Mac users sometimes have a bogus __MACOSX directory, which may double the file count.
+      continue;
+    }
+
+    let enclosed_name = match file.enclosed_name() {
+      None => return Err(PmxError::FileError),
+      Some(name) => name,
+    };
+
+    if filename_lowercase.ends_with(".pmx") {
+      entries.push(PmxEntryDetail {
+        path: enclosed_name.to_path_buf(),
+        is_pmx: true,
+      });
+    } else {
+      // TODO(bt): Check type
+      entries.push(PmxEntryDetail {
+        path: enclosed_name.to_path_buf(),
+        is_pmx: false,
+      })
+    }
+  }
+
+  for entry in entries.iter() {
+    info!("Entry: {:?}", entry);
+  }
+
+  Ok(entries)
+}
+
+
