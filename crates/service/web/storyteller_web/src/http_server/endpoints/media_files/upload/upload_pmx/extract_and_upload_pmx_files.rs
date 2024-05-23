@@ -1,5 +1,5 @@
 use std::collections::{HashMap, HashSet};
-use std::io::{BufReader, Cursor};
+use std::io::{BufReader, Cursor, Read};
 use std::path::{Path, PathBuf};
 
 use log::{error, info, warn};
@@ -27,6 +27,7 @@ pub enum PmxError {
   InvalidArchive,
   TooManyFiles,
   TooManyPmxFiles,
+  ExtractionError,
   NoPmxFile,
   UploadError,
   FileError,
@@ -40,20 +41,20 @@ pub struct PmxDetails {
 }
 
 pub async fn extract_and_upload_pmx_files(
-  file_bytes: &[u8],
+  zip_container_file_bytes: &[u8],
   bucket_client: &BucketClient,
   prefix: Option<&str>,
   suffix: Option<&str>
 ) -> Result<PmxDetails, PmxError> {
 
-  let maybe_mimetype = get_mimetype_for_bytes(file_bytes);
+  let maybe_mimetype = get_mimetype_for_bytes(zip_container_file_bytes);
 
   if maybe_mimetype != Some("application/zip") {
     warn!("File must be an application/zip");
     return Err(PmxError::InvalidArchive);
   }
 
-  let mut cursor = Cursor::new(file_bytes);
+  let mut cursor = Cursor::new(zip_container_file_bytes);
   let reader = std::io::BufReader::new(cursor);
   let mut archive = zip::ZipArchive::new(reader)
       .map_err(|err| {
@@ -89,10 +90,18 @@ pub async fn extract_and_upload_pmx_files(
     let filename = file.name();
     let filename_lowercase = filename.to_lowercase();
 
+    let mut zip_item_bytes = Vec::new();
+
+    file.read(&mut zip_item_bytes)
+        .map_err(|err| {
+          error!("Problem reading file from archive: {:?}", err);
+          PmxError::ExtractionError
+        })?;
+
     if entry.is_pmx {
       bucket_client.upload_file_with_content_type(
         pmx_public_upload_path.get_full_object_path_str(),
-        file_bytes.as_ref(),
+        zip_item_bytes.as_ref(),
         "application/octet-stream")
           .await
           .map_err(|e| {
@@ -100,13 +109,13 @@ pub async fn extract_and_upload_pmx_files(
             PmxError::UploadError
           })?;
 
-      let hash = sha256_hash_bytes(&file_bytes)
+      let hash = sha256_hash_bytes(&zip_item_bytes)
           .map_err(|io_error| {
             error!("Problem hashing bytes: {:?}", io_error);
             PmxError::FileError
           })?;
 
-      file_size_bytes = file_bytes.len();
+      file_size_bytes = zip_item_bytes.len();
 
     } else {
       let name = entry.alternative_output_name.as_ref()
@@ -115,11 +124,12 @@ pub async fn extract_and_upload_pmx_files(
 
       let path = format!("{}/{}", pmx_public_upload_directory, name);
 
-      let mimetype = get_mimetype_for_bytes(file_bytes)
+      let mimetype = get_mimetype_for_bytes(&zip_item_bytes)
           .unwrap_or("application/octet-stream");
+
       bucket_client.upload_file_with_content_type(
         &path,
-        file_bytes.as_ref(),
+        zip_item_bytes.as_ref(),
         mimetype)
           .await
           .map_err(|e| {
