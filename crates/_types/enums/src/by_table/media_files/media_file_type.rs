@@ -53,7 +53,10 @@ pub enum MediaFileType {
   /// See: https://mikumikudance.fandom.com/wiki/VMD_file_format
   Vmd,
 
-  /// MMD type file, often associated with external files for textures
+  /// "Polygon Model eXtend", character data from MikuMikuDance
+  /// NB: this is often associated with external files for textures, which
+  /// we'll store in the same bucket path.
+  /// See: https://mikumikudance.fandom.com/wiki/MMD:Polygon_Model_eXtend
   Pmx,
 
   /// CSV format. (We use these for ArKit)
