@@ -1,96 +1,67 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCaretDown,
-  faCaretUp,
-  faCheck,
-  faTimes,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faCheck, faTimes } from "@fortawesome/pro-solid-svg-icons";
 import {
   createColumnHelper,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
   useReactTable,
-  ColumnFiltersState,
-  SortingState,
-  Column,
+  getCoreRowModel,
 } from "@tanstack/react-table";
-import { Container, Panel, TempInput } from "components/common";
+import {
+  Button,
+  Container,
+  Pagination,
+  Panel,
+  TempInput,
+} from "components/common";
 import PageHeader from "components/layout/PageHeader";
 import {
   BetaKey,
   ListBetaKeys,
-  ListBetaKeysResponse,
 } from "@storyteller/components/src/api/beta_key/ListBetaKeys";
 import "./BetaKey.scss";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { useListContent } from "hooks";
+import prepFilter from "resources/prepFilter";
+import LoadingSpinner from "components/common/LoadingSpinner";
 
-interface CustomColumnMeta {
-  className?: string;
-  headerClassName?: string;
-  canFilter?: boolean;
-}
-
-const Filter = ({ column }: { column: Column<BetaKey, unknown> }) => {
-  const columnFilterValue = column.getFilterValue();
-
-  if (column.id === "maybe_redeemed_at") {
-    return (
-      // <TempSelect
-      //   value={(columnFilterValue ?? "") as string}
-      //   onChange={e => column.setFilterValue(e.target.value)}
-      //   className="my-2 py-1"
-      //   options={[
-      //     { value: "", label: "All" },
-      //     { value: "redeemed", label: "Redeemed" },
-      //     { value: "not_redeemed", label: "Not Redeemed" },
-      //   ]}
-      // />\
-      null
-    );
-  }
-
-  return (
-    <TempInput
-      type="text"
-      value={(columnFilterValue ?? "") as string}
-      onChange={e => column.setFilterValue(e.target.value)}
-      placeholder={`Search...`}
-      className="my-2 py-1"
-    />
-  );
-};
+const columnHelper = createColumnHelper<BetaKey>();
 
 export default function BetaKeysListPage() {
-  const [data, setData] = useState<BetaKey[]>([]);
   const [loading, setLoading] = useState(true);
+  const { pathname: search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
+  const [list, listSet] = useState<BetaKey[]>([]);
+  const [username, usernameSet] = useState("");
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const keysList = useListContent({
+    addQueries: {
+      page_size: urlQueries.get("page_size") || "20",
+      ...(username.trim()
+        ? prepFilter(username, "maybe_referrer_username")
+        : {}),
+    },
+    addSetters: { usernameSet },
+    debug: "ListBetaKeys",
+    fetcher: ListBetaKeys,
+    list,
+    listSet,
+    requestList: true,
+    onSuccess: () => setLoading(false),
+    urlParam: username.toLowerCase(),
+    resultsKey: "beta_keys",
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response: ListBetaKeysResponse = await ListBetaKeys("", {});
-        if (response.success) {
-          setData(response.beta_keys);
-        } else {
-          console.error("Error fetching data: API call unsuccessful");
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handlePageClick = (selectedItem: { selected: number }) => {
+    keysList.pageChange(selectedItem.selected);
+  };
 
-    fetchData();
-  }, []);
-
-  const columnHelper = createColumnHelper<BetaKey>();
+  const paginationProps = {
+    onPageChange: handlePageClick,
+    pageCount: keysList.pageCount,
+    currentPage: keysList.page,
+  };
 
   const columns = [
     columnHelper.accessor("maybe_redeemed_at", {
@@ -102,21 +73,6 @@ export default function BetaKeysListPage() {
         ) : (
           <FontAwesomeIcon icon={faTimes} className="fs-5 text-danger" />
         );
-      },
-      meta: {
-        className: "status-cell",
-        headerClassName: "status-header",
-        canFilter: true,
-      } as CustomColumnMeta,
-      filterFn: (row, columnId, filterValue) => {
-        const redeemed = row.getValue(columnId);
-        if (filterValue === "redeemed") {
-          return !!redeemed;
-        }
-        if (filterValue === "not_redeemed") {
-          return !redeemed;
-        }
-        return true;
       },
     }),
     columnHelper.accessor("created_at", {
@@ -134,12 +90,7 @@ export default function BetaKeysListPage() {
       header: "Key",
       cell: info => {
         const key = info.getValue();
-
-        if (key) {
-          return key;
-        } else {
-          return "********";
-        }
+        return key || "********";
       },
     }),
     columnHelper.accessor("creator.username", {
@@ -210,74 +161,54 @@ export default function BetaKeysListPage() {
   ];
 
   const table = useReactTable({
-    data,
+    data: keysList.list,
     columns,
-    state: {
-      columnFilters,
-      sorting,
-    },
-    onColumnFiltersChange: setColumnFilters,
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   });
+
+  const handleSetUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+    usernameSet(e.target.value);
+  };
 
   return (
     <Container type="panel-full">
       <PageHeader title="Beta Keys List" subText="List of beta keys created" />
       <Panel padding={true}>
         <div>
+          <div className="d-flex flex-column flex-lg-row">
+            <div className="d-flex gap-1 flex-grow-1">
+              <TempInput
+                placeholder="Search by Referrer Username"
+                value={username}
+                onChange={handleSetUsername}
+                style={{ width: "240px" }}
+                onKeyPress={event => {
+                  if (event.key === "Enter") {
+                    keysList.reFetch();
+                  }
+                }}
+              />
+              <Button label="Search" onClick={keysList.reFetch} />
+            </div>
+            <Pagination {...paginationProps} />
+          </div>
+
           {loading ? (
-            <div>Loading...</div>
+            <div className="py-5">
+              <LoadingSpinner />
+            </div>
           ) : (
             <>
-              <div className="table-responsive">
-                <table className="table w-100">
+              <div className="table-responsive mt-4 mb-4">
+                <table className="table w-100 overflow-hidden">
                   <thead>
                     {table.getHeaderGroups().map(headerGroup => (
                       <tr key={headerGroup.id}>
                         {headerGroup.headers.map(header => (
-                          <th
-                            key={header.id}
-                            colSpan={header.colSpan}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {header.isPlaceholder ? null : (
-                              <>
-                                <div
-                                  {...{
-                                    className: header.column.getCanSort()
-                                      ? "cursor-pointer select-none"
-                                      : "",
-                                    onClick:
-                                      header.column.getToggleSortingHandler(),
-                                  }}
-                                >
-                                  {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                  )}
-                                  {header.column.getIsSorted() ? (
-                                    header.column.getIsSorted() === "asc" ? (
-                                      <FontAwesomeIcon
-                                        icon={faCaretUp}
-                                        className="ms-2 opacity-75"
-                                      />
-                                    ) : (
-                                      <FontAwesomeIcon
-                                        icon={faCaretDown}
-                                        className="ms-2 opacity-75"
-                                      />
-                                    )
-                                  ) : null}
-                                </div>
-                                {header.column.getCanFilter() ? (
-                                  <div>
-                                    <Filter column={header.column} />
-                                  </div>
-                                ) : null}
-                              </>
+                          <th key={header.id} colSpan={header.colSpan}>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
                             )}
                           </th>
                         ))}
@@ -288,13 +219,7 @@ export default function BetaKeysListPage() {
                     {table.getRowModel().rows.map(row => (
                       <tr key={row.id}>
                         {row.getVisibleCells().map(cell => (
-                          <td
-                            key={cell.id}
-                            className={
-                              (cell.column.columnDef.meta as CustomColumnMeta)
-                                ?.className
-                            }
-                          >
+                          <td key={cell.id}>
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext()
@@ -306,11 +231,14 @@ export default function BetaKeysListPage() {
                   </tbody>
                 </table>
               </div>
-              {data.length === 0 && (
-                <div className="mt-5">No data available</div>
+              {list.length === 0 && (
+                <div className="my-5 text-center">No data available</div>
               )}
             </>
           )}
+          <div className="d-flex justify-content-end">
+            <Pagination {...paginationProps} />
+          </div>
         </div>
       </Panel>
     </Container>
