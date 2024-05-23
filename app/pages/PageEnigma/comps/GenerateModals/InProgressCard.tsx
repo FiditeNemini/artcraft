@@ -2,10 +2,9 @@ import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/pro-solid-svg-icons";
 
-import { STORAGE_KEYS } from "~/enums";
-import { environmentVariables, addToast } from "~/signals";
+import { STORAGE_KEYS, ToastTypes } from "~/enums";
+import { addToast, environmentVariables } from "~/signals";
 
-import { ToastTypes } from "~/enums";
 import { JobState } from "~/pages/PageEnigma/enums";
 import { ActiveJob } from "~/pages/PageEnigma/models";
 
@@ -15,21 +14,21 @@ interface Props {
   movie: ActiveJob;
 }
 
-function getPercent(status: string) {
-  if (status === "started") {
+function getPercent(status: JobState) {
+  if (status === JobState.STARTED) {
     return 20;
   }
-  if (status === "waiting_to_start") {
+  if (status === JobState.PENDING) {
     return 0;
   }
-  if (status === "attempt_failed") {
+  if (status === JobState.COMPLETE_FAILURE) {
     return 0;
   }
   return 100;
 }
 
 export function InProgressCard({ movie }: Props) {
-  const completePercent = getPercent(movie.status.status);
+  const completePercent = getPercent(movie.status.status as JobState);
   const completeLength = (600 * completePercent) / 100;
 
   const deleteJob = useCallback(() => {
