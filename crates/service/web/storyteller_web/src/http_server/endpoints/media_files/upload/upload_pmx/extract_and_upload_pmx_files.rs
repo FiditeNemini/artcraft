@@ -92,7 +92,7 @@ pub async fn extract_and_upload_pmx_files(
 
     let mut zip_item_bytes = Vec::new();
 
-    file.read(&mut zip_item_bytes)
+    file.read_to_end(&mut zip_item_bytes)
         .map_err(|err| {
           error!("Problem reading file from archive: {:?}", err);
           PmxError::ExtractionError
