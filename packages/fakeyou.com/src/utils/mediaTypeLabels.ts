@@ -8,6 +8,8 @@ export const mediaTypeLabels = {
   [MediaFileType.BVH]: "BVH",
   [MediaFileType.GLB]: "GLB",
   [MediaFileType.GLTF]: "glTF",
+  [MediaFileType.Pmd]: "PMD",
+  [MediaFileType.Pmx]: "PMX",
   [MediaFileType.SceneRon]: "RON",
   [MediaFileType.SceneJson]: "Scene",
   [MediaFileType.FBX]: "FBX",

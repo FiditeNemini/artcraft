@@ -334,6 +334,8 @@ export default function MediaPage() {
             {promptSection}
           </>
         );
+      case MediaFileType.Pmd:
+      case MediaFileType.Pmx:
       case MediaFileType.BVH:
       case MediaFileType.GLB:
       case MediaFileType.GLTF:
@@ -391,7 +393,7 @@ export default function MediaPage() {
           </div>
         );
       default:
-        return <div>Unsupported media typeaaa</div>;
+        return <div>Unsupported media type</div>;
     }
   }
 
@@ -603,7 +605,9 @@ export default function MediaPage() {
         case MediaFileType.BVH:
         case MediaFileType.GLB:
         case MediaFileType.GLTF:
+        case MediaFileType.Pmd:
         case MediaFileType.SceneRon:
+        case MediaFileType.Vmd:
           return (
             <WeightCoverImage
               {...{

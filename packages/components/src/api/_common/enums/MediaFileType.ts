@@ -20,6 +20,12 @@ export enum MediaFileType {
   // uploads in this format. It's a very popular 3D graphics format.
   FBX = "fbx",
 
+  // polygon model data for miku dance
+  Pmd = "pmd",
+
+  // polygon model
+  Pmx = "pmx",
+
   // Full Storyteller Engine scenes (RON = Rusty Object Notation)
   // This is a temporary format that will eventually go away.
   SceneRon = "scene_ron",

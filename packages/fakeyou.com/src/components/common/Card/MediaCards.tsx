@@ -29,6 +29,10 @@ export default function MediaCards({ props, type }: Props) {
       return <GLTFCard {...props} />;
     case "fbx":
       return <FBXCard {...props} />;
+    case "pmd":
+      return <GLBCard {...{ ...props, labelOverride: "PMD" }} />;
+    case "pmx":
+      return <GLBCard {...{ ...props, labelOverride: "PMX" }} />;
     case "scene_ron":
       return <SceneRonCard {...props} />;
     case "scene_json":

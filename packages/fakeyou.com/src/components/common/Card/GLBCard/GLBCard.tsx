@@ -11,6 +11,7 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 interface GLBCardProps {
   bookmarks: any;
   data: any;
+  labelOverride?: string;
   ratings: any;
   showCreator?: boolean;
   source?: string;
@@ -20,12 +21,12 @@ interface GLBCardProps {
 export default function GLBCard({
   bookmarks,
   data,
+  labelOverride,
   showCreator,
   source = "",
   ratings,
   type,
 }: GLBCardProps) {
-
   const linkUrl = getCardUrl(data, source, type);
 
   const timeAgo = useTimeAgo(data.created_at);
@@ -35,8 +36,8 @@ export default function GLBCard({
   const bucketConfig = new BucketConfig();
 
   let coverImage = `/images/default-covers/${
-      data?.cover_image?.default_cover.image_index || 0
-    }.webp`;
+    data?.cover_image?.default_cover.image_index || 0
+  }.webp`;
 
   if (data?.cover_image?.maybe_cover_image_public_bucket_path) {
     coverImage = bucketConfig.getCdnUrl(
@@ -62,7 +63,7 @@ export default function GLBCard({
               <Badge
                 {...{
                   className: "fy-entity-type-glb",
-                  label: "GLB",
+                  label: labelOverride || "GLB",
                   overlay: true,
                 }}
               />
