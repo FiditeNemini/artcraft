@@ -26,6 +26,7 @@ use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::batch_generations::*;
 use tokens::tokens::beta_keys::*;
+use tokens::tokens::browser_session_logs::*;
 use tokens::tokens::comments::*;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
@@ -48,6 +49,7 @@ use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::weights_cover_image_details::*;
+use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::*;
 use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::*;
@@ -118,6 +120,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
 #[openapi(
   paths(
     billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler,
+    crate::http_server::endpoints::analytics::log_browser_session_handler::log_browser_session_handler,
     crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler,
     crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler,
     crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::redeem_beta_key_handler,
@@ -189,6 +192,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     // Tokens
     BatchGenerationToken,
     BetaKeyToken,
+    BrowserSessionLogToken,
     CommentToken,
     InferenceJobToken,
     MediaFileToken,
@@ -334,11 +338,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
-    InferenceJobStatusResponsePayload,
-    InferenceJobTokenType,
     InferTtsError,
     InferTtsRequest,
     InferTtsSuccessResponse,
+    InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListBetaKeysError,
@@ -387,6 +391,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListWeightsByUserError,
     ListWeightsByUserPathInfo,
     ListWeightsByUserSuccessResponse,
+    LogBrowserSessionError,
+    LogBrowserSessionRequest,
+    LogBrowserSessionSuccessResponse,
     LoginErrorResponse,
     LoginErrorType,
     LoginRequest,
@@ -397,8 +404,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFilesByBatchListItem,
     MediaFileUploadError,
+    MediaFilesByBatchListItem,
     ModelWeightForList,
     ModelWeightSearchResult,
     PinnedMediaFile,

@@ -35,3 +35,4 @@ pub mod voice_designer;
 pub mod w2l;
 pub mod weights;
 pub mod workflows;
+pub mod analytics;

@@ -26,6 +26,7 @@ pub(crate) enum TokenPrefix {
   AuditLog,
   BatchGeneration,
   BetaKey,
+  BrowserSessionLog,
   Comment,
   DownloadJob,
   EmailSenderJob,
@@ -96,6 +97,7 @@ impl PrefixGenerator for TokenPrefix {
       Self::AuditLog => "audit_",
       Self::BatchGeneration => "batch_g_",
       Self::BetaKey => "beta_key_",
+      Self::BrowserSessionLog => "bsl_",
       Self::Comment => "comment_",
       Self::DownloadJob => "jdown_", // NB: Previously "JGUP:"
       Self::EmailSenderJob => "email_job_",
