@@ -22,6 +22,7 @@ export enum FileType {
   Ron = "ron",
   Pmd = "pmd",
   Vmd = "vmd",
+  Pmx = "pmx",
 
   // Unknown or unsupported
   Unknown = "unknown",
@@ -41,6 +42,10 @@ const FILE_TYPE_MAP : Record<string, FileType> = {
   "wav": FileType.Wav,
   "pmd": FileType.Pmd,
   "vmd": FileType.Vmd,
+  "pmx": FileType.Pmx,
+
+  // TODO: This is temporary
+  "zip": FileType.Pmx,
 }
 
 export function GetFileTypeByExtension(filename: string) : FileType {

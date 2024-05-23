@@ -1,4 +1,3 @@
-import { MediaFileSubtype } from "../enums/MediaFileSubtype";
 import MakeMultipartRequest from "../MakeMultipartRequest";
 
 export interface UploadPmxRequest {

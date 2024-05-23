@@ -7,6 +7,7 @@ import { Button } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
 import { FileType, GetFileTypeByExtension } from "@storyteller/components/src/utils/GetFileTypeByExtension";
 import { UploadMedia,  UploadMediaResponse, } from "@storyteller/components/src/api/media_files/UploadMedia";
+import { UploadPmx,  UploadPmxResponse, } from "@storyteller/components/src/api/media_files/UploadPmx";
 import { UploadEngineAsset,  UploadEngineAssetResponse, } from "@storyteller/components/src/api/media_files/UploadEngineAsset";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { v4 as uuidv4 } from "uuid";
@@ -45,6 +46,7 @@ export default function DevUpload(props: DevUploadProps) {
       case FileType.Ron:
       case FileType.Pmd:
       case FileType.Vmd:
+      case FileType.Pmx:
         uploadType = UploadType.EngineAsset;
         break;
       case FileType.Jpg:
@@ -82,17 +84,31 @@ export default function DevUpload(props: DevUploadProps) {
 
     switch(uploadType) {
       case UploadType.EngineAsset:
-        UploadEngineAsset({
-          uuid_idempotency_token: uuidv4(),
-          file,
-          media_file_subtype: maybeMediaFileSubtype,
-        })
-        .then((res: UploadEngineAssetResponse) => {
-          if ("media_file_token" in res) {
-            setTokens([res.media_file_token, ...tokens]);
-            setFile(null);
-          }
-        });
+        if (file.name.toLocaleLowerCase().endsWith("zip")) {
+          UploadPmx({
+            uuid_idempotency_token: uuidv4(),
+            file,
+            engine_category: "character",
+          })
+          .then((res: UploadPmxResponse) => {
+            if ("media_file_token" in res) {
+              setTokens([res.media_file_token, ...tokens]);
+              setFile(null);
+            }
+          });
+        } else {
+          UploadEngineAsset({
+            uuid_idempotency_token: uuidv4(),
+            file,
+            media_file_subtype: maybeMediaFileSubtype,
+          })
+          .then((res: UploadEngineAssetResponse) => {
+            if ("media_file_token" in res) {
+              setTokens([res.media_file_token, ...tokens]);
+              setFile(null);
+            }
+          });
+        }
         break;
       default:
         UploadMedia({
