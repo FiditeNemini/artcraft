@@ -13,6 +13,7 @@ pub enum MediaFileUploadError {
   NotFoundVerbose(String),
   MustBeLoggedIn,
   ServerError,
+  ServerErrorVerbose(String),
   RateLimited,
 }
 
@@ -25,6 +26,7 @@ impl ResponseError for MediaFileUploadError {
       Self::NotFoundVerbose(_) => StatusCode::NOT_FOUND,
       Self::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
       Self::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      Self::ServerErrorVerbose(_) => StatusCode::INTERNAL_SERVER_ERROR,
       Self::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }

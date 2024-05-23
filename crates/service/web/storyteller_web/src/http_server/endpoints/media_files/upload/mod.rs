@@ -6,5 +6,6 @@ pub mod upload_image_media_file_handler;
 pub mod upload_new_engine_asset_media_file_handler;
 pub mod upload_new_scene_media_file_handler;
 pub mod upload_new_video_media_file_handler;
+pub mod upload_pmx;
 pub mod upload_saved_scene_media_file_handler;
 pub mod upload_video;

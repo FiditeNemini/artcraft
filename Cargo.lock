@@ -6369,6 +6369,7 @@ dependencies = [
  "utoipa-swagger-ui",
  "uuid 0.8.2",
  "videos",
+ "zip",
 ]
 
 [[package]]
