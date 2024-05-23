@@ -27,10 +27,12 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_file_upl
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
+use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::CreateBetaKeysError;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::drain_multipart_request::drain_multipart_request;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
+use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
@@ -122,37 +124,47 @@ pub async fn upload_pmx_media_file_handler(
 
   // ==================== READ SESSION ==================== //
 
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+  // NB: We require a moderator to upload PMX files.
+  let user_session = require_moderator(&http_request, &server_state, UseDatabase::FromPool(&mut mysql_connection))
       .await
-      .map_err(|e| {
-        error!("Session checker error: {:?}", e);
-        MediaFileUploadError::ServerError
+      .map_err(|err| match err {
+        RequireModeratorError::ServerError => MediaFileUploadError::ServerError,
+        RequireModeratorError::NotAuthorized => MediaFileUploadError::NotAuthorized,
       })?;
 
   let maybe_avt_token = server_state
       .avt_cookie_manager
       .get_avt_token_from_request(&http_request);
 
-  // ==================== BANNED USERS ==================== //
+//  // ==================== READ SESSION ==================== //
+//
+//  let maybe_user_session = server_state
+//      .session_checker
+//      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+//      .await
+//      .map_err(|e| {
+//        error!("Session checker error: {:?}", e);
+//        MediaFileUploadError::ServerError
+//      })?;
+//
+//  // ==================== BANNED USERS ==================== //
+//
+//  if let Some(ref user) = maybe_user_session {
+//    if user.is_banned {
+//      return Err(MediaFileUploadError::NotAuthorized);
+//    }
+//  }
 
-  if let Some(ref user) = maybe_user_session {
-    if user.is_banned {
-      return Err(MediaFileUploadError::NotAuthorized);
-    }
-  }
-
-  // ==================== RATE LIMIT ==================== //
-
-  let rate_limiter = match maybe_user_session {
-    None => &server_state.redis_rate_limiters.file_upload_logged_out,
-    Some(ref _session) => &server_state.redis_rate_limiters.file_upload_logged_in,
-  };
-
-  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(MediaFileUploadError::RateLimited);
-  }
+//  // ==================== RATE LIMIT ==================== //
+//
+//  let rate_limiter = match maybe_user_session {
+//    None => &server_state.redis_rate_limiters.file_upload_logged_out,
+//    Some(ref _session) => &server_state.redis_rate_limiters.file_upload_logged_in,
+//  };
+//
+//  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+//    return Err(MediaFileUploadError::RateLimited);
+//  }
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
@@ -192,9 +204,10 @@ pub async fn upload_pmx_media_file_handler(
   let creator_set_visibility = form.maybe_visibility
       .map(|visibility| visibility.0)
       .or_else(|| {
-        maybe_user_session
-            .as_ref()
-            .map(|user_session| user_session.preferred_tts_result_visibility)
+        //maybe_user_session
+        //    .as_ref()
+        //    .map(|user_session| user_session.preferred_tts_result_visibility)
+        Some(user_session.preferred_tts_result_visibility)
       })
       .unwrap_or(Visibility::default());
 
@@ -202,8 +215,8 @@ pub async fn upload_pmx_media_file_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let maybe_user_token = maybe_user_session
-      .map(|session| session.get_strongly_typed_user_token());
+  //let maybe_user_token = maybe_user_session
+  //    .map(|session| session.get_strongly_typed_user_token());
 
   // ==================== FILE DATA ==================== //
 
@@ -254,7 +267,7 @@ pub async fn upload_pmx_media_file_handler(
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
     maybe_media_class: Some(MediaFileClass::Dimensional),
     media_file_type: MediaFileType::Pmx,
-    maybe_creator_user_token: maybe_user_token.as_ref(),
+    maybe_creator_user_token: Some(&user_session.get_strongly_typed_user_token()),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility,

@@ -26,7 +26,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
-use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
+use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 
@@ -87,7 +87,7 @@ pub async fn moderator_get_token_info_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ModeratorTokenInfoError> {
 
-  let user_session = require_moderator(&http_request, &server_state)
+  let user_session = require_moderator(&http_request, &server_state, UseDatabase::Implicit)
       .await
       .map_err(|err| match err {
         RequireModeratorError::ServerError => ModeratorTokenInfoError::ServerError,
