@@ -5,7 +5,7 @@
 FROM ubuntu:jammy as rust-base
 
 # NB: This can be "stable" or another version.
-ARG RUST_TOOLCHAIN="1.73.0"
+ARG RUST_TOOLCHAIN="1.78.0"
 
 WORKDIR /tmp
 
