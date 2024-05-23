@@ -246,6 +246,17 @@ export const ControlPanelSceneObject = () => {
         />
       </div>
 
+      <Button
+        variant="secondary"
+        icon={locked ? faLock : faLockOpen}
+        onClick={toggleLock}
+        className={
+          locked ? "bg-brand-primary/20 hover:bg-brand-primary/40" : ""
+        }
+      >
+        {locked ? "Unlock" : "Lock"} object
+      </Button>
+
       <Transition
         show={!isCollapsed}
         enter="transition-all duration-200 ease-in-out"
@@ -256,17 +267,6 @@ export const ControlPanelSceneObject = () => {
         leaveTo="opacity-0 max-h-0"
         className={"flex flex-col gap-2 overflow-y-auto"}
       >
-        <Button
-          variant="secondary"
-          icon={locked ? faLock : faLockOpen}
-          onClick={toggleLock}
-          className={
-            locked ? "bg-brand-primary/20 hover:bg-brand-primary/40" : ""
-          }
-        >
-          {locked ? "Unlock" : "Lock"} object
-        </Button>
-
         <div className="flex flex-col gap-1">
           <H5>Color</H5>
           <input
@@ -314,7 +314,7 @@ export const ControlPanelSceneObject = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="mb-1 flex flex-col gap-1">
           <H5>Scale</H5>
           <InputVector
             x={localScale.x.toString()}
@@ -326,12 +326,8 @@ export const ControlPanelSceneObject = () => {
         </div>
       </Transition>
 
-      <div className="mt-2 flex gap-1.5">
-        <Button
-          variant="secondary"
-          className="grow"
-          onClick={handleOnAddKeyFrame}
-        >
+      <div className="mt-0.5 flex gap-1.5">
+        <Button variant="action" className="grow" onClick={handleOnAddKeyFrame}>
           Add Keyframe (K)
         </Button>
         <Button

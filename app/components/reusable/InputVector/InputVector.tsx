@@ -44,6 +44,9 @@ export const InputVector = ({
   const wrapperCommonClasses =
     "relative flex items-center before:inline-block before:h-6 before:bg-brand-primary before:text-white before:rounded-l-lg before:w-1.5 before:text-center before:justify-center before:items-center before:font-semibold before:flex before:align-middle before:leading-8 text-xs";
 
+  const lockedCommonClasses =
+    "hover:cursor-not-allowed hover:bg-brand-secondary";
+
   function validateInput(newValue: string, oldValue: string) {
     if (newValue === "" || newValue === "-" || newValue === ".") {
       return newValue;
@@ -128,10 +131,20 @@ export const InputVector = ({
 
   return (
     <div className="flex w-full flex-col justify-between gap-1.5">
-      <span className={twMerge(wrapperCommonClasses, "before:bg-axis-x")}>
+      <span
+        className={twMerge(
+          wrapperCommonClasses,
+          "before:bg-axis-x",
+          disabled && "opacity-60",
+        )}
+      >
         <div className="absolute left-3.5 z-10 font-semibold">X</div>
         <input
-          className={twMerge(inputCommonClasses, "focus:outline-axis-x")}
+          className={twMerge(
+            inputCommonClasses,
+            "focus:outline-axis-x",
+            disabled && lockedCommonClasses,
+          )}
           type="text"
           name="x"
           onChange={handleOnChange}
@@ -150,10 +163,20 @@ export const InputVector = ({
           onKeyDown={handleKeyDown}
         />
       </span>
-      <span className={twMerge(wrapperCommonClasses, "before:bg-axis-y")}>
+      <span
+        className={twMerge(
+          wrapperCommonClasses,
+          "before:bg-axis-y",
+          disabled && "opacity-60",
+        )}
+      >
         <div className="absolute left-3.5 z-10 font-semibold">Y</div>
         <input
-          className={twMerge(inputCommonClasses, "focus:outline-axis-y")}
+          className={twMerge(
+            inputCommonClasses,
+            "focus:outline-axis-y",
+            disabled && lockedCommonClasses,
+          )}
           type="text"
           name="y"
           onChange={handleOnChange}
@@ -172,10 +195,20 @@ export const InputVector = ({
           onKeyDown={handleKeyDown}
         />
       </span>
-      <span className={twMerge(wrapperCommonClasses, "before:bg-axis-z")}>
+      <span
+        className={twMerge(
+          wrapperCommonClasses,
+          "before:bg-axis-z",
+          disabled && "opacity-60",
+        )}
+      >
         <div className="absolute left-3.5 z-10 font-semibold">Z</div>
         <input
-          className={twMerge(inputCommonClasses, "focus:outline-axis-z")}
+          className={twMerge(
+            inputCommonClasses,
+            "focus:outline-axis-z",
+            disabled && lockedCommonClasses,
+          )}
           type="text"
           name="z"
           onChange={handleOnChange}
