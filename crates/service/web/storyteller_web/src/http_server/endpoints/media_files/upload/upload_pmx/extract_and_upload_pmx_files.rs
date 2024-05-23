@@ -25,6 +25,8 @@ static ALLOWED_EXTENSIONS : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 pub enum PmxError {
   InvalidArchive,
   TooManyFiles,
+  TooManyPmxFiles,
+  NoPmxFile,
   UploadError,
   FileError,
 }
@@ -192,6 +194,50 @@ fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result
         path: enclosed_name.to_path_buf(),
         is_pmx: false,
       })
+    }
+  }
+
+  let mut maybe_parent_directory_to_remove = None;
+
+  {
+    let pmx_entry = entries.iter()
+        .filter(|entry| entry.is_pmx)
+        .collect::<Vec<&PmxEntryDetail>>();
+
+    if pmx_entry.len() != 1 {
+      return Err(PmxError::TooManyPmxFiles);
+    }
+
+    match pmx_entry.get(0) {
+      None => return Err(PmxError::NoPmxFile),
+      Some(pmx_file) => {
+        maybe_parent_directory_to_remove = pmx_file.path.parent().map(|p| p.to_path_buf());
+      }
+    }
+  }
+
+  for entry in entries.iter() {
+    info!("Entry: {:?}", entry);
+  }
+
+  if let Some(parent) = maybe_parent_directory_to_remove {
+    info!("Common parent: {:?}", parent);
+
+    let remove_parent = entries.iter()
+        .all(|entry| entry.path.starts_with(&parent));
+
+    if remove_parent {
+      entries = entries.into_iter()
+          .map(|entry| {
+            let new_path = entry.path.strip_prefix(&parent)
+                .map(|path| path.to_path_buf())
+                .unwrap_or_else(|_err| entry.path.clone());
+            PmxEntryDetail {
+              path: new_path,
+              is_pmx: entry.is_pmx,
+            }
+          })
+          .collect::<Vec<PmxEntryDetail>>();
     }
   }
 

@@ -243,6 +243,8 @@ pub async fn upload_pmx_media_file_handler(
         match err {
           PmxError::InvalidArchive => MediaFileUploadError::ServerErrorVerbose("invalid archive file".to_string()),
           PmxError::TooManyFiles => MediaFileUploadError::ServerErrorVerbose("too many files".to_string()),
+          PmxError::NoPmxFile => MediaFileUploadError::ServerErrorVerbose("no pmx files".to_string()),
+          PmxError::TooManyPmxFiles => MediaFileUploadError::ServerErrorVerbose("too many pmx files".to_string()),
           PmxError::UploadError => MediaFileUploadError::ServerErrorVerbose("upload error".to_string()),
           PmxError::FileError => MediaFileUploadError::ServerErrorVerbose("file error".to_string()),
         }
