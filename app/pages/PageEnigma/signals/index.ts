@@ -15,4 +15,5 @@ export * from "./sidePanel";
 export * from "./sizing";
 export * from "./stylizeTab";
 export * from "./timing";
+export * from "./timeline";
 export * from "./error";

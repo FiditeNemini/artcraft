@@ -1,43 +1,34 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { useSignals } from "@preact/signals-react/runtime";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import {
   addNewCharacter,
   addObjectToTimeline,
+  clearExistingData,
   currentTime,
+  deleteObjectOrCharacter,
   loadAudioData,
   loadCameraData,
   loadCharacterData,
   loadObjectData,
   selectedObject,
+  addKeyframe,
 } from "~/pages/PageEnigma/signals";
-import Queue, { ToastDataType } from "~/pages/PageEnigma/Queue/Queue";
+import Queue, {
+  QueueSubscribeType,
+  ToastDataType,
+} from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
-import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import {
   MediaItem,
-  QueueClip,
   QueueKeyframe,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
 import { ClipGroup } from "~/pages/PageEnigma/enums";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { addToast } from "~/signals";
 import { ToastTypes } from "~/enums";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
-
-interface Arguments {
-  action: fromEngineActions | toEngineActions | toTimelineActions;
-  data:
-    | QueueClip
-    | UpdateTime
-    | QueueKeyframe
-    | ClipUI[]
-    | MediaItem
-    | ToastDataType
-    | null;
-}
 
 const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
   [ClipGroup.CHARACTER]: loadCharacterData,
@@ -48,11 +39,9 @@ const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
 
 export function useQueueHandler() {
   useSignals();
-  const { addKeyframe, clearExistingData, deleteObjectOrCharacter } =
-    useContext(TrackContext);
 
   const handleFromEngineActions = useCallback(
-    ({ action, data }: Arguments) => {
+    ({ action, data }: QueueSubscribeType) => {
       console.log("FROM ENGINE", action, data);
       switch (action) {
         case fromEngineActions.ADD_OBJECT: {
@@ -97,11 +86,11 @@ export function useQueueHandler() {
           throw new Error(`Unknown action ${action}`);
       }
     },
-    [clearExistingData, deleteObjectOrCharacter],
+    [deleteObjectOrCharacter],
   );
 
   const handleToTimelineActions = useCallback(
-    ({ action, data }: Arguments) => {
+    ({ action, data }: QueueSubscribeType) => {
       console.log("TO TIMELINE", action, data);
       switch (action) {
         case toTimelineActions.ADD_KEYFRAME:
@@ -111,7 +100,7 @@ export function useQueueHandler() {
           throw new Error(`Unknown action ${action}`);
       }
     },
-    [addKeyframe],
+    [],
   );
 
   useEffect(() => {

@@ -24,13 +24,13 @@ import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
-import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { Clip, Keyframe } from "~/pages/PageEnigma/models";
 import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHeaders";
 import { pageWidth } from "~/signals";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import PremiumLockTimeline from "./PremiumLockTimeline";
 import { AssetType, DoNotShow } from "~/enums";
+import { deleteKeyframe } from "~/pages/PageEnigma/signals/timeline";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -50,7 +50,6 @@ function scrollItem(itemId: string) {
 export const Timeline = () => {
   useSignals();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { deleteKeyframe } = useUpdateKeyframe();
   const lastSelectedObject = useRef(selectedObject.value);
 
   if (selectedObject.value !== lastSelectedObject.current) {
@@ -101,7 +100,7 @@ export const Timeline = () => {
       deleteKeyframe(selectedItem.value as Keyframe);
     }
     selectedItem.value = null;
-  }, [deleteKeyframe]);
+  }, []);
 
   const onDeleteAsk = useCallback(
     (event: KeyboardEvent) => {
@@ -114,7 +113,9 @@ export const Timeline = () => {
       ) {
         event.stopPropagation();
         event.preventDefault();
-        const show = localStorage.getItem("Delete-clip");
+        const show = localStorage.getItem(
+          `Delete-${getItemType(selectedItem.value)}`,
+        );
         if (show === DoNotShow) {
           onDelete();
           return;
