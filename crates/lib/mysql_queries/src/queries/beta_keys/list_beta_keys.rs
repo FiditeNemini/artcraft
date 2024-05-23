@@ -15,11 +15,8 @@ pub struct BetaKeyListPage {
 
   pub sort_ascending: bool,
 
-  /// ID of the first record in the result set.
-  pub first_id: Option<i64>,
-
-  /// ID of the last record in the result set.
-  pub last_id: Option<i64>,
+  pub current_page: usize,
+  pub total_page_count: usize,
 }
 
 pub struct BetaKeyListItem {
@@ -53,37 +50,52 @@ pub struct BetaKeyListItem {
 pub struct ListBetaKeysArgs<'a> {
   pub filter_to_referrer_user_token: Option<&'a UserToken>,
   pub filter_to_remaining_keys: bool,
-  pub limit: usize,
-  pub maybe_offset: Option<usize>,
-  pub cursor_is_reversed: bool,
+
+  pub page_size: usize,
+  pub page_index: usize,
   pub sort_ascending: bool,
+
   pub mysql_pool: &'a MySqlPool,
 }
 
 pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyListPage> {
+  /// Let's figure out how many results we could have returned total
+  let count_fields = select_total_count_field();
 
-  let mut query = query_builder(
+  let mut count_query_builder = query_builder(
+    count_fields,
     args.filter_to_referrer_user_token,
     args.filter_to_remaining_keys,
-    args.limit,
-    args.maybe_offset,
-    args.cursor_is_reversed,
+    false,
+    args.page_index,
+    args.page_size,
     args.sort_ascending,
   );
 
-  info!("query_builder query (wip): {:?}", query.sql());
+  info!("count query: {:?}", count_query_builder.sql());
 
-  let query = query.build_query_as::<MediaFileListItemInternal>();
+  let row_count_query = count_query_builder.build_query_scalar::<i64>();
+  let row_count_result = row_count_query.fetch_one(args.mysql_pool).await?;
 
-  info!("query dsl query (wip): {:?}", query.sql());
+  let number_of_pages = (row_count_result / args.page_size as i64) as usize;
 
+  /// Now fetch the actual results with all the fields
+  let result_fields = select_result_fields();
+
+  let mut query = query_builder(
+    result_fields,
+    args.filter_to_referrer_user_token,
+    args.filter_to_remaining_keys,
+    true,
+    args.page_index,
+    args.page_size,
+    args.sort_ascending,
+  );
+
+  info!("actual query: {:?}", query.sql());
+
+  let query = query.build_query_as::<BetaKeyListItemInternal>();
   let results = query.fetch_all(args.mysql_pool).await?;
-
-  let first_id = results.first()
-      .map(|raw_result| raw_result.id);
-
-  let last_id = results.last()
-      .map(|raw_result| raw_result.id);
 
   let results = results.into_iter()
       .map(|record| {
@@ -113,26 +125,14 @@ pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyL
 
   Ok(BetaKeyListPage {
     records: results,
-    sort_ascending: !args.cursor_is_reversed,
-    first_id,
-    last_id,
+    sort_ascending: args.sort_ascending,
+    current_page: args.page_index,
+    total_page_count: number_of_pages,
   })
 }
 
-fn query_builder<'a>(
-  filter_to_referrer_user_token: Option<&'a UserToken>,
-  filter_to_remaining_keys: bool,
-  limit: usize,
-  maybe_offset: Option<usize>,
-  cursor_is_reversed: bool,
-  sort_ascending: bool,
-) -> QueryBuilder<'a, MySql> {
-
-  let mut sort_ascending = sort_ascending;
-  // NB: Query cannot be statically checked by sqlx
-  let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
-    r#"
-SELECT
+fn select_result_fields() -> &'static str {
+  r#"
   b.id,
   b.token,
 
@@ -159,6 +159,34 @@ SELECT
 
   b.created_at,
   b.maybe_redeemed_at
+    "#
+}
+
+fn select_total_count_field() -> &'static str {
+  r#"
+    COUNT(b.id) AS total_count
+  "#
+}
+
+fn query_builder<'a>(
+  select_fields: &'a str,
+
+  filter_to_referrer_user_token: Option<&'a UserToken>,
+  filter_to_remaining_keys: bool,
+
+  enforce_limits: bool,
+  page_index: usize,
+  page_size: usize,
+  sort_ascending: bool,
+) -> QueryBuilder<'a, MySql> {
+
+  let mut sort_ascending = sort_ascending;
+
+  // NB: Query cannot be statically checked by sqlx
+  let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
+    format!(r#"
+SELECT
+  {select_fields}
 
 FROM beta_keys AS b
 
@@ -171,7 +199,7 @@ LEFT OUTER JOIN users AS referrer
 LEFT OUTER JOIN users AS redeemer
     ON b.maybe_redeemer_user_token = redeemer.token
     "#
-  );
+  ));
 
   let mut first_predicate_added = false;
 
@@ -198,33 +226,33 @@ LEFT OUTER JOIN users AS redeemer
     query_builder.push(" b.maybe_redeemed_at IS NULL ");
   }
 
-  if let Some(offset) = maybe_offset {
-    if !first_predicate_added {
-      query_builder.push(" WHERE ");
-      first_predicate_added = true;
-    } else {
-      query_builder.push(" AND ");
-    }
-
-    if sort_ascending {
-      if cursor_is_reversed {
-        // NB: We're searching backwards.
-        query_builder.push(" b.id < ");
-        sort_ascending = !sort_ascending;
-      } else {
-        query_builder.push(" b.id > ");
-      }
-    } else {
-      if cursor_is_reversed {
-        // NB: We're searching backwards.
-        query_builder.push(" b.id > ");
-        sort_ascending = !sort_ascending;
-      } else {
-        query_builder.push(" b.id < ");
-      }
-    }
-    query_builder.push_bind(offset as i64);
-  }
+//  if let Some(offset) = maybe_offset {
+//    if !first_predicate_added {
+//      query_builder.push(" WHERE ");
+//      first_predicate_added = true;
+//    } else {
+//      query_builder.push(" AND ");
+//    }
+//
+//    if sort_ascending {
+//      if cursor_is_reversed {
+//        // NB: We're searching backwards.
+//        query_builder.push(" b.id < ");
+//        sort_ascending = !sort_ascending;
+//      } else {
+//        query_builder.push(" b.id > ");
+//      }
+//    } else {
+//      if cursor_is_reversed {
+//        // NB: We're searching backwards.
+//        query_builder.push(" b.id > ");
+//        sort_ascending = !sort_ascending;
+//      } else {
+//        query_builder.push(" b.id < ");
+//      }
+//    }
+//    query_builder.push_bind(offset as i64);
+//  }
 
   if sort_ascending {
     query_builder.push(" ORDER BY b.id ASC ");
@@ -232,12 +260,17 @@ LEFT OUTER JOIN users AS redeemer
     query_builder.push(" ORDER BY b.id DESC ");
   }
 
-  query_builder.push(format!(" LIMIT {limit} "));
+//  query_builder.push(format!(" LIMIT {limit} "));
+
+  if enforce_limits {
+    let offset = page_index * page_size;
+    query_builder.push(format!(" LIMIT {page_size} OFFSET {offset} "));
+  }
 
   query_builder
 }
 
-struct MediaFileListItemInternal {
+struct BetaKeyListItemInternal {
   id: i64,
   token: BetaKeyToken,
 
@@ -266,7 +299,7 @@ struct MediaFileListItemInternal {
   maybe_redeemed_at: Option<DateTime<Utc>>,
 }
 
-impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
+impl FromRow<'_, MySqlRow> for BetaKeyListItemInternal {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
     let creator_user_token : String = row.try_get("creator_user_token")?;
     let creator_user_token = UserToken::new(creator_user_token);

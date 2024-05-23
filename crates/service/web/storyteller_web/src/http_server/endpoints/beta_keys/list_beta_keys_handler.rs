@@ -29,6 +29,7 @@ use users_component::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::CreateBetaKeysError;
 use crate::http_server::endpoints::events::list_events::ListEventsError;
@@ -44,8 +45,7 @@ use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 pub struct ListBetaKeysQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
-  pub cursor: Option<String>,
-  pub cursor_is_reversed: Option<bool>,
+  pub page_index: Option<usize>,
 
   /// Scope the beta keys to a referrer user.
   pub maybe_referrer_username: Option<String>,
@@ -58,7 +58,7 @@ pub struct ListBetaKeysQueryParams {
 pub struct ListBetaKeysSuccessResponse {
   pub success: bool,
   pub beta_keys: Vec<BetaKeyItem>,
-  pub pagination: PaginationCursors,
+  pub pagination: PaginationPage,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -150,28 +150,15 @@ pub async fn list_beta_keys_handler(
   }
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
-  let limit = query.page_size.unwrap_or(25);
-
   let sort_ascending = query.sort_ascending.unwrap_or(false);
-  let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
-
-  let cursor = if let Some(cursor) = query.cursor.as_deref() {
-    let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ListBetaKeysError::ServerError
-        })?;
-    Some(cursor as usize)
-  } else {
-    None
-  };
+  let page_size = query.page_size.unwrap_or_else(|| 500);
+  let page_index = query.page_index.unwrap_or_else(|| 0);
 
   let query_results = list_beta_keys(ListBetaKeysArgs {
     filter_to_referrer_user_token: maybe_scope_user_token.as_ref(),
     filter_to_remaining_keys: query.only_list_remaining.unwrap_or(false),
-    limit,
-    maybe_offset: cursor,
-    cursor_is_reversed,
+    page_size,
+    page_index,
     sort_ascending,
     mysql_pool: &server_state.mysql_pool,
   }).await;
@@ -182,28 +169,6 @@ pub async fn list_beta_keys_handler(
       warn!("Query error: {:?}", err);
       return Err(ListBetaKeysError::ServerError);
     }
-  };
-
-  let cursor_next = if let Some(id) = results_page.last_id {
-    let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ListBetaKeysError::ServerError
-        })?;
-    Some(cursor)
-  } else {
-    None
-  };
-
-  let cursor_previous = if let Some(id) = results_page.first_id {
-    let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ListBetaKeysError::ServerError
-        })?;
-    Some(cursor)
-  } else {
-    None
   };
 
   let results = results_page.records.into_iter()
@@ -239,10 +204,9 @@ pub async fn list_beta_keys_handler(
   let response = ListBetaKeysSuccessResponse {
     success: true,
     beta_keys: results,
-    pagination: PaginationCursors {
-      maybe_next: cursor_next,
-      maybe_previous: cursor_previous,
-      cursor_is_reversed,
+    pagination: PaginationPage{
+      current: results_page.current_page,
+      total_page_count: results_page.total_page_count,
     }
   };
 
