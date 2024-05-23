@@ -60,7 +60,7 @@ export const H6 = ({ className, children }: TypoProps) => (
 export const Link = ({ className, ...rest }: NavLinkProps) => (
   <NavLink
     className={twMerge(
-      "text-brand-primary hover:text-brand-primary-400",
+      "text-brand-primary transition-all duration-150 hover:text-brand-primary-400",
       className as string,
     )}
     {...rest}

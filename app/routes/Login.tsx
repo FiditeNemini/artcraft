@@ -50,10 +50,16 @@ export default function LoginScreen() {
       style={{ height: "calc(100% - 72px)" }}
     >
       <div className="mx-auto my-6 w-10/12 max-w-2xl">
-        <H1 className="text-center">Login to Storyteller</H1>
+        <H1 className="text-center text-[32px] font-bold">
+          Login to Storyteller
+        </H1>
       </div>
       <div className="relative mx-auto my-6 w-10/12 max-w-2xl overflow-hidden rounded-lg border border-ui-panel-border bg-ui-panel p-6">
-        <form ref={formRef} onSubmit={handleOnSumbit}>
+        <form
+          ref={formRef}
+          onSubmit={handleOnSumbit}
+          className="flex flex-col gap-4"
+        >
           <Input
             label="Username or Email"
             icon={faUser}
@@ -62,7 +68,6 @@ export default function LoginScreen() {
             autoComplete="username"
             required
           />
-          <br />
           <Input
             label="Password"
             icon={faKey}
@@ -72,12 +77,20 @@ export default function LoginScreen() {
             autoComplete="current-password"
             required
           />
-          <br />
-          <div className="flex justify-end gap-2">
-            <P>Don't have an account?</P>
-            <Link to="/signup">Sign Up</Link>
+          <div className="align-items mb-3 flex">
+            <a
+              href="https://storyteller.ai/password-reset"
+              className="grow text-sm text-brand-primary transition-all duration-150 hover:text-brand-primary-400"
+            >
+              Forgot your password?
+            </a>
+            <div className="flex justify-end gap-1 text-sm">
+              <P>Don&apos;t have an account?</P>
+              <Link to="/signup">Sign Up</Link>
+            </div>
           </div>
-          <Button>Login</Button>
+
+          <Button className="h-11 w-full text-[15px]">Login</Button>
         </form>
         <LoadingDots
           className="absolute left-0 top-0 h-full w-full"

@@ -40,15 +40,18 @@ export const Input = React.forwardRef(
 
         <div className="relative w-full">
           {icon && (
-            <FontAwesomeIcon icon={icon} className="absolute h-5 pl-3 pt-2.5" />
+            <FontAwesomeIcon
+              icon={icon}
+              className="text-md absolute pl-3 pt-3"
+            />
           )}
           <input
             ref={ref}
             id={id ? id : label ? kebabCase(label) : undefined}
             className={twMerge(
-              "h-10 w-full rounded-md bg-brand-secondary px-3 py-2.5 text-white outline-none",
+              "h-10 w-full rounded-lg bg-brand-secondary px-3 py-2.5 text-white outline-none",
               "outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary",
-              icon && "pl-12",
+              icon && "pl-10",
               isError && "outline-red focus:outline-red",
               inputClassName,
             )}
