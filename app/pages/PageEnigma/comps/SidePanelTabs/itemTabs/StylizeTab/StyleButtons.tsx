@@ -12,9 +12,9 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { Switch } from "@headlessui/react";
 import PremiumLock from "~/components/PremiumLock";
 import {
-  upscale,
   faceDetail,
   styleStrength,
+  upscale,
 } from "~/pages/PageEnigma/signals/stylizeTab";
 
 export function StyleButtons() {
@@ -25,6 +25,13 @@ export function StyleButtons() {
   };
 
   const switchPreview = async () => {
+    if (editorState.value === EditorStates.EDIT) {
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.ENTER_EDIT_STATE,
+        data: null,
+      });
+    }
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.ENTER_PREVIEW_STATE,
@@ -56,7 +63,7 @@ export function StyleButtons() {
           <div className="mb-2 text-xs text-white/70">
             (This helps you test and re-test your scene)
           </div>
-          {editorState.value === EditorStates.EDIT && (
+          {editorState.value !== EditorStates.PREVIEW && (
             <>
               <Button
                 icon={faArrowsRotate}
@@ -152,13 +159,13 @@ export function StyleButtons() {
             </div>
             <input
               className="
-             active:accent-red-700 
-             w-full 
-             cursor-pointer 
-             accent-brand-primary 
-             outline-none 
-             transition-all 
-             duration-150 
+             active:accent-red-700
+             w-full
+             cursor-pointer
+             accent-brand-primary
+             outline-none
+             transition-all
+             duration-150
              hover:accent-brand-primary-400
              focus:outline-none
            "
