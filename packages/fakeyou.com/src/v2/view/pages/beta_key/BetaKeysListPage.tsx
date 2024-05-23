@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import {
   Button,
+  Checkbox,
   Container,
   Pagination,
   Panel,
@@ -34,6 +35,7 @@ export default function BetaKeysListPage() {
   const urlQueries = new URLSearchParams(search);
   const [list, listSet] = useState<BetaKey[]>([]);
   const [username, usernameSet] = useState("");
+  const [onlyUnredeemed, onlyUnredeemedSet] = useState("false");
 
   const keysList = useListContent({
     addQueries: {
@@ -41,6 +43,7 @@ export default function BetaKeysListPage() {
       ...(username.trim()
         ? prepFilter(username, "maybe_referrer_username")
         : {}),
+      ...prepFilter(onlyUnredeemed, "only_list_remaining"),
     },
     addSetters: { usernameSet },
     debug: "ListBetaKeys",
@@ -170,25 +173,39 @@ export default function BetaKeysListPage() {
     usernameSet(e.target.value);
   };
 
+  const handleShowOnlyUnredeemed = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onlyUnredeemedSet(e.target.checked ? "true" : "false");
+    keysList.reFetch();
+  };
+
   return (
     <Container type="panel-full">
       <PageHeader title="Beta Keys List" subText="List of beta keys created" />
       <Panel padding={true}>
         <div>
           <div className="d-flex flex-column flex-lg-row gap-3">
-            <div className="d-flex gap-1 flex-grow-1">
-              <TempInput
-                placeholder="Search by Referrer Username"
-                value={username}
-                onChange={handleSetUsername}
-                style={{ width: "240px" }}
-                onKeyPress={event => {
-                  if (event.key === "Enter") {
-                    keysList.reFetch();
-                  }
-                }}
+            <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-3 gap-lg-5 flex-grow-1">
+              <div className="d-flex gap-1 align-items-center">
+                <TempInput
+                  placeholder="Search by Referrer Username"
+                  value={username}
+                  onChange={handleSetUsername}
+                  style={{ width: "240px" }}
+                  onKeyPress={event => {
+                    if (event.key === "Enter") {
+                      keysList.reFetch();
+                    }
+                  }}
+                />
+                <Button label="Search" onClick={keysList.reFetch} />
+              </div>
+
+              <Checkbox
+                label="Show only unredeemed"
+                className="mb-0 fs-7"
+                onChange={handleShowOnlyUnredeemed}
+                checked={onlyUnredeemed === "true"}
               />
-              <Button label="Search" onClick={keysList.reFetch} />
             </div>
             <Pagination {...paginationProps} />
           </div>
