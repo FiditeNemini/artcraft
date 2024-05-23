@@ -54,11 +54,11 @@ pub async fn require_moderator(
 
       saved_connection = Some(connection);
 
-      saved_connection.as_mut().expect("this should be safe - we just saved the connection")
+      // NB: We just saved it, so it shouldn't error. Safer than unwrap/expect.
+      saved_connection.as_mut().ok_or(RequireModeratorError::ServerError)?
     },
     UseDatabase::FromPool(pool) => pool,
   };
-
 
   let maybe_user_session = server_state
       .session_checker
