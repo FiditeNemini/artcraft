@@ -23,7 +23,7 @@ export enum toEngineActions {
   MUTE = "mute",
   // data={version, type, group, object_uuid} if lipsync
   // data={version, type, group} if global_audio
-  PLAY_CLIP = "play_clip",
+  REFRESH_PREVIEW = "refresh_preview",
   // data=QueueClip
   TOGGLE_CAMERA_STATE = "toggle_camera",
   // data=null

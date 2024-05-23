@@ -9,6 +9,7 @@ export * from "./InferenceJobType";
 export * from "./JobState";
 export * from "./MediaFileClass";
 export * from "./MediaFileType";
+export * from "./StylizeTabPages";
 export * from "./Visibility";
 export * from "./WeightCategory";
 export * from "./WeightType";

@@ -30,13 +30,18 @@ If you can use chat gpt to create the interface.
 
 Copy & paste the env settings from `.env-local-proxy` to `.env`, (if the file `.env` do not exist, simply create one at the root of this project's folder beside the other env settings files).
 
-The settings from `.env-local-proxy` directs all requests to `localhost:3000`, this relieve us from having to deal with CORS between various services.
+The settings from `.env-local-proxy` directs all requests to `localhost:3000`, this will relieve us from having to deal with CORS between various services.
 
-Then, start the proxy server in the folder `/proxy`
+Then, start the proxy server in the folder `/proxy`. Before running the proxy for the first time, run:
+
+```
+npm i
+```
+
+To start the proxy run:
 
 ```
 node proxy.js
-
 ```
 
 ### Run the Code Locally

@@ -1,7 +1,5 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
-
+import { ChangeEvent, useContext, useEffect } from "react";
 import { Textarea } from "~/components";
-
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRandom } from "@fortawesome/pro-solid-svg-icons";
@@ -10,63 +8,61 @@ import {
   RandomTextsNegative,
 } from "~/pages/PageEnigma/constants/RandomTexts";
 import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
+import { promptsStore } from "~/pages/PageEnigma/signals";
+import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
   selection: ArtStyle;
 }
 
 export const Prompts = ({ selection }: Props) => {
+  useSignals();
   const editorEngine = useContext(EngineContext);
-  const [textBufferPositive, setTextBufferPositive] = useState("");
-  const [textBufferNegative, setTextBufferNegative] = useState("");
-
-  const [isUserInputPositive, setIsUserInputPositive] = useState(false);
-  const [isUserInputNegative, setIsUserInputNegative] = useState(false);
 
   useEffect(() => {
     if (editorEngine === null) {
       return;
     }
 
-    if (!isUserInputPositive) {
+    if (!promptsStore.isUserInputPositive.value) {
       const randomIndexPositive = Math.floor(
         Math.random() * RandomTextsPositive[selection].length,
       );
       const randomTextPositive =
         RandomTextsPositive[selection][randomIndexPositive];
       editorEngine.positive_prompt = randomTextPositive;
-      setTextBufferPositive(randomTextPositive);
+      promptsStore.textBufferPositive.value = randomTextPositive;
     }
 
-    if (!isUserInputNegative) {
+    if (!promptsStore.isUserInputNegative.value) {
       const randomIndexNegative = Math.floor(
         Math.random() * RandomTextsNegative[selection].length,
       );
       const randomTextNegative =
         RandomTextsNegative[selection][randomIndexNegative];
       editorEngine.negative_prompt = randomTextNegative;
-      setTextBufferNegative(randomTextNegative);
+      promptsStore.textBufferNegative.value = randomTextNegative;
     }
-  }, [selection, editorEngine, isUserInputPositive, isUserInputNegative]);
+  }, [selection, editorEngine]);
 
   const onChangeHandlerNegative = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (editorEngine === null) {
       console.log("Editor is null");
       return;
     }
-    setIsUserInputNegative(true);
+    promptsStore.isUserInputNegative.value = true;
     editorEngine.negative_prompt = event.target.value;
-    setTextBufferNegative(event.target.value);
+    promptsStore.textBufferNegative.value = event.target.value;
   };
 
   const onChangeHandlerPositive = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    if (editorEngine == null) {
+    if (editorEngine === null) {
       console.log("Editor is null");
       return;
     }
-    setIsUserInputPositive(true);
+    promptsStore.isUserInputPositive.value = true;
     editorEngine.positive_prompt = event.target.value;
-    setTextBufferPositive(event.target.value);
+    promptsStore.textBufferPositive.value = event.target.value;
   };
 
   const generateRandomTextPositive = () => {
@@ -77,8 +73,8 @@ export const Prompts = ({ selection }: Props) => {
     if (editorEngine !== null) {
       editorEngine.positive_prompt = randomText;
     }
-    setIsUserInputPositive(false);
-    setTextBufferPositive(randomText);
+    promptsStore.isUserInputPositive.value = false;
+    promptsStore.textBufferPositive.value = randomText;
   };
 
   const generateRandomTextNegative = () => {
@@ -89,23 +85,22 @@ export const Prompts = ({ selection }: Props) => {
     if (editorEngine !== null) {
       editorEngine.negative_prompt = randomText;
     }
-    setIsUserInputNegative(false);
-    setTextBufferNegative(randomText);
+    promptsStore.isUserInputNegative.value = false;
+    promptsStore.textBufferNegative.value = randomText;
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-t-lg bg-ui-panel px-4">
+    <div className="flex flex-col gap-3 rounded-t-lg bg-ui-panel">
       <div className="relative w-full">
         <Textarea
           label="Enter a Prompt"
           className="w-full"
-          rows={2}
+          rows={3}
           name="positive-prompt"
           placeholder="Type here to describe your scene"
           onChange={onChangeHandlerPositive}
-          resize="none"
           required
-          value={textBufferPositive}
+          value={promptsStore.textBufferPositive.value}
         />
         <div className="absolute right-0 top-[2px]">
           <button
@@ -117,6 +112,7 @@ export const Prompts = ({ selection }: Props) => {
           </button>
         </div>
       </div>
+
       <div className="relative w-full">
         <Textarea
           label="Negative Prompt"
@@ -125,8 +121,7 @@ export const Prompts = ({ selection }: Props) => {
           name="negative-prompt"
           placeholder="Type here to filter out the things you don't want in the scene"
           onChange={onChangeHandlerNegative}
-          resize="none"
-          value={textBufferNegative}
+          value={promptsStore.textBufferNegative.value}
         />
         <div className="absolute right-0 top-[2px]">
           <button

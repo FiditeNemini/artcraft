@@ -13,5 +13,6 @@ export * from "./selectedItem";
 export * from "./shape";
 export * from "./sidePanel";
 export * from "./sizing";
+export * from "./stylizeTab";
 export * from "./timing";
 export * from "./error";

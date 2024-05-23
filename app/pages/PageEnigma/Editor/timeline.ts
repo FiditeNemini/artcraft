@@ -168,6 +168,11 @@ export class TimeLine {
       case toEngineActions.TOGGLE_CAMERA_STATE:
         this.editorEngine.switchCameraView();
         break;
+      case toEngineActions.REFRESH_PREVIEW:
+        if (this.editorEngine.switchPreviewToggle) {
+          await this.editorEngine.generateFrame();
+        }
+        break;
       case toEngineActions.GENERATE_VIDEO: {
         const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
         this.editorEngine.generation_options = options as GenerationOptions;
