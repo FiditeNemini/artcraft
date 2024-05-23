@@ -47,6 +47,10 @@ CREATE TABLE beta_keys (
 
   -- ========== EXTRA INFO ==========
 
+  -- A flag to manually indicate if the key was given away to a user.
+  -- This might be useful when generating flags in bulk.
+  is_distributed BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- Optional notes that can be attached to a beta key
   maybe_notes VARCHAR(255) DEFAULT NULL,
 
