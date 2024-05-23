@@ -45,9 +45,20 @@ CREATE TABLE beta_keys (
   -- Wide enough for IPv4/6
   maybe_redeemer_ip_address VARCHAR(40) DEFAULT NULL,
 
+  -- ========== EXTRA INFO ==========
+
+  -- Optional notes that can be attached to a beta key
+  maybe_notes VARCHAR(255) DEFAULT NULL,
+
   -- ========== TIMESTAMPS ==========
 
+  -- When the key was created
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  -- When the key expires (optional)
+  maybe_expires_at TIMESTAMP NULL,
+
+  -- When the key was redeemed
   maybe_redeemed_at TIMESTAMP NULL,
 
   -- INDICES --
