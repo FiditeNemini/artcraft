@@ -85,10 +85,8 @@ pub struct UploadPmxSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
-/// Upload an engine asset: character, animation, etc. Just don't use this for scenes.
+/// Upload a pmx zip file.
 /// 
-/// This is for new assets. You can't update existing assets with this endpoint.
-///
 /// Be careful to set the correct `engine_category` and `maybe_animation_type` (if needed) fields!
 #[utoipa::path(
   post,
