@@ -3,12 +3,16 @@ import { PageStyleSelection } from "./PageStyleSelection";
 import { Prompts } from "./Prompts";
 import { StyleButtons } from "./StyleButtons";
 import { useSignals } from "@preact/signals-react/runtime";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 import { styleList } from "~/pages/PageEnigma/styleList";
-import { StylizeTabPages } from "~/pages/PageEnigma/enums";
+import { EditorStates, StylizeTabPages } from "~/pages/PageEnigma/enums";
 import { StyleSelectionButton } from "./StyleSelectionButton";
 import { GenerateMovieButton } from "./GenerateMovieButton";
+import { editorState } from "~/pages/PageEnigma/signals/engine";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export function StylizeTab() {
   useSignals();
@@ -17,6 +21,16 @@ export function StylizeTab() {
   const [generateSectionHeight, setGenerateSectionHeight] = useState(110);
 
   const currentStyle = styleList.find((style) => style.type === selection);
+
+  useEffect(() => {
+    if (editorState.value === EditorStates.PREVIEW) {
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.REFRESH_PREVIEW,
+        data: null,
+      });
+    }
+  }, [selection]);
 
   const handleSelectStyle = (newSelection: ArtStyle) => {
     setSelection(newSelection);
