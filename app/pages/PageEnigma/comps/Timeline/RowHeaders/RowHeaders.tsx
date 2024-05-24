@@ -172,7 +172,7 @@ export const RowHeaders = () => {
             ) : (
               <div
                 className="mb-4 h-[103px] w-full rounded-l-lg bg-object-groupBg"
-                style={{ height: 55 + objectGroup.value.objects.length * 48 }}
+                style={{ height: 48 + objectGroup.value.objects.length * 52 }}
               >
                 <div className="h-[47px] text-xs font-medium text-white">
                   <div
@@ -187,7 +187,7 @@ export const RowHeaders = () => {
                 {objectGroup.value.objects.map((obj) => (
                   <div
                     key={obj.object_uuid}
-                    className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80"
+                    className="mb-4 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80"
                   >
                     {obj.name}
                   </div>
