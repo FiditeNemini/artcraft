@@ -132,7 +132,7 @@ export const AnimationTab = () => {
         onClose={() => setOpen(false)}
         onSuccess={refetchAnimations}
         isOpen={open}
-        fileTypes={["GLB", "FBX"]}
+        fileTypes={["GLB", "FBX", "VMD"]}
         title="Upload Animation"
         typeOptions={[
           { Mixamo: MediaFileAnimationType.Mixamo },

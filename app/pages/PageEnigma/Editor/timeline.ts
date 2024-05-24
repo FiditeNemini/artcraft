@@ -190,7 +190,7 @@ export class TimeLine {
     const pos = this.getPos();
     const new_data = { ...data };
 
-    const obj = await this.scene.loadGlbWithPlaceholder(
+    const obj = await this.scene.loadObject(
       media_id,
       name,
       true,

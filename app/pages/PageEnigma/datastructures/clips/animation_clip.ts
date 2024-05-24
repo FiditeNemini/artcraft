@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/Addons.js";
+import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
 
 import { MoveAIResult, Retarget } from "../../Editor/retargeting";
 import { environmentVariables } from "~/signals";
@@ -91,8 +92,19 @@ export class AnimationClip {
             });
             resolve(animationClip);
           });
-        } else {
-          console.log("Could not animation type.");
+        } else if (url.includes(".vmd")) {
+          console.log("VMD Loader")
+          let root = this.mixer?.getRoot();
+          console.log(root)
+          if(root){
+            const mmdLoader = new MMDLoader();
+            mmdLoader.loadAnimation(url, (root as THREE.SkinnedMesh), (mmd) => {
+              resolve((mmd as THREE.AnimationClip));
+            });
+            console.log("Loaded")
+
+          }
+          console.log("Dont")
         }
       });
     });

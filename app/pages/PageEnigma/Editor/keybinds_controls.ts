@@ -20,7 +20,7 @@ export class MouseControls {
             this.editor.lockControls?.unlock();
         }
 
-        if (event.button !== 0) {
+        if (event.button !== 0 && this.editor.camera) {
             const camera_pos = new THREE.Vector3(
                 parseFloat(this.editor.camera.position.x.toFixed(2)),
                 parseFloat(this.editor.camera.position.y.toFixed(2)),
@@ -57,6 +57,7 @@ export class MouseControls {
 
     // Sets new mouse location usually used in raycasts.
     onMouseMove(event: any) {
+        if(this.editor.canvReference == undefined) { return; }
         const rect = this.editor.canvReference.getBoundingClientRect();
         if (this.editor.mouse == undefined) {
             return;
@@ -68,6 +69,7 @@ export class MouseControls {
 
     // When the mouse clicks the screen.
     onMouseClick() {
+        if(this.editor.camera == undefined) { return; }
         const camera_pos = new THREE.Vector3(
             parseFloat(this.editor.camera.position.x.toFixed(2)),
             parseFloat(this.editor.camera.position.y.toFixed(2)),
@@ -97,7 +99,8 @@ export class MouseControls {
                 if (
                     child.type == "Mesh" ||
                     child.type == "Object3D" ||
-                    child.type == "Group"
+                    child.type == "Group" ||
+                    child.type == "SkinnedMesh"
                 ) {
                     interactable.push(child);
                 }

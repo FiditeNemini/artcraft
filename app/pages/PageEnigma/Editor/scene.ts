@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader, GLTF } from "three/addons/loaders/GLTFLoader.js";
+import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
+
 import { environmentVariables } from "~/signals";
 
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
@@ -234,16 +236,82 @@ class Scene {
       object.userData["color"] = hex_color;
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
-          if (c.userData["base"] == undefined) {
-            c.userData["base"] = c.material.color.getHex();
+          if (c.material.color !== undefined) {
+            if (c.userData["base"] == undefined) {
+              c.userData["base"] = c.material.color.getHex();
+            }
+            var currentColor = new THREE.Color(c.userData["base"]);
+            var tint = new THREE.Color(hex_color);
+            currentColor.multiply(tint);
+            c.material.color.set(new THREE.Color(currentColor));
           }
-          var currentColor = new THREE.Color(c.userData["base"]);
-          var tint = new THREE.Color(hex_color);
-          currentColor.multiply(tint);
-          c.material.color.set(new THREE.Color(currentColor));
         }
       });
     }
+  }
+
+  async loadMMDWithPlaceholder(
+    media_id: string,
+    name: string,
+    auto_add: boolean = true,
+    position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
+  ): Promise<THREE.Object3D> {
+    if (this.placeholder_manager === undefined) {
+      throw Error("Place holder Manager is undefined");
+    }
+    const url = await this.getMediaURL(media_id);
+    const key = media_id + name + generateUUID();
+    await this.placeholder_manager.add(key, `Loading: ${name}`, position);
+    const mmd = await this.load_mmd_wrapped(url, async (progress) => {
+      const total_loaded = progress.loaded / progress.total;
+      if (total_loaded == 1.0) {
+        if (this.placeholder_manager === undefined) {
+          throw Error("Place holder Manager is undefined");
+        }
+        await this.placeholder_manager.remove(key);
+      }
+    }).catch((error: Error) => {
+      throw error;
+    });
+    mmd.traverse((c: THREE.Object3D) => {
+      if (c instanceof THREE.Mesh) {
+        c.material.metalness = 0.0;
+        c.material.specular = 0.5;
+        c.material.shininess = 0.0;
+        c.castShadow = true;
+        c.receiveShadow = true;
+        c.frustumCulled = false;
+        c.material.transparent = false;
+      }
+    });
+    mmd.castShadow = true;
+    mmd.receiveShadow = true;
+    mmd.frustumCulled = false;
+    mmd.name = "MMD" + name;
+    mmd.frustumCulled = false;
+    mmd.userData["media_id"] = media_id;
+    mmd.userData["color"] = "#FFFFFF";
+    mmd.userData["metalness"] = 0.0;
+    mmd.userData["shininess"] = 0.5;
+    mmd.userData["specular"] = 0.5;
+    mmd.userData["locked"] = false;
+    mmd.layers.enable(0);
+    mmd.layers.enable(1);
+    this.scene.add(mmd);
+    return mmd;
+  }
+
+  async loadObject(
+    media_id: string,
+    name: string,
+    auto_add: boolean = true,
+    position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
+  ): Promise<THREE.Object3D> {
+    const url = await this.getMediaURL(media_id);
+    if (url.includes(".pmd") || url.includes(".pmx")) {
+      return await this.loadMMDWithPlaceholder(media_id, name, auto_add, position)
+    }
+    return await this.loadGlbWithPlaceholder(media_id, name, auto_add, position);
   }
 
   async loadGlbWithPlaceholder(
@@ -277,6 +345,7 @@ class Scene {
     }).catch((error: Error) => {
       throw error;
     });
+
 
     let child_result = undefined;
     // Loads the first child
@@ -331,6 +400,26 @@ class Scene {
         media_url,
         (gltf) => {
           resolve(gltf);
+        },
+        progress,
+        (error) => {
+          reject(error);
+        },
+      );
+    });
+  }
+
+  private load_mmd_wrapped(
+    media_url: string,
+    progress: (event: ProgressEvent) => void,
+  ): Promise<THREE.SkinnedMesh> {
+    return new Promise((resolve, reject) => {
+      const mmdLoader = new MMDLoader();
+      mmdLoader.load(
+        media_url,
+        (mesh: THREE.SkinnedMesh) => {
+          mesh.scale.set(0.1, 0.1, 0.1);
+          resolve(mesh);
         },
         progress,
         (error) => {

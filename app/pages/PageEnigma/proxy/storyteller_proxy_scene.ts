@@ -80,7 +80,7 @@ export class StoryTellerProxyScene {
             break;
           default:
             if (token.includes("m_")) {
-              obj = await this.scene.loadGlbWithPlaceholder(
+              obj = await this.scene.loadObject(
                 token,
                 json_object.object_name,
               );

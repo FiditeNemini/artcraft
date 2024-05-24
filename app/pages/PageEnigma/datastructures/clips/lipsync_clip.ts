@@ -83,9 +83,16 @@ export class LipSyncClip {
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
           if (c.morphTargetInfluences && c.morphTargetDictionary) {
-            const blendShapeIndexE = c.morphTargetDictionary["E"];
-            const blendShapeIndexO = c.morphTargetDictionary["O"];
-            const blendShapeIndexA = c.morphTargetDictionary["aa"];
+            let blendShapeIndexE = c.morphTargetDictionary["E"];
+            let blendShapeIndexO = c.morphTargetDictionary["O"];
+            let blendShapeIndexA = c.morphTargetDictionary["aa"];
+
+            if (blendShapeIndexE === undefined) {
+              blendShapeIndexE = c.morphTargetDictionary["お"]; // MMD OH
+              blendShapeIndexO = c.morphTargetDictionary["ω"]; // MMD O
+              blendShapeIndexA = c.morphTargetDictionary["あ"]; // MMD A
+            }
+
             if (blendShapeIndexE != null) {
               this.blendshape_helper = new BlendShapeHelper(
                 blendShapeIndexA,
