@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
+import { faCirclePlus, faMobileNotch } from "@fortawesome/pro-solid-svg-icons";
 
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { AssetFilterOption, AssetType } from "~/enums";
@@ -20,7 +20,12 @@ import {
 } from "~/api/media_files/ListFeaturedMediaFiles";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FilterButtons, UploadModalMovement } from "~/components";
+import {
+  Button,
+  ButtonDialogue,
+  FilterButtons,
+  UploadModalMovement,
+} from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
 export enum FetchStatus {
@@ -142,7 +147,7 @@ export const ExpressionTab = () => {
         />
       </div>
 
-      <div className="w-full px-4">
+      <div className="flex w-full flex-col gap-2.5 px-4">
         <Button
           icon={faCirclePlus}
           variant="action"
@@ -151,6 +156,28 @@ export const ExpressionTab = () => {
         >
           Upload Expression
         </Button>
+        <ButtonDialogue
+          buttonProps={{
+            variant: "secondary",
+            label:
+              "Watch a tutorial on how to create expressions using your iPhone",
+            className:
+              "justify-center border-2 border-white/30 hover:border-white/40 text-start p-3 gap-3.5 rounded-xl",
+            icon: faMobileNotch,
+            iconClassName: "text-3xl",
+          }}
+          dialogProps={{
+            className: "max-w-6xl",
+          }}
+          title={<>Video Tutorial: Creating your own expressions</>}
+        >
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video
+            className="aspect-video w-full rounded-lg"
+            controls
+            src="https://storage.googleapis.com/vocodes-public/media/t/p/w/q/6/tpwq6beqn95f1h1q9e88c42r0gdekg7p/storyteller_tpwq6beqn95f1h1q9e88c42r0gdekg7p.mp4"
+          ></video>
+        </ButtonDialogue>
       </div>
       <div className="h-full w-full overflow-y-auto px-4">
         <ItemElements

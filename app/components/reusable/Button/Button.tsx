@@ -6,6 +6,7 @@ import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: IconDefinition;
+  iconClassName?: string;
   iconFlip?: boolean;
   htmlFor?: string;
   variant?: "primary" | "secondary" | "action";
@@ -14,6 +15,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = ({
   icon,
+  iconClassName,
   children,
   className: propsClassName,
   htmlFor,
@@ -56,13 +58,21 @@ export const Button = ({
         {loading && !iconFlip ? (
           <FontAwesomeIcon icon={faSpinnerThird} className="animate-spin" />
         ) : (
-          <>{icon && !iconFlip ? <FontAwesomeIcon icon={icon} /> : null}</>
+          <>
+            {icon && !iconFlip ? (
+              <FontAwesomeIcon icon={icon} className={iconClassName} />
+            ) : null}
+          </>
         )}
         {children}
         {loading && iconFlip ? (
           <FontAwesomeIcon icon={faSpinnerThird} className="animate-spin" />
         ) : (
-          <>{icon && iconFlip ? <FontAwesomeIcon icon={icon} /> : null}</>
+          <>
+            {icon && iconFlip ? (
+              <FontAwesomeIcon icon={icon} className={iconClassName} />
+            ) : null}
+          </>
         )}
       </label>
     );
@@ -76,13 +86,21 @@ export const Button = ({
       {loading && !iconFlip ? (
         <FontAwesomeIcon icon={faSpinnerThird} className="animate-spin" />
       ) : (
-        <>{icon && !iconFlip ? <FontAwesomeIcon icon={icon} /> : null}</>
+        <>
+          {icon && !iconFlip ? (
+            <FontAwesomeIcon icon={icon} className={iconClassName} />
+          ) : null}
+        </>
       )}
       {children}
       {loading && iconFlip ? (
         <FontAwesomeIcon icon={faSpinnerThird} className="animate-spin" />
       ) : (
-        <>{icon && iconFlip ? <FontAwesomeIcon icon={icon} /> : null}</>
+        <>
+          {icon && iconFlip ? (
+            <FontAwesomeIcon icon={icon} className={iconClassName} />
+          ) : null}
+        </>
       )}
     </button>
   );
