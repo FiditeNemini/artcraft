@@ -200,7 +200,8 @@ export default function BetaKeysListPage() {
       header: "Note",
       cell: info => {
         const note = info.getValue();
-        const { token } = info.row.original;
+        const { token, maybe_note_html } = info.row.original;
+
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const [localNote, setLocalNote] = useState(note);
 
@@ -229,7 +230,12 @@ export default function BetaKeysListPage() {
           </div>
         ) : (
           <div className="d-flex gap-1 align-items-start note-cell">
-            <span className="me-3">{note || "-"}</span>
+            <span 
+              className="me-3" 
+              dangerouslySetInnerHTML={{
+                __html: maybe_note_html || "-",
+              }}
+            ></span>
             <Button
               label="Edit"
               onClick={() => handleEditStart(token, note || "")}

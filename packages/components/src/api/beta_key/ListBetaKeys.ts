@@ -38,6 +38,7 @@ export interface BetaKey {
   product: string;
   token: string;
   maybe_note?: string;
+  maybe_note_html?: string;
 }
 
 export interface ListBetaKeysRequest {}
