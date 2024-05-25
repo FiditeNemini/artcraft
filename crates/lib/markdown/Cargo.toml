@@ -24,6 +24,7 @@ errors = { path = "../errors" }
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 # External
+once_cell = "1.18.0"
 pulldown-cmark = "0.9.3" # markdown
 regex = "1.10.4"
 

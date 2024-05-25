@@ -3747,6 +3747,7 @@ version = "0.0.1"
 dependencies = [
  "errors",
  "my-workspace-hack",
+ "once_cell",
  "pulldown-cmark",
  "regex",
 ]

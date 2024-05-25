@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+use once_cell::sync::Lazy;
 use pulldown_cmark::{html, Options, Parser};
 use regex::{Captures, Regex};
 
@@ -15,7 +17,6 @@ pub fn markdown_with_socials_to_html(markdown_input: &str) -> String {
       .replace("\"", "&quot;")
       .replace("'", "&#x27;"); // NB: &apos; is not in the HTML spec
 
-  // TODO: Use copy on write
   let markdown_input = replace_instagram_user(&markdown_input);
   let markdown_input = replace_reddit_subreddit(&markdown_input);
   let markdown_input = replace_reddit_user(&markdown_input);
@@ -38,52 +39,64 @@ pub fn markdown_with_socials_to_html(markdown_input: &str) -> String {
 
 // TODO(bt,2024-05-25): Not sure if the username parsing is right for each service.
 
-fn replace_instagram_user(input: &str) -> String {
-  let re = Regex::new(r"(insta(gram)?(.com)?/([\w\-_]+))").unwrap(); // TODO: once_cell
-  let result = re.replace(input, |caps: &Captures| {
+static INSTAGRAM_USER : Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"(insta(gram)?(.com)?/([\w\-_]+))").expect("regex should compile")
+});
+
+fn replace_instagram_user(input: &str) -> Cow<str> {
+  INSTAGRAM_USER.replace(input, |caps: &Captures| {
     format!("[{}](https://instagram.com/{})", &caps[1], &caps[4])
-  });
-  result.to_string()
+  })
 }
 
-fn replace_reddit_subreddit(input: &str) -> String {
-  let re = Regex::new(r"(r/([\w\-_]+))").unwrap(); // TODO: once_cell
-  let result = re.replace(input, |caps: &Captures| {
+static REDDIT_SUBREDDIT: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"(r/([\w\-_]+))").expect("regex should compile")
+});
+
+fn replace_reddit_subreddit(input: &str) -> Cow<str> {
+  REDDIT_SUBREDDIT.replace(input, |caps: &Captures| {
     format!("[{}](https://www.reddit.com/r/{})", &caps[1], &caps[2])
-  });
-  result.to_string()
+  })
 }
 
-fn replace_reddit_user(input: &str) -> String {
-  let re = Regex::new(r"(u/([\w\-_]+))").unwrap(); // TODO: once_cell
-  let result = re.replace(input, |caps: &Captures| {
+static REDDIT_USER: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"(u/([\w\-_]+))").expect("regex should compile")
+});
+
+fn replace_reddit_user(input: &str) -> Cow<str> {
+  REDDIT_USER.replace(input, |caps: &Captures| {
     format!("[{}](https://www.reddit.com/user/{})", &caps[1], &caps[2])
-  });
-  result.to_string()
+  })
 }
 
-fn replace_tiktok_user(input: &str) -> String {
-  let re = Regex::new(r"(tiktok(.com)?/([@\w\-_]+))").unwrap(); // TODO: once_cell
-  let result = re.replace(input, |caps: &Captures| {
-    format!("[{}](https://www.tiktok.com/{})", &caps[1], &caps[3])
-  });
-  result.to_string()
+static TIKTOK_USER: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"(tiktok(.com)?/@?([\w\-_]+))").expect("regex should compile")
+});
+
+fn replace_tiktok_user(input: &str) -> Cow<str> {
+  TIKTOK_USER.replace(input, |caps: &Captures| {
+    format!("[{}](https://www.tiktok.com/@{})", &caps[1], &caps[3])
+  })
 }
 
-fn replace_x_user(input: &str) -> String {
-  let re = Regex::new(r"(x(.com)?/([\w\-_]+))").unwrap(); // TODO: once_cell
-  let result = re.replace(input, |caps: &Captures| {
+static X_USER: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"(x(.com)?/([\w\-_]+))").expect("regex should compile")
+});
+
+fn replace_x_user(input: &str) -> Cow<str> {
+  X_USER.replace(input, |caps: &Captures| {
     format!("[{}](https://x.com/{})", &caps[1], &caps[3])
-  });
-  result.to_string()
+  })
 }
 
-fn replace_youtube_channel(input: &str) -> String {
-  let re = Regex::new(r"((yt|youtube(.com)?)/([@\w\-_]+))").unwrap(); // TODO: once_cell
-  let result = re.replace(input, |caps: &Captures| {
-    format!("[{}](https://www.youtube.com/{})", &caps[1], &caps[4])
-  });
-  result.to_string()
+static YOUTUBE_CHANNEL: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"((yt|youtube(.com)?)/@?([\w\-_]+))").expect("regex should compile")
+});
+
+fn replace_youtube_channel(input: &str) -> Cow<str> {
+  YOUTUBE_CHANNEL.replace(input, |caps: &Captures| {
+    format!("[{}](https://www.youtube.com/@{})", &caps[1], &caps[4])
+  })
 }
 
 #[cfg(test)]
@@ -175,22 +188,48 @@ mod tests {
   mod tiktok {
     use super::*;
 
-    #[test]
-    pub fn tiktok() {
-      assert_eq!(&markdown_with_socials_to_html("tiktok/storyteller_ai"),
-                 "<p><a href=\"https://www.tiktok.com/storyteller_ai\">tiktok/storyteller_ai</a></p>\n");
+    mod with_at {
+      use super::*;
+
+      #[test]
+      pub fn tiktok() {
+        assert_eq!(&markdown_with_socials_to_html("tiktok/@storyteller_ai"),
+                   "<p><a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok/@storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn tiktok_dot_com() {
+        assert_eq!(&markdown_with_socials_to_html("tiktok.com/@storyteller_ai"),
+                   "<p><a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok.com/@storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn tiktok_before_after() {
+        assert_eq!(&markdown_with_socials_to_html("creator tiktok/@storyteller_ai posted it"),
+                   "<p>creator <a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok/@storyteller_ai</a> posted it</p>\n");
+      }
     }
 
-    #[test]
-    pub fn tiktok_dot_com() {
-      assert_eq!(&markdown_with_socials_to_html("tiktok.com/storyteller_ai"),
-                 "<p><a href=\"https://www.tiktok.com/storyteller_ai\">tiktok.com/storyteller_ai</a></p>\n");
-    }
+    mod without_at {
+      use super::*;
 
-    #[test]
-    pub fn tiktok_before_after() {
-      assert_eq!(&markdown_with_socials_to_html("creator tiktok/storyteller_ai posted it"),
-                 "<p>creator <a href=\"https://www.tiktok.com/storyteller_ai\">tiktok/storyteller_ai</a> posted it</p>\n");
+      #[test]
+      pub fn tiktok() {
+        assert_eq!(&markdown_with_socials_to_html("tiktok/storyteller_ai"),
+                   "<p><a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok/storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn tiktok_dot_com() {
+        assert_eq!(&markdown_with_socials_to_html("tiktok.com/storyteller_ai"),
+                   "<p><a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok.com/storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn tiktok_before_after() {
+        assert_eq!(&markdown_with_socials_to_html("creator tiktok/storyteller_ai posted it"),
+                   "<p>creator <a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok/storyteller_ai</a> posted it</p>\n");
+      }
     }
   }
 
@@ -219,22 +258,70 @@ mod tests {
   mod youtube {
     use super::*;
 
-    #[test]
-    pub fn youtube() {
-      assert_eq!(&markdown_with_socials_to_html("youtube/@storyteller_ai"),
-                 "<p><a href=\"https://www.youtube.com/@storyteller_ai\">youtube/@storyteller_ai</a></p>\n");
+    pub mod with_at {
+      use super::*;
+
+      #[test]
+      pub fn yt() {
+        assert_eq!(&markdown_with_socials_to_html("yt/@storyteller_ai"),
+                   "<p><a href=\"https://www.youtube.com/@storyteller_ai\">yt/@storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn youtube() {
+        assert_eq!(&markdown_with_socials_to_html("youtube/@storyteller_ai"),
+                   "<p><a href=\"https://www.youtube.com/@storyteller_ai\">youtube/@storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn youtube_dot_com() {
+        assert_eq!(&markdown_with_socials_to_html("youtube.com/@storyteller_ai"),
+                   "<p><a href=\"https://www.youtube.com/@storyteller_ai\">youtube.com/@storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn youtube_before_after() {
+        assert_eq!(&markdown_with_socials_to_html("creator youtube/@storyteller_ai posted it"),
+                   "<p>creator <a href=\"https://www.youtube.com/@storyteller_ai\">youtube/@storyteller_ai</a> posted it</p>\n");
+      }
     }
 
-    #[test]
-    pub fn youtube_dot_com() {
-      assert_eq!(&markdown_with_socials_to_html("youtube.com/@storyteller_ai"),
-                 "<p><a href=\"https://www.youtube.com/@storyteller_ai\">youtube.com/@storyteller_ai</a></p>\n");
+    pub mod without_at {
+      use super::*;
+
+      #[test]
+      pub fn yt() {
+        assert_eq!(&markdown_with_socials_to_html("yt/storyteller_ai"),
+                   "<p><a href=\"https://www.youtube.com/@storyteller_ai\">yt/storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn youtube() {
+        assert_eq!(&markdown_with_socials_to_html("youtube/storyteller_ai"),
+                   "<p><a href=\"https://www.youtube.com/@storyteller_ai\">youtube/storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn youtube_dot_com() {
+        assert_eq!(&markdown_with_socials_to_html("youtube.com/storyteller_ai"),
+                   "<p><a href=\"https://www.youtube.com/@storyteller_ai\">youtube.com/storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn youtube_before_after() {
+        assert_eq!(&markdown_with_socials_to_html("creator youtube/storyteller_ai posted it"),
+                   "<p>creator <a href=\"https://www.youtube.com/@storyteller_ai\">youtube/storyteller_ai</a> posted it</p>\n");
+      }
     }
+  }
+
+  mod complex {
+    use super::*;
 
     #[test]
-    pub fn youtube_before_after() {
-      assert_eq!(&markdown_with_socials_to_html("creator youtube/@storyteller_ai posted it"),
-                 "<p>creator <a href=\"https://www.youtube.com/@storyteller_ai\">youtube/@storyteller_ai</a> posted it</p>\n");
+    pub fn multiple_socials() {
+      assert_eq!(&markdown_with_socials_to_html("the r/foo user x/bar."),
+                 "<p>the <a href=\"https://www.reddit.com/r/foo\">r/foo</a> user <a href=\"https://x.com/bar\">x/bar</a>.</p>\n");
     }
   }
 }
