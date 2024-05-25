@@ -70,7 +70,7 @@ fn replace_reddit_user(input: &str) -> Cow<str> {
 }
 
 static TIKTOK_USER: Lazy<Regex> = Lazy::new(|| {
-  Regex::new(r"(tiktok(.com)?/@?([\w\-_]+))").expect("regex should compile")
+  Regex::new(r"(tiktok(.com)?/@?([\w\.\-_]+))").expect("regex should compile")
 });
 
 fn replace_tiktok_user(input: &str) -> Cow<str> {
@@ -198,6 +198,12 @@ mod tests {
       }
 
       #[test]
+      pub fn tiktok_user_with_dot() {
+        assert_eq!(&markdown_with_socials_to_html("tiktok/@foo.bar"),
+                   "<p><a href=\"https://www.tiktok.com/@foo.bar\">tiktok/@foo.bar</a></p>\n");
+      }
+
+      #[test]
       pub fn tiktok_dot_com() {
         assert_eq!(&markdown_with_socials_to_html("tiktok.com/@storyteller_ai"),
                    "<p><a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok.com/@storyteller_ai</a></p>\n");
@@ -217,6 +223,12 @@ mod tests {
       pub fn tiktok() {
         assert_eq!(&markdown_with_socials_to_html("tiktok/storyteller_ai"),
                    "<p><a href=\"https://www.tiktok.com/@storyteller_ai\">tiktok/storyteller_ai</a></p>\n");
+      }
+
+      #[test]
+      pub fn tiktok_user_with_dot() {
+        assert_eq!(&markdown_with_socials_to_html("tiktok/foo.bar"),
+                   "<p><a href=\"https://www.tiktok.com/@foo.bar\">tiktok/foo.bar</a></p>\n");
       }
 
       #[test]
