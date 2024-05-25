@@ -97,52 +97,54 @@ export function StyleButtons() {
           )}
         </div>
 
-        <PremiumLock requiredPlan="any" plural={true}>
-          <Switch.Group>
-            <div className="mb-4 mt-4 flex gap-6">
-              <div className="flex items-center">
-                <Switch.Label className="mr-3 text-sm font-medium">
-                  Upscale
-                </Switch.Label>
-                <Switch
-                  checked={upscale.value}
-                  onChange={() => (upscale.value = !upscale.value)}
-                  className={`${
-                    upscale.value
-                      ? "bg-brand-primary"
-                      : "bg-gray-500 hover:bg-gray-400"
-                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
-                >
-                  <span
+        <div className="mb-4 mt-4">
+          <PremiumLock requiredPlan="any" plural={true}>
+            <Switch.Group>
+              <div className="flex gap-6">
+                <div className="flex items-center">
+                  <Switch.Label className="mr-3 text-sm font-medium">
+                    Upscale
+                  </Switch.Label>
+                  <Switch
+                    checked={upscale.value}
+                    onChange={() => (upscale.value = !upscale.value)}
                     className={`${
-                      upscale.value ? "translate-x-6" : "translate-x-1"
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                  />
-                </Switch>
-              </div>
-              <div className="flex items-center">
-                <Switch.Label className="mr-3 text-sm font-medium">
-                  Face Detail
-                </Switch.Label>
-                <Switch
-                  checked={faceDetail.value}
-                  onChange={() => (faceDetail.value = !faceDetail.value)}
-                  className={`${
-                    faceDetail.value
-                      ? "bg-brand-primary"
-                      : "bg-gray-500 hover:bg-gray-400"
-                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
-                >
-                  <span
+                      upscale.value
+                        ? "bg-brand-primary"
+                        : "bg-gray-500 hover:bg-gray-400"
+                    } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                  >
+                    <span
+                      className={`${
+                        upscale.value ? "translate-x-6" : "translate-x-1"
+                      } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                    />
+                  </Switch>
+                </div>
+                <div className="flex items-center">
+                  <Switch.Label className="mr-3 text-sm font-medium">
+                    Face Detail
+                  </Switch.Label>
+                  <Switch
+                    checked={faceDetail.value}
+                    onChange={() => (faceDetail.value = !faceDetail.value)}
                     className={`${
-                      faceDetail.value ? "translate-x-6" : "translate-x-1"
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                  />
-                </Switch>
+                      faceDetail.value
+                        ? "bg-brand-primary"
+                        : "bg-gray-500 hover:bg-gray-400"
+                    } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                  >
+                    <span
+                      className={`${
+                        faceDetail.value ? "translate-x-6" : "translate-x-1"
+                      } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                    />
+                  </Switch>
+                </div>
               </div>
-            </div>
-          </Switch.Group>
-        </PremiumLock>
+            </Switch.Group>
+          </PremiumLock>
+        </div>
 
         <div>
           <Label>
