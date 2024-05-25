@@ -21,6 +21,7 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use markdown::markdown_with_socials_to_html::markdown_with_socials_to_html;
 use mysql_queries::queries::beta_keys::list_beta_keys::{list_beta_keys, ListBetaKeysArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use tokens::tokens::beta_keys::BetaKeyToken;
@@ -197,7 +198,9 @@ pub async fn list_beta_keys_handler(
             beta_key.maybe_redeemer_gravatar_hash
           ),
           is_distributed: beta_key.is_distributed,
-          maybe_note_html: markdownify(beta_key.maybe_notes.as_deref()),
+          maybe_note_html: beta_key.maybe_notes
+              .as_deref()
+              .map(|notes| markdown_with_socials_to_html(notes)),
           maybe_note: beta_key.maybe_notes,
           created_at: beta_key.created_at,
           maybe_redeemed_at: beta_key.maybe_redeemed_at,
@@ -219,23 +222,4 @@ pub async fn list_beta_keys_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
-}
-
-/*
-TODO: Example comments:
-reddit.com/u/FallingKnifeFilms
-r/aivideo mod ZashManson
-
-tiktok.com/@lil.filth
-
-youtube.com/@papagamersby5865
-https://www.youtube.com/@WebsiteLearners (WHOA!)
-
-linktr.ee/virtualityxr
-
-https://x.com/redneopurp
- */
-
-fn markdownify(maybe_note: Option<&str>) -> Option<String> {
-  None
 }
