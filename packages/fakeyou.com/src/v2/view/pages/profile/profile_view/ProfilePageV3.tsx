@@ -73,7 +73,7 @@ function ProfilePageV3(this: any, props: Props) {
     pathname === `/profile/${username}` ||
     pathname === `/profile/${username}/`
   ) {
-    return <Redirect to={`/profile/${username}/videos`} />;
+    return <Redirect to={`/profile/${username}/video`} />;
   }
 
   if (notFoundState) {
@@ -97,15 +97,15 @@ function ProfilePageV3(this: any, props: Props) {
 
   const tabs = [
     {
-      to: `/profile/${username}/videos`,
-      label: "Videos",
+      to: `/profile/${username}/video`,
+      label: "Video",
       content: <VideosTab username={username} />,
       icon: faFilm,
       padding: true,
     },
     {
-      to: `/profile/${username}/audios`,
-      label: "Audios",
+      to: `/profile/${username}/audio`,
+      label: "Audio",
       content: <AudiosTab username={username} />,
       icon: faVolume,
       padding: true,
