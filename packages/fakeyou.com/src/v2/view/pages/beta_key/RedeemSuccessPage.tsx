@@ -3,6 +3,10 @@ import React from "react";
 import "./BetaKey.scss";
 
 export default function RedeemSuccessPage() {
+  const handleWatchTutorial = () => {
+    window.location.href = "/welcome-to-studio";
+  };
+
   const handleEnterStudio = () => {
     window.location.href = "https://studio.storyteller.ai";
   };
@@ -26,6 +30,11 @@ export default function RedeemSuccessPage() {
           </div>
 
           <div className="d-flex flex-column align-items-center">
+            <Button
+              label="Watch Tutorial"
+              className="redeem-button mt-4"
+              onClick={handleWatchTutorial}
+            />
             <Button
               label="Enter Studio"
               className="redeem-button mt-4"
