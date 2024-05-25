@@ -42,7 +42,7 @@ export default function BetaKeysListPage() {
 
   const keysList = useListContent({
     addQueries: {
-      page_size: urlQueries.get("page_size") || "20",
+      page_size: urlQueries.get("page_size") || "500",
       ...(username.trim()
         ? prepFilter(username, "maybe_referrer_username")
         : {}),
