@@ -4,6 +4,7 @@ use actix_web::{App, Error, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler;
+use crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::edit_beta_key_distributed_flag_handler;
 use crate::http_server::endpoints::beta_keys::edit_beta_key_note_handler::edit_beta_key_note_handler;
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler;
 use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::redeem_beta_key_handler;
@@ -34,6 +35,10 @@ pub fn add_beta_key_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/{token}/note")
           .route(web::post().to(edit_beta_key_note_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/{token}/distributed")
+          .route(web::post().to(edit_beta_key_distributed_flag_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )

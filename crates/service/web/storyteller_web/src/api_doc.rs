@@ -51,6 +51,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::weights_cover_image_details::*;
 use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
+use crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::*;
 use crate::http_server::endpoints::beta_keys::edit_beta_key_note_handler::*;
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::*;
 use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::*;
@@ -124,6 +125,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler,
     crate::http_server::endpoints::analytics::log_browser_session_handler::log_browser_session_handler,
     crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler,
+    crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::edit_beta_key_distributed_flag_handler,
     crate::http_server::endpoints::beta_keys::edit_beta_key_note_handler::edit_beta_key_note_handler,
     crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler,
     crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::redeem_beta_key_handler,
@@ -302,6 +304,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     DeleteWeightError,
     DeleteWeightPathInfo,
     DeleteWeightRequest,
+    EditBetaKeyDistributedFlagError,
+    EditBetaKeyDistributedFlagPathInfo,
+    EditBetaKeyDistributedFlagRequest,
+    EditBetaKeyDistributedFlagSuccessResponse,
     EditBetaKeyNoteError,
     EditBetaKeyNotePathInfo,
     EditBetaKeyNoteRequest,
