@@ -5,9 +5,8 @@ export const promptsStore = {
   textBufferNegative: signal(""),
   isUserInputPositive: signal(false),
   isUserInputNegative: signal(false),
+  showNegativePrompt: signal(false),
 };
-
-export const showAdvancedOptions = signal(false);
 
 export const upscale = signal(false);
 export const faceDetail = signal(false);
