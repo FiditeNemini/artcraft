@@ -94,6 +94,11 @@ static YOUTUBE_CHANNEL: Lazy<Regex> = Lazy::new(|| {
 });
 
 fn replace_youtube_channel(input: &str) -> Cow<str> {
+  if input.contains("/channel/") {
+    // TODO(bt,2024-05-25): Regex crate does not support lookahead.
+    //  This is a temporary hack to prevent clobbering actual YouTube URLs.
+    return Cow::Borrowed(input);
+  }
   YOUTUBE_CHANNEL.replace(input, |caps: &Captures| {
     format!("[{}](https://www.youtube.com/@{})", &caps[1], &caps[4])
   })
@@ -269,6 +274,12 @@ mod tests {
 
   mod youtube {
     use super::*;
+
+    #[test]
+    pub fn full_channels_not_changed() {
+      assert_eq!(&markdown_with_socials_to_html("https://www.youtube.com/channel/UCEU3gjhuT1V86Ru_RoCTcCA "),
+                 "<p>https://www.youtube.com/channel/UCEU3gjhuT1V86Ru_RoCTcCA </p>\n");
+    }
 
     pub mod with_at {
       use super::*;
