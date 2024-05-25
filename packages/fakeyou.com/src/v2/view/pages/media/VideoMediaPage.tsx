@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import moment from "moment";
 import { AnimationStatus, useAnimationStatus } from "hooks";
 import {
@@ -229,27 +230,35 @@ export default function DevMediaPage({
               className: "video-page-creator",
             }}
           >
-            <Gravatar
+            <Link
               {...{
-                noHeight: true,
-                size: 56,
+                className: "video-page-creator-avatar",
+                to: `/profile/${mediaFile?.maybe_creator_user?.display_name}`,
               }}
-              username={mediaFile?.maybe_creator_user?.username || ""}
-              email_hash={mediaFile?.maybe_creator_user?.gravatar_hash || ""}
-              avatarIndex={
-                mediaFile?.maybe_creator_user?.default_avatar.image_index || 0
-              }
-              backgroundIndex={
-                mediaFile?.maybe_creator_user?.default_avatar.color_index || 0
-              }
-            />
-            <div
+            >
+              <Gravatar
+                {...{
+                  noHeight: true,
+                  size: 56,
+                }}
+                username={mediaFile?.maybe_creator_user?.username || ""}
+                email_hash={mediaFile?.maybe_creator_user?.gravatar_hash || ""}
+                avatarIndex={
+                  mediaFile?.maybe_creator_user?.default_avatar.image_index || 0
+                }
+                backgroundIndex={
+                  mediaFile?.maybe_creator_user?.default_avatar.color_index || 0
+                }
+              />
+            </Link>
+            <Link
               {...{
                 className: "video-page-creator-info",
+                to: `/profile/${mediaFile?.maybe_creator_user?.display_name}`,
               }}
             >
               <h3>{mediaFile?.maybe_creator_user?.username || ""}</h3>
-            </div>
+            </Link>
           </div>
           <div
             {...{
