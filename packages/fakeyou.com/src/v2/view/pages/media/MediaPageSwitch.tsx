@@ -54,7 +54,7 @@ export default function MediaPageSwitch() {
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const canEdit = canEditMediaFile(urlToken);
+  const canEdit = canEditMediaFile(mediaFile?.maybe_creator_user?.user_token);
   const isModerator = canBanUsers() || false;
 
   const closeDeleteModal = () => setIsDeleteModalOpen(false);

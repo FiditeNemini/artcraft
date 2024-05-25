@@ -23,8 +23,8 @@ interface ModalProps {
 
 interface SessionContextType {
   canAccessStudio: () => boolean;
-  canEditTtsModel: (token: string) => boolean;
-  canEditMediaFile: (token: string) => boolean;
+  canEditTtsModel: (creatorUserToken: string) => boolean;
+  canEditMediaFile: (creatorUserToken?: string) => boolean;
   canBanUsers: () => boolean;
   check: () => boolean;
   loggedIn: boolean;
@@ -96,13 +96,14 @@ export default function SessionProvider({
       return false;
     }
   };
-  const userTokenMatch = (otherUserToken: string) =>
-    !otherUserToken || !user?.user_token
-      ? false
-      : user.user_token === otherUserToken;
+  // NB: Since user token matching is used for ownership permission checking, neither may be undefined!
+  const userTokenMatch = (otherUserToken?: string) =>
+    user?.user_token !== undefined && 
+      otherUserToken !== undefined && 
+      user.user_token === otherUserToken;
   const canEditTtsModel = (userToken: string) =>
     user?.can_delete_other_users_tts_models || userTokenMatch(userToken);
-  const canEditMediaFile = (userToken: string) =>
+  const canEditMediaFile = (userToken?: string) =>
     user?.can_delete_other_users_tts_results || userTokenMatch(userToken);
   const canBanUsers = () => user?.can_ban_users || false;
   const canAccessStudio = () => {
