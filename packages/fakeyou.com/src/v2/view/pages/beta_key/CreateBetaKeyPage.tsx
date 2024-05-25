@@ -15,6 +15,7 @@ import { useSession } from "hooks";
 export default function CreateBetaKeyPage() {
   const [username, setUsername] = useState("");
   const [numberOfKeys, setNumberOfKeys] = useState(1);
+  const [note, setNote] = useState("");
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"success" | "danger" | null>(null);
   const [generatedKeys, setGeneratedKeys] = useState<string[]>([]);
@@ -54,6 +55,7 @@ export default function CreateBetaKeyPage() {
       const response = await CreateBetaKey("", {
         maybe_referrer_username: username,
         number_of_keys: numberOfKeys,
+        maybe_note: note || null,
         uuid_idempotency_token: uuidv4(),
       });
 
@@ -114,6 +116,12 @@ export default function CreateBetaKeyPage() {
             onChange={e => setNumberOfKeys(Number(e.target.value))}
             defaultValue={1}
             required={true}
+          />
+          <TempInput
+            label="Note"
+            placeholder="Note (optional, what the keys are for etc.)"
+            value={note}
+            onChange={e => setNote(e.target.value)}
           />
           <div className="mt-2 d-flex justify-content-end gap-2">
             <Button
