@@ -65,16 +65,37 @@ pub struct ListBetaKeysSuccessResponse {
 
 #[derive(Serialize, ToSchema)]
 pub struct BetaKeyItem {
+  /// The primary key. Internal use.
   pub token: BetaKeyToken,
+
+  /// The product the key unlocks.
   pub product: BetaKeyProduct,
+
+  /// The key that the user will input to unlock the product.
   pub key_value: String,
+
+  /// The user that created the key.
   pub creator: UserDetailsLight,
+
+  /// The user that will be in charge of distributing the key. (Gamification!)
   pub maybe_referrer: Option<UserDetailsLight>,
+
+  /// The user that redeemed the key on their account.
   pub maybe_redeemer: Option<UserDetailsLight>,
+
+  /// Denotes whether we handed this key out. A reminder not to re-share.
   pub is_distributed: bool,
+
+  /// Optional note about the key. Can be used to describe why it was created or who it was given to.
   pub maybe_note: Option<String>,
+
+  /// The note, with markdown parsed to html.
   pub maybe_note_html: Option<String>,
+
+  /// When the key was created.
   pub created_at: DateTime<Utc>,
+
+  /// When the key was redeemed (the key will no longer be usable once redeemed)
   pub maybe_redeemed_at: Option<DateTime<Utc>>,
 }
 
