@@ -27,10 +27,8 @@
   }
 }
 
-.status-cell {
-  width: 80px;
-}
-
-.status-header {
-  width: 80px;
+.note-cell {
+  width: 260px;
+  white-space: normal;
+  word-wrap: break-word;
 }

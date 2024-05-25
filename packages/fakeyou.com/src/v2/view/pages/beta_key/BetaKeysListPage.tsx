@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes } from "@fortawesome/pro-solid-svg-icons";
+import { faCheck, faSave, faTimes } from "@fortawesome/pro-solid-svg-icons";
 import {
   createColumnHelper,
   flexRender,
@@ -21,6 +21,7 @@ import {
   BetaKey,
   ListBetaKeys,
 } from "@storyteller/components/src/api/beta_key/ListBetaKeys";
+import { EditBetaKeyNote } from "@storyteller/components/src/api/beta_key/EditBetaKeyNote";
 import "./BetaKey.scss";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { useListContent } from "hooks";
@@ -36,6 +37,8 @@ export default function BetaKeysListPage() {
   const [list, listSet] = useState<BetaKey[]>([]);
   const [username, usernameSet] = useState("");
   const [onlyUnredeemed, onlyUnredeemedSet] = useState("false");
+  const [inEditNoteMode, setInEditNoteMode] = useState(false);
+  const [editNote, setEditNote] = useState({ token: "", note: "" });
 
   const keysList = useListContent({
     addQueries: {
@@ -46,7 +49,7 @@ export default function BetaKeysListPage() {
       ...prepFilter(onlyUnredeemed, "only_list_remaining"),
     },
     addSetters: { usernameSet },
-    debug: "ListBetaKeys",
+    // debug: "ListBetaKeys",
     fetcher: ListBetaKeys,
     list,
     listSet,
@@ -60,6 +63,30 @@ export default function BetaKeysListPage() {
     keysList.pageChange(selectedItem.selected);
   };
 
+  const handleEditStart = (token: string, currentNote: string) => {
+    setEditNote({ token, note: currentNote });
+    setInEditNoteMode(true);
+  };
+
+  const saveNote = async (token: string, note: string | undefined) => {
+    const response = await EditBetaKeyNote(token, { note });
+    if (response.success) {
+      // Find the index of the row with the matching token
+      const rowIndex = list.findIndex(item => item.token === token);
+      if (rowIndex !== -1) {
+        // Create a new copy of the list
+        const newList = [...list];
+        // Update the note for the specific row
+        newList[rowIndex] = { ...newList[rowIndex], maybe_note: note };
+        // Update the state with the new list
+        listSet(newList);
+      }
+    } else {
+      console.log("Failed to save the note");
+    }
+    setInEditNoteMode(false);
+  };
+
   const paginationProps = {
     onPageChange: handlePageClick,
     pageCount: keysList.pageCount,
@@ -68,6 +95,7 @@ export default function BetaKeysListPage() {
 
   const columns = [
     columnHelper.accessor("maybe_redeemed_at", {
+      id: "redeemed_status",
       header: "Redeemed?",
       cell: info => {
         const value = info.getValue();
@@ -79,10 +107,12 @@ export default function BetaKeysListPage() {
       },
     }),
     columnHelper.accessor("created_at", {
+      id: "created_date",
       header: "Created Date",
       cell: info => new Date(info.getValue()).toLocaleDateString(),
     }),
     columnHelper.accessor("maybe_redeemed_at", {
+      id: "redemption_date",
       header: "Redemption Date",
       cell: info => {
         const value = info.getValue();
@@ -90,6 +120,7 @@ export default function BetaKeysListPage() {
       },
     }),
     columnHelper.accessor("key_value", {
+      id: "key",
       header: "Key",
       cell: info => {
         const key = info.getValue();
@@ -97,6 +128,7 @@ export default function BetaKeysListPage() {
       },
     }),
     columnHelper.accessor("creator.username", {
+      id: "creator",
       header: "Key Creator",
       cell: info => {
         const username = info.getValue();
@@ -117,6 +149,7 @@ export default function BetaKeysListPage() {
       },
     }),
     columnHelper.accessor("maybe_referrer.username", {
+      id: "referrer",
       header: "Referrer",
       cell: info => {
         const username = info.getValue();
@@ -140,6 +173,7 @@ export default function BetaKeysListPage() {
       },
     }),
     columnHelper.accessor("maybe_redeemer.username", {
+      id: "redeemer",
       header: "Redeemed by",
       cell: info => {
         const username = info.getValue();
@@ -158,6 +192,52 @@ export default function BetaKeysListPage() {
           </div>
         ) : (
           "-"
+        );
+      },
+    }),
+    columnHelper.accessor("maybe_note", {
+      id: "note",
+      header: "Note",
+      cell: info => {
+        const note = info.getValue();
+        const { token } = info.row.original;
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [localNote, setLocalNote] = useState(note);
+
+        const handleLocalNoteChange = (
+          event: React.ChangeEvent<HTMLInputElement>
+        ) => {
+          setLocalNote(event.target.value);
+        };
+
+        return inEditNoteMode && editNote.token === token ? (
+          <div className="d-flex gap-1 align-items-center note-cell">
+            <TempInput
+              type="text"
+              value={localNote}
+              onChange={handleLocalNoteChange}
+              className="py-1 fs-7"
+              style={{ width: "200px" }}
+            />
+            <Button
+              icon={faSave}
+              label="Save"
+              onClick={() => saveNote(token, localNote)}
+              variant="link"
+              className="fs-7"
+            />
+          </div>
+        ) : (
+          <div className="d-flex gap-1 align-items-start note-cell">
+            <span className="me-3">{note || "-"}</span>
+            <Button
+              label="Edit"
+              onClick={() => handleEditStart(token, note || "")}
+              small={true}
+              variant="link"
+              className="fs-7"
+            />
+          </div>
         );
       },
     }),

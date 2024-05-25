@@ -37,6 +37,7 @@ export interface BetaKey {
   } | null;
   product: string;
   token: string;
+  maybe_note?: string;
 }
 
 export interface ListBetaKeysRequest {}

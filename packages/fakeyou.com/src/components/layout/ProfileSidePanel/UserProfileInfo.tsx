@@ -44,7 +44,6 @@ export default function UserProfileInfo(props: UserProfileInfoProps) {
 
   const getUser = useCallback(async username => {
     const response = await GetUserByUsername(username);
-    console.log("Response received:", response);
     if (GetUserByUsernameIsOk(response)) {
       setUserData(response);
     } else if (GetUserByUsernameIsErr(response)) {
