@@ -81,3 +81,35 @@ $badge-colors: (
   "purple": #8f49de,
   "pink": #cc1d92,
 );
+
+@mixin social-colors {
+  color: $white;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.bg-facebook {
+    background-color: #4267b2;
+  }
+
+  &.bg-reddit {
+    background-color: #ff5700;
+  }
+
+  &.bg-reddit {
+    background-color: #ff5700;
+  }
+
+  &.bg-whatsapp {
+    background-color: #25d366;
+  }
+
+  &.bg-x {
+    background-color: #1da1f2;
+  }
+
+  &.bg-email {
+    background-color: #858585;
+  }
+}

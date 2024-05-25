@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/pro-solid-svg-icons";
 import { faBookmark as faBookmarkOutline } from "@fortawesome/pro-regular-svg-icons";
 import { WorkDots } from "components/svg";
+import { AnimationStatus, useAnimationStatus } from "hooks";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./BookmarkButton.scss";
@@ -29,24 +30,19 @@ export default function BookmarkButton({
   overlay,
   toggle,
 }: BookmarkButtonProps) {
+  const { events, status } = useAnimationStatus();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     // setIsLoading(true);
-    toggle(entityToken, entityType).then((isToggled: boolean) => {
-      // setIsToggled(isToggled);
-      setIsLoading(false);
-    });
-    // try {
-    //   await onToggle(!isToggled);
-    //   setIsToggled(!isToggled);
-    // } catch (error) {
-    //   console.error("Error calling API", error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    if (status === AnimationStatus.paused) {
+      toggle(entityToken, entityType).then((isToggled: boolean) => {
+        // setIsToggled(isToggled);
+        setIsLoading(false);
+      });
+    }
   };
 
   const buttonClass = isToggled ? "favorite-button toggled" : "favorite-button";
@@ -79,7 +75,9 @@ export default function BookmarkButton({
           />
           <div className="favorite-text">
             <div {...{ className: "favorite-text-wrapper" }}>
-              <WorkDots {...{ labels: ["Saved", "Save"], index }} />
+              <WorkDots
+                {...{ events, labels: ["Saved", "Save"], noPad: true, index }}
+              />
             </div>
           </div>
         </button>

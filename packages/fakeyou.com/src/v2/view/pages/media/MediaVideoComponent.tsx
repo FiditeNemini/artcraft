@@ -3,20 +3,20 @@ import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaF
 import React from "react";
 
 interface MediaVideoComponentProps {
-  mediaFile: MediaFile;
+  mediaFile?: MediaFile;
 }
 
 export default function MediaVideoComponent({
   mediaFile,
 }: MediaVideoComponentProps) {
-  let mediaLink = new BucketConfig().getGcsUrl(
-    mediaFile.public_bucket_path
-  );
+  let mediaLink = mediaFile
+    ? new BucketConfig().getGcsUrl(mediaFile.public_bucket_path)
+    : "";
 
-  return (
+  return mediaFile && mediaFile.public_bucket_path ? (
     <video className="rounded" controls width="100%" height="auto">
       <source src={mediaLink} />
       Your browser does not support the video element.
     </video>
-  );
+  ) : null;
 }

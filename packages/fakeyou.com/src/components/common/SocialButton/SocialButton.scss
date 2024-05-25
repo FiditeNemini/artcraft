@@ -22,39 +22,7 @@
   margin-bottom: 10px;
   transition: 0.2s;
 
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &.bg-facebook {
-    color: $white;
-    background-color: #4267b2;
-  }
-
-  &.bg-reddit {
-    color: $white;
-    background-color: #ff5700;
-  }
-
-  &.bg-reddit {
-    color: $white;
-    background-color: #ff5700;
-  }
-
-  &.bg-whatsapp {
-    color: $white;
-    background-color: #25d366;
-  }
-
-  &.bg-x {
-    color: $white;
-    background-color: #1da1f2;
-  }
-
-  &.bg-email {
-    color: $white;
-    background-color: #858585;
-  }
+  @include social-colors;
 }
 
 .social-button-text {

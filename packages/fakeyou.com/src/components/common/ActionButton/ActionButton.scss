@@ -1,0 +1,83 @@
+@import "scss/colours.scss";
+
+.fy-action-button {
+	appearance: none;
+	background-color: rgba(lighten($secondary, 5%), 0.9);
+	border: none;
+	border-radius: 0.5rem;
+	color: #fff;
+	display: flex;
+	gap: 0.125rem;
+	align-items: center;
+	// background: red;
+	line-height: 1;
+	font-size: 0.875rem;
+	text-align: right;
+	min-height: 2.25rem;
+	min-width: 1rem;
+	position: relative;
+	padding: 0 0 0 0.5rem;
+	// text-align: right;
+
+	&:hover {
+		background: rgba(lighten($secondary, 10%), 0.9);
+	}
+
+	svg {
+		width: 1em;
+		color: $primary;
+		margin-right: 1rem;
+	}
+
+	.fy-action-button-icon-toggled {
+		animation: pulse 0.3s ease;
+	}
+}
+.bookmark-action-button {
+	svg {
+		color: map-get($badge-colors, "yellow");
+	}
+	&.action-button-toggled {
+		background-color: darken(rgba(map-get($badge-colors, "yellow"), 0.9), 32%);
+
+		&:hover {
+			background-color: darken(
+				rgba(map-get($badge-colors, "yellow"), 0.9),
+				25%
+			);
+		}
+	}
+
+	.fy-workdots-label {
+		min-width: 2rem;
+	}
+}
+
+.feature-action-button {
+	svg {
+		color: map-get($badge-colors, "purple");
+	}
+	&.action-button-toggled {
+		background-color: darken(rgba(map-get($badge-colors, "purple"), 0.9), 32%);
+
+		&:hover {
+			background-color: darken(
+				rgba(map-get($badge-colors, "purple"), 0.9),
+				25%
+			);
+		}
+	}
+}
+
+.like-action-button {
+	svg {
+		color: $primary;
+	}
+	&.action-button-toggled {
+		background-color: rgba(#593a48, 0.9);
+
+		&:hover {
+			background-color: lighten(rgba(#593a48, 0.9), 10%);
+		}
+	}
+}

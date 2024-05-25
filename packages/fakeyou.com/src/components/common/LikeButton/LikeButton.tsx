@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/pro-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
 import { WorkDots } from "components/svg";
+import { AnimationStatus, useAnimationStatus } from "hooks";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./LikeButton.scss";
@@ -29,18 +30,19 @@ export default function LikeButton({
   large,
   toggle,
 }: LikeButtonProps) {
+  const { events, status } = useAnimationStatus();
   const [isLoading, setIsLoading] = useState(false);
-
-  // console.log("😎",busy);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     // setIsLoading(true);
-    toggle(entityToken, entityType).then((isToggled: boolean) => {
-      // setIsToggled(isToggled);
-      setIsLoading(false);
-    });
+    if (status === AnimationStatus.paused) {
+      toggle(entityToken, entityType).then((isToggled: boolean) => {
+        // setIsToggled(isToggled);
+        setIsLoading(false);
+      });
+    }
     // try {
     //   await onToggle(!isToggled);
     //   setIsToggled(!isToggled);
@@ -80,7 +82,12 @@ export default function LikeButton({
           <div className="like-number">
             <div className="like-number-wrapper">
               <WorkDots
-                {...{ labels: [likeCountShort], index: busy ? 0 : 1 }}
+                {...{
+                  events,
+                  labels: [likeCountShort],
+                  noPad: true,
+                  index: busy ? 0 : 1,
+                }}
               />
             </div>
           </div>

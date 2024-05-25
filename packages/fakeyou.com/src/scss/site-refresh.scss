@@ -193,6 +193,12 @@ styles with important tags:
     color: rgba($white, 0.8);
     font-weight: 400;
     border-color: rgba($white, 0.12);
+
+    // this is to remove the lingering border on the comment component when there is only one comment -V
+
+    &:only-of-type {
+      border: none;
+    }
   }
 
   .table-mw {

@@ -1,8 +1,10 @@
 import Accordion from "./Accordion";
+import ActionButton, { ActionButtonProps } from "./ActionButton";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import Badge from "./Badge";
 import BasicTabs from "./BasicTabs";
+import BookmarkButton from "./BookmarkButton";
 import Button from "./Button";
 import ButtonRevertToDefault from "./ButtonRevertToDefault";
 import Checkbox from "./Checkbox";
@@ -39,6 +41,7 @@ import SelectModalVideoTabs from "./SelectModalVideoTabs";
 import SelectModalWeightsTabs from "./SelectModalWeightsTabs";
 import Skeleton from "./Skeleton";
 import Slider from "./Slider";
+import SocialButton, { Socials } from "./SocialButton";
 import Spinner from "./Spinner";
 import SplitPanel from "./SplitPanel";
 import Tabs, { NonRouteTabs } from "./Tabs";
@@ -56,10 +59,12 @@ import WeightCoverImage from "./WeightCoverImage";
 
 export {
   Accordion,
+  ActionButton,
   AudioBlobPreview,
   AudioInput,
   Badge,
   BasicTabs,
+  BookmarkButton,
   Button,
   //Cards
   MediaCards,
@@ -101,6 +106,7 @@ export {
   SelectModalWeightsTabs,
   Skeleton,
   Slider,
+  SocialButton,
   Spinner,
   SplitPanel,
   Tabs,
@@ -117,7 +123,4 @@ export {
   WeightCoverImage,
 };
 
-export type {
-  ModalUtilities,
-  SelectModalData
-};
+export type { ActionButtonProps, ModalUtilities, SelectModalData, Socials };

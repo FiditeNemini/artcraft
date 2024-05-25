@@ -33,8 +33,17 @@ export default function useMedia({
 
   const previousToken = usePrevious(mediaToken);
 
+  const reload = () => {
+    statusSet(FetchStatus.ready);
+    mediaSet(undefined);
+  };
+
   useEffect(() => {
-    if (mediaToken && (!media || previousToken !== mediaToken)) {
+    if (
+      status === FetchStatus.ready &&
+      mediaToken &&
+      (!media || previousToken !== mediaToken)
+    ) {
       statusSet(FetchStatus.in_progress);
       GetMedia(mediaToken, {})
         .then(res => {
@@ -64,5 +73,14 @@ export default function useMedia({
     }
   }, [media, mediaToken, previousToken, prompt, onSuccess, status, statusSet]);
 
-  return { media, mediaSet, prompt, remove, status, writeStatus };
+  return {
+    media,
+    mediaFile: media,
+    mediaSet,
+    prompt,
+    remove,
+    reload,
+    status,
+    writeStatus,
+  };
 }

@@ -1,34 +1,40 @@
-import useBatchContent from './useBatchContent';
-import useBookmarks from './useBookmarks';
-import useChanger from './useChanger';
-import useCoverImgUpload from './useCoverImgUpload';
-import useDebounce from './useDebounce';
-import useFile from './useFile';
-import useHover from './useHover';
-import useId from './useId';
-import useIdempotency from './useIdempotency';
-import useInferenceJobs from './useInferenceJobs';
-import useInterval from './useInterval';
-import useJobStatus from './useJobStatus';
-import useLazyLists from './useLazyLists';
-import useListContent from './useListContent';
-import useLocalize from './useLocalize';
-import useMedia from './useMedia';
-import useMediaUploader from './useMediaUploader';
-import useModal from './useModal';
-import useNotifications from './useNotifications';
+import useAnimationStatus, {
+  AnimationEvents,
+  AnimationStatus,
+} from "./useAnimationStatus";
+import useBatchContent from "./useBatchContent";
+import useBookmarks, { MakeBookmarksProps } from "./useBookmarks";
+import useChanger from "./useChanger";
+import useCoverImgUpload from "./useCoverImgUpload";
+import useDebounce from "./useDebounce";
+import useFile from "./useFile";
+import useHover from "./useHover";
+import useId from "./useId";
+import useIdempotency from "./useIdempotency";
+import useInferenceJobs from "./useInferenceJobs";
+import useInterval from "./useInterval";
+import useJobStatus from "./useJobStatus";
+import useLazyLists from "./useLazyLists";
+import useListContent from "./useListContent";
+import useLocalize from "./useLocalize";
+import useMedia from "./useMedia";
+import useMediaUploader from "./useMediaUploader";
+import useModal from "./useModal";
+import useNotifications from "./useNotifications";
 import useOnScreen from "./useOnScreen";
-import usePrevious from './usePrevious';
-import useQueuePoll from './useQueuePoll';
-import useRatings from './useRatings';
-import useSdUpload from './useSdUpload';
-import useSession from './useSession';
-import useSlides from './useSlides';
-import useStatusPoll from './useStatusPoll';
-import useVideo from './useVideo';
-import useWeightFetch from './useWeightFetch';
+import usePrevious from "./usePrevious";
+import useQueuePoll from "./useQueuePoll";
+import useRatings, { MakeRatingsProps } from "./useRatings";
+import useSdUpload from "./useSdUpload";
+import useSession from "./useSession";
+import useSlides from "./useSlides";
+import useStatusPoll from "./useStatusPoll";
+import useVideo from "./useVideo";
+import useWeightFetch from "./useWeightFetch";
 
 export {
+  AnimationStatus,
+  useAnimationStatus,
   useBatchContent,
   useBookmarks,
   useChanger,
@@ -57,5 +63,7 @@ export {
   useSlides,
   useStatusPoll,
   useVideo,
-  useWeightFetch
+  useWeightFetch,
 };
+
+export type { AnimationEvents, MakeBookmarksProps, MakeRatingsProps };

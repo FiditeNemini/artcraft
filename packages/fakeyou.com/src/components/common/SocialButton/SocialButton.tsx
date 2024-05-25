@@ -9,13 +9,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import "./SocialButton.scss";
 
+export type Socials = "x" | "whatsapp" | "facebook" | "reddit" | "email";
+
 interface SocialButtonProps {
-  social: "x" | "whatsapp" | "facebook" | "reddit" | "email";
+  hideLabel?: boolean;
+  social: Socials;
   shareUrl: string;
   shareText: string;
 }
 
 export default function SocialButton({
+  hideLabel,
   social,
   shareUrl,
   shareText,
@@ -64,13 +68,18 @@ export default function SocialButton({
 
   return (
     <button className="social-button" onClick={handleClick}>
-      <div className={`social-button-icon bg-${social}`}>
+      <div
+        className={`${
+          !hideLabel ? "social-button-icon" : "social-button-icon-no-style"
+        } bg-${social}`}
+      >
         <FontAwesomeIcon icon={socialIcon} />
       </div>
-
-      <p className="social-button-text">
-        {social.charAt(0).toUpperCase() + social.slice(1)}
-      </p>
+      {!hideLabel ? (
+        <p className="social-button-text">
+          {social.charAt(0).toUpperCase() + social.slice(1)}
+        </p>
+      ) : null}
     </button>
   );
 }
