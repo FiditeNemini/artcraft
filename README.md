@@ -55,6 +55,10 @@ npm run dev
 
 ## Other Documentation
 
+Here is the Swagger documentation for the backend endpoints
+
+- https://storyteller-docs.netlify.app/
+
 This project uses Remix for routing and Tailwind for styling:
 
 - [Remix Docs](https://remix.run/docs)
