@@ -12,6 +12,7 @@ db.secrets
 db_secrets.toml
 env-secrets
 production_database_secret_connect.sh
+script/production_database_secret_connect.sh
 production_database_secret_query.sh
 production_database_voice_clone_report_download.sh
 secrets.toml
