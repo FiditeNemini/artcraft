@@ -2,6 +2,7 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+-- u.user_role_slug = 'admin' as is_staff,
 -- Users created by studio users in 1 week
 select
   u.username,
