@@ -29,7 +29,7 @@ import {
   persistLogin,
 } from "~/signals";
 
-import { LoadingDotsBricks, Toaster } from "~/components";
+import { LoadingDotsBricks } from "~/components";
 
 config.autoAddCss = false; /* eslint-disable import/first */
 
@@ -120,7 +120,6 @@ export default function App() {
       </head>
       <body className="overflow-hidden bg-ui-background">
         <CompleteTakeoverLoadingScreen isShowing={showLoader} />
-        <Toaster />
         <div className="topbar-spacer" />
         <Outlet />
         <ScrollRestoration />

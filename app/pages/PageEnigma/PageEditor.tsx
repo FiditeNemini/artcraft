@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-
-import { LoadingDots, TopBar } from "~/components";
+import { LoadingDots, Toaster, TopBar } from "~/components";
 import { SidePanel } from "~/pages/PageEnigma/comps/SidePanel";
-
 import { Timeline } from "./comps/Timeline";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
@@ -11,9 +9,7 @@ import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { PreviewFrameImage } from "./comps/PreviewFrameImage";
-
 import { pageHeight, pageWidth } from "~/signals";
-
 import {
   timelineHeight,
   sidePanelWidth,
@@ -22,7 +18,6 @@ import {
   dndTimelineHeight,
   editorLoader,
 } from "~/pages/PageEnigma/signals";
-
 import { EditorCanvas } from "./comps/EngineCanvases";
 import { SceneContainer } from "./comps/SceneContainer";
 
@@ -71,6 +66,7 @@ export const PageEditor = () => {
           }}
         >
           <div className="relative w-full overflow-hidden bg-transparent">
+            <Toaster />
             <SceneContainer>
               <EditorCanvas />
               <PreviewFrameImage />
