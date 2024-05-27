@@ -77,7 +77,7 @@ export default function BetaKeysListPage() {
         // Create a new copy of the list
         const newList = [...list];
         // Update the note for the specific row
-        newList[rowIndex] = { ...newList[rowIndex], maybe_note: note };
+        newList[rowIndex] = { ...newList[rowIndex], maybe_note_html: note };
         // Update the state with the new list
         listSet(newList);
       }
@@ -195,15 +195,21 @@ export default function BetaKeysListPage() {
         );
       },
     }),
-    columnHelper.accessor("maybe_note", {
+    columnHelper.accessor("maybe_note_html", {
       id: "note",
       header: "Note",
       cell: info => {
-        const note = info.getValue();
-        const { token, maybe_note_html } = info.row.original;
+        const noteHtml = info.getValue();
+        const { token } = info.row.original;
+
+        const stripHtml = (html: string) => {
+          const tmp = document.createElement("DIV");
+          tmp.innerHTML = html;
+          return tmp.textContent || tmp.innerText || "";
+        };
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [localNote, setLocalNote] = useState(note);
+        const [localNote, setLocalNote] = useState(stripHtml(noteHtml || ""));
 
         const handleLocalNoteChange = (
           event: React.ChangeEvent<HTMLInputElement>
@@ -230,15 +236,15 @@ export default function BetaKeysListPage() {
           </div>
         ) : (
           <div className="d-flex gap-1 align-items-start note-cell">
-            <span 
-              className="me-3" 
+            <span
+              className="me-3"
               dangerouslySetInnerHTML={{
-                __html: maybe_note_html || "-",
+                __html: noteHtml || "-",
               }}
-            ></span>
+            />
             <Button
               label="Edit"
-              onClick={() => handleEditStart(token, note || "")}
+              onClick={() => handleEditStart(token, noteHtml || "")}
               small={true}
               variant="link"
               className="fs-7"
