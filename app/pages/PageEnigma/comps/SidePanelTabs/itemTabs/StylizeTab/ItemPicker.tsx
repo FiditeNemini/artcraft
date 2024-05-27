@@ -1,27 +1,41 @@
 import { twMerge } from "tailwind-merge";
 import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 import { H4 } from "~/components";
-import { ImgHTMLAttributes } from "react";
+import { ImgHTMLAttributes, useEffect, useState } from "react";
 
 interface ItemPickerProps extends ImgHTMLAttributes<HTMLImageElement> {
   label: string;
   type: ArtStyle;
   selected: boolean;
   onSelected: (picked: ArtStyle) => void;
+  className?: string;
+  defaultImg?: string;
 }
 
 export const ItemPicker = ({
   label,
   type,
   selected = false,
+  defaultImg = "/resources/placeholders/style_placeholder.png",
+  src = defaultImg,
   onSelected,
   width,
   height,
+  className,
   ...imgProps
 }: ItemPickerProps) => {
   const handleSelected = () => {
     onSelected(type);
   };
+
+  const [imageSrc, setImageSrc] = useState<string>(defaultImg);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setImageSrc(src);
+    img.onerror = () => setImageSrc(defaultImg);
+    img.src = src || defaultImg;
+  }, [src, defaultImg]);
 
   return (
     <button
@@ -30,6 +44,7 @@ export const ItemPicker = ({
         selected
           ? "border-brand-primary"
           : "border-[#4B4B5C] hover:border-ui-controls-button",
+        className,
       )}
       style={{
         minWidth: (width as number) + 4,
@@ -40,9 +55,10 @@ export const ItemPicker = ({
       onClick={handleSelected}
     >
       <img
-        className="object-fill"
+        className="h-full w-full object-cover"
+        src={imageSrc}
         {...imgProps}
-        alt="style"
+        alt={label}
         style={{
           minWidth: width,
           minHeight: height,
@@ -51,7 +67,7 @@ export const ItemPicker = ({
         }}
       />
       <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
-      <H4 className="absolute bottom-[1px] left-[6px] truncate text-start text-[13px] drop-shadow-md">
+      <H4 className="absolute bottom-[2px] left-[6px] truncate text-start text-[13px] drop-shadow-md">
         {label}
       </H4>
       <svg

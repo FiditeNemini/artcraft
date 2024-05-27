@@ -58,7 +58,10 @@ export function StylizeTab() {
           onClick={() => setView(StylizeTabPages.STYLE_SELECTION)}
           selectedStyle={selection}
           label={currentStyle?.label || "Select a Style"}
-          imageSrc={currentStyle?.image || ""}
+          imageSrc={
+            currentStyle?.image ||
+            "/resources/placeholders/style_placeholder.png"
+          }
         />
         <Prompts selection={selection} />
         <StyleButtons />

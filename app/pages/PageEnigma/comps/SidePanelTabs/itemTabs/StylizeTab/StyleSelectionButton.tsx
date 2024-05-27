@@ -1,5 +1,6 @@
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
 import { H4, Label } from "~/components";
 import { ArtStyle } from "~/pages/PageEnigma/enums";
 
@@ -15,6 +16,16 @@ export function StyleSelectionButton({
   label,
   imageSrc,
 }: StyleSelectionButtonProps) {
+  const defaultImage = "/resources/placeholders/style_placeholder.png";
+  const [currentImage, setCurrentImage] = useState(defaultImage);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setCurrentImage(imageSrc);
+    img.onerror = () => setCurrentImage(defaultImage);
+    img.src = imageSrc;
+  }, [imageSrc, defaultImage]);
+
   return (
     <div className="flex flex-col">
       <Label>Select a Style</Label>
@@ -23,7 +34,7 @@ export function StyleSelectionButton({
         onClick={onClick}
       >
         <div className="aspect-video w-20 overflow-hidden rounded-md bg-ui-controls-button/100">
-          <img src={imageSrc} alt={label} className="object-cover" />
+          <img src={currentImage} alt={label} className="object-cover" />
         </div>
         <div className="grow">
           <>

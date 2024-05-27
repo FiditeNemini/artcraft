@@ -47,6 +47,7 @@ export const PageStyleSelection = ({
                 selected={selection === style.type}
                 onSelected={handlePickingStylizer}
                 src={style.image}
+                className="aspect-video"
               />
             ))}
           </div>
