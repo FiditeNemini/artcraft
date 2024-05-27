@@ -4,7 +4,6 @@ import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
 import { useRef, useState } from "react";
 import { BucketConfig } from "~/api/BucketConfig";
 import dayjs from "dayjs";
-import { Tooltip } from "~/components";
 import { environmentVariables } from "~/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
@@ -69,20 +68,19 @@ export function CompletedCard({ movie, setMovieId }: Props) {
         </div>
       </div>
       <div className="pr-5">
-        <Tooltip content="Download" position="top">
-          <button
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              const title =
-                movie.maybe_title !== null ? movie.maybe_title : "Untitled";
-              downloadFile({ url: downloadLink, title });
-            }}
-            className="text-xl text-white/50 transition-all duration-150 hover:text-white/90"
-          >
-            <FontAwesomeIcon icon={faArrowDownToLine} />
-          </button>
-        </Tooltip>
+        <button
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const title =
+              movie.maybe_title !== null ? movie.maybe_title : "Untitled";
+            downloadFile({ url: downloadLink, title });
+          }}
+          className="text-[15px] font-medium text-white/50 transition-all duration-150 hover:text-white/100"
+        >
+          <FontAwesomeIcon icon={faArrowDownToLine} className="mr-2" />
+          Download
+        </button>
       </div>
     </div>
   );

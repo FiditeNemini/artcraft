@@ -1,9 +1,4 @@
-import {
-  activeJobs,
-  generateMovieId,
-  movies,
-  viewMyMovies,
-} from "~/pages/PageEnigma/signals";
+import { activeJobs, movies, viewMyMovies } from "~/pages/PageEnigma/signals";
 import { CompletedCard } from "~/pages/PageEnigma/comps/GenerateModals/CompletedCard";
 import { InProgressCard } from "~/pages/PageEnigma/comps/GenerateModals/InProgressCard";
 import { useSignals } from "@preact/signals-react/runtime";
