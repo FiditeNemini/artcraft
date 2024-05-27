@@ -108,6 +108,7 @@ export class EmotionClip {
   async reset(object: THREE.Object3D) {
     await this._detect_face(object);
     const keys: { [key: string]: number } = {};
+    if(this.emotion_json === undefined || this.emotion_json === null) { return; }
     Object.keys(this.emotion_json).forEach((key) => {
       keys[key] = 0;
     });
@@ -118,6 +119,7 @@ export class EmotionClip {
     if (this.faces.length <= 0) {
       await this._detect_face(object);
     }
+    if(this.emotion_json === undefined || this.emotion_json === null) { return; }
     const keys: { [key: string]: number } = {};
     Object.keys(this.emotion_json).forEach((key) => {
       if (Math.floor(frame) > this.emotion_json[key].length) {
