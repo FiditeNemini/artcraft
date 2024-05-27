@@ -97,10 +97,10 @@ export const DragComponent = () => {
           src: thumbnail,
         }}
         alt={dragItem.value.name}
-        className="rounded-t-lg"
+        className="pointer-events-none select-none rounded-t-lg"
       />
       <div
-        className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
+        className="w-full truncate rounded-b-lg px-2 py-1 text-center text-[13px]"
         style={{ backgroundColor: "#39394D" }}
       >
         {dragItem.value.name || dragItem.value.media_id}

@@ -54,7 +54,7 @@ export const ItemElements = ({
     </div>
   ) : (
     <div
-      className={`grid ${gridColumnsClass} gap-3 ${className ? " " + className : ""}`}
+      className={`grid ${gridColumnsClass} gap-2.5 ${className ? " " + className : ""}`}
     >
       {displayItems.map((item) => (
         <ItemElement debug={debug} key={item.media_id} item={item} />

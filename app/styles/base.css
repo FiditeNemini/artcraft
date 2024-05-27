@@ -34,6 +34,12 @@ body {
   font-family: "Fira Sans", sans-serif;
   color: #fff;
   color-scheme: dark;
+  user-select: none;
+}
+
+img {
+  user-select: none;
+  pointer-events: none;
 }
 
 .topbar-spacer {

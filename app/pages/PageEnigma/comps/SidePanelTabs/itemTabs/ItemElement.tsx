@@ -15,7 +15,7 @@ export const ItemElement = ({ item }: Props) => {
 
   return (
     <div
-      className="relative w-full cursor-pointer rounded-xl bg-[#A0A0A0] transition-all duration-200"
+      className="group relative w-full cursor-pointer select-none overflow-hidden rounded-lg transition-all duration-200 hover:brightness-110"
       onPointerDown={(event) => DndAsset.onPointerDown(event, item)}
     >
       <img
@@ -24,12 +24,9 @@ export const ItemElement = ({ item }: Props) => {
           e.currentTarget.src = defaultThumb;
         }}
         alt={item.name}
-        className="aspect-[4.5/5] w-full rounded-t-lg object-cover object-center"
+        className="pointer-events-none aspect-[4.5/5] w-full select-none bg-[#A0A0A0] object-cover object-center"
       />
-      <div
-        className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
-        style={{ backgroundColor: "#39394D" }}
-      >
+      <div className="pointer-events-none w-full select-none truncate bg-ui-controls px-2 py-1 text-center text-[13px] transition-all duration-200 group-hover:bg-ui-controls-button/50">
         {item.name || item.media_id}
       </div>
     </div>
