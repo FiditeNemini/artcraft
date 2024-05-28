@@ -145,6 +145,23 @@ class Scene {
     });
   }
 
+  getPoint(keyframe_uuid: string): THREE.Object3D | undefined {
+    let keyframe_point = undefined;
+    this.scene.children.forEach((object) => {
+      if (object.userData.media_id) {
+        const obj_keyframe_uuid = object.userData.media_id.replace(
+          "Point::",
+          "",
+        );
+        if (obj_keyframe_uuid === keyframe_uuid) {
+          keyframe_point = object;
+          return object;
+        }
+      }
+    });
+    return keyframe_point;
+  }
+
   updatePoint(
     keyframe_uuid: string,
     keyframe_pos: THREE.Vector3,

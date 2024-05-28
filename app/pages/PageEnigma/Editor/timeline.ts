@@ -686,6 +686,7 @@ export class TimeLine {
               object,
               element.offset,
               this.scrubber_frame_position,
+              this.scene
             );
             element.length =
               this.transform_engine.clips[element.object_uuid].length;
