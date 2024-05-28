@@ -333,17 +333,28 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     if skip_process_video {
         info!("Skipping video trim / resample...");
         info!("(This might break if we need to copy the video path. Salt's code implicitly expects videos to be in certain places, but doesn't allow passing of config, and that's horrible.)");
+
+        std::fs::copy(&videos.original_video_path, &videos.trimmed_resampled_video_path)
+            .map_err(|err| {
+                error!("Error copying video (1): {:?}", err);
+                ProcessSingleJobError::IoError(err)
+            })?;
+
+        std::fs::copy(&videos.original_video_path, &videos.comfy_output_video_path)
+            .map_err(|err| {
+                error!("Error copying video (2): {:?}", err);
+                ProcessSingleJobError::IoError(err)
+            })?;
+
     } else {
         info!("Calling video trim / resample...");
         info!("Script: {:?}", &model_dependencies.inference_command.processing_script);
-
-        let video_processing_script = model_dependencies.inference_command.processing_script.clone();
 
         // shell out to python script
         let output = Command::new("python3")
             .stdout(Stdio::inherit()) // NB: This should emit to the rust job's stdout
             .stderr(Stdio::inherit()) // NB: This should emit to the rust job's stderr
-            .arg(video_processing_script)
+            .arg(path_to_string(&model_dependencies.inference_command.processing_script))
             .arg(path_to_string(&videos.original_video_path))
             .arg(format!("{:?}", trim_start_millis))
             .arg(format!("{:?}", trim_end_millis))
