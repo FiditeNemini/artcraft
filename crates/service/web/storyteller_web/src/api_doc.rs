@@ -2,6 +2,7 @@ use utoipa::OpenApi;
 
 use billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::*;
+use billing_component::users::http_endpoints::list_active_user_subscriptions_handler::*;
 use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
@@ -123,6 +124,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
 #[openapi(
   paths(
     billing_component::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler,
+    billing_component::users::http_endpoints::list_active_user_subscriptions_handler::list_active_user_subscriptions_handler,
     crate::http_server::endpoints::analytics::log_browser_session_handler::log_browser_session_handler,
     crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler,
     crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::edit_beta_key_distributed_flag_handler,
@@ -361,6 +363,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListAvailableWeightsSuccessResponse,
     ListBetaKeysError,
     ListBetaKeysQueryParams,
+    ListActiveUserSubscriptionsError,
+    ListActiveUserSubscriptionsResponse,
+    SubscriptionProductKey,
     ListBetaKeysSuccessResponse,
     ListCommentsError,
     ListCommentsPathInfo,

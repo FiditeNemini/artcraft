@@ -36,7 +36,7 @@ pub struct CreateCheckoutSessionSuccessResponse {
 /// Create a Stripe Checkout session and return the redirect URL in Json.
 #[utoipa::path(
   get,
-  tag = "Stripe Billing",
+  tag = "Billing",
   path = "/v1/billing/stripe/checkout/create_redirect",
   params(
     ("request" = CreateCheckoutSessionRequest, description = "Payload for Request"),
