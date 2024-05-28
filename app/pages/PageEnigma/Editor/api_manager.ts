@@ -2,7 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { STORAGE_KEYS } from "~/enums";
-import { environmentVariables, signalScene } from "~/signals";
+import {
+  environmentVariables,
+  signalScene,
+  startPollingActiveJobs,
+} from "~/signals";
 import { updateExistingScene, uploadNewScene } from "./api_fetchers";
 import { uploadThumbnail } from "~/api";
 
@@ -401,6 +405,8 @@ export class APIManager {
       },
       body: json_data,
     });
+
+    startPollingActiveJobs();
 
     if (!response.ok) {
       // Handle HTTP error responses

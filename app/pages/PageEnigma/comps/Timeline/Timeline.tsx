@@ -29,7 +29,8 @@ import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHead
 import { pageWidth } from "~/signals";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import PremiumLockTimeline from "./PremiumLockTimeline";
-import { AssetType, DoNotShow } from "~/enums";
+import { AssetType } from "~/enums";
+import { DoNotShow } from "~/constants";
 import { deleteKeyframe } from "~/pages/PageEnigma/signals/timeline";
 
 function getItemType(item: Clip | Keyframe | null) {

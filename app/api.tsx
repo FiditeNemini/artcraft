@@ -6,6 +6,12 @@ export const login = `${apiHost}/v1/login`;
 export const getSession = `${apiHost}/v1/session`;
 export const logout = `${apiHost}/v1/logout`;
 
+// Inference Jobs
+export const getRecentJobs = `${apiHost}/v1/jobs/session`;
+export const getActiveJobs = `${apiHost}/v1/jobs/session?exclude_states=complete_success,complete_failure,dead,cancelled_by_user,cancelled_by_system`;
+export const getJobStatus = (jobToken: string) =>
+  `${apiHost}/v1/model_inference/job_status/${jobToken}`;
+
 // TTS
 export const inferTts = `${apiHost}/tts/inference`;
 export const listTts = `${apiHost}/tts/list`;

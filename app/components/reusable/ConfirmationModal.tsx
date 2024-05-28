@@ -1,6 +1,6 @@
 import { Fragment, useCallback } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { DoNotShow } from "~/enums";
+import { DoNotShow } from "~/constants";
 import { Button } from "~/components";
 
 interface Props {

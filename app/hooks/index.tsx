@@ -1,1 +1,1 @@
-export { useInferenceJobManager } from "./useInferenceJobManager";
+export * from "./useInferenceJobManager";

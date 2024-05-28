@@ -1,1 +1,2 @@
-export { useInferenceJobManager } from './useInferenceJobManager';
+export { useInferenceJobManager } from "./useInferenceJobManager";
+export { useActiveJobs } from "./useActiveJobs";

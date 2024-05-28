@@ -1,14 +1,15 @@
+import { useSignals } from "@preact/signals-react/runtime";
+import { twMerge } from "tailwind-merge";
 import { faFilm } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "~/components";
-import {
-  activeJobs,
-  generateMovieId,
-  viewMyMovies,
-} from "~/pages/PageEnigma/signals";
+import { generateMovieId, viewMyMovies } from "~/pages/PageEnigma/signals";
+
+import { activeWorkflowJobs } from "~/signals";
 
 export const MyMoviesButton = () => {
-  const activeCount = activeJobs.value.jobs.length;
+  useSignals();
+  const activeCount = activeWorkflowJobs.value.length;
 
   return (
     <div className="relative">
@@ -47,11 +48,14 @@ export const MyMoviesButton = () => {
           <div>My Movies</div>
         </div>
       </Button>
-      {activeCount > 0 && (
-        <div className="absolute right-[-7px] top-[-7px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-brand-primary text-[13px] font-medium text-white">
-          {activeCount}
-        </div>
-      )}
+      <div
+        className={twMerge(
+          "invisible absolute right-[-7px] top-[-7px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-brand-primary text-[13px] font-medium text-white",
+          activeCount > 0 && "visible",
+        )}
+      >
+        {activeCount}
+      </div>
     </div>
   );
 };
