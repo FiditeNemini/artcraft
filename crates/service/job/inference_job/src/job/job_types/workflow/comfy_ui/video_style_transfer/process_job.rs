@@ -41,10 +41,11 @@ use tokens::tokens::prompts::PromptToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
-use crate::job::job_types::workflow::comfy_ui::download_input_video::{download_input_video, DownloadInputVideoArgs};
-use crate::job::job_types::workflow::comfy_ui::job_outputs::JobOutputs;
-use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
+use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::{download_input_video, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::job_outputs::JobOutputs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
@@ -60,10 +61,6 @@ fn get_file_extension(mimetype: &str) -> Result<&'static str> {
     Ok(ext)
 }
 
-pub struct ComfyProcessJobArgs<'a> {
-    pub job_dependencies: &'a JobDependencies,
-    pub job: &'a AvailableInferenceJob,
-}
 
 fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
     for entry in WalkDir::new(path) {

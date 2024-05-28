@@ -18,7 +18,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::process_job::ComfyProcessJobArgs;
+use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::process_single_wf_job::get_workflow_args_from_job;
 
 pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError>{
