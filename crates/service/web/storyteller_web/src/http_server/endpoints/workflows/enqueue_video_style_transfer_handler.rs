@@ -88,6 +88,9 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Only for premium accounts
     remove_watermark: Option<bool>,
 
+    /// Use lipsync in the workflow
+    use_lipsync: Option<bool>,
+
     /// Use face detailer
     /// Only for premium accounts
     use_face_detailer: Option<bool>,
@@ -304,6 +307,12 @@ pub async fn enqueue_video_style_transfer_handler(
     let remove_watermark = request.remove_watermark
         .map(|remove_watermark| remove_watermark && has_paid_plan);
 
+    let lipsync_enabled = request.use_lipsync
+        .or_else(|| {
+            get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
+                .map(|value| str_to_bool(&value))
+        });
+
     let inference_args = WorkflowArgs {
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
@@ -334,8 +343,7 @@ pub async fn enqueue_video_style_transfer_handler(
             .and_then(|value| try_str_to_num(&value).ok()),
         use_face_detailer: request.use_face_detailer,
         use_upscaler: request.use_upscaler,
-        lipsync_enabled: get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
-            .map(|value| str_to_bool(&value)),
+        lipsync_enabled,
         strength: maybe_strength,
     };
 
