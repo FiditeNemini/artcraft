@@ -227,6 +227,7 @@ class Editor {
       faceDetail: false,
       upscale: false,
       styleStrength: 1.0,
+      lipSync: false,
     };
   }
 

@@ -15,6 +15,7 @@ import {
   faceDetail,
   styleStrength,
   upscale,
+  lipSync,
 } from "~/pages/PageEnigma/signals/stylizeTab";
 
 export function StyleButtons() {
@@ -98,11 +99,36 @@ export function StyleButtons() {
         </div>
 
         <div className="mb-4 mt-4">
-          <PremiumLock requiredPlan="any" plural={true}>
+          <div>
+            <div className="flex items-center py-[6px]">
+              <Switch.Group>
+                <Switch.Label className="mr-3 grow text-sm font-medium">
+                  Use Lip Sync
+                </Switch.Label>
+                <Switch
+                  checked={lipSync.value}
+                  onChange={() => (lipSync.value = !lipSync.value)}
+                  className={`${
+                    lipSync.value
+                      ? "bg-brand-primary hover:bg-brand-primary-400"
+                      : "bg-gray-500 hover:bg-gray-400"
+                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                >
+                  <span
+                    className={`${
+                      lipSync.value ? "translate-x-6" : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </Switch.Group>
+            </div>
+          </div>
+          <PremiumLock requiredPlan="any" plural={true} className="mt-2">
             <Switch.Group>
-              <div className="flex gap-6">
-                <div className="flex items-center">
-                  <Switch.Label className="mr-3 text-sm font-medium">
+              <div className="flex flex-col gap-[6px]">
+                <hr className="opacity-[5%]" />
+                <div className="flex w-full items-center">
+                  <Switch.Label className="mr-3 grow text-sm font-medium">
                     Upscale
                   </Switch.Label>
                   <Switch
@@ -110,7 +136,7 @@ export function StyleButtons() {
                     onChange={() => (upscale.value = !upscale.value)}
                     className={`${
                       upscale.value
-                        ? "bg-brand-primary"
+                        ? "bg-brand-primary hover:bg-brand-primary-400"
                         : "bg-gray-500 hover:bg-gray-400"
                     } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
                   >
@@ -121,16 +147,17 @@ export function StyleButtons() {
                     />
                   </Switch>
                 </div>
-                <div className="flex items-center">
-                  <Switch.Label className="mr-3 text-sm font-medium">
-                    Face Detail
+                <hr className="opacity-[5%]" />
+                <div className="flex w-full items-center">
+                  <Switch.Label className="mr-3 grow text-sm font-medium">
+                    Face Detailer
                   </Switch.Label>
                   <Switch
                     checked={faceDetail.value}
                     onChange={() => (faceDetail.value = !faceDetail.value)}
                     className={`${
                       faceDetail.value
-                        ? "bg-brand-primary"
+                        ? "bg-brand-primary hover:bg-brand-primary-400"
                         : "bg-gray-500 hover:bg-gray-400"
                     } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
                   >
@@ -141,6 +168,7 @@ export function StyleButtons() {
                     />
                   </Switch>
                 </div>
+                <hr className="opacity-[5%]" />
               </div>
             </Switch.Group>
           </PremiumLock>

@@ -272,6 +272,7 @@ export class VideoGeneration {
         this.editor.generation_options.faceDetail,
         this.editor.generation_options.upscale,
         this.editor.generation_options.styleStrength,
+        this.editor.generation_options.lipSync,
       )
       .catch((error) => {
         // TODO handle stylize error.
