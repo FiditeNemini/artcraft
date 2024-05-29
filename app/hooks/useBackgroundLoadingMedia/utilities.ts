@@ -1,30 +1,56 @@
 import { MediaFileType } from "~/pages/PageEnigma/enums";
 
+import { ToastTypes } from "~/enums";
+
 import {
   GetMediaByUser,
   GetMediaListResponse,
 } from "~/api/media_files/GetMediaByUser";
 
-export function instanceOfMediaListResponse(
-  object: GetMediaListResponse | { success: boolean; error_reason: string },
-): object is GetMediaListResponse {
-  return "results" in object;
-}
-export function GetUserMovies(username: string) {
+import {
+  addToast,
+  authentication,
+  setUserAudioItems,
+  setUserMovies,
+} from "~/signals";
+const { userInfo } = authentication;
+
+export function PollUserMovies() {
+  if (!userInfo.value) {
+    //do nothing return if login info does not exist
+    return;
+  }
   return GetMediaByUser(
-    username,
+    userInfo.value.username,
     {},
     {
       filter_media_type: MediaFileType.Video,
     },
   )
     .then((res: GetMediaListResponse) => {
-      return res;
+      setUserMovies(res.results);
     })
     .catch(() => {
-      return {
-        success: false,
-        error_reason: "Unknown Error in Loading My Movies",
-      };
+      addToast(ToastTypes.ERROR, "Unknown Error in Loading My Movies");
+    });
+}
+
+export function PollUserAudioItems() {
+  if (!userInfo.value) {
+    //do nothing return if login info does not exist
+    return;
+  }
+  return GetMediaByUser(
+    userInfo.value.username,
+    {},
+    {
+      filter_media_type: MediaFileType.Audio,
+    },
+  )
+    .then((res: GetMediaListResponse) => {
+      setUserAudioItems(res.results);
+    })
+    .catch(() => {
+      addToast(ToastTypes.ERROR, "Unknown Error in Loading My Audio Items");
     });
 }

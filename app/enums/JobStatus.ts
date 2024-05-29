@@ -8,3 +8,9 @@ export enum JobStatus {
   CANCELLED_BY_USER = "cancelled_by_user",
   CANCCELLED_BY_SYSTEM = "cancelled_by_system",
 }
+
+export enum JobType {
+  TextToSpeech = "text_to_speech",
+  VoiceConversion = "voice_conversion",
+  VideoStyleTransfer = "workflow",
+}

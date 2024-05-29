@@ -11,6 +11,7 @@ import { GenerateTtsAudioResponse } from "~/pages/PageEnigma/models/tts";
 import { GenerateTtsAudio } from "./utilities";
 import { TtsState } from "../../../../models/voice";
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
+import { startPollingActiveJobs } from "~/signals";
 
 export const PageTTS = ({
   changePage,
@@ -33,21 +34,14 @@ export const PageTTS = ({
 
       GenerateTtsAudio(request).then((res: GenerateTtsAudioResponse) => {
         if (res && res.inference_job_token) {
-          setTtsState({
-            ...ttsState,
-            inferenceTokens: [
-              ...ttsState.inferenceTokens,
-              res.inference_job_token,
-            ],
-          });
-
+          startPollingActiveJobs();
           changePage(AudioTabPages.LIBRARY);
         }
       });
     } else {
       console.log("no voice model selected");
     }
-  }, [ttsState, changePage, setTtsState]);
+  }, [ttsState, changePage]);
 
   const handleTextInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTtsState({

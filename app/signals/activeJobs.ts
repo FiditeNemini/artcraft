@@ -1,10 +1,11 @@
 import { signal, computed } from "@preact/signals-core";
 
-import { JobStatus } from "~/enums";
+import { JobStatus, JobType } from "~/enums";
+import { PollRecentJobs } from "~/hooks/useActiveJobs/utilities";
 import { Job } from "~/models";
 import { isJobStatusTerminal } from "~/utilities";
 
-export const recentJobs = signal<Job[] | undefined>([]);
+export const recentJobs = signal<Job[] | undefined>(undefined);
 export const setJobs = (newJobList: Job[]) => {
   recentJobs.value = [...newJobList];
 };
@@ -24,9 +25,22 @@ export const activeWorkflowJobs = computed(() => {
     return undefined;
   }
   return activeJobs.value.filter((job) => {
-    return job.request.inference_category === "workflow";
+    return job.request.inference_category === JobType.VideoStyleTransfer;
   });
 });
+
+export const activeAudioJobs = computed(() => {
+  if (!activeJobs.value) {
+    return undefined;
+  }
+  return activeJobs.value.filter((job) => {
+    return (
+      job.request.inference_category === JobType.TextToSpeech ||
+      job.request.inference_category === JobType.VoiceConversion
+    );
+  });
+});
+
 export const completedJobs = computed(() => {
   if (!recentJobs.value) {
     return undefined;
@@ -36,13 +50,13 @@ export const completedJobs = computed(() => {
   });
 });
 
-export const shouldPollActiveJobs = signal<boolean>(true);
+export const shouldPollActiveJobs = signal<boolean>(false);
 
 export const startPollingActiveJobs = () => {
-  console.info("start polling Active Jobs");
+  PollRecentJobs(); //poll once regardless of polling intervals
   shouldPollActiveJobs.value = true;
 };
+
 export const stopPollingActiveJobs = () => {
-  console.info("stop polling Active Jobs");
   shouldPollActiveJobs.value = false;
 };

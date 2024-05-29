@@ -5,7 +5,6 @@ export * from "./ClipType";
 export * from "./EditorState";
 export * from "./FetchStatus";
 export * from "./GenerateTtsAudioErrorType";
-export * from "./InferenceJobType";
 export * from "./JobState";
 export * from "./MediaFileClass";
 export * from "./MediaFileType";

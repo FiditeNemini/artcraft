@@ -9,7 +9,9 @@ import { activeWorkflowJobs } from "~/signals";
 
 export const MyMoviesButton = () => {
   useSignals();
-  const activeCount = activeWorkflowJobs.value.length;
+  const activeCount = activeWorkflowJobs.value
+    ? activeWorkflowJobs.value.length
+    : 0;
 
   return (
     <div className="relative">

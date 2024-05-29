@@ -6,33 +6,33 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { InferenceJob } from "~/pages/PageEnigma/models";
+import { JobStatus } from "~/enums";
+import { Job } from "~/models";
 import { ButtonIcon, H5 } from "~/components";
-import { JobState } from "~/pages/PageEnigma/enums";
 
-export const InferenceElement = ({ job }: { job: InferenceJob }) => {
+export const InferenceElement = ({ job }: { job: Job }) => {
   const className = twMerge(
     "rounded-md w-full flex justify-between items-center p-2 gap-2",
-    job.job_status === JobState.PENDING ? "bg-inference-pending" : "",
-    job.job_status === JobState.STARTED ? "bg-inference-generating" : "",
-    job.job_status === JobState.DEAD ? "bg-inference-error" : "",
+    job.status.status === JobStatus.PENDING ? "bg-inference-pending" : "",
+    job.status.status === JobStatus.STARTED ? "bg-inference-generating" : "",
+    job.status.status === JobStatus.DEAD ? "bg-inference-error" : "",
   );
 
   const statusText = "".concat(
-    job.job_status === JobState.PENDING ? "Pending..." : "",
-    job.job_status === JobState.STARTED ? "Generating..." : "",
-    job.job_status === JobState.DEAD ? "Error" : "",
+    job.status.status === JobStatus.PENDING ? "Pending..." : "",
+    job.status.status === JobStatus.STARTED ? "Generating..." : "",
+    job.status.status === JobStatus.DEAD ? "Error" : "",
   );
   return (
     <div className={className}>
-      {job.job_status === JobState.DEAD && (
+      {job.status.status === JobStatus.DEAD && (
         <FontAwesomeIcon icon={faCircleXmark} />
       )}
-      {job.job_status !== JobState.DEAD && (
+      {job.status.status !== JobStatus.DEAD && (
         <FontAwesomeIcon icon={faSpinnerThird} spin />
       )}
       <H5 className="grow">{statusText}</H5>
-      {job.job_status === JobState.DEAD && (
+      {job.status.status === JobStatus.DEAD && (
         <ButtonIcon
           icon={faXmark}
           onClick={() => {

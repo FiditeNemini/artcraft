@@ -13,6 +13,7 @@ import { GenerateVoiceConversion } from "./utilities";
 import { H4, H6, Button, Label, UploadAudioComponent } from "~/components";
 
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
+import { startPollingActiveJobs } from "~/signals";
 
 export const PageVoicetoVoice = ({
   changePage,
@@ -35,19 +36,14 @@ export const PageVoicetoVoice = ({
       GenerateVoiceConversion(request).then(
         (res: EnqueueVoiceConversionResponse) => {
           if (res && res.inference_job_token) {
-            setV2VState({
-              ...v2vState,
-              inferenceTokens: [
-                ...v2vState.inferenceTokens,
-                res.inference_job_token,
-              ],
-            });
+            startPollingActiveJobs();
             changePage(AudioTabPages.LIBRARY);
           }
         },
       );
     }
-  }, [v2vState, changePage, setV2VState]);
+  }, [v2vState, changePage]);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col">

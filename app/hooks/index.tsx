@@ -1,1 +1,1 @@
-export * from "./useInferenceJobManager";
+export * from "./useActiveJobs";

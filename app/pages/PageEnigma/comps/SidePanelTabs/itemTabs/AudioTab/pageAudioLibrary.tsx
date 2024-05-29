@@ -3,8 +3,6 @@ import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import { useSignals, useComputed } from "@preact/signals-react/runtime";
 import { audioFilter, audioItems } from "~/pages/PageEnigma/signals";
-import { audioItemsFromServer } from "~/pages/PageEnigma/signals/mediaFromServer";
-import { inferenceJobs } from "~/pages/PageEnigma/signals/inferenceJobs";
 
 import { Button, Pagination, UploadAudioButtonDialogue } from "~/components";
 
@@ -12,13 +10,11 @@ import { AudioItemElements } from "./audioItemElements";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { InferenceElement } from "./inferenceElement";
 import { AssetFilterOption } from "~/enums";
-import {
-  AudioTabPages,
-  InferenceJobType,
-  JobState,
-} from "~/pages/PageEnigma/enums";
+import { AudioTabPages } from "~/pages/PageEnigma/enums";
 
-export const PageLibrary = ({
+import { activeAudioJobs, userAudioItems } from "~/signals";
+
+export const PageAudioLibrary = ({
   changePage,
   reloadLibrary,
 }: {
@@ -26,9 +22,10 @@ export const PageLibrary = ({
   reloadLibrary: () => void;
 }) => {
   useSignals();
+  const loadUserAudioItems = userAudioItems.value ? userAudioItems.value : [];
   const allAudioItems = useComputed(() => [
     ...audioItems.value,
-    ...audioItemsFromServer.value,
+    ...loadUserAudioItems,
   ]);
   const displayedItems = allAudioItems.value.filter((item) => {
     if (audioFilter.value === AssetFilterOption.ALL) {
@@ -39,17 +36,7 @@ export const PageLibrary = ({
     }
     return item.isBookmarked;
   });
-  const audioInferenceJobs = useComputed(() =>
-    inferenceJobs.value.filter((job) => {
-      if (
-        job.job_status !== JobState.COMPLETE_SUCCESS &&
-        (job.job_type === InferenceJobType.TextToSpeech ||
-          job.job_type === InferenceJobType.VoiceConversion)
-      ) {
-        return job;
-      }
-    }),
-  );
+
   const pageSize = 20;
   const totalPages = Math.ceil(allAudioItems.value.length / pageSize);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -109,10 +96,10 @@ export const PageLibrary = ({
       </div>
 
       <div className="w-full grow overflow-y-auto px-4">
-        {audioInferenceJobs.value.length > 0 && (
+        {activeAudioJobs.value && activeAudioJobs.value.length > 0 && (
           <div className="mb-4 grid grid-cols-1 gap-2">
-            {audioInferenceJobs.value.map((job) => {
-              return <InferenceElement key={job.job_id} job={job} />;
+            {activeAudioJobs.value.map((job) => {
+              return <InferenceElement key={job.job_token} job={job} />;
             })}
           </div>
         )}

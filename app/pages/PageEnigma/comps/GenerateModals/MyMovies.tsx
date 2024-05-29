@@ -1,15 +1,12 @@
-import {
-  // generateMovieId,
-  myMovies,
-  viewMyMovies,
-} from "~/pages/PageEnigma/signals";
+import { viewMyMovies } from "~/pages/PageEnigma/signals";
 import { CompletedCard } from "~/pages/PageEnigma/comps/GenerateModals/CompletedCard";
 import { InProgressCard } from "~/pages/PageEnigma/comps/GenerateModals/InProgressCard";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faFilm } from "@fortawesome/pro-solid-svg-icons";
 import { TransitionDialogue } from "~/components";
 
-import { activeWorkflowJobs } from "~/signals";
+import { activeWorkflowJobs, userMovies } from "~/signals";
+
 interface Props {
   setMovieId: (page: string) => void;
 }
@@ -41,7 +38,7 @@ export function MyMovies({ setMovieId }: Props) {
         <div>
           <div className="mx-5 mb-1 font-medium">Completed</div>
           <div className="flex flex-col">
-            {myMovies.value?.map((movie) => (
+            {userMovies.value?.map((movie) => (
               <CompletedCard
                 key={movie.token}
                 movie={movie}

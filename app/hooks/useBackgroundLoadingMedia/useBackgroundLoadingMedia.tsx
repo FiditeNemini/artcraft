@@ -1,47 +1,18 @@
-import { useCallback } from "react";
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
-import { GetUserMovies, instanceOfMediaListResponse } from "./utilities";
-import { addToast, authentication, completedJobs } from "~/signals";
+import { PollUserMovies, PollUserAudioItems } from "./utilities";
 
-import {
-  myMovies,
-  setMyMovies,
-  shouldPollMyMovies,
-} from "~/pages/PageEnigma/signals";
-import { ToastTypes } from "~/enums";
+import { completedJobs, userMovies, userAudioItems } from "~/signals";
+
+import { JobType } from "~/enums";
 
 export const useBackgroundLoadingMedia = () => {
   useSignals();
 
-  const PollMyMovies = useCallback(() => {
-    // console.log("polling my movies");
-    if (authentication.userInfo.value?.username) {
-      GetUserMovies(authentication.userInfo.value.username).then((res) => {
-        // console.log("GetUerMovies has response:", res);
-        if (instanceOfMediaListResponse(res)) {
-          setMyMovies(res.results);
-        } else {
-          addToast(ToastTypes.ERROR, res.error_reason);
-        }
-      });
-    }
-  }, []);
-
-  useSignalEffect(() => {
-    if (shouldPollMyMovies.value) {
-      // shouldPollMyMovies is initiated as true to guaruntee first pull on load
-      PollMyMovies();
-    }
-  });
-
   useSignalEffect(() => {
     //CASE 1: first load
-    // if myMovies undefined, first load is not done
-    if (!myMovies.value) {
-      // turn on polling if it is not already on
-      if (!shouldPollMyMovies.value) {
-        shouldPollMyMovies.value = true;
-      }
+    // if myMovies undefined, poll for the first time
+    if (!userMovies.value) {
+      PollUserMovies();
       return;
     }
 
@@ -53,7 +24,7 @@ export const useBackgroundLoadingMedia = () => {
     const workflowJobsTokens = completedJobs.value
       .filter((job) => {
         if (
-          job.request.inference_category === "workflow" &&
+          job.request.inference_category === JobType.VideoStyleTransfer &&
           job.maybe_result.entity_token
         ) {
           return true;
@@ -67,21 +38,61 @@ export const useBackgroundLoadingMedia = () => {
       return;
     }
 
-    const myMoviesTokens = myMovies.value.map((movie) => movie.token);
+    const userMoviesTokens = userMovies.value.map((movie) => movie.token);
     const isEveryTokenIncludedInPolled = workflowJobsTokens.every((token) =>
-      myMoviesTokens.includes(token),
+      userMoviesTokens.includes(token),
     );
     if (!isEveryTokenIncludedInPolled) {
       //there are videos newly completed, poll
-      shouldPollMyMovies.value = true;
+      PollUserMovies();
       return;
     }
 
-    // at this point, make sure we stop polling because:
-    // - myMovies first load is done
-    // - completed jobs that contain new videos are all polled
-    if (shouldPollMyMovies.value) {
-      shouldPollMyMovies.value = false;
+    //else, no new movies, no need to poll;
+  });
+
+  useSignalEffect(() => {
+    //CASE 1: first load
+    // if audioItems undefined, poll for the first time
+    if (!userAudioItems.value) {
+      PollUserAudioItems();
+      return;
     }
+
+    //CASE 2: pull after jobs completion
+    if (!completedJobs.value || completedJobs.value.length === 0) {
+      return; // nothing to do if there's no complete jobs
+    }
+
+    const audioJobsTokens = completedJobs.value
+      .filter((job) => {
+        if (
+          (job.request.inference_category === JobType.TextToSpeech ||
+            job.request.inference_category === JobType.VoiceConversion) &&
+          job.maybe_result.entity_token
+        ) {
+          return true;
+        }
+        return false;
+      })
+      .map((job) => job.maybe_result.entity_token);
+
+    if (audioJobsTokens.length === 0) {
+      //nothing to do if no complete jobs involves audio
+      return;
+    }
+
+    const userAudioItemsTokens = userAudioItems.value.map(
+      (audio) => audio.media_id,
+    );
+    const isEveryTokenIncludedInPolled = audioJobsTokens.every((token) =>
+      userAudioItemsTokens.includes(token),
+    );
+    if (!isEveryTokenIncludedInPolled) {
+      //there are videos newly completed, poll
+      PollUserAudioItems();
+      return;
+    }
+    //else, no new movies, no need to poll;
   });
 };

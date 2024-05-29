@@ -6,3 +6,4 @@ export const ONE_MINUTE = 60000;
 export const TWO_SECONDS = 2000;
 export const FIVE_SECONDS = 5000;
 export const SEVEN_SECONDS = 7000;
+export const TEN_SECONDS = 10000;

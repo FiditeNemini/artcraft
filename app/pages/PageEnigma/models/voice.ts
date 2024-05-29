@@ -12,14 +12,10 @@ export type AudioPanelState = {
 export type TtsState = {
   voice: TtsModelListItem | undefined;
   text: string;
-  hasEnqueued: number;
-  inferenceTokens: string[];
 };
 
 export type V2VState = {
   voice: VoiceConversionModelListItem | undefined;
   file: File | undefined;
   inputFileToken: string | undefined;
-  hasEnqueued: number;
-  inferenceTokens: string[];
 };
