@@ -659,10 +659,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         comfy_args,
         videos: &videos,
         job_progress_reporter: &mut job_progress_reporter,
-        work_temp_dir: &work_temp_dir,
-        workflow_path: &workflow_path,
-        root_comfy_path: &root_comfy_path,
-        maybe_lora_path: maybe_lora_path.as_deref(),
         download_video,
         should_insert_prompt_record,
         maybe_style_name,
@@ -713,7 +709,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     job_progress_reporter.log_status("done")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    info!("Job complete. Result video media token: {:?}", &media_file_token);
+    info!("Result video media token: {:?}", &media_file_token);
 
     info!("Job {:?} complete success!", args.job.id);
 

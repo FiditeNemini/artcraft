@@ -51,20 +51,21 @@ fn get_file_extension(mimetype: &str) -> anyhow::Result<&'static str> {
 pub struct SaveResultsArgs<'a> {
   pub job: &'a AvailableInferenceJob,
   pub deps: &'a JobDependencies,
-  pub job_args: &'a JobArgs<'a>,
-  pub comfy_args: &'a WorkflowArgs,
-  pub videos: &'a JobOutputs,
   pub job_progress_reporter: &'a mut Box<dyn JobProgressReporter>,
-  pub work_temp_dir: &'a TempDir,
-  pub workflow_path: &'a str,
-  pub root_comfy_path: &'a Path,
-  pub maybe_lora_path: Option<&'a Path>,
+
   pub download_video: VideoDownloadDetails,
-  pub should_insert_prompt_record: bool,
-  pub maybe_style_name: Option<StyleTransferName>,
+  pub videos: &'a JobOutputs,
   pub inference_duration: Duration,
+
+  // TODO: Maybe group these
+  pub should_insert_prompt_record: bool,
+  pub comfy_args: &'a WorkflowArgs,
+  pub maybe_style_name: Option<StyleTransferName>,
   pub maybe_positive_prompt: Option<&'a str>,
   pub maybe_negative_prompt: Option<&'a str>,
+
+  // TODO: Maybe remove these
+  pub job_args: &'a JobArgs<'a>,
 }
 
 pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<MediaFileToken, ProcessSingleJobError> {
@@ -183,32 +184,6 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     thread::sleep(Duration::from_millis(sleep_millis));
   }
 
-  // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
-
-  info!("Cleaning up temporary files...");
-
-  safe_delete_temp_file(&args.videos.original_video_path);
-  safe_delete_temp_file(&args.videos.trimmed_resampled_video_path);
-  safe_delete_temp_file(&args.videos.comfy_output_video_path);
-  safe_delete_temp_file(args.videos.video_to_watermark());
-  safe_delete_temp_file(args.videos.get_final_video_to_upload());
-  safe_delete_temp_file(args.videos.get_non_watermarked_video_to_upload());
-
-  // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
-
-  safe_delete_temp_file(&args.workflow_path);
-
-  // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
-  if let Some(lora_path) = args.maybe_lora_path {
-    safe_delete_temp_file(lora_path);
-  }
-
-  let output_dir = args.root_comfy_path.join("output");
-  safe_recursively_delete_files(&output_dir);
-
-  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&args.work_temp_dir);
-
   // ==================== SAVE RECORDS ==================== //
 
   // create a json detailing the args used to create the media
@@ -300,15 +275,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     }
   }
 
-  info!("ComfyUI Done.");
-
-  args.job_progress_reporter.log_status("done")
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
-
   info!("Result video media token: {:?}", &media_file_token);
-
-  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
-        args.job.id, id, &media_file_token);
 
   Ok(media_file_token)
 }
