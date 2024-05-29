@@ -16,33 +16,46 @@ use utoipa::ToSchema;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default, ToSchema)]
 pub enum InferenceCategory {
-  /// Eg. SadTalker and possibly Wav2Lip
+  /// Facial lipsync animation (eg. SadTalker, Wav2Lip)
   #[serde(rename = "lipsync_animation")]
   #[default]
   LipsyncAnimation,
 
+  /// FakeYou's text to speech (eg. Tacotron2)
   #[serde(rename = "text_to_speech")]
   TextToSpeech,
 
+  /// FakeYou's voice conversion (eg. svc, rvc)
   #[serde(rename = "voice_conversion")]
   VoiceConversion,
 
-  #[serde(rename = "video_filter")]
-  VideoFilter,
-
+  /// Image generation (eg. Stable Diffusion 1.5)
   #[serde(rename = "image_generation")]
   ImageGeneration,
 
+  /// Turn video into animation data with mocap processing (eg. Mocapnet).
   #[serde(rename = "mocap")]
   Mocap,
 
+  /// ComfyUI workflows
+  /// This is what powers Storyteller Studio!
   #[serde(rename = "workflow")]
   Workflow,
 
+  /// FBX to GLTF/GLB.
+  /// Still supported, but few people will use it.
   #[serde(rename = "format_conversion")]
   FormatConversion,
 
+  /// DEPRECATED. Do not use.
+  /// This was for ReRenderAVideo, which we never productionized.
+  #[deprecated(note = "This was for ReRenderAVideo, which we never productionized.")]
+  #[serde(rename = "video_filter")]
+  VideoFilter,
+
+  /// DEPRECATED. Bevy engine serverside rendering.
   #[serde(rename = "convert_bvh_to_workflow")]
+  #[deprecated(note = "This was for Bevy engine's server side rendering.")]
   ConvertBvhToWorkflow,
 }
 
@@ -58,11 +71,11 @@ impl InferenceCategory {
       Self::LipsyncAnimation => "lipsync_animation",
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
-      Self::VideoFilter => "video_filter",
       Self::ImageGeneration => "image_generation",
       Self::Mocap => "mocap",
       Self::Workflow => "workflow",
       Self::FormatConversion => "format_conversion",
+      Self::VideoFilter => "video_filter",
       Self::ConvertBvhToWorkflow => "convert_bvh_to_workflow",
     }
   }
@@ -72,11 +85,11 @@ impl InferenceCategory {
       "lipsync_animation" => Ok(Self::LipsyncAnimation),
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
-      "video_filter" => Ok(Self::VideoFilter),
       "image_generation" => Ok(Self::ImageGeneration),
       "mocap" => Ok(Self::Mocap),
       "workflow" => Ok(Self::Workflow),
       "format_conversion" => Ok(Self::FormatConversion),
+      "video_filter" => Ok(Self::VideoFilter),
       "convert_bvh_to_workflow" => Ok(Self::ConvertBvhToWorkflow),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -89,11 +102,11 @@ impl InferenceCategory {
       Self::LipsyncAnimation,
       Self::TextToSpeech,
       Self::VoiceConversion,
-      Self::VideoFilter,
       Self::ImageGeneration,
       Self::Mocap,
       Self::Workflow,
       Self::FormatConversion,
+      Self::VideoFilter,
       Self::ConvertBvhToWorkflow,
     ])
   }
@@ -112,11 +125,11 @@ mod tests {
       assert_serialization(InferenceCategory::LipsyncAnimation, "lipsync_animation");
       assert_serialization(InferenceCategory::TextToSpeech, "text_to_speech");
       assert_serialization(InferenceCategory::VoiceConversion, "voice_conversion");
-      assert_serialization(InferenceCategory::VideoFilter, "video_filter");
       assert_serialization(InferenceCategory::ImageGeneration, "image_generation");
       assert_serialization(InferenceCategory::Mocap, "mocap");
       assert_serialization(InferenceCategory::Workflow, "workflow");
       assert_serialization(InferenceCategory::FormatConversion, "format_conversion");
+      assert_serialization(InferenceCategory::VideoFilter, "video_filter");
       assert_serialization(InferenceCategory::ConvertBvhToWorkflow, "convert_bvh_to_workflow");
     }
 
@@ -125,11 +138,11 @@ mod tests {
       assert_eq!(InferenceCategory::LipsyncAnimation.to_str(), "lipsync_animation");
       assert_eq!(InferenceCategory::TextToSpeech.to_str(), "text_to_speech");
       assert_eq!(InferenceCategory::VoiceConversion.to_str(), "voice_conversion");
-      assert_eq!(InferenceCategory::VideoFilter.to_str(), "video_filter");
       assert_eq!(InferenceCategory::ImageGeneration.to_str(), "image_generation");
       assert_eq!(InferenceCategory::Mocap.to_str(), "mocap");
       assert_eq!(InferenceCategory::Workflow.to_str(), "workflow");
       assert_eq!(InferenceCategory::FormatConversion.to_str(), "format_conversion");
+      assert_eq!(InferenceCategory::VideoFilter.to_str(), "video_filter");
       assert_eq!(InferenceCategory::ConvertBvhToWorkflow.to_str(), "convert_bvh_to_workflow");
     }
 
@@ -138,11 +151,11 @@ mod tests {
       assert_eq!(InferenceCategory::from_str("lipsync_animation").unwrap(), InferenceCategory::LipsyncAnimation);
       assert_eq!(InferenceCategory::from_str("text_to_speech").unwrap(), InferenceCategory::TextToSpeech);
       assert_eq!(InferenceCategory::from_str("voice_conversion").unwrap(), InferenceCategory::VoiceConversion);
-      assert_eq!(InferenceCategory::from_str("video_filter").unwrap(), InferenceCategory::VideoFilter);
       assert_eq!(InferenceCategory::from_str("image_generation").unwrap(), InferenceCategory::ImageGeneration);
       assert_eq!(InferenceCategory::from_str("mocap").unwrap(), InferenceCategory::Mocap);
       assert_eq!(InferenceCategory::from_str("workflow").unwrap(), InferenceCategory::Workflow);
       assert_eq!(InferenceCategory::from_str("format_conversion").unwrap(), InferenceCategory::FormatConversion);
+      assert_eq!(InferenceCategory::from_str("video_filter").unwrap(), InferenceCategory::VideoFilter);
       assert_eq!(InferenceCategory::from_str("convert_bvh_to_workflow").unwrap(), InferenceCategory::ConvertBvhToWorkflow);
     }
 
@@ -154,11 +167,11 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceCategory::LipsyncAnimation));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::TextToSpeech));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::VoiceConversion));
-      assert_eq!(variants.pop_first(), Some(InferenceCategory::VideoFilter));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::ImageGeneration));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::Mocap));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::Workflow));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::FormatConversion));
+      assert_eq!(variants.pop_first(), Some(InferenceCategory::VideoFilter));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::ConvertBvhToWorkflow));
       assert_eq!(variants.pop_first(), None);
 
