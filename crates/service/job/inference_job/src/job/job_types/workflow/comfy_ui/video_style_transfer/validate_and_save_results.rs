@@ -32,8 +32,8 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::VideoDownloadDetails;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::JobArgs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job_dependencies::JobDependencies;
 
 fn get_file_extension(mimetype: &str) -> anyhow::Result<&'static str> {
@@ -57,12 +57,7 @@ pub struct SaveResultsArgs<'a> {
   pub videos: &'a VideoPaths,
   pub inference_duration: Duration,
 
-  // TODO: Maybe group these
-  pub should_insert_prompt_record: bool,
   pub comfy_args: &'a WorkflowArgs,
-  pub maybe_style_name: Option<StyleTransferName>,
-  pub maybe_positive_prompt: Option<&'a str>,
-  pub maybe_negative_prompt: Option<&'a str>,
 
   // TODO: Maybe remove these
   pub job_args: &'a JobArgs<'a>,
@@ -228,12 +223,21 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
         ProcessSingleJobError::Other(e)
       })?;
 
-  if args.should_insert_prompt_record {
+  let should_insert_prompt_record =
+      args.comfy_args.positive_prompt.is_some()
+          || args.comfy_args.negative_prompt.is_some()
+          || args.comfy_args.lipsync_enabled.is_some()
+          || args.comfy_args.strength.is_some()
+          || args.comfy_args.style_name.is_some()
+          || args.comfy_args.use_face_detailer.is_some()
+          || args.comfy_args.use_upscaler.is_some();
+
+  if should_insert_prompt_record {
     info!("Saving prompt record");
 
     let mut other_args_builder = PromptInnerPayloadBuilder::new();
 
-    if let Some(style_name) = args.maybe_style_name {
+    if let Some(style_name) = args.comfy_args.style_name {
       info!("building PromptInnerPayload with style_name = {:?}", style_name);
       other_args_builder.set_style_name(style_name);
     }
@@ -262,8 +266,8 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
       maybe_apriori_prompt_token: Some(&prompt_token),
       prompt_type: PromptType::ComfyUi,
       maybe_creator_user_token: args.job.maybe_creator_user_token_typed.as_ref(),
-      maybe_positive_prompt: args.maybe_positive_prompt.as_deref(),
-      maybe_negative_prompt: args.maybe_negative_prompt.as_deref(),
+      maybe_positive_prompt: args.comfy_args.positive_prompt.as_deref(),
+      maybe_negative_prompt: args.comfy_args.negative_prompt.as_deref(),
       maybe_other_args: maybe_other_args.as_ref(),
       creator_ip_address: &args.job.creator_ip_address,
       mysql_executor: &args.deps.db.mysql_pool,

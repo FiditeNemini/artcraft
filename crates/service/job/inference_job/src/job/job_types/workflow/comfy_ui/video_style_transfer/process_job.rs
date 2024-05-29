@@ -45,9 +45,9 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::{download_input_video, DownloadInputVideoArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::validate_job;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
@@ -147,27 +147,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Workflow args: {:?}", comfy_args);
 
-    let mut should_insert_prompt_record = false;
-    let mut maybe_style_name = None;
-    let mut maybe_positive_prompt = None;
-    let mut maybe_negative_prompt = None;
-
-    // ==================== EXTRACT TEXT PROMPTS ==================== //
-
-    if let Some(style_name) = comfy_args.style_name {
-        should_insert_prompt_record = true;
-        maybe_style_name = Some(style_name);
-    }
-
-    if let Some(prompt) = comfy_args.positive_prompt.as_deref() {
-        should_insert_prompt_record = true;
-        maybe_positive_prompt = Some(prompt.to_string());
-    }
-
-    if let Some(prompt) = comfy_args.negative_prompt.as_deref() {
-        should_insert_prompt_record = true;
-        maybe_negative_prompt = Some(prompt.to_string());
-    }
 
     // ==================== WRITE WORKFLOW PROMPT ==================== //
 
@@ -175,8 +154,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         workflow_path: &workflow_path,
         comfy_args: &comfy_args,
         model_dependencies: &model_dependencies,
-        maybe_positive_prompt: maybe_positive_prompt.as_deref(),
-        maybe_negative_prompt: maybe_negative_prompt.as_deref(),
+        maybe_positive_prompt: comfy_args.positive_prompt.as_deref(),
+        maybe_negative_prompt: comfy_args.negative_prompt.as_deref(),
     })?;
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
@@ -493,7 +472,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
         let command_exit_status = model_dependencies
             .ffmpeg_watermark_command
-            .execute_inference(WatermarkArgs {
+            .execute(WatermarkArgs {
                 video_path: videos.video_to_watermark(),
                 maybe_override_logo_path: None,
                 alpha: 0.6,
@@ -532,11 +511,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         videos: &videos,
         job_progress_reporter: &mut job_progress_reporter,
         download_video,
-        should_insert_prompt_record,
-        maybe_style_name,
         inference_duration,
-        maybe_positive_prompt: maybe_positive_prompt.as_deref(),
-        maybe_negative_prompt: maybe_negative_prompt.as_deref(),
     }).await?;
 
     // ==================== (OPTIONAL) DEBUG SLEEP ==================== //

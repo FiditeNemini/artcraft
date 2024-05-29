@@ -108,7 +108,7 @@ impl FfmpegLogoWatermarkCommand {
     })
   }
 
-  pub fn execute_inference<P: AsRef<Path>>(
+  pub fn execute<P: AsRef<Path>>(
     &self,
     args: WatermarkArgs<P>,
   ) -> CommandExitStatus {

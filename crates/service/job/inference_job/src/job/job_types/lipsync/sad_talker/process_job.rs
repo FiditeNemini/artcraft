@@ -254,7 +254,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     let command_exit_status = model_dependencies
         .ffmpeg_watermark_command
-        .execute_inference(WatermarkArgs {
+        .execute(WatermarkArgs {
           video_path: &output_video_fs_path,
           maybe_override_logo_path: None,
           alpha: 0.6,
