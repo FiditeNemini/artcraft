@@ -54,8 +54,8 @@ pub enum InferenceCategory {
   VideoFilter,
 
   /// DEPRECATED. Bevy engine serverside rendering.
-  #[serde(rename = "convert_bvh_to_workflow")]
   #[deprecated(note = "This was for Bevy engine's server side rendering.")]
+  #[serde(rename = "convert_bvh_to_workflow")]
   ConvertBvhToWorkflow,
 }
 
