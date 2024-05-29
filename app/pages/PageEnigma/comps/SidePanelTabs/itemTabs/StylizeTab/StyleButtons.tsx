@@ -103,7 +103,7 @@ export function StyleButtons() {
             <div className="flex items-center py-[6px]">
               <Switch.Group>
                 <Switch.Label className="mr-3 grow text-sm font-medium">
-                  Use Lip Sync
+                  Preserve Lip Movement
                 </Switch.Label>
                 <Switch
                   checked={lipSync.value}
