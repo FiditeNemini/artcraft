@@ -22,7 +22,7 @@ use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file_for_inference::MediaFileForInference;
-use subprocess_common::command_runner::command_runner_args::{FileOrCreate, RunAsSubprocessArgs};
+use subprocess_common::command_runner::command_runner_args::{FileOrCreate, RunAsSubprocessArgs, StreamRedirection};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -136,8 +136,8 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
             output_directory: &output_directory,
             binary: true,
           }),
-          maybe_stderr_output_file: Some(FileOrCreate::NewFileWithName(&stderr_output_file)),
-          maybe_stdout_output_file: None,
+          stderr: StreamRedirection::File(FileOrCreate::NewFileWithName(&stderr_output_file)),
+          stdout: StreamRedirection::None,
         })
   };
 

@@ -12,7 +12,7 @@ use filesys::path_to_string::path_to_string;
 
 use crate::command_exit_status::CommandExitStatus;
 use crate::command_runner::command_args::CommandArgs;
-use crate::command_runner::command_runner_args::{FileOrCreate, RunAsSubprocessArgs};
+use crate::command_runner::command_runner_args::{FileOrCreate, RunAsSubprocessArgs, StreamRedirection};
 use crate::command_runner::env_var_policy::EnvVarPolicy;
 use crate::docker_options::DockerOptions;
 use crate::executable_or_command::ExecutableOrShellCommand;
@@ -88,24 +88,30 @@ impl CommandRunner {
       config.env = Some(env_vars);
     }
 
-    match args.maybe_stderr_output_file {
-      Some(FileOrCreate::NewFileWithName(stderr_output_file)) => {
+    match args.stderr {
+      StreamRedirection::None => {} // Inherit defaults.
+      StreamRedirection::Pipe => {
+        config.stderr = Redirection::Pipe;
+      }
+      StreamRedirection::File(FileOrCreate::NewFileWithName(stderr_output_file)) => {
         info!("stderr will be written to file: {:?}", stderr_output_file);
 
         let stderr_file = File::create(stderr_output_file)?;
         config.stderr = Redirection::File(stderr_file);
-      },
-      _ => {},
+      }
     }
 
-    match args.maybe_stdout_output_file {
-      Some(FileOrCreate::NewFileWithName(stdout_output_file)) => {
+    match args.stdout {
+      StreamRedirection::None => {} // Inherit defaults.
+      StreamRedirection::Pipe => {
+        config.stdout = Redirection::Pipe;
+      }
+      StreamRedirection::File(FileOrCreate::NewFileWithName(stdout_output_file)) => {
         info!("stdout will be written to file: {:?}", stdout_output_file);
 
         let stdout_file = File::create(stdout_output_file)?;
         config.stdout = Redirection::File(stdout_file);
-      },
-      _ => {},
+      }
     }
 
     let mut popen_handle = Popen::create(&command_parts, config)?;

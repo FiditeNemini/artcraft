@@ -15,13 +15,24 @@ pub enum FileOrCreate<'a> {
   // Future option(3): already open file handle
 }
 
+pub enum StreamRedirection<'a> {
+  /// Ignore redirection (inherit defaults)
+  None,
+
+  /// If set, write stdout or stderr to this file.
+  File(FileOrCreate<'a>),
+
+  /// Redirect to a pipe
+  Pipe,
+}
+
 pub struct RunAsSubprocessArgs<'a> {
   /// The args for the process we're going to call
   pub args: Box<&'a dyn CommandArgs>,
 
-  /// If set, write stderr to this file.
-  pub maybe_stderr_output_file: Option<FileOrCreate<'a>>,
+  /// How to handle stderr redirection.
+  pub stderr: StreamRedirection<'a>,
 
-  /// If set, write stdout to this file.
-  pub maybe_stdout_output_file: Option<FileOrCreate<'a>>,
+  /// How to handle stdout redirection.
+  pub stdout: StreamRedirection<'a>,
 }

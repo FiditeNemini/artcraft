@@ -35,7 +35,7 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
-use subprocess_common::command_runner::command_runner_args::RunAsSubprocessArgs;
+use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::prompts::PromptToken;
@@ -436,8 +436,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                     input_audio_file: &videos.trimmed_resampled_video_path,
                     output_video_file: &output_video_fs_path_restored,
                 }),
-                maybe_stderr_output_file: None,
-                maybe_stdout_output_file: None,
+                stderr: StreamRedirection::None,
+                stdout: StreamRedirection::None,
             });
 
         let mut use_restored_audio = true;
