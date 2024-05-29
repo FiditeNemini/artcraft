@@ -19,6 +19,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod check_directory_exists;
 pub mod check_file_exists;
 pub mod create_dir_all_if_missing;
 pub mod directory_exists;
@@ -29,7 +30,7 @@ pub mod filename_concat;
 pub mod is_filesystem_full_error;
 pub mod path_to_string;
 pub mod rename_across_devices;
-pub mod check_directory_exists;
-pub mod safe_delete_temp_file;
 pub mod safe_delete_possible_temp_file;
 pub mod safe_delete_temp_directory;
+pub mod safe_delete_temp_file;
+pub mod safe_recursively_delete_files;

@@ -23,6 +23,7 @@ use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
@@ -45,33 +46,11 @@ use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProc
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::{download_input_video, DownloadInputVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::job_outputs::JobOutputs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
-
-fn get_file_extension(mimetype: &str) -> Result<&'static str> {
-    let ext = match mimetype {
-        "video/mp4" => "mp4",
-        "image/png" => "png",
-        "image/jpeg" => "jpg",
-        "image/gif" => "gif",
-        _ => return Err(anyhow!("Mimetype not supported: {}", mimetype)),
-    };
-    Ok(ext)
-}
-
-
-fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
-    for entry in WalkDir::new(path) {
-        let entry = entry?;
-        if entry.path().is_file() {
-            safe_delete_temp_file(entry.path());
-        }
-    }
-    Ok(())
-}
-
 
 pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
@@ -534,7 +513,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_file(&videos.original_video_path);
 
         let output_dir = root_comfy_path.join("output");
-        recursively_delete_files_in(&output_dir).unwrap();
+        safe_recursively_delete_files(&output_dir);
 
         return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
             &videos.comfy_output_video_path)));
@@ -671,114 +650,28 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
           .map(|path| file_exists(path)).unwrap_or(false),
     );
 
-    // ==================== GET METADATA ==================== //
+    // ==================== VALIDATE AND SAVE RESULTS ======================== //
 
-    info!("Interrogating result file size ...");
+    let media_file_token = validate_and_save_results(SaveResultsArgs {
+        job,
+        deps: &deps,
+        job_args: &job_args,
+        comfy_args,
+        videos: &videos,
+        job_progress_reporter: &mut job_progress_reporter,
+        work_temp_dir: &work_temp_dir,
+        workflow_path: &workflow_path,
+        root_comfy_path: &root_comfy_path,
+        maybe_lora_path: maybe_lora_path.as_deref(),
+        download_video,
+        should_insert_prompt_record,
+        maybe_style_name,
+        inference_duration,
+        maybe_positive_prompt: maybe_positive_prompt.as_deref(),
+        maybe_negative_prompt: maybe_negative_prompt.as_deref(),
+    }).await?;
 
-    let final_video = videos.get_final_video_to_upload();
-
-    let file_size_bytes = file_size(final_video)
-        .map_err(|err| ProcessSingleJobError::Other(err))?;
-
-    info!("Interrogating result mimetype ...");
-
-    let mimetype = get_mimetype_for_file(final_video)
-        .map_err(|err| ProcessSingleJobError::from_io_error(err))?
-        .map(|mime| mime.to_string())
-        .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
-
-    // create ext from mimetype
-    let ext = get_file_extension(mimetype.as_str())
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    // Extension is really a "suffix" and should have the leading period to act as an extension.
-    let ext = if ext.starts_with(".") {
-        ext.to_string()
-    } else {
-        format!(".{ext}")
-    };
-
-    const PREFIX: &str = "storyteller_";
-
-    //// determine media type from mime type
-    //let media_type = match mimetype.as_str() {
-    //    "video/mp4" => MediaFileType::Video,
-    //    "image/png" => MediaFileType::Image,
-    //    "image/jpeg" => MediaFileType::Image,
-    //    _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
-    //};
-
-    info!("Calculating sha256...");
-
-    let file_checksum = sha256_hash_file(final_video)
-        .map_err(|err| {
-            ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
-        })?;
-
-    // ==================== UPLOAD VIDEO TO BUCKET ==================== //
-
-    job_progress_reporter.log_status("uploading result")
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(PREFIX),
-        Some(&ext));
-
-    let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
-
-    info!("Output file destination bucket path: {:?}", &result_bucket_object_pathbuf);
-
-    info!("Uploading media ...");
-
-    args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
-        &result_bucket_object_pathbuf,
-        &final_video,
-        &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
-        .await
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    // generate thumbnail using thumbnail service
-    let thumbnail_types = match mimetype.as_str() {
-        "video/mp4" => vec!["image/gif", "image/jpeg"],
-        _ => vec![],
-    };
-
-    info!("Generating thumbnail tasks...");
-
-    for output_type in thumbnail_types {
-        let thumbnail_task_result = ThumbnailTaskBuilder::new()
-            .with_bucket(&*args.job_dependencies.buckets.public_bucket_client.bucket_name())
-            .with_path(&*path_to_string(result_bucket_object_pathbuf.clone()))
-            .with_source_mimetype(mimetype.as_str())
-            .with_output_mimetype(output_type)
-            .with_output_suffix("thumb")
-            .with_output_extension(get_file_extension(output_type).unwrap())
-            .with_event_id(&job.id.0.to_string())
-            .send()
-            .await;
-
-        match thumbnail_task_result {
-            Ok(thumbnail_task) => {
-                debug!("Thumbnail task created: {:?}", thumbnail_task);
-            },
-            Err(e) => {
-                error!("Failed to create thumbnail task: {:?}", e);
-            }
-        }
-    }
-
-    // Also upload the non-watermarked copy
-    info!("Uploading non-watermarked copy...");
-
-    let result = args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
-        &result_bucket_object_pathbuf.with_extension("no_watermark.mp4"),
-        &videos.get_non_watermarked_video_to_upload(),
-        &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
-        .await;
-
-    if let Err(err) = result {
-        error!("Failed to upload non-watermarked copy: {:?}", err);
-    }
+    // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
 
     if let Some(sleep_millis) = comfy_args.sleep_millis {
         info!("Sleeping for millis: {sleep_millis}");
@@ -804,115 +697,25 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
     if let Some(lora_path) = maybe_lora_path {
-        safe_delete_temp_file(&lora_path);
+        safe_delete_temp_file(lora_path);
     }
 
     let output_dir = root_comfy_path.join("output");
-    recursively_delete_files_in(&output_dir).unwrap();
+    safe_recursively_delete_files(&output_dir);
 
     // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
     safe_delete_temp_directory(&work_temp_dir);
 
-    // ==================== SAVE RECORDS ==================== //
-
-    // create a json detailing the args used to create the media
-    let args_json = serde_json::to_string(&job_args)
-        .map_err(|e| ProcessSingleJobError::Other(e.into()))?;
-
-    info!("Saving ComfyUI result (media_files table record) ...");
-
-    // NB: We do this to avoid deep-frying the video.
-    // This also lets us hide the engine renders from users.
-    // This shouldn't ever become a deeply nested tree of children, but rather a single root
-    // with potentially many direct children.
-    let style_transfer_source_media_file_token = download_video
-        .input_video_media_file
-        .maybe_style_transfer_source_media_file_token
-        .as_ref()
-        .unwrap_or_else(|| &download_video.input_video_media_file.token);
-
-    let prompt_token = PromptToken::generate();
-
-    let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
-        pool: &args.job_dependencies.db.mysql_pool,
-        job: &job,
-        maybe_mime_type: Some(&mimetype),
-        maybe_title: download_video.input_video_media_file.maybe_title.as_deref(),
-        maybe_style_transfer_source_media_file_token: Some(&style_transfer_source_media_file_token),
-        maybe_scene_source_media_file_token: download_video.input_video_media_file.maybe_scene_source_media_file_token.as_ref(),
-        file_size_bytes,
-        sha256_checksum: &file_checksum,
-        maybe_prompt_token: Some(&prompt_token),
-        public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-        maybe_public_bucket_prefix: Some(PREFIX),
-        maybe_public_bucket_extension: Some(&ext),
-        is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
-        worker_hostname: &args.job_dependencies.job.info.container.hostname,
-        worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
-        extra_file_modification_info: Some(&args_json),
-    })
-        .await
-        .map_err(|e| {
-            error!("Error saving media file record: {:?}", e);
-            ProcessSingleJobError::Other(e)
-        })?;
-
-    if should_insert_prompt_record {
-        info!("Saving prompt record");
-
-        let mut other_args_builder = PromptInnerPayloadBuilder::new();
-
-        if let Some(style_name) = maybe_style_name {
-            info!("building PromptInnerPayload with style_name = {:?}", style_name);
-            other_args_builder.set_style_name(style_name);
-        }
-
-        if comfy_args.use_face_detailer.unwrap_or(false) {
-            other_args_builder.set_used_face_detailer(true);
-        }
-
-        if comfy_args.use_upscaler.unwrap_or(false) {
-            other_args_builder.set_used_upscaler(true);
-        }
-
-        other_args_builder.set_strength(comfy_args.strength);
-
-        if let Ok(duration) = chrono::Duration::from_std(inference_duration) {
-            // NB: Fail open.
-            other_args_builder.set_inference_duration(Some(duration));
-        }
-
-        let maybe_other_args = other_args_builder.build();
-
-        info!("maybe other prompt args: {:?}", maybe_other_args);
-
-        // NB: Don't fail the job if the query fails.
-        let prompt_result = insert_prompt(InsertPromptArgs {
-            maybe_apriori_prompt_token: Some(&prompt_token),
-            prompt_type: PromptType::ComfyUi,
-            maybe_creator_user_token: job.maybe_creator_user_token_typed.as_ref(),
-            maybe_positive_prompt: maybe_positive_prompt.as_deref(),
-            maybe_negative_prompt: maybe_negative_prompt.as_deref(),
-            maybe_other_args: maybe_other_args.as_ref(),
-            creator_ip_address: &job.creator_ip_address,
-            mysql_executor: &args.job_dependencies.db.mysql_pool,
-            phantom: Default::default(),
-        }).await;
-
-        if let Err(err) = prompt_result {
-            error!("No prompt result token? something has failed: {:?} (we'll ignore this error)", err);
-        }
-    }
+    // ==================== DONE ==================== //
 
     info!("ComfyUI Done.");
 
     job_progress_reporter.log_status("done")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    info!("Result video media token: {:?}", &media_file_token);
+    info!("Job complete. Result video media token: {:?}", &media_file_token);
 
-    info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
-        job.id, id, &media_file_token);
+    info!("Job {:?} complete success!", args.job.id);
 
     Ok(JobSuccessResult {
         maybe_result_entity: Some(ResultEntity {

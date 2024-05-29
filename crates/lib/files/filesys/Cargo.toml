@@ -26,6 +26,7 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 # External
 # KEEP THIS TO A MINIMUM OR NIL.
 log = "0.4.20"
+walkdir = "2.4.0"
 
 
 [dev-dependencies]
