@@ -32,7 +32,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::VideoDownloadDetails;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::job_outputs::JobOutputs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::JobArgs;
 use crate::job_dependencies::JobDependencies;
 
@@ -54,7 +54,7 @@ pub struct SaveResultsArgs<'a> {
   pub job_progress_reporter: &'a mut Box<dyn JobProgressReporter>,
 
   pub download_video: VideoDownloadDetails,
-  pub videos: &'a JobOutputs,
+  pub videos: &'a VideoPaths,
   pub inference_duration: Duration,
 
   // TODO: Maybe group these

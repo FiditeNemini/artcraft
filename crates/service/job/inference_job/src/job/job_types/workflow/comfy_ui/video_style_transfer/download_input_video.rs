@@ -8,7 +8,7 @@ use filesys::path_to_string::path_to_string;
 use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, MediaFile};
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::job_outputs::JobOutputs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::JobArgs;
 
 pub struct VideoDownloadDetails {
@@ -17,7 +17,7 @@ pub struct VideoDownloadDetails {
 
 pub struct DownloadInputVideoArgs<'a> {
   pub job_args: &'a JobArgs<'a>,
-  pub videos: &'a JobOutputs,
+  pub videos: &'a VideoPaths,
   pub mysql_pool: &'a MySqlPool,
   pub remote_cloud_file_client: &'a RemoteCloudFileClient,
 }

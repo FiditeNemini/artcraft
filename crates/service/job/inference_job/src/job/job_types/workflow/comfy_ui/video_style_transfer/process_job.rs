@@ -45,7 +45,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::{download_input_video, DownloadInputVideoArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::job_outputs::JobOutputs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::validate_job;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
@@ -231,7 +231,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     info!("Root comfy path: {:?}", &root_comfy_path);
     info!("Job output path will be (fix this code! the job shouldn't set this path!): {:?}", &job_args.output_path);
 
-    let mut videos = JobOutputs::new(&root_comfy_path, job_args.output_path);
+    let mut videos = VideoPaths::new(&root_comfy_path, job_args.output_path);
 
     // TODO(bt,2024-04-20): Clean up this mess.
 
@@ -246,21 +246,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Downloaded video!");
 
-    info!(r#"[debugging] Downstream video paths:
-      - original video path: {:?}
-      - original video path (exists): {:?}
-      - trimmed video path: {:?}
-      - trimmed video path (exists): {:?}
-      - comfy output path: {:?}
-      - comfy output path (exists): {:?}
-    "#,
-        &videos.original_video_path,
-        file_exists(&videos.original_video_path),
-        &videos.trimmed_resampled_video_path,
-        file_exists(&videos.trimmed_resampled_video_path),
-        &videos.comfy_output_video_path,
-        file_exists(&videos.comfy_output_video_path),
-    );
+    videos.debug_print_paths_after_download();
 
     // ========================= PROCESS VIDEO ======================== //
 
@@ -335,28 +321,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             })?;
     }
 
-    // TODO: I think comfy overwrites the original stripped video !
-    //  To fix it, we just need a copy.
-
-    info!(r#"[debugging] After resampling, video paths:
-      - original video path: {:?}
-      - original video path (exists): {:?}
-      - trimmed video path: {:?}
-      - trimmed video path (exists): {:?}
-      - comfy input path: {:?}
-      - comfy input path (exists): {:?}
-      - comfy output path: {:?}
-      - comfy output path (exists): {:?}
-    "#,
-        &videos.original_video_path,
-        file_exists(&videos.original_video_path),
-        &videos.trimmed_resampled_video_path,
-        file_exists(&videos.trimmed_resampled_video_path),
-        &videos.comfy_input_video_path,
-        file_exists(&videos.comfy_input_video_path),
-        &videos.comfy_output_video_path,
-        file_exists(&videos.comfy_output_video_path),
-    );
+    videos.debug_print_paths_after_trim();
 
     // make outputs dir if not exist
     let output_dir = root_comfy_path.join("output");
@@ -441,25 +406,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Captured stduout output: {}", contents);
     }
 
-    info!(r#"[debugging] After comfy, video paths:
-      - original video path: {:?}
-      - original video path (exists): {:?}
-      - trimmed video path: {:?}
-      - trimmed video path (exists): {:?}
-      - comfy input path: {:?}
-      - comfy input path (exists): {:?}
-      - comfy output path: {:?}
-      - comfy output path (exists): {:?}
-    "#,
-        &videos.original_video_path,
-        file_exists(&videos.original_video_path),
-        &videos.trimmed_resampled_video_path,
-        file_exists(&videos.trimmed_resampled_video_path),
-        &videos.comfy_input_video_path,
-        file_exists(&videos.comfy_input_video_path),
-        &videos.comfy_output_video_path,
-        file_exists(&videos.comfy_output_video_path),
-    );
+    videos.debug_print_paths_after_comfy();
 
     // ==================== CHECK OUTPUT FILE ======================== //
 
@@ -533,31 +480,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     }
 
-    info!(r#"[debugging] After restored audio, video paths:
-      - original video path: {:?}
-      - original video path (exists): {:?}
-      - trimmed video path: {:?}
-      - trimmed video path (exists): {:?}
-      - comfy input path: {:?}
-      - comfy input path (exists): {:?}
-      - comfy output path: {:?}
-      - comfy output path (exists): {:?}
-      - restored audio output path: {:?}
-      - restored audio output path (exists): {:?}
-    "#,
-        &videos.original_video_path,
-        file_exists(&videos.original_video_path),
-        &videos.trimmed_resampled_video_path,
-        file_exists(&videos.trimmed_resampled_video_path),
-        &videos.comfy_input_video_path,
-        file_exists(&videos.comfy_input_video_path),
-        &videos.comfy_output_video_path,
-        file_exists(&videos.comfy_output_video_path),
-        &videos.audio_restored_video_path,
-        videos.audio_restored_video_path.as_ref()
-          .map(|path| file_exists(path)).unwrap_or(false),
-    );
-
     // ==================== OPTIONAL WATERMARK ==================== //
 
     // TODO(bt, 2024-03-01): Interrogate account for premium
@@ -598,31 +520,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     }
 
-    info!(r#"[debugging] After watermarking video, video paths:
-      - original video path: {:?}
-      - original video path (exists): {:?}
-      - trimmed video path: {:?}
-      - trimmed video path (exists): {:?}
-      - comfy output path: {:?}
-      - comfy output path (exists): {:?}
-      - restored audio output path: {:?}
-      - restored audio output path (exists): {:?}
-      - watermarking output path: {:?}
-      - watermarking output path (exists): {:?}
-    "#,
-        &videos.original_video_path,
-        file_exists(&videos.original_video_path),
-        &videos.trimmed_resampled_video_path,
-        file_exists(&videos.trimmed_resampled_video_path),
-        &videos.comfy_output_video_path,
-        file_exists(&videos.comfy_output_video_path),
-        &videos.audio_restored_video_path,
-        videos.audio_restored_video_path.as_ref()
-          .map(|path| file_exists(path)).unwrap_or(false),
-        &videos.watermarked_video_path,
-        videos.watermarked_video_path.as_ref()
-          .map(|path| file_exists(path)).unwrap_or(false),
-    );
+    videos.debug_print_paths_after_post_processing();
 
     // ==================== VALIDATE AND SAVE RESULTS ======================== //
 
