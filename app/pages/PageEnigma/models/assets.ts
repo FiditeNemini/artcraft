@@ -3,6 +3,7 @@ import { AssetType } from "~/enums";
 export interface MediaItem {
   version: number;
   type: AssetType;
+  media_type?: string;
   media_id: string;
   object_uuid?: string;
   name: string;

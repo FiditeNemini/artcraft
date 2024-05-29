@@ -22,6 +22,7 @@ export const animationItems = signal<MediaItem[]>([
     name: "Sit",
     thumbnail: "/resources/characters/img04.png",
     isMine: true,
+    media_type: "glb",
   },
   {
     version: 1,
@@ -31,6 +32,7 @@ export const animationItems = signal<MediaItem[]>([
     name: "Idle",
     thumbnail: "/resources/characters/img07.png",
     isBookmarked: true,
+    media_type: "glb",
   },
   {
     version: 1,
@@ -39,6 +41,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Walk",
     thumbnail: "/resources/characters/img07.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -47,6 +50,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Punch",
     thumbnail: "/resources/characters/img08.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -55,6 +59,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Jump",
     thumbnail: "/resources/characters/img06.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -63,6 +68,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Dance",
     thumbnail: "/resources/characters/img11.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -71,6 +77,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Jump Forward",
     thumbnail: "/resources/characters_gif/Jump Forward.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -79,6 +86,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Tonic Seizure",
     thumbnail: "/resources/characters_gif/Tonic Seizure.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -87,6 +95,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Ginga Variation 3",
     thumbnail: "/resources/characters_gif/Ginga Variation 3.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -95,6 +104,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Crouch Running",
     thumbnail: "/resources/characters_gif/Crouch Running.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -103,6 +113,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Strafing Jump",
     thumbnail: "/resources/characters_gif/Strafing Jump.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -111,6 +122,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Texting",
     thumbnail: "/resources/characters_gif/Texting.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -119,6 +131,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Pushing",
     thumbnail: "/resources/characters_gif/Pushing.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -127,6 +140,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Standing Idle To Crouch",
     thumbnail: "/resources/characters_gif/Standing Idle To Crouch.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -135,6 +149,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Fight Idle To Standing Idle",
     thumbnail: "/resources/characters_gif/Fight Idle To Standing Idle.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -143,6 +158,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Texting While Standing",
     thumbnail: "/resources/characters_gif/Texting While Standing.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -151,6 +167,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Getting Bit",
     thumbnail: "/resources/characters_gif/Getting Bit.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -159,6 +176,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Twist Dance",
     thumbnail: "/resources/characters_gif/Twist Dance.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -167,6 +185,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Peek Around Corner",
     thumbnail: "/resources/characters_gif/Femme Peek Around Corner.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -175,6 +194,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Sword And Shield Casting",
     thumbnail: "/resources/characters_gif/Sword And Shield Casting.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -183,6 +203,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Breakdance Ready",
     thumbnail: "/resources/characters_gif/Breakdance Ready.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -191,6 +212,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Sitting Yell",
     thumbnail: "/resources/characters_gif/Sitting Yell.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -199,6 +221,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Uppercut",
     thumbnail: "/resources/characters_gif/Uppercut.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -207,6 +230,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Breakdance Uprock Var 1",
     thumbnail: "/resources/characters_gif/Breakdance Uprock Var 1.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -215,6 +239,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Standard Walk",
     thumbnail: "/resources/characters_gif/Standard Walk.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -223,6 +248,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Rifle Pull Out",
     thumbnail: "/resources/characters_gif/Rifle Pull Out.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -231,6 +257,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Sword And Shield Jump",
     thumbnail: "/resources/characters_gif/Sword And Shield Jump.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -239,6 +266,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Baseball Bunt",
     thumbnail: "/resources/characters_gif/Baseball Bunt.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -247,6 +275,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Strafing",
     thumbnail: "/resources/characters_gif/Strafing.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -255,6 +284,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Sneaking Forward",
     thumbnail: "/resources/characters_gif/Sneaking Forward.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -263,6 +293,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Skinning Test",
     thumbnail: "/resources/characters_gif/Skinning Test.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -271,6 +302,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Right Strafe Walking",
     thumbnail: "/resources/characters_gif/Right Strafe Walking.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -279,6 +311,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Laying Breathless",
     thumbnail: "/resources/characters_gif/Laying Breathless.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -287,6 +320,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Box Jump",
     thumbnail: "/resources/characters_gif/Box Jump.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -295,6 +329,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Orc Walk",
     thumbnail: "/resources/characters_gif/Orc Walk.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -303,6 +338,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Run Look Back",
     thumbnail: "/resources/characters_gif/Run Look Back.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -311,6 +347,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Standing Torch Jump",
     thumbnail: "/resources/characters_gif/Standing Torch Jump.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -319,6 +356,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Lengthy Head Nod",
     thumbnail: "/resources/characters_gif/Lengthy Head Nod.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -327,6 +365,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Pistol Run Backward Arc",
     thumbnail: "/resources/characters_gif/Pistol Run Backward Arc.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -335,6 +374,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Right Hook",
     thumbnail: "/resources/characters_gif/Right Hook.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -343,6 +383,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Great Sword Impact",
     thumbnail: "/resources/characters_gif/Great Sword Impact.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -351,6 +392,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Zombie Biting",
     thumbnail: "/resources/characters_gif/Zombie Biting.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -359,6 +401,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Leaning",
     thumbnail: "/resources/characters_gif/Leaning.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -367,6 +410,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Standing Torch To Crouch Torch",
     thumbnail: "/resources/characters_gif/Standing Torch To Crouch Torch.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -375,6 +419,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Action Idle To Fight Idle",
     thumbnail: "/resources/characters_gif/Action Idle To Fight Idle.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -383,6 +428,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Corkscrew Evade",
     thumbnail: "/resources/characters_gif/Corkscrew Evade.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -391,6 +437,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Catwalk Walk Forward Crossed",
     thumbnail: "/resources/characters_gif/Catwalk Walk Forward Crossed.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -399,6 +446,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Look Around",
     thumbnail: "/resources/characters_gif/Look Around.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -407,6 +455,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Zombie Stand Up",
     thumbnail: "/resources/characters_gif/Zombie Stand Up.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -415,6 +464,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Convulsing",
     thumbnail: "/resources/characters_gif/Convulsing.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -423,6 +473,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Pistol Whip",
     thumbnail: "/resources/characters_gif/Pistol Whip.gif",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -431,6 +482,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 100,
     name: "Mutant Idle",
     thumbnail: "/resources/characters_gif/Mutant Idle.gif",
+    media_type: "glb",
   },
 ]);
 
@@ -483,6 +535,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Female Doll",
     thumbnail: "/resources/characters/img03.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -490,6 +543,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Male Doll",
     thumbnail: "/resources/characters/img07.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -497,6 +551,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Story Girl",
     thumbnail: "/resources/characters/img13.png",
+    media_type: "glb",
   },
   {
     version: 1,
@@ -504,6 +559,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Roko",
     thumbnail: "/resources/characters/roko.png",
+    media_type: "glb",
   },
 ]);
 

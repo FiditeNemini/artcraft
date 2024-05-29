@@ -82,7 +82,7 @@ export const DragComponent = () => {
 
   return (
     <div
-      className="absolute rounded-lg bg-[#A0A0A0] bg-dnd-wrapper/50"
+      className="absolute rounded-lg"
       style={{
         width: 91,
         height: 114,
@@ -97,12 +97,9 @@ export const DragComponent = () => {
           src: thumbnail,
         }}
         alt={dragItem.value.name}
-        className="pointer-events-none select-none rounded-t-lg"
+        className="pointer-events-none select-none rounded-t-lg bg-gradient-to-b from-[#CCCCCC] to-[#A0A0A0]"
       />
-      <div
-        className="w-full truncate rounded-b-lg px-2 py-1 text-center text-[13px]"
-        style={{ backgroundColor: "#39394D" }}
-      >
+      <div className="w-full truncate rounded-b-lg bg-ui-controls px-2 py-1 text-center text-[13px]">
         {dragItem.value.name || dragItem.value.media_id}
       </div>
     </div>

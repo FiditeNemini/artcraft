@@ -76,6 +76,7 @@ export const CharactersTab = () => {
                 media_id: item.token,
                 name: item.maybe_title ?? "Unknown",
                 type: AssetType.CHARACTER,
+                media_type: item.media_type,
                 version: 1,
                 ...(item.cover_image.maybe_cover_image_public_bucket_path
                   ? {

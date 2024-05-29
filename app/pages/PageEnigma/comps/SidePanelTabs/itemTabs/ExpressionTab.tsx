@@ -70,6 +70,7 @@ export const ExpressionTab = () => {
           return {
             version: 1,
             type: AssetType.EXPRESSION,
+            media_type: item.media_type,
             media_id: item.token,
             name: item.maybe_title,
             publicBucketPath: item.public_bucket_path,
@@ -109,6 +110,7 @@ export const ExpressionTab = () => {
                 version: 1,
                 type: AssetType.EXPRESSION,
                 media_id: item.token,
+                media_type: item.media_type,
                 name: item.maybe_title,
                 publicBucketPath: item.public_bucket_path,
                 length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,

@@ -46,6 +46,7 @@ export const AnimationTab = () => {
             return {
               version: 1,
               type: AssetType.ANIMATION,
+              media_type: item.media_type,
               media_id: item.token,
               name: item.maybe_title,
               publicBucketPath: item.public_bucket_path,
