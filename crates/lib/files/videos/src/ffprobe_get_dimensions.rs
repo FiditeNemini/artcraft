@@ -31,3 +31,23 @@ pub fn ffprobe_get_dimensions(
     })),
   }
 }
+
+#[cfg(test)]
+pub mod tests {
+  use testing::test_file_path::test_file_path;
+
+  use crate::ffprobe_get_dimensions::ffprobe_get_dimensions;
+
+  #[test]
+  pub fn test_decode_mp4() {
+    let filename = test_file_path("test_data/video/mp4/golden_sun_garoh.mp4")
+        .expect("path should exist");
+
+    let info = ffprobe_get_dimensions(filename)
+        .expect("should be able to read with ffprobe")
+        .expect("dimensions should not be empty");
+
+    assert_eq!(info.width, 640);
+    assert_eq!(info.height, 480);
+  }
+}
