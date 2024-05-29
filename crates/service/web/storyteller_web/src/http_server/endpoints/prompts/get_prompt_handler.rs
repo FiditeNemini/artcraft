@@ -72,6 +72,11 @@ pub struct PromptInfo {
   /// and typically only applies to video style transfer.
   pub used_upscaler: bool,
 
+  /// If lipsync was enabled.
+  /// This might not be present for all types of inference
+  /// and typically only applies to video style transfer.
+  pub lipsync_enabled: bool,
+
   // TODO: Author of prompt info
 
   /// Fields that only moderators should see.
@@ -176,6 +181,7 @@ pub async fn get_prompt_handler(
   let mut maybe_style_name = None;
   let mut used_face_detailer = false;
   let mut used_upscaler = false;
+  let mut lipsync_enabled = false;
 
   let mut main_ipa_workflow = None;
   let mut face_detailer_workflow = None;
@@ -187,6 +193,7 @@ pub async fn get_prompt_handler(
     }
     used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
     used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
+    lipsync_enabled = inner_payload.lipsync_enabled.unwrap_or(false);
 
     main_ipa_workflow = inner_payload.main_ipa_workflow.clone();
     face_detailer_workflow = inner_payload.face_detailer_workflow.clone();
@@ -212,6 +219,7 @@ pub async fn get_prompt_handler(
       maybe_style_name,
       used_face_detailer,
       used_upscaler,
+      lipsync_enabled,
       prompt_type: result.prompt_type,
       created_at: result.created_at,
       maybe_moderator_fields,

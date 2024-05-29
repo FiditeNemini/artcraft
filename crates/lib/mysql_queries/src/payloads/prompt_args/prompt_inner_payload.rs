@@ -26,6 +26,11 @@ pub struct PromptInnerPayload {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub used_upscaler: Option<bool>,
 
+  #[serde(rename = "le")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "lipsync_enabled")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub lipsync_enabled: Option<bool>,
+
   #[serde(rename = "st")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
   #[serde(alias = "strength")]
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,6 +61,7 @@ pub struct PromptInnerPayloadBuilder {
   pub style_name: Option<EncodedStyleTransferName>,
   pub used_face_detailer: Option<bool>,
   pub used_upscaler: Option<bool>,
+  pub lipsync_enabled: Option<bool>,
   pub strength: Option<f32>,
   pub inference_duration: Option<Duration>,
   pub main_ipa_workflow: Option<String>,
@@ -69,6 +75,7 @@ impl PromptInnerPayloadBuilder {
       style_name: None,
       used_face_detailer: None,
       used_upscaler: None,
+      lipsync_enabled: None,
       strength: None,
       inference_duration: None,
       main_ipa_workflow: None,
@@ -81,6 +88,7 @@ impl PromptInnerPayloadBuilder {
     if self.style_name.is_none()
         && self.used_face_detailer.is_none()
         && self.used_upscaler.is_none()
+        && self.lipsync_enabled.is_none()
         && self.strength.is_none()
         && self.inference_duration.is_none()
         && self.main_ipa_workflow.is_none()
@@ -94,6 +102,7 @@ impl PromptInnerPayloadBuilder {
       style_name: self.style_name,
       used_face_detailer: self.used_face_detailer,
       used_upscaler: self.used_upscaler,
+      lipsync_enabled: self.lipsync_enabled,
       strength: self.strength,
       inference_duration_millis: self.inference_duration
           .map(|duration| duration.num_milliseconds()
@@ -122,6 +131,14 @@ impl PromptInnerPayloadBuilder {
       self.used_upscaler = Some(true);
     } else {
       self.used_upscaler = None;
+    }
+  }
+
+  pub fn set_lipsync_enabled(&mut self, enabled: bool) {
+    if enabled {
+      self.lipsync_enabled = Some(true);
+    } else {
+      self.lipsync_enabled = None;
     }
   }
 
@@ -155,4 +172,3 @@ impl PromptInnerPayload{
     Ok(serde_json::to_string(self)?)
   }
 }
-

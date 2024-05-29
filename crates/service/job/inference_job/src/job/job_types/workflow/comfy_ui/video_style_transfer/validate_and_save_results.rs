@@ -256,6 +256,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
       other_args_builder.set_upscaler_workflow(args.comfy_deps.configs.upscaler_workflow.clone());
     }
 
+    if args.comfy_args.lipsync_enabled.unwrap_or(false) {
+      other_args_builder.set_lipsync_enabled(true);
+    }
+
     other_args_builder.set_strength(args.comfy_args.strength);
 
     if let Ok(duration) = chrono::Duration::from_std(args.inference_duration) {
