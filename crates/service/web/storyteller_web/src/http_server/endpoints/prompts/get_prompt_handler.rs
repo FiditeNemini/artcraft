@@ -26,6 +26,8 @@ use tokens::tokens::prompts::PromptToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::endpoints::media_files::get::get_media_file_handler::GetMediaFileError;
+use crate::http_server::web_utils::require_user_session::require_user_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -72,7 +74,25 @@ pub struct PromptInfo {
 
   // TODO: Author of prompt info
 
+  /// Fields that only moderators should see.
+  pub maybe_moderator_fields: Option<PromptInfoModeratorFields>,
+
   pub created_at: DateTime<Utc>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct PromptInfoModeratorFields {
+  /// Version of Yae's workflow
+  /// Used for logging and debugging by the art team.
+  pub main_ipa_workflow: Option<String>,
+
+  /// Version of Yae's face detailer workflow
+  /// Used for logging and debugging by the art team.
+  pub face_detailer_workflow: Option<String>,
+
+  /// Version of Yae's upscaler workflow
+  /// Used for logging and debugging by the art team.
+  pub upscaler_workflow: Option<String>,
 }
 
 #[derive(Debug, ToSchema)]
@@ -124,6 +144,19 @@ pub async fn get_prompt_handler(
   path: Path<GetPromptPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetPromptError>
 {
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        GetPromptError::ServerError
+      })?;
+
+  let is_moderator = maybe_user_session
+      .map(|session| session.can_ban_users)
+      .unwrap_or(false);
+
   let prompt_token = path.into_inner().token;
 
   let result = get_prompt(
@@ -144,12 +177,30 @@ pub async fn get_prompt_handler(
   let mut used_face_detailer = false;
   let mut used_upscaler = false;
 
+  let mut main_ipa_workflow = None;
+  let mut face_detailer_workflow = None;
+  let mut upscaler_workflow = None;
+
   if let Some(inner_payload) = &result.maybe_other_args {
     if let Some(encoded_style_name) = &inner_payload.style_name {
       maybe_style_name = encoded_style_name.to_style_name();
     }
     used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
     used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
+
+    main_ipa_workflow = inner_payload.main_ipa_workflow.clone();
+    face_detailer_workflow = inner_payload.face_detailer_workflow.clone();
+    upscaler_workflow = inner_payload.upscaler_workflow.clone();
+  }
+
+  let mut maybe_moderator_fields = None;
+
+  if is_moderator {
+    maybe_moderator_fields = Some(PromptInfoModeratorFields {
+      main_ipa_workflow,
+      face_detailer_workflow,
+      upscaler_workflow,
+    });
   }
 
   let response = GetPromptSuccessResponse {
@@ -163,6 +214,7 @@ pub async fn get_prompt_handler(
       used_upscaler,
       prompt_type: result.prompt_type,
       created_at: result.created_at,
+      maybe_moderator_fields,
     },
   };
 

@@ -524,6 +524,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         job,
         deps: &deps,
         job_args: &job_args,
+        comfy_deps: model_dependencies,
         comfy_args,
         videos: &videos,
         job_progress_reporter: &mut job_progress_reporter,

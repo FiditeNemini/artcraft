@@ -6,14 +6,6 @@ use crate::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTrans
 
 // TODO(bt,2024-04-13): Once this gets big enough, design a PromptInnerPayloadBuilder that returns None if no fields were set.
 
-pub struct PromptInnerPayloadBuilder {
-  pub style_name: Option<EncodedStyleTransferName>,
-  pub used_face_detailer: Option<bool>,
-  pub used_upscaler: Option<bool>,
-  pub strength: Option<f32>,
-  pub inference_duration: Option<Duration>,
-}
-
 /// Used to encode extra state for the `prompts` table in the `maybe_other_args` column.
 /// This should act somewhat like a serialized protobuf stored inside a record.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -43,6 +35,32 @@ pub struct PromptInnerPayload {
   #[serde(alias = "inference_duration")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub inference_duration_millis: Option<u64>,
+
+  #[serde(rename = "wip")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "main_ipa_workflow")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub main_ipa_workflow: Option<String>,
+
+  #[serde(rename = "wfd")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "face_detailer_workflow")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub face_detailer_workflow: Option<String>,
+
+  #[serde(rename = "wu")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "upscaler_workflow")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub upscaler_workflow: Option<String>,
+}
+
+pub struct PromptInnerPayloadBuilder {
+  pub style_name: Option<EncodedStyleTransferName>,
+  pub used_face_detailer: Option<bool>,
+  pub used_upscaler: Option<bool>,
+  pub strength: Option<f32>,
+  pub inference_duration: Option<Duration>,
+  pub main_ipa_workflow: Option<String>,
+  pub face_detailer_workflow: Option<String>,
+  pub upscaler_workflow: Option<String>,
 }
 
 impl PromptInnerPayloadBuilder {
@@ -53,6 +71,9 @@ impl PromptInnerPayloadBuilder {
       used_upscaler: None,
       strength: None,
       inference_duration: None,
+      main_ipa_workflow: None,
+      face_detailer_workflow: None,
+      upscaler_workflow: None,
     }
   }
 
@@ -62,6 +83,9 @@ impl PromptInnerPayloadBuilder {
         && self.used_upscaler.is_none()
         && self.strength.is_none()
         && self.inference_duration.is_none()
+        && self.main_ipa_workflow.is_none()
+        && self.face_detailer_workflow.is_none()
+        && self.upscaler_workflow.is_none()
     {
       return None;
     }
@@ -75,6 +99,9 @@ impl PromptInnerPayloadBuilder {
           .map(|duration| duration.num_milliseconds()
               .max(0)
               .unsigned_abs()), // NB: Why does chrono return i64 ? That's crazy!
+      main_ipa_workflow: self.main_ipa_workflow,
+      face_detailer_workflow: self.face_detailer_workflow,
+      upscaler_workflow: self.upscaler_workflow,
     })
   }
 
@@ -104,6 +131,18 @@ impl PromptInnerPayloadBuilder {
 
   pub fn set_inference_duration(&mut self, duration: Option<Duration>) {
     self.inference_duration = duration;
+  }
+
+  pub fn set_main_ipa_workflow(&mut self, workflow: Option<String>) {
+    self.main_ipa_workflow = workflow;
+  }
+
+  pub fn set_face_detailer_workflow(&mut self, workflow: Option<String>) {
+    self.face_detailer_workflow = workflow;
+  }
+
+  pub fn set_upscaler_workflow(&mut self, workflow: Option<String>) {
+    self.upscaler_workflow = workflow;
   }
 }
 

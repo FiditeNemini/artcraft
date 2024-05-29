@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use actix_web::http::StatusCode;
 use tokio::process::Command;
 use tokio::time::sleep;
+use easyenv::get_env_string_optional;
 
 use errors::AnyhowResult;
 
@@ -15,6 +16,20 @@ pub struct ComfyDependencies {
     pub inference_command: ComfyInferenceCommand,
     pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
     pub ffmpeg_command_runner: FfmpegCommandRunner,
+    pub configs: ComfyConfigs,
+}
+
+/// NB: These are used for logging and debugging by the art team
+pub struct ComfyConfigs {
+    /// Version of Yae's workflow
+    /// Not functional. Used for logging and debugging by the art team.
+    pub main_workflow: Option<String>,
+    /// Version of Yae's face detailer workflow
+    /// Not functional. Used for logging and debugging by the art team.
+    pub face_detailer_workflow: Option<String>,
+    /// Version of Yae's upscaler workflow
+    /// Not functional. Used for logging and debugging by the art team.
+    pub upscaler_workflow: Option<String>,
 }
 
 impl ComfyDependencies {
@@ -70,6 +85,11 @@ impl ComfyDependencies {
             inference_command,
             ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
             ffmpeg_command_runner: FfmpegCommandRunner::from_env()?,
+            configs: ComfyConfigs {
+                main_workflow: get_env_string_optional("MAIN_IPA_WORKFLOW"),
+                face_detailer_workflow: get_env_string_optional("FACE_DETAILER_WORKFLOW"),
+                upscaler_workflow: get_env_string_optional("UPSCALER_WORKFLOW"),
+            },
         })
     }
 }

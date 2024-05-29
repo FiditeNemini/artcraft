@@ -31,6 +31,7 @@ use tokens::tokens::prompts::PromptToken;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
+use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::VideoDownloadDetails;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::JobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
@@ -51,6 +52,7 @@ fn get_file_extension(mimetype: &str) -> anyhow::Result<&'static str> {
 pub struct SaveResultsArgs<'a> {
   pub job: &'a AvailableInferenceJob,
   pub deps: &'a JobDependencies,
+  pub comfy_deps: &'a ComfyDependencies,
   pub job_progress_reporter: &'a mut Box<dyn JobProgressReporter>,
 
   pub download_video: VideoDownloadDetails,
@@ -237,6 +239,8 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
     let mut other_args_builder = PromptInnerPayloadBuilder::new();
 
+    other_args_builder.set_main_ipa_workflow(args.comfy_deps.configs.main_workflow.clone());
+
     if let Some(style_name) = args.comfy_args.style_name {
       info!("building PromptInnerPayload with style_name = {:?}", style_name);
       other_args_builder.set_style_name(style_name);
@@ -244,10 +248,12 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
     if args.comfy_args.use_face_detailer.unwrap_or(false) {
       other_args_builder.set_used_face_detailer(true);
+      other_args_builder.set_face_detailer_workflow(args.comfy_deps.configs.face_detailer_workflow.clone());
     }
 
     if args.comfy_args.use_upscaler.unwrap_or(false) {
       other_args_builder.set_used_upscaler(true);
+      other_args_builder.set_upscaler_workflow(args.comfy_deps.configs.upscaler_workflow.clone());
     }
 
     other_args_builder.set_strength(args.comfy_args.strength);
