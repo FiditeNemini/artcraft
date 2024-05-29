@@ -1,6 +1,7 @@
 .env
 node_modules
 /~/
+proxy/~/
 /.cache
 /public/build
 /build

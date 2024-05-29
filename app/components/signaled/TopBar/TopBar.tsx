@@ -31,7 +31,7 @@ export const TopBar = ({ pageName }: Props) => {
           <a href="/" className="">
             <span className="sr-only">Storyteller.ai</span>
             <img
-              className="h-9 w-auto"
+              className="h-[39px] w-auto pb-[3px]"
               src="/resources/images/Storyteller-Logo-1.png"
               alt="Logo StoryTeller.ai"
             />
@@ -47,7 +47,7 @@ export const TopBar = ({ pageName }: Props) => {
           <SceneTitleInput pageName={pageName} />
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2.5">
           <MyMoviesButton />
           <div className="flex justify-end gap-2">
             <AuthButtons />

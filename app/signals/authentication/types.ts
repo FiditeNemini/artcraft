@@ -4,6 +4,8 @@ export interface UserInfo {
   display_name: string;
   email_gravatar_hash: string;
 
+  core_info: CoreInfo;
+
   // Rollout feature flags
   can_access_studio: boolean;
   maybe_feature_flags: string[];
@@ -32,6 +34,17 @@ export interface UserInfo {
   can_delete_other_users_w2l_results: boolean;
   can_ban_users: boolean;
   can_delete_users: boolean;
+}
+
+export interface CoreInfo {
+  default_avatar: {
+    color_index: number;
+    image_index: number;
+  };
+  display_name: string;
+  gravatar_hash: string;
+  user_token: string;
+  username: string;
 }
 
 // Responses from the `/session` endpoint.

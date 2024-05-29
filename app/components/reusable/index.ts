@@ -8,6 +8,7 @@ export * from "./ButtonLink";
 export * from "./ConfirmationModal";
 export * from "./FileWrapper"; //need to rid of scss
 export * from "./FilterButtons"; //this relies on a list of filters locally, could be more flexible
+export * from "./Gravatar";
 export * from "./Input"; //need to decouple hotkey signal
 export * from "./InputVector"; //need to decouple hotkey signal
 export * from "./ListDropdown";
