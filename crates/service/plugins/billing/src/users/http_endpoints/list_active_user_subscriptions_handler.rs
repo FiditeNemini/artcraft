@@ -18,7 +18,10 @@ pub struct ListActiveUserSubscriptionsResponse {
 
 #[derive(Serialize, ToSchema)]
 pub struct SubscriptionProductKey {
+  /// This should always be "fakeyou".
   pub namespace: String,
+
+  /// Possible values: fakeyou_plus, fakeyou_pro, fakeyou_elite, etc.
   pub product_slug: String,
 }
 
