@@ -208,10 +208,39 @@ export default function TopNav({
     }
   }, [domain.titlePart, isOnLandingPage, isOnBetaKeyRedeemPage]);
 
+  const topBarWrapper = document.getElementById("topbar-wrapper");
+
   if (
-    (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
-    isOnBetaKeyRedeemPage
+    topBarWrapper &&
+    domain.titlePart === "Storyteller AI" &&
+    isOnLandingPage
   ) {
+    topBarWrapper.classList.add("topbar-hide-top");
+  }
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        topBarWrapper &&
+        domain.titlePart === "Storyteller AI" &&
+        isOnLandingPage
+      ) {
+        if (window.scrollY > 100) {
+          topBarWrapper.classList.remove("topbar-hide-top");
+        } else {
+          topBarWrapper.classList.add("topbar-hide-top");
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [domain.titlePart, isOnLandingPage, topBarWrapper]);
+
+  if (isOnBetaKeyRedeemPage) {
     return null;
   }
 
