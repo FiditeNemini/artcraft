@@ -158,6 +158,10 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lipsync_enabled: Option<bool>,
 
+    #[serde(rename = "dl")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_lcm: Option<bool>,
+
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strength: Option<f32>,

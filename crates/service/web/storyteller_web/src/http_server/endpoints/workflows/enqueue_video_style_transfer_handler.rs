@@ -99,6 +99,11 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Only for premium accounts
     use_upscaler: Option<bool>,
 
+    /// Disable LCM
+    /// Don't let ordinary users do this.
+    /// Non-LCM workflows take a long time.
+    disable_lcm: Option<bool>,
+
     /// Use Strength of the style transfer
     /// Must be between 0.0 (match source) and 1.0 (maximum dreaming).
     /// The default, if not sent, is 1.0.
@@ -221,6 +226,11 @@ pub async fn enqueue_video_style_transfer_handler(
     // TODO: Separate priority for animation.
     let priority_level = plan.web_vc_base_priority_level();
 
+    let is_staff = maybe_user_session
+        .as_ref()
+        .map(|user| user.role.can_ban_users)
+        .unwrap_or(false);
+
     // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
     let is_debug_request =
@@ -313,6 +323,13 @@ pub async fn enqueue_video_style_transfer_handler(
                 .map(|value| str_to_bool(&value))
         });
 
+    let disable_lcm = request.disable_lcm
+        .or_else(|| {
+            get_request_header_optional(&http_request, "DISABLE-LCM")
+                .map(|value| str_to_bool(&value))
+        })
+        .and_then(|disable_lcm| Some(disable_lcm && is_staff)); // Only staff can disable LCM
+
     let inference_args = WorkflowArgs {
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
@@ -335,6 +352,7 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
+        // TODO: Get rid of the temporary flags.
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
             .map(|value| str_to_bool(&value)),
         skip_process_video: get_request_header_optional(&http_request, "SKIP-PROCESS-VIDEO")
@@ -344,6 +362,7 @@ pub async fn enqueue_video_style_transfer_handler(
         use_face_detailer: request.use_face_detailer,
         use_upscaler: request.use_upscaler,
         lipsync_enabled,
+        disable_lcm,
         strength: maybe_strength,
     };
 

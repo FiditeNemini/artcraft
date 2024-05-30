@@ -55,6 +55,11 @@ pub struct PromptInnerPayload {
   #[serde(alias = "upscaler_workflow")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub upscaler_workflow: Option<String>,
+
+  #[serde(rename = "dl")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "disable_lcm")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub disable_lcm: Option<bool>,
 }
 
 pub struct PromptInnerPayloadBuilder {
@@ -62,6 +67,7 @@ pub struct PromptInnerPayloadBuilder {
   pub used_face_detailer: Option<bool>,
   pub used_upscaler: Option<bool>,
   pub lipsync_enabled: Option<bool>,
+  pub disable_lcm: Option<bool>,
   pub strength: Option<f32>,
   pub inference_duration: Option<Duration>,
   pub main_ipa_workflow: Option<String>,
@@ -76,6 +82,7 @@ impl PromptInnerPayloadBuilder {
       used_face_detailer: None,
       used_upscaler: None,
       lipsync_enabled: None,
+      disable_lcm: None,
       strength: None,
       inference_duration: None,
       main_ipa_workflow: None,
@@ -89,6 +96,7 @@ impl PromptInnerPayloadBuilder {
         && self.used_face_detailer.is_none()
         && self.used_upscaler.is_none()
         && self.lipsync_enabled.is_none()
+        && self.disable_lcm.is_none()
         && self.strength.is_none()
         && self.inference_duration.is_none()
         && self.main_ipa_workflow.is_none()
@@ -103,6 +111,7 @@ impl PromptInnerPayloadBuilder {
       used_face_detailer: self.used_face_detailer,
       used_upscaler: self.used_upscaler,
       lipsync_enabled: self.lipsync_enabled,
+      disable_lcm: self.disable_lcm,
       strength: self.strength,
       inference_duration_millis: self.inference_duration
           .map(|duration| duration.num_milliseconds()
@@ -139,6 +148,14 @@ impl PromptInnerPayloadBuilder {
       self.lipsync_enabled = Some(true);
     } else {
       self.lipsync_enabled = None;
+    }
+  }
+
+  pub fn set_disable_lcm(&mut self, enabled: bool) {
+    if enabled {
+      self.disable_lcm = Some(true);
+    } else {
+      self.disable_lcm = None;
     }
   }
 

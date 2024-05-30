@@ -91,6 +91,8 @@ pub struct InferenceArgs<'s> {
 
     pub lipsync_enabled: bool,
 
+    pub disable_lcm: bool,
+
     pub maybe_strength: Option<f32>,
 }
 
@@ -273,6 +275,10 @@ impl ComfyInferenceCommand {
 
         if args.lipsync_enabled {
             command.push_str(" --lipsync-enabled ");
+        }
+
+        if args.disable_lcm {
+            command.push_str(" --disable-lcm ");
         }
 
         if let Some(strength) = args.maybe_strength {

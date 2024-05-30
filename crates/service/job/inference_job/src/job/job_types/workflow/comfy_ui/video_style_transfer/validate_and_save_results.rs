@@ -232,6 +232,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
           || args.comfy_args.strength.is_some()
           || args.comfy_args.style_name.is_some()
           || args.comfy_args.use_face_detailer.is_some()
+          || args.comfy_args.disable_lcm.is_some()
           || args.comfy_args.use_upscaler.is_some();
 
   if should_insert_prompt_record {
@@ -258,6 +259,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
     if args.comfy_args.lipsync_enabled.unwrap_or(false) {
       other_args_builder.set_lipsync_enabled(true);
+    }
+
+    if args.comfy_args.disable_lcm.unwrap_or(false) {
+      other_args_builder.set_disable_lcm(true);
     }
 
     other_args_builder.set_strength(args.comfy_args.strength);
