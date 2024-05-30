@@ -10,6 +10,14 @@ export interface Prompt {
   prompt_type: string,
   used_face_detailer: boolean,
   used_upscaler: boolean,
+  lcm_disabled: boolean,
+  maybe_moderator_fields?: PromptModeratorFields,
+}
+
+export interface PromptModeratorFields {
+  main_ipa_workflow?: string,
+  face_detailer_workflow?: string,
+  upscaler_workflow?: string,
 }
 
 export interface GetPromptsResponse {
