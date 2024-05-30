@@ -121,7 +121,7 @@ export function addCharacterAudio({
     group: ClipGroup.CHARACTER,
     type: ClipType.AUDIO,
     offset,
-    length: dragItem.length,
+    length: dragItem.length ?? 60,
     clip_uuid,
     object_uuid: characterId,
     name: dragItem.name,
