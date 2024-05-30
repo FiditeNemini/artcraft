@@ -9,7 +9,7 @@ interface ButtonIconProps extends FontAwesomeIconProps {
   icon: IconDefinition;
   onClick: () => void;
   className?: string;
-  hoverFill?: boolean;
+  bgFill?: boolean;
   disabled?: boolean;
 }
 
@@ -18,13 +18,13 @@ export const ButtonIcon = ({
   size,
   onClick,
   className: propsClassName,
-  hoverFill = false,
+  bgFill = false,
   disabled,
   ...rest
 }: ButtonIconProps) => {
   const className = twMerge(
-    "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
-    hoverFill
+    "box-content flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
+    bgFill
       ? "bg-ui-controls-button hover:bg-ui-controls-button/[0.75]"
       : "bg-transparent hover:bg-ui-panel/[0.4]",
     disabled && "opacity-50 hover:bg-transparent",
@@ -33,7 +33,7 @@ export const ButtonIcon = ({
 
   return (
     <button className={className} onClick={onClick} disabled={disabled}>
-      <FontAwesomeIcon icon={icon} size={size} {...rest}/>
+      <FontAwesomeIcon icon={icon} size={size} {...rest} />
     </button>
   );
 };

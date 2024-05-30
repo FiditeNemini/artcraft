@@ -20,6 +20,7 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { EditorCanvas } from "./comps/EngineCanvases";
 import { SceneContainer } from "./comps/SceneContainer";
+import { AspectRatioMenu } from "./comps/AspectRatioMenu";
 
 export const PageEditor = () => {
   useSignals();
@@ -80,6 +81,7 @@ export const PageEditor = () => {
               <div className="grid grid-cols-3 gap-4">
                 <ControlsTopButtons />
                 <Controls3D />
+                <AspectRatioMenu />
               </div>
             </div>
 

@@ -18,7 +18,11 @@ import { TimeLine } from "./timeline.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { ClipGroup, EditorStates } from "~/pages/PageEnigma/enums";
+import {
+  ClipGroup,
+  EditorStates,
+  CameraAspectRatio,
+} from "~/pages/PageEnigma/enums";
 import { AssetType } from "~/enums";
 import { XYZ } from "../datastructures/common";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
@@ -52,6 +56,8 @@ class Editor {
   activeScene: Scene;
   camera: THREE.PerspectiveCamera | null = null;
   render_camera: THREE.PerspectiveCamera | null = null;
+  render_camera_aspect_ratio: CameraAspectRatio =
+    CameraAspectRatio.HORIZONTAL_16_9;
   renderer: THREE.WebGLRenderer | undefined;
   rawRenderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
@@ -135,6 +141,7 @@ class Editor {
   save_manager: SaveManager;
 
   generation_options: GenerationOptions;
+
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
@@ -184,8 +191,9 @@ class Editor {
     this.selectedCanvas = false;
     // Audio Engine Test.
 
-    this.render_width = 1280;
-    this.render_height = 720;
+    this.render_camera_aspect_ratio = CameraAspectRatio.HORIZONTAL_16_9;
+    this.render_width = this.getRenderDimensions().width;
+    this.render_height = this.getRenderDimensions().height;
 
     this.audio_engine = new AudioEngine();
     this.emotion_engine = new EmotionEngine(this.version);
@@ -230,7 +238,32 @@ class Editor {
       lipSync: false,
     };
   }
-
+  getRenderDimensions() {
+    switch (this.render_camera_aspect_ratio) {
+      case CameraAspectRatio.HORIZONTAL_16_9: {
+        return {
+          width: 1280,
+          height: 720,
+          aspectRatio: 16 / 9,
+        };
+      }
+      case CameraAspectRatio.VERTICAL_9_16: {
+        return {
+          width: 720,
+          height: 1280,
+          aspectRatio: 9 / 16,
+        };
+      }
+      case CameraAspectRatio.SQUARE_1_1:
+      default: {
+        return {
+          width: 1080,
+          height: 1080,
+          aspectRatio: 1,
+        };
+      }
+    }
+  }
   isEmpty(value: string | null) {
     return value === null || value.trim().length === 0;
   }
@@ -265,6 +298,23 @@ class Editor {
   }
   updateCamViewCanvas(newCanvas: HTMLCanvasElement) {
     this.canvasRenderCamReference = newCanvas;
+  }
+
+  changeRenderCameraAspectRatio(newAspectRatio: CameraAspectRatio) {
+    this.render_camera_aspect_ratio = newAspectRatio;
+    const { width, height, aspectRatio } = this.getRenderDimensions();
+    this.render_width = width;
+    this.render_height = height;
+    if (this.render_camera) {
+      this.render_camera.aspect = aspectRatio;
+      this.render_camera.updateProjectionMatrix();
+    }
+
+    Queue.publish({
+      queueName: QueueNames.FROM_ENGINE,
+      action: fromEngineActions.CAMERA_ASPECT_RATIO_CHANGED,
+      data: this.render_camera_aspect_ratio,
+    });
   }
   initialize({
     sceneToken,
@@ -397,6 +447,8 @@ class Editor {
     }
     this.control.addEventListener("change", this.renderScene.bind(this));
     this.control.addEventListener("dragging-changed", (event: any) => {
+      //TODO: any should be the following
+      // (event: THREE.Event<"dragging-changed", TransformControls>) => {
       if (this.orbitControls == undefined) {
         return;
       }
@@ -683,8 +735,23 @@ class Editor {
 
     if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
       if (this.recorder === undefined && this.render_camera) {
-        this.rawRenderer.setSize(1024, 576);
-        this.render_camera.aspect = 1024 / 576;
+        const width =
+          this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
+            ? 1024
+            : this.render_camera_aspect_ratio ===
+                CameraAspectRatio.VERTICAL_9_16
+              ? 576
+              : 1000;
+        const height =
+          this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
+            ? 576
+            : this.render_camera_aspect_ratio ===
+                CameraAspectRatio.VERTICAL_9_16
+              ? 1024
+              : 1000;
+
+        this.rawRenderer.setSize(width, height);
+        this.render_camera.aspect = width / height;
       }
 
       this.render_timer += this.clock.getDelta();
@@ -950,8 +1017,7 @@ class Editor {
       return;
     }
 
-    //this.renderer.setSize(this.render_width, this.render_height);
-    this.render_camera.aspect = this.render_width / this.render_height;
+    this.render_camera.aspect = this.getRenderDimensions().aspectRatio;
     this.render_camera.updateProjectionMatrix();
   }
 

@@ -14,21 +14,22 @@ import {
   selectedObject,
   addKeyframe,
 } from "~/pages/PageEnigma/signals";
-import Queue, {
-  QueueSubscribeType,
-  ToastDataType,
-} from "~/pages/PageEnigma/Queue/Queue";
+import Queue, { QueueSubscribeType } from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+
+import { ToastDataType } from "~/components";
+
 import {
   MediaItem,
   QueueKeyframe,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { CameraAspectRatio, ClipGroup } from "~/pages/PageEnigma/enums";
 import { addToast } from "~/signals";
 import { ToastTypes } from "~/enums";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { cameraAspectRatio } from "../signals/engine";
 
 const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
   [ClipGroup.CHARACTER]: loadCharacterData,
@@ -82,11 +83,15 @@ export function useQueueHandler() {
           addToast(ToastTypes.ERROR, message);
           break;
         }
+        case fromEngineActions.CAMERA_ASPECT_RATIO_CHANGED: {
+          cameraAspectRatio.value = data as CameraAspectRatio;
+          break;
+        }
         default:
           throw new Error(`Unknown action ${action}`);
       }
     },
-    [deleteObjectOrCharacter],
+    [],
   );
 
   const handleToTimelineActions = useCallback(

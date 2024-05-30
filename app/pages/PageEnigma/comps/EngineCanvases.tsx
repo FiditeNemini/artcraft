@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext } from "react";
 import { EngineContext } from "../contexts/EngineContext";
 
 export const EditorCanvas = () => {
@@ -23,7 +23,7 @@ export const EditorCanvas = () => {
   );
 };
 
-export const CameraViewCanvas = () => {
+export const CameraViewCanvas = ({ className }: { className?: string }) => {
   const editorEngine = useContext(EngineContext);
 
   const canvasCallbackRef = useCallback(
@@ -40,5 +40,7 @@ export const CameraViewCanvas = () => {
     [editorEngine],
   );
 
-  return <canvas ref={canvasCallbackRef} id="camera-view" />;
+  return (
+    <canvas className={className} ref={canvasCallbackRef} id="camera-view" />
+  );
 };

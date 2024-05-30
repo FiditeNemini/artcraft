@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { ButtonHTMLAttributes, Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
   IconDefinition,
@@ -6,14 +6,20 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, ButtonProps, TransitionDialogue } from "~/components";
+import { twMerge } from "tailwind-merge";
 
 type UnionedButtonProps = { label?: string } & ButtonProps;
 
-interface ButtonDropdownProps {
+interface ButtonDropdownProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   icon?: IconDefinition;
+  align?: "left" | "right";
+  showSelected?: boolean;
   options: Array<{
     label: string;
+    className?: string;
+    icon?: IconDefinition;
+    selected?: boolean;
     description?: string;
     onClick?: () => void;
     disabled?: boolean;
@@ -32,9 +38,12 @@ interface ButtonDropdownProps {
 }
 
 export const ButtonDropdown = ({
+  className,
   label,
   options,
   icon,
+  align = "left",
+  showSelected,
 }: ButtonDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(
@@ -69,7 +78,12 @@ export const ButtonDropdown = ({
     <div className="relative">
       <Menu as="div" className="inline-block text-left">
         <Menu.Button as="div">
-          <Button icon={faChevronDown} iconFlip={true} variant="secondary">
+          <Button
+            className={className}
+            icon={faChevronDown}
+            iconFlip={true}
+            variant="secondary"
+          >
             {icon ? <FontAwesomeIcon icon={icon} /> : null}
             {label}
           </Button>
@@ -85,7 +99,10 @@ export const ButtonDropdown = ({
         >
           <Menu.Items
             static
-            className="absolute left-0 mt-1 w-max divide-y divide-gray-100 overflow-hidden rounded-lg bg-brand-secondary py-1.5 focus:outline-none"
+            className={twMerge(
+              "absolute z-20 mt-1 w-max divide-y divide-gray-100 overflow-hidden rounded-lg bg-brand-secondary py-1.5 shadow-xl focus:outline-none",
+              align === "left" ? "left-0" : "right-0",
+            )}
           >
             <div>
               {options.map((option, index) => (
@@ -97,16 +114,51 @@ export const ButtonDropdown = ({
                     {({ active }) => (
                       <button
                         disabled={option.disabled}
-                        className={`duration-50 bg-brand-secondary font-medium text-white transition-all ${
-                          active ? "bg-ui-controls-button/60" : ""
-                        } ${option.disabled ? "pointer-events-none opacity-40" : ""} group flex w-full items-center py-1.5 pl-7 pr-4 text-sm`.trim()}
+                        className={twMerge(
+                          "duration-50 bg-brand-secondary font-medium text-white transition-all",
+                          active ? "bg-ui-controls-button/60" : "",
+                          option.disabled
+                            ? "pointer-events-none opacity-40"
+                            : "",
+                          "group flex w-full items-center py-1.5 pl-7 pr-4 text-sm",
+                          option.className,
+                        )}
                         onClick={() => handleOptionClick(index)}
                       >
-                        <div className="flex w-full">
+                        <div className="flex w-full items-center">
+                          {option.icon && (
+                            <FontAwesomeIcon
+                              icon={option.icon}
+                              className="mr-2"
+                            />
+                          )}
                           <div className="grow text-start">{option.label}</div>
                           <div className="ml-10 font-normal text-white/75">
                             {option.description && option.description}
                           </div>
+                          {showSelected && (
+                            <>
+                              {option.selected ? (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 512 512"
+                                  className="ml-3 flex h-5"
+                                >
+                                  <path
+                                    opacity="1"
+                                    d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+                                    fill="#FC6B68"
+                                  />
+                                  <path
+                                    d="M369 175c-9.4 9.4-9.4 24.6 0 33.9L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0z"
+                                    fill="#FFFFFF"
+                                  />
+                                </svg>
+                              ) : (
+                                <div className="w-8" />
+                              )}
+                            </>
+                          )}
                         </div>
                       </button>
                     )}

@@ -9,6 +9,11 @@ import { ToastTypes } from "~/enums";
 import { toasts, deleteToast } from "~/signals";
 import { useEffect, useRef, useState } from "react";
 
+export type ToastDataType = {
+  type: ToastTypes;
+  message: string;
+};
+
 export const Toaster = () => {
   useSignals();
   const TITLES = {

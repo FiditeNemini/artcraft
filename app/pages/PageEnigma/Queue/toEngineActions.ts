@@ -27,6 +27,10 @@ export enum toEngineActions {
   // data=QueueClip
   TOGGLE_CAMERA_STATE = "toggle_camera",
   // data=null
+
+  CHANGE_CAMERA_ASPECT_RATIO = "change_camera_aspect_ratio",
+  // data=CamperaAspectRatio
+
   UNMUTE = "unmute",
   // data={version, type, group, object_uuid} if lipsync
   // data={version, type, group} if global_audio

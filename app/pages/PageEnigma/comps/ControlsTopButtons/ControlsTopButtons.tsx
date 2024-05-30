@@ -71,7 +71,7 @@ export const ControlsTopButtons = () => {
         title: sceneTitleInput,
       });
     }
-  }, [sceneTitleInput]);
+  }, [sceneTitleInput, editorEngine]);
 
   const handleButtonNewFromTemplate = () => {
     handleButtonLoadScene();
@@ -119,6 +119,7 @@ export const ControlsTopButtons = () => {
         <ButtonDropdown
           label="File"
           icon={faFile}
+          className="shadow-xl"
           options={[
             {
               label: "New scene",
@@ -246,6 +247,7 @@ export const ControlsTopButtons = () => {
           buttonProps={{
             variant: "secondary",
             label: "Help",
+            className: "shadow-xl",
           }}
           dialogProps={{
             className: "max-w-6xl w-auto",

@@ -21,3 +21,10 @@ export const hideEditorLoader = () => {
     // it is important to keep the message so the loader fades out nicely
   };
 };
+
+export const editorLetterBox = signal<boolean>(true);
+
+export const toggleEditorLetterBox = (newState?: boolean) => {
+  editorLetterBox.value =
+    newState !== undefined ? newState : !editorLetterBox.value;
+};

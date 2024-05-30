@@ -16,7 +16,11 @@ import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
 import { AssetType } from "~/enums";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
+import {
+  CameraAspectRatio,
+  ClipGroup,
+  ClipType,
+} from "~/pages/PageEnigma/enums";
 import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/Editor/editor";
 import EmotionEngine from "./emotion_engine";
@@ -177,6 +181,12 @@ export class TimeLine {
         const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
         this.editorEngine.generation_options = options as GenerationOptions;
         this.editorEngine.generateVideo();
+        break;
+      }
+      case toEngineActions.CHANGE_CAMERA_ASPECT_RATIO: {
+        this.editorEngine.changeRenderCameraAspectRatio(
+          data.data as CameraAspectRatio,
+        );
         break;
       }
       default:

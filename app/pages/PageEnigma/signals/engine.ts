@@ -1,6 +1,9 @@
 import { signal } from "@preact/signals-core";
-import { EditorStates } from "~/pages/PageEnigma/enums";
+import { CameraAspectRatio, EditorStates } from "~/pages/PageEnigma/enums";
 
 export const editorState = signal<EditorStates>(EditorStates.EDIT);
+export const cameraAspectRatio = signal<CameraAspectRatio>(
+  CameraAspectRatio.HORIZONTAL_16_9,
+);
 
 export const previewSrc = signal("");

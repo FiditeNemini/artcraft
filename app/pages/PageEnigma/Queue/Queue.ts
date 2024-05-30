@@ -1,6 +1,7 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
+import { CameraAspectRatio } from "../enums";
 import {
   QueueClip,
   QueueKeyframe,
@@ -11,12 +12,7 @@ import { toTimelineActions } from "./toTimelineActions";
 
 import { ClipUI } from "../datastructures/clips/clip_ui";
 import { GenerationOptions } from "../models/generationOptions";
-import { ToastTypes } from "~/enums";
-
-export type ToastDataType = {
-  type: ToastTypes;
-  message: string;
-};
+import { ToastDataType } from "~/components";
 
 export type UnionedActionTypes =
   | fromEngineActions
@@ -31,6 +27,7 @@ export type UnionedDataTypes =
   | MediaItem
   | ToastDataType
   | GenerationOptions
+  | CameraAspectRatio
   | null;
 
 export type QueueSubscribeType = {

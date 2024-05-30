@@ -1,5 +1,7 @@
 export enum fromEngineActions {
   ADD_OBJECT = "add_object",
+  CAMERA_ASPECT_RATIO_CHANGED = "camera_aspect_ratio_changed",
+  // data = CameraAspectRatio
   DELETE_OBJECT = "delete_object",
   DESELECT_OBJECT = "deselect_object",
   RESET_TIMELINE = "reset_timeline",
