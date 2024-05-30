@@ -26,32 +26,45 @@ export class StoryTellerProxyScene {
     this.sceneItemProxy = [];
   }
 
+  async getChildren(child: THREE.Object3D) {
+    if (this.lookUpDictionary[child.uuid] == null) {
+      this.lookUpDictionary[child.uuid] = new StoryTellerProxy3DObject(
+        this.version,
+        child.userData["media_id"],
+      );
+    }
+    const proxyObject3D: StoryTellerProxy3DObject =
+      this.lookUpDictionary[child.uuid];
+    proxyObject3D.position.copy(child.position);
+    proxyObject3D.rotation.copy(child.rotation);
+    proxyObject3D.scale.copy(child.scale);
+    proxyObject3D.object_user_data_name = child.userData.name;
+    proxyObject3D.object_name = child.name;
+    proxyObject3D.object_uuid = child.uuid;
+    proxyObject3D.color = child.userData["color"];
+    proxyObject3D.metalness = child.userData["metalness"];
+    proxyObject3D.shininess = child.userData["shininess"];
+    proxyObject3D.specular = child.userData["specular"];
+    proxyObject3D.locked = child.userData["locked"];
+    const json_data = await proxyObject3D.toJSON();
+    return json_data
+  }
+
   public async saveToScene(): Promise<any> {
     const results: ObjectJSON[] = [];
     if (this.scene.scene != null) {
-      for (const child of this.scene.scene.children) {
-        if (child.userData["media_id"] != undefined) {
-          if (this.lookUpDictionary[child.uuid] == null) {
-            this.lookUpDictionary[child.uuid] = new StoryTellerProxy3DObject(
-              this.version,
-              child.userData["media_id"],
-            );
+      for (let pchild of this.scene.scene.children) {
+        if (pchild.type == "Group") {
+          for (let child of pchild.children) {
+            if (child.userData["media_id"] != undefined) {
+              results.push(await this.getChildren(child));
+            }
           }
-          const proxyObject3D: StoryTellerProxy3DObject =
-            this.lookUpDictionary[child.uuid];
-          proxyObject3D.position.copy(child.position);
-          proxyObject3D.rotation.copy(child.rotation);
-          proxyObject3D.scale.copy(child.scale);
-          proxyObject3D.object_user_data_name = child.userData.name;
-          proxyObject3D.object_name = child.name;
-          proxyObject3D.object_uuid = child.uuid;
-          proxyObject3D.color = child.userData["color"];
-          proxyObject3D.metalness = child.userData["metalness"];
-          proxyObject3D.shininess = child.userData["shininess"];
-          proxyObject3D.specular = child.userData["specular"];
-          proxyObject3D.locked = child.userData["locked"];
-          const json_data = await proxyObject3D.toJSON();
-          results.push(json_data);
+        }
+        else {
+          if (pchild.userData["media_id"] != undefined) {
+            results.push(await this.getChildren(pchild));
+          }
         }
       }
     } else {

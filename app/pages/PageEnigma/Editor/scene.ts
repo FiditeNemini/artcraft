@@ -415,13 +415,13 @@ class Scene {
 
     if (auto_add) {
       glb.scene.name = "Scene";
-      glb.userData["name"] = "Scene";
-      glb.userData["media_id"] = media_id;
-      glb.userData["color"] = "#FFFFFF";
-      glb.userData["metalness"] = 0.0;
-      glb.userData["shininess"] = 0.5;
-      glb.userData["specular"] = 0.5;
-      glb.userData["locked"] = false;
+      glb.scene.userData["name"] = "Scene";
+      glb.scene.userData["media_id"] = media_id;
+      glb.scene.userData["color"] = "#FFFFFF";
+      glb.scene.userData["metalness"] = 0.0;
+      glb.scene.userData["shininess"] = 0.5;
+      glb.scene.userData["specular"] = 0.5;
+      glb.scene.userData["locked"] = false;
       this.scene.add(glb.scene);
     }
 
