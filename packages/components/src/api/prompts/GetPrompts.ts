@@ -10,6 +10,7 @@ export interface Prompt {
   prompt_type: string,
   used_face_detailer: boolean,
   used_upscaler: boolean,
+  lipsync_enabled: boolean,
   lcm_disabled: boolean,
   maybe_moderator_fields?: PromptModeratorFields,
 }

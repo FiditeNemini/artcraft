@@ -148,6 +148,20 @@ export default function PromptViewer({
               </div>
             </>
           )}
+          {prompt?.lipsync_enabled && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">
+                  Lipsync Enabled
+                </h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  {prompt?.lipsync_enabled ? "Yes" : "No"}
+                </p>
+              </div>
+            </>
+          )}
           {prompt?.lcm_disabled && (
             <>
               <div className="d-flex gap-3 align-items-center mb-2 mt-3">

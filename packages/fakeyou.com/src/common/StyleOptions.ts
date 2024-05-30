@@ -52,7 +52,7 @@ export interface StyleOption {
 
 export const STYLE_OPTIONS: readonly StyleOption[] = [
 	{
-		label: "2D Anime",
+		label: "2.5D Anime",
 		value: "anime_2_5d",
 	},
 	{
