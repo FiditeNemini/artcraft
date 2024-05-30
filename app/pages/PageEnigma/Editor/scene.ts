@@ -331,6 +331,28 @@ class Scene {
     return await this.loadGlbWithPlaceholder(media_id, name, auto_add, position);
   }
 
+  addChildrenToScene(parent: THREE.Object3D, scene: THREE.Scene): void {
+    parent.children.forEach((child: THREE.Object3D) => {
+      scene.add(child);
+      // If the child has its own children, recursively add them
+      if (child.children && child.children.length > 0) {
+        this.addChildrenToScene(child, scene);
+      }
+    });
+  }
+  
+  containsGroup(object: THREE.Object3D): boolean {
+    if (object instanceof THREE.Group) {
+      return true;
+    }
+    for (const child of object.children) {
+      if (this.containsGroup(child)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   async loadGlbWithPlaceholder(
     media_id: string,
     name: string,
@@ -388,11 +410,20 @@ class Scene {
       child.userData["locked"] = false;
       child.layers.enable(0);
       child.layers.enable(1);
-      if (auto_add) {
-        this.scene.add(child);
-      }
       child_result = child;
     });
+
+    if (auto_add) {
+      glb.scene.name = "Scene";
+      glb.userData["name"] = "Scene";
+      glb.userData["media_id"] = media_id;
+      glb.userData["color"] = "#FFFFFF";
+      glb.userData["metalness"] = 0.0;
+      glb.userData["shininess"] = 0.5;
+      glb.userData["specular"] = 0.5;
+      glb.userData["locked"] = false;
+      this.scene.add(glb.scene);
+    }
 
     if (child_result == undefined) {
       throw Error("GLB Did not contain an object or children.");
