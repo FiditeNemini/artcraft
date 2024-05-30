@@ -88,7 +88,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   // Extension is really a "suffix" and should have the leading period to act as an extension.
-  let ext = if ext.starts_with(".") {
+  let ext_suffix = if ext.starts_with(".") {
     ext.to_string()
   } else {
     format!(".{ext}")
@@ -118,7 +118,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
   let result_bucket_location = MediaFileBucketPath::generate_new(
     Some(PREFIX),
-    Some(&ext));
+    Some(&ext_suffix));
 
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
@@ -213,7 +213,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     maybe_prompt_token: Some(&prompt_token),
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(PREFIX),
-    maybe_public_bucket_extension: Some(&ext),
+    maybe_public_bucket_extension: Some(&ext_suffix),
     is_on_prem: args.deps.job.info.container.is_on_prem,
     worker_hostname: &args.deps.job.info.container.hostname,
     worker_cluster: &args.deps.job.info.container.cluster_name,
