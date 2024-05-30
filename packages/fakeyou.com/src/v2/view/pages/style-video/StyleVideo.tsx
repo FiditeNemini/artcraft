@@ -19,6 +19,7 @@ import {
 import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";
 import { STYLE_OPTIONS } from "common/StyleOptions";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -32,6 +33,8 @@ export default function StyleVideo() {
   const [useUpscaler, setUseUpscaler] = useState(false);
   const [strength, setStrength] = useState(1.0);
   const { enqueue } = useInferenceJobs();
+
+  usePrefixedDocumentTitle("Style Video");
 
   const onClick = () => {
     if (mediaToken) {

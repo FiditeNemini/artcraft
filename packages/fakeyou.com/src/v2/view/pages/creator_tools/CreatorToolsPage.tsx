@@ -6,6 +6,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel } from "components/common";
 import { useLocalize } from "hooks";
 import React from "react";
@@ -19,6 +20,8 @@ interface CreatorToolsPageProps {
 export default function CreatorToolsPage(props: CreatorToolsPageProps) {
   const { t } = useLocalize("LandingPage");
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
+
+  usePrefixedDocumentTitle("Creator Tools");
 
   const videoProducts = [
     {
