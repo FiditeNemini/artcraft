@@ -93,6 +93,16 @@ export default function PromptViewer({
               </div>
             </>
           )}
+          {prompt.maybe_strength && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Strength</h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">{prompt.maybe_strength}</p>
+              </div>
+            </>
+          )}
           {isModerator &&
             prompt?.maybe_moderator_fields?.main_ipa_workflow && (
               <>

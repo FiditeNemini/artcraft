@@ -7,6 +7,7 @@ export interface Prompt {
   maybe_positive_prompt?: string,
   maybe_negative_prompt?: string,
   maybe_style_name?: string,
+  maybe_strength?: number,
   prompt_type: string,
   used_face_detailer: boolean,
   used_upscaler: boolean,
