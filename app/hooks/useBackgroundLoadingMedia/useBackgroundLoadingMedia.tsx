@@ -12,6 +12,7 @@ export const useBackgroundLoadingMedia = () => {
     //CASE 1: first load
     // if myMovies undefined, poll for the first time
     if (!userMovies.value) {
+      userMovies.value = [];
       PollUserMovies();
       return;
     }

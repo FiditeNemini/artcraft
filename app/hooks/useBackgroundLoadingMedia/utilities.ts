@@ -12,6 +12,7 @@ import {
   authentication,
   setUserAudioItems,
   setUserMovies,
+  userMovies,
 } from "~/signals";
 const { userInfo } = authentication;
 
@@ -28,7 +29,9 @@ export function PollUserMovies() {
     },
   )
     .then((res: GetMediaListResponse) => {
-      setUserMovies(res.results);
+      if (userMovies.value && res.results.length !== userMovies.value.length) {
+        setUserMovies(res.results);
+      }
     })
     .catch(() => {
       addToast(ToastTypes.ERROR, "Unknown Error in Loading My Movies");
