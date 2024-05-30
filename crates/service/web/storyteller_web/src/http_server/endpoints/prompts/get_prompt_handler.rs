@@ -62,6 +62,10 @@ pub struct PromptInfo {
   /// and typically only applies to video style transfer.
   pub maybe_style_name: Option<StyleTransferName>,
 
+  /// If a "strength" was used.
+  /// Typically only for video style transfer.
+  pub maybe_strength: Option<f32>,
+
   /// If a face detailer was used.
   /// This might not be present for all types of inference
   /// and typically only applies to video style transfer.
@@ -183,6 +187,7 @@ pub async fn get_prompt_handler(
   };
 
   let mut maybe_style_name = None;
+  let mut maybe_strength = None;
   let mut used_face_detailer = false;
   let mut used_upscaler = false;
   let mut lipsync_enabled = false;
@@ -196,6 +201,7 @@ pub async fn get_prompt_handler(
     if let Some(encoded_style_name) = &inner_payload.style_name {
       maybe_style_name = encoded_style_name.to_style_name();
     }
+    maybe_strength = inner_payload.strength;
     used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
     used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
     lipsync_enabled = inner_payload.lipsync_enabled.unwrap_or(false);
@@ -220,6 +226,7 @@ pub async fn get_prompt_handler(
     success: true,
     prompt: PromptInfo {
       token: result.token,
+      maybe_strength,
       maybe_positive_prompt: result.maybe_positive_prompt,
       maybe_negative_prompt: result.maybe_negative_prompt,
       maybe_style_name,
