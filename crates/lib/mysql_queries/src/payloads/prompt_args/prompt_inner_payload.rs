@@ -60,6 +60,11 @@ pub struct PromptInnerPayload {
   #[serde(alias = "disable_lcm")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub disable_lcm: Option<bool>,
+
+  #[serde(rename = "uc")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "use_cinematic")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub use_cinematic: Option<bool>,
 }
 
 pub struct PromptInnerPayloadBuilder {
@@ -68,6 +73,7 @@ pub struct PromptInnerPayloadBuilder {
   pub used_upscaler: Option<bool>,
   pub lipsync_enabled: Option<bool>,
   pub disable_lcm: Option<bool>,
+  pub use_cinematic: Option<bool>,
   pub strength: Option<f32>,
   pub inference_duration: Option<Duration>,
   pub main_ipa_workflow: Option<String>,
@@ -83,6 +89,7 @@ impl PromptInnerPayloadBuilder {
       used_upscaler: None,
       lipsync_enabled: None,
       disable_lcm: None,
+      use_cinematic: None,
       strength: None,
       inference_duration: None,
       main_ipa_workflow: None,
@@ -97,6 +104,7 @@ impl PromptInnerPayloadBuilder {
         && self.used_upscaler.is_none()
         && self.lipsync_enabled.is_none()
         && self.disable_lcm.is_none()
+        && self.use_cinematic.is_none()
         && self.strength.is_none()
         && self.inference_duration.is_none()
         && self.main_ipa_workflow.is_none()
@@ -112,6 +120,7 @@ impl PromptInnerPayloadBuilder {
       used_upscaler: self.used_upscaler,
       lipsync_enabled: self.lipsync_enabled,
       disable_lcm: self.disable_lcm,
+      use_cinematic: self.use_cinematic,
       strength: self.strength,
       inference_duration_millis: self.inference_duration
           .map(|duration| duration.num_milliseconds()
@@ -156,6 +165,14 @@ impl PromptInnerPayloadBuilder {
       self.disable_lcm = Some(true);
     } else {
       self.disable_lcm = None;
+    }
+  }
+
+  pub fn set_use_cinematic(&mut self, enabled: bool) {
+    if enabled {
+      self.use_cinematic = Some(true);
+    } else {
+      self.use_cinematic = None;
     }
   }
 
