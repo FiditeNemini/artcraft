@@ -19,6 +19,7 @@ export interface Prompt {
 }
 
 export interface PromptModeratorFields {
+  maybe_inference_duration_millis?: number,
   main_ipa_workflow?: string,
   face_detailer_workflow?: string,
   upscaler_workflow?: string,
