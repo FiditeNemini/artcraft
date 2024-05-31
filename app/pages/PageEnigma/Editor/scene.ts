@@ -211,6 +211,9 @@ class Scene {
       camera_position.z,
     );
     camera_obj.layers.set(1);
+    camera_obj.children.forEach(child => {
+      child.layers.set(1);
+    });
     this.scene.add(camera_obj);
   }
 
@@ -323,12 +326,13 @@ class Scene {
     name: string,
     auto_add: boolean = true,
     position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
+    version: number = 1.0
   ): Promise<THREE.Object3D> {
     const url = await this.getMediaURL(media_id);
     if (url.includes(".pmd") || url.includes(".pmx")) {
       return await this.loadMMDWithPlaceholder(media_id, name, auto_add, position)
     }
-    return await this.loadGlbWithPlaceholder(media_id, name, auto_add, position);
+    return await this.loadGlbWithPlaceholder(media_id, name, auto_add, position, version);
   }
 
   addChildrenToScene(parent: THREE.Object3D, scene: THREE.Scene): void {
@@ -358,6 +362,7 @@ class Scene {
     name: string,
     auto_add: boolean = true,
     position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
+    load_version: number = 1.0
   ): Promise<THREE.Object3D> {
     if (this.placeholder_manager === undefined) {
       throw Error("Place holder Manager is undefined");
@@ -410,10 +415,13 @@ class Scene {
       child.userData["locked"] = false;
       child.layers.enable(0);
       child.layers.enable(1);
-      child_result = child;
+      if(load_version <= 1.0) {
+        child_result = child;
+        console.log("Loading older model consider resaving to upgrade to newer version of save file. Save Version:", load_version)
+      }
     });
 
-    if (auto_add) {
+    if (load_version <= 1.0){
       glb.scene.name = "Scene";
       glb.scene.userData["name"] = "Scene";
       glb.scene.userData["media_id"] = media_id;
@@ -422,11 +430,29 @@ class Scene {
       glb.scene.userData["shininess"] = 0.5;
       glb.scene.userData["specular"] = 0.5;
       glb.scene.userData["locked"] = false;
-      this.scene.add(glb.scene);
+    }
+    else if (load_version > 1.0) {
+      glb.scene.name = name;
+      glb.scene.userData["name"] = name;
+      glb.scene.userData["media_id"] = media_id;
+      glb.scene.userData["color"] = "#FFFFFF";
+      glb.scene.userData["metalness"] = 0.0;
+      glb.scene.userData["shininess"] = 0.5;
+      glb.scene.userData["specular"] = 0.5;
+      glb.scene.userData["locked"] = false;
+    }
+
+
+    if(load_version > 1.0) {
+      child_result = glb.scene;
     }
 
     if (child_result == undefined) {
       throw Error("GLB Did not contain an object or children.");
+    }
+
+    if (auto_add) {
+      this.scene.add(child_result);
     }
 
     return child_result;

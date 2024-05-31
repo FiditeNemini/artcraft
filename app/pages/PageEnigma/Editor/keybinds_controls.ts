@@ -111,7 +111,7 @@ export class MouseControls {
         if (intersects.length > 0) {
             if (intersects[0].object.type != "GridHelper") {
                 let currentObject = intersects[0].object;
-                while (currentObject.parent?.parent && currentObject.parent?.parent.type !== "Scene") {
+                while (currentObject.parent && currentObject.parent.type !== "Scene") {
                     currentObject = currentObject.parent;
                 }
                 this.editor.selected = currentObject;

@@ -29,7 +29,7 @@ export class SaveManager {
             this.editor.version,
             this.editor.activeScene,
         );
-        const scene_json = await proxyScene.saveToScene();
+        const scene_json = await proxyScene.saveToScene(this.editor.version);
 
         const proxyTimeline = new StoryTellerProxyTimeline(
             this.editor.version,
@@ -86,9 +86,13 @@ export class SaveManager {
             this.editor.version,
             this.editor.activeScene,
         );
-        await proxyScene.loadFromSceneJson(scene_json["scene"]);
+        await proxyScene.loadFromSceneJson(scene_json["scene"], scene_json["version"]);
+        this.editor.version = scene_json["version"];
         this.editor.cam_obj = this.editor.activeScene.get_object_by_name(this.editor.camera_name);
         this.editor.cam_obj?.layers.set(1);
+        this.editor.cam_obj?.children.forEach(child => {
+            child.layers.set(1);
+        });
 
         const proxyTimeline = new StoryTellerProxyTimeline(
             this.editor.version,

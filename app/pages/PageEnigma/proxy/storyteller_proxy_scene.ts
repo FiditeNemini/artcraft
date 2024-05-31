@@ -50,21 +50,54 @@ export class StoryTellerProxyScene {
     return json_data
   }
 
-  public async saveToScene(): Promise<any> {
+  public async saveToSceneOlder(): Promise<any> {
+    const results: ObjectJSON[] = [];
+    if (this.scene.scene != null) {
+      for (const child of this.scene.scene.children) {
+        if (child.userData["media_id"] != undefined) {
+          if (this.lookUpDictionary[child.uuid] == null) {
+            this.lookUpDictionary[child.uuid] = new StoryTellerProxy3DObject(
+              this.version,
+              child.userData["media_id"],
+            );
+          }
+          const proxyObject3D: StoryTellerProxy3DObject =
+            this.lookUpDictionary[child.uuid];
+          proxyObject3D.position.copy(child.position);
+          proxyObject3D.rotation.copy(child.rotation);
+          proxyObject3D.scale.copy(child.scale);
+          proxyObject3D.object_user_data_name = child.userData.name;
+          proxyObject3D.object_name = child.name;
+          proxyObject3D.object_uuid = child.uuid;
+          proxyObject3D.color = child.userData["color"];
+          proxyObject3D.metalness = child.userData["metalness"];
+          proxyObject3D.shininess = child.userData["shininess"];
+          proxyObject3D.specular = child.userData["specular"];
+          proxyObject3D.locked = child.userData["locked"];
+          const json_data = await proxyObject3D.toJSON();
+          results.push(json_data);
+        }
+      }
+    } else {
+      console.log("Scene doesn't exist needs to be assigned");
+    }
+    console.log(results);
+    return results;
+  }
+
+  public async saveToScene(version: number): Promise<any> {
+    this.version = version;
+    console.log("Saving with version:", this.version)
     const results: ObjectJSON[] = [];
     if (this.scene.scene != null) {
       for (let pchild of this.scene.scene.children) {
-        if (pchild.type == "Group") {
-          for (let child of pchild.children) {
-            if (child.userData["media_id"] != undefined) {
-              results.push(await this.getChildren(child));
-            }
-          }
-        }
-        else {
+        if(this.version >= 1.0){
           if (pchild.userData["media_id"] != undefined) {
             results.push(await this.getChildren(pchild));
           }
+        } else {
+          console.log("Saving older.")
+          return this.saveToSceneOlder();
         }
       }
     } else {
@@ -73,7 +106,8 @@ export class StoryTellerProxyScene {
     return results;
   }
 
-  public async loadFromSceneJson(scene_json: ObjectJSON[]) {
+  public async loadFromSceneJson(scene_json: ObjectJSON[], version: number) {
+    console.log(scene_json);
     if (scene_json != null && this.scene != null) {
       while (this.scene.scene.children.length > 0) {
         this.scene.scene.remove(this.scene.scene.children[0]);
@@ -96,6 +130,9 @@ export class StoryTellerProxyScene {
               obj = await this.scene.loadObject(
                 token,
                 json_object.object_name,
+                true,
+                new THREE.Vector3(-0.5, 1.5, 0),
+                version
               );
             } else if (token.includes("Point::")) {
               let keyframe_uuid = token.replace("Point::", "");
