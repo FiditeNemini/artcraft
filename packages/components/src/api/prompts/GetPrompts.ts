@@ -8,6 +8,7 @@ export interface Prompt {
   maybe_negative_prompt?: string,
   maybe_style_name?: string,
   maybe_strength?: number,
+  maybe_inference_duration_millis?: number,
   prompt_type: string,
   used_face_detailer: boolean,
   used_upscaler: boolean,

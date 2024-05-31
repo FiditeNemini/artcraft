@@ -216,6 +216,18 @@ export default function PromptViewer({
                 </div>
               </>
             )}
+            {prompt?.maybe_inference_duration_millis && (
+              <>
+                <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                  <h6 className="fw-semibold mb-0 flex-grow-1">Inference Duration (seconds)</h6>
+                </div>
+                <div className="panel-inner p-2 rounded">
+                  <p className="fs-7">
+                    {(prompt?.maybe_inference_duration_millis / 1000 / 60).toFixed(2)} minutes
+                  </p>
+                </div>
+              </>
+            )}
         </Panel>
       )}
     </>
