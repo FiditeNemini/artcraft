@@ -102,6 +102,9 @@ pub struct PromptInfo {
 
 #[derive(Serialize, ToSchema)]
 pub struct PromptInfoModeratorFields {
+  /// How many milliseconds it took to run generation.
+  pub maybe_inference_duration_millis: Option<u64>,
+
   /// Version of Yae's workflow
   /// Used for logging and debugging by the art team.
   pub main_ipa_workflow: Option<String>,
@@ -229,6 +232,7 @@ pub async fn get_prompt_handler(
 
   if is_moderator {
     maybe_moderator_fields = Some(PromptInfoModeratorFields {
+      maybe_inference_duration_millis,
       main_ipa_workflow,
       face_detailer_workflow,
       upscaler_workflow,
