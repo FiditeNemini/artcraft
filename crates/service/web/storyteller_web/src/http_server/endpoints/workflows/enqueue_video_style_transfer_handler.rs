@@ -104,6 +104,10 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Non-LCM workflows take a long time.
     disable_lcm: Option<bool>,
 
+    /// Use the cinematic workflow
+    /// Don't let ordinary users do this.
+    use_cinematic: Option<bool>,
+
     /// Use Strength of the style transfer
     /// Must be between 0.0 (match source) and 1.0 (maximum dreaming).
     /// The default, if not sent, is 1.0.
@@ -330,6 +334,13 @@ pub async fn enqueue_video_style_transfer_handler(
         })
         .and_then(|disable_lcm| Some(disable_lcm && is_staff)); // Only staff can disable LCM
 
+    let use_cinematic = request.use_cinematic
+        .or_else(|| {
+            get_request_header_optional(&http_request, "USE-CINEMATIC")
+                .map(|value| str_to_bool(&value))
+        })
+        .and_then(|use_cinematic| Some(use_cinematic && is_staff)); // Only staff can use cinematic
+
     let inference_args = WorkflowArgs {
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
@@ -363,6 +374,7 @@ pub async fn enqueue_video_style_transfer_handler(
         use_upscaler: request.use_upscaler,
         lipsync_enabled,
         disable_lcm,
+        use_cinematic,
         strength: maybe_strength,
     };
 

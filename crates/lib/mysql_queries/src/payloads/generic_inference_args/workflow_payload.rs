@@ -162,6 +162,10 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_lcm: Option<bool>,
 
+    #[serde(rename = "uc")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub use_cinematic: Option<bool>,
+
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strength: Option<f32>,
