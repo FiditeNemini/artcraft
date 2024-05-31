@@ -241,7 +241,7 @@ pub async fn list_media_files_for_user_handler(
   let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
   let mut maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
 
-  info!("Querying media files for user: {:?} - {:?}", path.username, maybe_filter_media_types);
+  info!("Querying media files for user: {:?} type: {:?} as: {:?}", path.username, maybe_filter_media_types, view_as);
 
   let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
     username: &path.username,
