@@ -62,6 +62,9 @@ pub struct PromptInfo {
   /// and typically only applies to video style transfer.
   pub maybe_style_name: Option<StyleTransferName>,
 
+  /// How many milliseconds it took to run generation.
+  pub maybe_inference_duration_millis: Option<u64>,
+
   /// If a "strength" was used.
   /// Typically only for video style transfer.
   pub maybe_strength: Option<f32>,
@@ -192,12 +195,14 @@ pub async fn get_prompt_handler(
 
   let mut maybe_style_name = None;
   let mut maybe_strength = None;
+  let mut maybe_inference_duration_millis = None;
   let mut used_face_detailer = false;
   let mut used_upscaler = false;
   let mut lipsync_enabled = false;
   let mut lcm_disabled = false;
   let mut use_cinematic = false;
 
+  // Moderator fields
   let mut main_ipa_workflow = None;
   let mut face_detailer_workflow = None;
   let mut upscaler_workflow = None;
@@ -207,12 +212,14 @@ pub async fn get_prompt_handler(
       maybe_style_name = encoded_style_name.to_style_name();
     }
     maybe_strength = inner_payload.strength;
+    maybe_inference_duration_millis = inner_payload.inference_duration_millis;
     used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
     used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
     lipsync_enabled = inner_payload.lipsync_enabled.unwrap_or(false);
     lcm_disabled = inner_payload.disable_lcm.unwrap_or(false);
     use_cinematic = inner_payload.use_cinematic.unwrap_or(false);
 
+    // Moderator fields
     main_ipa_workflow = inner_payload.main_ipa_workflow.clone();
     face_detailer_workflow = inner_payload.face_detailer_workflow.clone();
     upscaler_workflow = inner_payload.upscaler_workflow.clone();
@@ -236,6 +243,7 @@ pub async fn get_prompt_handler(
       maybe_positive_prompt: result.maybe_positive_prompt,
       maybe_negative_prompt: result.maybe_negative_prompt,
       maybe_style_name,
+      maybe_inference_duration_millis,
       used_face_detailer,
       used_upscaler,
       lipsync_enabled,
