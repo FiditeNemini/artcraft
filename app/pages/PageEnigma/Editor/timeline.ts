@@ -316,6 +316,7 @@ export class TimeLine {
       name,
       true,
       pos,
+      this.editorEngine.version
     );
     obj.userData["name"] = name;
     obj.name = name;
