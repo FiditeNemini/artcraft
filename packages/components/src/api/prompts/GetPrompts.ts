@@ -13,6 +13,7 @@ export interface Prompt {
   used_upscaler: boolean,
   lipsync_enabled: boolean,
   lcm_disabled: boolean,
+  use_cinematic: boolean,
   maybe_moderator_fields?: PromptModeratorFields,
 }
 
