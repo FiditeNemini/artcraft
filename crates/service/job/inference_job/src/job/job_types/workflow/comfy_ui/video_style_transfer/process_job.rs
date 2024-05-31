@@ -380,6 +380,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
             lipsync_enabled: comfy_args.lipsync_enabled.unwrap_or(false),
             disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
+            use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
             maybe_strength: comfy_args.strength,
         });
 

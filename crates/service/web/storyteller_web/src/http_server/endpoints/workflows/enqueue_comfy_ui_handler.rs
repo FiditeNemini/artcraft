@@ -288,6 +288,7 @@ pub async fn enqueue_comfy_ui_handler(
         use_upscaler: None,
         lipsync_enabled: None,
         disable_lcm: None,
+        use_cinematic: None,
         strength: None,
     };
 

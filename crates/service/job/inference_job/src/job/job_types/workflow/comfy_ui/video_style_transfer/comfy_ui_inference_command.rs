@@ -93,6 +93,8 @@ pub struct InferenceArgs<'s> {
 
     pub disable_lcm: bool,
 
+    pub use_cinematic: bool,
+
     pub maybe_strength: Option<f32>,
 }
 
@@ -279,6 +281,10 @@ impl ComfyInferenceCommand {
 
         if args.disable_lcm {
             command.push_str(" --disable-lcm ");
+        }
+
+        if args.use_cinematic {
+            command.push_str(" --enable-cinematic ");
         }
 
         if let Some(strength) = args.maybe_strength {

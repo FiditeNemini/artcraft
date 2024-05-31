@@ -257,6 +257,7 @@ pub async fn enqueue_workflow_upload_request(
         use_upscaler: None,
         lipsync_enabled: None,
         disable_lcm: None,
+        use_cinematic: None,
         strength: None,
     };
    
