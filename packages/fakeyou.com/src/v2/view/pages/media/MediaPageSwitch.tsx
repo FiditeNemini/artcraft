@@ -15,6 +15,7 @@ import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 import { faStarShooting as faStarShootingOutline } from "@fortawesome/pro-regular-svg-icons";
 
 import "./MediaPage.scss";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export interface MediaSubViewProps {
   bookmarkButtonProps: ActionButtonProps;
@@ -60,6 +61,25 @@ export default function MediaPageSwitch() {
   const closeDeleteModal = () => setIsDeleteModalOpen(false);
   const openDeleteModal = () => setIsDeleteModalOpen(true);
   const deleteMedia = () => remove(!!user?.can_ban_users);
+
+  let pageTitle;
+
+  switch (mediaFile?.media_type) {
+    case MediaFileType.Audio:
+      pageTitle = mediaFile?.maybe_title || "Audio File";
+      break;
+    case MediaFileType.Video:
+      pageTitle = mediaFile?.maybe_title || "Video File";
+      break;
+    case MediaFileType.Image:
+      pageTitle = mediaFile?.maybe_title || "Image File";
+      break;
+    default:
+      pageTitle = mediaFile?.maybe_title || "Media File";
+      break;
+  }
+
+  usePrefixedDocumentTitle(pageTitle);
 
   const bookmarkButtonProps: ActionButtonProps = {
     ...bookmarks.makeProps({
