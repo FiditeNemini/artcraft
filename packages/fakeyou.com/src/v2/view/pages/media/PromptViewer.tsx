@@ -99,7 +99,7 @@ export default function PromptViewer({
                 <h6 className="fw-semibold mb-0 flex-grow-1">Strength</h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">{prompt.maybe_strength}</p>
+                <p className="fs-7">{prompt.maybe_strength.toFixed(2)}</p>
               </div>
             </>
           )}
