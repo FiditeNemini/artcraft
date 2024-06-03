@@ -12,3 +12,4 @@ export const upscale = signal(false);
 export const faceDetail = signal(false);
 export const styleStrength = signal(1.0);
 export const lipSync = signal(false);
+export const cinematic = signal(false);

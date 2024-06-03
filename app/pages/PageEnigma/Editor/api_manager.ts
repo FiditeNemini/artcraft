@@ -377,6 +377,7 @@ export class APIManager {
     use_upscaler: boolean = false,
     use_strength: number = 1.0,
     use_lipsync: boolean = false,
+    use_cinematic: boolean = false,
   ) {
     const uuid = uuidv4();
 
@@ -394,6 +395,7 @@ export class APIManager {
       use_upscaler: use_upscaler,
       use_strength: use_strength,
       use_lipsync: use_lipsync,
+      use_cinematic: use_cinematic,
     };
 
     const json_data = JSON.stringify(data);

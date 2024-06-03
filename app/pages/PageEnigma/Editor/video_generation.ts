@@ -40,13 +40,17 @@ export class VideoGeneration {
         this.editor.render_width,
         this.editor.render_height,
       );
+
       this.editor.render_camera.aspect =
         this.editor.render_width / this.editor.render_height;
+
       this.editor.render_camera.updateProjectionMatrix();
+
       this.editor.rawRenderer.render(
         this.editor.activeScene.scene,
         this.editor.render_camera,
       );
+
       const imgData = this.editor.rawRenderer.domElement.toDataURL();
       const response = await fetch(imgData); // Fetch the data URL
       const blob = await response.blob(); // Convert to Blob
@@ -273,11 +277,14 @@ export class VideoGeneration {
         this.editor.generation_options.upscale,
         this.editor.generation_options.styleStrength,
         this.editor.generation_options.lipSync,
+        this.editor.generation_options.cinematic,
       )
       .catch((error) => {
         // TODO handle stylize error.
         console.log(error);
       });
+    // Not sure if this is needed will double check TODO: MC
+    //this.editor.generating_preview = false;
 
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
     this.editor.updateLoad(100, "Done Check Your Media Tab On Profile.");

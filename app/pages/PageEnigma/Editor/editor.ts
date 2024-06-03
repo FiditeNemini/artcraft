@@ -236,6 +236,7 @@ class Editor {
       upscale: false,
       styleStrength: 1.0,
       lipSync: false,
+      cinematic: false,
     };
   }
   getRenderDimensions() {

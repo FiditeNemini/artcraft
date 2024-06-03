@@ -10,6 +10,7 @@ import {
   faceDetail,
   styleStrength,
   lipSync,
+  cinematic,
 } from "~/pages/PageEnigma/signals/stylizeTab";
 import { useEffect, useRef } from "react";
 
@@ -55,6 +56,7 @@ export function GenerateMovieButton({
       faceDetail.value,
       styleStrength.value,
       lipSync.value,
+      cinematic.value,
     );
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,

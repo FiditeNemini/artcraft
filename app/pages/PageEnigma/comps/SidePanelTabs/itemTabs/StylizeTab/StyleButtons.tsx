@@ -16,6 +16,7 @@ import {
   styleStrength,
   upscale,
   lipSync,
+  cinematic,
 } from "~/pages/PageEnigma/signals/stylizeTab";
 
 export function StyleButtons() {
@@ -122,12 +123,35 @@ export function StyleButtons() {
                 </Switch>
               </Switch.Group>
             </div>
+            <hr className="opacity-[5%]" />
+            <div className="flex items-center py-[6px]">
+              <Switch.Group>
+                <Switch.Label className="mr-3 grow text-sm font-medium">
+                  Use Cinematic
+                </Switch.Label>
+                <Switch
+                  checked={cinematic.value}
+                  onChange={() => (cinematic.value = !cinematic.value)}
+                  className={`${
+                    cinematic.value
+                      ? "bg-brand-primary hover:bg-brand-primary-400"
+                      : "bg-gray-500 hover:bg-gray-400"
+                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                >
+                  <span
+                    className={`${
+                      cinematic.value ? "translate-x-6" : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </Switch.Group>
+            </div>
           </div>
           <PremiumLock requiredPlan="any" plural={true} className="mt-2">
-            <Switch.Group>
-              <div className="flex flex-col gap-[6px]">
-                <hr className="opacity-[5%]" />
-                <div className="flex w-full items-center">
+            <div className="flex flex-col gap-[6px]">
+              <hr className="opacity-[5%]" />
+              <div className="flex w-full items-center">
+                <Switch.Group>
                   <Switch.Label className="mr-3 grow text-sm font-medium">
                     Upscale
                   </Switch.Label>
@@ -146,9 +170,11 @@ export function StyleButtons() {
                       } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                     />
                   </Switch>
-                </div>
-                <hr className="opacity-[5%]" />
-                <div className="flex w-full items-center">
+                </Switch.Group>
+              </div>
+              <hr className="opacity-[5%]" />
+              <div className="flex w-full items-center">
+                <Switch.Group>
                   <Switch.Label className="mr-3 grow text-sm font-medium">
                     Face Detailer
                   </Switch.Label>
@@ -167,10 +193,10 @@ export function StyleButtons() {
                       } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                     />
                   </Switch>
-                </div>
-                <hr className="opacity-[5%]" />
+                </Switch.Group>
               </div>
-            </Switch.Group>
+              <hr className="opacity-[5%]" />
+            </div>
           </PremiumLock>
         </div>
 
