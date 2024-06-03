@@ -204,7 +204,7 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
     }
   }
 
-  let entries = filter_out_small_pmx_files(entries)?;
+  let entries = keep_only_largest_pmx_file(entries)?;
   let entries = remove_useless_leading_directories(entries)?;
 
   for entry in entries.iter() {
@@ -215,7 +215,7 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
 }
 
 // Some PMX zip files contain multiple PMXes. As a heuristic, we want to keep the largest one.
-fn filter_out_small_pmx_files(mut entries: Vec<PmxZipEntryDetail>) -> Result<Vec<PmxZipEntryDetail>, PmxError> {
+fn keep_only_largest_pmx_file(mut entries: Vec<PmxZipEntryDetail>) -> Result<Vec<PmxZipEntryDetail>, PmxError> {
   let non_pmx_entries = entries.iter()
       .filter(|entry| !entry.is_pmx)
       .map(|entry| entry.clone())
