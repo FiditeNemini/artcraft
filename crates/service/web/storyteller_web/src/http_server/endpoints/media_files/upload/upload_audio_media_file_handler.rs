@@ -177,7 +177,9 @@ pub async fn upload_audio_media_file_handler(
 
   // ==================== UPLOAD METADATA ==================== //
 
-  let maybe_title = form.maybe_title.map(|title| title.to_string());
+  let maybe_title = form.maybe_title
+      .map(|title| title.trim().to_string())
+      .filter(|title| !title.is_empty());
 
   let creator_set_visibility = form.maybe_visibility
       .map(|visibility| visibility.0)
