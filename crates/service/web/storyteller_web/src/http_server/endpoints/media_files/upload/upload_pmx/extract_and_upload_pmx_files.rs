@@ -26,7 +26,6 @@ static ALLOWED_EXTENSIONS : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 pub enum PmxError {
   InvalidArchive,
   TooManyFiles,
-  TooManyPmxFiles,
   ExtractionError,
   NoPmxFile,
   UploadError,
@@ -75,7 +74,7 @@ pub async fn extract_and_upload_pmx_files(
 
   info!("Reading archive contents...");
 
-  let entries = get_pmx_entries(&mut archive)?;
+  let entries = get_relevant_zip_entries(&mut archive)?;
 
   for entry in entries.iter() {
     info!("Entry: {:?}", entry);
@@ -118,7 +117,7 @@ pub async fn extract_and_upload_pmx_files(
       file_size_bytes = zip_item_bytes.len();
 
     } else {
-      let name = entry.alternative_output_name.as_ref()
+      let name = entry.maybe_better_alternative_output_name.as_ref()
           .unwrap_or_else(|| &entry.enclosed_name);
       let name = path_to_string(name);
 
@@ -147,14 +146,15 @@ pub async fn extract_and_upload_pmx_files(
   })
 }
 
-#[derive(Debug)]
-struct PmxEntryDetail {
+#[derive(Debug, Clone)]
+struct PmxZipEntryDetail {
   enclosed_name: PathBuf,
-  alternative_output_name: Option<PathBuf>,
+  maybe_better_alternative_output_name: Option<PathBuf>,
+  file_size: u64,
   is_pmx: bool,
 }
 
-fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result<Vec<PmxEntryDetail>, PmxError> {
+fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result<Vec<PmxZipEntryDetail>, PmxError> {
   let mut entries = Vec::new();
 
   for i in 0..(archive.len()) {
@@ -187,21 +187,24 @@ fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result
     };
 
     if filename_lowercase.ends_with(".pmx") {
-      entries.push(PmxEntryDetail {
+      entries.push(PmxZipEntryDetail {
         enclosed_name: enclosed_name.to_path_buf(),
-        alternative_output_name: None,
+        maybe_better_alternative_output_name: None,
+        file_size: file.size(),
         is_pmx: true,
       });
     } else {
       // TODO(bt): Check type
-      entries.push(PmxEntryDetail {
+      entries.push(PmxZipEntryDetail {
         enclosed_name: enclosed_name.to_path_buf(),
-        alternative_output_name: None,
+        maybe_better_alternative_output_name: None,
+        file_size: file.size(),
         is_pmx: false,
       })
     }
   }
 
+  let entries = filter_out_small_pmx_files(entries)?;
   let entries = remove_useless_leading_directories(entries)?;
 
   for entry in entries.iter() {
@@ -211,20 +214,45 @@ fn get_pmx_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result
   Ok(entries)
 }
 
+// Some PMX zip files contain multiple PMXes. As a heuristic, we want to keep the largest one.
+fn filter_out_small_pmx_files(mut entries: Vec<PmxZipEntryDetail>) -> Result<Vec<PmxZipEntryDetail>, PmxError> {
+  let non_pmx_entries = entries.iter()
+      .filter(|entry| !entry.is_pmx)
+      .map(|entry| entry.clone())
+      .collect::<Vec<PmxZipEntryDetail>>();
+
+  let largest_pmx= entries.iter()
+      .filter(|entry| entry.is_pmx)
+      .reduce(|a, b| {
+        if a.file_size > b.file_size {
+          a
+        } else {
+          b
+        }
+      })
+      .map(|entry| entry.clone());
+
+  match largest_pmx {
+    None => return Err(PmxError::NoPmxFile),
+    Some(pmx_file) => {
+      entries = non_pmx_entries;
+      entries.push(pmx_file);
+    }
+  }
+
+  Ok(entries)
+}
+
 // Some zip files have entries with useless leading directories. This will remove them.
-fn remove_useless_leading_directories(mut entries: Vec<PmxEntryDetail>) -> Result<Vec<PmxEntryDetail>, PmxError> {
+fn remove_useless_leading_directories(mut entries: Vec<PmxZipEntryDetail>) -> Result<Vec<PmxZipEntryDetail>, PmxError> {
   let mut maybe_parent_directory_to_remove = None;
 
   {
-    let pmx_entry = entries.iter()
+    let pmx_entries = entries.iter()
         .filter(|entry| entry.is_pmx)
-        .collect::<Vec<&PmxEntryDetail>>();
+        .collect::<Vec<&PmxZipEntryDetail>>();
 
-    if pmx_entry.len() != 1 {
-      return Err(PmxError::TooManyPmxFiles);
-    }
-
-    match pmx_entry.get(0) {
+    match pmx_entries.get(0) {
       None => return Err(PmxError::NoPmxFile),
       Some(pmx_file) => {
         maybe_parent_directory_to_remove = pmx_file.enclosed_name.parent().map(|p| p.to_path_buf());
@@ -244,17 +272,16 @@ fn remove_useless_leading_directories(mut entries: Vec<PmxEntryDetail>) -> Resul
             let new_path = entry.enclosed_name.strip_prefix(&parent)
                 .map(|path| path.to_path_buf())
                 .unwrap_or_else(|_err| entry.enclosed_name.clone());
-            PmxEntryDetail {
+            PmxZipEntryDetail {
               enclosed_name: entry.enclosed_name,
-              alternative_output_name: Some(new_path),
+              maybe_better_alternative_output_name: Some(new_path),
+              file_size: entry.file_size,
               is_pmx: entry.is_pmx,
             }
           })
-          .collect::<Vec<PmxEntryDetail>>();
+          .collect::<Vec<PmxZipEntryDetail>>();
     }
   }
 
   Ok(entries)
 }
-
-
