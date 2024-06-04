@@ -346,363 +346,405 @@ export default function TopNav({
   }
 
   return (
-    <div
-      id="topbar-wrapper"
-      className={`position-fixed ${
-        domain.titlePart !== "FakeYou"
-          ? "topbar-bg-transparent"
-          : !loggedIn && isOnLandingPage && !isScrolled
-            ? "topbar-bg-dark"
-            : ""
-      }`.trim()}
-    >
-      <div className="topbar-nav">
-        <div className="topbar-nav-left">
-          <div className="d-flex gap-1 align-items-center">
-            <Link to="/" className="me-3">
-              <img
-                src={domain.logo}
-                alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
-                height="36"
-                className="mb-1 d-none d-lg-block"
-              />
-              <img
-                src="/fakeyou/FakeYou-Logo-Mobile.png"
-                alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
-                height="36"
-                className="mb-0 d-block d-lg-none"
-              />
-            </Link>
-
-            <div className="d-none d-lg-block">
-              <NavItem
-                icon={faScrewdriverWrench}
-                label="Creator Tools"
-                link="/tools"
-              />
-            </div>
-            <NavItem
-              icon={faCompass}
-              label="Explore"
-              link="/explore"
-              className="d-none d-lg-block"
-            />
-            <NavItem
-              icon={faStar}
-              label="Pricing"
-              link="/pricing"
-              className="me-3 d-none d-lg-block"
-            />
-          </div>
-        </div>
-
-        <div className="topbar-nav-center">
-          {/* Search Bar */}
-          <div className="d-none d-lg-block">
-            {domain.titlePart === "FakeYou" && (
+    <>
+      {domain.titlePart === "Storyteller AI" &&
+        isOnLandingPage &&
+        !isScrolled && (
+          <div
+            className="position-fixed top-0 end-0 pe-3 ps-3 topbar-bg-dark d-flex align-items-center gap-2"
+            style={{
+              zIndex: 20,
+              height: "65px",
+              borderRadius: "0 0 0 0.75rem",
+            }}
+          >
+            {loggedIn ? (
+              profileDropdown
+            ) : (
               <>
-                {(!isOnLandingPage &&
-                  !isOnLoginPage &&
-                  !isOnSignUpPage &&
-                  !isOnStudioPage) ||
-                (loggedIn &&
-                  !isOnLoginPage &&
-                  !isOnSignUpPage &&
-                  !isOnStudioPage) ||
-                (isOnLandingPage &&
-                  isScrolled &&
-                  !isOnLoginPage &&
-                  !isOnSignUpPage &&
-                  !isOnStudioPage) ? (
-                  <SearchBar
-                    onFocus={onFocusHandler}
-                    onBlur={onBlurHandler}
-                    isFocused={isFocused}
-                  />
-                ) : null}
+                <Button
+                  label="Login"
+                  small
+                  variant="secondary"
+                  onClick={() => {
+                    history.push("/login");
+                  }}
+                />
+                <Button
+                  label="Sign Up"
+                  small
+                  onClick={() => {
+                    history.push("/signup");
+                  }}
+                />
               </>
             )}
           </div>
-        </div>
+        )}
+      <div
+        id="topbar-wrapper"
+        className={`position-fixed ${
+          domain.titlePart !== "FakeYou"
+            ? "topbar-bg-transparent"
+            : !loggedIn && isOnLandingPage && !isScrolled
+              ? "topbar-bg-dark"
+              : ""
+        }`.trim()}
+      >
+        <div className="topbar-nav">
+          <div className="topbar-nav-left">
+            <div className="d-flex gap-1 align-items-center">
+              <Link to="/" className="me-3">
+                <img
+                  src={domain.logo}
+                  alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
+                  height="36"
+                  className="mb-1 d-none d-lg-block"
+                />
+                <img
+                  src="/fakeyou/FakeYou-Logo-Mobile.png"
+                  alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
+                  height="36"
+                  className="mb-0 d-block d-lg-none"
+                />
+              </Link>
 
-        <div className="topbar-nav-right">
-          {domain.titlePart === "Storyteller AI" && (
-            <div className="d-none d-lg-block">
-              <Button
-                icon={faPortalEnter}
-                label="Enter Storyteller Studio"
-                href="https://studio.storyteller.ai/"
-                small={true}
-                className="me-2"
+              <div className="d-none d-lg-block">
+                <NavItem
+                  icon={faScrewdriverWrench}
+                  label="Creator Tools"
+                  link="/tools"
+                />
+              </div>
+              <NavItem
+                icon={faCompass}
+                label="Explore"
+                link="/explore"
+                className="d-none d-lg-block"
+              />
+              <NavItem
+                icon={faStar}
+                label="Pricing"
+                link="/pricing"
+                className="me-3 d-none d-lg-block"
               />
             </div>
-          )}
+          </div>
 
-          <div className="d-flex align-items-center gap-2">
-            <div className="d-none d-lg-flex gap-2">
-              <Button
-                {...{
-                  icon: faClipboardList,
-                  label: "My Jobs",
-                  onClick: openModal,
-                  variant: "secondary",
-                  small: true,
-                }}
-              />
-
-              {loggedIn ? (
-                profileDropdown
-              ) : (
+          <div className="topbar-nav-center">
+            {/* Search Bar */}
+            <div className="d-none d-lg-block">
+              {domain.titlePart === "FakeYou" && (
                 <>
-                  <Button
-                    label="Login"
-                    small
-                    variant="secondary"
-                    onClick={() => {
-                      history.push("/login");
-                    }}
-                  />
-                  <Button
-                    label="Sign Up"
-                    small
-                    onClick={() => {
-                      history.push("/signup");
-                    }}
-                  />
+                  {(!isOnLandingPage &&
+                    !isOnLoginPage &&
+                    !isOnSignUpPage &&
+                    !isOnStudioPage) ||
+                  (loggedIn &&
+                    !isOnLoginPage &&
+                    !isOnSignUpPage &&
+                    !isOnStudioPage) ||
+                  (isOnLandingPage &&
+                    isScrolled &&
+                    !isOnLoginPage &&
+                    !isOnSignUpPage &&
+                    !isOnStudioPage) ? (
+                    <SearchBar
+                      onFocus={onFocusHandler}
+                      onBlur={onBlurHandler}
+                      isFocused={isFocused}
+                    />
+                  ) : null}
                 </>
               )}
             </div>
-            {!showNavItem && (
-              <>
+          </div>
+
+          <div className="topbar-nav-right">
+            {domain.titlePart === "Storyteller AI" && (
+              <div className="d-none d-lg-block">
                 <Button
-                  icon={faClipboardList}
-                  variant="secondary"
+                  icon={faPortalEnter}
+                  label="Enter Storyteller Studio"
+                  href="https://studio.storyteller.ai/"
                   small={true}
-                  label="My Jobs"
-                  onClick={openModal}
-                  className="d-lg-none"
+                  className="me-2"
                 />
-                <Button
-                  icon={faSearch}
-                  variant="secondary"
-                  small={true}
-                  square={true}
-                  onClick={handleSearchButtonClick}
-                  className="d-lg-none"
-                />
-              </>
+              </div>
             )}
 
-            <Button
-              icon={menuButtonIcon}
-              variant="secondary"
-              small={true}
-              square={true}
-              onClick={handleMenuButtonClick}
-              className="d-lg-none"
-            />
+            <div className="d-flex align-items-center gap-2">
+              <div className="d-none d-lg-flex gap-2">
+                <Button
+                  {...{
+                    icon: faClipboardList,
+                    label: "My Jobs",
+                    onClick: openModal,
+                    variant: "secondary",
+                    small: true,
+                  }}
+                />
+
+                {loggedIn ? (
+                  profileDropdown
+                ) : (
+                  <>
+                    <Button
+                      label="Login"
+                      small
+                      variant="secondary"
+                      onClick={() => {
+                        history.push("/login");
+                      }}
+                    />
+                    <Button
+                      label="Sign Up"
+                      small
+                      onClick={() => {
+                        history.push("/signup");
+                      }}
+                    />
+                  </>
+                )}
+              </div>
+              {!showNavItem && (
+                <>
+                  <Button
+                    icon={faClipboardList}
+                    variant="secondary"
+                    small={true}
+                    label="My Jobs"
+                    onClick={openModal}
+                    className="d-lg-none"
+                  />
+                  <Button
+                    icon={faSearch}
+                    variant="secondary"
+                    small={true}
+                    square={true}
+                    onClick={handleSearchButtonClick}
+                    className="d-lg-none"
+                  />
+                </>
+              )}
+
+              <Button
+                icon={menuButtonIcon}
+                variant="secondary"
+                small={true}
+                square={true}
+                onClick={handleMenuButtonClick}
+                className="d-lg-none"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      <div className={`${mobileMenu} d-lg-none`} style={{ height: "100vh" }}>
-        <ul className="sidebar-nav">
-          <li>
-            <NavLink
-              exact={true}
-              to={domain.website === Website.FakeYou ? "/" : "/dashboard"}
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon icon={faHome} className="sidebar-heading-icon" />
-              {domain.website === Website.FakeYou ? "Home" : "Dashboard"}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/pricing"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon icon={faStar} className="sidebar-heading-icon" />
-              {t("infoPricing")}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/explore"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faCompass}
-                className="sidebar-heading-icon"
-              />
-              Explore
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/inference-jobs-list"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faClipboardList}
-                className="sidebar-heading-icon"
-              />
-              My Jobs
-            </NavLink>
-          </li>
-          <li className="sidebar-heading">{t("speechTitle")}</li>
-          <li>
-            <NavLink
-              to="/tts"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faMessageDots}
-                className="sidebar-heading-icon"
-              />
-              {t("speechTts")}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/voice-conversion"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faWaveformLines}
-                className="sidebar-heading-icon"
-              />
-              {t("speechVc")}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/voice-designer"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faWandMagicSparkles}
-                className="sidebar-heading-icon"
-              />
-              {"Voice Designer"}
-            </NavLink>
-          </li>
-          <li className="sidebar-heading">{t("videoTitle")}</li>
+        {/* Mobile Menu */}
+        <div className={`${mobileMenu} d-lg-none`} style={{ height: "100vh" }}>
+          <ul className="sidebar-nav">
+            <li>
+              <NavLink
+                exact={true}
+                to={domain.website === Website.FakeYou ? "/" : "/dashboard"}
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faHome}
+                  className="sidebar-heading-icon"
+                />
+                {domain.website === Website.FakeYou ? "Home" : "Dashboard"}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/pricing"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faStar}
+                  className="sidebar-heading-icon"
+                />
+                {t("infoPricing")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/explore"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faCompass}
+                  className="sidebar-heading-icon"
+                />
+                Explore
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/inference-jobs-list"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faClipboardList}
+                  className="sidebar-heading-icon"
+                />
+                My Jobs
+              </NavLink>
+            </li>
+            <li className="sidebar-heading">{t("speechTitle")}</li>
+            <li>
+              <NavLink
+                to="/tts"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faMessageDots}
+                  className="sidebar-heading-icon"
+                />
+                {t("speechTts")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/voice-conversion"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faWaveformLines}
+                  className="sidebar-heading-icon"
+                />
+                {t("speechVc")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/voice-designer"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faWandMagicSparkles}
+                  className="sidebar-heading-icon"
+                />
+                {"Voice Designer"}
+              </NavLink>
+            </li>
+            <li className="sidebar-heading">{t("videoTitle")}</li>
 
-          <li>
-            <NavLink
-              to="/video-styletransfer"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faFilms}
-                className="sidebar-heading-icon"
-              />
-              {t("videoStyleTransfer")}
-            </NavLink>
-          </li>
+            <li>
+              <NavLink
+                to="/video-styletransfer"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faFilms}
+                  className="sidebar-heading-icon"
+                />
+                {t("videoStyleTransfer")}
+              </NavLink>
+            </li>
 
-          <li>
-            <NavLink
-              to="/face-animator"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faFaceViewfinder}
-                className="sidebar-heading-icon"
-              />
-              {t("videoFaceAnimator")}
-            </NavLink>
-          </li>
+            <li>
+              <NavLink
+                to="/face-animator"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faFaceViewfinder}
+                  className="sidebar-heading-icon"
+                />
+                {t("videoFaceAnimator")}
+              </NavLink>
+            </li>
 
-          {/* {maybeImageGeneration}
+            {/* {maybeImageGeneration}
 
           {maybeBetaFeatures} */}
 
-          <li className="sidebar-heading">{t("communityTitle")}</li>
-          <li>
-            <NavLink
-              to="/contribute"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faCloudUpload}
-                className="sidebar-heading-icon"
-              />
-              {t("communityUploadModels")}
-            </NavLink>
-          </li>
-          <li className="mb-3">
-            <a href={GetDiscordLink()} target="_blank" rel="noreferrer">
-              <FontAwesomeIcon
-                icon={faDiscord}
-                className="sidebar-heading-icon"
-              />
-              {t("communityDiscord")}
-            </a>
-            <NavLink
-              to="/leaderboard"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faTrophy}
-                className="sidebar-heading-icon"
-              />
-              {t("communityLeaderboard")}
-            </NavLink>
-            <NavLink
-              to="/guide"
-              activeClassName="active-link"
-              onClick={handleNavLinkClick}
-            >
-              <FontAwesomeIcon
-                icon={faBookOpen}
-                className="sidebar-heading-icon"
-              />
-              {t("communityGuide")}
-            </NavLink>
-          </li>
+            <li className="sidebar-heading">{t("communityTitle")}</li>
+            <li>
+              <NavLink
+                to="/contribute"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faCloudUpload}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityUploadModels")}
+              </NavLink>
+            </li>
+            <li className="mb-3">
+              <a href={GetDiscordLink()} target="_blank" rel="noreferrer">
+                <FontAwesomeIcon
+                  icon={faDiscord}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityDiscord")}
+              </a>
+              <NavLink
+                to="/leaderboard"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faTrophy}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityLeaderboard")}
+              </NavLink>
+              <NavLink
+                to="/guide"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faBookOpen}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityGuide")}
+              </NavLink>
+            </li>
 
-          <div className="px-4 d-flex d-lg-none gap-2 mb-2">
-            {userOrLoginButton}
-            {signupOrLogOutButton}
-          </div>
-        </ul>
-      </div>
-
-      {/* Mobile Searchbar */}
-      {isMobileSearchBarVisible && (
-        <div className="topbar-mobile-search-bar-container">
-          <div className="topbar-mobile-search-bar">
-            <SearchBar
-              onFocus={onFocusHandler}
-              onBlur={onBlurHandler}
-              isFocused={isFocused}
-              autoFocus={true}
-            />
-
-            <Button
-              icon={faXmark}
-              className="close-search-button"
-              onClick={() => {
-                setIsMobileSearchBarVisible(false);
-              }}
-            />
-          </div>
+            <div className="px-4 d-flex d-lg-none gap-2 mb-2">
+              {userOrLoginButton}
+              {signupOrLogOutButton}
+            </div>
+          </ul>
         </div>
-      )}
-    </div>
+
+        {/* Mobile Searchbar */}
+        {isMobileSearchBarVisible && (
+          <div className="topbar-mobile-search-bar-container">
+            <div className="topbar-mobile-search-bar">
+              <SearchBar
+                onFocus={onFocusHandler}
+                onBlur={onBlurHandler}
+                isFocused={isFocused}
+                autoFocus={true}
+              />
+
+              <Button
+                icon={faXmark}
+                className="close-search-button"
+                onClick={() => {
+                  setIsMobileSearchBarVisible(false);
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
