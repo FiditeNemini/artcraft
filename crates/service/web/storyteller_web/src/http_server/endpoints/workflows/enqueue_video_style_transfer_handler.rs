@@ -23,6 +23,7 @@ use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowA
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::str_to_bool::str_to_bool;
+use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
 use primitives::try_str_to_num::try_str_to_num;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
@@ -346,8 +347,8 @@ pub async fn enqueue_video_style_transfer_handler(
         creator_visibility: Some(set_visibility),
         trim_start_milliseconds: Some(trim_start_millis),
         trim_end_milliseconds: Some(trim_end_millis),
-        positive_prompt: request.prompt.clone(),
-        negative_prompt: request.negative_prompt.clone(),
+        positive_prompt: request.prompt.new_string_trim_or_empty(),
+        negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
         enable_lipsync: request.enable_lipsync,
         maybe_input_file: Some(request.input_file.clone()),
         remove_watermark,

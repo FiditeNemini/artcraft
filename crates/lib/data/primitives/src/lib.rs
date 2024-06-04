@@ -19,4 +19,6 @@
 #![allow(non_snake_case)]
 
 pub mod str_to_bool;
+pub mod traits;
+pub mod trim_or_empty;
 pub mod try_str_to_num;
