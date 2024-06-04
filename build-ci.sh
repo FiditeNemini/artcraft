@@ -46,6 +46,9 @@ find . -type f -exec sed -i "s${d}%BUILD_BASE_API%${d}${BASE_API}${d}g" {} +
 find . -type f -exec sed -i "s${d}%BUILD_GOOGLE_API%${d}${GOOGLE_API}${d}g" {} +
 find . -type f -exec sed -i "s${d}%BUILD_FUNNEL_API%${d}${FUNNEL_API}${d}g" {} +
 find . -type f -exec sed -i "s${d}%BUILD_CDN_API%${d}${CDN_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%BUILD_UPLOAD_VIDEO%${d}${UPLOAD_VIDEO_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%BUILD_MEDIA_VIDEO%${d}${MEDIA_VIDEO_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%BUILD_GRAVATAR_VIDEO%${d}${GRAVATAR_API}${d}g" {} +
 
 # TODO: Run tests when we add them.
 
