@@ -22,7 +22,7 @@ import {
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useLocalize, useModal, useSession } from "hooks";
@@ -193,6 +193,9 @@ export default function TopNav({
   //   // { id: 4, name: "Text to Image", link: "/text-to-image" },
   // ];
 
+  const location = useLocation();
+  const topBarWrapper = document.getElementById("topbar-wrapper");
+
   useEffect(() => {
     const pageContentWrapper = document.getElementById("page-content-wrapper");
 
@@ -208,14 +211,14 @@ export default function TopNav({
     }
   }, [domain.titlePart, isOnLandingPage, isOnBetaKeyRedeemPage]);
 
-  const topBarWrapper = document.getElementById("topbar-wrapper");
-
   if (
     topBarWrapper &&
     domain.titlePart === "Storyteller AI" &&
     isOnLandingPage
   ) {
     topBarWrapper.classList.add("topbar-hide-top");
+  } else {
+    topBarWrapper?.classList.remove("topbar-hide-top");
   }
 
   useEffect(() => {
@@ -238,7 +241,7 @@ export default function TopNav({
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [domain.titlePart, isOnLandingPage, topBarWrapper]);
+  }, [domain.titlePart, isOnLandingPage, topBarWrapper, location]);
 
   if (isOnBetaKeyRedeemPage) {
     return null;
@@ -351,15 +354,27 @@ export default function TopNav({
         isOnLandingPage &&
         !isScrolled && (
           <div
-            className="position-fixed top-0 end-0 pe-3 ps-3 topbar-bg-dark d-flex align-items-center gap-2"
+            className="position-fixed top-0 end-0 pe-3 ps-3 d-flex align-items-center gap-2"
             style={{
               zIndex: 20,
               height: "65px",
               borderRadius: "0 0 0 0.75rem",
+              backgroundColor: "#242433",
             }}
           >
             {loggedIn ? (
-              profileDropdown
+              <div className="d-flex gap-2 align-items-center">
+                <Button
+                  {...{
+                    icon: faClipboardList,
+                    label: "My Jobs",
+                    onClick: openModal,
+                    variant: "secondary",
+                    small: true,
+                  }}
+                />
+                {profileDropdown}
+              </div>
             ) : (
               <>
                 <Button
