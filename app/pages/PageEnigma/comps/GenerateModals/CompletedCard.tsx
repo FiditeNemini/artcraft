@@ -43,12 +43,12 @@ export function CompletedCard({ movie, setMovieId }: Props) {
       }}
     >
       <div className="flex gap-4">
-        <div className="rounded-lg">
+        <div className="flex h-32 w-32 justify-center rounded-lg bg-ui-background">
           <img
             src={
               loadError ? "/resources/images/movie-placeholder.png" : imageUrl
             }
-            className="aspect-video w-36 rounded-lg object-cover"
+            className="h-full object-contain"
             alt={movie.maybe_title ?? "unknown"}
             crossOrigin="anonymous"
             onError={() => setLoadError(true)}

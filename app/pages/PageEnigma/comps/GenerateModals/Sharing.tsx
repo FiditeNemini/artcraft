@@ -68,7 +68,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
     >
       <div className="flex gap-6 px-5 pb-5">
         <div className="max-h-[420px] w-full overflow-hidden rounded-lg">
-          <video controls crossOrigin="anonymous" width="100%">
+          <video controls crossOrigin="anonymous" className="h-full w-full">
             <source
               src={`${environmentVariables.value.GOOGLE_API}/vocodes-public${mediaFile?.public_bucket_path}`}
               type="video/mp4"
