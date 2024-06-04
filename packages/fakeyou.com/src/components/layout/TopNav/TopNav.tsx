@@ -193,7 +193,6 @@ export default function TopNav({
   //   // { id: 4, name: "Text to Image", link: "/text-to-image" },
   // ];
 
-  const location = useLocation();
   const topBarWrapper = document.getElementById("topbar-wrapper");
 
   useEffect(() => {
@@ -241,7 +240,7 @@ export default function TopNav({
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [domain.titlePart, isOnLandingPage, topBarWrapper, location]);
+  }, [domain.titlePart, isOnLandingPage, topBarWrapper]);
 
   if (isOnBetaKeyRedeemPage) {
     return null;
