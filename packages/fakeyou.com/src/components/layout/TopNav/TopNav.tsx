@@ -22,7 +22,7 @@ import {
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
+import { Link, NavLink, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useLocalize, useModal, useSession } from "hooks";
