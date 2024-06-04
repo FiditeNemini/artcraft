@@ -7,7 +7,15 @@ import { AudioMediaItem } from "~/pages/PageEnigma/models";
 export const userMovies = signal<MediaInfo[] | undefined>(undefined);
 
 export const setUserMovies = (newSet: MediaInfo[]) => {
-  userMovies.value = newSet;
+  const userMoviesTokens = (userMovies.value || []).map((movie) => movie.token);
+  const newSetTokens = newSet.map((newSetMovie) => newSetMovie.token);
+  const isSameTokens =
+    userMoviesTokens.length === newSetTokens.length &&
+    newSetTokens.every((token) => userMoviesTokens.includes(token));
+  if (!isSameTokens) {
+    userMovies.value = newSet;
+  }
+  //else do nothing cos it's the same list;
 };
 
 //Signal for background loading User's Audio Items.
