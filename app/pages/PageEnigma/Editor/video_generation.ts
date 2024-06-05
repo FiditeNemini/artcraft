@@ -215,8 +215,9 @@ export class VideoGeneration {
       "anullsrc", // This adds a silent audio track
       "-max_muxing_queue_size",
       "999999",
-      // "-vf",
-      // "select=gte(n\\,1),scale=1024:576", // scale=1024:576
+      "-vf",
+      "select=gte(n\\,1)",
+      // "select=gte(n\\,1),scale=1024:576",
       "-c:v",
       "libx264", // Specify video codec (optional, but recommended for MP4)
       "-c:a",
