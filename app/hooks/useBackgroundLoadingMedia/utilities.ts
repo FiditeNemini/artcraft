@@ -13,6 +13,7 @@ import {
   setUserAudioItems,
   setUserMovies,
   userMovies,
+  isRetreivingAudioItems,
 } from "~/signals";
 const { userInfo } = authentication;
 
@@ -43,6 +44,7 @@ export function PollUserAudioItems() {
     //do nothing return if login info does not exist
     return;
   }
+  isRetreivingAudioItems.value = true;
   return GetMediaByUser(
     userInfo.value.username,
     {},
@@ -51,9 +53,11 @@ export function PollUserAudioItems() {
     },
   )
     .then((res: GetMediaListResponse) => {
+      isRetreivingAudioItems.value = false;
       setUserAudioItems(res.results);
     })
     .catch(() => {
+      isRetreivingAudioItems.value = false;
       addToast(ToastTypes.ERROR, "Unknown Error in Loading My Audio Items");
     });
 }

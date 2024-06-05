@@ -1,5 +1,5 @@
+import { useSignals } from "@preact/signals-react/runtime";
 import { twMerge } from "tailwind-merge";
-import { Button, ButtonIcon, Tooltip } from "~/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBlinds,
@@ -7,21 +7,21 @@ import {
   faCameraViewfinder,
   faSpinnerThird,
 } from "@fortawesome/pro-solid-svg-icons";
-import Queue from "~/pages/PageEnigma/Queue/Queue";
-import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+
+import Queue, { QueueNames } from "~/pages/PageEnigma/Queue";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+
 import {
   cameraAspectRatio,
   editorState,
-} from "~/pages/PageEnigma/signals/engine";
-import { useSignals } from "@preact/signals-react/runtime";
-import {
   editorLetterBox,
   sidePanelHeight,
   toggleEditorLetterBox,
-} from "../../signals";
+} from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio, EditorStates } from "~/pages/PageEnigma/enums";
-import { CameraViewCanvas } from "../EngineCanvases";
+import { CameraViewCanvas } from "~/pages/PageEnigma/comps/EngineCanvases";
+
+import { Button, ButtonIcon, Tooltip } from "~/components";
 
 export const PreviewEngineCamera = () => {
   useSignals();

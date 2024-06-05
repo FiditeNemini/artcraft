@@ -23,6 +23,7 @@ export const Letterbox = ({
   useSignals();
 
   if (editorState.value !== EditorStates.CAMERA_VIEW || !isShowing) {
+    console.log("The Letterbox is loading.");
     return;
   }
 
@@ -45,9 +46,7 @@ export const Letterbox = ({
     width,
     height,
   });
-  console.log(matteOri, "matteOri");
-  console.log(matteWidth, "matteWidth");
-  console.log(matteHeight, "matteHeight");
+
   return (
     <div
       id="letterbox"

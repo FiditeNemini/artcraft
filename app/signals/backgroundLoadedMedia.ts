@@ -46,6 +46,8 @@ export const setUserAudioItems = (newSet: MediaInfo[]) => {
   userAudioItems.value = morphedNewSet;
 };
 
+export const isRetreivingAudioItems = signal<boolean>(false);
+
 export const cancelNewFromAudioItem = (mediaId: string) => {
   if (!userAudioItems.value || userAudioItems.value.length === 0) {
     return;

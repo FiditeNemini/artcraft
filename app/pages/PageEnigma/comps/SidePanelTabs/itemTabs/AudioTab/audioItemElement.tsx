@@ -4,11 +4,9 @@ import { WaveformPlayer, H5, H6 } from "~/components";
 import { AudioMediaItem } from "~/pages/PageEnigma/models";
 
 import { AudioTypePill } from "./audioTypePills";
-import {
-  cancelNewFromAudioItem,
-  updateAudioItemLength,
-  updateDemoAudioItemLength,
-} from "~/pages/PageEnigma/signals";
+import { cancelNewFromAudioItem, updateAudioItemLength } from "~/signals";
+import { updateDemoAudioItemLength } from "~/pages/PageEnigma/signals";
+
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {

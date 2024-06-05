@@ -25,7 +25,7 @@ export const EditorCanvas = () => {
 
 export const CameraViewCanvas = ({ className }: { className?: string }) => {
   const editorEngine = useContext(EngineContext);
-
+  // TODO PATCH WIL
   const canvasCallbackRef = useCallback(
     (node: HTMLCanvasElement) => {
       if (node && editorEngine) {

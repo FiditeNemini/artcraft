@@ -1,5 +1,5 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { isRetreivingAudioItems } from "~/pages/PageEnigma/signals";
+import { isRetreivingAudioItems } from "~/signals";
 import { AudioItemElement } from "./audioItemElement";
 import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
