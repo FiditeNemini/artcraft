@@ -15,6 +15,7 @@ export interface MediaFile {
   maybe_engine_extension: string | null;
   maybe_batch_token: string;
   maybe_title: string | null;
+  maybe_style_name: string | null;
   maybe_original_filename: string | null;
   maybe_creator_user: UserDetailsLight | null;
   maybe_prompt_token: string | null;
@@ -31,10 +32,10 @@ export interface MediaFile {
   maybe_scene_source_media_file_token: string | null;
   cover_image: {
     default_cover: {
-      color_index: number,
-      image_index: number
-    },
-    maybe_cover_image_public_bucket_path: string | null
+      color_index: number;
+      image_index: number;
+    };
+    maybe_cover_image_public_bucket_path: string | null;
   };
   maybe_moderator_fields?: MediaFileModeratorFields;
   created_at: Date;

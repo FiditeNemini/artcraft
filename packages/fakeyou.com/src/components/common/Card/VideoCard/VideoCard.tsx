@@ -7,6 +7,7 @@ import Button from "components/common/Button";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Link } from "react-router-dom";
 import getCardUrl from "../getCardUrl";
+import { STYLES_BY_KEY } from "common/StyleOptions";
 
 interface VideoCardProps {
   bookmarks?: any;
@@ -128,6 +129,10 @@ export default function VideoCard({
     bucketImageUrl,
   ]);
 
+  const styleLabel = STYLES_BY_KEY.has(data.maybe_style_name)
+    ? STYLES_BY_KEY.get(data.maybe_style_name)?.label
+    : "Unknown Style";
+
   const card = (
     <Card
       padding={false}
@@ -165,9 +170,13 @@ export default function VideoCard({
             <div className="card-img-overlay-text">
               <div>
                 <h6 className="fw-semibold text-white mb-1">
-                  {data.weight_name}
+                  {data.maybe_title}
                 </h6>
-                <p className="fs-7 opacity-75">{timeAgo}</p>
+                <p className="fs-7 opacity-75">
+                  {timeAgo}
+                  <span className="px-2">•</span>
+                  {styleLabel}
+                </p>
                 {/* <CardFooter
                   {...{
                     creator: data?.maybe_creator,
