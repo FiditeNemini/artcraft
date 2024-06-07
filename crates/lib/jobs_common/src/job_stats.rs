@@ -120,7 +120,7 @@ impl JobStats {
       })
    }
 
-   pub fn start_job(&self, job_token: &str) -> AnyhowResult<SuccessAndFailureStats> {
+   pub fn record_job_start(&self, job_token: &str) -> AnyhowResult<SuccessAndFailureStats> {
       // NB: lock errors can't be moved between threads, so we change their type
       let mut lock = self.inner.write()
           .map_err(|e| anyhow!("lock error: {:?}", e))?;
@@ -137,7 +137,7 @@ impl JobStats {
       })
    }
 
-   pub fn end_job(&self) -> AnyhowResult<SuccessAndFailureStats> {
+   pub fn record_job_end(&self) -> AnyhowResult<SuccessAndFailureStats> {
       // NB: lock errors can't be moved between threads, so we change their type
       let mut lock = self.inner.write()
           .map_err(|e| anyhow!("lock error: {:?}", e))?;

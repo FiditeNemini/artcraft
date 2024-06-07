@@ -127,6 +127,8 @@ async fn do_process_single_job(
   // TODO(bt, 2023-01-11): Restore an optional status logger
   //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
+  let _stats = job_dependencies.job.info.job_stats.record_job_start(job.inference_job_token.as_str()).ok();
+
   let job_start_time = Instant::now();
 
   // ==================== HANDLE KEEPALIVE (OPTIONAL) ==================== //

@@ -134,6 +134,8 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
     let result = process_single_job(job_dependencies, &job).await;
     let job_duration = Instant::now().duration_since(start_time);
 
+    let _stats = job_dependencies.job.info.job_stats.record_job_end().ok();
+
     let model_type_str = match job.maybe_model_type {
       Some(model_type) => model_type.to_string(),
       None => "unknown".to_string(),
@@ -144,7 +146,6 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       OtelAttribute::new("job_model", model_type_str),
       OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
     ];
-
 
     let managed_result =  match result {
       Ok(success_case) => {
@@ -175,10 +176,16 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       }
     };
 
-    job_duration_instrumentation_attributes.push(OtelAttribute::new("job_status", managed_result.is_err().then(|| "possibly_failed").unwrap_or("possibly_succeeded")));
+    job_duration_instrumentation_attributes.push(OtelAttribute::new(
+      "job_status",
+      managed_result
+          .is_err()
+          .then(|| "possibly_failed")
+          .unwrap_or("possibly_succeeded")));
 
-    job_dependencies.job_instruments.job_duration.record(job_duration.as_millis() as u64,
-        &job_duration_instrumentation_attributes);
+    job_dependencies.job_instruments.job_duration.record(
+      job_duration.as_millis() as u64,
+      &job_duration_instrumentation_attributes);
   }
   Ok(())
 }
