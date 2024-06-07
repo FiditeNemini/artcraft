@@ -4,6 +4,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
+use chrono::{DateTime, Duration, Utc};
 use log::error;
 
 use actix_helpers::response_serializers::error_to_json_http_response::error_to_json_http_response;
@@ -25,8 +26,20 @@ pub struct HealthCheckResponse {
 
   pub total_failure_ratio: f32,
   pub total_success_ratio: f32,
+
+  /// If the process is currently executing a job, this will be true.
+  pub is_currently_running_job: bool,
+
+  /// If the process is currently executing a job, this will be the job's metadata.
+  pub maybe_current_job: Option<JobDetail>,
 }
 
+#[derive(Serialize)]
+pub struct JobDetail {
+  pub job_token: String,
+  pub started_at: DateTime<Utc>,
+  pub duration_millis: u64,
+}
 
 // =============== Error Response ===============
 
@@ -92,6 +105,17 @@ pub async fn get_health_check_handler(
     total_success_count: job_stats.total_success_count,
     total_failure_ratio,
     total_success_ratio,
+    is_currently_running_job: job_stats.maybe_current_job.is_some(),
+    maybe_current_job: job_stats.maybe_current_job.map(|job| {
+      JobDetail {
+        job_token: job.job_token.clone(),
+        started_at: job.job_started_at,
+        duration_millis: Utc::now()
+            .signed_duration_since(job.job_started_at)
+            .num_milliseconds()
+            .unsigned_abs(),
+      }
+    }),
   };
 
   let body = serde_json::to_string(&response)
