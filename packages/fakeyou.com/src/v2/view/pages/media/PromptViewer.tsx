@@ -5,6 +5,7 @@ import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia"
 import { Button, Panel } from "components/common";
 import { STYLES_BY_KEY } from "common/StyleOptions";
 import { faCopy } from "@fortawesome/pro-solid-svg-icons";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface PromptViewerProps {
   isModerator: boolean;
@@ -37,25 +38,43 @@ export default function PromptViewer({
     <>
       {prompt.maybe_positive_prompt && (
         <Panel padding={true} className="mt-3">
-          <div className="d-flex gap-3 align-items-center mb-2">
-            <h6 className="fw-semibold mb-0 flex-grow-1">Prompt</h6>
-            <Button
-              icon={faCopy}
-              onClick={() =>
-                copyToClipboard(
-                  prompt.maybe_positive_prompt || "",
-                  setCopyPositiveButtonText
-                )
-              }
-              label={copyPositiveButtonText}
-              variant="link"
-              className="fs-7"
-            />
-          </div>
-          <div className="panel-inner p-2 rounded">
-            <p className="fs-7">{prompt.maybe_positive_prompt}</p>
-          </div>
+          {isModerator && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Download</h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  <a href={
+                    new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path.replace('.mp4', '.no_watermark.mp4'))
+                  }>Download Without Watermark</a>
 
+                </p>
+              </div>
+            </>
+          )}
+          {prompt.maybe_positive_prompt && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Prompt</h6>
+                <Button
+                  icon={faCopy}
+                  onClick={() =>
+                    copyToClipboard(
+                      prompt.maybe_positive_prompt || "",
+                      setCopyPositiveButtonText
+                    )
+                  }
+                  label={copyPositiveButtonText}
+                  variant="link"
+                  className="fs-7"
+                />
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">{prompt.maybe_positive_prompt}</p>
+              </div>
+            </>
+          )}
           {prompt.maybe_negative_prompt && (
             <>
               <div className="d-flex gap-3 align-items-center mb-2 mt-3">
