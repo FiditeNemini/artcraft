@@ -67,6 +67,7 @@ describe('media files', () => {
       maybe_media_subtype: null,
       maybe_prompt_token: null,
       maybe_title: null,
+      maybe_style_name: 'style_name_here',
       maybe_original_filename: null,
       maybe_engine_extension: null,
       public_bucket_path: "path/to/file",
