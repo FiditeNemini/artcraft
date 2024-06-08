@@ -10,6 +10,7 @@ SET
     maybe_loyalty_program_key = 'fakeyou_contributor',
     user_role_slug = "admin"
 WHERE username IN (
+  '48hourfilm',
   'intro_video',
   'zzz_last_item'
 )
