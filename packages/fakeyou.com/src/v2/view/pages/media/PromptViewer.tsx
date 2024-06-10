@@ -47,8 +47,7 @@ export default function PromptViewer({
                 <p className="fs-7">
                   <a href={
                     new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path.replace('.mp4', '.no_watermark.mp4'))
-                  }>Download Without Watermark</a>
-
+                  }>Download Without Watermark</a> (Staff Only)
                 </p>
               </div>
             </>
