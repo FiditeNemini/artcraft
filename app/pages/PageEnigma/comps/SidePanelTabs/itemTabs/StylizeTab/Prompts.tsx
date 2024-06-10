@@ -66,6 +66,7 @@ export const Prompts = ({ selection }: Props) => {
       editorEngine.positive_prompt = randomText;
     }
     promptsStore.isUserInputPositive.value = false;
+    Editor.positive_prompt = randomText;
     promptsStore.textBufferPositive.value = randomText;
   };
 
