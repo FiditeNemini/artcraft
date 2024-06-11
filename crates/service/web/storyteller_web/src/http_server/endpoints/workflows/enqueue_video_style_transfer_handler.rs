@@ -31,6 +31,7 @@ use users_component::session::lookup::user_session_extended::UserSessionExtended
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
+use crate::http_server::endpoints::workflows::coordinate_workflow_args::{coordinate_workflow_args, CoordinatedWorkflowArgs};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
@@ -289,7 +290,6 @@ pub async fn enqueue_video_style_transfer_handler(
         .or(maybe_user_preferred_visibility)
         .unwrap_or(Visibility::Public);
 
-
     let mut trim_start_millis = request.trim_start_millis.unwrap_or(0);
     let mut trim_end_millis = request.trim_end_millis.unwrap_or(DEFAULT_TRIM_MILLISECONDS_END);
 
@@ -318,29 +318,28 @@ pub async fn enqueue_video_style_transfer_handler(
         })
         .transpose()?;
 
-    // Must have paid plan to remove watermark
-    let remove_watermark = request.remove_watermark
-        .map(|remove_watermark| remove_watermark && has_paid_plan);
+    let coordinated_args = CoordinatedWorkflowArgs {
+        use_lipsync: request.use_lipsync
+            .or_else(|| {
+                get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
+                    .map(|value| str_to_bool(&value))
+            }),
+        use_face_detailer: request.use_face_detailer,
+        use_upscaler: request.use_upscaler,
+        remove_watermark: request.remove_watermark,
+        disable_lcm: request.disable_lcm
+            .or_else(|| {
+                get_request_header_optional(&http_request, "DISABLE-LCM")
+                    .map(|value| str_to_bool(&value))
+            }),
+        use_cinematic: request.use_cinematic
+            .or_else(|| {
+                get_request_header_optional(&http_request, "USE-CINEMATIC")
+                    .map(|value| str_to_bool(&value))
+            }),
+    };
 
-    let lipsync_enabled = request.use_lipsync
-        .or_else(|| {
-            get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
-                .map(|value| str_to_bool(&value))
-        });
-
-    let disable_lcm = request.disable_lcm
-        .or_else(|| {
-            get_request_header_optional(&http_request, "DISABLE-LCM")
-                .map(|value| str_to_bool(&value))
-        })
-        .and_then(|disable_lcm| Some(disable_lcm && is_staff)); // Only staff can disable LCM
-
-    let use_cinematic = request.use_cinematic
-        .or_else(|| {
-            get_request_header_optional(&http_request, "USE-CINEMATIC")
-                .map(|value| str_to_bool(&value))
-        })
-        .and_then(|use_cinematic| Some(use_cinematic && is_staff)); // Only staff can use cinematic
+    let coordinated_args = coordinate_workflow_args(coordinated_args, is_staff || has_paid_plan);
 
     let inference_args = WorkflowArgs {
         style_name: Some(request.style),
@@ -349,9 +348,7 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_end_milliseconds: Some(trim_end_millis),
         positive_prompt: request.prompt.new_string_trim_or_empty(),
         negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
-        enable_lipsync: request.enable_lipsync,
         maybe_input_file: Some(request.input_file.clone()),
-        remove_watermark,
         // The new, simplified enqueuing doesn't care about the following parameters:
         maybe_lora_model: None,
         maybe_json_modifications: None,
@@ -364,6 +361,7 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
+
         // TODO: Get rid of the temporary flags.
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
             .map(|value| str_to_bool(&value)),
@@ -371,12 +369,17 @@ pub async fn enqueue_video_style_transfer_handler(
             .map(|value| str_to_bool(&value)),
         sleep_millis: get_request_header_optional(&http_request, "SLEEP-MILLIS")
             .and_then(|value| try_str_to_num(&value).ok()),
-        use_face_detailer: request.use_face_detailer,
-        use_upscaler: request.use_upscaler,
-        lipsync_enabled,
-        disable_lcm,
-        use_cinematic,
         strength: maybe_strength,
+
+        remove_watermark: coordinated_args.remove_watermark,
+        use_face_detailer: coordinated_args.use_face_detailer,
+        use_upscaler: coordinated_args.use_upscaler,
+        disable_lcm: coordinated_args.disable_lcm,
+        use_cinematic: coordinated_args.use_cinematic,
+
+        // TODO: What's the difference here?
+        lipsync_enabled: coordinated_args.use_lipsync,
+        enable_lipsync: coordinated_args.use_lipsync,
     };
 
     info!("Creating ComfyUI job record...");
