@@ -40,11 +40,17 @@ If you can use chat gpt to create the interface.
 
 - `studio-testing` - The testing branch.
 
-  Anyone can push their changes to this branch for testing in a production-like environment. Since it is built and hosted on https://studio-testing.studio.storyteller.ai ,
-  you won't face CORS issues, same-site cookie issues, or have to use a local development proxy. (This doesn't obviate the need for a development
-  proxy for fast development iteration, but is a fantastic way to test your changes in a "production-like" environment.)
+<<<<<<< HEAD
+Anyone can push their changes to this branch for testing in a production-like environment. Since it is built and hosted on https://studio-testing.studio.storyteller.ai ,
+you won't face CORS issues, same-site cookie issues, or have to use a local development proxy. (This doesn't obviate the need for a development
+proxy for fast development iteration, but is a fantastic way to test your changes in a "production-like" environment.)
+=======
+Anyone can push their changes to this branch for testing in a production-like environment. Since it is built and hosted on https://studio-testing.studio.storyteller.ai ,
+you won't face CORS issues, same-site cookie issues, or have to use a local development proxy.
 
-  Force push to this branch by using `git push -f origin studio-testing`
+> > > > > > > f4a06fca (Update README.md)
+
+Force push to this branch by using `git push -f origin studio-testing`
 
 ## API Docs
 
