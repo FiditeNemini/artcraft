@@ -270,6 +270,8 @@ class Editor {
   }
 
   containerMayReset() {
+    //TODO: we should not need this, if the container is reset,
+    // updateSceneContainer should update the reference in the editor
     if (!this.container) {
       console.warn(
         "Editor - Container does not exist, querying from DOM via document.getElementById",
@@ -277,7 +279,12 @@ class Editor {
       this.container = document.getElementById("video-scene-container");
     }
   }
+  updateSceneContainer(newContainer: HTMLDivElement) {
+    this.container = newContainer;
+  }
   engineCanvasMayReset() {
+    //TODO: we should not need this, if the this canvas is reset,
+    // updateEngineCanvas should update the reference in the editor
     if (!this.canvReference) {
       console.warn(
         "Editor - Engine Canbas does not exist, querying from DOM via document.getElementById",
@@ -287,7 +294,12 @@ class Editor {
       ) as HTMLCanvasElement;
     }
   }
+  updateEngineCanvas(newCanvas: HTMLCanvasElement) {
+    this.canvReference = newCanvas;
+  }
   camViewCanvasMayReset() {
+    //TODO: we should not need this, if the this canvas is reset,
+    // updateCamViewCanvas should update the reference in the editor
     if (!this.canvasRenderCamReference) {
       console.warn(
         "Editor - Cam View Canvas does not exist, querying from DOM via document.getElementById",

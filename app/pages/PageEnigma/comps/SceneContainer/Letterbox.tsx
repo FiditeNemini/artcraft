@@ -23,7 +23,7 @@ export const Letterbox = ({
   useSignals();
 
   if (editorState.value !== EditorStates.CAMERA_VIEW || !isShowing) {
-    console.log("The Letterbox is loading.");
+    //case of Letterbox should not show
     return;
   }
 

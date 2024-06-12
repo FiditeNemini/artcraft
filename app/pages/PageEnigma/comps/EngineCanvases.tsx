@@ -1,13 +1,17 @@
 import { useCallback, useContext } from "react";
-import { EngineContext } from "../contexts/EngineContext";
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 
 export const EditorCanvas = () => {
   const editorEngine = useContext(EngineContext);
 
   const canvasCallbackRef = useCallback(
     (node: HTMLCanvasElement) => {
-      if (node && editorEngine && editorEngine.setEditorCanvas) {
-        editorEngine.setEditorCanvas(node);
+      if (node && editorEngine) {
+        if (!editorEngine.canvReference) {
+          editorEngine.setEditorCanvas(node);
+        } else {
+          editorEngine.updateEngineCanvas(node);
+        }
       }
     },
     [editorEngine],
@@ -25,7 +29,6 @@ export const EditorCanvas = () => {
 
 export const CameraViewCanvas = ({ className }: { className?: string }) => {
   const editorEngine = useContext(EngineContext);
-  // TODO PATCH WIL
   const canvasCallbackRef = useCallback(
     (node: HTMLCanvasElement) => {
       if (node && editorEngine) {
