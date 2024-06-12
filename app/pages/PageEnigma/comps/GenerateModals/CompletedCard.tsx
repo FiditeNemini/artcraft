@@ -43,7 +43,7 @@ export function CompletedCard({ movie, setMovieId }: Props) {
       }}
     >
       <div className="flex gap-4">
-        <div className="flex h-32 w-32 justify-center rounded-lg bg-ui-background">
+        <div className="flex h-32 w-32 justify-center overflow-hidden rounded-lg bg-ui-background">
           <img
             src={
               loadError ? "/resources/images/movie-placeholder.png" : imageUrl
