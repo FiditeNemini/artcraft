@@ -107,7 +107,7 @@ export const PreviewEngineCamera = () => {
             <FontAwesomeIcon icon={faSpinnerThird} size={"3x"} spin />
           </div>
           <div className="absolute left-0 top-0 h-full w-full">
-            <CameraViewCanvas className="h-full w-full" />
+            <CameraViewCanvas className="!h-full !w-full" />
           </div>
         </div>
       </div>
