@@ -24,6 +24,32 @@ No use of any type.
 If you can use chat gpt to create the interface.
 ```
 
+## Branches
+
+- `main` - The main branch is the production source of truth.
+
+  Changes to main will automatically build, but will not auto-deploy to production. You'll have to promote changes to production using the Netlify control panel.
+
+  Merge your code to main frequently. If you have to have a long-lived set of changes, ask yourself whether it might be better to feature flag your code off and
+  land it to main rather than fight rebasing against the whole team.
+
+- `studio-staging` - The staging auto-deploy branch.
+
+  You do not ever need to interact with this branch. Changes to `main` will automatically be pushed to `studio-staging` and auto-deployed to
+  https://studio-staging.studio.storyteller.ai . You can test changes that have landed in `main` here before promoting them to production.
+
+- `studio-testing` - The testing branch.
+
+  Anyone can push their changes to this branch for testing in a production-like environment. Since it is built and hosted on https://studio-testing.studio.storyteller.ai ,
+  you won't face CORS issues, same-site cookie issues, or have to use a local development proxy. (This doesn't obviate the need for a development
+  proxy for fast development iteration, but is a fantastic way to test your changes in a "production-like" environment.)
+
+  Force push to this branch by using `git push -f origin studio-testing`
+
+## API Docs
+
+Server API docs live here: https://storyteller-docs.netlify.app/
+
 ## Local Testing & Development
 
 ### Set up `.env` and the Proxy Server
@@ -41,8 +67,11 @@ npm i
 To start the proxy run:
 
 ```
-node proxy.js
+npm run dev
 ```
+
+If the proxy fails, make sure your node version is 18.18. If you need to change the node version
+run `npm rebuild` once before re-running `npm run dev`
 
 ### Run the Code Locally
 
