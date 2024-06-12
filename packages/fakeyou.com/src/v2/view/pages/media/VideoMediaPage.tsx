@@ -26,6 +26,7 @@ import {
   faArrowRightArrowLeft,
   faCheck,
   faPen,
+  faStars,
   faTrash,
   faX,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -58,6 +59,8 @@ export default function DevMediaPage({
     editingTitle,
     basicTransition({ ...events })
   );
+
+  console.log("😎", mediaFile);
 
   const saveTitle = () => {
     editingTitleSet(EditingTitleState.saving);
@@ -215,9 +218,22 @@ export default function DevMediaPage({
                   icon: faArrowRightArrowLeft,
                   label: "Style Transfer",
                   to: `/style-video/${mediaFile?.token || ""}`,
+                  variant: "secondary",
                 }}
               />
             )}
+            {canAccessStudio() &&
+              mediaFile?.maybe_scene_source_media_file_token && (
+                <Button
+                  {...{
+                    icon: faStars,
+                    label: "Remix",
+                    href: `https://studio.storyteller.ai/${
+                      mediaFile?.maybe_scene_source_media_file_token || ""
+                    }`,
+                  }}
+                />
+              )}
           </div>
         </header>
         <div
