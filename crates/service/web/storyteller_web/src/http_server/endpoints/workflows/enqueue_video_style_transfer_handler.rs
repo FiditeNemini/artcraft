@@ -76,7 +76,12 @@ pub struct EnqueueVideoStyleTransferRequest {
     
     /// The negative prompt (optional)
     negative_prompt: Option<String>,
-    
+
+    /// Use Strength of the style transfer
+    /// Must be between 0.0 (match source) and 1.0 (maximum dreaming).
+    /// The default, if not sent, is 1.0.
+    use_strength: Option<f32>,
+
     /// Optional trim start in milliseconds
     trim_start_millis: Option<u64>,
     
@@ -86,20 +91,12 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Enable lipsyncing in the workflow
     enable_lipsync: Option<bool>,
 
-    /// Remove watermark from the output
-    /// Only for premium accounts
-    remove_watermark: Option<bool>,
-
     /// Use lipsync in the workflow
     use_lipsync: Option<bool>,
 
-    /// Use face detailer
+    /// Remove watermark from the output
     /// Only for premium accounts
-    use_face_detailer: Option<bool>,
-
-    /// Use video upscaler
-    /// Only for premium accounts
-    use_upscaler: Option<bool>,
+    remove_watermark: Option<bool>,
 
     /// Disable LCM
     /// Don't let ordinary users do this.
@@ -110,10 +107,13 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Don't let ordinary users do this.
     use_cinematic: Option<bool>,
 
-    /// Use Strength of the style transfer
-    /// Must be between 0.0 (match source) and 1.0 (maximum dreaming).
-    /// The default, if not sent, is 1.0.
-    use_strength: Option<f32>,
+    /// Use face detailer
+    /// Only for premium accounts
+    use_face_detailer: Option<bool>,
+
+    /// Use video upscaler
+    /// Only for premium accounts
+    use_upscaler: Option<bool>,
 
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
@@ -342,13 +342,33 @@ pub async fn enqueue_video_style_transfer_handler(
     let coordinated_args = coordinate_workflow_args(coordinated_args, is_staff || has_paid_plan);
 
     let inference_args = WorkflowArgs {
+        maybe_input_file: Some(request.input_file.clone()),
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
         trim_start_milliseconds: Some(trim_start_millis),
         trim_end_milliseconds: Some(trim_end_millis),
         positive_prompt: request.prompt.new_string_trim_or_empty(),
         negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
-        maybe_input_file: Some(request.input_file.clone()),
+        strength: maybe_strength,
+
+        disable_lcm: coordinated_args.disable_lcm,
+        use_cinematic: coordinated_args.use_cinematic,
+        use_face_detailer: coordinated_args.use_face_detailer,
+        use_upscaler: coordinated_args.use_upscaler,
+        remove_watermark: coordinated_args.remove_watermark,
+
+        // TODO: What's the difference here?
+        lipsync_enabled: coordinated_args.use_lipsync,
+        enable_lipsync: coordinated_args.use_lipsync,
+
+        // TODO: Get rid of the temporary flags.
+        rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
+            .map(|value| str_to_bool(&value)),
+        skip_process_video: get_request_header_optional(&http_request, "SKIP-PROCESS-VIDEO")
+            .map(|value| str_to_bool(&value)),
+        sleep_millis: get_request_header_optional(&http_request, "SLEEP-MILLIS")
+            .and_then(|value| try_str_to_num(&value).ok()),
+
         // The new, simplified enqueuing doesn't care about the following parameters:
         maybe_lora_model: None,
         maybe_json_modifications: None,
@@ -361,25 +381,6 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
-
-        // TODO: Get rid of the temporary flags.
-        rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
-            .map(|value| str_to_bool(&value)),
-        skip_process_video: get_request_header_optional(&http_request, "SKIP-PROCESS-VIDEO")
-            .map(|value| str_to_bool(&value)),
-        sleep_millis: get_request_header_optional(&http_request, "SLEEP-MILLIS")
-            .and_then(|value| try_str_to_num(&value).ok()),
-        strength: maybe_strength,
-
-        remove_watermark: coordinated_args.remove_watermark,
-        use_face_detailer: coordinated_args.use_face_detailer,
-        use_upscaler: coordinated_args.use_upscaler,
-        disable_lcm: coordinated_args.disable_lcm,
-        use_cinematic: coordinated_args.use_cinematic,
-
-        // TODO: What's the difference here?
-        lipsync_enabled: coordinated_args.use_lipsync,
-        enable_lipsync: coordinated_args.use_lipsync,
     };
 
     info!("Creating ComfyUI job record...");
