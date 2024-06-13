@@ -320,6 +320,7 @@ pub async fn enqueue_video_style_transfer_handler(
 
     let coordinated_args = CoordinatedWorkflowArgs {
         use_lipsync: request.use_lipsync
+            .or_else(|| request.enable_lipsync)
             .or_else(|| {
                 get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
                     .map(|value| str_to_bool(&value))
@@ -356,10 +357,8 @@ pub async fn enqueue_video_style_transfer_handler(
         use_face_detailer: coordinated_args.use_face_detailer,
         use_upscaler: coordinated_args.use_upscaler,
         remove_watermark: coordinated_args.remove_watermark,
-
-        // TODO: What's the difference here?
         lipsync_enabled: coordinated_args.use_lipsync,
-        enable_lipsync: coordinated_args.use_lipsync,
+        enable_lipsync: None,
 
         // TODO: Get rid of the temporary flags.
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")

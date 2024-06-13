@@ -123,6 +123,7 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub negative_prompt: Option<String>,
 
+    #[deprecated(note = "Use `lipsync_enabled` instead")]
     #[serde(rename = "el")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enable_lipsync: Option<bool>,
