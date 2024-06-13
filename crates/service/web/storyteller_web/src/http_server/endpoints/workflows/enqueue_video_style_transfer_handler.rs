@@ -358,11 +358,10 @@ pub async fn enqueue_video_style_transfer_handler(
         use_upscaler: coordinated_args.use_upscaler,
         remove_watermark: coordinated_args.remove_watermark,
         lipsync_enabled: coordinated_args.use_lipsync,
-        enable_lipsync: None,
+        enable_lipsync: coordinated_args.use_lipsync, // TODO(bt): We can stop writing this flag after we re-deploy the job.
 
         // TODO: Get rid of the temporary flags.
-        rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
-            .map(|value| str_to_bool(&value)),
+        rollout_python_workflow_args: None,
         skip_process_video: get_request_header_optional(&http_request, "SKIP-PROCESS-VIDEO")
             .map(|value| str_to_bool(&value)),
         sleep_millis: get_request_header_optional(&http_request, "SLEEP-MILLIS")

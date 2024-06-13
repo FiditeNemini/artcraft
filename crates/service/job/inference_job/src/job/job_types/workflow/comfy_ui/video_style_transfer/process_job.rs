@@ -332,41 +332,29 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let positive_prompt_file = work_temp_dir.path().join("positive_prompt.txt");
     let negative_prompt_file = work_temp_dir.path().join("negative_prompt.txt");
 
-    let inference_details;
+    let maybe_positive_prompt_filename = comfy_args.positive_prompt
+        .as_deref()
+        .map(|prompt| {
+            std::fs::write(&positive_prompt_file, prompt)
+                .map(|_| positive_prompt_file.as_path())
+                .map_err(|e| ProcessSingleJobError::IoError(e))
+        })
+        .transpose()?;
 
-    // NB: We're rolling forward to a world where the JSON modifications are performed on the Python side.
-    //let python_side_orchestration = comfy_args.rollout_python_workflow_args.unwrap_or(false);
-    const PYTHON_SIDE_ORCHESTRATION: bool = true;
+    let maybe_negative_prompt_filename = comfy_args.negative_prompt
+        .as_deref()
+        .map(|prompt| {
+            std::fs::write(&negative_prompt_file, prompt)
+                .map(|_| negative_prompt_file.as_path())
+                .map_err(|e| ProcessSingleJobError::IoError(e))
+        })
+        .transpose()?;
 
-    if PYTHON_SIDE_ORCHESTRATION {
-        let maybe_positive_prompt_filename = comfy_args.positive_prompt
-            .as_deref()
-            .map(|prompt| {
-                std::fs::write(&positive_prompt_file, prompt)
-                    .map(|_| positive_prompt_file.as_path())
-                    .map_err(|e| ProcessSingleJobError::IoError(e))
-            })
-            .transpose()?;
-
-        let maybe_negative_prompt_filename = comfy_args.negative_prompt
-            .as_deref()
-            .map(|prompt| {
-                std::fs::write(&negative_prompt_file, prompt)
-                    .map(|_| negative_prompt_file.as_path())
-                    .map_err(|e| ProcessSingleJobError::IoError(e))
-            })
-            .transpose()?;
-
-        inference_details = InferenceDetails::NewPythonArgs {
-            maybe_style: comfy_args.style_name,
-            maybe_positive_prompt_filename,
-            maybe_negative_prompt_filename,
-        }
-    } else {
-        inference_details = InferenceDetails::OldRustArgs {
-            prompt_location: PathBuf::from(&workflow_path),
-        }
-    }
+    let inference_details = InferenceDetails::NewPythonArgs {
+        maybe_style: comfy_args.style_name,
+        maybe_positive_prompt_filename,
+        maybe_negative_prompt_filename,
+    };
 
     let inference_start_time = Instant::now();
 

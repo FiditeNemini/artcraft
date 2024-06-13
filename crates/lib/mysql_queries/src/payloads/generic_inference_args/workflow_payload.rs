@@ -133,6 +133,7 @@ pub struct WorkflowArgs {
     pub remove_watermark: Option<bool>,
 
     // TODO(bt,2024-05-13): This is a temporary rollout flag to enable us to do Python-side mapping of job args
+    #[deprecated(note = "This has been rolled out and is effectively dead.")]
     #[serde(rename = "pa")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rollout_python_workflow_args: Option<bool>,
