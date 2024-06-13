@@ -62,11 +62,12 @@ export const Prompts = ({ selection }: Props) => {
       Math.random() * RandomTextsPositive[selection].length,
     );
     const randomText = RandomTextsPositive[selection][randomIndex];
-    if (editorEngine !== null) {
-      editorEngine.positive_prompt = randomText;
+    if (editorEngine === null) {
+      console.log("Editor is null");
+      return;
     }
     promptsStore.isUserInputPositive.value = false;
-    Editor.positive_prompt = randomText;
+    editorEngine.positive_prompt = randomText;
     promptsStore.textBufferPositive.value = randomText;
   };
 
