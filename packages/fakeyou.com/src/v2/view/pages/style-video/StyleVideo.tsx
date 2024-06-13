@@ -31,6 +31,7 @@ export default function StyleVideo() {
   const [length, lengthSet] = useState(3000);
   const [useFaceDetailer, setUseFaceDetailer] = useState(false);
   const [useUpscaler, setUseUpscaler] = useState(false);
+  const [useCinematic, setUseCinematic] = useState(false);
   const [strength, setStrength] = useState(1.0);
   const { enqueue } = useInferenceJobs();
 
@@ -48,6 +49,7 @@ export default function StyleVideo() {
         trim_end_millis: length,
         trim_start_millis: 0,
         use_face_detailer: useFaceDetailer,
+        use_cinematic: useCinematic,
         use_upscaler: useUpscaler,
         use_strength: strength,
         uuid_idempotency_token: uuidv4(),
@@ -166,6 +168,18 @@ export default function StyleVideo() {
               onChange={() => setUseUpscaler(!useUpscaler)}
               />
             <label className="form-check-label" htmlFor="useUpscaler">Use Upscaler</label>
+          </div>
+        </div>
+        <div {...{ className: "prompt-row" }}>
+          <div className="form-check form-switch w-100">
+            <input 
+              className="form-check-input" 
+              type="checkbox" 
+              id="useCinematic" 
+              checked={useCinematic}
+              onChange={() => setUseCinematic(!useCinematic)}
+              />
+            <label className="form-check-label" htmlFor="useCinematic">Use Cinematic</label>
           </div>
         </div>
 

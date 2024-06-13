@@ -19,6 +19,9 @@ export interface EnqueueVSTRequest {
   // Only for premium accounts
   use_upscaler?: boolean,
 
+  // Use cinematic mode
+  use_cinematic?: boolean,
+
   // Use Strength of the style transfer
   // Must be between 0.0 (match source) and 1.0 (maximum dreaming).
   // The default, if not sent, is 1.0.
