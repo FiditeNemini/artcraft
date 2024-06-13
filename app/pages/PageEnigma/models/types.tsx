@@ -7,6 +7,8 @@ import {
   WeightCategory,
   WeightType,
 } from "~/pages/PageEnigma/enums";
+import { MediaInfo } from "./movies";
+import { Pagination } from "./pagination";
 
 export interface UserDetailsLight {
   user_token: string;
@@ -51,6 +53,11 @@ export interface MediaFile {
     maybe_weight_creator: UserDetailsLight;
     maybe_cover_image_public_bucket_path: string;
   };
+}
+export interface GetMediaListResponse {
+  pagination: Pagination;
+  success: boolean;
+  results: MediaInfo[];
 }
 
 export interface GetMediaFileResponse {

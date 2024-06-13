@@ -11,7 +11,7 @@ import { ButtonDialogue, ButtonDropdown, Input, H4 } from "~/components";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
-import { LoadScene } from "./LoadScene";
+import { LoadUserScenes } from "./LoadUserScenes";
 import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
 
 import { getCurrentLocationWithoutParams } from "~/utilities";
@@ -150,10 +150,10 @@ export const ControlsTopButtons = () => {
               },
             },
             {
-              label: "New scene from template...",
+              label: "New scene from Featured",
               description: "Ctrl+Shift+N",
               dialogProps: {
-                title: "Create a New Scene from Template",
+                title: "Create a New Scene from a Featured Scene",
                 content: (
                   <NewSceneFromTemplate onSceneSelect={handleSceneSelection} />
                 ),
@@ -170,11 +170,13 @@ export const ControlsTopButtons = () => {
               },
             },
             {
-              label: "Load existing scene",
+              label: "Load my scene",
               description: "Ctrl+O",
               dialogProps: {
-                title: "Load a Scene",
-                content: <LoadScene onSceneSelect={handleSceneSelection} />,
+                title: "Load a Saved Scene",
+                content: (
+                  <LoadUserScenes onSceneSelect={handleSceneSelection} />
+                ),
                 confirmButtonProps: {
                   label: "Load",
                   disabled: sceneTokenSelected === "",
