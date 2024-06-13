@@ -423,13 +423,16 @@ export default function TopNav({
                 />
               </Link>
 
-              <div className="d-none d-lg-block">
-                <NavItem
-                  icon={faScrewdriverWrench}
-                  label="Creator Tools"
-                  link="/tools"
-                />
-              </div>
+              {domain.titlePart === "FakeYou" && (
+                <div className="d-none d-lg-block">
+                  <NavItem
+                    icon={faScrewdriverWrench}
+                    label="Creator Tools"
+                    link="/tools"
+                  />
+                </div>
+              )}
+
               <NavItem
                 icon={faCompass}
                 label="Explore"
