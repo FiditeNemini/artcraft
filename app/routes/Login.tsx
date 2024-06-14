@@ -1,23 +1,32 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
 
 import { AUTH_STATUS } from "~/enums";
-import { authentication, login } from "~/signals";
+import { authentication, login, logout } from "~/signals";
 
-import { Button, H1, Input, Link, P } from "~/components";
-import { LoadingDots } from "~/components";
+import {
+  Button,
+  H1,
+  Input,
+  Link,
+  P,
+  LoadingDots,
+  ConfirmationModal,
+} from "~/components";
 
 export default function LoginScreen() {
   useSignals();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [showLoader, setShowLoader] = useState<string | undefined>(undefined);
   const formRef = useRef<HTMLFormElement | null>(null);
   const { status: authStatus } = authentication;
+  const authLoaderMessage = getAuthLoaderMessage();
+  const shouldShowLoader = checkShouldShowLoader();
+  const showNoAccessModal = authStatus.value === AUTH_STATUS.NO_ACCESS;
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -26,13 +35,9 @@ export default function LoginScreen() {
       const usernameOrEmail = form.get("usernameOrEmail")?.toString();
       const password = form.get("password")?.toString();
       if (usernameOrEmail && password && login) {
-        setShowLoader("Authenticating");
         login({
           usernameOrEmail,
           password,
-          failureCallback: () => {
-            setShowLoader(undefined);
-          },
         });
       }
     }
@@ -40,8 +45,9 @@ export default function LoginScreen() {
 
   useSignalEffect(() => {
     const redirectPath = searchParams.get("redirect");
-    if (authStatus.value === AUTH_STATUS.LOGGED_IN)
+    if (authStatus.value === AUTH_STATUS.LOGGED_IN) {
       navigate(redirectPath ? redirectPath : "/");
+    }
   });
 
   return (
@@ -94,11 +100,47 @@ export default function LoginScreen() {
         </form>
         <LoadingDots
           className="absolute left-0 top-0 h-full w-full"
-          isShowing={showLoader !== undefined}
-          message={showLoader}
+          isShowing={shouldShowLoader}
+          message={authLoaderMessage}
           type="bricks"
+        />
+        <ConfirmationModal
+          text="We're in a closed beta and you'll need a beta key to use this app."
+          title="Unauthorized"
+          open={showNoAccessModal}
+          onClose={handleLogout}
+          cancelText="Close"
+          onCancel={handleLogout}
+          okText="Get Beta Key"
+          onOk={() => {
+            handleLogout();
+            if (window) {
+              window.open("https://storyteller.ai/beta-key/redeem", "_blank");
+            }
+          }}
         />
       </div>
     </div>
   );
 }
+
+const handleLogout = () => {
+  if (authentication.status.value !== AUTH_STATUS.LOGGED_OUT) {
+    logout();
+  }
+};
+const checkShouldShowLoader = () => {
+  return (
+    authentication.status.value === AUTH_STATUS.LOGGING ||
+    authentication.status.value === AUTH_STATUS.LOGGED_IN
+  );
+};
+const getAuthLoaderMessage = () => {
+  if (authentication.status.value === AUTH_STATUS.LOGGED_IN) {
+    return "Authenticated, Redirecting...";
+  }
+  if (authentication.sessionToken) {
+    return "Getting User Info...";
+  }
+  return "Getting Session...";
+};

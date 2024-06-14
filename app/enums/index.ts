@@ -2,6 +2,7 @@ export * from "./ArtStyle";
 export * from "./AssetFilterOption";
 export * from "./AssetType";
 export * from "./authentication";
+export * from "./Billing";
 export * from "./ClipGroup";
 export * from "./ClipType";
 export * from "./FileTypes";

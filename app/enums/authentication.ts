@@ -4,6 +4,7 @@ export enum STORAGE_KEYS {
 
 export enum AUTH_STATUS {
   INIT = "INIT",
+  NO_ACCESS = "no_access",
   LOGGED_IN = "logged_in",
   LOGGING = "logging",
   LOGGED_OUT = "logged_out",

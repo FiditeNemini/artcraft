@@ -87,7 +87,6 @@ export class UsersApi extends ApiManager {
       .catch((err) => {
         return {
           success: false,
-          signed_session: undefined,
           error_message: err.message,
         };
       });

@@ -1,20 +1,6 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-
-export enum SubscriptionNamespace {
-  FAKEYOU = "fakeyou",
-}
-export enum SubscriptionProduct {
-  PLUS = "fakeyou_plus",
-  PRO = "fakeyou_pro",
-  ELITE = "fakeyou_elite",
-}
-export enum LoyaltyProgram {
-  CONTRIBUTOR = "fakeyou_contributor",
-}
-export interface Subscription {
-  namespace: SubscriptionNamespace;
-  product_slug: SubscriptionProduct;
-}
+import { Subscription } from "~/models/Billing";
+import { LoyaltyProgram } from "~/enums";
 
 export class BillingApi extends ApiManager {
   public async ListActiveSubscriptions(): Promise<

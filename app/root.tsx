@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { Transition } from "@headlessui/react";
 import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
@@ -22,14 +21,8 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 // Prevent fontawesome from adding its CSS since we did it manually above:
 import { config } from "@fortawesome/fontawesome-svg-core";
 
-import {
-  environmentVariables,
-  pageHeight,
-  pageWidth,
-  persistLogin,
-} from "~/signals";
-
-import { LoadingDotsBricks } from "~/components";
+import EnvironmentVariables from "~/Classes/EnvironmentVariables";
+import { environmentVariables, pageHeight, pageWidth } from "~/signals";
 
 config.autoAddCss = false; /* eslint-disable import/first */
 
@@ -80,17 +73,30 @@ export async function loader() {
 }
 
 export default function App() {
-  useSignals();
   const data = useLoaderData() as { ENV: Record<string, string> };
 
-  const [showLoader, setShowLoader] = useState<boolean>(true);
-  useEffect(() => {
-    setTimeout(() => setShowLoader(false), 2500);
-  }, []);
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body className="overflow-hidden bg-ui-background">
+        {data && <GlobalSettingsManager env={data.ENV} />}
+        <div className="topbar-spacer" />
+        <Outlet />
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
 
+const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
+  useSignals();
   useEffect(() => {
-    persistLogin();
-
     function setPage() {
       // TODO address this issue with zooming
       pageHeight.value = window.innerHeight;
@@ -107,53 +113,38 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    environmentVariables.value = data.ENV;
-  }, [data]);
+    EnvironmentVariables.initialize(env);
+    environmentVariables.value = env;
+  }, [env]);
 
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body className="overflow-hidden bg-ui-background">
-        <CompleteTakeoverLoadingScreen isShowing={showLoader} />
-        <div className="topbar-spacer" />
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  );
-}
+  return null;
+};
 
-function CompleteTakeoverLoadingScreen({ isShowing }: { isShowing: boolean }) {
-  return (
-    <Transition
-      id="complete-takeover-loading-screen"
-      show={isShowing}
-      enter="transition-opacity duration-150"
-      enterFrom="opacity-0"
-      enterTo="opacity-100"
-      leave="transition-opacity duration-1000"
-      leaveFrom="opacity-100"
-      leaveTo="opacity-0"
-      style={{
-        backgroundColor: "#1a1a27",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 9999,
-      }}
-    >
-      <LoadingDotsBricks />
-    </Transition>
-  );
-}
+// function CompleteTakeoverLoadingScreen({ isShowing }: { isShowing: boolean }) {
+//   return (
+//     <Transition
+//       id="complete-takeover-loading-screen"
+//       show={isShowing}
+//       enter="transition-opacity duration-150"
+//       enterFrom="opacity-0"
+//       enterTo="opacity-100"
+//       leave="transition-opacity duration-1000"
+//       leaveFrom="opacity-100"
+//       leaveTo="opacity-0"
+//       style={{
+//         backgroundColor: "#1a1a27",
+//         position: "fixed",
+//         top: 0,
+//         left: 0,
+//         width: "100vw",
+//         height: "100vh",
+//         display: "flex",
+//         justifyContent: "center",
+//         alignItems: "center",
+//         zIndex: 9999,
+//       }}
+//     >
+//       <LoadingDotsBricks />
+//     </Transition>
+//   );
+// }
