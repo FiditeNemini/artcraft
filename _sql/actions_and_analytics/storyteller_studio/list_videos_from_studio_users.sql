@@ -11,7 +11,7 @@ from media_files as m
 join users as u
 on m.maybe_creator_user_token = u.token
 where u.can_access_studio = true
-and m.created_at > (CURDATE() - INTERVAL 1 WEEK)
+and m.created_at > (CURDATE() - INTERVAL 1 DAY)
 and m.is_intermediate_system_file = false
 and m.media_class = 'video'
 group by u.token
