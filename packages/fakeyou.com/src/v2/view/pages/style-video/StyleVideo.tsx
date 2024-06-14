@@ -32,6 +32,7 @@ export default function StyleVideo() {
   const [useFaceDetailer, setUseFaceDetailer] = useState(false);
   const [useUpscaler, setUseUpscaler] = useState(false);
   const [useCinematic, setUseCinematic] = useState(false);
+  const [enableLipsync, setEnableLipsync] = useState(false);
   const [strength, setStrength] = useState(1.0);
   const { enqueue } = useInferenceJobs();
 
@@ -41,7 +42,7 @@ export default function StyleVideo() {
     if (mediaToken) {
       EnqueueVST("", {
         creator_set_visibility: "private",
-        enable_lipsync: true,
+        enable_lipsync: enableLipsync,
         input_file: mediaToken,
         negative_prompt: negativePrompt,
         prompt,
@@ -148,38 +149,58 @@ export default function StyleVideo() {
         <h6>Quality Options</h6>
         <div {...{ className: "prompt-row" }}>
           <div className="form-check form-switch w-100">
-            <input 
-              className="form-check-input" 
-              type="checkbox" 
-              id="useFaceDetailer" 
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="useFaceDetailer"
               checked={useFaceDetailer}
               onChange={() => setUseFaceDetailer(!useFaceDetailer)}
-              />
-            <label className="form-check-label" htmlFor="useFaceDetailer">Use Face Detailer</label>
+            />
+            <label className="form-check-label" htmlFor="useFaceDetailer">
+              Use Face Detailer
+            </label>
           </div>
         </div>
         <div {...{ className: "prompt-row" }}>
           <div className="form-check form-switch w-100">
-            <input 
-              className="form-check-input" 
-              type="checkbox" 
-              id="useUpscaler" 
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="useUpscaler"
               checked={useUpscaler}
               onChange={() => setUseUpscaler(!useUpscaler)}
-              />
-            <label className="form-check-label" htmlFor="useUpscaler">Use Upscaler</label>
+            />
+            <label className="form-check-label" htmlFor="useUpscaler">
+              Use Upscaler
+            </label>
           </div>
         </div>
         <div {...{ className: "prompt-row" }}>
           <div className="form-check form-switch w-100">
-            <input 
-              className="form-check-input" 
-              type="checkbox" 
-              id="useCinematic" 
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="useCinematic"
               checked={useCinematic}
               onChange={() => setUseCinematic(!useCinematic)}
-              />
-            <label className="form-check-label" htmlFor="useCinematic">Use Cinematic</label>
+            />
+            <label className="form-check-label" htmlFor="useCinematic">
+              Use Cinematic
+            </label>
+          </div>
+        </div>
+        <div {...{ className: "prompt-row" }}>
+          <div className="form-check form-switch w-100">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="enableLipsync"
+              checked={enableLipsync}
+              onChange={() => setEnableLipsync(!enableLipsync)}
+            />
+            <label className="form-check-label" htmlFor="enableLipsync">
+              Preserve Lip Movement
+            </label>
           </div>
         </div>
 
