@@ -87,7 +87,7 @@ impl fmt::Display for GetIsFeaturedItemError {
 
 /// Determine if an item is featured
 #[utoipa::path(
-  post,
+  get,
   tag = "Featured Items",
   path = "/v1/featured_item/is_featured/{entity_type}/{entity_token}",
   request_body = GetIsFeaturedItemRequest,

@@ -940,7 +940,7 @@ fn add_featured_item_routes<T, B> (app: App<T>) -> App<T>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/is_featured/{entity_type}/{entity_token}")
-          .route(web::delete().to(get_is_featured_item_handler))
+          .route(web::get().to(get_is_featured_item_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )
