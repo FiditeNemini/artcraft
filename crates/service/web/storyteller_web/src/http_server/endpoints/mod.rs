@@ -25,7 +25,6 @@ pub mod stubs;
 pub mod subscriptions;
 pub mod trending;
 pub mod tts;
-pub mod twitch;
 pub mod user_bookmarks;
 pub mod user_ratings;
 pub mod vocoders;

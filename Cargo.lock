@@ -3,31 +3,6 @@
 version = 3
 
 [[package]]
-name = "actix"
-version = "0.13.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de7fa236829ba0841304542f7614c42b80fca007455315c45c785ccfa873a85b"
-dependencies = [
- "actix-macros",
- "actix-rt",
- "actix_derive",
- "bitflags 2.4.1",
- "bytes 1.6.0",
- "crossbeam-channel",
- "futures-core",
- "futures-sink",
- "futures-task",
- "futures-util",
- "log",
- "once_cell",
- "parking_lot 0.12.1",
- "pin-project-lite",
- "smallvec 1.11.2",
- "tokio",
- "tokio-util",
-]
-
-[[package]]
 name = "actix-codec"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -57,29 +32,6 @@ dependencies = [
  "log",
  "once_cell",
  "smallvec 1.11.2",
-]
-
-[[package]]
-name = "actix-files"
-version = "0.6.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0773d59061dedb49a8aed04c67291b9d8cf2fe0b60130a381aab53c6dd86e9be"
-dependencies = [
- "actix-http",
- "actix-service",
- "actix-utils",
- "actix-web",
- "bitflags 2.4.1",
- "bytes 1.6.0",
- "derive_more",
- "futures-core",
- "http-range",
- "log",
- "mime",
- "mime_guess",
- "percent-encoding",
- "pin-project-lite",
- "v_htmlescape",
 ]
 
 [[package]]
@@ -276,24 +228,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-web-actors"
-version = "4.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "420b001bb709d8510c3e2659dae046e54509ff9528018d09c78381e765a1f9fa"
-dependencies = [
- "actix",
- "actix-codec",
- "actix-http",
- "actix-web",
- "bytes 1.6.0",
- "bytestring",
- "futures-core",
- "pin-project-lite",
- "tokio",
- "tokio-util",
-]
-
-[[package]]
 name = "actix-web-codegen"
 version = "4.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -367,17 +301,6 @@ dependencies = [
  "reusable_types",
  "speculoos",
  "url",
-]
-
-[[package]]
-name = "actix_derive"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c7db3d5a9718568e4cf4a537cfd7070e6e6ff7481510d0237fb529ac850f6d3"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.66",
 ]
 
 [[package]]
@@ -3048,12 +2971,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "http-range"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21dec9db110f5f872ed9699c3ecf50cf16f423502706ba5c72462e28d3157573"
-
-[[package]]
 name = "http-types"
 version = "2.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5342,26 +5259,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "redis"
-version = "0.21.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "152f3863635cbb76b73bc247845781098302c6c9ad2060e1a9a7de56840346b6"
-dependencies = [
- "async-trait",
- "bytes 1.6.0",
- "combine 4.6.6",
- "futures-util",
- "itoa 1.0.9",
- "percent-encoding",
- "pin-project-lite",
- "ryu",
- "sha1 0.6.1",
- "tokio",
- "tokio-util",
- "url",
-]
-
-[[package]]
 name = "redis_caching"
 version = "0.0.1"
 dependencies = [
@@ -5986,17 +5883,6 @@ dependencies = [
  "percent-encoding",
  "serde",
  "thiserror",
-]
-
-[[package]]
-name = "serde_repr"
-version = "0.1.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3081f5ffbb02284dda55132aa26daecedd7372a42417bbbab6f14ab7d6bb9145"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.66",
 ]
 
 [[package]]
@@ -6638,8 +6524,6 @@ dependencies = [
  "tokio",
  "toml 0.8.14",
  "tts_common",
- "twitch_common",
- "twitch_oauth2",
  "url_config",
  "user_input_common",
  "user_traits_component",
@@ -7587,47 +7471,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "twitch_api2"
-version = "0.6.0-rc.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "600ce224d5eafc176688f05836bbcfec3d314956b5f4a5a360218b4289923dd5"
-dependencies = [
- "aliri_braid",
- "async-trait",
- "chrono",
- "displaydoc",
- "futures 0.3.29",
- "http",
- "once_cell",
- "reqwest",
- "serde",
- "serde_derive",
- "serde_json",
- "serde_path_to_error",
- "serde_repr",
- "thiserror",
- "twitch_oauth2",
- "typed-builder",
- "url",
- "version_check",
-]
-
-[[package]]
-name = "twitch_common"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "container_common",
- "easyenv",
- "my-workspace-hack",
- "once_cell",
- "regex",
- "serde",
- "serde_derive",
- "twitch_oauth2",
-]
-
-[[package]]
 name = "twitch_oauth2"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7645,17 +7488,6 @@ dependencies = [
  "serde_json",
  "thiserror",
  "url",
-]
-
-[[package]]
-name = "typed-builder"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a46ee5bd706ff79131be9c94e7edcb82b703c487766a114434e5790361cf08c5"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -7896,12 +7728,6 @@ dependencies = [
  "num-traits",
  "wasm-bindgen",
 ]
-
-[[package]]
-name = "v_htmlescape"
-version = "0.15.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e8257fbc510f0a46eb602c10215901938b5c2a7d5e70fc11483b1d3c9b5b18c"
 
 [[package]]
 name = "vcpkg"
@@ -8158,64 +7984,6 @@ name = "webpki-roots"
 version = "0.25.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1778a42e8b3b90bff8d0f5032bf22250792889a5cdc752aa0020c84abe3aaf10"
-
-[[package]]
-name = "websocket-gateway"
-version = "0.0.1"
-dependencies = [
- "actix",
- "actix-cors",
- "actix-files",
- "actix-http",
- "actix-rt",
- "actix-service",
- "actix-utils",
- "actix-web",
- "actix-web-actors",
- "actix_cors_configs",
- "anyhow",
- "base64 0.22.1",
- "chrono",
- "config",
- "container_common",
- "derive_more",
- "diesel",
- "dotenv",
- "easyenv",
- "errors",
- "futures 0.1.31",
- "futures 0.3.29",
- "futures-util",
- "hostname 0.4.0",
- "http_server_common",
- "hyper",
- "lazy_static",
- "limitation",
- "log",
- "magic-crypt",
- "md-5 0.10.6",
- "my-workspace-hack",
- "mysql_queries",
- "native-tls",
- "r2d2_redis",
- "rand 0.8.5",
- "redis 0.21.7",
- "redis_common",
- "regex",
- "reqwest",
- "serde",
- "serde_derive",
- "serde_json",
- "sha2 0.9.9",
- "sqlx",
- "time",
- "tokio",
- "toml 0.8.14",
- "twitch_api2",
- "twitch_common",
- "twitch_oauth2",
- "uuid",
-]
 
 [[package]]
 name = "weezl"

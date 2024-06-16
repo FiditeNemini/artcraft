@@ -27,7 +27,6 @@ members = [
   "crates/lib/api_clients/cloud_storage",
   "crates/lib/api_clients/google_drive_common",
   "crates/lib/api_clients/thumbnail_generator",
-  "crates/lib/api_clients/twitch_common",
   "crates/lib/bootstrap",
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/redis_caching",
@@ -84,7 +83,6 @@ members = [
   "crates/service/job/w2l_inference_job",
   "crates/service/web/dummy_service",
   "crates/service/web/storyteller_web",
-  "crates/service/web/websocket_gateway",
 
   # Service Plugins: complete subsystems that can be plugged into services (users, billing, etc.)
   "crates/service/plugins/billing",

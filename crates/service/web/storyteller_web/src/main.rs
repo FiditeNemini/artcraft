@@ -64,7 +64,6 @@ use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
-use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
@@ -81,7 +80,7 @@ use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
 use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::routes::add_routes::add_routes;
-use crate::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans, TwitchOauth, TwitchOauthSecrets};
+use crate::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
@@ -268,16 +267,6 @@ async fn main() -> AnyhowResult<()> {
       easyenv::get_env_string_or_default("SORT_KEY_SECRET", "webscale");
   let sort_key_crypto = SortKeyCrypto::new(&sort_key_crypto_secret);
 
-  let twitch_oauth_redirect_landing_url = easyenv::get_env_string_or_default(
-    "TWITCH_OAUTH_REDIRECT_LANDING_URL",
-    "https://api.jungle.horse/twitch/oauth/enroll_redirect_landing");
-
-  let twitch_oauth_redirect_landing_finished_url = easyenv::get_env_string_or_default(
-    "TWITCH_OAUTH_REDIRECT_LANDING_FINISHED_URL",
-    "https://jungle.horse/");
-
-  let twitch_secrets = TwitchSecrets::from_env()?;
-
   let health_check_interval = easyenv::get_env_duration_seconds_or_default(
     "HEALTH_CHECK_INTERVAL_SECS", Duration::from_secs(3));
 
@@ -450,14 +439,6 @@ async fn main() -> AnyhowResult<()> {
             "QUEUE_STATS_CACHE_TTL_SECONDS",
             Duration::from_secs(60))),
       }
-    },
-    twitch_oauth: TwitchOauth {
-      secrets: TwitchOauthSecrets {
-        client_id: twitch_secrets.app_client_id,
-        client_secret: twitch_secrets.app_client_secret,
-      },
-      redirect_landing_url: twitch_oauth_redirect_landing_url,
-      redirect_landing_finished_url: twitch_oauth_redirect_landing_finished_url,
     },
     ip_ban_list,
     cidr_ban_set,

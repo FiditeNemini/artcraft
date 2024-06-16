@@ -91,8 +91,6 @@ pub struct ServerState {
   pub static_api_token_set: StaticApiTokenSet,
 
   pub caches: InMemoryCaches,
-
-  pub twitch_oauth: TwitchOauth,
 }
 
 #[derive(Clone)]
@@ -109,21 +107,6 @@ pub struct EnvConfig {
 #[derive(Clone)]
 pub struct ServerInfo {
   pub build_sha: String,
-}
-
-/// Necessary to run the OAuth flow.
-#[derive(Clone)]
-pub struct TwitchOauth {
-  pub secrets: TwitchOauthSecrets,
-  pub redirect_landing_url: String,
-  pub redirect_landing_finished_url: String,
-}
-
-/// Necessary to run the OAuth flow.
-#[derive(Clone)]
-pub struct TwitchOauthSecrets {
-  pub client_id: String,
-  pub client_secret: String,
 }
 
 /// Different rate limiters for different users

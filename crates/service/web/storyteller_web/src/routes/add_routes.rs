@@ -83,16 +83,6 @@ use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler
 use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_user_tts_inference_results_handler;
 use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
 use crate::http_server::endpoints::tts::search_tts_models_handler::search_tts_models_handler;
-use crate::http_server::endpoints::twitch::event_rules::create_event_rule::create_twitch_event_rule_handler;
-use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
-use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
-use crate::http_server::endpoints::twitch::event_rules::get_event_rule::get_twitch_event_rule_for_user_handler;
-use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
-use crate::http_server::endpoints::twitch::event_rules::reorder_twitch_event_rules::reorder_twitch_event_rules_handler;
-use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oauth_status_handler;
-use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
-use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
-use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler;
@@ -172,7 +162,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_user_profile_routes(app); /* /user */
   app = add_api_token_routes(app); /* /api_tokens */
   app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
-  app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
   app = add_flag_routes(app); /* /flag */
   app = add_desktop_app_routes(app); /* /v1/vc/... */
@@ -943,72 +932,6 @@ fn add_featured_item_routes<T, B> (app: App<T>) -> App<T>
           .route(web::get().to(get_is_featured_item_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
-  )
-}
-
-
-// ==================== TWITCH ROUTES ====================
-
-// TODO: Maybe move these into an "oauth-gateway" type http service.
-//  We'll want the domain to have reputation and not confuse people.
-//  It'll also be nice to accrue all oauth things here.
-fn add_twitch_routes<T, B> (app: App<T>) -> App<T>
-  where
-      B: MessageBody,
-      T: ServiceFactory<
-        ServiceRequest,
-        Config = (),
-        Response = ServiceResponse<B>,
-        Error = Error,
-        InitError = (),
-      >,
-{
-  // TODO: Move oauth endpoints under /twitch/oauth (requires updating Twitch configs too.)
-  app.service(web::scope("/twitch")
-    .service(web::scope("/oauth")
-        .service(web::resource("/enroll_json")
-            .route(web::get().to(oauth_begin_enroll_json))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/enroll_redirect_begin")
-            .route(web::get().to(oauth_begin_enroll_redirect))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/enroll_redirect_landing")
-            .route(web::get().to(oauth_end_enroll_from_redirect))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/check")
-            .route(web::get().to(check_oauth_status_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-    )
-    .service(web::scope("/event_rule")
-        .service(web::resource("/create")
-            .route(web::post().to(create_twitch_event_rule_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/reorder")
-            .route(web::post().to(reorder_twitch_event_rules_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/list")
-            .route(web::get().to(list_twitch_event_rules_for_user_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/{token}/info")
-            .route(web::get().to(get_twitch_event_rule_for_user_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/{token}/update")
-            .route(web::post().to(edit_twitch_event_rule_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(web::resource("/{token}/delete")
-            .route(web::delete().to(delete_twitch_event_rule_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-    )
   )
 }
 
