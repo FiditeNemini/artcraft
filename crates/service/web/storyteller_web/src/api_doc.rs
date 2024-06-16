@@ -65,6 +65,7 @@ use crate::http_server::endpoints::featured_items::create_featured_item_handler:
 use crate::http_server::endpoints::featured_items::delete_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::get_is_featured_item_handler::*;
 use crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::*;
+use crate::http_server::endpoints::inference_job::dismiss_finished_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
@@ -141,6 +142,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler,
     crate::http_server::endpoints::featured_items::get_is_featured_item_handler::get_is_featured_item_handler,
     crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
+    crate::http_server::endpoints::inference_job::dismiss_finished_session_jobs_handler::dismiss_finished_session_jobs_handler,
     crate::http_server::endpoints::inference_job::get_inference_job_status_handler::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::list_session_jobs_handler::list_session_jobs_handler,
     crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
@@ -308,6 +310,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     DeleteWeightError,
     DeleteWeightPathInfo,
     DeleteWeightRequest,
+    DismissFinishedSessionJobsError,
+    DismissFinishedSessionJobsSuccessResponse,
     EditBetaKeyDistributedFlagError,
     EditBetaKeyDistributedFlagPathInfo,
     EditBetaKeyDistributedFlagRequest,

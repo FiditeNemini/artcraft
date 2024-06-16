@@ -9,8 +9,8 @@ use log::{error, warn};
 use utoipa::ToSchema;
 
 use http_server_common::request::get_request_ip::get_request_ip;
-use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_cancelled_by_user::mark_generic_inference_job_cancelled_by_user;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::{get_inference_job_status, get_inference_job_status_from_connection};
+use mysql_queries::queries::generic_inference::web::mark_generic_inference_job_cancelled_by_user::mark_generic_inference_job_cancelled_by_user;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -70,7 +70,7 @@ impl fmt::Display for TerminateInferenceJobError {
     ("path" = TerminateInferenceJobPathInfo, description = "Path params for Request")
   ),
   responses(
-    (status = 200, body = ListUserBookmarksForEntitySuccessResponse),
+    (status = 200, body = TerminateInferenceJobSuccessResponse),
     (status = 500, body = TerminateInferenceJobError),
   ),
 )]

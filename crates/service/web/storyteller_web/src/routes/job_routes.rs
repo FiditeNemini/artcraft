@@ -6,6 +6,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_helpers::route_builder::RouteBuilder;
 
 use crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler;
+use crate::http_server::endpoints::inference_job::dismiss_finished_session_jobs_handler::dismiss_finished_session_jobs_handler;
 use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::get_inference_job_status_handler;
 use crate::http_server::endpoints::inference_job::get_pending_inference_job_count_handler::get_pending_inference_job_count_handler;
 use crate::http_server::endpoints::inference_job::list_session_jobs_handler::list_session_jobs_handler;
@@ -39,6 +40,11 @@ pub fn add_job_routes<T, B> (app: App<T>) -> App<T>
             .service(
               web::resource("/session")
                   .route(web::get().to(list_session_jobs_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(
+              web::resource("/session/dismiss_finished")
+                  .route(web::post().to(dismiss_finished_session_jobs_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
       );
