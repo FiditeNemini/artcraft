@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="//unpkg.com/swagger-ui-dist@3/swagger-ui.css">
-
-  <title>Storyteller API</title>
-
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="SwaggerUI" />
+    <title>Storyteller API</title>
+    <link rel="stylesheet" href="//unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+  </head>
   <body>
-    <div id="app-docs" />
 
-    <script src="//unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
-    <script>
+		<div id="swagger-ui"></div>
 
-      window.onload = function () {
-        const ui = SwaggerUIBundle({
-          url: "api.json",
-          dom_id: "#app-docs",
+		<script src="//unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+		<script src="//unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js" crossorigin></script>
+		<script>
+			window.onload = () => {
+				window.ui = SwaggerUIBundle({
+					url: 'api.json',
+					dom_id: '#swagger-ui',
           deepLinking: true,
-        })
-      }
-
-    </script>
-
+					presets: [
+						SwaggerUIBundle.presets.apis,
+						SwaggerUIStandalonePreset
+					],
+					layout: "StandaloneLayout",
+				});
+			};
+		</script>
   </body>
 </html>
-
