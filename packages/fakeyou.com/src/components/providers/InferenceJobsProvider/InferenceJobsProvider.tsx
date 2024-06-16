@@ -1,15 +1,31 @@
-import React from "react";
-import { InferenceJobsContext } from "context";
+import React, { createContext } from "react";
+import {
+	BaseQueueObject,
+	GetQueuesResponse,
+} from "@storyteller/components/src/api/stats/queues/GetQueues";
 import { useQueuePoll } from "hooks";
 
-interface Props {
-  children?: any;
+interface InferenceJobsContextType {
+	inferenceJobs?: any;
+	byCategory?: any;
+	enqueue?: any;
+	queueStats: GetQueuesResponse;
 }
 
-export default function InferenceJobsProvider({  children, ...rest }: Props) {
+export const InferenceJobsContext = createContext<InferenceJobsContextType>({
+	queueStats: BaseQueueObject(),
+});
+
+interface Props {
+	children?: any;
+}
+
+export default function InferenceJobsProvider({ children, ...rest }: Props) {
 	const queueStats = useQueuePoll();
 
-	return <InferenceJobsContext.Provider {...{ value: { ...rest, queueStats } }}>
-		{ children }
-	</InferenceJobsContext.Provider>
-};
+	return (
+		<InferenceJobsContext.Provider {...{ value: { ...rest, queueStats } }}>
+			{children}
+		</InferenceJobsContext.Provider>
+	);
+}

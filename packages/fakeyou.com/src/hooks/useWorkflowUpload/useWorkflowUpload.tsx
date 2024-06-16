@@ -14,10 +14,9 @@ export default function useWorkflow() {
   const [commitHash, commitHashSet] = useState("");
   const [visibility, visibilitySet] = useState("private");
 
- 
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
 
-  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.VideoWorkflow, true);
+  const { enqueue } = useInferenceJobs();
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = {
@@ -25,7 +24,7 @@ export default function useWorkflow() {
       descriptionSet,
       titleSet,
       visibilitySet,
-      commitHashSet
+      commitHashSet,
     };
     todo[target.name + "Set"](target.value);
   };
@@ -44,14 +43,18 @@ export default function useWorkflow() {
       google_drive_link: uploadPath,
       title,
       description,
-      commit_hash:commitHash,
-      creator_set_visibility: visibility
+      commit_hash: commitHash,
+      creator_set_visibility: visibility,
     })
       .then((res: any) => {
         if (res.success && res.inference_job_token) {
           writeStatusSet(FetchStatus.success);
-          enqueue(res.inference_job_token,true);
-      }
+          enqueue(
+            res.inference_job_token,
+            FrontendInferenceJobType.VideoWorkflow,
+            true
+          );
+        }
       })
       .catch(err => {
         writeStatusSet(FetchStatus.error);

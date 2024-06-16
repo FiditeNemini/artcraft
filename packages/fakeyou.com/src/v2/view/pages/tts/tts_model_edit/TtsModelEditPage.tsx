@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
@@ -47,8 +46,6 @@ const UNSET_CUSTOM_VOCODER_SENTINEL = ""; // NB: Empty string
 
 interface Props {
   sessionWrapper: SessionWrapper;
-  enqueueTtsJob: (jobToken: string) => void;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
 }
 
 function TtsModelEditPage(props: Props) {
@@ -94,7 +91,7 @@ function TtsModelEditPage(props: Props) {
     DEFAULT_PRETRAINED_VOCODER
   );
 
-  const getModel = useCallback(async (token) => {
+  const getModel = useCallback(async token => {
     const model = await GetTtsModel(token);
 
     if (GetTtsModelIsOk(model)) {
@@ -288,15 +285,15 @@ function TtsModelEditPage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res === undefined || !res.success) {
           return; // Endpoint error?
         }
 
         history.push(modelLink);
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };
@@ -437,7 +434,7 @@ function TtsModelEditPage(props: Props) {
     );
   }
 
-  let customVocoderOptions = vocoderModels.map((vocoder) => {
+  let customVocoderOptions = vocoderModels.map(vocoder => {
     return (
       <option key={vocoder.vocoder_token} value={vocoder.vocoder_token}>
         {vocoder.title} (by {vocoder.creator_display_name})

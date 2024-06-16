@@ -12,6 +12,7 @@ import useHover from "./useHover";
 import useId from "./useId";
 import useIdempotency from "./useIdempotency";
 import useInferenceJobs from "./useInferenceJobs";
+import useInferenceJobsPolling from "./useInferenceJobsPolling";
 import useInterval from "./useInterval";
 import useJobStatus from "./useJobStatus";
 import useLazyLists from "./useLazyLists";
@@ -45,6 +46,7 @@ export {
   useId,
   useIdempotency,
   useInferenceJobs,
+  useInferenceJobsPolling,
   useInterval,
   useJobStatus,
   useLazyLists,

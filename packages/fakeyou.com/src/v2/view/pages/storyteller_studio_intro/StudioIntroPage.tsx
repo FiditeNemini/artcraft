@@ -22,49 +22,54 @@ interface Props {
 const PAGE_TITLE = "Storyteller Studio";
 
 function StudioIntroPage(props: Props) {
-  // NB: The URL parameter might be a raw media token (for .scn.ron files), or it might 
-  // have an appended suffix to assist the engine in loading the correct scene format. 
+  // NB: The URL parameter might be a raw media token (for .scn.ron files), or it might
+  // have an appended suffix to assist the engine in loading the correct scene format.
   // For example, this is a valid "mediaTokenSpec": `m_zk0qkm1tgsdbh6e3c9kedy34vaympd.glb`
-  const { mediaToken : mediaTokenSpec } = useParams<{ mediaToken: string }>();
+  const { mediaToken: mediaTokenSpec } = useParams<{ mediaToken: string }>();
 
-  const { base: mediaToken, maybeRemainder: maybeExtension } = SplitFirstPeriod(mediaTokenSpec);
+  const { base: mediaToken, maybeRemainder: maybeExtension } =
+    SplitFirstPeriod(mediaTokenSpec);
 
   const history = useHistory();
 
-  const inferenceJobs = useInferenceJobs(
-    FrontendInferenceJobType.EngineComposition
-  );
+  const inferenceJobs = useInferenceJobs();
 
-  // If the user saves the scene in the engine, we'll need to use the new token 
+  // If the user saves the scene in the engine, we'll need to use the new token
   // for subsequent steps of this flow.
   const [savedMediaToken, setSavedMediaToken] = useState(mediaToken);
 
   // We don't show the "next step" buttons until the engine loads.
-  // Unfortunately the engine sometimes fires this twice, with one instance 
-  // being called before the scene loads. Until this is fixed, we'll count the 
+  // Unfortunately the engine sometimes fires this twice, with one instance
+  // being called before the scene loads. Until this is fixed, we'll count the
   // number of event fires and assume we must have two calls.
   const [sceneIsLoadedCount, sceneIsLoadedCountSet] = useState(0);
 
-  // If the scene is saved, we know the user must have interacted. 
+  // If the scene is saved, we know the user must have interacted.
   // This can serve as a second optional gate for enabling the next steps.
   const [sceneIsSaved, sceneIsSavedSet] = useState(false);
 
   usePrefixedDocumentTitle(PAGE_TITLE);
 
-  const onSaveCallback = useCallback((sceneMediaToken: string) => {
-    console.log(`Saved scene, new media token: ${sceneMediaToken}`)
+  const onSaveCallback = useCallback(
+    (sceneMediaToken: string) => {
+      console.log(`Saved scene, new media token: ${sceneMediaToken}`);
 
-    setSavedMediaToken(sceneMediaToken);
-    sceneIsSavedSet(true); // Just in case we missed the "scene loaded" event.
+      setSavedMediaToken(sceneMediaToken);
+      sceneIsSavedSet(true); // Just in case we missed the "scene loaded" event.
 
-    // Replace the history state without causing a React re-render
-    window.history.replaceState(null, PAGE_TITLE, `/studio-intro/${sceneMediaToken}`);
-
-  }, [setSavedMediaToken, sceneIsSavedSet]);
+      // Replace the history state without causing a React re-render
+      window.history.replaceState(
+        null,
+        PAGE_TITLE,
+        `/studio-intro/${sceneMediaToken}`
+      );
+    },
+    [setSavedMediaToken, sceneIsSavedSet]
+  );
 
   const onSceneReadyCallback = useCallback(() => {
     sceneIsLoadedCountSet(sceneIsLoadedCount + 1);
-  }, [sceneIsLoadedCount, sceneIsLoadedCountSet])
+  }, [sceneIsLoadedCount, sceneIsLoadedCountSet]);
 
   if (!props.sessionWrapper.canAccessStudio()) {
     return <StudioNotAvailable />;
@@ -72,7 +77,7 @@ function StudioIntroPage(props: Props) {
 
   let assetDescriptor;
 
-  // We should prefer to start the onboarding flow with an existing scene, but if 
+  // We should prefer to start the onboarding flow with an existing scene, but if
   // one is unavailable, we should show the sample room.
   if (maybeExtension !== undefined) {
     assetDescriptor = {
@@ -97,7 +102,10 @@ function StudioIntroPage(props: Props) {
       skybox: "meadow_4k",
     }).then((res: any) => {
       if (res && res.success) {
-        inferenceJobs.enqueue(res.inference_job_token);
+        inferenceJobs.enqueue(
+          res.inference_job_token,
+          FrontendInferenceJobType.EngineComposition
+        );
         history.push(`/studio-intro/style/${res.inference_job_token}`);
       }
     });
@@ -112,7 +120,7 @@ function StudioIntroPage(props: Props) {
       <div {...{ className: "p-3 d-flex justify-content-center" }}>
         <Button label="Create Movie from 3D Scene" onClick={onClick} />
       </div>
-    )
+    );
   }
 
   return (

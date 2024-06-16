@@ -1,6 +1,5 @@
 import React from "react";
 
-
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { Analytics } from "common/Analytics";
@@ -12,9 +11,12 @@ import { State, Action } from "../reducer";
 import TabContentUpload from "./tabContentUpload";
 import TabContentLibrary from "./tabContentLibrary";
 
-
 export default function PageVideoProvision({
-  debug=false, parentPath, t, pageState, dispatchPageState
+  debug = false,
+  parentPath,
+  t,
+  pageState,
+  dispatchPageState,
 }: {
   debug?: boolean;
   parentPath: string;
@@ -22,27 +24,40 @@ export default function PageVideoProvision({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }) {
-
   const tabs = [
     {
       label: t("tabTitle.upload"),
-      content: <TabContentUpload {...{
-        debug, t, pageState, dispatchPageState
-      }} />,
+      content: (
+        <TabContentUpload
+          {...{
+            debug,
+            t,
+            pageState,
+            dispatchPageState,
+          }}
+        />
+      ),
       to: `${parentPath}/upload`,
       padding: true,
     },
     {
       label: t("tabTitle.library"),
-      content: <TabContentLibrary {...{
-        debug, t, pageState, dispatchPageState
-      }} />,
+      content: (
+        <TabContentLibrary
+          {...{
+            debug,
+            t,
+            pageState,
+            dispatchPageState,
+          }}
+        />
+      ),
       to: `${parentPath}/select-media`,
       padding: true,
     },
   ];
 
-  return(
+  return (
     <>
       <Panel className="mb-4">
         <div className="row g-0">
@@ -54,12 +69,14 @@ export default function PageVideoProvision({
           </div>
         </div>
       </Panel>
-      <InferenceJobsList {...{
-        showNoJobs:false,
-        failures: inferenceFailures,
-        onSelect: () => Analytics.voiceConversionClickDownload(),
-        jobType: FrontendInferenceJobType.VideoStyleTransfer,
-      }}/>
+      <InferenceJobsList
+        {...{
+          showNoJobs: false,
+          failures: inferenceFailures,
+          onSelect: () => Analytics.voiceConversionClickDownload(),
+          jobType: FrontendInferenceJobType.VideoStyleTransfer,
+        }}
+      />
     </>
   );
 }

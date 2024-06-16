@@ -58,8 +58,8 @@ export default function StyleVideo() {
         if (res.success && res.inference_job_token) {
           enqueue(
             res.inference_job_token,
-            true,
-            FrontendInferenceJobType.VideoStyleTransfer
+            FrontendInferenceJobType.VideoStyleTransfer,
+            true
           );
         } else {
           console.log("Failed to enqueue job", res);

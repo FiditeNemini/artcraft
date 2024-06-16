@@ -2,20 +2,19 @@ import React, { useState } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionTtsModelUploadResultList } from "../../_common/SessionTtsModelUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
+import { useInferenceJobs } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
-  enqueueTtsModelUploadJob: (jobToken: string) => void;
-  ttsModelUploadJobs: Array<TtsModelUploadJob>;
 }
 
 interface TtsModelUploadJobResponsePayload {
@@ -25,6 +24,8 @@ interface TtsModelUploadJobResponsePayload {
 
 function UploadTtsModelPage(props: Props) {
   let history = useHistory();
+  const { enqueueInferenceJob } = useInferenceJobs();
+
   PosthogClient.recordPageview();
 
   const [downloadUrl, setDownloadUrl] = useState("");
@@ -97,8 +98,8 @@ function UploadTtsModelPage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         let response: TtsModelUploadJobResponsePayload = res;
 
         if (!response.success || response.job_token === undefined) {
@@ -107,11 +108,14 @@ function UploadTtsModelPage(props: Props) {
 
         console.log("enqueuing...");
 
-        props.enqueueTtsModelUploadJob(response.job_token);
+        enqueueInferenceJob(
+          response.job_token,
+          FrontendInferenceJobType.TextToSpeech
+        );
 
         history.push("/");
       })
-      .catch((e) => {
+      .catch(e => {
         //this.props.onSpeakErrorCallback();
       });
 
@@ -238,9 +242,7 @@ function UploadTtsModelPage(props: Props) {
         </div>
       </form>
 
-      <SessionTtsModelUploadResultList
-        modelUploadJobs={props.ttsModelUploadJobs}
-      />
+      <SessionTtsModelUploadResultList />
     </div>
   );
 }

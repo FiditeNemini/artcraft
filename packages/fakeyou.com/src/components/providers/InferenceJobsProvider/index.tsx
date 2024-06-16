@@ -1,1 +1,1 @@
-export { default } from './InferenceJobsProvider';
+export { default, InferenceJobsContext } from "./InferenceJobsProvider";

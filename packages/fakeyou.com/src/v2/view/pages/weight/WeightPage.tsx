@@ -20,11 +20,6 @@ import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import Badge from "components/common/Badge";
 import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
@@ -42,29 +37,13 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
 //import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface WeightProps {
-  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-  enqueueTtsJob: (jobToken: string) => void;
 }
 
 export default function WeightPage({
-  sessionWrapper,
   sessionSubscriptionsWrapper,
-  inferenceJobs,
-  ttsInferenceJobs,
-  enqueueInferenceJob,
-  enqueueTtsJob,
-  inferenceJobsByCategory,
 }: WeightProps) {
   const { canEditTtsModel, canBanUsers, user } = useSession();
   const { search } = useLocation();
@@ -83,14 +62,7 @@ export default function WeightPage({
     },
     token: weight_token,
   });
-  const {
-    data: weight,
-    fetchError,
-    isLoading,
-    title,
-    remove,
-  } = fetchedWeight;
-  console.log(fetchedWeight);
+  const { data: weight, fetchError, isLoading, title, remove } = fetchedWeight;
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.created_at || "").format("LLL");
@@ -127,10 +99,8 @@ export default function WeightPage({
     case WeightType.SDXL:
       imageGenPanel = (
         <SdInferencePanel
-          inferenceJobs={inferenceJobs}
           sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
           weight_token={weight?.weight_token}
-          enqueueInferenceJob={enqueueInferenceJob}
           weightPageType="sd"
         />
       );
@@ -138,10 +108,8 @@ export default function WeightPage({
     case WeightType.LORA:
       imageGenPanel = (
         <SdInferencePanel
-          inferenceJobs={inferenceJobs}
           sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
           weight_token={weight?.weight_token}
-          enqueueInferenceJob={enqueueInferenceJob}
           weightPageType="lora"
         />
       );
@@ -153,12 +121,7 @@ export default function WeightPage({
       case WeightCategory.TTS:
         return (
           <TtsInferencePanel
-            inferenceJobs={inferenceJobs}
             sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            enqueueInferenceJob={enqueueInferenceJob}
-            inferenceJobsByCategory={inferenceJobsByCategory}
-            ttsInferenceJobs={ttsInferenceJobs}
-            enqueueTtsJob={enqueueTtsJob}
             voiceToken={weight.weight_token}
           />
         );
@@ -166,9 +129,6 @@ export default function WeightPage({
         return (
           <VcInferencePanel
             sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            enqueueInferenceJob={enqueueInferenceJob}
-            inferenceJobs={inferenceJobs}
-            inferenceJobsByCategory={inferenceJobsByCategory}
             voiceToken={weight.weight_token}
           />
         );
@@ -176,11 +136,7 @@ export default function WeightPage({
       case WeightCategory.ZS:
         return (
           <VdInferencePanel
-            inferenceJobs={inferenceJobs}
             sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            enqueueInferenceJob={enqueueInferenceJob}
-            inferenceJobsByCategory={inferenceJobsByCategory}
-            ttsInferenceJobs={ttsInferenceJobs}
             voiceToken={weight.weight_token}
           />
         );

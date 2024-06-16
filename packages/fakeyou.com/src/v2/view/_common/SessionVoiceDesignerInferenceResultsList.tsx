@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { TtsInferenceJob } from "../../../App";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,12 +18,13 @@ import {
   GetPendingTtsJobCountIsOk,
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
-import { useLocalize } from "hooks";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
+import { useInferenceJobs, useLocalize } from "hooks";
 
 interface Props {
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
@@ -34,6 +34,7 @@ const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 function SessionVoiceDesignerInferenceResultsList(props: Props) {
   const { t } = useLocalize("SessionTtsInferenceResultList");
+  const { inferenceJobsByCategory } = useInferenceJobs();
 
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
@@ -71,76 +72,78 @@ function SessionVoiceDesignerInferenceResultsList(props: Props) {
 
   // ============================= GENERIC INFERENCE =============================
 
-  props.inferenceJobs.forEach((job) => {
-    if (!job.maybeResultToken) {
-      let cssStyle = "alert alert-secondary mb-0";
-      let stateDescription = "Pending...";
+  inferenceJobsByCategory
+    .get(FrontendInferenceJobType.TextToSpeech)
+    .forEach((job: InferenceJob) => {
+      if (!job.maybeResultToken) {
+        let cssStyle = "alert alert-secondary mb-0";
+        let stateDescription = "Pending...";
 
-      switch (job.jobState) {
-        case JobState.PENDING:
-        case JobState.UNKNOWN:
-          stateDescription =
-            job.maybeExtraStatusDescription == null
-              ? t("resultsProgressPending")
-              : job.maybeExtraStatusDescription;
-          break;
-        case JobState.STARTED:
-          cssStyle = "alert alert-success mb-0";
-          stateDescription =
-            job.maybeExtraStatusDescription == null
-              ? t("resultsProgressStarted")
-              : job.maybeExtraStatusDescription;
-          break;
-        case JobState.ATTEMPT_FAILED:
-          cssStyle = "alert alert-danger mb-0";
-          stateDescription = `${t("resultsProgressFail", {
-            0: job.attemptCount || "0",
-          })}}`;
-          break;
-        case JobState.COMPLETE_FAILURE:
-        case JobState.DEAD:
-          cssStyle = "alert alert-danger mb-0";
-          // TODO(bt,2023-01-23): Translate when I can test it
-          stateDescription = t("resultsProgressDead");
-          break;
-        case JobState.COMPLETE_SUCCESS:
-          cssStyle = "message is-success mb-0";
-          // Not sure why we're here instead of other branch!
-          stateDescription = t("resultsProgressSuccess");
-          break;
-      }
+        switch (job.jobState) {
+          case JobState.PENDING:
+          case JobState.UNKNOWN:
+            stateDescription =
+              job.maybeExtraStatusDescription == null
+                ? t("resultsProgressPending")
+                : job.maybeExtraStatusDescription;
+            break;
+          case JobState.STARTED:
+            cssStyle = "alert alert-success mb-0";
+            stateDescription =
+              job.maybeExtraStatusDescription == null
+                ? t("resultsProgressStarted")
+                : job.maybeExtraStatusDescription;
+            break;
+          case JobState.ATTEMPT_FAILED:
+            cssStyle = "alert alert-danger mb-0";
+            stateDescription = `${t("resultsProgressFail", {
+              0: job.attemptCount || "0",
+            })}}`;
+            break;
+          case JobState.COMPLETE_FAILURE:
+          case JobState.DEAD:
+            cssStyle = "alert alert-danger mb-0";
+            // TODO(bt,2023-01-23): Translate when I can test it
+            stateDescription = t("resultsProgressDead");
+            break;
+          case JobState.COMPLETE_SUCCESS:
+            cssStyle = "message is-success mb-0";
+            // Not sure why we're here instead of other branch!
+            stateDescription = t("resultsProgressSuccess");
+            break;
+        }
 
-      results.push(
-        <div key={job.jobToken}>
-          <div>
+        results.push(
+          <div key={job.jobToken}>
             <div>
-              <div className={cssStyle}>{stateDescription}</div>
+              <div>
+                <div className={cssStyle}>{stateDescription}</div>
+              </div>
             </div>
           </div>
-        </div>
-      );
-    } else {
-      let audioLink = new BucketConfig().getGcsUrl(
-        job.maybeResultPublicBucketMediaPath
-      );
-      let ttsPermalink = `/media/${job.maybeResultToken}`;
+        );
+      } else {
+        let audioLink = new BucketConfig().getGcsUrl(
+          job.maybeResultPublicBucketMediaPath
+        );
+        let ttsPermalink = `/media/${job.maybeResultToken}`;
 
-      let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
+        let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
 
-      results.push(
-        <div key={job.jobToken}>
-          {/*<div className="message-header">
+        results.push(
+          <div key={job.jobToken}>
+            {/*<div className="message-header">
               <p>{job.title}</p>
               <button className="delete" aria-label="delete"></button>
             </div>*/}
-          <div>
-            <div className="panel panel-tts-results p-4 gap-3 d-flex flex-column">
-              <div>
-                <h5 className="mb-2">{job.maybeModelTitle}</h5>
-                <p>{job.maybeRawInferenceText}</p>
-              </div>
+            <div>
+              <div className="panel panel-tts-results p-4 gap-3 d-flex flex-column">
+                <div>
+                  <h5 className="mb-2">{job.maybeModelTitle}</h5>
+                  <p>{job.maybeRawInferenceText}</p>
+                </div>
 
-              {/* <audio
+                {/* <audio
                 className="w-100"
                 controls
                 src={audioLink}
@@ -152,134 +155,26 @@ function SessionVoiceDesignerInferenceResultsList(props: Props) {
                 <code>audio</code> element.
               </audio> */}
 
-              {wavesurfers}
+                {wavesurfers}
 
-              <div className="mt-2">
-                <Link
-                  to={ttsPermalink}
-                  onClick={() => {
-                    Analytics.ttsClickResultLink();
-                  }}
-                  className="fw-semibold"
-                >
-                  <FontAwesomeIcon icon={faLink} className="me-2" />
-                  {t("resultsAudioShareDownload")}
-                </Link>
+                <div className="mt-2">
+                  <Link
+                    to={ttsPermalink}
+                    onClick={() => {
+                      Analytics.ttsClickResultLink();
+                    }}
+                    className="fw-semibold"
+                  >
+                    <FontAwesomeIcon icon={faLink} className="me-2" />
+                    {t("resultsAudioShareDownload")}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      );
-    }
-  });
-
-  // TODO(bt,2023-04-08): Clean this utter garbage duplication up.
-
-  // ============================= LEGACY TTS =============================
-
-  props.ttsInferenceJobs.forEach((job) => {
-    if (!job.maybeResultToken) {
-      let cssStyle = "alert alert-secondary mb-0";
-      let stateDescription = "Pending...";
-
-      switch (job.jobState) {
-        case JobState.PENDING:
-        case JobState.UNKNOWN:
-          stateDescription =
-            job.maybeExtraStatusDescription == null
-              ? t("resultsProgressPending")
-              : job.maybeExtraStatusDescription;
-          break;
-        case JobState.STARTED:
-          cssStyle = "alert alert-success mb-0";
-          stateDescription =
-            job.maybeExtraStatusDescription == null
-              ? t("resultsProgressStarted")
-              : job.maybeExtraStatusDescription;
-          break;
-        case JobState.ATTEMPT_FAILED:
-          cssStyle = "alert alert-danger mb-0";
-          stateDescription = `${t("resultsProgressFail", {
-            0: job.attemptCount || "0",
-          })}}`;
-          break;
-        case JobState.COMPLETE_FAILURE:
-        case JobState.DEAD:
-          cssStyle = "alert alert-danger mb-0";
-          // TODO(bt,2023-01-23): Translate when I can test it
-          stateDescription = t("resultsProgressDead");
-          break;
-        case JobState.COMPLETE_SUCCESS:
-          cssStyle = "message is-success mb-0";
-          // Not sure why we're here instead of other branch!
-          stateDescription = t("resultsProgressSuccess");
-          break;
+        );
       }
-
-      results.push(
-        <div key={job.jobToken}>
-          <div>
-            <div>
-              <div className={cssStyle}>{stateDescription}</div>
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      let audioLink = new BucketConfig().getGcsUrl(
-        job.maybePublicBucketWavAudioPath
-      );
-      let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
-
-      let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
-
-      results.push(
-        <div key={job.jobToken}>
-          {/*<div className="message-header">
-              <p>{job.title}</p>
-              <button className="delete" aria-label="delete"></button>
-            </div>*/}
-          <div>
-            <div className="panel panel-tts-results p-4 gap-3 d-flex flex-column">
-              <div>
-                <h5 className="mb-2">{job.title}</h5>
-                <p>{job.rawInferenceText}</p>
-              </div>
-
-              {/* <audio
-                className="w-100"
-                controls
-                src={audioLink}
-                onClick={() => {
-                  Analytics.ttsClickResultInlinePlay();
-                }}
-              >
-                Your browser does not support the
-                <code>audio</code> element.
-              </audio> */}
-
-              {wavesurfers}
-
-              <div className="mt-2">
-                <Link
-                  to={ttsPermalink}
-                  onClick={() => {
-                    Analytics.ttsClickResultLink();
-                  }}
-                  className="fw-semibold"
-                >
-                  <FontAwesomeIcon icon={faLink} className="me-2" />
-                  {t("resultsAudioShareDownload")}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-  });
-
-  // ============================= END LEGACY TTS =============================
+    });
 
   let noResultsSection = (
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">

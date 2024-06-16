@@ -20,17 +20,15 @@ import { useFile } from "hooks";
 import useVoiceRequests from "./useVoiceRequests";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { useSession } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 
 interface RouteParams {
   dataset_token?: string;
 }
 
 function VoiceDesignerFormPage({
-  enqueueInferenceJob,
   sessionWrapper,
 }: {
-  enqueueInferenceJob: any;
   sessionWrapper: SessionWrapper;
 }) {
   const history = useHistory();
@@ -45,6 +43,7 @@ function VoiceDesignerFormPage({
   const [samples, samplesSet] = useState([]); // fetched/uploaded samples
   const audioProps = useFile({});
   const { user, sessionFetched } = useSession();
+  const { enqueueInferenceJob } = useInferenceJobs();
 
   const datasetInputs = [
     {

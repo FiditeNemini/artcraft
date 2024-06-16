@@ -2,17 +2,8 @@ import React, { useEffect, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInferenceResultsList";
 import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsModelUploadResultsList";
-import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
-import { SessionW2lTemplateUploadResultList } from "../../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
-import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
-import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 import {
   ListTtsModels,
@@ -64,7 +55,7 @@ import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 import { Container, Panel } from "components/common";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faMessageDots } from "@fortawesome/pro-solid-svg-icons";
@@ -94,19 +85,6 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-
-  enqueueTtsJob: (jobToken: string) => void;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-
-  ttsModelUploadJobs: Array<TtsModelUploadJob>;
-  w2lInferenceJobs: Array<W2lInferenceJob>;
-  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
   clearTextBuffer: () => void;
@@ -143,6 +121,7 @@ function TtsModelListPage(props: Props) {
 
   PosthogClient.recordPageview();
 
+  const { enqueueInferenceJob } = useInferenceJobs();
   const { t } = useLocalize("TtsModelListPage");
 
   //Loading spinning icon
@@ -309,14 +288,14 @@ function TtsModelListPage(props: Props) {
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
 
-      if (response.inference_job_token_type === "generic") {
-        props.enqueueInferenceJob(
-          response.inference_job_token,
-          FrontendInferenceJobType.TextToSpeech
-        );
-      } else {
-        props.enqueueTtsJob(response.inference_job_token);
-      }
+      // if (response.inference_job_token_type === "generic") {
+      enqueueInferenceJob(
+        response.inference_job_token,
+        FrontendInferenceJobType.TextToSpeech
+      );
+      // } else {
+      //   props.enqueueTtsJob(response.inference_job_token);
+      // }
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
@@ -607,12 +586,6 @@ function TtsModelListPage(props: Props) {
                   </h4>
                   <div className="d-flex flex-column gap-3 session-tts-section">
                     <SessionTtsInferenceResultList
-                      inferenceJobs={
-                        props.inferenceJobsByCategory.get(
-                          FrontendInferenceJobType.TextToSpeech
-                        )!
-                      }
-                      ttsInferenceJobs={props.ttsInferenceJobs}
                       sessionSubscriptionsWrapper={
                         props.sessionSubscriptionsWrapper
                       }
@@ -630,17 +603,7 @@ function TtsModelListPage(props: Props) {
         </div> */}
       </Panel>
 
-      <SessionW2lInferenceResultList
-        w2lInferenceJobs={props.w2lInferenceJobs}
-      />
-
-      <SessionW2lTemplateUploadResultList
-        w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
-      />
-
-      <SessionTtsModelUploadResultList
-        modelUploadJobs={props.ttsModelUploadJobs}
-      />
+      <SessionTtsModelUploadResultList />
     </Container>
   );
 }

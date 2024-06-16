@@ -194,7 +194,7 @@ function VoiceDesignerMainPage() {
       <InferenceJobsList
         {...{
           failures,
-          jobType: FrontendInferenceJobType.VoiceDesignerCreateVoice,
+          jobType: FrontendInferenceJobType.TextToSpeech,
           t,
         }}
       />

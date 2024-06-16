@@ -6,7 +6,6 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { v4 as uuidv4 } from "uuid";
 import {
   GenerateTtsAudio,
@@ -24,28 +23,16 @@ import {
 import { RandomTexts, PlaceholderTexts } from "./RandomTexts";
 import "./LandingDemo.scss";
 import { isMobile } from "react-device-detect";
+import { useInferenceJobs } from "hooks";
 
 interface TtsInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-  enqueueTtsJob: (jobToken: string) => void;
   showHanashi?: boolean;
   autoFocusTextBox?: boolean;
 }
 
 export default function LandingDemo({
-  inferenceJobs,
   sessionSubscriptionsWrapper,
-  ttsInferenceJobs,
-  enqueueInferenceJob,
-  enqueueTtsJob,
-  inferenceJobsByCategory,
   showHanashi = true,
   autoFocusTextBox = true,
 }: TtsInferencePanelProps) {
@@ -63,6 +50,8 @@ export default function LandingDemo({
   );
   const [placeholder, setPlaceholder] = useState("");
   const [isHanashiHovered, setIsHanashiHovered] = useState(false);
+
+  const { enqueueInferenceJob, inferenceJobs } = useInferenceJobs();
 
   useEffect(() => {
     // Randomize placeholder text on component mount
@@ -128,14 +117,14 @@ export default function LandingDemo({
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
 
-      if (response.inference_job_token_type === "generic") {
-        enqueueInferenceJob(
-          response.inference_job_token,
-          FrontendInferenceJobType.TextToSpeech
-        );
-      } else {
-        enqueueTtsJob(response.inference_job_token);
-      }
+      // if (response.inference_job_token_type === "generic") {
+      enqueueInferenceJob(
+        response.inference_job_token,
+        FrontendInferenceJobType.TextToSpeech
+      );
+      // } else {
+      //   enqueueTtsJob(response.inference_job_token);
+      // }
       // Store the job token
       setJobToken(response.inference_job_token);
       // Store the last enqueued text
@@ -156,7 +145,9 @@ export default function LandingDemo({
       const jobStatusResponse = await GetTtsInferenceJobStatus(jobToken);
 
       if (GetTtsInferenceJobStatusIsOk(jobStatusResponse)) {
-        const job = inferenceJobs.find(job => job.jobToken === jobToken);
+        const job = inferenceJobs.find(
+          (job: InferenceJob) => job.jobToken === jobToken
+        );
         if (job && jobStatusResponse.state.maybe_public_bucket_wav_audio_path) {
           const audioLink = new BucketConfig().getGcsUrl(
             jobStatusResponse.state.maybe_public_bucket_wav_audio_path

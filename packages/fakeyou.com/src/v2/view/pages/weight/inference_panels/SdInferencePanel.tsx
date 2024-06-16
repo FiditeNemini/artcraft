@@ -25,36 +25,28 @@ import {
   EnqueueImageGenIsSuccess,
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PremiumLock from "components/PremiumLock";
+import { useInferenceJobs } from "hooks";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 interface SdInferencePanelProps {
-  inferenceJobs: Array<InferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   weight_token?: string;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
   isStandalone?: boolean;
   weightPageType?: "lora" | "sd";
 }
 
 function SdInferencePanel({
-  enqueueInferenceJob,
   weight_token,
   sessionSubscriptionsWrapper,
   isStandalone = false,
-  inferenceJobs,
   weightPageType = "sd",
 }: SdInferencePanelProps) {
+  const { enqueueInferenceJob, inferenceJobs } = useInferenceJobs();
   const [loraToken, setLoraToken] = useState<string | null>(null);
   const [sdToken, setSdToken] = useState<string | null>(null);
 
@@ -521,7 +513,7 @@ function SdInferencePanel({
           />
         </SplitPanel>
 
-        {inferenceJobs[0] ? (
+        {inferenceJobs && inferenceJobs.length ? (
           <div className={isStandalone ? "mt-4" : "mt-3"}>
             <InferenceJobsList
               {...{

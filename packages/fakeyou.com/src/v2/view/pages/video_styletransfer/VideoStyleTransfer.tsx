@@ -2,10 +2,7 @@ import React, { useReducer, useEffect } from "react";
 
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useInferenceJobs, useLocalize } from "hooks";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { Container } from "components/common";
 
 import { states, reducer } from "./reducer";
@@ -14,13 +11,9 @@ import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faFilms } from "@fortawesome/pro-solid-svg-icons";
 import { VideoStyleTransferNotAvailable } from "v2/view/_common/VideoStyleTransferNotAvailable";
 
-export default function VideoStyleTransfer(props: {
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+export default function VideoStyleTransfer({
+  sessionWrapper,
+}: {
   sessionWrapper: SessionWrapper;
 }) {
   const debug = false;
@@ -30,8 +23,7 @@ export default function VideoStyleTransfer(props: {
     status: NO_FILE,
   });
 
-  const { enqueueInferenceJob } = props;
-  useInferenceJobs(FrontendInferenceJobType.VideoStyleTransfer);
+  const { enqueueInferenceJob } = useInferenceJobs();
   useEffect(() => {
     if (
       pageState.status === states.JOB_ENQUEUED &&
@@ -48,7 +40,7 @@ export default function VideoStyleTransfer(props: {
     }
   }, [pageState, enqueueInferenceJob]);
 
-  if (!props.sessionWrapper.canAccessVideoStyleTransfer()) {
+  if (!sessionWrapper.canAccessVideoStyleTransfer()) {
     return <VideoStyleTransferNotAvailable />;
   }
 

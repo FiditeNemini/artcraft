@@ -2,7 +2,7 @@ import React from "react";
 import {
   faCircleExclamation,
   faEye,
-  faArrowsTurnToDots
+  faArrowsTurnToDots,
 } from "@fortawesome/free-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import PageHeader from "components/layout/PageHeader";
@@ -32,7 +32,6 @@ export default function UploadWorkflowPage({
     { label: "Public", value: "public" },
     { label: "Private", value: "private" },
   ];
-
 
   const failures = (fail = "") => {
     switch (fail) {
@@ -122,7 +121,7 @@ export default function UploadWorkflowPage({
                   placeholder: "Description",
                   value: description,
                 }}
-              />  
+              />
               <TempInput
                 {...{
                   label: "Commit Hash",
@@ -143,7 +142,6 @@ export default function UploadWorkflowPage({
                   value: visibility,
                 }}
               />
-              
             </div>
           </div>
         </SplitPanel.Body>

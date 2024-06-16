@@ -3,7 +3,6 @@ import axios from "axios";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { W2lInferenceJob } from "../../../../../App";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
@@ -28,6 +27,8 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { useInferenceJobs } from "hooks";
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -36,12 +37,11 @@ interface EnqueueJobResponsePayload {
 
 interface Props {
   sessionWrapper: SessionWrapper;
-  enqueueW2lJob: (jobToken: string) => void;
-  w2lInferenceJobs: Array<W2lInferenceJob>;
 }
 
 function W2lTemplateViewPage(props: Props) {
   let { templateSlug }: { templateSlug: string } = useParams();
+  const { enqueueInferenceJob } = useInferenceJobs();
 
   PosthogClient.recordPageview();
 
@@ -92,7 +92,7 @@ function W2lTemplateViewPage(props: Props) {
     [modApprovedFormValue]
   );
 
-  const getTemplateUseCount = useCallback(async (templateToken) => {
+  const getTemplateUseCount = useCallback(async templateToken => {
     const count = await GetW2lTemplateUseCount(templateToken);
     setW2lTemplateUseCount(count || 0);
   }, []);
@@ -157,15 +157,18 @@ function W2lTemplateViewPage(props: Props) {
     // and then interpreting the resultant JSON. Maybe I didn't try hard enough?
     axios
       .post(endpointUrl, formData, { withCredentials: true })
-      .then((res) => res.data)
-      .then((res) => {
+      .then(res => res.data)
+      .then(res => {
         console.log("w2l submitted");
         let response: EnqueueJobResponsePayload = res;
         if (!response.success || response.inference_job_token === undefined) {
           return;
         }
         console.log("w2l enqueueing");
-        props.enqueueW2lJob(response.inference_job_token);
+        enqueueInferenceJob(
+          res.inference_job_token,
+          FrontendInferenceJobType.VoiceConversion
+        );
       });
 
     return false;
@@ -439,7 +442,7 @@ function W2lTemplateViewPage(props: Props) {
                       type="file"
                       name="audio"
                       className="form-control form-control-lg"
-                      onChange={(e) => handleAudioFileChange(e.target.files)}
+                      onChange={e => handleAudioFileChange(e.target.files)}
                     />
                   </div>
                   <button className="btn btn-primary w-100 mt-3">Submit</button>
@@ -555,9 +558,7 @@ function W2lTemplateViewPage(props: Props) {
         </div>
       </div>
 
-      <SessionW2lInferenceResultList
-        w2lInferenceJobs={props.w2lInferenceJobs}
-      />
+      <SessionW2lInferenceResultList />
     </div>
   );
 }

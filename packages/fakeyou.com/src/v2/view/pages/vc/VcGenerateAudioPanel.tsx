@@ -7,10 +7,7 @@ import {
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import UploadComponent from "./vc_model_list/components/UploadComponent";
 import {
@@ -30,6 +27,7 @@ import PitchEstimateMethodComponent from "./vc_model_list/components/PitchEstima
 import PitchShiftComponent from "./vc_model_list/components/PitchShiftComponent";
 import RecordComponent from "./vc_model_list/components/RecordComponent";
 import { v4 as uuidv4 } from "uuid";
+import { useInferenceJobs } from "hooks";
 
 interface VcGenerateAudioPanelProps {
   sessionWrapper: SessionWrapper;
@@ -44,13 +42,6 @@ interface VcGenerateAudioPanelProps {
   setMaybeSelectedVoiceConversionModel: (
     maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
   ) => void;
-
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
 
 export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
@@ -61,9 +52,8 @@ export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
     undefined
   );
 
-  const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(
-    uuidv4()
-  );
+  const [convertIdempotencyToken, setConvertIdempotencyToken] =
+    useState(uuidv4());
 
   const [autoConvertF0, setAutoConvertF0] = useState(false);
 
@@ -77,6 +67,8 @@ export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
   // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
   // with this variable.
   const [formIsCleared, setFormIsCleared] = useState(false);
+
+  const { enqueueInferenceJob } = useInferenceJobs();
 
   let {
     setVoiceConversionModels,
@@ -96,7 +88,7 @@ export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
       setVoiceConversionModels(models);
       if (!maybeSelectedVoiceConversionModel && models.length > 0) {
         let model = models[0];
-        const featuredModels = models.filter((m) => m.is_front_page_featured);
+        const featuredModels = models.filter(m => m.is_front_page_featured);
         if (featuredModels.length > 0) {
           // Random featured model
           model =
@@ -156,7 +148,7 @@ export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
     let result = await EnqueueVoiceConversion(request);
 
     if (EnqueueVoiceConversionIsSuccess(result)) {
-      props.enqueueInferenceJob(
+      enqueueInferenceJob(
         result.inference_job_token,
         FrontendInferenceJobType.VoiceConversion
       );
@@ -395,11 +387,6 @@ export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
             </h4>
             <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
               <SessionVoiceConversionResultsList
-                inferenceJobs={
-                  props.inferenceJobsByCategory.get(
-                    FrontendInferenceJobType.VoiceConversion
-                  )!
-                }
                 sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
               />
             </div>

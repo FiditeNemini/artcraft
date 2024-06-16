@@ -20,11 +20,7 @@ import Container from "components/common/Container/Container";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
 import { SessionVoiceDesignerInferenceResultsList } from "v2/view/_common/SessionVoiceDesignerInferenceResultsList";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
@@ -32,17 +28,11 @@ import Skeleton from "components/common/Skeleton";
 import useVoiceRequests from "./useVoiceRequests";
 import { v4 as uuidv4 } from "uuid";
 import { useHistory } from "react-router-dom";
+import { useInferenceJobs } from "hooks";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
 
 export default function VoiceDesignerUseVoicePage(
@@ -64,8 +54,9 @@ export default function VoiceDesignerUseVoicePage(
   const { inference } = useVoiceRequests({});
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const history = useHistory();
+  const { enqueueInferenceJob } = useInferenceJobs();
 
-  const getVoiceDetails = useCallback(async (voice_token) => {
+  const getVoiceDetails = useCallback(async voice_token => {
     try {
       let result = await GetVoice(voice_token, {});
 
@@ -131,13 +122,13 @@ export default function VoiceDesignerUseVoicePage(
       })
       .then((res: any) => {
         if (res && res.success) {
-          props.enqueueInferenceJob(
+          enqueueInferenceJob(
             res.inference_job_token,
             FrontendInferenceJobType.VoiceDesignerTts
           );
         }
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error enqueuing TTS:", error);
       })
       .finally(() => {
@@ -237,12 +228,6 @@ export default function VoiceDesignerUseVoicePage(
               </h4>
               <div className="d-flex flex-column gap-3 session-tts-section">
                 <SessionVoiceDesignerInferenceResultsList
-                  inferenceJobs={
-                    props.inferenceJobsByCategory.get(
-                      FrontendInferenceJobType.VoiceDesignerTts
-                    )!
-                  }
-                  ttsInferenceJobs={props.ttsInferenceJobs}
                   sessionSubscriptionsWrapper={
                     props.sessionSubscriptionsWrapper
                   }
@@ -309,10 +294,7 @@ export default function VoiceDesignerUseVoicePage(
           <FontAwesomeIcon icon={faMessages} className="me-3" />
           Comments
         </h4>
-        <CommentComponent
-          entityType="user"
-          entityToken={voice_token}
-        />
+        <CommentComponent entityType="user" entityToken={voice_token} />
       </Panel>
     </Container>
   );

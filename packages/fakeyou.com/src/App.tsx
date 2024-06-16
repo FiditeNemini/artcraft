@@ -14,49 +14,20 @@ import PageContainer from "./v2/view/PageContainer";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import {
-  TtsInferenceJob,
-  TtsInferenceJobStateResponsePayload,
-} from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import {
-  W2lInferenceJob,
-  W2lInferenceJobStateResponsePayload,
-} from "@storyteller/components/src/jobs/W2lInferenceJobs";
-import {
-  TtsModelUploadJob,
-  TtsModelUploadJobStateResponsePayload,
-} from "@storyteller/components/src/jobs/TtsModelUploadJobs";
-import {
-  W2lTemplateUploadJob,
-  W2lTemplateUploadJobStateResponsePayload,
-} from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
-import { jobStateCanChange } from "@storyteller/components/src/jobs/JobStates";
+import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import deepEqual from "deep-equal";
-import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
-import {
-  GetRemoteDownloadJobStatus,
-  GetRemoteDownloadJobStatusIsOk,
-} from "@storyteller/components/src/api/remote_downloads/GetRemoteDownloadJobStatus";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import {
   AvailableLanguageKey,
   AVAILABLE_LANGUAGE_MAP,
   ENGLISH_LANGUAGE,
 } from "./_i18n/AvailableLanguageMap";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import {
-  GetModelInferenceJobStatus,
-  GetModelInferenceJobStatusIsOk,
-} from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
-import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
@@ -164,18 +135,6 @@ interface State {
   // An improved notice for "new" languages asking users to help.
   isShowingBootstrapLanguageNotice: boolean;
 
-  // Jobs enqueued during this browser session.
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  w2lInferenceJobs: Array<W2lInferenceJob>;
-  ttsModelUploadJobs: Array<TtsModelUploadJob>;
-  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
-  vocoderUploadJobs: Array<VocoderUploadJob>;
-  voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
-
-  // Generic inference jobs.
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-
   // Current text entered
   textBuffer: string;
 
@@ -188,27 +147,6 @@ function newVocodes() {
   const twitter = /twitter/i.test(navigator.userAgent || "");
   const alphaCookie = document.cookie.includes("enable-alpha");
   return discord || twitter || alphaCookie;
-}
-
-function initInferenceJobsByCategoryMap(): Map<
-  FrontendInferenceJobType,
-  InferenceJob[]
-> {
-  let inferenceJobsByCategory = new Map();
-  inferenceJobsByCategory.set(FrontendInferenceJobType.FaceAnimation, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
-  inferenceJobsByCategory.set(
-    FrontendInferenceJobType.VoiceDesignerCreateVoice,
-    []
-  );
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceDesignerTts, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.ImageGeneration, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoWorkflow, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoStyleTransfer, []);
-  return inferenceJobsByCategory;
 }
 
 function isMacOs() {
@@ -235,8 +173,6 @@ class App extends React.Component<Props, State> {
 
     let showPleaseFollowNotice = false;
 
-    let inferenceJobsByCategory = initInferenceJobsByCategoryMap();
-
     this.state = {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
@@ -255,16 +191,6 @@ class App extends React.Component<Props, State> {
       isShowingTwitchTtsNotice: showTwitchNotice,
       isShowingPleaseFollowNotice: showPleaseFollowNotice,
       isShowingBootstrapLanguageNotice: false,
-
-      ttsInferenceJobs: [],
-      w2lInferenceJobs: [],
-      ttsModelUploadJobs: [],
-      w2lTemplateUploadJobs: [],
-      vocoderUploadJobs: [],
-      voiceConversionModelUploadJobs: [],
-
-      inferenceJobs: [],
-      inferenceJobsByCategory: inferenceJobsByCategory,
 
       textBuffer: "",
 
@@ -302,9 +228,6 @@ class App extends React.Component<Props, State> {
       await this.querySessionSubscriptions();
     }, 60000);
     // TODO: Use websockets, this is dumb
-    setInterval(() => {
-      this.pollJobs();
-    }, 1000);
   }
 
   querySession = async () => {
@@ -458,370 +381,6 @@ class App extends React.Component<Props, State> {
     this.setState({ maybeSelectedVoiceConversionModel: model });
   };
 
-  checkInferenceJob = async (jobToken: string) => {
-    const lookupResult = await GetModelInferenceJobStatus(jobToken);
-
-    let inferenceJobsByCategory = initInferenceJobsByCategoryMap();
-
-    if (GetModelInferenceJobStatusIsOk(lookupResult)) {
-      let updatedJobs: Array<InferenceJob> = [];
-
-      this.state.inferenceJobs.forEach(existingJob => {
-        if (
-          existingJob.jobToken !== lookupResult.state!.job_token ||
-          !jobStateCanChange(existingJob.jobState)
-        ) {
-          updatedJobs.push(existingJob);
-          inferenceJobsByCategory
-            .get(existingJob.frontendJobType)
-            ?.push(existingJob);
-          return;
-        }
-
-        let updatedJob = InferenceJob.fromResponse(
-          lookupResult.state!,
-          existingJob.frontendJobType
-        );
-
-        updatedJobs.push(updatedJob);
-        inferenceJobsByCategory
-          .get(updatedJob.frontendJobType)
-          ?.push(updatedJob);
-      });
-
-      this.setState({
-        inferenceJobs: updatedJobs,
-        inferenceJobsByCategory: inferenceJobsByCategory,
-      });
-    }
-  };
-
-  enqueueInferenceJob = (
-    jobToken: string,
-    frontendJobType: FrontendInferenceJobType
-  ) => {
-    const newJob = new InferenceJob(jobToken, frontendJobType);
-    this.setState({
-      inferenceJobs: [...this.state.inferenceJobs, newJob],
-    });
-  };
-
-  enqueueTtsJob = (jobToken: string) => {
-    const newJob = new TtsInferenceJob(jobToken);
-    let inferenceJobs = this.state.ttsInferenceJobs.concat([newJob]);
-
-    this.setState({
-      ttsInferenceJobs: inferenceJobs,
-    });
-  };
-
-  checkTtsJob = (jobToken: string) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getTtsInferenceJobState(jobToken);
-
-    fetch(endpointUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then(res => res.json())
-      .then(response => {
-        const jobResponse: TtsInferenceJobStateResponsePayload = response;
-
-        if (jobResponse === undefined || jobResponse.state === undefined) {
-          return;
-        }
-
-        let updatedJobs: Array<TtsInferenceJob> = [];
-
-        this.state.ttsInferenceJobs.forEach(existingJob => {
-          if (
-            existingJob.jobToken !== jobResponse.state!.job_token ||
-            !jobStateCanChange(existingJob.jobState)
-          ) {
-            updatedJobs.push(existingJob);
-            return;
-          }
-
-          let updatedJob = TtsInferenceJob.fromResponse(jobResponse.state!);
-          updatedJobs.push(updatedJob);
-        });
-
-        this.setState({
-          ttsInferenceJobs: updatedJobs,
-        });
-      })
-      .catch(e => {
-        /* Ignore. */
-      });
-  };
-
-  enqueueTtsModelUploadJob = (jobToken: string) => {
-    const newJob = new TtsModelUploadJob(jobToken);
-    let modelUploadJobs = this.state.ttsModelUploadJobs.concat([newJob]);
-
-    this.setState({
-      ttsModelUploadJobs: modelUploadJobs,
-    });
-  };
-
-  checkTtsModelUploadJob = (jobToken: string) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getTtsModelUploadJobState(jobToken);
-
-    fetch(endpointUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then(res => res.json())
-      .then(response => {
-        const jobResponse: TtsModelUploadJobStateResponsePayload = response;
-
-        if (jobResponse === undefined || jobResponse.state === undefined) {
-          return;
-        }
-
-        let updatedJobs: Array<TtsModelUploadJob> = [];
-        this.state.ttsModelUploadJobs.forEach(existingJob => {
-          if (
-            existingJob.jobToken !== jobResponse.state!.job_token ||
-            !jobStateCanChange(existingJob.jobState)
-          ) {
-            updatedJobs.push(existingJob);
-            return;
-          }
-
-          let updatedJob = TtsModelUploadJob.fromResponse(jobResponse.state!);
-          updatedJobs.push(updatedJob);
-        });
-
-        this.setState({
-          ttsModelUploadJobs: updatedJobs,
-        });
-      })
-      .catch(e => {
-        /* Ignore. */
-      });
-  };
-
-  enqueueW2lJob = (jobToken: string) => {
-    const newJob = new W2lInferenceJob(jobToken);
-    let inferenceJobs = this.state.w2lInferenceJobs.concat([newJob]);
-
-    this.setState({
-      w2lInferenceJobs: inferenceJobs,
-    });
-  };
-
-  checkW2lJob = (jobToken: string) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getW2lInferenceJobState(jobToken);
-
-    fetch(endpointUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then(res => res.json())
-      .then(response => {
-        const jobResponse: W2lInferenceJobStateResponsePayload = response;
-
-        if (jobResponse === undefined || jobResponse.state === undefined) {
-          return;
-        }
-
-        let updatedJobs: Array<W2lInferenceJob> = [];
-        this.state.w2lInferenceJobs.forEach(existingJob => {
-          if (
-            existingJob.jobToken !== jobResponse.state!.job_token ||
-            !jobStateCanChange(existingJob.jobState)
-          ) {
-            updatedJobs.push(existingJob);
-            return;
-          }
-
-          let updatedJob = W2lInferenceJob.fromResponse(jobResponse.state!);
-          updatedJobs.push(updatedJob);
-        });
-
-        this.setState({
-          w2lInferenceJobs: updatedJobs,
-        });
-      })
-      .catch(e => {
-        /* Ignore. */
-      });
-  };
-
-  enqueueW2lTemplateUploadJob = (jobToken: string) => {
-    const newJob = new W2lTemplateUploadJob(jobToken);
-    let inferenceJobs = this.state.w2lTemplateUploadJobs.concat([newJob]);
-
-    this.setState({
-      w2lTemplateUploadJobs: inferenceJobs,
-    });
-  };
-
-  checkW2lTemplateUploadJob = (jobToken: string) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getW2lTemplateUploadJobState(jobToken);
-
-    fetch(endpointUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then(res => res.json())
-      .then(response => {
-        const jobResponse: W2lTemplateUploadJobStateResponsePayload = response;
-
-        if (jobResponse === undefined || jobResponse.state === undefined) {
-          return;
-        }
-
-        let updatedJobs: Array<W2lTemplateUploadJob> = [];
-
-        this.state.w2lTemplateUploadJobs.forEach(existingJob => {
-          if (
-            existingJob.jobToken !== jobResponse.state!.job_token ||
-            !jobStateCanChange(existingJob.jobState)
-          ) {
-            updatedJobs.push(existingJob);
-            return;
-          }
-
-          let updatedJob = W2lTemplateUploadJob.fromResponse(
-            jobResponse.state!
-          );
-          updatedJobs.push(updatedJob);
-        });
-
-        this.setState({
-          w2lTemplateUploadJobs: updatedJobs,
-        });
-      })
-      .catch(e => {
-        /* Ignore. */
-      });
-  };
-
-  enqueueVocoderUploadJob = (jobToken: string) => {
-    const newJob = new VocoderUploadJob(jobToken);
-    let uploadJobs = this.state.vocoderUploadJobs.concat([newJob]);
-
-    this.setState({
-      vocoderUploadJobs: uploadJobs,
-    });
-  };
-
-  checkVocoderUploadJob = async (jobToken: string) => {
-    const lookupResult = await GetRemoteDownloadJobStatus(jobToken);
-
-    if (GetRemoteDownloadJobStatusIsOk(lookupResult)) {
-      let updatedJobs: Array<VocoderUploadJob> = [];
-
-      this.state.vocoderUploadJobs.forEach(existingJob => {
-        if (
-          existingJob.jobToken !== lookupResult.state!.job_token ||
-          !jobStateCanChange(existingJob.jobState)
-        ) {
-          updatedJobs.push(existingJob);
-          return;
-        }
-
-        let updatedJob = VocoderUploadJob.fromResponse(lookupResult.state!);
-        updatedJobs.push(updatedJob);
-      });
-
-      this.setState({
-        vocoderUploadJobs: updatedJobs,
-      });
-    }
-  };
-
-  enqueueVoiceConversionModelUploadJob = (jobToken: string) => {
-    const newJob = new VoiceConversionModelUploadJob(jobToken);
-    let uploadJobs = this.state.voiceConversionModelUploadJobs.concat([newJob]);
-
-    this.setState({
-      voiceConversionModelUploadJobs: uploadJobs,
-    });
-  };
-
-  checkVoiceConversionModelUploadJob = async (jobToken: string) => {
-    const lookupResult = await GetRemoteDownloadJobStatus(jobToken);
-
-    if (GetRemoteDownloadJobStatusIsOk(lookupResult)) {
-      let updatedJobs: Array<VocoderUploadJob> = [];
-
-      this.state.voiceConversionModelUploadJobs.forEach(existingJob => {
-        if (
-          existingJob.jobToken !== lookupResult.state!.job_token ||
-          !jobStateCanChange(existingJob.jobState)
-        ) {
-          updatedJobs.push(existingJob);
-          return;
-        }
-
-        let updatedJob = VoiceConversionModelUploadJob.fromResponse(
-          lookupResult.state!
-        );
-        updatedJobs.push(updatedJob);
-      });
-
-      this.setState({
-        voiceConversionModelUploadJobs: updatedJobs,
-      });
-    }
-  };
-
-  pollJobs = () => {
-    this.state.inferenceJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkInferenceJob(job.jobToken);
-      }
-    });
-    this.state.ttsInferenceJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkTtsJob(job.jobToken);
-      }
-    });
-    this.state.w2lInferenceJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkW2lJob(job.jobToken);
-      }
-    });
-    this.state.ttsModelUploadJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkTtsModelUploadJob(job.jobToken);
-      }
-    });
-    this.state.w2lTemplateUploadJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkW2lTemplateUploadJob(job.jobToken);
-      }
-    });
-    this.state.vocoderUploadJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkVocoderUploadJob(job.jobToken);
-      }
-    });
-    this.state.voiceConversionModelUploadJobs.forEach(job => {
-      if (jobStateCanChange(job.jobState)) {
-        this.checkVoiceConversionModelUploadJob(job.jobToken);
-      }
-    });
-  };
-
   setMigrationMode = (mode: MigrationMode) => {
     this.setState({ migrationMode: mode });
   };
@@ -848,12 +407,13 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper">
-              <CoreServicesProvider {...{
-                enqueue: this.enqueueInferenceJob,
-                querySession: this.querySession,
-                querySubscriptions: this.querySessionSubscriptions,
-                state: this.state
-              }}>
+              <CoreServicesProvider
+                {...{
+                  querySession: this.querySession,
+                  querySubscriptions: this.querySessionSubscriptions,
+                  state: this.state,
+                }}
+              >
                 <Switch>
                   <Route path="/">
                     <PageContainer
@@ -865,9 +425,7 @@ class App extends React.Component<Props, State> {
                       querySessionSubscriptionsAction={
                         this.querySessionSubscriptions
                       }
-                      isShowingVocodesNotice={
-                        this.state.isShowingVocodesNotice
-                      }
+                      isShowingVocodesNotice={this.state.isShowingVocodesNotice}
                       clearVocodesNotice={this.clearVocodesNotice}
                       isShowingLangaugeNotice={
                         this.state.isShowingLanguageNotice
@@ -889,33 +447,29 @@ class App extends React.Component<Props, State> {
                       clearBootstrapLanguageNotice={
                         this.clearBootstrapLanguageNotice
                       }
-                      enqueueInferenceJob={this.enqueueInferenceJob}
-                      inferenceJobs={this.state.inferenceJobs}
-                      inferenceJobsByCategory={
-                        this.state.inferenceJobsByCategory
-                      }
-                      enqueueTtsJob={this.enqueueTtsJob}
-                      ttsInferenceJobs={this.state.ttsInferenceJobs}
-                      enqueueW2lJob={this.enqueueW2lJob}
-                      w2lInferenceJobs={this.state.w2lInferenceJobs}
-                      enqueueTtsModelUploadJob={
-                        this.enqueueTtsModelUploadJob
-                      }
-                      ttsModelUploadJobs={this.state.ttsModelUploadJobs}
-                      enqueueW2lTemplateUploadJob={
-                        this.enqueueW2lTemplateUploadJob
-                      }
-                      w2lTemplateUploadJobs={
-                        this.state.w2lTemplateUploadJobs
-                      }
-                      enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
-                      vocoderUploadJobs={this.state.vocoderUploadJobs}
-                      enqueueVoiceConversionModelUploadJob={
-                        this.enqueueVoiceConversionModelUploadJob
-                      }
-                      voiceConversionModelUploadJobs={
-                        this.state.voiceConversionModelUploadJobs
-                      }
+                      // enqueueInferenceJob={this.enqueueInferenceJob}
+                      // inferenceJobs={this.state.inferenceJobs}
+                      // inferenceJobsByCategory={
+                      //   this.state.inferenceJobsByCategory
+                      // }
+                      // enqueueTtsJob={this.enqueueTtsJob}
+                      // ttsInferenceJobs={this.state.ttsInferenceJobs}
+                      // enqueueW2lJob={this.enqueueW2lJob}
+                      // w2lInferenceJobs={this.state.w2lInferenceJobs}
+                      // enqueueTtsModelUploadJob={this.enqueueTtsModelUploadJob}
+                      // ttsModelUploadJobs={this.state.ttsModelUploadJobs}
+                      // enqueueW2lTemplateUploadJob={
+                      //   this.enqueueW2lTemplateUploadJob
+                      // }
+                      // w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
+                      // enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
+                      // vocoderUploadJobs={this.state.vocoderUploadJobs}
+                      // enqueueVoiceConversionModelUploadJob={
+                      //   this.enqueueVoiceConversionModelUploadJob
+                      // }
+                      // voiceConversionModelUploadJobs={
+                      //   this.state.voiceConversionModelUploadJobs
+                      // }
                       textBuffer={this.state.textBuffer}
                       setTextBuffer={this.setTextBuffer}
                       clearTextBuffer={this.clearTextBuffer}
@@ -932,23 +486,15 @@ class App extends React.Component<Props, State> {
                       allTtsCategoriesByTokenMap={
                         this.props.allTtsCategoriesByTokenMap
                       }
-                      allTtsModelsByTokenMap={
-                        this.props.allTtsModelsByTokenMap
-                      }
+                      allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
                       ttsModelsByCategoryToken={
                         this.props.ttsModelsByCategoryToken
                       }
                       dropdownCategories={this.props.dropdownCategories}
-                      setDropdownCategories={
-                        this.props.setDropdownCategories
-                      }
+                      setDropdownCategories={this.props.setDropdownCategories}
                       selectedCategories={this.props.selectedCategories}
-                      setSelectedCategories={
-                        this.props.setSelectedCategories
-                      }
-                      maybeSelectedTtsModel={
-                        this.props.maybeSelectedTtsModel
-                      }
+                      setSelectedCategories={this.props.setSelectedCategories}
+                      maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
                       setMaybeSelectedTtsModel={
                         this.props.setMaybeSelectedTtsModel
                       }
@@ -958,9 +504,7 @@ class App extends React.Component<Props, State> {
                       setSelectedTtsLanguageScope={
                         this.props.setSelectedTtsLanguageScope
                       }
-                      voiceConversionModels={
-                        this.state.voiceConversionModels
-                      }
+                      voiceConversionModels={this.state.voiceConversionModels}
                       setVoiceConversionModels={
                         this.setAllVoiceConversionModels
                       }

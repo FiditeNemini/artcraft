@@ -1,38 +1,17 @@
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 // import Alert from "components/common/Alert/Alert";
 import { useLocalize } from "hooks";
 import React from "react";
 import LandingDemo from "./LandingDemo/FakeYouLandingDemo";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { Button, Panel } from "components/common";
 
 interface FakeYouLandingHeaderProps {
-  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-  enqueueTtsJob: (jobToken: string) => void;
 }
 
 export default function FakeYouLandingHeader({
-  sessionWrapper,
   sessionSubscriptionsWrapper,
-  inferenceJobs,
-  ttsInferenceJobs,
-  enqueueInferenceJob,
-  inferenceJobsByCategory,
-  enqueueTtsJob,
 }: FakeYouLandingHeaderProps) {
   const { t } = useLocalize("LandingPage");
 
@@ -54,12 +33,7 @@ export default function FakeYouLandingHeader({
         <div className="row g-5">
           <div className="col-12 col-lg-6 order-lg-2">
             <LandingDemo
-              inferenceJobs={inferenceJobs}
               sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-              enqueueInferenceJob={enqueueInferenceJob}
-              inferenceJobsByCategory={inferenceJobsByCategory}
-              ttsInferenceJobs={ttsInferenceJobs}
-              enqueueTtsJob={enqueueTtsJob}
             />
           </div>
           <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center pt-3 pt-lg-0">

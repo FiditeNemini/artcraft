@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
-import { useFile, useLocalize, useMedia } from "hooks";
+import { useFile, useInferenceJobs, useLocalize, useMedia } from "hooks";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -31,10 +31,7 @@ import "./FaceAnimator.scss";
 import PremiumLock from "components/PremiumLock";
 
 export default function FaceAnimator({
-  enqueueInferenceJob,
   sessionSubscriptionsWrapper,
-  inferenceJobs,
-  inferenceJobsByCategory,
   ...rest
 }: FaceAnimatorCore) {
   const { mediaToken } = useParams<{ mediaToken: string }>();
@@ -59,6 +56,8 @@ export default function FaceAnimator({
   const [still, stillSet] = useState(false);
 
   const [preferPresetAudio, preferPresetAudioSet] = useState(!!mediaToken);
+
+  const { enqueueInferenceJob } = useInferenceJobs();
 
   //const animationChange = ({ target }: any) => animationStyleSet(target.value);
   const frameDimensionsChange = ({ target }: any) =>

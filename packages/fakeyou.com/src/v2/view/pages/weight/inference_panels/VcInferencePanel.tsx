@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { faRightLeft } from "@fortawesome/pro-solid-svg-icons";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Button } from "components/common";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 import Accordion from "components/common/Accordion";
 import SplitPanel from "components/common/SplitPanel";
@@ -23,27 +20,21 @@ import PitchEstimateMethodComponent from "../../vc/vc_model_list/components/Pitc
 import PitchShiftComponent from "../../vc/vc_model_list/components/PitchShiftComponent";
 import RecordComponent from "../../vc/vc_model_list/components/RecordComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useInferenceJobs } from "hooks";
 
 interface VcInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
   voiceToken: string;
 }
 
 export default function VcInferencePanel({
   sessionSubscriptionsWrapper,
-  enqueueInferenceJob,
-  inferenceJobsByCategory,
-  inferenceJobs,
   voiceToken,
 }: VcInferencePanelProps) {
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
+
+  const { enqueueInferenceJob, inferenceJobs } = useInferenceJobs();
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string | undefined>(
     undefined
@@ -294,11 +285,6 @@ export default function VcInferencePanel({
             <Accordion.Item title="Session V2V Results" defaultOpen={true}>
               <div className="p-3">
                 <SessionVoiceConversionResultsList
-                  inferenceJobs={
-                    inferenceJobsByCategory.get(
-                      FrontendInferenceJobType.VoiceConversion
-                    )!
-                  }
                   sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                 />
               </div>

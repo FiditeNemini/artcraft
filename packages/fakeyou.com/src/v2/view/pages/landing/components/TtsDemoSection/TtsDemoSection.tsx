@@ -44,12 +44,7 @@ export default function TtsDemoSection(props: TtsDemoSectionProps) {
         </div>
         <div className="col-12 col-lg-6">
           <LandingDemo
-            inferenceJobs={props.inferenceJobs}
             sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-            enqueueInferenceJob={props.enqueueInferenceJob}
-            inferenceJobsByCategory={props.inferenceJobsByCategory}
-            ttsInferenceJobs={props.ttsInferenceJobs}
-            enqueueTtsJob={props.enqueueTtsJob}
             showHanashi={false}
             autoFocusTextBox={false}
           />

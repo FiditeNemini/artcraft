@@ -1,7 +1,6 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
 
-
 .work-indicator {
   @include medium-svg;
   // height: 2.25rem;
@@ -14,20 +13,26 @@
   //   stroke: #fff;
   // }
 
-  polyline { transform: translate(2px,2px); }
+  polyline {
+    transform: translate(6px, 6px);
+  }
 
   .work-indicator-circle-track {
-    stroke: rgba(#fff, .15);
+    stroke: rgba(#fff, 0.15);
     stroke-width: 4px;
   }
-  
+
   .work-indicator-circle-marker {
     transform-origin: 18px 18px;
     animation: work-indicator-spin 1.5s linear infinite;
   }
 
   @keyframes work-indicator-spin {
-    0% {  transform: rotate(0deg) }
-    100% { transform: rotate(360deg) }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 }

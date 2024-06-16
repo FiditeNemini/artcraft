@@ -1,5 +1,8 @@
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { FrontendInferenceJobType,  InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 
 export interface FaceAnimatorSlide {
   audioProps: any;
@@ -10,8 +13,8 @@ export interface FaceAnimatorSlide {
   disableFaceEnhancement: any;
   disableFaceEnhancementChange: any;
   index: number;
-  preferPresetAudio?: any,
-  preferPresetAudioSet?: any,
+  preferPresetAudio?: any;
+  preferPresetAudioSet?: any;
   presetAudio?: any;
   still: any;
   stillChange: any;
@@ -26,10 +29,4 @@ export interface FaceAnimatorSlide {
 
 export interface FaceAnimatorCore {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }

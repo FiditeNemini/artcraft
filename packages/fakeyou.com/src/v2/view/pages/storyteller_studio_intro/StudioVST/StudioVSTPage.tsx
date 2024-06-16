@@ -5,7 +5,10 @@ import { Button, Container, Panel, Select, TextArea } from "components/common";
 
 // import { VideoPlayer } from "components/common/VideoPlayer";
 import { useJobStatus, useInferenceJobs, useMedia } from "hooks";
-import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
+import {
+  EnqueueVST,
+  EnqueueVSTResponse,
+} from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
 import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
@@ -20,7 +23,7 @@ export default function PageVSTApp() {
 
   const job = useJobStatus({ jobToken });
 
-  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.VideoStyleTransfer);
+  const { enqueue } = useInferenceJobs();
 
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
@@ -38,7 +41,7 @@ export default function PageVSTApp() {
   };
 
   const handleGenerate = () => {
-    EnqueueVST("",{
+    EnqueueVST("", {
       creator_set_visibility: vstValues.visibility,
       enable_lipsync: false,
       input_file: job?.maybe_result?.entity_token || "",
@@ -47,11 +50,13 @@ export default function PageVSTApp() {
       style: vstValues.sdModelToken,
       trim_end_millis: 3000,
       trim_start_millis: 0,
-      uuid_idempotency_token: uuidv4()
-    })
-    .then((res: EnqueueVSTResponse) => {
+      uuid_idempotency_token: uuidv4(),
+    }).then((res: EnqueueVSTResponse) => {
       if (res.success && res.inference_job_token) {
-        enqueue(res.inference_job_token);
+        enqueue(
+          res.inference_job_token,
+          FrontendInferenceJobType.VideoStyleTransfer
+        );
         // console.log("Job enqueued successfully", res.inference_job_token);
         history.push(`/studio-intro/result/${res.inference_job_token}`);
       } else {
@@ -79,7 +84,7 @@ export default function PageVSTApp() {
   }
 
   const handleStyleSelection = (selectedOption: StyleOption) => {
-    console.log('option', selectedOption);
+    console.log("option", selectedOption);
     const selectedSdModelToken = selectedOption ? selectedOption.value : null;
     if (selectedSdModelToken) {
       setVstValues(curr => ({ ...curr, sdModelToken: selectedSdModelToken }));
@@ -111,11 +116,12 @@ export default function PageVSTApp() {
   // }
 
   const { media } = useMedia({
-    mediaToken: job?.maybe_result?.entity_token
+    mediaToken: job?.maybe_result?.entity_token,
   });
 
   const mediaLink =
-    media?.public_bucket_path && new BucketConfig().getGcsUrl(media?.public_bucket_path || "");
+    media?.public_bucket_path &&
+    new BucketConfig().getGcsUrl(media?.public_bucket_path || "");
 
   return (
     <Container type="panel" className="mt-5">
@@ -127,10 +133,7 @@ export default function PageVSTApp() {
           <div className="col-12 col-md-6">
             {job.isSuccessful && job.maybe_result ? (
               <div className="ratio ratio-4x3 panel-inner rounded">
-                <video
-                  src={mediaLink}
-                  controls
-                />
+                <video src={mediaLink} controls />
               </div>
             ) : (
               <div className="ratio ratio-4x3 panel-inner rounded">
@@ -145,7 +148,7 @@ export default function PageVSTApp() {
                 label="Label"
                 options={STYLE_OPTIONS}
                 onChange={handleStyleSelection}
-                />
+              />
             </div>
 
             <TextArea

@@ -3,20 +3,22 @@ import { JobState, jobStateFromString } from "./JobStates";
 
 // Type of inference job (specified by the frontend, not backend)
 export enum FrontendInferenceJobType {
-  FaceAnimation,
-  TextToSpeech,
-  VoiceConversion,
+  FaceAnimation, // lipsync_animation
+  TextToSpeech, // text_to_speech
+  VoiceConversion, // voice_conversion
   VoiceDesignerCreateVoice,
   VoiceDesignerTts,
-  ImageGeneration,
-  VideoMotionCapture,
-  ConvertFbxtoGltf,
-  EngineComposition,
-  VideoWorkflow,
-  VideoStyleTransfer,
+  ImageGeneration, // image_generation
+  VideoMotionCapture, // mocap ?
+  ConvertFbxtoGltf, // format_conversion
+  EngineComposition, // convert_bvh_to_workflow ?
+  VideoWorkflow, // workflow ?
+  VideoStyleTransfer, // video_filter ?
 }
 
-export enum AllInferenceJobs { All }
+export enum AllInferenceJobs {
+  All,
+}
 
 export type JobListOptions = FrontendInferenceJobType | AllInferenceJobs;
 

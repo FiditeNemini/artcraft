@@ -4,10 +4,6 @@ import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInferenceResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
-import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
-import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
 import { v4 as uuidv4 } from "uuid";
 import {
   ListTtsModels,
@@ -43,11 +39,12 @@ import { DynamicallyCategorizeModels } from "../../../../../model/categories/Syn
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { SearchOmnibar } from "./search/SearchOmnibar";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
 import { Container, Panel } from "components/common";
+import { useInferenceJobs } from "hooks";
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
@@ -67,12 +64,6 @@ interface Props {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
-  enqueueTtsJob: (jobToken: string) => void;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  ttsModelUploadJobs: Array<TtsModelUploadJob>;
-  w2lInferenceJobs: Array<W2lInferenceJob>;
-  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
   clearTextBuffer: () => void;
@@ -105,7 +96,8 @@ interface Props {
 }
 
 function TrumpTtsPage(props: Props) {
-  //Loading spinning icon
+  //Loading spinning icon\
+  const { enqueueInferenceJob } = useInferenceJobs();
   const [loading, setLoading] = useState(false);
   const [isAudioLimitAlertVisible, setAudioLimitAlertVisible] = useState(false);
   PosthogClient.recordPageview();
@@ -278,7 +270,10 @@ function TrumpTtsPage(props: Props) {
 
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
-      props.enqueueTtsJob(response.inference_job_token);
+      enqueueInferenceJob(
+        response.inference_job_token,
+        FrontendInferenceJobType.ImageGeneration
+      );
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
@@ -474,8 +469,6 @@ function TrumpTtsPage(props: Props) {
                   </h4>
                   <div className="d-flex flex-column gap-3 session-tts-section">
                     <SessionTtsInferenceResultList
-                      inferenceJobs={props.inferenceJobs}
-                      ttsInferenceJobs={props.ttsInferenceJobs}
                       sessionSubscriptionsWrapper={
                         props.sessionSubscriptionsWrapper
                       }

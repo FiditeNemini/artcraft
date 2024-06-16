@@ -5,7 +5,6 @@ import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInfere
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { LanguageCodeToDescriptionWithDefault } from "@storyteller/components/src/i18n/SupportedModelLanguages";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import {
   TEXT_PIPELINE_NAMES,
   TEXT_PIPELINE_NAMES_FOR_MODERATORS,
@@ -65,15 +64,13 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { useInferenceJobs } from "hooks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  enqueueTtsJob: (jobToken: string) => void;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
   clearTextBuffer: () => void;
@@ -99,13 +96,15 @@ function TtsModelViewPage(props: Props) {
 
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
+  const { enqueueInferenceJob } = useInferenceJobs();
+
   const documentTitle =
     ttsModel?.title === undefined
       ? undefined
       : `${ttsModel.title} Deep Fake TTS generator`;
   usePrefixedDocumentTitle(documentTitle);
 
-  const getModel = useCallback(async (token) => {
+  const getModel = useCallback(async token => {
     const model = await GetTtsModel(token);
 
     if (GetTtsModelIsOk(model)) {
@@ -119,19 +118,19 @@ function TtsModelViewPage(props: Props) {
     }
   }, []);
 
-  const getModelUseCount = useCallback(async (token) => {
+  const getModelUseCount = useCallback(async token => {
     const useCount = await GetTtsModelUseCount(token);
     setTtsModelUseCount(useCount);
   }, []);
 
-  const listTtsCategoriesForModel = useCallback(async (token) => {
+  const listTtsCategoriesForModel = useCallback(async token => {
     const categoryList = await ListTtsCategoriesForModel(token);
     if (ListTtsCategoriesForModelIsOk(categoryList)) {
       setAssignedCategories(categoryList.categories);
 
       let categoriesByTokenMap = new Map();
 
-      categoryList.categories.forEach((category) => {
+      categoryList.categories.forEach(category => {
         categoriesByTokenMap.set(category.category_token, category);
       });
 
@@ -147,7 +146,7 @@ function TtsModelViewPage(props: Props) {
     if (ListTtsCategoriesIsOk(categoryList)) {
       let categoriesByTokenMap = new Map();
 
-      categoryList.categories.forEach((category) => {
+      categoryList.categories.forEach(category => {
         categoriesByTokenMap.set(category.category_token, category);
       });
 
@@ -246,16 +245,19 @@ function TtsModelViewPage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         let response: EnqueueJobResponsePayload = res;
         if (!response.success || response.inference_job_token === undefined) {
           return;
         }
 
-        props.enqueueTtsJob(response.inference_job_token);
+        enqueueInferenceJob(
+          response.inference_job_token,
+          FrontendInferenceJobType.TextToSpeech
+        );
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };
@@ -372,7 +374,7 @@ function TtsModelViewPage(props: Props) {
         <>
           <div>
             <ul className="d-flex flex-column gap-2">
-              {assignedCategories.map((category) => {
+              {assignedCategories.map(category => {
                 const categoryHierarchy = recursiveBuildHierarchy(
                   allCategoriesByTokenMap,
                   assignedCategoriesByTokenMap,
@@ -859,8 +861,6 @@ function TtsModelViewPage(props: Props) {
           Session TTS Results
         </h4>
         <SessionTtsInferenceResultList
-          inferenceJobs={props.inferenceJobs}
-          ttsInferenceJobs={props.ttsInferenceJobs}
           sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         />
       </div>

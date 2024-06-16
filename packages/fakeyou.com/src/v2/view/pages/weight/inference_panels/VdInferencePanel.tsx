@@ -4,41 +4,29 @@ import Panel from "components/common/Panel/Panel";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import useVoiceRequests from "../../voice_designer/useVoiceRequests";
 import { v4 as uuidv4 } from "uuid";
 import Accordion from "components/common/Accordion";
 import { SessionVoiceDesignerInferenceResultsList } from "v2/view/_common/SessionVoiceDesignerInferenceResultsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useInferenceJobs } from "hooks";
 
 interface VdInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
   voiceToken: string;
 }
 
 export default function VdInferencePanel({
-  inferenceJobs,
   sessionSubscriptionsWrapper,
-  ttsInferenceJobs,
-  enqueueInferenceJob,
-  inferenceJobsByCategory,
   voiceToken,
 }: VdInferencePanelProps) {
   const [textBuffer, setTextBuffer] = useState("");
   const { inference } = useVoiceRequests({});
   const [isEnqueuing, setIsEnqueuing] = useState(false);
+
+  const { enqueueInferenceJob, inferenceJobs } = useInferenceJobs();
 
   const handleEnqueueTts = () => {
     setIsEnqueuing(true);
@@ -107,18 +95,12 @@ export default function VdInferencePanel({
         </div>
       </form>
 
-      {inferenceJobs[0] && (
+      {inferenceJobs && inferenceJobs.length && (
         <div className="mt-4">
           <Accordion>
             <Accordion.Item title="Session TTS Results" defaultOpen={true}>
               <div className="p-3">
                 <SessionVoiceDesignerInferenceResultsList
-                  inferenceJobs={
-                    inferenceJobsByCategory.get(
-                      FrontendInferenceJobType.VoiceDesignerTts
-                    )!
-                  }
-                  ttsInferenceJobs={ttsInferenceJobs}
                   sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                 />
               </div>

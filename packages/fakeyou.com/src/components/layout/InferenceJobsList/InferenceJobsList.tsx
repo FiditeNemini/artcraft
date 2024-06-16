@@ -1,8 +1,12 @@
 import React from "react";
-import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  AllInferenceJobs,
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 // import { useTransition } from "@react-spring/web";
 import JobItem from "./JobItem";
-import { useInferenceJobs,  useLocalize, useSession } from "hooks";
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 import "./InferenceJobsList.scss";
 import { Button, Panel, JobQueueTicker } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,7 +14,7 @@ import { faClipboardList } from "@fortawesome/pro-solid-svg-icons";
 
 interface JobsListProps {
   failures: (fail: string) => string;
-  jobType?: FrontendInferenceJobType;
+  jobType?: FrontendInferenceJobType | AllInferenceJobs;
   onSelect?: (e: any) => any;
   panel?: boolean;
   showJobQueue?: boolean;
@@ -36,31 +40,44 @@ export default function InferenceJobsList({
   panel = true,
   showHeader = true,
   showJobQueue = false,
-  showNoJobs = false
+  showNoJobs = false,
 }: JobsListProps) {
   const { sessionSubscriptions } = useSession();
   const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
-  const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobType);
+  const {
+    inferenceJobs = [],
+    inferenceJobsByCategory,
+    jobStatusDescription,
+  } = useInferenceJobs();
   const { t } = useLocalize("InferenceJobs");
+  const selectedJobs =
+    jobType === undefined || jobType === AllInferenceJobs.All
+      ? inferenceJobs
+      : inferenceJobsByCategory.get(jobType);
 
   const jobContent = (
     <>
-      {showHeader &&<h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
-      { showJobQueue && <JobQueueTicker {...{ hasPaidFeatures }}/> }
+      {showHeader && <h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
+      {showJobQueue && <JobQueueTicker {...{ hasPaidFeatures }} />}
       <div {...{ className: "fy-inference-jobs-list-grid" }}>
-        { inferenceJobs.map((job: InferenceJob, key: number) => 
-          <JobItem {...{
-            failures,
-            jobStatusDescription,
-            key,
-            onSelect,
-            resultPaths,
-            t,
-            ...job,
-          }}/>
-        ).reverse() }
+        {selectedJobs &&
+          selectedJobs
+            .map((job: InferenceJob, key: number) => (
+              <JobItem
+                {...{
+                  failures,
+                  jobStatusDescription,
+                  key,
+                  onSelect,
+                  resultPaths,
+                  t,
+                  ...job,
+                }}
+              />
+            ))
+            .reverse()}
       </div>
-      {!inferenceJobs.length && showNoJobs && (
+      {(!selectedJobs || !selectedJobs.length) && showNoJobs && (
         <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">
           <FontAwesomeIcon icon={faClipboardList} className="display-6 mb-2" />
           <div>
@@ -74,14 +91,20 @@ export default function InferenceJobsList({
     </>
   );
 
-  if (inferenceJobs.length || showNoJobs) {
-    return <>
-        { panel ? <Panel {...{ className: "fy-inference-jobs-list rounded", padding: true }}>
-            { jobContent }
-          </Panel> :
-          <>{ jobContent }</>
-        }
-      </>;
+  if (selectedJobs || showNoJobs) {
+    return (
+      <>
+        {panel ? (
+          <Panel
+            {...{ className: "fy-inference-jobs-list rounded", padding: true }}
+          >
+            {jobContent}
+          </Panel>
+        ) : (
+          <>{jobContent}</>
+        )}
+      </>
+    );
   } else {
     return null;
   }

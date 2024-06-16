@@ -20,7 +20,7 @@ interface Props {
 export default function EngineCompositor({ value, sessionWrapper }: Props) {
   const [mediaToken, mediaTokenSet] = useState();
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
-  const inferenceJobs = useInferenceJobs(FrontendInferenceJobType.EngineComposition);
+  const { enqueue } = useInferenceJobs();
 
   const onClick = () => {
     EnqueueEngineCompositing("", {
@@ -28,7 +28,11 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
       media_file_token: mediaToken || "",
     }).then((res: any) => {
       if (res && res.success) {
-        inferenceJobs.enqueue(res.inference_job_token,true);
+        enqueue(
+          res.inference_job_token,
+          FrontendInferenceJobType.EngineComposition,
+          true
+        );
       }
     });
   };
@@ -63,7 +67,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
                 label: "Choose 3D data",
                 onChange,
                 type: "media",
-                value: mediaToken
+                value: mediaToken,
               }}
             />
           </div>

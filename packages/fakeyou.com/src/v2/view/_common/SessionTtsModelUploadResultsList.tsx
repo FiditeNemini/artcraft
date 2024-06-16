@@ -1,66 +1,71 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
-import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
+import { useInferenceJobs } from "hooks";
 
-interface Props {
-  modelUploadJobs: Array<TtsModelUploadJob>;
-}
+// interface Props {}
 
-function SessionTtsModelUploadResultList(props: Props) {
+function SessionTtsModelUploadResultList() {
+  const { inferenceJobsByCategory } = useInferenceJobs();
   let results: Array<JSX.Element> = [];
 
-  props.modelUploadJobs.forEach((job) => {
-    if (!job.maybeModelToken) {
-      let stateDescription = "Pending...";
+  inferenceJobsByCategory
+    .get(FrontendInferenceJobType.TextToSpeech)
+    .forEach((job: InferenceJob) => {
+      if (!job.maybeModelToken) {
+        let stateDescription = "Pending...";
 
-      switch (job.jobState) {
-        case JobState.PENDING:
-        case JobState.UNKNOWN:
-          stateDescription =
-            job.maybeExtraStatusDescription == null
-              ? "Pending..."
-              : job.maybeExtraStatusDescription;
-          break;
-        case JobState.STARTED:
-          stateDescription =
-            job.maybeExtraStatusDescription == null
-              ? "Started..."
-              : job.maybeExtraStatusDescription;
-          break;
-        case JobState.ATTEMPT_FAILED:
-          stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
-          break;
-        case JobState.COMPLETE_FAILURE:
-        case JobState.DEAD:
-          stateDescription =
-            "Failed Permanently. Please tell us in Discord so we can fix. :(";
-          break;
-        case JobState.COMPLETE_SUCCESS:
-          stateDescription = "Success!"; // Not sure why we're here instead of other branch!
-          break;
-      }
+        switch (job.jobState) {
+          case JobState.PENDING:
+          case JobState.UNKNOWN:
+            stateDescription =
+              job.maybeExtraStatusDescription == null
+                ? "Pending..."
+                : job.maybeExtraStatusDescription;
+            break;
+          case JobState.STARTED:
+            stateDescription =
+              job.maybeExtraStatusDescription == null
+                ? "Started..."
+                : job.maybeExtraStatusDescription;
+            break;
+          case JobState.ATTEMPT_FAILED:
+            stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
+            break;
+          case JobState.COMPLETE_FAILURE:
+          case JobState.DEAD:
+            stateDescription =
+              "Failed Permanently. Please tell us in Discord so we can fix. :(";
+            break;
+          case JobState.COMPLETE_SUCCESS:
+            stateDescription = "Success!"; // Not sure why we're here instead of other branch!
+            break;
+        }
 
-      results.push(
-        <div key={job.jobToken}>
-          <div className="alert alert-primary">{stateDescription}</div>
-        </div>
-      );
-    } else {
-      let ttsPermalink = `/tts/${job.maybeModelToken}`;
-
-      results.push(
-        <div key={job.jobToken}>
-          <div className="panel py-4 p-3 p-lg-4 gap-4">
-            Complete!
-            <Link to={ttsPermalink} className="btn btn-primary ms-4">
-              See &amp; use TTS model
-            </Link>
+        results.push(
+          <div key={job.jobToken}>
+            <div className="alert alert-primary">{stateDescription}</div>
           </div>
-        </div>
-      );
-    }
-  });
+        );
+      } else {
+        let ttsPermalink = `/tts/${job.maybeModelToken}`;
+
+        results.push(
+          <div key={job.jobToken}>
+            <div className="panel py-4 p-3 p-lg-4 gap-4">
+              Complete!
+              <Link to={ttsPermalink} className="btn btn-primary ms-4">
+                See &amp; use TTS model
+              </Link>
+            </div>
+          </div>
+        );
+      }
+    });
 
   let title = <span />;
   if (results.length !== 0) {

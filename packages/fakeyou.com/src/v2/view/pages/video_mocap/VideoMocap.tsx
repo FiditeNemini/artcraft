@@ -1,10 +1,7 @@
 import React, { useReducer, useEffect } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 import { Button, Container, Panel, Tabs } from "components/common";
 import { useInferenceJobs, useLocalize } from "hooks";
@@ -24,23 +21,19 @@ import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
-export default function VideoMotionCapture(props: {
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+export default function VideoMotionCapture({
+  sessionWrapper,
+}: {
   sessionWrapper: SessionWrapper;
 }) {
-  const { enqueueInferenceJob, sessionWrapper } = props;
   const { t } = useLocalize("VideoMotionCapture");
   const { NO_FILE, FILE_UPLOADING, MOCAPNET_ENQUEUED } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
   });
 
-  const { inferenceJobs } = useInferenceJobs(
+  const { enqueueInferenceJob, inferenceJobsByCategory } = useInferenceJobs();
+  const inferenceJobs = inferenceJobsByCategory.get(
     FrontendInferenceJobType.VideoMotionCapture
   );
   const hasMotionCaptureJobs = inferenceJobs && inferenceJobs.length > 0;
@@ -63,7 +56,7 @@ export default function VideoMotionCapture(props: {
   const { pathname } = useLocation();
 
   if (!sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />
+    return <StudioNotAvailable />;
   }
 
   if (pathname === `/video-mocap` || pathname === `/video-mocap/`) {
@@ -109,7 +102,10 @@ export default function VideoMotionCapture(props: {
                 <Tabs tabs={tabs} />
               </div>
               <div className="col-12 col-md-6 p-5 mt-3">
-                <p>Upload or select a video from the library, our AI will analyze and turn it into a 3D model (aka a BVH file) </p>
+                <p>
+                  Upload or select a video from the library, our AI will analyze
+                  and turn it into a 3D model (aka a BVH file){" "}
+                </p>
               </div>
             </>
           )}

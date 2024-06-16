@@ -4,11 +4,8 @@ import Panel from "components/common/Panel/Panel";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+// import InferenceJobsList from "components/layout/InferenceJobsList";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from "uuid";
 import Accordion from "components/common/Accordion";
@@ -22,29 +19,22 @@ import {
 import { Analytics } from "common/Analytics";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
+import { useInferenceJobs } from "hooks";
 
 interface TtsInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobs: Array<InferenceJob>;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
   voiceToken: string;
-  enqueueTtsJob: (jobToken: string) => void;
+  // enqueueTtsJob: (jobToken: string) => void;
 }
 
 export default function TtsInferencePanel({
-  inferenceJobs,
   sessionSubscriptionsWrapper,
-  ttsInferenceJobs,
-  enqueueInferenceJob,
-  enqueueTtsJob,
-  inferenceJobsByCategory,
   voiceToken,
 }: TtsInferencePanelProps) {
+  const { enqueueInferenceJob, inferenceJobsByCategory } = useInferenceJobs();
+  const ttsJobs = inferenceJobsByCategory.get(
+    FrontendInferenceJobType.TextToSpeech
+  );
   const [textBuffer, setTextBuffer] = useState("");
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [maybeTtsError, setMaybeTtsError] = useState<
@@ -86,14 +76,14 @@ export default function TtsInferencePanel({
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
 
-      if (response.inference_job_token_type === "generic") {
-        enqueueInferenceJob(
-          response.inference_job_token,
-          FrontendInferenceJobType.TextToSpeech
-        );
-      } else {
-        enqueueTtsJob(response.inference_job_token);
-      }
+      // if (response.inference_job_token_type === "generic") {
+      enqueueInferenceJob(
+        response.inference_job_token,
+        FrontendInferenceJobType.TextToSpeech
+      );
+      // } else {
+      //   enqueueTtsJob(response.inference_job_token);
+      // }
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
@@ -191,18 +181,20 @@ export default function TtsInferencePanel({
         </div>
       </form>
 
-      {inferenceJobs[0] && (
+      {/*      <InferenceJobsList
+        {...{
+          failures: () => "Uknown failure",
+          onSelect: () => Analytics.voiceConversionClickDownload(),
+          jobType: FrontendInferenceJobType.TextToSpeech,
+        }}
+      />*/}
+
+      {ttsJobs && ttsJobs.length && (
         <div className="mt-4">
           <Accordion>
             <Accordion.Item title="Session TTS Results" defaultOpen={true}>
               <div className="p-3">
                 <SessionTtsInferenceResultList
-                  inferenceJobs={
-                    inferenceJobsByCategory.get(
-                      FrontendInferenceJobType.TextToSpeech
-                    )!
-                  }
-                  ttsInferenceJobs={ttsInferenceJobs}
                   sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                 />
               </div>

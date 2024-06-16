@@ -11,28 +11,20 @@ import PageHeader from "components/layout/PageHeader";
 // import { useHistory, useParams } from "react-router-dom";
 // import { v4 as uuidv4 } from "uuid";
 // import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+// import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import FbxToGltfJobList from "./components/FbxToGltfJobList";
-import {
-  // EnqueueFbxToGltf,
-  // EnqueueFbxToGltfIsSuccess,
-  // EnqueueFbxToGltfIsError,
-} from "@storyteller/components/src/api/file_conversion/EnqueueFbxToGltf";
+import // EnqueueFbxToGltf,
+// EnqueueFbxToGltfIsSuccess,
+// EnqueueFbxToGltfIsError,
+"@storyteller/components/src/api/file_conversion/EnqueueFbxToGltf";
 import { onChanger } from "resources";
 
 import { EntityInput } from "components/entities";
 
-interface FbxToGltfPageProps {
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-}
+// interface FbxToGltfPageProps {}
 
-export default function FbxToGltfPage({
-  enqueueInferenceJob,
-}: FbxToGltfPageProps) {
-  const [mediaToken,mediaTokenSet] = useState();
+export default function FbxToGltfPage() {
+  const [mediaToken, mediaTokenSet] = useState();
   const onChange = onChanger({ mediaTokenSet });
 
   // const EnqueueConvert = async ({ upload_token }: any) => {
@@ -74,57 +66,58 @@ export default function FbxToGltfPage({
         imageUrl="/images/header/fbx-to-gltf.png"
       />
 
-        <div className="mb-4">
-          <FbxToGltfJobList />
-        </div>
+      <div className="mb-4">
+        <FbxToGltfJobList />
+      </div>
 
       <Panel padding={true}>
         <div className="d-flex flex-column gap-3">
-          <EntityInput {...{
-            accept: ["engine_asset"],
-            aspectRatio: "landscape",
-            label: "Choose FBX file",
-            name: "mediaToken",
-            onChange,
-            // owner: "echelon",
-            type: "media"
-          }}/>
+          <EntityInput
+            {...{
+              accept: ["engine_asset"],
+              aspectRatio: "landscape",
+              label: "Choose FBX file",
+              name: "mediaToken",
+              onChange,
+              // owner: "echelon",
+              type: "media",
+            }}
+          />
           {
-
-          //   mediaToken && presetFile ? (
-          //   <div>
-          //     <label className="sub-title">FBX file from media</label>
-          //     <Panel className="panel-inner p-3 rounded">
-          //       <div className="d-flex gap-3 align-items-center flex-wrap">
-          //         <div className="d-flex gap-3 flex-grow-1 align-items-center">
-          //           <FontAwesomeIcon icon={faFile} className="display-6" />
-          //           <div>
-          //             <h6 className="mb-1">{presetFile.token}</h6>
-          //             <p className="opacity-75">
-          //               Created by {presetFile.maybe_creator_user?.display_name}
-          //             </p>
-          //           </div>
-          //         </div>
-          //         <Button
-          //           icon={faTrashAlt}
-          //           square={true}
-          //           onClick={clearMediaToken}
-          //           variant="danger"
-          //           small={true}
-          //           tooltip="Remove file"
-          //         />
-          //       </div>
-          //     </Panel>
-          //   </div>
-          // ) : (
-          //   <FileInput
-          //     {...fileProps}
-          //     label="Select FBX File"
-          //     fileTypes={["FBX"]}
-          //     mediaToken={mediaToken}
-          //   />
-          // )
-        }
+            //   mediaToken && presetFile ? (
+            //   <div>
+            //     <label className="sub-title">FBX file from media</label>
+            //     <Panel className="panel-inner p-3 rounded">
+            //       <div className="d-flex gap-3 align-items-center flex-wrap">
+            //         <div className="d-flex gap-3 flex-grow-1 align-items-center">
+            //           <FontAwesomeIcon icon={faFile} className="display-6" />
+            //           <div>
+            //             <h6 className="mb-1">{presetFile.token}</h6>
+            //             <p className="opacity-75">
+            //               Created by {presetFile.maybe_creator_user?.display_name}
+            //             </p>
+            //           </div>
+            //         </div>
+            //         <Button
+            //           icon={faTrashAlt}
+            //           square={true}
+            //           onClick={clearMediaToken}
+            //           variant="danger"
+            //           small={true}
+            //           tooltip="Remove file"
+            //         />
+            //       </div>
+            //     </Panel>
+            //   </div>
+            // ) : (
+            //   <FileInput
+            //     {...fileProps}
+            //     label="Select FBX File"
+            //     fileTypes={["FBX"]}
+            //     mediaToken={mediaToken}
+            //   />
+            // )
+          }
 
           <div className="d-flex justify-content-end">
             <Button

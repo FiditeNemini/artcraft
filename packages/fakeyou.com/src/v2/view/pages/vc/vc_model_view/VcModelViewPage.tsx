@@ -24,7 +24,6 @@ interface VcModelViewPageProps {
   setMaybeSelectedInferenceJob: any;
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobsByCategory: any;
 }
 
 export default function VcModelViewPage(props: VcModelViewPageProps) {
@@ -108,14 +107,11 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
       />
 
       <VcGenerateAudioPanel
-        inferenceJobsByCategory={props.inferenceJobsByCategory}
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         sessionWrapper={props.sessionWrapper}
         setVoiceConversionModels={() => {}}
         voiceConversionModels={[]}
         setMaybeSelectedVoiceConversionModel={() => {}}
-        enqueueInferenceJob={() => {}}
-        inferenceJobs={[]}
       />
 
       {modelDescription && (
@@ -174,10 +170,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
           <FontAwesomeIcon icon={faMessages} className="me-3" />
           Comments
         </h4>
-        <CommentComponent
-          entityType="user"
-          entityToken="test"
-        />
+        <CommentComponent entityType="user" entityToken="test" />
       </Panel>
     </Container>
   );

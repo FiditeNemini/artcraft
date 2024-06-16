@@ -21,30 +21,20 @@ import {
   RouteComponentProps,
 } from "react-router-dom";
 import { TermsPage } from "./pages/about/terms_page/TermsPage";
-import { TtsInferenceJob, W2lInferenceJob } from "../../App";
 import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeletePage";
 import { TtsModelEditPage } from "./pages/tts/tts_model_edit/TtsModelEditPage";
-import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
-import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
-import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { TtsModelViewPage } from "./pages/tts/tts_model_view/TtsModelViewPage";
 import { TtsResultDeletePage } from "./pages/tts/tts_result_delete/TtsResultDeletePage";
 import { TtsResultViewPage } from "./pages/tts/tts_result_view/TtsResultViewPage";
 import { ContributeIndexPage } from "./pages/contribute/ContributeIndexPage";
 
 import { UploadTtsModelPage } from "./pages/upload/UploadTtsModelPage";
-import { UploadW2lPhotoPage } from "./pages/upload/UploadW2lPhotoPage";
-import { UploadW2lVideoPage } from "./pages/upload/UploadW2lVideoPage";
-import { UploadVocoderPage } from "./pages/upload/UploadVocoderPage";
-import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
 import UploadWorkflowPage from "./pages/upload/UploadWorkflowPage";
 
 import { W2lResultViewPage } from "./pages/w2l/w2l_result_view/W2lResultViewPage";
 import { W2lTemplateListPage } from "./pages/w2l/w2l_template_list/W2lTemplateListPage";
-import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
-import { W2lTemplateViewPage } from "./pages/w2l/w2l_template_view/W2lTemplateViewPage";
 import { TtsResultEditPage } from "./pages/tts/tts_result_edit/TtsResultEditPage";
 import { W2lResultEditPage } from "./pages/w2l/w2l_result_edit/W2lResultEditPage";
 import { W2lTemplateDeletePage } from "./pages/w2l/w2l_template_delete/W2lTemplateDeletePage";
@@ -82,10 +72,6 @@ import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -129,10 +115,6 @@ import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
 import DevTTS from "./pages/dev_tts/DevTTS";
-import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPage";
-import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
-import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
-import StudioTutorial from "./pages/studio_tutorial/StudioTutorial";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
@@ -168,33 +150,6 @@ interface Props {
 
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
-
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-
-  enqueueTtsJob: (jobToken: string) => void;
-  ttsInferenceJobs: Array<TtsInferenceJob>;
-
-  enqueueW2lJob: (jobToken: string) => void;
-  w2lInferenceJobs: Array<W2lInferenceJob>;
-
-  enqueueTtsModelUploadJob: (jobToken: string) => void;
-  ttsModelUploadJobs: Array<TtsModelUploadJob>;
-
-  enqueueW2lTemplateUploadJob: (jobToken: string) => void;
-  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
-
-  // TODO: Begin to unify generic download jobs (vocoder, voice conversion, ...)
-  enqueueVocoderUploadJob: (jobToken: string) => void;
-  vocoderUploadJobs: Array<VocoderUploadJob>;
-
-  // TODO: Begin to unify generic download jobs (vocoder, voice conversion, ...)
-  enqueueVoiceConversionModelUploadJob: (jobToken: string) => void;
-  voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
 
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
@@ -412,7 +367,7 @@ class PageContainer extends React.Component<
                     <MediaPage />
                   </Route>*/}
 
- {/*                 <Route path="/dev-media/:token">
+                  {/*                 <Route path="/dev-media/:token">
                     <DevMediaPage />
                   </Route>*/}
 
@@ -438,14 +393,6 @@ class PageContainer extends React.Component<
                         sessionSubscriptionsWrapper={
                           this.props.sessionSubscriptionsWrapper
                         }
-                        inferenceJobs={this.props.inferenceJobs}
-                        enqueueInferenceJob={this.props.enqueueInferenceJob}
-                        inferenceJobsByCategory={
-                          this.props.inferenceJobsByCategory
-                        }
-                        ttsInferenceJobs={this.props.ttsInferenceJobs}
-                        enqueueTtsJob={this.props.enqueueTtsJob}
-                        sessionWrapper={this.props.sessionWrapper}
                       />
                     )}
                   />
@@ -475,8 +422,6 @@ class PageContainer extends React.Component<
                   <Route path="/tts/:token/edit">
                     <TtsModelEditPage
                       sessionWrapper={this.props.sessionWrapper}
-                      enqueueTtsJob={this.props.enqueueTtsJob}
-                      ttsInferenceJobs={this.props.ttsInferenceJobs}
                     />
                   </Route>
 
@@ -498,9 +443,6 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
-                      enqueueTtsJob={this.props.enqueueTtsJob}
-                      inferenceJobs={this.props.inferenceJobs}
-                      ttsInferenceJobs={this.props.ttsInferenceJobs}
                       textBuffer={this.props.textBuffer}
                       setTextBuffer={this.props.setTextBuffer}
                       clearTextBuffer={this.props.clearTextBuffer}
@@ -543,69 +485,15 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/w2l/:templateSlug">
-                    <W2lTemplateViewPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      enqueueW2lJob={this.props.enqueueW2lJob}
-                      w2lInferenceJobs={this.props.w2lInferenceJobs}
-                    />
-                  </Route>
-
                   <Route path="/video">
                     <W2lTemplateListPage
                       sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>
 
-                  <Route path="/upload/w2l_photo">
-                    <UploadW2lPhotoPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                      enqueueW2lTemplateUploadJob={
-                        this.props.enqueueW2lTemplateUploadJob
-                      }
-                    />
-                  </Route>
-
-                  <Route path="/upload/w2l_video">
-                    <UploadW2lVideoPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                      enqueueW2lTemplateUploadJob={
-                        this.props.enqueueW2lTemplateUploadJob
-                      }
-                    />
-                  </Route>
-
                   <Route path="/upload/tts">
                     <UploadTtsModelPage
                       sessionWrapper={this.props.sessionWrapper}
-                      ttsModelUploadJobs={this.props.ttsModelUploadJobs}
-                      enqueueTtsModelUploadJob={
-                        this.props.enqueueTtsModelUploadJob
-                      }
-                    />
-                  </Route>
-
-                  <Route path="/upload/voice_conversion">
-                    <UploadVoiceConversionModel
-                      sessionWrapper={this.props.sessionWrapper}
-                      voiceConversionModelUploadJobs={
-                        this.props.voiceConversionModelUploadJobs
-                      }
-                      enqueueVoiceConversionModelUploadJob={
-                        this.props.enqueueVoiceConversionModelUploadJob
-                      }
-                    />
-                  </Route>
-
-                  <Route path="/upload/vocoder" exact={true}>
-                    <UploadVocoderPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      vocoderUploadJobs={this.props.vocoderUploadJobs}
-                      enqueueVocoderUploadJob={
-                        this.props.enqueueVocoderUploadJob
-                      }
                     />
                   </Route>
 
@@ -742,9 +630,6 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
-                      inferenceJobsByCategory={
-                        this.props.inferenceJobsByCategory
-                      }
                       setMaybeSelectedInferenceJob={
                         this.props.maybeSelectedVoiceConversionModel
                       }
@@ -767,11 +652,6 @@ class PageContainer extends React.Component<
                       setMaybeSelectedVoiceConversionModel={
                         this.props.setMaybeSelectedVoiceConversionModel
                       }
-                      enqueueInferenceJob={this.props.enqueueInferenceJob}
-                      inferenceJobs={this.props.inferenceJobs}
-                      inferenceJobsByCategory={
-                        this.props.inferenceJobsByCategory
-                      }
                     />
                   </Route>
 
@@ -790,20 +670,14 @@ class PageContainer extends React.Component<
                   <Route path="/face-animator/:mediaToken?">
                     <FaceAnimator
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
                         sessionSubscriptionsWrapper:
                           this.props.sessionSubscriptionsWrapper,
-                        inferenceJobs: this.props.inferenceJobs,
-                        inferenceJobsByCategory:
-                          this.props.inferenceJobsByCategory,
                       }}
                     />
                   </Route>
 
                   <Route path="/fbx-to-gltf/:mediaToken?">
-                    <FbxToGltfPage
-                      enqueueInferenceJob={this.props.enqueueInferenceJob}
-                    />
+                    <FbxToGltfPage />
                   </Route>
 
                   {/*
@@ -816,37 +690,6 @@ class PageContainer extends React.Component<
                   //   />
                   // </Route>
                     */}
-
-                  <Route path="/studio-intro/result/:jobToken?">
-                    <StudioIntroResultPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  </Route>
-
-                  <Route path="/studio-intro/style/:jobToken?">
-                    <StudioVSTPage />
-                  </Route>
-
-                  <Route path="/studio-intro/:mediaToken?">
-                    <StudioIntroPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  </Route>
-
-                  <Route path="/studio-tutorial/:mediaToken?">
-                    <StudioTutorial
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  </Route>
 
                   <Route path="/commissions">
                     <CommunityCommissionsPage />
@@ -888,7 +731,6 @@ class PageContainer extends React.Component<
                   <Route exact path="/voice-designer/create">
                     <VoiceDesignerFormPage
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
                         sessionWrapper: this.props.sessionWrapper,
                         sessionSubscriptionsWrapper:
                           this.props.sessionSubscriptionsWrapper,
@@ -903,7 +745,6 @@ class PageContainer extends React.Component<
                   >
                     <VoiceDesignerFormPage
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
                         sessionWrapper: this.props.sessionWrapper,
                         sessionSubscriptionsWrapper:
                           this.props.sessionSubscriptionsWrapper,
@@ -918,7 +759,6 @@ class PageContainer extends React.Component<
                   >
                     <VoiceDesignerFormPage
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
                         sessionWrapper: this.props.sessionWrapper,
                         sessionSubscriptionsWrapper:
                           this.props.sessionSubscriptionsWrapper,
@@ -936,12 +776,6 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
-                      inferenceJobs={this.props.inferenceJobs}
-                      enqueueInferenceJob={this.props.enqueueInferenceJob}
-                      inferenceJobsByCategory={
-                        this.props.inferenceJobsByCategory
-                      }
-                      ttsInferenceJobs={this.props.ttsInferenceJobs}
                     />
                   </Route>
 
@@ -964,12 +798,6 @@ class PageContainer extends React.Component<
                   <Route path="/video-mocap/:mediaToken?">
                     <VideoMocap
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
-                        sessionSubscriptionsWrapper:
-                          this.props.sessionSubscriptionsWrapper,
-                        inferenceJobs: this.props.inferenceJobs,
-                        inferenceJobsByCategory:
-                          this.props.inferenceJobsByCategory,
                         sessionWrapper: this.props.sessionWrapper,
                       }}
                     />
@@ -978,12 +806,6 @@ class PageContainer extends React.Component<
                   <Route path="/video-workflow">
                     <VideoWorkflowPage
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
-                        sessionSubscriptionsWrapper:
-                          this.props.sessionSubscriptionsWrapper,
-                        inferenceJobs: this.props.inferenceJobs,
-                        inferenceJobsByCategory:
-                          this.props.inferenceJobsByCategory,
                         sessionWrapper: this.props.sessionWrapper,
                       }}
                     />
@@ -992,12 +814,6 @@ class PageContainer extends React.Component<
                   <Route path="/video-styletransfer">
                     <VideoStyleTransfer
                       {...{
-                        enqueueInferenceJob: this.props.enqueueInferenceJob,
-                        sessionSubscriptionsWrapper:
-                          this.props.sessionSubscriptionsWrapper,
-                        inferenceJobs: this.props.inferenceJobs,
-                        inferenceJobsByCategory:
-                          this.props.inferenceJobsByCategory,
                         sessionWrapper: this.props.sessionWrapper,
                       }}
                     />
@@ -1008,9 +824,7 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
-                      enqueueInferenceJob={this.props.enqueueInferenceJob}
                       sessionWrapper={this.props.sessionWrapper}
-                      inferenceJobs={this.props.inferenceJobs}
                     />
                   </Route>
 
@@ -1020,12 +834,6 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
-                      enqueueTtsJob={this.props.enqueueTtsJob}
-                      inferenceJobs={this.props.inferenceJobs}
-                      ttsInferenceJobs={this.props.ttsInferenceJobs}
-                      ttsModelUploadJobs={this.props.ttsModelUploadJobs}
-                      w2lInferenceJobs={this.props.w2lInferenceJobs}
-                      w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
                       textBuffer={this.props.textBuffer}
                       setTextBuffer={this.props.setTextBuffer}
                       clearTextBuffer={this.props.clearTextBuffer}
@@ -1092,16 +900,6 @@ class PageContainer extends React.Component<
                       clearBootstrapLanguageNotice={
                         this.props.clearBootstrapLanguageNotice
                       }
-                      enqueueInferenceJob={this.props.enqueueInferenceJob}
-                      inferenceJobs={this.props.inferenceJobs}
-                      inferenceJobsByCategory={
-                        this.props.inferenceJobsByCategory
-                      }
-                      enqueueTtsJob={this.props.enqueueTtsJob}
-                      ttsInferenceJobs={this.props.ttsInferenceJobs}
-                      ttsModelUploadJobs={this.props.ttsModelUploadJobs}
-                      w2lInferenceJobs={this.props.w2lInferenceJobs}
-                      w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
                       textBuffer={this.props.textBuffer}
                       setTextBuffer={this.props.setTextBuffer}
                       clearTextBuffer={this.props.clearTextBuffer}
@@ -1136,14 +934,6 @@ class PageContainer extends React.Component<
                       setSelectedTtsLanguageScope={
                         this.props.setSelectedTtsLanguageScope
                       }
-                    />
-                  </Route>
-
-                  <Route path="/w2l/:templateSlug">
-                    <W2lTemplateViewPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      enqueueW2lJob={this.props.enqueueW2lJob}
-                      w2lInferenceJobs={this.props.w2lInferenceJobs}
                     />
                   </Route>
 
@@ -1189,13 +979,6 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
-                      enqueueInferenceJob={this.props.enqueueInferenceJob}
-                      inferenceJobs={this.props.inferenceJobs}
-                      inferenceJobsByCategory={
-                        this.props.inferenceJobsByCategory
-                      }
-                      ttsInferenceJobs={this.props.ttsInferenceJobs}
-                      enqueueTtsJob={this.props.enqueueTtsJob}
                     />
                   </Route>
                 </Switch>

@@ -10,7 +10,7 @@ interface Props {
 function SessionW2lTemplateUploadResultList(props: Props) {
   let results: Array<JSX.Element> = [];
 
-  props.w2lTemplateUploadJobs.forEach((job) => {
+  props.w2lTemplateUploadJobs.forEach(job => {
     if (!job.maybeW2lTemplateToken) {
       let stateDescription = "Pending...";
 

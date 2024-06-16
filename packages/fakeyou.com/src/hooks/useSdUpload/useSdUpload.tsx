@@ -14,7 +14,7 @@ export default function useSdUpload() {
   const [descriptionMD, descriptionMDSet] = useState("");
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const coverImg = useCoverImgUpload();
-  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.ImageGeneration, true);
+  const { enqueue } = useInferenceJobs();
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = {
@@ -41,7 +41,11 @@ export default function useSdUpload() {
     })
       .then((res: any) => {
         writeStatusSet(FetchStatus.success);
-        enqueue(res.inference_job_token,true);
+        enqueue(
+          res.inference_job_token,
+          FrontendInferenceJobType.ImageGeneration,
+          true
+        );
       })
       .catch(err => {
         writeStatusSet(FetchStatus.error);

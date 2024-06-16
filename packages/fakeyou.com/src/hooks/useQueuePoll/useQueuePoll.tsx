@@ -1,16 +1,28 @@
 import { useEffect, useState } from "react";
-import { BaseQueueObject, GetQueues, GetQueuesResponse, QueuePollRefreshDefault } from "@storyteller/components/src/api/stats/queues/GetQueues";
+import {
+  BaseQueueObject,
+  GetQueues,
+  GetQueuesResponse,
+  QueuePollRefreshDefault,
+} from "@storyteller/components/src/api/stats/queues/GetQueues";
 import { useInterval } from "hooks";
 
 export default function useQueuePoll() {
-  const [queueStats, setQueueStats] = useState<GetQueuesResponse>(BaseQueueObject());
-  const [initialized,initializedSet] = useState(false);
+  const [queueStats, setQueueStats] =
+    useState<GetQueuesResponse>(BaseQueueObject());
+  const [initialized, initializedSet] = useState(false);
 
-  const interval = Math.max(QueuePollRefreshDefault, queueStats.refresh_interval_millis);
+  const interval = Math.max(
+    QueuePollRefreshDefault,
+    queueStats.refresh_interval_millis
+  );
 
-  const onTick = ({ currentQueue }: { currentQueue: GetQueuesResponse }) => {
-    GetQueues("",{})
-    .then((res: GetQueuesResponse) => {
+  const onTick = ({
+    eventProps: { queueStats: currentQueue },
+  }: {
+    eventProps: { queueStats: GetQueuesResponse };
+  }) => {
+    GetQueues("", {}).then((res: GetQueuesResponse) => {
       if (res.cache_time) {
         let cache_time = new Date(res.cache_time);
 
@@ -24,11 +36,16 @@ export default function useQueuePoll() {
   useEffect(() => {
     if (!initialized) {
       initializedSet(true);
-      onTick({ currentQueue: queueStats });
+      onTick({ eventProps: { queueStats } });
     }
-  },[initialized,queueStats]);
+  }, [initialized, queueStats]);
 
-  useInterval({ currentQueue: queueStats, interval, onTick, initialized, locked: !initialized, });
+  useInterval({
+    eventProps: { queueStats },
+    interval,
+    onTick,
+    locked: !initialized,
+  });
 
   return queueStats;
-};
+}

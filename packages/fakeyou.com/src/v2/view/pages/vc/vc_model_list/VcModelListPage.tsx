@@ -25,15 +25,12 @@ import {
   EnqueueVoiceConversionRequest,
 } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
 import { Analytics } from "../../../../../common/Analytics";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 import PitchShiftComponent from "./components/PitchShiftComponent";
 import PitchEstimateMethodComponent from "./components/PitchEstimateMethodComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Container, Panel } from "components/common";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
@@ -51,18 +48,12 @@ interface Props {
   setMaybeSelectedVoiceConversionModel: (
     maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
   ) => void;
-
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
 
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("AI Voice Conversion");
 
+  const { enqueueInferenceJob } = useInferenceJobs();
   const { t } = useLocalize("VcModelListPage");
   PosthogClient.recordPageview();
 
@@ -182,7 +173,7 @@ function VcModelListPage(props: Props) {
     let result = await EnqueueVoiceConversion(request);
 
     if (EnqueueVoiceConversionIsSuccess(result)) {
-      props.enqueueInferenceJob(
+      enqueueInferenceJob(
         result.inference_job_token,
         FrontendInferenceJobType.VoiceConversion
       );
@@ -506,11 +497,6 @@ function VcModelListPage(props: Props) {
                   </h4>
                   <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
                     <SessionVoiceConversionResultsList
-                      inferenceJobs={
-                        props.inferenceJobsByCategory.get(
-                          FrontendInferenceJobType.VoiceConversion
-                        )!
-                      }
                       sessionSubscriptionsWrapper={
                         props.sessionSubscriptionsWrapper
                       }
