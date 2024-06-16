@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
+use reqwest::StatusCode;
 
-use actix_web::http::StatusCode;
 use tokio::process::Command;
 use tokio::time::sleep;
 use easyenv::get_env_string_optional;

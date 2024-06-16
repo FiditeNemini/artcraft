@@ -71,7 +71,7 @@ rand_core = { version = "0.6.4", default-features = false, features = ["std"] }
 regex = { version = "1.10.5" }
 regex-automata = { version = "0.4.7", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
 regex-syntax = { version = "0.8.4" }
-reqwest = { version = "0.11.24", features = ["blocking", "gzip", "json", "native-tls"] }
+reqwest = { version = "0.12.4", features = ["blocking", "gzip", "json", "native-tls"] }
 semver = { version = "1.0.20", features = ["serde"] }
 serde = { version = "1.0.203", features = ["alloc", "derive", "rc"] }
 serde_json = { version = "1.0.113", features = ["preserve_order", "raw_value"] }

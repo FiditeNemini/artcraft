@@ -101,7 +101,7 @@ language-tags = "0.3.2" # Parsing single tags richly
 
 # HTTP
 # TODO/NB: This is just for Twitch, but we might need it later.
-reqwest = { version = "0.11.4" }
+reqwest = { version = "0.12.4" }
 native-tls = { version = "0.2.8", features = ["vendored"] }
 
 # Runtime
