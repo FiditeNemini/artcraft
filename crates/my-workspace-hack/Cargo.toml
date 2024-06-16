@@ -14,7 +14,7 @@ publish = false
 
 ### BEGIN HAKARI SECTION
 [dependencies]
-actix-rt = { version = "2.9.0" }
+actix-rt = { version = "2.10.0" }
 ahash = { version = "0.8.11" }
 arrayvec = { version = "0.7.4", features = ["serde"] }
 base64 = { version = "0.21.5" }

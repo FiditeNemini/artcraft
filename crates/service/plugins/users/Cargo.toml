@@ -52,7 +52,7 @@ regex = "1.5.4"
 time = "0.3.30"
 
 # Web
-actix-web = "4.4.0"
+actix-web = "4.7.0"
 jwt = "0.13.0"
 
 # Crypto

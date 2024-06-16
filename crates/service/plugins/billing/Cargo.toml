@@ -39,7 +39,7 @@ regex = "1.5.4"
 
 # Web
 actix-http = "3.7.0"
-actix-web = "4.4.0"
+actix-web = "4.7.0"
 
 # Serialization
 serde = "1.0.125"

@@ -25,5 +25,5 @@ reusable_types = { path = "../../_types/reusable_types" }
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 # External
-actix-web = "4.4.0"
+actix-web = "4.7.0"
 anyhow = "1.0.86"
