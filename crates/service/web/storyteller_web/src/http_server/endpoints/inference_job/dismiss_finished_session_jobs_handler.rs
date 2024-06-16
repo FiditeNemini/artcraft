@@ -62,9 +62,9 @@ impl fmt::Display for DismissFinishedSessionJobsError {
 ///
 /// This will prevent these jobs from being returned in the "list session jobs" endpoint.
 #[utoipa::path(
-  delete,
+  post,
   tag = "Jobs",
-  path = "/v1/jobs/session/finished",
+  path = "/v1/jobs/session/dismiss_finished",
   responses(
     (status = 200, body = DismissFinishedSessionJobsSuccessResponse),
     (status = 500, body = DismissFinishedSessionJobsError),

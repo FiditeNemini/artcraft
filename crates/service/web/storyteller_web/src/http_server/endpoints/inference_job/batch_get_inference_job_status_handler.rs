@@ -152,7 +152,7 @@ impl fmt::Display for BatchGetInferenceJobStatusError {
   }
 }
 
-
+/// Get job statuses for a batch of multiple job tokens.
 #[utoipa::path(
   get,
   tag = "Jobs",

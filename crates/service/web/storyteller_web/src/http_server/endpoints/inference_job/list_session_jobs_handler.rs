@@ -161,10 +161,13 @@ impl fmt::Display for ListSessionJobsError {
 }
 
 
-/// List jobs (pending, finished, dead, etc.) that are associated with the user's session.
+/// List job statuses for jobs that are associated with the user's session.
 ///
-/// The user must be logged in. This endpoint will only show the last 36 hours of jobs.
-/// Any jobs "dismissed" by the user will not be returned.
+/// The user must be logged in. This endpoint will only show the last 36 hours
+/// of jobs. Any jobs "dismissed" by the user will not be returned.
+///
+/// This returns jobs of all states: pending, started, attempt_failed,
+/// complete_success, dead, etc.
 #[utoipa::path(
   get,
   tag = "Jobs",

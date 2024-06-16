@@ -140,7 +140,7 @@ impl fmt::Display for GetInferenceJobStatusError {
   }
 }
 
-
+/// Get the status for a single job.
 #[utoipa::path(
   get,
   tag = "Jobs",
