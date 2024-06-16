@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::{http::StatusCode, HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::web::Query;
-use hyper::StatusCode;
 use log::warn;
 
 use mysql_queries::queries::stats::get_on_prem_worker_stats::get_on_prem_worker_stats;

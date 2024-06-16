@@ -1,8 +1,7 @@
 use std::str::FromStr;
 
-use hyper::client::Client;
-use hyper::Uri;
 use log::info;
+use reqwest::{Client, Url};
 
 use errors::AnyhowResult;
 
@@ -24,7 +23,7 @@ pub enum HealthState {
 pub struct Tacotron2SidecarHealthCheckClient {
   // NB: includes port
   hostname: String,
-  health_check_url: Uri,
+  health_check_url: Url,
 }
 
 impl Tacotron2SidecarHealthCheckClient {
@@ -35,7 +34,7 @@ impl Tacotron2SidecarHealthCheckClient {
     //    .finish();
 
     let health_check_url = format!("http://{}/_status", hostname);
-    let health_check_url = Uri::from_str(&health_check_url)?;
+    let health_check_url = Url::from_str(&health_check_url)?;
 
     Ok(Self {
       hostname: hostname.to_string(),
@@ -48,10 +47,12 @@ impl Tacotron2SidecarHealthCheckClient {
     info!("Requesting {}", &self.health_check_url);
 
     let client = Client::new();
-    let response = client.get(self.health_check_url.clone()).await?;
 
-    let bytes = hyper::body::to_bytes(response.into_body()).await?;
-    let response_body = String::from_utf8(bytes.to_vec())?;
+    let response = client.get(self.health_check_url.clone())
+        .send()
+        .await?;
+
+    let response_body = response.text().await?;
 
     let response_json = serde_json::from_str::<HealthCheckResponse>(&response_body)?;
 

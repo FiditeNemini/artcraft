@@ -1,9 +1,8 @@
 use std::path::Path;
 
 use anyhow::anyhow;
-use hyper::{Body, Request};
-use hyper::client::Client;
 use log::info;
+use reqwest::Client;
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
@@ -152,15 +151,14 @@ impl Tacotron2InferenceSidecarClient {
 
     let request = serde_json::to_string(&request)?;
 
-    let req = Request::builder()
-        .method(hyper::Method::POST)
-        .uri(url)
-        .header("content-type", "application/json")
-        .body(Body::from(request))?;
-
     let client = Client::new();
 
-    let response = client.request(req).await?;
+    let response = client.post(&url)
+        .header("content-type", "application/json")
+        .body(request)
+        .send()
+        .await?;
+
     let status = response.status();
 
     info!("Response status: {} ({:?})", status, status.canonical_reason());

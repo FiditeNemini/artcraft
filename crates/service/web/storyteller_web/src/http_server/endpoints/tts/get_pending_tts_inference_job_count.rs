@@ -1,9 +1,8 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::{http::StatusCode, HttpRequest, HttpResponse, ResponseError, web};
 use chrono::NaiveDateTime;
-use hyper::StatusCode;
 use log::{debug, error, warn};
 
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count;

@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::{http::StatusCode, HttpRequest, HttpResponse, ResponseError, web};
 use chrono::NaiveDateTime;
-use hyper::StatusCode;
 use log::{debug, error, warn};
 
 use mysql_queries::queries::stats::get_unified_queue_stats::get_unified_queue_stats;
