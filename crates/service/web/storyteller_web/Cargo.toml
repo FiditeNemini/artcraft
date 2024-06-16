@@ -175,7 +175,6 @@ async-trait = "0.1.58"
 
 utoipa = { version = "4", features = ["chrono","actix_extras"] }
 utoipa-swagger-ui = { version = "7", features = ["actix-web"] }
-http = "0.2.11"
 
 # TODO: move zip pieces into a separate library that encapsulates calls to this lib
 zip = "0.6.6"

@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
-use http::StatusCode;
+use actix_web::http::StatusCode;
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
 use utoipa::ToSchema;
