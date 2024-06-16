@@ -28,7 +28,7 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # Serialization
 serde = { version = "1.0.125", features = ["derive"] }
-toml = "0.5.8"
+toml = "0.5.11"
 
 [dev-dependencies]
 
