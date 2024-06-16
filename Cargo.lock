@@ -6892,20 +6892,7 @@ version = "0.26.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d8cec3501a5194c432b2b7976db6b7d10ec95c253208b45f83f7136aa985e29"
 dependencies = [
- "strum_macros 0.26.4",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.25.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23dc1fa9ac9c169a78ba62f0b841814b7abae11bdd047b9c58f893439e309ea0"
-dependencies = [
- "heck 0.4.1",
- "proc-macro2",
- "quote",
- "rustversion",
- "syn 2.0.66",
+ "strum_macros",
 ]
 
 [[package]]
@@ -7971,7 +7958,7 @@ dependencies = [
  "server_environment",
  "sha2 0.9.9",
  "sqlx",
- "strum_macros 0.25.3",
+ "strum_macros",
  "time",
  "tokens",
  "toml 0.8.14",

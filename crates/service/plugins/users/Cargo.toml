@@ -72,6 +72,6 @@ sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls",
 # Redis Database
 r2d2_redis = "0.14.0"
 byteorder = "1.5.0"
-strum_macros = "0.25.3"
+strum_macros = "0.26.4"
 
 utoipa = { version = "4", features = ["chrono","actix_extras"] }
