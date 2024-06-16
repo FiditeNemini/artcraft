@@ -161,6 +161,10 @@ impl fmt::Display for ListSessionJobsError {
 }
 
 
+/// List jobs (pending, finished, dead, etc.) that are associated with the user's session.
+///
+/// The user must be logged in. This endpoint will only show the last 36 hours of jobs.
+/// Any jobs "dismissed" by the user will not be returned.
 #[utoipa::path(
   get,
   tag = "Jobs",

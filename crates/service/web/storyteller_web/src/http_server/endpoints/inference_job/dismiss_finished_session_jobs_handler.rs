@@ -64,7 +64,7 @@ impl fmt::Display for DismissFinishedSessionJobsError {
 #[utoipa::path(
   delete,
   tag = "Jobs",
-  path = "/v1/jobs/session/dismiss_finished",
+  path = "/v1/jobs/session/finished",
   responses(
     (status = 200, body = DismissFinishedSessionJobsSuccessResponse),
     (status = 500, body = DismissFinishedSessionJobsError),

@@ -43,8 +43,8 @@ pub fn add_job_routes<T, B> (app: App<T>) -> App<T>
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(
-              web::resource("/session/dismiss_finished")
-                  .route(web::post().to(dismiss_finished_session_jobs_handler))
+              web::resource("/session/finished")
+                  .route(web::delete().to(dismiss_finished_session_jobs_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
       );

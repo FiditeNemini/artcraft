@@ -61,7 +61,10 @@ impl fmt::Display for TerminateInferenceJobError {
   }
 }
 
-
+/// Terminate a job for the user.
+///
+/// The user must own the job. This works for logged in users as well as logged out users
+/// If the user was logged out, we check the IP address.
 #[utoipa::path(
   delete,
   tag = "Jobs",
