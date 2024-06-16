@@ -35,7 +35,7 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 # External
 clap = "4.4.8"
 log = "0.4.14"
-strum = { version = "0.25", features = ["derive"] }
+strum = { version = "0.26", features = ["derive"] }
 tempdir = "0.3.7"
 
 # Async + clients
