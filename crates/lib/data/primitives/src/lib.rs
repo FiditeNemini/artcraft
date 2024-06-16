@@ -18,6 +18,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod lazy_any_option_true;
 pub mod str_to_bool;
 pub mod traits;
 pub mod trim_or_empty;

@@ -22,6 +22,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use primitives::lazy_any_option_true::lazy_any_option_true;
 use primitives::str_to_bool::str_to_bool;
 use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
 use primitives::try_str_to_num::try_str_to_num;
@@ -92,6 +93,7 @@ pub struct EnqueueVideoStyleTransferRequest {
     enable_lipsync: Option<bool>,
 
     /// Use lipsync in the workflow
+    #[deprecated(note = "use enable_lipsync")]
     use_lipsync: Option<bool>,
 
     /// Remove watermark from the output
@@ -319,28 +321,30 @@ pub async fn enqueue_video_style_transfer_handler(
         .transpose()?;
 
     let coordinated_args = CoordinatedWorkflowArgs {
-        use_lipsync: request.use_lipsync
-            .or_else(|| request.enable_lipsync)
-            .or_else(|| {
-                get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
-                    .map(|value| str_to_bool(&value))
-            }),
+        use_lipsync: lazy_any_option_true(&[
+            Box::new(|| request.enable_lipsync),
+            Box::new(|| request.use_lipsync),
+            Box::new(|| get_request_header_optional(&http_request, "LIPSYNC-ENABLED")
+                .map(|value| str_to_bool(&value)))
+        ]),
+        disable_lcm: lazy_any_option_true(&[
+            Box::new(|| request.disable_lcm),
+            Box::new(|| get_request_header_optional(&http_request, "DISABLE-LCM")
+               .map(|value| str_to_bool(&value)))
+        ]),
+        use_cinematic: lazy_any_option_true(&[
+            Box::new(|| request.use_cinematic),
+            Box::new(|| get_request_header_optional(&http_request, "USE-CINEMATIC")
+                .map(|value| str_to_bool(&value)))
+        ]),
         use_face_detailer: request.use_face_detailer,
         use_upscaler: request.use_upscaler,
         remove_watermark: request.remove_watermark,
-        disable_lcm: request.disable_lcm
-            .or_else(|| {
-                get_request_header_optional(&http_request, "DISABLE-LCM")
-                    .map(|value| str_to_bool(&value))
-            }),
-        use_cinematic: request.use_cinematic
-            .or_else(|| {
-                get_request_header_optional(&http_request, "USE-CINEMATIC")
-                    .map(|value| str_to_bool(&value))
-            }),
     };
 
-    let coordinated_args = coordinate_workflow_args(coordinated_args, is_staff || has_paid_plan);
+    let is_allowed_expensive_generation = is_staff || has_paid_plan;
+
+    let coordinated_args = coordinate_workflow_args(coordinated_args, is_allowed_expensive_generation);
 
     let inference_args = WorkflowArgs {
         maybe_input_file: Some(request.input_file.clone()),
