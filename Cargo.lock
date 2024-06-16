@@ -4099,6 +4099,7 @@ version = "0.1.0"
 dependencies = [
  "actix-rt",
  "ahash 0.8.11",
+ "arrayvec",
  "base64 0.21.5",
  "base64ct",
  "bitflags 2.4.1",
@@ -4133,7 +4134,6 @@ dependencies = [
  "hmac 0.12.1",
  "hyper",
  "indexmap 2.2.3",
- "itertools 0.10.5",
  "lazy_static",
  "libc",
  "log",
@@ -4152,12 +4152,14 @@ dependencies = [
  "pulldown-cmark",
  "quote",
  "rand 0.8.5",
+ "rand_chacha 0.3.1",
  "rand_core 0.6.4",
  "regex",
  "regex-automata",
  "regex-syntax",
  "reqwest",
  "rustix",
+ "semver 1.0.20",
  "serde",
  "serde_json",
  "sha1 0.10.6",
@@ -4184,8 +4186,7 @@ dependencies = [
  "url",
  "void",
  "winapi 0.3.9",
- "windows-sys 0.52.0",
- "zip",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
