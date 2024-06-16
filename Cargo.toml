@@ -82,7 +82,6 @@ members = [
   "crates/service/job/tts_inference_job",
   "crates/service/job/w2l_download_job",
   "crates/service/job/w2l_inference_job",
-  "crates/service/other/twitch_pubsub_subscriber",
   "crates/service/web/dummy_service",
   "crates/service/web/storyteller_web",
   "crates/service/web/websocket_gateway",
