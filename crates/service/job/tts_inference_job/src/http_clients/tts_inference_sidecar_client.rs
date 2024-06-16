@@ -1,9 +1,8 @@
 use std::path::Path;
 
 use anyhow::anyhow;
-use hyper::{Body, Request};
-use hyper::client::Client;
 use log::info;
+use reqwest::Client;
 
 use container_common::anyhow_result::AnyhowResult;
 use mysql_queries::column_types::vocoder_type::VocoderType;
@@ -139,27 +138,21 @@ impl TtsInferenceSidecarClient {
     let url = format!("http://{}/infer", self.hostname);
     info!("Requesting {}", url);
 
-    //let maybe_response = self.client.get(&url)
-    //    .header(header::CONTENT_TYPE, "application/json")
-    //    .send_json(&request)
-    //    .await;
-
     let request = serde_json::to_string(&request)?;
-
-    let req = Request::builder()
-        .method(hyper::Method::POST)
-        .uri(url)
-        .header("content-type", "application/json")
-        .body(Body::from(request))?;
 
     let client = Client::new();
 
-    let _maybe_response = client.request(req).await?;
+    let _maybe_response = client.post(&url)
+        .header("content-type", "application/json")
+        .body(request)
+        .send()
+        .await?;
 
     //match maybe_response {
     //  Err(e) => Err(anyhow!("Error talking to sidecar: {:?}", e)),
     //  Ok(_) => Ok(()),
     //}
+
     Ok(())
   }
 }

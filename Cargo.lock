@@ -388,26 +388,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4aa90d7ce82d4be67b64039a3d588d38dbcc6736577de4a847025ce5b0c468d1"
 
 [[package]]
-name = "aliri_braid"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b321b715087f4b23fdfe778cb5a60988ebddc6ef61fbbf78bb9294dcd855df78"
-dependencies = [
- "aliri_braid_impl",
-]
-
-[[package]]
-name = "aliri_braid_impl"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f9afe97decc070be1864d96ab118383abed1c58fc09696663666049431110c5"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "alloc-no-stdlib"
 version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1295,11 +1275,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
 dependencies = [
  "bytes 1.6.0",
- "futures-core",
  "memchr",
- "pin-project-lite",
- "tokio",
- "tokio-util",
 ]
 
 [[package]]
@@ -3126,7 +3102,6 @@ dependencies = [
  "http 1.1.0",
  "http-body 1.0.0",
  "httparse",
- "httpdate",
  "itoa 1.0.11",
  "pin-project-lite",
  "smallvec 1.13.2",
@@ -4228,19 +4203,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mio"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4929e1f84c5e54c3ec6141cd5d8b5a5c055f031f80cf78f2072920173cb4d880"
-dependencies = [
- "hermit-abi",
- "libc",
- "log",
- "wasi 0.11.0+wasi-snapshot-preview1",
- "windows-sys 0.52.0",
-]
-
-[[package]]
 name = "mio-uds"
 version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4322,7 +4284,6 @@ dependencies = [
  "cc",
  "chrono",
  "clap",
- "combine 4.6.6",
  "crossbeam-utils 0.8.19",
  "crypto-common",
  "deranged",
@@ -4344,6 +4305,7 @@ dependencies = [
  "hashbrown 0.14.5",
  "heck 0.4.1",
  "hmac 0.12.1",
+ "hyper 0.14.28",
  "hyper 1.3.1",
  "indexmap 2.2.6",
  "lazy_static",
@@ -4352,7 +4314,7 @@ dependencies = [
  "md-5 0.10.6",
  "memchr",
  "miniz_oxide",
- "mio 1.0.0",
+ "mio 0.8.11",
  "native-tls",
  "num-bigint",
  "num-integer",
@@ -4377,6 +4339,7 @@ dependencies = [
  "sha1 0.10.6",
  "sha2 0.10.8",
  "simd-adler32",
+ "smallvec 1.13.2",
  "socket2",
  "spin 0.9.8",
  "sqlx",
@@ -4385,14 +4348,15 @@ dependencies = [
  "sqlx-macros-core",
  "sqlx-mysql",
  "sqlx-sqlite",
+ "stable_deref_trait",
  "syn 1.0.109",
  "syn 2.0.66",
  "time",
  "time-macros",
  "tokio",
  "tokio-stream",
+ "tower",
  "tracing",
- "twitch_oauth2",
  "unicode-bidi",
  "unicode-normalization",
  "url",
@@ -5662,7 +5626,6 @@ version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "566cafdd92868e0939d3fb961bd0dc25fcfaaed179291093b3d43e6b3150ea10"
 dependencies = [
- "async-compression",
  "base64 0.22.1",
  "bytes 1.6.0",
  "encoding_rs",
@@ -5692,7 +5655,6 @@ dependencies = [
  "system-configuration",
  "tokio",
  "tokio-native-tls",
- "tokio-util",
  "tower-service",
  "url",
  "wasm-bindgen",
@@ -7769,7 +7731,6 @@ dependencies = [
  "filesys",
  "hashing",
  "hostname 0.4.0",
- "hyper 1.3.1",
  "jobs_common",
  "lfu",
  "log",
@@ -7777,6 +7738,7 @@ dependencies = [
  "my-workspace-hack",
  "mysql_queries",
  "r2d2_redis",
+ "reqwest 0.12.4",
  "serde",
  "serde_derive",
  "serde_json",
@@ -7801,26 +7763,6 @@ dependencies = [
  "serde_derive",
  "unicode-segmentation",
  "user_input_common",
-]
-
-[[package]]
-name = "twitch_oauth2"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66cd36a2886d169cebd1661c8818b1434bb5dc59ed700ea4de00c17a8005496d"
-dependencies = [
- "aliri_braid",
- "async-trait",
- "base64 0.13.1",
- "displaydoc",
- "http 0.2.11",
- "once_cell",
- "rand 0.8.5",
- "reqwest 0.11.27",
- "serde",
- "serde_json",
- "thiserror",
- "url",
 ]
 
 [[package]]
