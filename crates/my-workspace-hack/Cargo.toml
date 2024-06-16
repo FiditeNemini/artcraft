@@ -17,7 +17,7 @@ publish = false
 actix-rt = { version = "2.10.0" }
 ahash = { version = "0.8.11" }
 arrayvec = { version = "0.7.4", features = ["serde"] }
-base64 = { version = "0.21.7" }
+base64 = { version = "0.22.1" }
 base64ct = { version = "1.6.0", default-features = false, features = ["alloc"] }
 bitflags = { version = "2.4.1", default-features = false, features = ["serde", "std"] }
 block-buffer = { version = "0.9.0", default-features = false, features = ["block-padding"] }
@@ -94,7 +94,7 @@ void = { version = "1.0.2" }
 
 [build-dependencies]
 ahash = { version = "0.8.11" }
-base64 = { version = "0.21.7" }
+base64 = { version = "0.22.1" }
 base64ct = { version = "1.6.0", default-features = false, features = ["alloc"] }
 bitflags = { version = "2.4.1", default-features = false, features = ["serde", "std"] }
 byteorder = { version = "1.5.0" }

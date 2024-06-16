@@ -76,12 +76,12 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 anyhow = "1.0.86"
-base64 = "0.21.7"
+base64 = "0.22.1"
 chrono = { version = "0.4.22", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hex = "0.4.3"
-hostname = "0.3.1"
+hostname = "0.4.0"
 lazy_static = "1.4.0"
 lexical-sort = "0.3.1"
 log = "0.4.14"
@@ -94,7 +94,7 @@ regex = "1.5.4"
 # Opus is the browser's default (only) recording codec: https://blog.addpipe.com/audio-constraints-getusermedia/
 symphonia = { git = "https://github.com/pdeljanov/Symphonia.git", rev = "e1a70095c4409478c1ded499fb8dd4afa540fb90", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "opus", "vorbis", "wav"] }
 time = "0.3.30"
-uuid = { version = "0.8.2", features = ["v4"] }
+uuid = { version = "1.8.0", features = ["v4"] }
 
 # TODO/TEMPORARY:
 #  Twitch
@@ -161,14 +161,14 @@ async-stripe = { version = "0.26.0", default-features = false, features = ["runt
 
 # Crypto
 magic-crypt = "3.1.13" # encrypting sort IDs for the frontend so we don't leak info
-md-5 = "0.9.1" # gravatar
+md-5 = "0.10.6" # gravatar
 sha2 = "0.9.9" # file hashes, inference text hashes, etc.
 
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.108"
-toml = "0.5.11"
+toml = "0.8.14"
 
 # Text processing
 pulldown-cmark = "0.9.3"

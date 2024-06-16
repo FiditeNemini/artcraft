@@ -24,7 +24,7 @@ normal = ["my-workspace-hack"]
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 # External
-uuid = { version = "0.8.2", features = ["v4"] }
+uuid = { version = "1.8.0", features = ["v4"] }
 
 [dev-dependencies]
 # None yet
