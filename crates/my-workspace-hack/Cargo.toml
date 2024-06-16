@@ -37,7 +37,7 @@ flume = { version = "0.11.0", default-features = false, features = ["async"] }
 futures = { version = "0.3.29", features = ["thread-pool"] }
 futures-channel = { version = "0.3.30", features = ["sink"] }
 futures-core = { version = "0.3.30" }
-futures-executor = { version = "0.3.29", features = ["thread-pool"] }
+futures-executor = { version = "0.3.30", features = ["thread-pool"] }
 futures-io = { version = "0.3.30" }
 futures-sink = { version = "0.3.30" }
 futures-task = { version = "0.3.30", default-features = false, features = ["std"] }
@@ -61,7 +61,7 @@ num-bigint = { version = "0.4.4" }
 num-integer = { version = "0.1.45", default-features = false, features = ["i128", "std"] }
 num-iter = { version = "0.1.43", default-features = false, features = ["i128", "std"] }
 num-rational = { version = "0.4.1", features = ["serde"] }
-num-traits = { version = "0.2.17", features = ["i128", "libm"] }
+num-traits = { version = "0.2.19", features = ["i128", "libm"] }
 proc-macro2 = { version = "1.0.85", features = ["span-locations"] }
 quick-xml = { version = "0.30.0", features = ["encoding", "serialize"] }
 quote = { version = "1.0.36" }
@@ -115,7 +115,7 @@ flate2 = { version = "1.0.30" }
 flume = { version = "0.11.0", default-features = false, features = ["async"] }
 futures-channel = { version = "0.3.30", features = ["sink"] }
 futures-core = { version = "0.3.30" }
-futures-executor = { version = "0.3.29", features = ["thread-pool"] }
+futures-executor = { version = "0.3.30", features = ["thread-pool"] }
 futures-io = { version = "0.3.30" }
 futures-sink = { version = "0.3.30" }
 futures-task = { version = "0.3.30", default-features = false, features = ["std"] }
@@ -136,7 +136,7 @@ mio = { version = "0.8.11", features = ["net", "os-ext"] }
 native-tls = { version = "0.2.11", default-features = false, features = ["vendored"] }
 num-integer = { version = "0.1.45", default-features = false, features = ["i128", "std"] }
 num-iter = { version = "0.1.43", default-features = false, features = ["i128", "std"] }
-num-traits = { version = "0.2.17", features = ["i128", "libm"] }
+num-traits = { version = "0.2.19", features = ["i128", "libm"] }
 proc-macro2 = { version = "1.0.85", features = ["span-locations"] }
 quote = { version = "1.0.36" }
 rand = { version = "0.8.5", features = ["small_rng"] }
