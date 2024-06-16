@@ -88,6 +88,6 @@ mime = "0.3.17"
 rand = { version = "0.8.5", features = [] }
 jsonpath_lib = "0.3.0"
 walkdir = "2.4.0"
-opentelemetry = {version = "0.21.0", features = ["metrics"]}
-opentelemetry-otlp = { version = "0.14.0", features = ["metrics"] }
-opentelemetry_sdk = { version = "0.21.2", features = ["metrics", "rt-tokio"] }
+opentelemetry = {version = "0.23.0", features = ["metrics"]}
+opentelemetry-otlp = { version = "0.16.0", features = ["metrics"] }
+opentelemetry_sdk = { version = "0.23.0", features = ["metrics", "rt-tokio"] }
