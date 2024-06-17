@@ -7,7 +7,7 @@ import {
   objectsMinimized,
   timelineScrollY,
   toggleAudioMute,
-  toggleLipSyncMute,
+  // toggleLipSyncMute,
 } from "~/pages/PageEnigma/signals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
@@ -16,7 +16,6 @@ import { GlobalAudioHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/
 import { CameraHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CameraHeader";
 import { ObjectsHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/ObjectsHeader";
 import { CharacterHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CharacterHeader";
-import { environmentVariables } from "~/signals";
 import { LipSyncSubHeader } from "./LipSyncSubHeader";
 
 export const RowHeaders = () => {
@@ -55,9 +54,6 @@ export const RowHeaders = () => {
             <div
               key={character.object_uuid}
               className="mb-1 w-full rounded-l-lg bg-character-groupBg pb-2"
-              // style={{
-              //   height: environmentVariables.value.EXPRESSIONS ? 247 : 199,
-              // }}
             >
               <div className="h-[30px]  text-xs font-medium text-white">
                 <div
@@ -75,11 +71,9 @@ export const RowHeaders = () => {
               <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Position
               </div>
-              {environmentVariables.value.EXPRESSIONS && (
-                <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                  Expression
-                </div>
-              )}
+              <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                Expression
+              </div>
               <LipSyncSubHeader character={character} />
             </div>
           );

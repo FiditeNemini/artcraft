@@ -13,7 +13,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
-import { environmentVariables } from "~/signals";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -143,15 +142,13 @@ export const Character = ({ character }: Props) => {
           updateKeyframe={updateClipPosition}
           group={ClipGroup.CHARACTER}
         />
-        {environmentVariables.value.EXPRESSIONS && (
-          <TrackClips
-            id={character.object_uuid}
-            clips={expressionClips}
-            updateClip={updateClipEmotions}
-            group={ClipGroup.CHARACTER}
-            type={ClipType.EXPRESSION}
-          />
-        )}
+        <TrackClips
+          id={character.object_uuid}
+          clips={expressionClips}
+          updateClip={updateClipEmotions}
+          group={ClipGroup.CHARACTER}
+          type={ClipType.EXPRESSION}
+        />
         {editorEngine &&
           editorEngine.isObjectLipsync(character.object_uuid) && (
             <TrackClips

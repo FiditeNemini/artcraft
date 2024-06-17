@@ -4,7 +4,6 @@ import { twMerge } from "tailwind-merge";
 
 import { AssetType } from "~/enums";
 import { EditorStates } from "~/pages/PageEnigma/enums";
-import { environmentVariables } from "~/signals";
 import { editorState } from "~/pages/PageEnigma/signals/engine";
 import {
   selectedTab,
@@ -22,7 +21,7 @@ export const SidePanelMenu = () => {
   useSignals();
   const [tabs, setTabs] = useState<TabItem[]>();
   useLayoutEffect(() => {
-    setTabs(tabList(environmentVariables.value));
+    setTabs(tabList);
   }, []);
 
   useEffect(() => {

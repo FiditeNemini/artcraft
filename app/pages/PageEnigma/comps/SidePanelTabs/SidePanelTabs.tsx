@@ -2,17 +2,15 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { selectedTab, sidePanelHeight } from "~/pages/PageEnigma/signals";
 import { tabList } from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
 import { useMouseEventsSidePanel } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsSidePanel";
-import { environmentVariables } from "~/signals";
 
 export const SidePanelTabs = () => {
   useSignals();
   const { onPointerDown } = useMouseEventsSidePanel();
-  const tabs = tabList(environmentVariables.value);
 
   return (
     <>
       <div style={{ height: sidePanelHeight.value, width: "100%" }}>
-        {(tabs ?? []).map((tab) => (
+        {tabList.map((tab) => (
           <div
             key={tab.value}
             className={

@@ -9,7 +9,6 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { json } from "@remix-run/router";
 
 import normalizeCss from "./styles/normalize.css?url";
 import tailwindCss from "./styles/tailwind.css?url";
@@ -129,32 +128,3 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
 
   return null;
 };
-
-// function CompleteTakeoverLoadingScreen({ isShowing }: { isShowing: boolean }) {
-//   return (
-//     <Transition
-//       id="complete-takeover-loading-screen"
-//       show={isShowing}
-//       enter="transition-opacity duration-150"
-//       enterFrom="opacity-0"
-//       enterTo="opacity-100"
-//       leave="transition-opacity duration-1000"
-//       leaveFrom="opacity-100"
-//       leaveTo="opacity-0"
-//       style={{
-//         backgroundColor: "#1a1a27",
-//         position: "fixed",
-//         top: 0,
-//         left: 0,
-//         width: "100vw",
-//         height: "100vh",
-//         display: "flex",
-//         justifyContent: "center",
-//         alignItems: "center",
-//         zIndex: 9999,
-//       }}
-//     >
-//       <LoadingDotsBricks />
-//     </Transition>
-//   );
-// }
