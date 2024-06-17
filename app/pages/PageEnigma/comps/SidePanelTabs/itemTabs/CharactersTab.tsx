@@ -57,7 +57,7 @@ export const CharactersTab = () => {
         {
           filter_engine_categories: "character",
           page_index: page,
-          page_size: 24,
+          page_size: 200,
         },
       ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
         if (res.success && res.results) {

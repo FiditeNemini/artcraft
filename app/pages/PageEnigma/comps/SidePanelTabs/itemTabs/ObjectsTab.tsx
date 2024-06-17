@@ -62,7 +62,7 @@ export const ObjectsTab = () => {
         {
           filter_engine_categories: "object",
           page_index: page,
-          page_size: 24,
+          page_size: 200,
         },
       ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
         if (res.success && res.results) {
