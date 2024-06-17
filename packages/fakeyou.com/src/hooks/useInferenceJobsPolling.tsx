@@ -159,12 +159,13 @@ export default function useInferenceJobsPolling({
     jobToken: string,
     frontendJobType: FrontendInferenceJobType
   ) => {
+    onTick({ eventProps: { inferenceJobs: [] } });
     if (user) {
       // reserving this space for later uses
     } else {
       keepAliveSet(false);
       const newJob = new InferenceJob(jobToken, frontendJobType);
-      inferenceJobsSet([...(inferenceJobs || []), newJob]);
+      inferenceJobsSet([newJob, ...(inferenceJobs || [])]);
     }
 
     keepAliveSet(true);

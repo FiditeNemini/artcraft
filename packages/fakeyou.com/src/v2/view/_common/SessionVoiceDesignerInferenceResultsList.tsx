@@ -218,9 +218,6 @@ function SessionVoiceDesignerInferenceResultsList(props: Props) {
     );
   }
 
-  // Users have requested reverse chronological results
-  results.reverse();
-
   return (
     <div>
       <div>

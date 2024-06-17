@@ -279,7 +279,7 @@ export default function VcInferencePanel({
           <NonRouteTabs tabs={vcTabs} />
         </form>
       </SplitPanel.Body>
-      {inferenceJobs[0] && (
+      {inferenceJobs && inferenceJobs.length ? (
         <SplitPanel.Footer padding={true}>
           <Accordion>
             <Accordion.Item title="Session V2V Results" defaultOpen={true}>
@@ -291,7 +291,7 @@ export default function VcInferencePanel({
             </Accordion.Item>
           </Accordion>
         </SplitPanel.Footer>
-      )}
+      ) : null}
     </SplitPanel>
   );
 }

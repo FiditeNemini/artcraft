@@ -61,21 +61,19 @@ export default function InferenceJobsList({
       {showJobQueue && <JobQueueTicker {...{ hasPaidFeatures }} />}
       <div {...{ className: "fy-inference-jobs-list-grid" }}>
         {selectedJobs &&
-          selectedJobs
-            .map((job: InferenceJob, key: number) => (
-              <JobItem
-                {...{
-                  failures,
-                  jobStatusDescription,
-                  key,
-                  onSelect,
-                  resultPaths,
-                  t,
-                  ...job,
-                }}
-              />
-            ))
-            .reverse()}
+          selectedJobs.map((job: InferenceJob, key: number) => (
+            <JobItem
+              {...{
+                failures,
+                jobStatusDescription,
+                key,
+                onSelect,
+                resultPaths,
+                t,
+                ...job,
+              }}
+            />
+          ))}
       </div>
       {(!selectedJobs || !selectedJobs.length) && showNoJobs && (
         <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">

@@ -189,7 +189,7 @@ export default function TtsInferencePanel({
         }}
       />*/}
 
-      {ttsJobs && ttsJobs.length && (
+      {ttsJobs && ttsJobs.length ? (
         <div className="mt-4">
           <Accordion>
             <Accordion.Item title="Session TTS Results" defaultOpen={true}>
@@ -202,7 +202,7 @@ export default function TtsInferencePanel({
           </Accordion>
           {maybeError}
         </div>
-      )}
+      ) : null}
     </Panel>
   );
 }
