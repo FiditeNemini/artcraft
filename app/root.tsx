@@ -55,21 +55,31 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader() {
-  return json({
-    ENV: {
-      // @ts-expect-error ProvessEnv is correct
-      BASE_API: process.env.BASE_API || "%BUILD_BASE_API%",
-      // @ts-expect-error ProvessEnv is correct
-      GOOGLE_API: process.env.GOOGLE_API || "%BUILD_GOOGLE_API%",
+  if (process.env.NODE_ENV === "development") {
+    const env = {
+      BASE_API: "",
+      GOOGLE_API: "",
       // @ts-expect-error ProvessEnv is correct
       FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
       // @ts-expect-error ProvessEnv is correct
       CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
-      EXPRESSIONS:
-        // @ts-expect-error ProvessEnv is correct
-        process.env.EXPRESSIONS === "true" || "%EXPRESSIONS_VALUE%" === "true",
-    } as Record<string, string | boolean>,
-  });
+      GRAVATAR_API: "",
+    } as Record<string, string | boolean>;
+    return { ENV: env };
+  }
+  const env = {
+    // @ts-expect-error ProvessEnv is correct
+    BASE_API: process.env.BASE_API || "%BUILD_BASE_API%",
+    // @ts-expect-error ProvessEnv is correct
+    GOOGLE_API: process.env.GOOGLE_API || "%BUILD_GOOGLE_API%",
+    // @ts-expect-error ProvessEnv is correct
+    FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
+    // @ts-expect-error ProvessEnv is correct
+    CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
+    // @ts-expect-error ProvessEnv is correct
+    GRAVATAR_API: process.env.GRAVATAR_API || "%BUILD_GRAVATAR_API%",
+  } as Record<string, string | boolean>;
+  return { ENV: env };
 }
 
 export default function App() {
@@ -113,8 +123,8 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   }, []);
 
   useEffect(() => {
-    EnvironmentVariables.initialize(env);
     environmentVariables.value = env;
+    EnvironmentVariables.initialize(env);
   }, [env]);
 
   return null;

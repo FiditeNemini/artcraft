@@ -4,10 +4,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { netlifyPlugin } from "@netlify/remix-edge-adapter/plugin";
 
 export default defineConfig({
-  
   plugins: [
-    remix(), 
-    netlifyPlugin(), 
+    remix(),
+    netlifyPlugin(),
     tsconfigPaths(),
     {
       name: "configure-response-headers",
@@ -18,5 +17,16 @@ export default defineConfig({
           next();
         });
       },
-    },],
+    },
+  ],
+  server: {
+    proxy: {
+      "/v1": "https://api.storyteller.ai",
+      "/avatar": "https://www.gravatar.com",
+      "/google": {
+        target: "https://storage.googleapis.com",
+        rewrite: (path) => path.replace(/^\/google/, ""),
+      },
+    },
+  },
 });

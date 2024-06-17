@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
+import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 
 interface Props {
   size: number;
@@ -27,7 +28,7 @@ function Gravatar(props: Props) {
   // https://en.gravatar.com/site/implement/images/
   const encondedDefaultImage = encodeURIComponent(defaultImageUrl);
 
-  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}&d=${encondedDefaultImage}`;
+  const gravatarUrl = `${EnvironmentVariables.values.GRAVATAR_API}/avatar/${props.email_hash}?s=${props.size}&d=${encondedDefaultImage}`;
 
   const [imgUrl, setImgUrl] = useState<string>(gravatarUrl);
 
