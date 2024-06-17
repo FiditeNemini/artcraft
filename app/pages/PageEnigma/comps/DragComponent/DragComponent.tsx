@@ -28,7 +28,7 @@ export const DragComponent = () => {
             id={`ani-dnd-${dragItem.value.media_id}`}
             className={[
               "absolute p-2",
-              "rounded-lg",
+              "rounded-md",
               !canDrop.value
                 ? "bg-brand-primary"
                 : "border border-dashed border-dnd-canDropBorder bg-dnd-canDrop",
@@ -39,7 +39,7 @@ export const DragComponent = () => {
               left: currX + 1,
               zIndex: 10000,
               width: (dragItem.value.length ?? 0) * 4 * scale.value,
-              height: 32,
+              height: 30,
             }}
           />
           <div

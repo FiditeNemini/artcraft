@@ -28,7 +28,7 @@ export const Scrubber = ({ page }: Props) => {
     <div
       className="absolute z-20 flex cursor-ew-resize flex-col items-center"
       style={{
-        top: 16,
+        top: 8,
         left: displayTime * 4 * scale.value + 199 - scrollX,
       }}
       onPointerDown={onPointerDown}
@@ -54,7 +54,7 @@ export const Scrubber = ({ page }: Props) => {
         style={{
           width: 2,
           marginTop: -5,
-          height: timelineHeight.value - 48,
+          height: timelineHeight.value - 36,
         }}
       />
     </div>

@@ -88,7 +88,7 @@ export const Character = ({ character }: Props) => {
     return (
       <div
         id={`track-character-${character.object_uuid}`}
-        className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4"
+        className="relative flex h-[30px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}
       >
         <button
@@ -111,10 +111,10 @@ export const Character = ({ character }: Props) => {
   return (
     <div
       id={`track-character-${character.object_uuid}`}
-      className="relative block rounded-r-lg bg-character-groupBg pb-5 pr-4"
+      className="relative block rounded-r-lg bg-character-groupBg pb-2 pr-4"
       style={{ width: fullWidth.value + 16 }}
     >
-      <div className="flex h-[35px] items-center justify-end">
+      <div className="flex h-[30px] items-center justify-end">
         <button
           className="absolute"
           style={{
@@ -129,7 +129,7 @@ export const Character = ({ character }: Props) => {
           <FontAwesomeIcon icon={faAngleUp} />
         </button>
       </div>
-      <div className="flex flex-col gap-3 pt-[12px]">
+      <div className="flex flex-col">
         <TrackClips
           id={character.object_uuid}
           clips={animationClips}

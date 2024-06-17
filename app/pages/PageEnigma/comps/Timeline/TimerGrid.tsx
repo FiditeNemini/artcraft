@@ -21,8 +21,8 @@ export const TimerGrid = ({ page }: Props) => {
   return (
     <div
       className={[
-        "prevent-select ml-[204px] mt-4",
-        "relative flex h-7 overflow-hidden",
+        "prevent-select ml-[204px] mt-2",
+        "relative flex h-5 overflow-hidden",
         "border-t border-t-ui-panel-border",
         "text-xs text-white opacity-75",
       ].join(" ")}
@@ -33,13 +33,13 @@ export const TimerGrid = ({ page }: Props) => {
           .map((_, index) => (
             <Fragment key={index}>
               <div
-                className="absolute ps-1 pt-2"
+                className="absolute ps-0.5 pt-1.5 text-[11px]"
                 style={{ left: index * sectionWidth + 4 }}
               >
                 00:{index < 10 ? "0" + index.toString() : index.toString()}
               </div>
               <div
-                className="absolute block bg-ui-divider"
+                className="absolute mt-0.5 block bg-ui-divider"
                 style={{
                   width: 1,
                   left: index * sectionWidth,
@@ -51,7 +51,7 @@ export const TimerGrid = ({ page }: Props) => {
                 .map((_, ind) => (
                   <div
                     key={ind}
-                    className="absolute block h-2 bg-ui-divider"
+                    className="absolute mt-0.5 block h-1 bg-ui-divider"
                     style={{
                       width: 1,
                       top: 0,
@@ -63,7 +63,7 @@ export const TimerGrid = ({ page }: Props) => {
             </Fragment>
           ))}
         <div
-          className="absolute pt-2"
+          className="absolute ps-0.5 pt-1.5 text-[11px]"
           style={{ left: filmLength.value * sectionWidth + 4 }}
         >
           00:

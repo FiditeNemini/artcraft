@@ -7,7 +7,7 @@ export const Characters = () => {
   return (
     <>
       {characterGroup.value.characters.map((character) => (
-        <div key={character.object_uuid} className="pb-4 pr-4">
+        <div key={character.object_uuid} className="mb-1 pr-4">
           <Character character={character} />
         </div>
       ))}

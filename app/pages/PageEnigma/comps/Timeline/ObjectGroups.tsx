@@ -21,7 +21,7 @@ export const ObjectGroups = () => {
     return (
       <div
         id="track-objects"
-        className="relative mb-4 flex h-[35px] items-center justify-end rounded-r-lg bg-object-groupBg pr-4"
+        className="relative mb-4 flex h-[30px] items-center justify-end rounded-r-lg bg-object-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}
       >
         <button
@@ -44,7 +44,7 @@ export const ObjectGroups = () => {
   return (
     <div
       id="track-objects"
-      className="relative mb-5 block rounded-r-lg  bg-object-groupBg pr-4"
+      className="relative mb-5 block rounded-r-lg  bg-object-groupBg pb-2 pr-4"
       style={{ width: fullWidth.value + 16 }}
     >
       <button
@@ -60,11 +60,11 @@ export const ObjectGroups = () => {
       >
         <FontAwesomeIcon icon={faAngleUp} />
       </button>
-      <div className="pt-[47px]">
+      <div className="pt-[30px]">
         {objectGroup.value.objects.map((object) => (
           <div
             key={object.object_uuid}
-            className="pb-4 pr-4"
+            className="mb-1"
             id={`track-object-${selectedObject.value?.id}`}
           >
             <ObjectTrackComponent object={object} />

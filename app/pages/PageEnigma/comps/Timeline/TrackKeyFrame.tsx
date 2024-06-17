@@ -26,7 +26,7 @@ export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
   return (
     <button
       className={[
-        "top-[11px] block h-[14px] w-[14px] rotate-45 cursor-ew-resize",
+        "top-[9px] block h-[12px] w-[12px] rotate-45 cursor-ew-resize",
         "absolute",
         keyframe.keyframe_uuid === selectedKeyframeId
           ? "bg-keyframe-selected"

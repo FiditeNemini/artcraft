@@ -13,7 +13,7 @@ export const LipSyncSubHeader = ({
   const editorEngine = useContext(EngineContext);
   if (editorEngine && editorEngine.isObjectLipsync(character.object_uuid)) {
     return (
-      <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+      <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
         <div className="flex gap-3">
           Lip Sync
           <button

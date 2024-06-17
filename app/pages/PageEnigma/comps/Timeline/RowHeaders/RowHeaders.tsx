@@ -23,9 +23,9 @@ export const RowHeaders = () => {
   useSignals();
 
   const compressedHeaderClasses =
-    "flex h-[35px] items-center gap-2 pl-2 text-xs rounded-tl-lg font-medium text-white";
+    "flex h-[30px] items-center gap-2 pl-2 text-xs rounded-tl-lg font-medium text-white w-32";
   const uncompressedHeaderClasses =
-    "flex h-[35px] items-center gap-2 rounded-br-lg rounded-tl-lg pl-2 text-xs font-medium text-white";
+    "flex h-[30px] items-center gap-2 rounded-br-lg rounded-tl-lg pl-2 text-xs font-medium text-white w-32";
 
   return (
     <div className="relative">
@@ -38,7 +38,7 @@ export const RowHeaders = () => {
             return (
               <div
                 key={character.object_uuid}
-                className="mb-4 h-[35px] w-full rounded-l-lg bg-character-groupBg"
+                className="mb-1 h-[30px] w-full rounded-l-lg bg-character-groupBg"
               >
                 <div
                   className={[
@@ -54,12 +54,12 @@ export const RowHeaders = () => {
           return (
             <div
               key={character.object_uuid}
-              className="mb-4 w-full rounded-l-lg bg-character-groupBg pb-2"
+              className="mb-1 w-full rounded-l-lg bg-character-groupBg pb-2"
               // style={{
               //   height: environmentVariables.value.EXPRESSIONS ? 247 : 199,
               // }}
             >
-              <div className="h-[47px] text-xs font-medium text-white">
+              <div className="h-[30px]  text-xs font-medium text-white">
                 <div
                   className={[
                     uncompressedHeaderClasses,
@@ -69,14 +69,14 @@ export const RowHeaders = () => {
                   <CharacterHeader name={character.name} />
                 </div>
               </div>
-              <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+              <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Animation
               </div>
-              <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+              <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Position
               </div>
               {environmentVariables.value.EXPRESSIONS && (
-                <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                   Expression
                 </div>
               )}
@@ -86,7 +86,7 @@ export const RowHeaders = () => {
         })}
 
         {cameraMinimized.value ? (
-          <div className="mb-4 h-[35px] w-full rounded-l-lg bg-camera-groupBg">
+          <div className="mb-1 h-[30px] w-full rounded-l-lg bg-camera-groupBg">
             <div
               className={[compressedHeaderClasses, "bg-camera-titleBg"].join(
                 " ",
@@ -96,8 +96,8 @@ export const RowHeaders = () => {
             </div>
           </div>
         ) : (
-          <div className="mb-4 h-[103px] w-full rounded-l-lg bg-camera-groupBg">
-            <div className="h-[47px] text-xs font-medium text-white">
+          <div className="mb-1 h-[72px] w-full rounded-l-lg bg-camera-groupBg">
+            <div className="h-[30px]  text-xs font-medium text-white">
               <div
                 className={[
                   uncompressedHeaderClasses,
@@ -107,14 +107,14 @@ export const RowHeaders = () => {
                 <CameraHeader />
               </div>
             </div>
-            <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+            <div className="flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
               Position
             </div>
           </div>
         )}
 
         {audioMinimized.value ? (
-          <div className="mb-4 h-[35px] w-full rounded-l-lg bg-global_audio-groupBg">
+          <div className="mb-1 h-[30px] w-full rounded-l-lg bg-global_audio-groupBg">
             <div
               className={[
                 compressedHeaderClasses,
@@ -125,8 +125,8 @@ export const RowHeaders = () => {
             </div>
           </div>
         ) : (
-          <div className="mb-4 h-[103px] w-full rounded-l-lg bg-global_audio-groupBg">
-            <div className="h-[47px] text-xs font-medium text-white">
+          <div className="mb-1 h-[72px] w-full rounded-l-lg bg-global_audio-groupBg">
+            <div className="h-[30px]  text-xs font-medium text-white">
               <div
                 className={[
                   uncompressedHeaderClasses,
@@ -136,7 +136,7 @@ export const RowHeaders = () => {
                 <GlobalAudioHeader />
               </div>
             </div>
-            <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+            <div className="flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
               <div className="flex gap-3">
                 Track 1
                 <button
@@ -159,7 +159,7 @@ export const RowHeaders = () => {
         {objectGroup.value.objects.length > 0 && (
           <>
             {objectsMinimized.value ? (
-              <div className="mb-4 h-[35px] w-full rounded-l-lg bg-object-groupBg">
+              <div className="h-[30px] w-full rounded-l-lg bg-object-groupBg">
                 <div
                   className={[
                     compressedHeaderClasses,
@@ -171,10 +171,12 @@ export const RowHeaders = () => {
               </div>
             ) : (
               <div
-                className="mb-4 h-[103px] w-full rounded-l-lg bg-object-groupBg"
-                style={{ height: 48 + objectGroup.value.objects.length * 52 }}
+                className="mb-1 h-[72px] w-full rounded-l-lg bg-object-groupBg"
+                style={{
+                  height: `${38 + objectGroup.value.objects.length * 34}px`,
+                }}
               >
-                <div className="h-[47px] text-xs font-medium text-white">
+                <div className="h-[30px] text-xs font-medium text-white">
                   <div
                     className={[
                       uncompressedHeaderClasses,
@@ -187,7 +189,7 @@ export const RowHeaders = () => {
                 {objectGroup.value.objects.map((obj) => (
                   <div
                     key={obj.object_uuid}
-                    className="mb-4 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80"
+                    className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80"
                   >
                     {obj.name}
                   </div>

@@ -90,7 +90,7 @@ export const Timeline = () => {
   }, []);
 
   useEffect(() => {
-    timelineHeight.value = window.outerHeight * 0.25;
+    timelineHeight.value = 208;
   }, []);
 
   const onDelete = useCallback(() => {
@@ -143,7 +143,7 @@ export const Timeline = () => {
           <div
             className="ml-[60px] mt-2 w-[144px] overflow-hidden"
             style={{
-              height: timelineHeight.value - 54,
+              height: timelineHeight.value - 36,
             }}
           >
             <RowHeaders />
@@ -153,7 +153,7 @@ export const Timeline = () => {
             onScroll={onScroll}
             style={{
               width: pageWidth.value - 204,
-              height: timelineHeight.value - 54,
+              height: timelineHeight.value - 36,
             }}
           >
             <div
@@ -162,10 +162,10 @@ export const Timeline = () => {
             >
               <PremiumLockTimeline locked={false} />
               <Characters />
-              <div className="pb-4 pr-8">
+              <div className="pb-1 pr-8">
                 <Camera />
               </div>
-              <div className="pb-4 pr-8">
+              <div className="pb-1 pr-8">
                 <Audio />
               </div>
               <ObjectGroups />

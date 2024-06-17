@@ -67,7 +67,7 @@ export const TrackKeyFrames = ({
   return (
     <div
       id={`track-${group}-${id}`}
-      className={`relative block h-9 w-full rounded-lg bg-${group}-unselected`}
+      className={`relative mb-1 block h-[30px] w-full rounded-md bg-${group}-unselected`}
       onPointerMove={onPointerMove}
     >
       {keyframes.map((keyframe) => (

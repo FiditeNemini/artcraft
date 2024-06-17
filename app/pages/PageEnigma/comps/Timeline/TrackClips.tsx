@@ -152,14 +152,14 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     <div
       id={`track-${trackType}-${id}`}
       className={[
-        "relative block h-9 w-full rounded-lg",
+        "relative mb-1 block h-[30px] w-full rounded-md",
         `bg-${group}-unselected`,
-        clips.length === 0 ? "border-2 border-dashed border-white/30" : "",
+        clips.length === 0 ? "border border-dashed border-white/30" : "",
       ].join(" ")}
     >
       <div
         className={[
-          "absolute inset-0 rounded-lg",
+          "absolute inset-0 rounded-md",
           canDropAsset
             ? "animate-pulse bg-white/30 duration-[750ms]"
             : "opacity-0",

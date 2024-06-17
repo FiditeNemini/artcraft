@@ -19,7 +19,7 @@ export const Audio = () => {
     return (
       <div
         id="track-global-audio"
-        className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-global_audio-groupBg pr-4"
+        className="relative flex h-[30px] items-center justify-end rounded-r-lg bg-global_audio-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}
       >
         <button
@@ -42,7 +42,7 @@ export const Audio = () => {
   return (
     <div
       id="track-global-audio"
-      className="relative block rounded-r-lg bg-global_audio-groupBg pb-5 pr-4"
+      className="relative block rounded-r-lg bg-global_audio-groupBg pb-2 pr-4"
       style={{ width: fullWidth.value + 16 }}
     >
       <button
@@ -58,7 +58,7 @@ export const Audio = () => {
       >
         <FontAwesomeIcon icon={faAngleUp} />
       </button>
-      <div className="pt-[47px]">
+      <div className="pt-[30px]">
         <TrackClips
           id={audioGroup.value.id}
           clips={clips}

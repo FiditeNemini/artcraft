@@ -19,7 +19,7 @@ export const Camera = () => {
     return (
       <div
         id="track-camera"
-        className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-camera-groupBg pr-4"
+        className="relative flex h-[30px] items-center justify-end rounded-r-lg bg-camera-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}
       >
         <button
@@ -42,7 +42,7 @@ export const Camera = () => {
   return (
     <div
       id="track-camera"
-      className="relative block rounded-r-lg bg-camera-groupBg pb-5 pr-4"
+      className="relative block rounded-r-lg bg-camera-groupBg pb-2 pr-4"
       style={{ width: fullWidth.value + 16 }}
     >
       <div className="flex justify-end">
@@ -60,7 +60,7 @@ export const Camera = () => {
           <FontAwesomeIcon icon={faAngleUp} />
         </button>
       </div>
-      <div className="pt-[47px]">
+      <div className="pt-[30px]">
         <TrackKeyFrames
           id={cameraGroup.value.id}
           keyframes={keyframes}
