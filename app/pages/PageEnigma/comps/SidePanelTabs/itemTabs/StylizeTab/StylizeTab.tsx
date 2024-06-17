@@ -13,6 +13,7 @@ import { editorState } from "~/pages/PageEnigma/signals/engine";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { IPAdapter } from "./IPAdapter";
 
 export function StylizeTab() {
   useSignals();
@@ -64,6 +65,7 @@ export function StylizeTab() {
           }
         />
         <Prompts selection={selection} />
+        <IPAdapter />
         <StyleButtons />
       </div>
       <GenerateMovieButton

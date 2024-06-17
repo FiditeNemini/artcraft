@@ -237,3 +237,7 @@ img {
       10007px 0 0 0 #393948;
   }
 }
+
+.ReactCrop__crop-selection:focus {
+  outline: none !important;
+}
