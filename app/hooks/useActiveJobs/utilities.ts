@@ -1,27 +1,19 @@
-import { getRecentJobs } from "~/api";
 import { ToastTypes } from "~/enums";
-import { authentication, addToast, setJobs } from "~/signals";
+import { addToast, setJobs } from "~/signals";
+import { JobsApi } from "~/Classes/ApiManager/JobsApi";
+export async function PollRecentJobs() {
+  const jobsApi = new JobsApi();
 
-export function PollRecentJobs() {
-  console.log("Poll recent jobs");
-  const endpoint = getRecentJobs;
-
-  fetch(endpoint, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      session: authentication.sessionToken.value || "",
-    },
-    credentials: "include",
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.jobs && res.jobs.length > 0) {
-        setJobs(res.jobs);
-        // just no jobs, not an error, do nothing
-      }
-    })
-    .catch(() => {
-      addToast(ToastTypes.ERROR, "Unknown Error in Getting Recent Jobs");
-    });
+  const response = await jobsApi.ListRecentJobs();
+  if (response.success && response.data) {
+    if (response.data.length > 0) {
+      setJobs(response.data);
+    }
+    // else, just no jobs, not an error, do nothing
+    return;
+  }
+  addToast(
+    ToastTypes.ERROR,
+    response.errorMessage || "Unknown Error: List Recent Jobs",
+  );
 }

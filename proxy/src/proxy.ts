@@ -17,16 +17,6 @@ app.use(
 );
 
 app.use(
-  "/tts",
-  createProxyMiddleware({
-    target: "https://api.fakeyou.com/tts",
-    changeOrigin: true,
-    secure: true,
-    // logger: console,
-  }),
-);
-
-app.use(
   "/google",
   createProxyMiddleware({
     target: "https://storage.googleapis.com",

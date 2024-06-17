@@ -6,12 +6,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { H4, H6, Button, Label, Textarea } from "~/components";
 
-import { GenerateTtsAudioResponse } from "~/pages/PageEnigma/models/tts";
-
-import { GenerateTtsAudio } from "./utilities";
-import { TtsState } from "../../../../models/voice";
+import { TtsState } from "~/pages/PageEnigma/models/voice";
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
-import { startPollingActiveJobs } from "~/signals";
+import { ToastTypes } from "~/enums";
+import { addToast, startPollingActiveJobs } from "~/signals";
+import { TtsApi } from "~/Classes/ApiManager/TtsApi";
 
 export const PageTTS = ({
   changePage,
@@ -22,24 +21,33 @@ export const PageTTS = ({
   ttsState: TtsState;
   setTtsState: (newState: TtsState) => void;
 }) => {
-  const requestTts = useCallback(() => {
+  const requestTts = useCallback(async () => {
     const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
 
-    if (modelToken) {
-      const request = {
-        uuid_idempotency_token: uuidv4(),
-        tts_model_token: modelToken,
-        inference_text: ttsState.text,
-      };
+    if (!modelToken) {
+      addToast(ToastTypes.ERROR, "Please first pick a voice");
+      return;
+    }
 
-      GenerateTtsAudio(request).then((res: GenerateTtsAudioResponse) => {
-        if (res && res.inference_job_token) {
-          startPollingActiveJobs();
-          changePage(AudioTabPages.LIBRARY);
-        }
-      });
+    const request = {
+      uuid_idempotency_token: uuidv4(),
+      tts_model_token: modelToken,
+      inference_text: ttsState.text,
+    };
+
+    const ttsApi = new TtsApi();
+    const response = await ttsApi.GenerateTtsAudio(request);
+    if (
+      response.success &&
+      response.data &&
+      response.data.inference_job_token
+    ) {
+      startPollingActiveJobs();
+      changePage(AudioTabPages.LIBRARY);
+    } else if (response.errorMessage) {
+      addToast(ToastTypes.ERROR, response.errorMessage);
     } else {
-      console.log("no voice model selected");
+      addToast(ToastTypes.ERROR, "Unknown Error: Generate TTS");
     }
   }, [ttsState, changePage]);
 

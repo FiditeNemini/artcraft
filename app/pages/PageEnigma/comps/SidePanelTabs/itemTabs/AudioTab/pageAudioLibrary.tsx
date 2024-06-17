@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import { useSignals, useComputed } from "@preact/signals-react/runtime";
+import { useSignals } from "@preact/signals-react/runtime";
 import { audioFilter, audioItems } from "~/pages/PageEnigma/signals";
 
 import { Button, Pagination, UploadAudioButtonDialogue } from "~/components";
@@ -23,11 +23,8 @@ export const PageAudioLibrary = ({
 }) => {
   useSignals();
   const loadUserAudioItems = userAudioItems.value ? userAudioItems.value : [];
-  const allAudioItems = useComputed(() => [
-    ...audioItems.value,
-    ...loadUserAudioItems,
-  ]);
-  const displayedItems = allAudioItems.value.filter((item) => {
+  const allAudioItems = [...audioItems.value, ...loadUserAudioItems];
+  const displayedItems = allAudioItems.filter((item) => {
     if (audioFilter.value === AssetFilterOption.ALL) {
       return true;
     }
@@ -38,7 +35,7 @@ export const PageAudioLibrary = ({
   });
 
   const pageSize = 20;
-  const totalPages = Math.ceil(allAudioItems.value.length / pageSize);
+  const totalPages = Math.ceil(allAudioItems.length / pageSize);
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   return (
@@ -63,7 +60,7 @@ export const PageAudioLibrary = ({
               "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
-            disabled={!allAudioItems.value.some((item) => item.isMine)}
+            disabled={!allAudioItems.some((item) => item.isMine)}
           >
             My Audios
           </button>
@@ -76,7 +73,7 @@ export const PageAudioLibrary = ({
               "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!allAudioItems.value.some((item) => item.isBookmarked)}
+            disabled={!allAudioItems.some((item) => item.isBookmarked)}
           >
             Bookmarked
           </button>
