@@ -829,9 +829,9 @@ class Editor {
 
         this.cam_obj.visible = false;
 
-        const min = new THREE.Vector3(-12, -1, -12);
-        const max = new THREE.Vector3(12, 24, 12);
-        this.camera.position.copy(this.camera.position.clamp(min, max));
+        // const min = new THREE.Vector3(-12, -1, -12);
+        // const max = new THREE.Vector3(12, 24, 12);
+        // this.camera.position.copy(this.camera.position.clamp(min, max));
       }
     } else if (this.cam_obj) {
       this.cam_obj.visible = true;
