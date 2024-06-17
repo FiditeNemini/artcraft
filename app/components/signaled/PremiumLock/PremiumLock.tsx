@@ -19,7 +19,7 @@ const sessionSubscriptions = {
   hasActiveEliteSubscription: () => false, // if has elite or not
 };
 
-export default function PremiumLock({
+export function PremiumLock({
   requiredPlan = "plus",
   plural = false,
   children,

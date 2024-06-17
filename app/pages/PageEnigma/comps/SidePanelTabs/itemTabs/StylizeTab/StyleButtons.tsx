@@ -1,4 +1,4 @@
-import { Button, Label } from "~/components";
+import { Button, Label, PremiumLock } from "~/components";
 import {
   faArrowsRotate,
   faChevronLeft,
@@ -10,7 +10,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { Switch } from "@headlessui/react";
-import PremiumLock from "~/components/PremiumLock";
+
 import {
   faceDetail,
   styleStrength,
