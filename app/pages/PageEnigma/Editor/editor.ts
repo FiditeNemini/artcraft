@@ -485,12 +485,12 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    this.renderer.domElement.addEventListener(
+    window.addEventListener(
       "mousedown",
       this.mouse_controls.onMouseDown.bind(this.mouse_controls),
       false,
     );
-    this.renderer.domElement.addEventListener(
+    window.addEventListener(
       "mouseup",
       this.mouse_controls.onMouseUp.bind(this.mouse_controls),
       false,
@@ -520,7 +520,7 @@ class Editor {
 
     document.addEventListener("mouseover", (event) => {
       if (this.orbitControls && this.cameraViewControls) {
-        if (event.target instanceof HTMLCanvasElement) {
+        if (event.target instanceof HTMLCanvasElement || (event.target as HTMLElement).id == "letterbox") {
           if (this.camera_person_mode) {
             this.orbitControls.enabled = false;
             this.cameraViewControls.enabled = true;
