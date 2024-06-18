@@ -20,7 +20,7 @@ export const withProtectionRoute = <P extends object>(
     if (
       status.value === AUTH_STATUS.INIT ||
       status.value === AUTH_STATUS.LOGGING ||
-      status.value === AUTH_STATUS.LOGGING2
+      status.value === AUTH_STATUS.GET_USER_INFO
     ) {
       return (
         <div className="fixed flex h-full w-full flex-col  items-center justify-center">

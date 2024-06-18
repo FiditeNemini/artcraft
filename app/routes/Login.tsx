@@ -26,6 +26,7 @@ export default function LoginScreen() {
   const { status: authStatus } = authentication;
   const authLoaderMessage = getAuthLoaderMessage();
   const shouldShowLoader = checkShouldShowLoader();
+
   const showNoAccessModal = authStatus.value === AUTH_STATUS.NO_ACCESS;
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>) => {
@@ -108,12 +109,12 @@ export default function LoginScreen() {
           text="We're in a closed beta and you'll need a beta key to use this app."
           title="Unauthorized"
           open={showNoAccessModal}
-          onClose={handleLogout}
+          onClose={handleClose}
           cancelText="Close"
-          onCancel={handleLogout}
+          onCancel={handleClose}
           okText="Get Beta Key"
           onOk={() => {
-            handleLogout();
+            handleClose();
             if (window) {
               window.open("https://storyteller.ai/beta-key/redeem", "_blank");
             }
@@ -124,11 +125,12 @@ export default function LoginScreen() {
   );
 }
 
-const handleLogout = () => {
+const handleClose = () => {
   if (authentication.status.value !== AUTH_STATUS.LOGGED_OUT) {
     logout();
   }
 };
+
 const checkShouldShowLoader = () => {
   return (
     authentication.status.value === AUTH_STATUS.LOGGING ||
@@ -139,7 +141,7 @@ const getAuthLoaderMessage = () => {
   if (authentication.status.value === AUTH_STATUS.LOGGED_IN) {
     return "Authenticated, Redirecting...";
   }
-  if (authentication.status.value === AUTH_STATUS.LOGGING2) {
+  if (authentication.status.value === AUTH_STATUS.GET_USER_INFO) {
     return "Getting User Info...";
   }
   return "Getting Session...";

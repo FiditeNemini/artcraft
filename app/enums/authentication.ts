@@ -7,7 +7,7 @@ export enum AUTH_STATUS {
   NO_ACCESS = "no_access",
   LOGGED_IN = "logged_in",
   LOGGING = "logging",
-  LOGGING2 = "logging_2",
+  GET_USER_INFO = "get_user_info",
   LOGGED_OUT = "logged_out",
 }
 

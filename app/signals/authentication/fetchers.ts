@@ -45,7 +45,7 @@ export const login = async ({
   // technically user is login with the system now, HOWEVER,
   // in storyteller studio, only having a sesison is not enough,
   // we need session info and active subscription info as well
-  handleLoginPartTwo();
+  getUserInfoAndSubcriptions();
 };
 
 export const persistLogin = async () => {
@@ -53,11 +53,11 @@ export const persistLogin = async () => {
   if (authentication.status.value !== AUTH_STATUS.INIT) {
     return;
   }
-  handleLoginPartTwo();
+  getUserInfoAndSubcriptions();
 };
 
-async function handleLoginPartTwo() {
-  updateAuthStatus(AUTH_STATUS.LOGGING2);
+async function getUserInfoAndSubcriptions() {
+  updateAuthStatus(AUTH_STATUS.GET_USER_INFO);
   const usersApi = new UsersApi();
   const sessionResponse = await usersApi.GetSession();
   if (
@@ -66,6 +66,11 @@ async function handleLoginPartTwo() {
     !sessionResponse.data.user
   ) {
     setLogoutStates();
+    return;
+  }
+
+  if (sessionResponse.data && !sessionResponse.data.user.can_access_studio) {
+    updateAuthStatus(AUTH_STATUS.NO_ACCESS);
     return;
   }
 
