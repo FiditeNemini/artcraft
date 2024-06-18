@@ -295,6 +295,7 @@ export class APIManager {
       credentials: "include",
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
       },
       body: formData,
     });
@@ -401,6 +402,7 @@ export class APIManager {
       credentials: "include",
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
       },
       body: json_data,
     });
