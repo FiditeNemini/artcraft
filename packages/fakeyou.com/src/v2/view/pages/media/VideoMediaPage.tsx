@@ -216,7 +216,7 @@ export default function DevMediaPage({
               <Button
                 {...{
                   icon: faArrowRightArrowLeft,
-                  label: "Style Transfer",
+                  label: "Prompt Again",
                   to: `/style-video/${mediaFile?.token || ""}`,
                   variant: "secondary",
                 }}

@@ -542,7 +542,7 @@ export default function MediaPage({
                   <Button
                     {...{
                       icon: faArrowRightArrowLeft,
-                      label: "Style Transfer",
+                      label: "Prompt Again",
                       to: `/style-video/${mediaFile.token}`,
                       variant: "primary",
                       className: "flex-grow-1",
