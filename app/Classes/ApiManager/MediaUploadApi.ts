@@ -2,52 +2,29 @@ import { ApiManager, ApiResponse } from "./ApiManager";
 import { Visibility } from "~/enums";
 
 export class MediaUploadApi extends ApiManager {
-  public async UploadThumbnail({
-    mediaFileToken,
-    imageToken,
-  }: {
-    mediaFileToken: string;
-    imageToken: string;
-  }): Promise<ApiResponse<undefined>> {
-    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/cover_image/${mediaFileToken}`;
-    return await this.post<
-      { cover_image_media_file_token: string },
-      {
-        success?: boolean;
-        BadInput?: string;
-      }
-    >({ endpoint, body: { cover_image_media_file_token: imageToken } })
-      .then((response) => ({
-        success: response.success ?? false,
-        errorMessage: response.BadInput,
-      }))
-      .catch((err) => {
-        return {
-          success: false,
-          errorMessage: err.message,
-        };
-      });
-  }
-
-  public async UploadImage({
+  private async Upload({
+    endpoint,
     uuid,
     blob,
     fileName,
-    title,
-    visibility = Visibility.Public,
+    options,
   }: {
+    endpoint: string;
     blob: Blob;
     fileName: string;
     uuid: string;
-    title?: string;
-    visibility?: Visibility;
+    options: Record<string, string | number | undefined>;
   }): Promise<ApiResponse<string>> {
-    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/image`;
-    const formRecord = {
-      is_intermediate_system_file: "true",
-      ...(title ? { maybe_title: title } : {}),
-      maybe_visibility: visibility,
-    };
+    const formRecord = Object.entries(options).reduce(
+      (allOptions, [key, value]) => {
+        if (value === undefined) {
+          return allOptions;
+        }
+        return { ...allOptions, [key]: value.toString() };
+      },
+      {} as Record<string, string>,
+    );
+
     return await this.postForm<{
       success: boolean;
       media_file_token?: string;
@@ -66,56 +43,169 @@ export class MediaUploadApi extends ApiManager {
       });
   }
 
-  public async UploadVideo({
-    uuid,
+  public async UploadAudio({
     blob,
     fileName,
-    title,
-    styleName,
-    sceneSourceMediaFileToken,
-    visibility = Visibility.Public,
+    uuid,
+    maybe_title,
+    maybe_visibility = Visibility.Public,
   }: {
     blob: Blob;
     fileName: string;
     uuid: string;
-    title: string;
-    styleName?: string;
-    sceneSourceMediaFileToken?: string;
-    visibility?: Visibility;
+    maybe_title?: string | undefined;
+    maybe_visibility?: Visibility | undefined;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/audio`;
+    const options: Record<string, string | number | undefined> = {
+      maybe_title,
+      maybe_visibility: maybe_visibility?.toString(),
+    };
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
+  }
+
+  public async UploadImage({
+    blob,
+    fileName,
+    uuid,
+    maybe_title,
+    maybe_visibility = Visibility.Public,
+  }: {
+    blob: Blob;
+    fileName: string;
+    uuid: string;
+    maybe_title?: string | undefined;
+    maybe_visibility?: Visibility | undefined;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/image`;
+    const options: Record<string, string | number | undefined> = {
+      is_intermediate_system_file: "true",
+      maybe_title,
+      maybe_visibility: maybe_visibility?.toString(),
+    };
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
+  }
+
+  public async UploadNewEngineAsset({
+    blob,
+    fileName,
+    uuid,
+    maybe_animation_type,
+    maybe_duration_millis,
+    maybe_title,
+    maybe_visibility = Visibility.Public,
+  }: {
+    blob: Blob;
+    fileName: string;
+    uuid: string;
+    maybe_animation_type?: string;
+    maybe_duration_millis?: number;
+    maybe_title?: string;
+    maybe_visibility?: Visibility;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/new_engine_asset`;
+    const options: Record<string, string | number | undefined> = {
+      maybe_title,
+      maybe_visibility: maybe_visibility?.toString(),
+      maybe_animation_type,
+      maybe_duration_millis,
+    };
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
+  }
+
+  public async UploadNewScene({
+    blob,
+    fileName,
+    uuid,
+    maybe_title,
+    maybe_visibility = Visibility.Public,
+  }: {
+    blob: Blob;
+    fileName: string;
+    uuid: string;
+    maybe_title?: string;
+    maybe_visibility?: Visibility;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/new_scene`;
+    const options: Record<string, string | number | undefined> = {
+      maybe_title,
+      maybe_visibility: maybe_visibility?.toString(),
+    };
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
+  }
+
+  public async UploadNewVideo({
+    blob,
+    fileName,
+    uuid,
+    maybe_title,
+    maybe_visibility = Visibility.Public,
+    maybe_style_name,
+    maybe_scene_source_media_file_token,
+  }: {
+    blob: Blob;
+    fileName: string;
+    uuid: string;
+    maybe_title?: string;
+    maybe_visibility?: Visibility;
+    maybe_style_name?: string;
+    maybe_scene_source_media_file_token?: string;
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/new_video`;
-    const formRecord = {
+    const options: Record<string, string | number | undefined> = {
       is_intermediate_system_file: "true",
-      maybe_title: title,
-      maybe_visibility: visibility,
-      ...(styleName ? { maybe_style_name: styleName } : {}),
-      ...(sceneSourceMediaFileToken
-        ? {
-            maybe_scene_source_media_file_token: sceneSourceMediaFileToken,
-          }
-        : {}),
+      maybe_title,
+      maybe_visibility: maybe_visibility?.toString(),
+      maybe_style_name,
+      maybe_scene_source_media_file_token,
     };
-    return await this.postForm<{
-      success?: string;
-      media_file_token?: string;
-      BadInput?: string;
-    }>({
-      endpoint,
-      formRecord,
-      blob,
-      blobFileName: fileName,
-      uuid,
-    })
-      .then((response) => ({
-        success: Boolean(response.success ?? false),
-        data: response.media_file_token,
-        errorMessage: response.BadInput,
-      }))
-      .catch((err) => {
-        return {
-          success: false,
-          errorMessage: err.message,
-        };
-      });
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
+  }
+
+  public async UploadPmx({
+    blob,
+    fileName,
+    uuid,
+    engine_category,
+    maybe_animation_type,
+    maybe_duration_millis,
+    maybe_title,
+    maybe_visibility = Visibility.Public,
+  }: {
+    blob: Blob;
+    fileName: string;
+    uuid: string;
+    engine_category?: string;
+    maybe_animation_type?: string;
+    maybe_duration_millis?: number;
+    maybe_title?: string;
+    maybe_visibility?: Visibility;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/pmx`;
+    const options: Record<string, string | number | undefined> = {
+      is_intermediate_system_file: "true",
+      engine_category,
+      maybe_animation_type,
+      maybe_duration_millis,
+      maybe_title,
+      maybe_visibility,
+    };
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
+  }
+
+  public async UploadSavedScene({
+    blob,
+    fileName,
+    uuid,
+    mediaToken,
+  }: {
+    blob: Blob;
+    fileName: string;
+    uuid: string;
+    mediaToken: string;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/saved_scene/${mediaToken}`;
+    const options: Record<string, string | number | undefined> = {};
+    return this.Upload({ endpoint, blob, fileName, uuid, options });
   }
 }

@@ -6,29 +6,15 @@ import {
 } from "~/pages/PageEnigma/models";
 import { ApiManager, ApiResponse } from "./ApiManager";
 import { authentication } from "~/signals";
+import { Property } from "csstype";
+import Visibility = Property.Visibility;
+import {
+  FilterEngineCategories,
+  FilterMediaClasses,
+  FilterMediaType,
+} from "~/enums";
 
-export enum FilterMediaClasses {
-  AUDIO = "audio",
-  IMAGE = "image",
-  VIDEO = "video",
-}
-
-export enum FilterMediaType {
-  SCENE_JSON = "scene_json",
-  GLB = "glb",
-  GLTF = "gltf",
-}
-
-export enum FilterEngineCategories {
-  ANIMATION = "animation",
-  AUDIO = "audio",
-  CHARACTER = "character",
-  EXPRESSION = "expression",
-  OBJECT = "object",
-  SCENE = "scene",
-}
-
-interface ListFeaturedMediaQuery {
+interface ListMediaQuery {
   sort_ascending?: boolean;
   page_size?: number;
   cursor?: string;
@@ -48,6 +34,40 @@ interface ListUserMediaQuery {
 }
 
 export class MediaFilesApi extends ApiManager {
+  public async DeleteMediaFileByToken({
+    mediaFileToken,
+    asMod = true,
+    setDelete = true,
+  }: {
+    mediaFileToken: string;
+    asMod?: boolean;
+    setDelete?: boolean;
+  }): Promise<ApiResponse<MediaFile>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/file/${mediaFileToken}`;
+
+    const body = { as_mod: asMod, set_delete: setDelete };
+    return await this.delete<
+      {
+        as_mod: boolean;
+        set_delete: boolean;
+      },
+      {
+        success?: boolean;
+        BadInput?: string;
+      }
+    >({ endpoint, body })
+      .then((response) => ({
+        success: response.success ?? false,
+        errorMessage: response.BadInput,
+      }))
+      .catch((err) => {
+        return {
+          success: false,
+          errorMessage: err.message,
+        };
+      });
+  }
+
   public async ListMediaFilesByTokens({
     mediaTokens,
   }: {
@@ -82,6 +102,74 @@ export class MediaFilesApi extends ApiManager {
       .then((response) => ({
         success: response.success,
         data: response.media_file,
+      }))
+      .catch((err) => {
+        return {
+          success: false,
+          errorMessage: err.message,
+        };
+      });
+  }
+
+  public async ListMediaFiles(
+    query: ListMediaQuery,
+  ): Promise<ApiResponse<MediaInfo[], PaginationInfinite>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list`;
+    const queryWithStrings = {
+      ...query,
+      filter_media_classes: query.filter_media_classes
+        ? query.filter_media_classes.join(",")
+        : undefined,
+      filter_media_type: query.filter_media_type
+        ? query.filter_media_type.join(",")
+        : undefined,
+      filter_engine_categories: query.filter_engine_categories
+        ? query.filter_engine_categories.join(",")
+        : undefined,
+    };
+    return await this.get<{
+      success: boolean;
+      results: MediaInfo[];
+      pagination?: PaginationInfinite;
+    }>({ endpoint, query: queryWithStrings })
+      .then((response) => ({
+        success: response.success,
+        data: response.results ?? [],
+        pagination: response.pagination,
+      }))
+      .catch((err) => {
+        return {
+          success: false,
+          errorMessage: err.message,
+        };
+      });
+  }
+
+  public async ListFeaturedMediaFiles(
+    query: ListMediaQuery,
+  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list_featured`;
+    const queryWithStrings = {
+      ...query,
+      filter_media_classes: query.filter_media_classes
+        ? query.filter_media_classes.join(",")
+        : undefined,
+      filter_media_type: query.filter_media_type
+        ? query.filter_media_type.join(",")
+        : undefined,
+      filter_engine_categories: query.filter_engine_categories
+        ? query.filter_engine_categories.join(",")
+        : undefined,
+    };
+    return await this.get<{
+      success: boolean;
+      results: MediaInfo[];
+      pagination: Pagination;
+    }>({ endpoint, query: queryWithStrings })
+      .then((response) => ({
+        success: true,
+        data: response.results,
+        pagination: response.pagination,
       }))
       .catch((err) => {
         return {
@@ -126,31 +214,77 @@ export class MediaFilesApi extends ApiManager {
       });
   }
 
-  public async ListFeaturedMediaFiles(
-    query: ListFeaturedMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
-    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list_featured`;
-    const queryWithStrings = {
-      ...query,
-      filter_media_classes: query.filter_media_classes
-        ? query.filter_media_classes.join(",")
-        : undefined,
-      filter_media_type: query.filter_media_type
-        ? query.filter_media_type.join(",")
-        : undefined,
-      filter_engine_categories: query.filter_engine_categories
-        ? query.filter_engine_categories.join(",")
-        : undefined,
-    };
-    return await this.get<{
-      success: boolean;
-      results: MediaInfo[];
-      pagination: Pagination;
-    }>({ endpoint, query: queryWithStrings })
+  public async RenameMediaFileByToken({
+    mediaToken,
+    name,
+  }: {
+    mediaToken: string;
+    name: string;
+  }): Promise<ApiResponse<undefined>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_file/rename/${mediaToken}`;
+    const body = { name };
+
+    return await this.post<
+      { name: string },
+      {
+        success?: boolean;
+        BadInput?: string;
+      }
+    >({ endpoint, body })
       .then((response) => ({
-        success: true,
-        data: response.results,
-        pagination: response.pagination,
+        success: response.success ?? false,
+        errorMessage: response.BadInput,
+      }))
+      .catch((err) => {
+        return { success: false, errorMessage: err.message };
+      });
+  }
+
+  public async UpdateCoverImage({
+    mediaFileToken,
+    imageToken,
+  }: {
+    mediaFileToken: string;
+    imageToken: string;
+  }): Promise<ApiResponse<undefined>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/cover_image/${mediaFileToken}`;
+    return await this.post<
+      { cover_image_media_file_token: string },
+      {
+        success?: boolean;
+        BadInput?: string;
+      }
+    >({ endpoint, body: { cover_image_media_file_token: imageToken } })
+      .then((response) => ({
+        success: response.success ?? false,
+        errorMessage: response.BadInput,
+      }))
+      .catch((err) => {
+        return {
+          success: false,
+          errorMessage: err.message,
+        };
+      });
+  }
+
+  public async UpdateVisibility({
+    mediaFileToken,
+    visibility,
+  }: {
+    mediaFileToken: string;
+    visibility: Visibility;
+  }): Promise<ApiResponse<undefined>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/visibility/${mediaFileToken}`;
+    return await this.post<
+      { creator_set_visibility: string },
+      {
+        success?: boolean;
+        BadInput?: string;
+      }
+    >({ endpoint, body: { creator_set_visibility: visibility } })
+      .then((response) => ({
+        success: response.success ?? false,
+        errorMessage: response.BadInput,
       }))
       .catch((err) => {
         return {

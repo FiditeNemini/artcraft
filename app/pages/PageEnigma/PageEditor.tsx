@@ -10,7 +10,7 @@ import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { PreviewFrameImage } from "./comps/PreviewFrameImage";
 import { pageHeight, pageWidth } from "~/signals";
-import { Helmet } from 'react-helmet';
+// import { Helmet } from 'react-helmet';
 import {
   timelineHeight,
   sidePanelWidth,
@@ -53,7 +53,7 @@ export const PageEditor = () => {
 
   return (
     <div className="w-screen" data-sl="canvas-mq">
-       <Helmet>
+      {/* <Helmet>
         <script type="text/javascript">{`
           window.smartlook||(function(d) {
             var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
@@ -62,7 +62,7 @@ export const PageEditor = () => {
             })(document);
             smartlook('init', '3d1ddaf51ab1fa28ffe0b2bd94aa0e233bb0fd9e', { region: 'eu' });
         `}</script>
-      </Helmet>
+      </Helmet> */}
       <TopBar pageName="Edit Scene" />
       <div
         className="relative flex w-screen"
@@ -80,7 +80,7 @@ export const PageEditor = () => {
           <div className="relative w-full overflow-hidden bg-transparent">
             <Toaster />
             <SceneContainer>
-              <EditorCanvas/>
+              <EditorCanvas />
               <PreviewFrameImage />
             </SceneContainer>
 

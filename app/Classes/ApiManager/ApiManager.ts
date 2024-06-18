@@ -1,5 +1,7 @@
 import environmentVariables from "../EnvironmentVariables";
 
+type NonNullableObject<T extends object> = NonNullable<T>;
+
 export interface ApiResponse<T, P = undefined> {
   success: boolean;
   errorMessage?: string;
@@ -131,5 +133,42 @@ export class ApiManager {
       method: "POST",
       body: formData,
     });
+  }
+
+  protected camelToSnakeCase(str: string) {
+    return str.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
+  }
+
+  protected parseQueryValues(
+    params: Record<string, string | string[] | boolean | number | undefined>,
+  ): Record<string, string> {
+    return Object.entries(params).reduce(
+      (allParams, [key, value]) => {
+        if (!value) {
+          return allParams;
+        }
+        const snakeKey = this.camelToSnakeCase(key);
+        if (Array.isArray(value)) {
+          return { ...allParams, [snakeKey]: value.join(",") };
+        }
+        return { ...allParams, [snakeKey]: value.toString() };
+      },
+      {} as Record<string, string>,
+    );
+  }
+
+  protected parseBodyValues<T extends object, B extends object>(
+    params: NonNullableObject<T>,
+  ): B {
+    return Object.entries(params).reduce((allParams, [key, value]) => {
+      if (!value) {
+        return allParams;
+      }
+      const snakeKey = this.camelToSnakeCase(key);
+      if (Array.isArray(value)) {
+        return { ...allParams, [snakeKey]: value };
+      }
+      return { ...allParams, [snakeKey]: value };
+    }, {} as B);
   }
 }

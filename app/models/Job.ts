@@ -1,3 +1,5 @@
+import { JobStatus } from "~/enums";
+
 export interface Job {
   created_at: string;
   job_token: string;

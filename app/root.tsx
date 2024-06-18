@@ -54,18 +54,18 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader() {
-  if (process.env.NODE_ENV === "development") {
-    const env = {
-      BASE_API: "",
-      GOOGLE_API: "",
-      // @ts-expect-error ProvessEnv is correct
-      FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
-      // @ts-expect-error ProvessEnv is correct
-      CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
-      GRAVATAR_API: "",
-    } as Record<string, string | boolean>;
-    return { ENV: env };
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   const env = {
+  //     BASE_API: "",
+  //     GOOGLE_API: "",
+  //     // @ts-expect-error ProvessEnv is correct
+  //     FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
+  //     // @ts-expect-error ProvessEnv is correct
+  //     CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
+  //     GRAVATAR_API: "",
+  //   } as Record<string, string | boolean>;
+  //   return { ENV: env };
+  // }
   const env = {
     // @ts-expect-error ProvessEnv is correct
     BASE_API: process.env.BASE_API || "%BUILD_BASE_API%",

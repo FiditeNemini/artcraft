@@ -14,19 +14,19 @@ describe("TtsApi", () => {
   });
   describe("GenerateTtsAudio", () => {
     it("success no visibility", async () => {
-      const ttsApi = new TtsApi();
-      jest.spyOn(ttsApi, "fetch").mockResolvedValue({
+      const api = new TtsApi();
+      jest.spyOn(api, "fetch").mockResolvedValue({
         inference_job_token: "ijt1",
         inference_job_token_type: "ijtt1",
         success: true,
       });
-      const response = await ttsApi.GenerateTtsAudio({
+      const response = await api.GenerateTtsAudio({
         uuid_idempotency_token: "uit1",
         tts_model_token: "tmt1",
         inference_text: "inference text",
         is_storyteller_demo: false,
       });
-      expect(ttsApi.fetch).toHaveBeenCalledWith(
+      expect(api.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/v1/tts/inference",
         {
           method: "POST",
@@ -50,20 +50,20 @@ describe("TtsApi", () => {
     });
 
     it("success visibility", async () => {
-      const ttsApi = new TtsApi();
-      jest.spyOn(ttsApi, "fetch").mockResolvedValue({
+      const api = new TtsApi();
+      jest.spyOn(api, "fetch").mockResolvedValue({
         inference_job_token: "ijt1",
         inference_job_token_type: "ijtt1",
         success: true,
       });
-      const response = await ttsApi.GenerateTtsAudio({
+      const response = await api.GenerateTtsAudio({
         creator_set_visibility: Visibility.Private,
         uuid_idempotency_token: "uit1",
         tts_model_token: "tmt1",
         inference_text: "inference text",
         is_storyteller_demo: false,
       });
-      expect(ttsApi.fetch).toHaveBeenCalledWith(
+      expect(api.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/v1/tts/inference",
         {
           method: "POST",
@@ -87,17 +87,17 @@ describe("TtsApi", () => {
     });
 
     it("failure", async () => {
-      const ttsApi = new TtsApi();
-      jest.spyOn(ttsApi, "fetch").mockResolvedValue({
+      const api = new TtsApi();
+      jest.spyOn(api, "fetch").mockResolvedValue({
         BadInput: "error",
       });
-      const response = await ttsApi.GenerateTtsAudio({
+      const response = await api.GenerateTtsAudio({
         uuid_idempotency_token: "uit1",
         tts_model_token: "tmt1",
         inference_text: "inference text",
         is_storyteller_demo: false,
       });
-      expect(ttsApi.fetch).toHaveBeenCalledWith(
+      expect(api.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/v1/tts/inference",
         {
           method: "POST",
@@ -119,15 +119,15 @@ describe("TtsApi", () => {
     });
 
     it("exception", async () => {
-      const ttsApi = new TtsApi();
-      jest.spyOn(ttsApi, "fetch").mockRejectedValue(new Error("error"));
-      const response = await ttsApi.GenerateTtsAudio({
+      const api = new TtsApi();
+      jest.spyOn(api, "fetch").mockRejectedValue(new Error("error"));
+      const response = await api.GenerateTtsAudio({
         uuid_idempotency_token: "uit1",
         tts_model_token: "tmt1",
         inference_text: "inference text",
         is_storyteller_demo: false,
       });
-      expect(ttsApi.fetch).toHaveBeenCalledWith(
+      expect(api.fetch).toHaveBeenCalledWith(
         "http://localhost:3000/v1/tts/inference",
         {
           method: "POST",
