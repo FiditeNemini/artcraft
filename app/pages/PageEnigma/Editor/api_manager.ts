@@ -385,7 +385,7 @@ export class APIManager {
       negative_prompt: negative_prompt,
       trim_start_millis: 0,
       trim_end_millis: 7000,
-      enable_lipsync: true,
+      enable_lipsync: use_lipsync,
       creator_set_visibility: visibility,
       use_face_detailer: use_face_detailer,
       use_upscaler: use_upscaler,
