@@ -380,7 +380,7 @@ class Editor {
     });
 
     this.rawRenderer = new THREE.WebGLRenderer({
-      antialias: false,
+      antialias: true,
       canvas: this.canvasRenderCamReference,
       preserveDrawingBuffer: true,
     });
@@ -894,7 +894,7 @@ class Editor {
         // }
         this.camViewCanvasMayReset();
         this.rawRenderer = new THREE.WebGLRenderer({
-          antialias: false,
+          antialias: true,
           canvas: this.canvasRenderCamReference || undefined,
           preserveDrawingBuffer: true,
         });

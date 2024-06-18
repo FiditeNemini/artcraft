@@ -302,7 +302,7 @@ export class VideoGeneration {
     this.editor.camViewCanvasMayReset();
 
     this.editor.rawRenderer = new THREE.WebGLRenderer({
-      antialias: false,
+      antialias: true,
       canvas: this.editor.canvasRenderCamReference || undefined,
       preserveDrawingBuffer: true,
     });
