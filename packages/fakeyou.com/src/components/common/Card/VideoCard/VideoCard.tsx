@@ -44,6 +44,10 @@ export default function VideoCard({
   const [gifExists, setGifExists] = useState(false);
   const [staticImageExists, setStaticImageExists] = useState(false);
 
+  const publicBucketPath = data.details
+    ? data.details.maybe_media_file_data.public_bucket_path
+    : data.public_bucket_path;
+
   const bucketConfig = new BucketConfig();
   //video doesnt have random cover image endpoint or thumbnails yet
   const defaultImageUrl = `/images/default-covers/${
@@ -52,19 +56,19 @@ export default function VideoCard({
 
   // We are checking the existence of the bucket gif files because it seems as though we can't check the cdn file's existence without running into cors issues
   // CDN URLS
-  const staticImageUrl = data?.public_bucket_path
-    ? bucketConfig.getCdnUrl(data.public_bucket_path + "-thumb.jpg", 600, 100)
+  const staticImageUrl = publicBucketPath
+    ? bucketConfig.getCdnUrl(publicBucketPath + "-thumb.jpg", 600, 100)
     : defaultImageUrl;
-  const gifUrl = data?.public_bucket_path
-    ? bucketConfig.getCdnUrl(data.public_bucket_path + "-thumb.gif", 360, 20)
+  const gifUrl = publicBucketPath
+    ? bucketConfig.getCdnUrl(publicBucketPath + "-thumb.gif", 360, 20)
     : null;
 
   // BUCKET URLS
-  const bucketGifUrl = data?.public_bucket_path
-    ? bucketConfig.getGcsUrl(data.public_bucket_path + "-thumb.gif")
+  const bucketGifUrl = publicBucketPath
+    ? bucketConfig.getGcsUrl(publicBucketPath + "-thumb.gif")
     : null;
-  const bucketImageUrl = data?.public_bucket_path
-    ? bucketConfig.getGcsUrl(data.public_bucket_path + "-thumb.jpg")
+  const bucketImageUrl = publicBucketPath
+    ? bucketConfig.getGcsUrl(publicBucketPath + "-thumb.jpg")
     : null;
 
   const checkGifExists = async (url: string) => {
