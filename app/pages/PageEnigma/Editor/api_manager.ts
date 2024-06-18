@@ -131,18 +131,18 @@ export class APIManager {
       : await uploadNewScene(file, sceneTitle, this.sessionToken);
 
     if (sceneThumbnail) {
-      let image_resp = await this.uploadMediaSceneThumbnail(
+      const image_resp = await this.uploadMediaSceneThumbnail(
         sceneThumbnail,
         "render.png",
       );
       if (image_resp["media_file_token"]) {
-        let image_token = image_resp["media_file_token"];
+        const image_token = image_resp["media_file_token"];
         await fetch(uploadThumbnail + uploadSceneResponse["media_file_token"], {
           method: "POST",
+          credentials: "include",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
-            session: this.sessionToken,
           },
           body: JSON.stringify({ cover_image_media_file_token: image_token }),
         });
@@ -242,10 +242,9 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      // credentials: "include",
+      credentials: "include",
       headers: {
         Accept: "application/json",
-        session: this.sessionToken,
       },
       body: formData,
     });
@@ -295,10 +294,9 @@ export class APIManager {
     }
     const response = await fetch(url, {
       method: "POST",
-      // credentials: "include",
+      credentials: "include",
       headers: {
         Accept: "application/json",
-        session: this.sessionToken,
       },
       body: formData,
     });
@@ -333,9 +331,9 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
+      credentials: "include",
       headers: {
         Accept: "application/json",
-        session: this.sessionToken,
       },
       body: formData,
     });
@@ -402,10 +400,9 @@ export class APIManager {
 
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
+      credentials: "include",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
-        session: this.sessionToken,
       },
       body: json_data,
     });
