@@ -26,18 +26,18 @@ import {
 } from "~/pages/PageEnigma/models";
 
 import { authentication } from "~/signals";
-const { userInfo, sessionToken } = authentication;
+const { userInfo } = authentication;
 
 export const ListAudioByUser = () => {
-  if (userInfo.value && sessionToken.value) {
+  if (userInfo.value) {
     return fetch(
       listMediaByUser(userInfo.value.username) + "?filter_media_type=audio",
       {
         method: "GET",
         headers: {
           Accept: "application/json",
-          session: sessionToken.value,
         },
+        credentials: "include",
       },
     )
       .then((res) => res.json())
@@ -57,13 +57,13 @@ export const ListAudioByUser = () => {
 };
 
 export function ListTtsModels(): Promise<Array<TtsModelListItem> | undefined> {
-  if (userInfo.value && sessionToken.value) {
+  if (userInfo.value) {
     return fetch(listTts, {
       method: "GET",
       headers: {
         Accept: "application/json",
-        session: sessionToken.value,
       },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((res) => {
@@ -106,8 +106,8 @@ export function GenerateTtsAudio(
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      session: sessionToken.value || "",
     },
+    credentials: "include",
     body: JSON.stringify(request),
   })
     .then((res) => res.json())
@@ -139,8 +139,8 @@ export function GetMediaFileByToken(
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      session: sessionToken.value || "",
     },
+    credentials: "include",
   })
     .then((res) => res.json())
     .then((res) => {
@@ -167,31 +167,25 @@ export function GetMediaFileByToken(
 export function ListVoiceConversionModels(): Promise<
   Array<VoiceConversionModelListItem> | undefined
 > {
-  if (sessionToken.value) {
-    return fetch(listV2V, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        session: sessionToken.value,
-      },
+  return fetch(listV2V, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      const response: VoiceConversionModelListResponse = res;
+      if (!response.success) {
+        return;
+      }
+      return response?.models;
     })
-      .then((res) => res.json())
-      .then((res) => {
-        const response: VoiceConversionModelListResponse = res;
-        if (!response.success) {
-          return;
-        }
-        return response?.models;
-      })
-      .catch(() => {
-        return undefined;
-      });
-  } else {
-    return new Promise((resolve) => {
-      resolve(undefined);
+    .catch(() => {
+      return undefined;
     });
-  }
 }
 
 export function GenerateVoiceConversion(
@@ -202,7 +196,6 @@ export function GenerateVoiceConversion(
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      session: sessionToken.value || "",
     },
     body: JSON.stringify(request),
   })

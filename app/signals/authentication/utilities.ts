@@ -3,12 +3,6 @@ import { authentication } from "./authentication";
 import { AUTH_STATUS } from "~/enums";
 import { UserInfo, ActiveSubscriptions } from "~/models";
 
-//TODO: DELETE THIS TOKEN HACK ASAP
-export const updateSessionToken = (newToken: string | undefined) => {
-  console.log("HACK // set session token >>", newToken);
-  authentication.sessionToken.value = newToken;
-};
-
 export const updateAuthStatus = (newStatus: AUTH_STATUS) => {
   authentication.status.value = newStatus;
 };
@@ -40,6 +34,4 @@ export const setLogoutStates = () => {
   updateAuthStatus(AUTH_STATUS.LOGGED_OUT);
   updateUserInfo(undefined);
   updateActiveSubscriptions(undefined);
-  //TODO: DELETE THIS TOKEN HACK ASAP
-  updateSessionToken(undefined);
 };

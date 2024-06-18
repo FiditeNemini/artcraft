@@ -1,9 +1,8 @@
 import { uploadAudioV2V } from "~/api";
-import { authentication } from "~/signals";
 export interface UploadAudioRequest {
   uuid_idempotency_token: string;
   source?: string; // eg. "device", "file"
-  file: any;
+  file: File;
 }
 
 export interface UploadAudioResponse {
@@ -31,8 +30,8 @@ export async function UploadAudio(
     method: "POST",
     headers: {
       Accept: "application/json",
-      session: authentication.sessionToken.value || "",
     },
+    credentials: "include",
     body: formData,
   })
     .then((res) => res.json())
@@ -42,7 +41,7 @@ export async function UploadAudio(
       }
       return { success: false };
     })
-    .catch((e) => {
+    .catch(() => {
       return { success: false };
     });
 }

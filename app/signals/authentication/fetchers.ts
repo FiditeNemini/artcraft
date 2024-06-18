@@ -5,7 +5,6 @@ import { BillingApi } from "~/Classes/ApiManager/BillingApi";
 import {
   updateActiveSubscriptions,
   updateAuthStatus,
-  updateSessionToken,
   updateUserInfo,
   setLogoutStates,
 } from "./utilities";
@@ -42,8 +41,6 @@ export const login = async ({
     setLogoutStates();
     return;
   }
-  //TODO: DELETE THIS TOKEN HACK ASAP
-  updateSessionToken(loginResponse.data.signedSession);
 
   // technically user is login with the system now, HOWEVER,
   // in storyteller studio, only having a sesison is not enough,
@@ -56,37 +53,11 @@ export const persistLogin = async () => {
   if (authentication.status.value !== AUTH_STATUS.INIT) {
     return;
   }
-  //Persist Login if Session Data exist
-  const sessionCookie = await getSessionCookie();
-  if (!sessionCookie) {
-    // case of no existing session
-    setLogoutStates();
-    return;
-  }
-
-  //TODO: DELETE THIS TOKEN HACK ASAP
-  updateSessionToken(sessionCookie);
   handleLoginPartTwo();
 };
 
-function getSessionCookie() {
-  if (!document) {
-    return undefined;
-  }
-  const cookies = document.cookie.split(";");
-  const cookieKeyValue = cookies.find((cookie) => {
-    return cookie.includes("session=");
-  });
-  if (!cookieKeyValue) {
-    // no cookie
-    return undefined;
-  }
-  const [, cookieValue] = cookieKeyValue.trim().split("=");
-  return cookieValue;
-}
-
 async function handleLoginPartTwo() {
-  console.log("parttwo");
+  updateAuthStatus(AUTH_STATUS.LOGGING2);
   const usersApi = new UsersApi();
   const sessionResponse = await usersApi.GetSession();
   if (

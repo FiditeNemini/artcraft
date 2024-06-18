@@ -3,7 +3,6 @@ import { ActiveSubscriptions, UserInfo } from "~/models";
 import { AUTH_STATUS, LoyaltyProgram } from "~/enums";
 
 const status = signal<AUTH_STATUS>(AUTH_STATUS.INIT);
-const sessionToken = signal<string | undefined>(undefined);
 const userInfo = signal<UserInfo | undefined>(undefined);
 const activeSubs = signal<ActiveSubscriptions | undefined>(undefined);
 
@@ -32,7 +31,6 @@ const hasPremium = computed(() => {
 
 export const authentication = {
   status,
-  sessionToken,
   userInfo,
   activeSubs,
   hasAccess,

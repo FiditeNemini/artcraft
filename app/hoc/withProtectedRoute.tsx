@@ -12,16 +12,15 @@ export const withProtectionRoute = <P extends object>(
   function ProtectionRoute(rest: P) {
     useSignals();
     useSignalEffect(() => {
-      if (authentication.status.value === AUTH_STATUS.INIT) {
-        persistLogin();
-      }
+      persistLogin();
     });
 
     const { status, userInfo } = authentication;
     //render according to auth status
     if (
       status.value === AUTH_STATUS.INIT ||
-      status.value === AUTH_STATUS.LOGGING
+      status.value === AUTH_STATUS.LOGGING ||
+      status.value === AUTH_STATUS.LOGGING2
     ) {
       return (
         <div className="fixed flex h-full w-full flex-col  items-center justify-center">

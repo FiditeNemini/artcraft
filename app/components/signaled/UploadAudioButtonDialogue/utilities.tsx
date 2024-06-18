@@ -1,5 +1,4 @@
 import { uploadMedia } from "~/api";
-import { authentication } from "~/signals";
 
 export interface UploadMediaRequest {
   uuid_idempotency_token: string;
@@ -25,8 +24,8 @@ export const UploadMedia = (request: UploadMediaRequest) => {
     method: "POST",
     headers: {
       Accept: "application/json",
-      session: authentication.sessionToken.value || "",
     },
+    credentials: "include",
     body: formData,
   })
     .then((res) => res.json())

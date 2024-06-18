@@ -139,7 +139,7 @@ const getAuthLoaderMessage = () => {
   if (authentication.status.value === AUTH_STATUS.LOGGED_IN) {
     return "Authenticated, Redirecting...";
   }
-  if (authentication.sessionToken) {
+  if (authentication.status.value === AUTH_STATUS.LOGGING2) {
     return "Getting User Info...";
   }
   return "Getting Session...";

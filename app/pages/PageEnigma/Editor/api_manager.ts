@@ -98,11 +98,9 @@ class APIManagerResponseError extends Error {
 
 export class APIManager {
   baseUrl: string;
-  sessionToken: string;
 
   constructor() {
     this.baseUrl = environmentVariables.value.BASE_API;
-    this.sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
   }
 
   /**
@@ -127,8 +125,8 @@ export class APIManager {
     });
 
     const uploadSceneResponse = sceneToken
-      ? await updateExistingScene(file, sceneToken, this.sessionToken)
-      : await uploadNewScene(file, sceneTitle, this.sessionToken);
+      ? await updateExistingScene(file, sceneToken)
+      : await uploadNewScene(file, sceneTitle);
 
     if (sceneThumbnail) {
       const image_resp = await this.uploadMediaSceneThumbnail(

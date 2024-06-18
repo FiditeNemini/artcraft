@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/pro-solid-svg-icons";
 
-import { STORAGE_KEYS, ToastTypes } from "~/enums";
+import { ToastTypes } from "~/enums";
 import { addToast, environmentVariables } from "~/signals";
 
 import { JobState } from "~/pages/PageEnigma/enums";
@@ -33,14 +33,13 @@ export function InProgressCard({ movie }: Props) {
 
   const deleteJob = useCallback(() => {
     const endpoint = `${environmentVariables.value.BASE_API}/v1/jobs/job/${movie.job_token}`;
-    const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
 
     fetch(endpoint, {
       method: "DELETE",
       headers: {
         Accept: "application/json",
-        session: sessionToken,
       },
+      credentials: "include",
     })
       .then(() => {
         addToast(ToastTypes.SUCCESS, "File successfully deleted.");
