@@ -23,7 +23,6 @@ bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }
-container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
 email_sender = { path = "../../../lib/email_sender" }
 enums = { path = "../../../_types/enums" }

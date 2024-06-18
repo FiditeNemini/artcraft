@@ -18,7 +18,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
-container_common = { path = "../deprecated/container_common" }
+errors = { path = "../errors" }
 user_input_common = { path = "../user_input_common" }
 
 # Workspace hack (faster compile times)

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 /// Text Pipelines for TTS
 /// The system only tolerates the following values for TTS text pipelines.
