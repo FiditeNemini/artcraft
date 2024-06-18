@@ -44,6 +44,6 @@ export const CameraViewCanvas = ({ className }: { className?: string }) => {
   );
 
   return (
-    <canvas className={className} ref={canvasCallbackRef} id="camera-view" />
+    <canvas className={className} ref={canvasCallbackRef} id="camera-view"/>
   );
 };
