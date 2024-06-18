@@ -19,7 +19,7 @@ actix-rt = { version = "2.10.0" }
 ahash = { version = "0.8.11" }
 anstream = { version = "0.6.14" }
 arrayvec = { version = "0.7.4", features = ["serde"] }
-base64 = { version = "0.22.1" }
+base64 = { version = "0.21.7" }
 base64ct = { version = "1.6.0", default-features = false, features = ["alloc"] }
 bitflags = { version = "2.5.0", default-features = false, features = ["serde", "std"] }
 block-buffer = { version = "0.9.0", default-features = false, features = ["block-padding"] }
@@ -47,7 +47,6 @@ getrandom = { version = "0.2.14", default-features = false, features = ["std"] }
 hashbrown = { version = "0.14.5", features = ["raw"] }
 hmac = { version = "0.12.1", default-features = false, features = ["reset"] }
 hyper-582f2526e08bb6a0 = { package = "hyper", version = "0.14.28", features = ["full"] }
-hyper-dff4ba8e3ae991db = { package = "hyper", version = "1.3.1", features = ["client", "http1", "http2"] }
 indexmap = { version = "2.2.6", features = ["serde"] }
 itertools = { version = "0.12.1" }
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
@@ -100,7 +99,7 @@ void = { version = "1.0.2" }
 [build-dependencies]
 actix-router = { version = "0.5.3" }
 ahash = { version = "0.8.11" }
-base64 = { version = "0.22.1" }
+base64 = { version = "0.21.7" }
 base64ct = { version = "1.6.0", default-features = false, features = ["alloc"] }
 bitflags = { version = "2.5.0", default-features = false, features = ["serde", "std"] }
 byteorder = { version = "1.5.0" }
@@ -169,6 +168,7 @@ unicode-normalization = { version = "0.1.23" }
 url = { version = "2.5.1", features = ["serde"] }
 
 [target.x86_64-unknown-linux-gnu.dependencies]
+hyper-dff4ba8e3ae991db = { package = "hyper", version = "1.3.1", features = ["client", "http1", "http2"] }
 openssl = { version = "0.10.64", features = ["vendored"] }
 openssl-sys = { version = "0.9.102", default-features = false, features = ["vendored"] }
 rustls-pki-types = { version = "1.7.0", features = ["std"] }
@@ -183,6 +183,7 @@ socket2 = { version = "0.5.7", default-features = false, features = ["all"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-apple-darwin.dependencies]
+hyper-dff4ba8e3ae991db = { package = "hyper", version = "1.3.1", features = ["client", "http1", "http2"] }
 rustls-pki-types = { version = "1.7.0", features = ["std"] }
 spin = { version = "0.9.8" }
 tower = { version = "0.4.13", default-features = false, features = ["balance", "buffer", "limit", "timeout", "util"] }
@@ -193,6 +194,7 @@ socket2 = { version = "0.5.7", default-features = false, features = ["all"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-pc-windows-msvc.dependencies]
+hyper-dff4ba8e3ae991db = { package = "hyper", version = "1.3.1", features = ["client", "http1", "http2"] }
 rustls-pki-types = { version = "1.7.0", features = ["std"] }
 spin = { version = "0.9.8" }
 tower = { version = "0.4.13", default-features = false, features = ["balance", "buffer", "limit", "timeout", "util"] }

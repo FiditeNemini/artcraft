@@ -14,7 +14,6 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-#[macro_use] extern crate lazy_static;
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
