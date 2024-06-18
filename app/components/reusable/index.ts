@@ -12,6 +12,7 @@ export * from "./Gravatar";
 export * from "./Input"; //need to decouple hotkey signal
 export * from "./InputVector"; //need to decouple hotkey signal
 export * from "./ListDropdown";
+export * from "./LoadingBar";
 export * from "./Pagination";
 export * from "./Pill";
 export * from "./Select"; //Select's onChange type should be generic
@@ -22,8 +23,6 @@ export * from "./TransitionDialogue"; //need to decouple hotkey signal
 export * from "./Typography";
 export * from "./WaveformPlayer";
 
-//TODO: need to rewrite to decouple from signal
-export * from "./LoadingBar";
 //TODO: need to rewrite because it's against tailwind
 export * from "./LoadingDots";
 //TODO: need to rewrite because it's not using fontawesome

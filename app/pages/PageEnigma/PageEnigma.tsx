@@ -4,10 +4,11 @@ import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragCompon
 import { EngineProvider } from "./contexts/EngineContext";
 import { useActiveJobs } from "~/hooks";
 import { useQueueHandler } from "./hooks/useQueueHandler";
-import { ErrorDialog, LoadingBar } from "~/components";
+import { ErrorDialog } from "~/components";
 import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
 import { useBackgroundLoadingMedia } from "~/hooks/useBackgroundLoadingMedia";
 
+import { EditorLoadingBar } from "./comps/EditorLoadingBar";
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useActiveJobs();
   useBackgroundLoadingMedia();
@@ -23,11 +24,7 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
         <GenerateModals />
         <ErrorDialog />
       </EngineProvider>
-      <LoadingBar
-        id="editor-loading-bar"
-        wrapperClassName="absolute top-0 left-0 z-20"
-        innerWrapperClassName="max-w-screen-sm"
-      />
+      <EditorLoadingBar />
     </TrackProvider>
   );
 };
