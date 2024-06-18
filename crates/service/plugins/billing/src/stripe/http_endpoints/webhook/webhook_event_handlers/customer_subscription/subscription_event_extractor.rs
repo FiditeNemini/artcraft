@@ -3,7 +3,7 @@ use chrono::NaiveDateTime;
 use log::error;
 use stripe::{Subscription, SubscriptionStatus};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 

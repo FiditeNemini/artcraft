@@ -18,7 +18,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
-container_common = { path = "../../../lib/deprecated/container_common" }
+errors = { path = "../../../lib/errors" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 reusable_types = { path = "../../../_types/reusable_types" }

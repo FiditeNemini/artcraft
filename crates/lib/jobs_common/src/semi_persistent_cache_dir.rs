@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 /// These are for files on the worker filesystems
 pub struct SemiPersistentCacheDir {

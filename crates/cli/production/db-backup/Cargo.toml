@@ -16,10 +16,9 @@ path = "src/main.rs"
 normal = ["my-workspace-hack"]
 
 [dependencies]
-
 # Internal
-container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
+errors = { path = "../../../lib/errors" }
 
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

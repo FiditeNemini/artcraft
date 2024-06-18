@@ -21,7 +21,6 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
-container_common = { path = "../deprecated/container_common" }
 errors = { path = "../errors" }
 redis_common = { path = "../redis_common" }
 

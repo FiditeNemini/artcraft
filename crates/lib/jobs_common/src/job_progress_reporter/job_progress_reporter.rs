@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 pub trait JobProgressReporterBuilder {
   // NB: Still learning "Box<dyn Trait>" vs "impl Trait";

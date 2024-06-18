@@ -2,8 +2,8 @@ use log::info;
 use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
 
-use container_common::anyhow_result::AnyhowResult;
 use easyenv::init_all_with_default_logging;
+use errors::AnyhowResult;
 
 use crate::cli_args::Action;
 use crate::operations::delete_all_anonymous_user_images::delete_all_anonymous_user_images::delete_all_anonymous_user_images;

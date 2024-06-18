@@ -415,7 +415,6 @@ dependencies = [
  "anyhow",
  "chrono",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "enums",
@@ -869,8 +868,8 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "chrono",
- "container_common",
  "dotenv",
+ "errors",
  "http_server_common",
  "log",
  "mockall",
@@ -1757,9 +1756,9 @@ name = "db-backup"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "container_common",
  "dotenv",
  "easyenv",
+ "errors",
  "log",
  "my-workspace-hack",
  "serde",
@@ -1772,7 +1771,6 @@ version = "0.0.1"
 dependencies = [
  "buckets",
  "clap",
- "container_common",
  "dotenv",
  "easyenv",
  "enums",
@@ -2355,7 +2353,6 @@ dependencies = [
  "bootstrap",
  "chrono",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "elasticsearch",
@@ -3616,7 +3613,6 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "container_common",
  "errors",
  "log",
  "my-workspace-hack",

@@ -3,8 +3,8 @@ use std::collections::HashSet;
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use once_cell::sync::Lazy;
+use errors::AnyhowResult;
 
-use container_common::anyhow_result::AnyhowResult;
 use http_server_common::request::get_request_ip::get_request_ip;
 
 /// List of IP addresses that send webhook requests

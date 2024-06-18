@@ -2,7 +2,7 @@ use r2d2_redis::{r2d2, RedisConnectionManager};
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use redis_common::redis_keys::RedisKeys;
 
 use crate::job_progress_reporter::job_progress_reporter::{JobProgressReporter, JobProgressReporterBuilder};

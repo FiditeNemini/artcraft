@@ -18,7 +18,6 @@ normal = ["my-workspace-hack"]
 [dependencies]
 # Internal
 buckets = { path = "../../../_types/buckets" }
-container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
