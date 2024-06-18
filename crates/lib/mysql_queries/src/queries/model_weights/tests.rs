@@ -9,7 +9,6 @@ mod tests {
   use tokio;
 
   use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-  use container_common::anyhow_result::AnyhowResult;
   // common tests
   use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
@@ -17,6 +16,7 @@ mod tests {
   };
   use enums::common::view_as::ViewAs;
   use enums::common::visibility::Visibility;
+  use errors::AnyhowResult;
   use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
   use crate::queries::model_weights::create::create_weight::create_weight;

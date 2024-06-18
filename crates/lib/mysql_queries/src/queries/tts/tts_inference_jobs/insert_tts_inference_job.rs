@@ -1,8 +1,8 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
 
-use container_common::token::random_uuid::generate_random_uuid;
 use errors::AnyhowResult;
+use idempotency::uuid::generate_random_uuid;
 
 use crate::builders::RequiredOption;
 

@@ -21,9 +21,9 @@ normal = ["my-workspace-hack"]
 buckets = { path = "../../_types/buckets" }
 composite_identifiers = { path = "../../_types/composite_identifiers" }
 config = { path = "../deprecated/config" }
-container_common = { path = "../deprecated/container_common" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../errors" }
+idempotency = { path = "../idempotency" }
 reusable_types = { path = "../../_types/reusable_types" }
 tokens = { path = "../../_types/tokens" }
 

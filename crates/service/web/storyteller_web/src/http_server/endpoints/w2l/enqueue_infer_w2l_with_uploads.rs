@@ -14,9 +14,9 @@ use futures::TryStreamExt;
 use log::{error, info, warn};
 use r2d2_redis::redis::Commands;
 
-use container_common::token::random_uuid::generate_random_uuid;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
+use idempotency::uuid::generate_random_uuid;
 use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
 use mysql_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
 use redis_common::redis_keys::RedisKeys;
