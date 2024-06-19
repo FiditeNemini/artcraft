@@ -1,63 +1,53 @@
-import { MediaFileType } from "~/pages/PageEnigma/enums";
+import { FilterMediaClasses, ToastTypes } from "~/enums";
 
-import { ToastTypes } from "~/enums";
-
-import {
-  GetMediaByUser,
-  GetMediaListResponse,
-} from "~/api/media_files/GetMediaByUser";
+import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
 
 import {
   addToast,
   authentication,
   setUserAudioItems,
   setUserMovies,
-  userMovies,
   isRetreivingAudioItems,
 } from "~/signals";
 const { userInfo } = authentication;
 
-export function PollUserMovies() {
+export async function PollUserMovies() {
   if (!userInfo.value) {
     //do nothing return if login info does not exist
     return;
   }
-  return GetMediaByUser(
-    userInfo.value.username,
-    {},
-    {
-      filter_media_type: MediaFileType.Video,
-    },
-  )
-    .then((res: GetMediaListResponse) => {
-      if (userMovies.value && res.results.length !== userMovies.value.length) {
-        setUserMovies(res.results);
-      }
-    })
-    .catch(() => {
-      addToast(ToastTypes.ERROR, "Unknown Error in Loading My Movies");
-    });
+
+  const mediaFilesApi = new MediaFilesApi();
+  const response = await mediaFilesApi.ListUserMediaFiles({
+    filter_media_classes: [FilterMediaClasses.VIDEO],
+  });
+  if (response.success && response.data) {
+    setUserMovies(response.data);
+    return;
+  }
+  addToast(
+    ToastTypes.ERROR,
+    response.errorMessage || "Unknown Error in Loading My Movies",
+  );
 }
 
-export function PollUserAudioItems() {
+export async function PollUserAudioItems() {
   if (!userInfo.value) {
     //do nothing return if login info does not exist
     return;
   }
   isRetreivingAudioItems.value = true;
-  return GetMediaByUser(
-    userInfo.value.username,
-    {},
-    {
-      filter_media_type: MediaFileType.Audio,
-    },
-  )
-    .then((res: GetMediaListResponse) => {
-      isRetreivingAudioItems.value = false;
-      setUserAudioItems(res.results);
-    })
-    .catch(() => {
-      isRetreivingAudioItems.value = false;
-      addToast(ToastTypes.ERROR, "Unknown Error in Loading My Audio Items");
-    });
+  const mediaFilesApi = new MediaFilesApi();
+  const response = await mediaFilesApi.ListUserMediaFiles({
+    filter_media_classes: [FilterMediaClasses.AUDIO],
+  });
+  isRetreivingAudioItems.value = false;
+  if (response.success && response.data) {
+    setUserAudioItems(response.data);
+    return;
+  }
+  addToast(
+    ToastTypes.ERROR,
+    response.errorMessage || "Unknown Error in Loading My Audio Items",
+  );
 }

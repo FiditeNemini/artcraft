@@ -6,8 +6,9 @@ import {
 } from "~/pages/PageEnigma/models";
 import { ApiManager, ApiResponse } from "./ApiManager";
 import { authentication } from "~/signals";
-import { Property } from "csstype";
-import Visibility = Property.Visibility;
+import type { Property } from "csstype";
+type Visibility = Property.Visibility;
+
 import {
   FilterEngineCategories,
   FilterMediaClasses,
