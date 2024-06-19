@@ -26,8 +26,8 @@ export const uploadAudioV2V = `${apiHost}/v1/media_uploads/upload_audio`;
 //   `${apiHost}/v1/media_files/list/user/${username}`;
 
 // Get Any Media
-export const getMediaFileByToken = (fileToken: string) =>
-  `${apiHost}/v1/media_files/file/${fileToken}`;
+// export const getMediaFileByToken = (fileToken: string) =>
+//   `${apiHost}/v1/media_files/file/${fileToken}`;
 
 // Upload File
 export const uploadMedia = `${apiHost}/v1/media_files/upload`;

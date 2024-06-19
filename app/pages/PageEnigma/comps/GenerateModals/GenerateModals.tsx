@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useSignals } from "@preact/signals-react/runtime";
+import { useCallback, useState } from "react";
+import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 
 import { MediaFile } from "~/pages/PageEnigma/models";
 
@@ -7,34 +7,37 @@ import { generateMovieId } from "~/pages/PageEnigma/signals";
 import { ToastTypes } from "~/enums";
 import { addToast } from "~/signals";
 
-import { GetMediaFileByToken } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab/utilities";
-
 import { MyMovies } from "~/pages/PageEnigma/comps/GenerateModals/MyMovies";
 import { Sharing } from "~/pages/PageEnigma/comps/GenerateModals/Sharing";
+import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
 
 export function GenerateModals() {
   useSignals();
-  const [movieId, setMovieId] = useState(generateMovieId.value);
   const [mediaFile, setMediaFile] = useState<MediaFile | null>(null);
 
-  useEffect(() => {
-    if (!mediaFile) {
-      setMovieId("");
+  const GetMediaFileByToken = useCallback(async (movieId: string) => {
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.GetMediaFileByToken({
+      mediaFileToken: movieId,
+    });
+    if (response.success && response.data) {
+      setMediaFile(response.data);
+      return;
     }
-  }, [mediaFile]);
-
-  useEffect(() => {
-    // console.log(2, movieId);
-    if (movieId) {
-      GetMediaFileByToken(movieId).then((res) => {
-        if (!res.success) {
-          addToast(ToastTypes.ERROR, "Unable to read media file");
-          return;
-        }
-        setMediaFile(res.media_file ?? null);
-      });
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage ||
+        `Unknown Error in Getting Movie (token=${movieId}`,
+    );
+  }, []);
+  const setMovieId = useCallback((movieId: string) => {
+    generateMovieId.value = movieId;
+  }, []);
+  useSignalEffect(() => {
+    if (generateMovieId.value) {
+      GetMediaFileByToken(generateMovieId.value);
     }
-  }, [movieId]);
+  });
 
   if (!mediaFile) {
     return <MyMovies setMovieId={setMovieId} />;

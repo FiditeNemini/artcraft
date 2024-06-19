@@ -22,12 +22,13 @@ interface Props {
 
 export function Sharing({ mediaFile, setMediaFile }: Props) {
   useSignals();
-  // console.log(mediaFile);
 
   const mediaTitle = mediaFile?.maybe_title ?? mediaFile?.token;
+  // TODO: ApiManager should provide all endpoints
   const shareUrl = `https://storyteller.ai/media/${mediaFile?.token || ""}`;
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
+  // TODO: ApiManager should provide all endpoints
   const downloadLink = `${environmentVariables.value.GOOGLE_API}/vocodes-public${mediaFile?.public_bucket_path}`;
 
   const handleCopyLink = () => {
