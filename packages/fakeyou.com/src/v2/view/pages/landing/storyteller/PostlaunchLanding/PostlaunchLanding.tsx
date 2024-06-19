@@ -434,9 +434,10 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
   );
 }
 
-const firstTitle = "Control Your Movie";
-const firstSubtext =
-  "Effortlessly create your movie in any style you want with AI.";
+//const firstTitle = "Control Your Movie";
+const firstTitle = "Tell Your Story";
+//"Effortlessly create your movie in any style you want with AI.";
+const firstSubtext = "Effortlessly create in any style you want with AI.";
 const secondTitle = "Your AI 3D Creation Engine";
 const secondSubtext =
   "Turn your creative ideas into stunning visuals, by simply building a 3D scene and generate.";
