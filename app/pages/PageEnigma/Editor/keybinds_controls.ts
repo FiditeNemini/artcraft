@@ -34,23 +34,35 @@ export class MouseControls {
         if (hotkeysStatus.value.disabled) {
             return;
         }
-        if (event.key === "f" && this.editor.selected && this.editor.orbitControls) {
+        else if (event.key === "f" && this.editor.selected && this.editor.orbitControls) {
             this.editor.orbitControls.target.copy(this.editor.selected.position);
             this.editor.orbitControls.maxDistance = 4;
             this.editor.orbitControls.update();
             this.editor.orbitControls.maxDistance = 999;
             return;
         }
-        if (event.key === " ") {
+        else if (event.key === " ") {
             if (!this.editor.rendering && !this.editor.switchPreviewToggle && this.editor.selectedCanvas) {
                 this.editor.togglePlayback();
             }
             return;
         }
-        if (event.key === "Backspace" || event.key === "Delete") {
+        else if (event.key === "Backspace" || event.key === "Delete") {
             if (this.editor.selected) {
                 this.editor.deleteObject(this.editor.selected.uuid);
             }
+            return;
+        }
+        else if (event.key === "t") { // transform
+            this.editor.control?.setMode("translate");
+            return;
+        }
+        else if (event.key === "r") { // rotate
+            this.editor.control?.setMode("rotate");
+            return;
+        }
+        else if (event.key === "g") { // scale
+            this.editor.control?.setMode("scale");
             return;
         }
     }

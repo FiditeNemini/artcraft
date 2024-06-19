@@ -76,6 +76,21 @@ export const Help = () => {
           </Shortcut> */}
         </ShortcutsGroup>
 
+        <ShortcutsGroup label="Shortcuts">
+          <Shortcut label="Transform">
+            <Key button="T" />
+          </Shortcut>
+          <Shortcut label="Rotate">
+            <Key button="R" />
+          </Shortcut>
+          <Shortcut label="Scale">
+            <Key button="G" />
+          </Shortcut>
+          <Shortcut label="Focus">
+            <Key button="F" />
+          </Shortcut>
+        </ShortcutsGroup>
+
         <ShortcutsGroup label="Interaction">
           <Shortcut label="Select Object">
             <Mouse button="left" label="(Click)" />
@@ -88,18 +103,6 @@ export const Help = () => {
           </Shortcut> */}
           <Shortcut label="Delete Selection">
             <Key button="Del" />
-          </Shortcut>
-        </ShortcutsGroup>
-
-        <ShortcutsGroup label="Side Panel">
-          <Shortcut label="Add Character">
-            <Mouse button="left" label="(Drag onto scene)" />
-          </Shortcut>
-          <Shortcut label="Add Animation">
-            <Mouse button="left" label="(Drag onto timeline)" />
-          </Shortcut>
-          <Shortcut label="Add Object">
-            <Mouse button="left" label="(Drag onto scene)" />
           </Shortcut>
         </ShortcutsGroup>
       </div>
@@ -136,6 +139,18 @@ export const Help = () => {
           </Shortcut>
           <Shortcut label="Delete Selected Keyframe">
             <Key button="Del" />
+          </Shortcut>
+        </ShortcutsGroup>
+
+        <ShortcutsGroup label="Side Panel">
+          <Shortcut label="Add Character">
+            <Mouse button="left" label="(Drag onto scene)" />
+          </Shortcut>
+          <Shortcut label="Add Animation">
+            <Mouse button="left" label="(Drag onto timeline)" />
+          </Shortcut>
+          <Shortcut label="Add Object">
+            <Mouse button="left" label="(Drag onto scene)" />
           </Shortcut>
         </ShortcutsGroup>
       </div>
