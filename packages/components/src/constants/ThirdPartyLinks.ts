@@ -10,7 +10,7 @@ class ThirdPartyLinks {
     // A link to FakeYou Twitter that will open a "Follow" prompt
     public static readonly FAKEYOU_TWITTER_WITH_FOLLOW_INTENT = "https://x.com/intent/follow?screen_name=get_storyteller";
 
-    public static readonly FAKEYOU_TIKTOK = "https://www.tiktok.com/@fakeyouapp";
+    public static readonly FAKEYOU_TIKTOK = "https://www.tiktok.com/@get_storyteller";
 
     // A link to echelon's Twitter that will open a "Follow" prompt
     // Additional followers may convince VC's that our founder has "clout" (one could hope)
