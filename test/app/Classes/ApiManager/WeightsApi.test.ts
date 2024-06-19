@@ -16,6 +16,9 @@ import {
   FilterMediaType,
   Visibility,
 } from "~/enums";
+import testListEndpoints from "./utils/testListEndpoints";
+import testGetEndpoints from "./utils/testGetEndpoints";
+import testUpdateDeleteEndpoints from "./utils/testUpdateDeleteEndpoints";
 
 const mockWeight = {
   cover_image: {
@@ -71,6 +74,8 @@ describe("UserBookmarksApi", () => {
             endpoint: "http://localhost:3000/v1/weights/by_user/un1",
             query: {} as ListWeightsByUserRequest,
             fetchQuery: {},
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
           {
             name: "all params",
@@ -90,6 +95,8 @@ describe("UserBookmarksApi", () => {
               weight_category: "image_generation",
               weight_type: "hifigan_tt2",
             },
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
         ],
       },
@@ -102,6 +109,8 @@ describe("UserBookmarksApi", () => {
             endpoint: "http://localhost:3000/v1/weights/list",
             query: {} as ListWeightsRequest,
             fetchQuery: {},
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
           {
             name: "all params",
@@ -124,6 +133,8 @@ describe("UserBookmarksApi", () => {
               weight_category: "image_generation",
               weight_type: "hifigan_tt2",
             },
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
         ],
       },
@@ -136,6 +147,8 @@ describe("UserBookmarksApi", () => {
             endpoint: "http://localhost:3000/v1/weights/list_featured",
             query: {} as ListFeaturedWeightsRequest,
             fetchQuery: {},
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
           {
             name: "all params",
@@ -162,6 +175,8 @@ describe("UserBookmarksApi", () => {
               filter_media_type: "glb,gltf",
               filter_engine_categories: "animation,audio,character",
             },
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
         ],
       },
@@ -174,49 +189,13 @@ describe("UserBookmarksApi", () => {
             endpoint: "http://localhost:3000/v1/weights/list_pinned",
             query: undefined,
             fetchQuery: undefined,
+            response: { results: [mockWeight] },
+            data: [mockWeight],
           },
         ],
       },
     ].forEach((testMethod) => {
-      describe(testMethod.name, () => {
-        afterEach(() => {
-          jest.clearAllMocks();
-        });
-
-        testMethod.tests.forEach((test) => {
-          it(test.name, async () => {
-            jest.spyOn(api, "fetch").mockResolvedValue({
-              results: [mockWeight],
-              success: true,
-            });
-            const response = await testMethod.function(test.query as any);
-            expect(api.fetch).toHaveBeenCalledWith(test.endpoint, {
-              method: "GET",
-              query: test.fetchQuery,
-            });
-            expect(response).toEqual({
-              data: [mockWeight],
-              success: true,
-              errorMessage: undefined,
-            });
-          });
-        });
-
-        it("exception", async () => {
-          jest.spyOn(api, "fetch").mockRejectedValue(new Error("server error"));
-          const response = await testMethod.function(
-            testMethod.tests[0].query as any,
-          );
-          expect(api.fetch).toHaveBeenCalledWith(testMethod.tests[0].endpoint, {
-            method: "GET",
-            query: testMethod.tests[0].fetchQuery,
-          });
-          expect(response).toEqual({
-            success: false,
-            errorMessage: "server error",
-          });
-        });
-      });
+      testListEndpoints(api, testMethod);
     });
   });
   describe("run search test", () => {
@@ -291,43 +270,7 @@ describe("UserBookmarksApi", () => {
         },
       },
     ].forEach((testMethod) => {
-      describe(testMethod.name, () => {
-        afterEach(() => {
-          jest.clearAllMocks();
-        });
-
-        it("success", async () => {
-          jest.spyOn(api, "fetch").mockResolvedValue({
-            ...mockWeight,
-            success: true,
-          });
-          const response = await testMethod.function(testMethod.params);
-          expect(api.fetch).toHaveBeenCalledWith(testMethod.endpoint, {
-            method: "GET",
-            body: undefined,
-            query: undefined,
-          });
-          expect(response).toEqual({
-            data: mockWeight,
-            success: true,
-            errorMessage: undefined,
-          });
-        });
-
-        it("exception", async () => {
-          jest.spyOn(api, "fetch").mockRejectedValue(new Error("server error"));
-          const response = await testMethod.function(testMethod.params);
-          expect(api.fetch).toHaveBeenCalledWith(testMethod.endpoint, {
-            method: "GET",
-            body: undefined,
-            query: undefined,
-          });
-          expect(response).toEqual({
-            success: false,
-            errorMessage: "server error",
-          });
-        });
-      });
+      testGetEndpoints(api, testMethod, mockWeight);
     });
   });
   describe("run update/delete tests", () => {
@@ -379,61 +322,7 @@ describe("UserBookmarksApi", () => {
         },
       },
     ].forEach((testMethod) => {
-      describe(testMethod.name, () => {
-        afterEach(() => {
-          jest.clearAllMocks();
-        });
-
-        it(test.name, async () => {
-          jest.spyOn(api, "fetch").mockResolvedValue({
-            success: true,
-          });
-          const response = await testMethod.function(
-            testMethod.paramsIn as any,
-          );
-          expect(api.fetch).toHaveBeenCalledWith(testMethod.endpoint, {
-            method: testMethod.method,
-            body: testMethod.paramsTest,
-            query: undefined,
-          });
-          expect(response).toEqual({
-            success: true,
-            errorMessage: undefined,
-          });
-        });
-
-        it("failure", async () => {
-          jest.spyOn(api, "fetch").mockResolvedValue({ BadInput: "bad input" });
-          const response = await testMethod.function(
-            testMethod.paramsIn as any,
-          );
-          expect(api.fetch).toHaveBeenCalledWith(testMethod.endpoint, {
-            method: testMethod.method,
-            body: testMethod.paramsTest,
-            query: undefined,
-          });
-          expect(response).toEqual({
-            success: false,
-            errorMessage: "bad input",
-          });
-        });
-
-        it("exception", async () => {
-          jest.spyOn(api, "fetch").mockRejectedValue(new Error("server error"));
-          const response = await testMethod.function(
-            testMethod.paramsIn as any,
-          );
-          expect(api.fetch).toHaveBeenCalledWith(testMethod.endpoint, {
-            method: testMethod.method,
-            body: testMethod.paramsTest,
-            query: undefined,
-          });
-          expect(response).toEqual({
-            success: false,
-            errorMessage: "server error",
-          });
-        });
-      });
+      testUpdateDeleteEndpoints(api, testMethod);
     });
   });
 });
