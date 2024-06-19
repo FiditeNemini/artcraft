@@ -47,7 +47,7 @@ const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
 const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
 /// The default ending trim point of a video if not supplied in the request.
-const DEFAULT_TRIM_MILLISECONDS_END : u64 = 3_000;
+const DEFAULT_TRIM_MILLISECONDS_END : u64 = 7_000;
 
 /// This is the maximum duration (for premium users)
 const MAXIMUM_DURATION_MILLIS : u64 = 10_000;
