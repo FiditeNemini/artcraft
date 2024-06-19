@@ -160,7 +160,7 @@ function PrelaunchLanding(props: Props) {
           ) : mediaItem ? (
             <img
               onClick={() =>
-                window.location.href = `/media/${mediaItem.token}`
+                (window.location.href = `/media/${mediaItem.token}`)
               }
               src={gifUrl}
               className="w-100 h-100 object-fit-cover"
@@ -174,6 +174,6 @@ function PrelaunchLanding(props: Props) {
   };
 
   return <div className="prelaunch-grid-container">{renderGridItems()}</div>;
-};
+}
 
 export default PrelaunchLanding;

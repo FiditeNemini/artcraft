@@ -215,9 +215,9 @@ export default function TopNav({
     domain.titlePart === "Storyteller AI" &&
     isOnLandingPage
   ) {
-    topBarWrapper.classList.add("topbar-hide-top");
+    topBarWrapper.classList.add("topbar-bg-transparent");
   } else {
-    topBarWrapper?.classList.remove("topbar-hide-top");
+    topBarWrapper?.classList.remove("topbar-bg-transparent");
   }
 
   useEffect(() => {
@@ -227,10 +227,10 @@ export default function TopNav({
         domain.titlePart === "Storyteller AI" &&
         isOnLandingPage
       ) {
-        if (window.scrollY > 100) {
-          topBarWrapper.classList.remove("topbar-hide-top");
+        if (window.scrollY > 500) {
+          topBarWrapper.classList.remove("topbar-bg-transparent");
         } else {
-          topBarWrapper.classList.add("topbar-hide-top");
+          topBarWrapper.classList.add("topbar-bg-transparent");
         }
       }
     };
@@ -349,7 +349,7 @@ export default function TopNav({
 
   return (
     <>
-      {domain.titlePart === "Storyteller AI" &&
+      {/* {domain.titlePart === "Storyteller AI" &&
         isOnLandingPage &&
         !isScrolled && (
           <div
@@ -394,7 +394,7 @@ export default function TopNav({
               </>
             )}
           </div>
-        )}
+        )} */}
       <div
         id="topbar-wrapper"
         className={`position-fixed ${
@@ -478,17 +478,18 @@ export default function TopNav({
           </div>
 
           <div className="topbar-nav-right">
-            {domain.titlePart === "Storyteller AI" && (
-              <div className="d-none d-lg-block">
-                <Button
-                  icon={faPortalEnter}
-                  label="Enter Storyteller Studio"
-                  href="https://studio.storyteller.ai/"
-                  small={true}
-                  className="me-2"
-                />
-              </div>
-            )}
+            {domain.titlePart === "Storyteller AI" &&
+              sessionWrapper.canAccessStudio() && (
+                <div className="d-none d-lg-block">
+                  <Button
+                    icon={faPortalEnter}
+                    label="Enter Storyteller Studio"
+                    href="https://studio.storyteller.ai/"
+                    small={true}
+                    className="me-2"
+                  />
+                </div>
+              )}
 
             <div className="d-flex align-items-center gap-2">
               <div className="d-none d-lg-flex gap-2">

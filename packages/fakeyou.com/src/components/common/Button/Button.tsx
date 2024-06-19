@@ -24,6 +24,7 @@ export default function Button({
   isLoading = false,
   isActive,
   type = "button",
+  fontLarge,
   ...rest
 }: ButtonProps) {
   let variant = variantProps;
@@ -60,6 +61,8 @@ export default function Button({
 
   const commonProps = {
     className: `${externalClass} button ${small ? "button-small" : ""} ${
+      fontLarge ? "button-font-large" : ""
+    } ${
       square ? (small ? "button-square-small" : "button-square") : ""
     } button-${variant} ${full ? "w-100" : ""}`,
     disabled: disabled || isLoading,

@@ -33,7 +33,7 @@
   "dependencies": {
     "@react-spring/types": "^9.7.3",
     "@typeform/embed": "^4.8.1",
-    "@typeform/embed-react": "^3.15.0",
+    "framer-motion": "6.5.1",
     "local-storage": "^2.0.0",
     "moment": "^2.29.4",
     "universal-cookie": "^6.1.1",

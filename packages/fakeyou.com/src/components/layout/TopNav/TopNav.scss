@@ -1,7 +1,8 @@
 @import "scss/colours.scss";
 
 .topbar-bg-transparent {
-  background-color: transparent;
+  background-color: transparent !important;
+  border-bottom: 1px solid transparent !important;
 }
 
 .topbar-bg-dark {

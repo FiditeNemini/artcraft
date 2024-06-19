@@ -12,7 +12,7 @@ import {
   faSignOutAlt,
   faBook,
   faStar,
-  faWandMagicSparkles
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -160,7 +160,7 @@ function TopNav(props: Props) {
   }
 
   return (
-    <div className="d-none d-lg-block">
+    <div className="d-none d-lg-block overflow-hidden vw-100">
       <nav
         className="navbar navbar-expand-lg navbar-dark pt-3"
         aria-label="Offcanvas navbar large"

@@ -4399,6 +4399,7 @@ __metadata:
     "@testing-library/react": ^9.5.0
     "@testing-library/user-event": ^7.2.1
     "@tippyjs/react": ^4.2.6
+    "@typeform/embed-react": ^3.17.0
     "@types/axios": ^0.14.0
     "@types/deep-equal": ^1.0.3
     "@types/google.analytics": ^0.0.42
@@ -4444,6 +4445,7 @@ __metadata:
     react-device-detect: ^2.2.3
     react-dom: ^16.13.1
     react-drag-drop-files: ^2.3.9
+    react-fast-marquee: ^1.6.4
     react-i18next: ^11.15.4
     react-iframe: ^1.8.5
     react-infinite-scroll-component: ^6.1.0
@@ -4474,9 +4476,9 @@ __metadata:
   dependencies:
     "@react-spring/types": ^9.7.3
     "@typeform/embed": ^4.8.1
-    "@typeform/embed-react": ^3.15.0
     craco: ^0.0.3
     cross-env: ^7.0.3
+    framer-motion: 6.5.1
     husky: ^8.0.3
     lerna: ^4.0.0
     local-storage: ^2.0.0
@@ -4937,22 +4939,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typeform/embed-react@npm:^3.15.0":
-  version: 3.15.0
-  resolution: "@typeform/embed-react@npm:3.15.0"
+"@typeform/embed-react@npm:^3.17.0":
+  version: 3.17.0
+  resolution: "@typeform/embed-react@npm:3.17.0"
   dependencies:
-    "@typeform/embed": 4.8.1
+    "@typeform/embed": 4.10.0
     fast-deep-equal: ^3.1.3
   peerDependencies:
     react: ">=16.8.0"
-  checksum: d5e5d4b1cdfc128de2ce6c17ba648adbe98bfecc5a2c296fbedc8fb32da0c302e813baa6ce3ecc3de9dc84f36ccfd42250a4693f846d84ce2574e6fedcaa86e5
+  checksum: 90d58df3124de46eda7db5f71fd478d4b57ee952b7da04b3eb64c74036e4830a8e5ea7f4bce67eb55827af91cdda0fa107fc2aa13801b0890c8c611af742584a
   languageName: node
   linkType: hard
 
-"@typeform/embed@npm:4.8.1, @typeform/embed@npm:^4.8.1":
-  version: 4.8.1
-  resolution: "@typeform/embed@npm:4.8.1"
-  checksum: 1e7ac3d0d95c1ea823160f1478a973f871550a4bab7de1501f557b1e18966ab5a740b6a913d9436b5ee59d0f25d707b66582a8c41dea195383cca3afb1955b23
+"@typeform/embed@npm:4.10.0":
+  version: 4.10.0
+  resolution: "@typeform/embed@npm:4.10.0"
+  checksum: 388c409428af05c8db7066b07ab85b78ce2ed3de9ed9f020c464a92d5fc2c7fb4c6081cb9311d93dd18d251381401be6ab427f1ec44aeca548e27d9b5f454780
   languageName: node
   linkType: hard
 
@@ -4960,6 +4962,13 @@ __metadata:
   version: 1.38.0
   resolution: "@typeform/embed@npm:1.38.0"
   checksum: 41115134e5cee28f5e031181b4525c7885d23707699cf183921110262717c7544bfd101428267410b812914c235687783e373ce98e37bdc447d72f8177663597
+  languageName: node
+  linkType: hard
+
+"@typeform/embed@npm:^4.8.1":
+  version: 4.8.1
+  resolution: "@typeform/embed@npm:4.8.1"
+  checksum: 1e7ac3d0d95c1ea823160f1478a973f871550a4bab7de1501f557b1e18966ab5a740b6a913d9436b5ee59d0f25d707b66582a8c41dea195383cca3afb1955b23
   languageName: node
   linkType: hard
 
@@ -11084,7 +11093,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^6.5.1":
+"framer-motion@npm:6.5.1, framer-motion@npm:^6.5.1":
   version: 6.5.1
   resolution: "framer-motion@npm:6.5.1"
   dependencies:
@@ -17797,6 +17806,16 @@ __metadata:
     react: ">= 16.8.0 || 18.0.0"
     react-dom: ">= 16.8.0 || 18.0.0"
   checksum: 95301d63faa858ac0e8c2ab32e1e864ed49d8b36e96216960af0ac797bc30fe11c7747b9c3bed3728f5371e57a93277a064fd433c6f8e1a24a9a32bbf1d354e8
+  languageName: node
+  linkType: hard
+
+"react-fast-marquee@npm:^1.6.4":
+  version: 1.6.4
+  resolution: "react-fast-marquee@npm:1.6.4"
+  peerDependencies:
+    react: ">= 16.8.0 || 18.0.0"
+    react-dom: ">= 16.8.0 || 18.0.0"
+  checksum: 30bb2c967b5162e7de130cccfcf51654ac1e29ecbf82116225a13958a05a79bc0ec11d72c49f172fa8c4d1f226b51cc93f9db5cb595c5a3529de8b41f60cbc2c
   languageName: node
   linkType: hard
 

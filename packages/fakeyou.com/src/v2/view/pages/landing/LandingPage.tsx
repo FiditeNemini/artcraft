@@ -18,7 +18,8 @@ import {
 } from "@storyteller/components/src/env/GetWebsite";
 // import OnboardingSelection from "./storyteller/OnboardingSelection";
 // import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
-import PrelaunchLanding from "./storyteller/PrelaunchLanding/PrelaunchLanding";
+// import PrelaunchLanding from "./storyteller/PrelaunchLanding/PrelaunchLanding";
+import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -54,7 +55,8 @@ function LandingPage(props: Props) {
     <>
       {domain.website === Website.StorytellerAi && (
         // <LandingVideoReel sessionWrapper={props.sessionWrapper} />
-        <PrelaunchLanding sessionWrapper={props.sessionWrapper} />
+        // <PrelaunchLanding sessionWrapper={props.sessionWrapper} />
+        <PostlaunchLanding sessionWrapper={props.sessionWrapper} />
       )}
       <Container type="panel">
         {
