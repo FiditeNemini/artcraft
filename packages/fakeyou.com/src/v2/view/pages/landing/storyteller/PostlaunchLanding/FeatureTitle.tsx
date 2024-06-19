@@ -9,6 +9,7 @@ interface FeatureTitleProps {
   description: string;
   icon: IconDefinition;
   id: string;
+  position?: "left" | "right";
 }
 
 export default function FeatureTitle({
@@ -16,6 +17,7 @@ export default function FeatureTitle({
   description,
   icon,
   id,
+  position = "left",
 }: FeatureTitleProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { margin: "-50% 0px -50% 0px" });
@@ -41,7 +43,8 @@ export default function FeatureTitle({
           transition: "all 0.25s",
           opacity: !isInView ? 0.2 : 1,
           transform: !isInView ? "scale(0.90)" : "scale(1)",
-          transformOrigin: "right center",
+          transformOrigin:
+            position === "right" ? "left center" : "right center",
           backgroundColor: "#242433",
           border: !isInView
             ? "2px solid rgba(255, 255, 255, 0.04)"

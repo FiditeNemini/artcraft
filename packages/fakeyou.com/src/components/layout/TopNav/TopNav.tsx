@@ -493,15 +493,19 @@ export default function TopNav({
 
             <div className="d-flex align-items-center gap-2">
               <div className="d-none d-lg-flex gap-2">
-                <Button
-                  {...{
-                    icon: faClipboardList,
-                    label: "My Jobs",
-                    onClick: openModal,
-                    variant: "secondary",
-                    small: true,
-                  }}
-                />
+                {(domain.titlePart === "FakeYou" ||
+                  (sessionWrapper.isLoggedIn() &&
+                    domain.titlePart === "Storyteller AI")) && (
+                  <Button
+                    {...{
+                      icon: faClipboardList,
+                      label: "My Jobs",
+                      onClick: openModal,
+                      variant: "secondary",
+                      small: true,
+                    }}
+                  />
+                )}
 
                 {loggedIn ? (
                   profileDropdown

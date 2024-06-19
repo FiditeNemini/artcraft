@@ -7,6 +7,7 @@ interface FeatureCardProps extends CardProps {
 
 interface CardProps {
   id: string;
+  video?: string;
 }
 
 function FeatureCard({ children, id }: FeatureCardProps) {
@@ -27,11 +28,10 @@ function FeatureCard({ children, id }: FeatureCardProps) {
   );
 }
 
-export function BuildScene({ id }: CardProps) {
+export function FeatureVideo({ id, video }: CardProps) {
   return (
-    <FeatureCard id={id}>
+    <FeatureCard id={id} video={video}>
       <video
-        src="/videos/landing/build_scene.mp4"
         className="object-fit-contain w-100 h-100"
         preload="metadata"
         muted={true}
@@ -39,58 +39,9 @@ export function BuildScene({ id }: CardProps) {
         controls={false}
         loop={true}
         playsInline={true}
-      />
-    </FeatureCard>
-  );
-}
-
-export function Animate({ id }: CardProps) {
-  return (
-    <FeatureCard id={id}>
-      <video
-        src="/videos/landing/animate_scene.mp4"
-        className="object-fit-contain w-100 h-100"
-        preload="metadata"
-        muted={true}
-        autoPlay={true}
-        controls={false}
-        loop={true}
-        playsInline={true}
-      />
-    </FeatureCard>
-  );
-}
-
-export function SelectStyle({ id }: CardProps) {
-  return (
-    <FeatureCard id={id}>
-      <video
-        src="/videos/landing/select_style.mp4"
-        className="object-fit-contain w-100 h-100"
-        preload="metadata"
-        muted={true}
-        autoPlay={true}
-        controls={false}
-        loop={true}
-        playsInline={true}
-      />
-    </FeatureCard>
-  );
-}
-
-export function GenerateMovie({ id }: CardProps) {
-  return (
-    <FeatureCard id={id}>
-      <video
-        src="/videos/landing/generate_movie.mp4"
-        className="object-fit-contain w-100 h-100"
-        preload="metadata"
-        muted={true}
-        autoPlay={true}
-        controls={false}
-        loop={true}
-        playsInline={true}
-      />
+      >
+        <source src={video} type="video/mp4" />
+      </video>
     </FeatureCard>
   );
 }

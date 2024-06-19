@@ -9,13 +9,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useScroll, useTransform, motion } from "framer-motion";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import FeatureTitle from "./FeatureTitle";
-import { Animate, BuildScene, GenerateMovie, SelectStyle } from "./FeatureCard";
+import { FeatureVideo } from "./FeatureCard";
 import {
   faArrowRight,
   faCube,
+  faFaceViewfinder,
   faFilm,
+  faMicrophoneLines,
   faPaintbrushPencil,
+  faPersonRays,
   faPersonRunning,
+  faRetweet,
 } from "@fortawesome/pro-solid-svg-icons";
 import ScrollingSceneCarousel from "./ScrollingSceneCarousel";
 import EmailSignUp from "./EmailSignUp";
@@ -150,7 +154,6 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
             }}
           >
             <video
-              src="/videos/landing/hero_video.mp4"
               preload="metadata"
               style={{
                 width: "100%",
@@ -164,21 +167,35 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
               muted={true}
               loop={true}
               playsInline={true}
-            />
+            >
+              <source
+                src="/videos/landing/hero_landing_video.mp4"
+                type="video/mp4"
+              />
+            </video>
           </div>
 
-          <div style={{ marginTop: "60px", marginBottom: "60px" }}>
+          <div
+            className="container d-flex flex-column text-center justify-content-center align-items-center w-100"
+            style={{ marginBottom: "50px" }}
+          >
+            <div className="d-flex flex-column align-items-center">
+              <h2 className="display-4 fw-bold mt-4">{secondTitle}</h2>
+              <p className="lead fw-normal fs-5 opacity-75">{secondSubtext}</p>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "60px" }}>
             <ScrollingSceneCarousel small={true} />
           </div>
 
           <div
             className="container d-flex flex-column text-center justify-content-center align-items-center w-100"
-            style={{ marginBottom: "70px" }}
+            style={{ marginBottom: "40px" }}
           >
             <div className="d-flex flex-column align-items-center">
-              <h2 className="display-4 fw-bold mt-4">{secondTitle}</h2>
-              <p className="lead fw-normal fs-5 opacity-75">{secondSubtext}</p>
-              {ctaButton}
+              <h2 className="display-4 fw-bold mt-4">{thirdTitle}</h2>
+              <p className="lead fw-normal fs-5 opacity-75">{thirdSubtext}</p>
             </div>
           </div>
 
@@ -186,7 +203,6 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
             {features.map(feature => (
               <li key={feature.id} className="list-unstyled d-flex flex-column">
                 <video
-                  src={feature.video}
                   className="object-fit-contain w-100 h-100 mb-4"
                   preload="metadata"
                   muted={true}
@@ -195,7 +211,43 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                   loop={true}
                   playsInline={true}
                   style={{ borderRadius: "1rem" }}
-                />
+                >
+                  <source src={feature.video} type="video/mp4" />
+                </video>
+                <h2 className="fs-2 fw-bold mb-3">
+                  <FontAwesomeIcon icon={feature.icon} className="me-3" />
+                  {feature.title}
+                </h2>
+                <p className="opacity-75 mb-5">{feature.description}</p>
+              </li>
+            ))}
+          </div>
+
+          <div
+            className="container d-flex flex-column text-center justify-content-center align-items-center w-100"
+            style={{ marginBottom: "40px", marginTop: "60px" }}
+          >
+            <div className="d-flex flex-column align-items-center">
+              <h2 className="display-4 fw-bold mt-4">{fourthTitle}</h2>
+              <p className="lead fw-normal fs-5 opacity-75">{fourthSubtext}</p>
+            </div>
+          </div>
+
+          <div className="container d-flex flex-column gap-5">
+            {features2.map(feature => (
+              <li key={feature.id} className="list-unstyled d-flex flex-column">
+                <video
+                  className="object-fit-contain w-100 h-100 mb-4"
+                  preload="metadata"
+                  muted={true}
+                  autoPlay={true}
+                  controls={false}
+                  loop={true}
+                  playsInline={true}
+                  style={{ borderRadius: "1rem" }}
+                >
+                  <source src={feature.video} type="video/mp4" />
+                </video>
                 <h2 className="fs-2 fw-bold mb-3">
                   <FontAwesomeIcon icon={feature.icon} className="me-3" />
                   {feature.title}
@@ -214,7 +266,6 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
               Videos created with Storyteller Studio.
             </p>
             <video
-              src="/videos/landing/landing_reel.mp4"
               poster="/images/landing/storyteller/Landing_Reel_Poster.png"
               preload="metadata"
               style={{
@@ -229,7 +280,9 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
               muted={true}
               loop={true}
               playsInline={true}
-            />
+            >
+              <source src="/videos/landing/landing_reel.mp4" type="video/mp4" />
+            </video>
             {props.sessionWrapper.isLoggedIn() && ctaButton}
           </div>
 
@@ -280,7 +333,6 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                   }}
                 >
                   <video
-                    src="/videos/landing/hero_video.mp4"
                     className="position-absolute"
                     preload="metadata"
                     style={{
@@ -294,7 +346,12 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                     muted={true}
                     loop={true}
                     playsInline={true}
-                  />
+                  >
+                    <source
+                      src="/videos/landing/hero_landing_video.mp4"
+                      type="video/mp4"
+                    />
+                  </video>
                   <motion.div
                     className="position-absolute"
                     style={{
@@ -361,6 +418,8 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                 {thirdSubtext}
               </p>
             </div>
+
+            {/* Steps of video creation */}
             <div
               className="d-flex w-100 align-items-start"
               style={{ gap: "40px" }}
@@ -395,7 +454,72 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                   }}
                 >
                   {features.map(feature => (
-                    <feature.card id={feature.id} key={feature.id} />
+                    <feature.card
+                      id={feature.id}
+                      key={feature.id}
+                      video={feature.video}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <h1
+                className="fw-bold display-4"
+                style={{ marginTop: !isSmallScreen ? "-40px" : "-120px" }}
+              >
+                {fourthTitle}
+              </h1>
+              <p
+                className="lead fw-medium opacity-75 fs-4"
+                style={{ marginBottom: !isSmallScreen ? "-10%" : "-22%" }}
+              >
+                {fourthSubtext}
+              </p>
+            </div>
+
+            {/* More features */}
+            <div
+              className="d-flex w-100 align-items-start flex-row-reverse"
+              style={{ gap: "40px" }}
+            >
+              <div className="w-100">
+                <ul
+                  className="list-unstyled"
+                  style={{ paddingTop: "50vh", paddingBottom: "33vh" }}
+                >
+                  {features2.map(feature => (
+                    <li key={feature.id}>
+                      <FeatureTitle
+                        id={feature.id}
+                        title={feature.title}
+                        icon={feature.icon}
+                        description={feature.description}
+                        position="right"
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div
+                className="w-100 position-sticky top-0 d-flex align-items-center justify-content-center"
+                style={{ height: "100vh", marginTop: "120px" }}
+              >
+                <div
+                  className="ratio ratio-1x1"
+                  style={{
+                    width: !isSmallScreen ? "600px" : "650px",
+                    backgroundColor: "#242433",
+                    borderRadius: "1rem",
+                  }}
+                >
+                  {features2.map(feature => (
+                    <feature.card
+                      id={feature.id}
+                      key={feature.id}
+                      video={feature.video}
+                    />
                   ))}
                 </div>
               </div>
@@ -403,14 +527,13 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
 
             <div
               className="container d-flex flex-column align-items-center"
-              style={{ marginTop: "-50px" }}
+              style={{ marginTop: !isSmallScreen ? "0px" : "-100px" }}
             >
               <h1 className="display-5 fw-bold">Showcase</h1>
               <p className="lead fw-medium opacity-75 fs-4 mb-5">
                 Videos created with Storyteller Studio.
               </p>
               <video
-                src="/videos/landing/landing_reel.mp4"
                 poster="/images/landing/storyteller/Landing_Reel_Poster.png"
                 preload="metadata"
                 style={{
@@ -425,7 +548,12 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                 muted={true}
                 loop={true}
                 playsInline={true}
-              />
+              >
+                <source
+                  src="/videos/landing/landing_reel.mp4"
+                  type="video/mp4"
+                />
+              </video>
               {props.sessionWrapper.isLoggedIn() && ctaButton}
             </div>
 
@@ -450,15 +578,17 @@ const secondSubtext =
   "Turn your creative ideas into stunning visuals, by simply building a 3D scene and generate.";
 const thirdTitle = "Filmmaking Made Easy";
 const thirdSubtext = "Just a few simple steps to creating your movie.";
+const fourthTitle = "Human in the Loop";
+const fourthSubtext = "Giving you full control of your creation process.";
 
 const features = [
   {
     title: "Build your 3D scene",
     icon: faCube,
     description:
-      " Storyteller Studio allows you to create and customize your 3D environment. Add characters, objects, and fine-tune details to craft the perfect scene for your movie.",
+      "Storyteller Studio allows you to create and customize your 3D environment. Add characters, objects, and fine-tune details to craft the perfect scene for your movie.",
     id: "build-scene",
-    card: BuildScene,
+    card: FeatureVideo,
     video: "/videos/landing/build_scene.mp4",
   },
   {
@@ -467,7 +597,7 @@ const features = [
     description:
       "Bring your scene to life by adding animations to your characters and objects. Control movements to create dynamic visuals that engage your audience.",
     id: "animate-scene",
-    card: Animate,
+    card: FeatureVideo,
     video: "/videos/landing/animate_scene.mp4",
   },
   {
@@ -476,7 +606,7 @@ const features = [
     description:
       "Choose from a variety of artistic styles to transform your 3D scene. Whether you prefer a realistic look or a more abstract approach, our AI can apply the style seamlessly.",
     id: "select-style",
-    card: SelectStyle,
+    card: FeatureVideo,
     video: "/videos/landing/select_style.mp4",
   },
   {
@@ -485,7 +615,46 @@ const features = [
     description:
       "Let Storyteller Studio's AI process your scene and selected style to produce a stunning video. Sit back and watch as your 3D creation comes to life with the chosen visual art style.",
     id: "generate-movie",
-    card: GenerateMovie,
+    card: FeatureVideo,
     video: "/videos/landing/generate_movie.mp4",
+  },
+  {
+    title: "Share and remix",
+    icon: faRetweet,
+    description:
+      "Share your results, scenes, assets, fine tuned ML models, and more with the community. Remix others' creations to enhance your own projects and inspire new ideas.",
+    id: "share-and-remix",
+    card: FeatureVideo,
+    video: "/videos/landing/share_remix.mp4",
+  },
+];
+
+const features2 = [
+  {
+    title: "Facial mocap",
+    icon: faFaceViewfinder,
+    description:
+      "Record your facial expressions and use them in your scene. Our facial mocap feature ensures your characters mimic your emotions.",
+    id: "facial-mocap",
+    card: FeatureVideo,
+    video: "/videos/landing/facial_mocap.mp4",
+  },
+  {
+    title: "Body mocap",
+    icon: faPersonRays,
+    description:
+      "Capture full-body movements and apply them to your characters. Body mocap allows for realistic and fluid character animations.",
+    id: "body-mocap",
+    card: FeatureVideo,
+    video: "/videos/landing/body_mocap.mp4",
+  },
+  {
+    title: "Voice conversion",
+    icon: faMicrophoneLines,
+    description:
+      "Record your own voice and transform it into a character's voice. Choose from thousands of voice options to match your character perfectly.",
+    id: "voice-conversion",
+    card: FeatureVideo,
+    video: "/videos/landing/voice_conversion.mp4",
   },
 ];
