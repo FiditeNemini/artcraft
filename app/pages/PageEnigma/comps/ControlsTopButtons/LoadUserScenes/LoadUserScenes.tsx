@@ -1,15 +1,22 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import dayjs from "dayjs";
 
 import { MediaInfo } from "~/pages/PageEnigma/models";
-import { ToastTypes } from "~/enums";
+import { FilterEngineCategories, ToastTypes } from "~/enums";
 
 import { addToast } from "~/signals";
 
-import { GetScenesByUser } from "./utilities";
 import { ScenePicker, SceneTypes } from "../ScenePicker";
 import { Label, LoadingSpinner } from "~/components";
+
+import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
 
 interface LoadSceneProps {
   onSceneSelect: (token: string) => void;
@@ -35,12 +42,7 @@ export const LoadUserScenes = ({ onSceneSelect }: LoadSceneProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [bottomGradientOpacity, setBottomGradientOpacity] = useState(1);
 
-  useEffect(() => {
-    if (scenes) {
-      //only call once on mount
-      return;
-    }
-
+  const getScenesByUser = useCallback(async () => {
     const modMediaInfoToScenes = (results: MediaInfo[]) =>
       results.map((scene: MediaInfo) => ({
         token: scene.token,
@@ -51,14 +53,27 @@ export const LoadUserScenes = ({ onSceneSelect }: LoadSceneProps) => {
           : undefined,
       }));
 
-    GetScenesByUser().then((res) => {
-      if ("results" in res) {
-        setScenes(modMediaInfoToScenes(res.results));
-        return;
-      }
-      addToast(ToastTypes.ERROR, res.error_reason);
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.ListUserMediaFiles({
+      filter_engine_categories: [FilterEngineCategories.SCENE],
     });
-  }, [scenes]);
+    if (response.success && response.data) {
+      setScenes(modMediaInfoToScenes(response.data));
+      return;
+    }
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Loading User Scenes",
+    );
+  }, []);
+
+  useEffect(() => {
+    if (scenes) {
+      //only call once on mount
+      return;
+    }
+    getScenesByUser();
+  }, [scenes, getScenesByUser]);
 
   const handleSceneSelect = (selectedScene: SceneTypes) => {
     onSceneSelect(selectedScene.token);
