@@ -1,24 +1,15 @@
-import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
+import { Weight } from "~/models";
 import { H4, H6 } from "~/components";
-import { VoiceConversionModelListItem } from "~/pages/PageEnigma/models";
 
 export const VoiceModelElement = ({
   model,
   onSelect,
 }: {
-  model: TtsModelListItem | VoiceConversionModelListItem;
-  onSelect: (item: TtsModelListItem | VoiceConversionModelListItem) => void;
+  model: Weight;
+  onSelect: (item: Weight) => void;
 }) => {
-  let creatorName: string | undefined;
-  if ("creator_display_name" in model) {
-    //case of TTS Models
-    creatorName = model.creator_display_name;
-  } else if ("creator" in model) {
-    //case of V2V Models
-    creatorName = model.creator.display_name;
-  } else {
-    creatorName = undefined;
-  }
+  const creatorName = model.creator.display_name;
+
   return (
     <button
       className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-transparent bg-brand-secondary p-3 text-start transition-all hover:border-ui-controls-button hover:bg-ui-controls-button/40"

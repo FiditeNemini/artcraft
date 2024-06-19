@@ -1,10 +1,3 @@
-import { VoiceConversionModelListItem } from "~/pages/PageEnigma/models/types";
-
-export interface VoiceConversionModelListResponse {
-  success: boolean;
-  models: Array<VoiceConversionModelListItem>;
-}
-
 export interface EnqueueVoiceConversionRequest {
   uuid_idempotency_token: string;
   voice_conversion_model_token: string;
@@ -19,4 +12,5 @@ export interface EnqueueVoiceConversionRequest {
 export interface EnqueueVoiceConversionResponse {
   success: boolean;
   inference_job_token?: string;
+  error_reason?: string;
 }

@@ -3,12 +3,8 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
 import { AudioPanelState } from "~/pages/PageEnigma/models/voice";
-import {
-  TtsModelListItem,
-  VoiceConversionModelListItem,
-} from "~/pages/PageEnigma/models";
 
-import { ListTtsModels, ListVoiceConversionModels } from "./utilities";
+import { Weight } from "~/models";
 import { initialTtsState, initialV2VState } from "./values";
 
 import { PageAudioLibrary } from "./pageAudioLibrary";
@@ -16,6 +12,12 @@ import { PageAudioGeneration } from "./pageAudioGeneration";
 import { PageSelectTtsModel } from "./pageSelectTtsModel";
 import { PageSelectV2VModel } from "./pageSelectV2VModel";
 import { PollUserAudioItems } from "~/hooks/useBackgroundLoadingMedia/utilities";
+import {
+  ScopedWeightCategory,
+  WeightsApi,
+} from "~/Classes/ApiManager/WeightsApi";
+import { addToast } from "~/signals";
+import { ToastTypes } from "~/enums";
 
 export const AudioTab = () => {
   useSignals();
@@ -30,24 +32,50 @@ export const AudioTab = () => {
     v2vState: initialV2VState,
   });
 
-  const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
-  const [v2vModels, setV2VModels] = useState<
-    Array<VoiceConversionModelListItem>
-  >([]);
+  const [ttsModels, setTtsModels] = useState<Weight[]>([]);
+  const [v2vModels, setV2VModels] = useState<Weight[]>([]);
+
+  const ListTtsModels = useCallback(async () => {
+    const weightApi = new WeightsApi();
+    const response = await weightApi.ListWeights({
+      weightCategory: [ScopedWeightCategory.TEXT_TO_SPEECH],
+      pageSize: 10000,
+    });
+    if (response.success && response.data) {
+      setTtsModels(response.data);
+      return;
+    }
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Getting TTS Models",
+    );
+  }, []);
+
+  const ListVoiceConversionModels = useCallback(async () => {
+    const weightApi = new WeightsApi();
+    const response = await weightApi.ListWeights({
+      weightCategory: [ScopedWeightCategory.VOICE_CONVERSION],
+      pageSize: 10000,
+    });
+    if (response.success && response.data) {
+      setV2VModels(response.data);
+      return;
+    }
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Getting V2V Models",
+    );
+  }, []);
 
   useEffect(() => {
     if (!state.firstLoad) {
       //fetch all the data on first load once, after securing auth info
-      ListTtsModels().then((res) => {
-        if (res) setTtsModels(res);
-      });
-      ListVoiceConversionModels().then((res) => {
-        if (res) setV2VModels(res);
-      });
+      ListTtsModels();
+      ListVoiceConversionModels();
       setState((curr) => ({ ...curr, firstLoad: true }));
       // completed the first load
     }
-  }, [state]);
+  }, [state, ListTtsModels, ListVoiceConversionModels]);
 
   const changePage = useCallback((newPage: AudioTabPages) => {
     setState((curr) => ({

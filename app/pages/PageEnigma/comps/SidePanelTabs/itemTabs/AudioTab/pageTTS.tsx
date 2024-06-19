@@ -22,7 +22,7 @@ export const PageTTS = ({
   setTtsState: (newState: TtsState) => void;
 }) => {
   const requestTts = useCallback(async () => {
-    const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
+    const modelToken = ttsState.voice ? ttsState.voice.weight_token : undefined;
 
     if (!modelToken) {
       addToast(ToastTypes.ERROR, "Please first pick a voice");
@@ -72,7 +72,7 @@ export const PageTTS = ({
             <>
               <H4>{ttsState.voice.title}</H4>
               <H6 className="text-white/70">
-                by {ttsState.voice.creator_display_name}
+                by {ttsState.voice.creator.display_name}
               </H6>
             </>
           )}

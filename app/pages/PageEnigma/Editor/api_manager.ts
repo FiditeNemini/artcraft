@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import { STORAGE_KEYS } from "~/enums";
 import {
   environmentVariables,
   signalScene,

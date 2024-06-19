@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Input } from "~/components";
-import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
+import { Weight } from "~/models";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { VoiceModelElement } from "./voiceModelElement";
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
@@ -11,8 +11,8 @@ export const PageSelectTtsModel = ({
   onSelect,
 }: {
   changePage: (newPage: AudioTabPages) => void;
-  ttsModels: Array<TtsModelListItem>;
-  onSelect: (item: TtsModelListItem) => void;
+  ttsModels: Weight[];
+  onSelect: (item: Weight) => void;
 }) => {
   const [query, setQuery] = useState("");
   const filteredListOfModels =
@@ -50,9 +50,9 @@ export const PageSelectTtsModel = ({
           {slicedArray.map((item) => {
             return (
               <VoiceModelElement
-                key={item.model_token}
+                key={item.weight_token}
                 model={item}
-                onSelect={(item) => onSelect(item as TtsModelListItem)}
+                onSelect={(item) => onSelect(item)}
               />
             );
           })}

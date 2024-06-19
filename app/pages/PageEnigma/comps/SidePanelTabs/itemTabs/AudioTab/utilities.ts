@@ -1,135 +1,10 @@
+import { getMediaFileByToken, inferV2V } from "~/api";
 import {
-  listTts,
-  listV2V,
-  inferTts,
-  listMediaByUser,
-  getMediaFileByToken,
-  inferV2V,
-} from "~/api";
-import {
-  VoiceConversionModelListResponse,
   EnqueueVoiceConversionRequest,
   EnqueueVoiceConversionResponse,
 } from "./typesImported";
-import {
-  TtsModelListItem,
-  TtsModelListResponsePayload,
-  StatusLike,
-  GenerateTtsAudioRequest,
-  GenerateTtsAudioResponse,
-} from "~/pages/PageEnigma/models/tts";
 
-import { GenerateTtsAudioErrorType } from "~/pages/PageEnigma/enums";
-import {
-  GetMediaFileResponse,
-  VoiceConversionModelListItem,
-} from "~/pages/PageEnigma/models";
-
-import { authentication } from "~/signals";
-const { userInfo } = authentication;
-
-export const ListAudioByUser = () => {
-  if (userInfo.value) {
-    return fetch(
-      listMediaByUser(userInfo.value.username) + "?filter_media_type=audio",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-        credentials: "include",
-      },
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.success && res.results) {
-          return res.results;
-        } else {
-          Promise.reject();
-        }
-      })
-      .catch(() => ({ success: false }));
-  } else {
-    return new Promise((resolve) => {
-      resolve({ success: false });
-    });
-  }
-};
-
-export function ListTtsModels(): Promise<Array<TtsModelListItem> | undefined> {
-  if (userInfo.value) {
-    return fetch(listTts, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        const response: TtsModelListResponsePayload = res;
-        if (!response.success) {
-          return undefined;
-        }
-        return response?.models;
-      })
-      .catch(() => {
-        return undefined;
-      });
-  } else {
-    return new Promise((resolve) => {
-      resolve(undefined);
-    });
-  }
-}
-
-export function maybeMapError(
-  statuslike: StatusLike,
-): GenerateTtsAudioErrorType | undefined {
-  switch (statuslike.status) {
-    case 400:
-      return GenerateTtsAudioErrorType.BadRequest;
-    case 404:
-      return GenerateTtsAudioErrorType.NotFound;
-    case 429:
-      return GenerateTtsAudioErrorType.TooManyRequests;
-    case 500:
-      return GenerateTtsAudioErrorType.ServerError;
-  }
-}
-
-export function GenerateTtsAudio(
-  request: GenerateTtsAudioRequest,
-): Promise<GenerateTtsAudioResponse> {
-  return fetch(inferTts, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(request),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (!("inference_job_token" in res)) {
-        return { error: GenerateTtsAudioErrorType.UnknownError };
-      }
-      const ret: GenerateTtsAudioResponse = {
-        success: true,
-        inference_job_token: res.inference_job_token,
-        inference_job_token_type: res.inference_job_token_type,
-      };
-      return ret;
-    })
-    .catch((e) => {
-      const maybeError = maybeMapError(e);
-      if (maybeError !== undefined) {
-        return { error: maybeError };
-      }
-      return { error: GenerateTtsAudioErrorType.UnknownError };
-    });
-}
+import { GetMediaFileResponse } from "~/pages/PageEnigma/models";
 
 export function GetMediaFileByToken(
   fileToken: string,
@@ -164,30 +39,6 @@ export function GetMediaFileByToken(
     });
 }
 
-export function ListVoiceConversionModels(): Promise<
-  Array<VoiceConversionModelListItem> | undefined
-> {
-  return fetch(listV2V, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      const response: VoiceConversionModelListResponse = res;
-      if (!response.success) {
-        return;
-      }
-      return response?.models;
-    })
-    .catch(() => {
-      return undefined;
-    });
-}
-
 export function GenerateVoiceConversion(
   request: EnqueueVoiceConversionRequest,
 ): Promise<EnqueueVoiceConversionResponse> {
@@ -198,6 +49,7 @@ export function GenerateVoiceConversion(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(request),
+    credentials: "include",
   })
     .then((res) => res.json())
     .then((res) => {

@@ -13,7 +13,8 @@ import { GenerateVoiceConversion } from "./utilities";
 import { H4, H6, Button, Label, UploadAudioComponent } from "~/components";
 
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
-import { startPollingActiveJobs } from "~/signals";
+import { addToast, startPollingActiveJobs } from "~/signals";
+import { ToastTypes } from "~/enums";
 
 export const PageVoicetoVoice = ({
   changePage,
@@ -25,23 +26,35 @@ export const PageVoicetoVoice = ({
   setV2VState: (newState: V2VState) => void;
 }) => {
   const requestV2V = useCallback(() => {
-    const modelToken = v2vState.voice ? v2vState.voice.token : undefined;
-    if (modelToken && v2vState.inputFileToken) {
-      const request: EnqueueVoiceConversionRequest = {
-        uuid_idempotency_token: uuidv4(),
-        voice_conversion_model_token: modelToken,
-        source_media_upload_token: v2vState.inputFileToken,
-      };
-
-      GenerateVoiceConversion(request).then(
-        (res: EnqueueVoiceConversionResponse) => {
-          if (res && res.inference_job_token) {
-            startPollingActiveJobs();
-            changePage(AudioTabPages.LIBRARY);
-          }
-        },
-      );
+    const modelToken = v2vState.voice ? v2vState.voice.weight_token : undefined;
+    if (!modelToken) {
+      addToast(ToastTypes.ERROR, "Please first pick a voice");
+      return;
     }
+    if (!v2vState.inputFileToken) {
+      addToast(ToastTypes.ERROR, "Please upload a voice clip to convert from");
+      return;
+    }
+    const request: EnqueueVoiceConversionRequest = {
+      uuid_idempotency_token: uuidv4(),
+      voice_conversion_model_token: modelToken,
+      source_media_upload_token: v2vState.inputFileToken,
+    };
+
+    GenerateVoiceConversion(request).then(
+      (res: EnqueueVoiceConversionResponse) => {
+        console.log(request, res);
+        if (res && res.inference_job_token) {
+          startPollingActiveJobs();
+          changePage(AudioTabPages.LIBRARY);
+          return;
+        }
+        addToast(
+          ToastTypes.ERROR,
+          res.error_reason || "Unknown Error in Generating Voice Conversions",
+        );
+      },
+    );
   }, [v2vState, changePage]);
 
   return (

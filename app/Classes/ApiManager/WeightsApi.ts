@@ -31,6 +31,9 @@ export enum ScopedWeightCategory {
 interface WeightsRequest {
   username?: string;
   pageSize?: number;
+  weightType?: ScopedWeightType[];
+  weightCategory?: ScopedWeightCategory[];
+  //TODO: what is scoped??
   scopedWeightType?: ScopedWeightType[];
   scopedWeightCategory?: ScopedWeightCategory[];
 }

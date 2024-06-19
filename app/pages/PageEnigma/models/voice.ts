@@ -1,5 +1,4 @@
-import { TtsModelListItem } from "~/pages/PageEnigma/models";
-import { VoiceConversionModelListItem } from "~/pages/PageEnigma/models/types";
+import { Weight } from "~/models";
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
 
 export type AudioPanelState = {
@@ -10,12 +9,12 @@ export type AudioPanelState = {
   v2vState: V2VState;
 };
 export type TtsState = {
-  voice: TtsModelListItem | undefined;
+  voice: Weight | undefined;
   text: string;
 };
 
 export type V2VState = {
-  voice: VoiceConversionModelListItem | undefined;
+  voice: Weight | undefined;
   file: File | undefined;
   inputFileToken: string | undefined;
 };

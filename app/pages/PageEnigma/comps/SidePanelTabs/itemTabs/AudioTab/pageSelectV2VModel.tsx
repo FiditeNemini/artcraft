@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
 
+import { Weight } from "~/models";
 import { Input } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { VoiceModelElement } from "./voiceModelElement";
-import { VoiceConversionModelListItem } from "~/pages/PageEnigma/models";
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
 
 export const PageSelectV2VModel = ({
@@ -12,8 +12,8 @@ export const PageSelectV2VModel = ({
   onSelect,
 }: {
   changePage: (newPage: AudioTabPages) => void;
-  v2vModels: Array<VoiceConversionModelListItem>;
-  onSelect: (item: VoiceConversionModelListItem) => void;
+  v2vModels: Weight[];
+  onSelect: (item: Weight) => void;
 }) => {
   const [query, setQuery] = useState("");
   const filteredListOfModels =
@@ -50,11 +50,9 @@ export const PageSelectV2VModel = ({
         {slicedArray.map((item) => {
           return (
             <VoiceModelElement
-              key={item.token}
+              key={item.weight_token}
               model={item}
-              onSelect={(item) =>
-                onSelect(item as VoiceConversionModelListItem)
-              }
+              onSelect={(item) => onSelect(item)}
             />
           );
         })}
