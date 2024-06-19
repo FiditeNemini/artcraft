@@ -20,6 +20,7 @@ import {
 import ScrollingSceneCarousel from "./ScrollingSceneCarousel";
 import EmailSignUp from "./EmailSignUp";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useModal } from "hooks";
 
 interface PostlaunchLandingProps {
   sessionWrapper: SessionWrapper;
@@ -28,6 +29,12 @@ interface PostlaunchLandingProps {
 export default function PostlaunchLanding(props: PostlaunchLandingProps) {
   const [imageHeight, setImageHeight] = useState("100vh");
   const domain: WebsiteConfig = useDomainConfig();
+  const { open } = useModal();
+  const openModal = () =>
+    open({
+      component: EmailSignUp,
+      props: { mobile: true, showHanashi: false, handleClose: openModal },
+    });
 
   const webpageTitle =
     domain.website === Website.FakeYou
@@ -117,7 +124,7 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
         fontLarge={true}
         icon={faArrowRight}
         iconFlip={true}
-        href="https://7mjlxvmjq8u.typeform.com/to/ZQTkv9ha"
+        onClick={openModal}
       />
     </div>
   );
@@ -228,7 +235,7 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
 
           {!props.sessionWrapper.canAccessStudio() ? (
             <div style={{ marginTop: "100px" }}>
-              <EmailSignUp mobile={true} />
+              <EmailSignUp mobile={true} showHanashi={false} />
             </div>
           ) : null}
         </div>

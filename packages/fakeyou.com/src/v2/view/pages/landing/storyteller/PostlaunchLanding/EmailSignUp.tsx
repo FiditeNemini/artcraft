@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import { Widget } from "@typeform/embed-react";
+import ModalHeader from "components/modals/ModalHeader";
 
 interface EmailSignUpProps {
   mobile?: boolean;
+  showHanashi?: boolean;
+  handleClose?: any;
 }
 
-export default function EmailSignUp({ mobile }: EmailSignUpProps) {
+export default function EmailSignUp({
+  mobile,
+  showHanashi = true,
+  handleClose,
+}: EmailSignUpProps) {
   const [isHanashiHovered, setIsHanashiHovered] = useState(false);
 
   return (
     <div>
+      {handleClose && (
+        <div style={{ marginBottom: "56px" }}>
+          <ModalHeader title=" " handleClose={handleClose} />
+        </div>
+      )}
       <h1 className="text-center mb-5 fw-bold display-5">
         Join the waitlist today!
       </h1>
@@ -18,11 +30,11 @@ export default function EmailSignUp({ mobile }: EmailSignUpProps) {
           paddingTop: mobile ? "0px" : "60px",
           backgroundColor: "#242433",
           borderRadius: "1rem",
-          borderTop: "3px solid #e66462",
+          borderTop: handleClose ? "none" : "3px solid #e66462",
           position: "relative",
         }}
       >
-        {!mobile && (
+        {showHanashi && (
           <img
             src={
               isHanashiHovered

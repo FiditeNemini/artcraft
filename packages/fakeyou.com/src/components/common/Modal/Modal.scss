@@ -4,7 +4,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-color: rgba(darken($panel, 8%), 0.7) !important;
+  background-color: rgba(darken($panel, 8%), 0.8) !important;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -67,7 +67,7 @@
 .fy-core-modal {
   .modal-content {
     // width: 85vw;
-    min-height: 70vh;
+    // min-height: 70vh;
     padding: 1.5rem;
   }
 }
