@@ -10,7 +10,7 @@ import {
   errorDialogTitle,
 } from "~/pages/PageEnigma/signals";
 import { Input } from "~/components";
-import { renameScene } from "./utilities";
+import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
 
 interface Props {
   pageName: string;
@@ -34,9 +34,9 @@ export const SceneTitleInput = ({ pageName }: Props) => {
     setState((curr) => ({ ...curr, isSaving: val }));
   };
 
-  const handleShowErrorDialog = () => {
+  const handleShowErrorDialog = (errorMessage: string) => {
     errorDialogTitle.value = "Error";
-    errorDialogMessage.value = "Scene name can not be empty.";
+    errorDialogMessage.value = errorMessage;
     showErrorDialog.value = true;
   };
 
@@ -50,11 +50,26 @@ export const SceneTitleInput = ({ pageName }: Props) => {
     }
   };
 
+  const renameScene = async (sceneTitle: string, sceneToken: string) => {
+    const mediaFileApi = new MediaFilesApi();
+    const response = await mediaFileApi.RenameMediaFileByToken({
+      mediaToken: sceneToken,
+      name: sceneTitle,
+    });
+    if (!response.success) {
+      handleShowErrorDialog(
+        response.errorMessage || "Unknown Error in Renaming Scene",
+      );
+      resetPreviousTitle();
+    }
+    setIsSaving(false);
+  };
+
   const validateSceneTitle = (e: React.FocusEvent<HTMLInputElement>) => {
     setShowInput(false);
     if (scene.value.title === "") {
       setIsValid(false);
-      handleShowErrorDialog();
+      handleShowErrorDialog("Scene name can not be empty.");
       resetPreviousTitle();
       e.currentTarget.focus();
     } else if (scene.value.token) {
@@ -62,11 +77,7 @@ export const SceneTitleInput = ({ pageName }: Props) => {
       renameScene(
         scene.value.title!, //guarunteed by input
         scene.value.token,
-      ).then((res) => {
-        // console.log(res);
-        //TODO: HANDLE ERROR
-        setIsSaving(false);
-      });
+      );
     }
   };
 

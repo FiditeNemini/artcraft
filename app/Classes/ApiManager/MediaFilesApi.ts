@@ -222,7 +222,7 @@ export class MediaFilesApi extends ApiManager {
     mediaToken: string;
     name: string;
   }): Promise<ApiResponse<undefined>> {
-    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_file/rename/${mediaToken}`;
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/rename/${mediaToken}`;
     const body = { name };
 
     return await this.post<

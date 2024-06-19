@@ -59,6 +59,7 @@ module.exports = {
         "jsx-a11y/click-events-have-key-events": SEVERITY.OFF,
         "jsx-a11y/no-static-element-interactions": SEVERITY.OFF,
         "jsx-a11y/media-has-caption": SEVERITY.OFF,
+        "jsx-a11y/no-autofocus": SEVERITY.OFF,
       },
     },
 
