@@ -11,13 +11,26 @@ interface Props {
   title?: string;
 }
 
-export default function ModalHeader({ children, handleClose, onSearchChange = () => {}, search, title }: Props) {
+export default function ModalHeader({
+  children,
+  handleClose,
+  onSearchChange = () => {},
+  search,
+  title,
+}: Props) {
   return (
     <header {...{ className: "fy-media-browser-header" }}>
       <div {...{ className: "fy-media-browser-tools" }}>
-        { search !== undefined ? <Input autoFocus {...{ onChange: onSearchChange, value: search }}/> :
-          title && <h3 className="fw-semibold">{ title }</h3> }
-        { handleClose && (
+        {search !== undefined ? (
+          <Input autoFocus {...{ onChange: onSearchChange, value: search }} />
+        ) : (
+          title && <h3 className="fw-semibold">{title}</h3>
+        )}
+
+        {children && (
+          <div {...{ className: "fy-media-browser-tools" }}>{children}</div>
+        )}
+        {handleClose && (
           <Icon
             {...{
               className: "icon-close-button",
@@ -27,9 +40,6 @@ export default function ModalHeader({ children, handleClose, onSearchChange = ()
           />
         )}
       </div>
-      {children && (
-        <div {...{ className: "fy-media-browser-tools" }}>{children}</div>
-      )}
     </header>
   );
 }

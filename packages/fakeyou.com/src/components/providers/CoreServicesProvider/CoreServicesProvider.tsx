@@ -21,8 +21,14 @@ export default function CoreServicesProvider({
   querySubscriptions,
   state,
 }: Props) {
-  const { byCategory, enqueueInferenceJob, inferenceJobs } =
-    useInferenceJobsPolling({ sessionWrapper: state.sessionWrapper });
+  const {
+    byCategory,
+    clearJobs,
+    clearJobsStatus,
+    enqueueInferenceJob,
+    inferenceJobs,
+    someJobsAreDone,
+  } = useInferenceJobsPolling({ sessionWrapper: state.sessionWrapper });
 
   const sessionProps = {
     querySession: querySession,
@@ -34,7 +40,10 @@ export default function CoreServicesProvider({
   const inferenceJobsProps = {
     enqueue: enqueueInferenceJob,
     byCategory,
+    clearJobs,
+    clearJobsStatus,
     inferenceJobs,
+    someJobsAreDone,
   };
 
   return (

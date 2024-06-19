@@ -4,11 +4,15 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-// import { useTransition } from "@react-spring/web";
 import JobItem from "./JobItem";
 import { useInferenceJobs, useLocalize, useSession } from "hooks";
 import "./InferenceJobsList.scss";
-import { Button, Panel, JobQueueTicker } from "components/common";
+import {
+  JobsClearButton,
+  Button,
+  Panel,
+  JobQueueTicker,
+} from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboardList } from "@fortawesome/pro-solid-svg-icons";
 
@@ -45,19 +49,46 @@ export default function InferenceJobsList({
   const { sessionSubscriptions } = useSession();
   const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
   const {
+    clearJobs,
+    clearJobsStatus,
     inferenceJobs = [],
     inferenceJobsByCategory,
     jobStatusDescription,
+    someJobsAreDone,
   } = useInferenceJobs();
   const { t } = useLocalize("InferenceJobs");
+
   const selectedJobs =
     jobType === undefined || jobType === AllInferenceJobs.All
       ? inferenceJobs
       : inferenceJobsByCategory.get(jobType);
 
+  // const { index, ticker } = useInterval({
+  //   debug: "YES",
+  //   end: 2,
+  //   interval: 1000,
+  // });
+
   const jobContent = (
     <>
-      {showHeader && <h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
+      {showHeader && (
+        <header>
+          <h3 className="fw-semibold">{t("core.heading")}</h3>
+          <div
+            {...{
+              className: "fy-clear-jobs-input",
+            }}
+          >
+            <JobsClearButton
+              {...{
+                clearJobs,
+                clearJobsStatus,
+                someJobsAreDone,
+              }}
+            />
+          </div>
+        </header>
+      )}
       {showJobQueue && <JobQueueTicker {...{ hasPaidFeatures }} />}
       <div {...{ className: "fy-inference-jobs-list-grid" }}>
         {selectedJobs &&
@@ -82,8 +113,9 @@ export default function InferenceJobsList({
             <h4 className="fw-semibold mb-1">{t("core.noJobsTitle")}</h4>
             <p className="opacity-75 mb-2">{t("core.noJobsSubtitle")}</p>
           </div>
-
-          <Button label={t("core.exploreBtn")} to="/explore" />
+          <div>
+            <Button label={t("core.exploreBtn")} to="/explore" />
+          </div>
         </div>
       )}
     </>

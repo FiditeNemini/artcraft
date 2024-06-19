@@ -1,19 +1,57 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
 
-$primary-transparent: rgba($primary,.75);
+$primary-transparent: rgba($primary, 0.75);
 
 .fy-inference-jobs-list {
   overflow: hidden;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 3rem;
+    margin-bottom: 1rem;
+
+    h3 {
+      height: 1em;
+      margin-bottom: 0;
+      // display: inline;
+      // background-color: green;
+    }
+  }
+}
+
+.fy-clear-jobs-input {
+  position: relative;
+  height: 100%;
+  width: 3rem;
+  right: 0;
+
+  .fy-clear-jobs-frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    // top: 50%;
+    // transform: translateY(-50%);
+  }
 }
 
 .fy-inference-jobs-list-grid {
   display: grid;
-  grid-template-columns: 2.25rem fit-content(100px) minmax(0, 1fr) minmax(min-content, 1fr);
+  grid-template-columns: 2.25rem fit-content(100px) minmax(0, 1fr) minmax(
+      min-content,
+      1fr
+    );
   gap: 1rem 0;
 
   .work-indicator {
-    margin-right: -.5rem; // offset for svg gap
+    margin-right: -0.5rem; // offset for svg gap
   }
 
   h6 {
@@ -24,8 +62,9 @@ $primary-transparent: rgba($primary,.75);
     white-space: nowrap;
   }
 
-  .fy-inference-job-hover-on, .fy-inference-job-hover-off {
-    padding: .5rem;
+  .fy-inference-job-hover-on,
+  .fy-inference-job-hover-off {
+    padding: 0.5rem;
 
     // &:first-of-type { }
   }
@@ -39,25 +78,31 @@ $primary-transparent: rgba($primary,.75);
   }
 
   .fy-inference-job-indicator {
-    border-radius: .5rem 0 0 .5rem;
-    margin-left: -.5rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+    margin-left: -0.5rem;
     padding-right: 0;
-   }
-  .fy-inference-job-action-frame { border-radius: 0 .5rem .5rem 0 }
+  }
+  .fy-inference-job-action-frame {
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
 
-  .fy-inference-job-subtitle, .fy-inference-job-subtitle-success, .job-info-label  {
-    font-size: .875rem;
+  .fy-inference-job-subtitle,
+  .fy-inference-job-subtitle-success,
+  .job-info-label {
+    font-size: 0.875rem;
     font-weight: 400;
     white-space: nowrap;
     height: 1.125em;
     line-height: 1em;
   }
 
-  .fy-inference-job-subtitle, .job-info-label {
-    opacity: .6;
+  .fy-inference-job-subtitle,
+  .job-info-label {
+    opacity: 0.6;
   }
 
-  .fy-inference-job-subtitle, .fy-inference-job-subtitle-success {
+  .fy-inference-job-subtitle,
+  .fy-inference-job-subtitle-success {
     display: block;
   }
 
@@ -82,14 +127,14 @@ $primary-transparent: rgba($primary,.75);
   }
 
   .fy-inference-job-action-frame {
-    margin-right: -.5rem;
+    margin-right: -0.5rem;
     position: relative;
     padding: 0;
     // width: fit-content;
     // background: rgba(#0f0, .1);
 
-    .fy-inference-job-action, .fy-inference-job-action-success {
-
+    .fy-inference-job-action,
+    .fy-inference-job-action-success {
       @include medium-svg;
 
       cursor: pointer;
@@ -98,39 +143,46 @@ $primary-transparent: rgba($primary,.75);
       // padding-left: .75rem;
       // display: flex;
       // align-items: center;
-      border-radius: .5rem;
+      border-radius: 0.5rem;
       // line-height: 1em;
       margin: auto 0 auto auto;
-
     }
-  
-    .job-status-complete-success {
 
-      &:hover { background-color: $panel-inner; }
+    .job-status-complete-success {
+      &:hover {
+        background-color: $panel-inner;
+      }
     }
 
     .fy-inference-job-action-success {
       background-color: $primary-transparent;
-      &:hover { background-color: lighten($primary, 5%); }
+      &:hover {
+        background-color: lighten($primary, 5%);
+      }
     }
 
-    .fy-inference-job-action, .job-stop-confirm, .job-stop-cancel {
+    .fy-inference-job-action,
+    .job-stop-confirm,
+    .job-stop-cancel {
       cursor: pointer;
       background-color: $secondary;
-      &:hover { background-color: $secondary-light; }
+      &:hover {
+        background-color: $secondary-light;
+      }
     }
     .fy-slide-wrapper {
       justify-content: flex-end;
       display: flex;
       align-items: center;
-      padding-right: .5rem;
+      padding-right: 0.5rem;
       white-space: nowrap;
     }
 
-    .job-stop-confirm, .job-stop-cancel {
-      border-radius: .5rem;
-      margin-left: .5rem;
-      padding: .625rem 1rem;;
+    .job-stop-confirm,
+    .job-stop-cancel {
+      border-radius: 0.5rem;
+      margin-left: 0.5rem;
+      padding: 0.625rem 1rem;
       line-height: 1em;
       // height: 2.25rem;
     }
@@ -138,10 +190,10 @@ $primary-transparent: rgba($primary,.75);
 }
 
 .fy-job-queue-ticker {
-    border-radius: .5rem;
-    margin-bottom: 1rem;
-    // padding:1rem;
-    background-color: rgba(0, 0, 0, .25);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  // padding:1rem;
+  background-color: rgba(0, 0, 0, 0.25);
 
   header {
     display: flex;
@@ -152,52 +204,101 @@ $primary-transparent: rgba($primary,.75);
   h6 {
     display: inline;
     margin-bottom: 0;
-    opacity: .66;
+    opacity: 0.66;
     padding: 1rem;
     height: 1em;
   }
 
-
   @keyframes tictictic {
-    00.0% { transform: rotate(0deg); }
-    04.2% { transform: rotate(15deg); }
-    08.3% { transform: rotate(30deg); }
-    12.5% { transform: rotate(45deg); }
-    16.7% { transform: rotate(60deg); }
-    20.8% { transform: rotate(75deg); }
-    25.0% { transform: rotate(90deg); }
-    29.2% { transform: rotate(105deg); }
-    33.3% { transform: rotate(120deg); }
-    37.5% { transform: rotate(135deg); }
-    41.7% { transform: rotate(150deg); }
-    45.8% { transform: rotate(165deg); }
-    50.0% { transform: rotate(180deg); }
-    54.2% { transform: rotate(195deg); }
-    58.3% { transform: rotate(210deg); }
-    62.5% { transform: rotate(225deg); }
-    66.7% { transform: rotate(240deg); }
-    70.8% { transform: rotate(255deg); }
-    75.0% { transform: rotate(270deg); }
-    79.2% { transform: rotate(285deg); }
-    83.3% { transform: rotate(300deg); }
-    87.5% { transform: rotate(315deg); }
-    91.7% { transform: rotate(330deg); }
-    95.8% { transform: rotate(345deg); }
-    100% { transform: rotate(360deg); }
+    00.0% {
+      transform: rotate(0deg);
+    }
+    04.2% {
+      transform: rotate(15deg);
+    }
+    08.3% {
+      transform: rotate(30deg);
+    }
+    12.5% {
+      transform: rotate(45deg);
+    }
+    16.7% {
+      transform: rotate(60deg);
+    }
+    20.8% {
+      transform: rotate(75deg);
+    }
+    25.0% {
+      transform: rotate(90deg);
+    }
+    29.2% {
+      transform: rotate(105deg);
+    }
+    33.3% {
+      transform: rotate(120deg);
+    }
+    37.5% {
+      transform: rotate(135deg);
+    }
+    41.7% {
+      transform: rotate(150deg);
+    }
+    45.8% {
+      transform: rotate(165deg);
+    }
+    50.0% {
+      transform: rotate(180deg);
+    }
+    54.2% {
+      transform: rotate(195deg);
+    }
+    58.3% {
+      transform: rotate(210deg);
+    }
+    62.5% {
+      transform: rotate(225deg);
+    }
+    66.7% {
+      transform: rotate(240deg);
+    }
+    70.8% {
+      transform: rotate(255deg);
+    }
+    75.0% {
+      transform: rotate(270deg);
+    }
+    79.2% {
+      transform: rotate(285deg);
+    }
+    83.3% {
+      transform: rotate(300deg);
+    }
+    87.5% {
+      transform: rotate(315deg);
+    }
+    91.7% {
+      transform: rotate(330deg);
+    }
+    95.8% {
+      transform: rotate(345deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .job-cta-clock {
     height: 2.625rem;
     width: 2.625rem;
     fill: none;
-    margin-left: .25rem;
-    animation: tictictic 15s cubic-bezier(1,.14,.27,1.51) infinite;
+    margin-left: 0.25rem;
+    animation: tictictic 15s cubic-bezier(1, 0.14, 0.27, 1.51) infinite;
 
     .clock-circle {
       fill: $primary;
     }
     .mask-circle {
-      fill: #fff; 
+      fill: #fff;
     }
 
     line {
@@ -213,11 +314,10 @@ $primary-transparent: rgba($primary,.75);
     padding: 0 1rem 1rem;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
-    gap: .5rem;
+    gap: 0.5rem;
 
-
-   * {
-       display: flex;
+    * {
+      display: flex;
       flex-direction: column;
       justify-content: space-between;
 
@@ -226,8 +326,8 @@ $primary-transparent: rgba($primary,.75);
         max-width: 5rem;
         // background-color: greenyellow;
         // white-space: nowrap;
-        font-size: .75rem;
-        opacity: .5;
+        font-size: 0.75rem;
+        opacity: 0.5;
         line-height: 1.25em;
       }
     }
@@ -241,33 +341,41 @@ $primary-transparent: rgba($primary,.75);
     border-top: none;
     border-right: none;
     overflow: hidden;
-    transition: background-color .5s cubic-bezier(0.45, 0, 0.55, 1);
-    background-color: rgba($primary,.45);
-    border-radius: 0 .5rem 0 .5rem;
+    transition: background-color 0.5s cubic-bezier(0.45, 0, 0.55, 1);
+    background-color: rgba($primary, 0.45);
+    border-radius: 0 0.5rem 0 0.5rem;
     line-height: 1em;
 
     &:hover {
-     background-color: rgba($primary,.25);
+      background-color: rgba($primary, 0.25);
     }
 
     .cta-membership-gradient {
-      background: linear-gradient(90deg, rgba($primary,.0) 0%, rgba($primary,.85) 100%);
-      padding: .5rem;
+      background: linear-gradient(
+        90deg,
+        rgba($primary, 0) 0%,
+        rgba($primary, 0.85) 100%
+      );
+      padding: 0.5rem;
       position: relative;
       display: flex;
-      color: rgba(#fff,.80);
+      color: rgba(#fff, 0.8);
       align-items: center;
 
       .job-cta-message {
         line-height: 1.25em;
-        margin: 0 .5rem 0 .75rem;
-        &:hover { color: rgba(#fff,.80); }
+        margin: 0 0.5rem 0 0.75rem;
+        &:hover {
+          color: rgba(#fff, 0.8);
+        }
         span {
-          color: rgba(#fff,.90);
+          color: rgba(#fff, 0.9);
           font-weight: bolder;
           text-decoration: underline;
           text-shadow: $primary 0 0 6px;
-          &:hover { color: #fff; }
+          &:hover {
+            color: #fff;
+          }
         }
       }
     }
@@ -279,4 +387,3 @@ $primary-transparent: rgba($primary,.75);
   height: 100%;
   width: 100%;
 }
-

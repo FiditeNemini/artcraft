@@ -13,6 +13,11 @@ import {
   GetJobStatus,
   GetJobStatusResponse,
 } from "@storyteller/components/src/api/model_inference/GetJobStatus";
+import {
+  DismissFinishedJobs,
+  DismissFinishedJobsResponse,
+} from "@storyteller/components/src/api/jobs/DismissFinishedJobs";
+import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { useInterval } from "hooks";
 
 export type CategoryMap = Map<FrontendInferenceJobType, InferenceJob[]>;
@@ -63,6 +68,8 @@ export default function useInferenceJobsPolling({
   const [inferenceJobs, inferenceJobsSet] = useState<InferenceJob[]>();
   const [byCategory, byCategorySet] = useState(newJobCategoryMap());
   const [initialized, initializedSet] = useState(false);
+
+  const [clearJobsStatus, clearJobsStatusSet] = useState(FetchStatus.ready);
 
   // this boolean when set to true starts a useInterval loop, when false it runs clearInterval on that loop
   // this is to prevent memory leaks, and to update params provided to useInterval's onTick event.
@@ -171,6 +178,25 @@ export default function useInferenceJobsPolling({
     keepAliveSet(true);
   };
 
+  const clearJobs = () => {
+    keepAliveSet(false);
+    if (clearJobsStatus === FetchStatus.ready) {
+      clearJobsStatusSet(FetchStatus.in_progress);
+      DismissFinishedJobs("", {}).then((res: DismissFinishedJobsResponse) => {
+        if (res.success) {
+          onTick({ eventProps: { inferenceJobs: [] } });
+          keepAliveSet(true);
+          clearJobsStatusSet(FetchStatus.ready);
+          console.log("🗑️ Finish jobs cleared");
+        }
+      });
+    }
+  };
+
+  const someJobsAreDone =
+    !!inferenceJobs &&
+    inferenceJobs.some(job => !jobStateCanChange(job.jobState));
+
   useInterval({
     eventProps: { inferenceJobs },
     interval,
@@ -180,8 +206,11 @@ export default function useInferenceJobsPolling({
 
   return {
     byCategory,
+    clearJobs,
+    clearJobsStatus,
     inferenceJobsByCategory: byCategory,
     enqueueInferenceJob,
     inferenceJobs,
+    someJobsAreDone,
   };
 }

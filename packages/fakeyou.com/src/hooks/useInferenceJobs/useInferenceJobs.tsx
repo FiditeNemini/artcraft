@@ -6,14 +6,23 @@ import { useModal } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 
 export default function useInferenceJobs(debug = false) {
-  const { byCategory, enqueue, inferenceJobs, queueStats } =
-    useContext(InferenceJobsContext);
+  const {
+    byCategory,
+    clearJobs,
+    clearJobsStatus,
+    enqueue,
+    inferenceJobs,
+    queueStats,
+    someJobsAreDone,
+  } = useContext(InferenceJobsContext);
 
   const { open } = useModal();
   const openJobListModal = (jobType?: FrontendInferenceJobType) =>
     open({ component: InferenceJobsModal, props: { jobType } });
 
   return {
+    clearJobs,
+    clearJobsStatus,
     enqueue: (
       jobToken: string,
       jobTypeOverride?: FrontendInferenceJobType,
@@ -30,5 +39,6 @@ export default function useInferenceJobs(debug = false) {
     jobStatusDescription: (jobState: JobState) =>
       Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState],
     queueStats,
+    someJobsAreDone,
   };
 }

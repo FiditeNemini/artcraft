@@ -4,6 +4,7 @@
 .fy-media-browser-tools {
   display: flex;
   align-items: center;
+  margin: auto 0 auto auto;
   gap: 1rem;
   justify-content: space-between;
 
@@ -11,11 +12,15 @@
     margin: auto 0 auto auto;
   }
 
-  .fy-temp-select { margin-bottom: 0 }
+  .fy-temp-select {
+    margin-bottom: 0;
+  }
 }
 
-.fy-media-browser-header{
-  h3 { margin-bottom: 0 }
+.fy-media-browser-header {
+  h3 {
+    margin-bottom: 0;
+  }
   > * {
     margin-bottom: 1rem;
   }
@@ -27,7 +32,6 @@
 
   @include close-parent;
 }
-
 
 .fy-media-browser-list {
   flex-grow: 1;

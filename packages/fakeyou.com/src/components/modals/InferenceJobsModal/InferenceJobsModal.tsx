@@ -1,10 +1,10 @@
 import React, { useState } from "react"; // useState
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { TempSelect as Select } from "components/common";
+import { TempSelect as Select, JobsClearButton } from "components/common";
 import { enumToKeyArr } from "resources";
 import ModalHeader from "../ModalHeader";
-import { useLocalize, useSession } from "hooks";
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 
 interface Props {
   handleClose?: any;
@@ -19,14 +19,16 @@ export default function InferenceJobsModal({
   ...rest
 }: Props) {
   const { canAccessStudio } = useSession();
+  const { clearJobs, clearJobsStatus, someJobsAreDone } = useInferenceJobs();
   const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
-  const [jobType,jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
+  const [jobType, jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
   const typeObj = ["All", ...Object.values(FrontendInferenceJobType)];
-  const options = typeObj.filter(val => isNaN(Number(val)))
-  .map((value) => {
-    if (typeof value === "string") return { value, label: value }
-    return { label: "", value: "" };
-  });
+  const options = typeObj
+    .filter(val => isNaN(Number(val)))
+    .map(value => {
+      if (typeof value === "string") return { value, label: value };
+      return { label: "", value: "" };
+    });
   const { t } = useLocalize("InferenceJobs");
   const selectedType = typeObj.indexOf(jobType) - 1;
   const failures = (fail = "") => {
@@ -38,22 +40,34 @@ export default function InferenceJobsModal({
 
   return (
     <>
-      { showModalHeader && <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }} /> }
-      { canAccessStudio() &&
-        <Select {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
-      }
+      {showModalHeader && (
+        <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }}>
+          <JobsClearButton
+            {...{ clearJobs, clearJobsStatus, someJobsAreDone }}
+          />
+        </ModalHeader>
+      )}
+      {canAccessStudio() && (
+        <Select
+          {...{
+            onChange: ({ target }: { target: any }) => jobTypeSet(target.value),
+            options,
+            value: jobType,
+          }}
+        />
+      )}
       <InferenceJobsList
         {...{
           failures,
           onSelect: () => {
             if (handleClose) handleClose();
           },
-          ...selectedType > -1 ? { jobType: selectedType } : {},
+          ...(selectedType > -1 ? { jobType: selectedType } : {}),
           showHeader: false,
           showJobQueue: true,
           showNoJobs: true,
           panel: false,
-          ...rest
+          ...rest,
         }}
       />
     </>
