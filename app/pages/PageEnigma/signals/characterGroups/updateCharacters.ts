@@ -46,7 +46,6 @@ export function updateCharacters({
   }
 
   if (type === ClipType.EXPRESSION) {
-    debugger;
     characterGroup.value = {
       ...oldCharacterGroup,
       characters: oldCharacterGroup.characters.map((character) => {
