@@ -4,7 +4,7 @@ import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import { faFile } from "@fortawesome/pro-solid-svg-icons";
 
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
-import { ToastTypes } from "~/enums";
+import { ToastTypes, getArtStyle } from "~/enums";
 import { scene, signalScene, authentication, addToast } from "~/signals";
 
 import { ButtonDialogue, ButtonDropdown, Input, H4 } from "~/components";
@@ -15,6 +15,17 @@ import { LoadUserScenes } from "./LoadUserScenes";
 import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
 
 import { getCurrentLocationWithoutParams } from "~/utilities";
+import { SceneGenereationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
+import {
+  cameraAspectRatio,
+  cinematic,
+  faceDetail,
+  lipSync,
+  resetSceneGenerationMetadata,
+  styleStrength,
+  upscale,
+} from "~/pages/PageEnigma/signals";
+import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
 
 export const ControlsTopButtons = () => {
   useSignals();
@@ -36,15 +47,44 @@ export const ControlsTopButtons = () => {
     setSceneTitleInput("");
   };
 
+  const handleResetScene = () => {
+    resetSceneGenerationMetadata();
+    editorEngine?.changeRenderCameraAspectRatio(
+      CameraAspectRatio.HORIZONTAL_16_9,
+    );
+  };
   const handleButtonNew = () => {
+    handleResetScene();
     editorEngine?.newScene(sceneTitleInput);
   };
 
+  const getSceneGenereationMetaData =
+    useCallback((): SceneGenereationMetaData => {
+      // when this is called, editor engine is guarunteed by it's caller
+      return {
+        positivePrompt: editorEngine!.positive_prompt,
+        negativePrompt: editorEngine!.negative_prompt,
+        artisticStyle: getArtStyle(editorEngine!.art_style.toString()),
+        cameraAspectRatio: cameraAspectRatio.value,
+        adapterImageToken: "",
+        upscale: upscale.value,
+        faceDetail: faceDetail.value,
+        styleStrength: styleStrength.value,
+        lipSync: lipSync.value,
+        cinematic: cinematic.value,
+      };
+    }, [editorEngine]);
+
   const handleButtonSave = async () => {
-    // console.log(`SceneName is ${scene.value.title}`);
-    const retSceneMediaToken = await editorEngine?.saveScene({
+    if (!editorEngine) {
+      addToast(ToastTypes.ERROR, "No Engine Error in Saving Scenes");
+      return;
+    }
+    const sceneGenerationMetadata = getSceneGenereationMetaData();
+    const retSceneMediaToken = await editorEngine.saveScene({
       sceneTitle: scene.value.title || "",
       sceneToken: scene.value.token,
+      sceneGenerationMetadata,
     });
     if (retSceneMediaToken) {
       addToast(ToastTypes.SUCCESS, retSceneMediaToken);
@@ -58,9 +98,15 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonSaveAsCopy = useCallback(async () => {
-    const retSceneMediaToken = await editorEngine?.saveScene({
+    if (!editorEngine) {
+      addToast(ToastTypes.ERROR, "No Engine Error in Saving Scenes");
+      return;
+    }
+    const sceneGenerationMetadata = getSceneGenereationMetaData();
+    const retSceneMediaToken = await editorEngine.saveScene({
       sceneTitle: sceneTitleInput,
       sceneToken: undefined,
+      sceneGenerationMetadata,
     });
     if (retSceneMediaToken) {
       addToast(ToastTypes.SUCCESS, retSceneMediaToken);
@@ -71,13 +117,15 @@ export const ControlsTopButtons = () => {
         title: sceneTitleInput,
       });
     }
-  }, [sceneTitleInput, editorEngine]);
+  }, [sceneTitleInput, editorEngine, getSceneGenereationMetaData]);
 
   const handleButtonNewFromTemplate = () => {
+    handleResetScene();
     handleButtonLoadScene();
   };
 
   const handleButtonLoadScene = () => {
+    handleResetScene();
     editorEngine?.loadScene(sceneTokenSelected).catch((err) => {
       addToast(ToastTypes.ERROR, err.message);
     });

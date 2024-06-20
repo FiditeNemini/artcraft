@@ -160,7 +160,7 @@ export class APIManager {
       throw new APIManagerResponseError("Failed to load scene");
     }
 
-    const json = await JSON.parse(await response.text());
+    const json = await response.json();
     if (json && json.media_file) {
       if (json.media_file.maybe_title === null) {
         console.warn(`Scene /w Token: ${scene_media_file_token} has no title`);

@@ -150,6 +150,8 @@ export class TimeLine {
       case toEngineActions.UNMUTE:
         await this.mute(data.data as ClipUI, true);
         break;
+
+      // Create operations
       case toEngineActions.ADD_CHARACTER:
         this.addCharacter(data.data as MediaItem);
         break;
@@ -163,6 +165,7 @@ export class TimeLine {
         this.queueNewObjectMessage(newShape, data.data as MediaItem);
         break;
       }
+
       case toEngineActions.ENTER_PREVIEW_STATE:
         await this.editorEngine.switchPreview();
         break;
@@ -205,7 +208,7 @@ export class TimeLine {
       name,
       true,
       pos,
-      this.editorEngine.version
+      this.editorEngine.version,
     );
 
     obj.userData["name"] = name;
@@ -316,7 +319,7 @@ export class TimeLine {
       name,
       true,
       pos,
-      this.editorEngine.version
+      this.editorEngine.version,
     );
     obj.userData["name"] = name;
     obj.name = name;
@@ -698,7 +701,7 @@ export class TimeLine {
               object,
               element.offset,
               this.scrubber_frame_position,
-              this.scene
+              this.scene,
             );
             element.length =
               this.transform_engine.clips[element.object_uuid].length;

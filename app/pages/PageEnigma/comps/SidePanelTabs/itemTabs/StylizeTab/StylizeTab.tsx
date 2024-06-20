@@ -2,8 +2,8 @@ import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle"
 import { PageStyleSelection } from "./PageStyleSelection";
 import { Prompts } from "./Prompts";
 import { StyleButtons } from "./StyleButtons";
-import { useSignals } from "@preact/signals-react/runtime";
-import { useEffect, useState } from "react";
+import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
+import { useState } from "react";
 import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 import { styleList } from "~/pages/PageEnigma/styleList";
 import { EditorStates, StylizeTabPages } from "~/pages/PageEnigma/enums";
@@ -14,16 +14,21 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { IPAdapter } from "./IPAdapter";
+import {
+  selectedArtStyle,
+  setArtStyleSelection,
+} from "~/pages/PageEnigma/signals";
 
 export function StylizeTab() {
   useSignals();
-  const [selection, setSelection] = useState<ArtStyle>(styleList[0].type);
   const [view, setView] = useState(StylizeTabPages.MAIN);
   const [generateSectionHeight, setGenerateSectionHeight] = useState(110);
 
-  const currentStyle = styleList.find((style) => style.type === selection);
+  const currentStyle = styleList.find(
+    (style) => style.type === selectedArtStyle.value,
+  );
 
-  useEffect(() => {
+  useSignalEffect(() => {
     if (editorState.value === EditorStates.PREVIEW) {
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
@@ -31,17 +36,18 @@ export function StylizeTab() {
         data: null,
       });
     }
-  }, [selection]);
+  });
 
   const handleSelectStyle = (newSelection: ArtStyle) => {
-    setSelection(newSelection);
+    setArtStyleSelection(newSelection);
+    // setSelection(newSelection);
     setView(StylizeTabPages.MAIN);
   };
 
   if (view === StylizeTabPages.STYLE_SELECTION) {
     return (
       <PageStyleSelection
-        selection={selection}
+        selection={selectedArtStyle.value}
         setSelection={handleSelectStyle}
         changePage={setView}
       />
@@ -57,14 +63,14 @@ export function StylizeTab() {
       >
         <StyleSelectionButton
           onClick={() => setView(StylizeTabPages.STYLE_SELECTION)}
-          selectedStyle={selection}
+          selectedStyle={selectedArtStyle.value}
           label={currentStyle?.label || "Select a Style"}
           imageSrc={
             currentStyle?.image ||
             "/resources/placeholders/style_placeholder.png"
           }
         />
-        <Prompts selection={selection} />
+        <Prompts selection={selectedArtStyle.value} />
         <IPAdapter />
         <StyleButtons />
       </div>

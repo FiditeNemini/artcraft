@@ -7,4 +7,7 @@ export const cameraAspectRatio = signal<CameraAspectRatio>(
   CameraAspectRatio.HORIZONTAL_16_9,
 );
 
+export const setCameraAspectRatio = (newAspectRatio: CameraAspectRatio) => {
+  cameraAspectRatio.value = newAspectRatio;
+};
 export const previewSrc = signal("");

@@ -1,4 +1,7 @@
 import { signal } from "@preact/signals-core";
+import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
+import { ArtStyle } from "~/enums";
+import { styleList } from "../styleList";
 
 export const promptsStore = {
   textBufferPositive: signal(""),
@@ -10,8 +13,60 @@ export const promptsStore = {
 
 export const adapterImage = signal<string | null>(null);
 
+export const selectedArtStyle = signal<ArtStyle>(styleList[0].type);
 export const upscale = signal(false);
 export const faceDetail = signal(false);
 export const styleStrength = signal(1.0);
 export const lipSync = signal(false);
 export const cinematic = signal(false);
+
+export const setArtStyleSelection = (newStyle: ArtStyle) => {
+  if (selectedArtStyle.value !== newStyle) {
+    selectedArtStyle.value = newStyle;
+  }
+};
+export const resetSceneGenerationMetadata = () => {
+  promptsStore.textBufferPositive.value = "";
+  promptsStore.textBufferNegative.value = "";
+  promptsStore.isUserInputPositive.value = false;
+  promptsStore.isUserInputNegative.value = false;
+  promptsStore.showNegativePrompt.value = false;
+  selectedArtStyle.value = styleList[0].type;
+  upscale.value = false;
+  faceDetail.value = false;
+  styleStrength.value = 1.0;
+  lipSync.value = false;
+  cinematic.value = false;
+};
+
+export const restoreSceneGenerationMetadata = (
+  newData: SceneGenereationMetaData,
+) => {
+  if (newData.positivePrompt && newData.positivePrompt !== "") {
+    promptsStore.textBufferPositive.value = newData.positivePrompt;
+    promptsStore.isUserInputPositive.value = true;
+  }
+  if (newData.negativePrompt && newData.negativePrompt !== "") {
+    promptsStore.textBufferNegative.value = newData.negativePrompt;
+    promptsStore.isUserInputNegative.value = true;
+    promptsStore.showNegativePrompt.value = true;
+  }
+  if (newData.artisticStyle) {
+    setArtStyleSelection(newData.artisticStyle);
+  }
+  if (newData.upscale) {
+    upscale.value = newData.upscale;
+  }
+  if (newData.faceDetail) {
+    faceDetail.value = newData.faceDetail;
+  }
+  if (newData.styleStrength) {
+    styleStrength.value = newData.styleStrength;
+  }
+  if (newData.lipSync) {
+    lipSync.value = newData.lipSync;
+  }
+  if (newData.cinematic) {
+    cinematic.value = newData.cinematic;
+  }
+};

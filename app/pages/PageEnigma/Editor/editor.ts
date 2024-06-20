@@ -43,6 +43,7 @@ import {
 import { updateObjectPanel } from "../signals";
 import { GenerationOptions } from "../models/generationOptions";
 import { toEngineActions } from "../Queue/toEngineActions";
+import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -520,7 +521,10 @@ class Editor {
 
     document.addEventListener("mouseover", (event) => {
       if (this.orbitControls && this.cameraViewControls) {
-        if (event.target instanceof HTMLCanvasElement || (event.target as HTMLElement).id == "letterbox") {
+        if (
+          event.target instanceof HTMLCanvasElement ||
+          (event.target as HTMLElement).id == "letterbox"
+        ) {
           if (this.camera_person_mode) {
             this.orbitControls.enabled = false;
             this.cameraViewControls.enabled = true;
@@ -586,6 +590,7 @@ class Editor {
   public async loadScene(scene_media_token: string) {
     await this.save_manager.loadScene(scene_media_token);
 
+    // publish to the UI the values for the prompts and artistic style and settings?
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.UPDATE_TIME,
@@ -617,11 +622,17 @@ class Editor {
   public async saveScene({
     sceneTitle,
     sceneToken,
+    sceneGenerationMetadata,
   }: {
     sceneTitle: string;
     sceneToken?: string;
+    sceneGenerationMetadata: SceneGenereationMetaData;
   }): Promise<string> {
-    return await this.save_manager.saveScene({ sceneTitle, sceneToken });
+    return await this.save_manager.saveScene({
+      sceneTitle: sceneTitle,
+      sceneToken: sceneToken,
+      sceneGenerationMetadata: sceneGenerationMetadata,
+    });
   }
 
   /**
