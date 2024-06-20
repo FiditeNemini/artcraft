@@ -112,4 +112,8 @@ $badge-colors: (
   &.bg-email {
     background-color: #858585;
   }
+
+  &.bg-download {
+    background-color: map-get($badge-colors, "purple");
+  }
 }
