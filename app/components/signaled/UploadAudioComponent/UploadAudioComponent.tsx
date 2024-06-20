@@ -101,8 +101,9 @@ export const UploadAudioComponent = ({
         name="file"
         types={FILE_TYPES}
         maxSize={50}
-        children={<DragAndDropZone file={file} />}
-      />
+      >
+        <DragAndDropZone file={file} />
+      </FileUploader>
 
       {file && (
         <>

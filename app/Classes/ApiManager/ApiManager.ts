@@ -64,6 +64,27 @@ export class ApiManager {
     return response.json();
   }
 
+  public async fetchMultipartFormData<T>(
+    endpoint: string,
+    {
+      method,
+      body,
+    }: {
+      method: string;
+      body: FormData;
+    },
+  ): Promise<T> {
+    const response = await fetch(endpoint, {
+      method,
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
+      body: body,
+    });
+    return response.json();
+  }
+
   protected get<T>({
     endpoint,
     query,
@@ -129,7 +150,11 @@ export class ApiManager {
     } else if (blob) {
       formData.append("file", blob);
     }
-    return this.fetch<FormData, T>(endpoint, {
+    // return this.fetch<FormData, T>(endpoint, {
+    //   method: "POST",
+    //   body: formData,
+    // });
+    return this.fetchMultipartFormData<T>(endpoint, {
       method: "POST",
       body: formData,
     });

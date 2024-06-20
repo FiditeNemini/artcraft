@@ -1,45 +1,28 @@
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  faCirclePlus,
-  faFileArrowUp,
-  faFileAudio,
-  faSpinnerThird,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faCirclePlus, faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FileUploader } from "react-drag-drop-files";
 
 import {
   Button,
+  FileUploader,
   H2,
-  P,
   TransitionDialogue,
   WaveformPlayer,
 } from "~/components";
 
-import { UploadMedia, UploadMediaResponse } from "./utilities";
+import { MediaUploadApi } from "~/Classes/ApiManager/MediaUploadApi";
+import { AUDIO_FILE_TYPE, ToastTypes } from "~/enums";
+export const FILE_TYPES = Object.keys(AUDIO_FILE_TYPE);
 
-import { AUDIO_FILE_TYPE } from "~/enums";
-const FILE_TYPES = Object.keys(AUDIO_FILE_TYPE);
-
-// import { ListDropdown } from "../ListDropdown";
-// const visiblityOptions = [
-//   {
-//     name: "private",
-//     value: "private",
-//   },
-//   {
-//     name: "public",
-//     value: "public",
-//   },
-// ];
+import { getFileName } from "~/utilities";
+import { addToast } from "~/signals";
 
 type ComponentState = {
   isOpen: boolean;
   file: File | undefined;
   audioUrl: string;
   uploadState: "init" | "staged" | "uploading" | "uploaded" | "error";
-  // visibility: string;
   fileToken: string | undefined;
 };
 const initialValues: ComponentState = {
@@ -47,12 +30,7 @@ const initialValues: ComponentState = {
   file: undefined,
   audioUrl: "",
   uploadState: "init",
-  // visibility: "private",
   fileToken: undefined,
-};
-
-const getFileName = (file: File) => {
-  return file.name.split(".")[0] || "";
 };
 
 export const UploadAudioButtonDialogue = ({
@@ -65,9 +43,7 @@ export const UploadAudioButtonDialogue = ({
 
   const closeModal = () => setState(initialValues);
   const openModal = () => setState((curr) => ({ ...curr, isOpen: true }));
-  // const selectVisibility = (value:string) => {
-  //   setState((curr)=>({...curr, visibility:value}))
-  // };
+
   const handleFileChange = (file: File) => {
     setState((curr) => ({
       ...curr,
@@ -82,39 +58,52 @@ export const UploadAudioButtonDialogue = ({
       isOpen: true,
     });
   };
-  const submitUpload = () => {
-    if (file) {
+  const submitUpload = async () => {
+    if (!file) {
+      //TODO: Maybe more verbose on not having file
+      return;
+    }
+    setState((curr) => ({
+      ...curr,
+      uploadState: "uploading",
+    }));
+    const mediaApi = new MediaUploadApi();
+
+    const request = {
+      blob: file,
+      fileName: getFileName(file),
+      uuid: uuidv4(),
+      maybe_title: getFileName(file),
+    };
+    const response = await mediaApi.UploadAudio(request);
+    if (response.success && response.data) {
       setState((curr) => ({
         ...curr,
-        uploadState: "uploading",
+        uploadState: "uploaded",
+        fileToken: response.data,
       }));
-      UploadMedia({
-        uuid_idempotency_token: uuidv4(),
-        file: file,
-        source: "file",
-        title: getFileName(file),
-      }).then((res: UploadMediaResponse) => {
-        // console.log(res);
-        if ("media_file_token" in res) {
-          setState((curr) => ({
-            ...curr,
-            uploadState: "uploaded",
-            fileToken: res.media_file_token,
-          }));
-        } else {
-          setState((curr) => ({
-            ...curr,
-            uploadState: "error",
-          }));
-        }
-      });
+      return;
     }
+
+    //handle errors
+    console.log(response.errorMessage);
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error: Upload Audio",
+    );
+    setState((curr) => ({
+      ...curr,
+      uploadState: "staged",
+    }));
   };
+
   useEffect(() => {
-    if (fileToken) {
+    if (fileToken && uploadState === "uploaded") {
+      //calling the callback on a successful upload
       onUploaded(fileToken);
     }
-  }, [fileToken]);
+  }, [fileToken, uploadState, onUploaded]);
+
   return (
     <>
       <Button
@@ -133,12 +122,11 @@ export const UploadAudioButtonDialogue = ({
       >
         <div className="flex w-full flex-col gap-3">
           <FileUploader
+            file={file}
+            fileTypes={FILE_TYPES}
             handleChange={handleFileChange}
-            name="file"
-            types={FILE_TYPES}
-            maxSize={50}
-            children={<DragAndDropZone file={file} />}
           />
+
           {file && (
             <div className="flex items-center gap-3 rounded-lg bg-brand-secondary p-3">
               <div className="grow">
@@ -146,7 +134,7 @@ export const UploadAudioButtonDialogue = ({
               </div>
             </div>
           )}
-          {/* <ListDropdown list={visiblityOptions} onSelect={selectVisibility}/> */}
+
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={closeModal}>
               {uploadState === "uploaded" ? "Close" : "Cancel"}
@@ -170,48 +158,4 @@ export const UploadAudioButtonDialogue = ({
       </TransitionDialogue>
     </>
   );
-};
-
-const DragAndDropZone = ({ file }: { file: File | undefined }) => {
-  const fileSize =
-    file && file.size >= 1024 * 1024
-      ? (file.size / 1024 / 1024).toFixed(2) + " MB"
-      : file
-        ? `${Math.floor(file.size / 1024)} KB`
-        : null;
-
-  const fileName = file && getFileName(file).toUpperCase();
-
-  if (!file) {
-    return (
-      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border-2 border-dashed border-ui-controls-button/50 bg-brand-secondary p-3">
-        <FontAwesomeIcon icon={faFileArrowUp} className="text-4xl" />
-        <div className="flex flex-col gap-0">
-          <P className="font-medium">
-            <u>Upload a file</u> or drop it here
-          </P>
-          <P className="flex items-center gap-2 text-sm font-normal opacity-50">
-            {FILE_TYPES.join(", ").toString()} supported
-          </P>
-        </div>
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-lg border-2 border-dashed border-ui-controls-button/50 bg-brand-secondary p-3">
-        <FontAwesomeIcon icon={faFileAudio} className="text-4xl" />
-        <div className="flex grow flex-col gap-0">
-          <P className="font-medium">
-            {file.name.slice(0, file.name.lastIndexOf("."))}
-          </P>
-          <P className="flex items-center gap-2 text-sm font-normal">
-            <span className="opacity-50">
-              {`${fileName} file size: ${fileSize} `}
-            </span>
-            <u className="transition-all hover:text-white/80">Change File</u>
-          </P>
-        </div>
-      </div>
-    );
-  }
 };

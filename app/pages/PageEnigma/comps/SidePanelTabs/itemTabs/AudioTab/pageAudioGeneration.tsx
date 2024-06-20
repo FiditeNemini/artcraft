@@ -1,5 +1,9 @@
 import { twMerge } from "tailwind-merge";
-import { AudioPanelState, TtsState, V2VState } from "../../../../models/voice";
+import {
+  AudioPanelState,
+  TtsState,
+  V2VState,
+} from "~/pages/PageEnigma/models/voice";
 
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { PageTTS } from "./pageTTS";

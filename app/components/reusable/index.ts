@@ -6,6 +6,7 @@ export * from "./ButtonIcon";
 export * from "./ButtonIconSelect";
 export * from "./ButtonLink";
 export * from "./ConfirmationModal";
+export * from "./FileUploader";
 export * from "./FileWrapper"; //need to rid of scss
 export * from "./FilterButtons"; //this relies on a list of filters locally, could be more flexible
 export * from "./Gravatar";

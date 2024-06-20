@@ -29,3 +29,11 @@ export const isJobStatusTerminal = (curr: JobStatus) => {
   }
   return true;
 };
+
+export const getFileName = (file: File) => {
+  return file.name.split(".")[0] || "";
+};
+
+export const getFileTypesFromEnum = (enumOfTypes: object) => {
+  return Object.keys(enumOfTypes);
+};
