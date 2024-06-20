@@ -4,71 +4,69 @@ import { twMerge } from "tailwind-merge";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 
 import { MediaItem } from "~/pages/PageEnigma/models";
-import { AssetFilterOption, AssetType } from "~/enums";
+import {
+  AssetFilterOption,
+  AssetType,
+  FilterEngineCategories,
+  ToastTypes,
+} from "~/enums";
 
 import { animationFilter, animationItems } from "~/pages/PageEnigma/signals";
-import { authentication } from "~/signals";
+import { addToast } from "~/signals";
 
 import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
 import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
-import {
-  GetMediaByUser,
-  GetMediaListResponse,
-} from "~/api/media_files/GetMediaByUser";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import { Button, UploadModalMovement } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
+import { MediaFilesApi } from "~/Classes/ApiManager";
 
 export const AnimationTab = () => {
   useSignals();
-  const { userInfo } = authentication;
 
   const [open, setOpen] = useState(false);
   const [userAnimations, setUserAnimations] = useState<MediaItem[] | null>();
 
   const refetchAnimations = useCallback(async () => {
-    if (!userInfo.value) {
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.ListUserMediaFiles({
+      filter_engine_categories: [FilterEngineCategories.ANIMATION],
+    });
+    if (response.success && response.data) {
+      setUserAnimations(
+        response.data.map((item, index: number) => {
+          return {
+            version: 1,
+            type: AssetType.ANIMATION,
+            media_type: item.media_type,
+            media_id: item.token,
+            name: item.maybe_title,
+            publicBucketPath: item.public_bucket_path,
+            length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
+            thumbnail: item.cover_image?.maybe_cover_image_public_bucket_path
+              ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
+                item.cover_image?.maybe_cover_image_public_bucket_path
+              : undefined,
+            isMine: true,
+            imageIndex: index,
+          } as MediaItem;
+        }),
+      );
       return;
     }
-    const { username, user_token } = userInfo.value;
-    return GetMediaByUser(
-      username,
-      {},
-      {
-        filter_engine_categories: MediaFileEngineCategory.Animation,
-        // page_size: 5,
-      },
-    ).then((res: GetMediaListResponse) => {
-      if (res.success && res.results) {
-        setUserAnimations(
-          res.results.map((item, index: number) => {
-            return {
-              version: 1,
-              type: AssetType.ANIMATION,
-              media_type: item.media_type,
-              media_id: item.token,
-              name: item.maybe_title,
-              publicBucketPath: item.public_bucket_path,
-              length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
-              thumbnail: item.cover_image?.maybe_cover_image_public_bucket_path
-                ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
-                  item.cover_image?.maybe_cover_image_public_bucket_path
-                : undefined,
-              isMine: item.maybe_creator_user?.user_token === user_token,
-              imageIndex: index,
-            } as MediaItem;
-          }),
-        );
-      }
-    });
-  }, [userInfo.value]);
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Getting User Animations",
+    );
+    setUserAnimations([]); // set it to empty to avoid looping;
+  }, []);
 
   useEffect(() => {
-    if (userInfo.value && !userAnimations) {
+    if (!userAnimations) {
       refetchAnimations();
     }
-  }, [userInfo.value, refetchAnimations, userAnimations]);
+  }, [refetchAnimations, userAnimations]);
 
   return (
     <>

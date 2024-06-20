@@ -2,22 +2,17 @@ import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus, faMobileNotch } from "@fortawesome/pro-solid-svg-icons";
 
-import { MediaItem } from "~/pages/PageEnigma/models";
-import { AssetFilterOption, AssetType } from "~/enums";
+import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
+import {
+  AssetFilterOption,
+  AssetType,
+  FilterEngineCategories,
+  ToastTypes,
+} from "~/enums";
 
-import { expressionFilter, expressionItems } from "~/pages/PageEnigma/signals";
-import { authentication } from "~/signals";
-
+import { expressionFilter } from "~/pages/PageEnigma/signals";
 import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
-import {
-  GetMediaByUser,
-  GetMediaListResponse,
-} from "~/api/media_files/GetMediaByUser";
 import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
-import {
-  ListFeaturedMediaFiles,
-  ListFeaturedMediaFilesResponse,
-} from "~/api/media_files/ListFeaturedMediaFiles";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import {
@@ -28,18 +23,12 @@ import {
 } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
-export enum FetchStatus {
-  paused,
-  // ready triggers a new fetch
-  ready,
-  in_progress,
-  success,
-  error,
-}
+import { MediaFilesApi } from "~/Classes/ApiManager";
+import { addToast } from "~/signals";
 
 export const ExpressionTab = () => {
   useSignals();
-  const { userInfo } = authentication;
+  const [userExpressions, setUserExpressions] = useState<MediaItem[] | null>();
 
   const [open, setOpen] = useState(false);
 
@@ -47,93 +36,75 @@ export const ExpressionTab = () => {
     AssetFilterOption.FEATURED,
   );
 
-  const [featured, setFeatured] = useState<{ value: MediaItem[] }>({
-    value: [],
-  });
-  const [status, setStatus] = useState(FetchStatus.ready);
+  const [featuredExpressions, setFeaturedExpressions] = useState<
+    MediaItem[] | undefined
+  >(undefined);
 
-  const refetchExpressions = useCallback(async () => {
-    if (!userInfo.value) {
+  const responseMapping = (data: MediaInfo[], isMine: boolean) => {
+    return data.map((item, index: number) => {
+      return {
+        version: 1,
+        type: AssetType.EXPRESSION,
+        media_type: item.media_type,
+        media_id: item.token,
+        name: item.maybe_title,
+        publicBucketPath: item.public_bucket_path,
+        length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
+        thumbnail: item.cover_image?.maybe_cover_image_public_bucket_path
+          ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
+            item.cover_image?.maybe_cover_image_public_bucket_path
+          : undefined,
+        isMine: isMine,
+        imageIndex: index,
+      } as MediaItem;
+    });
+  };
+
+  const fetchUserExpressions = useCallback(async () => {
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.ListUserMediaFiles({
+      filter_engine_categories: [FilterEngineCategories.EXPRESSION],
+    });
+    if (response.success && response.data) {
+      const newExpressions = responseMapping(response.data, true);
+      setUserExpressions(newExpressions);
       return;
     }
-    const { username, user_token } = userInfo.value;
-    return GetMediaByUser(
-      username,
-      {},
-      {
-        filter_engine_categories: MediaFileEngineCategory.Expression,
-        // page_size: 5,
-      },
-    ).then((res: GetMediaListResponse) => {
-      if (res.success && res.results) {
-        expressionItems.value = res.results.map((item, index: number) => {
-          return {
-            version: 1,
-            type: AssetType.EXPRESSION,
-            media_type: item.media_type,
-            media_id: item.token,
-            name: item.maybe_title,
-            publicBucketPath: item.public_bucket_path,
-            length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
-            thumbnail: item.cover_image?.maybe_cover_image_public_bucket_path
-              ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
-                item.cover_image?.maybe_cover_image_public_bucket_path
-              : undefined,
-            isMine: item.maybe_creator_user?.user_token === user_token,
-            imageIndex: index,
-          } as MediaItem;
-        });
-      }
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Fetching User Expressions",
+    );
+  }, []);
+
+  const fetchFeaturedExpressions = useCallback(async () => {
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.ListFeaturedMediaFiles({
+      filter_engine_categories: [FilterEngineCategories.EXPRESSION],
     });
-  }, [userInfo.value]);
+    if (response.success && response.data) {
+      const newExpressions = responseMapping(response.data, false);
+      setFeaturedExpressions(newExpressions);
+      return;
+    }
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Fetching Featured Expressions",
+    );
+  }, []);
 
   useEffect(() => {
-    if (userInfo.value && !expressionItems.value.length) {
-      refetchExpressions();
+    if (!userExpressions) {
+      fetchUserExpressions();
     }
-    if (status === FetchStatus.ready) {
-      setStatus(FetchStatus.in_progress);
-      ListFeaturedMediaFiles(
-        "",
-        {},
-        {
-          filter_engine_categories: "expression",
-          // page_index: page,
-          page_size: 100,
-        },
-      ).then((res: GetMediaListResponse | ListFeaturedMediaFilesResponse) => {
-        if (res.success && res.results) {
-          setStatus(FetchStatus.success);
-          setFeatured({
-            value: res.results.map((item) => {
-              return {
-                version: 1,
-                type: AssetType.EXPRESSION,
-                media_id: item.token,
-                media_type: item.media_type,
-                name: item.maybe_title,
-                publicBucketPath: item.public_bucket_path,
-                length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
-                thumbnail: item.cover_image
-                  ?.maybe_cover_image_public_bucket_path
-                  ? "https://cdn.fakeyou.com/cdn-cgi/image/width=600,quality=100" +
-                    item.cover_image?.maybe_cover_image_public_bucket_path
-                  : undefined,
-                isMine:
-                  item.maybe_creator_user?.user_token ===
-                  userInfo.value?.user_token,
-                imageIndex: 0,
-              } as MediaItem;
-            }),
-            // .filter((item,i) => (item.thumbnail)) disabled for testing for now
-          });
-          // if (res.pagination) {
-          //   pageCountSet(res.pagination.total_page_count);
-          // }
-        }
-      });
+    if (!featuredExpressions) {
+      fetchFeaturedExpressions();
     }
-  }, [userInfo.value, refetchExpressions, status]);
+  }, [
+    userExpressions,
+    featuredExpressions,
+    fetchUserExpressions,
+    fetchFeaturedExpressions,
+  ]);
 
   return (
     <>
@@ -185,8 +156,8 @@ export const ExpressionTab = () => {
         <ItemElements
           items={
             selectedFilter === AssetFilterOption.FEATURED
-              ? featured.value
-              : expressionItems.value
+              ? featuredExpressions || []
+              : userExpressions || []
           }
           assetFilter={expressionFilter.value}
         />
@@ -194,7 +165,7 @@ export const ExpressionTab = () => {
       <UploadModalMovement
         closeModal={() => setOpen(false)}
         onClose={() => setOpen(false)}
-        onSuccess={refetchExpressions}
+        onSuccess={fetchUserExpressions}
         isOpen={open}
         fileTypes={["CSV"]}
         title="Upload Expression"

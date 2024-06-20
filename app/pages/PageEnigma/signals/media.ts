@@ -509,8 +509,6 @@ export const audioItems = signal<AudioMediaItem[]>([
   },
 ]);
 
-export const expressionItems = signal<MediaItem[]>([]);
-
 export const cameraItems = signal<MediaItem[]>([
   {
     version: 1,
