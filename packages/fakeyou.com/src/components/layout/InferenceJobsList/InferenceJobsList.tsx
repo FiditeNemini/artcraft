@@ -107,7 +107,10 @@ export default function InferenceJobsList({
           ))}
       </div>
       {(!selectedJobs || !selectedJobs.length) && showNoJobs && (
-        <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">
+        <div
+          className="d-flex flex-column p-4 gap-3 text-center align-items-center"
+          style={{ minHeight: "35vh" }}
+        >
           <FontAwesomeIcon icon={faClipboardList} className="display-6 mb-2" />
           <div>
             <h4 className="fw-semibold mb-1">{t("core.noJobsTitle")}</h4>
