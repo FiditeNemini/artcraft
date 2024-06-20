@@ -1,13 +1,24 @@
 import { useContext, useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "@remix-run/react";
 import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
-import { faFile } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCheckSquare,
+  faFile,
+  faSquare,
+} from "@fortawesome/pro-solid-svg-icons";
 
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { ToastTypes, getArtStyle } from "~/enums";
 import { scene, signalScene, authentication, addToast } from "~/signals";
+import { outlinerIsShowing } from "../../signals/outliner/outliner";
 
-import { ButtonDialogue, ButtonDropdown, Input, H4 } from "~/components";
+import {
+  ButtonDialogue,
+  ButtonDropdown,
+  Input,
+  H4,
+  Button,
+} from "~/components";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
@@ -26,6 +37,7 @@ import {
   upscale,
 } from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
+import { twMerge } from "tailwind-merge";
 
 export const ControlsTopButtons = () => {
   useSignals();
@@ -161,8 +173,12 @@ export const ControlsTopButtons = () => {
     }
   });
 
+  const handleShowOutliner = () => {
+    outlinerIsShowing.value = !outlinerIsShowing.value;
+  };
+
   return (
-    <div className="flex flex-col gap-2 pl-3 pt-3">
+    <div className="flex flex-col gap-2 pl-2 pt-2">
       <div className="flex gap-1.5">
         <ButtonDropdown
           label="File"
@@ -292,6 +308,21 @@ export const ControlsTopButtons = () => {
             },
           ]}
         />
+
+        <Button
+          icon={outlinerIsShowing.value ? faCheckSquare : faSquare}
+          className="shadow-xl"
+          iconClassName={twMerge(
+            "text-[16px]",
+            outlinerIsShowing.value
+              ? "text-white"
+              : "text-ui-controls-button/90",
+          )}
+          variant="secondary"
+          onClick={handleShowOutliner}
+        >
+          Outliner
+        </Button>
 
         <ButtonDialogue
           buttonProps={{

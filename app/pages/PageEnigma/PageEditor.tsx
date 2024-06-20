@@ -18,10 +18,12 @@ import {
   dndSidePanelWidth,
   dndTimelineHeight,
   editorLoader,
+  sidePanelHeight,
 } from "~/pages/PageEnigma/signals";
 import { EditorCanvas } from "./comps/EngineCanvases";
 import { SceneContainer } from "./comps/SceneContainer";
 import { AspectRatioMenu } from "./comps/AspectRatioMenu";
+import { Outliner } from "./comps/Outliner";
 
 export const PageEditor = () => {
   useSignals();
@@ -50,6 +52,12 @@ export const PageEditor = () => {
     dndTimelineHeight.value > -1
       ? pageHeight.value - dndTimelineHeight.value - 68
       : pageHeight.value - timelineHeight.value - 68;
+
+  const getScale = () => {
+    const height = sidePanelHeight.value;
+    const scaleHeight = height < 640 ? height / 640 : 1;
+    return scaleHeight;
+  };
 
   return (
     <div className="w-screen" data-sl="canvas-mq">
@@ -107,7 +115,13 @@ export const PageEditor = () => {
               }}
               onClick={handleOverlayClick}
             >
-              <PreviewEngineCamera />
+              <div
+                className="absolute bottom-0 mb-2 ml-2 flex origin-bottom-left flex-col gap-2"
+                style={{ transform: `scale(${getScale()})` }}
+              >
+                <Outliner />
+                <PreviewEngineCamera />
+              </div>
               <ControlsVideo />
               <ControlPanelSceneObject />
             </div>

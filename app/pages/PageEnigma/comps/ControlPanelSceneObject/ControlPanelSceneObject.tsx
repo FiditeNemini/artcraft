@@ -214,15 +214,15 @@ export const ControlPanelSceneObject = () => {
   };
 
   const getScale = () => {
-    const height = sidePanelHeight.value; // Ensure this is the correct way to get the height
-    return height < 603 ? height / 603 : 1;
+    const height = sidePanelHeight.value;
+    return height < 660 ? height / 660 : 1;
   };
 
   return (
     <Transition
       show={isShowing.value}
       className={twMerge(
-        "absolute bottom-0 right-0 m-3 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel p-3.5 text-white shadow-lg",
+        "absolute bottom-0 right-0 mb-2 mr-2 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel/95 p-3.5 text-white shadow-lg",
       )}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"

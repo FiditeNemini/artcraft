@@ -9,6 +9,7 @@ export * from "./media";
 export * from "./myMovies";
 export * from "./objectGroup";
 export * from "./objectPanel";
+export * from "./outliner";
 export * from "./selectedItem";
 export * from "./shape";
 export * from "./sidePanel";

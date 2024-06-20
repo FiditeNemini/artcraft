@@ -15,7 +15,6 @@ import {
   cameraAspectRatio,
   editorState,
   editorLetterBox,
-  sidePanelHeight,
   toggleEditorLetterBox,
 } from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio, EditorStates } from "~/pages/PageEnigma/enums";
@@ -38,22 +37,12 @@ export const PreviewEngineCamera = () => {
     });
   };
 
-  const getScale = () => {
-    const height = sidePanelHeight.value;
-    const scaleHeight = height < 480 ? height / 480 : 1;
-    return scaleHeight;
-  };
-
   return (
-    <div
-      id="preview-engine-camera"
-      className="absolute bottom-0 m-3 origin-bottom-left shadow-lg"
-      style={{ transform: `scale(${getScale()})` }}
-    >
+    <div id="preview-engine-camera" className="origin-bottom-left shadow-lg">
       <div className="relative">
         <div
           className={twMerge(
-            "-z-10 flex w-full flex-wrap items-center rounded-t-lg bg-ui-controls p-1.5 text-white",
+            "origin -z-10 flex w-full flex-wrap items-center rounded-t-lg bg-ui-controls p-1.5 text-white",
             cameraAspectRatio.value !== CameraAspectRatio.VERTICAL_9_16
               ? "h-11 w-72 justify-between"
               : "h-20 w-44 justify-center",
