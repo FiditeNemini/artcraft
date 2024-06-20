@@ -137,7 +137,7 @@ export class ApiManager {
     endpoint: string;
     formRecord: Record<string, string>;
     uuid: string;
-    blob?: Blob;
+    blob?: Blob | File;
     blobFileName?: string;
   }): Promise<T> {
     const formData = new FormData();
@@ -150,10 +150,6 @@ export class ApiManager {
     } else if (blob) {
       formData.append("file", blob);
     }
-    // return this.fetch<FormData, T>(endpoint, {
-    //   method: "POST",
-    //   body: formData,
-    // });
     return this.fetchMultipartFormData<T>(endpoint, {
       method: "POST",
       body: formData,

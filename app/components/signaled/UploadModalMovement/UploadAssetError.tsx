@@ -14,21 +14,13 @@ export const UploadAssetError = ({
   return (
     <>
       {isAssetError
-        ? "There was a problem uploading your object."
-        : "There was a problem creating art for your object"}
+        ? "There was a problem uploading your file."
+        : "There was a problem uploading the thumbnail for your file."}
       <div className="mt-6 flex justify-end gap-2">
-        <Button
-          {...{
-            onClick: onCancel,
-            variant: "secondary",
-          }}>
+        <Button onClick={onCancel} variant="secondary">
           Cancel
         </Button>
-        <Button
-          {...{
-            onClick: onRetry,
-            variant: "primary",
-          }}>
+        <Button onClick={onRetry} variant="primary">
           Try again
         </Button>
       </div>

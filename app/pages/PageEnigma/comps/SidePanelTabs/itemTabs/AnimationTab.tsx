@@ -8,18 +8,17 @@ import {
   AssetFilterOption,
   AssetType,
   FilterEngineCategories,
+  MediaFileAnimationType,
   ToastTypes,
 } from "~/enums";
 
 import { animationFilter, animationItems } from "~/pages/PageEnigma/signals";
 import { addToast } from "~/signals";
 
-import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
-import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
-
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import { Button, UploadModalMovement } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
+
 import { MediaFilesApi } from "~/Classes/ApiManager";
 
 export const AnimationTab = () => {
@@ -127,7 +126,6 @@ export const AnimationTab = () => {
         />
       </div>
       <UploadModalMovement
-        closeModal={() => setOpen(false)}
         onClose={() => setOpen(false)}
         onSuccess={refetchAnimations}
         isOpen={open}
@@ -140,7 +138,7 @@ export const AnimationTab = () => {
           { Rigify: MediaFileAnimationType.Rigify },
           { Rokoko: MediaFileAnimationType.Rokoko },
         ]}
-        type={MediaFileEngineCategory.Animation}
+        type={FilterEngineCategories.ANIMATION}
       />
     </>
   );

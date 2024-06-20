@@ -1,28 +1,23 @@
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
 import { TransitionDialogue, LoadingDots } from "~/components";
-import "./UploadModal.scss";
-import { UploadLoaderError } from "./UploadLoaderError";
+
 import { UploadAssetError } from "./UploadAssetError";
 import { UploadSuccess } from "./UploadSuccess";
 import { UploadFiles } from "./UploadFiles";
-import {
-  MediaFileAnimationType,
-  MediaFileEngineCategory,
-  UploadNewEngineAsset,
-} from "~/api/media_files/UploadNewEngineAsset";
-import { v4 as uuidv4 } from "uuid";
-import { UploadMedia } from "~/api/media_files/UploadMedia";
-import { EditCoverImage } from "~/api/media_files/EditCoverImage";
+import { MediaFilesApi, MediaUploadApi } from "~/Classes/ApiManager";
+import { FilterEngineCategories, MediaFileAnimationType } from "~/enums";
+import { getFileName } from "~/utilities";
 
 interface Props {
-  closeModal: () => void;
   onClose: () => void;
   onSuccess: () => void;
   isOpen: boolean;
   title: string;
   fileTypes: string[];
   typeOptions: { [key: string]: string }[];
-  type: MediaFileEngineCategory;
+  type: FilterEngineCategories;
 }
 
 enum UploaderState {
@@ -34,11 +29,9 @@ enum UploaderState {
   assetError,
   coverCreateError,
   coverSetError,
-  loaderError,
 }
 
 export function UploadModalMovement({
-  closeModal,
   isOpen,
   onClose,
   onSuccess,
@@ -49,9 +42,15 @@ export function UploadModalMovement({
 }: Props) {
   const [objUploadStatus, setObjUploadStatus] = useState(UploaderState.ready);
 
-  const resetModalState = useCallback(() => {
+  const resetModalState = () => {
     setObjUploadStatus(UploaderState.ready);
-  }, []);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      resetModalState();
+    }
+  }, [isOpen]);
 
   const onSubmit = async ({
     title,
@@ -66,54 +65,62 @@ export function UploadModalMovement({
     length: number;
     thumbnailFile: File | null;
   }) => {
-    const res = await UploadNewEngineAsset({
-      engine_category: type,
+    setObjUploadStatus(UploaderState.uploadingAsset);
+    const mediaUploadApi = new MediaUploadApi();
+    const assetReponse = await mediaUploadApi.UploadNewEngineAsset({
       file: assetFile,
-      maybe_animation_type: typeOption as MediaFileAnimationType,
+      fileName: assetFile.name,
+      engine_category: type,
+      maybe_animation_type: typeOption,
       maybe_duration_millis: length,
       maybe_title: title,
-      uuid_idempotency_token: uuidv4(),
+      uuid: uuidv4(),
     });
-    if (!("media_file_token" in res)) {
+
+    if (!assetReponse.success || !assetReponse.data) {
       setObjUploadStatus(UploaderState.assetError);
       return;
     }
-    const assetToken = res.media_file_token;
+    const assetToken = assetReponse.data;
     if (!thumbnailFile) {
       setObjUploadStatus(UploaderState.success);
       return;
     }
-    const resp = await UploadMedia({
-      uuid_idempotency_token: uuidv4(),
-      file: thumbnailFile,
-      source: title,
+
+    setObjUploadStatus(UploaderState.uploadingCover);
+    const thumbnailResponse = await mediaUploadApi.UploadImage({
+      uuid: uuidv4(),
+      blob: thumbnailFile,
+      fileName: getFileName(thumbnailFile),
+      maybe_title: "thumbnail_" + title,
     });
-    if (!("media_file_token" in resp)) {
-      setObjUploadStatus(UploaderState.uploadingCover);
+    if (!thumbnailResponse.success || !thumbnailResponse.data) {
+      setObjUploadStatus(UploaderState.coverCreateError);
       return;
     }
-    const thumbnailToken = resp.media_file_token;
-    const editRes = await EditCoverImage(assetToken, {
-      cover_image_media_file_token: thumbnailToken,
+
+    setObjUploadStatus(UploaderState.settingCover);
+    const thumbnailToken = thumbnailResponse.data;
+    const mediaFilesApi = new MediaFilesApi();
+    const setThumbnailResponse = await mediaFilesApi.UpdateCoverImage({
+      mediaFileToken: assetToken,
+      imageToken: thumbnailToken,
     });
-    if (!editRes.success) {
-      setObjUploadStatus(UploaderState.uploadingCover);
+    if (!setThumbnailResponse.success) {
+      setObjUploadStatus(UploaderState.coverSetError);
       return;
     }
     setObjUploadStatus(UploaderState.success);
   };
 
-  const objUploaderContent = () => {
+  const ObjUploaderContent = () => {
     switch (objUploadStatus) {
       case UploaderState.ready:
         return (
           <UploadFiles
             title={title}
             fileTypes={fileTypes}
-            onClose={() => {
-              closeModal();
-              onClose();
-            }}
+            onClose={onClose}
             typeOptions={typeOptions}
             onSubmit={onSubmit}
           />
@@ -122,20 +129,18 @@ export function UploadModalMovement({
       case UploaderState.uploadingCover:
       case UploaderState.settingCover:
         return (
-          <div {...{ className: "obj-uploader-modal-load-view" }}>
-            <LoadingDots {...{ className: "uploader-dots" }} />
-            <div {...{ className: "uploader-message" }}>Uploading...</div>
-          </div>
+          <>
+            <LoadingDots className="mb-1 bg-transparent" />
+            <div className="w-100 text-center opacity-50">Uploading...</div>
+          </>
         );
       case UploaderState.success:
         return (
           <UploadSuccess
             title={title}
             onOk={() => {
-              closeModal();
-              onClose();
               onSuccess();
-              setTimeout(() => setObjUploadStatus(UploaderState.ready), 0);
+              onClose();
             }}
           />
         );
@@ -144,50 +149,19 @@ export function UploadModalMovement({
       case UploaderState.coverSetError:
         return (
           <UploadAssetError
-            onCancel={() => {
-              closeModal();
-              onClose();
-              setTimeout(() => setObjUploadStatus(UploaderState.ready), 0);
-            }}
+            onCancel={onClose}
             onRetry={() => {
-              switch (objUploadStatus) {
-                case UploaderState.assetError: {
-                  break;
-                }
-                case UploaderState.coverCreateError: {
-                  break;
-                }
-              }
-            }}
-            isAssetError={objUploadStatus === UploaderState.assetError}
-          />
-        );
-      case UploaderState.loaderError:
-        return (
-          <UploadLoaderError
-            onCancel={() => {
-              closeModal();
-              onClose();
-              setTimeout(() => setObjUploadStatus(UploaderState.ready), 0);
-            }}
-            onRetry={() => {
-              setObjUploadStatus(UploaderState.ready);
               resetModalState();
             }}
+            isAssetError={objUploadStatus === UploaderState.assetError}
           />
         );
     }
   };
 
   return (
-    <TransitionDialogue
-      {...{
-        isOpen,
-        onClose,
-        title: title,
-      }}
-    >
-      {objUploaderContent()}
+    <TransitionDialogue isOpen={isOpen} onClose={onClose} title={title}>
+      <ObjUploaderContent />
     </TransitionDialogue>
   );
 }

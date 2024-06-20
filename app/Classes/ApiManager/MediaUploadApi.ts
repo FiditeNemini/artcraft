@@ -1,5 +1,5 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { Visibility } from "~/enums";
+import { FilterEngineCategories, Visibility } from "~/enums";
 
 export class MediaUploadApi extends ApiManager {
   private async Upload({
@@ -10,7 +10,7 @@ export class MediaUploadApi extends ApiManager {
     options,
   }: {
     endpoint: string;
-    blob: Blob;
+    blob: Blob | File;
     fileName: string;
     uuid: string;
     options: Record<string, string | number | undefined>;
@@ -87,17 +87,19 @@ export class MediaUploadApi extends ApiManager {
   }
 
   public async UploadNewEngineAsset({
-    blob,
+    file,
     fileName,
     uuid,
+    engine_category,
     maybe_animation_type,
     maybe_duration_millis,
     maybe_title,
     maybe_visibility = Visibility.Public,
   }: {
-    blob: Blob;
+    file: File;
     fileName: string;
     uuid: string;
+    engine_category: FilterEngineCategories;
     maybe_animation_type?: string;
     maybe_duration_millis?: number;
     maybe_title?: string;
@@ -105,12 +107,13 @@ export class MediaUploadApi extends ApiManager {
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/new_engine_asset`;
     const options: Record<string, string | number | undefined> = {
+      engine_category,
       maybe_title,
       maybe_visibility: maybe_visibility?.toString(),
       maybe_animation_type,
       maybe_duration_millis,
     };
-    return this.Upload({ endpoint, blob, fileName, uuid, options });
+    return this.Upload({ endpoint, blob: file, fileName, uuid, options });
   }
 
   public async UploadNewScene({

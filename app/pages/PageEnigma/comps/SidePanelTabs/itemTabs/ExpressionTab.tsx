@@ -8,11 +8,10 @@ import {
   AssetType,
   FilterEngineCategories,
   ToastTypes,
+  MediaFileAnimationType,
 } from "~/enums";
 
 import { expressionFilter } from "~/pages/PageEnigma/signals";
-import { MediaFileEngineCategory } from "~/api/media_files/UploadEngineAsset";
-import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import {
@@ -170,7 +169,7 @@ export const ExpressionTab = () => {
         fileTypes={["CSV"]}
         title="Upload Expression"
         typeOptions={[{ ARKit: MediaFileAnimationType.ArKit }]}
-        type={MediaFileEngineCategory.Expression}
+        type={FilterEngineCategories.EXPRESSION}
       />
     </>
   );

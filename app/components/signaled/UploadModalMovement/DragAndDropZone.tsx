@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileArrowUp, faFileAudio } from "@fortawesome/pro-solid-svg-icons";
 import { P } from "~/components";
-import { getFileName } from "./utils/getFileName";
+import { getFileName } from "~/utilities";
 
 interface Props {
   file: File | null;

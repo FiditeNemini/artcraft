@@ -1,7 +1,7 @@
 import { Button, H6, Input, ListDropdown } from "~/components";
 import { UploadFile } from "./UploadFile";
 import { useState } from "react";
-import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
+import { MediaFileAnimationType } from "~/enums";
 
 interface Props {
   title: string;

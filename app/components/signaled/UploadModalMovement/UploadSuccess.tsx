@@ -7,20 +7,13 @@ interface Props {
 
 export const UploadSuccess = ({ title, onOk }: Props) => {
   return (
-    <div {...{ className: "obj-uploader-modal-success-view" }}>
-      <div
-        {...{
-          className: "uploader-message",
-        }}>{`Added ${title} to objects`}</div>
+    <>
+      <div className="w-100 text-center opacity-50">{`Added ${title} to your library`}</div>
       <div className="mt-6 flex justify-end gap-2">
-        <Button
-          {...{
-            onClick: onOk,
-            variant: "primary",
-          }}>
+        <Button onClick={onOk} variant="primary">
           Ok
         </Button>
       </div>
-    </div>
+    </>
   );
 };

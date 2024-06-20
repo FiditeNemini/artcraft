@@ -7,6 +7,7 @@ export * from "./ClipGroup";
 export * from "./ClipType";
 export * from "./FileTypes";
 export * from "./JobStatus";
+export * from "./MediaFileAnimationTypes";
 export * from "./QueryFilters";
 export * from "./toasts";
 export * from "./Visibility";
