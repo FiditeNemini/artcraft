@@ -1,12 +1,12 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
 
 interface VoiceConversionParams {
-  autoPredictF0: boolean;
-  creatorSetVisibility: string;
-  isStorytellerDemo: boolean;
-  overrideF0Method: string;
+  autoPredictF0?: boolean;
+  creatorSetVisibility?: string;
+  isStorytellerDemo?: boolean;
+  overrideF0Method?: string;
   sourceMediaUploadToken: string;
-  transpose: number;
+  transpose?: number;
   uuidIdempotencyToken: string;
   voiceConversionModelToken: string;
 }

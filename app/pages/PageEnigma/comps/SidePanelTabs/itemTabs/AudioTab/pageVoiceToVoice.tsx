@@ -1,20 +1,14 @@
 import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-import { V2VState } from "../../../../models/voice";
 import { faChevronRight, faRightLeft } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import {
-  EnqueueVoiceConversionRequest,
-  EnqueueVoiceConversionResponse,
-} from "./typesImported";
-import { GenerateVoiceConversion } from "./utilities";
-import { H4, H6, Button, Label, UploadAudioComponent } from "~/components";
-
-import { AudioTabPages } from "~/pages/PageEnigma/enums";
-import { addToast, startPollingActiveJobs } from "~/signals";
 import { ToastTypes } from "~/enums";
+import { AudioTabPages } from "~/pages/PageEnigma/enums";
+import { V2VState } from "~/pages/PageEnigma/models/voice";
+import { VoiceConversionApi } from "~/Classes/ApiManager/VoiceConversionApi";
+import { addToast, startPollingActiveJobs } from "~/signals";
+import { H4, H6, Button, Label, UploadAudioComponent } from "~/components";
 
 export const PageVoicetoVoice = ({
   changePage,
@@ -25,7 +19,7 @@ export const PageVoicetoVoice = ({
   v2vState: V2VState;
   setV2VState: (newState: V2VState) => void;
 }) => {
-  const requestV2V = useCallback(() => {
+  const requestV2V = useCallback(async () => {
     const modelToken = v2vState.voice ? v2vState.voice.weight_token : undefined;
     if (!modelToken) {
       addToast(ToastTypes.ERROR, "Please first pick a voice");
@@ -35,25 +29,21 @@ export const PageVoicetoVoice = ({
       addToast(ToastTypes.ERROR, "Please upload a voice clip to convert from");
       return;
     }
-    const request: EnqueueVoiceConversionRequest = {
-      uuid_idempotency_token: uuidv4(),
-      voice_conversion_model_token: modelToken,
-      source_media_upload_token: v2vState.inputFileToken,
+    const request = {
+      uuidIdempotencyToken: uuidv4(),
+      voiceConversionModelToken: modelToken,
+      sourceMediaUploadToken: v2vState.inputFileToken,
     };
-
-    GenerateVoiceConversion(request).then(
-      (res: EnqueueVoiceConversionResponse) => {
-        console.log(request, res);
-        if (res && res.inference_job_token) {
-          startPollingActiveJobs();
-          changePage(AudioTabPages.LIBRARY);
-          return;
-        }
-        addToast(
-          ToastTypes.ERROR,
-          res.error_reason || "Unknown Error in Generating Voice Conversions",
-        );
-      },
+    const v2vApi = new VoiceConversionApi();
+    const response = await v2vApi.ConvertVoice(request);
+    if (response.success && response.data) {
+      startPollingActiveJobs();
+      changePage(AudioTabPages.LIBRARY);
+      return;
+    }
+    addToast(
+      ToastTypes.ERROR,
+      response.errorMessage || "Unknown Error in Generating Voice Conversions",
     );
   }, [v2vState, changePage]);
 
