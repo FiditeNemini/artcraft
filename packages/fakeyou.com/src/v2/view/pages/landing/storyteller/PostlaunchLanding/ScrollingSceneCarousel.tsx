@@ -57,7 +57,10 @@ export default function ScrollingSceneCarousel({
     <div className="d-flex gap-5 mt-5 overflow-hidden flex-column">
       <Marquee
         gradient={true}
-        gradientColor="#1a1a27"
+        // this component doesn't seem to like string values and was causing errors
+        // so hex is converted to an RGB array -VH
+        // gradientColor="#1a1a27"
+        gradientColor={[26, 26, 29]}
         gradientWidth={small ? 80 : 200}
         speed={small ? 100 : 50}
         pauseOnHover={true}
@@ -82,7 +85,8 @@ export default function ScrollingSceneCarousel({
       {!small && (
         <Marquee
           gradient={true}
-          gradientColor="#1a1a27"
+          // gradientColor="#1a1a27"
+          gradientColor={[26, 26, 29]}
           gradientWidth={small ? 80 : 200}
           speed={small ? 100 : 50}
           pauseOnHover={true}

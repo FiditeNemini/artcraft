@@ -17,6 +17,8 @@ import {
   RenameMedia,
   RenameMediaResponse,
 } from "@storyteller/components/src/api/media_files/RenameMedia";
+import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import PromptViewer from "./PromptViewer";
 import { MediaSubViewProps } from "./MediaPageSwitch";
 import { a, useTransition } from "@react-spring/web";
@@ -54,13 +56,12 @@ export default function DevMediaPage({
   const [editingTitle, editingTitleSet] = useState(EditingTitleState.closed);
   const { events, status: animationStatus } = useAnimationStatus();
   const titlePaused = animationStatus === AnimationStatus.paused;
+  const bucketConfig = new BucketConfig();
 
   const transitions = useTransition(
     editingTitle,
     basicTransition({ ...events })
   );
-
-  console.log("😎", mediaFile);
 
   const saveTitle = () => {
     editingTitleSet(EditingTitleState.saving);
@@ -119,7 +120,16 @@ export default function DevMediaPage({
     "facebook",
     "reddit",
     "email",
+    "download",
   ];
+
+  let downloadLink = bucketConfig.getGcsUrl(mediaFile?.public_bucket_path);
+
+  const sharePath = `/media/${mediaFile?.token || ""}`;
+
+  const shareUrl = GetWebsiteLink(sharePath);
+
+  const shareText = "Check out this media on FakeYou.com!";
 
   return (
     <>
@@ -290,10 +300,11 @@ export default function DevMediaPage({
               {shareLinks.map((social, i) => (
                 <SocialButton
                   {...{
+                    downloadLink,
                     hideLabel: true,
                     social,
-                    shareUrl: "abc",
-                    shareText: "xyz",
+                    shareUrl,
+                    shareText,
                   }}
                 />
               ))}

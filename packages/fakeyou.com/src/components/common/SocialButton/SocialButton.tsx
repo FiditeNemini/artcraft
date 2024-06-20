@@ -4,21 +4,33 @@ import {
   faWhatsapp,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { faXmark, faEnvelope } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownToLine,
+  faXmark,
+  faEnvelope,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import "./SocialButton.scss";
 
-export type Socials = "x" | "whatsapp" | "facebook" | "reddit" | "email";
+export type Socials =
+  | "x"
+  | "whatsapp"
+  | "facebook"
+  | "reddit"
+  | "email"
+  | "download";
 
 interface SocialButtonProps {
+  downloadLink?: string;
   hideLabel?: boolean;
   social: Socials;
-  shareUrl: string;
+  shareUrl?: string;
   shareText: string;
 }
 
 export default function SocialButton({
+  downloadLink,
   hideLabel,
   social,
   shareUrl,
@@ -30,6 +42,7 @@ export default function SocialButton({
     facebook: faFacebookF,
     reddit: faRedditAlien,
     email: faEnvelope,
+    download: faArrowDownToLine,
   };
 
   let socialIcon = socialIcons[social] || faXmark;
@@ -56,18 +69,22 @@ export default function SocialButton({
         return `mailto:?subject=${encodeURIComponent(
           text
         )}&body=${encodeURIComponent(url)}`;
+      case "download":
+        return downloadLink;
       default:
         return "#";
     }
   };
 
-  const handleClick = () => {
-    const shareLink = getShareLink(social, shareUrl, shareText);
-    window.open(shareLink, "_blank");
-  };
-
   return (
-    <button className="social-button" onClick={handleClick}>
+    <a
+      {...{
+        className: "social-button",
+        href: getShareLink(social, shareUrl || "", shareText),
+        target: "_blank",
+        ...(social === "download" ? { download: true } : {}),
+      }}
+    >
       <div
         className={`${
           !hideLabel ? "social-button-icon" : "social-button-icon-no-style"
@@ -80,6 +97,6 @@ export default function SocialButton({
           {social.charAt(0).toUpperCase() + social.slice(1)}
         </p>
       ) : null}
-    </button>
+    </a>
   );
 }
