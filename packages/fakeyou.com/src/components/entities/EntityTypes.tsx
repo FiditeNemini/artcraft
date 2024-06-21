@@ -15,6 +15,15 @@ export enum EntityType {
 
 // 2
 
+// Media classes are broader categories of media, whereas MediaFilters below is mixed
+export enum MediaClasses {
+  unknown,
+  audio,
+  image,
+  video,
+  dimensional,
+}
+
 // MediaFilters is probably better titled MediaCategories
 // I have to make that change in a couple places
 
@@ -61,6 +70,11 @@ export enum EngineTypes {
   gltf,
   obj,
   ron,
+  scene_ron,
+  scene_json,
+  pmd,
+  vmd,
+  pmx,
 }
 
 export enum AudioTypes {
@@ -144,6 +158,12 @@ export const ListEntityFilters = (mode?: EntityInputMode) => {
 
   return Object.values(selectedFilters).filter(val => isNaN(Number(val)));
 };
+
+export const mediaClassOptions = (t = (v: string) => v) =>
+  enumToKeyArr(MediaClasses).map((value, i) => ({
+    value,
+    label: t(`MediaClasses.${value}`),
+  }));
 
 // this creates a [{ label, value }] option array for select inputs based on desired endpoint mode
 // note the use t() to translate labels
