@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { FilterButtons } from "./FilterButtons";
 import { withActions } from "@storybook/addon-actions/decorator";
-import { AssetFilterOption } from "~/pages/PageEnigma/enums";
+import { AssetFilterOption } from "~/enums";
 
 const meta: Meta<typeof FilterButtons> = {
   component: FilterButtons,

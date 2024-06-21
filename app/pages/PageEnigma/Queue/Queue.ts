@@ -45,7 +45,13 @@ class Queue {
   > = {};
   private _subscribers: Record<
     string,
-    (entry: { action: UnionedActionTypes; data: UnionedDataTypes }) => void
+    {
+      id: string;
+      handler: (entry: {
+        action: UnionedActionTypes;
+        data: UnionedDataTypes;
+      }) => void;
+    }[]
   > = {};
 
   public publish({
@@ -63,18 +69,31 @@ class Queue {
     this._queue[queueName].push({ action, data });
     console.log("Queued", queueName, action, data);
 
-    if (this._subscribers[queueName]) {
-      this._subscribers[queueName](this._queue[queueName].splice(0, 1)[0]);
+    if (this._subscribers[queueName].length) {
+      this._subscribers[queueName].forEach((item) =>
+        item.handler(this._queue[queueName][0]),
+      );
+      this._queue[queueName].splice(0, 1);
     }
   }
 
   public subscribe(
     queueName: string,
+    id: string,
     onMessage: (entry: QueueSubscribeType) => void,
   ) {
-    this._subscribers[queueName] = onMessage;
+    if (!this._subscribers[queueName]) {
+      this._subscribers[queueName] = [];
+    }
+    this._subscribers[queueName] = this._subscribers[queueName].filter(
+      (handler) => handler.id !== id,
+    );
+    this._subscribers[queueName].push({ id, handler: onMessage });
     while (this._queue[queueName]?.length) {
-      this._subscribers[queueName](this._queue[queueName].splice(0, 1)[0]);
+      this._subscribers[queueName].forEach((item) =>
+        item.handler(this._queue[queueName][0]),
+      );
+      this._queue[queueName].splice(0, 1);
     }
   }
 }

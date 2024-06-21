@@ -109,7 +109,7 @@ export function useQueueHandler() {
   );
 
   useEffect(() => {
-    Queue.subscribe(QueueNames.FROM_ENGINE, handleFromEngineActions);
-    Queue.subscribe(QueueNames.TO_TIMELINE, handleToTimelineActions);
+    Queue.subscribe(QueueNames.FROM_ENGINE, "useQ", handleFromEngineActions);
+    Queue.subscribe(QueueNames.TO_TIMELINE, "useQ", handleToTimelineActions);
   }, [handleFromEngineActions, handleToTimelineActions]);
 }

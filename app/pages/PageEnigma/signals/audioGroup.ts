@@ -6,7 +6,6 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
-import { filmLength } from "~/pages/PageEnigma/signals/sizing";
 import { publishClip } from "~/pages/PageEnigma/signals/utils/publishClip";
 
 export const audioGroup = signal<AudioGroup>({
