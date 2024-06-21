@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { faCheck, faChevronDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { MediaFileAnimationType } from "~/api/media_files/UploadNewEngineAsset";
+import { MediaFileAnimationType } from "~/enums";
 
 export type SelectValue = string | number;
 export type SelectOption = { label: string; value: SelectValue };

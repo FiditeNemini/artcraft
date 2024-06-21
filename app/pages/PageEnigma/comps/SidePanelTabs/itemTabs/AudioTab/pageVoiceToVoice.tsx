@@ -92,20 +92,6 @@ export const PageVoicetoVoice = ({
           }}
         />
       </div>
-      {/* <div className="my-4 flex w-full gap-4 justify-between items-center">
-        <span className="bg-brand-secondary grow h-1"/>
-        <H4>OR</H4>
-        <span className="bg-brand-secondary grow h-1"/>
-      </div> */}
-      {/* <Button
-        className="h-11 w-full text-sm"
-        variant="secondary"
-        icon={faCircleDot}
-        onClick={() => {
-          console.log("Record Button is clicked");
-        }}>
-        Record Audio
-      </Button> */}
       <Button
         className="w-full py-3 text-sm"
         variant="primary"

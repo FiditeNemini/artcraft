@@ -19,7 +19,7 @@ export const apiHost = "https://api.storyteller.ai";
 //V2V
 // export const listV2V = `${apiHost}/v1/voice_conversion/model_list`;
 // export const inferV2V = `${apiHost}/v1/voice_conversion/inference`;
-export const uploadAudioV2V = `${apiHost}/v1/media_uploads/upload_audio`;
+// export const uploadAudioV2V = `${apiHost}/v1/media_uploads/upload_audio`;
 
 // User Media
 // export const listMediaByUser = (username: string) =>

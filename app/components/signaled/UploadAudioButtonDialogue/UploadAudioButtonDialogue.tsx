@@ -86,7 +86,6 @@ export const UploadAudioButtonDialogue = ({
     }
 
     //handle errors
-    console.log(response.errorMessage);
     addToast(
       ToastTypes.ERROR,
       response.errorMessage || "Unknown Error: Upload Audio",

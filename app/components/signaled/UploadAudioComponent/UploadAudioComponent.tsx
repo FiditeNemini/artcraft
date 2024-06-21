@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -11,32 +11,30 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "./utilities";
-
 import { Button, ButtonIcon, P, Tooltip, WaveformPlayer } from "~/components";
-import { AUDIO_FILE_TYPE } from "~/enums";
+import { MediaUploadApi } from "~/Classes/ApiManager";
+import { getFileName } from "~/utilities";
+import { AUDIO_FILE_TYPE, ToastTypes } from "~/enums";
+import { addToast } from "~/signals";
 const FILE_TYPES = Object.keys(AUDIO_FILE_TYPE);
 
 interface Props {
-  file?: File;
   onFileStaged?: (file: File) => void;
   onClear?: () => void;
   onFileUploaded: (token: string) => void;
 }
 
 export const UploadAudioComponent = ({
-  file: propsFile,
   onFileStaged,
   onClear,
   onFileUploaded,
 }: Props) => {
-  const [{ file, uploadState, uploadToken }, setState] = useState<{
+  const [{ file, uploadState }, setState] = useState<{
     file: File | undefined;
-    uploadState: "init" | "none" | "uploading" | "uploaded" | "error";
-    uploadToken?: string;
+    uploadState: "none" | "staged" | "uploading" | "uploaded" | "error";
   }>({
-    file: propsFile,
-    uploadState: propsFile ? "none" : "init",
+    file: undefined,
+    uploadState: "none",
   });
 
   const audioUrl = file ? URL.createObjectURL(file) : "";
@@ -45,8 +43,11 @@ export const UploadAudioComponent = ({
     setState((curr) => ({
       ...curr,
       file: file,
-      uploadState: "none",
+      uploadState: "staged",
     }));
+    if (onFileStaged) {
+      onFileStaged(file);
+    }
   };
 
   const handleClear = () => {
@@ -56,42 +57,43 @@ export const UploadAudioComponent = ({
       uploadState: "none",
       uploadToken: undefined,
     }));
+    if (onClear) {
+      onClear();
+    }
   };
 
-  const handleUploadFile = () => {
-    if (file === undefined) return false;
+  const handleUploadFile = useCallback(
+    async (file: File) => {
+      setState((curr) => ({ ...curr, uploadState: "uploading" }));
 
-    setState((curr) => ({ ...curr, uploadState: "uploading" }));
-    const request: UploadAudioRequest = {
-      uuid_idempotency_token: uuidv4(),
-      file: file,
-      source: "file",
-    };
-
-    UploadAudio(request).then((res) => {
-      if (UploadAudioIsOk(res)) {
+      const mediaUploadApi = new MediaUploadApi();
+      const request = {
+        blob: file,
+        fileName: getFileName(file),
+        uuid: uuidv4(),
+        maybe_title: getFileName(file),
+      };
+      const response = await mediaUploadApi.UploadAudio(request);
+      if (response.success && response.data) {
         setState((curr) => ({
           ...curr,
           uploadState: "uploaded",
-          uploadToken: res.upload_token,
         }));
-      } else {
-        setState((curr) => ({
-          ...curr,
-          uploadState: "error",
-          uploadToken: undefined,
-        }));
+        onFileUploaded(response.data);
+        return;
       }
-    });
-  };
-
-  useEffect(() => {
-    if (file && uploadState === "none" && onFileStaged) onFileStaged(file);
-    if (!file && uploadState === "none" && onClear) onClear();
-  }, [file, uploadState]);
-  useEffect(() => {
-    if (uploadState === "uploaded" && uploadToken) onFileUploaded(uploadToken);
-  }, [uploadToken, uploadState]);
+      //handle errors
+      addToast(
+        ToastTypes.ERROR,
+        response.errorMessage || "Unknown Error: Upload Audio",
+      );
+      setState((curr) => ({
+        ...curr,
+        uploadState: "staged",
+      }));
+    },
+    [onFileUploaded],
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -123,8 +125,14 @@ export const UploadAudioComponent = ({
             <Button
               className="w-full py-2.5"
               variant="action"
-              onClick={handleUploadFile}
-              disabled={uploadState !== "none" && uploadState !== "error"}
+              onClick={() => {
+                if (!file) {
+                  //TODO: Maybe more verbose on not having file
+                  return false;
+                }
+                handleUploadFile(file);
+              }}
+              disabled={uploadState !== "staged"}
               icon={
                 uploadState === "uploaded"
                   ? faCheck
