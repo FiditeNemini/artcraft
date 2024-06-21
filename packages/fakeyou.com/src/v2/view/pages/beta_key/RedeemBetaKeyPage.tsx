@@ -4,11 +4,13 @@ import "./BetaKey.scss";
 import { faKey, faPersonWalkingArrowLoopLeft } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { RedeemBetaKey } from "@storyteller/components/src/api/beta_key/RedeemBetaKey";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { useSession } from "hooks";
 
 export default function RedeemBetaKeyPage() {
-  const [key, setKey] = useState("");
+  const { token: pageToken } = useParams<{ token: string }>();
+
+  const [key, setKey] = useState(pageToken || "");
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const history = useHistory();

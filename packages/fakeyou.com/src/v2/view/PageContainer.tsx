@@ -951,7 +951,7 @@ class PageContainer extends React.Component<
                     <RedeemSuccessPage />
                   </Route>
 
-                  <Route path="/beta-key/redeem">
+                  <Route path="/beta-key/redeem/:token?">
                     <RedeemBetaKeyPage />
                   </Route>
 
