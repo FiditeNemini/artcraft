@@ -30,7 +30,7 @@ export class SaveManager {
   }): Promise<string> {
     this.editor.generating_preview = true; // Set this to true to stop control panel from flipping out.
     // remove controls when saving scene.
-    this.editor.removeTransformControls();
+    this.editor.utils.removeTransformControls();
     showEditorLoader();
 
     const proxyScene = new StoryTellerProxyScene(
@@ -38,7 +38,7 @@ export class SaveManager {
       this.editor.activeScene,
     );
     const scene_json = await proxyScene.saveToScene(this.editor.version);
-
+    console.log(scene_json);
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.editor.version,
       this.editor.timeline,

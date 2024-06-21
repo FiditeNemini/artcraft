@@ -21,7 +21,7 @@ export class VideoGeneration {
   async generateFrame() {
     if (!this.editor.generating_preview && this.editor.rawRenderer) {
       this.editor.generating_preview = true;
-      this.editor.removeTransformControls();
+      this.editor.utils.removeTransformControls();
       this.editor.activeScene.renderMode(true);
       if (this.editor.activeScene.hot_items) {
         this.editor.activeScene.hot_items.forEach((element) => {

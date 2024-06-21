@@ -72,7 +72,8 @@ export class Utils {
         this.removeTransformControls(false);
       } else if (this.editor.control) {
         this.scene.scene.add(this.editor.control);
-        this.editor.control.attach(this.editor.selected);
+        if(this.editor.sceneManager?.selected_objects)
+        this.editor.control.attach(this.editor.sceneManager?.selected_objects[0]);
       }
 
       return object.userData["locked"];
@@ -91,7 +92,7 @@ export class Utils {
     }
     if (remove_outline) {
       this.editor.last_selected = this.editor.selected;
-      this.editor.selected = undefined;
+      this.editor.outlinePass.selectedObjects = [];
       this.editor.publishSelect();
     }
     this.editor.control.detach();
@@ -101,16 +102,19 @@ export class Utils {
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
-    if (this.editor.selected != undefined || this.editor.selected != null) {
-      this.editor.selected.position.x = position.x;
-      this.editor.selected.position.y = position.y;
-      this.editor.selected.position.z = position.z;
-      this.editor.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x);
-      this.editor.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y);
-      this.editor.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z);
-      this.editor.selected.scale.x = scale.x;
-      this.editor.selected.scale.y = scale.y;
-      this.editor.selected.scale.z = scale.z;
+    if(this.editor.sceneManager?.selected_objects){
+      let object = this.editor.sceneManager?.selected_objects[0]
+      if (object != undefined || object != null) {
+        object.position.x = position.x;
+        object.position.y = position.y;
+        object.position.z = position.z;
+        object.rotation.x = THREE.MathUtils.degToRad(rotation.x);
+        object.rotation.y = THREE.MathUtils.degToRad(rotation.y);
+        object.rotation.z = THREE.MathUtils.degToRad(rotation.z);
+        object.scale.x = scale.x;
+        object.scale.y = scale.y;
+        object.scale.z = scale.z;
+      }
     }
   }
 
@@ -118,7 +122,7 @@ export class Utils {
     this.editor.camera_person_mode = !this.editor.camera_person_mode;
     this.editor.cameraViewControls?.reset();
     if (this.editor.cam_obj) {
-      if (this.editor.camera_person_mode) {
+      if (this.editor.camera_person_mode && this.editor.camera) {
         this.editor.last_cam_pos.copy(this.editor.camera.position);
         this.editor.last_cam_rot.copy(this.editor.camera.rotation);
 
@@ -136,7 +140,7 @@ export class Utils {
         }
         this.editor.cam_obj.scale.set(0, 0, 0);
 
-        this.editor.removeTransformControls();
+        this.removeTransformControls();
         this.editor.selected = this.editor.cam_obj;
         this.editor.publishSelect();
         this.editor.updateSelectedUI();
@@ -146,7 +150,7 @@ export class Utils {
             element.visible = false;
           });
         }
-      } else {
+      } else if (this.editor.camera) {
         this.editor.camera.position.copy(this.editor.last_cam_pos);
         this.editor.camera.rotation.copy(this.editor.last_cam_rot);
         if (this.editor.orbitControls) {
@@ -173,21 +177,48 @@ export class Utils {
 
   // Returns the "check sum" of the editors selected object.
   getselectedSum(): number {
-    if (this.editor.selected === undefined) {
+    if (this.editor.sceneManager?.selected_objects === undefined) {
+      return 0;
+    }
+    if(this.editor.sceneManager?.selected_objects.length <= 0) {
       return 0;
     }
     const posCombo =
-      this.editor.selected.position.x +
-      this.editor.selected.position.y +
-      this.editor.selected.position.z;
+      this.editor.sceneManager?.selected_objects[0].position.x +
+      this.editor.sceneManager?.selected_objects[0].position.y +
+      this.editor.sceneManager?.selected_objects[0].position.z;
     const rotCombo =
-      this.editor.selected.rotation.x +
-      this.editor.selected.rotation.y +
-      this.editor.selected.rotation.z;
+      this.editor.sceneManager?.selected_objects[0].rotation.x +
+      this.editor.sceneManager?.selected_objects[0].rotation.y +
+      this.editor.sceneManager?.selected_objects[0].rotation.z;
     const sclCombo =
-      this.editor.selected.scale.x + this.editor.selected.scale.y + this.editor.selected.scale.z;
+      this.editor.sceneManager?.selected_objects[0].scale.x + this.editor.sceneManager?.selected_objects[0].scale.y + this.editor.sceneManager?.selected_objects[0].scale.z;
     return posCombo + rotCombo + sclCombo;
   }
+
+ /* Will add in the future
+
+A good practice to remove 3D objects from Three.js scenes
+function removeObject3D(object3D) {
+    if (!(object3D instanceof THREE.Object3D)) return false;
+
+    // for better memory management and performance
+    if (object3D.geometry) object3D.geometry.dispose();
+
+    if (object3D.material) {
+        if (object3D.material instanceof Array) {
+            // for better memory management and performance
+            object3D.material.forEach(material => material.dispose());
+        } else {
+            // for better memory management and performance
+            object3D.material.dispose();
+        }
+    }
+    object3D.removeFromParent(); // the parent might be the scene or another Object3D, but it is sure to be removed this way
+    return true;
+}
+
+ */
 
   deleteObject(uuid: string) {
     const obj = this.scene.get_object_by_uuid(uuid);

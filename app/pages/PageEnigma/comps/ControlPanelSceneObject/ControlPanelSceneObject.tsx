@@ -236,7 +236,7 @@ export const ControlPanelSceneObject = () => {
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
           <p className="max-w-36 truncate font-semibold">
-            {currentSceneObject.object_name}
+            {currentSceneObject.object_name.charAt(0).toUpperCase() + currentSceneObject.object_name.slice(1)}
           </p>
         </div>
         <FontAwesomeIcon
@@ -245,17 +245,6 @@ export const ControlPanelSceneObject = () => {
           className="cursor-pointer opacity-75 transition-opacity duration-100 ease-in-out hover:opacity-50"
         />
       </div>
-
-      <Button
-        variant="secondary"
-        icon={locked ? faLock : faLockOpen}
-        onClick={toggleLock}
-        className={
-          locked ? "bg-brand-primary/20 hover:bg-brand-primary/40" : ""
-        }
-      >
-        {locked ? "Unlock" : "Lock"} object
-      </Button>
 
       <Transition
         show={!isCollapsed}

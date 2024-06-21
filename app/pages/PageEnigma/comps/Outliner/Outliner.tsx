@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import {
   outlinerIsShowing,
   outlinerState,
@@ -21,12 +21,16 @@ import { Button, Input } from "~/components";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 import { useSignals } from "@preact/signals-react/runtime";
+import { EngineContext } from "../../contexts/EngineContext";
 
 const OutlinerItem = ({ item }: { item: SceneObject }) => {
   useSignals();
   const [hovered, setHovered] = useState(false);
 
   const isSelected = outlinerState.selectedItem.value?.id === item.id;
+
+
+  const editorEngine = useContext(EngineContext)
 
   // Delete object logic here
   const handleDeleteKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -38,6 +42,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
   // Double click logic here
   const handleDoubleClick = () => {
     console.log("Item double clicked:", item.id);
+    editorEngine?.sceneManager?.double_click(item.id);
   };
 
   return (
@@ -51,7 +56,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
       onMouseLeave={() => setHovered(false)}
       onDoubleClick={handleDoubleClick}
       onKeyDown={handleDeleteKeyPress}
-      onClick={() => selectItem(item.id)}
+      onClick={() => selectItem(item.id, editorEngine?.sceneManager)}
       tabIndex={0}
     >
       <span className="flex items-center gap-2.5">
@@ -64,7 +69,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleLock(item.id);
+            toggleLock(item.id, editorEngine?.lockUnlockObject.bind(editorEngine));
           }}
           style={{
             opacity: hovered || item.locked ? 1 : 0,
@@ -80,7 +85,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleVisibility(item.id);
+            toggleVisibility(item.id, editorEngine?.sceneManager?.hideObject.bind(editorEngine.sceneManager));
           }}
           style={{
             opacity: hovered || !item.visible ? 1 : 0,

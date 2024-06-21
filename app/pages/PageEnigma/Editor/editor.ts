@@ -40,10 +40,11 @@ import {
   loadingBarIsShowing,
   signalScene,
 } from "~/signals";
-import { updateObjectPanel } from "../signals";
+import { outlinerState, updateObjectPanel } from "../signals";
 import { GenerationOptions } from "../models/generationOptions";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
+import { SceneManager } from "./scene_manager_api";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -138,10 +139,15 @@ class Editor {
 
   utils: Utils;
   videoGeneration: VideoGeneration;
-  mouse_controls: MouseControls;
+  mouse_controls: MouseControls | undefined;
   save_manager: SaveManager;
 
   generation_options: GenerationOptions;
+
+  sceneManager: SceneManager | undefined;
+
+
+  outliner_feature_flag: boolean;
 
   constructor() {
     console.log(
@@ -217,9 +223,7 @@ class Editor {
 
     this.utils = new Utils(this, this.activeScene);
     this.videoGeneration = new VideoGeneration(this);
-    this.mouse_controls = new MouseControls(this);
     this.save_manager = new SaveManager(this);
-
     this.current_frame = 0;
 
     // Scene State
@@ -239,6 +243,10 @@ class Editor {
       lipSync: false,
       cinematic: false,
     };
+
+
+    this.outliner_feature_flag = true;
+
   }
   getRenderDimensions() {
     switch (this.render_camera_aspect_ratio) {
@@ -392,11 +400,12 @@ class Editor {
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
-    window.addEventListener("resize", this.onWindowResize.bind(this));
-    this.renderer.domElement.addEventListener(
-      "resize",
-      this.onWindowResize.bind(this),
-    );
+
+    // window.addEventListener("resize", this.onWindowResize.bind(this));
+    // this.renderer.domElement.addEventListener(
+    //   "resize",
+    //   this.onWindowResize.bind(this),
+    // );
 
     this._configurePostProcessing();
     // Controls and movement.
@@ -439,22 +448,6 @@ class Editor {
     this.control.setRotationSnap(0.01);
     console.log("Control Sensitivity:", this.control.sensitivity);
 
-    // OnClick and MouseMove events.
-    window.addEventListener(
-      "mousemove",
-      this.mouse_controls.onMouseMove.bind(this.mouse_controls),
-      false,
-    );
-    window.addEventListener(
-      "click",
-      this.mouse_controls.onMouseClick.bind(this.mouse_controls),
-      false,
-    );
-    window.addEventListener(
-      "keydown",
-      this.mouse_controls.onkeydown.bind(this.mouse_controls),
-      false,
-    );
     // Base control and debug stuff remove debug in prod.
     if (this.control == undefined) {
       return;
@@ -486,22 +479,29 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    window.addEventListener(
-      "mousedown",
-      this.mouse_controls.onMouseDown.bind(this.mouse_controls),
-      false,
-    );
-    window.addEventListener(
-      "mouseup",
-      this.mouse_controls.onMouseUp.bind(this.mouse_controls),
-      false,
-    );
-
     // saving state of the scene
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
 
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
+
+    if (this.outliner_feature_flag) {
+      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      if (result) outlinerState.items.value = result.items;
+    }
+
+    this.mouse_controls = new MouseControls(this.camera, this.camera_person_mode, this.lockControls,
+      this.camera_last_pos, this.orbitControls,
+      this.selectedCanvas, this.switchPreviewToggle, this.rendering, this.togglePlayback.bind(this),
+      this.deleteObject.bind(this), this.canvReference, this.mouse, this.timeline.mouse,
+      this.raycaster, this.control, this.outlinePass, this.activeScene.scene,
+      this.publishSelect.bind(this), this.updateSelectedUI.bind(this),
+      this.transform_interaction, this.last_selected, this.getAssetType.bind(this), this.setSelected.bind(this));
+
+    if (this.outliner_feature_flag) {
+      this.sceneManager = new SceneManager(this.version, this.mouse_controls, this.activeScene, true); // Enabled dev mode.
+      this.mouse_controls.sceneManager = this.sceneManager;
+    }
 
     // Creates the main update loop.
     //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
@@ -585,17 +585,31 @@ class Editor {
       action: fromEngineActions.RESET_TIMELINE,
       data: null,
     });
+
+    if (this.outliner_feature_flag) {
+      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      if (result) outlinerState.items.value = result.items;
+    }
   }
 
   public async loadScene(scene_media_token: string) {
     await this.save_manager.loadScene(scene_media_token);
-
+    if (this.outliner_feature_flag) {
+      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      if (result) outlinerState.items.value = result.items;
+    }
     // publish to the UI the values for the prompts and artistic style and settings?
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.UPDATE_TIME,
       data: { currentTime: 1 },
     });
+  }
+
+  setSelected(object: THREE.Object3D[] | undefined) {
+    if (this.sceneManager) {
+      this.sceneManager.selected_objects = object;
+    }
   }
 
   isObjectLipsync(object_uuid: string) {
@@ -607,7 +621,11 @@ class Editor {
   }
 
   lockUnlockObject(object_uuid: string): boolean {
-    return this.utils.lockUnlockObject(object_uuid);
+    let res = this.utils.lockUnlockObject(object_uuid);
+    if(this.outliner_feature_flag) {
+      this.updateSelectedUI();
+    }
+    return res;
   }
 
   setColor(object_uuid: string, hex_color: string) {
@@ -633,29 +651,6 @@ class Editor {
       sceneToken: sceneToken,
       sceneGenerationMetadata: sceneGenerationMetadata,
     });
-  }
-
-  /**
-   * This cleans up the transform controls
-   * During saving it
-   * Doesn't retain those controls.
-   * @returns
-   */
-  removeTransformControls(remove_outline: boolean = true) {
-    if (this.control == undefined) {
-      return;
-    }
-    if (this.outlinePass == undefined) {
-      return;
-    }
-    if (remove_outline) {
-      this.last_selected = this.selected;
-      this.selected = undefined;
-      this.publishSelect();
-    }
-    this.control.detach();
-    this.activeScene.scene.remove(this.control);
-    if (remove_outline) this.outlinePass.selectedObjects = [];
   }
 
   switchCameraView() {
@@ -737,6 +732,10 @@ class Editor {
 
   deleteObject(uuid: string) {
     this.utils.deleteObject(uuid);
+    if (this.outliner_feature_flag) {
+      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      if (result) outlinerState.items.value = result.items;
+    }
   }
 
   create_parim(name: string, pos: THREE.Vector3) {
@@ -763,14 +762,14 @@ class Editor {
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 1024
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 576
               : 1000;
         const height =
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 576
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 1024
               : 1000;
 
@@ -816,6 +815,11 @@ class Editor {
 
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
+
+      if (this.outliner_feature_flag) {
+        let result = this.sceneManager?.render_outliner(this.timeline.characters);
+        if (result) outlinerState.items.value = result.items;
+      }
     }
 
     if (this.clock == undefined || this.renderer == undefined) {
@@ -980,21 +984,41 @@ class Editor {
   }
 
   updateSelectedUI() {
-    if (this.selected === undefined || this.timeline.is_playing) {
-      return;
+    let mainSelected;
+    if (this.outliner_feature_flag) {
+      if (this.sceneManager?.selected_objects === undefined || this.timeline.is_playing) {
+        return;
+      }
+      if (this.sceneManager?.selected_objects.length <= 0) {
+        return 0;
+      }
+
+      mainSelected = this.sceneManager?.selected_objects[0];
     }
-    const pos = this.selected.position;
-    const rot = this.selected.rotation;
-    const scale = this.selected.scale;
+    else {
+      if (this.timeline.is_playing) {
+        return;
+      }
+
+      if (this.selected == undefined) {
+        return 0;
+      }
+      mainSelected = this.selected;
+    }
+
+    this.selected = mainSelected;
+    const pos = mainSelected.position;
+    const rot = mainSelected.rotation;
+    const scale = mainSelected.scale;
 
     // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
     updateObjectPanel({
       group:
-        this.selected.name === this.camera_name
+        mainSelected.name === this.camera_name
           ? ClipGroup.CAMERA
           : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-      object_uuid: this.selected.uuid,
-      object_name: this.selected.name,
+      object_uuid: mainSelected.uuid,
+      object_name: mainSelected.name,
       version: String(this.version),
       objectVectors: {
         position: {
@@ -1074,26 +1098,52 @@ class Editor {
   }
 
   publishSelect() {
-    if (this.selected) {
-      console.log("publish", this.selected);
-      Queue.publish({
-        queueName: QueueNames.FROM_ENGINE,
-        action: fromEngineActions.SELECT_OBJECT,
-        data: {
-          type: this.getAssetType(this.selected),
-          object_uuid: this.selected.uuid,
-          version: 1,
-          media_id: this.selected.id.toString(),
-          name: "",
-        } as MediaItem,
-      });
-      return;
+    if (this, this.outliner_feature_flag) {
+      if (this.sceneManager?.selected_objects && this.sceneManager?.selected_objects?.length > 0) {
+        Queue.publish({
+          queueName: QueueNames.FROM_ENGINE,
+          action: fromEngineActions.SELECT_OBJECT,
+          data: {
+            type: this.getAssetType(this.sceneManager?.selected_objects[0]),
+            object_uuid: this.sceneManager?.selected_objects[0].uuid,
+            version: 1,
+            media_id: this.sceneManager?.selected_objects[0].id.toString(),
+            name: "",
+          } as MediaItem,
+        });
+        return;
+      }
+      else {
+        Queue.publish({
+          queueName: QueueNames.FROM_ENGINE,
+          action: fromEngineActions.DESELECT_OBJECT,
+          data: null,
+        });
+      }
     }
-    Queue.publish({
-      queueName: QueueNames.FROM_ENGINE,
-      action: fromEngineActions.DESELECT_OBJECT,
-      data: null,
-    });
+    else {
+      if (this.selected) {
+        Queue.publish({
+          queueName: QueueNames.FROM_ENGINE,
+          action: fromEngineActions.SELECT_OBJECT,
+          data: {
+            type: this.getAssetType(this.selected),
+            object_uuid: this.selected.uuid,
+            version: 1,
+            media_id: this.selected.id.toString(),
+            name: "",
+          } as MediaItem,
+        });
+        return;
+      }
+      else {
+        Queue.publish({
+          queueName: QueueNames.FROM_ENGINE,
+          action: fromEngineActions.DESELECT_OBJECT,
+          data: null,
+        });
+      }
+    }
   }
 }
 

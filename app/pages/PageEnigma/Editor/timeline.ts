@@ -27,6 +27,8 @@ import EmotionEngine from "./emotion_engine";
 import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
+import { outlinerState } from "../signals";
+
 export class TimeLine {
   editorEngine: Editor;
   timeline_items: ClipUI[];
@@ -151,22 +153,27 @@ export class TimeLine {
       case toEngineActions.UNMUTE:
         await this.mute(data.data as ClipUI, true);
         break;
-
       // Create operations
       case toEngineActions.ADD_CHARACTER:
         this.addCharacter(data.data as MediaItem);
+        let result = this.editorEngine.sceneManager?.render_outliner(this.characters);
+        if(result) outlinerState.items.value = result.items;
         break;
       case toEngineActions.ADD_OBJECT: {
         const newObject = await this.addObject(data.data as MediaItem);
         this.queueNewObjectMessage(newObject, data.data as MediaItem);
+        let result = this.editorEngine.sceneManager?.render_outliner(this.characters);
+        console.log(result)
+        if(result) outlinerState.items.value = result.items;
         break;
       }
       case toEngineActions.ADD_SHAPE: {
         const newShape = await this.addShape(data.data as MediaItem);
         this.queueNewObjectMessage(newShape, data.data as MediaItem);
+        let result = this.editorEngine.sceneManager?.render_outliner(this.characters);
+        if(result) outlinerState.items.value = result.items;
         break;
       }
-
       case toEngineActions.ENTER_PREVIEW_STATE:
         await this.editorEngine.switchPreview();
         break;
@@ -217,7 +224,7 @@ export class TimeLine {
     obj.position.copy(pos);
     const object_uuid = obj.uuid;
 
-    this.characters[object_uuid] = ClipGroup.CHARACTER;
+    this.characters[object_uuid] = ClipGroup.CHARACTER; // TODO: Create a class to make the idea of a character.
     new_data["object_uuid"] = object_uuid;
 
     Queue.publish({
@@ -297,8 +304,8 @@ export class TimeLine {
     const raycaster = new THREE.Raycaster();
     raycaster.layers.enable(0);
     raycaster.layers.enable(1);
-    if (this.mouse && this.camera) {
-      raycaster.setFromCamera(this.mouse, this.camera);
+    if (this.editorEngine.mouse && this.camera) {
+      raycaster.setFromCamera(this.editorEngine.mouse, this.camera);
       const intersects = raycaster.intersectObjects(
         this.scene.scene.children,
         false,

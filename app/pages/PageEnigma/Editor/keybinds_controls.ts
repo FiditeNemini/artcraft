@@ -1,32 +1,137 @@
-import Editor from "./editor";
 import * as THREE from "three";
-import { hideObjectPanel, hotkeysStatus, showObjectPanel } from "../signals";
+import { hideObjectPanel, hotkeysStatus, outlinerState, showObjectPanel } from "../signals";
+import { OrbitControls, OutlinePass, PointerLockControls } from "three/examples/jsm/Addons.js";
+import { TransformControls } from "./TransformControls";
+import { SceneManager, SceneObject } from "./scene_manager_api";
 
 export class MouseControls {
-    editor: Editor;
+    camera: THREE.PerspectiveCamera | null;
+    camera_person_mode: boolean;
+    lockControls: PointerLockControls | undefined;
+    camera_last_pos: THREE.Vector3;
+    selected: THREE.Object3D[] | undefined;
+    orbitControls: OrbitControls | undefined;
+    selectedCanvas: boolean;
+    switchPreviewToggle: boolean;
+    rendering: boolean;
+    togglePlayback: Function;
+    deleteObject: Function;
+    canvReference: HTMLCanvasElement | null = null;
+    mouse: THREE.Vector2 | undefined;
+    timeline_mouse: THREE.Vector2 | undefined;
+    control: TransformControls | undefined;
+    raycaster: THREE.Raycaster | undefined;
+    outlinePass: OutlinePass | undefined;
+    scene: THREE.Scene;
+    publishSelect: Function;
+    updateSelectedUI: Function;
+    transform_interaction: boolean;
+    last_selected: THREE.Object3D[] | undefined;
+    getAssetType: Function;
+    setSelected: Function;
+    sceneManager: SceneManager | undefined;
 
-    constructor(editor: Editor) {
-        this.editor = editor;
+    constructor(camera: THREE.PerspectiveCamera | null, camera_person_mode: boolean, lockControls: PointerLockControls | undefined,
+        camera_last_pos: THREE.Vector3, orbitControls: OrbitControls | undefined,
+        selectedCanvas: boolean, switchPreviewToggle: boolean, rendering: boolean, togglePlayback: Function,
+        deleteObject: Function, canvReference: HTMLCanvasElement | null,
+        mouse: THREE.Vector2 | undefined, timeline_mouse: THREE.Vector2 | undefined,
+        raycaster: THREE.Raycaster | undefined, control: TransformControls | undefined,
+        outlinePass: OutlinePass | undefined, scene: THREE.Scene,
+        publishSelect: Function, updateSelectedUI: Function,
+        transform_interaction: boolean, last_selected: THREE.Object3D | undefined,
+        getAssetType: Function, setSelected: Function
+    ) {
+        this.camera = camera;
+        this.camera_person_mode = camera_person_mode;
+        this.lockControls = lockControls;
+        this.camera_last_pos = camera_last_pos;
+        this.selected = [];
+        this.orbitControls = orbitControls;
+        this.selectedCanvas = selectedCanvas;
+        this.switchPreviewToggle = switchPreviewToggle;
+        this.rendering = rendering;
+        this.togglePlayback = togglePlayback;
+        this.deleteObject = deleteObject;
+        this.canvReference = canvReference;
+        this.mouse = mouse;
+        this.timeline_mouse = timeline_mouse;
+        this.raycaster = raycaster;
+        this.control = control;
+        this.outlinePass = outlinePass;
+        this.scene = scene;
+        this.publishSelect = publishSelect;
+        this.updateSelectedUI = updateSelectedUI;
+        this.transform_interaction = transform_interaction;
+        this.last_selected = [];
+        this.getAssetType = getAssetType;
+        this.setSelected = setSelected;
+        this.sceneManager = undefined;
+    }
+
+    focus() {
+        if(this.orbitControls){
+            this.orbitControls.target.copy(this.selected[0].position);
+            this.orbitControls.maxDistance = 4;
+            this.orbitControls.update();
+            this.orbitControls.maxDistance = 999;
+        }
+    }
+
+    removeTransformControls(remove_outline: boolean = true) {
+        if (this.control == undefined) {
+            return;
+        }
+        if (this.outlinePass == undefined) {
+            return;
+        }
+        if (remove_outline) {
+            this.last_selected = this.selected;
+            this.selected = [];
+            this.publishSelect();
+        }
+        this.control.detach();
+        this.scene.remove(this.control);
+        if (remove_outline) this.outlinePass.selectedObjects = [];
+    }
+
+    selectObject(currentObject: THREE.Object3D) {
+        this.setSelected(this.selected);
+        this.publishSelect();
+
+        // this.editor.update_properties()
+        if (currentObject.userData["locked"] !== true && this.control) {
+            this.scene.add(this.control);
+            this.control.attach(currentObject);
+        }
+
+        if(this.selected && this.outlinePass){
+            this.outlinePass.selectedObjects = this.selected;
+        }
+        this.transform_interaction = true;
+        // Contact react land
+        showObjectPanel();
+        this.updateSelectedUI();
     }
 
     onMouseDown(event: any) {
-        if (event.button === 1 && this.editor.camera_person_mode) {
-            this.editor.lockControls?.lock();
+        if (event.button === 1 && this.camera_person_mode) {
+            this.lockControls?.lock();
         }
     }
 
     onMouseUp(event: any) {
         if (event.button === 1) {
-            this.editor.lockControls?.unlock();
+            this.lockControls?.unlock();
         }
 
-        if (event.button !== 0 && this.editor.camera) {
+        if (event.button !== 0 && this.camera) {
             const camera_pos = new THREE.Vector3(
-                parseFloat(this.editor.camera.position.x.toFixed(2)),
-                parseFloat(this.editor.camera.position.y.toFixed(2)),
-                parseFloat(this.editor.camera.position.z.toFixed(2)),
+                parseFloat(this.camera.position.x.toFixed(2)),
+                parseFloat(this.camera.position.y.toFixed(2)),
+                parseFloat(this.camera.position.z.toFixed(2)),
             );
-            this.editor.camera_last_pos.copy(camera_pos);
+            this.camera_last_pos.copy(camera_pos);
         }
     }
 
@@ -34,79 +139,78 @@ export class MouseControls {
         if (hotkeysStatus.value.disabled) {
             return;
         }
-        else if (event.key === "f" && this.editor.selected && this.editor.orbitControls) {
-            this.editor.orbitControls.target.copy(this.editor.selected.position);
-            this.editor.orbitControls.maxDistance = 4;
-            this.editor.orbitControls.update();
-            this.editor.orbitControls.maxDistance = 999;
+        else if (event.key === "f" && this.selected && this.orbitControls) {
+            this.focus();
             return;
         }
         else if (event.key === " ") {
-            if (!this.editor.rendering && !this.editor.switchPreviewToggle && this.editor.selectedCanvas) {
-                this.editor.togglePlayback();
+            if (!this.rendering && !this.switchPreviewToggle && this.selectedCanvas) {
+                this.togglePlayback();
             }
             return;
         }
         else if (event.key === "Backspace" || event.key === "Delete") {
-            if (this.editor.selected) {
-                this.editor.deleteObject(this.editor.selected.uuid);
+            if (this.selected) {
+                this.selected.forEach(selected => {
+                    this.deleteObject(selected.uuid);
+                });
             }
             return;
         }
         else if (event.key === "t") { // transform
-            this.editor.control?.setMode("translate");
+            this.control?.setMode("translate");
             return;
         }
         else if (event.key === "r") { // rotate
-            this.editor.control?.setMode("rotate");
+            this.control?.setMode("rotate");
             return;
         }
         else if (event.key === "g") { // scale
-            this.editor.control?.setMode("scale");
+            this.control?.setMode("scale");
             return;
         }
     }
 
     // Sets new mouse location usually used in raycasts.
-    onMouseMove(event: any) {
-        if(this.editor.canvReference == undefined) { return; }
-        const rect = this.editor.canvReference.getBoundingClientRect();
-        if (this.editor.mouse == undefined) {
+    onMouseMove(event: MouseEvent) {
+        if (this.canvReference == undefined) { return; }
+        const rect = this.canvReference.getBoundingClientRect();
+        if (this.mouse == undefined) {
             return;
         }
-        this.editor.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        this.editor.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        this.editor.timeline.mouse = this.editor.mouse;
+        this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        this.timeline_mouse = this.mouse;
     }
 
     // When the mouse clicks the screen.
     onMouseClick() {
-        if(this.editor.camera == undefined) { return; }
+        if (this.camera == undefined) { return; }
         const camera_pos = new THREE.Vector3(
-            parseFloat(this.editor.camera.position.x.toFixed(2)),
-            parseFloat(this.editor.camera.position.y.toFixed(2)),
-            parseFloat(this.editor.camera.position.z.toFixed(2)),
+            parseFloat(this.camera.position.x.toFixed(2)),
+            parseFloat(this.camera.position.y.toFixed(2)),
+            parseFloat(this.camera.position.z.toFixed(2)),
         );
-        if (this.editor.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
-            this.editor.camera_last_pos.copy(camera_pos);
+        if (this.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
+            this.camera_last_pos.copy(camera_pos);
         }
 
         if (
-            this.editor.raycaster == undefined ||
-            this.editor.mouse == undefined ||
-            this.editor.control == undefined ||
-            this.editor.outlinePass == undefined ||
-            this.editor.camera_person_mode ||
-            !this.editor.camera_last_pos.equals(camera_pos)
+            this.raycaster == undefined ||
+            this.mouse == undefined ||
+            this.control == undefined ||
+            this.outlinePass == undefined ||
+            this.camera_person_mode ||
+            !this.camera_last_pos.equals(camera_pos)
         ) {
-            this.editor.camera_last_pos.copy(camera_pos);
+            this.camera_last_pos.copy(camera_pos);
             return;
         }
-        this.editor.camera_last_pos.copy(camera_pos);
+        this.camera_last_pos.copy(camera_pos);
 
-        this.editor.raycaster.setFromCamera(this.editor.mouse, this.editor.camera);
+        this.raycaster.setFromCamera(this.mouse, this.camera);
         const interactable: any[] = [];
-        this.editor.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+        this.scene.children.forEach((child: THREE.Object3D) => {
             if (child.name != "") {
                 if (
                     child.type == "Mesh" ||
@@ -118,7 +222,7 @@ export class MouseControls {
                 }
             }
         });
-        const intersects = this.editor.raycaster.intersectObjects(interactable, true);
+        const intersects = this.raycaster.intersectObjects(interactable, true);
 
         if (intersects.length > 0) {
             if (intersects[0].object.type != "GridHelper") {
@@ -126,30 +230,29 @@ export class MouseControls {
                 while (currentObject.parent && currentObject.parent.type !== "Scene") {
                     currentObject = currentObject.parent;
                 }
-                this.editor.selected = currentObject;
+
+                this.selected = [];
+
                 // Show panel here
-
-                if (this.editor.selected.type == "Scene") {
-                    this.editor.selected = intersects[0].object;
+                if (currentObject.type == "Scene") {
+                    this.selected?.push(intersects[0].object);
                 }
-                this.editor.activeScene.selected = this.editor.selected;
-                this.editor.publishSelect();
-
-                // this.editor.update_properties()
-                if (this.editor.selected.userData["locked"] !== true) {
-                    this.editor.activeScene.scene.add(this.editor.control);
-                    this.editor.control.attach(this.editor.selected);
+                else {
+                    this.selected?.push(currentObject);
                 }
 
-                this.editor.outlinePass.selectedObjects = [this.editor.selected];
-                this.editor.transform_interaction = true;
-                // Contact react land
-                showObjectPanel();
-                this.editor.updateSelectedUI();
+                this.selectObject(currentObject);
             }
         } else {
-            this.editor.removeTransformControls();
+            this.selected = [];
+            this.setSelected(this.selected);
+            this.removeTransformControls();
             hideObjectPanel();
+        }
+
+        if (this.sceneManager) {
+            const selected: SceneObject | null = this.sceneManager.selected();
+            outlinerState.selectedItem.value = selected;
         }
     }
 }

@@ -2,22 +2,22 @@ import { useContext, useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "@remix-run/react";
 import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import {
-  // faCheckSquare,
+  faCheckSquare,
   faFile,
-  // faSquare,
+  faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { ToastTypes, getArtStyle } from "~/enums";
 import { scene, signalScene, authentication, addToast } from "~/signals";
-// import { outlinerIsShowing } from "~/pages/PageEnigma/signals/outliner/outliner";
+import { outlinerIsShowing } from "~/pages/PageEnigma/signals/outliner/outliner";
 
 import {
   ButtonDialogue,
   ButtonDropdown,
   Input,
   H4,
-  // Button,
+  Button,
 } from "~/components";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
@@ -37,7 +37,7 @@ import {
   upscale,
 } from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
-// import { twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 
 export const ControlsTopButtons = () => {
   useSignals();
@@ -173,9 +173,9 @@ export const ControlsTopButtons = () => {
     }
   });
 
-  // const handleShowOutliner = () => {
-  //   outlinerIsShowing.value = !outlinerIsShowing.value;
-  // };
+   const handleShowOutliner = () => {
+     outlinerIsShowing.value = !outlinerIsShowing.value;
+   };
 
   return (
     <div className="flex flex-col gap-2 pl-2 pt-2">
@@ -309,7 +309,7 @@ export const ControlsTopButtons = () => {
           ]}
         />
 
-        {/* //TODO: uncomment to show outliner button
+        
         <Button
           icon={outlinerIsShowing.value ? faCheckSquare : faSquare}
           className="shadow-xl"
@@ -323,7 +323,7 @@ export const ControlsTopButtons = () => {
           onClick={handleShowOutliner}
         >
           Outliner
-        </Button> */}
+        </Button> 
 
         <ButtonDialogue
           buttonProps={{

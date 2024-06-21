@@ -12,7 +12,6 @@ class Scene {
   gridHelper: THREE.GridHelper | undefined;
   scene: THREE.Scene;
   hot_items: THREE.Object3D[] | undefined;
-  selected: THREE.Object3D | undefined;
 
   // Display message
   message_mesh: THREE.Mesh | undefined;
@@ -30,7 +29,6 @@ class Scene {
     this.gridHelper;
     this.scene = new THREE.Scene();
     this.hot_items = [];
-    this.selected = undefined;
 
     this.message_mesh = undefined;
     this.loading_placeholder = undefined;
@@ -136,8 +134,6 @@ class Scene {
           "",
         );
         if (obj_keyframe_uuid === keyframe_uuid) {
-          console.log("FOUNDDDD", obj_keyframe_uuid);
-          console.log("Found!", object);
           this.scene.remove(object);
           return;
         }
@@ -267,6 +263,13 @@ class Scene {
           }
         }
       });
+    }
+  }
+
+  setVisible(object_uuid: string, visible: boolean) {
+    let object = this.get_object_by_uuid(object_uuid);
+    if (object) {
+      object.visible = visible;
     }
   }
 
