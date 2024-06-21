@@ -166,7 +166,7 @@ export class MediaUploadApi extends ApiManager {
   }
 
   public async UploadPmx({
-    blob,
+    file,
     fileName,
     uuid,
     engine_category,
@@ -175,7 +175,7 @@ export class MediaUploadApi extends ApiManager {
     maybe_title,
     maybe_visibility = Visibility.Public,
   }: {
-    blob: Blob;
+    file: File;
     fileName: string;
     uuid: string;
     engine_category?: string;
@@ -193,7 +193,7 @@ export class MediaUploadApi extends ApiManager {
       maybe_title,
       maybe_visibility,
     };
-    return this.Upload({ endpoint, blob, fileName, uuid, options });
+    return this.Upload({ endpoint, blob: file, fileName, uuid, options });
   }
 
   public async UploadSavedScene({

@@ -6,27 +6,23 @@ import {
   TransitionDialogue,
   LoadingDots,
 } from "~/components";
-import {
-  UploadNewEngineAsset,
-  UploadNewEngineAssetResponse,
-  MediaFileAnimationType,
-  MediaFileEngineCategory,
-} from "~/api/media_files/UploadNewEngineAsset";
-import {
-  UploadMedia,
-  UploadMediaResponse,
-} from "~/api/media_files/UploadMedia";
+
 import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+// import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 
-import { EditCoverImage } from "~/api/media_files/EditCoverImage";
-import { AssetType } from "~/enums";
+import {
+  AssetType,
+  FilterEngineCategories,
+  MediaFileAnimationType,
+} from "~/enums";
 
 import "./UploadModal.scss";
+import { MediaFilesApi, MediaUploadApi } from "~/Classes/ApiManager";
+import { getFileExtension, getFileName } from "~/utilities";
 
 interface Props {
   closeModal: () => void;
@@ -62,13 +58,14 @@ export function UploadModal({
   type,
 }: Props) {
   const [title, titleSet] = useState("");
-  const [visibility, visibilitySet] = useState("public");
+  // const [visibility, visibilitySet] = useState("public");
   const [objUploadStatus, objUploadStatusSet] = useState(UploaderState.ready);
   const [assetToken, assetTokenSet] = useState("");
   const [coverToken, coverTokenSet] = useState("");
   const [targetNode, targetNodeSet] = useState<HTMLCanvasElement | null>(null);
-  const [animationType, animationTypeSet] =
-    useState<MediaFileAnimationType | null>(null);
+  const [animationType, animationTypeSet] = useState<
+    MediaFileAnimationType | undefined
+  >(undefined);
 
   const isCharacter = type === AssetType.CHARACTER;
 
@@ -81,11 +78,11 @@ export function UploadModal({
   const resetModalState = useCallback(() => {
     setResetModal(false);
     titleSet("");
-    visibilitySet("");
+    // visibilitySet("");
     objUploadStatusSet(UploaderState.ready);
     assetTokenSet("");
     coverTokenSet("");
-    animationTypeSet(null);
+    animationTypeSet(undefined);
   }, [setResetModal]);
 
   useEffect(() => {
@@ -98,7 +95,6 @@ export function UploadModal({
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
       camera.position.z = 2;
-
 
       const renderer = new THREE.WebGLRenderer({
         alpha: true,
@@ -114,7 +110,7 @@ export function UploadModal({
       scene.add(light);
 
       if (file) {
-        if (file.name.includes(".glb")){
+        if (file.name.includes(".glb")) {
           const loader = new GLTFLoader();
           loader.load(
             URL.createObjectURL(file),
@@ -122,7 +118,6 @@ export function UploadModal({
               glb.scene.children.forEach((child) => {
                 child.userData["color"] = "#FFFFFF";
                 scene.add(child);
-
 
                 let maxSize = 2;
                 if (scene.children.length > 0) {
@@ -164,8 +159,10 @@ export function UploadModal({
         } else if (file.name.includes(".pmd")) {
           camera.position.z = 30;
           const loader = new FontLoader();
-          loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-              const textGeometry = new TextGeometry( 'MMD', {
+          loader.load(
+            "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
+            function (font) {
+              const textGeometry = new TextGeometry("MMD", {
                 font: font,
                 size: 100,
                 depth: 5,
@@ -174,16 +171,19 @@ export function UploadModal({
                 bevelThickness: 1,
                 bevelSize: 1,
                 bevelOffset: 0,
-                bevelSegments: 5
-              } );
+                bevelSegments: 5,
+              });
               textGeometry.computeBoundingBox();
-              const textMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+              const textMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+              });
               const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-              textMesh.scale.set(0.15,0.15,0.01);
-              textMesh.position.set(-22,-5,0);
+              textMesh.scale.set(0.15, 0.15, 0.01);
+              textMesh.position.set(-22, -5, 0);
               scene.add(textMesh);
               renderer.render(scene, camera);
-          });
+            },
+          );
 
           // Cant load MMD due to threejs loader expecting ending extention.
           // const mmdLoader = new MMDLoader();
@@ -224,69 +224,81 @@ export function UploadModal({
   // ];
   // const visiblityId = `fy-uploader-modal-visibility-${useId()}`;
 
-  const setCoverImage = (asset: string, cover: string) => {
+  const setCoverImage = async (assetToken: string, thumbnailToken: string) => {
     objUploadStatusSet(UploaderState.settingCover);
-    EditCoverImage(asset, {
-      cover_image_media_file_token: cover,
-    })
-      .then(() => {
-        objUploadStatusSet(UploaderState.success);
-        onSuccess();
-      })
-      .catch(() => {
-        objUploadStatusSet(UploaderState.coverSetError);
-      });
+    const mediaFilesApi = new MediaFilesApi();
+    const setThumbnailResponse = await mediaFilesApi.UpdateCoverImage({
+      mediaFileToken: assetToken,
+      imageToken: thumbnailToken,
+    });
+    if (!setThumbnailResponse.success) {
+      objUploadStatusSet(UploaderState.coverSetError);
+      return;
+    }
+    objUploadStatusSet(UploaderState.success);
   };
 
-  const createCoverImage = (asset: string) => {
-    targetNode?.toBlob((blob: Blob | null) => {
+  const createCoverImage = async (assetToken: string) => {
+    if (!targetNode) {
+      //TODO: Verbose Error
+      return;
+    }
+    await targetNode.toBlob(async (blob: Blob | null) => {
       if (!blob) {
+        //TODO: Verbose Error
         return;
       }
-      // TODO failure modal
-      const newCap = new File([blob], "storyteller-cap.png");
+      const thumbnailFile = new File([blob], "storyteller-cap.png");
       objUploadStatusSet(UploaderState.uploadingCover);
-      UploadMedia({
-        uuid_idempotency_token: uuidv4(),
-        file: newCap,
-        source: "file",
-        title: `Cover image${title ? " for " + title : ""}`,
-      })
-        .then((captureRes: UploadMediaResponse) => {
-          coverTokenSet(captureRes.media_file_token);
-          setCoverImage(asset, captureRes.media_file_token);
-        })
-        .catch(() => {
-          objUploadStatusSet(UploaderState.coverCreateError);
-        });
+      const mediaUploadApi = new MediaUploadApi();
+      const thumbnailResponse = await mediaUploadApi.UploadImage({
+        uuid: uuidv4(),
+        blob: thumbnailFile,
+        fileName: getFileName(thumbnailFile),
+        maybe_title: "thumbnail_" + title,
+      });
+      if (!thumbnailResponse.success || !thumbnailResponse.data) {
+        objUploadStatusSet(UploaderState.coverCreateError);
+        return;
+      }
+      coverTokenSet(thumbnailResponse.data);
+      setCoverImage(assetToken, thumbnailResponse.data);
     });
   };
 
-  const uploadAsset = () => {
+  const uploadAsset = async () => {
     objUploadStatusSet(UploaderState.uploadingAsset);
-    UploadNewEngineAsset({
-      engine_category: isCharacter
-        ? MediaFileEngineCategory.Character
-        : MediaFileEngineCategory.Object,
-      file,
-      maybe_title: title,
-      maybe_visibility: visibility === "public" ? "public" : "private",
-      uuid_idempotency_token: uuidv4(),
-      ...(isCharacter && animationType
-        ? {
+    const mediaUploadApi = new MediaUploadApi();
+    const fileExtension = getFileExtension(file);
+    console.log(fileExtension);
+    const assetReponse =
+      fileExtension === ".zip"
+        ? await mediaUploadApi.UploadPmx({
+            file: file,
+            fileName: file.name,
+            engine_category: FilterEngineCategories.CHARACTER,
+            maybe_title: title,
             maybe_animation_type: animationType,
-          }
-        : {}),
-    })
-      .then((assetRes: UploadNewEngineAssetResponse) => {
-        if ("media_file_token" in assetRes) {
-          assetTokenSet(assetRes.media_file_token);
-          createCoverImage(assetRes.media_file_token);
-        }
-      })
-      .catch(() => {
-        objUploadStatusSet(UploaderState.assetError);
-      });
+            uuid: uuidv4(),
+          })
+        : await mediaUploadApi.UploadNewEngineAsset({
+            file: file,
+            fileName: file.name,
+            engine_category: isCharacter
+              ? FilterEngineCategories.CHARACTER
+              : FilterEngineCategories.OBJECT,
+            maybe_animation_type: animationType,
+            maybe_title: title,
+            uuid: uuidv4(),
+          });
+
+    if (!assetReponse.success || !assetReponse.data) {
+      objUploadStatusSet(UploaderState.assetError);
+      return;
+    }
+
+    assetTokenSet(assetReponse.data);
+    createCoverImage(assetReponse.data);
   };
 
   const animationOptions = [
@@ -356,7 +368,7 @@ export function UploadModal({
                     animationTypeSet(value);
                   }}
                   placeholder="Select an animation type (optional)"
-                  value={animationType!}
+                  value={animationType}
                 />
               </>
             ) : null}
@@ -398,11 +410,12 @@ export function UploadModal({
               {...{
                 className: "uploader-message",
               }}
-            >{`Added ${title} to objects`}</div>
+            >{`Added ${title} to your library`}</div>
             <div className="mt-6 flex justify-end gap-2">
               <Button
                 {...{
                   onClick: () => {
+                    onSuccess();
                     closeModal();
                     onClose();
                   },

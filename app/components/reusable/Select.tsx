@@ -11,7 +11,7 @@ interface ListDropdownProps {
   options: SelectOption[];
   onChange: (val: MediaFileAnimationType) => void;
   placeholder?: string;
-  value: SelectValue;
+  value?: SelectValue;
 }
 export const Select = ({
   onChange,
