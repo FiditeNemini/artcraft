@@ -1,20 +1,30 @@
 import { Button, Container, Label, Panel, TempInput } from "components/common";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./BetaKey.scss";
-import { faKey, faPersonWalkingArrowLoopLeft } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faKey,
+  faPersonWalkingArrowLoopLeft,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { RedeemBetaKey } from "@storyteller/components/src/api/beta_key/RedeemBetaKey";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { useSession } from "hooks";
+import LoadingSpinner from "components/common/LoadingSpinner";
 
 export default function RedeemBetaKeyPage() {
   const { token: pageToken } = useParams<{ token: string }>();
-
   const [key, setKey] = useState(pageToken || "");
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const history = useHistory();
-  const { user, loggedIn } = useSession();
+  const { user, loggedIn, sessionFetched } = useSession();
+
+  useEffect(() => {
+    if (sessionStorage.getItem("redirected") === "true") {
+      sessionStorage.removeItem("redirected");
+      window.location.reload();
+    }
+  }, [loggedIn]);
 
   const handleGoToSuccess = () => {
     history.push("/beta-key/redeem/success");
@@ -42,6 +52,20 @@ export default function RedeemBetaKeyPage() {
     }
   };
 
+  if (!sessionFetched) {
+    return (
+      <Container type="panel" className="narrow-container">
+        <div className="d-flex align-items-center justify-content-center vh-100 gap-4">
+          <LoadingSpinner
+            label="Loading"
+            className="me-3 fs-6"
+            labelClassName="fs-4"
+          />
+        </div>
+      </Container>
+    );
+  }
+
   if (!loggedIn) {
     return (
       <Container type="panel" className="narrow-container">
@@ -62,15 +86,21 @@ export default function RedeemBetaKeyPage() {
               </p>
               <div className="d-flex gap-2 mt-2">
                 <Button
-                  label="Sign Up"
+                  label="Login"
                   className="mt-3"
-                  to="/signup?redirect=/beta-key/redeem/"
+                  onClick={() => {
+                    sessionStorage.setItem("redirected", "true");
+                    history.push("/login?redirect=/beta-key/redeem/");
+                  }}
                   variant="secondary"
                 />
                 <Button
-                  label="Login"
+                  label="Sign Up"
                   className="mt-3"
-                  to="/login?redirect=/beta-key/redeem/"
+                  onClick={() => {
+                    sessionStorage.setItem("redirected", "true");
+                    history.push("/signup?redirect=/beta-key/redeem/");
+                  }}
                 />
               </div>
             </div>
@@ -136,7 +166,11 @@ export default function RedeemBetaKeyPage() {
               />
             </div>
           </Panel>
-          <p><Link to="/"><FontAwesomeIcon icon={faPersonWalkingArrowLoopLeft} /> Back Home</Link></p>
+          <p>
+            <Link to="/">
+              <FontAwesomeIcon icon={faPersonWalkingArrowLoopLeft} /> Back Home
+            </Link>
+          </p>
         </div>
       </Container>
     </>
