@@ -40,5 +40,12 @@
     "glb": "GLB",
     "gltf": "gltf",
     "fbx": "FBX"
+  },
+  "MediaClasses": {
+    "unknown": "All media",
+    "audio": "Audio",
+    "image": "Image",
+    "video": "Video",
+    "dimensional": "3D Assets"
   }
 }

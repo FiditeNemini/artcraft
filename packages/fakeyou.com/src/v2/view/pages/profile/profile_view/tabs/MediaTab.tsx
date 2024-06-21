@@ -13,7 +13,8 @@ import Pagination from "components/common/Pagination";
 
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useBookmarks, useListContent, useRatings } from "hooks";
+import { mediaClassOptions } from "components/entities/EntityTypes";
+import { useBookmarks, useListContent, useLocalize, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function MediaTab({ username }: { username: string }) {
@@ -24,17 +25,14 @@ export default function MediaTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [mediaType, mediaTypeSet] = useState(
-    urlQueries.get("filter_media_type") || "all"
+    urlQueries.get("filter_media_classes") || "unknown"
   );
   const [list, listSet] = useState<MediaFile[]>([]);
+
   const media = useListContent({
     addQueries: {
       page_size: urlQueries.get("page_size") || "24",
-      ...prepFilter(
-        mediaType,
-        "filter_media_type",
-        mediaType === "3dFile" ? "bvh,glb,gltf" : ""
-      ),
+      ...prepFilter(mediaType, "filter_media_classes"),
     },
     addSetters: { mediaTypeSet },
     // debug: "profile media",
@@ -50,6 +48,7 @@ export default function MediaTab({ username }: { username: string }) {
     requestList: true,
     urlParam: username.toLowerCase(),
   });
+  const { t } = useLocalize("EntityGeneral");
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     media.pageChange(selectedItem.selected);
@@ -61,14 +60,7 @@ export default function MediaTab({ username }: { username: string }) {
     currentPage: media.page,
   };
 
-  const filterOptions = [
-    { value: "all", label: "All Media" },
-    { value: "image", label: "Images" },
-    { value: "audio", label: "Audio" },
-    { value: "video", label: "Video" },
-    { value: "scene_ron", label: "3D Scenes" },
-    { value: "3dFile", label: "3D Assets" },
-  ];
+  const filterOptions = mediaClassOptions(t);
 
   const sortOptions = [
     { value: false, label: "Newest" },
