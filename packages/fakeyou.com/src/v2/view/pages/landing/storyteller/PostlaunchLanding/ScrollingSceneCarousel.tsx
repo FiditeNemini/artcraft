@@ -59,8 +59,8 @@ export default function ScrollingSceneCarousel({
         gradient={true}
         // this component doesn't seem to like string values and was causing errors
         // so hex is converted to an RGB array -VH
-        // gradientColor="#1a1a27"
-        gradientColor={[26, 26, 29]}
+        gradientColor="#1a1a27"
+        //gradientColor={[26, 26, 29]}
         gradientWidth={small ? 80 : 200}
         speed={small ? 100 : 50}
         pauseOnHover={true}
@@ -85,8 +85,8 @@ export default function ScrollingSceneCarousel({
       {!small && (
         <Marquee
           gradient={true}
-          // gradientColor="#1a1a27"
-          gradientColor={[26, 26, 29]}
+          gradientColor="#1a1a27"
+          //gradientColor={[26, 26, 29]}
           gradientWidth={small ? 80 : 200}
           speed={small ? 100 : 50}
           pauseOnHover={true}
