@@ -187,7 +187,7 @@ pub async fn list_beta_keys_handler(
     }
   }
 
-  let filter_keys = None
+  let filter_keys = query.filter
       .or_else(|| match query.only_list_remaining {
         Some(true) => Some(ListBetaKeysFilterOption::Unredeemed),
         _ => Some(ListBetaKeysFilterOption::All),
