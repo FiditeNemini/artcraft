@@ -44,6 +44,13 @@ use crate::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
+pub enum ListKeyOption {
+  All,
+  Redeemed,
+  Unredeemed,
+}
+
+#[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListBetaKeysQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
@@ -54,6 +61,8 @@ pub struct ListBetaKeysQueryParams {
 
   /// Only return un-redeemed, un-expired keys.
   pub only_list_remaining: Option<bool>,
+
+  pub list_keys: Option<ListKeyOption>,
 }
 
 #[derive(Serialize, ToSchema)]
