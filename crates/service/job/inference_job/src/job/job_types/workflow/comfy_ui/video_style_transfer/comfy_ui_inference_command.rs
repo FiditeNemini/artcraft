@@ -96,6 +96,9 @@ pub struct InferenceArgs<'s> {
     pub use_cinematic: bool,
 
     pub maybe_strength: Option<f32>,
+
+    pub global_ipa_image_filename: Option<String>,
+    pub global_ipa_strength: Option<f32>,
 }
 
 #[derive(Debug)]
@@ -292,6 +295,20 @@ impl ComfyInferenceCommand {
             command.push_str(&strength.to_string());
             command.push_str(" ");
         }
+
+        if let Some(global_ipa_image_filename) = &args.global_ipa_image_filename {
+            // NB: This is very dangerous. We're not handling escaping well.
+            command.push_str(" --global_ipa_image_filename ");
+            command.push_str(&format!("'{}'", global_ipa_image_filename));
+            command.push_str(" ");
+        }
+
+        if let Some(global_ipa_strength) = &args.global_ipa_strength {
+            command.push_str(" --global_ipa_strength ");
+            command.push_str(&format!("{}", global_ipa_strength));
+            command.push_str(" ");
+        }
+
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {
             command = docker_options.to_command_string(&command);

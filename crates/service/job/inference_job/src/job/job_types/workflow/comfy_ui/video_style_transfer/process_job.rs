@@ -322,6 +322,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
             use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
             maybe_strength: comfy_args.strength,
+            global_ipa_image_filename: global_ipa_image
+                .as_ref()
+                .map(|image| path_to_string(&image.ipa_image_path)),
+            global_ipa_strength: None, // TODO: Expose a UI slider
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
