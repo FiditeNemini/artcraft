@@ -44,6 +44,7 @@ import { outlinerState, updateObjectPanel } from "../signals";
 import { GenerationOptions } from "../models/generationOptions";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
+import { MediaUploadApi } from "~/Classes/ApiManager";
 import { SceneManager } from "./scene_manager_api";
 
 export type EditorInitializeConfig = {
@@ -144,8 +145,9 @@ class Editor {
 
   generation_options: GenerationOptions;
 
-  sceneManager: SceneManager | undefined;
+  media_upload: MediaUploadApi;
 
+  sceneManager: SceneManager | undefined;
 
   outliner_feature_flag: boolean;
 
@@ -244,9 +246,8 @@ class Editor {
       cinematic: false,
     };
 
-
+    this.media_upload = new MediaUploadApi();
     this.outliner_feature_flag = true;
-
   }
   getRenderDimensions() {
     switch (this.render_camera_aspect_ratio) {

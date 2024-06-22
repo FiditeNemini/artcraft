@@ -211,4 +211,27 @@ export class MediaUploadApi extends ApiManager {
     const options: Record<string, string | number | undefined> = {};
     return this.Upload({ endpoint, blob, fileName, uuid, options });
   }
+
+  // this is used to send the scene snapshot to the vst upload endpoint this creates a snapshot of the scene where in we can remix from the og.
+  public async UploadSceneSnapshotMediaFileForm({
+    blob,
+    uuid,
+    maybe_title, // title of the scene at the time
+    maybe_scene_source_media_file_token, // original token that started it all
+  }: {
+    blob: Blob;
+    uuid: string;
+    maybe_title: string;
+    maybe_scene_source_media_file_token: string | undefined;
+  }): Promise<ApiResponse<string>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/scene_snapshot`;
+
+    const options: Record<string, string | number | undefined> = {
+      maybe_title: maybe_title,
+      maybe_scene_source_media_file_token: maybe_scene_source_media_file_token,
+    };
+
+    const fileName = `${maybe_title}-${uuid}`;
+    return this.Upload({ endpoint, blob, fileName, uuid, options }); // token comes back and send it VST
+  }
 }

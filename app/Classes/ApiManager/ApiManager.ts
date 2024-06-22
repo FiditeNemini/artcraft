@@ -52,6 +52,7 @@ export class ApiManager {
       : endpoint;
 
     const bodyInString = JSON.stringify(body);
+
     const response = await fetch(endpointWithQueries, {
       method,
       headers: {
@@ -127,7 +128,7 @@ export class ApiManager {
     });
   }
 
-  protected postForm<T>({
+  protected async postForm<T>({
     endpoint,
     formRecord,
     uuid,
@@ -150,10 +151,17 @@ export class ApiManager {
     } else if (blob) {
       formData.append("file", blob);
     }
+
     return this.fetchMultipartFormData<T>(endpoint, {
       method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
       body: formData,
     });
+
+    return response.json();
   }
 
   protected camelToSnakeCase(str: string) {

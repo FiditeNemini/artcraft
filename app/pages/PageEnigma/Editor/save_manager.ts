@@ -13,12 +13,56 @@ export type EditorInitializeConfig = {
   sceneToken: string;
 };
 
+// need to move this into the
 export class SaveManager {
   editor: Editor;
   constructor(editor: Editor) {
     this.editor = editor;
   }
 
+  // JSON structure
+  public async saveData({
+    sceneGenerationMetadata,
+  }: {
+    sceneTitle: string;
+    sceneToken?: string;
+    sceneGenerationMetadata: SceneGenereationMetaData;
+  }): Promise<string> {
+    const proxyScene = new StoryTellerProxyScene(
+      this.editor.version,
+      this.editor.activeScene,
+    );
+    const scene_json = await proxyScene.saveToScene(this.editor.version);
+
+    const proxyTimeline = new StoryTellerProxyTimeline(
+      this.editor.version,
+      this.editor.timeline,
+      this.editor.transform_engine,
+      this.editor.animation_engine,
+      this.editor.audio_engine,
+      this.editor.lipsync_engine,
+      this.editor.emotion_engine,
+    );
+    const timeline_json = await proxyTimeline.saveToJson();
+
+    const save_data = {
+      version: this.editor.version,
+      scene: scene_json,
+      ...sceneGenerationMetadata,
+      timeline: timeline_json,
+    };
+
+    // const result = await this.editor.api_manager.saveSceneState({
+    //   saveJson: JSON.stringify(save_data),
+    //   sceneTitle,
+    //   sceneToken,
+    //   sceneThumbnail,
+    // });
+
+    return JSON.stringify(save_data);
+  }
+
+  // TODO Move this function into scene manager.
   public async saveScene({
     sceneTitle,
     sceneToken,

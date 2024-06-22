@@ -10,6 +10,10 @@ import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { Visibility } from "./api_manager.js";
 import * as THREE from "three";
 import { getSceneSignals } from "~/signals";
+import { v4 as uuidv4 } from "uuid";
+import { SceneGenereationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
+
+// TODO THIS CLASS MAKES NO SENSE Refactor so we generate all the frames first. then pass it through this pipeline as a data structure process it. through this class.
 
 export class VideoGeneration {
   editor: Editor;
@@ -254,12 +258,62 @@ export class VideoGeneration {
     const style_name = this.editor.art_style.toString();
     const media_token = this.editor.current_scene_media_token || undefined;
 
+    const metaData: SceneGenereationMetaData = {
+      artisticStyle: this.editor.art_style,
+      positivePrompt: this.editor.positive_prompt,
+      negativePrompt: this.editor.negative_prompt,
+      cameraAspectRatio: this.editor.render_camera_aspect_ratio,
+      adapterImageToken: "",
+      upscale: this.editor.generation_options.upscale,
+      faceDetail: this.editor.generation_options.faceDetail,
+      styleStrength: this.editor.generation_options.styleStrength,
+      lipSync: this.editor.generation_options.lipSync,
+      cinematic: this.editor.generation_options.cinematic,
+    };
+
+    // This is to save the snapshot of the scene for remixing...
+    const uuid_snapshot = uuidv4();
+
+    const saveData = await this.editor.save_manager.saveData({
+      sceneTitle: title,
+      sceneToken: media_token,
+      sceneGenerationMetadata: metaData,
+    });
+
+    console.log("SAVE DATA:");
+    console.log(saveData);
+    const file = new File([saveData], `${title}.glb`, {
+      type: "application/json",
+    });
+
+    const response =
+      await this.editor.media_upload.UploadSceneSnapshotMediaFileForm({
+        maybe_title: title,
+        maybe_scene_source_media_file_token: media_token, // can be undefined or null
+        uuid: uuid_snapshot,
+        blob: file,
+      });
+
+    let immutable_media_token = undefined;
+    if (response.success) {
+      if (response.data) {
+        immutable_media_token = response.data;
+      }
+    } else {
+      console.log("ERROR:");
+      console.log(response.errorMessage);
+    }
+
+    console.log("Immutable Token:");
+    console.log(immutable_media_token);
+
+    /// TODO refactor this whole thing extract this out.
     const data: any = await this.editor.api_manager.uploadMedia({
       blob,
       fileName: `${title}.mp4`,
       title,
       styleName: style_name,
-      maybe_scene_source_media_file_token: media_token,
+      maybe_scene_source_media_file_token: immutable_media_token,
     });
 
     if (data == null) {
@@ -267,6 +321,8 @@ export class VideoGeneration {
     }
     const upload_token = data["media_file_token"];
 
+    // create the scene token from here then snapshot it associate with the video generation.
+    // send immutable token with the video ... TODO:
     await this.editor.api_manager
       .stylizeVideo(
         upload_token,
