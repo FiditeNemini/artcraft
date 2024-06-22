@@ -47,9 +47,16 @@ pub struct BetaKeyListItem {
   pub maybe_redeemed_at: Option<DateTime<Utc>>,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum FilterToKeys {
+  All,
+  Redeemed,
+  Unredeemed,
+}
+
 pub struct ListBetaKeysArgs<'a> {
   pub filter_to_referrer_user_token: Option<&'a UserToken>,
-  pub filter_to_remaining_keys: bool,
+  pub filter_to_keys: FilterToKeys,
 
   pub page_size: usize,
   pub page_index: usize,
@@ -65,7 +72,7 @@ pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyL
   let mut count_query_builder = query_builder(
     count_fields,
     args.filter_to_referrer_user_token,
-    args.filter_to_remaining_keys,
+    args.filter_to_keys,
     false,
     args.page_index,
     args.page_size,
@@ -85,7 +92,7 @@ pub async fn list_beta_keys(args: ListBetaKeysArgs<'_>) -> AnyhowResult<BetaKeyL
   let mut query = query_builder(
     result_fields,
     args.filter_to_referrer_user_token,
-    args.filter_to_remaining_keys,
+    args.filter_to_keys,
     true,
     args.page_index,
     args.page_size,
@@ -172,7 +179,7 @@ fn query_builder<'a>(
   select_fields: &'a str,
 
   filter_to_referrer_user_token: Option<&'a UserToken>,
-  filter_to_remaining_keys: bool,
+  filter_to_keys: FilterToKeys,
 
   enforce_limits: bool,
   page_index: usize,
@@ -215,15 +222,22 @@ LEFT OUTER JOIN users AS redeemer
     query_builder.push_bind(user_token.as_str());
   }
 
-  if filter_to_remaining_keys {
-    if !first_predicate_added {
-      query_builder.push(" WHERE ");
-      first_predicate_added = true;
-    } else {
-      query_builder.push(" AND ");
-    }
+  match filter_to_keys {
+    FilterToKeys::All => {} // No-op
+    FilterToKeys::Redeemed | FilterToKeys::Unredeemed => {
+      if !first_predicate_added {
+        query_builder.push(" WHERE ");
+        first_predicate_added = true;
+      } else {
+        query_builder.push(" AND ");
+      }
 
-    query_builder.push(" b.maybe_redeemed_at IS NULL ");
+      if filter_to_keys == FilterToKeys::Redeemed {
+        query_builder.push(" b.maybe_redeemed_at IS NOT NULL ");
+      } else {
+        query_builder.push(" b.maybe_redeemed_at IS NULL ");
+      }
+    }
   }
 
 //  if let Some(offset) = maybe_offset {

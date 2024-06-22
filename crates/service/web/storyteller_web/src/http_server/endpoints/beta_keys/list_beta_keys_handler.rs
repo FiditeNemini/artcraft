@@ -22,7 +22,7 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use markdown::markdown_with_socials_to_html::markdown_with_socials_to_html;
-use mysql_queries::queries::beta_keys::list_beta_keys::{list_beta_keys, ListBetaKeysArgs};
+use mysql_queries::queries::beta_keys::list_beta_keys::{FilterToKeys, list_beta_keys, ListBetaKeysArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use tokens::tokens::beta_keys::BetaKeyToken;
 use tokens::tokens::media_files::MediaFileToken;
@@ -43,9 +43,9 @@ use crate::http_server::web_utils::require_user_session::{require_user_session, 
 use crate::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
-#[derive(Copy, Clone, Deserialize, ToSchema, IntoParams)]
+#[derive(Copy, Clone, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum ListKeyOption {
+pub enum ListBetaKeysFilterOption {
   All,
   Redeemed,
   Unredeemed,
@@ -67,7 +67,7 @@ pub struct ListBetaKeysQueryParams {
 
   /// How to filter the keys.
   /// If not specified, "all" is the default.
-  pub list_keys: Option<ListKeyOption>,
+  pub filter: Option<ListBetaKeysFilterOption>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -187,12 +187,17 @@ pub async fn list_beta_keys_handler(
     }
   }
 
-  let list_keys = query.list_keys
-      .unwrap_or_else(|| match query.only_list_remaining {
-        Some(true) => ListKeyOption::Unredeemed,
-        _ => ListKeyOption::All,
+  let filter_keys = None
+      .or_else(|| match query.only_list_remaining {
+        Some(true) => Some(ListBetaKeysFilterOption::Unredeemed),
+        _ => Some(ListBetaKeysFilterOption::All),
       })
-      .unwrap_or(ListKeyOption::All);
+      .map(|filter| match filter {
+        ListBetaKeysFilterOption::All => FilterToKeys::All,
+        ListBetaKeysFilterOption::Redeemed => FilterToKeys::Redeemed,
+        ListBetaKeysFilterOption::Unredeemed => FilterToKeys::Unredeemed,
+      })
+      .unwrap_or(FilterToKeys::All);
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
   let sort_ascending = query.sort_ascending.unwrap_or(false);
@@ -201,7 +206,7 @@ pub async fn list_beta_keys_handler(
 
   let query_results = list_beta_keys(ListBetaKeysArgs {
     filter_to_referrer_user_token: maybe_scope_user_token.as_ref(),
-    filter_to_remaining_keys: query.only_list_remaining.unwrap_or(false),
+    filter_to_keys: filter_keys,
     page_size,
     page_index,
     sort_ascending,
