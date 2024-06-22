@@ -43,7 +43,8 @@ use crate::http_server::web_utils::require_user_session::{require_user_session, 
 use crate::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
-#[derive(Deserialize, ToSchema, IntoParams)]
+#[derive(Copy, Clone, Deserialize, ToSchema, IntoParams)]
+#[serde(rename_all = "snake_case")]
 pub enum ListKeyOption {
   All,
   Redeemed,
@@ -59,9 +60,13 @@ pub struct ListBetaKeysQueryParams {
   /// Scope the beta keys to a referrer user.
   pub maybe_referrer_username: Option<String>,
 
+  /// DEPRECATED: use `list_keys` instead.
   /// Only return un-redeemed, un-expired keys.
+  #[deprecated(note = "Use list_keys instead")]
   pub only_list_remaining: Option<bool>,
 
+  /// How to filter the keys.
+  /// If not specified, "all" is the default.
   pub list_keys: Option<ListKeyOption>,
 }
 
@@ -181,6 +186,13 @@ pub async fn list_beta_keys_handler(
       },
     }
   }
+
+  let list_keys = query.list_keys
+      .unwrap_or_else(|| match query.only_list_remaining {
+        Some(true) => ListKeyOption::Unredeemed,
+        _ => ListKeyOption::All,
+      })
+      .unwrap_or(ListKeyOption::All);
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
   let sort_ascending = query.sort_ascending.unwrap_or(false);
