@@ -38,7 +38,9 @@ pub struct MediaFile {
 
   pub maybe_media_subtype: Option<MediaFileSubtype>,
 
-  // TODO: Other media details (file size, mime type, dimensions, duration, etc.)
+  pub maybe_mime_type: Option<String>,
+
+  // TODO: Other media details (file size, dimensions, duration, etc.)
   // TODO: Provenance data (product, upload vs inference, model details and foreign keys)
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
@@ -123,6 +125,8 @@ pub struct MediaFileRaw {
   pub maybe_animation_type: Option<MediaFileAnimationType>,
 
   pub maybe_media_subtype: Option<MediaFileSubtype>,
+
+  pub maybe_mime_type: Option<String>,
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
@@ -220,6 +224,7 @@ pub async fn get_media_file(
     maybe_animation_type: record.maybe_animation_type,
     media_class: record.media_class,
     maybe_media_subtype: record.maybe_media_subtype,
+    maybe_mime_type: record.maybe_mime_type,
     maybe_batch_token: record.maybe_batch_token,
     maybe_style_transfer_source_media_file_token: record.maybe_style_transfer_source_media_file_token,
     maybe_scene_source_media_file_token: record.maybe_scene_source_media_file_token,
@@ -278,6 +283,8 @@ SELECT
     m.maybe_animation_type as `maybe_animation_type: enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType`,
 
     m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
+
+    m.maybe_mime_type,
 
     users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
@@ -380,6 +387,8 @@ SELECT
     m.maybe_animation_type as `maybe_animation_type: enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType`,
 
     m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
+
+    m.maybe_mime_type,
 
     users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,

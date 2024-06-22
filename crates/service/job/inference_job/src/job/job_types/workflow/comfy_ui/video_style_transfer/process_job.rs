@@ -46,6 +46,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::{download_input_video, DownloadInputVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
@@ -213,6 +214,23 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let mut videos = VideoPaths::new(&root_comfy_path, job_args.output_path);
 
     // TODO(bt,2024-04-20): Clean up this mess.
+
+    // ==================== DOWNLOAD GLOBAL IPA IMAGE (IF SET) ==================== //
+
+    let mut global_ipa_image = None;
+
+    if let Some(ipa_media_token) = comfy_args.global_ip_adapter_token.as_ref() {
+        let results = download_global_ipa_image(DownloadGlobalIpaImageArgs {
+            ipa_media_token,
+            comfy_input_directory: &input_dir,
+            mysql_pool: &deps.db.mysql_pool,
+            remote_cloud_file_client: &remote_cloud_file_client,
+        }).await?;
+
+        info!("Downloaded global IPA image to {:?}", results.ipa_image_path);
+
+        global_ipa_image = Some(results);
+    }
 
     // ==================== DOWNLOAD VIDEO ==================== //
 
