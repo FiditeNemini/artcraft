@@ -120,10 +120,9 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
 
-    // TODO(bt,2024-05-13): Plumb this through to jobs.
     /// Optional Global IP-Adapter image.
     /// The underlying media file must be an image.
-    ipa_media_token: Option<MediaFileToken>,
+    global_ipa_media_token: Option<MediaFileToken>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -354,8 +353,10 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_end_milliseconds: Some(trim_end_millis),
         positive_prompt: request.prompt.new_string_trim_or_empty(),
         negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
+        global_ip_adapter_token: request.global_ipa_media_token.as_ref().map(|t| t.clone()),
         strength: maybe_strength,
 
+        // Flags
         disable_lcm: coordinated_args.disable_lcm,
         use_cinematic: coordinated_args.use_cinematic,
         use_face_detailer: coordinated_args.use_face_detailer,

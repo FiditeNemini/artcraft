@@ -123,6 +123,12 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub negative_prompt: Option<String>,
 
+    // Optional global IP Adapter image media file token
+    // This will apply to the entire workflow / video
+    #[serde(rename = "gi")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub global_ip_adapter_token: Option<MediaFileToken>,
+
     #[deprecated(note = "Use `lipsync_enabled` instead")]
     #[serde(rename = "el")]
     #[serde(skip_serializing_if = "Option::is_none")]
