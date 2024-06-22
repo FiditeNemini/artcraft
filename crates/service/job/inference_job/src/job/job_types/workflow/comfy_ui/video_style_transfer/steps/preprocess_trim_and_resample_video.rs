@@ -15,14 +15,14 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 
-pub struct TrimAndProcessVideoArgs<'a> {
+pub struct ProcessTrimAndResampleVideoArgs<'a> {
   pub comfy_args: &'a WorkflowArgs,
   pub comfy_deps: &'a ComfyDependencies,
   pub videos: &'a VideoPaths,
 }
 
-pub fn trim_and_preprocess_video(
-  args: TrimAndProcessVideoArgs<'_>
+pub fn preprocess_trim_and_resample_video(
+  args: ProcessTrimAndResampleVideoArgs<'_>
 ) -> Result<(), ProcessSingleJobError> {
   let target_fps = args.comfy_args.target_fps.unwrap_or(24);
 

@@ -50,7 +50,7 @@ use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::down
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::{download_input_video, DownloadInputVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::trim_and_preprocess_video::{trim_and_preprocess_video, TrimAndProcessVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_trim_and_resample_video::{preprocess_trim_and_resample_video, ProcessTrimAndResampleVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
@@ -254,7 +254,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
-    trim_and_preprocess_video(TrimAndProcessVideoArgs {
+    preprocess_trim_and_resample_video(ProcessTrimAndResampleVideoArgs {
         comfy_args,
         comfy_deps: model_dependencies,
         videos: &videos,
