@@ -48,6 +48,8 @@ use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_in
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::{download_input_video, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::trim_and_preprocess_video::{trim_and_preprocess_video, TrimAndProcessVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
@@ -250,7 +252,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
     }
 
-    // ========================= PROCESS VIDEO ======================== //
+    // ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
     trim_and_preprocess_video(TrimAndProcessVideoArgs {
         comfy_args,
@@ -377,83 +379,19 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== COPY BACK AUDIO ==================== //
 
-    const RESTORE_AUDIO : bool = true;
-
-    if RESTORE_AUDIO {
-        info!("Restoring audio...");
-
-        let output_video_fs_path_restored = videos.comfy_output_video_path.with_extension("_restored.mp4");
-
-        let command_exit_status = model_dependencies
-            .ffmpeg_command_runner
-            .run_with_subprocess(RunAsSubprocessArgs {
-                args: Box::new(&FfmpegAudioReplaceArgs {
-                    input_video_file: &videos.comfy_output_video_path,
-                    input_audio_file: &videos.trimmed_resampled_video_path,
-                    output_video_file: &output_video_fs_path_restored,
-                }),
-                stderr: StreamRedirection::None,
-                stdout: StreamRedirection::None,
-            });
-
-        let mut use_restored_audio = true;
-
-        // NB: Don't fail the entire command if audio restoration fails
-        if let Err(err) = check_file_exists(&output_video_fs_path_restored) {
-            use_restored_audio = false;
-            error!("Audio copy failed: {:?}", err);
-        }
-
-        if !command_exit_status.is_success() {
-            use_restored_audio = false;
-            error!("Audio copy failed: {:?} ; we'll save the non-audio copy.", command_exit_status);
-        }
-
-        if use_restored_audio {
-            info!("Success generating restored audio file: {:?}", output_video_fs_path_restored);
-            videos.audio_restored_video_path = Some(output_video_fs_path_restored);
-        }
-    }
+    post_process_restore_audio(PostProcessRestoreVideoArgs {
+        comfy_deps: model_dependencies,
+        videos: &mut videos,
+    });
 
     // ==================== OPTIONAL WATERMARK ==================== //
 
-    // TODO(bt, 2024-03-01): Interrogate account for premium
-    // TODO(bt, 2024-04-21): Combine this ffmpeg processing with the previous step
-    const REMOVE_WATERMARK : bool = false;
+    post_process_add_watermark(PostProcessAddWatermarkArgs {
+        comfy_deps: model_dependencies,
+        videos: &mut videos,
+    });
 
-    if !REMOVE_WATERMARK {
-        info!("Adding watermark...");
-
-        let output_video_fs_path_watermark = videos.comfy_output_video_path.with_extension("_watermark.mp4");
-
-        let command_exit_status = model_dependencies
-            .ffmpeg_watermark_command
-            .execute(WatermarkArgs {
-                video_path: videos.video_to_watermark(),
-                maybe_override_logo_path: None,
-                alpha: 0.6,
-                scale: 0.1, // NB: 0.1 is good for the Storyteller logo @ 2653x512 placed on 1024x576 output.
-                output_path: &output_video_fs_path_watermark,
-            });
-
-        let mut use_watermarked_file = true;
-
-        // NB: Don't fail the entire command if watermarking fails.
-        if let Err(err) = check_file_exists(&output_video_fs_path_watermark) {
-            use_watermarked_file = false;
-            error!("Watermarking failed: {:?}", err);
-        }
-
-        if !command_exit_status.is_success() {
-            use_watermarked_file = false;
-            error!("Watermark failed: {:?} ; we'll save the non-watermarked copy.", command_exit_status);
-        }
-
-        if use_watermarked_file {
-            info!("Success generating watermarked file: {:?}", output_video_fs_path_watermark);
-            videos.watermarked_video_path = Some(output_video_fs_path_watermark);
-        }
-    }
+    // ==================== DEBUG ======================== //
 
     videos.debug_print_paths_after_post_processing();
 
