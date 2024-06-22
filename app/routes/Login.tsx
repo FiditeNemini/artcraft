@@ -52,10 +52,7 @@ export default function LoginScreen() {
   });
 
   return (
-    <div
-      className="fixed w-full overflow-scroll"
-      style={{ height: "calc(100% - 72px)" }}
-    >
+    <div className="fixed w-full" style={{ height: "calc(100% - 72px)" }}>
       <div className="mx-auto my-6 w-10/12 max-w-2xl">
         <H1 className="text-center text-[32px] font-bold">
           Login to Storyteller

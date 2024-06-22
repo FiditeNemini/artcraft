@@ -22,6 +22,9 @@ import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 import { useSignals } from "@preact/signals-react/runtime";
 import { EngineContext } from "../../contexts/EngineContext";
+import { cameraAspectRatio, sidePanelHeight } from "../../signals";
+import { pageWidth } from "~/signals";
+import { CameraAspectRatio } from "../../enums";
 
 const OutlinerItem = ({ item }: { item: SceneObject }) => {
   useSignals();
@@ -29,8 +32,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
 
   const isSelected = outlinerState.selectedItem.value?.id === item.id;
 
-
-  const editorEngine = useContext(EngineContext)
+  const editorEngine = useContext(EngineContext);
 
   // Delete object logic here
   const handleDeleteKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -69,7 +71,10 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleLock(item.id, editorEngine?.lockUnlockObject.bind(editorEngine));
+            toggleLock(
+              item.id,
+              editorEngine?.lockUnlockObject.bind(editorEngine),
+            );
           }}
           style={{
             opacity: hovered || item.locked ? 1 : 0,
@@ -85,7 +90,12 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleVisibility(item.id, editorEngine?.sceneManager?.hideObject.bind(editorEngine.sceneManager));
+            toggleVisibility(
+              item.id,
+              editorEngine?.sceneManager?.hideObject.bind(
+                editorEngine.sceneManager,
+              ),
+            );
           }}
           style={{
             opacity: hovered || !item.visible ? 1 : 0,
@@ -125,12 +135,35 @@ export const Outliner = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const getOutlinerHeightClass = () => {
+    if (pageWidth.value >= 2000) {
+      if (cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16) {
+        return `${sidePanelHeight.value * 0.5 - 120}px`;
+      } else if (cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1) {
+        return `${sidePanelHeight.value * 0.42}px`;
+      } else {
+        return `${sidePanelHeight.value * 0.54}px`;
+      }
+    }
+
+    if (pageWidth.value < 2000) {
+      if (cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16) {
+        return `${sidePanelHeight.value * 0.7 - 10}px`;
+      } else if (cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1) {
+        return `${sidePanelHeight.value * 0.7}px`;
+      } else {
+        return `${sidePanelHeight.value * 0.7}px`;
+      }
+    }
+  };
+
   return (
     <Transition
       show={outlinerIsShowing.value}
       className={twMerge(
-        "flex h-[34vh] w-[240px] origin-bottom-left flex-col overflow-hidden rounded-lg bg-ui-panel/95 shadow-lg",
+        "flex max-h-[34vh] w-[240px] origin-bottom-left flex-col overflow-hidden rounded-lg bg-ui-panel/95 shadow-lg",
       )}
+      style={{ height: getOutlinerHeightClass() }}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
       enterTo="opacity-100"

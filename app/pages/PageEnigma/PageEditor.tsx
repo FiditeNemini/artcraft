@@ -19,11 +19,14 @@ import {
   dndTimelineHeight,
   editorLoader,
   sidePanelHeight,
+  cameraAspectRatio,
+  outlinerIsShowing,
 } from "~/pages/PageEnigma/signals";
 import { EditorCanvas } from "./comps/EngineCanvases";
 import { SceneContainer } from "./comps/SceneContainer";
 import { AspectRatioMenu } from "./comps/AspectRatioMenu";
 import { Outliner } from "./comps/Outliner";
+import { CameraAspectRatio } from "./enums";
 
 export const PageEditor = () => {
   useSignals();
@@ -55,7 +58,26 @@ export const PageEditor = () => {
 
   const getScale = () => {
     const height = sidePanelHeight.value;
-    const scaleHeight = height < 640 ? height / 640 : 1;
+    const scaleHeight = height < 610 ? height / 610 : 1;
+
+    if (
+      cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16 &&
+      outlinerIsShowing.value &&
+      height < 900
+    ) {
+      if (pageWidth.value > 2000) {
+        return scaleHeight;
+      }
+      return scaleHeight * 0.78;
+    }
+
+    if (
+      cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1 &&
+      pageWidth.value < 2000
+    ) {
+      return scaleHeight * 0.85;
+    }
+
     return scaleHeight;
   };
 

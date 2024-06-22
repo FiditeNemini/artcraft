@@ -16,7 +16,10 @@ import {
   editorState,
   editorLetterBox,
   toggleEditorLetterBox,
+  sidePanelHeight,
+  outlinerIsShowing,
 } from "~/pages/PageEnigma/signals";
+import { pageWidth } from "~/signals";
 import { CameraAspectRatio, EditorStates } from "~/pages/PageEnigma/enums";
 import { CameraViewCanvas } from "~/pages/PageEnigma/comps/EngineCanvases";
 
@@ -37,15 +40,55 @@ export const PreviewEngineCamera = () => {
     });
   };
 
+  const getLargeScreenHeightClass = () => {
+    if (cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16) {
+      return pageWidth.value >= 2000
+        ? "w-44 justify-center"
+        : "w-36 justify-center";
+    } else {
+      return pageWidth.value >= 2000
+        ? "w-72 justify-between"
+        : "w-64 justify-between";
+    }
+  };
+
+  const getSmallScreenHeightClass = () => {
+    if (
+      cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16 &&
+      sidePanelHeight.value < 2000 &&
+      outlinerIsShowing.value
+    ) {
+      return "w-40 justify-center";
+    }
+    return "";
+  };
+
+  const getSquareAspectRatioClass = () => {
+    if (cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1) {
+      return pageWidth.value >= 2000
+        ? "w-[240px] justify-between"
+        : "w-60 justify-between";
+    }
+  };
+
   return (
     <div id="preview-engine-camera" className="origin-bottom-left shadow-lg">
-      <div className="relative">
+      <div
+        className={twMerge(
+          "relative",
+          getLargeScreenHeightClass(),
+          getSmallScreenHeightClass(),
+          getSquareAspectRatioClass(),
+        )}
+      >
         <div
           className={twMerge(
-            "origin -z-10 flex w-full flex-wrap items-center rounded-t-lg bg-ui-controls p-1.5 text-white",
+            "origin -z-10 flex h-auto w-full flex-wrap items-center gap-1.5 rounded-t-lg bg-ui-controls p-2 text-white",
             cameraAspectRatio.value !== CameraAspectRatio.VERTICAL_9_16
-              ? "h-11 w-72 justify-between"
-              : "h-20 w-44 justify-center",
+              ? "justify-between"
+              : "flex-col justify-center",
+            cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1 &&
+              "justify-center",
           )}
         >
           <div
@@ -65,6 +108,7 @@ export const PreviewEngineCamera = () => {
                 <ButtonIcon
                   icon={editorLetterBox.value ? faBlinds : faBlindsRaised}
                   onClick={() => toggleEditorLetterBox()}
+                  className="h-7 w-7"
                 />
               </Tooltip>
             )}
@@ -75,7 +119,7 @@ export const PreviewEngineCamera = () => {
               className="rounded-md px-2 py-1 text-sm"
             >
               {editorState.value === EditorStates.EDIT
-                ? "Enter Camera View"
+                ? "Enter View"
                 : "Exit View"}
             </Button>
           </div>
@@ -95,7 +139,7 @@ export const PreviewEngineCamera = () => {
           <div className="flex h-full w-full items-center justify-center bg-ui-panel">
             <FontAwesomeIcon icon={faSpinnerThird} size={"3x"} spin />
           </div>
-          <div className="absolute left-0 top-0 h-full w-full">
+          <div className="absolute left-0 top-0 h-full w-full overflow-hidden">
             <CameraViewCanvas className="!h-full !w-full" />
           </div>
         </div>
