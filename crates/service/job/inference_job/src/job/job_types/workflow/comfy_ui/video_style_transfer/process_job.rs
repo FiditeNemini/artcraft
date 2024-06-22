@@ -48,6 +48,7 @@ use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_in
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::{download_input_video, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::trim_and_preprocess_video::{trim_and_preprocess_video, TrimAndProcessVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
@@ -251,82 +252,13 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ========================= PROCESS VIDEO ======================== //
 
-    let target_fps = comfy_args.target_fps.unwrap_or(24);
+    trim_and_preprocess_video(TrimAndProcessVideoArgs {
+        comfy_args,
+        comfy_deps: model_dependencies,
+        videos: &videos,
+    })?;
 
-    let trim_start_millis = comfy_args.trim_start_milliseconds
-        .or_else(|| comfy_args.trim_start_seconds.map(|s| s as u64 * 1_000))
-        .unwrap_or(0);
-
-    let trim_end_millis = comfy_args.trim_end_milliseconds
-        .or_else(|| comfy_args.trim_end_seconds.map(|s| s as u64 * 1_000))
-        .unwrap_or(3_000);
-
-    info!("trim start millis: {trim_start_millis}");
-    info!("trim end millis: {trim_end_millis}");
-    info!("target FPS: {target_fps}");
-
-    let skip_process_video = comfy_args.skip_process_video.unwrap_or(false);
-
-    if skip_process_video {
-        info!("Skipping video trim / resample...");
-        info!("(This might break if we need to copy the video path. Salt's code implicitly expects videos to be in certain places, but doesn't allow passing of config, and that's horrible.)");
-
-        std::fs::copy(&videos.original_video_path, &videos.trimmed_resampled_video_path)
-            .map_err(|err| {
-                error!("Error copying video (1): {:?}", err);
-                ProcessSingleJobError::IoError(err)
-            })?;
-
-        std::fs::copy(&videos.original_video_path, &videos.comfy_output_video_path)
-            .map_err(|err| {
-                error!("Error copying video (2): {:?}", err);
-                ProcessSingleJobError::IoError(err)
-            })?;
-
-    } else {
-        info!("Calling video trim / resample...");
-        info!("Script: {:?}", &model_dependencies.inference_command.processing_script);
-
-        // shell out to python script
-        let output = Command::new("python3")
-            .stdout(Stdio::inherit()) // NB: This should emit to the rust job's stdout
-            .stderr(Stdio::inherit()) // NB: This should emit to the rust job's stderr
-            .arg(path_to_string(&model_dependencies.inference_command.processing_script))
-            .arg(path_to_string(&videos.original_video_path))
-            .arg(format!("{:?}", trim_start_millis))
-            .arg(format!("{:?}", trim_end_millis))
-            .arg(format!("{:?}", target_fps))
-            .output()
-            .map_err(|e| {
-                error!("Error running inference: {:?}", e);
-                ProcessSingleJobError::Other(e.into())
-            })?;
-
-        // check if the command was successful
-        if !output.status.success() {
-            // print stdout and stderr
-            error!("Video processing failed: {:?}", output.status);
-            error!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-            error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-            return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
-        }
-
-        info!("Finished video trim / resample.");
-
-        // NB: The process video script implicitly saves the above video as "input.mp4"
-        // Comfy sometimes overwrites this, so we need to make a copy.
-        std::fs::copy(&videos.comfy_input_video_path, &videos.trimmed_resampled_video_path)
-            .map_err(|err| {
-                error!("Error copying trimmed video: {:?}", err);
-                ProcessSingleJobError::IoError(err)
-            })?;
-    }
-
-    videos.debug_print_paths_after_trim();
-
-    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.trimmed_resampled_video_path) {
-        info!("Trimmed / resampled video dimensions: {}x{}", dimensions.width, dimensions.height);
-    }
+    // ========================= CREATE OUTPUT DIR ======================== //
 
     // make outputs dir if not exist
     let output_dir = root_comfy_path.join("output");
@@ -426,6 +358,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
         if let Some(lora_path) = maybe_lora_path {
             safe_delete_temp_file(&lora_path);
+        }
+
+        if let Some(ipa_path) = global_ipa_image {
+            safe_delete_temp_file(ipa_path.ipa_image_path);
         }
 
         safe_delete_temp_file(&videos.comfy_input_video_path);
@@ -566,6 +502,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
     if let Some(lora_path) = maybe_lora_path {
         safe_delete_temp_file(lora_path);
+    }
+
+    if let Some(ipa_path) = global_ipa_image {
+        safe_delete_temp_file(ipa_path.ipa_image_path);
     }
 
     let output_dir = root_comfy_path.join("output");
