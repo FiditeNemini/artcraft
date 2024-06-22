@@ -32,8 +32,8 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::VideoDownloadDetails;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::JobArgs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::VideoDownloadDetails;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job_dependencies::JobDependencies;
 

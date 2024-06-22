@@ -45,9 +45,9 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::download_input_video::{download_input_video, DownloadInputVideoArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::validate_job::validate_job;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::{download_input_video, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::job_dependencies::JobDependencies;
@@ -75,7 +75,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
     // check for lack of maybe_json_modifications
 
-    let job_args = validate_job(job)?;
+    let job_args = check_and_validate_job(job)?;
 
     // ==================== TEMP DIR ==================== //
 

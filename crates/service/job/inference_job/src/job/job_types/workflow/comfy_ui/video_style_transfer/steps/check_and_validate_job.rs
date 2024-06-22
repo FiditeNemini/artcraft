@@ -19,7 +19,7 @@ pub struct JobArgs<'a> {
     pub maybe_input_file: &'a Option<MediaFileToken>,
 }
 
-pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
+pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
     let inference_args = job.maybe_inference_args
         .as_ref()
         .map(|args| args.args.as_ref())
