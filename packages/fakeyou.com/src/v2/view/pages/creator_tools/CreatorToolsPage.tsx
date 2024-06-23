@@ -6,6 +6,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { GetWebsite, WEBSITE, Website } from "@storyteller/components/src/env/GetWebsite";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel } from "components/common";
 import { useLocalize } from "hooks";
@@ -86,6 +87,10 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
     },
   ];
 
+  const storytellerLink = GetWebsite().website === Website.FakeYou ? 
+    WEBSITE.storyteller.link : 
+    WEBSITE.storyteller_studio.link;
+
   return (
     <Container type="panel">
       <Panel clear={true} className={`${!isLoggedIn ? "section" : "mt-4"}`}>
@@ -148,8 +153,8 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
                   label="Enter Storyteller Studio"
                   icon={faPortalEnter}
                   className="enter-storyteller-button"
-                  href="https://studio.storyteller.ai/"
-                />
+                  href={storytellerLink}
+                  />
               </div>
             </Panel>
           </div>

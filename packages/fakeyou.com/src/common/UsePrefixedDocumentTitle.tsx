@@ -21,6 +21,7 @@ export function usePrefixedDocumentTitle(title?: string) {
       defaultSuffix = FAKEYOU_SUFFIX;
       break;
     case Website.StorytellerAi:
+    case Website.StorytellerStudio:
     default:
       defaultTitle = STORYTELLER_DEFAULT_TITLE;
       defaultSuffix = STORYTELLER_SUFFIX;
