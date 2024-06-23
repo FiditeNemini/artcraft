@@ -48,6 +48,39 @@ export const login = async ({
   getUserInfoAndSubcriptions();
 };
 
+export const signUp = async ({
+  username,
+  email,
+  password,
+  passwordConfirmation,
+}: {
+  username: string;
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+}) => {
+  updateAuthStatus(AUTH_STATUS.LOGGING);
+
+  const usersApi = new UsersApi();
+  const response = await usersApi.Signup({
+    email,
+    password,
+    passwordConfirmation,
+    username,
+  });
+  console.log(response);
+  if (!response.success || !response.data) {
+    setLogoutStates();
+    return response.errorMessage ?? "Unknown error";
+  }
+
+  // technically user is login with the system now, HOWEVER,
+  // in storyteller studio, only having a sesison is not enough,
+  // we need session info and active subscription info as well
+  getUserInfoAndSubcriptions();
+  return "";
+};
+
 export const persistLogin = async () => {
   //Only run First Load, return if not
   if (authentication.status.value !== AUTH_STATUS.INIT) {
