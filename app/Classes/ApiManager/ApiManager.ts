@@ -160,8 +160,6 @@ export class ApiManager {
       credentials: "include",
       body: formData,
     });
-
-    return response.json();
   }
 
   protected camelToSnakeCase(str: string) {

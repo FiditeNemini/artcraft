@@ -26,7 +26,7 @@ import { LoadUserScenes } from "./LoadUserScenes";
 import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
 
 import { getCurrentLocationWithoutParams } from "~/utilities";
-import { SceneGenereationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
+import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
 import {
   cameraAspectRatio,
   cinematic,
@@ -70,22 +70,26 @@ export const ControlsTopButtons = () => {
     editorEngine?.newScene(sceneTitleInput);
   };
 
-  const getSceneGenereationMetaData =
-    useCallback((): SceneGenereationMetaData => {
-      // when this is called, editor engine is guarunteed by it's caller
+  const getSceneGenereationMetaData = useCallback(():
+    | SceneGenerationMetaData
+    | undefined => {
+    // when this is called, editor engine is guarunteed by it's caller
+    if (editorEngine) {
       return {
-        positivePrompt: editorEngine!.positive_prompt,
-        negativePrompt: editorEngine!.negative_prompt,
-        artisticStyle: getArtStyle(editorEngine!.art_style.toString()),
+        positivePrompt: editorEngine.positive_prompt,
+        negativePrompt: editorEngine.negative_prompt,
+        artisticStyle: getArtStyle(editorEngine.art_style.toString()),
         cameraAspectRatio: cameraAspectRatio.value,
-        adapterImageToken: "",
+        globalIPAMediaToken:
+          editorEngine.generation_options.globalIpAdapterImageMediaToken,
         upscale: upscale.value,
         faceDetail: faceDetail.value,
         styleStrength: styleStrength.value,
         lipSync: lipSync.value,
         cinematic: cinematic.value,
       };
-    }, [editorEngine]);
+    }
+  }, [editorEngine]);
 
   const handleButtonSave = async () => {
     if (!editorEngine) {
@@ -173,9 +177,9 @@ export const ControlsTopButtons = () => {
     }
   });
 
-   const handleShowOutliner = () => {
-     outlinerIsShowing.value = !outlinerIsShowing.value;
-   };
+  const handleShowOutliner = () => {
+    outlinerIsShowing.value = !outlinerIsShowing.value;
+  };
 
   return (
     <div className="flex flex-col gap-2 pl-2 pt-2">
@@ -309,7 +313,6 @@ export const ControlsTopButtons = () => {
           ]}
         />
 
-        
         <Button
           icon={outlinerIsShowing.value ? faCheckSquare : faSquare}
           className="shadow-xl"
@@ -323,7 +326,7 @@ export const ControlsTopButtons = () => {
           onClick={handleShowOutliner}
         >
           Outliner
-        </Button> 
+        </Button>
 
         <ButtonDialogue
           buttonProps={{

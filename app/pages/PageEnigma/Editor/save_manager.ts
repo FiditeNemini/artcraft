@@ -1,3 +1,4 @@
+import { scene } from "~/signals";
 import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
 import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
@@ -51,13 +52,6 @@ export class SaveManager {
       ...sceneGenerationMetadata,
       timeline: timeline_json,
     };
-
-    // const result = await this.editor.api_manager.saveSceneState({
-    //   saveJson: JSON.stringify(save_data),
-    //   sceneTitle,
-    //   sceneToken,
-    //   sceneThumbnail,
-    // });
 
     return JSON.stringify(save_data);
   }
@@ -124,6 +118,7 @@ export class SaveManager {
     return result;
   }
 
+  // TODO Refactor remove editor.
   public async loadScene(scene_media_token: string) {
     showEditorLoader();
 
@@ -150,6 +145,10 @@ export class SaveManager {
     // this calls the signal function to propagate the data to the UI
     restoreSceneGenerationMetadata(scene_json);
     // these propogate the values into the editor
+    if (scene_json.globalIpAdapterImageMediaToken) {
+      // this should be populated right after
+      this.editor.generation_options.globalIpAdapterImageMediaToken;
+    }
     if (scene_json.positivePrompt) {
       this.editor.positive_prompt = scene_json.positivePrompt;
     }
@@ -170,6 +169,7 @@ export class SaveManager {
     this.editor.cam_obj = this.editor.activeScene.get_object_by_name(
       this.editor.camera_name,
     );
+
     this.editor.cam_obj?.layers.set(1);
     this.editor.cam_obj?.children.forEach((child) => {
       child.layers.set(1);
@@ -189,6 +189,7 @@ export class SaveManager {
     this.editor.timeline.checkEditorCanPlay();
 
     hideEditorLoader();
+    // TODO figure out if this is a bug.
     this.editor.timeline.scrub({ data: { currentTime: 0 } });
   }
 }

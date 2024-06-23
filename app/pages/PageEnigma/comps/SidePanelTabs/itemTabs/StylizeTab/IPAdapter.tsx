@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useContext,
+  useEffect,
+} from "react";
 import { FileUploader } from "react-drag-drop-files";
 import {
   ReactCrop,
@@ -20,8 +26,10 @@ import { Button, Label, P, TransitionDialogue } from "~/components";
 import { useSignals } from "@preact/signals-react/runtime";
 import { adapterImage } from "~/pages/PageEnigma/signals";
 
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 export const IPAdapter: React.FC = () => {
   useSignals();
+  const editorEngine = useContext(EngineContext);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
@@ -30,10 +38,21 @@ export const IPAdapter: React.FC = () => {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const FILE_TYPES = ["JPG", "PNG", "JPEG"];
 
+  useEffect(() => {
+    if (editorEngine) {
+      // load the image token if availible
+      // Bombay load the image from the image token here.
+      editorEngine.generation_options.globalIpAdapterImageMediaToken;
+    }
+  }, []);
+
   const onFileChange = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       setImageSrc(reader.result as string);
+      if (editorEngine) {
+        editorEngine.globalIpAdapterImage = file;
+      }
       setIsDialogOpen(true);
     };
     reader.readAsDataURL(file);

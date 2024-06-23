@@ -145,6 +145,9 @@ class Editor {
 
   generation_options: GenerationOptions;
 
+  // just a passive the image to be uploaded. we store the token and use that in snapshots.
+  globalIpAdapterImage: File | undefined;
+
   media_upload: MediaUploadApi;
 
   sceneManager: SceneManager | undefined;
@@ -244,9 +247,12 @@ class Editor {
       styleStrength: 1.0,
       lipSync: false,
       cinematic: false,
+      globalIpAdapterImageMediaToken: "",
     };
 
     this.media_upload = new MediaUploadApi();
+    this.globalIpAdapterImage = undefined; // used to display when loading in the app. and to serialize to an image token
+    // TODO REMOVE
     this.outliner_feature_flag = true;
   }
   getRenderDimensions() {
@@ -487,20 +493,45 @@ class Editor {
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
     if (this.outliner_feature_flag) {
-      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      const result = this.sceneManager?.render_outliner(
+        this.timeline.characters,
+      );
       if (result) outlinerState.items.value = result.items;
     }
 
-    this.mouse_controls = new MouseControls(this.camera, this.camera_person_mode, this.lockControls,
-      this.camera_last_pos, this.orbitControls,
-      this.selectedCanvas, this.switchPreviewToggle, this.rendering, this.togglePlayback.bind(this),
-      this.deleteObject.bind(this), this.canvReference, this.mouse, this.timeline.mouse,
-      this.raycaster, this.control, this.outlinePass, this.activeScene.scene,
-      this.publishSelect.bind(this), this.updateSelectedUI.bind(this),
-      this.transform_interaction, this.last_selected, this.getAssetType.bind(this), this.setSelected.bind(this));
+    this.mouse_controls = new MouseControls(
+      this.camera,
+      this.camera_person_mode,
+      this.lockControls,
+      this.camera_last_pos,
+      this.orbitControls,
+      this.selectedCanvas,
+      this.switchPreviewToggle,
+      this.rendering,
+      this.togglePlayback.bind(this),
+      this.deleteObject.bind(this),
+      this.canvReference,
+      this.mouse,
+      this.timeline.mouse,
+      this.raycaster,
+      this.control,
+      this.outlinePass,
+      this.activeScene.scene,
+      this.publishSelect.bind(this),
+      this.updateSelectedUI.bind(this),
+      this.transform_interaction,
+      this.last_selected,
+      this.getAssetType.bind(this),
+      this.setSelected.bind(this),
+    );
 
     if (this.outliner_feature_flag) {
-      this.sceneManager = new SceneManager(this.version, this.mouse_controls, this.activeScene, true); // Enabled dev mode.
+      this.sceneManager = new SceneManager(
+        this.version,
+        this.mouse_controls,
+        this.activeScene,
+        true,
+      ); // Enabled dev mode.
       this.mouse_controls.sceneManager = this.sceneManager;
     }
 
@@ -588,15 +619,20 @@ class Editor {
     });
 
     if (this.outliner_feature_flag) {
-      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      const result = this.sceneManager?.render_outliner(
+        this.timeline.characters,
+      );
       if (result) outlinerState.items.value = result.items;
     }
   }
 
   public async loadScene(scene_media_token: string) {
     await this.save_manager.loadScene(scene_media_token);
+
     if (this.outliner_feature_flag) {
-      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      const result = this.sceneManager?.render_outliner(
+        this.timeline.characters,
+      );
       if (result) outlinerState.items.value = result.items;
     }
     // publish to the UI the values for the prompts and artistic style and settings?
@@ -622,8 +658,8 @@ class Editor {
   }
 
   lockUnlockObject(object_uuid: string): boolean {
-    let res = this.utils.lockUnlockObject(object_uuid);
-    if(this.outliner_feature_flag) {
+    const res = this.utils.lockUnlockObject(object_uuid);
+    if (this.outliner_feature_flag) {
       this.updateSelectedUI();
     }
     return res;
@@ -734,7 +770,9 @@ class Editor {
   deleteObject(uuid: string) {
     this.utils.deleteObject(uuid);
     if (this.outliner_feature_flag) {
-      let result = this.sceneManager?.render_outliner(this.timeline.characters);
+      const result = this.sceneManager?.render_outliner(
+        this.timeline.characters,
+      );
       if (result) outlinerState.items.value = result.items;
     }
   }
@@ -763,14 +801,14 @@ class Editor {
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 1024
             : this.render_camera_aspect_ratio ===
-              CameraAspectRatio.VERTICAL_9_16
+                CameraAspectRatio.VERTICAL_9_16
               ? 576
               : 1000;
         const height =
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 576
             : this.render_camera_aspect_ratio ===
-              CameraAspectRatio.VERTICAL_9_16
+                CameraAspectRatio.VERTICAL_9_16
               ? 1024
               : 1000;
 
@@ -818,7 +856,9 @@ class Editor {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
       if (this.outliner_feature_flag) {
-        let result = this.sceneManager?.render_outliner(this.timeline.characters);
+        const result = this.sceneManager?.render_outliner(
+          this.timeline.characters,
+        );
         if (result) outlinerState.items.value = result.items;
       }
     }
@@ -929,6 +969,7 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...", this.frame_buffer);
+
     this.timeline.is_playing = false;
     this.timeline.scrubber_frame_position = 0;
     this.timeline.current_time = 0;
@@ -987,7 +1028,10 @@ class Editor {
   updateSelectedUI() {
     let mainSelected;
     if (this.outliner_feature_flag) {
-      if (this.sceneManager?.selected_objects === undefined || this.timeline.is_playing) {
+      if (
+        this.sceneManager?.selected_objects === undefined ||
+        this.timeline.is_playing
+      ) {
         return;
       }
       if (this.sceneManager?.selected_objects.length <= 0) {
@@ -995,8 +1039,7 @@ class Editor {
       }
 
       mainSelected = this.sceneManager?.selected_objects[0];
-    }
-    else {
+    } else {
       if (this.timeline.is_playing) {
         return;
       }
@@ -1099,8 +1142,11 @@ class Editor {
   }
 
   publishSelect() {
-    if (this, this.outliner_feature_flag) {
-      if (this.sceneManager?.selected_objects && this.sceneManager?.selected_objects?.length > 0) {
+    if ((this, this.outliner_feature_flag)) {
+      if (
+        this.sceneManager?.selected_objects &&
+        this.sceneManager?.selected_objects?.length > 0
+      ) {
         Queue.publish({
           queueName: QueueNames.FROM_ENGINE,
           action: fromEngineActions.SELECT_OBJECT,
@@ -1113,16 +1159,14 @@ class Editor {
           } as MediaItem,
         });
         return;
-      }
-      else {
+      } else {
         Queue.publish({
           queueName: QueueNames.FROM_ENGINE,
           action: fromEngineActions.DESELECT_OBJECT,
           data: null,
         });
       }
-    }
-    else {
+    } else {
       if (this.selected) {
         Queue.publish({
           queueName: QueueNames.FROM_ENGINE,
@@ -1136,8 +1180,7 @@ class Editor {
           } as MediaItem,
         });
         return;
-      }
-      else {
+      } else {
         Queue.publish({
           queueName: QueueNames.FROM_ENGINE,
           action: fromEngineActions.DESELECT_OBJECT,

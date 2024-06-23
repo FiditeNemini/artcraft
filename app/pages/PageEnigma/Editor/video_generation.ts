@@ -12,14 +12,18 @@ import * as THREE from "three";
 import { getSceneSignals } from "~/signals";
 import { v4 as uuidv4 } from "uuid";
 import { SceneGenereationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
+import { MediaUploadApi } from "~/Classes/ApiManager";
+import { adapterImage } from "../signals";
 
 // TODO THIS CLASS MAKES NO SENSE Refactor so we generate all the frames first. then pass it through this pipeline as a data structure process it. through this class.
 
 export class VideoGeneration {
   editor: Editor;
+  mediaUploadAPI: MediaUploadApi;
 
   constructor(editor: Editor) {
     this.editor = editor;
+    this.mediaUploadAPI = new MediaUploadApi();
   }
 
   async generateFrame() {
@@ -258,17 +262,40 @@ export class VideoGeneration {
     const style_name = this.editor.art_style.toString();
     const media_token = this.editor.current_scene_media_token || undefined;
 
+    // convert the ip adapter image and upload as a media token
+    const image_uuid = uuidv4();
+    let ipa_image_token = undefined;
+    if (this.editor.globalIpAdapterImage != undefined) {
+      const response = await this.mediaUploadAPI.UploadImage({
+        fileName: `${image_uuid}.ipa`,
+        blob: this.editor.globalIpAdapterImage,
+        uuid: image_uuid,
+      });
+      if (response.success) {
+        if (response.data) {
+          ipa_image_token = response.data;
+        }
+      }
+    }
+
+    let globalIPAMediaToken = "";
+
+    if (ipa_image_token) {
+      globalIPAMediaToken = ipa_image_token;
+    }
+
+    // TODO Remove so many of these around wtf. SceneGenereationMetaData should only be one place
     const metaData: SceneGenereationMetaData = {
       artisticStyle: this.editor.art_style,
       positivePrompt: this.editor.positive_prompt,
       negativePrompt: this.editor.negative_prompt,
       cameraAspectRatio: this.editor.render_camera_aspect_ratio,
-      adapterImageToken: "",
       upscale: this.editor.generation_options.upscale,
       faceDetail: this.editor.generation_options.faceDetail,
       styleStrength: this.editor.generation_options.styleStrength,
       lipSync: this.editor.generation_options.lipSync,
       cinematic: this.editor.generation_options.cinematic,
+      globalIPAMediaToken: globalIPAMediaToken,
     };
 
     // This is to save the snapshot of the scene for remixing...
@@ -335,10 +362,13 @@ export class VideoGeneration {
         this.editor.generation_options.styleStrength,
         this.editor.generation_options.lipSync,
         this.editor.generation_options.cinematic,
+        globalIPAMediaToken,
       )
       .catch((error) => {
         // TODO handle stylize error.
         console.log(error);
+        this.editor.updateLoad(100, "Failed To Render");
+        this.editor.endLoading();
       });
     // Not sure if this is needed will double check TODO: MC
     //this.editor.generating_preview = false;
@@ -362,6 +392,7 @@ export class VideoGeneration {
       canvas: this.editor.canvasRenderCamReference || undefined,
       preserveDrawingBuffer: true,
     });
+
     this.editor.activeScene.renderMode(false);
 
     this.editor.switchEdit();

@@ -373,6 +373,7 @@ export class APIManager {
     use_strength: number = 1.0,
     use_lipsync: boolean = false,
     use_cinematic: boolean = false,
+    use_global_ipa_media_token: string | null = null,
   ) {
     const uuid = uuidv4();
 
@@ -390,6 +391,7 @@ export class APIManager {
       use_upscaler: use_upscaler,
       use_strength: use_strength,
       use_lipsync: use_lipsync,
+      global_ipa_media_token: use_global_ipa_media_token,
       use_cinematic: use_cinematic,
     };
 

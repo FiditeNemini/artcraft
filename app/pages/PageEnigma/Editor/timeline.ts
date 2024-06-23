@@ -99,7 +99,6 @@ export class TimeLine {
     );
 
     this.current_time = 0;
-
     this.camera_name = camera_name;
   }
 
@@ -198,6 +197,7 @@ export class TimeLine {
         break;
       case toEngineActions.GENERATE_VIDEO: {
         const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
+        // pass this in ... rather than doing it implicitly ...
         this.editorEngine.generation_options = options as GenerationOptions;
         this.editorEngine.generateVideo();
         break;

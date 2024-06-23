@@ -7,7 +7,7 @@ export interface SceneGenereationMetaData {
   negativePrompt: string;
 
   cameraAspectRatio: CameraAspectRatio;
-  adapterImageToken: string;
+  globalIPAMediaToken: string;
 
   upscale: boolean;
   faceDetail: boolean;
