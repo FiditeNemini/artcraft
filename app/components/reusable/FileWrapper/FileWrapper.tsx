@@ -57,6 +57,7 @@ export function FileWrapper({
     setDragging(false);
     onDragDrop(event);
     if (event.dataTransfer.files && event.dataTransfer.files[0]) {
+      setResetModal(true);
       setFile(event.dataTransfer.files[0]);
       setModalOpen(true);
     }
