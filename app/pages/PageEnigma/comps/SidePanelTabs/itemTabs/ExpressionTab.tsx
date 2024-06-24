@@ -162,7 +162,6 @@ export const ExpressionTab = () => {
         />
       </div>
       <UploadModalMovement
-        closeModal={() => setOpen(false)}
         onClose={() => setOpen(false)}
         onSuccess={fetchUserExpressions}
         isOpen={open}

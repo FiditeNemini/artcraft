@@ -40,6 +40,7 @@ function getAddCharacter(item: ClipUI) {
 }
 
 export function loadCharacterData(item: ClipUI) {
+  console.log("animation drop", item);
   const existingCharacter = getAddCharacter(item);
   if (item.type === ClipType.ANIMATION) {
     const newItem = {

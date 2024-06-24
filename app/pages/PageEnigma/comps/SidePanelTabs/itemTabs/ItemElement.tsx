@@ -12,7 +12,7 @@ interface Props {
 
 export const ItemElement = ({ item }: Props) => {
   useSignals();
-  const defaultThumb = `/resources/images/default-covers/${item.imageIndex || 0}.webp`;
+  const defaultThumb = `/resources/images/default-covers/${(item.imageIndex || 0) % 24}.webp`;
   const thumbnail = item.thumbnail ? item.thumbnail : defaultThumb;
 
   return (

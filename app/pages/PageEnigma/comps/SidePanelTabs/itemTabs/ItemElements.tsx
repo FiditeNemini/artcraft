@@ -25,13 +25,10 @@ export const ItemElements = ({
       : sidePanelWidth.value;
 
   const displayItems = items.filter((item) => {
-    if (assetFilter === AssetFilterOption.ALL) {
-      return true;
+    if (assetFilter === AssetFilterOption.BOOKMARKED) {
+      return item.isBookmarked;
     }
-    if (assetFilter === AssetFilterOption.MINE) {
-      return item.isMine;
-    }
-    return item.isBookmarked;
+    return true;
   });
 
   function getGridColumnsClass(displayWidth: number): string {
