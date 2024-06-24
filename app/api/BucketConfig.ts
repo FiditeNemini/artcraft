@@ -1,4 +1,4 @@
-import { environmentVariables } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 
 class BucketConfig {
   isLocalDev: boolean;
@@ -17,7 +17,8 @@ class BucketConfig {
     if (path !== undefined && path !== null && !path.startsWith("/")) {
       path = "/" + path;
     }
-    return `https://storage.googleapis.com/${bucket}${path}`;
+    const media_api_base_url = environmentVariables.values.GOOGLE_API;
+    return `${media_api_base_url}/${bucket}${path}`;
   }
 
   private getBucket(): string {
@@ -29,10 +30,7 @@ class BucketConfig {
     width?: number,
     quality?: number,
   ): string {
-    // const basePath = this.isLocalDev
-    //   ? "https://dev-cdn.fakeyou.com"
-    //   : "https://cdn.fakeyou.com";
-    const basePath = environmentVariables.value.CDN_API;
+    const cndBasePath = environmentVariables.values.CDN_API;
     const path = bucketRelativePath?.startsWith("/")
       ? bucketRelativePath
       : "/" + bucketRelativePath;
@@ -48,9 +46,9 @@ class BucketConfig {
       resizeParams = resizeParams.slice(0, -1);
     }
     if (resizeParams) {
-      return `${basePath}/${resizeParams}${path}`;
+      return `${cndBasePath}/${resizeParams}${path}`;
     } else {
-      return `${basePath}${path}`;
+      return `${cndBasePath}${path}`;
     }
   }
 }

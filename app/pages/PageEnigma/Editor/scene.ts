@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader, GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
 
-import { environmentVariables } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { generateUUID } from "three/src/math/MathUtils.js";
@@ -162,7 +162,7 @@ class Scene {
     keyframe_uuid: string,
     keyframe_pos: THREE.Vector3,
     keyframe_rot: THREE.Vector3,
-    keyframe_scl: THREE.Vector3,
+    // keyframe_scl: THREE.Vector3,
   ) {
     this.scene.traverse((object) => {
       if (object.userData.media_id) {
@@ -207,7 +207,7 @@ class Scene {
       camera_position.z,
     );
     camera_obj.layers.set(1);
-    camera_obj.children.forEach(child => {
+    camera_obj.children.forEach((child) => {
       child.layers.set(1);
     });
     this.scene.add(camera_obj);
@@ -228,12 +228,13 @@ class Scene {
 
   async getMediaURL(media_id: string) {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = environmentVariables.value.BASE_API;
+    const api_base_url = environmentVariables.values.BASE_API;
+    const media_api_base_url = environmentVariables.values.GOOGLE_API;
     const url = `${api_base_url}/v1/media_files/file/${media_id}`;
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_base_url = `${media_api_base_url}/vocodes-public`;
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
@@ -247,7 +248,7 @@ class Scene {
   }
 
   setColor(object_uuid: string, hex_color: string) {
-    let object = this.get_object_by_uuid(object_uuid);
+    const object = this.get_object_by_uuid(object_uuid);
     if (object) {
       object.userData["color"] = hex_color;
       object.traverse((c: THREE.Object3D) => {
@@ -256,8 +257,8 @@ class Scene {
             if (c.userData["base"] == undefined) {
               c.userData["base"] = c.material.color.getHex();
             }
-            var currentColor = new THREE.Color(c.userData["base"]);
-            var tint = new THREE.Color(hex_color);
+            const currentColor = new THREE.Color(c.userData["base"]);
+            const tint = new THREE.Color(hex_color);
             currentColor.multiply(tint);
             c.material.color.set(new THREE.Color(currentColor));
           }
@@ -267,7 +268,7 @@ class Scene {
   }
 
   setVisible(object_uuid: string, visible: boolean) {
-    let object = this.get_object_by_uuid(object_uuid);
+    const object = this.get_object_by_uuid(object_uuid);
     if (object) {
       object.visible = visible;
     }
@@ -329,13 +330,24 @@ class Scene {
     name: string,
     auto_add: boolean = true,
     position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
-    version: number = 1.0
+    version: number = 1.0,
   ): Promise<THREE.Object3D> {
     const url = await this.getMediaURL(media_id);
     if (url.includes(".pmd") || url.includes(".pmx")) {
-      return await this.loadMMDWithPlaceholder(media_id, name, auto_add, position)
+      return await this.loadMMDWithPlaceholder(
+        media_id,
+        name,
+        auto_add,
+        position,
+      );
     }
-    return await this.loadGlbWithPlaceholder(media_id, name, auto_add, position, version);
+    return await this.loadGlbWithPlaceholder(
+      media_id,
+      name,
+      auto_add,
+      position,
+      version,
+    );
   }
 
   addChildrenToScene(parent: THREE.Object3D, scene: THREE.Scene): void {
@@ -347,7 +359,7 @@ class Scene {
       }
     });
   }
-  
+
   containsGroup(object: THREE.Object3D): boolean {
     if (object instanceof THREE.Group) {
       return true;
@@ -365,7 +377,7 @@ class Scene {
     name: string,
     auto_add: boolean = true,
     position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
-    load_version: number = 1.0
+    load_version: number = 1.0,
   ): Promise<THREE.Object3D> {
     if (this.placeholder_manager === undefined) {
       throw Error("Place holder Manager is undefined");
@@ -393,7 +405,6 @@ class Scene {
       throw error;
     });
 
-
     let child_result = undefined;
     // Loads the first child
     glb.scene.children.forEach((child) => {
@@ -418,13 +429,16 @@ class Scene {
       child.userData["locked"] = false;
       child.layers.enable(0);
       child.layers.enable(1);
-      if(load_version <= 1.0) {
+      if (load_version <= 1.0) {
         child_result = child;
-        console.log("Loading older model consider resaving to upgrade to newer version of save file. Save Version:", load_version)
+        console.log(
+          "Loading older model consider resaving to upgrade to newer version of save file. Save Version:",
+          load_version,
+        );
       }
     });
 
-    if (load_version <= 1.0){
+    if (load_version <= 1.0) {
       glb.scene.name = "Scene";
       glb.scene.userData["name"] = "Scene";
       glb.scene.userData["media_id"] = media_id;
@@ -433,8 +447,7 @@ class Scene {
       glb.scene.userData["shininess"] = 0.5;
       glb.scene.userData["specular"] = 0.5;
       glb.scene.userData["locked"] = false;
-    }
-    else if (load_version > 1.0) {
+    } else if (load_version > 1.0) {
       glb.scene.name = name;
       glb.scene.userData["name"] = name;
       glb.scene.userData["media_id"] = media_id;
@@ -445,8 +458,7 @@ class Scene {
       glb.scene.userData["locked"] = false;
     }
 
-
-    if(load_version > 1.0) {
+    if (load_version > 1.0) {
       child_result = glb.scene;
     }
 

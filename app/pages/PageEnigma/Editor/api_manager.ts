@@ -1,14 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import {
-  environmentVariables,
-  signalScene,
-  startPollingActiveJobs,
-} from "~/signals";
+import { signalScene, startPollingActiveJobs } from "~/signals";
 import { updateExistingScene, uploadNewScene } from "./api_fetchers";
 import { uploadThumbnail } from "~/api";
-
+import environmentVariables from "~/Classes/EnvironmentVariables";
 /**
  * Storyteller Studio API Manager
  * The source of truth of all these media items is the database in the cloud
@@ -74,15 +70,15 @@ export enum Visibility {
 /**
  * This is designed to surface user customer facing messages as errors.
  */
-type Data = { [key: string]: any };
-class APIManagerResponseSuccess {
-  public user_message: string;
-  public data: Data | null;
-  constructor(user_message: string = "", data: Data | null = null) {
-    this.data = data;
-    this.user_message = user_message;
-  }
-}
+// type Data = { [key: string]: any };
+// class APIManagerResponseSuccess {
+//   public user_message: string;
+//   public data: Data | null;
+//   constructor(user_message: string = "", data: Data | null = null) {
+//     this.data = data;
+//     this.user_message = user_message;
+//   }
+// }
 
 /**
  * This is designed to surface user customer facing messages as errors.
@@ -99,7 +95,7 @@ export class APIManager {
   baseUrl: string;
 
   constructor() {
-    this.baseUrl = environmentVariables.value.BASE_API;
+    this.baseUrl = environmentVariables.values.BASE_API as string;
   }
 
   /**
@@ -153,7 +149,7 @@ export class APIManager {
   public async loadSceneState(
     scene_media_file_token: string | null,
   ): Promise<any> {
-    const api_base_url = environmentVariables.value.BASE_API;
+    const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
     if (response.status > 200) {
@@ -173,7 +169,7 @@ export class APIManager {
       });
     }
     const bucket_path = json["media_file"]["public_bucket_path"];
-    const media_base_url = environmentVariables.value.GOOGLE_API;
+    const media_base_url = environmentVariables.values.GOOGLE_API;
     const media_url = `${media_base_url}/vocodes-public${bucket_path}`; // gets you a bucket path
 
     const file_response = await fetch(media_url);
@@ -204,7 +200,7 @@ export class APIManager {
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = environmentVariables.value.GOOGLE_API;
+    const media_base_url = environmentVariables.values.GOOGLE_API;
     const media_url = `${media_base_url}/vocodes-public${bucketPath}`; // gets you a bucket path
     return media_url;
   }
@@ -224,7 +220,7 @@ export class APIManager {
     return file;
   }
 
-  public async uploadMediaSceneThumbnail(blob: any, fileName: string) {
+  public async uploadMediaSceneThumbnail(blob: Blob | File, fileName: string) {
     const url = `${this.baseUrl}/v1/media_files/upload/image`;
     const uuid = uuidv4();
 
@@ -308,13 +304,13 @@ export class APIManager {
   }
 
   public async uploadMediaFrameGeneration(
-    blob: any,
+    blob: Blob | File,
     fileName: string,
     style: string = "comic_book",
     positive_prompt: string,
     negative_prompt: string,
   ): Promise<string> {
-    const url = `${environmentVariables.value.FUNNEL_API}/preview/`;
+    const url = `${environmentVariables.values.FUNNEL_API}/preview/`;
 
     const payload = {
       style: style,

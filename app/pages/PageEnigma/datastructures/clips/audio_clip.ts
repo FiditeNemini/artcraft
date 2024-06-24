@@ -1,11 +1,11 @@
-import { environmentVariables } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 
-interface AudioData {
+interface AudioDataInterface {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;
 }
 
-class AudioData implements AudioData {
+class AudioData implements AudioDataInterface {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;
   source: AudioBufferSourceNode | undefined;
@@ -19,7 +19,7 @@ class AudioData implements AudioData {
 export class AudioClip {
   version: number;
   media_id: string;
-  type: "audio" = "audio";
+  type: "audio";
   volume: number;
   audio_data: AudioData | undefined;
 
@@ -35,7 +35,7 @@ export class AudioClip {
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = environmentVariables.value.BASE_API;
+    const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
 
     console.log(`API BASE URL? ${api_base_url}`);
@@ -43,7 +43,8 @@ export class AudioClip {
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_api_base_url = environmentVariables.values.GOOGLE_API;
+    const media_base_url = `${media_api_base_url}/vocodes-public`;
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
@@ -57,7 +58,7 @@ export class AudioClip {
     return new AudioData(audioContext, audioBuffer);
   }
 
-  toJSON(): any {
+  toJSON() {
     return {
       version: this.version,
       media_id: this.media_id,

@@ -1,12 +1,13 @@
 import { LipSync } from "../../Editor/lipsync";
 import * as THREE from "three";
-import { environmentVariables } from "~/signals";
-interface AudioData {
+import environmentVariables from "~/Classes/EnvironmentVariables";
+
+interface AudioDataInterface {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;
 }
 
-class AudioData implements AudioData {
+class AudioData implements AudioDataInterface {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;
   source: AudioBufferSourceNode | undefined;
@@ -31,7 +32,7 @@ class BlendShapeHelper {
 export class LipSyncClip {
   version: number;
   media_id: string;
-  type: "lipsync" = "lipsync";
+  type: "lipsync";
   volume: number;
   audio_data: AudioData | undefined;
   lipsync: LipSync;
@@ -55,7 +56,7 @@ export class LipSyncClip {
   // lip sync will be generated through TTS
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = environmentVariables.value.BASE_API;
+    const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
 
     console.log(`API BASE URL? ${api_base_url}`);
@@ -64,7 +65,8 @@ export class LipSyncClip {
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_api_base_url = environmentVariables.values.GOOGLE_API;
+    const media_base_url = `${media_api_base_url}/vocodes-public`;
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
@@ -135,7 +137,11 @@ export class LipSyncClip {
     });
   }
 
-  step(frame: number, offset: number, rendering: boolean) {
+  step(
+    frame: number,
+    offset: number,
+    // rendering: boolean
+  ) {
     if (this.lipsync == null) {
       return;
     }
@@ -151,7 +157,7 @@ export class LipSyncClip {
     this.lipsync = new LipSync();
   }
 
-  toJSON(): any {
+  toJSON() {
     return {
       version: this.version,
       media_id: this.media_id,

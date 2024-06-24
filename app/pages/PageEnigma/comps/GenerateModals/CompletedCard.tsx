@@ -4,7 +4,7 @@ import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
 import { useRef, useState } from "react";
 import { BucketConfig } from "~/api/BucketConfig";
 import dayjs from "dayjs";
-import { environmentVariables } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 import { useSignals } from "@preact/signals-react/runtime";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
 import { styleList } from "~/pages/PageEnigma/styleList";
@@ -26,7 +26,7 @@ export function CompletedCard({ movie, setMovieId }: Props) {
   // console.log(movie);
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
-  const downloadLink = `${environmentVariables.value.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
+  const downloadLink = `${environmentVariables.values.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
 
   const imageUrl = bucketConfig.current.getCdnUrl(
     movie.public_bucket_path + "-thumb.gif",

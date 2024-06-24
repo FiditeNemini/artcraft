@@ -4,7 +4,7 @@ import { FBXLoader } from "three/examples/jsm/Addons.js";
 import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
 
 import { MoveAIResult, Retarget } from "../../Editor/retargeting";
-import { environmentVariables } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 
 export class AnimationClip {
   version: number;
@@ -49,16 +49,15 @@ export class AnimationClip {
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = environmentVariables.value.BASE_API;
+    const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
-
-    console.log(`API BASE URL? ${api_base_url}`);
-    console.log(`CALLED URL? ${url}`);
 
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+
+    const media_api_base_url = environmentVariables.values.GOOGLE_API;
+    const media_base_url = `${media_api_base_url}/vocodes-public`;
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
@@ -79,7 +78,7 @@ export class AnimationClip {
         } else if (url.includes(".fbx")) {
           const fbxLoader = new FBXLoader();
           fbxLoader.load(url, (fbx) => {
-            let animationClip = fbx.animations[0];
+            const animationClip = fbx.animations[0];
             this.retargeted = true;
             animationClip.tracks.forEach((track) => {
               const retarget = new Retarget();
@@ -93,18 +92,17 @@ export class AnimationClip {
             resolve(animationClip);
           });
         } else if (url.includes(".vmd")) {
-          console.log("VMD Loader")
-          let root = this.mixer?.getRoot();
-          console.log(root)
-          if(root){
+          console.log("VMD Loader");
+          const root = this.mixer?.getRoot();
+          console.log(root);
+          if (root) {
             const mmdLoader = new MMDLoader();
-            mmdLoader.loadAnimation(url, (root as THREE.SkinnedMesh), (mmd) => {
-              resolve((mmd as THREE.AnimationClip));
+            mmdLoader.loadAnimation(url, root as THREE.SkinnedMesh, (mmd) => {
+              resolve(mmd as THREE.AnimationClip);
             });
-            console.log("Loaded")
-
+            console.log("Loaded");
           }
-          console.log("Dont")
+          console.log("Dont");
         }
       });
     });
@@ -142,7 +140,7 @@ export class AnimationClip {
     if (this.retargeted === false) {
       return;
     }
-    let rootObject = this.mixer?.getRoot();
+    const rootObject = this.mixer?.getRoot();
     if (rootObject)
       for (
         let index_ = 0;
@@ -163,12 +161,12 @@ export class AnimationClip {
               ) {
                 const property = this.special_properties[index__];
                 if (property.bone == bone.name + ".quaternion") {
-                  let quat_y = THREE.MathUtils.degToRad(property.y);
+                  const quat_y = THREE.MathUtils.degToRad(property.y);
                   bone.rotateY(quat_y);
                   if (property.only_y == false) {
-                    let quat_x = THREE.MathUtils.degToRad(property.x);
+                    const quat_x = THREE.MathUtils.degToRad(property.x);
                     bone.rotateX(quat_x);
-                    let quat_z = THREE.MathUtils.degToRad(property.z);
+                    const quat_z = THREE.MathUtils.degToRad(property.z);
                     bone.rotateZ(quat_z);
                   } else {
                     if (child_holder.parent) {
@@ -219,7 +217,7 @@ export class AnimationClip {
     this.mixer?.setTime(0);
   }
 
-  toJSON(): any {
+  toJSON() {
     return {
       version: this.version,
       media_id: this.media_id,

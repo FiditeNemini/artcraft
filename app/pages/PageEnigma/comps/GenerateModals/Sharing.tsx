@@ -12,7 +12,7 @@ import {
 import SocialButton from "./SocialButton";
 import { generateMovieId, viewMyMovies } from "~/pages/PageEnigma/signals";
 import dayjs from "dayjs";
-import { environmentVariables } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
 
 interface Props {
@@ -29,7 +29,8 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
   // TODO: ApiManager should provide all endpoints
-  const downloadLink = `${environmentVariables.value.GOOGLE_API}/vocodes-public${mediaFile?.public_bucket_path}`;
+  const media_api_base_url = environmentVariables.values.GOOGLE_API;
+  const downloadLink = `${media_api_base_url}/vocodes-public${mediaFile?.public_bucket_path}`;
 
   const handleCopyLink = () => {
     if (navigator.clipboard) {
@@ -70,10 +71,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
       <div className="flex gap-6 px-5 pb-5">
         <div className="max-h-[420px] w-full overflow-hidden rounded-lg">
           <video controls crossOrigin="anonymous" className="h-full w-full">
-            <source
-              src={`${environmentVariables.value.GOOGLE_API}/vocodes-public${mediaFile?.public_bucket_path}`}
-              type="video/mp4"
-            />
+            <source src={downloadLink} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>

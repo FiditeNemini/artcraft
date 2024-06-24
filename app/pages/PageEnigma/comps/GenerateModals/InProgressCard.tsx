@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/pro-solid-svg-icons";
 
 import { ToastTypes } from "~/enums";
-import { addToast, environmentVariables } from "~/signals";
+import { addToast } from "~/signals";
+import environmentVariables from "~/Classes/EnvironmentVariables";
 
 import { JobState } from "~/pages/PageEnigma/enums";
 import { ActiveJob } from "~/pages/PageEnigma/models";
@@ -32,7 +33,7 @@ export function InProgressCard({ movie }: Props) {
   const completeLength = (600 * completePercent) / 100;
 
   const deleteJob = useCallback(() => {
-    const endpoint = `${environmentVariables.value.BASE_API}/v1/jobs/job/${movie.job_token}`;
+    const endpoint = `${environmentVariables.values.BASE_API}/v1/jobs/job/${movie.job_token}`;
 
     fetch(endpoint, {
       method: "DELETE",

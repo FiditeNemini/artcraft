@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { environmentVariables } from "~/signals";
 
+import environmentVariables from "~/Classes/EnvironmentVariables";
 interface CsvJson {
   [key: string]: string[];
 }
@@ -8,7 +8,7 @@ interface CsvJson {
 export class EmotionClip {
   version: number;
   media_id: string;
-  type: "expression" = "expression";
+  type: "expression";
   emotion_json: any;
   faces: THREE.Mesh[];
 
@@ -24,7 +24,7 @@ export class EmotionClip {
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = environmentVariables.value.BASE_API;
+    const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
 
     console.log(`API BASE URL? ${api_base_url}`);
@@ -33,7 +33,8 @@ export class EmotionClip {
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_api_base_url = environmentVariables.values.GOOGLE_API;
+    const media_base_url = `${media_api_base_url}/vocodes-public`;
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
@@ -134,7 +135,7 @@ export class EmotionClip {
     this.setBlends(keys);
   }
 
-  toJSON(): any {
+  toJSON() {
     return {
       version: this.version,
       media_id: this.media_id,

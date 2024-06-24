@@ -1,6 +1,7 @@
 .env
 .eslintcache
 .vite
+.notes
 node_modules
 /~/
 proxy/~/

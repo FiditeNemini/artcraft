@@ -21,7 +21,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
-import { environmentVariables, pageHeight, pageWidth } from "~/signals";
+import { pageHeight, pageWidth } from "~/signals";
 import { Toaster } from "~/components";
 
 config.autoAddCss = false; /* eslint-disable import/first */
@@ -124,7 +124,6 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   }, []);
 
   useEffect(() => {
-    environmentVariables.value = env;
     EnvironmentVariables.initialize(env);
   }, [env]);
 
