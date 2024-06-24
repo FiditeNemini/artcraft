@@ -1,5 +1,5 @@
 .fy-style-video-page {
-	.fy-entity-input {
+	.fy-style-video-page-ipa-input {
 		max-height: 33vh;
 		margin-bottom: 1rem;
 	}
@@ -10,6 +10,13 @@
 
 		.fy-textarea {
 			flex: 1;
+		}
+	}
+
+	.prompt-column {
+		display: inline-block;
+		&:nth-child(2) {
+			flex-grow: 1;
 		}
 	}
 

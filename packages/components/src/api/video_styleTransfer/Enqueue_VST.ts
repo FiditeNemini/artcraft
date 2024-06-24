@@ -8,6 +8,8 @@ export interface EnqueueVSTRequest {
   prompt: string;
   style: string;
 
+  global_ipa_media_token?: string | null;
+
   trim_end_millis: number;
   trim_start_millis: number;
 

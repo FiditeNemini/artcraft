@@ -26,6 +26,7 @@ export default function StyleVideo() {
   const { studioAccessCheck } = useSession();
   const [style, styleSet] = useState("anime_2d_flat");
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
+  const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
   const [negativePrompt, negativePromptSet] = useState("");
   const [length, lengthSet] = useState(3000);
@@ -43,6 +44,7 @@ export default function StyleVideo() {
       EnqueueVST("", {
         creator_set_visibility: "private",
         enable_lipsync: enableLipsync,
+        global_ipa_media_token: IPAToken,
         input_file: mediaToken,
         negative_prompt: negativePrompt,
         prompt,
@@ -91,6 +93,7 @@ export default function StyleVideo() {
           {...{
             accept: ["video"],
             aspectRatio: "landscape",
+            className: "fy-style-video-page-video-input",
             label: "Choose a video",
             name: "mediaToken",
             value: pageMediaToken,
@@ -100,35 +103,63 @@ export default function StyleVideo() {
             type: "media",
           }}
         />
-        <Select
-          {...{
-            label: "Style",
-            onChange: ({ target }: { target: any }) => {
-              styleSet(target.value);
-            },
-            options: styleOptions,
-            value: style,
-          }}
-        />
-        <div {...{ className: "prompt-row" }}>
-          <TextArea
+        <div {...{ className: "prompt-row mt-3" }}>
+          <div
             {...{
-              label: "Positive prompt",
-              rows: 5,
-              onChange: ({ target }: { target: any }) => {
-                promptSet(target.value);
-              },
+              className: "prompt-column",
             }}
-          />
-          <TextArea
+          >
+            <EntityInput
+              {...{
+                accept: ["image"],
+                aspectRatio: "square",
+                className: "fy-style-video-page-ipa-input",
+                label: "IP Adapter Image",
+                name: "IPAToken",
+                value: IPAToken,
+                onChange: ({ target }: { target: any }) => {
+                  IPATokenSet(target.value);
+                },
+                type: "media",
+              }}
+            />
+          </div>
+          <div
             {...{
-              label: "Negative prompt",
-              rows: 5,
-              onChange: ({ target }: { target: any }) => {
-                negativePromptSet(target.value);
-              },
+              className: "prompt-column flex-grow",
             }}
-          />
+          >
+            <Select
+              {...{
+                label: "Style",
+                onChange: ({ target }: { target: any }) => {
+                  styleSet(target.value);
+                },
+                options: styleOptions,
+                value: style,
+              }}
+            />
+            <div {...{ className: "prompt-row" }}>
+              <TextArea
+                {...{
+                  label: "Positive prompt",
+                  rows: 5,
+                  onChange: ({ target }: { target: any }) => {
+                    promptSet(target.value);
+                  },
+                }}
+              />
+              <TextArea
+                {...{
+                  label: "Negative prompt",
+                  rows: 5,
+                  onChange: ({ target }: { target: any }) => {
+                    negativePromptSet(target.value);
+                  },
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         <h6>Strength ({strength})</h6>

@@ -34,6 +34,7 @@ const resultPaths = {
   VoiceConversion: "/media",
   VoiceDesignerCreateVoice: "/voice-designer/voice",
   VoiceDesignerTts: "/media",
+  VideoWorkflow: "/media",
   ImageGeneration: "/media",
 };
 
