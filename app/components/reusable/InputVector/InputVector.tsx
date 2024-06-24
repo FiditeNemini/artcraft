@@ -51,7 +51,7 @@ export const InputVector = ({
     if (newValue === "" || newValue === "-" || newValue === ".") {
       return newValue;
     }
-    return /^-?[0-9]*(.[0-9]*)?$/.test(newValue) ? newValue : oldValue;
+    return /^-?\d*(\.\d{0,2})?$/.test(newValue) ? newValue : oldValue;
   }
 
   function handleOnChange(event: ChangeEvent<HTMLInputElement>) {
