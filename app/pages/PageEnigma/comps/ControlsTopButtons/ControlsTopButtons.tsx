@@ -31,6 +31,7 @@ import {
   cameraAspectRatio,
   cinematic,
   faceDetail,
+  globalIPAMediaToken,
   lipSync,
   resetSceneGenerationMetadata,
   styleStrength,
@@ -80,8 +81,7 @@ export const ControlsTopButtons = () => {
         negativePrompt: editorEngine.negative_prompt,
         artisticStyle: getArtStyle(editorEngine.art_style.toString()),
         cameraAspectRatio: cameraAspectRatio.value,
-        globalIPAMediaToken:
-          editorEngine.generation_options.globalIpAdapterImageMediaToken,
+        globalIPAMediaToken: globalIPAMediaToken.value,
         upscale: upscale.value,
         faceDetail: faceDetail.value,
         styleStrength: styleStrength.value,

@@ -7,6 +7,7 @@ import {
   hideEditorLoader,
   restoreSceneGenerationMetadata,
   showEditorLoader,
+  globalIPAMediaToken,
 } from "../signals";
 import Editor from "./editor";
 import { getArtStyle } from "~/enums";
@@ -147,7 +148,7 @@ export class SaveManager {
     // these propogate the values into the editor
     if (scene_json.globalIpAdapterImageMediaToken) {
       // this should be populated right after
-      this.editor.generation_options.globalIpAdapterImageMediaToken;
+      globalIPAMediaToken.value = scene_json.globalIpAdapterImageMediaToken;
     }
     if (scene_json.positivePrompt) {
       this.editor.positive_prompt = scene_json.positivePrompt;

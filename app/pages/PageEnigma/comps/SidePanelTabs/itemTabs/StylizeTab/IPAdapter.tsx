@@ -23,10 +23,26 @@ import {
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button, Label, P, TransitionDialogue } from "~/components";
-import { useSignals } from "@preact/signals-react/runtime";
-import { adapterImage } from "~/pages/PageEnigma/signals";
-
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
+import { BucketConfig } from "~/api/BucketConfig";
+import { useSignals } from "@preact/signals-react/runtime";
+import { globalIPAMediaToken, adapterImage } from "~/pages/PageEnigma/signals";
+
+const base64ToFile = (base64: string, filename: string): File => {
+  const arr = base64.split(",");
+  const mime = arr[0].match(/:(.*?);/)?.[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, { type: mime });
+};
+
 export const IPAdapter: React.FC = () => {
   useSignals();
   const editorEngine = useContext(EngineContext);
@@ -37,22 +53,42 @@ export const IPAdapter: React.FC = () => {
   const [isExpandedDialogOpen, setIsExpandedDialogOpen] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const FILE_TYPES = ["JPG", "PNG", "JPEG"];
+  const bucketConfig = new BucketConfig();
 
   useEffect(() => {
-    if (editorEngine) {
-      // load the image token if availible
-      // Bombay load the image from the image token here.
-      editorEngine.generation_options.globalIpAdapterImageMediaToken;
-    }
-  }, []);
+    const fetchMediaFile = async () => {
+      const mediaFilesApi = new MediaFilesApi();
+      if (
+        editorEngine &&
+        adapterImage.value === null &&
+        globalIPAMediaToken.value
+      ) {
+        try {
+          const response = await mediaFilesApi.GetMediaFileByToken({
+            mediaFileToken: globalIPAMediaToken.value || "",
+          });
+          if (response.success && response.data) {
+            const imageUrl = bucketConfig.getGcsUrl(
+              response.data.public_bucket_path,
+            );
+            adapterImage.value = imageUrl;
+          } else {
+            console.error("Failed to fetch media file:", response.errorMessage);
+          }
+        } catch (error) {
+          console.error("Error fetching media file:", error);
+        }
+      }
+    };
+
+    fetchMediaFile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editorEngine, globalIPAMediaToken.value, adapterImage.value]);
 
   const onFileChange = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       setImageSrc(reader.result as string);
-      if (editorEngine) {
-        editorEngine.globalIpAdapterImage = file;
-      }
       setIsDialogOpen(true);
     };
     reader.readAsDataURL(file);
@@ -119,13 +155,25 @@ export const IPAdapter: React.FC = () => {
     });
   };
 
+  // this is the function that outputs the cropped image
   const onSaveCrop = async () => {
     if (completedCrop && imageSrc && imgRef.current) {
       const croppedImageUrl = await createCroppedImage(
         imgRef.current,
         completedCrop,
       );
-      adapterImage.value = croppedImageUrl || "";
+
+      if (croppedImageUrl) {
+        // converts base64 cropped image into a file for upload
+        const croppedImageFile = base64ToFile(
+          croppedImageUrl,
+          "cropped-image.jpg",
+        );
+        adapterImage.value = URL.createObjectURL(croppedImageFile);
+        if (editorEngine) {
+          editorEngine.globalIpAdapterImage = croppedImageFile;
+        }
+      }
       setIsDialogOpen(false);
       setCrop(undefined);
     }
@@ -137,6 +185,7 @@ export const IPAdapter: React.FC = () => {
     setImageSrc(null);
     setCrop(undefined);
     adapterImage.value = null;
+    globalIPAMediaToken.value = "";
   };
 
   const DragAndDropZone = () => {
@@ -183,10 +232,11 @@ export const IPAdapter: React.FC = () => {
             <div className="relative h-[150px] cursor-pointer overflow-hidden rounded-lg border-2 border-white/10 bg-black/25">
               <img
                 src={adapterImage.value}
-                alt="Cropped"
+                alt="IPAdapter"
                 width={512}
                 height={512}
                 className="aspect-square h-full w-full object-contain"
+                crossOrigin="anonymous"
               />
             </div>
           </FileUploader>
@@ -234,6 +284,7 @@ export const IPAdapter: React.FC = () => {
                 onLoad={onImageLoad}
                 alt="Source"
                 className="max-h-full object-contain"
+                crossOrigin="anonymous"
               />
             </ReactCrop>
           )}
@@ -268,6 +319,7 @@ export const IPAdapter: React.FC = () => {
               src={adapterImage.value}
               alt="Expanded"
               className="max-h-full max-w-full rounded object-contain"
+              crossOrigin="anonymous"
             />
           )}
         </div>

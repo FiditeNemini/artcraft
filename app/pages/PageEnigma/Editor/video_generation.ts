@@ -13,7 +13,7 @@ import { getSceneSignals } from "~/signals";
 import { v4 as uuidv4 } from "uuid";
 import { SceneGenereationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
 import { MediaUploadApi } from "~/Classes/ApiManager";
-import { adapterImage } from "../signals";
+import { globalIPAMediaToken } from "../signals";
 
 // TODO THIS CLASS MAKES NO SENSE Refactor so we generate all the frames first. then pass it through this pipeline as a data structure process it. through this class.
 
@@ -265,6 +265,7 @@ export class VideoGeneration {
     // convert the ip adapter image and upload as a media token
     const image_uuid = uuidv4();
     let ipa_image_token = undefined;
+
     if (this.editor.globalIpAdapterImage != undefined) {
       const response = await this.mediaUploadAPI.UploadImage({
         fileName: `${image_uuid}.ipa`,
@@ -277,11 +278,8 @@ export class VideoGeneration {
         }
       }
     }
-
-    let globalIPAMediaToken = "";
-
     if (ipa_image_token) {
-      globalIPAMediaToken = ipa_image_token;
+      globalIPAMediaToken.value = ipa_image_token;
     }
 
     // TODO Remove so many of these around wtf. SceneGenereationMetaData should only be one place
@@ -295,7 +293,7 @@ export class VideoGeneration {
       styleStrength: this.editor.generation_options.styleStrength,
       lipSync: this.editor.generation_options.lipSync,
       cinematic: this.editor.generation_options.cinematic,
-      globalIPAMediaToken: globalIPAMediaToken,
+      globalIPAMediaToken: globalIPAMediaToken.value,
     };
 
     // This is to save the snapshot of the scene for remixing...
@@ -362,7 +360,7 @@ export class VideoGeneration {
         this.editor.generation_options.styleStrength,
         this.editor.generation_options.lipSync,
         this.editor.generation_options.cinematic,
-        globalIPAMediaToken,
+        globalIPAMediaToken.value,
       )
       .catch((error) => {
         // TODO handle stylize error.

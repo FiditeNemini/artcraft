@@ -11,8 +11,8 @@ export const promptsStore = {
   showNegativePrompt: signal(false),
 };
 
+export const globalIPAMediaToken = signal("");
 export const adapterImage = signal<string | null>(null);
-
 export const selectedArtStyle = signal<ArtStyle>(styleList[0].type);
 export const upscale = signal(false);
 export const faceDetail = signal(false);
@@ -42,6 +42,9 @@ export const resetSceneGenerationMetadata = () => {
 export const restoreSceneGenerationMetadata = (
   newData: SceneGenereationMetaData,
 ) => {
+  if (newData.globalIPAMediaToken) {
+    globalIPAMediaToken.value = newData.globalIPAMediaToken;
+  }
   if (newData.positivePrompt && newData.positivePrompt !== "") {
     promptsStore.textBufferPositive.value = newData.positivePrompt;
     promptsStore.isUserInputPositive.value = true;
