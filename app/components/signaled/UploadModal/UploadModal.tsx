@@ -326,7 +326,7 @@ export function UploadModal({
       label: "Move AI ARKit",
       value: MediaFileAnimationType.MoveAiArKit,
     },
-    { label: "Rigify", value: MediaFileAnimationType.MoveAi },
+    { label: "Rigify", value: MediaFileAnimationType.Rigify },
     {
       label: "Rigify ARKit",
       value: MediaFileAnimationType.MoveAiArKit,
