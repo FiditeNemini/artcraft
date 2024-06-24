@@ -23,7 +23,6 @@ interface Props {
 
 export function CompletedCard({ movie, setMovieId }: Props) {
   useSignals();
-  // console.log(movie);
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
   const downloadLink = `${environmentVariables.values.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
