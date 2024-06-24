@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
-import { twMerge } from "tailwind-merge";
 import { useSignals } from "@preact/signals-react/runtime";
-import { audioFilter, audioItems } from "~/pages/PageEnigma/signals";
+import { audioItems } from "~/pages/PageEnigma/signals";
 
-import { Button, Pagination, UploadAudioButtonDialogue } from "~/components";
+import {
+  Button,
+  FilterButtons,
+  Pagination,
+  UploadAudioButtonDialogue,
+} from "~/components";
 
 import { AudioItemElements } from "./audioItemElements";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
@@ -22,63 +26,27 @@ export const PageAudioLibrary = ({
   reloadLibrary: () => void;
 }) => {
   useSignals();
-  const loadUserAudioItems = userAudioItems.value ? userAudioItems.value : [];
-  const allAudioItems = [...audioItems.value, ...loadUserAudioItems];
-  const displayedItems = allAudioItems.filter((item) => {
-    if (audioFilter.value === AssetFilterOption.ALL) {
-      return true;
-    }
-    if (audioFilter.value === AssetFilterOption.MINE) {
-      return item.isMine;
-    }
-    return item.isBookmarked;
-  });
 
-  const pageSize = 20;
-  const totalPages = Math.ceil(allAudioItems.length / pageSize);
+  const [selectedFilter, setSelectedFilter] = useState(
+    AssetFilterOption.FEATURED,
+  );
+  const filteredAudioItems =
+    selectedFilter === AssetFilterOption.FEATURED
+      ? audioItems.value ?? []
+      : userAudioItems.value ?? [];
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const pageSize = 20;
+  const totalPages = Math.ceil(filteredAudioItems.length / pageSize);
 
   return (
     <>
       <TabTitle title="Audio" />
-      <div>
-        <div className="flex gap-2 overflow-x-auto overflow-y-hidden px-4">
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.ALL)}
-          >
-            All
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
-            disabled={!allAudioItems.some((item) => item.isMine)}
-          >
-            My Audios
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.BOOKMARKED
-                ? "active"
-                : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!allAudioItems.some((item) => item.isBookmarked)}
-          >
-            Bookmarked
-          </button>
-        </div>
-      </div>
+      <FilterButtons
+        value={selectedFilter}
+        onClick={(buttonIdx) => {
+          setSelectedFilter(Number(buttonIdx));
+        }}
+      />
 
       <div className="flex w-full gap-3 px-4">
         <UploadAudioButtonDialogue onUploaded={reloadLibrary} />
@@ -103,7 +71,7 @@ export const PageAudioLibrary = ({
         <AudioItemElements
           currentPage={currentPage}
           pageSize={pageSize}
-          items={displayedItems}
+          items={filteredAudioItems}
         />
       </div>
       {totalPages > 1 && (

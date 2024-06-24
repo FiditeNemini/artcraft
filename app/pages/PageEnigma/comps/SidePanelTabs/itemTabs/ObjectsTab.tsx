@@ -11,12 +11,12 @@ import {
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
-import { objectFilter, shapeItems } from "~/pages/PageEnigma/signals";
+import { shapeItems } from "~/pages/PageEnigma/signals";
 
 import { BucketConfig } from "~/api/BucketConfig";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FileWrapper, FilterButtons } from "~/components";
+import { Button, FileWrapper, FilterButtons, Pagination } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { MediaFilesApi } from "~/Classes/ApiManager";
 import { addToast } from "~/signals";
@@ -30,12 +30,18 @@ export const ObjectsTab = () => {
   const [featuredObjects, setFeaturedObjects] = useState<
     MediaItem[] | undefined
   >(undefined);
-
-  // const [page, setPage] = useState(0);
-  // const [pageCount, setPageCount] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
+  const filteredObjects =
+    selectedFilter === AssetFilterOption.FEATURED
+      ? [...shapeItems.value, ...(featuredObjects ?? [])]
+      : userObjects ?? [];
+
+  const pageSize = 21;
+  const totalPages = Math.ceil(filteredObjects.length / pageSize);
 
   const [fetchStatuses, setFetchStatuses] = useState({
     userObjectsFetch: FetchStatus.READY,
@@ -46,14 +52,6 @@ export const ObjectsTab = () => {
     fetchStatuses.userObjectsFetch === FetchStatus.IN_PROGRESS ||
     fetchStatuses.featuredObjectsFetch === FetchStatus.READY ||
     fetchStatuses.featuredObjectsFetch === FetchStatus.IN_PROGRESS;
-
-  // const pageChange = (page: number) => {
-  //   setPage(page);
-  //   setFetchStatuses({
-  //     userObjectsFetch: FetchStatus.READY,
-  //     featuredObjectsFetch: FetchStatus.READY,
-  //   });
-  // };
 
   const responseMapping = (data: MediaInfo[]) => {
     return data.map((item) => {
@@ -87,6 +85,7 @@ export const ObjectsTab = () => {
     }));
     const mediaFilesApi = new MediaFilesApi();
     const response = await mediaFilesApi.ListUserMediaFiles({
+      page_size: 100,
       filter_engine_categories: [FilterEngineCategories.OBJECT],
     });
 
@@ -146,61 +145,50 @@ export const ObjectsTab = () => {
     }
   }, [userObjects, fetchUserObjects, featuredObjects, fetchFeaturedObjects]);
 
-  const assetFilter = objectFilter;
-
   return (
-    <>
-      <FileWrapper
-        onSuccess={fetchUserObjects}
-        render={(parentId) => (
-          <>
-            <TabTitle title="Objects" />
-            <div>
-              <FilterButtons
-                value={selectedFilter}
-                onClick={(button) => {
-                  setSelectedFilter(Number(button));
-                }}
-              />
-            </div>
-            <div {...{ className: "w-full px-4" }}>
-              <Button
-                {...{
-                  className: "file-picker-button py-3",
-                  htmlFor: parentId,
-                  icon: faCirclePlus,
-                  variant: "action",
-                }}
-              >
-                Upload Object
-              </Button>
-            </div>
-            <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
-              <ItemElements
-                busy={isFetching}
-                debug="objects tab"
-                items={
-                  selectedFilter === AssetFilterOption.FEATURED
-                    ? [...shapeItems.value, ...(featuredObjects || [])]
-                    : userObjects || []
-                }
-                assetFilter={assetFilter.value}
-              />
-            </div>
-            {/* {pageCount ? (
-              <Pagination
-                {...{
-                  className: "-mt-4 mb-3.5 px-4",
-                  currentPage: page,
-                  onPageChange: pageChange,
-                  totalPages: pageCount,
-                }}
-              />
-            ) : null} */}
-          </>
-        )}
-        type={AssetType.OBJECT}
-      />
-    </>
+    <FileWrapper
+      onSuccess={fetchUserObjects}
+      type={AssetType.OBJECT}
+      render={(parentId) => (
+        <>
+          <TabTitle title="Objects" />
+          <FilterButtons
+            value={selectedFilter}
+            onClick={(button) => {
+              setSelectedFilter(Number(button));
+            }}
+          />
+          <div className="w-full px-4">
+            <Button
+              className="file-picker-button py-3"
+              htmlFor={parentId}
+              icon={faCirclePlus}
+              variant="action"
+            >
+              Upload Object
+            </Button>
+          </div>
+          <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
+            <ItemElements
+              busy={isFetching}
+              debug="objects tab"
+              currentPage={currentPage}
+              pageSize={pageSize}
+              items={filteredObjects}
+            />
+          </div>
+          {totalPages > 1 && (
+            <Pagination
+              className="-mt-4 px-4"
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(newPage: number) => {
+                setCurrentPage(newPage);
+              }}
+            />
+          )}
+        </>
+      )} // End FileWrapper Render
+    />
   );
 };

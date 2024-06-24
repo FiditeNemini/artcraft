@@ -1,15 +1,15 @@
 import { ItemElement } from "./ItemElement";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/signals";
-import { LoadingDots } from "~/components";
-import { AssetFilterOption } from "~/enums";
+import { H4, P, LoadingDots } from "~/components";
 
 interface Props {
   busy?: boolean;
   className?: string;
   debug?: string;
+  currentPage?: number;
+  pageSize?: number;
   items: MediaItem[];
-  assetFilter: AssetFilterOption;
 }
 
 export const ItemElements = ({
@@ -17,19 +17,18 @@ export const ItemElements = ({
   className,
   debug,
   items,
-  assetFilter,
+  currentPage,
+  pageSize = 20,
 }: Props) => {
   const displayWidth =
     dndSidePanelWidth.value > -1
       ? dndSidePanelWidth.value
       : sidePanelWidth.value;
 
-  const displayItems = items.filter((item) => {
-    if (assetFilter === AssetFilterOption.BOOKMARKED) {
-      return item.isBookmarked;
-    }
-    return true;
-  });
+  const displayItems =
+    currentPage !== undefined
+      ? items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+      : items;
 
   function getGridColumnsClass(displayWidth: number): string {
     if (displayWidth <= 280) {
@@ -45,11 +44,22 @@ export const ItemElements = ({
 
   const gridColumnsClass = getGridColumnsClass(displayWidth);
 
-  return busy ? (
-    <div className="flex h-full w-full">
-      <LoadingDots className="bg-transparent" />
-    </div>
-  ) : (
+  if (busy) {
+    return (
+      <div className="flex h-full w-full">
+        <LoadingDots className="bg-transparent" />
+      </div>
+    );
+  }
+  if (items.length === 0) {
+    return (
+      <div className="h-full w-full text-center">
+        <H4> You do not have anything here. </H4>
+        <P> Plase upload some assets. </P>
+      </div>
+    );
+  }
+  return (
     <div
       className={`grid ${gridColumnsClass} gap-2.5 ${className ? " " + className : ""}`}
     >

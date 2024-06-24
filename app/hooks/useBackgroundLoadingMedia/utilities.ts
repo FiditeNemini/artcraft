@@ -39,6 +39,7 @@ export async function PollUserAudioItems() {
   isRetreivingAudioItems.value = true;
   const mediaFilesApi = new MediaFilesApi();
   const response = await mediaFilesApi.ListUserMediaFiles({
+    page_size: 100,
     filter_media_classes: [FilterMediaClasses.AUDIO],
   });
   isRetreivingAudioItems.value = false;

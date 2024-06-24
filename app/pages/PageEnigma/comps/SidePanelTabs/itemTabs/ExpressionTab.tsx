@@ -11,13 +11,12 @@ import {
   MediaFileAnimationType,
 } from "~/enums";
 
-import { expressionFilter } from "~/pages/PageEnigma/signals";
-
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import {
   Button,
   ButtonDialogue,
   FilterButtons,
+  Pagination,
   UploadModalMovement,
 } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
@@ -27,17 +26,23 @@ import { addToast } from "~/signals";
 
 export const ExpressionTab = () => {
   useSignals();
-  const [userExpressions, setUserExpressions] = useState<MediaItem[] | null>();
-
   const [open, setOpen] = useState(false);
 
-  const [selectedFilter, setSelectedFilter] = useState(
-    AssetFilterOption.FEATURED,
-  );
-
+  const [userExpressions, setUserExpressions] = useState<MediaItem[] | null>();
   const [featuredExpressions, setFeaturedExpressions] = useState<
     MediaItem[] | undefined
   >(undefined);
+  const [selectedFilter, setSelectedFilter] = useState(
+    AssetFilterOption.FEATURED,
+  );
+  const filteredExpressions =
+    selectedFilter === AssetFilterOption.FEATURED
+      ? featuredExpressions ?? []
+      : userExpressions ?? [];
+
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const pageSize = 21;
+  const totalPages = Math.ceil(filteredExpressions.length / pageSize);
 
   const responseMapping = (data: MediaInfo[], isMine: boolean) => {
     return data.map((item, index: number) => {
@@ -62,6 +67,7 @@ export const ExpressionTab = () => {
   const fetchUserExpressions = useCallback(async () => {
     const mediaFilesApi = new MediaFilesApi();
     const response = await mediaFilesApi.ListUserMediaFiles({
+      page_size: 100,
       filter_engine_categories: [FilterEngineCategories.EXPRESSION],
     });
     if (response.success && response.data) {
@@ -109,15 +115,12 @@ export const ExpressionTab = () => {
     <>
       <TabTitle title="Expressions" />
 
-      <div>
-        <FilterButtons
-          value={selectedFilter}
-          onClick={(button) => {
-            // reFetchList();
-            setSelectedFilter(button);
-          }}
-        />
-      </div>
+      <FilterButtons
+        value={selectedFilter}
+        onClick={(button) => {
+          setSelectedFilter(button);
+        }}
+      />
 
       <div className="flex w-full flex-col gap-2.5 px-4">
         <Button
@@ -143,7 +146,6 @@ export const ExpressionTab = () => {
           }}
           title={<>Video Tutorial: Creating your own expressions</>}
         >
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <video
             className="aspect-video w-full rounded-lg"
             controls
@@ -151,16 +153,23 @@ export const ExpressionTab = () => {
           ></video>
         </ButtonDialogue>
       </div>
-      <div className="h-full w-full overflow-y-auto px-4">
+      <div className="h-full w-full overflow-y-auto px-4 pb-4">
         <ItemElements
-          items={
-            selectedFilter === AssetFilterOption.FEATURED
-              ? featuredExpressions || []
-              : userExpressions || []
-          }
-          assetFilter={expressionFilter.value}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          items={filteredExpressions}
         />
       </div>
+      {totalPages > 1 && (
+        <Pagination
+          className="-mt-4 px-4"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage: number) => {
+            setCurrentPage(newPage);
+          }}
+        />
+      )}
       <UploadModalMovement
         onClose={() => setOpen(false)}
         onSuccess={fetchUserExpressions}

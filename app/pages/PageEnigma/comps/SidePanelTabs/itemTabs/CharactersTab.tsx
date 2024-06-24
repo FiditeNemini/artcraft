@@ -10,19 +10,15 @@ import {
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
-import {
-  characterFilter,
-  characterItems as demoCharacterItems,
-} from "~/pages/PageEnigma/signals";
+import { characterItems as demoCharacterItems } from "~/pages/PageEnigma/signals";
 import { addToast } from "~/signals";
 
 import { BucketConfig } from "~/api/BucketConfig";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FileWrapper, FilterButtons } from "~/components";
+import { Button, FileWrapper, FilterButtons, Pagination } from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
-// import { usePagination } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/hooks/usePagination";
 import { MediaFilesApi } from "~/Classes/ApiManager";
 
 export const CharactersTab = () => {
@@ -34,10 +30,22 @@ export const CharactersTab = () => {
   const [featuredCharacters, setFeaturedCharacters] = useState<
     MediaItem[] | undefined
   >(undefined);
-  // const [pageCount, setPageCount] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
+  const allFeaturedCharacters = [
+    ...demoCharacterItems.value,
+    ...(featuredCharacters ?? []),
+  ];
+  const filteredCharacters =
+    selectedFilter === AssetFilterOption.FEATURED
+      ? allFeaturedCharacters ?? []
+      : userCharacters ?? [];
+
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
+  const pageSize = 21;
+  const totalPages = Math.ceil(filteredCharacters.length / pageSize);
 
   const [fetchStatuses, setFetchStatuses] = useState({
     userObjectsFetch: FetchStatus.READY,
@@ -48,12 +56,6 @@ export const CharactersTab = () => {
     fetchStatuses.userObjectsFetch === FetchStatus.IN_PROGRESS ||
     fetchStatuses.featuredObjectsFetch === FetchStatus.READY ||
     fetchStatuses.featuredObjectsFetch === FetchStatus.IN_PROGRESS;
-
-  // const { page, pageChange } = usePagination(setStatus);
-
-  // const reFetchList = () => {
-  //   setStatus(FetchStatus.READY);
-  // };
 
   const responseMapping = (data: MediaInfo[]) => {
     return data.map((item) => {
@@ -87,6 +89,7 @@ export const CharactersTab = () => {
     const mediaFilesApi = new MediaFilesApi();
 
     const response = await mediaFilesApi.ListUserMediaFiles({
+      page_size: 100,
       filter_engine_categories: [FilterEngineCategories.CHARACTER],
     });
 
@@ -153,12 +156,11 @@ export const CharactersTab = () => {
     fetchFeaturedCharacters,
   ]);
 
-  const assetFilter = characterFilter;
-
   return (
     <>
       <FileWrapper
         onSuccess={fetchUserCharacters}
+        type={AssetType.CHARACTER}
         render={(parentId) => (
           <>
             <TabTitle title="Characters" />
@@ -170,14 +172,12 @@ export const CharactersTab = () => {
                 }}
               />
             </div>
-            <div {...{ className: "w-full px-4" }}>
+            <div className="w-full px-4">
               <Button
-                {...{
-                  className: "file-picker-button py-3",
-                  htmlFor: parentId,
-                  icon: faCirclePlus,
-                  variant: "action",
-                }}
+                className="file-picker-button py-3"
+                htmlFor={parentId}
+                icon={faCirclePlus}
+                variant="action"
               >
                 Upload Character
               </Button>
@@ -186,30 +186,23 @@ export const CharactersTab = () => {
               <ItemElements
                 busy={isFetching}
                 debug="characters tab"
-                items={
-                  selectedFilter === AssetFilterOption.FEATURED
-                    ? [
-                        ...demoCharacterItems.value,
-                        ...(featuredCharacters || []),
-                      ]
-                    : userCharacters || []
-                }
-                assetFilter={assetFilter.value}
+                items={filteredCharacters}
+                currentPage={currentPage}
+                pageSize={pageSize}
               />
             </div>
-            {/* {pageCount ? (
+            {totalPages > 1 && (
               <Pagination
-                {...{
-                  className: "-mt-4 mb-3.5 px-4",
-                  currentPage: page,
-                  onPageChange: pageChange,
-                  totalPages: pageCount,
+                className="-mt-4 px-4"
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(newPage: number) => {
+                  setCurrentPage(newPage);
                 }}
               />
-            ) : null} */}
+            )}
           </>
-        )}
-        type={AssetType.CHARACTER}
+        )} // End FileWrapper Render
       />
     </>
   );
