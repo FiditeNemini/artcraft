@@ -126,7 +126,7 @@ export default function SignUpScreen() {
             type="password"
             label="Password Confrimation"
             icon={faKey}
-            placeholder="Password COnfirmation"
+            placeholder="Password Confirmation"
             name="password-confirmation"
             errorMessage={passwordConfirmationError}
             required
