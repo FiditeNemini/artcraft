@@ -13,6 +13,7 @@ import {
   loadObjectData,
   selectedObject,
   addKeyframe,
+  selectedItem,
 } from "~/pages/PageEnigma/signals";
 import Queue, { QueueSubscribeType } from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -65,6 +66,8 @@ export function useQueueHandler() {
             type: (data as MediaItem).type,
             id: (data as MediaItem).object_uuid ?? "",
           };
+          // Deselect clip item when scene item is selected
+          selectedItem.value = null;
           break;
         case fromEngineActions.UPDATE_CHARACTER_ID:
           addNewCharacter(data as MediaItem);
