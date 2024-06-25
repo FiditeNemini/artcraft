@@ -203,8 +203,7 @@ export default function TopNav({
     if (pageContentWrapper) {
       if (
         (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
-        isOnBetaKeyRedeemPage ||
-        isOnWaitlistSuccessPage
+        isOnBetaKeyRedeemPage
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
