@@ -5,6 +5,7 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { TwitterLink } from "@storyteller/components/src/elements/TwitterLink";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel, SocialButton } from "components/common";
 import React, { useEffect, useState } from "react";
 
@@ -27,6 +28,8 @@ export default function WaitlistSuccessPage() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  usePrefixedDocumentTitle("Next Steps");
 
   return (
     <>
