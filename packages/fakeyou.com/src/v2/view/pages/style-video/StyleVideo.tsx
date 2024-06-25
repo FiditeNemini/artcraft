@@ -44,7 +44,7 @@ export default function StyleVideo() {
       EnqueueVST("", {
         creator_set_visibility: "private",
         enable_lipsync: enableLipsync,
-        global_ipa_media_token: IPAToken,
+        ...(IPAToken ? { global_ipa_media_token: IPAToken } : {}),
         input_file: mediaToken,
         negative_prompt: negativePrompt,
         prompt,

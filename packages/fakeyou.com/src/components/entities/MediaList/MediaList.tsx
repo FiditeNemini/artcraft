@@ -63,14 +63,11 @@ export default function MediaList({
 }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);
 
-  // console.log("🪼",{ entityType, list, success, rest });
-
   return list.length === 0 && success ? (
     <div className="text-center mt-4 opacity-75">No media created yet.</div>
   ) : (
     <MasonryGrid {...{ gridRef }}>
       {list.map((data: any, key: number) => {
-        console.log("🐡", data);
         let props = {
           data,
           type: data.media_type ? "media" : "weight",

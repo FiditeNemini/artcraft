@@ -45,7 +45,6 @@ export default function EntityInputEmpty({
 }: EmptySlideProps) {
   const { open } = useModal();
   const { user } = useSession();
-  console.log("😎", user);
   const accepted = Array.isArray(accept) ? accept : [accept];
   const inputMode = EntityInputMode[type];
   const isMedia = inputMode === EntityInputMode.media;
