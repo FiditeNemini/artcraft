@@ -92,7 +92,6 @@ export default function VideoCard({
   // Preload images and check if the GIF exists when the component mounts
   useEffect(() => {
     // Check if the static image exists
-
     if (bucketImageUrl === null) return;
     checkImageExists(bucketImageUrl).then(staticExists => {
       setStaticImageExists(staticExists);
@@ -112,7 +111,7 @@ export default function VideoCard({
         imgGif.src = bucketGifUrl;
       }
     });
-  }, [bucketGifUrl, staticImageUrl, defaultImageUrl, bucketImageUrl]);
+  }, [bucketGifUrl, staticImageUrl, defaultImageUrl, bucketImageUrl, data]);
 
   useEffect(() => {
     if (isHovered && gifExists && bucketGifUrl && staticImageExists) {
@@ -131,7 +130,13 @@ export default function VideoCard({
     staticImageExists,
     defaultImageUrl,
     bucketImageUrl,
+    data,
   ]);
+
+  useEffect(() => {
+    setImageSrc(defaultImageUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   const styleLabel = STYLES_BY_KEY.has(data.maybe_style_name)
     ? STYLES_BY_KEY.get(data.maybe_style_name)?.label

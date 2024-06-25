@@ -16,6 +16,8 @@ interface Props {
 }
 
 export default function MediaCards({ props, type }: Props) {
+  const keySuffix = props.data.token + "-" + props.page;
+
   switch (type) {
     case "audio":
       return <AudioCard {...props} />;
@@ -41,7 +43,7 @@ export default function MediaCards({ props, type }: Props) {
       // TODO(bt,2024-05-09): This is a temporary hack. ARKit files are uploaded as these
       return <ArKitCard {...props} />;
     case "video":
-      return <VideoCard {...props} />;
+      return <VideoCard {...props} key={`video-${keySuffix}`} />;
     default:
       return <div>Unsupported media type</div>;
   }
