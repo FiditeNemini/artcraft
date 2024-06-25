@@ -106,7 +106,7 @@ $badge-colors: (
   }
 
   &.bg-x {
-    background-color: #1da1f2;
+    background-color: #000000;
   }
 
   &.bg-email {
@@ -114,6 +114,6 @@ $badge-colors: (
   }
 
   &.bg-download {
-    background-color: map-get($badge-colors, "purple");
+    background-color: $primary;
   }
 }

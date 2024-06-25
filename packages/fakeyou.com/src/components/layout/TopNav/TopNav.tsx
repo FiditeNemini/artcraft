@@ -63,6 +63,8 @@ export default function TopNav({
   const isOnStudioPage = window.location.pathname.includes("/studio");
   const isOnBetaKeyRedeemPage =
     window.location.pathname.includes("/beta-key/redeem");
+  const isOnWaitlistSuccessPage =
+    window.location.pathname.includes("/waitlist-success");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -201,14 +203,20 @@ export default function TopNav({
     if (pageContentWrapper) {
       if (
         (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
-        isOnBetaKeyRedeemPage
+        isOnBetaKeyRedeemPage ||
+        isOnWaitlistSuccessPage
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
         pageContentWrapper.style.padding = "";
       }
     }
-  }, [domain.titlePart, isOnLandingPage, isOnBetaKeyRedeemPage]);
+  }, [
+    domain.titlePart,
+    isOnLandingPage,
+    isOnBetaKeyRedeemPage,
+    isOnWaitlistSuccessPage,
+  ]);
 
   if (
     topBarWrapper &&
@@ -242,7 +250,7 @@ export default function TopNav({
     };
   }, [domain.titlePart, isOnLandingPage, topBarWrapper]);
 
-  if (isOnBetaKeyRedeemPage) {
+  if (isOnBetaKeyRedeemPage || isOnWaitlistSuccessPage) {
     return null;
   }
 

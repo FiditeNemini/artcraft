@@ -2,16 +2,15 @@ import {
   faFacebookF,
   faRedditAlien,
   faWhatsapp,
-  faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import {
   faArrowDownToLine,
-  faXmark,
   faEnvelope,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import "./SocialButton.scss";
+import { ReactComponent as XLogo } from "./TwitterX.svg";
 
 export type Socials =
   | "x"
@@ -37,15 +36,13 @@ export default function SocialButton({
   shareText,
 }: SocialButtonProps) {
   const socialIcons = {
-    x: faTwitter,
+    x: XLogo,
     whatsapp: faWhatsapp,
     facebook: faFacebookF,
     reddit: faRedditAlien,
     email: faEnvelope,
     download: faArrowDownToLine,
   };
-
-  let socialIcon = socialIcons[social] || faXmark;
 
   const getShareLink = (social: string, url: string, text: string) => {
     switch (social) {
@@ -90,7 +87,11 @@ export default function SocialButton({
           !hideLabel ? "social-button-icon" : "social-button-icon-no-style"
         } bg-${social}`}
       >
-        <FontAwesomeIcon icon={socialIcon} />
+        {social === "x" ? (
+          <XLogo style={{ width: "32px", height: "32px", fill: "white" }} />
+        ) : (
+          <FontAwesomeIcon icon={socialIcons[social]} />
+        )}
       </div>
       {!hideLabel ? (
         <p className="social-button-text">
