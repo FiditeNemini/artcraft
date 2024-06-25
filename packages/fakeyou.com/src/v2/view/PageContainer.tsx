@@ -127,7 +127,6 @@ import { ProfilePageV3 } from "./pages/profile/profile_view/ProfilePageV3";
 import ProfileSidePanel from "components/layout/ProfileSidePanel/ProfileSidePanel";
 import CreatorToolsPage from "./pages/creator_tools/CreatorToolsPage";
 import WaitlistNextStepsPage from "./pages/waitlist_next_steps/WaitlistNextStepsPage";
-import WaitlistSuccessPage from "./pages/waitlist_success/WaitlistSuccess";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -945,10 +944,6 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/waitlist-success">
-                    <WaitlistSuccessPage />
-                  </Route>
-
                   <Route path="/beta-key/create">
                     <CreateBetaKeyPage />
                   </Route>
@@ -972,9 +967,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/waitlist-next-steps">
-                    <WaitlistNextStepsPage
-                      sessionWrapper={this.props.sessionWrapper}
-                    />
+                    <WaitlistNextStepsPage />
                   </Route>
 
                   {/*
