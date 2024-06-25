@@ -63,8 +63,9 @@ export default function TopNav({
   const isOnStudioPage = window.location.pathname.includes("/studio");
   const isOnBetaKeyRedeemPage =
     window.location.pathname.includes("/beta-key/redeem");
-  const isOnWaitlistSuccessPage =
-    window.location.pathname.includes("/waitlist-success");
+  const isOnWaitlistSuccessPage = window.location.pathname.includes(
+    "/waitlist-next-steps"
+  );
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
