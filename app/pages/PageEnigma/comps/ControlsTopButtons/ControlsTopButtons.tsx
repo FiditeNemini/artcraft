@@ -25,7 +25,7 @@ import { Help } from "./Help";
 import { LoadUserScenes } from "./LoadUserScenes";
 import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
 
-import { getCurrentLocationWithoutParams } from "~/utilities";
+import { getCurrentLocationWithoutParams, isNumberString } from "~/utilities";
 import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
 import {
   cameraAspectRatio,
@@ -288,7 +288,18 @@ export const ControlsTopButtons = () => {
               label: "Save scene as copy",
               description: "Ctrl+Shift+S",
               onDialogOpen: () => {
-                setSceneTitleInput("Copy of " + sceneTitleInput);
+                const copyCountStr = sceneTitleInput.substring(
+                  sceneTitleInput.lastIndexOf("(") + 1,
+                  sceneTitleInput.length - 1,
+                );
+                if (isNumberString(copyCountStr)) {
+                  const newCopyCountStr = String(Number(copyCountStr) + 1);
+                  setSceneTitleInput(
+                    sceneTitleInput.replace(copyCountStr, newCopyCountStr),
+                  );
+                } else {
+                  setSceneTitleInput(sceneTitleInput + " (1)");
+                }
               },
               dialogProps: {
                 title: "Save Scene as Copy",

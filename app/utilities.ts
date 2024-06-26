@@ -30,6 +30,10 @@ export const isJobStatusTerminal = (curr: JobStatus) => {
   return true;
 };
 
+export const isNumberString = (value: string) => {
+  return !isNaN(Number(value));
+};
+
 export const getFileName = (file: File) => {
   return file.name.substring(0, file.name.lastIndexOf("."));
 };
