@@ -257,10 +257,8 @@ class Scene {
             if (c.userData["base"] == undefined) {
               c.userData["base"] = c.material.color.getHex();
             }
-            const currentColor = new THREE.Color(c.userData["base"]);
             const tint = new THREE.Color(hex_color);
-            currentColor.multiply(tint);
-            c.material.color.set(new THREE.Color(currentColor));
+            c.material.color.set(tint);
           }
         }
       });
