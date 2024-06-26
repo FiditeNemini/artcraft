@@ -90,7 +90,10 @@ export default function RedeemBetaKeyPage() {
                   className="mt-3"
                   onClick={() => {
                     sessionStorage.setItem("redirected", "true");
-                    history.push("/login?redirect=/beta-key/redeem/");
+                    const loginPath = pageToken
+                      ? `/login?redirect=/beta-key/redeem/${pageToken}`
+                      : "/login?redirect=/beta-key/redeem/";
+                    history.push(loginPath);
                   }}
                   variant="secondary"
                 />
@@ -99,7 +102,10 @@ export default function RedeemBetaKeyPage() {
                   className="mt-3"
                   onClick={() => {
                     sessionStorage.setItem("redirected", "true");
-                    history.push("/signup?redirect=/beta-key/redeem/");
+                    const signUpPath = pageToken
+                      ? `/signup?redirect=/beta-key/redeem/${pageToken}`
+                      : "/signup?redirect=/beta-key/redeem/";
+                    history.push(signUpPath);
                   }}
                 />
               </div>
