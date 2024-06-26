@@ -4,11 +4,15 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { Link } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface Props {}
 
 function TermsPage(props: Props) {
   PosthogClient.recordPageview();
+
+  const domain = useDomainConfig();
+
   usePrefixedDocumentTitle("Terms of Use");
 
   return (
@@ -22,7 +26,7 @@ function TermsPage(props: Props) {
                 className="img-fluid"
                 width="516"
                 height="444"
-                alt="FakeYou Kitsune Mascot!"
+                alt={`${domain.titlePart} Kitsune Mascot!`}
               />
             </div>
           </div>
@@ -46,7 +50,7 @@ function TermsPage(props: Props) {
           <h1 className="panel-title fw-bold">Terms and Conditions of Use</h1>
           <div className="py-6 d-flex flex-column gap-4">
             <p>
-              We do not condone the use of FakeYou for any type of
+              We do not condone the use of {domain.titlePart} for any type of
               impersonation, deception, slur, abuse, or mistreatment of any
               individual or group. Moreover, we do not allow the use of our
               service in such a way that it violates any law of the United
@@ -66,7 +70,8 @@ function TermsPage(props: Props) {
               and may be reported to the appropriate authorities.
             </p>
             <p>
-              This is a research technology for fun. You may not use FakeYou
+              This is a research technology for fun. You may not use{" "}
+              {domain.titlePart}
               deepfakes for commercial use (unless otherwise stated, and only
               with specially denoted commercial voices).
             </p>
@@ -81,8 +86,8 @@ function TermsPage(props: Props) {
             <div>
               <h2 className="mb-4">Takedown Requests</h2>
               <p>
-                The machine learning models and content at FakeYou are
-                user-submitted, but we'll be happy to remove content for any
+                The machine learning models and content at {domain.titlePart}{" "}
+                are user-submitted, but we'll be happy to remove content for any
                 reason for copyright holders, original speakers, voice actors,
                 et al. Please send us an email to{" "}
                 <code>copyright@storyteller.io</code> with details in order to
@@ -104,8 +109,8 @@ function TermsPage(props: Props) {
               and Learning Machines, Inc, doing business as Storyteller (
               <strong>"Storyteller"</strong>, <strong>“we”</strong>,{" "}
               <strong>“us”</strong>, or <strong>“our”</strong>), concerning your
-              access to and use of the https://fakeyou.com website as well as
-              any other media form, media channel, mobile website or mobile
+              access to and use of the {domain.link} website as well as any
+              other media form, media channel, mobile website or mobile
               application related, linked, or otherwise connected thereto
               (collectively, the “Site”). You agree that by accessing the Site,
               you have read, understood, and agree to be bound by all of these
@@ -800,11 +805,11 @@ function TermsPage(props: Props) {
 
             <p>
               We care about data privacy and security. Please review our Privacy
-              Policy: <Link to="/privacy">https://fakeyou.com/privacy</Link>. By
-              using the Site, you agree to be bound by our Privacy Policy, which
-              is incorporated into these Terms of Use. Please be advised the
-              Site is hosted in the United States. If you access the Site from
-              any other region of the world with laws or other requirements
+              Policy: <Link to="/privacy">{domain.link}/privacy</Link>. By using
+              the Site, you agree to be bound by our Privacy Policy, which is
+              incorporated into these Terms of Use. Please be advised the Site
+              is hosted in the United States. If you access the Site from any
+              other region of the world with laws or other requirements
               governing personal data collection, use, or disclosure that differ
               from applicable laws in the United States, then through your
               continued use of the Site, you are transferring your data to the
