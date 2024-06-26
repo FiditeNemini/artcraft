@@ -9,6 +9,15 @@ pub trait TrimOrEmptyable {
   }
 }
 
+// TODO: Can't create this due to conflicting implementations
+// impl<T> TrimOrEmptyable for T
+//   where T: AsRef<str>
+// {
+//   fn trim_or_empty(&self) -> Option<&str> {
+//     self.as_ref().trim_or_empty()
+//   }
+// }
+
 impl TrimOrEmptyable for Option<&str> {
   fn trim_or_empty(&self) -> Option<&str> {
     self.map(|s| s.trim())

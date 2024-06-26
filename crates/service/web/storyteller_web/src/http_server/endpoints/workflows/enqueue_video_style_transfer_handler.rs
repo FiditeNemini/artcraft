@@ -355,7 +355,8 @@ pub async fn enqueue_video_style_transfer_handler(
         negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
         global_ip_adapter_token: request.global_ipa_media_token
             .as_ref()
-            .trim_or_empty()
+            // NB: Frontend is mistakenly sending empty string - ignore it
+            .filter(|t| t.as_str().trim_or_empty().is_some())
             .map(|t| t.clone()),
         strength: maybe_strength,
 
