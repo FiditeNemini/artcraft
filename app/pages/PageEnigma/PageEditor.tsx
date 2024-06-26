@@ -10,7 +10,6 @@ import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { PreviewFrameImage } from "./comps/PreviewFrameImage";
 import { pageHeight, pageWidth } from "~/signals";
-// import { Helmet } from 'react-helmet';
 import {
   timelineHeight,
   sidePanelWidth,
@@ -18,7 +17,6 @@ import {
   dndSidePanelWidth,
   dndTimelineHeight,
   editorLoader,
-  sidePanelHeight,
   cameraAspectRatio,
   outlinerIsShowing,
 } from "~/pages/PageEnigma/signals";
@@ -53,11 +51,11 @@ export const PageEditor = () => {
     : pageWidth.value - 84;
   const height =
     dndTimelineHeight.value > -1
-      ? pageHeight.value - dndTimelineHeight.value - 68
-      : pageHeight.value - timelineHeight.value - 68;
+      ? pageHeight.value - dndTimelineHeight.value - 64
+      : pageHeight.value - timelineHeight.value - 64;
 
   const getScale = () => {
-    const height = sidePanelHeight.value;
+    const height = pageHeight.value - timelineHeight.value - 64;
     const scaleHeight = height < 610 ? height / 610 : 1;
 
     if (

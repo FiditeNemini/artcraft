@@ -22,7 +22,7 @@ import {
 export function StylizeTab() {
   useSignals();
   const [view, setView] = useState(StylizeTabPages.MAIN);
-  const [generateSectionHeight, setGenerateSectionHeight] = useState(110);
+  const [generateSectionHeight, setGenerateSectionHeight] = useState(114);
 
   const currentStyle = styleList.find(
     (style) => style.type === selectedArtStyle.value,

@@ -18,6 +18,8 @@ import {
   timelineHeight,
   timelineScrollX,
   timelineScrollY,
+  sidePanelVisible,
+  sidePanelWidth,
 } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
@@ -135,43 +137,53 @@ export const Timeline = () => {
     };
   }, [onDeleteAsk]);
 
+  const sidebarAdjustment = sidePanelVisible.value
+    ? sidePanelWidth.value + 84
+    : 84;
+
   return (
     <>
       <LowerPanel>
-        <TimerGrid page={Pages.EDIT} />
-        <div className="flex">
-          <div
-            className="ml-[60px] mt-2 w-[144px] overflow-hidden"
-            style={{
-              height: timelineHeight.value - 36,
-            }}
-          >
-            <RowHeaders />
-          </div>
-          <div
-            className="mb-20 mt-2 overflow-auto"
-            onScroll={onScroll}
-            style={{
-              width: pageWidth.value - 204,
-              height: timelineHeight.value - 36,
-            }}
-          >
+        <div
+          style={{
+            marginRight: sidebarAdjustment,
+          }}
+        >
+          <TimerGrid page={Pages.EDIT} />
+          <div className="flex">
             <div
-              className="relative"
-              style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}
+              className="ml-[60px] mt-2 w-[144px] min-w-[144px] overflow-hidden"
+              style={{
+                height: timelineHeight.value - 36,
+              }}
             >
-              <PremiumLockTimeline locked={false} />
-              <Characters />
-              <div className="pb-1 pr-8">
-                <Camera />
-              </div>
-              <div className="pb-1 pr-8">
-                <Audio />
-              </div>
-              <ObjectGroups />
+              <RowHeaders />
             </div>
+            <div
+              className="mb-20 mt-2 overflow-auto"
+              onScroll={onScroll}
+              style={{
+                width: pageWidth.value - 204,
+                height: timelineHeight.value - 36,
+              }}
+            >
+              <div
+                className="relative"
+                style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}
+              >
+                <PremiumLockTimeline locked={false} />
+                <Characters />
+                <div className="pb-1 pr-8">
+                  <Camera />
+                </div>
+                <div className="pb-1 pr-8">
+                  <Audio />
+                </div>
+                <ObjectGroups />
+              </div>
+            </div>
+            <Scrubber page={Pages.EDIT} />
           </div>
-          <Scrubber page={Pages.EDIT} />
         </div>
       </LowerPanel>
       <ConfirmationModal

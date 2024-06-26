@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import {
   outlinerIsShowing,
   outlinerState,
@@ -22,9 +22,10 @@ import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 import { useSignals } from "@preact/signals-react/runtime";
 import { EngineContext } from "../../contexts/EngineContext";
-import { cameraAspectRatio, sidePanelHeight } from "../../signals";
-import { pageWidth } from "~/signals";
+import { cameraAspectRatio, timelineHeight } from "../../signals";
+import { pageHeight, pageWidth } from "~/signals";
 import { CameraAspectRatio } from "../../enums";
+import { effect } from "@preact/signals-react";
 
 const OutlinerItem = ({ item }: { item: SceneObject }) => {
   useSignals();
@@ -119,6 +120,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
 export const Outliner = () => {
   useSignals();
   const [searchTerm, setSearchTerm] = useState("");
+  const [editorHeight, setEditorHeight] = useState(0);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -135,24 +137,41 @@ export const Outliner = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  useEffect(() => {
+    const updateEditorHeight = () => {
+      setEditorHeight(pageHeight.value - timelineHeight.value - 64);
+    };
+
+    updateEditorHeight();
+
+    const cleanup = effect(() => {
+      updateEditorHeight();
+    });
+
+    // Cleanup on unmount
+    return () => {
+      cleanup();
+    };
+  }, []);
+
   const getOutlinerHeightClass = () => {
     if (pageWidth.value >= 2000) {
       if (cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16) {
-        return `${sidePanelHeight.value * 0.5 - 120}px`;
+        return `${editorHeight * 0.5 - 120}px`;
       } else if (cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1) {
-        return `${sidePanelHeight.value * 0.42}px`;
+        return `${editorHeight * 0.42}px`;
       } else {
-        return `${sidePanelHeight.value * 0.54}px`;
+        return `${editorHeight * 0.54}px`;
       }
     }
 
     if (pageWidth.value < 2000) {
       if (cameraAspectRatio.value === CameraAspectRatio.VERTICAL_9_16) {
-        return `${sidePanelHeight.value * 0.7 - 10}px`;
+        return `${editorHeight * 0.7 - 10}px`;
       } else if (cameraAspectRatio.value === CameraAspectRatio.SQUARE_1_1) {
-        return `${sidePanelHeight.value * 0.7}px`;
+        return `${editorHeight * 0.7}px`;
       } else {
-        return `${sidePanelHeight.value * 0.7}px`;
+        return `${editorHeight * 0.7}px`;
       }
     }
   };

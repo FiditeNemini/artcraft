@@ -1,6 +1,5 @@
 import { computed, signal } from "@preact/signals-core";
 import { Tab } from "~/pages/PageEnigma/models";
-import { timelineHeight } from "~/pages/PageEnigma/signals/sizing";
 import { pageHeight } from "~/signals";
 import { AssetFilterOption } from "~/enums";
 
@@ -14,5 +13,5 @@ export const lastSelectedTab = signal<Tab | null>(null);
 export const cameraFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 
 export const sidePanelHeight = computed(() => {
-  return pageHeight.value - timelineHeight.value - 68; // header
+  return pageHeight.value - 64; // header
 });

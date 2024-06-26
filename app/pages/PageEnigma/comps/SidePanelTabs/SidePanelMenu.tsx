@@ -7,7 +7,6 @@ import { EditorStates } from "~/pages/PageEnigma/enums";
 import { editorState } from "~/pages/PageEnigma/signals/engine";
 import {
   selectedTab,
-  sidePanelHeight,
   sidePanelVisible,
 } from "~/pages/PageEnigma/signals/sidePanel";
 
@@ -16,6 +15,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 import { TabItem, tabList } from "./tabList";
+import { pageHeight } from "~/signals";
 
 export const SidePanelMenu = () => {
   useSignals();
@@ -33,12 +33,12 @@ export const SidePanelMenu = () => {
   return (
     <div
       className={[
-        "fixed bg-assets-background",
+        "fixed z-20 bg-assets-background",
         "px-2 py-2",
         "overflow-y-auto",
       ].join(" ")}
       style={{
-        height: sidePanelHeight.value,
+        height: pageHeight.value - 64,
         minWidth: 84,
         maxWidth: 84,
         right: 0,
@@ -78,7 +78,7 @@ export const SidePanelMenu = () => {
             <div>
               <img src={tab.icon} alt={tab.title} width={20} height={20} />
             </div>
-            <div className="-mb-1 mt-1" style={{ fontSize: 11 }}>
+            <div className="-mb-1 mt-1 text-nowrap" style={{ fontSize: 11 }}>
               {tab.title}
             </div>
           </button>
