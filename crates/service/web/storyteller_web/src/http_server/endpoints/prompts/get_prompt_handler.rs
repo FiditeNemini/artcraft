@@ -92,6 +92,11 @@ pub struct PromptInfo {
   /// Only staff can do this for now.
   pub use_cinematic: bool,
 
+  /// If a global IP Adapter Image was used, this is the details.
+  /// NB: We can't easily query for this without another DB round trip,
+  /// so the frontend should query for it instead.
+  pub maybe_global_ipa_image_token: Option<MediaFileToken>,
+
   // TODO: Author of prompt info
 
   /// Fields that only moderators should see.
@@ -199,6 +204,7 @@ pub async fn get_prompt_handler(
   let mut maybe_style_name = None;
   let mut maybe_strength = None;
   let mut maybe_inference_duration_millis = None;
+  let mut maybe_global_ipa_image_token = None;
   let mut used_face_detailer = false;
   let mut used_upscaler = false;
   let mut lipsync_enabled = false;
@@ -216,6 +222,7 @@ pub async fn get_prompt_handler(
     }
     maybe_strength = inner_payload.strength;
     maybe_inference_duration_millis = inner_payload.inference_duration_millis;
+    maybe_global_ipa_image_token = inner_payload.global_ipa_token.clone();
     used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
     used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
     lipsync_enabled = inner_payload.lipsync_enabled.unwrap_or(false);
@@ -256,6 +263,7 @@ pub async fn get_prompt_handler(
       prompt_type: result.prompt_type,
       created_at: result.created_at,
       maybe_moderator_fields,
+      maybe_global_ipa_image_token,
     },
   };
 
