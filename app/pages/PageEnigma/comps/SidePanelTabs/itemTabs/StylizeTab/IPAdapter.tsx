@@ -65,7 +65,7 @@ export const IPAdapter: React.FC = () => {
       ) {
         try {
           const response = await mediaFilesApi.GetMediaFileByToken({
-            mediaFileToken: globalIPAMediaToken.value || "",
+            mediaFileToken: globalIPAMediaToken.value,
           });
           if (response.success && response.data) {
             const imageUrl = bucketConfig.getGcsUrl(
@@ -185,7 +185,10 @@ export const IPAdapter: React.FC = () => {
     setImageSrc(null);
     setCrop(undefined);
     adapterImage.value = null;
-    globalIPAMediaToken.value = "";
+    globalIPAMediaToken.value = null;
+    if (editorEngine) {
+      editorEngine.globalIpAdapterImage = undefined;
+    }
   };
 
   const DragAndDropZone = () => {

@@ -247,7 +247,7 @@ class Editor {
       styleStrength: 1.0,
       lipSync: false,
       cinematic: false,
-      globalIpAdapterImageMediaToken: "",
+      globalIpAdapterImageMediaToken: null,
     };
 
     this.media_upload = new MediaUploadApi();

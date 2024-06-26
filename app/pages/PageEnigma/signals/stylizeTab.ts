@@ -11,7 +11,7 @@ export const promptsStore = {
   showNegativePrompt: signal(false),
 };
 
-export const globalIPAMediaToken = signal("");
+export const globalIPAMediaToken = signal<string | null>(null);
 export const adapterImage = signal<string | null>(null);
 export const selectedArtStyle = signal<ArtStyle>(styleList[0].type);
 export const upscale = signal(false);

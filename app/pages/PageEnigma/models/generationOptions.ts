@@ -4,7 +4,7 @@ export interface GenerationOptions {
   styleStrength: number;
   lipSync: boolean;
   cinematic: boolean;
-  globalIpAdapterImageMediaToken: string; // base 64 image
+  globalIpAdapterImageMediaToken: string | null;
 }
 
 export class GenerationOptions {
@@ -13,14 +13,14 @@ export class GenerationOptions {
   public styleStrength: number;
   public lipSync: boolean;
   public cinematic: boolean;
-  public globalIpAdapterImageMediaToken: string;
+  public globalIpAdapterImageMediaToken: string | null;
   constructor(
     upscale: boolean,
     faceDetail: boolean,
     styleStrength: number,
     lipSync: boolean,
     cinematic: boolean,
-    globalIpAdapterImageMediaToken: string,
+    globalIpAdapterImageMediaToken: string | null,
   ) {
     this.upscale = upscale;
     this.faceDetail = faceDetail;
