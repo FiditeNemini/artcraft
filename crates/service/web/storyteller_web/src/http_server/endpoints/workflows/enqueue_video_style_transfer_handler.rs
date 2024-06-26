@@ -353,7 +353,10 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_end_milliseconds: Some(trim_end_millis),
         positive_prompt: request.prompt.new_string_trim_or_empty(),
         negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
-        global_ip_adapter_token: request.global_ipa_media_token.as_ref().map(|t| t.clone()),
+        global_ip_adapter_token: request.global_ipa_media_token
+            .as_ref()
+            .trim_or_empty()
+            .map(|t| t.clone()),
         strength: maybe_strength,
 
         // Flags
