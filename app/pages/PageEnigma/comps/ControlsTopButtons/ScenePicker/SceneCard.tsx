@@ -30,11 +30,8 @@ export const SceneCard: React.FC<SceneCardProps> = ({
   };
 
   const bucketConfig = useRef(new BucketConfig());
-  const imageThumbnailUrl = scene.thumbnail &&  bucketConfig.current.getCdnUrl(
-    scene.thumbnail,
-    360,
-    20,
-  );
+  const imageThumbnailUrl =
+    scene.thumbnail && bucketConfig.current.getCdnUrl(scene.thumbnail, 360, 20);
   // thumbnail will be replaced with 3d scene screenshots
   const tempThumbnail = "/resources/placeholders/scene_placeholder.png";
 
@@ -42,14 +39,17 @@ export const SceneCard: React.FC<SceneCardProps> = ({
     <button
       key={scene.token}
       className={twMerge(
-        "relative w-full cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out ",
+        "relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out ",
         selectedSceneId === scene.token
           ? "border-brand-primary"
           : "border-[#4B4B5C] hover:border-ui-controls-button",
       )}
-      onClick={() => handleSelected(scene)}>
+      onClick={() => handleSelected(scene)}
+    >
       <img
-        src={imageThumbnailUrl && !loadError ? imageThumbnailUrl:  tempThumbnail}
+        src={
+          imageThumbnailUrl && !loadError ? imageThumbnailUrl : tempThumbnail
+        }
         className="aspect-video object-cover"
         crossOrigin="anonymous"
         alt={scene.name}
@@ -72,7 +72,8 @@ export const SceneCard: React.FC<SceneCardProps> = ({
         viewBox="0 0 512 512"
         className={`absolute right-1.5 top-1.5 h-[22px] w-[22px] transition-opacity duration-200 ease-in-out ${
           selectedSceneId === scene.token ? "opacity-100" : "opacity-0"
-        }`}>
+        }`}
+      >
         <path
           opacity="1"
           d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
