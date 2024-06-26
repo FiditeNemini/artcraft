@@ -2,19 +2,21 @@ import React from "react";
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface Props {}
 
 function PrivacyPage(props: Props) {
   PosthogClient.recordPageview();
   usePrefixedDocumentTitle("Privacy Statement");
+  const domain = useDomainConfig();
 
   return (
     <div>
       <div className="container pb-0 pt-5 pb-lg-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
           <h1 className=" fw-bold text-center text-lg-start">
-            FakeYou Privacy Statement
+            {domain.titlePart} Privacy Statement
           </h1>
           <h4 className="mt-1 mb-4 opacity-75 text-center text-lg-start">
             Updated: November 18, 2022
@@ -24,7 +26,7 @@ function PrivacyPage(props: Props) {
 
       <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-          <h1 className="panel-title fw-bold">FakeYou and You</h1>
+          <h1 className="panel-title fw-bold">{domain.titlePart} and You</h1>
           <div className="py-6 d-flex flex-column gap-4">
             In simple terms, we basically run a web service that allows you to
             register, submit data, upload voice data, and share results with
@@ -43,13 +45,13 @@ function PrivacyPage(props: Props) {
             </p>
             <ul>
               <li>
-                Visit our website at https://fakeyou.com, or any website of ours
-                that links to this privacy notice
+                Visit our website at {domain.link}, or any website of ours that
+                links to this privacy notice
               </li>
 
               <li>
-                Download and use our mobile application (FakeYou), or any other
-                application of ours that links to this privacy notice
+                Download and use our mobile application ({domain.titlePart}), or
+                any other application of ours that links to this privacy notice
               </li>
 
               <li>
