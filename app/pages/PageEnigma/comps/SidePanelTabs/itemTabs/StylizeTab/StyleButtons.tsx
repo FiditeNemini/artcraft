@@ -1,4 +1,4 @@
-import { Button, Label, PremiumLock } from "~/components";
+import { Button, Label, NumberInput, PremiumLock, Slider } from "~/components";
 import {
   faArrowsRotate,
   faChevronLeft,
@@ -10,6 +10,8 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { Switch } from "@headlessui/react";
+// import Slider from "rc-slider";
+// import "rc-slider/assets/index.css";
 
 import {
   faceDetail,
@@ -22,8 +24,12 @@ import {
 export function StyleButtons() {
   useSignals();
 
-  const sliderChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    styleStrength.value = parseFloat(event.target.value);
+  const sliderChanged = (value: number | number[]) => {
+    styleStrength.value = (value as number) / 100;
+  };
+
+  const handleNumberInputChange = (value: number) => {
+    styleStrength.value = value / 100;
   };
 
   const switchPreview = async () => {
@@ -202,35 +208,27 @@ export function StyleButtons() {
 
         <div>
           <Label>
-            <div className="mb-1 leading-tight">Set the Style Strength</div>
+            <div className="mb-1 leading-tight">Set the Style Strength (%)</div>
           </Label>
-          <div className="mb-2 text-xs text-white/70">
+          <div className="mb-2.5 text-xs text-white/70">
             (The higher the value the more the style will be applied, the lower
             the value the closer to source.)
           </div>
 
-          <div className="flex gap-2">
-            <div className="rounde w-8 py-0.5 text-center font-medium">
-              {styleStrength.value}
-            </div>
-            <input
-              className="
-             active:accent-red-700
-             w-full
-             cursor-pointer
-             accent-brand-primary
-             outline-none
-             transition-all
-             duration-150
-             hover:accent-brand-primary-400
-             focus:outline-none
-           "
-              type="range"
-              value={styleStrength.value}
-              min="0"
-              max="1.0"
-              step="0.1"
+          <div className="mb-2 flex items-center gap-3.5">
+            <NumberInput
+              value={styleStrength.value * 100}
+              onChange={handleNumberInputChange}
+            />
+            <Slider
+              value={styleStrength.value * 100}
+              min={0}
+              max={100}
+              step={1}
               onChange={sliderChanged}
+              showTooltip={true}
+              suffix="%"
+              className="mr-1"
             />
           </div>
         </div>

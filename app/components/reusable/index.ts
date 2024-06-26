@@ -14,9 +14,11 @@ export * from "./Input"; //need to decouple hotkey signal
 export * from "./InputVector"; //need to decouple hotkey signal
 export * from "./ListDropdown";
 export * from "./LoadingBar";
+export * from "./NumberInput";
 export * from "./Pagination";
 export * from "./Pill";
 export * from "./Select"; //Select's onChange type should be generic
+export * from "./Slider";
 export * from "./Tabs";
 export * from "./Textarea";
 export * from "./Tooltip";
