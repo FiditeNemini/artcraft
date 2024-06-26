@@ -1,6 +1,7 @@
 use chrono::Duration;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
+use tokens::tokens::media_files::MediaFileToken;
 
 use crate::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTransferName;
 
@@ -65,6 +66,12 @@ pub struct PromptInnerPayload {
   #[serde(alias = "use_cinematic")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub use_cinematic: Option<bool>,
+
+  /// Global IP Adapter image token, if set.
+  #[serde(rename = "gi")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "global_ipa_token")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub global_ipa_token: Option<MediaFileToken>,
 }
 
 pub struct PromptInnerPayloadBuilder {
@@ -79,6 +86,7 @@ pub struct PromptInnerPayloadBuilder {
   pub main_ipa_workflow: Option<String>,
   pub face_detailer_workflow: Option<String>,
   pub upscaler_workflow: Option<String>,
+  pub global_ipa_token: Option<MediaFileToken>,
 }
 
 impl PromptInnerPayloadBuilder {
@@ -95,6 +103,7 @@ impl PromptInnerPayloadBuilder {
       main_ipa_workflow: None,
       face_detailer_workflow: None,
       upscaler_workflow: None,
+      global_ipa_token: None,
     }
   }
 
@@ -110,6 +119,7 @@ impl PromptInnerPayloadBuilder {
         && self.main_ipa_workflow.is_none()
         && self.face_detailer_workflow.is_none()
         && self.upscaler_workflow.is_none()
+        && self.global_ipa_token.is_none()
     {
       return None;
     }
@@ -129,6 +139,7 @@ impl PromptInnerPayloadBuilder {
       main_ipa_workflow: self.main_ipa_workflow,
       face_detailer_workflow: self.face_detailer_workflow,
       upscaler_workflow: self.upscaler_workflow,
+      global_ipa_token: self.global_ipa_token,
     })
   }
 
@@ -194,6 +205,10 @@ impl PromptInnerPayloadBuilder {
 
   pub fn set_upscaler_workflow(&mut self, workflow: Option<String>) {
     self.upscaler_workflow = workflow;
+  }
+
+  pub fn set_global_ipa_token(&mut self, token: Option<MediaFileToken>) {
+    self.global_ipa_token = token;
   }
 }
 
