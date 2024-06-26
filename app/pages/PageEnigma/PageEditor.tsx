@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { LoadingDots, TopBar } from "~/components";
 import { SidePanel } from "~/pages/PageEnigma/comps/SidePanel";
@@ -9,7 +9,10 @@ import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { PreviewFrameImage } from "./comps/PreviewFrameImage";
-import { pageHeight, pageWidth } from "~/signals";
+
+import { loadingBarIsShowing, pageHeight, pageWidth } from "~/signals";
+// import { Helmet } from 'react-helmet';
+
 import {
   timelineHeight,
   sidePanelWidth,
@@ -25,9 +28,12 @@ import { SceneContainer } from "./comps/SceneContainer";
 import { AspectRatioMenu } from "./comps/AspectRatioMenu";
 import { Outliner } from "./comps/Outliner";
 import { CameraAspectRatio } from "./enums";
+import * as gpu from "detect-gpu";
+import { TurnOnGpu } from "~/pages/PageEnigma/TurnOnGpu";
 
 export const PageEditor = () => {
   useSignals();
+  const [validGpu, setValidGpu] = useState("unknown");
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -41,6 +47,15 @@ export const PageEditor = () => {
       return "You may have unsaved changes.";
     };
   }, []);
+
+  useEffect(() => {
+    const { getGPUTier } = gpu;
+    getGPUTier().then((gpuTier) => {
+      setTimeout(() => {
+        setValidGpu(gpuTier.type !== "BENCHMARK" ? "error" : "valid");
+      }, 200);
+    });
+  });
 
   const dndWidth =
     dndSidePanelWidth.value > -1
@@ -78,6 +93,14 @@ export const PageEditor = () => {
 
     return scaleHeight;
   };
+
+  if (validGpu === "unknown") {
+    return <LoadingDots />;
+  }
+  if (validGpu === "error") {
+    loadingBarIsShowing.value = false;
+    return <TurnOnGpu />;
+  }
 
   return (
     <div className="w-screen" data-sl="canvas-mq">
