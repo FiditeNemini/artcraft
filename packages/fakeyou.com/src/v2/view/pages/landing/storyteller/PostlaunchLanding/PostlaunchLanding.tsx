@@ -121,15 +121,28 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
       />
     </div>
   ) : (
-    <div className="d-flex">
-      <Button
-        label="Join the Waitlist"
-        className="mt-4"
-        fontLarge={true}
-        icon={faArrowRight}
-        iconFlip={true}
-        onClick={openModal}
-      />
+    <div className="d-flex flex-column gap-3">
+      <div>
+        <Button
+          label="Join the Waitlist"
+          className="mt-4"
+          fontLarge={true}
+          icon={faArrowRight}
+          iconFlip={true}
+          onClick={openModal}
+        />
+      </div>
+
+      <div className="d-flex align-items-center fs-7 gap-1">
+        <span className="opacity-75">Have a beta key?</span>
+        <Button
+          label="Redeem now!"
+          variant="link"
+          fontLarge={true}
+          className="fs-7"
+          to="/beta-key/redeem"
+        />
+      </div>
     </div>
   );
 
@@ -142,7 +155,9 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
             className="header-container text-center d-flex flex-column align-items-center justify-content-center mb-5"
             style={{ paddingTop: "80px" }}
           >
-            <h1 className="display-1 fw-bold mt-4">{firstTitle}</h1>
+            <h1 className="display-1 fw-bold mt-4" style={{ opacity: 0.9 }}>
+              {firstTitle}
+            </h1>
             <p className="lead fw-medium fs-4 opacity-75">{firstSubtext}</p>
             {ctaButton}
           </div>
@@ -311,7 +326,9 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                 style={{ paddingTop: "50px", opacity: opacityTitle }}
               >
                 <h1 className="display-1 fw-bold mt-4">{firstTitle}</h1>
-                <p className="lead fw-medium fs-4 opacity-75">{firstSubtext}</p>
+                <p className="lead fw-medium fs-4" style={{ opacity: 0.9 }}>
+                  {firstSubtext}
+                </p>
                 {ctaButton}
               </motion.div>
               <div
