@@ -23,6 +23,7 @@ export default defineConfig({
     proxy: {
       "/v1": "https://api.storyteller.ai",
       "/avatar": "https://www.gravatar.com",
+      "/preview": "https://style.storyteller.ai",
       "/google": {
         target: "https://storage.googleapis.com",
         rewrite: (path) => path.replace(/^\/google/, ""),
