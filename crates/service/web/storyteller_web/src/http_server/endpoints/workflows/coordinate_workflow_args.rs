@@ -50,7 +50,8 @@ pub fn coordinate_workflow_args(mut args: CoordinatedWorkflowArgs, is_staff: boo
 
   if args.use_lipsync == Some(true) {
     // can't use face detailer and lipsync together
-    args.use_face_detailer = None;
+    // TODO(bt): We're testing new code that might make this decision obsolete
+    // args.use_face_detailer = None;
   }
 
   // you can still use upscaler for non-lcm version (it will just take a while)
@@ -71,7 +72,7 @@ mod tests {
       remove_watermark: None,
     };
 
-    let coordinated_args = super::coordinate_workflow_args(args, false);
+    let coordinated_args = super::coordinate_workflow_args(args, true);
 
     assert_eq!(coordinated_args.use_lipsync, None);
     assert_eq!(coordinated_args.use_face_detailer, None);
@@ -91,7 +92,7 @@ mod tests {
       remove_watermark: None,
     };
 
-    let coordinated_args = super::coordinate_workflow_args(args, false);
+    let coordinated_args = super::coordinate_workflow_args(args, true);
 
     assert_eq!(coordinated_args.use_lipsync, None);
     assert_eq!(coordinated_args.use_face_detailer, None);
@@ -111,10 +112,11 @@ mod tests {
       remove_watermark: None,
     };
 
-    let coordinated_args = super::coordinate_workflow_args(args, false);
+    let coordinated_args = super::coordinate_workflow_args(args, true);
 
     assert_eq!(coordinated_args.use_lipsync, Some(true));
-    assert_eq!(coordinated_args.use_face_detailer, None);
+    //assert_eq!(coordinated_args.use_face_detailer, None);
+    assert_eq!(coordinated_args.use_face_detailer, Some(true)); // TODO(bt): Possibly temporary
     assert_eq!(coordinated_args.use_upscaler, None);
     assert_eq!(coordinated_args.disable_lcm, None);
     assert_eq!(coordinated_args.use_cinematic, None);
