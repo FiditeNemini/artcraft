@@ -6,6 +6,7 @@ use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
@@ -86,6 +87,7 @@ pub struct ListAvailableGenericInferenceJobArgs<'a> {
   pub num_records: u32,
   pub is_debug_worker: bool,
   pub sort_by_priority: bool,
+  pub maybe_scope_by_job_type: Option<&'a BTreeSet<InferenceJobType>>,
   pub maybe_scope_by_model_type: Option<&'a BTreeSet<InferenceModelType>>,
   pub maybe_scope_by_job_category: Option<&'a BTreeSet<InferenceCategory>>,
   pub mysql_pool: &'a MySqlPool,
@@ -264,6 +266,15 @@ WHERE
   )
 "#.to_string();
 
+  if let Some(job_type) = args.maybe_scope_by_job_type {
+    query.push_str(&format!(r#"
+      AND
+      (
+        job_type IN ({})
+      )
+    "#, job_type_predicate(job_type)));
+  }
+
   if let Some(model_types) = args.maybe_scope_by_model_type {
     query.push_str(&format!(r#"
       AND
@@ -344,6 +355,17 @@ struct AvailableInferenceJobRawInternal {
 
 /// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.
 /// Issue: https://github.com/launchbadge/sqlx/issues/875
+fn job_type_predicate(types: &BTreeSet<InferenceJobType>) -> String {
+  let mut vec = types.iter()
+      .map(|ty| ty.to_str())
+      .map(|ty| format!("\"{}\"", ty))
+      .collect::<Vec<String>>();
+  vec.sort(); // NB: For the benefit of tests.
+  vec.join(", ")
+}
+
+/// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.
+/// Issue: https://github.com/launchbadge/sqlx/issues/875
 fn model_type_predicate(types: &BTreeSet<InferenceModelType>) -> String {
   let mut vec = types.iter()
       .map(|ty| ty.to_str())
@@ -369,9 +391,32 @@ mod tests {
   use std::collections::BTreeSet;
 
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+  use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
   use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 
-  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::{inference_category_predicate, model_type_predicate};
+  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::{inference_category_predicate, job_type_predicate, model_type_predicate};
+
+  #[test]
+  fn test_job_type_predicate() {
+    // None
+    let types = BTreeSet::from([]);
+    assert_eq!(job_type_predicate(&types), "".to_string());
+
+    // One
+    let types = BTreeSet::from([
+      InferenceJobType::RvcV2,
+    ]);
+
+    assert_eq!(job_type_predicate(&types), "\"rvc_v2\"".to_string());
+
+    // Multiple
+    let types = BTreeSet::from([
+      InferenceJobType::MocapNet,
+      InferenceJobType::RvcV2,
+    ]);
+    assert_eq!(job_type_predicate(&types), "\"mocap_net\", \"rvc_v2\"".to_string());
+  }
+
 
   #[test]
   fn test_model_type_predicate() {
