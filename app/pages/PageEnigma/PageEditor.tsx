@@ -51,8 +51,13 @@ export const PageEditor = () => {
   useEffect(() => {
     const { getGPUTier } = gpu;
     getGPUTier().then((gpuTier) => {
+      console.log(gpuTier);
       setTimeout(() => {
-        setValidGpu(gpuTier.type !== "BENCHMARK" ? "error" : "valid");
+        setValidGpu(
+          gpuTier.type !== "BENCHMARK" && gpuTier.type !== "FALLBACK"
+            ? "error"
+            : "valid",
+        );
       }, 200);
     });
   });
