@@ -493,9 +493,7 @@ class Editor {
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
     if (this.outliner_feature_flag) {
-      const result = this.sceneManager?.render_outliner(
-        this.timeline.characters,
-      );
+      const result = this.sceneManager?.render_outliner(this.timeline.characters);
       if (result) outlinerState.items.value = result.items;
     }
 
@@ -531,6 +529,7 @@ class Editor {
         this.mouse_controls,
         this.activeScene,
         true,
+        this.updateOutliner.bind(this),
       ); // Enabled dev mode.
       this.mouse_controls.sceneManager = this.sceneManager;
     }
@@ -1027,6 +1026,12 @@ class Editor {
         });
       }
     }
+  }
+
+  updateOutliner() {
+    const result = this.sceneManager?.render_outliner(this.timeline.characters);
+    if (result) outlinerState.items.value = result.items;
+    this.updateSelectedUI();
   }
 
   updateSelectedUI() {

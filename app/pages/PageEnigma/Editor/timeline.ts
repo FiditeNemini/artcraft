@@ -28,6 +28,7 @@ import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
 import { outlinerState } from "../signals";
+import { CreationSceneItem } from "./Commands";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -155,7 +156,8 @@ export class TimeLine {
       // Create operations
       case toEngineActions.ADD_CHARACTER: {
         const newObject = await this.addCharacter(data.data as MediaItem);
-        this.queueNewObjectMessage(newObject, data.data as MediaItem);
+        if (newObject)
+          this.queueNewObjectMessage(newObject, data.data as MediaItem);
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -164,7 +166,8 @@ export class TimeLine {
       }
       case toEngineActions.ADD_OBJECT: {
         const newObject = await this.addObject(data.data as MediaItem);
-        this.queueNewObjectMessage(newObject, data.data as MediaItem);
+        if (newObject)
+          this.queueNewObjectMessage(newObject, data.data as MediaItem);
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -175,7 +178,7 @@ export class TimeLine {
       case toEngineActions.ADD_SHAPE: {
         const newShape = await this.addShape(data.data as MediaItem);
         this.queueNewObjectMessage(newShape, data.data as MediaItem);
-        const result = this.editorEngine.sceneManager?.render_outliner(
+        let result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
         if (result) outlinerState.items.value = result.items;
@@ -219,44 +222,45 @@ export class TimeLine {
     const pos = this.getPos();
     const new_data = { ...data };
 
-    const obj = await this.scene.loadObject(
+    const obj = await this.editorEngine.sceneManager?.create(
       media_id,
       name,
-      true,
       pos,
-      this.editorEngine.version,
     );
 
-    obj.userData["name"] = name;
-    obj.name = name;
-    obj.position.copy(pos);
-    const object_uuid = obj.uuid;
+    if (obj) {
+      obj.userData["name"] = name;
+      obj.name = name;
+      obj.position.copy(pos);
+      const object_uuid = obj.uuid;
 
-    this.characters[object_uuid] = ClipGroup.CHARACTER; // TODO: Create a class to make the idea of a character.
-    new_data["object_uuid"] = object_uuid;
+      this.characters[object_uuid] = ClipGroup.CHARACTER; // TODO: Create a class to make the idea of a character.
+      new_data["object_uuid"] = object_uuid;
 
-    Queue.publish({
-      queueName: QueueNames.FROM_ENGINE,
-      action: fromEngineActions.UPDATE_CHARACTER_ID,
-      data: new_data,
-    });
+      Queue.publish({
+        queueName: QueueNames.FROM_ENGINE,
+        action: fromEngineActions.UPDATE_CHARACTER_ID,
+        data: new_data,
+      });
 
-    this.addPlayableClip(
-      new ClipUI(
-        data.version,
-        ClipType.FAKE,
-        ClipGroup.CHARACTER,
-        "Default",
-        media_id,
-        obj.uuid,
-        obj.uuid,
-        name,
-        0,
-        0,
-        0,
-      ),
-    );
+      this.addPlayableClip(
+        new ClipUI(
+          data.version,
+          ClipType.FAKE,
+          ClipGroup.CHARACTER,
+          "Default",
+          media_id,
+          obj.uuid,
+          obj.uuid,
+          name,
+          0,
+          0,
+          0,
+        ),
+      );
 
+      await this.editorEngine.sceneManager?.add_creation_undostack(obj);
+    }
     return obj;
   }
 
@@ -315,22 +319,34 @@ export class TimeLine {
     const pos = this.getPos();
     const media_id = data.media_id;
     const name = data.name;
-    const obj = await this.scene.loadGlbWithPlaceholder(
+    // const obj = await this.scene.loadGlbWithPlaceholder(
+    //   media_id,
+    //   name,
+    //   true,
+    //   pos,
+    //   this.editorEngine.version,
+    // );
+
+    const obj = await this.editorEngine.sceneManager?.create(
       media_id,
       name,
-      true,
       pos,
-      this.editorEngine.version,
     );
-    obj.userData["name"] = name;
-    obj.name = name;
-    obj.position.copy(pos);
+    if (obj) {
+      obj.userData["name"] = name;
+      obj.name = name;
+      obj.position.copy(pos);
+
+      await this.editorEngine.sceneManager?.add_creation_undostack(obj);
+    }
     return obj;
   }
 
   public async addShape(data: MediaItem) {
     const pos = this.getPos();
-    return this.editorEngine.create_parim(data.media_id, pos);
+    const parim = this.editorEngine.create_parim(data.media_id, pos);
+    await this.editorEngine.sceneManager?.add_creation_undostack(parim);
+    return parim;
   }
 
   public async addKeyFrame(data: Keyframe) {

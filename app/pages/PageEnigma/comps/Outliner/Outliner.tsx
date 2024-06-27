@@ -33,7 +33,8 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
 
   const isSelected = outlinerState.selectedItem.value?.id === item.id;
 
-  const editorEngine = useContext(EngineContext);
+
+  const editorEngine = useContext(EngineContext)
 
   // Delete object logic here
   const handleDeleteKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -45,7 +46,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
   // Double click logic here
   const handleDoubleClick = () => {
     console.log("Item double clicked:", item.id);
-    editorEngine?.sceneManager?.double_click(item.id);
+    editorEngine?.sceneManager?.double_click();
   };
 
   return (
@@ -72,10 +73,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleLock(
-              item.id,
-              editorEngine?.lockUnlockObject.bind(editorEngine),
-            );
+            toggleLock(item.id, editorEngine?.lockUnlockObject.bind(editorEngine));
           }}
           style={{
             opacity: hovered || item.locked ? 1 : 0,
@@ -91,12 +89,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleVisibility(
-              item.id,
-              editorEngine?.sceneManager?.hideObject.bind(
-                editorEngine.sceneManager,
-              ),
-            );
+            toggleVisibility(item.id, editorEngine?.sceneManager?.hideObject.bind(editorEngine.sceneManager));
           }}
           style={{
             opacity: hovered || !item.visible ? 1 : 0,

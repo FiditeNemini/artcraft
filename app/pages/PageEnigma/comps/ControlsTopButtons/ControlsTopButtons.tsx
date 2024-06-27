@@ -177,9 +177,9 @@ export const ControlsTopButtons = () => {
     }
   });
 
-  const handleShowOutliner = () => {
-    outlinerIsShowing.value = !outlinerIsShowing.value;
-  };
+   const handleShowOutliner = () => {
+     outlinerIsShowing.value = !outlinerIsShowing.value;
+   };
 
   return (
     <div className="flex flex-col gap-2 pl-2 pt-2">
@@ -324,6 +324,7 @@ export const ControlsTopButtons = () => {
           ]}
         />
 
+        
         <Button
           icon={outlinerIsShowing.value ? faCheckSquare : faSquare}
           className="shadow-xl"
@@ -337,7 +338,7 @@ export const ControlsTopButtons = () => {
           onClick={handleShowOutliner}
         >
           Outliner
-        </Button>
+        </Button> 
 
         <ButtonDialogue
           buttonProps={{

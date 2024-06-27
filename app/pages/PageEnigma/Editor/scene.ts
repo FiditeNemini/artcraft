@@ -90,6 +90,32 @@ class Scene {
     return obj;
   }
 
+  get_objects_name(uuid: string): string {
+    const object = this.get_object_by_uuid(uuid);
+    if (object) {
+      return object.name;
+    }
+    return uuid;
+  }
+
+  get_objects_position(uuid: string): THREE.Vector3 {
+    const object = this.get_object_by_uuid(uuid);
+    let pos = new THREE.Vector3(0, 0, 0);
+    if (object) {
+      pos = pos.copy(object.position);
+    }
+    return pos;
+  }
+
+  get_objects_userdata(uuid: string): Record<string, any> {
+    const object = this.get_object_by_uuid(uuid);
+    let userdata = {};
+    if (object) {
+      userdata = object.userData;
+    }
+    return userdata;
+  }
+
   get_object_by_uuid(uuid: string) {
     return this.scene.getObjectByProperty("uuid", uuid);
   }
@@ -272,9 +298,10 @@ class Scene {
   }
 
   setVisible(object_uuid: string, visible: boolean) {
-    const object = this.get_object_by_uuid(object_uuid);
+    let object = this.get_object_by_uuid(object_uuid);
     if (object) {
       object.visible = visible;
+      object.userData["visible"] = object.visible;
     }
   }
 
