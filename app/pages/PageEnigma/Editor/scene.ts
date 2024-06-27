@@ -254,11 +254,17 @@ class Scene {
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
           if (c.material.color !== undefined) {
-            if (c.userData["base"] == undefined) {
+            if (c.userData["base"] === undefined) {
               c.userData["base"] = c.material.color.getHex();
             }
-            const tint = new THREE.Color(hex_color);
-            c.material.color.set(tint);
+            if (c.material.map === undefined  || c.material.map === null) {
+              const currentColor = new THREE.Color(c.userData["base"]);
+              const tint = new THREE.Color(hex_color);
+              currentColor.multiply(tint);
+              c.material.color.set(new THREE.Color(currentColor));
+            } else {
+              c.material.color.set(new THREE.Color(hex_color));
+            }
           }
         }
       });
