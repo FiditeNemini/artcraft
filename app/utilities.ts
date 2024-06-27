@@ -1,5 +1,14 @@
 import { Params } from "@remix-run/react";
 import { JobStatus } from "./enums";
+import deepEqual from "deep-equal";
+
+export const isObjectSerializable = (obj: object) => {
+  return deepEqual(obj, deepCopySerializableObjects(obj));
+};
+
+export const deepCopySerializableObjects = (obj: object) => {
+  return JSON.parse(JSON.stringify(obj));
+};
 
 export const kebabCase = (str: string) =>
   str
