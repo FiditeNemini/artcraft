@@ -34,6 +34,17 @@ export const isNumberString = (value: string) => {
   return !isNaN(Number(value));
 };
 
+export const isJobStatusError = (curr: JobStatus) => {
+  if (
+    curr === JobStatus.ATTEMPT_FAILED ||
+    curr === JobStatus.COMPLETE_FAILURE ||
+    curr === JobStatus.DEAD
+  ) {
+    return true;
+  }
+  return false;
+};
+
 export const getFileName = (file: File) => {
   return file.name.substring(0, file.name.lastIndexOf("."));
 };

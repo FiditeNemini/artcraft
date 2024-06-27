@@ -6,9 +6,7 @@ export async function PollRecentJobs() {
 
   const response = await jobsApi.ListRecentJobs();
   if (response.success && response.data) {
-    if (response.data.length > 0) {
-      setJobs(response.data);
-    }
+    setJobs(response.data);
     // else, just no jobs, not an error, do nothing
     return;
   }

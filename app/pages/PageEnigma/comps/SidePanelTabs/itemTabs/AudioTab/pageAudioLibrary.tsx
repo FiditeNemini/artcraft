@@ -12,7 +12,7 @@ import {
 
 import { AudioItemElements } from "./audioItemElements";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
-import { InferenceElement } from "./inferenceElement";
+import { InferenceElement } from "./audioInferenceElement";
 import { AssetFilterOption } from "~/enums";
 import { AudioTabPages } from "~/pages/PageEnigma/enums";
 
@@ -31,7 +31,7 @@ export const PageAudioLibrary = ({
     AssetFilterOption.FEATURED,
   );
   const filteredAudioItems =
-    selectedFilter === AssetFilterOption.FEATURED
+    selectedFilter === AssetFilterOption.MINE
       ? audioItems.value ?? []
       : userAudioItems.value ?? [];
   const [currentPage, setCurrentPage] = useState<number>(0);
