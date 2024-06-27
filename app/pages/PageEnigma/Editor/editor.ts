@@ -501,7 +501,7 @@ class Editor {
 
     this.mouse_controls = new MouseControls(
       this.camera,
-      this.camera_person_mode,
+      this.get_camera_person_mode.bind(this),
       this.lockControls,
       this.camera_last_pos,
       this.orbitControls,
@@ -688,6 +688,10 @@ class Editor {
       sceneToken: sceneToken,
       sceneGenerationMetadata: sceneGenerationMetadata,
     });
+  }
+
+  get_camera_person_mode(): boolean {
+    return this.camera_person_mode;
   }
 
   switchCameraView() {

@@ -6,7 +6,7 @@ import { SceneManager, SceneObject } from "./scene_manager_api";
 
 export class MouseControls {
     camera: THREE.PerspectiveCamera | null;
-    camera_person_mode: boolean;
+    get_camera_person_mode: Function;
     lockControls: PointerLockControls | undefined;
     camera_last_pos: THREE.Vector3;
     selected: THREE.Object3D[] | undefined;
@@ -31,7 +31,7 @@ export class MouseControls {
     setSelected: Function;
     sceneManager: SceneManager | undefined;
 
-    constructor(camera: THREE.PerspectiveCamera | null, camera_person_mode: boolean, lockControls: PointerLockControls | undefined,
+    constructor(camera: THREE.PerspectiveCamera | null, get_camera_person_mode: Function, lockControls: PointerLockControls | undefined,
         camera_last_pos: THREE.Vector3, orbitControls: OrbitControls | undefined,
         selectedCanvas: boolean, switchPreviewToggle: boolean, rendering: boolean, togglePlayback: Function,
         deleteObject: Function, canvReference: HTMLCanvasElement | null,
@@ -43,7 +43,7 @@ export class MouseControls {
         getAssetType: Function, setSelected: Function
     ) {
         this.camera = camera;
-        this.camera_person_mode = camera_person_mode;
+        this.get_camera_person_mode = get_camera_person_mode;
         this.lockControls = lockControls;
         this.camera_last_pos = camera_last_pos;
         this.selected = [];
@@ -115,14 +115,17 @@ export class MouseControls {
     }
 
     onMouseDown(event: any) {
-        if (event.button === 1 && this.camera_person_mode) {
+        if (event.button === 1 && this.get_camera_person_mode()) {
             this.lockControls?.lock();
+            console.log("LOCK")
         }
     }
 
     onMouseUp(event: any) {
         if (event.button === 1) {
             this.lockControls?.unlock();
+            console.log("UNLOCK")
+
         }
 
         if (event.button !== 0 && this.camera) {
