@@ -7,7 +7,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web_lab::extract::Query;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 use log::{error, warn};
 use r2d2_redis::redis::{Commands, RedisResult};
 use utoipa::{IntoParams, ToSchema};
@@ -23,8 +23,8 @@ use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
-use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
 
+use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -34,6 +34,8 @@ use crate::server_state::ServerState;
 /// typically do not require keepalive.
 const JOB_KEEPALIVE_TTL_SECONDS : usize = 60 * 3;
 
+/// For successful jobs over an hour, don't show more than a certain number of jobs
+const SUCCESSFUL_JOBS_DURATION_THRESHOLD : Duration = Duration::milliseconds(1000 * 60 * 60);
 
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListSessionJobsQueryParams {
@@ -273,11 +275,37 @@ pub async fn list_session_jobs_handler(
 }
 
 fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<HttpResponse, ListSessionJobsError> {
-  let records = records.into_iter()
+  let mut records = records.into_iter()
       .map(|record| {
         db_record_to_response_payload(record, None)
       })
       .collect::<Vec<_>>();
+
+  // NB: Having a lot of "success" entries that haven't been cleared can make the list
+  // long, so we can downsample.
+  let mut success_count = 0;
+  let now = Utc::now();
+
+  records.retain(|record| {
+    if record.status.status != JobStatusPlus::CompleteSuccess {
+      return true;
+    }
+
+    success_count += 1;
+    if success_count <= 5 {
+      return true;
+    }
+
+    let should_skip = record.maybe_result
+        .as_ref()
+        .map(|result| result.maybe_successfully_completed_at)
+        .flatten()
+        .map(|completed_at| completed_at.signed_duration_since(now))
+        .map(|duration| duration.gt(&SUCCESSFUL_JOBS_DURATION_THRESHOLD))
+        .unwrap_or(false);
+
+    should_skip
+  });
 
   let response = ListSessionJobsSuccessResponse {
     success: true,
