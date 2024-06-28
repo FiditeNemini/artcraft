@@ -41,15 +41,18 @@ export const outlinerState = {
 //   locked: false,
 // },
 
-export const outlinerIsShowing = signal(false);
+export const outlinerIsShowing = signal(true);
 
-export const selectItem = (id: string, sceneManager: SceneManager | undefined) => {
+export const selectItem = (
+  id: string,
+  sceneManager: SceneManager | undefined,
+) => {
   const item = outlinerState.items.value.find((item) => item.id === id);
   if (item) {
     outlinerState.selectedItem.value = item;
   }
 
-  if(sceneManager) {
+  if (sceneManager) {
     sceneManager.select_object(id);
   }
 };
@@ -62,7 +65,7 @@ export const toggleVisibility = (id: string, hideFn: Function | undefined) => {
     outlinerState.items.value = [...items];
   }
 
-  if(hideFn) {
+  if (hideFn) {
     hideFn(id);
   }
 };
@@ -75,7 +78,7 @@ export const toggleLock = (id: string, lockFn: Function | undefined) => {
     outlinerState.items.value = [...items];
   }
 
-  if(lockFn) {
+  if (lockFn) {
     lockFn(id);
   }
 };
