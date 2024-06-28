@@ -13,6 +13,7 @@
       "weights_category" : { "type" : "keyword" },
 
       "title" : { "type" : "search_as_you_type" },
+      "title_as_keyword" : { "type" : "keyword" },
 
       "maybe_cover_image_media_file_token" : { "type" : "keyword" },
       "maybe_cover_image_public_bucket_hash" : { "type" : "keyword" },

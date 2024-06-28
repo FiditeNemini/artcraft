@@ -13,7 +13,11 @@ use errors::AnyhowResult;
 use mysql_queries::queries::model_weights::list::list_model_weights_for_elastic_search_backfill_using_cursor::{list_model_weights_for_elastic_search_backfill_using_cursor, ModelWeightForElasticsearchRecord};
 use storyteller_root::get_storyteller_rust_root;
 
-pub async fn create_all_model_weight_documents(mysql: &Pool<MySql>, elasticsearch: &Elasticsearch) -> AnyhowResult<()> {
+pub async fn create_all_model_weight_documents(
+  mysql: &Pool<MySql>,
+  elasticsearch: &Elasticsearch
+) -> AnyhowResult<()> {
+
   info!("Create all model weight documents.");
 
   // TODO(bt, 2024-01-10): expose this as a CLI flag
@@ -63,7 +67,8 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Mode
     weights_type: record.weights_type,
     weights_category: record.weights_category,
 
-    title: record.title,
+    title: record.title.clone(),
+    title_as_keyword: record.title,
 
     maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token,
     maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,

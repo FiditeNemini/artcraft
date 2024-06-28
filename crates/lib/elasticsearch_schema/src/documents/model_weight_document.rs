@@ -30,6 +30,10 @@ pub struct ModelWeightDocument {
 
   pub title: String,
 
+  // NB: Not all datatypes are supported in the SQL DSL, so we have a copy of the title:
+  // https://opensearch.org/docs/latest/search-plugins/sql/datatypes/
+  pub title_as_keyword: String,
+
   // *** NB: Never put the bucket path to the model in Elasticsearch ! ***
 
   pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
