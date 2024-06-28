@@ -370,9 +370,10 @@ class Editor {
 
     // Sets up camera and base position.
     this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 200);
-    this.camera.position.z = 3;
-    this.camera.position.y = 3;
-    this.camera.position.x = -3;
+    this.camera.position.z = 2.5;
+    this.camera.position.y = 2.5;
+    this.camera.position.x = -2.5;
+    this.camera.lookAt(0, 0, 0);
 
     this.camera.layers.enable(0);
     this.camera.layers.enable(1); // This camera does not see this layer
@@ -425,27 +426,12 @@ class Editor {
       this.camera,
       this.renderer.domElement,
     );
-    this.cameraViewControls.movementSpeed = 1;
+    this.cameraViewControls.movementSpeed = 1.15;
     this.cameraViewControls.domElement = this.renderer.domElement;
     this.cameraViewControls.rollSpeed = Math.PI / 24;
     this.cameraViewControls.autoForward = false;
     this.cameraViewControls.dragToLook = true;
-    this.cameraViewControls.enabled = false;
-
-    this.orbitControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement,
-    );
-
-    //this.orbitControls.mouseButtons = {
-    //  MIDDLE: THREE.MOUSE.ROTATE,
-    //  RIGHT: THREE.MOUSE.PAN,
-    //}; // Blender Style
-    this.orbitControls.mouseButtons = {
-      LEFT: THREE.MOUSE.ROTATE,
-      MIDDLE: THREE.MOUSE.DOLLY,
-      RIGHT: THREE.MOUSE.PAN,
-    }; // Standard
+    this.cameraViewControls.enabled = true;
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     this.control.space = "local"; // Local transformation mode
@@ -462,11 +448,6 @@ class Editor {
     this.control.addEventListener("change", this.renderScene.bind(this));
     this.control.addEventListener("dragging-changed", (event: any) => {
       //TODO: any should be the following
-      // (event: THREE.Event<"dragging-changed", TransformControls>) => {
-      if (this.orbitControls == undefined) {
-        return;
-      }
-      this.orbitControls.enabled = !event.value;
       this.updateSelectedUI();
       this.camera_last_pos.copy(new THREE.Vector3(-99999, -99999, -99999));
       // this.update_properties()
@@ -493,7 +474,9 @@ class Editor {
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
     if (this.outliner_feature_flag) {
-      const result = this.sceneManager?.render_outliner(this.timeline.characters);
+      const result = this.sceneManager?.render_outliner(
+        this.timeline.characters,
+      );
       if (result) outlinerState.items.value = result.items;
     }
 
@@ -502,7 +485,6 @@ class Editor {
       this.get_camera_person_mode.bind(this),
       this.lockControls,
       this.camera_last_pos,
-      this.orbitControls,
       this.selectedCanvas,
       this.switchPreviewToggle,
       this.rendering,
@@ -551,25 +533,17 @@ class Editor {
     }
 
     document.addEventListener("mouseover", (event) => {
-      if (this.orbitControls && this.cameraViewControls) {
+      if (this.cameraViewControls) {
         if (
           event.target instanceof HTMLCanvasElement ||
           (event.target as HTMLElement).id == "letterbox"
         ) {
-          if (this.camera_person_mode) {
-            this.orbitControls.enabled = false;
-            this.cameraViewControls.enabled = true;
-          } else {
-            this.orbitControls.enabled = true;
-            this.cameraViewControls.enabled = false;
-          }
+          this.cameraViewControls.enabled = true;
           this.selectedCanvas = true;
         } else {
-          this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
           this.selectedCanvas = false;
         }
-        this.cameraViewControls?.reset();
       }
     });
 
@@ -871,9 +845,12 @@ class Editor {
     }
 
     const delta_time = this.clock.getDelta();
+    this.cameraViewControls?.update(5 * delta_time);
+    this.activeScene.shader_objects.forEach(shader => {
+      shader.material.uniforms[ 'time' ].value += 0.5 * delta_time;
+    });
 
     if (this.cameraViewControls && this.camera_person_mode) {
-      this.cameraViewControls.update(5 * delta_time);
       if (this.cam_obj && this.camera) {
         if (this.last_scrub != this.timeline.scrubber_frame_position) {
           this.camera.position.copy(this.cam_obj.position);
@@ -936,9 +913,6 @@ class Editor {
       this.switchPreviewToggle = true;
       editorState.value = EditorStates.PREVIEW;
       await this.generateFrame();
-      if (this.cameraViewControls) {
-        this.cameraViewControls.enabled = false;
-      }
     }
   }
 

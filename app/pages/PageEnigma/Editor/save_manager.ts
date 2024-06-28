@@ -1,4 +1,4 @@
-import { scene } from "~/signals";
+import * as THREE from "three";
 import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
 import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
@@ -52,6 +52,10 @@ export class SaveManager {
       scene: scene_json,
       ...sceneGenerationMetadata,
       timeline: timeline_json,
+      camera_data: {
+        position: this.editor.camera?.position,
+        rotation: this.editor.camera?.rotation,
+      },
     };
 
     return JSON.stringify(save_data);
@@ -94,6 +98,10 @@ export class SaveManager {
       scene: scene_json,
       ...sceneGenerationMetadata,
       timeline: timeline_json,
+      camera_data: {
+        position: this.editor.camera?.position,
+        rotation: this.editor.camera?.rotation,
+      },
     };
 
     // TODO turn scene information into and object ...
@@ -141,6 +149,15 @@ export class SaveManager {
       scene_json["scene"],
       scene_json["version"],
     );
+
+    const camera_data = scene_json["camera_data"];
+    if (camera_data && this.editor.camera) {
+      const camera_position: THREE.Vector3 = camera_data["position"];
+      const camera_rotation: THREE.Euler = camera_data["rotation"];
+
+      this.editor.camera.position.copy(camera_position);
+      this.editor.camera.rotation.copy(camera_rotation);
+    }
 
     // For Remixing Scenes.
     // this calls the signal function to propagate the data to the UI

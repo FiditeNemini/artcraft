@@ -72,8 +72,10 @@ export class Utils {
         this.removeTransformControls(false);
       } else if (this.editor.control) {
         this.scene.scene.add(this.editor.control);
-        if(this.editor.sceneManager?.selected_objects)
-        this.editor.control.attach(this.editor.sceneManager?.selected_objects[0]);
+        if (this.editor.sceneManager?.selected_objects)
+          this.editor.control.attach(
+            this.editor.sceneManager?.selected_objects[0],
+          );
       }
 
       return object.userData["locked"];
@@ -102,8 +104,8 @@ export class Utils {
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
-    if(this.editor.sceneManager?.selected_objects){
-      let object = this.editor.sceneManager?.selected_objects[0]
+    if (this.editor.sceneManager?.selected_objects) {
+      let object = this.editor.sceneManager?.selected_objects[0];
       if (object != undefined || object != null) {
         object.position.x = position.x;
         object.position.y = position.y;
@@ -129,11 +131,10 @@ export class Utils {
         this.editor.camera.position.copy(this.editor.cam_obj.position);
         this.editor.camera.rotation.copy(this.editor.cam_obj.rotation);
 
-        if (this.editor.orbitControls) {
-          this.editor.orbitControls.enabled = false;
-        }
         if (this.editor.lockControls) {
-          this.editor.activeScene.scene.add(this.editor.lockControls.getObject());
+          this.editor.activeScene.scene.add(
+            this.editor.lockControls.getObject(),
+          );
         }
         if (this.editor.cameraViewControls) {
           this.editor.cameraViewControls.enabled = true;
@@ -153,14 +154,10 @@ export class Utils {
       } else if (this.editor.camera) {
         this.editor.camera.position.copy(this.editor.last_cam_pos);
         this.editor.camera.rotation.copy(this.editor.last_cam_rot);
-        if (this.editor.orbitControls) {
-          this.editor.orbitControls.enabled = true;
-        }
         if (this.editor.lockControls) {
-          this.editor.activeScene.scene.remove(this.editor.lockControls.getObject());
-        }
-        if (this.editor.cameraViewControls) {
-          this.editor.cameraViewControls.enabled = false;
+          this.editor.activeScene.scene.remove(
+            this.editor.lockControls.getObject(),
+          );
         }
         this.editor.cam_obj.scale.set(1, 1, 1);
         if (this.editor.activeScene.hot_items) {
@@ -180,7 +177,7 @@ export class Utils {
     if (this.editor.sceneManager?.selected_objects === undefined) {
       return 0;
     }
-    if(this.editor.sceneManager?.selected_objects.length <= 0) {
+    if (this.editor.sceneManager?.selected_objects.length <= 0) {
       return 0;
     }
     const posCombo =
@@ -192,11 +189,13 @@ export class Utils {
       this.editor.sceneManager?.selected_objects[0].rotation.y +
       this.editor.sceneManager?.selected_objects[0].rotation.z;
     const sclCombo =
-      this.editor.sceneManager?.selected_objects[0].scale.x + this.editor.sceneManager?.selected_objects[0].scale.y + this.editor.sceneManager?.selected_objects[0].scale.z;
+      this.editor.sceneManager?.selected_objects[0].scale.x +
+      this.editor.sceneManager?.selected_objects[0].scale.y +
+      this.editor.sceneManager?.selected_objects[0].scale.z;
     return posCombo + rotCombo + sclCombo;
   }
 
- /* Will add in the future
+  /* Will add in the future
 
 A good practice to remove 3D objects from Three.js scenes
 function removeObject3D(object3D) {

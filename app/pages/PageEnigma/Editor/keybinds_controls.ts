@@ -46,7 +46,6 @@ export class MouseControls {
     camera_person_mode: boolean,
     lockControls: PointerLockControls | undefined,
     camera_last_pos: THREE.Vector3,
-    orbitControls: OrbitControls | undefined,
     selectedCanvas: boolean,
     switchPreviewToggle: boolean,
     rendering: boolean,
@@ -71,7 +70,6 @@ export class MouseControls {
     this.lockControls = lockControls;
     this.camera_last_pos = camera_last_pos;
     this.selected = [];
-    this.orbitControls = orbitControls;
     this.selectedCanvas = selectedCanvas;
     this.switchPreviewToggle = switchPreviewToggle;
     this.rendering = rendering;
@@ -94,11 +92,12 @@ export class MouseControls {
   }
 
   focus() {
-    if (this.orbitControls && this.selected) {
-      this.orbitControls.target.copy(this.selected[0].position);
-      this.orbitControls.maxDistance = 4;
-      this.orbitControls.update();
-      this.orbitControls.maxDistance = 999;
+    if(this.lockControls && this.selected) {
+      this.lockControls.camera.lookAt(this.selected[0].position);
+      this.lockControls.camera.position.copy(this.selected[0].position);
+      this.lockControls.moveForward(-5);
+      this.lockControls.camera.position.add(new THREE.Vector3(0,5,0));
+      this.lockControls.camera.lookAt(this.selected[0].position);
     }
   }
 
@@ -139,7 +138,7 @@ export class MouseControls {
   }
 
   onMouseDown(event: any) {
-    if (event.button === 1 && this.camera_person_mode) {
+    if (event.button === 1) {
       this.lockControls?.lock();
     }
   }
@@ -166,7 +165,7 @@ export class MouseControls {
   async onkeydown(event: KeyboardEvent) {
     if (hotkeysStatus.value.disabled) {
       return;
-    } else if (event.key === "f" && this.selected && this.orbitControls) {
+    } else if (event.key === "f" && this.selected && this.lockControls) {
       this.focus();
       return;
     } else if (event.key === " ") {
@@ -245,7 +244,6 @@ export class MouseControls {
       this.mouse == undefined ||
       this.control == undefined ||
       this.outlinePass == undefined ||
-      this.camera_person_mode ||
       !this.camera_last_pos.equals(camera_pos)
     ) {
       this.camera_last_pos.copy(camera_pos);

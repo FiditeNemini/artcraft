@@ -682,4 +682,11 @@ export const shapeItems = signal<MediaItem[]>([
     name: "Sphere",
     thumbnail: "/resources/shapes/sphere.png",
   },
+  {
+    version: 1,
+    media_id: "Water",
+    type: AssetType.SHAPE,
+    name: "Water",
+    thumbnail: "/resources/shapes/water.png",
+  },
 ]);

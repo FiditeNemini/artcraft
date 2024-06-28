@@ -22,10 +22,10 @@ export interface ObjectJSON {
   object_user_data_name: string;
   media_file_token: string;
   color: string;
-  metalness: number,
-  shininess: number,
-  specular: number,
-  locked: boolean,
+  metalness: number;
+  shininess: number;
+  specular: number;
+  locked: boolean;
   visible: boolean | undefined;
 }
 
@@ -47,16 +47,13 @@ export class StoryTellerProxy3DObject {
   locked: boolean;
   visible: boolean;
 
-  constructor(
-    version: number,
-    media_file_token: string,
-  ) {
+  constructor(version: number, media_file_token: string) {
     this.version = version;
     this.media_file_token = media_file_token;
 
     this.position = new THREE.Vector3(0.0, 0.0, 0.0);
     this.rotation = new THREE.Euler(0.0, 0.0, 0.0);
-    this.scale = new THREE.Vector3(1.0, 1.0, 1.0); 
+    this.scale = new THREE.Vector3(1.0, 1.0, 1.0);
 
     this.object_name = "";
     this.object_user_data_name = "";
@@ -72,10 +69,13 @@ export class StoryTellerProxy3DObject {
   }
 
   getColorAsHexString(object: THREE.Object3D): string {
-    if (object instanceof THREE.Mesh && object.material instanceof THREE.MeshBasicMaterial) {
-      return '#' + object.material.color.getHexString();
+    if (
+      object instanceof THREE.Mesh &&
+      object.material instanceof THREE.MeshBasicMaterial
+    ) {
+      return "#" + object.material.color.getHexString();
     }
-    return "#FFFFFF"
+    return "#FFFFFF";
   }
 
   public async initialize(object: THREE.Object3D) {

@@ -7,6 +7,7 @@ import environmentVariables from "~/Classes/EnvironmentVariables";
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { generateUUID } from "three/src/math/MathUtils.js";
 import { LoadingPlaceHolderManager } from "./placeholder_manager";
+import { Water } from "three/examples/jsm/Addons.js";
 class Scene {
   name: string;
   gridHelper: THREE.GridHelper | undefined;
@@ -20,6 +21,8 @@ class Scene {
 
   // global names
   camera_name: string;
+
+  shader_objects: Water[] = [];
 
   // loading indicator manager
   placeholder_manager: LoadingPlaceHolderManager | undefined;
@@ -72,9 +75,39 @@ class Scene {
       geometry = new THREE.SphereGeometry(0.5, 18, 12);
     } else if (name == "Donut") {
       geometry = new THREE.TorusGeometry(0.5, 0.25, 8, 24);
+    } else if (name == "Water") {
+      geometry = new THREE.PlaneGeometry( 100, 100 );
     }
 
-    const obj = new THREE.Mesh(geometry, material);
+    let obj;
+    if (name == "Water" && geometry) {
+      obj = new Water(
+        geometry,
+        {
+          textureWidth: 1024,
+          textureHeight: 1024,
+          waterNormals: new THREE.TextureLoader().load( 'https://threejs.org/examples/textures/waternormals.jpg', function ( texture ) {
+
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+          } ),
+          sunDirection: new THREE.Vector3(),
+          sunColor: 0xffffff,
+          waterColor: 0x00D8FF,
+          distortionScale: 0.3,
+          fog: this.scene.fog !== undefined,
+        }
+      );
+      obj.material.uniforms.size.value = 4.1;
+      obj.rotation.x = - Math.PI / 2;
+      obj.userData["water"] = true;
+      obj.userData["color"] = new THREE.Color(0x00D8FF).getHex();
+      obj.userData["base"] = new THREE.Color(0x00D8FF).getHex();
+
+      this.shader_objects.push(obj);
+    } else{
+      obj = new THREE.Mesh(geometry, material);
+    }
     obj.receiveShadow = true;
     obj.castShadow = true;
     obj.userData["media_id"] = "Parim";
@@ -279,7 +312,10 @@ class Scene {
       object.userData["color"] = hex_color;
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
-          if (c.material.color !== undefined) {
+          if(c.userData["water"] ) {
+            c.material.uniforms.waterColor.value = new THREE.Color(hex_color);
+          }
+          else if (c.material.color !== undefined) {
             if (c.userData["base"] === undefined) {
               c.userData["base"] = c.material.color.getHex();
             }
