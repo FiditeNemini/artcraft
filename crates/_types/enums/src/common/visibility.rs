@@ -153,10 +153,10 @@ mod tests {
     fn serialize() {
       let expected = "\"public\"".to_string(); // NB: Quoted
 
-      assert_eq!(expected, toml::to_string(&Visibility::Public).unwrap());
+      assert_eq!(expected, serde_json::to_string(&Visibility::Public).unwrap());
 
       // Just to show this serializes the same as a string
-      assert_eq!(expected, toml::to_string("public").unwrap());
+      assert_eq!(expected, serde_json::to_string("public").unwrap());
     }
 
     #[test]

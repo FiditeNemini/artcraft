@@ -84,6 +84,10 @@ pub enum StyleTransferName {
   #[serde(rename = "realistic_cyberpunk")]
   RealisticCyberpunk,
 
+  // New Styles (2024-06-27)
+
+  #[serde(rename = "dreamer")] // TODO: Land this in Gitub
+  Dreamer,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -130,6 +134,9 @@ impl StyleTransferName {
         Self::Dragonball => "dragonball",
         Self::RealisticMatrix => "realistic_matrix",
         Self::RealisticCyberpunk => "realistic_cyberpunk",
+
+        // New Styles (2024-06-27)
+        Self::Dreamer => "dreamer",
     }
   }
 
@@ -169,6 +176,7 @@ impl StyleTransferName {
       "dragonball" => Ok(Self::Dragonball),
       "realistic_matrix" => Ok(Self::RealisticMatrix),
       "realistic_cyberpunk" => Ok(Self::RealisticCyberpunk),
+      "dreamer" => Ok(Self::Dreamer),
       _ => Err(format!("Unknown StyleTransferName: {}", value)),
     }
   }
@@ -209,6 +217,7 @@ impl StyleTransferName {
       Self::Dragonball => "31_dragonball.json",
       Self::RealisticMatrix => "32_realistic_matrix.json",
       Self::RealisticCyberpunk => "33_realistic_cyberpunk.json",
+      Self::Dreamer => "34_dreamer.json",
     }
   }
 
@@ -250,6 +259,8 @@ impl StyleTransferName {
       Self::Dragonball,
       Self::RealisticMatrix,
       Self::RealisticCyberpunk,
+
+      Self::Dreamer,
     ])
   }
 }
@@ -298,6 +309,8 @@ mod tests {
       assert_serialization(StyleTransferName::Dragonball, "dragonball");
       assert_serialization(StyleTransferName::RealisticMatrix, "realistic_matrix");
       assert_serialization(StyleTransferName::RealisticCyberpunk, "realistic_cyberpunk");
+
+      assert_serialization(StyleTransferName::Dreamer, "dreamer");
     }
 
     mod impl_methods {
@@ -339,6 +352,8 @@ mod tests {
         assert_eq!(StyleTransferName::Dragonball.to_str(), "dragonball");
         assert_eq!(StyleTransferName::RealisticMatrix.to_str(), "realistic_matrix");
         assert_eq!(StyleTransferName::RealisticCyberpunk.to_str(), "realistic_cyberpunk");
+
+        assert_eq!(StyleTransferName::Dreamer.to_str(), "dreamer");
       }
 
       #[test]
@@ -378,6 +393,8 @@ mod tests {
         assert_eq!(StyleTransferName::from_str("realistic_matrix").unwrap(), StyleTransferName::RealisticMatrix);
         assert_eq!(StyleTransferName::from_str("realistic_cyberpunk").unwrap(), StyleTransferName::RealisticCyberpunk);
 
+        assert_eq!(StyleTransferName::from_str("dreamer").unwrap(), StyleTransferName::Dreamer);
+
         assert!(StyleTransferName::from_str("foo").is_err());
       }
     }
@@ -388,7 +405,7 @@ mod tests {
       #[test]
       fn all_variants() {
         let variants = StyleTransferName::all_variants();
-        assert_eq!(variants.len(), 33);
+        assert_eq!(variants.len(), 34);
       }
     }
 

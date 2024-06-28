@@ -124,10 +124,10 @@ mod tests {
     fn serialize() {
       let expected = "\"positive\"".to_string(); // NB: Quoted
 
-      assert_eq!(expected, toml::to_string(&UserRatingValue::Positive).unwrap());
+      assert_eq!(expected, serde_json::to_string(&UserRatingValue::Positive).unwrap());
 
       // Just to show this serializes the same as a string
-      assert_eq!(expected, toml::to_string("positive").unwrap());
+      assert_eq!(expected, serde_json::to_string("positive").unwrap());
     }
 
     #[test]

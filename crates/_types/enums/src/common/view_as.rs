@@ -112,10 +112,10 @@ mod tests {
         fn serialize() {
             let expected = "\"author\"".to_string(); // NB: Quoted
 
-            assert_eq!(expected, toml::to_string(&ViewAs::Author).unwrap());
+            assert_eq!(expected, serde_json::to_string(&ViewAs::Author).unwrap());
 
             // Just to show this serializes the same as a string
-            assert_eq!(expected, toml::to_string("author").unwrap());
+            assert_eq!(expected, serde_json::to_string("author").unwrap());
         }
 
         #[test]
