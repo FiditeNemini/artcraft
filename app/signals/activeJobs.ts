@@ -1,4 +1,5 @@
 import { signal, computed } from "@preact/signals-core";
+import deepEqual from "deep-equal";
 
 import { JobStatus, JobType } from "~/enums";
 import { PollRecentJobs } from "~/hooks/useActiveJobs/utilities";
@@ -7,7 +8,10 @@ import { isJobStatusTerminal } from "~/utilities";
 
 export const recentJobs = signal<Job[] | undefined>(undefined);
 export const setJobs = (newJobList: Job[]) => {
-  recentJobs.value = [...newJobList];
+  if (!deepEqual(setJobs, newJobList)) {
+    recentJobs.value = [...newJobList];
+  }
+  //else, same list, do nothing.
 };
 
 export const activeJobs = computed(() => {
@@ -47,6 +51,27 @@ export const completedJobs = computed(() => {
   }
   return recentJobs.value.filter((job) => {
     return job.status.status === JobStatus.COMPLETE_SUCCESS;
+  });
+});
+
+export const completedWorkflowJobs = computed(() => {
+  if (!completedJobs.value) {
+    return undefined;
+  }
+  return completedJobs.value.filter((job) => {
+    return job.request.inference_category === JobType.VideoStyleTransfer;
+  });
+});
+
+export const completedAudioJobs = computed(() => {
+  if (!completedJobs.value) {
+    return undefined;
+  }
+  return completedJobs.value.filter((job) => {
+    return (
+      job.request.inference_category === JobType.TextToSpeech ||
+      job.request.inference_category === JobType.VoiceConversion
+    );
   });
 });
 

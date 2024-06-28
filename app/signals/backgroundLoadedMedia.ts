@@ -2,17 +2,15 @@ import { signal } from "@preact/signals-core";
 import { AssetType } from "~/enums";
 import { MediaInfo } from "~/pages/PageEnigma/models/movies";
 import { AudioMediaItem } from "~/pages/PageEnigma/models";
+import deepEqual from "deep-equal";
 
 // Signal for background loading User's Movies
 export const userMovies = signal<MediaInfo[] | undefined>(undefined);
+export const isRetreivingUserMovies = signal<boolean>(false);
 
 export const setUserMovies = (newSet: MediaInfo[]) => {
-  const userMoviesTokens = (userMovies.value || []).map((movie) => movie.token);
-  const newSetTokens = newSet.map((newSetMovie) => newSetMovie.token);
-  const isSameTokens =
-    userMoviesTokens.length === newSetTokens.length &&
-    newSetTokens.every((token) => userMoviesTokens.includes(token));
-  if (!isSameTokens) {
+  if (!deepEqual(userMovies.value, newSet)) {
+    console.log("set movies");
     userMovies.value = newSet;
   }
   //else do nothing cos it's the same list;

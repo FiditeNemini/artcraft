@@ -1,55 +1,51 @@
+import { useRef } from "react";
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { PollUserMovies, PollUserAudioItems } from "./utilities";
 
-import { completedJobs, userMovies, userAudioItems } from "~/signals";
+import {
+  completedAudioJobs,
+  completedWorkflowJobs,
+  userMovies,
+  userAudioItems,
+  addToast,
+} from "~/signals";
 
-import { JobType } from "~/enums";
+import { JobType, ToastTypes } from "~/enums";
+import { Job } from "~/models";
+import deepEqual from "deep-equal";
 
 export const useBackgroundLoadingMedia = () => {
+  const lastCompletedWorkflow = useRef<Job[] | undefined>(undefined);
+  const lastCompletedAudioJobs = useRef<Job[] | undefined>(undefined);
+
   useSignals();
 
   useSignalEffect(() => {
     //CASE 1: first load
     // if myMovies undefined, poll for the first time
     if (!userMovies.value) {
-      userMovies.value = [];
       PollUserMovies();
       return;
     }
 
     //CASE 2: pull after jobs completion
-    if (!completedJobs.value || completedJobs.value.length === 0) {
-      return; // nothing to do if there's no complete jobs
+    if (!completedWorkflowJobs.value) {
+      return; // nothing to do if jobs is not initiated
     }
-
-    const workflowJobsTokens = completedJobs.value
-      .filter((job) => {
-        if (
-          job.request.inference_category === JobType.VideoStyleTransfer &&
-          job.maybe_result.entity_token
-        ) {
-          return true;
-        }
-        return false;
-      })
-      .map((job) => job.maybe_result.entity_token);
-
-    if (workflowJobsTokens.length === 0) {
-      //nothing to do if no complete jobs has workflows, which create videos
+    if (!lastCompletedWorkflow.current) {
+      lastCompletedWorkflow.current = completedWorkflowJobs.value;
+      return; // set first pull of jobs, no need to poll again yet
+    }
+    if (
+      completedWorkflowJobs.value.length === 0 ||
+      deepEqual(lastCompletedWorkflow.current, completedWorkflowJobs.value)
+    ) {
       return;
-    }
+    } // if no jobs; or if already poll for these completed job, do not poll again
 
-    const userMoviesTokens = userMovies.value.map((movie) => movie.token);
-    const isEveryTokenIncludedInPolled = workflowJobsTokens.every((token) =>
-      userMoviesTokens.includes(token),
-    );
-    if (!isEveryTokenIncludedInPolled) {
-      //there are videos newly completed, poll
-      PollUserMovies();
-      return;
-    }
-
-    //else, no new movies, no need to poll;
+    //there are videos newly completed, set and poll
+    lastCompletedWorkflow.current = completedWorkflowJobs.value;
+    PollUserMovies();
   });
 
   useSignalEffect(() => {
@@ -61,39 +57,21 @@ export const useBackgroundLoadingMedia = () => {
     }
 
     //CASE 2: pull after jobs completion
-    if (!completedJobs.value || completedJobs.value.length === 0) {
-      return; // nothing to do if there's no complete jobs
-    }
-
-    const audioJobsTokens = completedJobs.value
-      .filter((job) => {
-        if (
-          (job.request.inference_category === JobType.TextToSpeech ||
-            job.request.inference_category === JobType.VoiceConversion) &&
-          job.maybe_result.entity_token
-        ) {
-          return true;
-        }
-        return false;
-      })
-      .map((job) => job.maybe_result.entity_token);
-
-    if (audioJobsTokens.length === 0) {
-      //nothing to do if no complete jobs involves audio
+    if (!completedAudioJobs.value) {
       return;
-    }
-
-    const userAudioItemsTokens = userAudioItems.value.map(
-      (audio) => audio.media_id,
-    );
-    const isEveryTokenIncludedInPolled = audioJobsTokens.every((token) =>
-      userAudioItemsTokens.includes(token),
-    );
-    if (!isEveryTokenIncludedInPolled) {
-      //there are videos newly completed, poll
-      PollUserAudioItems();
+    } // nothing to do if jobs is not initiated
+    if (!lastCompletedAudioJobs.current) {
+      lastCompletedAudioJobs.current = completedAudioJobs.value;
+    } // set first pull of jobs, no need to poll again yet
+    if (
+      completedAudioJobs.value.length === 0 ||
+      deepEqual(lastCompletedAudioJobs.current, completedAudioJobs.value)
+    ) {
       return;
-    }
-    //else, no new movies, no need to poll;
+    } // if no jobs; or if already poll for these completed job, do not poll again
+
+    //there are audio jobs newly completed, set and poll
+    lastCompletedAudioJobs.current = completedAudioJobs.value;
+    PollUserAudioItems();
   });
 };

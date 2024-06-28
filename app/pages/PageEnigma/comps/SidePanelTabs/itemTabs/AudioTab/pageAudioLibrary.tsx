@@ -27,11 +27,9 @@ export const PageAudioLibrary = ({
 }) => {
   useSignals();
 
-  const [selectedFilter, setSelectedFilter] = useState(
-    AssetFilterOption.FEATURED,
-  );
+  const [selectedFilter, setSelectedFilter] = useState(AssetFilterOption.MINE);
   const filteredAudioItems =
-    selectedFilter === AssetFilterOption.MINE
+    selectedFilter === AssetFilterOption.FEATURED
       ? audioItems.value ?? []
       : userAudioItems.value ?? [];
   const [currentPage, setCurrentPage] = useState<number>(0);
