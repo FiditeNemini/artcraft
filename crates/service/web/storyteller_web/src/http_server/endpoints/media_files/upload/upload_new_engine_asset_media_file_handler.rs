@@ -24,6 +24,7 @@ use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
@@ -171,8 +172,103 @@ pub async fn upload_new_engine_asset_media_file_handler(
         MediaFileUploadError::BadInput("invalid idempotency token".to_string())
       })?;
 
-  // ==================== UPLOAD METADATA ==================== //
+  // ==================== USER DATA ==================== //
 
+  let ip_address = get_request_ip(&http_request);
+
+  let maybe_user_token = maybe_user_session
+      .as_ref()
+      .map(|session| session.get_strongly_typed_user_token());
+
+  // ==================== FILE DATA ==================== //
+
+  let file_info = validate_and_process_form(maybe_user_session.as_ref(), form)?;
+
+  // ==================== UPLOAD AND SAVE ==================== //
+
+  const PREFIX : Option<&str> = Some("asset_");
+
+  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(file_info.file_name_suffix));
+
+  info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
+
+  server_state.public_bucket_client.upload_file_with_content_type(
+    public_upload_path.get_full_object_path_str(),
+    file_info.file_bytes.as_ref(),
+    file_info.mimetype)
+      .await
+      .map_err(|e| {
+        warn!("Upload media bytes to bucket error: {:?}", e);
+        MediaFileUploadError::ServerError
+      })?;
+
+  // TODO(bt, 2024-02-22): This should be a transaction.
+  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
+    maybe_media_class: Some(file_info.media_class),
+    media_file_type: file_info.media_type,
+    maybe_creator_user_token: maybe_user_token.as_ref(),
+    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
+    creator_ip_address: &ip_address,
+    creator_set_visibility: file_info.creator_set_visibility,
+    upload_type: UploadType::Filesystem,
+    maybe_engine_category: Some(file_info.engine_category),
+    maybe_animation_type: file_info.maybe_animation_type,
+    maybe_mime_type: Some(file_info.mimetype),
+    file_size_bytes: file_info.file_size_bytes as u64,
+    maybe_duration_millis: file_info.maybe_duration_millis,
+    sha256_checksum: &file_info.sha256_checksum,
+    maybe_scene_source_media_file_token: None,
+    is_intermediate_system_file: false,
+    maybe_title: file_info.maybe_title.as_deref(),
+    public_bucket_directory_hash: public_upload_path.get_object_hash(),
+    maybe_public_bucket_prefix: PREFIX,
+    maybe_public_bucket_extension: Some(file_info.file_name_suffix),
+    pool: &server_state.mysql_pool,
+  })
+      .await
+      .map_err(|err| {
+        warn!("New file creation DB error: {:?}", err);
+        MediaFileUploadError::ServerError
+      })?;
+
+  info!("new media file id: {} token: {:?}", record_id, &token);
+
+  let response = UploadNewEngineAssetSuccessResponse {
+    success: true,
+    media_file_token: token,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| MediaFileUploadError::ServerError)?;
+
+  return Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body));
+}
+
+
+struct FileInfo {
+  // System metadata
+  media_class: MediaFileClass,
+  media_type: MediaFileType,
+  engine_category: MediaFileEngineCategory,
+  maybe_title: Option<String>,
+  creator_set_visibility: Visibility,
+  maybe_animation_type: Option<MediaFileAnimationType>,
+
+  // File data
+  file_bytes: Vec<u8>,
+  file_size_bytes: usize,
+  mimetype: &'static str,
+  file_name_suffix: &'static str,
+  sha256_checksum: String,
+  maybe_duration_millis: Option<u64>,
+}
+
+fn validate_and_process_form(
+  maybe_user_session: Option<&SessionUserRecord>,
+  mut form: UploadNewEngineAssetFileForm,
+) -> Result<FileInfo, MediaFileUploadError> {
   let engine_category = form.engine_category.0;
 
   let maybe_duration_millis = form.maybe_duration_millis
@@ -199,15 +295,6 @@ pub async fn upload_new_engine_asset_media_file_handler(
       })
       .unwrap_or(Visibility::default());
 
-  // ==================== USER DATA ==================== //
-
-  let ip_address = get_request_ip(&http_request);
-
-  let maybe_user_token = maybe_user_session
-      .map(|session| session.get_strongly_typed_user_token());
-
-  // ==================== FILE DATA ==================== //
-
   let maybe_filename = form.file.file_name.as_deref()
       .as_deref()
       .map(|filename| PathBuf::from(filename));
@@ -226,7 +313,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
 
   let file_size_bytes = file_bytes.len();
 
-  let hash = sha256_hash_bytes(&file_bytes)
+  let sha256_checksum = sha256_hash_bytes(&file_bytes)
       .map_err(|io_error| {
         error!("Problem hashing bytes: {:?}", io_error);
         MediaFileUploadError::ServerError
@@ -254,7 +341,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
     _ => {} // Allowed
   }
 
-  let (suffix, media_file_type, mimetype) = match maybe_file_extension {
+  let (file_name_suffix, media_type, mimetype) = match maybe_file_extension {
     None => {
       return Err(MediaFileUploadError::BadInput("no file extension".to_string()));
     }
@@ -276,69 +363,23 @@ pub async fn upload_new_engine_asset_media_file_handler(
     }
   };
 
-  let media_class = match media_file_type {
+  let media_class = match media_type {
     MediaFileType::Jpg | MediaFileType::Png | MediaFileType::Gif => MediaFileClass::Image,
     _ => MediaFileClass::Dimensional,
   };
 
-  // ==================== UPLOAD AND SAVE ==================== //
-
-  const PREFIX : Option<&str> = Some("asset_");
-
-  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(suffix));
-
-  info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
-
-  server_state.public_bucket_client.upload_file_with_content_type(
-    public_upload_path.get_full_object_path_str(),
-    file_bytes.as_ref(),
-    mimetype)
-      .await
-      .map_err(|e| {
-        warn!("Upload media bytes to bucket error: {:?}", e);
-        MediaFileUploadError::ServerError
-      })?;
-
-  // TODO(bt, 2024-02-22): This should be a transaction.
-  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: Some(media_class),
-    media_file_type,
-    maybe_creator_user_token: maybe_user_token.as_ref(),
-    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
-    creator_ip_address: &ip_address,
+  Ok(FileInfo {
+    media_class,
+    media_type,
+    engine_category,
+    maybe_title,
     creator_set_visibility,
-    upload_type: UploadType::Filesystem,
-    maybe_engine_category: Some(engine_category),
     maybe_animation_type,
-    maybe_mime_type: Some(mimetype),
-    file_size_bytes: file_size_bytes as u64,
+    file_bytes,
+    file_size_bytes,
+    mimetype,
+    file_name_suffix,
+    sha256_checksum,
     maybe_duration_millis,
-    sha256_checksum: &hash,
-    maybe_scene_source_media_file_token: None,
-    is_intermediate_system_file: false,
-    maybe_title: maybe_title.as_deref(),
-    public_bucket_directory_hash: public_upload_path.get_object_hash(),
-    maybe_public_bucket_prefix: PREFIX,
-    maybe_public_bucket_extension: Some(suffix),
-    pool: &server_state.mysql_pool,
   })
-      .await
-      .map_err(|err| {
-        warn!("New file creation DB error: {:?}", err);
-        MediaFileUploadError::ServerError
-      })?;
-
-  info!("new media file id: {} token: {:?}", record_id, &token);
-
-  let response = UploadNewEngineAssetSuccessResponse {
-    success: true,
-    media_file_token: token,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| MediaFileUploadError::ServerError)?;
-
-  return Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body));
 }
