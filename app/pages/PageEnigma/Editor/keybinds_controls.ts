@@ -12,6 +12,7 @@ import {
 } from "three/examples/jsm/Addons.js";
 import { TransformControls } from "./TransformControls";
 import { SceneManager, SceneObject } from "./scene_manager_api";
+import { FreeCam } from "./free_cam";
 
 export class MouseControls {
   camera: THREE.PerspectiveCamera | null;
@@ -40,10 +41,12 @@ export class MouseControls {
   setSelected: Function;
   sceneManager: SceneManager | undefined;
   private isProcessing: boolean = false;
+  private cameraViewControls: FreeCam;
 
   constructor(
     camera: THREE.PerspectiveCamera | null,
     camera_person_mode: boolean,
+    cameraViewControls: FreeCam,
     lockControls: PointerLockControls | undefined,
     camera_last_pos: THREE.Vector3,
     selectedCanvas: boolean,
@@ -67,6 +70,7 @@ export class MouseControls {
   ) {
     this.camera = camera;
     this.camera_person_mode = camera_person_mode;
+    this.cameraViewControls = cameraViewControls;
     this.lockControls = lockControls;
     this.camera_last_pos = camera_last_pos;
     this.selected = [];
@@ -208,6 +212,12 @@ export class MouseControls {
         this.isProcessing = false;
         return;
       }
+    }
+    
+    if (event.shiftKey) {
+      this.cameraViewControls.movementSpeed = 4;
+    } else {
+      this.cameraViewControls.movementSpeed = 1.15;
     }
   }
 

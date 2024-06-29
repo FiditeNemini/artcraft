@@ -55,25 +55,38 @@ export const Help = () => {
     <div className="mt-8 grid select-none grid-cols-2 gap-12 ps-4">
       <div className="flex flex-col gap-8">
         <ShortcutsGroup label="Navigation">
-          <Shortcut label="Pan View">
-            <Mouse button="right" label="(Drag)" />
+          {/* <Shortcut label="Forward">
+            <Key button="w" label="Forward" />
           </Shortcut>
           <Shortcut label="Rotate View">
             <Mouse button="left" label="(Drag)" />
           </Shortcut>
           <Shortcut label="Zoom">
             <Mouse button="middle" label="(Scroll)" />
-          </Shortcut>
-          {/* <Shortcut label="Free Fly">
+          </Shortcut> */}
+          <Shortcut label="Forward Backward">
             <KeyGroup>
               <Key button="W" />
-              <Key button="A" />
               <Key button="S" />
-              <Key button="D" />
-              <Key button="Q" />
-              <Key button="E" />
             </KeyGroup>
-          </Shortcut> */}
+          </Shortcut>
+          <Shortcut label="Left Right">
+            <KeyGroup>
+              <Key button="A" />
+              <Key button="D" />
+            </KeyGroup>
+          </Shortcut>
+          <Shortcut label="Up Down">
+            <KeyGroup>
+              <Key button="E" />
+              <Key button="Q" />
+            </KeyGroup>
+          </Shortcut>
+          <Shortcut label="Speed Boost">
+            <KeyGroup>
+              <Key button="Shift" />
+            </KeyGroup>
+          </Shortcut>
         </ShortcutsGroup>
 
         <ShortcutsGroup label="Shortcuts">

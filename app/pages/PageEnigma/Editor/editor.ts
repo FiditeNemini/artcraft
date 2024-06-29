@@ -483,6 +483,7 @@ class Editor {
     this.mouse_controls = new MouseControls(
       this.camera,
       this.get_camera_person_mode.bind(this),
+      this.cameraViewControls,
       this.lockControls,
       this.camera_last_pos,
       this.selectedCanvas,
@@ -541,6 +542,7 @@ class Editor {
           this.cameraViewControls.enabled = true;
           this.selectedCanvas = true;
         } else {
+          this.cameraViewControls.reset();
           this.cameraViewControls.enabled = false;
           this.selectedCanvas = false;
         }
