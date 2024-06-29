@@ -126,7 +126,7 @@ export class SceneManager implements SceneManagerAPI {
         this.version,
       );
     } else {
-      return await this.scene.instantiate(name, position);
+      return this.scene.instantiate(name, position);
     }
   }
 

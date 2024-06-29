@@ -49,7 +49,7 @@ export class StoryTellerProxyScene {
     proxyObject3D.locked = child.userData["locked"];
     proxyObject3D.visible = child.visible;
     const json_data = await proxyObject3D.toJSON();
-    return json_data
+    return json_data;
   }
 
   public async saveToSceneOlder(): Promise<any> {
@@ -89,16 +89,16 @@ export class StoryTellerProxyScene {
 
   public async saveToScene(version: number): Promise<any> {
     this.version = version;
-    console.log("Saving with version:", this.version)
+    console.log("Saving with version:", this.version);
     const results: ObjectJSON[] = [];
     if (this.scene.scene != null) {
       for (let pchild of this.scene.scene.children) {
-        if(this.version >= 1.0){
+        if (this.version >= 1.0) {
           if (pchild.userData["media_id"] != undefined) {
             results.push(await this.getChildren(pchild));
           }
         } else {
-          console.log("Saving older.")
+          console.log("Saving older.");
           return this.saveToSceneOlder();
         }
       }
@@ -119,7 +119,7 @@ export class StoryTellerProxyScene {
         let obj;
         switch (token) {
           case "Parim":
-            let prim_uuid = this.scene.instantiate(
+            const prim_uuid = this.scene.instantiate(
               json_object.object_name,
             ).uuid;
             obj = this.scene.get_object_by_uuid(prim_uuid);
@@ -134,16 +134,21 @@ export class StoryTellerProxyScene {
                 json_object.object_name,
                 true,
                 new THREE.Vector3(-0.5, 1.5, 0),
-                version
+                version,
               );
             } else if (token.includes("Point::")) {
-              let keyframe_uuid = token.replace("Point::", "");
+              const keyframe_uuid = token.replace("Point::", "");
               obj = this.scene.createPoint(
                 new THREE.Vector3(0, 0, 0),
                 new THREE.Vector3(0, 0, 0),
                 new THREE.Vector3(0, 0, 0),
                 keyframe_uuid,
               );
+            } else if (token.includes("Image::")) {
+              const prim_uuid = this.scene.instantiate(
+                token,
+              ).uuid;
+              obj = this.scene.get_object_by_uuid(prim_uuid);
             }
             break;
         }
@@ -167,8 +172,8 @@ export class StoryTellerProxyScene {
           obj.userData["shininess"] = json_object.shininess;
           obj.userData["specular"] = json_object.specular;
 
-          if(json_object.visible !== undefined){
-            this.scene.setVisible(obj.uuid, json_object.visible)
+          if (json_object.visible !== undefined) {
+            this.scene.setVisible(obj.uuid, json_object.visible);
           }
           this.scene.setColor(obj.uuid, json_object.color);
         }

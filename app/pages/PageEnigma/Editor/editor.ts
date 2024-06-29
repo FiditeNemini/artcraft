@@ -756,7 +756,7 @@ class Editor {
     }
   }
 
-  create_parim(name: string, pos: THREE.Vector3) {
+  async create_parim(name: string, pos: THREE.Vector3) {
     return this.activeScene.instantiate(name, pos);
   }
 

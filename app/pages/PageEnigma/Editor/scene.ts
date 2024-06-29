@@ -27,6 +27,7 @@ class Scene {
   // loading indicator manager
   placeholder_manager: LoadingPlaceHolderManager | undefined;
 
+
   constructor(name: string, camera_name: string) {
     this.name = name;
     this.gridHelper;
@@ -61,7 +62,10 @@ class Scene {
     this._create_camera_obj();
   }
 
-  instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
+  instantiate(
+    name: string,
+    pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
+  ) {
     const material = new THREE.MeshPhongMaterial({ color: 0xdacbce });
     material.shininess = 0.0;
     let geometry;
@@ -76,41 +80,55 @@ class Scene {
     } else if (name == "Donut") {
       geometry = new THREE.TorusGeometry(0.5, 0.25, 8, 24);
     } else if (name == "Water") {
-      geometry = new THREE.PlaneGeometry( 100, 100 );
+      geometry = new THREE.PlaneGeometry(100, 100);
+    } else if (name.includes("Image::")) {
+      geometry = new THREE.PlaneGeometry(1, 1);
     }
 
     let obj;
     if (name == "Water" && geometry) {
-      obj = new Water(
-        geometry,
-        {
-          textureWidth: 1024,
-          textureHeight: 1024,
-          waterNormals: new THREE.TextureLoader().load( 'https://threejs.org/examples/textures/waternormals.jpg', function ( texture ) {
-
+      obj = new Water(geometry, {
+        textureWidth: 1024,
+        textureHeight: 1024,
+        waterNormals: new THREE.TextureLoader().load(
+          "https://threejs.org/examples/textures/waternormals.jpg",
+          function (texture) {
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-
-          } ),
-          sunDirection: new THREE.Vector3(),
-          sunColor: 0xffffff,
-          waterColor: 0x00D8FF,
-          distortionScale: 0.3,
-          fog: this.scene.fog !== undefined,
-        }
-      );
+          },
+        ),
+        sunDirection: new THREE.Vector3(),
+        sunColor: 0xffffff,
+        waterColor: 0x00d8ff,
+        distortionScale: 0.3,
+        fog: this.scene.fog !== undefined,
+      });
       obj.material.uniforms.size.value = 4.1;
-      obj.rotation.x = - Math.PI / 2;
+      obj.rotation.x = -Math.PI / 2;
       obj.userData["water"] = true;
-      obj.userData["color"] = new THREE.Color(0x00D8FF).getHex();
-      obj.userData["base"] = new THREE.Color(0x00D8FF).getHex();
-
+      obj.userData["color"] = new THREE.Color(0x00d8ff).getHex();
+      obj.userData["base"] = new THREE.Color(0x00d8ff).getHex();
       this.shader_objects.push(obj);
-    } else{
+      obj.userData["media_id"] = "Parim";
+    } 
+    else if (name.includes("Image::")) {
+      const image_token = name.replace("Image::", "");
+      const loader = new THREE.TextureLoader();
+      const texture = loader.load(image_token);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const image_material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        map: texture,
+        transparent: true
+      });
+      obj = new THREE.Mesh(geometry, image_material);
+      obj.userData["media_id"] = name;
+    } 
+    else {
       obj = new THREE.Mesh(geometry, material);
+      obj.userData["media_id"] = "Parim";
     }
     obj.receiveShadow = true;
     obj.castShadow = true;
-    obj.userData["media_id"] = "Parim";
     //obj.type = "Object3D";
     obj.name = name;
     obj.position.copy(pos);
@@ -312,14 +330,13 @@ class Scene {
       object.userData["color"] = hex_color;
       object.traverse((c: THREE.Object3D) => {
         if (c instanceof THREE.Mesh) {
-          if(c.userData["water"] ) {
+          if (c.userData["water"]) {
             c.material.uniforms.waterColor.value = new THREE.Color(hex_color);
-          }
-          else if (c.material.color !== undefined) {
+          } else if (c.material.color !== undefined) {
             if (c.userData["base"] === undefined) {
               c.userData["base"] = c.material.color.getHex();
             }
-            if (c.material.map === undefined  || c.material.map === null) {
+            if (c.material.map === undefined || c.material.map === null) {
               const currentColor = new THREE.Color(c.userData["base"]);
               const tint = new THREE.Color(hex_color);
               currentColor.multiply(tint);
@@ -407,6 +424,14 @@ class Scene {
         auto_add,
         position,
       );
+    }
+    else if (
+      url.includes(".png") ||
+      url.includes(".jpg") ||
+      url.includes(".jpeg") ||
+      url.includes(".gif")
+    ) {
+      return this.instantiate("Image::"+url);
     }
     return await this.loadGlbWithPlaceholder(
       media_id,

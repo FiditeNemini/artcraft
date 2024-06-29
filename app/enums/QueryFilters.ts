@@ -17,4 +17,5 @@ export enum FilterEngineCategories {
   EXPRESSION = "expression",
   OBJECT = "object",
   SCENE = "scene",
+  IMAGE_PLANE = "image_plane"
 }

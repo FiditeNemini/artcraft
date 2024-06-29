@@ -184,28 +184,30 @@ export function UploadModal({
               renderer.render(scene, camera);
             },
           );
-
-          // Cant load MMD due to threejs loader expecting ending extention.
-          // const mmdLoader = new MMDLoader();
-          // const url = URL.createObjectURL(file);
-          // console.log(url)
-          // mmdLoader.load(
-          //   url,
-          //   (mesh: THREE.SkinnedMesh) => {
-          //     console.log("Loaded mesh")
-          //     mesh.scale.set(0.1,0.1,0.1);
-          //     console.log(mesh);
-          //     scene.add(mesh);
-          //   },
-          //   (xhr) => {
-          //     console.log(xhr)
-          //   },
-          //   (error) => {
-          //     console.log(error)
-          //   },
-          // );
+        } else if (
+          file.name.includes(".png") ||
+          file.name.includes(".jpg") ||
+          file.name.includes(".jpeg") ||
+          file.name.includes(".gif")
+        ) {
+          const geometry = new THREE.PlaneGeometry( 1, 1 );
+          const loader = new THREE.TextureLoader();
+          const texture = loader.load(URL.createObjectURL(file));
+          texture.colorSpace = THREE.SRGBColorSpace;
+          console.log(texture)
+          const image_material = new THREE.MeshBasicMaterial({
+            color: 0xFFFFFF,
+            map: texture,
+          });
+          const obj = new THREE.Mesh(geometry, image_material);
+          obj.receiveShadow = true;
+          obj.castShadow = true;
+          scene.add(obj);
         }
-        renderer.render(scene, camera);
+        const animate = function() {
+          renderer.render( scene, camera );
+        }
+        renderer.setAnimationLoop( animate );
       }
     }
   }, [file, targetNode, resetModal, resetModalState]);
@@ -271,17 +273,31 @@ export function UploadModal({
     const mediaUploadApi = new MediaUploadApi();
     const fileExtension = getFileExtension(file);
     console.log(fileExtension);
-    const assetReponse =
-      fileExtension === ".zip"
-        ? await mediaUploadApi.UploadPmx({
+    const assetReponse = await (async () => {
+      switch (fileExtension) {
+        case ".zip":
+          return mediaUploadApi.UploadPmx({
             file: file,
             fileName: file.name,
             engine_category: FilterEngineCategories.CHARACTER,
             maybe_title: title,
             maybe_animation_type: animationType,
             uuid: uuidv4(),
-          })
-        : await mediaUploadApi.UploadNewEngineAsset({
+          });
+        case ".png":
+        case ".gif":
+        case ".jpg":
+        case ".jpeg":
+          return mediaUploadApi.UploadNewEngineAsset({
+            file: file,
+            fileName: file.name,
+            engine_category: FilterEngineCategories.IMAGE_PLANE,
+            maybe_animation_type: animationType,
+            maybe_title: title,
+            uuid: uuidv4(),
+          });
+        default:
+          return mediaUploadApi.UploadNewEngineAsset({
             file: file,
             fileName: file.name,
             engine_category: isCharacter
@@ -291,6 +307,9 @@ export function UploadModal({
             maybe_title: title,
             uuid: uuidv4(),
           });
+      }
+    })();
+    
 
     if (!assetReponse.success || !assetReponse.data) {
       objUploadStatusSet(UploaderState.assetError);

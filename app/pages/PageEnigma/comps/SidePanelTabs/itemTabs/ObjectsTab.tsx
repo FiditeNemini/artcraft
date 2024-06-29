@@ -86,7 +86,7 @@ export const ObjectsTab = () => {
     const mediaFilesApi = new MediaFilesApi();
     const response = await mediaFilesApi.ListUserMediaFiles({
       page_size: 100,
-      filter_engine_categories: [FilterEngineCategories.OBJECT],
+      filter_engine_categories: [FilterEngineCategories.OBJECT, FilterEngineCategories.IMAGE_PLANE],
     });
 
     if (response.success && response.data) {
