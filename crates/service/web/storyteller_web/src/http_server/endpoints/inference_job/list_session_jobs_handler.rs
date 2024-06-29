@@ -34,9 +34,6 @@ use crate::server_state::ServerState;
 /// typically do not require keepalive.
 const JOB_KEEPALIVE_TTL_SECONDS : usize = 60 * 3;
 
-/// For successful jobs over an hour, don't show more than a certain number of jobs
-const SUCCESSFUL_JOBS_DURATION_THRESHOLD : Duration = Duration::milliseconds(1000 * 60 * 60);
-
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListSessionJobsQueryParams {
   //pub sort_ascending: Option<bool>,
@@ -284,27 +281,13 @@ fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<HttpRe
   // NB: Having a lot of "success" entries that haven't been cleared can make the list
   // long, so we can downsample.
   let mut success_count = 0;
-  let now = Utc::now();
 
   records.retain(|record| {
     if record.status.status != JobStatusPlus::CompleteSuccess {
       return true;
     }
-
     success_count += 1;
-    if success_count <= 5 {
-      return true;
-    }
-
-    let should_skip = record.maybe_result
-        .as_ref()
-        .map(|result| result.maybe_successfully_completed_at)
-        .flatten()
-        .map(|completed_at| completed_at.signed_duration_since(now))
-        .map(|duration| duration.gt(&SUCCESSFUL_JOBS_DURATION_THRESHOLD))
-        .unwrap_or(false);
-
-    should_skip
+    success_count <= 3
   });
 
   let response = ListSessionJobsSuccessResponse {
