@@ -25,30 +25,30 @@ pub async fn create_dimensional_media_file_documents(
 
   create_media_file_index(&elasticsearch, DELETE_EXISTING_INDEX).await?;
 
-//  let mut cursor = 0;
-//
-//  loop {
-//    let results = list_model_weights_for_elastic_search_backfill_using_cursor(mysql, PAGE_SIZE, cursor).await?;
-//
-//    if results.is_empty() {
-//      info!("No more results at cursor {cursor}");
-//      break;
-//    }
-//
-//    let maybe_last_id = results.last().map(|result| result.id);
-//
-//    match maybe_last_id {
-//      Some(last_id) => cursor = last_id as u64,
-//      None => {
-//        warn!("No final ID at cursor {cursor}");
-//        break;
-//      }
-//    }
-//
-//    for result in results {
-//      create_document_from_record(elasticsearch, result).await?;
-//    }
-//  }
+  let mut cursor = 0;
+
+  loop {
+    let results = list_model_weights_for_elastic_search_backfill_using_cursor(mysql, PAGE_SIZE, cursor).await?;
+
+    if results.is_empty() {
+      info!("No more results at cursor {cursor}");
+      break;
+    }
+
+    let maybe_last_id = results.last().map(|result| result.id);
+
+    match maybe_last_id {
+      Some(last_id) => cursor = last_id as u64,
+      None => {
+        warn!("No final ID at cursor {cursor}");
+        break;
+      }
+    }
+
+    for result in results {
+      create_document_from_record(elasticsearch, result).await?;
+    }
+  }
 
   Ok(())
 }
