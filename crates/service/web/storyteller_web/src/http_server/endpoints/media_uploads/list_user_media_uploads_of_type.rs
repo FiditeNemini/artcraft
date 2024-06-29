@@ -19,17 +19,20 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 /// For the URL PathInfo
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 #[derive(Deserialize)]
 pub struct ListUserMediaUploadsOfTypeProfilePathInfo {
   media_type: MediaUploadType,
 }
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 #[derive(Serialize)]
 pub struct ListUserMediaUploadsOfTypeSuccessResponse {
   pub success: bool,
   pub uploads: Vec<MediaUploadEntry>,
 }
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 #[derive(Serialize)]
 pub struct MediaUploadEntry {
   pub token: MediaUploadToken,
@@ -46,6 +49,7 @@ pub struct MediaUploadEntry {
   pub updated_at: DateTime<Utc>,
 }
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 #[derive(Debug)]
 pub enum ListUserMediaUploadsOfTypeError {
   ServerError,
@@ -77,6 +81,7 @@ impl fmt::Display for ListUserMediaUploadsOfTypeError {
   }
 }
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 pub async fn list_user_media_uploads_of_type_handler(
   http_request: HttpRequest,
   path: Path<ListUserMediaUploadsOfTypeProfilePathInfo>,

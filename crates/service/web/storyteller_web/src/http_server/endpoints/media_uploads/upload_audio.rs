@@ -11,12 +11,14 @@ use crate::http_server::endpoints::media_uploads::common::handle_upload::handle_
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
 use crate::server_state::ServerState;
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 #[derive(Serialize)]
 pub struct UploadAudioSuccessResponse {
   pub success: bool,
   pub upload_token: MediaUploadToken,
 }
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   HashSet::from([
     "audio/aac",
@@ -38,6 +40,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   ])
 });
 
+#[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 pub async fn upload_audio_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
