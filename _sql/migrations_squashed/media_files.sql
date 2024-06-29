@@ -109,6 +109,11 @@ CREATE TABLE media_files (
   --   * `glb` for GLB files
   --   * `gltf` for GLTF files
   --   * `scene_ron` for SCN.RON files
+  --   * `scene_json` for scene files for three.js
+  --   * `pmd`
+  --   * `vmd`
+  --   * `pmx`
+  --   * `csv`
   media_type VARCHAR(16) NOT NULL,
 
   -- Broad class of media:
@@ -117,16 +122,15 @@ CREATE TABLE media_files (
   --   * 'audio' for wav, mp3, etc.
   --   * 'image' for a variety of video types.
   --   * 'video' for a variety of video types.
-  --   * 'animation' for animations (engine)
-  --   * 'character' for characters (engine)
-  --   * 'prop' for props (engine)
-  --   * 'scene' for scenes (engine; internal and external scenes)
+  --   * 'dimensional' for a variety of 3d types
   media_class VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- A media file's possible subtype. Typically used for Storyteller Studio.
   --   * 'mixamo' for mixamo animations (eg. for BVH, GLB, FBX, etc. files)
   --   * 'mocap_net' for mocapnet animations (eg. for BVH files)
-  --   * 'scene' for generic scenes (eg. for BVH, GLB, FBX, etc. files)
+  --   * 'scene'
+  --   * 'character'
+  --   * 'animation'
   maybe_media_subtype VARCHAR(32) DEFAULT NULL,
 
   -- The file's mime type.
