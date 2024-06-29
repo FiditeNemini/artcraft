@@ -116,7 +116,8 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Mode
     weights_type: record.weights_type,
     weights_category: record.weights_category,
 
-    title: record.title,
+    title: record.title.to_string(),
+    title_as_keyword: record.title,
 
     maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token,
     maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,

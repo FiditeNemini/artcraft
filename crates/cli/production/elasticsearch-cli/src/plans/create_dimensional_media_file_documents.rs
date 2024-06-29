@@ -45,9 +45,9 @@ pub async fn create_dimensional_media_file_documents(
       }
     }
 
-    for result in results {
-      create_document_from_record(elasticsearch, result).await?;
-    }
+    //for result in results {
+    //  create_document_from_record(elasticsearch, result).await?;
+    //}
   }
 
   Ok(())
