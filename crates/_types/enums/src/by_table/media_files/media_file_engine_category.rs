@@ -32,6 +32,9 @@ pub enum MediaFileEngineCategory {
 
   /// A 3D skybox.
   Skybox,
+
+  /// An Image Plane
+  ImagePlane,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -49,6 +52,7 @@ impl MediaFileEngineCategory {
       Self::Expression => "expression",
       Self::Object => "object",
       Self::Skybox => "skybox",
+      Self::ImagePlane => "image_plane",
     }
   }
 
@@ -60,6 +64,7 @@ impl MediaFileEngineCategory {
       "expression" => Ok(Self::Expression),
       "object" => Ok(Self::Object),
       "skybox" => Ok(Self::Skybox),
+      "image_plane" => Ok(Self::ImagePlane),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -74,6 +79,7 @@ impl MediaFileEngineCategory {
       Self::Expression,
       Self::Object,
       Self::Skybox,
+      Self::ImagePlane,
     ])
   }
 }
@@ -94,6 +100,7 @@ mod tests {
       assert_serialization(MediaFileEngineCategory::Expression, "expression");
       assert_serialization(MediaFileEngineCategory::Object, "object");
       assert_serialization(MediaFileEngineCategory::Skybox, "skybox");
+      assert_serialization(MediaFileEngineCategory::ImagePlane, "image_plane");
     }
 
     #[test]
@@ -104,6 +111,7 @@ mod tests {
       assert_eq!(MediaFileEngineCategory::Expression.to_str(), "expression");
       assert_eq!(MediaFileEngineCategory::Object.to_str(), "object");
       assert_eq!(MediaFileEngineCategory::Skybox.to_str(), "skybox");
+      assert_eq!(MediaFileEngineCategory::ImagePlane.to_str(), "image_plane");
     }
 
     #[test]
@@ -114,19 +122,21 @@ mod tests {
       assert_eq!(MediaFileEngineCategory::from_str("expression").unwrap(), MediaFileEngineCategory::Expression);
       assert_eq!(MediaFileEngineCategory::from_str("object").unwrap(), MediaFileEngineCategory::Object);
       assert_eq!(MediaFileEngineCategory::from_str("skybox").unwrap(), MediaFileEngineCategory::Skybox);
+      assert_eq!(MediaFileEngineCategory::from_str("image_plane").unwrap(), MediaFileEngineCategory::ImagePlane);
       assert!(MediaFileEngineCategory::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileEngineCategory::all_variants();
-      assert_eq!(variants.len(), 6);
+      assert_eq!(variants.len(), 7);
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Scene));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Character));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Animation));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Expression));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Object));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Skybox));
+      assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::ImagePlane));
       assert_eq!(variants.pop_first(), None);
     }
   }

@@ -79,6 +79,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   HashSet::from([
     "image/jpeg",
     "image/png",
+    "image/gif",
     "image/webp",
   ])
 });

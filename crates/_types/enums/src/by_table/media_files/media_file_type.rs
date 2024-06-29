@@ -15,14 +15,17 @@ use utoipa::ToSchema;
 pub enum MediaFileType {
   // TODO(bt): Deprecate and split into audio mime types; use media_class to represent broadly
   /// Audio files: wav, mp3, etc.
+  #[deprecated]
   Audio,
 
   // TODO(bt): Deprecate and split into image mime types; use media_class to represent broadly
   /// Image files: png, jpeg, etc.
+  #[deprecated]
   Image,
 
   // TODO(bt): Deprecate and split into video mime types; use media_class to represent broadly
   /// Video files: mp4, etc.
+  #[deprecated]
   Video,
 
   /// BVH files (for Bevy)
@@ -61,6 +64,15 @@ pub enum MediaFileType {
 
   /// CSV format. (We use these for ArKit)
   Csv,
+
+  /// Jpeg images
+  Jpg,
+
+  /// Png images
+  Png,
+
+  /// Gif images
+  Gif
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -85,6 +97,9 @@ impl MediaFileType {
       Self::Vmd => "vmd",
       Self::Pmx => "pmx",
       Self::Csv => "csv",
+      Self::Jpg => "jpg",
+      Self::Png => "png",
+      Self::Gif => "gif",
     }
   }
 
@@ -103,6 +118,9 @@ impl MediaFileType {
       "vmd" => Ok(Self::Vmd),
       "pmx" => Ok(Self::Pmx),
       "csv" => Ok(Self::Csv),
+      "jpg" => Ok(Self::Jpg),
+      "png" => Ok(Self::Png),
+      "gif" => Ok(Self::Gif),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -124,6 +142,9 @@ impl MediaFileType {
       Self::Vmd,
       Self::Pmx,
       Self::Csv,
+      Self::Jpg,
+      Self::Png,
+      Self::Gif,
     ])
   }
 }
@@ -151,6 +172,9 @@ mod tests {
       assert_serialization(MediaFileType::Vmd, "vmd");
       assert_serialization(MediaFileType::Pmx, "pmx");
       assert_serialization(MediaFileType::Csv, "csv");
+      assert_serialization(MediaFileType::Jpg, "jpg");
+      assert_serialization(MediaFileType::Png, "png");
+      assert_serialization(MediaFileType::Gif, "gif");
     }
   }
 
@@ -172,6 +196,9 @@ mod tests {
       assert_eq!(MediaFileType::Vmd.to_str(), "vmd");
       assert_eq!(MediaFileType::Pmx.to_str(), "pmx");
       assert_eq!(MediaFileType::Csv.to_str(), "csv");
+      assert_eq!(MediaFileType::Jpg.to_str(), "jpg");
+      assert_eq!(MediaFileType::Png.to_str(), "png");
+      assert_eq!(MediaFileType::Gif.to_str(), "gif");
     }
 
     #[test]
@@ -189,6 +216,9 @@ mod tests {
       assert_eq!(MediaFileType::from_str("vmd").unwrap(), MediaFileType::Vmd);
       assert_eq!(MediaFileType::from_str("pmx").unwrap(), MediaFileType::Pmx);
       assert_eq!(MediaFileType::from_str("csv").unwrap(), MediaFileType::Csv);
+      assert_eq!(MediaFileType::from_str("jpg").unwrap(), MediaFileType::Jpg);
+      assert_eq!(MediaFileType::from_str("png").unwrap(), MediaFileType::Png);
+      assert_eq!(MediaFileType::from_str("gif").unwrap(), MediaFileType::Gif);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -199,7 +229,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 13);
+      assert_eq!(variants.len(), 16);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
@@ -213,6 +243,9 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Vmd));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Pmx));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Csv));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Jpg));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Png));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Gif));
       assert_eq!(variants.pop_first(), None);
     }
   }

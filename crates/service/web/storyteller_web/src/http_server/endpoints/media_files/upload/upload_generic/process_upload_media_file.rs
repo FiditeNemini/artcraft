@@ -304,6 +304,9 @@ pub async fn process_upload_media_file(
     MediaFileType::Vmd => MediaFileClass::Dimensional,
     MediaFileType::Csv => MediaFileClass::Dimensional,
     MediaFileType::Pmx => MediaFileClass::Dimensional,
+    MediaFileType::Jpg => MediaFileClass::Image,
+    MediaFileType::Png => MediaFileClass::Image,
+    MediaFileType::Gif => MediaFileClass::Image,
   };
 
   let upload_type = match upload_media_request.media_source {

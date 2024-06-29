@@ -239,6 +239,18 @@ pub async fn upload_new_engine_asset_media_file_handler(
         return Err(MediaFileUploadError::BadInput("CSV files are only allowed for expressions.".to_string()));
       }
     }
+    Some("jpg") | Some("jpeg") | Some("png") | Some("gif") => {
+      if maybe_animation_type.is_some() {
+        return Err(MediaFileUploadError::BadInput("Image files cannot have an animation type.".to_string()));
+      }
+      if maybe_duration_millis.is_some() {
+        return Err(MediaFileUploadError::BadInput("Image files cannot have a duration".to_string()));
+      }
+      let category = form.engine_category.0;
+      if category != MediaFileEngineCategory::ImagePlane {
+        return Err(MediaFileUploadError::BadInput("Image files are only allowed for image_plane.".to_string()));
+      }
+    }
     _ => {} // Allowed
   }
 
@@ -253,10 +265,20 @@ pub async fn upload_new_engine_asset_media_file_handler(
     Some("pmd") => (".pmd", MediaFileType::Pmd, "application/octet-stream"),
     Some("vmd") => (".vmd", MediaFileType::Vmd, "application/octet-stream"),
     Some("csv") => (".csv", MediaFileType::Vmd, "application/octet-stream"),
+    // Images
+    Some("jpg") => (".jpg", MediaFileType::Jpg, "image/jpeg"),
+    Some("png") => (".png", MediaFileType::Png, "image/png"),
+    Some("gif") => (".gif", MediaFileType::Gif, "image/gif"),
     _ => {
       return Err(MediaFileUploadError::BadInput(
-        "unsupported file extension. Must be bvh, glb, gltf, fbx, or csv (for expressions).".to_string()));
+        "unsupported file extension. Must be bvh, glb, gltf, fbx, csv (for expressions), or jpg, png, gif (for image_plane)."
+            .to_string()));
     }
+  };
+
+  let media_class = match media_file_type {
+    MediaFileType::Jpg | MediaFileType::Png | MediaFileType::Gif => MediaFileClass::Image,
+    _ => MediaFileClass::Dimensional,
   };
 
   // ==================== UPLOAD AND SAVE ==================== //
@@ -279,7 +301,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
 
   // TODO(bt, 2024-02-22): This should be a transaction.
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: Some(MediaFileClass::Dimensional),
+    maybe_media_class: Some(media_class),
     media_file_type,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
