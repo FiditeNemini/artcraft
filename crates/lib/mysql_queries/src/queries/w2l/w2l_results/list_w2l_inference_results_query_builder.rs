@@ -6,9 +6,10 @@
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
-use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+
+use crate::config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 
 #[derive(Serialize)]
 pub struct W2lInferenceListPage {

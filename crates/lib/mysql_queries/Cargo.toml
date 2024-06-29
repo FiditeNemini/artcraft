@@ -20,7 +20,6 @@ normal = ["my-workspace-hack"]
 # Internal
 buckets = { path = "../../_types/buckets" }
 composite_identifiers = { path = "../../_types/composite_identifiers" }
-config = { path = "../deprecated/config" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../errors" }
 idempotency = { path = "../idempotency" }

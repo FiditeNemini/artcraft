@@ -69,9 +69,9 @@ mod tests {
   use sqlx::mysql::MySqlPoolOptions;
 
   use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
-  use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
   use tokens::tokens::media_files::MediaFileToken;
 
+  use crate::config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
   use crate::queries::batch_generations::insert_batch_generation_records::{insert_batch_generation_records, InsertBatchArgs};
 
   async fn setup() -> sqlx::Pool<sqlx::MySql> {
