@@ -71,6 +71,7 @@ FROM rust-base AS builder
 COPY Cargo.lock .
 COPY Cargo.toml .
 COPY .sqlx/ .sqlx
+COPY _elasticsearch ./_elasticsearch
 COPY crates/ ./crates
 COPY includes/ ./includes
 COPY test_data/ ./test_data
