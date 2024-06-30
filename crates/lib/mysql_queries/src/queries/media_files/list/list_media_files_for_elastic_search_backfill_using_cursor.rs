@@ -427,7 +427,7 @@ impl FromRow<'_, MySqlRow> for RawRecord {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
     Ok(Self {
       id: row.try_get("id")?,
-      token: MediaFileToken::new(row.try_get("token")?),
+      token: MediaFileToken::try_from_mysql_row(row, "token")?,
 
       origin_category: MediaFileOriginCategory::try_from_mysql_row(row, "origin_category")?,
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
@@ -437,7 +437,7 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       maybe_origin_filename: row.try_get("maybe_origin_filename")?,
 
       is_batch_generated: row.try_get("is_batch_generated")?,
-      maybe_batch_token: row.try_get::<Option<String>, _>("maybe_batch_token")?.map(|token| BatchGenerationToken::new(token)),
+      maybe_batch_token: BatchGenerationToken::try_from_mysql_row_nullable(row, "maybe_batch_token")?,
 
       is_intermediate_system_file: row.try_get("is_intermediate_system_file")?,
 
@@ -469,7 +469,7 @@ impl FromRow<'_, MySqlRow> for RawRecord {
 
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
 
-      maybe_prompt_token: row.try_get::<Option<String>, _>("maybe_prompt_token")?.map(|token| PromptToken::new(token)),
+      maybe_prompt_token: PromptToken::try_from_mysql_row_nullable(row, "maybe_prompt_token")?,
 
       checksum_sha2: row.try_get("checksum_sha2")?,
 
@@ -479,12 +479,12 @@ impl FromRow<'_, MySqlRow> for RawRecord {
 
       extra_file_modification_info: row.try_get("extra_file_modification_info")?,
 
-      maybe_creator_user_token: row.try_get::<Option<String>, _>("maybe_creator_user_token")?.map(|token| UserToken::new(token)),
+      maybe_creator_user_token: UserToken::try_from_mysql_row_nullable(row, "maybe_creator_user_token")?,
       maybe_creator_username: row.try_get("maybe_creator_username")?,
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
       maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
 
-      maybe_creator_anonymous_visitor_token: row.try_get::<Option<String>, _>("maybe_creator_anonymous_visitor_token")?.map(|token| AnonymousVisitorTrackingToken::new(token)),
+      maybe_creator_anonymous_visitor_token: AnonymousVisitorTrackingToken::try_from_mysql_row_nullable(row, "maybe_creator_anonymous_visitor_token")?,
 
       creator_ip_address: row.try_get("creator_ip_address")?,
 
