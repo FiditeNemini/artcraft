@@ -6,6 +6,12 @@
 -- noinspection SqlResolveForFile
 
 -- This table contains both user uploads and inference or processing results.
+--
+-- The fields in media_files that should be filterable are:
+--    * media_class ("audio", "video", "image", "dimensional")
+--    * media_type ("fbx", "glb", "scene_json", "png", "jpg", etc.)
+--    * engine_category ("scene", "character", "animation", "object", "image_plane", etc.)
+--
 CREATE TABLE media_files (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,

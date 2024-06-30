@@ -1,7 +1,10 @@
+use std::collections::HashSet;
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::warn;
-use sqlx::{MySql, MySqlPool};
+use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
+use sqlx::mysql::MySqlRow;
 use sqlx::pool::PoolConnection;
 
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
@@ -14,7 +17,9 @@ use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
+use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::batch_generations::BatchGenerationToken;
@@ -22,6 +27,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
+use tokens::traits::mysql_token_from_row::MySqlTokenFromRow;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -107,16 +113,28 @@ pub struct MediaFileForElasticsearchRecord {
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
-pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
-  mysql_pool: &MySqlPool,
-  page_size: u64,
-  cursor: u64,
-) -> AnyhowResult<Vec<MediaFileForElasticsearchRecord>> {
-  let mut connection = mysql_pool.acquire().await?;
+pub struct ListArgs<'a> {
+  // Filters
+  pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
+  pub maybe_filter_media_classes: Option<&'a HashSet<MediaFileClass>>,
+  pub maybe_filter_engine_categories: Option<&'a HashSet<MediaFileEngineCategory>>,
 
-  let maybe_media_files
-      = list_media_files(&mut connection, page_size, cursor)
-      .await;
+  // Cursors
+  pub page_size: usize,
+  pub cursor: usize,
+
+  // Connection
+  pub mysql_pool: &'a MySqlPool,
+}
+
+pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
+  args: ListArgs<'_>
+) -> AnyhowResult<Vec<MediaFileForElasticsearchRecord>> {
+
+  let mut query = query_builder(&args);
+  let query = query.build_query_as::<RawRecord>();
+
+  let maybe_media_files = query.fetch_all(args.mysql_pool).await;
 
   let media_files : Vec<RawRecord> = match maybe_media_files {
     Ok(media_files) => media_files,
@@ -181,46 +199,42 @@ pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
       .collect::<Vec<MediaFileForElasticsearchRecord>>())
 }
 
-async fn list_media_files(
-  mysql_connection: &mut PoolConnection<MySql>,
-  page_size: u64,
-  cursor: u64,
-) -> Result<Vec<RawRecord>, sqlx::Error> {
-  Ok(sqlx::query_as!(
-      RawRecord,
-        r#"
+fn query_builder<'a>(
+  args: &ListArgs<'a>
+) -> QueryBuilder<'a, MySql> {
+  // NB: Query cannot be statically checked by sqlx
+  let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(r#"
 SELECT
     m.id,
-    m.token as `token: tokens::tokens::media_files::MediaFileToken`,
+    m.token,
 
-    m.origin_category as `origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
-    m.origin_product_category as `origin_product_category: enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory`,
+    m.origin_category,
+    m.origin_product_category,
 
-    m.maybe_origin_model_type as `maybe_origin_model_type: enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType`,
+    m.maybe_origin_model_type,
     m.maybe_origin_model_token,
-
     m.maybe_origin_filename,
 
     m.is_batch_generated,
-    m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
+    m.maybe_batch_token,
 
     m.is_intermediate_system_file,
 
     m.maybe_title,
 
-    cover_image.token as `maybe_cover_image_media_file_token: tokens::tokens::media_files::MediaFileToken`,
+    cover_image.token as maybe_cover_image_media_file_token,
     cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
     cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
     cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
 
-    m.maybe_style_transfer_source_media_file_token as `maybe_style_transfer_source_media_file_token: tokens::tokens::media_files::MediaFileToken`,
-    m.maybe_scene_source_media_file_token as `maybe_scene_source_media_file_token: tokens::tokens::media_files::MediaFileToken`,
+    m.maybe_style_transfer_source_media_file_token,
+    m.maybe_scene_source_media_file_token,
 
     m.nsfw_status,
 
-    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
-    m.media_class as `media_class: enums::by_table::media_files::media_file_class::MediaFileClass`,
-    m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
+    m.media_type,
+    m.media_class,
+    m.maybe_media_subtype,
 
     m.maybe_mime_type,
     m.file_size_bytes,
@@ -229,12 +243,12 @@ SELECT
     m.maybe_audio_encoding,
     m.maybe_video_encoding,
 
-    m.maybe_engine_category as `maybe_engine_category: enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory`,
-    m.maybe_animation_type as `maybe_animation_type: enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType`,
+    m.maybe_engine_category,
+    m.maybe_animation_type,
 
     m.maybe_text_transcript,
 
-    m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
+    m.maybe_prompt_token,
 
     m.checksum_sha2,
 
@@ -244,16 +258,16 @@ SELECT
 
     m.extra_file_modification_info,
 
-    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
-    users.username as `maybe_creator_username`,
-    users.display_name as `maybe_creator_display_name`,
-    users.email_gravatar_hash as `maybe_creator_gravatar_hash`,
+    users.token as maybe_creator_user_token,
+    users.username as maybe_creator_username,
+    users.display_name as maybe_creator_display_name,
+    users.email_gravatar_hash as maybe_creator_gravatar_hash,
 
-    m.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
+    m.maybe_creator_anonymous_visitor_token,
 
     m.creator_ip_address,
 
-    m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+    m.creator_set_visibility,
 
     m.created_at,
     m.updated_at,
@@ -267,17 +281,66 @@ LEFT OUTER JOIN users
 
 LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = m.maybe_cover_image_media_file_token
+    "#);
 
-WHERE
-  m.id > ?
-ORDER BY m.id ASC
-LIMIT ?
-        "#,
-      cursor,
-      page_size
-  )
-      .fetch_all(&mut **mysql_connection)
-      .await?)
+  query_builder.push(" WHERE m.id > ");
+  query_builder.push_bind(format!("{}", args.cursor));
+
+  query_builder.push(" AND NOT m.is_intermediate_system_file ");
+
+  if let Some(media_types) = args.maybe_filter_media_types {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !media_types.is_empty() {
+      query_builder.push(" AND m.media_type IN ( ");
+
+      let mut separated = query_builder.separated(", ");
+
+      for media_type in media_types.iter() {
+        separated.push_bind(media_type.to_str());
+      }
+
+      separated.push_unseparated(") ");
+    }
+  }
+
+  if let Some(media_classes) = args.maybe_filter_media_classes {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !media_classes.is_empty() {
+      query_builder.push(" AND m.media_class IN ( ");
+
+      let mut separated = query_builder.separated(", ");
+
+      for media_class in media_classes.iter() {
+        separated.push_bind(media_class.to_str());
+      }
+
+      separated.push_unseparated(") ");
+    }
+  }
+
+  if let Some(engine_categories) = args.maybe_filter_engine_categories {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !engine_categories.is_empty() {
+      query_builder.push(" AND m.maybe_engine_category IN ( ");
+
+      let mut separated = query_builder.separated(", ");
+
+      for engine_category in engine_categories.iter() {
+        separated.push_bind(engine_category.to_str());
+      }
+
+      separated.push_unseparated(") ");
+    }
+  }
+
+  query_builder.push(" ORDER BY m.id ASC ");
+  query_builder.push(" LIMIT ");
+  query_builder.push_bind(format!("{}", args.page_size));
+
+  query_builder
 }
 
 struct RawRecord {
@@ -358,4 +421,79 @@ struct RawRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+}
+
+impl FromRow<'_, MySqlRow> for RawRecord {
+  fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+    Ok(Self {
+      id: row.try_get("id")?,
+      token: MediaFileToken::new(row.try_get("token")?),
+
+      origin_category: MediaFileOriginCategory::try_from_mysql_row(row, "origin_category")?,
+      origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
+
+      maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
+      maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
+      maybe_origin_filename: row.try_get("maybe_origin_filename")?,
+
+      is_batch_generated: row.try_get("is_batch_generated")?,
+      maybe_batch_token: row.try_get::<Option<String>, _>("maybe_batch_token")?.map(|token| BatchGenerationToken::new(token)),
+
+      is_intermediate_system_file: row.try_get("is_intermediate_system_file")?,
+
+      maybe_title: row.try_get("maybe_title")?,
+
+      maybe_cover_image_media_file_token: row.try_get("maybe_cover_image_media_file_token")?,
+      maybe_cover_image_public_bucket_hash: row.try_get("maybe_cover_image_public_bucket_hash")?,
+      maybe_cover_image_public_bucket_prefix: row.try_get("maybe_cover_image_public_bucket_prefix")?,
+      maybe_cover_image_public_bucket_extension: row.try_get("maybe_cover_image_public_bucket_extension")?,
+
+      maybe_style_transfer_source_media_file_token: row.try_get("maybe_style_transfer_source_media_file_token")?,
+      maybe_scene_source_media_file_token: row.try_get("maybe_scene_source_media_file_token")?,
+
+      nsfw_status: row.try_get("nsfw_status")?,
+
+      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+      media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
+      maybe_media_subtype: MediaFileSubtype::try_from_mysql_row_nullable(row, "maybe_media_subtype")?,
+
+      maybe_mime_type: row.try_get("maybe_mime_type")?,
+      file_size_bytes: row.try_get("file_size_bytes")?,
+      maybe_duration_millis: row.try_get("maybe_duration_millis")?,
+
+      maybe_audio_encoding: row.try_get("maybe_audio_encoding")?,
+      maybe_video_encoding: row.try_get("maybe_video_encoding")?,
+
+      maybe_engine_category: MediaFileEngineCategory::try_from_mysql_row_nullable(row, "maybe_engine_category")?,
+      maybe_animation_type: MediaFileAnimationType::try_from_mysql_row_nullable(row, "maybe_animation_type")?,
+
+      maybe_text_transcript: row.try_get("maybe_text_transcript")?,
+
+      maybe_prompt_token: row.try_get::<Option<String>, _>("maybe_prompt_token")?.map(|token| PromptToken::new(token)),
+
+      checksum_sha2: row.try_get("checksum_sha2")?,
+
+      public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
+      maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
+      maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
+
+      extra_file_modification_info: row.try_get("extra_file_modification_info")?,
+
+      maybe_creator_user_token: row.try_get::<Option<String>, _>("maybe_creator_user_token")?.map(|token| UserToken::new(token)),
+      maybe_creator_username: row.try_get("maybe_creator_username")?,
+      maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
+      maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
+
+      maybe_creator_anonymous_visitor_token: row.try_get::<Option<String>, _>("maybe_creator_anonymous_visitor_token")?.map(|token| AnonymousVisitorTrackingToken::new(token)),
+
+      creator_ip_address: row.try_get("creator_ip_address")?,
+
+      creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+
+      created_at: row.try_get("created_at")?,
+      updated_at: row.try_get("updated_at")?,
+      user_deleted_at: row.try_get("user_deleted_at")?,
+      mod_deleted_at: row.try_get("mod_deleted_at")?,
+    })
+  }
 }
