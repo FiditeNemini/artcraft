@@ -64,6 +64,11 @@ export const Help = () => {
           <Shortcut label="Zoom">
             <Mouse button="middle" label="(Scroll)" />
           </Shortcut> */}
+          <Shortcut label="Orbit View">
+            <KeyGroup>
+              <Mouse button="middle" label="(Hold)" />
+            </KeyGroup>
+          </Shortcut>
           <Shortcut label="Forward Backward">
             <KeyGroup>
               <Key button="W" />
