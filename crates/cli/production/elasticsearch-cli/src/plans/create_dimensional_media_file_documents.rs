@@ -1,14 +1,20 @@
+use std::collections::HashSet;
 use std::fs::read_to_string;
+use std::iter::FromIterator;
 
 use elasticsearch::{BulkOperation, BulkParts, Elasticsearch};
 use log::{error, info, warn};
 use serde_json::Value;
 use sqlx::{MySql, Pool};
 
-use elasticsearch_schema::documents::media_file_document::MEDIA_FILE_INDEX;
+use elasticsearch_schema::documents::media_file_document::{MEDIA_FILE_INDEX, MediaFileDocument};
 use elasticsearch_schema::traits::document::Document;
 use elasticsearch_schema::utils::create_index_if_not_exists::{create_index_if_not_exists, CreateIndexArgs};
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
+use mysql_queries::queries::media_files::list::list_media_files_for_elastic_search_backfill_using_cursor::{list_media_files_for_elastic_search_backfill_using_cursor, ListArgs, MediaFileForElasticsearchRecord};
 use mysql_queries::queries::model_weights::list::list_model_weights_for_elastic_search_backfill_using_cursor::{list_model_weights_for_elastic_search_backfill_using_cursor, ModelWeightForElasticsearchRecord};
 use storyteller_root::get_storyteller_rust_root;
 
@@ -21,14 +27,41 @@ pub async fn create_dimensional_media_file_documents(
 
   // TODO(bt, 2024-01-10): expose this as a CLI flag
   const DELETE_EXISTING_INDEX : bool = true;
-  const PAGE_SIZE : u64 = 1000;
+  const PAGE_SIZE : usize = 1000;
 
   create_media_file_index(&elasticsearch, DELETE_EXISTING_INDEX).await?;
 
   let mut cursor = 0;
 
   loop {
-    let results = list_model_weights_for_elastic_search_backfill_using_cursor(mysql, PAGE_SIZE, cursor).await?;
+    let results = list_media_files_for_elastic_search_backfill_using_cursor(ListArgs {
+      mysql_pool: mysql,
+      page_size: PAGE_SIZE,
+      cursor,
+      maybe_filter_engine_categories: Some(&HashSet::from_iter(vec![
+        MediaFileEngineCategory::Animation,
+        MediaFileEngineCategory::Character,
+        MediaFileEngineCategory::Expression,
+        MediaFileEngineCategory::ImagePlane,
+        MediaFileEngineCategory::Object,
+        MediaFileEngineCategory::Scene,
+      ])),
+      maybe_filter_media_types: Some(&HashSet::from_iter(vec![
+        // Engine types
+        MediaFileType::Csv,
+        MediaFileType::Fbx,
+        MediaFileType::Glb,
+        MediaFileType::SceneJson,
+        // Image types
+        MediaFileType::Gif,
+        MediaFileType::Jpg,
+        MediaFileType::Png,
+      ])),
+      maybe_filter_media_classes: Some(&HashSet::from_iter(vec![
+        MediaFileClass::Image,
+        MediaFileClass::Dimensional,
+      ])),
+    }).await?;
 
     if results.is_empty() {
       info!("No more results at cursor {cursor}");
@@ -38,7 +71,7 @@ pub async fn create_dimensional_media_file_documents(
     let maybe_last_id = results.last().map(|result| result.id);
 
     match maybe_last_id {
-      Some(last_id) => cursor = last_id as u64,
+      Some(last_id) => cursor = last_id as usize,
       None => {
         warn!("No final ID at cursor {cursor}");
         break;
@@ -53,83 +86,73 @@ pub async fn create_dimensional_media_file_documents(
   Ok(())
 }
 
-//async fn create_document_from_record(elasticsearch: &Elasticsearch, record: ModelWeightForElasticsearchRecord) -> AnyhowResult<()> {
-//  info!("Create record for {:?} - {:?}", record.token, record.title);
-//
-//  let is_deleted = record.user_deleted_at.is_some() || record.mod_deleted_at.is_some();
-//
-//  let document = ModelWeightDocument {
-//    token: record.token,
-//
-//    creator_set_visibility: record.creator_set_visibility,
-//
-//    weights_type: record.weights_type,
-//    weights_category: record.weights_category,
-//
-//    title: record.title.clone(),
-//    title_as_keyword: record.title,
-//
-//    maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token,
-//    maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
-//    maybe_cover_image_public_bucket_prefix: record.maybe_cover_image_public_bucket_prefix,
-//    maybe_cover_image_public_bucket_extension: record.maybe_cover_image_public_bucket_extension,
-//
-//    creator_user_token: record.creator_user_token,
-//    creator_username: record.creator_username,
-//    creator_display_name: record.creator_display_name,
-//    creator_gravatar_hash: record.creator_gravatar_hash,
-//
-//    ratings_positive_count: record.maybe_ratings_positive_count.unwrap_or(0),
-//    ratings_negative_count: record.maybe_ratings_negative_count.unwrap_or(0),
-//    bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
-//
-//    maybe_ietf_language_tag: match record.weights_category {
-//      WeightsCategory::TextToSpeech => record.maybe_tts_ietf_language_tag,
-//      WeightsCategory::VoiceConversion => record.maybe_voice_conversion_ietf_language_tag,
-//      _ => None,
-//    },
-//
-//    maybe_ietf_primary_language_subtag: match record.weights_category {
-//      WeightsCategory::TextToSpeech => record.maybe_tts_ietf_primary_language_subtag,
-//      WeightsCategory::VoiceConversion => record.maybe_voice_conversion_ietf_primary_language_subtag,
-//      _ => None,
-//    },
-//
-//    created_at: record.created_at,
-//    updated_at: record.updated_at,
-//    user_deleted_at: record.user_deleted_at,
-//    mod_deleted_at: record.mod_deleted_at,
-//
-//    is_deleted,
-//  };
-//
-//  let op : BulkOperation<_> = BulkOperation::index(&document)
-//      .id(document.get_document_id())
-//      .into();
-//
-//  let response = elasticsearch
-//      .bulk(BulkParts::Index(MODEL_WEIGHT_INDEX))
-//      .body(vec![op])
-//      .send()
-//      .await?;
-//
-//  let json: Value = response.json().await?;
-//
-//  let had_errors = json["errors"].as_bool().unwrap_or(false);
-//  if had_errors {
-//    let failed: Vec<&Value> = json["items"]
-//        .as_array()
-//        .unwrap()
-//        .iter()
-//        .filter(|v| !v["error"].is_null())
-//        .collect();
-//
-//    // TODO: retry failures
-//    error!("Errors during indexing. Failures: {}", failed.len());
-//  }
-//
-//  Ok(())
-//}
+async fn create_document_from_record(elasticsearch: &Elasticsearch, record: MediaFileForElasticsearchRecord) -> AnyhowResult<()> {
+  info!("Create record for {:?}", record.token);
+
+  let is_deleted = record.user_deleted_at.is_some() || record.mod_deleted_at.is_some();
+
+  let document = MediaFileDocument {
+    token: record.token,
+
+    media_class: record.media_class,
+    media_type: record.media_type,
+    maybe_media_subtype: record.maybe_media_subtype,
+    maybe_mime_type: record.maybe_mime_type,
+    public_bucket_directory_hash: record.public_bucket_directory_hash,
+    maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
+    maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+    maybe_animation_type: record.maybe_animation_type,
+    creator_set_visibility: record.creator_set_visibility,
+
+    maybe_title: record.maybe_title,
+
+    maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token,
+    maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
+    maybe_cover_image_public_bucket_prefix: record.maybe_cover_image_public_bucket_prefix,
+    maybe_cover_image_public_bucket_extension: record.maybe_cover_image_public_bucket_extension,
+
+    maybe_creator_user_token: record.maybe_creator_user_token,
+    maybe_creator_username: record.maybe_creator_username,
+    maybe_creator_display_name: record.maybe_creator_display_name,
+    maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
+
+    created_at: record.created_at,
+    updated_at: record.updated_at,
+    user_deleted_at: record.user_deleted_at,
+    mod_deleted_at: record.mod_deleted_at,
+
+    is_deleted,
+    maybe_title_as_keyword: None,
+  };
+
+  let op : BulkOperation<_> = BulkOperation::index(&document)
+      .id(document.get_document_id())
+      .into();
+
+  let response = elasticsearch
+      .bulk(BulkParts::Index(MEDIA_FILE_INDEX))
+      .body(vec![op])
+      .send()
+      .await?;
+
+  let json: Value = response.json().await?;
+
+  let had_errors = json["errors"].as_bool().unwrap_or(false);
+
+  if had_errors {
+    let failed: Vec<&Value> = json["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|v| !v["error"].is_null())
+        .collect();
+
+    // TODO: retry failures
+    error!("Errors during indexing. Failures: {}", failed.len());
+  }
+
+  Ok(())
+}
 
 // NB: Adapted from elasticsearch crate examples source
 async fn create_media_file_index(client: &Elasticsearch, delete_existing: bool) -> AnyhowResult<()> {

@@ -31,9 +31,9 @@ pub struct MediaFileDocument {
 
   pub maybe_mime_type: Option<String>,
 
-  pub public_bucket_hash: Option<String>,
-  pub public_bucket_prefix: Option<String>,
-  pub public_bucket_extension: Option<String>,
+  pub public_bucket_directory_hash: String,
+  pub maybe_public_bucket_prefix: Option<String>,
+  pub maybe_public_bucket_extension: Option<String>,
 
   pub maybe_animation_type: Option<MediaFileAnimationType>,
 

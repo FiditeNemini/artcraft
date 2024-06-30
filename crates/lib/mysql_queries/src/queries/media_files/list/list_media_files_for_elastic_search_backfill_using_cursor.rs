@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use log::warn;
-use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
+use log::{info, warn};
+use sqlx::{Execute, FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 use sqlx::pool::PoolConnection;
 
@@ -15,8 +15,6 @@ use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginM
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
-use enums::by_table::model_weights::weights_category::WeightsCategory;
-use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
@@ -127,12 +125,15 @@ pub struct ListArgs<'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
+pub async fn list_media_files_for_elastic_search_backfill_using_cursor(
   args: ListArgs<'_>
 ) -> AnyhowResult<Vec<MediaFileForElasticsearchRecord>> {
 
   let mut query = query_builder(&args);
+
   let query = query.build_query_as::<RawRecord>();
+
+  info!("Query: {:?}", query.sql());
 
   let maybe_media_files = query.fetch_all(args.mysql_pool).await;
 
