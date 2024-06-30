@@ -34,6 +34,8 @@ pub async fn create_dimensional_media_file_documents(
   let mut cursor = 0;
 
   loop {
+    info!("Cursor: {cursor}");
+
     let results = list_media_files_for_elastic_search_backfill_using_cursor(ListArgs {
       mysql_pool: mysql,
       page_size: PAGE_SIZE,
@@ -63,6 +65,8 @@ pub async fn create_dimensional_media_file_documents(
       ])),
     }).await?;
 
+    info!("Results length: {}", results.len());
+
     if results.is_empty() {
       info!("No more results at cursor {cursor}");
       break;
@@ -78,9 +82,9 @@ pub async fn create_dimensional_media_file_documents(
       }
     }
 
-    //for result in results {
-    //  create_document_from_record(elasticsearch, result).await?;
-    //}
+    for result in results {
+      create_document_from_record(elasticsearch, result).await?;
+    }
   }
 
   Ok(())

@@ -1,0 +1,54 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "bool": {
+            "must" : [
+              {
+                "term": {
+                  "media_class": "dimensional"
+                }
+              },
+              {
+                "term": {
+                  "media_type": "glb"
+                }
+              }
+            ],
+            "should": [
+              {
+                "fuzzy": {
+                  "maybe_title": {
+                    "value": "cac",
+                    "fuzziness": 2
+                  }
+                }
+              },
+              {
+                "match": {
+                  "maybe_title": {
+                    "query": "cac",
+                    "boost": 1
+                  }
+                }
+              },
+              {
+                "multi_match": {
+                  "query": "cac",
+                  "type": "bool_prefix",
+                  "fields": [
+                    "maybe_title",
+                    "maybe_title._2gram",
+                    "maybe_title._3gram"
+                  ],
+                  "boost": 50
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
