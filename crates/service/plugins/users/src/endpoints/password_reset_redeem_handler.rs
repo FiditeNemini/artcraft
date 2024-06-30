@@ -14,8 +14,8 @@ use mysql_queries::queries::users::user_password_resets::lookup_password_reset_r
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use tokens::tokens::user_sessions::UserSessionToken;
-use crate::endpoints::login_handler::LoginErrorResponse;
 
+use crate::endpoints::login_handler::LoginErrorResponse;
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
 #[derive(Deserialize)]
