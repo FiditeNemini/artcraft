@@ -10,14 +10,14 @@
       "media_class" : { "type" : "keyword" },
       "media_type" : { "type" : "keyword" },
       "maybe_media_subtype" : { "type" : "keyword" },
+      "maybe_engine_category" : { "type" : "keyword" },
+      "maybe_animation_type" : { "type" : "keyword" },
 
       "maybe_mime_type" : { "type" : "keyword" },
 
       "public_bucket_hash" : { "type" : "keyword" },
       "public_bucket_prefix" : { "type" : "keyword" },
       "public_bucket_extension" : { "type" : "keyword" },
-
-      "maybe_animation_type" : { "type" : "keyword" },
 
       "creator_set_visibility" : { "type" : "keyword" },
 

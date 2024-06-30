@@ -101,14 +101,17 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Medi
     media_class: record.media_class,
     media_type: record.media_type,
     maybe_media_subtype: record.maybe_media_subtype,
+    maybe_engine_category: record.maybe_engine_category,
+    maybe_animation_type: record.maybe_animation_type,
+
     maybe_mime_type: record.maybe_mime_type,
     public_bucket_directory_hash: record.public_bucket_directory_hash,
     maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
     maybe_public_bucket_extension: record.maybe_public_bucket_extension,
-    maybe_animation_type: record.maybe_animation_type,
     creator_set_visibility: record.creator_set_visibility,
 
-    maybe_title: record.maybe_title,
+    maybe_title: record.maybe_title.clone(),
+    maybe_title_as_keyword: record.maybe_title,
 
     maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token,
     maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
@@ -126,7 +129,6 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Medi
     mod_deleted_at: record.mod_deleted_at,
 
     is_deleted,
-    maybe_title_as_keyword: None,
   };
 
   let op : BulkOperation<_> = BulkOperation::index(&document)

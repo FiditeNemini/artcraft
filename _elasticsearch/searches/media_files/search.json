@@ -7,12 +7,25 @@
             "must" : [
               {
                 "term": {
+                  "is_deleted": false
+                }
+              },
+              {
+                "term": {
                   "media_class": "dimensional"
                 }
               },
               {
                 "term": {
                   "media_type": "glb"
+                }
+              },
+              {
+                "bool": {
+                  "should": [
+                    { "term": { "maybe_engine_category": "object"} },
+                    { "term": { "maybe_engine_category": "image_plane"} }
+                  ]
                 }
               }
             ],
