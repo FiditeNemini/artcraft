@@ -17,9 +17,6 @@ use crate::http_server::endpoints::api_tokens::create_api_token::create_api_toke
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
 use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
-use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::create_beta_keys_handler;
-use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::list_beta_keys_handler;
-use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::redeem_beta_key_handler;
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
 use crate::http_server::endpoints::categories::tts::assign_tts_category::assign_tts_category_handler;

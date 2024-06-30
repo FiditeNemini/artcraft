@@ -1,4 +1,3 @@
-
 use std::fmt;
 use std::sync::Arc;
 
@@ -10,7 +9,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks::{ list_user_bookmarks_by_maybe_entity_type};
+use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks::list_user_bookmarks_by_maybe_entity_type;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

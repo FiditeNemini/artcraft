@@ -3,8 +3,6 @@ use mysql_queries::queries::users::user_sessions::get_user_session_by_token::Ses
 use users_component::session::lookup::user_session_extended::UserSessionExtended;
 use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
-use crate::server_state::StaticFeatureFlags;
-
 /// Check whether we should allow the request access to explore media.
 pub fn allowed_explore_media_access(maybe_session: Option<impl UserSessionExploreMediaFlag>) -> bool {
   // NB: We're more careful here since this is sensitive until we have NLP checks.

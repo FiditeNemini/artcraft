@@ -77,8 +77,9 @@ mod tests {
   }
 
   mod users {
-    use super::*;
     use tokens::tokens::users::UserToken;
+
+    use super::*;
 
     #[test]
     fn test_same_user() {
@@ -141,7 +142,7 @@ mod tests {
 
   mod anonymous_tracking {
     use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
-    use tokens::tokens::users::UserToken;
+
     use super::*;
 
     #[test]

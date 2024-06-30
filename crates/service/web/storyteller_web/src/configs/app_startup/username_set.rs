@@ -39,6 +39,7 @@ impl UsernameSet {
 #[cfg(test)]
 mod tests {
   use crate::configs::app_startup::username_set::UsernameSet;
+
   fn build_set() -> UsernameSet {
     UsernameSet::from_comma_separated("bob,john,ALICE, BoB,jOhn,  ,,,  , aLiCe, joHn, bob,Alice")
   }

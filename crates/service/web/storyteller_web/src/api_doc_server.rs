@@ -17,22 +17,19 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
+use std::error::Error;
+
+use actix_web::{App, HttpServer};
+use r2d2_redis::redis::Commands;
+use sqlx::MySqlPool;
+use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use actix_web::{App, HttpServer, middleware, web};
-use actix_web::middleware::{DefaultHeaders, Logger};
-
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::Commands;
-use r2d2_redis::RedisConnectionManager;
-use sqlx::mysql::MySqlPoolOptions;
-use sqlx::MySqlPool;
-use tokio::runtime::Runtime;
-
+use api_doc::ApiDoc;
 use errors::AnyhowResult;
 
-use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
-use crate::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, RedisRateLimiters, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
+use crate::configs::static_api_tokens::StaticApiTokenSet;
+use crate::server_state::ServerState;
 
 pub mod billing;
 pub mod configs;
@@ -47,17 +44,8 @@ pub mod threads;
 pub mod util;
 pub mod validations;
 
-use std::{
-  error::Error,
-  future::{self, Ready},
-  net::Ipv4Addr,
-};
-
 pub mod api_doc;
-use api_doc::ApiDoc;
 
-use futures::future::LocalBoxFuture;
-use utoipa::OpenApi;
 #[actix_web::main]
 async fn main() -> Result<(), impl Error> {
   HttpServer::new(move || {

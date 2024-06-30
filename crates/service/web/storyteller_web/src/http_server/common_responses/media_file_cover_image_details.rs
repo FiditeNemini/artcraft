@@ -2,12 +2,9 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 use utoipa::ToSchema;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::weights_cover_image_details::WeightsDefaultCoverInfo;
-use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
 
 /// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.

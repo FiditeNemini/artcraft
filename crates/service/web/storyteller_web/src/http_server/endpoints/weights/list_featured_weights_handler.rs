@@ -21,8 +21,8 @@ use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_we
 use tokens::tokens::model_weights::ModelWeightToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::ListFeaturedMediaFilesError;
 use crate::http_server::endpoints::media_files::list::list_media_files_handler::{ListMediaFilesError, ListMediaFilesQueryParams};
 use crate::server_state::ServerState;

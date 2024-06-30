@@ -13,9 +13,9 @@ use mysql_queries::queries::generic_inference::web::dismiss_finished_jobs_for_us
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::{get_inference_job_status, get_inference_job_status_from_connection};
 use mysql_queries::queries::generic_inference::web::mark_generic_inference_job_cancelled_by_user::mark_generic_inference_job_cancelled_by_user;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::TerminateInferenceJobError;
 use crate::http_server::web_utils::require_user_session::require_user_session;
-
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 

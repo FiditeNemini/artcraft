@@ -34,8 +34,8 @@ use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
-use crate::http_server::endpoints::weights::get_weight_handler::GetWeightPathInfo;
 
+use crate::http_server::endpoints::weights::get_weight_handler::GetWeightPathInfo;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 

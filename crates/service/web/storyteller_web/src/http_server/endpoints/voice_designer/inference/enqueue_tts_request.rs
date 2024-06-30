@@ -20,14 +20,14 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-    GenericInferenceArgs,
-    InferenceCategoryAbbreviated,
-    PolymorphicInferenceArgs,
+  GenericInferenceArgs,
+  InferenceCategoryAbbreviated,
+  PolymorphicInferenceArgs,
 };
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
-    insert_generic_inference_job,
-    InsertGenericInferenceArgs,
+  insert_generic_inference_job,
+  InsertGenericInferenceArgs,
 };
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::users::UserToken;

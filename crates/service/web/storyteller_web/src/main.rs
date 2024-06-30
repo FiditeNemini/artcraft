@@ -19,8 +19,8 @@
 
 use std::sync::Arc;
 use std::time::Duration;
-use actix_multipart::form::MultipartFormConfig;
 
+use actix_multipart::form::MultipartFormConfig;
 use actix_web::{App, HttpServer, middleware, web};
 use actix_web::middleware::{DefaultHeaders, Logger};
 use anyhow::anyhow;

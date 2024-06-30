@@ -21,14 +21,14 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-    GenericInferenceArgs,
-    InferenceCategoryAbbreviated,
-    PolymorphicInferenceArgs,
+  GenericInferenceArgs,
+  InferenceCategoryAbbreviated,
+  PolymorphicInferenceArgs,
 };
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
-    insert_generic_inference_job,
-    InsertGenericInferenceArgs,
+  insert_generic_inference_job,
+  InsertGenericInferenceArgs,
 };
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -519,9 +519,9 @@ fn inference_mode_from_url_path(url_path: &str) -> Option<TypeOfInference> {
 
 #[cfg(test)]
 mod tests {
-    use crate::http_server::endpoints::image_gen::enqueue_image_generation::{inference_mode_from_url_path, TypeOfInference};
+  use crate::http_server::endpoints::image_gen::enqueue_image_generation::{inference_mode_from_url_path, TypeOfInference};
 
-    #[test]
+  #[test]
     fn test_url_paths() {
         // Valid routes
         assert_eq!(inference_mode_from_url_path("/v1/image_gen/enqueue/inference"), Some(TypeOfInference::Inference));

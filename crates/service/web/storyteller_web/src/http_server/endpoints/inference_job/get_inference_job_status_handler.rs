@@ -19,8 +19,8 @@ use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::{GenericInferenceJobStatus, get_inference_job_status};
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
-use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
 
+use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -366,8 +366,8 @@ fn record_to_payload(
 #[cfg(test)]
 mod tests {
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-  use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
   use mysql_queries::queries::generic_inference::web::get_inference_job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
+
   use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::record_to_payload;
 
   #[test]

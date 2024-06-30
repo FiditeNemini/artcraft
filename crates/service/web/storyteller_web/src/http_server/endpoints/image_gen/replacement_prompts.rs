@@ -1,5 +1,4 @@
 use collections::random_from_array::random_from_array;
-use collections::random_from_vec::random_from_vec;
 
 const REPLACEMENT_PROMPTS : [&str; 4] = [
   "angry president bush, disappointed George Bush, single person, pointing in accusation, disappointed at the viewer, trying to teach the user a lesson, furrowed brow, sad, angry, disappointed, high quality, good art, best quality, amazing detail, masterpiece",

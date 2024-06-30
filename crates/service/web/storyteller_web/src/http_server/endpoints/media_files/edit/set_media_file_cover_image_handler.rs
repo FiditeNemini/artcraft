@@ -7,15 +7,15 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::{info, warn};
 use utoipa::ToSchema;
+
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
-
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::edit::set_media_file_cover_image::{set_media_file_cover_image, UpdateArgs};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::SetModelWeightCoverImageError;
 
+use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::SetModelWeightCoverImageError;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};

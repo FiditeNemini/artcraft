@@ -1,6 +1,4 @@
 use utoipa::ToSchema;
-use tokens::tokens::media_files::MediaFileToken;
-
 
 /// Fields useful for enriching media file listings
 #[derive(Clone, Serialize, ToSchema)]

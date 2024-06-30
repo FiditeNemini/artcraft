@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
+use actix_web::HttpResponse;
 use actix_web::web::Data;
 use log::debug;
 

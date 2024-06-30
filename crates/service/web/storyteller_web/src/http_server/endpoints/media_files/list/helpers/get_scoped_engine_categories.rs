@@ -1,7 +1,6 @@
 use std::collections::HashSet;
-use actix_web::web::Query;
+
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
-use crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::ListMediaFilesForUserQueryParams;
 
 pub fn get_scoped_engine_categories(
   maybe_query_param: Option<&str>
@@ -28,7 +27,9 @@ pub fn get_scoped_engine_categories(
 #[cfg(test)]
 mod test {
   use std::collections::HashSet;
+
   use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
+
   use crate::http_server::endpoints::media_files::list::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 
   #[test]

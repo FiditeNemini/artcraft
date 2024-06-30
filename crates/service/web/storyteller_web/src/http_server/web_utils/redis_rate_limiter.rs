@@ -4,10 +4,10 @@
 use actix_http::header::HeaderName;
 use actix_web::HttpRequest;
 use futures_old_for_limiter::Future;
-use limitation::{Error, Limiter};
 use log::info;
 
 use http_server_common::request::get_request_ip::get_request_ip;
+use limitation::{Error, Limiter};
 
 /// If this HTTP header is set, the rate limiter can be bypassed (eg. for debugging)
 const RATE_LIMIT_BYPASS_HEADER : &str = "limitless";

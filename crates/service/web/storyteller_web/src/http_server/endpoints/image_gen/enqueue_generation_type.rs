@@ -6,7 +6,6 @@ use strum::EnumCount;
 use strum::EnumIter;
 use utoipa::ToSchema;
 
-
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Debug, Deserialize, Serialize, ToSchema)]
 pub enum EnqueueImageGenType {
@@ -48,9 +47,9 @@ impl EnqueueImageGenType {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+  use super::*;
 
-    #[test]
+  #[test]
     fn test_to_str() {
         assert_eq!(EnqueueImageGenType::UploadLoRA.to_str(), "upload_lora");
         assert_eq!(EnqueueImageGenType::Checkpoint.to_str(), "upload_sd");

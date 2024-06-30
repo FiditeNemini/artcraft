@@ -1,5 +1,3 @@
-use actix_web_lab::__reexports::tracing::info;
-
 pub struct CoordinatedWorkflowArgs {
   /// Use lipsync in the workflow
   pub use_lipsync: Option<bool>,
