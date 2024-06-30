@@ -10,20 +10,29 @@ use std::fmt::Formatter;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use anyhow::anyhow;
 use log::{info, warn};
 use sqlx::MySqlPool;
 
 use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
+use errors::AnyhowResult;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::queries::beta_keys::redeem_beta_key::redeem_beta_key;
 use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
+use mysql_queries::queries::users::user::set_can_access_studio_transactional::{set_can_access_studio_transactional, SetCanAccessStudioArgs};
+use mysql_queries::queries::users::user::set_user_feature_flags_transactional::{set_user_feature_flags_transactional, SetUserFeatureFlagTransactionalArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use tokens::tokens::user_sessions::UserSessionToken;
+use tokens::tokens::users::UserToken;
 use user_input_common::check_for_slurs::contains_slurs;
 
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
+use crate::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 use crate::utils::email_to_gravatar::email_to_gravatar;
 use crate::validations::is_reserved_username::is_reserved_username;
 use crate::validations::validate_passwords::validate_passwords;
@@ -256,6 +265,12 @@ pub async fn create_account_handler(
       CreateAccountErrorResponse::server_error()
     })?;
 
+  // NB: Enroll new users in studio for a while.
+  enroll_in_studio(&new_user_data.user_token, &ip_address, &mysql_pool).await
+    .map_err(|e| {
+      warn!("error enrolling in studio: {:?}", e);
+    }).ok();
+
   let session_token = UserSessionToken::new_from_str(&session_token);
 
   let session_cookie = match session_cookie_manager.create_cookie(&session_token, &new_user_data.user_token) {
@@ -280,4 +295,38 @@ pub async fn create_account_handler(
     .cookie(session_cookie)
     .content_type("application/json")
     .body(body))
+}
+
+async fn enroll_in_studio(
+  user_token: &UserToken,
+  ip_address: &str,
+  mysql_pool: &MySqlPool,
+) -> AnyhowResult<()> {
+  let mut user_feature_flags = UserSessionFeatureFlags::empty();
+
+  user_feature_flags.add_flags([
+    UserFeatureFlag::Studio,
+    UserFeatureFlag::VideoStyleTransfer,
+  ]);
+
+  let mut transaction = mysql_pool.begin().await?;
+
+  set_user_feature_flags_transactional(SetUserFeatureFlagTransactionalArgs {
+    subject_user_token: user_token,
+    maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
+    maybe_mod_user_token: None,
+    ip_address: &ip_address,
+    transaction: &mut transaction,
+  }).await?;
+
+  // NB: This isn't a necessary field, but can be useful for analytics.
+  set_can_access_studio_transactional(SetCanAccessStudioArgs {
+    subject_user_token: user_token,
+    can_access_studio: true,
+    transaction: &mut transaction,
+  }).await?;
+
+  transaction.commit().await?;
+
+  Ok(())
 }
