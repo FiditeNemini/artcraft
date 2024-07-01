@@ -33,6 +33,7 @@ pub enum Action {
   /// Reindex media_files into ElasticSearch
   /// For now, this is just media files that are relevant to the engine.
   ReindexMediaFiles,
+  SearchMediaFiles,
 }
 
 #[derive(Parser, Debug)]

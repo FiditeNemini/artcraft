@@ -33,7 +33,7 @@
               {
                 "fuzzy": {
                   "maybe_title": {
-                    "value": "cac",
+                    "value": "REPLACE_ME",
                     "fuzziness": 2
                   }
                 }
@@ -41,14 +41,14 @@
               {
                 "match": {
                   "maybe_title": {
-                    "query": "cac",
+                    "query": "REPLACE_ME",
                     "boost": 1
                   }
                 }
               },
               {
                 "multi_match": {
-                  "query": "cac",
+                  "query": "REPLACE_ME",
                   "type": "bool_prefix",
                   "fields": [
                     "maybe_title",

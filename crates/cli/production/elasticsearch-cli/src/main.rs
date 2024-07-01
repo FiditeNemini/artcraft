@@ -20,7 +20,8 @@ use errors::AnyhowResult;
 use crate::cli_args::{Action, Environment, parse_cli_args};
 use crate::plans::create_all_model_weight_documents::create_all_model_weight_documents;
 use crate::plans::create_all_tts_documents::create_all_tts_documents;
-use crate::plans::create_dimensional_media_file_documents::create_dimensional_media_file_documents;
+use crate::plans::media_files::create_dimensional_media_file_documents::create_dimensional_media_file_documents;
+use crate::plans::media_files::test_search_media_files_documents::test_search_media_files;
 
 pub mod cli_args;
 pub mod plans;
@@ -66,6 +67,10 @@ pub async fn main() -> AnyhowResult<()> {
     Action::ReindexMediaFiles => {
       info!("Reindexing media files...");
       create_dimensional_media_file_documents(&mysql, &elasticsearch).await?;
+    }
+    Action::SearchMediaFiles => {
+      info!("Search media files...");
+      test_search_media_files(&elasticsearch).await?;
     }
   }
 
