@@ -263,10 +263,10 @@ pub async fn create_account_handler(
     })?;
 
   // NB: Enroll new users in studio for a while.
-  enroll_in_studio(&new_user_data.user_token, &ip_address, &mysql_pool).await
-    .map_err(|e| {
-      warn!("error enrolling in studio: {:?}", e);
-    }).ok();
+  //enroll_in_studio(&new_user_data.user_token, &ip_address, &mysql_pool).await
+  //  .map_err(|e| {
+  //    warn!("error enrolling in studio: {:?}", e);
+  //  }).ok();
 
   let session_token = UserSessionToken::new_from_str(&session_token);
 
