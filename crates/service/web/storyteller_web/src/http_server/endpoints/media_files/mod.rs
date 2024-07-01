@@ -1,6 +1,8 @@
 pub mod delete;
 pub mod edit;
 pub mod get;
+pub mod helpers;
 pub mod list;
+pub mod search;
 pub mod upload;
 pub mod upsert_upload;
