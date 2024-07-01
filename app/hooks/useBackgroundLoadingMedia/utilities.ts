@@ -12,10 +12,10 @@ import {
 } from "~/signals";
 const { userInfo } = authentication;
 
-export async function PollUserMovies() {
+export async function PollUserMovies(): Promise<boolean> {
   if (!userInfo.value || isRetreivingUserMovies.value) {
     //do nothing return if login info does not exist
-    return;
+    return true;
   }
 
   isRetreivingUserMovies.value = true;
@@ -26,23 +26,19 @@ export async function PollUserMovies() {
   isRetreivingUserMovies.value = false;
   if (response.success && response.data) {
     setUserMovies(response.data);
-    addToast(
-      ToastTypes.SUCCESS,
-      "New movie is completed! Please check My Movies",
-      false,
-    );
-    return;
+    return true;
   }
   addToast(
     ToastTypes.ERROR,
     response.errorMessage || "Unknown Error in Loading My Movies",
   );
+  return false;
 }
 
-export async function PollUserAudioItems() {
+export async function PollUserAudioItems(): Promise<boolean> {
   if (!userInfo.value) {
     //do nothing return if login info does not exist
-    return;
+    return true;
   }
   isRetreivingAudioItems.value = true;
   const mediaFilesApi = new MediaFilesApi();
@@ -53,15 +49,11 @@ export async function PollUserAudioItems() {
   isRetreivingAudioItems.value = false;
   if (response.success && response.data) {
     setUserAudioItems(response.data);
-    addToast(
-      ToastTypes.SUCCESS,
-      "New audio is generated! Please check your audio library",
-      false,
-    );
-    return;
+    return true;
   }
   addToast(
     ToastTypes.ERROR,
     response.errorMessage || "Unknown Error in Loading My Audio Items",
   );
+  return false;
 }

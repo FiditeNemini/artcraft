@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { signal } from "@preact/signals-core";
 import { ToastTypes } from "~/enums";
-import { FIVE_SECONDS, ONE_MINUTE, SEVEN_SECONDS } from "~/constants";
+import { FIVE_SECONDS, TEN_SECONDS } from "~/constants";
 
 export interface Toast {
   id: string;
@@ -26,7 +26,7 @@ export const addToast = (
     const calTimeout = timeout
       ? timeout
       : type === ToastTypes.SUCCESS
-        ? ONE_MINUTE
+        ? TEN_SECONDS
         : FIVE_SECONDS;
     setTimeout(() => {
       //delete toast after timeout

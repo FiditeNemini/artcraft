@@ -10,7 +10,7 @@ import {
   addToast,
 } from "~/signals";
 
-import { JobType, ToastTypes } from "~/enums";
+import { ToastTypes } from "~/enums";
 import { Job } from "~/models";
 import deepEqual from "deep-equal";
 
@@ -45,7 +45,15 @@ export const useBackgroundLoadingMedia = () => {
 
     //there are videos newly completed, set and poll
     lastCompletedWorkflow.current = completedWorkflowJobs.value;
-    PollUserMovies();
+    PollUserMovies().then((ret: boolean) => {
+      if (ret) {
+        addToast(
+          ToastTypes.SUCCESS,
+          "New movie is completed! Please check My Movies",
+          false,
+        );
+      }
+    });
   });
 
   useSignalEffect(() => {
@@ -58,20 +66,29 @@ export const useBackgroundLoadingMedia = () => {
 
     //CASE 2: pull after jobs completion
     if (!completedAudioJobs.value) {
-      return;
-    } // nothing to do if jobs is not initiated
+      return; // nothing to do if jobs is not initiated
+    }
     if (!lastCompletedAudioJobs.current) {
       lastCompletedAudioJobs.current = completedAudioJobs.value;
-    } // set first pull of jobs, no need to poll again yet
+      return; // set first pull of jobs, no need to poll again yet
+    }
     if (
       completedAudioJobs.value.length === 0 ||
       deepEqual(lastCompletedAudioJobs.current, completedAudioJobs.value)
     ) {
       return;
-    } // if no jobs; or if already poll for these completed job, do not poll again
+      // if no jobs; or if already poll for these completed job, do not poll again
+    }
 
     //there are audio jobs newly completed, set and poll
     lastCompletedAudioJobs.current = completedAudioJobs.value;
-    PollUserAudioItems();
+    PollUserAudioItems().then((ret: boolean) => {
+      if (ret) {
+        addToast(
+          ToastTypes.SUCCESS,
+          "New audio is generated! Please check your audio library",
+        );
+      }
+    });
   });
 };
