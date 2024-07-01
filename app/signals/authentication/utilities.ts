@@ -2,6 +2,7 @@ import { authentication } from "./authentication";
 
 import { AUTH_STATUS } from "~/enums";
 import { UserInfo, ActiveSubscriptions } from "~/models";
+import { flushAllBackgroundLoadedMedia } from "../backgroundLoadedMedia";
 
 export const updateAuthStatus = (newStatus: AUTH_STATUS) => {
   authentication.status.value = newStatus;
@@ -34,4 +35,5 @@ export const setLogoutStates = () => {
   updateAuthStatus(AUTH_STATUS.LOGGED_OUT);
   updateUserInfo(undefined);
   updateActiveSubscriptions(undefined);
+  flushAllBackgroundLoadedMedia();
 };
