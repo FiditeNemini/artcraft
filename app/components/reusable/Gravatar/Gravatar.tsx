@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 
 interface Props {
@@ -30,7 +32,13 @@ function Gravatar(props: Props) {
 
   const gravatarUrl = `${EnvironmentVariables.values.GRAVATAR_API}/avatar/${props.email_hash}?s=${props.size}&d=${encondedDefaultImage}`;
 
-  const [imgUrl, setImgUrl] = useState<string>(gravatarUrl);
+  const [{ imgUrl, showLoader }, setState] = useState<{
+    imgUrl: string;
+    showLoader: boolean;
+  }>({
+    imgUrl: gravatarUrl,
+    showLoader: true,
+  });
 
   const altText = props.username ? `${props.username}'s gravatar` : "gravatar";
 
@@ -62,10 +70,15 @@ function Gravatar(props: Props) {
   return (
     <div
       className={twMerge(
-        "overflow-hidden rounded-full border-2 border-white",
+        "relative aspect-square overflow-hidden rounded-full border-2 border-white",
         props.className,
       )}
     >
+      {showLoader && (
+        <div className="absolute flex h-full w-full items-center justify-center bg-brand-secondary">
+          <FontAwesomeIcon icon={faSpinnerThird} spin size={"lg"} />
+        </div>
+      )}
       <img
         crossOrigin="anonymous"
         alt={altText}
@@ -73,13 +86,18 @@ function Gravatar(props: Props) {
         height={props.size}
         width={props.size}
         style={{ backgroundColor: getBackgroundColor(props.backgroundIndex) }}
+        onLoad={() => {
+          setState((curr) => ({
+            imgUrl: curr.imgUrl,
+            showLoader: false,
+          }));
+        }}
         onError={() => {
-          setImgUrl((currUrl) => {
-            if (currUrl !== localDefaultUrl) {
-              return localDefaultUrl;
-            }
-            return currUrl;
-          });
+          setState((curr) => ({
+            imgUrl:
+              curr.imgUrl !== localDefaultUrl ? localDefaultUrl : curr.imgUrl,
+            showLoader: false,
+          }));
         }}
       />
     </div>

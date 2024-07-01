@@ -1,7 +1,7 @@
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { AUTH_STATUS } from "~/enums";
-import { authentication, logout } from "~/signals";
+import { authentication } from "~/signals";
 
 import { ButtonLink } from "~/components";
 import ProfileDropdown from "./ProfileDropdown";
@@ -9,23 +9,10 @@ import ProfileDropdown from "./ProfileDropdown";
 export const AuthButtons = () => {
   useSignals();
 
-  const { status, userInfo } = authentication;
-  const handleLogout = () => {
-    if (logout) logout();
-  };
+  const { status } = authentication;
+
   if (status.value === AUTH_STATUS.LOGGED_IN) {
-    return (
-      <ProfileDropdown
-        username={userInfo.value?.core_info.username || ""}
-        displayName={userInfo.value?.core_info.display_name || ""}
-        avatarIndex={userInfo.value?.core_info.default_avatar.image_index || 0}
-        backgroundColorIndex={
-          userInfo.value?.core_info.default_avatar.color_index || 0
-        }
-        emailHash={userInfo.value?.core_info.gravatar_hash || ""}
-        logoutHandler={() => handleLogout()}
-      />
-    );
+    return <ProfileDropdown />;
   } else {
     return (
       <>

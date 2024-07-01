@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretDown,
@@ -9,35 +10,29 @@ import { Menu, Transition } from "@headlessui/react";
 import { Gravatar } from "~/components/reusable";
 import { twMerge } from "tailwind-merge";
 
-interface ProfileDropdownProps {
-  username: string;
-  displayName: string;
-  avatarIndex: number;
-  backgroundColorIndex: number;
-  emailHash: string;
-  logoutHandler: () => void;
-}
+import { authentication, logout } from "~/signals";
 
-export default function ProfileDropdown({
-  username,
-  displayName,
-  avatarIndex,
-  backgroundColorIndex,
-  emailHash,
-  logoutHandler,
-}: ProfileDropdownProps) {
+export default function ProfileDropdown() {
+  useSignals();
+  const { userInfo } = authentication;
+
+  if (!userInfo.value) {
+    return null;
+  }
+  const username = userInfo.value.core_info.username;
+  const emailHash = userInfo.value.core_info.gravatar_hash;
+  const profileUrl = `https://storyteller.ai/profile/${userInfo.value.core_info.display_name}`;
+  const avatarIndex = userInfo.value.core_info.default_avatar.image_index;
+  const backgroundColorIndex =
+    userInfo.value.core_info.default_avatar.color_index;
+
   const options = [
-    {
-      label: "My Profile",
-      icon: faUser,
-      onClick: () => {
-        window.location.href = `https://storyteller.ai/profile/${displayName}`;
-      },
-    },
     {
       label: "Logout",
       icon: faRightFromBracket,
-      onClick: logoutHandler,
+      onClick: () => {
+        logout();
+      },
     },
   ];
 
@@ -68,26 +63,38 @@ export default function ProfileDropdown({
           static
           className="absolute right-[-5px] mt-2.5 w-36 overflow-hidden rounded-lg bg-brand-secondary shadow-lg focus:outline-none"
         >
-          <div>
-            {options.map((option, index) => (
-              <Fragment key={index}>
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      className={twMerge(
-                        "duration-50 group flex w-full items-center gap-2 bg-action/60 px-3 py-[10px] text-start text-sm font-medium text-white transition-all",
-                        active && "bg-action-500/80",
-                      )}
-                      onClick={() => option.onClick()}
-                    >
-                      <FontAwesomeIcon icon={option.icon} />
-                      {option.label}
-                    </button>
+          <Menu.Item key={0}>
+            {({ active }) => (
+              <a
+                className={twMerge(
+                  "duration-50 group flex w-full items-center gap-2 bg-action/60 px-3 py-[10px] text-start text-sm font-medium text-white transition-all",
+                  active && "bg-action-500/80",
+                )}
+                href={profileUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <FontAwesomeIcon icon={faUser} />
+                My Profile
+              </a>
+            )}
+          </Menu.Item>
+          {options.map((option, index) => (
+            <Menu.Item key={index + 1}>
+              {({ active }) => (
+                <button
+                  className={twMerge(
+                    "duration-50 group flex w-full items-center gap-2 bg-action/60 px-3 py-[10px] text-start text-sm font-medium text-white transition-all",
+                    active && "bg-action-500/80",
                   )}
-                </Menu.Item>
-              </Fragment>
-            ))}
-          </div>
+                  onClick={() => option.onClick()}
+                >
+                  <FontAwesomeIcon icon={option.icon} />
+                  {option.label}
+                </button>
+              )}
+            </Menu.Item>
+          ))}
         </Menu.Items>
       </Transition>
     </Menu>
