@@ -123,6 +123,7 @@ export class MouseControls {
   }
 
   selectObject(currentObject: THREE.Object3D) {
+    this.selected = [currentObject];
     this.setSelected(this.selected);
     this.publishSelect();
 
@@ -209,6 +210,18 @@ export class MouseControls {
         // redo
         this.isProcessing = true;
         await this.sceneManager?.redo();
+        this.isProcessing = false;
+        return;
+      } else if (event.key === "c") {
+        // redo
+        this.isProcessing = true;
+        await this.sceneManager?.copy();
+        this.isProcessing = false;
+        return;
+      } else if (event.key === "v") {
+        // redo
+        this.isProcessing = true;
+        await this.sceneManager?.paste();
         this.isProcessing = false;
         return;
       }

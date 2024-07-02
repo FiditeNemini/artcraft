@@ -344,7 +344,7 @@ export class TimeLine {
 
   public async addShape(data: MediaItem) {
     const pos = this.getPos();
-    const parim = this.editorEngine.create_parim(data.media_id, pos);
+    const parim = await this.editorEngine.create_parim(data.media_id, pos);
     await this.editorEngine.sceneManager?.add_creation_undostack(parim);
     return parim;
   }

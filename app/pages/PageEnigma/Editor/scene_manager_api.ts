@@ -63,6 +63,7 @@ export class SceneManager implements SceneManagerAPI {
   public undoStack: ICommand<CommandInputTypes>[] = [];
   private undoIndex: number = 0;
   private lastSceneState: SceneState;
+  private copiedObject: THREE.Object3D | undefined;
 
   constructor(
     version: number,
@@ -228,6 +229,34 @@ export class SceneManager implements SceneManagerAPI {
       visible: object.visible,
       locked: object.userData["locked"],
     };
+  }
+
+  public async copy() {
+    this.copiedObject = this.mouse_controls.selected?.at(0);
+  }
+
+  public async paste() {
+    if(this.copiedObject && this.copiedObject.name != "::CAM::") {
+      const userdata = this.copiedObject.userData;
+      const position = this.copiedObject.position.clone();
+      const rotation = this.copiedObject.rotation.clone();
+      const scale = this.copiedObject.scale.clone();
+
+      const media_id = userdata["media_id"];
+      const color = userdata["color"];
+      const name = this.copiedObject.name;
+
+      const obj = await this.create(media_id, name, position);
+      this.scene.setColor(obj.uuid, color);
+      obj.position.copy(position.add(new THREE.Vector3(0.5,0.0,0.5)));
+      obj.rotation.copy(rotation);
+      obj.scale.copy(scale);
+
+      this.mouse_controls.selectObject(obj);
+      this.updateOutliner();
+      await this.copy();
+      await this.add_creation_undostack(obj);
+    }
   }
 
   public onMouseMove(event: MouseEvent) {
