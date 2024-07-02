@@ -91,8 +91,6 @@ fn build_query(args: &SearchArgs) -> AnyhowResult<Value> {
       predicates.push(engine_categories_predicate(engine_categories));
     }
 
-    println!("Predicates: {:?}", predicates);
-
     Some(json!(predicates))
   })?;
 

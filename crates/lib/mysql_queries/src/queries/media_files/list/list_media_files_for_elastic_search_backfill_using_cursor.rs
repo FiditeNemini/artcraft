@@ -102,6 +102,9 @@ pub struct MediaFileForElasticsearchRecord {
 
   pub creator_set_visibility: Visibility,
 
+  // NB: is_featured is derived
+  pub is_featured: bool,
+
   // TODO: Other fields really don't matter.
 
   pub created_at: DateTime<Utc>,
@@ -132,8 +135,6 @@ pub async fn list_media_files_for_elastic_search_backfill_using_cursor(
   let mut query = query_builder(&args);
 
   let query = query.build_query_as::<RawRecord>();
-
-  info!("Query: {:?}", query.sql());
 
   let maybe_media_files = query.fetch_all(args.mysql_pool).await;
 
@@ -191,6 +192,7 @@ pub async fn list_media_files_for_elastic_search_backfill_using_cursor(
           maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
           creator_ip_address: record.creator_ip_address,
           creator_set_visibility: record.creator_set_visibility,
+          is_featured: i8_to_bool(record.is_featured),
           created_at: record.created_at,
           updated_at: record.updated_at,
           user_deleted_at: record.user_deleted_at,
@@ -270,6 +272,8 @@ SELECT
 
     m.creator_set_visibility,
 
+    featured_items.id IS NOT NULL as is_featured,
+
     m.created_at,
     m.updated_at,
     m.user_deleted_at,
@@ -282,6 +286,11 @@ LEFT OUTER JOIN users
 
 LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = m.maybe_cover_image_media_file_token
+
+LEFT OUTER JOIN featured_items
+    ON featured_items.entity_type = "media_file"
+    AND featured_items.deleted_at IS NULL
+    AND featured_items.entity_token = m.token
     "#);
 
   query_builder.push(" WHERE m.id > ");
@@ -415,6 +424,9 @@ struct RawRecord {
 
   pub creator_set_visibility: Visibility,
 
+  // NB: is_featured is derived
+  pub is_featured: i8,
+
   // TODO: Other fields really don't matter.
 
   pub created_at: DateTime<Utc>,
@@ -490,6 +502,8 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       creator_ip_address: row.try_get("creator_ip_address")?,
 
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+
+      is_featured: row.try_get("is_featured")?,
 
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,

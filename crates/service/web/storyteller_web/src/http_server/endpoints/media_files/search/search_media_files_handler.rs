@@ -128,6 +128,9 @@ pub struct SearchMediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  // Whether the media file is featured.
+  pub is_featured: bool,
+
   /// The name or title of the media file (optional)
   pub maybe_title: Option<String>,
 
@@ -252,6 +255,7 @@ pub async fn search_media_files_handler(
         //    positive_rating_count: result.maybe_ratings_positive_count.unwrap_or(0),
         //    bookmark_count: result.maybe_bookmark_count.unwrap_or(0),
         //  },
+        is_featured: result.is_featured,
         creator_set_visibility: result.creator_set_visibility,
         maybe_title: result.maybe_title,
         //  maybe_text_transcript: result.maybe_text_transcript,

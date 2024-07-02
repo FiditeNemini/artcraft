@@ -123,6 +123,8 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Medi
     maybe_creator_display_name: record.maybe_creator_display_name,
     maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
 
+    is_featured: record.is_featured,
+
     created_at: record.created_at,
     updated_at: record.updated_at,
     user_deleted_at: record.user_deleted_at,

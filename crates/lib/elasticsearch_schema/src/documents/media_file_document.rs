@@ -61,6 +61,9 @@ pub struct MediaFileDocument {
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 
+  /// Whether the file is featured.
+  pub is_featured: bool,
+
   /// Calculated as "either user or mod deleted"
   pub is_deleted: bool,
 }
