@@ -42,6 +42,8 @@ export class MouseControls {
   sceneManager: SceneManager | undefined;
   private isProcessing: boolean = false;
   private cameraViewControls: FreeCam;
+  private isMouseClicked: boolean = false;
+  private isMovable: Function;
 
   constructor(
     camera: THREE.PerspectiveCamera | null,
@@ -67,6 +69,7 @@ export class MouseControls {
     last_selected: THREE.Object3D | undefined,
     getAssetType: Function,
     setSelected: Function,
+    isMovable: Function,
   ) {
     this.camera = camera;
     this.camera_person_mode = camera_person_mode;
@@ -93,6 +96,7 @@ export class MouseControls {
     this.getAssetType = getAssetType;
     this.setSelected = setSelected;
     this.sceneManager = undefined;
+    this.isMovable = isMovable;
   }
 
   focus() {
@@ -143,14 +147,15 @@ export class MouseControls {
   }
 
   onMouseDown(event: any) {
-    if (event.button === 1) {
-      this.lockControls?.lock();
+    if ((event.button === 0 || event.button === 1) && this.isMovable()) {
+      this.isMouseClicked = true;
     }
   }
 
   onMouseUp(event: any) {
-    if (event.button === 1) {
+    if (event.button === 0 || event.button === 1) {
       this.lockControls?.unlock();
+      this.isMouseClicked = false;
     }
 
     if (event.button !== 0 && this.camera) {
@@ -246,6 +251,12 @@ export class MouseControls {
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     this.timeline_mouse = this.mouse;
+
+    if(this.isMouseClicked) {
+      this.lockControls?.lock();
+    } else {
+      this.lockControls?.unlock();
+    }
   }
 
   // When the mouse clicks the screen.

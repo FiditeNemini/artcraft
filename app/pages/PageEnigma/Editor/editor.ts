@@ -153,6 +153,7 @@ class Editor {
   sceneManager: SceneManager | undefined;
 
   outliner_feature_flag: boolean;
+  focused: boolean = false;
 
   constructor() {
     console.log(
@@ -450,6 +451,7 @@ class Editor {
       //TODO: any should be the following
       this.updateSelectedUI();
       this.camera_last_pos.copy(new THREE.Vector3(-99999, -99999, -99999));
+      this.focused = !event.value;
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
@@ -504,6 +506,7 @@ class Editor {
       this.last_selected,
       this.getAssetType.bind(this),
       this.setSelected.bind(this),
+      this.isMovable.bind(this)
     );
 
     if (this.outliner_feature_flag) {
@@ -541,8 +544,10 @@ class Editor {
         ) {
           this.cameraViewControls.enabled = true;
           this.selectedCanvas = true;
+          this.focused = true;
         } else {
           this.cameraViewControls.reset();
+          this.focused = false;
           this.cameraViewControls.enabled = false;
           this.selectedCanvas = false;
         }
@@ -554,6 +559,10 @@ class Editor {
       progress: 100,
     };
     loadingBarIsShowing.value = false;
+  }
+
+  public isMovable(): boolean {
+    return this.focused;
   }
 
   public async newScene(sceneTitleInput: string) {
