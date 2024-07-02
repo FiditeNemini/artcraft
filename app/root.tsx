@@ -78,6 +78,18 @@ export async function loader() {
     CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
     // @ts-expect-error ProvessEnv is correct
     GRAVATAR_API: process.env.GRAVATAR_API || "%BUILD_GRAVATAR_API%",
+    // @ts-expect-error ProvessEnv is correct
+    DEPLOY_PRIME_URL: process.env.DEPLOY_PRIME_URL || "%DEPLOY_PRIME_URL%",
+    REACT_APP_PUBLIC_POSTHOG_KEY:
+      // @ts-expect-error ProvessEnv is correct
+      process.env.REACT_APP_PUBLIC_POSTHOG_KEY ||
+      "%REACT_APP_PUBLIC_POSTHOG_KEY%",
+    REACT_APP_PUBLIC_POSTHOG_UI:
+      // @ts-expect-error ProvessEnv is correct
+      process.env.REACT_APP_PUBLIC_POSTHOG_UI ||
+      "%REACT_APP_PUBLIC_POSTHOG_UI%",
+    // @ts-expect-error ProvessEnv is correct
+    CONTEXT: process.env.CONTEXT || "%CONTEXT%",
   } as Record<string, string | boolean>;
   return { ENV: env };
 }

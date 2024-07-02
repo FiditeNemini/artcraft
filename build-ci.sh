@@ -49,9 +49,19 @@ find . -type f -exec sed -i "s${d}%BUILD_CDN_API%${d}${CDN_API}${d}g" {} +
 find . -type f -exec sed -i "s${d}%BUILD_UPLOAD_VIDEO%${d}${UPLOAD_VIDEO_API}${d}g" {} +
 find . -type f -exec sed -i "s${d}%BUILD_MEDIA_VIDEO%${d}${MEDIA_VIDEO_API}${d}g" {} +
 find . -type f -exec sed -i "s${d}%BUILD_GRAVATAR_VIDEO%${d}${GRAVATAR_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%DEPLOY_PRIME_URL%${d}${DEPLOY_PRIME_URL}${d}g" {} +
+find . -type f -exec sed -i "s${d}%CONTEXT%${d}${CONTEXT}${d}g" {} +
+
+# Replace Posthog env variables in the code
+find . -type f -exec sed -i "s${d}%REACT_APP_PUBLIC_POSTHOG_KEY%${d}${REACT_APP_PUBLIC_POSTHOG_KEY}${d}g" {} +
+find . -type f -exec sed -i "s${d}%REACT_APP_PUBLIC_POSTHOG_UI%${d}${REACT_APP_PUBLIC_POSTHOG_UI}${d}g" {} +
 
 # TODO: Run tests when we add them.
 
-# Run build.
+# Ensure the environment variables are exported
+export REACT_APP_PUBLIC_POSTHOG_KEY
+export REACT_APP_PUBLIC_POSTHOG_UI
+export CONTEXT
+# Run build.x
 npm run build
 

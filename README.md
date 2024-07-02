@@ -82,6 +82,23 @@ npm install
 npm run dev
 ```
 
+## PostHog
+
+PostHog is installed and working. To create a feature flag go to https://us.posthog.com/project/75284/feature_flags
+Add the feature flag for all users.
+
+To check the feature flag in the app use code similar to this
+
+```ts
+const [myFlag, setMyFlag] = useState(false);
+useEffect(() => {
+  const flag = posthog.isFeatureEnabled("<flag name>");
+  if (flag) {
+    setMyFlag(true);
+  }
+}, []);
+```
+
 ## Other Documentation
 
 Here is the Swagger documentation for the backend endpoints
