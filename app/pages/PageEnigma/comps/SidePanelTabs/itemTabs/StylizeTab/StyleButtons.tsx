@@ -20,6 +20,7 @@ import {
   lipSync,
   cinematic,
 } from "~/pages/PageEnigma/signals/stylizeTab";
+import { twMerge } from "tailwind-merge";
 
 export function StyleButtons() {
   useSignals();
@@ -61,6 +62,34 @@ export function StyleButtons() {
       action: toEngineActions.REFRESH_PREVIEW,
       data: null,
     });
+  };
+
+  const handleCinematicChange = () => {
+    cinematic.value = !cinematic.value;
+    if (cinematic.value) {
+      upscale.value = false;
+    }
+  };
+
+  const handleUpscaleChange = () => {
+    upscale.value = !upscale.value;
+    if (upscale.value) {
+      cinematic.value = false;
+    }
+  };
+
+  const handleLipsyncChange = () => {
+    lipSync.value = !lipSync.value;
+    if (lipSync.value) {
+      faceDetail.value = false;
+    }
+  };
+
+  const handleFaceDetailerChange = () => {
+    faceDetail.value = !faceDetail.value;
+    if (faceDetail.value) {
+      lipSync.value = false;
+    }
   };
 
   return (
@@ -109,17 +138,23 @@ export function StyleButtons() {
           <div>
             <div className="flex items-center py-[6px]">
               <Switch.Group>
-                <Switch.Label className="mr-3 grow text-sm font-medium">
+                <Switch.Label
+                  className={twMerge(
+                    "mr-3 grow text-sm font-medium transition-opacity",
+                    faceDetail.value ? "opacity-50" : "",
+                  )}
+                >
                   Preserve Lip Movement
                 </Switch.Label>
                 <Switch
                   checked={lipSync.value}
-                  onChange={() => (lipSync.value = !lipSync.value)}
-                  className={`${
+                  onChange={handleLipsyncChange}
+                  className={twMerge(
                     lipSync.value
                       ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400"
-                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                      : "bg-gray-500 hover:bg-gray-400",
+                    "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
+                  )}
                 >
                   <span
                     className={`${
@@ -128,29 +163,7 @@ export function StyleButtons() {
                   />
                 </Switch>
               </Switch.Group>
-            </div>
-            <hr className="opacity-[5%]" />
-            <div className="flex items-center py-[6px]">
-              <Switch.Group>
-                <Switch.Label className="mr-3 grow text-sm font-medium">
-                  Use Cinematic
-                </Switch.Label>
-                <Switch
-                  checked={cinematic.value}
-                  onChange={() => (cinematic.value = !cinematic.value)}
-                  className={`${
-                    cinematic.value
-                      ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400"
-                  } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
-                >
-                  <span
-                    className={`${
-                      cinematic.value ? "translate-x-6" : "translate-x-1"
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                  />
-                </Switch>
-              </Switch.Group>
+              <hr className="opacity-[5%]" />
             </div>
           </div>
           <PremiumLock requiredPlan="any" plural={true} className="mt-2">
@@ -158,17 +171,52 @@ export function StyleButtons() {
               <hr className="opacity-[5%]" />
               <div className="flex w-full items-center">
                 <Switch.Group>
-                  <Switch.Label className="mr-3 grow text-sm font-medium">
+                  <Switch.Label
+                    className={twMerge(
+                      "mr-3 grow text-sm font-medium transition-opacity",
+                      lipSync.value ? "opacity-50" : "",
+                    )}
+                  >
+                    Face Detailer
+                  </Switch.Label>
+                  <Switch
+                    checked={faceDetail.value}
+                    onChange={handleFaceDetailerChange}
+                    className={twMerge(
+                      faceDetail.value
+                        ? "bg-brand-primary hover:bg-brand-primary-400"
+                        : "bg-gray-500 hover:bg-gray-400",
+                      "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
+                    )}
+                  >
+                    <span
+                      className={`${
+                        faceDetail.value ? "translate-x-6" : "translate-x-1"
+                      } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                    />
+                  </Switch>
+                </Switch.Group>
+              </div>
+              <hr className="opacity-[5%]" />
+              <div className="flex w-full items-center">
+                <Switch.Group>
+                  <Switch.Label
+                    className={twMerge(
+                      "mr-3 grow text-sm font-medium transition-opacity",
+                      cinematic.value ? "opacity-50" : "",
+                    )}
+                  >
                     Upscale
                   </Switch.Label>
                   <Switch
                     checked={upscale.value}
-                    onChange={() => (upscale.value = !upscale.value)}
-                    className={`${
+                    onChange={handleUpscaleChange}
+                    className={twMerge(
                       upscale.value
                         ? "bg-brand-primary hover:bg-brand-primary-400"
-                        : "bg-gray-500 hover:bg-gray-400"
-                    } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                        : "bg-gray-500 hover:bg-gray-400",
+                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
+                    )}
                   >
                     <span
                       className={`${
@@ -179,23 +227,29 @@ export function StyleButtons() {
                 </Switch.Group>
               </div>
               <hr className="opacity-[5%]" />
-              <div className="flex w-full items-center">
+              <div className="flex items-center">
                 <Switch.Group>
-                  <Switch.Label className="mr-3 grow text-sm font-medium">
-                    Face Detailer
+                  <Switch.Label
+                    className={twMerge(
+                      "mr-3 grow text-sm font-medium transition-opacity",
+                      upscale.value ? "opacity-50" : "",
+                    )}
+                  >
+                    Use Cinematic
                   </Switch.Label>
                   <Switch
-                    checked={faceDetail.value}
-                    onChange={() => (faceDetail.value = !faceDetail.value)}
-                    className={`${
-                      faceDetail.value
+                    checked={cinematic.value}
+                    onChange={handleCinematicChange}
+                    className={twMerge(
+                      cinematic.value
                         ? "bg-brand-primary hover:bg-brand-primary-400"
-                        : "bg-gray-500 hover:bg-gray-400"
-                    } focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0`}
+                        : "bg-gray-500 hover:bg-gray-400",
+                      "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-all focus:outline-none focus:ring-0 focus:ring-offset-0",
+                    )}
                   >
                     <span
                       className={`${
-                        faceDetail.value ? "translate-x-6" : "translate-x-1"
+                        cinematic.value ? "translate-x-6" : "translate-x-1"
                       } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                     />
                   </Switch>
