@@ -36,7 +36,7 @@ use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 use crate::util::allowed_studio_access::allowed_studio_access;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
-pub struct SearchMediaFilesQueryParams {
+pub struct SearchFeaturedMediaFilesQueryParams {
   /// REQUIRED: The search term.
   ///
   /// This supports typeahead, but the request should still be debounced.
@@ -71,13 +71,13 @@ pub struct SearchMediaFilesQueryParams {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct SearchMediaFilesSuccessResponse {
+pub struct SearchFeaturedMediaFilesSuccessResponse {
   pub success: bool,
-  pub results: Vec<SearchMediaFileListItem>,
+  pub results: Vec<SearchFeaturedMediaFileListItem>,
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct SearchMediaFileListItem {
+pub struct SearchFeaturedMediaFileListItem {
   pub token: MediaFileToken,
 
   /// The coarse-grained class of media file: image, video, etc.
@@ -150,51 +150,51 @@ pub struct SearchMediaFileListItem {
 }
 
 #[derive(Debug, ToSchema)]
-pub enum SearchMediaFilesError {
+pub enum SearchFeaturedMediaFilesError {
   ServerError,
   NotAuthorized,
 }
 
-impl ResponseError for SearchMediaFilesError {
+impl ResponseError for SearchFeaturedMediaFilesError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      SearchMediaFilesError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      SearchMediaFilesError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      SearchFeaturedMediaFilesError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      SearchFeaturedMediaFilesError::NotAuthorized => StatusCode::UNAUTHORIZED,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      SearchMediaFilesError::ServerError => "server error".to_string(),
-      SearchMediaFilesError::NotAuthorized => "not authorized".to_string(),
+      SearchFeaturedMediaFilesError::ServerError => "server error".to_string(),
+      SearchFeaturedMediaFilesError::NotAuthorized => "not authorized".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
-impl std::fmt::Display for SearchMediaFilesError {
+impl std::fmt::Display for SearchFeaturedMediaFilesError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-/// Search for media files based on various criteria.
+/// Search for featured media files based on various criteria.
 #[utoipa::path(
   get,
   tag = "Media Files",
-  path = "/v1/media_files/search",
-  params(SearchMediaFilesQueryParams),
+  path = "/v1/media_files/search_featured",
+  params(SearchFeaturedMediaFilesQueryParams),
   responses(
-    (status = 200, description = "Success response", body = SearchMediaFilesSuccessResponse),
-    (status = 500, description = "Server error", body = SearchMediaFilesError),
+    (status = 200, description = "Success Response", body = SearchFeaturedMediaFilesSuccessResponse),
+    (status = 500, description = "Server error", body = SearchFeaturedMediaFilesError),
   ),
 )]
-pub async fn search_media_files_handler(
+pub async fn search_featured_media_files_handler(
     http_request: HttpRequest,
-    query: Query<SearchMediaFilesQueryParams>,
+    query: Query<SearchFeaturedMediaFilesQueryParams>,
     server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, SearchMediaFilesError>
+) -> Result<HttpResponse, SearchFeaturedMediaFilesError>
 {
   let mut maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
   let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
@@ -202,7 +202,7 @@ pub async fn search_media_files_handler(
 
   let results = search_media_files(SearchArgs {
     search_term: &query.search_term,
-    is_featured: None,
+    is_featured: Some(true),
     maybe_media_classes: maybe_filter_media_classes,
     maybe_media_types: maybe_filter_media_types,
     maybe_engine_categories: maybe_filter_engine_categories,
@@ -213,12 +213,12 @@ pub async fn search_media_files_handler(
     Ok(results) => results,
     Err(err) => {
       warn!("Searching error: {:?}", err);
-      return Err(SearchMediaFilesError::ServerError);
+      return Err(SearchFeaturedMediaFilesError::ServerError);
     }
   };
 
   let results = results.into_iter()
-      .map(|result| SearchMediaFileListItem {
+      .map(|result| SearchFeaturedMediaFileListItem {
         token: result.token.clone(),
         media_class: result.media_class,
         media_type: result.media_type,
@@ -270,13 +270,13 @@ pub async fn search_media_files_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = SearchMediaFilesSuccessResponse {
+  let response = SearchFeaturedMediaFilesSuccessResponse {
     success: true,
     results,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| SearchMediaFilesError::ServerError)?;
+      .map_err(|e| SearchFeaturedMediaFilesError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

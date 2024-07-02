@@ -1,1 +1,2 @@
 pub mod search_media_files_handler;
+pub mod search_featured_media_files_handler;
