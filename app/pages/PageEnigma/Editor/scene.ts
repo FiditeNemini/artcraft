@@ -81,6 +81,8 @@ class Scene {
       geometry = new THREE.TorusGeometry(0.5, 0.25, 8, 24);
     } else if (name == "Water") {
       geometry = new THREE.PlaneGeometry(100, 100);
+    } else if (name == "PointLight") {
+      geometry = new THREE.SphereGeometry(0.06, 18, 12);
     } else if (name.includes("Image::")) {
       geometry = new THREE.PlaneGeometry(1, 1);
     }
@@ -122,6 +124,12 @@ class Scene {
       });
       obj = new THREE.Mesh(geometry, image_material);
       obj.userData["media_id"] = name;
+    } else if (name == "PointLight") {
+      const light_material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+      });
+      obj = new THREE.Mesh(geometry, light_material);
+      obj.userData["media_id"] = "Parim";
     } 
     else {
       obj = new THREE.Mesh(geometry, material);
@@ -137,7 +145,18 @@ class Scene {
     obj.userData["shininess"] = 0.5;
     obj.userData["specular"] = 0.0;
     obj.userData["locked"] = false;
+
     this.scene.add(obj);
+
+    if (name == "PointLight") {
+      const light = new THREE.PointLight( 0xffffff, 1, 100 );
+      this.scene.add(light);
+      light.position.copy(obj.position);
+      obj.attach(light);
+      obj.layers.set(1);
+      obj.userData["light"] = light.uuid;
+    }
+
     return obj;
   }
 
@@ -343,6 +362,13 @@ class Scene {
               c.material.color.set(new THREE.Color(currentColor));
             } else {
               c.material.color.set(new THREE.Color(hex_color));
+            }
+
+            if(c.name == "PointLight") {
+              const light = this.get_object_by_uuid(c.userData["light"]);
+              if (light) {
+                (light as THREE.PointLight).color = new THREE.Color(hex_color);
+              }
             }
           }
         }
