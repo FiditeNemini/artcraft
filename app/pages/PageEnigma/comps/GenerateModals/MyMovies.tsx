@@ -49,7 +49,7 @@ const MovieList = ({ setMovieId }: Props) => {
     return (
       <div className="flex h-full w-full flex-col justify-center gap-6 text-center align-middle">
         <FontAwesomeIcon icon={faSpinnerThird} spin size={"3x"} />
-        <H3>Retreiving Completed Movies</H3>
+        <H3>Retrieving Completed Movies</H3>
       </div>
     );
   }

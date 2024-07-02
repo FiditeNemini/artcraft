@@ -54,10 +54,10 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   return (
     <TransitionDialogue
       title={generateTitle()}
-      titleIcon={generateMovieId.value ? faFilm : faChevronLeft}
+      titleIcon={generateMovieId.value ? faChevronLeft : faFilm}
       titleIconClassName="text-white/60 hover:text-white/80 transition-colors duration-150"
       onTitleIconClick={
-        generateMovieId.value ? undefined : () => setMediaFile(null)
+        generateMovieId.value ? () => setMediaFile(null) : undefined
       }
       className="max-w-6xl"
       childPadding={false}
