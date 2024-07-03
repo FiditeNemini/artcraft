@@ -275,6 +275,7 @@ export const ObjectsTab = () => {
             value={selectedFilter}
             onClick={(button) => {
               setSelectedFilter(Number(button));
+              setCurrentPage(0);
             }}
           />
           <div className="flex w-full flex-col gap-3 px-4">

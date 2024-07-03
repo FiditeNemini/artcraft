@@ -118,6 +118,7 @@ export const ExpressionTab = () => {
         value={selectedFilter}
         onClick={(button) => {
           setSelectedFilter(button);
+          setCurrentPage(0);
         }}
       />
 

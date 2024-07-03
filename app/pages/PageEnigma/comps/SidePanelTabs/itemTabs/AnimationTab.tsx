@@ -168,6 +168,7 @@ export const AnimationTab = () => {
         value={selectedFilter}
         onClick={(buttonIdx) => {
           setSelectedFilter(Number(buttonIdx));
+          setCurrentPage(0);
         }}
       />
 

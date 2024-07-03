@@ -43,6 +43,7 @@ export const PageAudioLibrary = ({
         value={selectedFilter}
         onClick={(buttonIdx) => {
           setSelectedFilter(Number(buttonIdx));
+          setCurrentPage(0);
         }}
       />
 

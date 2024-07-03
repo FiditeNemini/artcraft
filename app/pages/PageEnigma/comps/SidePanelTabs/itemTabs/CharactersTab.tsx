@@ -169,6 +169,7 @@ export const CharactersTab = () => {
                 value={selectedFilter}
                 onClick={(button) => {
                   setSelectedFilter(Number(button));
+                  setCurrentPage(0);
                 }}
               />
             </div>
