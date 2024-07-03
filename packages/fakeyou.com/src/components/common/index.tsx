@@ -11,6 +11,7 @@ import Checkbox from "./Checkbox";
 import { MediaCards, SkeletonCard, WeightsCards } from "./Card";
 import Container from "./Container";
 import CoverImageInput from "./CoverImageInput";
+import DeviceNotSupported from "./DeviceNotSupported";
 import ErrorMessage from "./ErrorMessage";
 import FileActions from "./FileActions";
 import FileDetails from "./FileDetails";
@@ -68,6 +69,7 @@ export {
   BookmarkButton,
   Button,
   //Cards
+  DeviceNotSupported,
   MediaCards,
   SkeletonCard,
   WeightsCards,

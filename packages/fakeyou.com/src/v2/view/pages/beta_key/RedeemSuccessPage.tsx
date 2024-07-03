@@ -1,6 +1,17 @@
-import { Button, Container } from "components/common";
+import {
+  Button,
+  Container,
+  Panel,
+  DeviceNotSupported,
+} from "components/common";
 import React from "react";
 import "./BetaKey.scss";
+import {
+  faCirclePlay,
+  faPersonToPortal,
+} from "@fortawesome/pro-solid-svg-icons";
+import RemixScenes from "components/common/RemixScenes";
+import { isMobile } from "react-device-detect";
 
 export default function RedeemSuccessPage() {
   const handleWatchTutorial = () => {
@@ -13,36 +24,66 @@ export default function RedeemSuccessPage() {
 
   return (
     <>
-      <Container type="panel" className="redeem-container">
-        <div className="d-flex flex-column align-items-center justify-content-center vh-100">
+      <Container type="panel" className="redeem-container mb-5">
+        <div className="d-flex flex-column align-items-center justify-content-center mt-5 pt-lg-3">
           <div className="px-4 d-flex flex-column align-items-center">
             <img
               src="/mascot/kitsune_pose7.webp"
               alt="Success Mascot"
-              style={{ maxWidth: "100%" }}
+              style={{ maxWidth: "300px" }}
             />
             <div className="d-flex flex-column align-items-center">
               <h2 className="fw-bold mb-1">Redemption Success</h2>
-              <p className="opacity-75 text-center fs-5">
+              <p className="opacity-75 text-center fs-5 fw-medium">
                 You now have access to Storyteller Studio Beta!
+                {isMobile && " But..."}
               </p>
             </div>
           </div>
-
-          <div className="d-flex flex-column align-items-center">
-            <Button
-              label="Watch Tutorial"
-              className="redeem-button mt-4"
-              onClick={handleWatchTutorial}
-            />
-            <Button
-              label="Enter Studio"
-              className="redeem-button mt-4"
-              onClick={handleEnterStudio}
-            />
-          </div>
         </div>
       </Container>
+
+      {isMobile ? (
+        <DeviceNotSupported />
+      ) : (
+        <>
+          <Container type="panel" className="pt-3">
+            <Panel padding={true}>
+              <div className="d-flex flex-column align-items-center text-center">
+                <h3 className="fw-bold mb-1">Let's get started</h3>
+                <p className="fw-medium mb-4 fs-5 opacity-75">
+                  Click on a scene below to remix it.
+                </p>
+              </div>
+
+              <RemixScenes />
+            </Panel>
+          </Container>
+
+          <Container type="panel" className="redeem-container">
+            <div className="w-100 d-flex gap-4 justify-content-between my-5 align-items-center">
+              <hr className="flex-grow-1" />
+              <span className="fw-bold fs-5 opacity-75">OR</span>
+              <hr className="flex-grow-1" />
+            </div>
+
+            <div className="d-flex gap-3 align-items-center justify-content-center mt-4">
+              <Button
+                icon={faCirclePlay}
+                label="Watch Tutorial"
+                onClick={handleWatchTutorial}
+                variant="secondary"
+              />
+              <Button
+                icon={faPersonToPortal}
+                label="Enter Studio"
+                onClick={handleEnterStudio}
+                variant="secondary"
+              />
+            </div>
+          </Container>
+        </>
+      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import "./Card.scss";
 
 interface CardProps {
@@ -9,8 +9,6 @@ interface CardProps {
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   backgroundImage?: string;
-  backgroundVideo?: string;
-  backgroundVideoHover?: string;
   height?: string;
   borderWidth?: string;
   hoverPrimaryColor?: true;
@@ -30,44 +28,13 @@ export default function Card({
   borderWidth,
   hoverPrimaryColor,
   aspectRatio = "auto",
-  bottomText,
-  backgroundVideo,
-  backgroundVideoHover,
 }: CardProps) {
-  const [textHovered, setTextHovered] = useState(false);
-  const [videoHovered, setVideoHovered] = useState(false);
-  const bgVideoRef = useRef<HTMLVideoElement>(null);
-  const bgVideoHoverRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (backgroundVideo && backgroundVideoHover) {
-      const bgVideo = bgVideoRef.current;
-      const bgVideoHover = bgVideoHoverRef.current;
-
-      if (bgVideo && bgVideoHover) {
-        const syncVideos = () => {
-          if (videoHovered) {
-            bgVideoHover.currentTime = bgVideo.currentTime;
-          }
-        };
-
-        bgVideo.addEventListener("timeupdate", syncVideos);
-
-        return () => {
-          bgVideo.removeEventListener("timeupdate", syncVideos);
-        };
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoHovered]);
-
   return (
     <>
       <div
         className={`card ${padding ? "p-3" : ""} ${
           onClick || canHover ? "card-clickable" : ""
-        } ${hoverPrimaryColor ? "card-hover-border-red" : ""} ${
-          textHovered ? "bottom-text-hover" : ""
+        } ${hoverPrimaryColor ? "card-hover-border-red" : ""}
         }`.trim()}
         style={{
           // ...(backgroundImage
@@ -88,55 +55,9 @@ export default function Card({
       >
         {children}
         {backgroundImage && (
-          <img
-            src={backgroundImage}
-            alt="Thumbnail"
-            className={`card-bg ${textHovered ? "card-bg-hover-img" : ""}`}
-          />
+          <img src={backgroundImage} alt="Thumbnail" className="card-bg" />
         )}
-        <div
-          onMouseEnter={() => setVideoHovered(true)}
-          onMouseLeave={() => setVideoHovered(false)}
-        >
-          {backgroundVideo && (
-            <video
-              ref={bgVideoRef}
-              src={backgroundVideo}
-              preload="auto"
-              autoPlay
-              loop
-              muted
-              className="w-100"
-              style={{
-                display:
-                  !videoHovered && backgroundVideoHover ? "block" : "none",
-              }}
-            />
-          )}
-          {backgroundVideoHover && (
-            <video
-              ref={bgVideoHoverRef}
-              src={backgroundVideoHover}
-              preload="auto"
-              autoPlay
-              loop
-              muted
-              className="w-100"
-              style={{ display: videoHovered ? "block" : "none" }}
-            />
-          )}
-        </div>
       </div>
-      {bottomText && (
-        <h6
-          className="card-bottom-text"
-          onClick={onClick}
-          onMouseEnter={() => setTextHovered(true)}
-          onMouseLeave={() => setTextHovered(false)}
-        >
-          {bottomText}
-        </h6>
-      )}
     </>
   );
 }
