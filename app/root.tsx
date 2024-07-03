@@ -22,7 +22,6 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 import { pageHeight, pageWidth } from "~/signals";
-import { Toaster } from "~/components";
 
 config.autoAddCss = false; /* eslint-disable import/first */
 
@@ -96,7 +95,6 @@ export default function App() {
       <body className="overflow-hidden bg-ui-background">
         {data && <GlobalSettingsManager env={data.ENV} />}
         <div className="topbar-spacer" />
-        <Toaster />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

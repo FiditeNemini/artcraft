@@ -70,12 +70,12 @@ export const Toaster = () => {
         <div
           key={toast.id}
           ref={(el) => (toastRefs.current[index] = el)}
-          className="absolute z-50 w-[360px] animate-fadeIn rounded-lg border-2 border-[#5E5E7C] bg-ui-controls p-4 shadow-xl"
+          className="absolute z-50 w-[360px] animate-fadeIn rounded-lg border-2 border-[#5E5E7C] bg-ui-controls p-3 shadow-xl"
           style={{
             top: heights
               .slice(0, index)
-              .reduce((acc, height) => acc + height + 8, 12),
-            right: 12,
+              .reduce((acc, height) => acc + height + 8, 52),
+            right: 8,
           }}
         >
           <div className="flex justify-between rounded-lg">

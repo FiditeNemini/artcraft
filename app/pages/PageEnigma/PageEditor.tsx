@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { LoadingDots, TopBar } from "~/components";
+import { LoadingDots, Toaster, TopBar } from "~/components";
 import { SidePanel } from "~/pages/PageEnigma/comps/SidePanel";
 import { Timeline } from "./comps/Timeline";
 import { Controls3D } from "./comps/Controls3D";
@@ -99,6 +99,7 @@ export const PageEditor = () => {
         >
           <div className="relative w-full overflow-hidden bg-transparent">
             <SceneContainer>
+              <Toaster />
               <EditorCanvas />
               <PreviewFrameImage />
             </SceneContainer>
