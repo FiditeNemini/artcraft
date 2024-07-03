@@ -9,10 +9,9 @@ function PosthogInit() {
     const data = EnvironmentVariables.values;
 
     const apiKey = data.REACT_APP_PUBLIC_POSTHOG_KEY as string;
-
     posthog.init(apiKey, {
-      ui_host: data.DEPLOY_PRIME_URL as string,
-      api_host: data.REACT_APP_PUBLIC_POSTHOG_UI as string,
+      api_host: data.DEPLOY_PRIME_URL + "/ingest" as string,
+      ui_host: data.REACT_APP_PUBLIC_POSTHOG_UI as string,
     });
   }, []);
 
