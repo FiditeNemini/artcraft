@@ -449,6 +449,7 @@ export default function MediaPage({
         case MediaFileType.GLB:
         case MediaFileType.GLTF:
         case MediaFileType.Pmd:
+        case MediaFileType.Pmx:
         case MediaFileType.SceneRon:
         case MediaFileType.Vmd:
           return (
