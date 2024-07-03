@@ -34,6 +34,13 @@ interface ListUserMediaQuery {
   filter_engine_categories?: FilterEngineCategories[];
 }
 
+interface SearchFeaturedMediaQuery {
+  search_term: string;
+  filter_media_classes?: FilterMediaClasses[];
+  filter_media_type?: FilterMediaType[];
+  filter_engine_categories?: FilterEngineCategories[];
+}
+
 export class MediaFilesApi extends ApiManager {
   public async DeleteMediaFileByToken({
     mediaFileToken,
@@ -213,6 +220,70 @@ export class MediaFilesApi extends ApiManager {
           errorMessage: err.message,
         };
       });
+  }
+
+  public async SearchFeaturedMediaFiles(
+    query: SearchFeaturedMediaQuery,
+  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/search_featured`;
+    const queryWithStrings = {
+      search_term: query.search_term,
+      filter_media_classes: query.filter_media_classes
+        ? query.filter_media_classes.join(",")
+        : undefined,
+      filter_media_type: query.filter_media_type
+        ? query.filter_media_type.join(",")
+        : undefined,
+      filter_engine_categories: query.filter_engine_categories
+        ? query.filter_engine_categories.join(",")
+        : undefined,
+    };
+    return await this.get<{
+      success: boolean;
+      results: MediaInfo[];
+      pagination: Pagination;
+    }>({ endpoint, query: queryWithStrings })
+      .then((response) => ({
+        success: true,
+        data: response.results,
+        pagination: response.pagination,
+      }))
+      .catch((err) => ({
+        success: false,
+        errorMessage: err.message,
+      }));
+  }
+
+  public async SearchUserMediaFiles(
+    query: SearchFeaturedMediaQuery,
+  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/search_session`;
+    const queryWithStrings = {
+      search_term: query.search_term,
+      filter_media_classes: query.filter_media_classes
+        ? query.filter_media_classes.join(",")
+        : undefined,
+      filter_media_type: query.filter_media_type
+        ? query.filter_media_type.join(",")
+        : undefined,
+      filter_engine_categories: query.filter_engine_categories
+        ? query.filter_engine_categories.join(",")
+        : undefined,
+    };
+    return await this.get<{
+      success: boolean;
+      results: MediaInfo[];
+      pagination: Pagination;
+    }>({ endpoint, query: queryWithStrings })
+      .then((response) => ({
+        success: true,
+        data: response.results,
+        pagination: response.pagination,
+      }))
+      .catch((err) => ({
+        success: false,
+        errorMessage: err.message,
+      }));
   }
 
   public async RenameMediaFileByToken({

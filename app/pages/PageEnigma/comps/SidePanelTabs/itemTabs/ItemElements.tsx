@@ -2,6 +2,8 @@ import { ItemElement } from "./ItemElement";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/signals";
 import { H4, P, LoadingDots } from "~/components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEmptySet } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   busy?: boolean;
@@ -51,11 +53,15 @@ export const ItemElements = ({
       </div>
     );
   }
-  if (items.length === 0) {
+  if (items.length === 0 && !busy) {
     return (
-      <div className="h-full w-full text-center">
-        <H4> You do not have anything here. </H4>
-        <P> Plase upload some assets. </P>
+      <div className="flex h-full w-full flex-col items-center justify-center text-center">
+        <FontAwesomeIcon
+          icon={faEmptySet}
+          className="mb-4 text-4xl opacity-30"
+        />
+        <H4>You do not have anything here.</H4>
+        <P className="text-sm opacity-75">Please upload some assets.</P>
       </div>
     );
   }

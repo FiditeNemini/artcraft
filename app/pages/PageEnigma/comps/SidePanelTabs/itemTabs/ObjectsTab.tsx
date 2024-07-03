@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
@@ -6,6 +7,7 @@ import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
   AssetType,
+  FeatureFlags,
   FilterEngineCategories,
   ToastTypes,
 } from "~/enums";
@@ -16,7 +18,13 @@ import { shapeItems } from "~/pages/PageEnigma/signals";
 import { BucketConfig } from "~/api/BucketConfig";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FileWrapper, FilterButtons, Pagination } from "~/components";
+import {
+  Button,
+  FileWrapper,
+  FilterButtons,
+  SearchFilter,
+  Pagination,
+} from "~/components";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { MediaFilesApi } from "~/Classes/ApiManager";
 import { addToast } from "~/signals";
@@ -24,6 +32,17 @@ import { addToast } from "~/signals";
 export const ObjectsTab = () => {
   useSignals();
 
+  const showSearchObjectComponent = usePosthogFeatureFlag(
+    FeatureFlags.SHOW_SEARCH_OBJECTS,
+  );
+
+  const [searchTermFeatured, setSearchTermFeatured] = useState("");
+  const [searchTermMine, setSearchTermMine] = useState("");
+  const [filteredSearchObjectsFeatured, setFilteredSearchObjectsFeatured] =
+    useState<MediaItem[]>([]);
+  const [filteredSearchObjectsMine, setFilteredSearchObjectsMine] = useState<
+    MediaItem[]
+  >([]);
   const [userObjects, setUserObjects] = useState<MediaItem[] | undefined>(
     undefined,
   );
@@ -46,12 +65,15 @@ export const ObjectsTab = () => {
   const [fetchStatuses, setFetchStatuses] = useState({
     userObjectsFetch: FetchStatus.READY,
     featuredObjectsFetch: FetchStatus.READY,
+    searchFetch: FetchStatus.READY,
   });
   const isFetching =
     fetchStatuses.userObjectsFetch === FetchStatus.READY ||
     fetchStatuses.userObjectsFetch === FetchStatus.IN_PROGRESS ||
     fetchStatuses.featuredObjectsFetch === FetchStatus.READY ||
-    fetchStatuses.featuredObjectsFetch === FetchStatus.IN_PROGRESS;
+    fetchStatuses.featuredObjectsFetch === FetchStatus.IN_PROGRESS ||
+    fetchStatuses.searchFetch === FetchStatus.READY ||
+    fetchStatuses.searchFetch === FetchStatus.IN_PROGRESS;
 
   const responseMapping = (data: MediaInfo[]) => {
     return data.map((item) => {
@@ -78,6 +100,86 @@ export const ObjectsTab = () => {
     });
   };
 
+  const fetchFeaturedSearchResults = useCallback(async () => {
+    setFetchStatuses((curr) => ({
+      ...curr,
+      searchFetch: FetchStatus.IN_PROGRESS,
+    }));
+    const searchTerm = searchTermFeatured;
+    if (!searchTerm.trim()) {
+      setFilteredSearchObjectsFeatured([]);
+      setFetchStatuses((curr) => ({
+        ...curr,
+        searchFetch: FetchStatus.SUCCESS,
+      }));
+      return;
+    }
+
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.SearchFeaturedMediaFiles({
+      search_term: searchTerm,
+      filter_engine_categories: [FilterEngineCategories.OBJECT],
+    });
+
+    if (response.success && response.data) {
+      const newSearchObjects = responseMapping(response.data);
+      setFilteredSearchObjectsFeatured(newSearchObjects);
+      setFetchStatuses((curr) => ({
+        ...curr,
+        searchFetch: FetchStatus.SUCCESS,
+      }));
+    } else {
+      addToast(
+        ToastTypes.ERROR,
+        response.errorMessage || "Failed to fetch search results",
+      );
+      setFetchStatuses((curr) => ({
+        ...curr,
+        searchFetch: FetchStatus.ERROR,
+      }));
+    }
+  }, [searchTermFeatured]);
+
+  const fetchUserSearchResults = useCallback(async () => {
+    setFetchStatuses((curr) => ({
+      ...curr,
+      searchFetch: FetchStatus.IN_PROGRESS,
+    }));
+    const searchTerm = searchTermMine;
+    if (!searchTerm.trim()) {
+      setFilteredSearchObjectsMine([]);
+      setFetchStatuses((curr) => ({
+        ...curr,
+        searchFetch: FetchStatus.SUCCESS,
+      }));
+      return;
+    }
+
+    const mediaFilesApi = new MediaFilesApi();
+    const response = await mediaFilesApi.SearchUserMediaFiles({
+      search_term: searchTerm,
+      filter_engine_categories: [FilterEngineCategories.OBJECT],
+    });
+
+    if (response.success && response.data) {
+      const newSearchObjects = responseMapping(response.data);
+      setFilteredSearchObjectsMine(newSearchObjects);
+      setFetchStatuses((curr) => ({
+        ...curr,
+        searchFetch: FetchStatus.SUCCESS,
+      }));
+    } else {
+      addToast(
+        ToastTypes.ERROR,
+        response.errorMessage || "Failed to fetch search results",
+      );
+      setFetchStatuses((curr) => ({
+        ...curr,
+        searchFetch: FetchStatus.ERROR,
+      }));
+    }
+  }, [searchTermMine]);
+
   const fetchUserObjects = useCallback(async () => {
     setFetchStatuses((curr) => ({
       ...curr,
@@ -86,7 +188,10 @@ export const ObjectsTab = () => {
     const mediaFilesApi = new MediaFilesApi();
     const response = await mediaFilesApi.ListUserMediaFiles({
       page_size: 100,
-      filter_engine_categories: [FilterEngineCategories.OBJECT, FilterEngineCategories.IMAGE_PLANE],
+      filter_engine_categories: [
+        FilterEngineCategories.OBJECT,
+        FilterEngineCategories.IMAGE_PLANE,
+      ],
     });
 
     if (response.success && response.data) {
@@ -145,6 +250,20 @@ export const ObjectsTab = () => {
     }
   }, [userObjects, fetchUserObjects, featuredObjects, fetchFeaturedObjects]);
 
+  useEffect(() => {
+    if (selectedFilter === AssetFilterOption.FEATURED) {
+      fetchFeaturedSearchResults();
+    } else if (selectedFilter === AssetFilterOption.MINE) {
+      fetchUserSearchResults();
+    }
+  }, [
+    searchTermFeatured,
+    searchTermMine,
+    fetchFeaturedSearchResults,
+    fetchUserSearchResults,
+    selectedFilter,
+  ]);
+
   return (
     <FileWrapper
       onSuccess={fetchUserObjects}
@@ -158,7 +277,7 @@ export const ObjectsTab = () => {
               setSelectedFilter(Number(button));
             }}
           />
-          <div className="w-full px-4">
+          <div className="flex w-full flex-col gap-3 px-4">
             <Button
               className="file-picker-button py-3"
               htmlFor={parentId}
@@ -167,6 +286,21 @@ export const ObjectsTab = () => {
             >
               Upload Object
             </Button>
+            {showSearchObjectComponent && (
+              <SearchFilter
+                searchTerm={
+                  selectedFilter === AssetFilterOption.FEATURED
+                    ? searchTermFeatured
+                    : searchTermMine
+                }
+                onSearchChange={
+                  selectedFilter === AssetFilterOption.FEATURED
+                    ? setSearchTermFeatured
+                    : setSearchTermMine
+                }
+                key={selectedFilter}
+              />
+            )}
           </div>
           <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
             <ItemElements
@@ -174,7 +308,15 @@ export const ObjectsTab = () => {
               debug="objects tab"
               currentPage={currentPage}
               pageSize={pageSize}
-              items={filteredObjects}
+              items={
+                selectedFilter === AssetFilterOption.FEATURED
+                  ? searchTermFeatured
+                    ? filteredSearchObjectsFeatured
+                    : filteredObjects
+                  : searchTermMine
+                    ? filteredSearchObjectsMine
+                    : filteredObjects
+              }
             />
           </div>
           {totalPages > 1 && (
@@ -188,7 +330,7 @@ export const ObjectsTab = () => {
             />
           )}
         </>
-      )} // End FileWrapper Render
+      )}
     />
   );
 };

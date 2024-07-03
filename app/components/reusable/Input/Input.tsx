@@ -12,6 +12,7 @@ import {
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   inputClassName?: string;
+  iconClassName?: string;
   label?: string;
   icon?: IconDefinition;
   isError?: boolean;
@@ -24,6 +25,7 @@ export const Input = React.forwardRef(
       label,
       icon,
       inputClassName,
+      iconClassName,
       className,
       id,
       isError,
@@ -42,7 +44,7 @@ export const Input = React.forwardRef(
           {icon && (
             <FontAwesomeIcon
               icon={icon}
-              className="text-md absolute pl-3 pt-3"
+              className={twMerge("text-md absolute pl-3 pt-3", iconClassName)}
             />
           )}
           <input

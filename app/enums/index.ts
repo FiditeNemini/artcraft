@@ -5,6 +5,7 @@ export * from "./authentication";
 export * from "./Billing";
 export * from "./ClipGroup";
 export * from "./ClipType";
+export * from "./FeatureFlags";
 export * from "./FileTypes";
 export * from "./JobStatus";
 export * from "./MediaFileAnimationTypes";

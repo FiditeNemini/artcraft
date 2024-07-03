@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { faCirclePlus, faMobileNotch } from "@fortawesome/pro-solid-svg-icons";
+import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 
 import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
 import {
@@ -14,7 +14,6 @@ import {
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import {
   Button,
-  ButtonDialogue,
   FilterButtons,
   Pagination,
   UploadModalMovement,
@@ -131,27 +130,6 @@ export const ExpressionTab = () => {
         >
           Upload Expression
         </Button>
-        <ButtonDialogue
-          buttonProps={{
-            variant: "secondary",
-            label:
-              "Watch a tutorial on how to create expressions using your iPhone",
-            className:
-              "justify-center border-2 border-white/30 hover:border-white/40 text-start p-3 gap-3.5 rounded-xl",
-            icon: faMobileNotch,
-            iconClassName: "text-3xl",
-          }}
-          dialogProps={{
-            className: "max-w-6xl",
-          }}
-          title={<>Video Tutorial: Creating your own expressions</>}
-        >
-          <video
-            className="aspect-video w-full rounded-lg"
-            controls
-            src="https://storage.googleapis.com/vocodes-public/media/t/p/w/q/6/tpwq6beqn95f1h1q9e88c42r0gdekg7p/storyteller_tpwq6beqn95f1h1q9e88c42r0gdekg7p.mp4"
-          ></video>
-        </ButtonDialogue>
       </div>
       <div className="h-full w-full overflow-y-auto px-4 pb-4">
         <ItemElements

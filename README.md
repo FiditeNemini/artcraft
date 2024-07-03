@@ -90,13 +90,20 @@ Add the feature flag for all users.
 To check the feature flag in the app use code similar to this
 
 ```ts
-const [myFlag, setMyFlag] = useState(false);
-useEffect(() => {
-  const flag = posthog.isFeatureEnabled("<flag name>");
-  if (flag) {
-    setMyFlag(true);
-  }
-}, []);
+import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureflag";
+import { FeatureFlags } from "~/enums";
+
+const Component = () => {
+  const flag = usePosthogFeatureFlag(FeaturesFlags.FLAG_NAME);
+  // if flag is true, the feature shoud be executed & showed;
+  // if flag is false, the feature should be disabled & hid;
+  // for example
+  return(
+    <>
+      {flag && <ComponentThatDependsOnTheFlag />}
+    </>
+  );
+};
 ```
 
 ## Other Documentation

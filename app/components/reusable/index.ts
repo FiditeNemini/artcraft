@@ -17,6 +17,7 @@ export * from "./LoadingBar";
 export * from "./NumberInput";
 export * from "./Pagination";
 export * from "./Pill";
+export * from "./SearchFilter";
 export * from "./Select"; //Select's onChange type should be generic
 export * from "./Slider";
 export * from "./Tabs";

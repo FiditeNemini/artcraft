@@ -1,7 +1,8 @@
 import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
-import posthog from "posthog-js";
+import { posthog } from "posthog-js";
+import { PostHogProvider } from "posthog-js/react";
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 
 function PosthogInit() {
@@ -22,7 +23,9 @@ startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <RemixBrowser />
+      <PostHogProvider client={posthog}>
+        <RemixBrowser />
+      </PostHogProvider>
       <PosthogInit />
     </StrictMode>,
   );

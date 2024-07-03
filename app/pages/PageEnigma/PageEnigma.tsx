@@ -2,11 +2,11 @@ import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 import { EngineProvider } from "./contexts/EngineContext";
-import { useActiveJobs } from "~/hooks";
+import { useActiveJobs } from "~/hooks/useActiveJobs";
+import { useBackgroundLoadingMedia } from "~/hooks/useBackgroundLoadingMedia";
 import { useQueueHandler } from "./hooks/useQueueHandler";
 import { ErrorDialog, LoadingDots } from "~/components";
 import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
-import { useBackgroundLoadingMedia } from "~/hooks/useBackgroundLoadingMedia";
 
 import { EditorLoadingBar } from "./comps/EditorLoadingBar";
 import { useSignals } from "@preact/signals-react/runtime";
