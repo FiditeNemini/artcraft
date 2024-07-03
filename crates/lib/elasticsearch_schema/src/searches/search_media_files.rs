@@ -8,6 +8,7 @@ use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 
 use crate::documents::media_file_document::{MEDIA_FILE_INDEX, MediaFileDocument};
 
@@ -23,6 +24,7 @@ static JSON_QUERY : Lazy<Value> = Lazy::new(|| {
 pub struct SearchArgs<'a> {
   pub search_term: &'a str,
   pub is_featured: Option<bool>,
+  pub maybe_creator_user_token: Option<&'a UserToken>,
   pub maybe_media_classes: Option<HashSet<MediaFileClass>>,
   pub maybe_media_types: Option<HashSet<MediaFileType>>,
   pub maybe_engine_categories: Option<HashSet<MediaFileEngineCategory>>,
@@ -84,6 +86,10 @@ fn build_query(args: &SearchArgs) -> AnyhowResult<Value> {
       predicates.push(featured_predicate(is_featured));
     }
 
+    if let Some(creator_user_token) = args.maybe_creator_user_token {
+      predicates.push(creator_user_token_predicate(creator_user_token));
+    }
+
     if let Some(media_classes) = &args.maybe_media_classes {
       predicates.push(media_classes_predicate(media_classes));
     }
@@ -126,6 +132,14 @@ fn featured_predicate(is_featured: bool) -> Value {
   json!({
     "term": {
       "is_featured": is_featured,
+    }
+  })
+}
+
+fn creator_user_token_predicate(creator_user_token: &UserToken) -> Value {
+  json!({
+    "term": {
+      "maybe_creator_user_token": creator_user_token.as_str(),
     }
   })
 }
@@ -185,6 +199,7 @@ mod tests {
   use enums::by_table::media_files::media_file_class::MediaFileClass;
   use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
   use enums::by_table::media_files::media_file_type::MediaFileType;
+  use tokens::tokens::users::UserToken;
 
   use crate::searches::search_media_files::{build_query, SearchArgs};
 
@@ -193,6 +208,7 @@ mod tests {
     let search = build_query(&SearchArgs {
       search_term: "foo",
       is_featured: None,
+      maybe_creator_user_token: None,
       maybe_media_classes: None,
       maybe_media_types: None,
       maybe_engine_categories: None,
@@ -225,6 +241,7 @@ mod tests {
     let search = build_query(&SearchArgs {
       search_term: "asdf",
       is_featured: Some(true),
+      maybe_creator_user_token: None,
       maybe_media_classes: None,
       maybe_media_types: None,
       maybe_engine_categories: None,
@@ -258,10 +275,49 @@ mod tests {
   }
 
   #[test]
+  fn test_creator_user_token() {
+    let search = build_query(&SearchArgs {
+      search_term: "asdf",
+      is_featured: None,
+      maybe_creator_user_token: Some(&UserToken::new_from_str("USER_TOKEN")),
+      maybe_media_classes: None,
+      maybe_media_types: None,
+      maybe_engine_categories: None,
+      client: &elasticsearch::Elasticsearch::default(),
+    }).unwrap();
+
+    let value = jsonpath_lib::select(
+      &search, "$.query.bool.must[0].bool.must[0].term.is_deleted").unwrap();
+
+    assert_eq!(value[0], &Value::Bool(false));
+
+    let value = jsonpath_lib::select(
+      &search, "$.query.bool.must[0].bool.must[1].term.maybe_creator_user_token").unwrap();
+
+    assert_eq!(value[0], &Value::String("USER_TOKEN".to_string()));
+
+    let value = jsonpath_lib::select(
+      &search, "$.query.bool.must[0].bool.should[0].fuzzy.maybe_title.value").unwrap();
+
+    assert_eq!(value[0], &Value::String("asdf".to_string()));
+
+    let value = jsonpath_lib::select(
+      &search, "$.query.bool.must[0].bool.should[1].match.maybe_title.query").unwrap();
+
+    assert_eq!(value[0], &Value::String("asdf".to_string()));
+
+    let value = jsonpath_lib::select(
+      &search, "$.query.bool.must[0].bool.should[2].multi_match.query").unwrap();
+
+    assert_eq!(value[0], &Value::String("asdf".to_string()));
+  }
+
+  #[test]
   fn test_media_class() {
     let search = build_query(&SearchArgs {
       search_term: "bar",
       is_featured: None,
+      maybe_creator_user_token: None,
       maybe_media_classes: Some(HashSet::from_iter(vec![
         MediaFileClass::Dimensional,
         MediaFileClass::Image,
@@ -288,6 +344,7 @@ mod tests {
     let search = build_query(&SearchArgs {
       search_term: "baz",
       is_featured: None,
+      maybe_creator_user_token: None,
       maybe_media_classes: None,
       maybe_media_types: Some(HashSet::from_iter(vec![
         MediaFileType::Glb,
@@ -314,6 +371,7 @@ mod tests {
     let search = build_query(&SearchArgs {
       search_term: "bin",
       is_featured: None,
+      maybe_creator_user_token: None,
       maybe_media_classes: None,
       maybe_media_types: None,
       maybe_engine_categories: Some(HashSet::from_iter(vec![

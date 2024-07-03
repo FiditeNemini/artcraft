@@ -203,6 +203,7 @@ pub async fn search_featured_media_files_handler(
   let results = search_media_files(SearchArgs {
     search_term: &query.search_term,
     is_featured: Some(true),
+    maybe_creator_user_token: None,
     maybe_media_classes: maybe_filter_media_classes,
     maybe_media_types: maybe_filter_media_types,
     maybe_engine_categories: maybe_filter_engine_categories,

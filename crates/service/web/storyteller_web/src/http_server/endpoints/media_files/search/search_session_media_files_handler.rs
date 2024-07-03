@@ -21,6 +21,7 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::users::UserToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
@@ -179,23 +180,49 @@ impl std::fmt::Display for SearchMediaFilesError {
   }
 }
 
-/// Search for media files based on various criteria.
+/// Search for media files for the active user based on various criteria.
+///
+/// This only returns media files owned by the active user.
 #[utoipa::path(
   get,
   tag = "Media Files",
-  path = "/v1/media_files/search",
+  path = "/v1/media_files/search_session",
   params(SearchMediaFilesQueryParams),
   responses(
     (status = 200, description = "Success response", body = SearchMediaFilesSuccessResponse),
+    (status = 401, description = "Not authorized", body = SearchMediaFilesError),
     (status = 500, description = "Server error", body = SearchMediaFilesError),
   ),
 )]
-pub async fn search_media_files_handler(
+pub async fn search_session_media_files_handler(
     http_request: HttpRequest,
     query: Query<SearchMediaFilesQueryParams>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, SearchMediaFilesError>
 {
+  // NB(bt,2024-07-01): This isn't great. Though we HMAC our cookies, this could
+  // result in bad situations where we don't invalidate sessions, etc. We're only
+  // doing this to prevent the database round trip on a fast "lookup" API.
+  let session_result = server_state
+      .session_cookie_manager
+      .decode_session_payload_from_request(&http_request);
+
+  let session = match session_result {
+    Ok(Some(session)) => session,
+    Ok(None) => {
+      return Err(SearchMediaFilesError::NotAuthorized);
+    },
+    Err(err) => {
+      warn!("Session decode error: {:?}", err);
+      return Err(SearchMediaFilesError::ServerError);
+    }
+  };
+
+  let user_token = match session.maybe_user_token {
+    Some(user_token) => UserToken::new_from_str(&user_token),
+    None => return Err(SearchMediaFilesError::NotAuthorized),
+  };
+
   let mut maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
   let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
   let mut maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
@@ -203,6 +230,7 @@ pub async fn search_media_files_handler(
   let results = search_media_files(SearchArgs {
     search_term: &query.search_term,
     is_featured: None,
+    maybe_creator_user_token: Some(&user_token),
     maybe_media_classes: maybe_filter_media_classes,
     maybe_media_types: maybe_filter_media_types,
     maybe_engine_categories: maybe_filter_engine_categories,
