@@ -7,7 +7,10 @@ import {
   faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
 
-import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import {
+  EditorExpandedI,
+  EngineContext,
+} from "~/pages/PageEnigma/contexts/EngineContext";
 import { ToastTypes, getArtStyle } from "~/enums";
 import { scene, signalScene, authentication, addToast } from "~/signals";
 import { outlinerIsShowing } from "~/pages/PageEnigma/signals/outliner/outliner";
@@ -39,6 +42,10 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { twMerge } from "tailwind-merge";
+import {
+  showWizard,
+  textInput,
+} from "~/pages/PageEnigma/Wizard/signals/wizard";
 
 export const ControlsTopButtons = () => {
   useSignals();
@@ -56,9 +63,6 @@ export const ControlsTopButtons = () => {
   ) => {
     setSceneTitleInput(e.target.value);
   };
-  const clearSceneTitleInput = () => {
-    setSceneTitleInput("");
-  };
 
   const handleResetScene = () => {
     resetSceneGenerationMetadata();
@@ -66,37 +70,32 @@ export const ControlsTopButtons = () => {
       CameraAspectRatio.HORIZONTAL_16_9,
     );
   };
-  const handleButtonNew = () => {
-    handleResetScene();
-    editorEngine?.newScene(sceneTitleInput);
-  };
 
-  const getSceneGenereationMetaData = useCallback(():
-    | SceneGenerationMetaData
-    | undefined => {
-    // when this is called, editor engine is guarunteed by it's caller
-    if (editorEngine) {
+  const getSceneGenereationMetaData = useCallback(
+    (editorEngine: EditorExpandedI): SceneGenerationMetaData => {
+      // when this is called, editor engine is guarunteed by it's caller
       return {
         positivePrompt: editorEngine.positive_prompt,
         negativePrompt: editorEngine.negative_prompt,
         artisticStyle: getArtStyle(editorEngine.art_style.toString()),
         cameraAspectRatio: cameraAspectRatio.value,
-        globalIPAMediaToken: globalIPAMediaToken.value,
+        globalIPAMediaToken: globalIPAMediaToken.value || undefined,
         upscale: upscale.value,
         faceDetail: faceDetail.value,
         styleStrength: styleStrength.value,
         lipSync: lipSync.value,
         cinematic: cinematic.value,
       };
-    }
-  }, [editorEngine]);
+    },
+    [],
+  );
 
   const handleButtonSave = async () => {
     if (!editorEngine) {
       addToast(ToastTypes.ERROR, "No Engine Error in Saving Scenes");
       return;
     }
-    const sceneGenerationMetadata = getSceneGenereationMetaData();
+    const sceneGenerationMetadata = getSceneGenereationMetaData(editorEngine);
     const retSceneMediaToken = await editorEngine.saveScene({
       sceneTitle: scene.value.title || "",
       sceneToken: scene.value.token,
@@ -118,7 +117,7 @@ export const ControlsTopButtons = () => {
       addToast(ToastTypes.ERROR, "No Engine Error in Saving Scenes");
       return;
     }
-    const sceneGenerationMetadata = getSceneGenereationMetaData();
+    const sceneGenerationMetadata = getSceneGenereationMetaData(editorEngine);
     const retSceneMediaToken = await editorEngine.saveScene({
       sceneTitle: sceneTitleInput,
       sceneToken: undefined,
@@ -177,9 +176,9 @@ export const ControlsTopButtons = () => {
     }
   });
 
-   const handleShowOutliner = () => {
-     outlinerIsShowing.value = !outlinerIsShowing.value;
-   };
+  const handleShowOutliner = () => {
+    outlinerIsShowing.value = !outlinerIsShowing.value;
+  };
 
   return (
     <div className="flex flex-col gap-2 pl-2 pt-2">
@@ -192,29 +191,9 @@ export const ControlsTopButtons = () => {
             {
               label: "New scene",
               description: "Ctrl+N",
-              onDialogOpen: () => {
-                setSceneTitleInput("Untitled New Scene");
-              },
-              dialogProps: {
-                title: "Create a New Scene",
-                content: (
-                  <Input
-                    value={sceneTitleInput}
-                    label="Please enter a name for your new scene"
-                    onChange={handleChangeSceneTitleInput}
-                    autoComplete="false"
-                  />
-                ),
-                confirmButtonProps: {
-                  label: "Create",
-                  disabled: sceneTitleInput === "",
-                  onClick: handleButtonNew,
-                },
-                closeButtonProps: {
-                  label: "Cancel",
-                },
-                showClose: true,
-                onClose: clearSceneTitleInput,
+              onClick: () => {
+                textInput.value = "Untitled New Scene";
+                showWizard.value = "new_scene";
               },
             },
             {
@@ -324,7 +303,6 @@ export const ControlsTopButtons = () => {
           ]}
         />
 
-        
         <Button
           icon={outlinerIsShowing.value ? faCheckSquare : faSquare}
           className="shadow-xl"
@@ -338,7 +316,7 @@ export const ControlsTopButtons = () => {
           onClick={handleShowOutliner}
         >
           Outliner
-        </Button> 
+        </Button>
 
         <ButtonDialogue
           buttonProps={{

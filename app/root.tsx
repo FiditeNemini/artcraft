@@ -23,6 +23,10 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 import { pageHeight, pageWidth } from "~/signals";
 
+import { Toaster } from "~/components";
+import { showWizard } from "~/pages/PageEnigma/Wizard/signals/wizard";
+
+
 config.autoAddCss = false; /* eslint-disable import/first */
 
 export const links: LinksFunction = () => [
@@ -124,6 +128,15 @@ const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   useEffect(() => {
     EnvironmentVariables.initialize(env);
   }, [env]);
+
+  useEffect(() => {
+    if (showWizard.value) {
+      return;
+    }
+    const wizard = localStorage.getItem("storyteller-wizard");
+    showWizard.value = wizard ? "" : "initial";
+    localStorage.setItem("storyteller-wizard", "shown");
+  }, []);
 
   return null;
 };

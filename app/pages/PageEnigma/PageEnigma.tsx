@@ -9,10 +9,13 @@ import { ErrorDialog, LoadingDots } from "~/components";
 import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
 
 import { EditorLoadingBar } from "./comps/EditorLoadingBar";
+
+import { Wizard } from "~/pages/PageEnigma/Wizard/Wizard";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useEffect, useState } from "react";
 import * as gpu from "detect-gpu";
 import { TurnOnGpu } from "~/pages/PageEnigma/TurnOnGpu";
+
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useSignals();
   useActiveJobs();
@@ -47,6 +50,7 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
         <DragComponent />
         <GenerateModals />
         <ErrorDialog />
+        <Wizard />
       </EngineProvider>
       <EditorLoadingBar />
     </TrackProvider>
