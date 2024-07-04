@@ -34,7 +34,7 @@ export interface CharacterGroup {
 export interface CharacterTrack {
   object_uuid: string;
   media_id: string;
-  maybe_animation_type: string | null;
+  // maybe_animation_type: string | null;
   name: string;
   muted: boolean;
   minimized: boolean;

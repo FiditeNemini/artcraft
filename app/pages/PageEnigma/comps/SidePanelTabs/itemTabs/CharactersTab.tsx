@@ -72,7 +72,7 @@ export const CharactersTab = () => {
         name: item.maybe_title ?? "Unknown",
         type: AssetType.CHARACTER,
         media_type: item.media_type,
-        maybe_animation_type: item.maybe_animation_type || undefined,
+        // maybe_animation_type: item.maybe_animation_type || undefined,
         version: 1,
         ...(item.cover_image.maybe_cover_image_public_bucket_path
           ? {

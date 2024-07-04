@@ -16,7 +16,7 @@ function getAddCharacter(item: ClipUI) {
     object_uuid: item.object_uuid,
     name: item.object_name,
     media_id: item.media_id,
-    maybe_animation_type: item.maybe_animation_type,
+    // maybe_animation_type: item.maybe_animation_type,
     muted: false,
     minimized: false,
     animationClips: [],

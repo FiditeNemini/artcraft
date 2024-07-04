@@ -7,7 +7,6 @@ export class ClipUI {
   type: ClipType;
   group: ClipGroup;
   name: string;
-  maybe_animation_type: string;
   media_id: string;
   object_uuid: string;
   object_name: string;
@@ -22,7 +21,6 @@ export class ClipUI {
     type: ClipType,
     group: ClipGroup,
     name: string,
-    maybe_animation_type: string,
     media_id: string,
     clip_uuid: string,
     object_uuid: string,
@@ -33,7 +31,7 @@ export class ClipUI {
   ) {
     this.version = version;
     this.group = group; // Only needed for UI
-    this.maybe_animation_type = maybe_animation_type; // only characters. : not used by engine.
+
     this.clip_uuid = clip_uuid;
 
     this.name = name; // UI
@@ -57,7 +55,6 @@ export class ClipUI {
       clip_uuid: this.clip_uuid,
       object_uuid: this.object_uuid,
       object_name: this.object_name,
-      maybe_animation_type: this.maybe_animation_type,
       media_id: this.media_id,
       start_offset: this.offset,
       ending_offset: this.length,

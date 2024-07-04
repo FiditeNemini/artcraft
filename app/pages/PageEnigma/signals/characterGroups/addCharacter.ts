@@ -22,7 +22,7 @@ export function addNewCharacter(data: MediaItem) {
     object_uuid: data.object_uuid,
     name: data.name,
     media_id: data.media_id,
-    maybe_animation_type: data.maybe_animation_type,
+    // maybe_animation_type: data.maybe_animation_type,
     muted: false,
     minimized: false,
     animationClips: [],
