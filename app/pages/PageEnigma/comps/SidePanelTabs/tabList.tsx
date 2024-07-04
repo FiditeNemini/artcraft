@@ -29,7 +29,7 @@ export const tabList = [
   },
   {
     icon: "/resources/icons/expressions.png",
-    title: "Expressions",
+    title: "Facial Expression",
     value: AssetType.EXPRESSION,
     component: <ExpressionTab />,
   },

@@ -529,23 +529,7 @@ export const cameraItems = signal<MediaItem[]>([
 export const characterItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
-    type: AssetType.CHARACTER,
-    name: "Female Doll",
-    thumbnail: "/resources/characters/img03.png",
-    media_type: "glb",
-  },
-  {
-    version: 1,
-    media_id: "m_9sqg0evpr23587jnr8z3zsvav1x077 ",
-    type: AssetType.CHARACTER,
-    name: "Male Doll",
-    thumbnail: "/resources/characters/img07.png",
-    media_type: "glb",
-  },
-  {
-    version: 1,
-    media_id: "m_pwtk45wsfr5z2bavmwxh2efnwvh4rr ",
+    media_id: "m_gff67btr810vg3ng9szj85zskztcgy",
     type: AssetType.CHARACTER,
     name: "Story Girl",
     thumbnail: "/resources/characters/img13.png",
@@ -563,6 +547,22 @@ export const characterItems = signal<MediaItem[]>([
 
 // TODO: CHANGE TO THIS FOR DEV MODE:
 export const devCharacterItems = signal<MediaItem[]>([
+  {
+    version: 1,
+    media_id: "m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+    type: AssetType.CHARACTER,
+    name: "Female Doll",
+    thumbnail: "/resources/characters/img03.png",
+    media_type: "glb",
+  },
+  {
+    version: 1,
+    media_id: "m_9sqg0evpr23587jnr8z3zsvav1x077 ",
+    type: AssetType.CHARACTER,
+    name: "Male Doll",
+    thumbnail: "/resources/characters/img07.png",
+    media_type: "glb",
+  },
   {
     version: 1,
     media_id: "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",

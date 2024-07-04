@@ -15,26 +15,34 @@ import { ActiveJob } from "~/pages/PageEnigma/models";
 import { Tooltip } from "~/components";
 import { JobsApi } from "~/Classes/ApiManager";
 import { PollRecentJobs } from "~/hooks/useActiveJobs/utilities";
-
+import { getStyleName } from "~/pages/PageEnigma/comps/GenerateModals/CompletedCard";
 interface Props {
   movie: ActiveJob;
 }
 
 function getPercent(status: JobState) {
-  if (status === JobState.STARTED) {
-    return 20;
-  }
   if (
     [
       JobState.PENDING,
       JobState.COMPLETE_FAILURE,
       JobState.ATTEMPT_FAILED,
+      JobState.DEAD,
     ].includes(status)
   ) {
     return 0;
   }
 
-  return 100;
+  if (status === JobState.PENDING) {
+    return 20;
+  }
+
+  if (status === JobState.STARTED) {
+    return 40;
+  }
+
+  if (status === JobState.COMPLETE_SUCCESS) {
+    return 100;
+  }
 }
 
 export function InProgressCard({ movie }: Props) {
@@ -56,6 +64,7 @@ export function InProgressCard({ movie }: Props) {
       response.errorMessage || "Error deleting the file.",
     );
   }, []);
+  console.log(movie);
 
   return (
     <div className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150">
@@ -73,6 +82,9 @@ export function InProgressCard({ movie }: Props) {
         <div className="flex flex-col justify-center gap-2">
           <div className="font-medium">
             {movie.request.maybe_model_title || "Untitled"}
+          </div>
+          <div className="font-medium">
+            {getStyleName(movie.request.maybe_style_name) || "Untitled"}
           </div>
           <div className="relative block h-[6px] w-[560px] overflow-hidden rounded-lg bg-white/10">
             <div

@@ -83,6 +83,11 @@ export const Character = ({ character }: Props) => {
     minimized,
   } = character;
 
+  let hasExpression = false;
+  if (character.maybe_animation_type != null) {
+    hasExpression = true;
+  }
+
   if (minimized) {
     return (
       <div
@@ -142,13 +147,15 @@ export const Character = ({ character }: Props) => {
           updateKeyframe={updateClipPosition}
           group={ClipGroup.CHARACTER}
         />
-        <TrackClips
-          id={character.object_uuid}
-          clips={expressionClips}
-          updateClip={updateClipEmotions}
-          group={ClipGroup.CHARACTER}
-          type={ClipType.EXPRESSION}
-        />
+        {hasExpression && (
+          <TrackClips
+            id={character.object_uuid}
+            clips={expressionClips}
+            updateClip={updateClipEmotions}
+            group={ClipGroup.CHARACTER}
+            type={ClipType.EXPRESSION}
+          />
+        )}
         {editorEngine &&
           editorEngine.isObjectLipsync(character.object_uuid) && (
             <TrackClips

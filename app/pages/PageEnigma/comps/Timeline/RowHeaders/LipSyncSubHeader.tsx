@@ -15,7 +15,7 @@ export const LipSyncSubHeader = ({
     return (
       <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
         <div className="flex gap-3">
-          Lip Sync
+          Vocal / Speech
           <button
             className="text-md text-white transition-colors duration-100 hover:text-white/80"
             onClick={() => toggleLipSyncMute(character.object_uuid)}

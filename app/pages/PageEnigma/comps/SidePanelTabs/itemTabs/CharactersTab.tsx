@@ -72,6 +72,7 @@ export const CharactersTab = () => {
         name: item.maybe_title ?? "Unknown",
         type: AssetType.CHARACTER,
         media_type: item.media_type,
+        maybe_animation_type: item.maybe_animation_type,
         version: 1,
         ...(item.cover_image.maybe_cover_image_public_bucket_path
           ? {
@@ -129,6 +130,7 @@ export const CharactersTab = () => {
         featuredObjectsFetch: FetchStatus.SUCCESS,
       }));
       const newCharacters = responseMapping(response.data);
+
       setFeaturedCharacters(newCharacters);
       return;
     }

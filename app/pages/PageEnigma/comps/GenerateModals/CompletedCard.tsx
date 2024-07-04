@@ -9,7 +9,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
 import { styleList } from "~/pages/PageEnigma/styleList";
 
-function getStyleName(typeInput: string) {
+export function getStyleName(typeInput: string) {
   const foundStyle = styleList.find((style) => {
     return style.type === typeInput;
   });

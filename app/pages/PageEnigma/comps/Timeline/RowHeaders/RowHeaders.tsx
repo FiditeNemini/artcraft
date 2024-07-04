@@ -50,6 +50,7 @@ export const RowHeaders = () => {
               </div>
             );
           }
+
           return (
             <div
               key={character.object_uuid}
@@ -71,9 +72,11 @@ export const RowHeaders = () => {
               <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Position
               </div>
-              <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                Expression
-              </div>
+              {character.maybe_animation_type != null && (
+                <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                  Facial Expression
+                </div>
+              )}
               <LipSyncSubHeader character={character} />
             </div>
           );

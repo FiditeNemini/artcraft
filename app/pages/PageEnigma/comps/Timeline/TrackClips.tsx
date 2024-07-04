@@ -21,14 +21,6 @@ interface Props {
   updateClip: (options: { id: string; length: number; offset: number }) => void;
 }
 
-const CLIP_TITLES: Record<ClipType, string> = {
-  [ClipType.ANIMATION]: "animation",
-  [ClipType.AUDIO]: "lip sync",
-  [ClipType.EXPRESSION]: "expression",
-  [ClipType.TRANSFORM]: "",
-  [ClipType.FAKE]: "",
-};
-
 function getCanDrop({
   dragType,
   type,
@@ -43,16 +35,19 @@ function getCanDrop({
       return true;
     }
     if (type === ClipType.AUDIO) {
-      DndAsset.notDropText = "Cannot drag animation onto audio track";
+      DndAsset.notDropText =
+        "Cannot drag character animation onto vocals and speech track";
     }
     if (type === ClipType.EXPRESSION) {
-      DndAsset.notDropText = "Cannot drag animation onto expression track";
+      DndAsset.notDropText =
+        "Cannot drag character animation onto facial expression track";
     }
     if (group === ClipGroup.GLOBAL_AUDIO) {
-      DndAsset.notDropText = "Cannot drag animation onto global audio track";
+      DndAsset.notDropText = "Cannot drag character animation onto music track";
     }
     if (group === ClipGroup.CAMERA) {
-      DndAsset.notDropText = "Cannot drag animation onto camera track";
+      DndAsset.notDropText =
+        "Cannot drag character animation onto camera track";
     }
   }
   if (dragType === AssetType.EXPRESSION) {
@@ -76,10 +71,10 @@ function getCanDrop({
       DndAsset.notDropText = "Cannot drag audio onto camera track";
     }
     if (type === ClipType.ANIMATION) {
-      DndAsset.notDropText = "Cannot drag audio onto animation track";
+      DndAsset.notDropText = "Cannot drag audio onto character animation track";
     }
     if (type === ClipType.EXPRESSION) {
-      DndAsset.notDropText = "Cannot drag audio onto expression track";
+      DndAsset.notDropText = "Cannot drag audio onto facial expression track";
     }
   }
   return false;
@@ -189,7 +184,17 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
             <FontAwesomeIcon icon={faArrowUp} className="text-white/80" />
           </div>
           <div className="text-xs text-white/80">
-            Drag and drop {CLIP_TITLES[type!] ?? "audio"} clip here
+            {type === ClipType.TRANSFORM
+              ? "Drag and Drop TRANSFORM clip here" // This should not show
+              : type === ClipType.AUDIO
+                ? "Drag and drop character speech or vocal audio clips here"
+                : type === ClipType.ANIMATION
+                  ? "Drag and drop character animation clips here"
+                  : type === ClipType.EXPRESSION
+                    ? "Drag and drop facial expression animation clips here"
+                    : type === ClipType.FAKE
+                      ? "Drag and Drop FAKE clip here" // this should not show.
+                      : "Drag and drop uploaded music clips or sound effects from the audio tab here"}
           </div>
         </div>
       )}
