@@ -4,6 +4,7 @@ import {
   stylizeScrollX,
   timelineHeight,
   timelineScrollX,
+  scrubberTime,
 } from "~/pages/PageEnigma/signals";
 import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -16,9 +17,12 @@ interface Props {
 export const Scrubber = ({ page }: Props) => {
   useSignals();
   const { onPointerDown, time } = useMouseEventsScrubber();
+
   const displayTime = time === -1 ? currentTime.value : time;
   const scrollX =
     page === Pages.EDIT ? timelineScrollX.value : stylizeScrollX.value;
+
+  scrubberTime.value = displayTime;
 
   if (displayTime * 4 * scale.value - scrollX < 0) {
     return null;
