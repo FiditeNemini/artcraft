@@ -533,6 +533,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Story Girl",
     thumbnail: "/resources/characters/img13.png",
+    maybe_animation_type: "mixamo_ar_kit",
     media_type: "glb",
   },
   {

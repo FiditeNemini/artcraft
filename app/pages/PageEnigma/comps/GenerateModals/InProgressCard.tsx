@@ -43,6 +43,7 @@ function getPercent(status: JobState) {
   if (status === JobState.COMPLETE_SUCCESS) {
     return 100;
   }
+  return 0;
 }
 
 export function InProgressCard({ movie }: Props) {
