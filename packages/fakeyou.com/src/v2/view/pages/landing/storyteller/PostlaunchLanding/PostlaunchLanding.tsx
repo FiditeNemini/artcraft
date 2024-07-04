@@ -25,6 +25,7 @@ import ScrollingSceneCarousel from "./ScrollingSceneCarousel";
 import EmailSignUp from "./EmailSignUp";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useModal } from "hooks";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 
 interface PostlaunchLandingProps {
   sessionWrapper: SessionWrapper;
@@ -108,6 +109,16 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
   const opacityLaptop = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const opacityTitle = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const opacityOverlay = useTransform(scrollYProgress, [0.6, 1], [0, 1]);
+
+  const containerDiscord = useRef(null);
+  const { scrollYProgress: scrollYProgress2 } = useScroll({
+    target: containerDiscord,
+    offset: ["-100vh", "100vh"],
+  });
+
+  const moveFirstUp = useTransform(scrollYProgress2, [0, 1], [0, -300]);
+  const moveSecondDown = useTransform(scrollYProgress2, [0, 1], [-300, 100]);
+  const moveThirdUp = useTransform(scrollYProgress2, [0, 1], [0, -300]);
 
   const ctaButton = props.sessionWrapper.canAccessStudio() ? (
     <div className="d-flex">
@@ -270,6 +281,24 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                 <p className="opacity-75 mb-5">{feature.description}</p>
               </li>
             ))}
+          </div>
+
+          <div className="bg-panel rounded p-5 my-5">
+            <div className="d-flex flex-column gap-3 align-items-center">
+              <h2 className="fw-bold text-center">
+                Become part of our creative community on Discord!
+              </h2>
+              <div className="d-flex">
+                <Button
+                  label="Join Discord Server"
+                  icon={faDiscord}
+                  variant="discord"
+                  fontLarge={true}
+                  href="https://discord.gg/storyteller"
+                  target="_blank"
+                />
+              </div>
+            </div>
           </div>
 
           <div
@@ -541,39 +570,104 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
                 </div>
               </div>
             </div>
+          </div>
 
+          <div
+            className="w-100 bg-panel overflow-hidden"
+            style={{ marginTop: !isSmallScreen ? "0px" : "-100px" }}
+          >
             <div
-              className="container d-flex flex-column align-items-center"
-              style={{ marginTop: !isSmallScreen ? "0px" : "-100px" }}
+              className="container"
+              style={{ width: "1300px" }}
+              ref={containerDiscord}
             >
-              <h1 className="display-5 fw-bold">Showcase</h1>
-              <p className="lead fw-medium opacity-75 fs-4 mb-5">
-                Videos created with Storyteller Studio.
-              </p>
-              <video
-                poster="/images/landing/storyteller/Landing_Reel_Poster.png"
-                preload="metadata"
-                style={{
-                  width: "100%",
-                  maxWidth: "900px",
-                  borderRadius: "1rem",
-                  overflow: "hidden",
-                  border: "2px solid rgba(255, 255, 255, 0.1)",
-                }}
-                autoPlay={true}
-                controls={false}
-                muted={true}
-                loop={true}
-                playsInline={true}
-              >
-                <source
-                  src="/videos/landing/landing_reel.mp4"
-                  type="video/mp4"
-                />
-              </video>
-              {props.sessionWrapper.isLoggedIn() && ctaButton}
+              <div className="row">
+                <div
+                  className="col-12 col-lg-6"
+                  style={{ paddingTop: "100px", paddingBottom: "100px" }}
+                >
+                  <div className="d-flex flex-column gap-4">
+                    <h1 className="fw-bold" style={{ width: "600px" }}>
+                      Become part of our creative community on Discord!
+                    </h1>
+                    <div className="d-flex">
+                      <Button
+                        label="Join Discord Server"
+                        icon={faDiscord}
+                        variant="discord"
+                        fontLarge={true}
+                        href="https://discord.gg/storyteller"
+                        target="_blank"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-12 col-lg-6 position-relative">
+                  <motion.div className="w-100 d-flex gap-4 position-absolute justify-content-center">
+                    <motion.img
+                      style={{ y: moveFirstUp }}
+                      src="/images/discord-pfp/discord-1.png"
+                      alt="discord 1"
+                    />
+                    <motion.img
+                      style={{ y: moveSecondDown }}
+                      src="/images/discord-pfp/discord-2.png"
+                      alt="discord 2"
+                    />
+                    <motion.img
+                      style={{ y: moveThirdUp }}
+                      src="/images/discord-pfp/discord-3.png"
+                      alt="discord 3"
+                    />
+                  </motion.div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      height: "160px",
+                      width: "100%",
+                      backgroundImage:
+                        "linear-gradient(to top, #262636, rgba(255,255,255,0)",
+                      backgroundPosition: "bottom center",
+                      backgroundRepeat: "no-repeat",
+                      zIndex: 10,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
+          </div>
 
+          <div
+            className="container d-flex flex-column align-items-center"
+            style={{ marginTop: !isSmallScreen ? "100px" : "100px" }}
+          >
+            <h1 className="display-5 fw-bold">Showcase</h1>
+            <p className="lead fw-medium opacity-75 fs-4 mb-5">
+              Videos created with Storyteller Studio.
+            </p>
+            <video
+              poster="/images/landing/storyteller/Landing_Reel_Poster.png"
+              preload="metadata"
+              style={{
+                width: "100%",
+                maxWidth: "900px",
+                borderRadius: "1rem",
+                overflow: "hidden",
+                border: "2px solid rgba(255, 255, 255, 0.1)",
+              }}
+              autoPlay={true}
+              controls={false}
+              muted={true}
+              loop={true}
+              playsInline={true}
+            >
+              <source src="/videos/landing/landing_reel.mp4" type="video/mp4" />
+            </video>
+            {props.sessionWrapper.isLoggedIn() && ctaButton}
+          </div>
+
+          <div className="container">
             {!props.sessionWrapper.canAccessStudio() ? (
               <div style={{ marginTop: "260px" }}>
                 <EmailSignUp />

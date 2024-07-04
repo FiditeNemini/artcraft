@@ -82,6 +82,23 @@
   border-color: lighten($action, 5%);
 }
 
+.button-discord,
+.button-discord:focus,
+.button-discord:active {
+  background-color: #5865f2;
+  color: $white !important;
+  border: 2.5px solid;
+  border-color: #5865f2;
+  transition: 0.2s;
+}
+
+.button-discord:hover {
+  background-color: #6b78ff;
+  color: $white !important;
+  border: 2.5px solid;
+  border-color: #6b78ff;
+}
+
 .button-danger,
 .button-danger:focus,
 .button-danger:active {
