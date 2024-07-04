@@ -1,7 +1,4 @@
-import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
-import { Button } from "components/common";
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React from "react";
 
 interface SceneCardProps {
   image: string;
@@ -9,6 +6,7 @@ interface SceneCardProps {
   title?: string;
   token?: string;
   small?: boolean;
+  allowHover?: boolean;
 }
 
 export default function SceneCard({
@@ -18,16 +16,12 @@ export default function SceneCard({
   token,
   small,
 }: SceneCardProps) {
-  const [showOverlay, setShowOverlay] = useState(false);
-
   return (
-    <motion.div
+    <div
       className="position-relative overflow-hidden rounded"
       style={{ width: "max-content", marginRight: small ? "24px" : "32px" }}
-      onHoverStart={() => setShowOverlay(true)}
-      onHoverEnd={() => setShowOverlay(false)}
     >
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {showOverlay && (
           <motion.div
             className="position-absolute w-100 h-100 p-2"
@@ -65,8 +59,8 @@ export default function SceneCard({
             </motion.p>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
       <img src={image} alt={alt} width={small ? 180 : 340} />
-    </motion.div>
+    </div>
   );
 }

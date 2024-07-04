@@ -66,7 +66,7 @@ const HoverVideoCard: React.FC<HoverVideoCardProps> = ({
         style={{
           position: "relative",
           aspectRatio: "16 / 9",
-          cursor: "pointer",
+          cursor: allowRemix ? "pointer" : "default",
           borderWidth: "2px",
           borderColor: "transparent",
           borderStyle: "solid",

@@ -1,0 +1,91 @@
+import React from "react";
+import Button from "../Button";
+import { faArrowRight, faCube } from "@fortawesome/pro-solid-svg-icons";
+import useModal from "hooks/useModal";
+import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
+import ScrollingSceneCarousel from "v2/view/pages/landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Panel from "../Panel";
+
+interface StorytellerStudioCTAProps {
+  // Define props here
+}
+
+const StorytellerStudioCTA = (props: StorytellerStudioCTAProps) => {
+  const { open } = useModal();
+  const openModal = () =>
+    open({
+      component: EmailSignUp,
+      props: { mobile: true, showHanashi: false, handleClose: openModal },
+    });
+
+  return (
+    <Panel className="pb-5 pt-3 pt-lg-0">
+      <div className="row py-3 pb-0 px-4 px-lg-5 py-lg-0 g-3 gx-lg-5">
+        <div className="col-12 col-lg-6 pb-lg-3 d-flex flex-column justify-content-center ps-lg-5">
+          <h1 className="fw-bold mb-3 text-center text-lg-start">
+            <FontAwesomeIcon icon={faCube} className="fs-2 me-2" /> Storyteller
+            Studio
+          </h1>
+          <p className="opacity-75 mb-4 text-center text-lg-start">
+            Harness the power of AI to bring your creative visions to life.
+            Craft stunning visuals by designing your own 3D scenes. Take control
+            and effortlessly produce movies in any style you envision.
+          </p>
+          <div className="d-flex justify-content-center justify-content-lg-start gap-3">
+            <Button
+              label="Join the Waitlist"
+              icon={faArrowRight}
+              iconFlip={true}
+              onClick={openModal}
+            />
+            {/* <Button
+              label="Visit Storyteller.ai"
+              iconFlip={true}
+              href="https://storyteller.ai/"
+              variant="secondary"
+            /> */}
+          </div>
+        </div>
+        <div className="col-12 col-lg-6 d-flex flex-column justify-content-center">
+          <div
+            className="overflow-hidden"
+            style={{
+              height: "80%",
+              borderRadius: "0.75rem",
+              border: "2px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <video
+              preload="metadata"
+              style={{
+                width: "100%",
+                objectFit: "cover",
+                marginTop: "-6%",
+                overflow: "hidden",
+              }}
+              autoPlay={true}
+              controls={false}
+              muted={true}
+              loop={true}
+              playsInline={true}
+            >
+              <source
+                src="/videos/landing/hero_landing_video.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
+        </div>
+      </div>
+      <div className="d-none d-lg-block">
+        <ScrollingSceneCarousel showGradient={false} />
+      </div>
+      <div className="d-block d-lg-none">
+        <ScrollingSceneCarousel showGradient={false} small={true} />
+      </div>
+    </Panel>
+  );
+};
+
+export default StorytellerStudioCTA;

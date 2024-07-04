@@ -5,6 +5,9 @@ import Marquee from "react-fast-marquee";
 
 interface ScrollingSceneCarouselProps {
   small?: boolean;
+  showGradient?: boolean;
+  pauseOnHover?: boolean;
+  className?: string;
 }
 
 interface MediaItem {
@@ -18,6 +21,9 @@ interface MediaItem {
 
 export default function ScrollingSceneCarousel({
   small,
+  showGradient = true,
+  pauseOnHover = false,
+  className,
 }: ScrollingSceneCarouselProps) {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const bucketConfig = new BucketConfig();
@@ -54,16 +60,18 @@ export default function ScrollingSceneCarousel({
   const secondHalf = mediaItems.slice(halfLength);
 
   return (
-    <div className="d-flex gap-5 mt-5 overflow-hidden flex-column">
+    <div
+      className={`d-flex gap-5 mt-5 overflow-hidden flex-column ${className}`.trim()}
+    >
       <Marquee
-        gradient={true}
+        gradient={showGradient ? true : false}
         // this component doesn't seem to like string values and was causing errors
         // so hex is converted to an RGB array -VH
         gradientColor="#1a1a27"
         //gradientColor={[26, 26, 29]}
         gradientWidth={small ? 80 : 200}
         speed={small ? 100 : 50}
-        pauseOnHover={true}
+        pauseOnHover={pauseOnHover ? true : false}
         direction="left"
       >
         {firstHalf.map((item, index) => (
@@ -84,12 +92,12 @@ export default function ScrollingSceneCarousel({
       </Marquee>
       {!small && (
         <Marquee
-          gradient={true}
+          gradient={showGradient ? true : false}
           gradientColor="#1a1a27"
           //gradientColor={[26, 26, 29]}
           gradientWidth={small ? 80 : 200}
           speed={small ? 100 : 50}
-          pauseOnHover={true}
+          pauseOnHover={pauseOnHover ? true : false}
           direction="right"
         >
           {secondHalf.map((item, index) => (

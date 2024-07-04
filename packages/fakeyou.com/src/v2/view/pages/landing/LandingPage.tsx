@@ -7,19 +7,17 @@ import { Container } from "components/common";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import { useDomainConfig } from "context/DomainConfigContext";
-// import LandingVideoReel from "./components/LandingVideoReel/LandingVideoReel";
 import "./LandingPage.scss";
 // import VstSectionV1 from "./components/VstSectionV1";
-import VstSectionV2 from "./components/VstSectionV2";
+// import VstSectionV2 from "./components/VstSectionV2";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import {
   WebsiteConfig,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
-// import OnboardingSelection from "./storyteller/OnboardingSelection";
-// import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
-// import PrelaunchLanding from "./storyteller/PrelaunchLanding/PrelaunchLanding";
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import MentionsSection from "components/common/MentionsSection";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -58,50 +56,41 @@ function LandingPage(props: Props) {
         // <PrelaunchLanding sessionWrapper={props.sessionWrapper} />
         <PostlaunchLanding sessionWrapper={props.sessionWrapper} />
       )}
-      <Container type="panel">
-        {
-          domain.website === Website.FakeYou ? (
+      {domain.website === Website.FakeYou && (
+        <>
+          <Container type="panel">
+            {/* FAKEYOU.COM */}
+            {!isLoggedIn && (
+              <>
+                <FakeYouLandingHeader
+                  sessionSubscriptionsWrapper={
+                    props.sessionSubscriptionsWrapper
+                  }
+                />
+                {/* <VstSectionV1 /> */}
+                {/* <VstSectionV2 /> */}
+              </>
+            )}
+
+            <div className="py-5">
+              <StorytellerStudioCTA />
+            </div>
+
+            <Dashboard sessionWrapper={props.sessionWrapper} />
+
+            {!isLoggedIn && (
+              <>
+                <FakeYouLandingBody />
+              </>
+            )}
+          </Container>
+          {!isLoggedIn && (
             <>
-              {/* FAKEYOU.COM */}
-              {!isLoggedIn && (
-                <>
-                  <FakeYouLandingHeader
-                    sessionSubscriptionsWrapper={
-                      props.sessionSubscriptionsWrapper
-                    }
-                  />
-                  {/* <VstSectionV1 /> */}
-                  <VstSectionV2 />
-                </>
-              )}
-
-              <Dashboard sessionWrapper={props.sessionWrapper} />
-
-              {!isLoggedIn && <FakeYouLandingBody />}
+              <MentionsSection />
             </>
-          ) : null
-          // <>
-          //   {/* STORYTELLER,AI */}
-
-          //   {protectedStudioOnboarding}
-
-          //   <VstSectionV2 />
-          //   <TtsDemoSection
-          //     sessionWrapper={props.sessionWrapper}
-          //     sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-          //     inferenceJobs={props.inferenceJobs}
-          //     ttsInferenceJobs={props.ttsInferenceJobs}
-          //     enqueueInferenceJob={props.enqueueInferenceJob}
-          //     inferenceJobsByCategory={props.inferenceJobsByCategory}
-          //     enqueueTtsJob={props.enqueueTtsJob}
-          //   />
-
-          //   <Dashboard sessionWrapper={props.sessionWrapper} />
-
-          //   <FakeYouLandingBody />
-          // </>
-        }
-      </Container>
+          )}
+        </>
+      )}
     </>
   );
 }

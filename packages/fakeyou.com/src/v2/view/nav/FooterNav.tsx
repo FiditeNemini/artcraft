@@ -141,7 +141,7 @@ function FooterNav(props: Props) {
         <footer id="footer">
           <Container type="panel" className="py-5">
             <div className="row g-5">
-              <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center pb-2">
+              <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start pb-2">
                 <Link to="/">
                   <img
                     src={domain.logo}
