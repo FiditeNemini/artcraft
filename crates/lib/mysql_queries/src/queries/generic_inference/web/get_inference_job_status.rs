@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use log::warn;
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
@@ -15,78 +15,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
-
-// NB: Serialization is for internal endpoints, not for returning to end-users.
-#[derive(Debug, Default, Serialize)]
-pub struct GenericInferenceJobStatus {
-  pub job_token: InferenceJobToken,
-
-  pub status: JobStatusPlus,
-  pub attempt_count: u16,
-
-  pub maybe_assigned_worker: Option<String>,
-  pub maybe_assigned_cluster: Option<String>,
-
-  pub maybe_first_started_at: Option<DateTime<Utc>>,
-
-  pub maybe_frontend_failure_category: Option<FrontendFailureCategory>,
-
-  pub request_details: RequestDetails,
-  pub maybe_result_details: Option<ResultDetails>,
-  pub user_details: UserDetails,
-
-  pub is_keepalive_required: bool,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-}
-
-/// NB: Serialize is for internal moderator-only endpoints
-/// Details about the user's original inference request
-/// (We may want to present it in the "pending" UI.)
-#[derive(Debug, Default, Serialize)]
-pub struct RequestDetails {
-  pub inference_category: InferenceCategory,
-  pub maybe_model_type: Option<String>, // TODO: Strongly type
-  pub maybe_model_token: Option<String>,
-  pub maybe_model_title: Option<String>,
-
-  /// TTS input. In the future, perhaps voice conversion SST
-  pub maybe_raw_inference_text: Option<String>,
-
-  /// For Comfy / Video Style Transfer jobs, this might include
-  /// the name of the selected style.
-  pub maybe_style_name: Option<StyleTransferName>,
-}
-
-/// NB: Serialize is for internal moderator-only endpoints
-/// Details about the generated result
-#[derive(Debug, Default, Serialize)]
-pub struct ResultDetails {
-  pub entity_type: String,
-  pub entity_token: String,
-
-  /// The bucket storage hash (for vc and media_files) or full path (for tts)
-  pub public_bucket_location_or_hash: String,
-  pub maybe_media_file_public_bucket_prefix: Option<String>,
-  pub maybe_media_file_public_bucket_extension: Option<String>,
-
-  /// Whether the location is a full path (for tts) or a hash (for vc) that
-  /// needs to be reconstructed into a path.
-  pub public_bucket_location_is_hash: bool,
-
-  pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
-}
-
-/// NB: DO NOT EXPOSE TO FRONTEND.
-/// NB: Serialize is for internal moderator-only endpoints
-/// This is used to gate access to job termination
-#[derive(Debug, Default, Serialize)]
-pub struct UserDetails {
-  pub maybe_creator_user_token: Option<UserToken>,
-  pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
-  pub creator_ip_address: String,
-}
+use crate::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails, UserDetails};
 
 /// Look up job status.
 /// Returns Ok(None) when the record cannot be found.
@@ -151,7 +80,9 @@ SELECT
     jobs.updated_at,
 
     jobs.first_started_at as maybe_first_started_at,
-    jobs.successfully_completed_at as maybe_successfully_completed_at
+    jobs.successfully_completed_at as maybe_successfully_completed_at,
+
+    NOW() as database_clock
 
 FROM generic_inference_jobs as jobs
 
@@ -294,6 +225,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
     is_keepalive_required: i8_to_bool(record.is_keepalive_required),
     created_at: record.created_at,
     updated_at: record.updated_at,
+    database_clock: DateTime::from_naive_utc_and_offset(record.database_clock, Utc),
   }
 }
 
@@ -339,6 +271,10 @@ struct RawGenericInferenceJobStatus {
 
   pub maybe_first_started_at: Option<DateTime<Utc>>,
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
+
+  // NB: Typed query can't convert to Utc, so we use NaiveDateTime and do the type conversion ourselves.
+  // The database server *should* be reporting in UTC.
+  pub database_clock: NaiveDateTime,
 }
 
 #[cfg(test)]
