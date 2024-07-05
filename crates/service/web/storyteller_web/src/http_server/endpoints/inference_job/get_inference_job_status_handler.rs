@@ -98,7 +98,8 @@ pub struct StatusDetailsResponse {
   /// messages. These pertain to both transient and permanent failures.
   pub maybe_failure_category: Option<FrontendFailureCategory>,
 
-  /// This is an integer number between 0 and 100 that reports the completeness.
+  /// This is an integer number between 0 and 100 (both inclusive) that
+  /// reports the completeness.
   pub progress_percentage: u8,
 }
 
