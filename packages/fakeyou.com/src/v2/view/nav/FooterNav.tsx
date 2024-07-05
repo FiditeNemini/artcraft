@@ -135,6 +135,14 @@ function FooterNav(props: Props) {
     },
   ];
 
+  const isOnCreatorOnboardingPage = window.location.pathname.includes(
+    "/creator-onboarding"
+  );
+
+  if (isOnCreatorOnboardingPage) {
+    return null;
+  }
+
   return (
     <>
       {!isOnStudioPage && (

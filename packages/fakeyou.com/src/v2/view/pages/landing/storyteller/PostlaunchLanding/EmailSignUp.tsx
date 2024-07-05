@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Widget } from "@typeform/embed-react";
 import ModalHeader from "components/modals/ModalHeader";
+import { set } from "local-storage";
 
 interface EmailSignUpProps {
   mobile?: boolean;
@@ -55,7 +56,13 @@ export default function EmailSignUp({
           />
         )}
 
-        <Widget id="TKSc5ImN" style={{ width: "100%", height: "300px" }} />
+        <Widget
+          onSubmit={() => {
+            set<boolean>("firstFormIsSubmitted", true);
+          }}
+          id="TKSc5ImN"
+          style={{ width: "100%", height: "300px" }}
+        />
       </div>
     </div>
   );

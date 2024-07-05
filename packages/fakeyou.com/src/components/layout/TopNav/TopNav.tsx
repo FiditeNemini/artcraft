@@ -66,6 +66,9 @@ export default function TopNav({
   const isOnWaitlistSuccessPage = window.location.pathname.includes(
     "/waitlist-next-steps"
   );
+  const isOnCreatorOnboardingPage = window.location.pathname.includes(
+    "/creator-onboarding"
+  );
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -204,7 +207,8 @@ export default function TopNav({
     if (pageContentWrapper) {
       if (
         (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
-        isOnBetaKeyRedeemPage
+        isOnBetaKeyRedeemPage ||
+        isOnCreatorOnboardingPage
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
@@ -216,6 +220,7 @@ export default function TopNav({
     isOnLandingPage,
     isOnBetaKeyRedeemPage,
     isOnWaitlistSuccessPage,
+    isOnCreatorOnboardingPage,
   ]);
 
   if (
@@ -250,7 +255,11 @@ export default function TopNav({
     };
   }, [domain.titlePart, isOnLandingPage, topBarWrapper]);
 
-  if (isOnBetaKeyRedeemPage || isOnWaitlistSuccessPage) {
+  if (
+    isOnBetaKeyRedeemPage ||
+    isOnWaitlistSuccessPage ||
+    isOnCreatorOnboardingPage
+  ) {
     return null;
   }
 

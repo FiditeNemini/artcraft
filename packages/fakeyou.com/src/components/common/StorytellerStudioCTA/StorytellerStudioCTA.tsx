@@ -6,12 +6,9 @@ import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/Ema
 import ScrollingSceneCarousel from "v2/view/pages/landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Panel from "../Panel";
+import { get } from "local-storage";
 
-interface StorytellerStudioCTAProps {
-  // Define props here
-}
-
-const StorytellerStudioCTA = (props: StorytellerStudioCTAProps) => {
+const StorytellerStudioCTA = () => {
   const { open } = useModal();
   const openModal = () =>
     open({
@@ -33,18 +30,33 @@ const StorytellerStudioCTA = (props: StorytellerStudioCTAProps) => {
             and effortlessly produce movies in any style you envision.
           </p>
           <div className="d-flex justify-content-center justify-content-lg-start gap-3">
-            <Button
-              label="Join the Waitlist"
-              icon={faArrowRight}
-              iconFlip={true}
-              onClick={openModal}
-            />
-            {/* <Button
-              label="Visit Storyteller.ai"
-              iconFlip={true}
-              href="https://storyteller.ai/"
-              variant="secondary"
-            /> */}
+            {!get<boolean>("firstFormIsSubmitted") ||
+            !get<boolean>("secondFormIsSubmitted") ? (
+              <>
+                {!get<boolean>("firstFormIsSubmitted") ? (
+                  <Button
+                    label="Join the Waitlist"
+                    icon={faArrowRight}
+                    iconFlip={true}
+                    onClick={openModal}
+                  />
+                ) : (
+                  <Button
+                    label="Get Access Sooner"
+                    icon={faArrowRight}
+                    iconFlip={true}
+                    to="/creator-onboarding"
+                  />
+                )}
+              </>
+            ) : (
+              <Button
+                label="Visit Storyteller.ai"
+                icon={faArrowRight}
+                iconFlip={true}
+                href="https://storyteller.ai/"
+              />
+            )}
           </div>
         </div>
         <div className="col-12 col-lg-6 d-flex flex-column justify-content-center">
