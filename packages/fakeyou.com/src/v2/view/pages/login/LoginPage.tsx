@@ -12,9 +12,9 @@ import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Analytics } from "../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import Container from "components/common/Container";
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
+import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -92,66 +92,108 @@ function LoginPage(props: Props) {
     );
   }
 
+  const betaKeyRedirect = redirectUrl?.includes("/beta-key/redeem");
+
   return (
-    <Container
-      type="panel"
-      className="login-panel d-flex flex-column align-items-center"
-    >
-      <h2 className="fw-bold mb-0 mt-5 mb-4">Login to {domain.titlePart}</h2>
+    <div className="overflow-hidden auth-page-left">
+      <div className="row h-100 g-0">
+        <div className="col-12 col-lg-6 col-xl-7 bg-panel d-flex flex-column align-items-center justify-content-center order-2 order-lg-1 p-5 p-lg-0">
+          <a href="https://storyteller.ai" style={{ marginBottom: "20px" }}>
+            <img
+              src="/fakeyou/Storyteller-Logo-1.png"
+              alt="Storyteller Logo"
+              style={{ maxWidth: "280px" }}
+            />
+          </a>
+          <p className="fw-medium fs-5 text-center">
+            Check out what our new AI creation engine can make!
+          </p>
 
-      <Panel padding={true}>
-        {errorWarning}
-
-        <form onSubmit={handleFormSubmit}>
-          <div className="d-flex flex-column gap-4">
-            <div>
-              <label className="sub-title">Username or Email</label>
-              <div className="form-group input-icon">
-                <span className="form-control-feedback">
-                  <FontAwesomeIcon icon={faUser} />
-                </span>
-                <input
-                  className="form-control"
-                  type="text"
-                  placeholder="Username or Email"
-                  value={usernameOrEmail}
-                  onChange={handleUsernameOrEmailChange}
-                />
-              </div>
-              {/*<p className="help"></p>*/}
-            </div>
-
-            <div>
-              <label className="sub-title">Password</label>
-              <div className="form-group input-icon">
-                <span className="form-control-feedback">
-                  <FontAwesomeIcon icon={faKey} />
-                </span>
-                <input
-                  className="form-control"
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                />
-              </div>
-              <p className="d-flex flex-lg-row gap-2">
-                <Link
-                  to="/password-reset"
-                  className="text-link form-text flex-grow-1"
-                >
-                  Forgot your password?
-                </Link>
-                <span className="form-text text-link">
-                  Don't have an account? <Link to="/signup">Sign up</Link>
-                </span>
-              </p>
-            </div>
+          <div className="w-100 d-none d-lg-block">
+            <ScrollingSceneCarousel gradientColor="#262636" />
           </div>
-          <button className="btn btn-primary w-100 mt-4">Login</button>
-        </form>
-      </Panel>
-    </Container>
+          <div className="w-100 d-block d-lg-none">
+            <ScrollingSceneCarousel gradientColor="#262636" small={true} />
+          </div>
+
+          {!betaKeyRedirect && (
+            <p className="fs-7 mt-5">
+              Interested? Join the waitlist at{" "}
+              <a href="https://storyteller.ai" className="text-red">
+                Storyteller.ai
+              </a>
+            </p>
+          )}
+        </div>
+
+        <div className="col-12 col-lg-6 col-xl-5 d-flex flex-column justify-content-center align-items-center align-items-lg-start order-lg-2 order-1 auth-page-right">
+          <h2 className="fw-bold mb-0 mt-5 mb-4">
+            {betaKeyRedirect
+              ? "Login to Redeem Beta Key"
+              : `Login to ${domain.titlePart}`}
+          </h2>
+
+          <Panel padding={true} className="login-panel rounded">
+            {errorWarning}
+
+            <form onSubmit={handleFormSubmit}>
+              <div className="d-flex flex-column gap-3">
+                <div>
+                  <label className="sub-title">Username or Email</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faUser} />
+                    </span>
+                    <input
+                      className="form-control"
+                      type="text"
+                      placeholder="Username or Email"
+                      value={usernameOrEmail}
+                      onChange={handleUsernameOrEmailChange}
+                    />
+                  </div>
+                  {/*<p className="help"></p>*/}
+                </div>
+
+                <div>
+                  <label className="sub-title">Password</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input
+                      className="form-control"
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                    />
+                  </div>
+                  <p className="d-flex flex-lg-row gap-2">
+                    <Link
+                      to="/password-reset"
+                      className="text-link form-text flex-grow-1"
+                    >
+                      Forgot your password?
+                    </Link>
+                    <span className="form-text text-link">
+                      <div className="d-flex gap-1">
+                        <div className="d-block d-xxl-none">No account? </div>
+                        <div className="d-none d-xxl-block">
+                          Don't have an account?
+                        </div>
+                        <Link to="/signup">Sign up</Link>
+                      </div>
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <button className="btn btn-primary w-100 mt-4">Login</button>
+            </form>
+          </Panel>
+        </div>
+      </div>
+    </div>
   );
 }
 

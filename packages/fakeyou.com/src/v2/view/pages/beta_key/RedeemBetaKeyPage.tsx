@@ -10,6 +10,8 @@ import { RedeemBetaKey } from "@storyteller/components/src/api/beta_key/RedeemBe
 import { Link, useHistory, useParams } from "react-router-dom";
 import { useSession } from "hooks";
 import LoadingSpinner from "components/common/LoadingSpinner";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { isMobile } from "react-device-detect";
 
 export default function RedeemBetaKeyPage() {
   const { token: pageToken } = useParams<{ token: string }>();
@@ -17,7 +19,7 @@ export default function RedeemBetaKeyPage() {
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const history = useHistory();
-  const { user, loggedIn, sessionFetched } = useSession();
+  const { loggedIn, sessionFetched } = useSession();
 
   useEffect(() => {
     if (sessionStorage.getItem("redirected") === "true") {
@@ -68,8 +70,14 @@ export default function RedeemBetaKeyPage() {
 
   if (!loggedIn) {
     return (
-      <Container type="panel" className="narrow-container">
-        <div className="d-flex flex-column align-items-center justify-content-center vh-100 gap-4">
+      <div
+        className="d-flex flex-column align-items-center justify-content-center"
+        style={{ minHeight: "100vh" }}
+      >
+        <Container
+          type="panel"
+          className="narrow-container d-flex flex-column align-items-center justify-content-center gap-4 mt-5"
+        >
           <img
             src="/fakeyou/Storyteller-Logo-1.png"
             alt="Storyteller Logo"
@@ -86,6 +94,17 @@ export default function RedeemBetaKeyPage() {
               </p>
               <div className="d-flex gap-2 mt-2">
                 <Button
+                  label="Sign Up"
+                  className="mt-3"
+                  onClick={() => {
+                    sessionStorage.setItem("redirected", "true");
+                    const signUpPath = pageToken
+                      ? `/signup?redirect=/beta-key/redeem/${pageToken}`
+                      : "/signup?redirect=/beta-key/redeem/";
+                    history.push(signUpPath);
+                  }}
+                />
+                <Button
                   label="Login"
                   className="mt-3"
                   onClick={() => {
@@ -97,26 +116,39 @@ export default function RedeemBetaKeyPage() {
                   }}
                   variant="secondary"
                 />
-                <Button
-                  label="Sign Up"
-                  className="mt-3"
-                  onClick={() => {
-                    sessionStorage.setItem("redirected", "true");
-                    const signUpPath = pageToken
-                      ? `/signup?redirect=/beta-key/redeem/${pageToken}`
-                      : "/signup?redirect=/beta-key/redeem/";
-                    history.push(signUpPath);
-                  }}
-                />
               </div>
             </div>
           </Panel>
-        </div>
-      </Container>
+        </Container>
+
+        {isMobile && (
+          <Container type="panel" className="px-4">
+            <div className="text-center mt-5 px-lg-5 d-flex flex-column">
+              <span className="text-red fw-medium fs-5">Note: </span>
+              <span className="opacity-75">
+                Storyteller Studio is not optimized for mobile devices yet. You
+                can redeem your beta key here first then access full features at{" "}
+                <span className="text-red">Storyteller.ai</span> on a desktop
+                computer after redemption.
+              </span>
+            </div>
+          </Container>
+        )}
+
+        <Container type="panel" className="pt-lg-5">
+          <div className="py-5">
+            <StorytellerStudioCTA
+              showButton={false}
+              showMarquee={false}
+              showIcon={false}
+              title="Ready to Unlock Your Creativity?"
+              subText="Make your story come alive. Simply build a scene and generate with a style you like. Sign up or log in now to redeem your beta key and start creating today!"
+            />
+          </div>
+        </Container>
+      </div>
     );
   }
-
-  console.log(user);
 
   return (
     <>
@@ -154,6 +186,7 @@ export default function RedeemBetaKeyPage() {
               }}
               required={true}
               className="text-center w-100 fs-5"
+              autoFocus={true}
             />
 
             {showAlert && (

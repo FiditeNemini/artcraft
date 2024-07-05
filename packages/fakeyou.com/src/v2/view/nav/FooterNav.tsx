@@ -138,8 +138,10 @@ function FooterNav(props: Props) {
   const isOnCreatorOnboardingPage = window.location.pathname.includes(
     "/creator-onboarding"
   );
+  const isOnLoginPage = window.location.pathname.includes("/login");
+  const isOnSignUpPage = window.location.pathname.includes("/signup");
 
-  if (isOnCreatorOnboardingPage) {
+  if (isOnCreatorOnboardingPage || isOnLoginPage || isOnSignUpPage) {
     return null;
   }
 

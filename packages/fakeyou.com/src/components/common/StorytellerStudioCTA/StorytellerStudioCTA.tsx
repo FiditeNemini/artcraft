@@ -8,7 +8,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Panel from "../Panel";
 import { get } from "local-storage";
 
-const StorytellerStudioCTA = () => {
+interface StorytellerStudioCTAProps {
+  showButton?: boolean;
+  showIcon?: boolean;
+  subText?: string;
+  title?: string;
+  showMarquee?: boolean;
+}
+
+const StorytellerStudioCTA = ({
+  showButton = true,
+  subText,
+  title,
+  showMarquee = true,
+  showIcon = true,
+}: StorytellerStudioCTAProps) => {
   const { open } = useModal();
   const openModal = () =>
     open({
@@ -21,43 +35,47 @@ const StorytellerStudioCTA = () => {
       <div className="row py-3 pb-0 px-4 px-lg-5 py-lg-0 g-3 gx-lg-5">
         <div className="col-12 col-lg-6 pb-lg-3 d-flex flex-column justify-content-center ps-lg-5">
           <h1 className="fw-bold mb-3 text-center text-lg-start">
-            <FontAwesomeIcon icon={faCube} className="fs-2 me-2" /> Storyteller
-            Studio
-          </h1>
-          <p className="opacity-75 mb-4 text-center text-lg-start">
-            Harness the power of AI to bring your creative visions to life.
-            Craft stunning visuals by designing your own 3D scenes. Take control
-            and effortlessly produce movies in any style you envision.
-          </p>
-          <div className="d-flex justify-content-center justify-content-lg-start gap-3">
-            {!get<boolean>("firstFormIsSubmitted") ||
-            !get<boolean>("secondFormIsSubmitted") ? (
-              <>
-                {!get<boolean>("firstFormIsSubmitted") ? (
-                  <Button
-                    label="Join the Waitlist"
-                    icon={faArrowRight}
-                    iconFlip={true}
-                    onClick={openModal}
-                  />
-                ) : (
-                  <Button
-                    label="Get Access Sooner"
-                    icon={faArrowRight}
-                    iconFlip={true}
-                    to="/creator-onboarding"
-                  />
-                )}
-              </>
-            ) : (
-              <Button
-                label="Visit Storyteller.ai"
-                icon={faArrowRight}
-                iconFlip={true}
-                href="https://storyteller.ai/"
-              />
+            {showIcon && (
+              <FontAwesomeIcon icon={faCube} className="fs-2 me-3" />
             )}
-          </div>
+            {title ? title : "Storyteller Studio"}
+          </h1>
+          <p className="opacity-75 text-center text-lg-start">
+            {subText
+              ? subText
+              : "Harness the power of AI to bring your creative visions to life. Craft stunning visuals by designing your own 3D scenes. Take control and effortlessly produce movies in any style you like."}
+          </p>
+          {showButton && (
+            <div className="d-flex justify-content-center justify-content-lg-start gap-3 mt-4">
+              {!get<boolean>("firstFormIsSubmitted") ||
+              !get<boolean>("secondFormIsSubmitted") ? (
+                <>
+                  {!get<boolean>("firstFormIsSubmitted") ? (
+                    <Button
+                      label="Join the Waitlist"
+                      icon={faArrowRight}
+                      iconFlip={true}
+                      onClick={openModal}
+                    />
+                  ) : (
+                    <Button
+                      label="Get Access Sooner"
+                      icon={faArrowRight}
+                      iconFlip={true}
+                      to="/creator-onboarding"
+                    />
+                  )}
+                </>
+              ) : (
+                <Button
+                  label="Visit Storyteller.ai"
+                  icon={faArrowRight}
+                  iconFlip={true}
+                  href="https://storyteller.ai/"
+                />
+              )}
+            </div>
+          )}
         </div>
         <div className="col-12 col-lg-6 d-flex flex-column justify-content-center">
           <div
@@ -90,12 +108,16 @@ const StorytellerStudioCTA = () => {
           </div>
         </div>
       </div>
-      <div className="d-none d-lg-block">
-        <ScrollingSceneCarousel showGradient={false} />
-      </div>
-      <div className="d-block d-lg-none">
-        <ScrollingSceneCarousel showGradient={false} small={true} />
-      </div>
+      {showMarquee && (
+        <>
+          <div className="d-none d-lg-block">
+            <ScrollingSceneCarousel showGradient={false} />
+          </div>
+          <div className="d-block d-lg-none">
+            <ScrollingSceneCarousel showGradient={false} small={true} />
+          </div>
+        </>
+      )}
     </Panel>
   );
 };

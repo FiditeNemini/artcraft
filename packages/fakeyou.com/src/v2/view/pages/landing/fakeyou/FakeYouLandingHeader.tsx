@@ -38,7 +38,7 @@ export default function FakeYouLandingHeader({
           </div>
           <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center pt-3 pt-lg-0">
             <Panel clear={true}>
-              <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
+              <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
                 {t("heroTitle")}
               </h1>
               <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">

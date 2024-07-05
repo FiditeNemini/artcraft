@@ -6,6 +6,7 @@ import Marquee from "react-fast-marquee";
 interface ScrollingSceneCarouselProps {
   small?: boolean;
   showGradient?: boolean;
+  gradientColor?: string;
   pauseOnHover?: boolean;
   className?: string;
 }
@@ -22,6 +23,7 @@ interface MediaItem {
 export default function ScrollingSceneCarousel({
   small,
   showGradient = true,
+  gradientColor,
   pauseOnHover = false,
   className,
 }: ScrollingSceneCarouselProps) {
@@ -67,7 +69,7 @@ export default function ScrollingSceneCarousel({
         gradient={showGradient ? true : false}
         // this component doesn't seem to like string values and was causing errors
         // so hex is converted to an RGB array -VH
-        gradientColor="#1a1a27"
+        gradientColor={gradientColor ? gradientColor : "#1a1a27"}
         //gradientColor={[26, 26, 29]}
         gradientWidth={small ? 80 : 200}
         speed={small ? 100 : 50}
@@ -93,7 +95,7 @@ export default function ScrollingSceneCarousel({
       {!small && (
         <Marquee
           gradient={showGradient ? true : false}
-          gradientColor="#1a1a27"
+          gradientColor={gradientColor ? gradientColor : "#1a1a27"}
           //gradientColor={[26, 26, 29]}
           gradientWidth={small ? 80 : 200}
           speed={small ? 100 : 50}

@@ -505,8 +505,17 @@ styles with important tags:
   }
 
   .login-panel {
-    max-width: 800px !important;
+    max-width: 480px !important;
     backdrop-filter: blur(5px);
+  }
+
+  .auth-page-left {
+    height: auto;
+  }
+
+  .auth-page-right {
+    padding: 1.25rem;
+    padding-bottom: 5rem;
   }
 
   .sub-title {
@@ -1769,6 +1778,14 @@ textarea {
       h2.panel-title {
         margin-top: -20px;
       }
+    }
+
+    .auth-page-left {
+      height: 100vh;
+    }
+
+    .auth-page-right {
+      padding: 5.2rem;
     }
 
     .lead {

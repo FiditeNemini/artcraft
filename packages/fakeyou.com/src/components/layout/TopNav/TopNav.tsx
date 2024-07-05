@@ -208,7 +208,9 @@ export default function TopNav({
       if (
         (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
         isOnBetaKeyRedeemPage ||
-        isOnCreatorOnboardingPage
+        isOnCreatorOnboardingPage ||
+        isOnLoginPage ||
+        isOnSignUpPage
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
@@ -221,6 +223,8 @@ export default function TopNav({
     isOnBetaKeyRedeemPage,
     isOnWaitlistSuccessPage,
     isOnCreatorOnboardingPage,
+    isOnLoginPage,
+    isOnSignUpPage,
   ]);
 
   if (
@@ -258,7 +262,9 @@ export default function TopNav({
   if (
     isOnBetaKeyRedeemPage ||
     isOnWaitlistSuccessPage ||
-    isOnCreatorOnboardingPage
+    isOnCreatorOnboardingPage ||
+    isOnSignUpPage ||
+    isOnLoginPage
   ) {
     return null;
   }

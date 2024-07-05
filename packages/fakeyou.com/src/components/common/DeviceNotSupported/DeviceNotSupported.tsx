@@ -9,7 +9,15 @@ import {
 import Button from "../Button";
 import RemixScenes from "../RemixScenes";
 
-export default function DeviceNotSupported() {
+interface DeviceNotSupportedProps {
+  showButton?: boolean;
+  showRemixScenes?: boolean;
+}
+
+export default function DeviceNotSupported({
+  showButton = true,
+  showRemixScenes = true,
+}: DeviceNotSupportedProps) {
   return (
     <Container type="panel">
       <Panel padding={true} className="py-5 d-flex flex-column gap-4">
@@ -36,30 +44,37 @@ export default function DeviceNotSupported() {
             <b className="text-red fw-medium"> Storyteller.ai</b> on a desktop
             computer to access Storyteller Studio.
           </p>
-          {/* <div className="d-flex justify-content-center mt-2">
-            <Button to="/" label="Back to Homepage" icon={faArrowLeft} />
-          </div> */}
-          <hr className="w-100" />
-          <p className="px-2 fw-medium fs-5">
-            You'll be able to create creative scenes like these...
-          </p>
+
+          {showRemixScenes && (
+            <>
+              <hr className="w-100" />
+              <p className="px-2 fw-medium fs-5">
+                You'll be able to create creative scenes like these...
+              </p>
+            </>
+          )}
         </div>
 
-        <RemixScenes allowRemix={false} />
+        {showRemixScenes && (
+          <>
+            <RemixScenes allowRemix={false} />
 
-        <p className="px-2 fw-medium fs-5 text-center">
-          Log into <b className="text-red fw-medium"> Storyteller.ai</b> on a
-          desktop computer to start creating now!
-        </p>
-
-        <div className="d-flex justify-content-center mt-3">
-          <Button
-            to="/"
-            label="Back to Homepage"
-            icon={faArrowLeft}
-            variant="primary"
-          />
-        </div>
+            <p className="px-2 fw-medium fs-5 text-center">
+              Log into <b className="text-red fw-medium"> Storyteller.ai</b> on
+              a desktop computer to start creating now!
+            </p>
+          </>
+        )}
+        {showButton && (
+          <div className="d-flex justify-content-center mt-3">
+            <Button
+              to="/"
+              label="Back to Homepage"
+              icon={faArrowLeft}
+              variant="primary"
+            />
+          </div>
+        )}
       </Panel>
     </Container>
   );
