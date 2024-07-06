@@ -80,16 +80,10 @@ export function StyleButtons() {
 
   const handleLipsyncChange = () => {
     lipSync.value = !lipSync.value;
-    if (lipSync.value) {
-      faceDetail.value = false;
-    }
   };
 
   const handleFaceDetailerChange = () => {
     faceDetail.value = !faceDetail.value;
-    if (faceDetail.value) {
-      lipSync.value = false;
-    }
   };
 
   return (
@@ -141,10 +135,9 @@ export function StyleButtons() {
                 <Switch.Label
                   className={twMerge(
                     "mr-3 grow text-sm font-medium transition-opacity",
-                    faceDetail.value ? "opacity-50" : "",
                   )}
                 >
-                  Preserve Lip Movement
+                  Sync Lips with Speech
                 </Switch.Label>
                 <Switch
                   checked={lipSync.value}
@@ -174,7 +167,6 @@ export function StyleButtons() {
                   <Switch.Label
                     className={twMerge(
                       "mr-3 grow text-sm font-medium transition-opacity",
-                      lipSync.value ? "opacity-50" : "",
                     )}
                   >
                     Face Detailer
