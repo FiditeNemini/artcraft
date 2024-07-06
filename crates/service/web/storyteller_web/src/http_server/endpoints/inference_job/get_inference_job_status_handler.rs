@@ -375,7 +375,7 @@ fn record_to_payload(
 #[cfg(test)]
 mod tests {
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-  use mysql_queries::queries::generic_inference::web::get_inference_job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
+  use mysql_queries::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
 
   use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::record_to_payload;
 

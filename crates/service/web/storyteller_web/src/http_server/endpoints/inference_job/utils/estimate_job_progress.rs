@@ -1,7 +1,5 @@
 use std::cmp::min;
 
-use chrono::Utc;
-
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
@@ -78,6 +76,13 @@ fn percent(numerator: u64, denominator: u64) -> u8 {
 
 #[cfg(test)]
 mod tests {
+  use chrono::{Duration, Utc};
+  use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+  use enums::common::job_status_plus::JobStatusPlus;
+  use mysql_queries::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails};
+
+  use crate::http_server::endpoints::inference_job::utils::estimate_job_progress::estimate_job_progress;
+
   #[test]
   fn test_percent() {
     assert_eq!(0, super::percent(0, 0));
@@ -90,5 +95,53 @@ mod tests {
     assert_eq!(75, super::percent(3, 4));
     assert_eq!(100, super::percent(4, 4));
     assert_eq!(100, super::percent(5, 4));
+  }
+
+  #[test]
+  fn test_pending() {
+    let mut job = GenericInferenceJobStatus::default();
+    job.status = JobStatusPlus::Pending;
+    assert_eq!(0, estimate_job_progress(&job));
+  }
+
+  #[test]
+  fn test_complete_success() {
+    let mut job = GenericInferenceJobStatus::default();
+    job.status = JobStatusPlus::CompleteSuccess;
+    assert_eq!(100, estimate_job_progress(&job));
+  }
+
+  mod running_jobs {
+    use super::*;
+
+    #[test]
+    fn test_started_just_now() {
+      let mut job = GenericInferenceJobStatus::default();
+      job.status = JobStatusPlus::Started;
+      job.created_at = Utc::now();
+      job.maybe_first_started_at = Some(Utc::now());
+      job.database_clock = Utc::now();
+      assert_eq!(0, estimate_job_progress(&job));
+    }
+
+    #[test]
+    fn test_started_shortly_ago() {
+      let mut job = GenericInferenceJobStatus::default();
+      job.status = JobStatusPlus::Started;
+      job.created_at = Utc::now() - Duration::seconds(10);
+      job.maybe_first_started_at = Some(Utc::now() - Duration::seconds(10));
+      job.database_clock = Utc::now();
+      assert_eq!(5, estimate_job_progress(&job));
+    }
+
+    #[test]
+    fn test_started_long_ago() {
+      let mut job = GenericInferenceJobStatus::default();
+      job.status = JobStatusPlus::Started;
+      job.created_at = Utc::now() - Duration::days(10);
+      job.maybe_first_started_at = Some(Utc::now() - Duration::days(10));
+      job.database_clock = Utc::now();
+      assert_eq!(95, estimate_job_progress(&job));
+    }
   }
 }
