@@ -6,15 +6,14 @@ import "swiper/css/autoplay";
 import "swiper/css/pagination";
 import "./MentionsSection.scss";
 
-interface MentionsSectionProps {}
+interface MentionsSectionProps { }
 
 const MentionsSection: React.FC<MentionsSectionProps> = () => {
   return (
     <div className="mentions-section text-center px-4 px-lg-0">
-      <h1 className="fw-bold pb-0">Media Mentions</h1>
-      <p className="pb-5 opacity-75 mb-3 fs-5">
-        Trusted by over 10 million satisfied users around the world.
-      </p>
+      <h1 className="fw-bold pb-5 mb-3 fs-4">
+        Trusted by over 10 million users around the world
+      </h1>
       <div className="mentions-swiper">
         <Swiper
           loop={true}
