@@ -7,7 +7,6 @@ use actix_web::error::Error;
 use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use reusable_types::server_environment::ServerEnvironment;
-use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
@@ -136,6 +135,7 @@ use crate::routes::beta_key_routes::add_beta_key_routes;
 use crate::routes::job_routes::add_job_routes;
 use crate::routes::media_files_routes::add_media_file_routes;
 use crate::routes::moderation_routes::add_moderator_routes;
+use crate::routes::user_routes::add_user_routes;
 use crate::routes::weights_routes::add_weights_routes;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
@@ -246,7 +246,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   // ==================== COMPONENTS ====================
 
-  app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
+  app = add_user_routes(app); // /create_account, /session, /login, /logout
   app = add_suggested_stripe_billing_routes(app); // /stripe, billing, webhooks, etc.
  
   // ==================== SERVICE ====================
