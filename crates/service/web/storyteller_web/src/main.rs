@@ -101,7 +101,6 @@ pub mod server_state;
 pub mod subscriptions;
 pub mod threads;
 pub mod util;
-pub mod validations;
 
 const DEFAULT_BIND_ADDRESS : &str = "0.0.0.0:12345";
 

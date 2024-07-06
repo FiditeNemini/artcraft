@@ -24,7 +24,7 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::endpoints::engine::drain_multipart_request::drain_multipart_request;
 use crate::server_state::ServerState;
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 #[derive(Debug, Serialize, ToSchema)]
 pub enum CreateSceneError {

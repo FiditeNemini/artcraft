@@ -19,7 +19,7 @@ pub fn validate_idempotency_token_format(token: &str) -> Result<(), String> {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+  use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
   #[test]
   fn valid_idempotency_tokens() {

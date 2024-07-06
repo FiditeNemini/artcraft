@@ -33,7 +33,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Form-multipart request fields.
 ///

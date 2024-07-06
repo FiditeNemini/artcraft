@@ -35,7 +35,7 @@ use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.

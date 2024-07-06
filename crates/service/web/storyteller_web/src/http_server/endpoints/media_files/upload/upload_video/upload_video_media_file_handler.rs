@@ -25,7 +25,7 @@ use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileU
 use crate::http_server::endpoints::media_files::upload::upload_video::drain_multipart_request::drain_multipart_request;
 use crate::http_server::endpoints::media_files::upload::upload_video::drain_multipart_request::MediaFileUploadSource;
 use crate::server_state::ServerState;
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 #[derive(Serialize, ToSchema)]
 pub struct UploadVideoMediaSuccessResponse {

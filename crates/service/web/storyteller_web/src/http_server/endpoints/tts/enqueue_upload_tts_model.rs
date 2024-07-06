@@ -20,7 +20,7 @@ use mysql_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::validations::model_uploads::validate_model_title;
+use crate::http_server::validations::model_uploads::validate_model_title;
 
 #[derive(Deserialize, Copy, Clone)]
 pub enum SupportedTtsModelType {

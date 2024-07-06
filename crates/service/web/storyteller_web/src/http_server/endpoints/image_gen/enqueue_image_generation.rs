@@ -41,7 +41,7 @@ use crate::http_server::endpoints::image_gen::prompt_enrichment::enrich_prompt;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// This is the number of images (batch size) to generate for each request.
 /// We should allow all users to have multiple images generated at once as this

@@ -30,7 +30,7 @@ use crate::http_server::endpoints::media_files::upsert_upload::write_error::Medi
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::drain_multipart_request::drain_multipart_request;
 use crate::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
 #[derive(Serialize, ToSchema)]

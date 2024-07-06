@@ -32,7 +32,7 @@ use crate::http_server::endpoints::media_files::upload::upload_engine_asset::dra
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::server_state::ServerState;
-use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Form-multipart request fields.
 ///
