@@ -32,10 +32,10 @@ use users_component::session::lookup::user_session_extended::UserSessionExtended
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
-use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
@@ -277,6 +277,7 @@ pub async fn enqueue_comfy_ui_handler(
         trim_end_milliseconds: None,
         positive_prompt: None,
         negative_prompt: None,
+        travel_prompt: None,
         global_ip_adapter_token: None,
         enable_lipsync: None,
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
@@ -291,6 +292,7 @@ pub async fn enqueue_comfy_ui_handler(
         disable_lcm: None,
         use_cinematic: None,
         strength: None,
+        frame_skip: None,
     };
 
     info!("Creating ComfyUI job record...");

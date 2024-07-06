@@ -246,6 +246,7 @@ pub async fn enqueue_workflow_upload_request(
         trim_end_milliseconds: None,
         positive_prompt: None,
         negative_prompt: None,
+        travel_prompt: None,
         global_ip_adapter_token: None,
         enable_lipsync: None,
         rollout_python_workflow_args: get_request_header_optional(&http_request, "PYTHON-WORKFLOW-ARGS")
@@ -260,6 +261,7 @@ pub async fn enqueue_workflow_upload_request(
         disable_lcm: None,
         use_cinematic: None,
         strength: None,
+        frame_skip: None,
     };
    
     // create the inference args here

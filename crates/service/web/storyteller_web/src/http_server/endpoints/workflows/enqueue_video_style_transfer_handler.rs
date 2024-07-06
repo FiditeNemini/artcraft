@@ -33,10 +33,10 @@ use users_component::session::lookup::user_session_extended::UserSessionExtended
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::endpoints::workflows::coordinate_workflow_args::{coordinate_workflow_args, CoordinatedWorkflowArgs};
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
-use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
@@ -123,6 +123,35 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Optional Global IP-Adapter image.
     /// The underlying media file must be an image.
     global_ipa_media_token: Option<MediaFileToken>,
+
+    /// To use prompt traveling, enqueue a prompt with this.
+    ///
+    /// An example of a prompt travel section:
+    ///
+    ///    "50": "(explosion:1.4)",
+    ///    "59": "(explosion:1.4)",
+    ///    "60": "fire, smoke, ash",
+    ///    "99": "fire, smoke, ash",
+    ///    "100": "",
+    ///
+    /// On the interval 50-59 there will be explosion, on
+    /// the interval 60-99 there will be fire, smoke, ash.
+    /// You must set
+    ///
+    /// Alternatively, the main `prompt` field can have a
+    /// prompt travel section if you end the main prompt
+    /// with `---` and then include a prompt travel text.
+    travel_prompt: Option<String>,
+
+    /// If you'd like to skip frames.
+    ///
+    /// Meaning:
+    ///  * 1 = not skipping frames.
+    ///  * 2 = skipping every 2nd, etc.
+    ///
+    /// The default, if not specified, is 2, which means
+    /// every 2nd frame is skipped.
+    frame_skip: Option<u8>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -320,6 +349,8 @@ pub async fn enqueue_video_style_transfer_handler(
         .transpose()?;
 
     let coordinated_args = CoordinatedWorkflowArgs {
+        prompt: request.prompt.new_string_trim_or_empty(),
+        travel_prompt: request.travel_prompt.new_string_trim_or_empty(),
         use_lipsync: lazy_any_option_true(&[
             Box::new(|| request.enable_lipsync),
             Box::new(|| request.use_lipsync),
@@ -346,19 +377,24 @@ pub async fn enqueue_video_style_transfer_handler(
     let coordinated_args = coordinate_workflow_args(coordinated_args, is_allowed_expensive_generation);
 
     let inference_args = WorkflowArgs {
+        // Main text prompts
+        positive_prompt: coordinated_args.prompt.new_string_trim_or_empty(),
+        negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
+        travel_prompt: coordinated_args.travel_prompt.new_string_trim_or_empty(),
+
+        // Other inputs
         maybe_input_file: Some(request.input_file.clone()),
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
         trim_start_milliseconds: Some(trim_start_millis),
         trim_end_milliseconds: Some(trim_end_millis),
-        positive_prompt: request.prompt.new_string_trim_or_empty(),
-        negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
         global_ip_adapter_token: request.global_ipa_media_token
             .as_ref()
             // NB: Frontend is mistakenly sending empty string - ignore it
             .filter(|t| t.as_str().trim_or_empty().is_some())
             .map(|t| t.clone()),
         strength: maybe_strength,
+        frame_skip: request.frame_skip,
 
         // Flags
         disable_lcm: coordinated_args.disable_lcm,

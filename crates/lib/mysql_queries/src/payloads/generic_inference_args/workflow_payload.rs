@@ -123,6 +123,10 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub negative_prompt: Option<String>,
 
+    #[serde(rename = "tp")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub travel_prompt: Option<String>,
+
     // Optional global IP Adapter image media file token
     // This will apply to the entire workflow / video
     #[serde(rename = "gi")]
@@ -177,4 +181,8 @@ pub struct WorkflowArgs {
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strength: Option<f32>,
+
+    #[serde(rename = "fs")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub frame_skip: Option<u8>,
 }

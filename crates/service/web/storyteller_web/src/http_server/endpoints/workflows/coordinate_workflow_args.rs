@@ -1,4 +1,13 @@
+#[derive(Default)]
 pub struct CoordinatedWorkflowArgs {
+  /// The "positive" prompt, which is the main workflow prompt
+  /// This can include a prompt traveling section, which will be parsed out.
+  /// If the `travel_prompt` field is specified, that will be used for prompt travel instead.
+  pub prompt: Option<String>,
+
+  /// An optional prompt travelling prompt
+  pub travel_prompt: Option<String>,
+
   /// Use lipsync in the workflow
   pub use_lipsync: Option<bool>,
 
@@ -25,6 +34,41 @@ pub struct CoordinatedWorkflowArgs {
 }
 
 pub fn coordinate_workflow_args(mut args: CoordinatedWorkflowArgs, is_staff: bool) -> CoordinatedWorkflowArgs {
+  handle_prompts(&mut args);
+  handle_flags(&mut args, is_staff);
+  args
+}
+
+fn handle_prompts(args: &mut CoordinatedWorkflowArgs) {
+  let mut replace_prompt = None;
+  let mut replace_travel_prompt = None;
+
+  let maybe_split_prompts = args.prompt.as_deref()
+      .map(|prompt| prompt.split_once("---"))
+      .flatten();
+
+  match maybe_split_prompts {
+    Some((prompt, travel_prompt)) => {
+      let p = prompt.trim();
+      let tp = travel_prompt.trim();
+
+      if !tp.is_empty() {
+        replace_prompt = Some(p.to_string());
+        replace_travel_prompt = Some(tp.to_string());
+      }
+    }
+    _ => {}
+  }
+
+  if replace_prompt.is_some() && replace_travel_prompt.is_some() {
+    args.prompt = replace_prompt;
+    if args.travel_prompt.is_none() {
+      args.travel_prompt = replace_travel_prompt;
+    }
+  }
+}
+
+fn handle_flags(args: &mut CoordinatedWorkflowArgs, is_staff: bool) {
   if !is_staff {
     // Non-staff cannot use these workflows
     args.disable_lcm = None;
@@ -53,70 +97,139 @@ pub fn coordinate_workflow_args(mut args: CoordinatedWorkflowArgs, is_staff: boo
   }
 
   // you can still use upscaler for non-lcm version (it will just take a while)
-
-  args
 }
 
 #[cfg(test)]
 mod tests {
-  #[test]
-  fn test_cinematic_and_upscaler() {
-    let args = super::CoordinatedWorkflowArgs {
-      use_lipsync: None,
-      use_face_detailer: None,
-      use_upscaler: Some(true),
-      disable_lcm: None,
-      use_cinematic: Some(true),
-      remove_watermark: None,
-    };
+  use super::{CoordinatedWorkflowArgs, coordinate_workflow_args};
 
-    let coordinated_args = super::coordinate_workflow_args(args, true);
+  mod prompts {
+    use super::*;
 
-    assert_eq!(coordinated_args.use_lipsync, None);
-    assert_eq!(coordinated_args.use_face_detailer, None);
-    assert_eq!(coordinated_args.use_upscaler, None);
-    assert_eq!(coordinated_args.disable_lcm, None);
-    assert_eq!(coordinated_args.use_cinematic, Some(true));
+    #[test]
+    fn test_no_prompts() {
+      let mut args = CoordinatedWorkflowArgs::default();
+      args.prompt = None;
+      args.travel_prompt = None;
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.prompt, None);
+      assert_eq!(coordinated_args.travel_prompt, None);
+    }
+
+    #[test]
+    fn test_simple_positive_prompt() {
+      let mut args = CoordinatedWorkflowArgs::default();
+      args.prompt = Some("foo, bar, baz".to_string());
+      args.travel_prompt = None;
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.prompt, Some("foo, bar, baz".to_string())); // Unchanged
+      assert_eq!(coordinated_args.travel_prompt, None);
+    }
+
+    #[test]
+    fn test_composite_positive_prompt() {
+      let mut args = CoordinatedWorkflowArgs::default();
+      args.prompt = Some("foo, bar, baz --- bin, bash".to_string());
+      args.travel_prompt = None;
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.prompt, Some("foo, bar, baz".to_string()));
+      assert_eq!(coordinated_args.travel_prompt, Some("bin, bash".to_string()));
+    }
+
+    #[test]
+    fn test_composite_positive_prompt_newlines() {
+      let mut args = CoordinatedWorkflowArgs::default();
+      args.prompt = Some("foo, bar, baz \n---\n bin, bash".to_string());
+      args.travel_prompt = None;
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.prompt, Some("foo, bar, baz".to_string()));
+      assert_eq!(coordinated_args.travel_prompt, Some("bin, bash".to_string()));
+    }
+
+    #[test]
+    fn test_composite_positive_prompt_and_travel_prompt() {
+      let mut args = CoordinatedWorkflowArgs::default();
+      args.prompt = Some("foo, bar, baz --- bin, bash".to_string());
+      args.travel_prompt = Some("querty, asdf".to_string());
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.prompt, Some("foo, bar, baz".to_string())); // Inline travel prompt dropped
+      assert_eq!(coordinated_args.travel_prompt, Some("querty, asdf".to_string())); // Authoritative field used
+    }
   }
 
-  #[test]
-  fn test_cinematic_and_disable_lcm() {
-    let args = super::CoordinatedWorkflowArgs {
-      use_lipsync: None,
-      use_face_detailer: None,
-      use_upscaler: None,
-      disable_lcm: Some(true),
-      use_cinematic: Some(true),
-      remove_watermark: None,
-    };
+  mod flags {
+    use super::*;
 
-    let coordinated_args = super::coordinate_workflow_args(args, true);
+    #[test]
+    fn test_cinematic_and_upscaler() {
+      let args = CoordinatedWorkflowArgs {
+        prompt: None,
+        travel_prompt: None,
+        use_lipsync: None,
+        use_face_detailer: None,
+        use_upscaler: Some(true),
+        disable_lcm: None,
+        use_cinematic: Some(true),
+        remove_watermark: None,
+      };
 
-    assert_eq!(coordinated_args.use_lipsync, None);
-    assert_eq!(coordinated_args.use_face_detailer, None);
-    assert_eq!(coordinated_args.use_upscaler, None);
-    assert_eq!(coordinated_args.disable_lcm, None);
-    assert_eq!(coordinated_args.use_cinematic, Some(true));
-  }
+      let coordinated_args = coordinate_workflow_args(args, true);
 
-  #[test]
-  fn test_lipsync_and_face_detailer() {
-    let args = super::CoordinatedWorkflowArgs {
-      use_lipsync: Some(true),
-      use_face_detailer: Some(true),
-      use_upscaler: None,
-      disable_lcm: None,
-      use_cinematic: None,
-      remove_watermark: None,
-    };
+      assert_eq!(coordinated_args.use_lipsync, None);
+      assert_eq!(coordinated_args.use_face_detailer, None);
+      assert_eq!(coordinated_args.use_upscaler, None);
+      assert_eq!(coordinated_args.disable_lcm, None);
+      assert_eq!(coordinated_args.use_cinematic, Some(true));
+    }
 
-    let coordinated_args = super::coordinate_workflow_args(args, true);
+    #[test]
+    fn test_cinematic_and_disable_lcm() {
+      let args = CoordinatedWorkflowArgs {
+        prompt: None,
+        travel_prompt: None,
+        use_lipsync: None,
+        use_face_detailer: None,
+        use_upscaler: None,
+        disable_lcm: Some(true),
+        use_cinematic: Some(true),
+        remove_watermark: None,
+      };
 
-    assert_eq!(coordinated_args.use_lipsync, Some(true));
-    //assert_eq!(coordinated_args.use_face_detailer, None);
-    assert_eq!(coordinated_args.use_face_detailer, Some(true)); // TODO(bt): Possibly temporary
-    assert_eq!(coordinated_args.use_upscaler, None);
-    assert_eq!(coordinated_args.disable_lcm, None);
-    assert_eq!(coordinated_args.use_cinematic, None);
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.use_lipsync, None);
+      assert_eq!(coordinated_args.use_face_detailer, None);
+      assert_eq!(coordinated_args.use_upscaler, None);
+      assert_eq!(coordinated_args.disable_lcm, None);
+      assert_eq!(coordinated_args.use_cinematic, Some(true));
+    }
+
+    #[test]
+    fn test_lipsync_and_face_detailer() {
+      let args = CoordinatedWorkflowArgs {
+        prompt: None,
+        travel_prompt: None,
+        use_lipsync: Some(true),
+        use_face_detailer: Some(true),
+        use_upscaler: None,
+        disable_lcm: None,
+        use_cinematic: None,
+        remove_watermark: None,
+      };
+
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.use_lipsync, Some(true));
+      //assert_eq!(coordinated_args.use_face_detailer, None);
+      assert_eq!(coordinated_args.use_face_detailer, Some(true)); // TODO(bt): Possibly temporary
+      assert_eq!(coordinated_args.use_upscaler, None);
+      assert_eq!(coordinated_args.disable_lcm, None);
+      assert_eq!(coordinated_args.use_cinematic, None);
+    }
   }
 }
