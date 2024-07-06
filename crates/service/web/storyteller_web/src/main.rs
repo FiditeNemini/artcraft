@@ -97,7 +97,6 @@ pub mod http_server;
 pub mod memory_cache;
 pub mod model;
 pub mod server_state;
-pub mod subscriptions;
 pub mod threads;
 pub mod util;
 
