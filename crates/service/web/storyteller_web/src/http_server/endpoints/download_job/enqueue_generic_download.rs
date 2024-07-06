@@ -14,7 +14,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::generic_download::web::insert_generic_download_job::{insert_generic_download_job, InsertGenericDownloadJobArgs};
 
 use crate::server_state::ServerState;
-use crate::http_server::validations::model_uploads::validate_model_title;
+use crate::http_server::validations::validate_model_title::validate_model_title;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 #[derive(Deserialize)]

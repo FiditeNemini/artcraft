@@ -19,7 +19,7 @@ use user_input_common::check_for_slurs::contains_slurs;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::http_server::validations::model_uploads::validate_model_title;
+use crate::http_server::validations::validate_model_title::validate_model_title;
 
 #[derive(Deserialize)]
 pub enum W2lTemplateType {

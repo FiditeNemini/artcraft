@@ -15,7 +15,7 @@ pub fn maybe_filter_model_name(name: Option<&str>) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-  use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
+  use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
 
   #[test]
   fn test_maybe_filter_model_name() {
