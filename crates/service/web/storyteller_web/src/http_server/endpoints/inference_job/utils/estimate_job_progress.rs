@@ -35,7 +35,7 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus) -> u8 {
 
   let now = job.database_clock;
 
-  if started_at < now {
+  if started_at > now {
     return 0; // We shouldn't see clock skew unless we read from a DB replica.
   }
 
