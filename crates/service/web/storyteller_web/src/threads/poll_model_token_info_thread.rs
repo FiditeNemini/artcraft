@@ -11,7 +11,7 @@ use errors::AnyhowResult;
 use mysql_queries::queries::model_weights::model_weight_info_lite::list_model_weight_info_lite::list_model_weight_info_lite;
 use mysql_queries::queries::voice_conversion::model_info_lite::list_voice_conversion_model_info_lite::list_voice_conversion_model_info_lite;
 
-use crate::memory_cache::model_token_to_info_cache::{ModelInfoForInferenceJob, ModelTokenToInfoCache};
+use crate::state::memory_cache::model_token_to_info_cache::{ModelInfoForInferenceJob, ModelTokenToInfoCache};
 
 pub async fn poll_model_token_info_thread(
   model_token_info_cache: ModelTokenToInfoCache,

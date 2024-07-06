@@ -78,7 +78,7 @@ use crate::configs::static_api_tokens::StaticApiTokenSet;
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::routes::add_routes::add_routes;
 use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
-use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
+use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
@@ -94,7 +94,6 @@ pub const RESERVED_SUBSTRINGS : &str = include_str!("../../../../../includes/bin
 pub mod billing;
 pub mod configs;
 pub mod http_server;
-pub mod memory_cache;
 pub mod model;
 pub mod state;
 pub mod threads;

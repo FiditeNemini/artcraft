@@ -34,7 +34,6 @@ use crate::state::server_state::ServerState;
 pub mod billing;
 pub mod configs;
 pub mod http_server;
-pub mod memory_cache;
 pub mod model;
 pub mod state;
 pub mod threads;

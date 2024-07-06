@@ -28,7 +28,7 @@ use crate::http_server::endpoints::stats::result_transformer::CacheableQueueStat
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
-use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
+use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::StaticApiTokenSet;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
