@@ -214,6 +214,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
       maybe_model_token: record.maybe_model_token,
       maybe_model_title: maybe_model_title.map(|title| title.to_string()),
       maybe_raw_inference_text: record.maybe_raw_inference_text,
+      maybe_inference_args: record.maybe_inference_args,
       maybe_style_name,
     },
     maybe_result_details,

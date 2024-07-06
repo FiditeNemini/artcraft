@@ -50,6 +50,9 @@ pub struct RequestDetails {
   /// TTS input. In the future, perhaps voice conversion SST
   pub maybe_raw_inference_text: Option<String>,
 
+  /// Raw JSON payload of polymorphic inference args
+  pub maybe_inference_args: Option<String>,
+
   /// For Comfy / Video Style Transfer jobs, this might include
   /// the name of the selected style.
   pub maybe_style_name: Option<StyleTransferName>,
