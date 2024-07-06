@@ -119,6 +119,10 @@ const FAKEYOU_PRICES = {
       title: "Wav2Lip",
       features: ["Up to 2 minutes video"],
     },
+    storyteller: {
+      title: "High-Fidelity, Controllable Video Generation",
+      features: ["Priority Beta Access to Storyteller Studio"],
+    },
     api: {
       title: "API Access",
       features: ["Full API access"],
@@ -187,6 +191,10 @@ const FAKEYOU_PRICES = {
     commercial: {
       title: "Commercial Voices",
       features: ["FakeYou commercial voices"],
+    },
+    storyteller: {
+      title: "High-Fidelity, Controllable Video Generation",
+      features: ["Priority Beta Access to Storyteller Studio"],
     },
   },
 };

@@ -6,7 +6,11 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { GetWebsite, WEBSITE, Website } from "@storyteller/components/src/env/GetWebsite";
+import {
+  GetWebsite,
+  WEBSITE,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel } from "components/common";
 import { useLocalize } from "hooks";
@@ -20,7 +24,6 @@ interface CreatorToolsPageProps {
 
 export default function CreatorToolsPage(props: CreatorToolsPageProps) {
   const { t } = useLocalize("LandingPage");
-  const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
   usePrefixedDocumentTitle("Creator Tools");
 
@@ -87,13 +90,14 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
     },
   ];
 
-  const storytellerLink = GetWebsite().website === Website.FakeYou ? 
-    WEBSITE.storyteller.link : 
-    WEBSITE.storyteller_studio.link;
+  const storytellerLink =
+    GetWebsite().website === Website.FakeYou
+      ? WEBSITE.storyteller.link
+      : WEBSITE.storyteller_studio.link;
 
   return (
     <Container type="panel">
-      <Panel clear={true} className={`${!isLoggedIn ? "section" : "mt-4"}`}>
+      <Panel clear={true} className="mt-5">
         <h1 className="fw-bold mb-4">
           <FontAwesomeIcon icon={faScrewdriverWrench} className="me-3" />
           Creator Tools
@@ -101,6 +105,17 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
 
         <div className="d-flex flex-column gap-5">
           <div>
+            <h2 className="fw-bold mb-3 mt-4">Video</h2>
+            <DashboardRow items={videoProducts} />
+          </div>
+          <div>
+            <h2 className="fw-bold mb-3 mt-4">Voice & Audio</h2>
+            <DashboardRow items={voiceProducts} />
+          </div>
+          <div>
+            <h2 className="fw-bold mb-3 mt-4">
+              High-Fidelity, Controllable Video Generation
+            </h2>
             <Panel padding={true} className="p-3 p-lg-4 rounded">
               <div className="row g-3 g-lg-4">
                 <div className="col-6 col-lg-3">
@@ -154,17 +169,9 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
                   icon={faPortalEnter}
                   className="enter-storyteller-button"
                   href={storytellerLink}
-                  />
+                />
               </div>
             </Panel>
-          </div>
-          <div>
-            <h2 className="fw-bold mb-3 mt-4">Video</h2>
-            <DashboardRow items={videoProducts} />
-          </div>
-          <div>
-            <h2 className="fw-bold mb-3 mt-4">Voice & Audio</h2>
-            <DashboardRow items={voiceProducts} />
           </div>
         </div>
       </Panel>

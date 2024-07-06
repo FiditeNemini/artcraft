@@ -20,6 +20,8 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
+import useModal from "hooks/useModal";
+import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -275,6 +277,12 @@ function SignupPage(props: Props) {
   };
 
   const betaKeyRedirect = redirectLink?.includes("/beta-key/redeem");
+  const { open } = useModal();
+  const openModal = () =>
+    open({
+      component: EmailSignUp,
+      props: { mobile: true, showHanashi: false, handleClose: openModal },
+    });
 
   usePrefixedDocumentTitle("Create an account");
 
@@ -379,10 +387,16 @@ function SignupPage(props: Props) {
 
           {!betaKeyRedirect && (
             <p className="fs-7 mt-5">
-              Interested? Join the waitlist at{" "}
-              <a href="https://storyteller.ai" className="text-red">
-                Storyteller.ai
-              </a>
+              Interested? Join the
+              <span
+                onClick={openModal}
+                className="text-red"
+                style={{ cursor: "pointer" }}
+              >
+                {" "}
+                waitlist
+              </span>{" "}
+              now!
             </p>
           )}
         </div>

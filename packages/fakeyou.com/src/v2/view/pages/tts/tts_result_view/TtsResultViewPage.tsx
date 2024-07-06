@@ -41,6 +41,8 @@ import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import MentionsSection from "components/common/MentionsSection";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -71,15 +73,13 @@ function TtsResultViewPage(props: Props) {
   const documentTitle =
     ttsInferenceResult?.tts_model_title === undefined
       ? undefined
-      : `Deep Fake ${
-          ttsInferenceResult.tts_model_title
-        } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
+      : `Deep Fake ${ttsInferenceResult.tts_model_title
+      } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
   usePrefixedDocumentTitle(documentTitle);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(token)}`;
-  const shareTitle = `I just used FakeYou to generate speech as ${
-    ttsInferenceResult?.tts_model_title || "one of my favorite characters"
-  }!`;
+  const shareTitle = `I just used FakeYou to generate speech as ${ttsInferenceResult?.tts_model_title || "one of my favorite characters"
+    }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -553,6 +553,12 @@ function TtsResultViewPage(props: Props) {
             />
           </div>
         </div>
+      </div>
+      <>
+        <MentionsSection />
+      </>
+      <div className="py-5">
+        <StorytellerStudioCTA />
       </div>
     </div>
   );

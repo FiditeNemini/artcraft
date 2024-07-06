@@ -67,6 +67,8 @@ import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { useInferenceJobs } from "hooks";
+import MentionsSection from "components/common/MentionsSection";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -170,9 +172,8 @@ function TtsModelViewPage(props: Props) {
   ]);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(token)}`;
-  const shareTitle = `Use FakeYou to generate speech as ${
-    ttsModel?.title || "your favorite characters"
-  }!`;
+  const shareTitle = `Use FakeYou to generate speech as ${ttsModel?.title || "your favorite characters"
+    }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -257,7 +258,7 @@ function TtsModelViewPage(props: Props) {
           FrontendInferenceJobType.TextToSpeech
         );
       })
-      .catch(e => {});
+      .catch(e => { });
 
     return false;
   };
@@ -863,6 +864,12 @@ function TtsModelViewPage(props: Props) {
         <SessionTtsInferenceResultList
           sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         />
+      </div>
+      <>
+        <MentionsSection />
+      </>
+      <div className="py-5">
+        <StorytellerStudioCTA />
       </div>
     </div>
   );

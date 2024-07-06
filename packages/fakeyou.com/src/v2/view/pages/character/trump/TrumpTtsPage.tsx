@@ -45,6 +45,7 @@ import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
 import { Container, Panel } from "components/common";
 import { useInferenceJobs } from "hooks";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
@@ -375,6 +376,9 @@ function TrumpTtsPage(props: Props) {
 
   return (
     <Container type="panel">
+      <div className="py-5">
+        <StorytellerStudioCTA />
+      </div>
       <PageHeaderWithImage
         headerImage="/mascot/trump.webp"
         titleIcon={faVolumeHigh}

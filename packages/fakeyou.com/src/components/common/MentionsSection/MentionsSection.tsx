@@ -10,10 +10,12 @@ interface MentionsSectionProps {}
 
 const MentionsSection: React.FC<MentionsSectionProps> = () => {
   return (
-    <div className="mentions-section text-center">
-      <h1 className="fw-bold pb-0">In the Spotlight</h1>
-      <p className="pb-5 opacity-75 mb-3">Our media mentions</p>
-      <div className="mentions-swiper px-4">
+    <div className="mentions-section text-center px-4 px-lg-0">
+      <h1 className="fw-bold pb-0">Media Mentions</h1>
+      <p className="pb-5 opacity-75 mb-3 fs-5">
+        Trusted by over 10 million satisfied users around the world.
+      </p>
+      <div className="mentions-swiper">
         <Swiper
           loop={true}
           autoplay={{

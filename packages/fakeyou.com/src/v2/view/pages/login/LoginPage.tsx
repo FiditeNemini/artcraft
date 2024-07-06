@@ -15,6 +15,8 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
+import useModal from "hooks/useModal";
+import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -93,6 +95,12 @@ function LoginPage(props: Props) {
   }
 
   const betaKeyRedirect = redirectUrl?.includes("/beta-key/redeem");
+  const { open } = useModal();
+  const openModal = () =>
+    open({
+      component: EmailSignUp,
+      props: { mobile: true, showHanashi: false, handleClose: openModal },
+    });
 
   return (
     <div className="overflow-hidden auth-page-left">
@@ -118,10 +126,16 @@ function LoginPage(props: Props) {
 
           {!betaKeyRedirect && (
             <p className="fs-7 mt-5">
-              Interested? Join the waitlist at{" "}
-              <a href="https://storyteller.ai" className="text-red">
-                Storyteller.ai
-              </a>
+              Interested? Join the
+              <span
+                onClick={openModal}
+                className="text-red"
+                style={{ cursor: "pointer" }}
+              >
+                {" "}
+                waitlist
+              </span>{" "}
+              now!
             </p>
           )}
         </div>

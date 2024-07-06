@@ -69,12 +69,11 @@ function LandingPage(props: Props) {
                 />
                 {/* <VstSectionV1 /> */}
                 {/* <VstSectionV2 /> */}
+                <div className="py-5">
+                  <StorytellerStudioCTA />
+                </div>
               </>
             )}
-
-            <div className="py-5">
-              <StorytellerStudioCTA />
-            </div>
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
 
@@ -85,9 +84,16 @@ function LandingPage(props: Props) {
             )}
           </Container>
           {!isLoggedIn && (
-            <>
+            <Container type="panel">
               <MentionsSection />
-            </>
+            </Container>
+          )}
+          {isLoggedIn && (
+            <Container type="panel" className="pt-5">
+              <div className="py-5">
+                <StorytellerStudioCTA />
+              </div>
+            </Container>
           )}
         </>
       )}

@@ -29,6 +29,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
 import "./FaceAnimator.scss";
 import PremiumLock from "components/PremiumLock";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 export default function FaceAnimator({
   sessionSubscriptionsWrapper,
@@ -220,6 +221,9 @@ export default function FaceAnimator({
         large={true}
         showCtaButton={true}
       >
+        <div className="py-5">
+          <StorytellerStudioCTA />
+        </div>
         <div {...{ className: "panel face-animator-main" }}>
           {transitions((style, i) => {
             const Page = FaceAnimatorSubViews[page];

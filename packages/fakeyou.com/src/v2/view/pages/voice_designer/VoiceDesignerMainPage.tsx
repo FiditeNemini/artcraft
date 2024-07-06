@@ -22,6 +22,8 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import "./VoiceDesigner.scss";
+import MentionsSection from "components/common/MentionsSection";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 // interface Props {}
 
@@ -291,6 +293,11 @@ function VoiceDesignerMainPage() {
           content={() => <p>{deleteText.text}</p>}
           onConfirm={handleDelete}
         />
+      </Container>
+
+      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
+        <MentionsSection />
+        <StorytellerStudioCTA />
       </Container>
     </>
   );

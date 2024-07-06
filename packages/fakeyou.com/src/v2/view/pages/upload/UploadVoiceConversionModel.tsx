@@ -14,6 +14,9 @@ import { WebUrl } from "../../../../common/WebUrl";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { SessionVoiceConversionModelUploadResultList } from "../../_common/SessionVoiceConversionModelUploadResultsList";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import MentionsSection from "components/common/MentionsSection";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { Container } from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -188,6 +191,11 @@ function UploadVoiceConversionModel(props: Props) {
       <SessionVoiceConversionModelUploadResultList
         voiceConversionModelUploadJobs={props.voiceConversionModelUploadJobs}
       />
+
+      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
+        <MentionsSection />
+        <StorytellerStudioCTA />
+      </Container>
     </div>
   );
 }

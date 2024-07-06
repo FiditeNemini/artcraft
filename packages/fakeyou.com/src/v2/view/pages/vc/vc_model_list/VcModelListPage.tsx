@@ -34,6 +34,8 @@ import { useInferenceJobs, useLocalize } from "hooks";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Container, Panel } from "components/common";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
+import MentionsSection from "components/common/MentionsSection";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -212,16 +214,17 @@ function VcModelListPage(props: Props) {
     props.maybeSelectedVoiceConversionModel !== undefined;
 
   return (
-    <Container type="panel">
-      <PageHeaderWithImage
-        headerImage="mascot/vc.webp"
-        titleIcon={faWaveformLines}
-        title={t("heroTitle")}
-        subText={t("heroText")}
-        yOffset="78%"
-      />
+    <>
+      <Container type="panel">
+        <PageHeaderWithImage
+          headerImage="mascot/vc.webp"
+          titleIcon={faWaveformLines}
+          title={t("heroTitle")}
+          subText={t("heroText")}
+          yOffset="78%"
+        />
 
-      {/* <div  className="container">
+        {/* <div  className="container">
         <div className="alert alert-info">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
           <span className="fw-medium">
@@ -234,126 +237,126 @@ function VcModelListPage(props: Props) {
         </div>
       </div> */}
 
-      <Panel padding={true}>
-        <div className="d-flex gap-4">
-          <form
-            className="w-100 d-flex flex-column"
-            onSubmit={handleFormSubmit}
-          >
-            {/* Explore Rollout */}
-            <label className="sub-title">
-              {t("vcVoiceLabel", { 0: voiceConversionModels.length })}
-            </label>
-            <div className="input-icon-search pb-4">
-              <span className="form-control-feedback">
-                <FontAwesomeIcon icon={faMicrophone} />
-              </span>
+        <Panel padding={true}>
+          <div className="d-flex gap-4">
+            <form
+              className="w-100 d-flex flex-column"
+              onSubmit={handleFormSubmit}
+            >
+              {/* Explore Rollout */}
+              <label className="sub-title">
+                {t("vcVoiceLabel", { 0: voiceConversionModels.length })}
+              </label>
+              <div className="input-icon-search pb-4">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faMicrophone} />
+                </span>
 
-              <VcModelListSearch
-                voiceConversionModels={props.voiceConversionModels}
-                setVoiceConversionModels={props.setVoiceConversionModels}
-                maybeSelectedVoiceConversionModel={
-                  props.maybeSelectedVoiceConversionModel
-                }
-                setMaybeSelectedVoiceConversionModel={interceptModelChange}
-              />
-            </div>
+                <VcModelListSearch
+                  voiceConversionModels={props.voiceConversionModels}
+                  setVoiceConversionModels={props.setVoiceConversionModels}
+                  maybeSelectedVoiceConversionModel={
+                    props.maybeSelectedVoiceConversionModel
+                  }
+                  setMaybeSelectedVoiceConversionModel={interceptModelChange}
+                />
+              </div>
 
-            <div className="row gx-5 gy-5">
-              <div className="col-12 col-lg-6 d-flex flex-column gap-4">
-                <ul className="nav nav-tabs nav-vc" id="myTab" role="tablist">
-                  <li className="nav-item w-100" role="presentation">
-                    <button
-                      className="nav-link active w-100"
-                      id="prerecorded-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#prerecorded"
-                      type="button"
-                      role="tab"
-                      aria-controls="prerecorded"
-                      aria-selected="true"
+              <div className="row gx-5 gy-5">
+                <div className="col-12 col-lg-6 d-flex flex-column gap-4">
+                  <ul className="nav nav-tabs nav-vc" id="myTab" role="tablist">
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link active w-100"
+                        id="prerecorded-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#prerecorded"
+                        type="button"
+                        role="tab"
+                        aria-controls="prerecorded"
+                        aria-selected="true"
+                      >
+                        {t("vcTabUpload")}
+                      </button>
+                    </li>
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link w-100"
+                        id="recordaudio-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#recordaudio"
+                        type="button"
+                        role="tab"
+                        aria-controls="recordaudio"
+                        aria-selected="false"
+                      >
+                        {t("vcTabRecord")}
+                      </button>
+                    </li>
+                  </ul>
+                  <div className="tab-content" id="myTabContent">
+                    <div
+                      className="tab-pane fade show active"
+                      id="prerecorded"
+                      role="tabpanel"
+                      aria-labelledby="prerecorded-tab"
                     >
-                      {t("vcTabUpload")}
-                    </button>
-                  </li>
-                  <li className="nav-item w-100" role="presentation">
-                    <button
-                      className="nav-link w-100"
-                      id="recordaudio-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#recordaudio"
-                      type="button"
-                      role="tab"
-                      aria-controls="recordaudio"
-                      aria-selected="false"
-                    >
-                      {t("vcTabRecord")}
-                    </button>
-                  </li>
-                </ul>
-                <div className="tab-content" id="myTabContent">
-                  <div
-                    className="tab-pane fade show active"
-                    id="prerecorded"
-                    role="tabpanel"
-                    aria-labelledby="prerecorded-tab"
-                  >
-                    <div className="d-flex flex-column gap-4 h-100">
-                      <div>
-                        <label className="sub-title">
-                          {t("vcUploadFileLabel")}
-                        </label>
-                        <div className="d-flex flex-column gap-3 upload-component">
-                          <UploadComponent
-                            setMediaUploadToken={setMediaUploadToken}
-                            formIsCleared={formIsCleared}
-                            setFormIsCleared={setFormIsCleared}
-                            setCanConvert={setCanConvert}
-                            changeConvertIdempotencyToken={
-                              changeConvertIdempotencyToken
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="sub-title">
-                          {t("vcPitchControlLabel")}
-                        </label>
-                        <div className="d-flex flex-column gap-3">
-                          <div>
-                            <PitchEstimateMethodComponent
-                              pitchMethod={maybeF0MethodOverride}
-                              onMethodChange={handlePitchMethodChange}
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">
+                            {t("vcUploadFileLabel")}
+                          </label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            <UploadComponent
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
                             />
-                          </div>
-                          <div>
-                            <PitchShiftComponent
-                              min={-36}
-                              max={36}
-                              step={1}
-                              value={semitones}
-                              onPitchChange={handlePitchChange}
-                            />
-                          </div>
-                          <div className="form-check">
-                            <input
-                              id="autoF0Checkbox"
-                              className="form-check-input"
-                              type="checkbox"
-                              checked={autoConvertF0}
-                              onChange={handleAutoF0Change}
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="autoF0Checkbox"
-                            >
-                              Auto F0 ({t("vcPitchControlF0")})
-                            </label>
                           </div>
                         </div>
-                      </div>
-                      {/*<div>
+
+                        <div>
+                          <label className="sub-title">
+                            {t("vcPitchControlLabel")}
+                          </label>
+                          <div className="d-flex flex-column gap-3">
+                            <div>
+                              <PitchEstimateMethodComponent
+                                pitchMethod={maybeF0MethodOverride}
+                                onMethodChange={handlePitchMethodChange}
+                              />
+                            </div>
+                            <div>
+                              <PitchShiftComponent
+                                min={-36}
+                                max={36}
+                                step={1}
+                                value={semitones}
+                                onPitchChange={handlePitchChange}
+                              />
+                            </div>
+                            <div className="form-check">
+                              <input
+                                id="autoF0Checkbox"
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={autoConvertF0}
+                                onChange={handleAutoF0Change}
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor="autoF0Checkbox"
+                              >
+                                Auto F0 ({t("vcPitchControlF0")})
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        {/*<div>
                           <label className="sub-title">
                             Or pick from your audio collection (5 files)
                           </label>
@@ -379,140 +382,149 @@ function VcModelListPage(props: Props) {
                           </div>
                               </div>*/}
 
-                      <div>
-                        <label className="sub-title">
-                          {t("vcConvertLabel")}
-                        </label>
+                        <div>
+                          <label className="sub-title">
+                            {t("vcConvertLabel")}
+                          </label>
 
-                        <div className="d-flex gap-3">
-                          <button
-                            className={speakButtonClass}
-                            onClick={handleVoiceConversion}
-                            type="submit"
-                            disabled={!enableConvertButton}
-                          >
-                            <FontAwesomeIcon
-                              icon={faRightLeft}
-                              className="me-2"
-                            />
-                            {t("vcButtonConvert")}
-                            {convertLoading && <LoadingIcon />}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className="tab-pane fade"
-                    id="recordaudio"
-                    role="tabpanel"
-                    aria-labelledby="recordaudio-tab"
-                  >
-                    <div className="d-flex flex-column gap-4 h-100">
-                      <div>
-                        <label className="sub-title">
-                          {t("vcRecordAudioLabel")}
-                        </label>
-                        <div className="d-flex flex-column gap-3 upload-component">
-                          <RecordComponent
-                            setMediaUploadToken={setMediaUploadToken}
-                            formIsCleared={formIsCleared}
-                            setFormIsCleared={setFormIsCleared}
-                            setCanConvert={setCanConvert}
-                            changeConvertIdempotencyToken={
-                              changeConvertIdempotencyToken
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="sub-title">
-                          {t("vcPitchControlLabel")}
-                        </label>
-                        <div className="d-flex flex-column gap-3">
-                          <div>
-                            <PitchEstimateMethodComponent
-                              pitchMethod={maybeF0MethodOverride}
-                              onMethodChange={handlePitchMethodChange}
-                            />
-                          </div>
-                          <div>
-                            <PitchShiftComponent
-                              min={-36}
-                              max={36}
-                              step={1}
-                              value={semitones}
-                              onPitchChange={handlePitchChange}
-                            />
-                          </div>
-                          <div className="form-check">
-                            <input
-                              id="autoF0CheckboxMic"
-                              className="form-check-input"
-                              type="checkbox"
-                              checked={autoConvertF0}
-                              onChange={handleAutoF0Change}
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="autoF0CheckboxMic"
+                          <div className="d-flex gap-3">
+                            <button
+                              className={speakButtonClass}
+                              onClick={handleVoiceConversion}
+                              type="submit"
+                              disabled={!enableConvertButton}
                             >
-                              Auto F0 ({t("vcPitchControlF0")})
-                            </label>
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              {t("vcButtonConvert")}
+                              {convertLoading && <LoadingIcon />}
+                            </button>
                           </div>
                         </div>
                       </div>
-
-                      <div>
-                        <label className="sub-title">
-                          {t("vcConvertLabel")}
-                        </label>
-
-                        <div className="d-flex gap-3">
-                          <button
-                            className={speakButtonClass}
-                            onClick={handleVoiceConversion}
-                            type="submit"
-                            disabled={!enableConvertButton}
-                          >
-                            <FontAwesomeIcon
-                              icon={faRightLeft}
-                              className="me-2"
+                    </div>
+                    <div
+                      className="tab-pane fade"
+                      id="recordaudio"
+                      role="tabpanel"
+                      aria-labelledby="recordaudio-tab"
+                    >
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">
+                            {t("vcRecordAudioLabel")}
+                          </label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            <RecordComponent
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
                             />
-                            {t("vcButtonConvert")}
-                            {convertLoading && <LoadingIcon />}
-                          </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="sub-title">
+                            {t("vcPitchControlLabel")}
+                          </label>
+                          <div className="d-flex flex-column gap-3">
+                            <div>
+                              <PitchEstimateMethodComponent
+                                pitchMethod={maybeF0MethodOverride}
+                                onMethodChange={handlePitchMethodChange}
+                              />
+                            </div>
+                            <div>
+                              <PitchShiftComponent
+                                min={-36}
+                                max={36}
+                                step={1}
+                                value={semitones}
+                                onPitchChange={handlePitchChange}
+                              />
+                            </div>
+                            <div className="form-check">
+                              <input
+                                id="autoF0CheckboxMic"
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={autoConvertF0}
+                                onChange={handleAutoF0Change}
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor="autoF0CheckboxMic"
+                              >
+                                Auto F0 ({t("vcPitchControlF0")})
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="sub-title">
+                            {t("vcConvertLabel")}
+                          </label>
+
+                          <div className="d-flex gap-3">
+                            <button
+                              className={speakButtonClass}
+                              onClick={handleVoiceConversion}
+                              type="submit"
+                              disabled={!enableConvertButton}
+                            >
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              {t("vcButtonConvert")}
+                              {convertLoading && <LoadingIcon />}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="col-12 col-lg-6">
-                <div className="d-flex flex-column gap-3">
-                  <h4 className="text-center text-lg-start">
-                    <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
-                    {t("vcResultsTitle")}
-                  </h4>
-                  <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
-                    <SessionVoiceConversionResultsList
-                      sessionSubscriptionsWrapper={
-                        props.sessionSubscriptionsWrapper
-                      }
-                    />
+                <div className="col-12 col-lg-6">
+                  <div className="d-flex flex-column gap-3">
+                    <h4 className="text-center text-lg-start">
+                      <FontAwesomeIcon
+                        icon={faBarsStaggered}
+                        className="me-3"
+                      />
+                      {t("vcResultsTitle")}
+                    </h4>
+                    <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
+                      <SessionVoiceConversionResultsList
+                        sessionSubscriptionsWrapper={
+                          props.sessionSubscriptionsWrapper
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
 
-        {/* <div className="pt-5">
+          {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
         </div> */}
-      </Panel>
-    </Container>
+        </Panel>
+      </Container>
+
+      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
+        <MentionsSection />
+        <StorytellerStudioCTA />
+      </Container>
+    </>
   );
 }
 

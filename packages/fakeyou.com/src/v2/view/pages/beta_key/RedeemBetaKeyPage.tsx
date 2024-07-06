@@ -12,6 +12,8 @@ import { useSession } from "hooks";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import { isMobile } from "react-device-detect";
+import useModal from "hooks/useModal";
+import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
 
 export default function RedeemBetaKeyPage() {
   const { token: pageToken } = useParams<{ token: string }>();
@@ -31,6 +33,13 @@ export default function RedeemBetaKeyPage() {
   const handleGoToSuccess = () => {
     history.push("/beta-key/redeem/success");
   };
+
+  const { open } = useModal();
+  const openModal = () =>
+    open({
+      component: EmailSignUp,
+      props: { mobile: true, showHanashi: false, handleClose: openModal },
+    });
 
   const handleRedeemBetaKey = async () => {
     try {
@@ -119,6 +128,18 @@ export default function RedeemBetaKeyPage() {
               </div>
             </div>
           </Panel>
+          <p className="fs-9 mt-5">
+            Don't have a beta key? Join the
+            <span
+              onClick={openModal}
+              className="text-red"
+              style={{ cursor: "pointer" }}
+            >
+              {" "}
+              waitlist
+            </span>{" "}
+            now!
+          </p>
         </Container>
 
         {isMobile && (

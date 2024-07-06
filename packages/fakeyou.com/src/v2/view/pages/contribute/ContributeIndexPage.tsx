@@ -24,6 +24,7 @@ import {
 import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Button } from "components/common";
+import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -57,6 +58,7 @@ function ContributeIndexPage(props: Props) {
   );
 
   return (
+
     <div>
       {/* <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
@@ -79,7 +81,9 @@ function ContributeIndexPage(props: Props) {
         showButtons={false}
         titleIcon={titleIcon}
       />
-
+      <div className="py-5">
+        <StorytellerStudioCTA />
+      </div>
       <div className="container-panel pb-3">
         <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
