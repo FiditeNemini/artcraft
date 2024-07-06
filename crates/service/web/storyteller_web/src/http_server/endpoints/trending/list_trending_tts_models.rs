@@ -21,7 +21,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::trending_model_analytics::list_trending_tts_models::list_trending_tts_models_with_pool;
 use tokens::tokens::tts_models::TtsModelToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // TODO TODO TODO: This endpoint is not done!
 // TODO TODO TODO: This endpoint is not done!

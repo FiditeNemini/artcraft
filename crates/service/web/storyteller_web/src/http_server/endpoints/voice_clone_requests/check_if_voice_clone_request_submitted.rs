@@ -9,7 +9,7 @@ use log::{log, warn};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::voice_clone_requests::get_voice_clone_request::{get_voice_clone_request_by_token, get_voice_clone_request_by_user_token};
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

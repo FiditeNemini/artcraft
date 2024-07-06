@@ -29,7 +29,7 @@ use crate::http_server::common_responses::media_file_origin_details::MediaFileOr
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
 
 #[derive(Deserialize, ToSchema)]

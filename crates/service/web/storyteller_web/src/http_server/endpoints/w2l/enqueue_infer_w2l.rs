@@ -18,7 +18,7 @@ use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job::{
 use redis_common::redis_keys::RedisKeys;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct InferW2lRequest {

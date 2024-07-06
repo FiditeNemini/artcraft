@@ -12,7 +12,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::api_tokens::delete_api_token::delete_api_token;
 use mysql_queries::queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

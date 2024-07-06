@@ -9,7 +9,7 @@ use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::http_server::endpoints::media_uploads::common::handle_upload::handle_upload;
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[deprecated(note = "Use `media_files` instead of `media_uploads`.")]
 #[derive(Serialize)]

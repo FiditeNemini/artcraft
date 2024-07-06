@@ -24,7 +24,7 @@ use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

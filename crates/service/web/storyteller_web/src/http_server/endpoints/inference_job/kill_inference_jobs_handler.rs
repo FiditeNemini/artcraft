@@ -13,7 +13,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::generic_inference::web::kill_generic_inference_jobs;
 use mysql_queries::queries::generic_inference::web::kill_generic_inference_jobs::{kill_generic_inference_jobs, KillGenericInferenceJobsArgs};
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// Only certain job statuses should be modified.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Deserialize)]

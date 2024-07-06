@@ -24,7 +24,7 @@ use tokens::tokens::tts_results::TtsResultToken;
 use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

@@ -17,7 +17,7 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
 use crate::http_server::web_utils::filter_model_name::filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

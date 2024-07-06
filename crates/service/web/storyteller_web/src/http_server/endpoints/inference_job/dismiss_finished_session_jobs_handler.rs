@@ -17,7 +17,7 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::TerminateInferenceJobError;
 use crate::http_server::web_utils::require_user_session::require_user_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, ToSchema)]
 pub struct DismissFinishedSessionJobsSuccessResponse {

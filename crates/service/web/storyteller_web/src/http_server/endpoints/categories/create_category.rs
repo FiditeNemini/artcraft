@@ -11,7 +11,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::model_categories::create_category::{create_category, CreateCategoryArgs};
 use tokens::tokens::model_categories::ModelCategoryToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS : bool = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES : bool = false;

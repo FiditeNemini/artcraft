@@ -10,7 +10,7 @@ use log::{log, warn};
 use mysql_queries::queries::w2l::w2l_templates::list_pending_w2l_templates::list_pending_w2l_templates;
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct GetPendingW2lTemplatesResponse {

@@ -19,7 +19,7 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::drain_multipart_request::{drain_multipart_request, MediaFileUploadSource};
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 // TODO(bt,2023-12-20): THIS CODE NEEDS CLEANUP. This has been cargo culted three+ times.

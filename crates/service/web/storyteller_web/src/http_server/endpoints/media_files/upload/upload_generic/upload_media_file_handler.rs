@@ -10,7 +10,7 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::process_upload_media_file::process_upload_media_file;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, ToSchema)]
 pub struct UploadMediaSuccessResponse {

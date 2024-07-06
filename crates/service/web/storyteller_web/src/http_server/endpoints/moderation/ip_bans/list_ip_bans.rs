@@ -9,7 +9,7 @@ use log::{error, log, warn};
 use mysql_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct ListIpBansResponse {

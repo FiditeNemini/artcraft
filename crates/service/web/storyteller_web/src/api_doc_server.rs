@@ -29,20 +29,16 @@ use api_doc::ApiDoc;
 use errors::AnyhowResult;
 
 use crate::configs::static_api_tokens::StaticApiTokenSet;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 pub mod billing;
 pub mod configs;
-pub mod cookies;
 pub mod http_server;
 pub mod memory_cache;
 pub mod model;
-pub mod routes;
-pub mod server_state;
-pub mod subscriptions;
+pub mod state;
 pub mod threads;
 pub mod util;
-pub mod validations;
 
 pub mod api_doc;
 

@@ -16,7 +16,7 @@ use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_b
 use mysql_queries::queries::voice_designer::datasets::update_dataset::{update_dataset, UpdateDatasetArgs};
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct UpdateDatasetRequest {

@@ -28,7 +28,7 @@ use tokens::tokens::users::UserToken;
 use crate::http_server::endpoints::inference_job::utils::estimate_job_progress::estimate_job_progress;
 use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For certain jobs or job classes (eg. non-premium), we kill the jobs if the user hasn't
 /// maintained a keepalive. This prevents wasted work when users who are unlikely to return

@@ -37,7 +37,7 @@ use crate::configs::plans::plan::Plan;
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_tts_model_with_caching::get_tts_model_with_caching;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &str = "storyteller_demo";

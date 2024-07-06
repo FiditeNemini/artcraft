@@ -14,7 +14,7 @@ use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_toke
 use mysql_queries::queries::voice_designer::voices::update_voice::{update_voice, UpdateVoiceArgs};
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct UpdateVoiceRequest {

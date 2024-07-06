@@ -28,7 +28,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize, ToSchema)]

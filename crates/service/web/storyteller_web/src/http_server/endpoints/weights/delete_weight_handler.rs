@@ -18,7 +18,7 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
 
 #[derive(Deserialize,ToSchema)]

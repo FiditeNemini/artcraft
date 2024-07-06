@@ -21,7 +21,7 @@ use users_component::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, Clone, ToSchema)]
 pub struct Weight {

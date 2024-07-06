@@ -12,7 +12,7 @@ use mysql_queries::queries::model_categories::assign_tts_category::{assign_tts_c
 use mysql_queries::queries::model_categories::get_category_by_token::get_category_by_token;
 use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

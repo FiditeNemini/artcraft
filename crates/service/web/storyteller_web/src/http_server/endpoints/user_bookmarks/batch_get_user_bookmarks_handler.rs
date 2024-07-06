@@ -15,7 +15,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 const MAX_BATCH_SIZE : usize = 200;
 

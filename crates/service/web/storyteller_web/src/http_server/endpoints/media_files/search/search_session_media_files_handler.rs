@@ -32,7 +32,7 @@ use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categ
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 use crate::util::allowed_studio_access::allowed_studio_access;
 

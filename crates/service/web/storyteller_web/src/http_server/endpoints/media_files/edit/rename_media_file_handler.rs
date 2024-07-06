@@ -15,7 +15,7 @@ use mysql_queries::queries::media_files::rename_media_file::rename_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
 
 #[derive(Deserialize, ToSchema)]

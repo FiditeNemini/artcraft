@@ -13,7 +13,7 @@ use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct ZsSampleRecordForResponse {

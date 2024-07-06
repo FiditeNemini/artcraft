@@ -15,7 +15,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 const MAX_BATCH_SIZE : usize = 200;
 

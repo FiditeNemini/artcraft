@@ -8,7 +8,7 @@ use limitation::Limiter;
 
 use crate::configs::app_startup::username_set::UsernameSet;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
-use crate::server_state::RedisRateLimiters;
+use crate::state::server_state::RedisRateLimiters;
 
 /// Build the various rate limiters
 pub fn configure_redis_rate_limiters(common_env: &CommonEnv) -> AnyhowResult<RedisRateLimiters> {

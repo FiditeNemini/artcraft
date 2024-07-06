@@ -9,7 +9,7 @@ use log::{log, warn};
 use mysql_queries::queries::users::user::list_users_query_builder::{ListUsersQueryBuilder, UserForList};
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // TODO: Implement the endpoint
 #[derive(Deserialize)]

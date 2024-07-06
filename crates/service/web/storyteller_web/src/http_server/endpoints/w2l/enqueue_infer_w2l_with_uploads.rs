@@ -24,7 +24,7 @@ use redis_common::redis_keys::RedisKeys;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_text;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 const BUCKET_AUDIO_FILE_NAME : &str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &str = "input_image_file";

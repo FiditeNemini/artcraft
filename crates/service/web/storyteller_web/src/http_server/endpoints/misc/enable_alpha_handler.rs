@@ -6,7 +6,7 @@ use actix_web::web::Query;
 use log::info;
 
 use crate::http_server::endpoints::misc::alpha_cookie::{alpha_cookie, ALPHA_COOKIE_NAME};
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 const CONTENT_TYPE : &str = "text/html; charset=utf-8";
 

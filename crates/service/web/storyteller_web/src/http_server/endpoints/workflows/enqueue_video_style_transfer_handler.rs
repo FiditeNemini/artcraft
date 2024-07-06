@@ -34,7 +34,7 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::endpoints::workflows::coordinate_workflow_args::{coordinate_workflow_args, CoordinatedWorkflowArgs};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 

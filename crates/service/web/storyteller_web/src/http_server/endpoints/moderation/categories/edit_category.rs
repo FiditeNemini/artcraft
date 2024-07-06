@@ -11,7 +11,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::model_categories::get_category_by_token::get_category_by_token;
 use mysql_queries::queries::model_categories::update_model_category::{update_model_category, UpdateModelCategoryArgs};
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

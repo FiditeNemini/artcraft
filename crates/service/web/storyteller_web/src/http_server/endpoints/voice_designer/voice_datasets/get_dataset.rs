@@ -15,7 +15,7 @@ use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct GetDatasetResponse {

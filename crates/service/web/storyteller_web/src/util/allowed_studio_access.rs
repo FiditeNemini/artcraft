@@ -3,7 +3,7 @@ use mysql_queries::queries::users::user_sessions::get_user_session_by_token::Ses
 use users_component::session::lookup::user_session_extended::UserSessionExtended;
 use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
-use crate::server_state::StaticFeatureFlags;
+use crate::state::server_state::StaticFeatureFlags;
 
 /// Check whether we should allow the request access to Storyteller Studio features.
 pub fn allowed_studio_access(maybe_session: Option<impl UserSessionStudioFlag>, flags: &StaticFeatureFlags) -> bool {

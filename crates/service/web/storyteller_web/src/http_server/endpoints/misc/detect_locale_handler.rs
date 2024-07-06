@@ -10,7 +10,7 @@ use http_server_common::request::get_request_header_optional::get_request_header
 use http_server_common::request::parse_accept_language::parse_accept_language;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Success Response ===============
 

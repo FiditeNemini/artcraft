@@ -19,7 +19,7 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
 pub struct SetModelWeightCoverImageRequest {

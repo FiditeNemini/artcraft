@@ -13,7 +13,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::generic_download::web::insert_generic_download_job::{insert_generic_download_job, InsertGenericDownloadJobArgs};
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_model_title::validate_model_title;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 

@@ -76,10 +76,10 @@ use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupIm
 use crate::configs::app_startup::redis_rate_limiters::configure_redis_rate_limiters;
 use crate::configs::static_api_tokens::StaticApiTokenSet;
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
+use crate::http_server::routes::add_routes::add_routes;
 use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
 use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
-use crate::http_server::routes::add_routes::add_routes;
-use crate::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
+use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
@@ -96,7 +96,7 @@ pub mod configs;
 pub mod http_server;
 pub mod memory_cache;
 pub mod model;
-pub mod server_state;
+pub mod state;
 pub mod threads;
 pub mod util;
 

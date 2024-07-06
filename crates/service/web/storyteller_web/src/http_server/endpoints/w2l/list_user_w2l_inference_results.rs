@@ -12,7 +12,7 @@ use mysql_queries::queries::w2l::w2l_results::list_w2l_inference_results_query_b
 use mysql_queries::queries::w2l::w2l_results::list_w2l_inference_results_query_builder::W2lInferenceRecordForList;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

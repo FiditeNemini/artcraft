@@ -36,7 +36,7 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::memory_cache::model_token_to_info_cache::{ModelInfoForInferenceJob, ModelTokenToInfoCache};
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.

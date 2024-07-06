@@ -11,7 +11,7 @@ use http_server_common::request::get_request_host::get_request_host;
 
 use crate::http_server::endpoints::investor_demo::default_redirect::{DEFAULT_INVESTOR_REDIRECT, redirect_is_allowed};
 use crate::http_server::endpoints::investor_demo::demo_cookie::STORYTELLER_DEMO_COOKIE_NAME;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct QueryFields {

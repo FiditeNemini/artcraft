@@ -5,7 +5,7 @@ use actix_web::HttpResponse;
 use actix_web::web::Data;
 use log::debug;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 pub async fn get_root_index(server_state: Data<Arc<ServerState>>) -> HttpResponse {
   debug!("GET /"); // NB: Google load balancer hits this a lot, and it spams.

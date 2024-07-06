@@ -6,7 +6,7 @@ use actix_web::http::header::LOCATION;
 use log::info;
 
 use crate::http_server::endpoints::misc::alpha_cookie::alpha_cookie;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[get("/enable")]
 pub async fn enable_alpha_easy_handler(

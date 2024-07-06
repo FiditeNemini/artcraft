@@ -19,7 +19,7 @@ use mysql_queries::queries::generic_download::web::insert_generic_download_job::
 use mysql_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_job::{insert_tts_model_upload_job, InsertTtsModelUploadJobArgs};
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_model_title::validate_model_title;
 
 #[derive(Deserialize, Copy, Clone)]

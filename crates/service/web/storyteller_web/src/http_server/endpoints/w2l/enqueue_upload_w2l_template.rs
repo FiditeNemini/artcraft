@@ -18,7 +18,7 @@ use mysql_queries::queries::w2l::w2l_template_upload_jobs::insert_w2l_template_u
 use user_input_common::check_for_slurs::contains_slurs;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_model_title::validate_model_title;
 
 #[derive(Deserialize)]

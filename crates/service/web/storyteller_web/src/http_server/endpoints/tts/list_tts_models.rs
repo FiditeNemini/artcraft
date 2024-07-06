@@ -24,7 +24,7 @@ use mysql_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_m
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct TtsModelRecordForResponse {

@@ -14,7 +14,7 @@ use mysql_queries::queries::generic_download::web::get_generic_download_job_stat
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_download_jobs::DownloadJobToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

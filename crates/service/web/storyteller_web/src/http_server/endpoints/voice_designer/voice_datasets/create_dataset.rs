@@ -13,7 +13,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct CreateDatasetRequest {

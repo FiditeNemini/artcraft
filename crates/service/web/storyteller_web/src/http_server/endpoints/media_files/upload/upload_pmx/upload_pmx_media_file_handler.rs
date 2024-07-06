@@ -33,7 +33,7 @@ use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileU
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
 use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Form-multipart request fields.

@@ -15,7 +15,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

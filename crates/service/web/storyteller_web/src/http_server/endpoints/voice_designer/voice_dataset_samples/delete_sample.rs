@@ -11,7 +11,7 @@ use mysql_queries::queries::voice_designer::voice_samples::delete_sample::{delet
 use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample::get_dataset_sample_by_token;
 use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
 
 // TODO(bt,2023-10-10): This is way too much boilerplate.

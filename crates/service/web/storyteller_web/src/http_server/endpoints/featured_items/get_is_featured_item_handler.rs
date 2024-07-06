@@ -37,7 +37,7 @@ use tokens::tokens::zs_voices::ZsVoiceToken;
 
 use crate::http_server::endpoints::weights::get_weight_handler::GetWeightPathInfo;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
 pub struct GetIsFeaturedItemPathInfo {

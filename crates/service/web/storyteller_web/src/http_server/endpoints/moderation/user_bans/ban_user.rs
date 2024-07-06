@@ -11,7 +11,7 @@ use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::
 
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct BanUserRequest {

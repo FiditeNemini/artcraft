@@ -37,7 +37,7 @@ use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::CreateBe
 use crate::http_server::endpoints::events::list_events::ListEventsError;
 use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
 use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
 #[derive(Copy, Clone, Deserialize, ToSchema)]

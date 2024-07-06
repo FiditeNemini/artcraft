@@ -13,7 +13,7 @@ use mysql_queries::queries::w2l::w2l_inference_jobs::get_w2l_inference_job_statu
 use redis_common::redis_keys::RedisKeys;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

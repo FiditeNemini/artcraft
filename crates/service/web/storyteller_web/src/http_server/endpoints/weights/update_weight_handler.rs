@@ -20,7 +20,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // TODO will eventually be polymorphic
 /// **IMPORTANT**: This endpoint handles sparse (by-field) updates rather than wholesale updates.

@@ -13,7 +13,7 @@ use mysql_queries::queries::voice_designer::voices::list_voices_by_username::lis
 use tokens::tokens::zs_voices::ZsVoiceToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct Voice {

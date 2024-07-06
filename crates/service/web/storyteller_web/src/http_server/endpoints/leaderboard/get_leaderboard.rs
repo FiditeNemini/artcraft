@@ -21,7 +21,7 @@ use users_component::common_responses::user_avatars::default_avatar_from_usernam
 use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct LeaderboardResponse {

@@ -31,7 +31,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
 #[derive(Deserialize, ToSchema, IntoParams)]

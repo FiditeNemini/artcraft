@@ -16,7 +16,7 @@ use mysql_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_tem
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 use crate::util::delete_role_disambiguation::delete_role_disambiguation;
 use crate::util::delete_role_disambiguation::DeleteRole;
 

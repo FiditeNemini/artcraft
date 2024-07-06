@@ -15,7 +15,7 @@ use mysql_queries::queries::media_files::edit::update_media_file_visibility::{up
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct UpdateMediaFileRequest {

@@ -14,7 +14,7 @@ use log::warn;
 use http_server_common::request::get_request_ip::get_service_request_ip;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::StaticFeatureFlags;
+use crate::state::server_state::StaticFeatureFlags;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with

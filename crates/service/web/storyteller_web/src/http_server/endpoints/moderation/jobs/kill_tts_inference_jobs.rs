@@ -9,7 +9,7 @@ use log::{error, log, warn};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::tts::tts_inference_jobs::kill_tts_inference_jobs::{JobStatus, kill_tts_inference_jobs};
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

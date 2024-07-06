@@ -25,7 +25,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::ListFeaturedMediaFilesError;
 use crate::http_server::endpoints::media_files::list::list_media_files_handler::{ListMediaFilesError, ListMediaFilesQueryParams};
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListFeaturedWeightsQueryParams {

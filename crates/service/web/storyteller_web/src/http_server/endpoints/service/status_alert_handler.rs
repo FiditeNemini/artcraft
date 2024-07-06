@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// How often the client should poll
 const REFRESH_INTERVAL: Duration = Duration::from_secs(60);

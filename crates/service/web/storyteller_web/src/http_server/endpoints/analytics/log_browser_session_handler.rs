@@ -32,7 +32,7 @@ use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_fea
 use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
 use crate::http_server::web_utils::require_user_session::RequireUserSessionError;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
 pub struct LogBrowserSessionRequest {

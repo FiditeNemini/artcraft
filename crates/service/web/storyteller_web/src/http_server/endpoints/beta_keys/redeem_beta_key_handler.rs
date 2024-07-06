@@ -39,7 +39,7 @@ use crate::http_server::web_utils::require_moderator::RequireModeratorError;
 use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::try_delete_session_cache::try_delete_session_cache;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
 pub struct RedeemBetaKeyRequest {

@@ -16,7 +16,7 @@ use log::warn;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::tts::tts_category_assignments::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 

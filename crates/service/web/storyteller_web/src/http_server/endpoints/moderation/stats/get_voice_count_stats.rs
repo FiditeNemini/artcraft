@@ -8,7 +8,7 @@ use log::{log, warn};
 use mysql_queries::queries::stats::get_voice_count_stats::get_voice_count_stats;
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct GetVoiceCountStatsResponse {

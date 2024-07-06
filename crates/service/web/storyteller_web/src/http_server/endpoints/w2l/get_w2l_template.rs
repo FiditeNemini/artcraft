@@ -11,7 +11,7 @@ use mysql_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_tem
 use mysql_queries::queries::w2l::w2l_templates::get_w2l_template::W2lTemplateRecordForResponse;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

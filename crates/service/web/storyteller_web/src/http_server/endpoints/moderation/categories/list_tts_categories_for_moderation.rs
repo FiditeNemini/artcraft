@@ -10,7 +10,7 @@ use log::{log, warn};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::model_categories::list_categories_query_builder::ListCategoriesQueryBuilder;
 
-use crate::server_state::ServerState;
+use crate::state::server_state::ServerState;
 
 // =============== Request ===============
 
