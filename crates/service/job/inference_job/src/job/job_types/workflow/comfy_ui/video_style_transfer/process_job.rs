@@ -284,18 +284,17 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== RUN COMFY INFERENCE ==================== //
 
-    info!("Ready for ComfyUI inference...");
+    info!("Preparing for ComfyUI inference...");
 
     job_progress_reporter.log_status("running inference")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    info!("Running ComfyUI inference...");
 
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let stdout_output_file = work_temp_dir.path().join("stdout.txt");
 
     let positive_prompt_file = work_temp_dir.path().join("positive_prompt.txt");
     let negative_prompt_file = work_temp_dir.path().join("negative_prompt.txt");
+    let travel_prompt_file = work_temp_dir.path().join("travel_prompt.txt");
 
     let maybe_positive_prompt_filename = comfy_args.positive_prompt
         .as_deref()
@@ -315,13 +314,25 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         })
         .transpose()?;
 
+    let maybe_travel_prompt_filename = comfy_args.travel_prompt
+        .as_deref()
+        .map(|prompt| {
+            std::fs::write(&travel_prompt_file, prompt)
+                .map(|_| travel_prompt_file.as_path())
+                .map_err(|e| ProcessSingleJobError::IoError(e))
+        })
+        .transpose()?;
+
     let inference_details = InferenceDetails::NewPythonArgs {
         maybe_style: comfy_args.style_name,
         maybe_positive_prompt_filename,
         maybe_negative_prompt_filename,
+        maybe_travel_prompt_filename,
     };
 
     let inference_start_time = Instant::now();
+
+    info!("Running ComfyUI inference...");
 
     let command_exit_status = model_dependencies
         .inference_command
@@ -335,6 +346,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
             use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
             maybe_strength: comfy_args.strength,
+            frame_skip: comfy_args.frame_skip,
             global_ipa_image_filename: global_ipa_image
                 .as_ref()
                 .map(|image| path_to_string(&image.ipa_image_path)),

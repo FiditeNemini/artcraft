@@ -99,6 +99,8 @@ pub struct InferenceArgs<'s> {
 
     pub maybe_strength: Option<f32>,
 
+    pub frame_skip: Option<u8>,
+
     pub global_ipa_image_filename: Option<String>,
     pub global_ipa_strength: Option<f32>,
 }
@@ -120,6 +122,11 @@ pub enum InferenceDetails<'s> {
         /// Optional: If set, Python will be in charge of overwriting the prompt JSON file
         /// with the correct workflow args.
         maybe_negative_prompt_filename: Option<&'s Path>,
+
+        /// Travel prompt file.
+        /// Optional: If set, Python will be in charge of overwriting the prompt JSON file
+        /// with the correct workflow args.
+        maybe_travel_prompt_filename: Option<&'s Path>,
 
         /// Style name
         /// Optional: If set, Python will be in charge of overwriting the prompt JSON file
@@ -254,6 +261,7 @@ impl ComfyInferenceCommand {
             InferenceDetails::NewPythonArgs {
                 maybe_positive_prompt_filename,
                 maybe_negative_prompt_filename,
+                maybe_travel_prompt_filename,
                 maybe_style
             } => {
                 if let Some(positive_prompt_filename) = maybe_positive_prompt_filename {
@@ -265,6 +273,12 @@ impl ComfyInferenceCommand {
                 if let Some(negative_prompt_filename) = maybe_negative_prompt_filename {
                     command.push_str(" --negative_prompt_filename ");
                     command.push_str(&path_to_string(negative_prompt_filename));
+                    command.push_str(" ");
+                }
+
+                if let Some(travel_prompt_filename) = maybe_travel_prompt_filename {
+                    command.push_str(" --travel_prompt_filename ");
+                    command.push_str(&path_to_string(travel_prompt_filename));
                     command.push_str(" ");
                 }
 
@@ -302,6 +316,12 @@ impl ComfyInferenceCommand {
             command.push_str(" ");
         }
 
+        if let Some(frame_skip) = args.frame_skip {
+            command.push_str(" --frame_skip ");
+            command.push_str(&frame_skip.to_string());
+            command.push_str(" ");
+        }
+
         if let Some(global_ipa_image_filename) = &args.global_ipa_image_filename {
             // NB: This is very dangerous. We're not handling escaping well.
             command.push_str(" --global_ipa_image_filename ");
@@ -314,7 +334,6 @@ impl ComfyInferenceCommand {
             command.push_str(&format!("{}", global_ipa_strength));
             command.push_str(" ");
         }
-
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {
             command = docker_options.to_command_string(&command);
