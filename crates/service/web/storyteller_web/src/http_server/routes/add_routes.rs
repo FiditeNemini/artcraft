@@ -131,12 +131,12 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::endpoints::workflows::enqueue_comfy_ui_handler::enqueue_comfy_ui_handler;
 use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler;
 use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
-use crate::routes::beta_key_routes::add_beta_key_routes;
-use crate::routes::job_routes::add_job_routes;
-use crate::routes::media_files_routes::add_media_file_routes;
-use crate::routes::moderation_routes::add_moderator_routes;
-use crate::routes::user_routes::add_user_routes;
-use crate::routes::weights_routes::add_weights_routes;
+use crate::http_server::routes::beta_key_routes::add_beta_key_routes;
+use crate::http_server::routes::job_routes::add_job_routes;
+use crate::http_server::routes::media_files_routes::add_media_file_routes;
+use crate::http_server::routes::moderation_routes::add_moderator_routes;
+use crate::http_server::routes::user_routes::add_user_routes;
+use crate::http_server::routes::weights_routes::add_weights_routes;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
