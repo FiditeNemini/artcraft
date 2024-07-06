@@ -79,6 +79,7 @@ export interface Status {
   maybe_assigned_worker: string;
   maybe_extra_status_description: string;
   maybe_failure_category: string;
+  progress_percentage: number;
   maybe_first_started_at: string;
   requires_keepalive: boolean;
   status: string;

@@ -20,34 +20,25 @@ interface Props {
   movie: ActiveJob;
 }
 
-function getPercent(status: JobState) {
+function getPercent(status: JobState, percentage: number) {
   if (
     [
-      JobState.PENDING,
       JobState.COMPLETE_FAILURE,
       JobState.ATTEMPT_FAILED,
       JobState.DEAD,
     ].includes(status)
   ) {
     return 0;
+  } else {
+    return percentage;
   }
-
-  if (status === JobState.PENDING) {
-    return 20;
-  }
-
-  if (status === JobState.STARTED) {
-    return 40;
-  }
-
-  if (status === JobState.COMPLETE_SUCCESS) {
-    return 100;
-  }
-  return 0;
 }
 
 export function InProgressCard({ movie }: Props) {
-  const completePercent = getPercent(movie.status.status as JobState);
+  const completePercent = getPercent(
+    movie.status.status as JobState,
+    movie.status.progress_percentage,
+  );
   const completeLength = (600 * completePercent) / 100;
 
   const deleteJob = useCallback(async (movieJob: ActiveJob) => {
@@ -65,7 +56,6 @@ export function InProgressCard({ movie }: Props) {
       response.errorMessage || "Error deleting the file.",
     );
   }, []);
-  console.log(movie);
 
   return (
     <div className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150">
