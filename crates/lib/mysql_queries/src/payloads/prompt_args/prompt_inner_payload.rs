@@ -1,4 +1,5 @@
 use chrono::Duration;
+
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
@@ -72,6 +73,12 @@ pub struct PromptInnerPayload {
   #[serde(alias = "global_ipa_token")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub global_ipa_token: Option<MediaFileToken>,
+
+  /// Prompt travel prompt
+  #[serde(rename = "tp")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "travel_prompt")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub travel_prompt: Option<String>,
 }
 
 pub struct PromptInnerPayloadBuilder {
@@ -87,6 +94,7 @@ pub struct PromptInnerPayloadBuilder {
   pub face_detailer_workflow: Option<String>,
   pub upscaler_workflow: Option<String>,
   pub global_ipa_token: Option<MediaFileToken>,
+  pub travel_prompt: Option<String>,
 }
 
 impl PromptInnerPayloadBuilder {
@@ -104,6 +112,7 @@ impl PromptInnerPayloadBuilder {
       face_detailer_workflow: None,
       upscaler_workflow: None,
       global_ipa_token: None,
+      travel_prompt: None,
     }
   }
 
@@ -120,6 +129,7 @@ impl PromptInnerPayloadBuilder {
         && self.face_detailer_workflow.is_none()
         && self.upscaler_workflow.is_none()
         && self.global_ipa_token.is_none()
+        && self.travel_prompt.is_none()
     {
       return None;
     }
@@ -140,6 +150,7 @@ impl PromptInnerPayloadBuilder {
       face_detailer_workflow: self.face_detailer_workflow,
       upscaler_workflow: self.upscaler_workflow,
       global_ipa_token: self.global_ipa_token,
+      travel_prompt: self.travel_prompt,
     })
   }
 
@@ -209,6 +220,10 @@ impl PromptInnerPayloadBuilder {
 
   pub fn set_global_ipa_token(&mut self, token: Option<MediaFileToken>) {
     self.global_ipa_token = token;
+  }
+
+  pub fn set_travel_prompt(&mut self, travel_prompt: Option<String>) {
+    self.travel_prompt = travel_prompt;
   }
 }
 

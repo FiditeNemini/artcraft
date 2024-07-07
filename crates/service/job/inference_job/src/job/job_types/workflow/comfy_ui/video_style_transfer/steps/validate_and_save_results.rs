@@ -238,6 +238,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
           || args.comfy_args.lipsync_enabled.is_some()
           || args.comfy_args.negative_prompt.is_some()
           || args.comfy_args.positive_prompt.is_some()
+          || args.comfy_args.travel_prompt.is_some()
           || args.comfy_args.strength.is_some()
           || args.comfy_args.style_name.is_some()
           || args.comfy_args.use_cinematic.is_some()
@@ -287,6 +288,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
     if args.comfy_args.global_ip_adapter_token.is_some() {
       other_args_builder.set_global_ipa_token(args.comfy_args.global_ip_adapter_token.clone());
+    }
+
+    if args.comfy_args.travel_prompt.is_some() {
+      other_args_builder.set_travel_prompt(args.comfy_args.travel_prompt.clone());
     }
 
     let maybe_other_args = other_args_builder.build();
