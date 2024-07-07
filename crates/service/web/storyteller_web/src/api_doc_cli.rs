@@ -30,7 +30,6 @@ use errors::AnyhowResult;
 pub mod billing;
 pub mod configs;
 pub mod http_server;
-pub mod model;
 pub mod state;
 pub mod threads;
 pub mod util;

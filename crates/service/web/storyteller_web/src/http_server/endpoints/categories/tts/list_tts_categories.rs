@@ -17,8 +17,8 @@ use enums::by_table::model_categories::model_type::ModelType;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use tokens::tokens::model_categories::ModelCategoryToken;
 
-use crate::model::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown_db_pool;
-use crate::model::categories::synthetic_category_list::SYNTHETIC_CATEGORY_LIST;
+use crate::configs::static_model::categories::synthetic_category_list::SYNTHETIC_CATEGORY_LIST;
+use crate::state::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown_db_pool;
 use crate::state::server_state::ServerState;
 
 // =============== Success Response ===============

@@ -2,7 +2,7 @@ use once_cell::sync::Lazy;
 
 use enums::by_table::model_categories::model_type::ModelType;
 
-use crate::model::categories::synthetic_category::SyntheticCategory;
+use crate::configs::static_model::categories::synthetic_category::SyntheticCategory;
 
 pub const SYNTHETIC_CATEGORY_LATEST_TTS_MODELS : SyntheticCategory = SyntheticCategory {
   category_token: "SYNTHETIC_CATEGORY:LATEST_MODELS",
