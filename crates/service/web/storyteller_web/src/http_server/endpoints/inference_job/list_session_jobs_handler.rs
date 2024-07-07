@@ -5,7 +5,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use actix_web_lab::extract::Query;
 use chrono::{DateTime, Duration, Utc};
 use log::{error, warn};
@@ -188,8 +188,9 @@ impl fmt::Display for ListSessionJobsError {
 pub async fn list_session_jobs_handler(
   http_request: HttpRequest,
   query: Query<ListSessionJobsQueryParams>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListSessionJobsError>
-{
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<ListSessionJobsSuccessResponse>, ListSessionJobsError> {
+
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
@@ -277,7 +278,7 @@ pub async fn list_session_jobs_handler(
   records_to_response(records)
 }
 
-fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<HttpResponse, ListSessionJobsError> {
+fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<Json<ListSessionJobsSuccessResponse>, ListSessionJobsError> {
   let mut records = records.into_iter()
       .map(|record| {
         db_record_to_response_payload(record, None)
@@ -296,20 +297,10 @@ fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<HttpRe
     success_count <= 3
   });
 
-  let response = ListSessionJobsSuccessResponse {
+  Ok(Json(ListSessionJobsSuccessResponse {
     success: true,
     jobs: records,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| {
-        error!("error returning response: {:?}",  e);
-        ListSessionJobsError::ServerError
-      })?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
 
 fn db_record_to_response_payload(

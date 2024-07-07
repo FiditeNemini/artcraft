@@ -5,7 +5,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use actix_web_lab::extract::Query;
 use chrono::{DateTime, Utc};
 use log::error;
@@ -174,8 +174,9 @@ impl fmt::Display for BatchGetInferenceJobStatusError {
 pub async fn batch_get_inference_job_status_handler(
   http_request: HttpRequest,
   query: Query<BatchGetInferenceJobStatusQueryParams>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, BatchGetInferenceJobStatusError>
-{
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<BatchGetInferenceJobStatusSuccessResponse>, BatchGetInferenceJobStatusError> {
+
   let tokens = query.tokens.iter()
       .map(|token| token.trim())
       // NB: A bunch of Python clients use our API and can fail in this manner.
@@ -186,7 +187,7 @@ pub async fn batch_get_inference_job_status_handler(
       .collect::<Vec<_>>();
 
   if tokens.is_empty() {
-    return records_to_response(Vec::new());
+    return Ok(records_to_response(Vec::new()));
   }
 
   // NB: Since this is publicly exposed, we don't query sensitive data.
@@ -230,30 +231,20 @@ pub async fn batch_get_inference_job_status_handler(
     };
   }
 
-  records_to_response(records)
+  Ok(records_to_response(records))
 }
 
-fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<HttpResponse, BatchGetInferenceJobStatusError> {
-  let records = records.into_iter()
-      .map(|record| {
-        db_record_to_response_payload(record, None)
-      })
-      .collect::<Vec<_>>();
-
-  let response = BatchGetInferenceJobStatusSuccessResponse {
+fn records_to_response(records: Vec<GenericInferenceJobStatus>)
+  -> Json<BatchGetInferenceJobStatusSuccessResponse>
+{
+  Json(BatchGetInferenceJobStatusSuccessResponse {
     success: true,
-    job_states: records,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| {
-        error!("error returning response: {:?}",  e);
-        BatchGetInferenceJobStatusError::ServerError
-      })?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+    job_states: records.into_iter()
+        .map(|record| {
+          db_record_to_response_payload(record, None)
+        })
+        .collect::<Vec<_>>(),
+  })
 }
 
 fn db_record_to_response_payload(

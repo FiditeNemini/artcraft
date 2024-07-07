@@ -4,7 +4,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use chrono::{DateTime, Utc};
 use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
@@ -162,7 +162,7 @@ impl fmt::Display for GetInferenceJobStatusError {
 pub async fn get_inference_job_status_handler(
   http_request: HttpRequest,
   path: Path<GetInferenceJobStatusPathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetInferenceJobStatusError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<Json<GetInferenceJobStatusSuccessResponse>, GetInferenceJobStatusError>
 {
   if path.token.as_str().trim() == "None" {
     // NB: A bunch of Python clients use our API and can fail in this manner.
@@ -231,20 +231,10 @@ pub async fn get_inference_job_status_handler(
   let record_for_response = record_to_payload(
     record, maybe_extra_status_description);
 
-  let response = GetInferenceJobStatusSuccessResponse {
+  Ok(Json(GetInferenceJobStatusSuccessResponse {
     success: true,
     state: record_for_response,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| {
-        error!("error returning response: {:?}",  e);
-        GetInferenceJobStatusError::ServerError
-      })?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
 
 fn record_to_payload(
