@@ -51,11 +51,14 @@ pub struct PromptInfo {
   /// Note: Prompts may or may not be compatible across systems.
   pub prompt_type: PromptType,
   
-  /// Positive prompt
+  /// Positive prompt (technically optional, but usually present)
   pub maybe_positive_prompt: Option<String>,
 
-  /// Negative prompt
+  /// Negative prompt (optional)
   pub maybe_negative_prompt: Option<String>,
+
+  /// Scheduled / travel prompt (optional)
+  pub maybe_travel_prompt: Option<String>,
 
   /// If a "style" was used, this is the name of it.
   /// This might not be present for all types of inference
@@ -68,6 +71,9 @@ pub struct PromptInfo {
   /// If a "strength" was used.
   /// Typically only for video style transfer.
   pub maybe_strength: Option<f32>,
+
+  /// If a frame skip setting was used.
+  pub maybe_frame_skip: Option<u8>,
 
   /// If a face detailer was used.
   /// This might not be present for all types of inference
@@ -205,6 +211,10 @@ pub async fn get_prompt_handler(
   let mut maybe_strength = None;
   let mut maybe_inference_duration_millis = None;
   let mut maybe_global_ipa_image_token = None;
+  let mut maybe_travel_prompt = None;
+  let mut maybe_frame_skip = None;
+
+  // Flags
   let mut used_face_detailer = false;
   let mut used_upscaler = false;
   let mut lipsync_enabled = false;
@@ -223,6 +233,10 @@ pub async fn get_prompt_handler(
     maybe_strength = inner_payload.strength;
     maybe_inference_duration_millis = inner_payload.inference_duration_millis;
     maybe_global_ipa_image_token = inner_payload.global_ipa_token.clone();
+    maybe_travel_prompt = inner_payload.travel_prompt.clone();
+    maybe_frame_skip = inner_payload.frame_skip;
+
+    // Flags
     used_face_detailer = inner_payload.used_face_detailer.unwrap_or(false);
     used_upscaler = inner_payload.used_upscaler.unwrap_or(false);
     lipsync_enabled = inner_payload.lipsync_enabled.unwrap_or(false);
@@ -253,6 +267,7 @@ pub async fn get_prompt_handler(
       maybe_strength,
       maybe_positive_prompt: result.maybe_positive_prompt,
       maybe_negative_prompt: result.maybe_negative_prompt,
+      maybe_travel_prompt,
       maybe_style_name,
       maybe_inference_duration_millis,
       used_face_detailer,
@@ -264,6 +279,7 @@ pub async fn get_prompt_handler(
       created_at: result.created_at,
       maybe_moderator_fields,
       maybe_global_ipa_image_token,
+      maybe_frame_skip,
     },
   };
 
