@@ -7,7 +7,7 @@ use log::warn;
 use mysql_queries::queries::stats::get_on_prem_worker_stats::get_on_prem_worker_stats;
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::ServerState;
+use crate::state::server_state::ServerState;
 
 const MIN_SAMPLE_SIZE : u32 = 100;
 const MAX_SAMPLE_SIZE : u32 = 10_000;

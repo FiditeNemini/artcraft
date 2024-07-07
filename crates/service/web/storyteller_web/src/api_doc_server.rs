@@ -25,7 +25,7 @@ use sqlx::MySqlPool;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use api_doc::ApiDoc;
+use docs::api_doc::ApiDoc;
 use errors::AnyhowResult;
 
 use crate::configs::static_api_tokens::StaticApiTokenSet;
@@ -39,7 +39,7 @@ pub mod state;
 pub mod threads;
 pub mod util;
 
-pub mod api_doc;
+pub mod docs;
 
 #[actix_web::main]
 async fn main() -> Result<(), impl Error> {

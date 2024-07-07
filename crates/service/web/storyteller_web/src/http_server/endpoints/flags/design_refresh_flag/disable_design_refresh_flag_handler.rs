@@ -5,7 +5,7 @@ use actix_web::{HttpRequest, HttpResponse, Responder, web};
 
 use crate::http_server::endpoints::flags::design_refresh_flag::build_design_refresh_cookie::build_design_refresh_cookie;
 use crate::http_server::endpoints::flags::get_cookie_domain::get_set_cookie_domain;
-use crate::ServerState;
+use crate::state::server_state::ServerState;
 
 pub async fn disable_design_refresh_flag_handler(
   http_request: HttpRequest,

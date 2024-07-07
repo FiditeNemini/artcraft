@@ -9,7 +9,7 @@ use redis_common::redis_cache_keys::RedisCacheKeys;
 
 use crate::http_server::endpoints::stats::result_transformer::{CacheableQueueStats, database_result_to_cacheable};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct GetUnifiedQueueStatsSuccessResponse {

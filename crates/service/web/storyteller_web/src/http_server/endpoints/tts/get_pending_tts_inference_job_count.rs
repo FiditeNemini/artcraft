@@ -8,7 +8,7 @@ use log::{debug, error, warn};
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::ServerState;
+use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct Response {
