@@ -294,6 +294,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
       other_args_builder.set_travel_prompt(args.comfy_args.travel_prompt.clone());
     }
 
+    if args.comfy_args.frame_skip.is_some() {
+      other_args_builder.set_frame_skip(args.comfy_args.frame_skip.clone());
+    }
+
     let maybe_other_args = other_args_builder.build();
 
     info!("maybe other prompt args: {:?}", maybe_other_args);

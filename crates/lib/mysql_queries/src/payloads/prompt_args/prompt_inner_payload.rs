@@ -79,6 +79,12 @@ pub struct PromptInnerPayload {
   #[serde(alias = "travel_prompt")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub travel_prompt: Option<String>,
+
+  /// Frame skip
+  #[serde(rename = "fs")] // NB: DO NOT CHANGE: IT WILL BREAK MYSQL RECORDS. Renamed to consume fewer bytes.
+  #[serde(alias = "frame_skip")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub frame_skip: Option<u8>,
 }
 
 pub struct PromptInnerPayloadBuilder {
@@ -95,6 +101,7 @@ pub struct PromptInnerPayloadBuilder {
   pub upscaler_workflow: Option<String>,
   pub global_ipa_token: Option<MediaFileToken>,
   pub travel_prompt: Option<String>,
+  pub frame_skip: Option<u8>,
 }
 
 impl PromptInnerPayloadBuilder {
@@ -113,6 +120,7 @@ impl PromptInnerPayloadBuilder {
       upscaler_workflow: None,
       global_ipa_token: None,
       travel_prompt: None,
+      frame_skip: None,
     }
   }
 
@@ -130,6 +138,7 @@ impl PromptInnerPayloadBuilder {
         && self.upscaler_workflow.is_none()
         && self.global_ipa_token.is_none()
         && self.travel_prompt.is_none()
+        && self.frame_skip.is_none()
     {
       return None;
     }
@@ -151,6 +160,7 @@ impl PromptInnerPayloadBuilder {
       upscaler_workflow: self.upscaler_workflow,
       global_ipa_token: self.global_ipa_token,
       travel_prompt: self.travel_prompt,
+      frame_skip: self.frame_skip,
     })
   }
 
@@ -224,6 +234,10 @@ impl PromptInnerPayloadBuilder {
 
   pub fn set_travel_prompt(&mut self, travel_prompt: Option<String>) {
     self.travel_prompt = travel_prompt;
+  }
+
+  pub fn set_frame_skip(&mut self, frame_skip: Option<u8>) {
+    self.frame_skip = frame_skip;
   }
 }
 
