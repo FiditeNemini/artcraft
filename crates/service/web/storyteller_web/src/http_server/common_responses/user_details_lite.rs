@@ -107,7 +107,7 @@ impl UserDefaultAvatarInfo {
 mod tests {
   use tokens::tokens::users::UserToken;
 
-  use crate::common_responses::user_details_lite::UserDetailsLight;
+  use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
   #[test]
   fn test_from_optional_db_fields() {

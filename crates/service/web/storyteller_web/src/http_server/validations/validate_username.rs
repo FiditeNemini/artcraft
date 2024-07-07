@@ -1,11 +1,10 @@
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub fn validate_username(username: &str) -> Result<(), String> {
-  lazy_static! {
-    static ref USERNAME_REGEX: Regex = {
-      Regex::new(r"^[A-Za-z0-9_\-]{3,16}$").expect("should be valid regex")
-    };
-  }
+  static USERNAME_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"^[A-Za-z0-9_\-]{3,16}$").expect("should be valid regex")
+  });
 
   if username.len() < 3 {
     return Err("username is too short".to_string());

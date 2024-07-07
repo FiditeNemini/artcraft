@@ -6802,7 +6802,6 @@ dependencies = [
  "idempotency",
  "infer 0.16.0",
  "language-tags",
- "lazy_static",
  "lexical-sort",
  "limitation",
  "log",

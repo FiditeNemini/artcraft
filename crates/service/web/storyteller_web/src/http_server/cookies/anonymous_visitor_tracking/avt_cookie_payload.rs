@@ -69,7 +69,7 @@ impl AvtCookiePayload {
 mod tests {
   use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 
-  use crate::cookies::anonymous_visitor_tracking::avt_cookie_payload::AvtCookiePayload;
+  use crate::http_server::cookies::anonymous_visitor_tracking::avt_cookie_payload::AvtCookiePayload;
 
   #[test]
   fn test_new() {

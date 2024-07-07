@@ -1,12 +1,11 @@
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub fn validate_profile_github_username(username: &str) -> Result<(), String> {
-  lazy_static! {
-    // TODO: https://github.com/shinnn/github-username-regex
-    static ref GITHUB_USERNAME_REGEX: Regex = {
-      Regex::new(r"^[a-zA-Z0-9\-]{1,39}$").expect("should be valid regex")
-    };
-  }
+  // TODO: https://github.com/shinnn/github-username-regex
+  static GITHUB_USERNAME_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"^[a-zA-Z0-9\-]{1,39}$").expect("should be valid regex")
+  });
 
   if username.len() < 1 {
     return Err("github username is too short".to_string());

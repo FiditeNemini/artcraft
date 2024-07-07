@@ -1,16 +1,16 @@
 use std::collections::HashSet;
 
+use once_cell::sync::Lazy;
+
 use crate::configs::reserved_names::RESERVED_SUBSTRINGS;
 use crate::configs::reserved_names::RESERVED_USERNAMES;
 
 pub fn is_reserved_username(username: &str) -> bool {
-  lazy_static! {
-    static ref RESERVED_USERNAMES_SET : HashSet<String> = RESERVED_USERNAMES.lines()
-      .map(|line| line.trim())
-      .filter(|line| !(line.starts_with("#") || line.is_empty()))
-      .map(|line| line.to_string())
-      .collect::<HashSet<String>>();
-  }
+  static RESERVED_USERNAMES_SET : Lazy<HashSet<String>> = Lazy::new(|| RESERVED_USERNAMES.lines()
+    .map(|line| line.trim())
+    .filter(|line| !(line.starts_with("#") || line.is_empty()))
+    .map(|line| line.to_string())
+    .collect::<HashSet<String>>());
 
   if RESERVED_USERNAMES_SET.contains(username) {
     return true;
@@ -20,13 +20,11 @@ pub fn is_reserved_username(username: &str) -> bool {
 }
 
 fn is_reserved_substring(username: &str) -> bool {
-  lazy_static! {
-    static ref RESERVED_SUBSTRINGS_LIST : Vec<String> = RESERVED_SUBSTRINGS.lines()
-      .map(|line| line.trim())
-      .filter(|line| !(line.starts_with("#") || line.is_empty()))
-      .map(|line| line.to_string())
-      .collect::<Vec<String>>();
-  }
+  static RESERVED_SUBSTRINGS_LIST : Lazy<Vec<String>> = Lazy::new(|| RESERVED_SUBSTRINGS.lines()
+    .map(|line| line.trim())
+    .filter(|line| !(line.starts_with("#") || line.is_empty()))
+    .map(|line| line.to_string())
+    .collect::<Vec<String>>());
 
   let undashed = username.replace("_", "").replace("-", "");
 
