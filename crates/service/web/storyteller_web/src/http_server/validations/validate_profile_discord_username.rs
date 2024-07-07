@@ -3,7 +3,7 @@ use regex::Regex;
 
 pub fn validate_profile_discord_username(username: &str) -> Result<(), String> {
   static DISCORD_USERNAME_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"^@?[^#@:]{2,32}#[0-9]{4}$").expect("should be valid regex")
+    Regex::new(r"^@?[^#@:]{2,32}(#[0-9]{4})?$").expect("should be valid regex")
   });
 
   if username.len() < 2 {
@@ -29,6 +29,8 @@ mod tests {
   fn valid_cases() {
     assert!(validate_profile_discord_username("echelon#0001").is_ok());
     assert!(validate_profile_discord_username("@echelon#0001").is_ok());
+    assert!(validate_profile_discord_username("echelon").is_ok());
+    assert!(validate_profile_discord_username("@echelon").is_ok());
   }
 
   #[test]
