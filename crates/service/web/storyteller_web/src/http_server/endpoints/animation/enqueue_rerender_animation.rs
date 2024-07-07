@@ -23,7 +23,7 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
-use users_component::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

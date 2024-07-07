@@ -16,9 +16,9 @@ use errors::AnyhowResult;
 use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
 use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
 use tokens::tokens::users::UserToken;
-use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
+use crate::http_server::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::http_server::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::state::server_state::ServerState;

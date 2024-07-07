@@ -24,7 +24,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
-use users_component::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

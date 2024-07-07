@@ -54,6 +54,7 @@ memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
+password = { path = "../../../lib/password" }
 primitives = { path = "../../../lib/data/primitives" }
 prompt_engineering = { path = "../../../lib/prompt_engineering" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
@@ -69,7 +70,6 @@ videos = { path = "../../../lib/files/videos" }
 # Internal Components
 billing_component = { path = "../../plugins/billing" }
 user_traits_component = { path = "../../plugins/user_traits_component" }
-users_component = { path = "../../plugins/users" }
 
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
@@ -81,11 +81,13 @@ chrono = { version = "0.4.22", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hostname = "0.4.0"
+lazy_static = "1.4.0" # Regex caching (TODO: Use OnceCell instead)
 lexical-sort = "0.3.1"
 log = "0.4.14"
 once_cell = "1.18.0"
 rand = "0.8.5"
 regex = "1.5.4"
+strum_macros = "0.26.4"
 
 #symphonia = { version = "0.5.2", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "opus", "vorbis", "wav"] }
 # Opus support still hasn't landed in Symphonia, so we have to use an older version (~0.5) off-master.

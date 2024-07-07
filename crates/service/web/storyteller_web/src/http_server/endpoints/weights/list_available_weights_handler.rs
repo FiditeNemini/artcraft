@@ -16,7 +16,7 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
 use tokens::tokens::model_weights::ModelWeightToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;

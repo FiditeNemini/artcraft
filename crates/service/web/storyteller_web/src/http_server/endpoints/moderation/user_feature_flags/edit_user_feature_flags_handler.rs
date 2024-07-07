@@ -23,9 +23,8 @@ use mysql_queries::queries::users::user_profiles::get_user_profile_by_token::get
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::get_user_session_by_token;
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use tokens::tokens::users::UserToken;
-use users_component::endpoints::get_profile_handler::GetProfilePathInfo;
-use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
+use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::state::server_state::ServerState;

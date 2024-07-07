@@ -1,6 +1,8 @@
 pub mod common_responses;
+pub mod cookies;
 pub mod endpoints;
 pub mod middleware;
 pub mod routes;
+pub mod session;
 pub mod validations;
 pub mod web_utils;

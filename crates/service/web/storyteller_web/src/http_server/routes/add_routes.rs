@@ -7,8 +7,6 @@ use actix_web::error::Error;
 use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use reusable_types::server_environment::ServerEnvironment;
-use users_component::endpoints::edit_profile_handler::edit_profile_handler;
-use users_component::endpoints::get_profile_handler::get_profile_handler;
 
 use crate::http_server::endpoints::animation::enqueue_face_animation::enqueue_face_animation_handler;
 use crate::http_server::endpoints::animation::enqueue_rerender_animation::enqueue_rerender_animation_handler;
@@ -150,13 +148,13 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       >,
 {
   let mut app = add_moderator_routes(app); /* /moderation */
+  app = add_user_routes(app); // /create_account, /session, /login, /logout, etc.
   app = add_tts_routes(app); /* /tts */
   app = add_w2l_routes(app); /* /w2l */
   app = add_web_vc_routes(app); /* /v1/voice_conversion */
   app = add_vocoder_routes(app); /* /vocoder */
   app = add_remote_download_routes(app); /* /v1/remote_downloads (prev. /retrieval, aka. "generic_download_jobs") */
   app = add_category_routes(app); /* /category */
-  app = add_user_profile_routes(app); /* /user */
   app = add_api_token_routes(app); /* /api_tokens */
   app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
@@ -246,7 +244,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   // ==================== COMPONENTS ====================
 
-  app = add_user_routes(app); // /create_account, /session, /login, /logout
   app = add_suggested_stripe_billing_routes(app); // /stripe, billing, webhooks, etc.
  
   // ==================== SERVICE ====================
@@ -611,70 +608,6 @@ fn add_category_routes<T, B> (app: App<T>) -> App<T>
                     .route(web::head().to(|| HttpResponse::Ok()))
               )
         )
-  )
-}
-
-// ==================== USER PROFILE ROUTES ====================
-
-fn add_user_profile_routes<T, B> (app: App<T>) -> App<T>
-  where
-      B: MessageBody,
-      T: ServiceFactory<
-        ServiceRequest,
-        Config = (),
-        Response = ServiceResponse<B>,
-        Error = Error,
-        InitError = (),
-      >,
-{
-  // NB(bt): Modern routes
-  app.service(web::scope("/v1/user")
-      .service(web::resource("/{username}/profile")
-          .route(web::get().to(get_profile_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(
-        web::resource("/{username}/edit_profile")
-            .route(web::post().to(edit_profile_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-  )
-  // NB(bt): Legacy routes
-  .service(web::scope("/user")
-      .service(
-        web::resource("/{username}/profile")
-            .route(web::get().to(get_profile_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(
-        web::resource("/{username}/edit_profile")
-            .route(web::post().to(edit_profile_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      // NB: Removed endpoint
-      .service(
-        web::resource("/{username}/tts_models")
-            .route(web::get().to(list_user_tts_models_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      // NB: Removed endpoint
-      .service(
-        web::resource("/{username}/tts_results")
-            .route(web::get().to(list_user_tts_inference_results_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      // NB: Removed endpoint
-      .service(
-        web::resource("/{username}/w2l_templates")
-            .route(web::get().to(list_user_w2l_templates_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      // NB: Removed endpoint
-      .service(
-        web::resource("/{username}/w2l_results")
-            .route(web::get().to(list_user_w2l_inference_results_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
   )
 }
 

@@ -4,15 +4,18 @@ use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceFactory, ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
 
-use users_component::endpoints::create_account_handler::create_account_handler;
-use users_component::endpoints::login_handler::login_handler;
-use users_component::endpoints::logout_handler::logout_handler;
-use users_component::endpoints::password_reset_redeem_handler::password_reset_redeem_handler;
-use users_component::endpoints::password_reset_request_handler::password_reset_request_handler;
-use users_component::endpoints::session_info_handler::session_info_handler;
-
-// NB: This does not include the user edit endpoints since FakeYou's API mounts them alongside other things.
-// A 'v2' API would mount under a v2 prefix and the entity type.
+use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_user_tts_inference_results_handler;
+use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
+use crate::http_server::endpoints::users::create_account_handler::create_account_handler;
+use crate::http_server::endpoints::users::edit_profile_handler::edit_profile_handler;
+use crate::http_server::endpoints::users::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::users::login_handler::login_handler;
+use crate::http_server::endpoints::users::logout_handler::logout_handler;
+use crate::http_server::endpoints::users::password_reset_redeem_handler::password_reset_redeem_handler;
+use crate::http_server::endpoints::users::password_reset_request_handler::password_reset_request_handler;
+use crate::http_server::endpoints::users::session_info_handler::session_info_handler;
+use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
+use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 
 pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
   where
@@ -79,5 +82,55 @@ pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
         web::resource("/v1/password_reset/redeem")
             .route(web::post().to(password_reset_redeem_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
+      )
+
+      // NB(bt): Modern user profile routes
+      .service(web::scope("/v1/user")
+          .service(web::resource("/{username}/profile")
+              .route(web::get().to(get_profile_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/{username}/edit_profile")
+                .route(web::post().to(edit_profile_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+      )
+      // NB(bt): Legacy user profile routes
+      .service(web::scope("/user")
+          .service(
+            web::resource("/{username}/profile")
+                .route(web::get().to(get_profile_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/{username}/edit_profile")
+                .route(web::post().to(edit_profile_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          // NB: Removed endpoint
+          .service(
+            web::resource("/{username}/tts_models")
+                .route(web::get().to(list_user_tts_models_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          // NB: Removed endpoint
+          .service(
+            web::resource("/{username}/tts_results")
+                .route(web::get().to(list_user_tts_inference_results_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          // NB: Removed endpoint
+          .service(
+            web::resource("/{username}/w2l_templates")
+                .route(web::get().to(list_user_w2l_templates_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          // NB: Removed endpoint
+          .service(
+            web::resource("/{username}/w2l_results")
+                .route(web::get().to(list_user_w2l_inference_results_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
       )
 }

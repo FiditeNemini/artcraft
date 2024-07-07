@@ -3,6 +3,7 @@ pub mod allowed_studio_access;
 pub mod allowed_video_style_transfer_access;
 pub mod check_creator_tokens;
 pub mod delete_role_disambiguation;
+pub mod email_to_gravatar;
 pub mod encrypted_sort_id;
 pub mod placeholder_images;
 pub mod troll_user_bans;

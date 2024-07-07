@@ -5,7 +5,7 @@ use log::warn;
 use sqlx::MySqlPool;
 
 use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, SubscriptionKey, UserMetadata};
-use users_component::session::session_checker::SessionChecker;
+use crate::http_server::session::session_checker::SessionChecker;
 
 /// A simple Actix injectable action
 #[derive(Clone)]

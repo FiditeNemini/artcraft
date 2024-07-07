@@ -88,7 +88,6 @@ members = [
   "crates/service/plugins/billing",
   "crates/service/plugins/inference_workloads",
   "crates/service/plugins/user_traits_component",
-  "crates/service/plugins/users",
 
   # Vendored code
   "crates/vendor/limitation",

@@ -21,7 +21,7 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::media_files::MediaFileToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;

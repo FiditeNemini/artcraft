@@ -20,7 +20,7 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use migration::voice_conversion::list_vc_models_for_migration::list_vc_models_for_migration;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;

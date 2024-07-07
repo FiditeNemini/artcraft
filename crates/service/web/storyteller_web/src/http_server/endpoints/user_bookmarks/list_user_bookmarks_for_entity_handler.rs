@@ -18,7 +18,7 @@ use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEnti
 use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks_for_entity::list_user_bookmarks_for_entity;
 use mysql_queries::queries::users::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
-use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
+use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;

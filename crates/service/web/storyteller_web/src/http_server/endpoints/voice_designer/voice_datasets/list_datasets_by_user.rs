@@ -12,7 +12,7 @@ use utoipa::ToSchema;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::voice_designer::datasets::list_datasets_by_username::list_datasets_by_username;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::state::server_state::ServerState;
 

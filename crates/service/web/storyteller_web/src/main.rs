@@ -14,6 +14,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+#[macro_use] extern crate lazy_static;
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
@@ -65,9 +66,6 @@ use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
-use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
-use users_component::session::http::http_user_session_manager::HttpUserSessionManager;
-use users_component::session::session_checker::SessionChecker;
 
 use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
 use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;
@@ -75,8 +73,11 @@ use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInte
 use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
 use crate::configs::app_startup::redis_rate_limiters::configure_redis_rate_limiters;
 use crate::configs::static_api_tokens::StaticApiTokenSet;
+use crate::http_server::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::routes::add_routes::add_routes;
+use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
+use crate::http_server::session::session_checker::SessionChecker;
 use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
 use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
@@ -87,9 +88,6 @@ use crate::threads::poll_model_token_info_thread::poll_model_token_info_thread;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use crate::util::troll_user_bans::load_troll_user_ban_list_from_directory::load_user_token_ban_list_from_directory;
 use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
-
-pub const RESERVED_USERNAMES : &str = include_str!("../../../../../includes/binary_includes/reserved_usernames.txt");
-pub const RESERVED_SUBSTRINGS : &str = include_str!("../../../../../includes/binary_includes/reserved_usernames_including.txt");
 
 pub mod billing;
 pub mod configs;

@@ -26,7 +26,7 @@ use mysql_queries::queries::beta_keys::list_beta_keys::{FilterToKeys, list_beta_
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use tokens::tokens::beta_keys::BetaKeyToken;
 use tokens::tokens::media_files::MediaFileToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;

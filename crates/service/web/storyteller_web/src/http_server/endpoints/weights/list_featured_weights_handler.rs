@@ -19,7 +19,7 @@ use mysql_queries::queries::media_files::list::list_media_files::{list_media_fil
 use mysql_queries::queries::model_weights::list::list_featured_weights::{list_featured_weights, ListFeaturedWeightsArgs};
 use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;
 use tokens::tokens::model_weights::ModelWeightToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;

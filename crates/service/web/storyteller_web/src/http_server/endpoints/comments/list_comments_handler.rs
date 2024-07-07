@@ -19,9 +19,9 @@ use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::list_comments_for_entity::list_comments_for_entity;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::users::UserToken;
-use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
+use crate::http_server::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::http_server::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;

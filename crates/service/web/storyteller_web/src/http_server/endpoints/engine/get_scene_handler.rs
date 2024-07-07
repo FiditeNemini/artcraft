@@ -18,7 +18,7 @@ use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

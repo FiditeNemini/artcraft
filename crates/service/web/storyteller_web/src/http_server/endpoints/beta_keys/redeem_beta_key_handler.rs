@@ -30,7 +30,7 @@ use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
-use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
+use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::ListBetaKeysError;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;

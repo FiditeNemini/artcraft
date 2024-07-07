@@ -9,7 +9,7 @@ use log::{info, warn};
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::voice_designer::voices::list_voices_query_builder::ListVoicesQueryBuilder;
 use tokens::tokens::zs_voices::ZsVoiceToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::state::server_state::ServerState;
 

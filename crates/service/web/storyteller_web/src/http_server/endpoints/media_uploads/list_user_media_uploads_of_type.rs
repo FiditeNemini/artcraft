@@ -13,7 +13,7 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_uploads::reverse_list_user_media_uploads_of_type::reverse_list_user_media_uploads_of_type_with_connection;
 use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
-use users_component::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;

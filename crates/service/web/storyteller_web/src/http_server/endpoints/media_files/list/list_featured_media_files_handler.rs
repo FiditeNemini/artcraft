@@ -22,7 +22,7 @@ use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::batch_get_media_files_by_tokens;
 use mysql_queries::queries::media_files::list::list_featured_media_files::{list_featured_media_files, ListFeaturedMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
-use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;

@@ -36,11 +36,6 @@ use tokens::tokens::prompts::*;
 use tokens::tokens::user_bookmarks::*;
 use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
-use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
-use users_component::endpoints::get_profile_handler::*;
-use users_component::endpoints::login_handler::*;
-use users_component::endpoints::logout_handler::*;
-use users_component::endpoints::session_info_handler::*;
 
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileCoverImageDetails;
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
@@ -49,6 +44,7 @@ use crate::http_server::common_responses::media_file_social_meta_lite::MediaFile
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::common_responses::weights_cover_image_details::*;
 use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
@@ -80,8 +76,8 @@ use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_handler::*;
 use crate::http_server::endpoints::media_files::list::list_pinned_media_files_handler::*;
-use crate::http_server::endpoints::media_files::search::search_session_media_files_handler::*;
 use crate::http_server::endpoints::media_files::search::search_featured_media_files_handler::*;
+use crate::http_server::endpoints::media_files::search::search_session_media_files_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_audio_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
@@ -109,6 +105,10 @@ use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_
 use crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
+use crate::http_server::endpoints::users::get_profile_handler::*;
+use crate::http_server::endpoints::users::login_handler::*;
+use crate::http_server::endpoints::users::logout_handler::*;
+use crate::http_server::endpoints::users::session_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::*;
@@ -159,8 +159,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler,
     crate::http_server::endpoints::media_files::list::list_pinned_media_files_handler::list_pinned_media_files_handler,
-    crate::http_server::endpoints::media_files::search::search_session_media_files_handler::search_session_media_files_handler,
     crate::http_server::endpoints::media_files::search::search_featured_media_files_handler::search_featured_media_files_handler,
+    crate::http_server::endpoints::media_files::search::search_session_media_files_handler::search_session_media_files_handler,
     crate::http_server::endpoints::media_files::upload::upload_audio_media_file_handler::upload_audio_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
@@ -186,6 +186,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::batch_get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
+    crate::http_server::endpoints::users::get_profile_handler::get_profile_handler,
+    crate::http_server::endpoints::users::login_handler::login_handler,
+    crate::http_server::endpoints::users::logout_handler::logout_handler,
+    crate::http_server::endpoints::users::session_info_handler::session_info_handler,
     crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler,
@@ -199,10 +203,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight_handler::update_weight_handler,
     crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
-    users_component::endpoints::get_profile_handler::get_profile_handler,
-    users_component::endpoints::login_handler::login_handler,
-    users_component::endpoints::logout_handler::logout_handler,
-    users_component::endpoints::session_info_handler::session_info_handler,
   ),
   components(schemas(
     // Tokens

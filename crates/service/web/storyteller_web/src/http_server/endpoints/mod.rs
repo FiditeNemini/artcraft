@@ -1,3 +1,4 @@
+pub mod analytics;
 pub mod animation;
 pub mod api_tokens;
 pub mod beta_keys;
@@ -25,6 +26,7 @@ pub mod stubs;
 pub mod subscriptions;
 pub mod trending;
 pub mod tts;
+pub mod users;
 pub mod user_bookmarks;
 pub mod user_ratings;
 pub mod vocoders;
@@ -34,4 +36,3 @@ pub mod voice_designer;
 pub mod w2l;
 pub mod weights;
 pub mod workflows;
-pub mod analytics;

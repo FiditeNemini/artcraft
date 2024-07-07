@@ -28,7 +28,7 @@ use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
 use primitives::try_str_to_num::try_str_to_num;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
-use users_component::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;

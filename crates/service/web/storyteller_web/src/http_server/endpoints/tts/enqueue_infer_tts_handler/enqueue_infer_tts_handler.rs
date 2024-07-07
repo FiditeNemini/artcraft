@@ -29,7 +29,7 @@ use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::users::UserToken;
 use tts_common::priority::{FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
-use users_component::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::app_startup::username_set::UsernameSet;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;

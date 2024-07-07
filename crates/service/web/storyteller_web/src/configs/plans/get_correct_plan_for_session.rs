@@ -3,7 +3,7 @@ use std::ops::Deref;
 use chrono::Utc;
 
 use reusable_types::server_environment::ServerEnvironment;
-use users_component::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::plan::Plan;
 use crate::configs::plans::plan_list::{DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN, LOYALTY_PLANS_BY_SLUG, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
