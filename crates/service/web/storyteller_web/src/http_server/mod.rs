@@ -1,3 +1,4 @@
+pub mod common_requests;
 pub mod common_responses;
 pub mod cookies;
 pub mod endpoints;

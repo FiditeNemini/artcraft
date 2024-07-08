@@ -15,6 +15,7 @@ use mysql_queries::queries::media_files::edit::set_media_file_cover_image::{set_
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::SetModelWeightCoverImageError;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::state::server_state::ServerState;
@@ -25,13 +26,6 @@ pub struct SetMediaFileCoverImageRequest {
   /// Optional media token for the image to set as the cover image
   /// If absent or empty string, the cover image will be cleared.
   cover_image_media_file_token: Option<MediaFileToken>,
-}
-
-/// For the URL PathInfo
-#[derive(Deserialize, ToSchema)]
-pub struct SetMediaFileCoverImagePathInfo {
-  /// The media file we're applying the cover image to.
-  token: MediaFileToken,
 }
 
 // =============== Error Response ===============
@@ -84,12 +78,12 @@ impl fmt::Display for SetMediaFileCoverImageError {
   ),
   params(
     ("request" = SetMediaFileCoverImageRequest, description = "Payload for Request"),
-    ("path" = SetMediaFileCoverImagePathInfo, description = "Path for Request")
+    ("path" = MediaFileTokenPathInfo, description = "Path for Request")
   )
 )]
 pub async fn set_media_file_cover_image_handler(
   http_request: HttpRequest,
-  path: Path<SetMediaFileCoverImagePathInfo>,
+  path: Path<MediaFileTokenPathInfo>,
   request: web::Json<SetMediaFileCoverImageRequest>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, SetMediaFileCoverImageError>{

@@ -15,6 +15,7 @@ use mysql_queries::queries::media_files::edit::update_media_file_engine_category
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::http_server::common_responses::simple_response::SimpleResponse;
 use crate::http_server::web_utils::require_user_session::require_user_session;
 use crate::state::server_state::ServerState;
@@ -22,12 +23,6 @@ use crate::state::server_state::ServerState;
 #[derive(Deserialize, ToSchema)]
 pub struct ChangeMediaFileEngineCategoryRequest {
     pub engine_category: MediaFileEngineCategory,
-}
-
-/// For the URL PathInfo
-#[derive(Deserialize, ToSchema)]
-pub struct ChangeMediaFileEngineCategoryPathInfo {
-    token: MediaFileToken,
 }
 
 // =============== Error Response ===============
@@ -79,12 +74,12 @@ impl fmt::Display for ChangeMediaFileEngineCategoryError {
     ),
     params(
         ("request" = ChangeMediaFileEngineCategoryRequest, description = "Payload for Request"),
-        ("path" = ChangeMediaFileEngineCategoryPathInfo, description = "Path for Request")
+        ("path" = MediaFileTokenPathInfo, description = "Path for Request")
     )
 )]
 pub async fn change_media_file_engine_category_handler(
     http_request: HttpRequest,
-    path: Path<ChangeMediaFileEngineCategoryPathInfo>,
+    path: Path<MediaFileTokenPathInfo>,
     request: Json<ChangeMediaFileEngineCategoryRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<Json<SimpleResponse>, ChangeMediaFileEngineCategoryError> {

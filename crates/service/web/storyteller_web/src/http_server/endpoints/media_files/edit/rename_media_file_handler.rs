@@ -12,7 +12,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::media_files::edit::rename_media_file::rename_media_file;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
-
+use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::state::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
@@ -22,12 +22,6 @@ pub struct RenameMediaFileRequest {
   /// New name for the media file.
   /// If absent or empty string, the name will be cleared
   name: Option<String>,
-}
-
-/// For the URL PathInfo
-#[derive(Deserialize, ToSchema)]
-pub struct RenameMediaFilePathInfo {
-  token: MediaFileToken,
 }
 
 // =============== Error Response ===============
@@ -77,12 +71,12 @@ impl fmt::Display for RenameMediaFileError {
   ),
   params(
     ("request" = RenameMediaFileRequest, description = "Payload for Request"),
-    ("path" = RenameMediaFilePathInfo, description = "Path for Request")
+    ("path" = MediaFileTokenPathInfo, description = "Path for Request")
   )
 )]
 pub async fn rename_media_file_handler(
   http_request: HttpRequest,
-  path: Path<RenameMediaFilePathInfo>,
+  path: Path<MediaFileTokenPathInfo>,
   request: web::Json<RenameMediaFileRequest>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, RenameMediaFileError>{

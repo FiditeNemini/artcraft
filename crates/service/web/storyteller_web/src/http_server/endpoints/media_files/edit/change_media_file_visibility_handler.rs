@@ -16,17 +16,12 @@ use mysql_queries::queries::media_files::edit::update_media_file_visibility::{up
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
 pub struct ChangeMediaFileVisibilityRequest {
     pub creator_set_visibility: Option<String>,
-}
-
-/// For the URL PathInfo
-#[derive(Deserialize, ToSchema)]
-pub struct ChangeMediaFileVisibilityPathInfo {
-    token: MediaFileToken,
 }
 
 // =============== Error Response ===============
@@ -69,19 +64,19 @@ impl fmt::Display for ChangeMediaFileVisibilityError {
     tag = "Media Files",
     path = "/v1/media_files/visibility/{token}",
     responses(
-        (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),
+        (status = 200, description = "Success", body = SimpleGenericJsonSuccess),
         (status = 400, description = "Bad input", body = ChangeMediaFileVisibilityError),
         (status = 401, description = "Not authorized", body = ChangeMediaFileVisibilityError),
         (status = 500, description = "Server error", body = ChangeMediaFileVisibilityError),
     ),
     params(
         ("request" = ChangeMediaFileVisibilityRequest, description = "Payload for Request"),
-        ("path" = ChangeMediaFileVisibilityPathInfo, description = "Path for Request")
+        ("path" = MediaFileTokenPathInfo, description = "Path for Request")
     )
 )]
 pub async fn change_media_file_visibility_handler(
     http_request: HttpRequest,
-    path: Path<ChangeMediaFileVisibilityPathInfo>,
+    path: Path<MediaFileTokenPathInfo>,
     request: web::Json<ChangeMediaFileVisibilityRequest>,
     server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ChangeMediaFileVisibilityError>
 {

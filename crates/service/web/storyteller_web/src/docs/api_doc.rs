@@ -37,6 +37,7 @@ use tokens::tokens::user_bookmarks::*;
 use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
 
+use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileCoverImageDetails;
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
 use crate::http_server::common_responses::media_file_origin_details::*;
@@ -244,6 +245,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     WeightsCategory,
     WeightsType,
 
+    // Common path info
+    MediaFileTokenPathInfo,
+
     // Common response structs
     MediaFileModelDetails,
     MediaFileOriginDetails,
@@ -287,13 +291,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BetaKeyItem,
     BookmarkRow,
     ChangeMediaFileAnimationTypeError,
-    ChangeMediaFileAnimationTypePathInfo,
     ChangeMediaFileAnimationTypeRequest,
     ChangeMediaFileEngineCategoryError,
-    ChangeMediaFileEngineCategoryPathInfo,
     ChangeMediaFileEngineCategoryRequest,
     ChangeMediaFileVisibilityError,
-    ChangeMediaFileVisibilityPathInfo,
     ChangeMediaFileVisibilityRequest,
     CreateBetaKeysError,
     CreateBetaKeysRequest,
@@ -467,7 +468,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     RedeemBetaKeyRequest,
     RedeemBetaKeySuccessResponse,
     RenameMediaFileError,
-    RenameMediaFilePathInfo,
     RenameMediaFileRequest,
     RequestDetailsResponse,
     ResultDetailsResponse,
@@ -478,7 +478,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SessionInfoSuccessResponse,
     SessionUserInfo,
     SetMediaFileCoverImageError,
-    SetMediaFileCoverImagePathInfo,
     SetMediaFileCoverImageRequest,
     SetModelWeightCoverImageError,
     SetModelWeightCoverImagePathInfo,

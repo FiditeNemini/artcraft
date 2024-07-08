@@ -16,6 +16,7 @@ use mysql_queries::queries::media_files::edit::update_media_file_animation_type:
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::http_server::common_responses::simple_response::SimpleResponse;
 use crate::http_server::web_utils::require_user_session::require_user_session;
 use crate::state::server_state::ServerState;
@@ -25,12 +26,6 @@ pub struct ChangeMediaFileAnimationTypeRequest {
     /// The new animation type for the media file.
     /// It can be cleared to null, but only for characters.
     pub maybe_animation_type: Option<MediaFileAnimationType>,
-}
-
-/// For the URL PathInfo
-#[derive(Deserialize, ToSchema)]
-pub struct ChangeMediaFileAnimationTypePathInfo {
-    token: MediaFileToken,
 }
 
 // =============== Error Response ===============
@@ -82,12 +77,12 @@ impl fmt::Display for ChangeMediaFileAnimationTypeError {
     ),
     params(
         ("request" = ChangeMediaFileAnimationTypeRequest, description = "Payload for Request"),
-        ("path" = ChangeMediaFileAnimationTypePathInfo, description = "Path for Request")
+        ("path" = MediaFileTokenPathInfo, description = "Path for Request")
     )
 )]
 pub async fn change_media_file_animation_type_handler(
     http_request: HttpRequest,
-    path: Path<ChangeMediaFileAnimationTypePathInfo>,
+    path: Path<MediaFileTokenPathInfo>,
     request: Json<ChangeMediaFileAnimationTypeRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<Json<SimpleResponse>, ChangeMediaFileAnimationTypeError> {
