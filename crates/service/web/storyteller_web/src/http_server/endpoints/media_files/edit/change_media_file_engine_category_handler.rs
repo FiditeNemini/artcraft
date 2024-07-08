@@ -1,0 +1,182 @@
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::{Json, Path};
+use anyhow::anyhow;
+use log::{error, log, warn};
+use utoipa::ToSchema;
+
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::media_files::edit::update_media_file_engine_category::update_media_file_engine_category;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
+use tokens::tokens::media_files::MediaFileToken;
+
+use crate::http_server::common_responses::simple_response::SimpleResponse;
+use crate::http_server::web_utils::require_user_session::require_user_session;
+use crate::state::server_state::ServerState;
+
+#[derive(Deserialize, ToSchema)]
+pub struct ChangeMediaFileEngineCategoryRequest {
+    pub engine_category: MediaFileEngineCategory,
+}
+
+/// For the URL PathInfo
+#[derive(Deserialize, ToSchema)]
+pub struct ChangeMediaFileEngineCategoryPathInfo {
+    token: MediaFileToken,
+}
+
+// =============== Error Response ===============
+
+#[derive(Debug, Serialize, ToSchema)]
+pub enum ChangeMediaFileEngineCategoryError {
+    BadInput(String),
+    NotFound,
+    NotAuthorized,
+    ServerError,
+}
+
+impl ResponseError for ChangeMediaFileEngineCategoryError {
+    fn status_code(&self) -> StatusCode {
+        match *self {
+            ChangeMediaFileEngineCategoryError::BadInput(_) => StatusCode::BAD_REQUEST,
+            ChangeMediaFileEngineCategoryError::NotFound => StatusCode::NOT_FOUND,
+            ChangeMediaFileEngineCategoryError::NotAuthorized => StatusCode::UNAUTHORIZED,
+            ChangeMediaFileEngineCategoryError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        serialize_as_json_error(self)
+    }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ChangeMediaFileEngineCategoryError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+// =============== Handler ===============
+
+/// Change the engine category of a media file.
+///
+/// Only certain transitions are allowed.
+#[utoipa::path(
+    post,
+    tag = "Media Files",
+    path = "/v1/media_files/engine_category/{token}",
+    responses(
+        (status = 200, description = "Success", body = SimpleResponse),
+        (status = 400, description = "Bad input", body = ChangeMediaFileEngineCategoryError),
+        (status = 401, description = "Not authorized", body = ChangeMediaFileEngineCategoryError),
+        (status = 500, description = "Server error", body = ChangeMediaFileEngineCategoryError),
+    ),
+    params(
+        ("request" = ChangeMediaFileEngineCategoryRequest, description = "Payload for Request"),
+        ("path" = ChangeMediaFileEngineCategoryPathInfo, description = "Path for Request")
+    )
+)]
+pub async fn change_media_file_engine_category_handler(
+    http_request: HttpRequest,
+    path: Path<ChangeMediaFileEngineCategoryPathInfo>,
+    request: Json<ChangeMediaFileEngineCategoryRequest>,
+    server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<SimpleResponse>, ChangeMediaFileEngineCategoryError> {
+
+    let user_session = require_user_session(&http_request, &server_state)
+        .await
+        .map_err(|e| {
+            warn!("Not authorized: {:?}", e);
+            ChangeMediaFileEngineCategoryError::NotAuthorized
+        })?;
+
+    let media_file_token = path.token.clone();
+    let is_mod = user_session.is_mod();
+
+    let media_file_lookup_result = get_media_file(
+        &path.token,
+        is_mod,
+        &server_state.mysql_pool,
+    ).await;
+
+    let media_file = match media_file_lookup_result {
+        Ok(Some(media_file)) => media_file,
+        Ok(None) => {
+            warn!("MediaFile not found: {:?}", media_file_token);
+            return Err(ChangeMediaFileEngineCategoryError::NotFound);
+        },
+        Err(err) => {
+            warn!("Error looking up media_file: {:?}", err);
+            return Err(ChangeMediaFileEngineCategoryError::ServerError);
+        }
+    };
+
+    match media_file.maybe_engine_category {
+        None => return Err(ChangeMediaFileEngineCategoryError::BadInput(
+            "No engine category on existing object".to_string())),
+
+        Some(existing_category) => {
+            if !is_valid_transition(existing_category) {
+                return Err(ChangeMediaFileEngineCategoryError::BadInput(
+                    format!("Invalid engine category on existing object: {:?}", existing_category)));
+            }
+        }
+    }
+
+    if !is_valid_transition(request.engine_category) {
+        return Err(ChangeMediaFileEngineCategoryError::BadInput(
+            format!("Invalid engine category: {:?}", request.engine_category)));
+    }
+
+    let is_creator = media_file.maybe_creator_user_token
+        .is_some_and(|t| t.as_str() == user_session.user_token.as_str());
+
+    if !is_creator && !is_mod {
+        warn!("user is not allowed to edit this media_file: {:?}", user_session.user_token);
+        return Err(ChangeMediaFileEngineCategoryError::NotAuthorized);
+    }
+
+    let query_result = update_media_file_engine_category(
+        &media_file_token,
+        request.engine_category,
+        &server_state.mysql_pool
+    ).await;
+
+    match query_result {
+        Ok(_) => {},
+        Err(err) => {
+            warn!("Update MediaFile DB error: {:?}", err);
+            return Err(ChangeMediaFileEngineCategoryError::ServerError);
+        }
+    };
+
+    Ok(Json(SimpleResponse {
+        success: true,
+    }))
+}
+
+fn is_valid_transition(engine_category: MediaFileEngineCategory) -> bool {
+    match engine_category {
+        // We allow engine transitions between these types since they are simple.
+        MediaFileEngineCategory::Object
+        | MediaFileEngineCategory::Creature
+        | MediaFileEngineCategory::Location
+        | MediaFileEngineCategory::SetDressing
+        | MediaFileEngineCategory::Skybox => true,
+
+        // We do not allow engine transitions between these types,
+        // because they are more complicated and require other metadata.
+        MediaFileEngineCategory::Scene
+        | MediaFileEngineCategory::Character
+        | MediaFileEngineCategory::Animation
+        | MediaFileEngineCategory::Expression
+        | MediaFileEngineCategory::ImagePlane
+        | MediaFileEngineCategory::VideoPlane => false,
+    }
+}

@@ -4,6 +4,7 @@ use actix_web::{App, Error, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::delete_media_file_handler;
+use crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::change_media_file_engine_category_handler;
 use crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::change_media_file_visibility_handler;
 use crate::http_server::endpoints::media_files::edit::rename_media_file_handler::rename_media_file_handler;
 use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::set_media_file_cover_image_handler;
@@ -58,6 +59,9 @@ pub fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/visibility/{token}")
           .route(web::post().to(change_media_file_visibility_handler))
+      )
+      .service(web::resource("/engine_category/{token}")
+          .route(web::post().to(change_media_file_engine_category_handler))
       )
       .service(web::resource("/file/{token}/update")
           .route(web::post().to(update_media_file_handler))

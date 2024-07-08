@@ -81,6 +81,10 @@ impl SessionUserRecord {
   pub fn get_strongly_typed_user_token(&self) -> UserToken {
     self.user_token.clone()
   }
+
+  pub fn is_mod(&self) -> bool {
+    self.can_ban_users
+  }
 }
 
 pub async fn get_user_session_by_token_pooled_connection(
