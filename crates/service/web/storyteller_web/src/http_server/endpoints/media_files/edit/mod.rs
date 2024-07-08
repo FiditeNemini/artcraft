@@ -1,3 +1,4 @@
+pub mod change_media_file_animation_type_handler;
 pub mod change_media_file_engine_category_handler;
 pub mod change_media_file_visibility_handler;
 pub mod rename_media_file_handler;

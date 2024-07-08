@@ -67,6 +67,7 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status_handl
 use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
+use crate::http_server::endpoints::media_files::edit::change_media_file_animation_type_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::*;
 use crate::http_server::endpoints::media_files::edit::rename_media_file_handler::*;
@@ -151,6 +152,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::inference_job::list_session_jobs_handler::list_session_jobs_handler,
     crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::media_files::delete::delete_media_file_handler::delete_media_file_handler,
+    crate::http_server::endpoints::media_files::edit::change_media_file_animation_type_handler::change_media_file_animation_type_handler,
     crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::change_media_file_engine_category_handler,
     crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::change_media_file_visibility_handler,
     crate::http_server::endpoints::media_files::edit::rename_media_file_handler::rename_media_file_handler,
@@ -284,6 +286,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchStatusDetailsResponse,
     BetaKeyItem,
     BookmarkRow,
+    ChangeMediaFileAnimationTypeError,
+    ChangeMediaFileAnimationTypePathInfo,
+    ChangeMediaFileAnimationTypeRequest,
     ChangeMediaFileEngineCategoryError,
     ChangeMediaFileEngineCategoryPathInfo,
     ChangeMediaFileEngineCategoryRequest,
