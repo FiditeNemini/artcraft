@@ -20,7 +20,7 @@ use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
-use mysql_queries::queries::media_files::get_media_file_for_inference::MediaFileForInference;
+use mysql_queries::queries::media_files::get::get_media_file_for_inference::MediaFileForInference;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};

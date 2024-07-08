@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
-use mysql_queries::queries::media_files::get_media_file_for_inference::MediaFileForInference;
+use mysql_queries::queries::media_files::get::get_media_file_for_inference::MediaFileForInference;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::MediaUploadRecordForInference;
 
 /// Dynamic payload for inference job media that also serves as an adapter

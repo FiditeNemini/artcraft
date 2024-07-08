@@ -8,7 +8,7 @@ use sqlx::{MySql, Pool};
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use errors::AnyhowResult;
-use mysql_queries::queries::media_files::delete_media_file::delete_media_file_as_mod;
+use mysql_queries::queries::media_files::delete::delete_media_file::delete_media_file_as_mod;
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 
 use crate::cli_args::Args;

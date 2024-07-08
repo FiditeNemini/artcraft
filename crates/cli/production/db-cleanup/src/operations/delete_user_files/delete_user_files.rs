@@ -6,7 +6,7 @@ use sqlx::{MySql, Pool};
 
 use enums::common::view_as::ViewAs;
 use errors::{anyhow, AnyhowResult};
-use mysql_queries::queries::media_files::delete_media_file::delete_media_file_as_mod;
+use mysql_queries::queries::media_files::delete::delete_media_file::delete_media_file_as_mod;
 use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 

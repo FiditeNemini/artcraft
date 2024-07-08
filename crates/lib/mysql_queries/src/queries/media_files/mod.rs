@@ -1,8 +1,6 @@
 pub mod create;
-pub mod delete_media_file;
+pub mod delete;
 pub mod edit;
 pub mod get;
-pub mod get_media_file_for_inference;
 pub mod list;
-pub mod rename_media_file;
 pub mod upsert;
