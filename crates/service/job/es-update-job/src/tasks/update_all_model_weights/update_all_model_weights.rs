@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::anyhow;
@@ -15,7 +16,7 @@ use mysql_queries::queries::model_weights::list::list_model_weight_tokens_update
 
 use crate::job_state::JobState;
 
-pub async fn main_loop(job_state: JobState) {
+pub async fn update_all_model_weights(job_state: Arc<JobState>) {
   // TODO(bt,2024-02-05): Write this cursor to Redis so job can resume without reindexing everything.
   let mut cursor = DateTime::UNIX_EPOCH;
 

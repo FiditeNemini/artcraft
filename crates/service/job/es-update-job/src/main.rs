@@ -16,6 +16,7 @@
 // Strict
 //#![forbid(warnings)]
 
+use std::sync::Arc;
 use elasticsearch::Elasticsearch;
 use elasticsearch::http::transport::Transport;
 use log::info;
@@ -28,10 +29,10 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
 use crate::job_state::{JobState, SleepConfigs};
-use crate::main_loop::main_loop;
-
+use crate::tasks::update_all_model_weights::update_all_model_weights::update_all_model_weights;
+use crate::tasks::update_engine_media_files::update_engine_media_files::update_engine_media_files;
 pub mod job_state;
-pub mod main_loop;
+pub mod tasks;
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
@@ -47,8 +48,7 @@ async fn main() -> AnyhowResult<()> {
   let mysql_pool = get_mysql_pool().await?;
   let elasticsearch = get_elasticsearch_client()?;
 
-
-  let job_state = JobState {
+  let job_state = Arc::new(JobState {
     mysql_pool,
     elasticsearch,
     sleep_config: SleepConfigs {
@@ -58,9 +58,25 @@ async fn main() -> AnyhowResult<()> {
       between_error_wait_millis: easyenv::get_env_num("BETWEEN_ERROR_WAIT_MILLIS", 10_000)?,
       between_no_updates_wait_millis: easyenv::get_env_num("BETWEEN_NO_UPDATES_WAIT_MILLIS", 20_000)?,
     },
-  };
+  });
 
-  let _r = main_loop(job_state).await;
+  info!("Starting thread to update all model weights...");
+
+  let job_state_1 = job_state.clone();
+
+  let handle_1 = tokio::task::spawn(async move {
+    let _r = update_all_model_weights(job_state_1).await;
+  });
+
+  info!("Starting thread to update engine media files...");
+
+  let job_state_2 = job_state.clone();
+
+  let handle_2 = tokio::task::spawn(async move {
+    let _r = update_engine_media_files(job_state_2).await;
+  });
+
+  futures::future::join_all([handle_1, handle_2]).await;
 
   Ok(())
 }
