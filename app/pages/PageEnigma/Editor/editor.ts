@@ -506,7 +506,7 @@ class Editor {
       this.last_selected,
       this.getAssetType.bind(this),
       this.setSelected.bind(this),
-      this.isMovable.bind(this)
+      this.isMovable.bind(this),
     );
 
     if (this.outliner_feature_flag) {
@@ -686,11 +686,19 @@ class Editor {
     loadingBarIsShowing.value = true;
   }
 
-  async updateLoad(progress: number, message: string) {
+  async updateLoad({
+    progress,
+    message,
+    label,
+  }: {
+    progress?: number;
+    message?: string;
+    label?: string;
+  }) {
     loadingBarData.value = {
-      ...loadingBarData.value,
-      progress: progress,
-      message: message,
+      label: label ?? loadingBarData.value.label,
+      progress: progress ?? loadingBarData.value.progress,
+      message: message ?? loadingBarData.value.message,
     };
   }
 
@@ -857,8 +865,8 @@ class Editor {
 
     const delta_time = this.clock.getDelta();
     this.cameraViewControls?.update(5 * delta_time);
-    this.activeScene.shader_objects.forEach(shader => {
-      shader.material.uniforms[ 'time' ].value += 0.5 * delta_time;
+    this.activeScene.shader_objects.forEach((shader) => {
+      shader.material.uniforms["time"].value += 0.5 * delta_time;
     });
 
     if (this.cameraViewControls && this.camera_person_mode) {
@@ -982,7 +990,12 @@ class Editor {
   }
 
   togglePlayback() {
-    this.updateLoad(25, "Starting Processing");
+    this.updateLoad({
+      progress: 25,
+      label: "Starting Processing",
+      message:
+        "Please stay on this screen while your video is being processed.",
+    });
     if (this.rawRenderer) {
       this.startRenderWidth = this.rawRenderer.domElement.width;
       this.startRenderHeight = this.rawRenderer.domElement.height;

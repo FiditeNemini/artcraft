@@ -1,7 +1,6 @@
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
-import { LoadingSpinner } from "..";
-import { loadingBarData } from "~/signals";
+import { LoadingSpinner } from "~/components";
 
 interface LoadingBarProps {
   id?: string;
@@ -11,6 +10,7 @@ interface LoadingBarProps {
   progressClassName?: string;
   variant?: string;
   show?: boolean;
+  hasSpinner?: boolean;
   progressData: {
     progress: number;
     label?: string;
@@ -23,6 +23,7 @@ export const LoadingBar = ({
   progressBackgroundClassName: propsProgressBackgroundClassName,
   progressClassName: propsProgressClassName,
   progressData,
+  hasSpinner,
   variant = "primary",
   show = true,
   ...rest
@@ -70,13 +71,11 @@ export const LoadingBar = ({
       {...rest}
     >
       <div className={innerWrapperClassName}>
-        {progressData.label && <label>{progressData.label}</label>}
-
         <div className="flex flex-col items-center gap-3">
           <div className="flex items-center gap-2.5">
-            <LoadingSpinner className="h-5" />
-            {progressData.message && (
-              <p className="text-lg font-medium">{progressData.message}</p>
+            {hasSpinner && <LoadingSpinner className="h-5" />}
+            {progressData.label && (
+              <label className="text-lg">{progressData.label}</label>
             )}
           </div>
         </div>
@@ -88,9 +87,9 @@ export const LoadingBar = ({
           />
         </div>
 
-        {loadingBarData.value.message?.includes("Processing") && (
+        {progressData.message && (
           <p className="text-center text-sm opacity-75">
-            Please stay on this screen while your video is being processed.
+            {progressData.message}
           </p>
         )}
       </div>

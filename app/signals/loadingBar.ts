@@ -6,7 +6,7 @@ export const loadingBarData = signal<{
   message: string;
   progress: number;
 }>({
-  label: "",
+  label: "Loading Editor Engine... 🦊",
   progress: 5,
-  message: "Loading Editor Engine... 🦊",
+  message: "",
 });
