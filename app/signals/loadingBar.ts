@@ -8,5 +8,5 @@ export const loadingBarData = signal<{
 }>({
   label: "",
   progress: 5,
-  message: "Loading Editor Engine 🦊",
+  message: "Loading Editor Engine... 🦊",
 });

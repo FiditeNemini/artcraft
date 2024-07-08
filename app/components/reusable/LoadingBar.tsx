@@ -1,5 +1,7 @@
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
+import { LoadingSpinner } from "..";
+import { loadingBarData } from "~/signals";
 
 interface LoadingBarProps {
   id?: string;
@@ -42,7 +44,7 @@ export const LoadingBar = ({
     propsWrapperClassName,
   );
   const innerWrapperClassName = twMerge(
-    "w-full h-full p-4 gap-4 m-auto flex flex-col justify-center items-center",
+    "w-full h-full p-4 gap-6 m-auto flex flex-col justify-center items-center",
     propsInnerWrapperClassName,
   );
   const progressBackgroundClassName = twMerge(
@@ -69,13 +71,28 @@ export const LoadingBar = ({
     >
       <div className={innerWrapperClassName}>
         {progressData.label && <label>{progressData.label}</label>}
+
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <LoadingSpinner className="h-5" />
+            {progressData.message && (
+              <p className="text-lg font-medium">{progressData.message}</p>
+            )}
+          </div>
+        </div>
+
         <div className={progressBackgroundClassName}>
           <div
             className={progressClassName}
             style={{ width: progressData.progress + "%" }}
           />
         </div>
-        {progressData.message && <p>{progressData.message}</p>}
+
+        {loadingBarData.value.message?.includes("Processing") && (
+          <p className="text-center text-sm opacity-75">
+            Please stay on this screen while your video is being processed.
+          </p>
+        )}
       </div>
     </Transition>
   );

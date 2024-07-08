@@ -192,7 +192,7 @@ export class VideoGeneration {
     const ffmpeg = createFFmpeg({ log: false });
     await ffmpeg.load();
 
-    this.editor.updateLoad(50, "Processing ...");
+    this.editor.updateLoad(50, "Processing...");
 
     // Write the Uint8Array to the FFmpeg file system
     //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
