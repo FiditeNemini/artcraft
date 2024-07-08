@@ -4,3 +4,15 @@ export enum AUDIO_FILE_TYPE {
   FLAC = "FLAC",
   OGG = "OGG",
 }
+
+export enum IMAGE_FILE_TYPE {
+  PNG = "PNG",
+  JPG = "JPG",
+  JPEG = "JPEG",
+  GIF = "GIF",
+}
+
+export enum OBJECT_FILE_TYPE {
+  GLB = "GLB",
+  FBX = "FBX",
+}

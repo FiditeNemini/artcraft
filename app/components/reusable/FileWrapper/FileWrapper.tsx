@@ -1,6 +1,6 @@
 import React, { ReactNode, useId, useRef, useState } from "react";
 import { AssetType } from "~/enums";
-import { UploadModal } from "~/components";
+import { UploadModalObject } from "~/components";
 import { twMerge } from "tailwind-merge";
 
 interface Props {
@@ -83,7 +83,7 @@ export function FileWrapper({
         {...rest}
       />
       {render(id)}
-      <UploadModal
+      <UploadModalObject
         closeModal={closeModal}
         file={file!}
         isOpen={modalOpen}

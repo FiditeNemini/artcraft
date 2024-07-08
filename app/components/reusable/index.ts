@@ -25,6 +25,8 @@ export * from "./Textarea";
 export * from "./Tooltip";
 export * from "./TransitionDialogue"; //need to decouple hotkey signal
 export * from "./Typography";
+export * from "./UploadModal";
+export * from "./UploadModal3DPreview";
 export * from "./WaveformPlayer";
 
 //TODO: need to rewrite because it's against tailwind

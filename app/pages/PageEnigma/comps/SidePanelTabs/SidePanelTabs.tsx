@@ -1,20 +1,27 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { selectedTab, sidePanelHeight } from "~/pages/PageEnigma/signals";
-import { tabList } from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
-import { useMouseEventsSidePanel } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsSidePanel";
+import { sidePanelHeight } from "~/pages/PageEnigma/signals";
 
-export const SidePanelTabs = () => {
+import { useMouseEventsSidePanel } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsSidePanel";
+import { TabItem } from "../SidePanel/tabList";
+
+export const SidePanelTabs = ({
+  selectedTab,
+  tabs,
+}: {
+  selectedTab: TabItem;
+  tabs: TabItem[];
+}) => {
   useSignals();
   const { onPointerDown } = useMouseEventsSidePanel();
 
   return (
     <>
       <div style={{ height: sidePanelHeight.value, width: "100%" }}>
-        {tabList.map((tab) => (
+        {tabs.map((tab, index) => (
           <div
-            key={tab.value}
+            key={index}
             className={
-              tab.value === selectedTab.value?.value
+              tab.title === selectedTab.title
                 ? "flex h-full flex-col gap-3.5 overflow-y-auto"
                 : "hidden"
             }

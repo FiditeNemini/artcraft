@@ -6,5 +6,4 @@ export enum AssetType {
   EXPRESSION = "expression",
   OBJECT = "object",
   SHAPE = "shape",
-  STYLE = "style", // TODO Remove
 }
