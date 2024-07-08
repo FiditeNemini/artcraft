@@ -28,7 +28,6 @@ import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
 import { outlinerState } from "../signals";
-import { CreationSceneItem } from "./Commands";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -157,7 +156,7 @@ export class TimeLine {
       case toEngineActions.ADD_CHARACTER: {
         const newObject = await this.addCharacter(data.data as MediaItem);
         if (newObject)
-          this.queueNewObjectMessage(newObject, data.data as MediaItem);
+          this.queueNewObjectMessage(newObject, data.data as MediaItem, AssetType.CHARACTER);
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -167,7 +166,7 @@ export class TimeLine {
       case toEngineActions.ADD_OBJECT: {
         const newObject = await this.addObject(data.data as MediaItem);
         if (newObject)
-          this.queueNewObjectMessage(newObject, data.data as MediaItem);
+          this.queueNewObjectMessage(newObject, data.data as MediaItem, AssetType.OBJECT);
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -177,8 +176,8 @@ export class TimeLine {
       }
       case toEngineActions.ADD_SHAPE: {
         const newShape = await this.addShape(data.data as MediaItem);
-        this.queueNewObjectMessage(newShape, data.data as MediaItem);
-        let result = this.editorEngine.sceneManager?.render_outliner(
+        this.queueNewObjectMessage(newShape, data.data as MediaItem, AssetType.SHAPE);
+        const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
         if (result) outlinerState.items.value = result.items;
@@ -267,13 +266,14 @@ export class TimeLine {
   queueNewObjectMessage(
     item: THREE.Object3D<THREE.Object3DEventMap>,
     data: MediaItem,
+    asset_type: AssetType.OBJECT | AssetType.CHARACTER | AssetType.SHAPE
   ) {
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.ADD_OBJECT,
       data: {
         media_id: data.media_id,
-        type: AssetType.OBJECT,
+        type: asset_type,
         name: item.name,
         object_uuid: item.uuid,
         version: 1,
@@ -545,7 +545,6 @@ export class TimeLine {
       keyframe_uuid,
       keyframe_pos as Vector3,
       keyframe_rot as Vector3,
-      keyframe_scl as Vector3,
     );
     this.checkEditorCanPlay();
   }
@@ -753,7 +752,7 @@ export class TimeLine {
             ].play(object);
             this.lipSync_engine.clips[
               element.object_uuid + element.media_id
-            ].step(this.scrubber_frame_position, element.offset, isRendering);
+            ].step(this.scrubber_frame_position, element.offset);
           }
         } else if (element.type === ClipType.ANIMATION) {
           if (object) {
