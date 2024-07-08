@@ -11,7 +11,9 @@ function PosthogInit() {
 
     const apiKey = data.REACT_APP_PUBLIC_POSTHOG_KEY as string;
     posthog.init(apiKey, {
-      api_host: data.DEPLOY_PRIME_URL + "/ingest" as string,
+      //HACK: This is the default host from Netlify, but need to figure out why it isn't working on prod.
+      // api_host: data.DEPLOY_PRIME_URL + "/ingest" as string,
+      api_host: "https://studio.storyteller.ai/ingest" as string,
       ui_host: data.REACT_APP_PUBLIC_POSTHOG_UI as string,
     });
   }, []);
