@@ -43,10 +43,15 @@ pub async fn create_dimensional_media_file_documents(
       maybe_filter_engine_categories: Some(&HashSet::from_iter(vec![
         MediaFileEngineCategory::Animation,
         MediaFileEngineCategory::Character,
+        MediaFileEngineCategory::Creature,
         MediaFileEngineCategory::Expression,
         MediaFileEngineCategory::ImagePlane,
+        MediaFileEngineCategory::Location,
         MediaFileEngineCategory::Object,
         MediaFileEngineCategory::Scene,
+        MediaFileEngineCategory::SetDressing,
+        MediaFileEngineCategory::Skybox,
+        MediaFileEngineCategory::VideoPlane,
       ])),
       maybe_filter_media_types: Some(&HashSet::from_iter(vec![
         // Engine types
