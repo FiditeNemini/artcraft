@@ -11,6 +11,7 @@ import { resetSceneGenerationMetadata } from "~/pages/PageEnigma/signals";
 import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { useContext, useMemo } from "react";
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 
 export enum WizardType {
   BACKGROUND = "background",
@@ -94,7 +95,7 @@ export const Wizard = () => {
         onPrior: "new_scene",
       },
       remix: {
-        label: "Choose a remix scene",
+        label: "Choose a Scene to Remix",
         type: WizardType.REMIX,
         nextTitle: "Remix Scene",
         showNext: () => !!selectedRemixCard.value,
@@ -105,6 +106,9 @@ export const Wizard = () => {
             editorEngine.loadScene(selectedRemixCard.value?.token);
             showWizard.value = "end";
           }
+        },
+        onBack: () => {
+          showWizard.value = "initial";
         },
         width: 1152,
       },
@@ -159,6 +163,13 @@ export const Wizard = () => {
       onClose={() => (showWizard.value = "end")}
       title={currentStep.value.label}
       width={currentStep.value.width ?? 672}
+      titleIcon={showWizard.value === "remix" ? faChevronLeft : undefined}
+      titleIconClassName="text-white/60 hover:text-white/80 transition-colors duration-150"
+      onTitleIconClick={
+        showWizard.value === "remix"
+          ? () => (showWizard.value = "initial")
+          : undefined
+      }
     >
       <WizardStep />
     </TransitionDialogue>

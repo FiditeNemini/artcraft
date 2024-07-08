@@ -14,16 +14,14 @@ export const MainPage = () => {
 
   return (
     <div>
-      <div className="font-bold">How would you like to start?</div>
-      <div className="flex justify-between">
+      <div className="mb-3 font-bold">How would you like to start?</div>
+      <div className="flex gap-5">
         {(step?.options ?? []).map((option) => (
           <Fragment key={option.value}>
             {option.label === "Remix" && (
               <button
                 className={twMerge(
-                  "relative flex h-[249px] w-[262px] bg-brand-secondary",
-                  "flex-col items-center rounded-lg px-2",
-                  "border-2 border-gray-400 pt-[58px]",
+                  "group relative flex h-[249px] w-full flex-col items-center rounded-lg border-2 border-white/5 bg-brand-secondary/50 px-2 pt-[58px] transition-all duration-150 hover:border-brand-primary hover:bg-brand-secondary",
                 )}
                 onClick={() => (showWizard.value = option.value as string)}
               >
@@ -45,11 +43,11 @@ export const MainPage = () => {
                     fill="white"
                   />
                 </svg>
-                <div className="mt-4">Remix</div>
-                <div className="mt-[47px] text-xs text-white/70">
+                <div className="mt-4 text-xl font-bold">Remix</div>
+                <div className="mt-4 px-6 text-sm text-white/70">
                   Create a scene from an existing scene
                 </div>
-                <div className="absolute bottom-[8px] right-[8px] text-white">
+                <div className="absolute bottom-[8px] right-[12px] text-lg text-white opacity-50 group-hover:opacity-100">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </div>
               </button>
@@ -58,9 +56,7 @@ export const MainPage = () => {
             {option.label === "Blank Scene" && (
               <button
                 className={twMerge(
-                  "relative flex h-[249px] w-[262px] bg-brand-secondary",
-                  "flex-col items-center rounded-lg px-2",
-                  "border-2 border-gray-400 pt-[58px]",
+                  "group relative flex h-[249px] w-full flex-col items-center rounded-lg border-2 border-white/5 bg-brand-secondary/50 px-2 pt-[58px] transition-all duration-150 hover:border-brand-primary hover:bg-brand-secondary",
                 )}
                 onClick={() => (showWizard.value = option.value as string)}
               >
@@ -76,11 +72,11 @@ export const MainPage = () => {
                     fill="white"
                   />
                 </svg>
-                <div className="mt-4">Blank Scene</div>
-                <div className="mt-[47px] text-xs text-white/70">
-                  Step by step guided scene creation
+                <div className="mt-4 text-xl font-bold">Blank Scene</div>
+                <div className="mt-4 px-6 text-sm text-white/70">
+                  If you’re already familiar with Storyteller Studio.
                 </div>
-                <div className="absolute bottom-[8px] right-[8px] text-white">
+                <div className="absolute bottom-[8px] right-[12px] text-lg text-white opacity-50 group-hover:opacity-100">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </div>
               </button>

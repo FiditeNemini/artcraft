@@ -42,7 +42,7 @@ export const WizardStep = () => {
   return (
     <div>
       <Component />
-      <div className="mt-4 flex justify-end gap-4">
+      <div className="flex justify-end gap-2">
         {(!step.showPrior || step.showPrior()) && (
           <Button
             variant="action"
