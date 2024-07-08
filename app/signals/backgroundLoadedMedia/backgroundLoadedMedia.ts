@@ -1,8 +1,7 @@
 import { signal } from "@preact/signals-core";
 import deepEqual from "deep-equal";
 
-import { MediaInfo } from "~/pages/PageEnigma/models/movies";
-import { AudioMediaItem } from "~/pages/PageEnigma/models";
+import { AudioMediaItem, MediaInfo } from "~/pages/PageEnigma/models";
 import { remapResponseToAudioMediaItems } from "./utilities";
 
 // Signals and signal functions for background loading User's Movies
