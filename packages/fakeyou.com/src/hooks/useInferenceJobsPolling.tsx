@@ -76,7 +76,7 @@ export default function useInferenceJobsPolling({
   const [keepAlive, keepAliveSet] = useState(!!user);
 
   // if this interval value is state set by the server response, useInterval will adjust accordingly
-  const interval = 2500;
+  const interval = 1500;
 
   // this is to acccomodate async session loading
   useEffect(() => {
@@ -105,7 +105,10 @@ export default function useInferenceJobsPolling({
   ) => {
     inferenceJobsSet(updatedJobs);
     byCategorySet(categoryMap);
-    if (!updatedJobs.some(job => jobStateCanChange(job.jobState))) {
+    if (
+      updatedJobs.length &&
+      !updatedJobs.some(job => jobStateCanChange(job.jobState))
+    ) {
       keepAliveSet(false);
     }
   };
