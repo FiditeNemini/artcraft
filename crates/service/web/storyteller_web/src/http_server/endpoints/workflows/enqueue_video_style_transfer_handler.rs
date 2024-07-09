@@ -219,6 +219,17 @@ pub async fn enqueue_video_style_transfer_handler(
     request: web::Json<EnqueueVideoStyleTransferRequest>,
     server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueVideoStyleTransferError>
 {
+    // ==================== VALIDATION ==================== //
+
+    match request.frame_skip {
+        None | Some(1) | Some(2) => {} // Allowed
+        _ => {
+            return Err(EnqueueVideoStyleTransferError::BadInput("Invalid frame skip value".to_string()));
+        }
+    }
+
+    // ==================== DB ==================== //
+
     let mut mysql_connection = server_state.mysql_pool
         .acquire()
         .await
