@@ -54,7 +54,7 @@ use crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handl
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 use crate::http_server::endpoints::service::status_alert_handler::status_alert_handler;
-use crate::http_server::endpoints::stats::get_unified_queue_stats::get_unified_queue_stats_handler;
+use crate::http_server::endpoints::stats::get_unified_queue_stats_handler::get_unified_queue_stats_handler;
 use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_downloads_handler;
 use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
 use crate::http_server::endpoints::stubs::app_plans::get_app_plans_handler;

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use actix_web::{http::StatusCode, HttpRequest, HttpResponse, ResponseError, web};
 use chrono::NaiveDateTime;
 use log::{debug, error, warn};
-
+use utoipa::ToSchema;
 use mysql_queries::queries::stats::get_unified_queue_stats::get_unified_queue_stats;
 use redis_common::redis_cache_keys::RedisCacheKeys;
 
@@ -11,7 +11,7 @@ use crate::http_server::endpoints::stats::result_transformer::{CacheableQueueSta
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct GetUnifiedQueueStatsSuccessResponse {
   pub success: bool,
   pub cache_time: NaiveDateTime,
@@ -24,12 +24,12 @@ pub struct GetUnifiedQueueStatsSuccessResponse {
   pub legacy_tts: LegacyQueueDetails,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct LegacyQueueDetails {
   pub pending_job_count: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ModernInferenceQueueStats {
   pub total_pending_job_count: u64,
 
@@ -39,7 +39,7 @@ pub struct ModernInferenceQueueStats {
   pub by_queue: ByQueueStats,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ByQueueStats {
   pub pending_face_animation_jobs: u64,
   pub pending_rvc_jobs: u64,
@@ -49,7 +49,7 @@ pub struct ByQueueStats {
   pub pending_stable_diffusion: u64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum GetUnifiedQueueStatsError {
   ServerError,
 }
@@ -77,6 +77,16 @@ impl std::fmt::Display for GetUnifiedQueueStatsError {
   }
 }
 
+/// Get queue stats for most inference jobs (tts, voice conversion, comfy, etc.)
+#[utoipa::path(
+  get,
+  tag = "Stats",
+  path = "/v1/stats/queues",
+  responses(
+    (status = 200, description = "Success", body = GetUnifiedQueueStatsSuccessResponse),
+    (status = 500, description = "Server error", body = GetUnifiedQueueStatsError),
+  ),
+)]
 pub async fn get_unified_queue_stats_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
@@ -204,7 +214,7 @@ pub async fn get_unified_queue_stats_handler(
         pending_stable_diffusion: cacheable_stats_result.queues.stable_diffusion,
       }
     },
-    legacy_tts: LegacyQueueDetails { 
+    legacy_tts: LegacyQueueDetails {
       pending_job_count: cacheable_stats_result.queues.legacy_tts,
     },
   })
