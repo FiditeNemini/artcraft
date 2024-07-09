@@ -114,6 +114,8 @@ pub async fn upload_new_engine_asset_media_file_handler(
   MultipartForm(mut form): MultipartForm<UploadNewEngineAssetFileForm>,
 ) -> Result<HttpResponse, MediaFileUploadError> {
 
+  validate_request(&form)?;
+
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
@@ -246,6 +248,20 @@ pub async fn upload_new_engine_asset_media_file_handler(
       .body(body));
 }
 
+fn validate_request(form: &UploadNewEngineAssetFileForm) -> Result<(), MediaFileUploadError> {
+  let duration_is_zeroish = form.maybe_duration_millis.is_none() ||
+      form.maybe_duration_millis
+          .as_ref()
+          .map(|duration| duration.0 == 0)
+          .unwrap_or(false);
+
+  if duration_is_zeroish && form.engine_category.0 == MediaFileEngineCategory::Animation {
+    return Err(MediaFileUploadError::BadInput(
+      "duration_millis must be supplied for animations".to_string()));
+  }
+
+  Ok(())
+}
 
 struct FileInfo {
   // System metadata
