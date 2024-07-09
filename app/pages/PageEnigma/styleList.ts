@@ -2,19 +2,44 @@ import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
 
 export const styleList = [
   {
-    label: "Anime 2.5D",
-    type: ArtStyle.Anime2_5D,
-    image: "/resources/styles/gif/2_5d_anime.gif",
-  },
-  {
     label: "Anime Flat",
     type: ArtStyle.Anime2DFlat,
     image: "/resources/styles/gif/2d_flat_anime.gif",
   },
   {
+    label: "Realistic 1",
+    type: ArtStyle.Realistic1,
+    image: "/resources/styles/gif/realistic_1.gif",
+  },
+  {
+    label: "Bloom Lighting",
+    type: ArtStyle.Bloom,
+    image: "/resources/styles/gif/bloom_lighting.gif",
+  },
+  {
     label: "Cartoon 3D",
     type: ArtStyle.Cartoon3D,
     image: "/resources/styles/gif/3d_cartoon.gif",
+  },
+  {
+    label: "Fantasy 2.5D",
+    type: ArtStyle.Anime2_5D,
+    image: "/resources/styles/gif/2_5d_anime.gif",
+  },
+  {
+    label: "Anime Standard",
+    type: ArtStyle.AnimeStandard,
+    image: "/resources/styles/gif/anime.gif",
+  },
+  {
+    label: "Carnage",
+    type: ArtStyle.Carnage,
+    image: "/resources/styles/gif/carnage.gif",
+  },
+  {
+    label: "Realistic Cyberpunk",
+    type: ArtStyle.RealisticCyberpunk,
+    image: "/resources/styles/gif/realistic_cyberpunk.gif",
   },
   {
     label: "Comic Book",
@@ -61,11 +86,7 @@ export const styleList = [
     type: ArtStyle.PopArt,
     image: "/resources/styles/gif/pop_art.gif",
   },
-  {
-    label: "Realistic 1",
-    type: ArtStyle.Realistic1,
-    image: "/resources/styles/gif/realistic_1.gif",
-  },
+
   {
     label: "Realistic 2",
     type: ArtStyle.Realistic2,
@@ -76,11 +97,7 @@ export const styleList = [
     type: ArtStyle.AnimeRetroNeon,
     image: "/resources/styles/gif/anime_retro_neon.gif",
   },
-  {
-    label: "Anime Standard",
-    type: ArtStyle.AnimeStandard,
-    image: "/resources/styles/gif/anime.gif",
-  },
+
   {
     label: "H.R. Giger",
     type: ArtStyle.HRGiger,
@@ -91,21 +108,13 @@ export const styleList = [
     type: ArtStyle.Simpsons,
     image: "/resources/styles/gif/simpsons.gif",
   },
-  {
-    label: "Carnage",
-    type: ArtStyle.Carnage,
-    image: "/resources/styles/gif/carnage.gif",
-  },
+
   {
     label: "Anime Pastel Cute",
     type: ArtStyle.PastelCuteAnime,
     image: "/resources/styles/gif/pastel_cute_anime.gif",
   },
-  {
-    label: "Bloom Lighting",
-    type: ArtStyle.Bloom,
-    image: "/resources/styles/gif/bloom_lighting.gif",
-  },
+
   {
     label: "Horror 2.5D",
     type: ArtStyle.Horror2_5D,
@@ -160,10 +169,5 @@ export const styleList = [
     label: "Realistic Matrix",
     type: ArtStyle.RealisticMatrix,
     image: "/resources/styles/gif/realistic_matrix.gif",
-  },
-  {
-    label: "Realistic Cyberpunk",
-    type: ArtStyle.RealisticCyberpunk,
-    image: "/resources/styles/gif/realistic_cyberpunk.gif",
   },
 ];
