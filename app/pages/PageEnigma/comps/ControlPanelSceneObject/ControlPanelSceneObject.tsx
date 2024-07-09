@@ -5,15 +5,13 @@ import {
   faChevronDown,
   faChevronUp,
   faCube,
-  faLock,
-  faLockOpen,
   faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
   objectPanel as objectPanelSignals,
-  sidePanelHeight,
+  timelineHeight,
 } from "../../signals";
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
@@ -28,6 +26,7 @@ import { EditorStates } from "~/pages/PageEnigma/enums";
 import { sanitize } from "./utils/sanitize";
 import { objectMismatch } from "~/pages/PageEnigma/comps/ControlPanelSceneObject/utils/objectMismatch";
 import { XYZ } from "~/pages/PageEnigma/datastructures/common";
+import { pageHeight } from "~/signals";
 
 // TODO this will be useful later to fix the bug on leading zeros
 // const formatNumber = (input: string): number => {
@@ -132,11 +131,6 @@ export const ControlPanelSceneObject = () => {
       return !/^-?[0-9]*(.[0-9]*)?$/.test(value);
     });
 
-  const toggleLock = () => {
-    setLocked((lockState: boolean) => !lockState);
-    editorEngine?.lockUnlockObject(editorEngine?.selected?.uuid || "");
-  };
-
   const handlePositionChange = (xyz: Record<string, string>) => {
     if (isInvalid(xyz)) {
       setLocalPosition(xyz);
@@ -214,7 +208,7 @@ export const ControlPanelSceneObject = () => {
   };
 
   const getScale = () => {
-    const height = sidePanelHeight.value;
+    const height = pageHeight.value - timelineHeight.value - 64;
     return height < 620 ? height / 620 : 1;
   };
 
@@ -236,7 +230,8 @@ export const ControlPanelSceneObject = () => {
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
           <p className="max-w-36 truncate font-semibold">
-            {currentSceneObject.object_name.charAt(0).toUpperCase() + currentSceneObject.object_name.slice(1)}
+            {currentSceneObject.object_name.charAt(0).toUpperCase() +
+              currentSceneObject.object_name.slice(1)}
           </p>
         </div>
         <FontAwesomeIcon
