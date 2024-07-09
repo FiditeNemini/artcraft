@@ -26,6 +26,9 @@ export const SidePanelMenu = ({
 }) => {
   useSignals();
   const showSetsTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SETS_TAB);
+  const showImagePlaneTab = usePosthogFeatureFlag(
+    FeatureFlags.SHOW_IMAGEPLANE_TAB,
+  );
   return (
     <div
       className={twMerge(
@@ -40,6 +43,9 @@ export const SidePanelMenu = ({
       <div className="flex w-full flex-col gap-2">
         {(tabs ?? []).map((tab) => {
           if (tab.title === TabTitles.SET_OBJECTS && !showSetsTab) {
+            return;
+          }
+          if (tab.title === TabTitles.IMAGE_PLANE && !showImagePlaneTab) {
             return;
           }
           return (

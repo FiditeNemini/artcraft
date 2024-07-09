@@ -120,7 +120,7 @@ export const ObjectsTab = () => {
     const mediaFilesApi = new MediaFilesApi();
     const response = await mediaFilesApi.SearchFeaturedMediaFiles({
       search_term: searchTerm,
-      filter_engine_categories: [FilterEngineCategories.OBJECT],
+      filter_engine_categories: [FilterEngineCategories.IMAGE_PLANE],
     });
 
     if (response.success && response.data) {

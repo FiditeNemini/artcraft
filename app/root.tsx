@@ -23,9 +23,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 import { pageHeight, pageWidth } from "~/signals";
 
-import { Toaster } from "~/components";
 import { showWizard } from "~/pages/PageEnigma/Wizard/signals/wizard";
-
 
 config.autoAddCss = false; /* eslint-disable import/first */
 

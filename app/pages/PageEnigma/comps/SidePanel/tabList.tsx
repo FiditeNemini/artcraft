@@ -8,6 +8,7 @@ import {
   faCube,
   faVolume,
   faBrush,
+  faPresentationScreen,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import { TabTitles } from "~/enums";
@@ -18,6 +19,7 @@ import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/Styl
 import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
 import { CharactersTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CharactersTab";
 import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
+import { ImagePlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ImagePlanesTab";
 
 export interface TabItem {
   icon: FontAwesomeIconProps["icon"];
@@ -50,6 +52,11 @@ export const tabList = [
     icon: faCube,
     title: TabTitles.OBJECTS,
     component: <ObjectsTab />,
+  },
+  {
+    icon: faPresentationScreen,
+    title: TabTitles.IMAGE_PLANE,
+    component: <ImagePlanesTab />,
   },
   {
     icon: faVolume,
