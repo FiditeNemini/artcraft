@@ -36,6 +36,9 @@ pub struct VideoPaths {
   /// This is the fourth output we generate.
   /// We'll want to upload this as a result, if available.
   pub watermarked_video_path: Option<PathBuf>,
+
+  // Nasty hack to reuse this elsewhere.
+  pub comfy_input_dir: PathBuf,
 }
 
 
@@ -62,6 +65,7 @@ impl VideoPaths {
       comfy_output_video_path,
       audio_restored_video_path: None,
       watermarked_video_path: None,
+      comfy_input_dir: input_dir,
     }
   }
 

@@ -17,6 +17,11 @@ pub struct JobArgs<'a> {
     pub maybe_json_modifications: &'a Option<HashMap<String, NewValue>>,
     pub maybe_lora_model: &'a Option<ModelWeightToken>,
     pub maybe_input_file: &'a Option<MediaFileToken>,
+
+    // Secondary videos (optional) that aid processing
+    pub maybe_depth_input_file: Option<&'a MediaFileToken>,
+    pub maybe_normal_input_file: Option<&'a MediaFileToken>,
+    pub maybe_outline_input_file: Option<&'a MediaFileToken>,
 }
 
 pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -54,7 +59,6 @@ pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, Pr
         }
     };
 
-
     // check if job is legacy
     let is_legacy = inference_args.maybe_json_modifications.is_some();
 
@@ -68,12 +72,14 @@ pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, Pr
         }
     };
 
-
     Ok(JobArgs {
         workflow_source: &inference_args.maybe_workflow_config,
         output_path,
         maybe_lora_model: &inference_args.maybe_lora_model,
         maybe_json_modifications: &inference_args.maybe_json_modifications,
         maybe_input_file: &inference_args.maybe_input_file,
+        maybe_depth_input_file: inference_args.maybe_input_depth_file.as_ref(),
+        maybe_normal_input_file: inference_args.maybe_input_normal_file.as_ref(),
+        maybe_outline_input_file: inference_args.maybe_input_outline_file.as_ref(),
     })
 }

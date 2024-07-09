@@ -47,7 +47,7 @@ use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProc
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_video::{download_input_video, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
@@ -238,7 +238,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== DOWNLOAD VIDEO ==================== //
 
-    let download_video = download_input_video(DownloadInputVideoArgs {
+    let download_video = download_input_videos(DownloadInputVideoArgs {
         job_args: &job_args,
         videos: &videos,
         mysql_pool: &deps.db.mysql_pool,

@@ -16,7 +16,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct MediaFilesByTokensRecord {
   pub token: MediaFileToken,
 
