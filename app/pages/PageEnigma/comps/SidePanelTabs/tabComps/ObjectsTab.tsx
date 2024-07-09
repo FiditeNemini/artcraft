@@ -1,21 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import { useSignals } from "@preact/signals-react/runtime";
-
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
-
 import {
   AssetFilterOption,
   AssetType,
   FeatureFlags,
   FilterEngineCategories,
-  ToastTypes,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
-import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
 import { shapeItems } from "~/pages/PageEnigma/signals";
-
-import { BucketConfig } from "~/api/BucketConfig";
 
 import {
   TabTitle,
@@ -28,8 +22,14 @@ import {
   SearchFilter,
   Pagination,
 } from "~/components";
-import { MediaFilesApi } from "~/Classes/ApiManager";
-import { addToast } from "~/signals";
+import {
+  fetchFeaturedMediaItems,
+  fetchFeaturedMediaItemsSearchResults,
+  FetchMediaItemStates,
+  fetchUserMediaItems,
+  fetchUserMediaItemsSearchResults,
+  isAnyStatusFetching,
+} from "../utilities";
 
 export const ObjectsTab = () => {
   useSignals();
@@ -39,209 +39,128 @@ export const ObjectsTab = () => {
   );
 
   const [searchTermFeatured, setSearchTermFeatured] = useState("");
-  const [searchTermMine, setSearchTermMine] = useState("");
-  const [filteredSearchObjectsFeatured, setFilteredSearchObjectsFeatured] =
-    useState<MediaItem[]>([]);
-  const [filteredSearchObjectsMine, setFilteredSearchObjectsMine] = useState<
-    MediaItem[]
-  >([]);
-  const [userObjects, setUserObjects] = useState<MediaItem[] | undefined>(
-    undefined,
-  );
-  const [featuredObjects, setFeaturedObjects] = useState<
-    MediaItem[] | undefined
-  >(undefined);
+  const [searchTermUser, setSearchTermUser] = useState("");
+
+  const [{ mediaItems: userObjects, status: userFetchStatus }, setUserFetch] =
+    useState<FetchMediaItemStates>({
+      mediaItems: undefined,
+      status: FetchStatus.READY,
+    });
+  const [
+    { mediaItems: featuredObjects, status: featuredFetchStatus },
+    setFeaturedFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+  const [
+    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
+    setFeaturedSearchFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+  const [
+    { mediaItems: userSearchResults, status: userSearchFetchStatus },
+    setUserSearchFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
   const [currentPage, setCurrentPage] = useState<number>(0);
 
-  const filteredObjects =
+  const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
       ? [...shapeItems.value, ...(featuredObjects ?? [])]
       : userObjects ?? [];
 
   const pageSize = 21;
-  const totalPages = Math.ceil(filteredObjects.length / pageSize);
+  const totalPages = Math.ceil(displayedItems.length / pageSize);
 
-  const [fetchStatuses, setFetchStatuses] = useState({
-    userObjectsFetch: FetchStatus.READY,
-    featuredObjectsFetch: FetchStatus.READY,
-    searchFetch: FetchStatus.READY,
-  });
-  const isFetching =
-    fetchStatuses.userObjectsFetch === FetchStatus.READY ||
-    fetchStatuses.userObjectsFetch === FetchStatus.IN_PROGRESS ||
-    fetchStatuses.featuredObjectsFetch === FetchStatus.READY ||
-    fetchStatuses.featuredObjectsFetch === FetchStatus.IN_PROGRESS ||
-    fetchStatuses.searchFetch === FetchStatus.READY ||
-    fetchStatuses.searchFetch === FetchStatus.IN_PROGRESS;
+  const isFetching = isAnyStatusFetching([
+    userFetchStatus,
+    featuredFetchStatus,
+    featuredSearchFetchStatus,
+    userSearchFetchStatus,
+  ]);
 
-  const responseMapping = (data: MediaInfo[]) => {
-    return data.map((item) => {
-      const bucketConfig = new BucketConfig();
-      const itemThumb = bucketConfig.getCdnUrl(
-        item.cover_image.maybe_cover_image_public_bucket_path ?? "",
-        600,
-        100,
-      );
-      return {
-        colorIndex: item.cover_image.default_cover.color_index,
-        imageIndex: item.cover_image.default_cover.image_index,
-        media_id: item.token,
-        name: item.maybe_title ?? "Unknown",
-        type: AssetType.OBJECT,
-        media_type: item.media_type,
-        version: 1,
-        ...(item.cover_image.maybe_cover_image_public_bucket_path
-          ? {
-              thumbnail: itemThumb,
-            }
-          : {}),
-      };
-    });
-  };
+  const fetchUserObjects = useCallback(
+    () =>
+      fetchUserMediaItems({
+        filterEngineCategories: [FilterEngineCategories.OBJECT],
+        setState: (newState: FetchMediaItemStates) => {
+          setUserFetch((curr) => ({
+            status: newState.status,
+            mediaItems: newState.mediaItems
+              ? newState.mediaItems
+              : curr.mediaItems,
+          }));
+        },
+        defaultErrorMessage: "Unknown Error in Fetching User Set Objects",
+      }),
+    [],
+  );
+
+  const fetchFeaturedObjects = useCallback(
+    () =>
+      fetchFeaturedMediaItems({
+        filterEngineCategories: [FilterEngineCategories.OBJECT],
+        setState: (newState: FetchMediaItemStates) => {
+          setFeaturedFetch((curr) => ({
+            status: newState.status,
+            mediaItems: newState.mediaItems
+              ? newState.mediaItems
+              : curr.mediaItems,
+          }));
+        },
+        defaultErrorMessage: "Unknown Error in Fetching Featured Set Objects",
+      }),
+    [],
+  );
+
+  const filterObjectItems = (searchTerm: string) =>
+    shapeItems.value.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 
   const fetchFeaturedSearchResults = useCallback(async () => {
-    setFetchStatuses((curr) => ({
-      ...curr,
-      searchFetch: FetchStatus.IN_PROGRESS,
-    }));
-    const searchTerm = searchTermFeatured;
-    if (!searchTerm.trim()) {
-      setFilteredSearchObjectsFeatured([]);
-      setFetchStatuses((curr) => ({
-        ...curr,
-        searchFetch: FetchStatus.SUCCESS,
-      }));
-      return;
-    }
-
-    const mediaFilesApi = new MediaFilesApi();
-    const response = await mediaFilesApi.SearchFeaturedMediaFiles({
-      search_term: searchTerm,
-      filter_engine_categories: [FilterEngineCategories.IMAGE_PLANE],
+    const filteredObjectItems = filterObjectItems(searchTermFeatured);
+    fetchFeaturedMediaItemsSearchResults({
+      filterEngineCategories: [FilterEngineCategories.OBJECT],
+      setState: (newState: FetchMediaItemStates) => {
+        setFeaturedSearchFetch(() => ({
+          status: newState.status,
+          mediaItems: newState.mediaItems
+            ? [...filteredObjectItems, ...newState.mediaItems]
+            : filteredObjectItems,
+        }));
+      },
+      defaultErrorMessage:
+        "Unknown Error in Fetching Featured Set Objects Search Results",
+      searchTerm: searchTermFeatured,
     });
-
-    if (response.success && response.data) {
-      const newSearchObjects = responseMapping(response.data);
-      setFilteredSearchObjectsFeatured(newSearchObjects);
-      setFetchStatuses((curr) => ({
-        ...curr,
-        searchFetch: FetchStatus.SUCCESS,
-      }));
-    } else {
-      addToast(
-        ToastTypes.ERROR,
-        response.errorMessage || "Failed to fetch search results",
-      );
-      setFetchStatuses((curr) => ({
-        ...curr,
-        searchFetch: FetchStatus.ERROR,
-      }));
-    }
   }, [searchTermFeatured]);
 
   const fetchUserSearchResults = useCallback(async () => {
-    setFetchStatuses((curr) => ({
-      ...curr,
-      searchFetch: FetchStatus.IN_PROGRESS,
-    }));
-    const searchTerm = searchTermMine;
-    if (!searchTerm.trim()) {
-      setFilteredSearchObjectsMine([]);
-      setFetchStatuses((curr) => ({
-        ...curr,
-        searchFetch: FetchStatus.SUCCESS,
-      }));
-      return;
-    }
-
-    const mediaFilesApi = new MediaFilesApi();
-    const response = await mediaFilesApi.SearchUserMediaFiles({
-      search_term: searchTerm,
-      filter_engine_categories: [FilterEngineCategories.OBJECT],
+    fetchUserMediaItemsSearchResults({
+      filterEngineCategories: [FilterEngineCategories.OBJECT],
+      setState: (newState: FetchMediaItemStates) => {
+        setUserSearchFetch((curr) => ({
+          status: newState.status,
+          mediaItems: newState.mediaItems
+            ? newState.mediaItems
+            : curr.mediaItems,
+        }));
+      },
+      defaultErrorMessage:
+        "Unknown Error in Fetching User Set Objects Search Results",
+      searchTerm: searchTermUser,
     });
-
-    if (response.success && response.data) {
-      const newSearchObjects = responseMapping(response.data);
-      setFilteredSearchObjectsMine(newSearchObjects);
-      setFetchStatuses((curr) => ({
-        ...curr,
-        searchFetch: FetchStatus.SUCCESS,
-      }));
-    } else {
-      addToast(
-        ToastTypes.ERROR,
-        response.errorMessage || "Failed to fetch search results",
-      );
-      setFetchStatuses((curr) => ({
-        ...curr,
-        searchFetch: FetchStatus.ERROR,
-      }));
-    }
-  }, [searchTermMine]);
-
-  const fetchUserObjects = useCallback(async () => {
-    setFetchStatuses((curr) => ({
-      ...curr,
-      userObjectsFetch: FetchStatus.IN_PROGRESS,
-    }));
-    const mediaFilesApi = new MediaFilesApi();
-    const response = await mediaFilesApi.ListUserMediaFiles({
-      page_size: 100,
-      filter_engine_categories: [
-        FilterEngineCategories.OBJECT,
-        FilterEngineCategories.IMAGE_PLANE,
-      ],
-    });
-
-    if (response.success && response.data) {
-      const newObjects = responseMapping(response.data);
-      setUserObjects(newObjects);
-      setFetchStatuses((curr) => ({
-        ...curr,
-        userObjectsFetch: FetchStatus.SUCCESS,
-      }));
-      return;
-    }
-    addToast(
-      ToastTypes.ERROR,
-      response.errorMessage || "Unknown Error in Fetching User Objects",
-    );
-    setFetchStatuses((curr) => ({
-      ...curr,
-      userObjectsFetch: FetchStatus.ERROR,
-    }));
-  }, []);
-
-  const fetchFeaturedObjects = useCallback(async () => {
-    setFetchStatuses((curr) => ({
-      ...curr,
-      featuredObjectsFetch: FetchStatus.IN_PROGRESS,
-    }));
-    const mediaFilesApi = new MediaFilesApi();
-    const response = await mediaFilesApi.ListFeaturedMediaFiles({
-      filter_engine_categories: [FilterEngineCategories.OBJECT],
-    });
-    if (response.success && response.data) {
-      const newObjects = responseMapping(response.data);
-      setFeaturedObjects(newObjects);
-      setFetchStatuses((curr) => ({
-        ...curr,
-        featuredObjectsFetch: FetchStatus.SUCCESS,
-      }));
-      return;
-    }
-    addToast(
-      ToastTypes.ERROR,
-      response.errorMessage || "Unknown Error in Fetching Featured Objects",
-    );
-    setFetchStatuses((curr) => ({
-      ...curr,
-      featuredObjectsFetch: FetchStatus.ERROR,
-    }));
-  }, []);
+  }, [searchTermUser]);
 
   useEffect(() => {
     if (!userObjects) {
@@ -254,13 +173,15 @@ export const ObjectsTab = () => {
 
   useEffect(() => {
     if (selectedFilter === AssetFilterOption.FEATURED) {
+      setCurrentPage(0);
       fetchFeaturedSearchResults();
     } else if (selectedFilter === AssetFilterOption.MINE) {
+      setCurrentPage(0);
       fetchUserSearchResults();
     }
   }, [
     searchTermFeatured,
-    searchTermMine,
+    searchTermUser,
     fetchFeaturedSearchResults,
     fetchUserSearchResults,
     selectedFilter,
@@ -294,14 +215,19 @@ export const ObjectsTab = () => {
                 searchTerm={
                   selectedFilter === AssetFilterOption.FEATURED
                     ? searchTermFeatured
-                    : searchTermMine
+                    : searchTermUser
                 }
                 onSearchChange={
                   selectedFilter === AssetFilterOption.FEATURED
                     ? setSearchTermFeatured
-                    : setSearchTermMine
+                    : setSearchTermUser
                 }
                 key={selectedFilter}
+                placeholder={
+                  selectedFilter === AssetFilterOption.FEATURED
+                    ? "Search featured objects"
+                    : "Search my objects"
+                }
               />
             )}
           </div>
@@ -314,11 +240,11 @@ export const ObjectsTab = () => {
               items={
                 selectedFilter === AssetFilterOption.FEATURED
                   ? searchTermFeatured
-                    ? filteredSearchObjectsFeatured
-                    : filteredObjects
-                  : searchTermMine
-                    ? filteredSearchObjectsMine
-                    : filteredObjects
+                    ? featuredSearchResults ?? []
+                    : displayedItems
+                  : searchTermUser
+                    ? userSearchResults ?? []
+                    : displayedItems
               }
             />
           </div>

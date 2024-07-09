@@ -149,7 +149,7 @@ export const UploadFiles3D = ({
           <canvas className="h-full w-full" ref={canvasCallbackRef} />
           {!assetFile.value && (
             <H6 className="absolute left-0 top-1/2 -mt-5 w-full text-center">
-              File Preivew
+              File Preview
             </H6>
           )}
           {previewStatus.type.includes("Error") && (

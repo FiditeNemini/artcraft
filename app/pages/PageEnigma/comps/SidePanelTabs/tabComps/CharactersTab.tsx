@@ -1,37 +1,74 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
-
 import {
   AssetFilterOption,
   AssetType,
+  FeatureFlags,
   FilterEngineCategories,
-  ToastTypes,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
-import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
 import { characterItems as demoCharacterItems } from "~/pages/PageEnigma/signals";
-import { addToast } from "~/signals";
-
-import { BucketConfig } from "~/api/BucketConfig";
-
-import { Button, FileWrapper, FilterButtons, Pagination } from "~/components";
+import {
+  Button,
+  FileWrapper,
+  FilterButtons,
+  Pagination,
+  SearchFilter,
+} from "~/components";
 import {
   ItemElements,
   TabTitle,
 } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
-
-import { MediaFilesApi } from "~/Classes/ApiManager";
+import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
+import {
+  fetchFeaturedMediaItems,
+  fetchFeaturedMediaItemsSearchResults,
+  FetchMediaItemStates,
+  fetchUserMediaItems,
+  fetchUserMediaItemsSearchResults,
+  isAnyStatusFetching,
+} from "../utilities";
 
 export const CharactersTab = () => {
   useSignals();
 
-  const [userCharacters, setUserCharacters] = useState<MediaItem[] | undefined>(
-    undefined,
+  const showSearchObjectComponent = usePosthogFeatureFlag(
+    FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
-  const [featuredCharacters, setFeaturedCharacters] = useState<
-    MediaItem[] | undefined
-  >(undefined);
+
+  const [searchTermFeatured, setSearchTermFeatured] = useState("");
+  const [searchTermUser, setSearchTermUser] = useState("");
+
+  const [
+    { mediaItems: userCharacters, status: userFetchStatus },
+    setUserFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+  const [
+    { mediaItems: featuredCharacters, status: featuredFetchStatus },
+    setFeaturedFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+  const [
+    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
+    setFeaturedSearchFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+  const [
+    { mediaItems: userSearchResults, status: userSearchFetchStatus },
+    setUserSearchFetch,
+  ] = useState<FetchMediaItemStates>({
+    mediaItems: undefined,
+    status: FetchStatus.READY,
+  });
+
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
@@ -39,7 +76,7 @@ export const CharactersTab = () => {
     ...demoCharacterItems.value,
     ...(featuredCharacters ?? []),
   ];
-  const filteredCharacters =
+  const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
       ? allFeaturedCharacters ?? []
       : userCharacters ?? [];
@@ -47,104 +84,88 @@ export const CharactersTab = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   const pageSize = 21;
-  const totalPages = Math.ceil(filteredCharacters.length / pageSize);
+  const totalPages = Math.ceil(displayedItems.length / pageSize);
 
-  const [fetchStatuses, setFetchStatuses] = useState({
-    userObjectsFetch: FetchStatus.READY,
-    featuredObjectsFetch: FetchStatus.READY,
-  });
-  const isFetching =
-    fetchStatuses.userObjectsFetch === FetchStatus.READY ||
-    fetchStatuses.userObjectsFetch === FetchStatus.IN_PROGRESS ||
-    fetchStatuses.featuredObjectsFetch === FetchStatus.READY ||
-    fetchStatuses.featuredObjectsFetch === FetchStatus.IN_PROGRESS;
+  const isFetching = isAnyStatusFetching([
+    userFetchStatus,
+    featuredFetchStatus,
+    featuredSearchFetchStatus,
+    userSearchFetchStatus,
+  ]);
 
-  const responseMapping = (data: MediaInfo[]): MediaItem[] => {
-    return data.map((item) => {
-      const bucketConfig = new BucketConfig();
-      const itemThumb = bucketConfig.getCdnUrl(
-        item.cover_image.maybe_cover_image_public_bucket_path ?? "",
-        600,
-        100,
-      );
-      return {
-        colorIndex: item.cover_image.default_cover.color_index,
-        imageIndex: item.cover_image.default_cover.image_index,
-        media_id: item.token,
-        name: item.maybe_title ?? "Unknown",
-        type: AssetType.CHARACTER,
-        media_type: item.media_type,
-        // maybe_animation_type: item.maybe_animation_type || undefined,
-        version: 1,
-        ...(item.cover_image.maybe_cover_image_public_bucket_path
-          ? {
-              thumbnail: itemThumb,
-            }
-          : {}),
-      };
-    });
-  };
-  const fetchUserCharacters = useCallback(async () => {
-    setFetchStatuses((curr) => ({
-      ...curr,
-      userObjectsFetch: FetchStatus.IN_PROGRESS,
-    }));
-    const mediaFilesApi = new MediaFilesApi();
+  const fetchUserCharacters = useCallback(
+    () =>
+      fetchUserMediaItems({
+        filterEngineCategories: [FilterEngineCategories.CHARACTER],
+        setState: (newState: FetchMediaItemStates) => {
+          setUserFetch((curr) => ({
+            status: newState.status,
+            mediaItems: newState.mediaItems
+              ? newState.mediaItems
+              : curr.mediaItems,
+          }));
+        },
+        defaultErrorMessage: "Unknown Error in Fetching User Characters",
+      }),
+    [],
+  );
 
-    const response = await mediaFilesApi.ListUserMediaFiles({
-      page_size: 100,
-      filter_engine_categories: [FilterEngineCategories.CHARACTER],
-    });
+  const fetchFeaturedCharacters = useCallback(
+    () =>
+      fetchFeaturedMediaItems({
+        filterEngineCategories: [FilterEngineCategories.CHARACTER],
+        setState: (newState: FetchMediaItemStates) => {
+          setFeaturedFetch((curr) => ({
+            status: newState.status,
+            mediaItems: newState.mediaItems
+              ? newState.mediaItems
+              : curr.mediaItems,
+          }));
+        },
+        defaultErrorMessage: "Unknown Error in Fetching Featured Characters",
+      }),
+    [],
+  );
 
-    if (response.success && response.data) {
-      setFetchStatuses((curr) => ({
-        ...curr,
-        userObjectsFetch: FetchStatus.SUCCESS,
-      }));
-      const newCharacters = responseMapping(response.data);
-      setUserCharacters(newCharacters);
-      return;
-    }
-    addToast(
-      ToastTypes.ERROR,
-      response.errorMessage || "Unknown Error in Fetching User Characters",
+  const filterCharacterItems = (searchTerm: string) =>
+    demoCharacterItems.value.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-    setFetchStatuses((curr) => ({
-      ...curr,
-      userObjectsFetch: FetchStatus.ERROR,
-    }));
-  }, []);
 
-  const fetchFeaturedCharacters = useCallback(async () => {
-    setFetchStatuses((curr) => ({
-      ...curr,
-      featuredObjectsFetch: FetchStatus.IN_PROGRESS,
-    }));
-    const mediaFilesApi = new MediaFilesApi();
-
-    const response = await mediaFilesApi.ListFeaturedMediaFiles({
-      filter_engine_categories: [FilterEngineCategories.CHARACTER],
+  const fetchFeaturedSearchResults = useCallback(async () => {
+    const filteredCharacterItems = filterCharacterItems(searchTermFeatured);
+    fetchFeaturedMediaItemsSearchResults({
+      filterEngineCategories: [FilterEngineCategories.CHARACTER],
+      setState: (newState: FetchMediaItemStates) => {
+        setFeaturedSearchFetch(() => ({
+          status: newState.status,
+          mediaItems: newState.mediaItems
+            ? [...filteredCharacterItems, ...newState.mediaItems]
+            : filteredCharacterItems,
+        }));
+      },
+      defaultErrorMessage:
+        "Unknown Error in Fetching Featured Characters Search Results",
+      searchTerm: searchTermFeatured,
     });
+  }, [searchTermFeatured]);
 
-    if (response.success && response.data) {
-      setFetchStatuses((curr) => ({
-        ...curr,
-        featuredObjectsFetch: FetchStatus.SUCCESS,
-      }));
-      const newCharacters = responseMapping(response.data);
-
-      setFeaturedCharacters(newCharacters);
-      return;
-    }
-    addToast(
-      ToastTypes.ERROR,
-      response.errorMessage || "Unknown Error in Fetching Featured Characters",
-    );
-    setFetchStatuses((curr) => ({
-      ...curr,
-      featuredObjectsFetch: FetchStatus.ERROR,
-    }));
-  }, []);
+  const fetchUserSearchResults = useCallback(async () => {
+    fetchUserMediaItemsSearchResults({
+      filterEngineCategories: [FilterEngineCategories.CHARACTER],
+      setState: (newState: FetchMediaItemStates) => {
+        setUserSearchFetch((curr) => ({
+          status: newState.status,
+          mediaItems: newState.mediaItems
+            ? newState.mediaItems
+            : curr.mediaItems,
+        }));
+      },
+      defaultErrorMessage:
+        "Unknown Error in Fetching User Characters Search Results",
+      searchTerm: searchTermUser,
+    });
+  }, [searchTermUser]);
 
   useEffect(() => {
     if (!userCharacters) {
@@ -158,6 +179,22 @@ export const CharactersTab = () => {
     fetchUserCharacters,
     featuredCharacters,
     fetchFeaturedCharacters,
+  ]);
+
+  useEffect(() => {
+    if (selectedFilter === AssetFilterOption.FEATURED) {
+      setCurrentPage(0);
+      fetchFeaturedSearchResults();
+    } else if (selectedFilter === AssetFilterOption.MINE) {
+      setCurrentPage(0);
+      fetchUserSearchResults();
+    }
+  }, [
+    searchTermFeatured,
+    searchTermUser,
+    fetchFeaturedSearchResults,
+    fetchUserSearchResults,
+    selectedFilter,
   ]);
 
   return (
@@ -177,7 +214,7 @@ export const CharactersTab = () => {
                 }}
               />
             </div>
-            <div className="w-full px-4">
+            <div className="flex w-full flex-col gap-3 px-4">
               <Button
                 className="file-picker-button py-3"
                 htmlFor={parentId}
@@ -186,14 +223,42 @@ export const CharactersTab = () => {
               >
                 Upload Character
               </Button>
+              {showSearchObjectComponent && (
+                <SearchFilter
+                  searchTerm={
+                    selectedFilter === AssetFilterOption.FEATURED
+                      ? searchTermFeatured
+                      : searchTermUser
+                  }
+                  onSearchChange={
+                    selectedFilter === AssetFilterOption.FEATURED
+                      ? setSearchTermFeatured
+                      : setSearchTermUser
+                  }
+                  key={selectedFilter}
+                  placeholder={
+                    selectedFilter === AssetFilterOption.FEATURED
+                      ? "Search featured characters"
+                      : "Search my characters"
+                  }
+                />
+              )}
             </div>
             <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
               <ItemElements
                 busy={isFetching}
                 debug="characters tab"
-                items={filteredCharacters}
                 currentPage={currentPage}
                 pageSize={pageSize}
+                items={
+                  selectedFilter === AssetFilterOption.FEATURED
+                    ? searchTermFeatured
+                      ? featuredSearchResults ?? []
+                      : displayedItems
+                    : searchTermUser
+                      ? userSearchResults ?? []
+                      : displayedItems
+                }
               />
             </div>
             {totalPages > 1 && (
@@ -207,7 +272,7 @@ export const CharactersTab = () => {
               />
             )}
           </>
-        )} // End FileWrapper Render
+        )}
       />
     </>
   );
