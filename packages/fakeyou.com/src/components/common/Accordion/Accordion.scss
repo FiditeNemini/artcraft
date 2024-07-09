@@ -3,11 +3,15 @@
 .fy-accordion-item {
   border: 1px solid rgba($white, 0.12);
   border-radius: 0.5rem;
-  overflow: hidden;
+
+  &.closed {
+    overflow: hidden;
+  }
 }
 
 .fy-accordion-header {
   display: flex;
+  border-radius: 0.45rem 0.45rem 0 0;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
@@ -21,13 +25,19 @@
 }
 
 .fy-accordion-content {
-  overflow: hidden;
+  // overflow: hidden;
+  border-radius: 0 0 0.5rem 0.5rem;
   background-color: lighten($panel, 4%);
 
   &.open {
+    // overflow: hidden;
     opacity: 1;
     max-height: 100%;
     visibility: visible;
+  }
+
+  &.closed {
+    overflow: hidden;
   }
 }
 

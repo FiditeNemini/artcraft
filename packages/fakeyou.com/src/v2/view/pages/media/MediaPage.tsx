@@ -23,13 +23,22 @@ import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
-import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
-import { ActionButton, Badge, Input } from "components/common";
-import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
+import {
+  ActionButton,
+  Badge,
+  Input,
+  TempSelect as Select,
+} from "components/common";
+import {
+  AnimationType,
+  EngineCategory,
+  MediaFileType,
+  WeightCategory,
+} from "@storyteller/components/src/api/_common/enums";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
@@ -44,10 +53,14 @@ import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import MentionsSection from "components/common/MentionsSection";
 
 export default function MediaPage({
+  animationType,
+  animationTypeChange,
   bookmarkButtonProps,
   canAccessStudio,
   canBanUsers,
   canEdit,
+  engineCategory,
+  engineCategoryChange,
   mediaFile,
   openDeleteModal,
   ratingButtonProps,
@@ -363,6 +376,87 @@ export default function MediaPage({
     },*/
   ];
 
+  // engine category editing
+
+  const engineCategoryOptions = [
+    {
+      label: "Object",
+      value: EngineCategory.Object,
+    },
+    {
+      label: "Creature",
+      value: EngineCategory.Creature,
+    },
+    {
+      label: "Location",
+      value: EngineCategory.Location,
+    },
+    {
+      label: "Skybox",
+      value: EngineCategory.Skybox,
+    },
+  ];
+
+  // if the current media file's engine category is among the list of changable types
+  // a select will be displayed
+
+  const editableEngineCategory = () =>
+    engineCategoryOptions.some(
+      editableCategory => engineCategory === editableCategory.value
+    );
+
+  const engineCategoryValueComponent = () =>
+    editableEngineCategory() ? (
+      <Select
+        {...{
+          onChange: engineCategoryChange,
+          options: engineCategoryOptions,
+          value: engineCategory,
+        }}
+      />
+    ) : (
+      engineCategory
+    );
+
+  const engineCategoryRow = engineCategory
+    ? [
+        {
+          property: "Engine Category",
+          value: engineCategory || "",
+          ...(canEdit ? { valueComponent: engineCategoryValueComponent } : {}),
+        },
+      ]
+    : [];
+
+  // animation type editing
+
+  const isAnimation = engineCategory === EngineCategory.Animation;
+
+  const animationOptions = Object.values(AnimationType).map(animationType => ({
+    label: animationType,
+    value: animationType,
+  }));
+
+  const animationValueComponent = () => (
+    <Select
+      {...{
+        onChange: animationTypeChange,
+        options: animationOptions,
+        value: animationType,
+      }}
+    />
+  );
+
+  const animationTypeRow = isAnimation
+    ? [
+        {
+          property: "Animation type",
+          value: animationType || "",
+          ...(canEdit ? { valueComponent: animationValueComponent } : {}),
+        },
+      ]
+    : [];
+
   const defaultDetails = [
     {
       property: "Type",
@@ -373,6 +467,8 @@ export default function MediaPage({
       value: mediaFile?.creator_set_visibility.toString() || "",
     },
     { property: "Created at", value: dateCreated || "" },
+    ...engineCategoryRow,
+    ...animationTypeRow,
   ];
 
   let mediaDetails;

@@ -74,9 +74,9 @@ function AccordionItem({
   };
 
   return (
-    <div className="fy-accordion-item">
+    <div className={`fy-accordion-item ${isOpen ? "open" : "closed"}`}>
       <div
-        className={`fy-accordion-header p-3 ${isOpen ? "open" : ""}`}
+        className={`fy-accordion-header p-3 ${isOpen ? "open" : "closed"}`}
         onClick={handleClick}
       >
         {title}
@@ -84,7 +84,9 @@ function AccordionItem({
           <FontAwesomeIcon icon={faChevronDown} />
         </span>
       </div>
-      <animated.div style={{ ...heightProps, overflow: "hidden" }}>
+      <animated.div
+        style={{ ...heightProps, ...(!isOpen ? { overflow: "hidden" } : {}) }}
+      >
         <animated.div
           ref={contentRef}
           style={contentOpacityProps}
@@ -116,9 +118,7 @@ function Accordion({ children, className }: AccordionProps) {
 
   return (
     <AccordionContext.Provider value={{ openItems, toggleItem }}>
-      <div className={`d-flex flex-column gap-3 ${className}`}>
-        {children}
-      </div>
+      <div className={`d-flex flex-column gap-3 ${className}`}>{children}</div>
     </AccordionContext.Provider>
   );
 }

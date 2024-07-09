@@ -1,15 +1,21 @@
 import MakeRequest from "../MakeRequest";
 import { UserDetailsLight } from "../_common/UserDetailsLight";
 import { MediaFileType } from "../_common/enums/MediaFileType";
-import { WeightCategory } from "../_common/enums/WeightCategory";
 import { WeightType } from "../_common/enums/WeightType";
 import { MediaFileClass } from "../enums/MediaFileClass";
 import { MediaFileSubtype } from "../enums/MediaFileSubtype";
+import {
+  AnimationType,
+  EngineCategory,
+  WeightCategory,
+} from "@storyteller/components/src/api/_common/enums";
 
 export interface MediaFile {
   token: string;
   media_type: MediaFileType;
   media_class: MediaFileClass | null;
+  maybe_engine_category: EngineCategory | null;
+  maybe_animation_type: AnimationType | null;
   maybe_media_subtype: MediaFileSubtype | null;
   public_bucket_path: string;
   maybe_engine_extension: string | null;

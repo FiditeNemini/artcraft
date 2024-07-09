@@ -32,3 +32,17 @@ td {
   font-weight: 500 !important;
   background-color: lighten($panel, 7%) !important;
 }
+
+// because overflow hidden is now disabled on open accordians, so drop downs can exist in them, border radius is applied to the tables within
+
+.fy-data-table {
+  tr:last-of-type {
+    td:first-of-type {
+      border-radius: 0 0 0 0.45rem;
+    }
+
+    td:last-of-type {
+      border-radius: 0 0 0.45rem 0;
+    }
+  }
+}

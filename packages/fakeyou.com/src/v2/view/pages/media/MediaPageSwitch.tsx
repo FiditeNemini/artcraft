@@ -1,11 +1,23 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
-import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
+import {
+  AnimationType,
+  EngineCategory,
+  MediaFileType,
+} from "@storyteller/components/src/api/_common/enums";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
 import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
+import {
+  EditAnimationType,
+  EditAnimationTypeResponse,
+} from "@storyteller/components/src/api/media_files/EditAnimationType";
+import {
+  EditEngineCategory,
+  EditEngineCategoryResponse,
+} from "@storyteller/components/src/api/media_files/EditEngineCategory";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { ActionButtonProps, Container, Modal, Panel } from "components/common";
 import MediaPage from "./MediaPage";
@@ -17,11 +29,18 @@ import { faStarShooting as faStarShootingOutline } from "@fortawesome/pro-regula
 import "./MediaPage.scss";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
+type AnimationOptions = AnimationType | null;
+type EngineCategoryOptions = EngineCategory | null;
+
 export interface MediaSubViewProps {
+  animationType: AnimationOptions;
+  animationTypeChange: (event: { target: { value: AnimationType } }) => void;
   bookmarkButtonProps: ActionButtonProps;
   canAccessStudio: () => boolean;
   canBanUsers: () => boolean;
   canEdit: boolean;
+  engineCategory: EngineCategoryOptions;
+  engineCategoryChange: (event: { target: { value: EngineCategory } }) => void;
   featureButtonProps: ActionButtonProps;
   isFeatured: boolean;
   isModerator: boolean;
@@ -43,12 +62,17 @@ export default function MediaPageSwitch() {
 
   const [isFeatured, isFeaturedSet] = useState(false);
   const [title, titleSet] = useState("");
+  const [animationType, animationTypeSet] = useState<AnimationOptions>(null);
+  const [engineCategory, engineCategorySet] =
+    useState<EngineCategoryOptions>(null);
 
   const { mediaFile, prompt, remove, status } = useMedia({
     mediaToken: urlToken,
     onSuccess: (res: any) => {
       isFeaturedSet(res.is_featured);
       titleSet(res.maybe_title || "Untitled Video");
+      animationTypeSet(res.maybe_animation_type || null);
+      engineCategorySet(res.maybe_engine_category || null);
       ratings.gather({ res, key: "token" });
       bookmarks.gather({ res, key: "token" });
     },
@@ -99,6 +123,34 @@ export default function MediaPageSwitch() {
     toolTipOn: "Unlike this",
   };
 
+  const animationTypeChange = ({
+    target,
+  }: {
+    target: { value: AnimationType };
+  }) => {
+    animationTypeSet(target.value);
+    EditAnimationType(mediaFile?.token || "", {
+      maybe_animation_type: target.value,
+    }).then((res: EditAnimationTypeResponse) => {
+      if (res.success) {
+      }
+    });
+  };
+
+  const engineCategoryChange = ({
+    target,
+  }: {
+    target: { value: EngineCategory };
+  }) => {
+    engineCategorySet(target.value);
+    EditEngineCategory(mediaFile?.token || "", {
+      engine_category: target.value,
+    }).then((res: EditEngineCategoryResponse) => {
+      if (res.success) {
+      }
+    });
+  };
+
   const featureButtonProps: ActionButtonProps = {
     actionType: "feature",
     isToggled: isFeatured,
@@ -121,10 +173,14 @@ export default function MediaPageSwitch() {
   };
 
   const subViewProps: MediaSubViewProps = {
+    animationType,
+    animationTypeChange,
     bookmarkButtonProps,
     canAccessStudio,
     canBanUsers,
     canEdit,
+    engineCategory,
+    engineCategoryChange,
     featureButtonProps,
     isFeatured,
     isModerator,
