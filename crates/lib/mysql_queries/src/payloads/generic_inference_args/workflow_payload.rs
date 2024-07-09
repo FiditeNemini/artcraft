@@ -58,6 +58,24 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_input_file: Option<MediaFileToken>,
 
+    #[serde(rename = "df")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_input_depth_file: Option<MediaFileToken>,
+
+    #[serde(rename = "nf")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_input_normal_file: Option<MediaFileToken>,
+
+    #[serde(rename = "of")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_input_outline_file: Option<MediaFileToken>,
+
+    // Optional global IP Adapter image media file token
+    // This will apply to the entire workflow / video
+    #[serde(rename = "gi")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub global_ip_adapter_token: Option<MediaFileToken>,
+
     #[serde(rename = "out")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_output_path: Option<String>,
@@ -126,12 +144,6 @@ pub struct WorkflowArgs {
     #[serde(rename = "tp")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub travel_prompt: Option<String>,
-
-    // Optional global IP Adapter image media file token
-    // This will apply to the entire workflow / video
-    #[serde(rename = "gi")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub global_ip_adapter_token: Option<MediaFileToken>,
 
     #[deprecated(note = "Use `lipsync_enabled` instead")]
     #[serde(rename = "el")]

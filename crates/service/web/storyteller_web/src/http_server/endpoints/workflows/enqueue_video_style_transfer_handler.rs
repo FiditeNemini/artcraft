@@ -72,6 +72,22 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// The input video media file (required)
     input_file: MediaFileToken,
 
+    /// Optional: the depth video file
+    /// The underlying media file must be a video.
+    input_depth_file: Option<MediaFileToken>,
+
+    /// Optional: the normal map video file
+    /// The underlying media file must be a video.
+    input_normal_file: Option<MediaFileToken>,
+
+    /// Optional: the outline video file
+    /// The underlying media file must be a video.
+    input_outline_file: Option<MediaFileToken>,
+
+    /// Optional: Global IP-Adapter image.
+    /// The underlying media file must be an image.
+    global_ipa_media_token: Option<MediaFileToken>,
+
     /// The positive prompt (optional)
     prompt: Option<String>,
     
@@ -119,10 +135,6 @@ pub struct EnqueueVideoStyleTransferRequest {
 
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
-
-    /// Optional Global IP-Adapter image.
-    /// The underlying media file must be an image.
-    global_ipa_media_token: Option<MediaFileToken>,
 
     /// To use prompt traveling, enqueue a prompt with this.
     ///
@@ -393,17 +405,18 @@ pub async fn enqueue_video_style_transfer_handler(
         negative_prompt: request.negative_prompt.new_string_trim_or_empty(),
         travel_prompt: coordinated_args.travel_prompt.new_string_trim_or_empty(),
 
-        // Other inputs
+        // Input files
         maybe_input_file: Some(request.input_file.clone()),
+        maybe_input_depth_file: empty_token_to_null(request.input_depth_file.as_ref()),
+        maybe_input_normal_file: empty_token_to_null(request.input_normal_file.as_ref()),
+        maybe_input_outline_file: empty_token_to_null(request.input_outline_file.as_ref()),
+        global_ip_adapter_token: empty_token_to_null(request.global_ipa_media_token.as_ref()),
+
+        // Other inputs
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
         trim_start_milliseconds: Some(trim_start_millis),
         trim_end_milliseconds: Some(trim_end_millis),
-        global_ip_adapter_token: request.global_ipa_media_token
-            .as_ref()
-            // NB: Frontend is mistakenly sending empty string - ignore it
-            .filter(|t| t.as_str().trim_or_empty().is_some())
-            .map(|t| t.clone()),
         strength: maybe_strength,
         frame_skip: request.frame_skip,
 
@@ -485,4 +498,11 @@ pub async fn enqueue_video_style_transfer_handler(
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(body))
+}
+
+// NB: Frontend is mistakenly sending empty string tokens - ignore those
+fn empty_token_to_null(maybe_token: Option<&MediaFileToken>) -> Option<MediaFileToken> {
+    maybe_token
+        .filter(|t| t.as_str().trim_or_empty().is_some())
+        .map(|t| t.clone())
 }
