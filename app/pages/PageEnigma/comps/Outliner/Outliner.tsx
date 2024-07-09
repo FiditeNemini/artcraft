@@ -33,8 +33,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
 
   const isSelected = outlinerState.selectedItem.value?.id === item.id;
 
-
-  const editorEngine = useContext(EngineContext)
+  const editorEngine = useContext(EngineContext);
 
   // Delete object logic here
   const handleDeleteKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -53,8 +52,9 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
     <div
       role="button"
       className={twMerge(
-        "flex cursor-pointer justify-between px-4 py-[7px] text-[13px] font-normal text-white/80 outline-none transition-all duration-100 hover:bg-action/35 focus:outline-none",
-        isSelected && "bg-action/90 font-medium text-white hover:bg-action/90",
+        "flex cursor-pointer justify-between px-4 py-[7px] text-[13px] font-normal text-white/80 outline-none transition-all duration-100 hover:bg-action/50 focus:outline-none",
+        isSelected &&
+          "bg-brand-primary/80 font-medium text-white hover:bg-brand-primary/80",
       )}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -73,7 +73,10 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleLock(item.id, editorEngine?.lockUnlockObject.bind(editorEngine));
+            toggleLock(
+              item.id,
+              editorEngine?.lockUnlockObject.bind(editorEngine),
+            );
           }}
           style={{
             opacity: hovered || item.locked ? 1 : 0,
@@ -82,14 +85,19 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
           <div className="w-3">
             <FontAwesomeIcon
               icon={item.locked ? faLock : faLockOpen}
-              className="opacity-60 transition-opacity duration-100 hover:opacity-100"
+              className="opacity-80 transition-opacity duration-100 hover:opacity-100"
             />
           </div>
         </button>
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleVisibility(item.id, editorEngine?.sceneManager?.hideObject.bind(editorEngine.sceneManager));
+            toggleVisibility(
+              item.id,
+              editorEngine?.sceneManager?.hideObject.bind(
+                editorEngine.sceneManager,
+              ),
+            );
           }}
           style={{
             opacity: hovered || !item.visible ? 1 : 0,
@@ -99,7 +107,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
             <FontAwesomeIcon
               icon={item.visible ? faEye : faEyeSlash}
               className={twMerge(
-                "opacity-60 transition-opacity duration-100 hover:opacity-100",
+                "opacity-80 transition-opacity duration-100 hover:opacity-100",
                 item.locked && "text-white/90",
               )}
             />
