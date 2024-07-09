@@ -75,7 +75,9 @@ export const LoadingBar = ({
           <div className="flex items-center gap-2.5">
             {hasSpinner && <LoadingSpinner className="h-5" />}
             {progressData.label && (
-              <label className="text-lg">{progressData.label}</label>
+              <label className="text-lg font-medium">
+                {progressData.label}
+              </label>
             )}
           </div>
         </div>

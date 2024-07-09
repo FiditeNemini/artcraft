@@ -108,7 +108,7 @@ export const UploadFilesImages = ({
         <div className="relative m-auto aspect-square w-full overflow-hidden rounded-lg bg-brand-secondary">
           {!assetFile.value && (
             <H6 className="absolute left-0 top-1/2 -mt-5 w-full text-center">
-              File Preivew
+              File Preview
             </H6>
           )}
           {assetFile.value && (

@@ -4,9 +4,7 @@ import { MediaInfo, MediaItem } from "~/pages/PageEnigma/models";
 import { BucketConfig } from "~/api/BucketConfig";
 
 export const isAnyStatusFetching = (statuses: FetchStatus[]): boolean => {
-  return statuses.some((status) => {
-    return status === FetchStatus.READY || status === FetchStatus.IN_PROGRESS;
-  });
+  return statuses.some((status) => status === FetchStatus.IN_PROGRESS);
 };
 
 export const responseMapping = (

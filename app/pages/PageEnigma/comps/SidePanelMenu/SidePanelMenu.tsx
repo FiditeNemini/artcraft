@@ -80,7 +80,10 @@ export const SidePanelMenu = ({
               <div>
                 <FontAwesomeIcon icon={tab.icon} size="lg" />
               </div>
-              <div className="-mb-1 mt-1" style={{ fontSize: 11 }}>
+              <div
+                className="-mb-1 mt-1 leading-[14px]"
+                style={{ fontSize: 11 }}
+              >
                 {tab.title}
               </div>
             </button>

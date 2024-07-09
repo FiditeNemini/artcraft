@@ -26,8 +26,6 @@ import {
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
 import { LoadUserScenes } from "./LoadUserScenes";
-import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
-
 import { getCurrentLocationWithoutParams, isNumberString } from "~/utilities";
 import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
 import {
@@ -134,11 +132,6 @@ export const ControlsTopButtons = () => {
     }
   }, [sceneTitleInput, editorEngine, getSceneGenereationMetaData]);
 
-  const handleButtonNewFromTemplate = () => {
-    handleResetScene();
-    handleButtonLoadScene();
-  };
-
   const handleButtonLoadScene = () => {
     handleResetScene();
     editorEngine?.loadScene(sceneTokenSelected).catch((err) => {
@@ -194,26 +187,6 @@ export const ControlsTopButtons = () => {
               onClick: () => {
                 textInput.value = "Untitled New Scene";
                 showWizard.value = "new_scene";
-              },
-            },
-            {
-              label: "New scene from Featured",
-              description: "Ctrl+Shift+N",
-              dialogProps: {
-                title: "Create a New Scene from a Featured Scene",
-                content: (
-                  <NewSceneFromTemplate onSceneSelect={handleSceneSelection} />
-                ),
-                confirmButtonProps: {
-                  label: "Create",
-                  disabled: sceneTokenSelected === "",
-                  onClick: handleButtonNewFromTemplate,
-                },
-                closeButtonProps: {
-                  label: "Cancel",
-                },
-                showClose: true,
-                className: "max-w-5xl",
               },
             },
             {
