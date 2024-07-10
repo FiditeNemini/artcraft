@@ -8,6 +8,16 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
+pub struct VideoDownloads {
+  /// The main video
+  pub input_video: InputVideoAndPaths,
+
+  // Secondary videos that provide enrichment signals.
+  pub maybe_depth: Option<InputVideoAndPaths>,
+  pub maybe_normal: Option<InputVideoAndPaths>,
+  pub maybe_outline: Option<InputVideoAndPaths>,
+}
+
 /// This is for the secondary depth, normal, and outline videos.
 /// We attach metadata as these videos progress through the system (if they're present).
 pub struct InputVideoAndPaths {

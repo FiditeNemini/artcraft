@@ -44,16 +44,16 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs, VideoDownloadDetails};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::input_video_and_paths::InputVideoAndPaths;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_trim_and_resample_videos::{preprocess_trim_and_resample_videos, ProcessTrimAndResampleVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{InputVideoAndPaths, VideoDownloads};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::job_dependencies::JobDependencies;
@@ -515,7 +515,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn safe_delete_all_input_videos(videos: &VideoDownloadDetails) {
+fn safe_delete_all_input_videos(videos: &VideoDownloads) {
     safe_delete_videos(&videos.input_video);
 
     if let Some(depth) = &videos.maybe_depth {

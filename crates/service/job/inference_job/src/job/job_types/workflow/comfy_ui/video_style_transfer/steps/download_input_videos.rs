@@ -15,15 +15,8 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::input_video_and_paths::{InputVideoAndPaths, VideoMediaFileRecord};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{InputVideoAndPaths, VideoDownloads, VideoMediaFileRecord};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
-
-pub struct VideoDownloadDetails {
-  pub input_video: InputVideoAndPaths,
-  pub maybe_depth: Option<InputVideoAndPaths>,
-  pub maybe_normal: Option<InputVideoAndPaths>,
-  pub maybe_outline: Option<InputVideoAndPaths>,
-}
 
 pub struct DownloadInputVideoArgs<'a> {
   pub job_args: &'a JobArgs<'a>,
@@ -34,7 +27,7 @@ pub struct DownloadInputVideoArgs<'a> {
 
 pub async fn download_input_videos(
   args: DownloadInputVideoArgs<'_>
-) -> Result<VideoDownloadDetails, ProcessSingleJobError> {
+) -> Result<VideoDownloads, ProcessSingleJobError> {
   let video_downloads = download_primary_video(&args).await?;
   let video_downloads = maybe_download_secondary_videos(video_downloads, &args).await?;
   Ok(video_downloads)
@@ -43,7 +36,7 @@ pub async fn download_input_videos(
 // TODO: Consolidate primary video download with secondary download logic.
 async fn download_primary_video(
   args: &DownloadInputVideoArgs<'_>
-) -> Result<VideoDownloadDetails, ProcessSingleJobError> {
+) -> Result<VideoDownloads, ProcessSingleJobError> {
   let input_media_file_token = match args.job_args.maybe_input_file {
     None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("No primary input video file provided"))),
     Some(token) => token.clone(),
@@ -99,7 +92,7 @@ async fn download_primary_video(
 
   info!("Downloaded primary input video!");
 
-  Ok(VideoDownloadDetails {
+  Ok(VideoDownloads {
     input_video: InputVideoAndPaths {
       record: VideoMediaFileRecord::Single(input_media_file),
       original_download_path: download_path,
@@ -119,9 +112,9 @@ enum SecondaryVideoType {
 }
 
 async fn maybe_download_secondary_videos(
-  mut video_downloads: VideoDownloadDetails,
+  mut video_downloads: VideoDownloads,
   args: &DownloadInputVideoArgs<'_>
-) -> Result<VideoDownloadDetails, ProcessSingleJobError> {
+) -> Result<VideoDownloads, ProcessSingleJobError> {
   const CAN_SEE_DELETED : bool = true; // We don't need to care about the deleted flag.
 
   let mut tokens = Vec::with_capacity(3);

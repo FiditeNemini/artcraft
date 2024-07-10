@@ -13,8 +13,7 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::VideoDownloadDetails;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::input_video_and_paths::InputVideoAndPaths;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{InputVideoAndPaths, VideoDownloads};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 
 pub struct ProcessTrimAndResampleVideoArgs<'a> {
@@ -28,7 +27,7 @@ pub struct ProcessTrimAndResampleVideoArgs<'a> {
   //  `VideoDownloadDetails`, which is a better system to keep track of the videos as they
   //  pass through the system.
   pub primary_video_paths: &'a VideoPaths,
-  pub download_videos: &'a mut VideoDownloadDetails,
+  pub download_videos: &'a mut VideoDownloads,
 }
 
 pub fn preprocess_trim_and_resample_videos(
@@ -154,7 +153,7 @@ fn preprocess_trim_and_resample_primary_video(
 fn preprocess_trim_and_resample_secondary_videos(
   comfy_deps: &ComfyDependencies,
   resample_details: &ResampleDetails,
-  secondary_videos: &mut VideoDownloadDetails,
+  secondary_videos: &mut VideoDownloads,
 ) -> Result<(), ProcessSingleJobError> {
 
   if let Some(depth) = secondary_videos.maybe_depth.as_mut() {
