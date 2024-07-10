@@ -55,7 +55,7 @@ pub struct SaveResultsArgs<'a> {
   pub comfy_deps: &'a ComfyDependencies,
   pub job_progress_reporter: &'a mut Box<dyn JobProgressReporter>,
 
-  pub download_video: VideoDownloadDetails,
+  pub download_videos: VideoDownloadDetails,
   pub videos: &'a VideoPaths,
   pub inference_duration: Duration,
 
@@ -200,11 +200,11 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
   // This also lets us hide the engine renders from users.
   // This shouldn't ever become a deeply nested tree of children, but rather a single root
   // with potentially many direct children.
-  let style_transfer_source_media_file_token = args.download_video
+  let style_transfer_source_media_file_token = args.download_videos
       .input_video_media_file
       .maybe_style_transfer_source_media_file_token
       .as_ref()
-      .unwrap_or_else(|| &args.download_video.input_video_media_file.token);
+      .unwrap_or_else(|| &args.download_videos.input_video_media_file.token);
 
   let prompt_token = PromptToken::generate();
 
@@ -212,9 +212,12 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     pool: &args.deps.db.mysql_pool,
     job: &args.job,
     maybe_mime_type: Some(&mimetype),
-    maybe_title: args.download_video.input_video_media_file.maybe_title.as_deref(),
+    maybe_title: args.download_videos.input_video_media_file.maybe_title.as_deref(),
     maybe_style_transfer_source_media_file_token: Some(&style_transfer_source_media_file_token),
-    maybe_scene_source_media_file_token: args.download_video.input_video_media_file.maybe_scene_source_media_file_token.as_ref(),
+    maybe_scene_source_media_file_token: args.download_videos
+        .input_video_media_file
+        .maybe_scene_source_media_file_token
+        .as_ref(),
     file_size_bytes,
     sha256_checksum: &file_checksum,
     maybe_prompt_token: Some(&prompt_token),

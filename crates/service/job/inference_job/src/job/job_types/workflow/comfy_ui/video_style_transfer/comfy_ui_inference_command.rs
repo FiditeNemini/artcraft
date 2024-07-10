@@ -103,6 +103,10 @@ pub struct InferenceArgs<'s> {
 
     pub global_ipa_image_filename: Option<String>,
     pub global_ipa_strength: Option<f32>,
+
+    pub depth_video_path: Option<&'s Path>,
+    pub normal_video_path: Option<&'s Path>,
+    pub outline_video_path: Option<&'s Path>,
 }
 
 #[derive(Debug)]
@@ -332,6 +336,24 @@ impl ComfyInferenceCommand {
         if let Some(global_ipa_strength) = &args.global_ipa_strength {
             command.push_str(" --global_ipa_strength ");
             command.push_str(&format!("{}", global_ipa_strength));
+            command.push_str(" ");
+        }
+
+        if let Some(depth_video_path) = args.depth_video_path {
+            command.push_str(" --depth_video_filename ");
+            command.push_str(&path_to_string(depth_video_path));
+            command.push_str(" ");
+        }
+
+        if let Some(normal_video_path) = args.normal_video_path {
+            command.push_str(" --normals_video_filename ");
+            command.push_str(&path_to_string(normal_video_path));
+            command.push_str(" ");
+        }
+
+        if let Some(outline_video_path) = args.outline_video_path {
+            command.push_str(" --outline_video_filename ");
+            command.push_str(&path_to_string(outline_video_path));
             command.push_str(" ");
         }
 

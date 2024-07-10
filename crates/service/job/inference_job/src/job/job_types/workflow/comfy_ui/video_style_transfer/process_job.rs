@@ -51,7 +51,7 @@ use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::down
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_trim_and_resample_video::{preprocess_trim_and_resample_video, ProcessTrimAndResampleVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_trim_and_resample_videos::{preprocess_trim_and_resample_videos, ProcessTrimAndResampleVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
@@ -238,7 +238,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== DOWNLOAD VIDEO ==================== //
 
-    let download_video = download_input_videos(DownloadInputVideoArgs {
+    let mut download_videos = download_input_videos(DownloadInputVideoArgs {
         job_args: &job_args,
         videos: &videos,
         mysql_pool: &deps.db.mysql_pool,
@@ -255,10 +255,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
-    preprocess_trim_and_resample_video(ProcessTrimAndResampleVideoArgs {
+    preprocess_trim_and_resample_videos(ProcessTrimAndResampleVideoArgs {
         comfy_args,
         comfy_deps: model_dependencies,
-        videos: &videos,
+        primary_video_paths: &videos,
+        download_videos: &mut download_videos,
     })?;
 
     // ========================= PREPROCESS AUDIO ======================== //
@@ -351,6 +352,15 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 .as_ref()
                 .map(|image| path_to_string(&image.ipa_image_path)),
             global_ipa_strength: None, // TODO: Expose a UI slider
+            depth_video_path: download_videos.maybe_depth.as_ref()
+                .map(|v| v.maybe_processed_path.as_deref())
+                .flatten(),
+            normal_video_path: download_videos.maybe_normal.as_ref()
+                .map(|v| v.maybe_processed_path.as_deref())
+                .flatten(),
+            outline_video_path: download_videos.maybe_outline.as_ref()
+                .map(|v| v.maybe_processed_path.as_deref())
+                .flatten(),
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
@@ -439,7 +449,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         comfy_args,
         videos: &videos,
         job_progress_reporter: &mut job_progress_reporter,
-        download_video,
+        download_videos,
         inference_duration,
     }).await?;
 
