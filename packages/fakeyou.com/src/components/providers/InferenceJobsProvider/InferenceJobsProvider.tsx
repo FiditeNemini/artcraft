@@ -43,6 +43,7 @@ export default function InferenceJobsProvider({ children }: Props) {
 					byCategory,
 					clearJobs,
 					clearJobsStatus,
+					enqueue: enqueueInferenceJob,
 					enqueueInferenceJob,
 					inferenceJobs,
 					someJobsAreDone,

@@ -106,7 +106,7 @@ export default function useInferenceJobsPolling({
     inferenceJobsSet(updatedJobs);
     byCategorySet(categoryMap);
     if (
-      updatedJobs.length &&
+      (user || updatedJobs.length) &&
       !updatedJobs.some(job => jobStateCanChange(job.jobState))
     ) {
       keepAliveSet(false);
