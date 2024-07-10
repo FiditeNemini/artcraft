@@ -273,7 +273,7 @@ function SignupPage(props: Props) {
       }
     }
 
-    let redirectUrl = redirectLink || "/";
+    let redirectUrl = redirectLink || WebUrl.pricingPageWithReferer("signup");
     if (domain.titlePart === "Storyteller AI") {
       redirectUrl = redirectSignUpLink;
       if (redirectUrl === redirectSignUpLink) {
