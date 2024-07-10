@@ -31,6 +31,11 @@ import {
   isAnyStatusFetching,
 } from "../utilities";
 
+const filterEngineCategories = [
+  FilterEngineCategories.SET_DRESSING,
+  FilterEngineCategories.OBJECT,
+];
+
 export const ObjectsTab = () => {
   useSignals();
 
@@ -93,7 +98,7 @@ export const ObjectsTab = () => {
   const fetchUserObjects = useCallback(
     () =>
       fetchUserMediaItems({
-        filterEngineCategories: [FilterEngineCategories.OBJECT],
+        filterEngineCategories: filterEngineCategories,
         setState: (newState: FetchMediaItemStates) => {
           setUserFetch((curr) => ({
             status: newState.status,
@@ -102,7 +107,7 @@ export const ObjectsTab = () => {
               : curr.mediaItems,
           }));
         },
-        defaultErrorMessage: "Unknown Error in Fetching User Set Objects",
+        defaultErrorMessage: "Unknown Error in Fetching User Objects",
       }),
     [],
   );
@@ -110,7 +115,7 @@ export const ObjectsTab = () => {
   const fetchFeaturedObjects = useCallback(
     () =>
       fetchFeaturedMediaItems({
-        filterEngineCategories: [FilterEngineCategories.OBJECT],
+        filterEngineCategories: filterEngineCategories,
         setState: (newState: FetchMediaItemStates) => {
           setFeaturedFetch((curr) => ({
             status: newState.status,
@@ -119,7 +124,7 @@ export const ObjectsTab = () => {
               : curr.mediaItems,
           }));
         },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Set Objects",
+        defaultErrorMessage: "Unknown Error in Fetching Featured Objects",
       }),
     [],
   );
@@ -132,7 +137,7 @@ export const ObjectsTab = () => {
   const fetchFeaturedSearchResults = useCallback(async () => {
     const filteredObjectItems = filterObjectItems(searchTermFeatured);
     fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.OBJECT],
+      filterEngineCategories: filterEngineCategories,
       setState: (newState: FetchMediaItemStates) => {
         setFeaturedSearchFetch(() => ({
           status: newState.status,
@@ -142,14 +147,14 @@ export const ObjectsTab = () => {
         }));
       },
       defaultErrorMessage:
-        "Unknown Error in Fetching Featured Set Objects Search Results",
+        "Unknown Error in Fetching Featured Objects Search Results",
       searchTerm: searchTermFeatured,
     });
   }, [searchTermFeatured]);
 
   const fetchUserSearchResults = useCallback(async () => {
     fetchUserMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.OBJECT],
+      filterEngineCategories: filterEngineCategories,
       setState: (newState: FetchMediaItemStates) => {
         setUserSearchFetch((curr) => ({
           status: newState.status,
@@ -159,7 +164,7 @@ export const ObjectsTab = () => {
         }));
       },
       defaultErrorMessage:
-        "Unknown Error in Fetching User Set Objects Search Results",
+        "Unknown Error in Fetching User Objects Search Results",
       searchTerm: searchTermUser,
     });
   }, [searchTermUser]);
@@ -206,7 +211,7 @@ export const ObjectsTab = () => {
           onClick={() => setOpenUploadModal(true)}
           className="w-full py-3 text-sm font-medium"
         >
-          Upload Objects
+          Upload Set Dressing or Other Objects
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
@@ -260,6 +265,7 @@ export const ObjectsTab = () => {
         onClose={() => setOpenUploadModal(false)}
         onSuccess={fetchUserObjects}
         isOpen={openUploadModal}
+        engineCategory={FilterEngineCategories.SET_DRESSING}
         fileTypes={Object.values(OBJECT_FILE_TYPE)}
         title="Upload Objects"
       />

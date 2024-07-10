@@ -14,8 +14,13 @@ export enum FilterEngineCategories {
   ANIMATION = "animation",
   AUDIO = "audio",
   CHARACTER = "character",
+  CREATURE = "creature",
   EXPRESSION = "expression",
+  IMAGE_PLANE = "image_plane",
+  LOCATION = "location",
   OBJECT = "object",
   SCENE = "scene",
-  IMAGE_PLANE = "image_plane"
+  SET_DRESSING = "set_dressing",
+  SKYBOX = "skybox",
+  VIDEO_PLANE = "video_plane",
 }

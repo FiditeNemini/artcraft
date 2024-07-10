@@ -5,11 +5,12 @@ import { FileUploader } from "../UploadModal/FileUploader";
 import { loadPreviewOnCanvas, snapshotCanvasAsThumbnail } from "./utilities";
 import { upload3DObjects } from "./utilities/upload3DObjects";
 import { UploaderState } from "~/models";
-import { MediaFileAnimationType } from "~/enums";
+import { FilterEngineCategories, MediaFileAnimationType } from "~/enums";
 
 interface Props {
   title: string;
   fileTypes: string[];
+  engineCategory: FilterEngineCategories;
   options?: {
     fileSubtypes?: { [key: string]: string }[];
     hasLength?: boolean;
@@ -22,6 +23,7 @@ interface Props {
 export const UploadFiles3D = ({
   title,
   fileTypes,
+  engineCategory,
   options,
   onClose,
   onUploadProgress,
@@ -85,6 +87,7 @@ export const UploadFiles3D = ({
       title: uploadTitle.value,
       assetFile: assetFile.value,
       thumbnailSnapshot: thumbnailFile,
+      engineCategory: engineCategory,
       animationType: subtype,
       progressCallback: onUploadProgress,
     });

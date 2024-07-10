@@ -6,7 +6,7 @@ import {
   UploaderStates,
 } from "~/enums";
 
-import { getFileName } from "~/utilities";
+import { getFileName, getFileExtension } from "~/utilities";
 
 import { MediaUploadApi, MediaFilesApi } from "~/Classes/ApiManager";
 import { UploaderState } from "~/models";
@@ -30,15 +30,31 @@ export const uploadAssets = async ({
 }) => {
   progressCallback({ status: UploaderStates.uploadingAsset });
   const mediaUploadApi = new MediaUploadApi();
-  const assetReponse = await mediaUploadApi.UploadNewEngineAsset({
-    file: assetFile,
-    fileName: assetFile.name,
-    engine_category: engineCategory,
-    maybe_animation_type: animationType,
-    maybe_duration_millis: length,
-    maybe_title: title,
-    uuid: uuidv4(),
-  });
+
+  const fileExtension = getFileExtension(assetFile);
+  const assetReponse = await (async () => {
+    switch (fileExtension) {
+      case ".zip":
+        return mediaUploadApi.UploadPmx({
+          file: assetFile,
+          fileName: assetFile.name,
+          engine_category: engineCategory,
+          maybe_title: title,
+          maybe_animation_type: animationType,
+          uuid: uuidv4(),
+        });
+      default:
+        return mediaUploadApi.UploadNewEngineAsset({
+          file: assetFile,
+          fileName: assetFile.name,
+          engine_category: engineCategory,
+          maybe_animation_type: animationType,
+          maybe_duration_millis: length,
+          maybe_title: title,
+          uuid: uuidv4(),
+        });
+    }
+  })();
 
   if (!assetReponse.success || !assetReponse.data) {
     progressCallback({

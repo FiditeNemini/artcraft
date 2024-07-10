@@ -3,7 +3,6 @@ import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 
 import {
   AssetFilterOption,
-  CHARACTER_FILE_TYPE,
   FeatureFlags,
   FilterEngineCategories,
   OBJECT_FILE_TYPE,
@@ -32,6 +31,11 @@ import {
   fetchUserMediaItemsSearchResults,
 } from "../utilities";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
+
+const filterEngineCategories = [
+  FilterEngineCategories.LOCATION,
+  FilterEngineCategories.SKYBOX,
+];
 
 export const SetsTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
@@ -94,7 +98,7 @@ export const SetsTab = () => {
   const fetchUserSetObjects = useCallback(
     () =>
       fetchUserMediaItems({
-        filterEngineCategories: [FilterEngineCategories.OBJECT],
+        filterEngineCategories: filterEngineCategories,
         setState: (newState: FetchMediaItemStates) => {
           setUserFetch((curr) => ({
             status: newState.status,
@@ -111,10 +115,7 @@ export const SetsTab = () => {
   const fetchFeaturedSetObjects = useCallback(
     () =>
       fetchFeaturedMediaItems({
-        filterEngineCategories: [
-          FilterEngineCategories.OBJECT,
-          FilterEngineCategories.IMAGE_PLANE,
-        ],
+        filterEngineCategories: filterEngineCategories,
         setState: (newState: FetchMediaItemStates) => {
           setFeaturedFetch((curr) => ({
             status: newState.status,
@@ -130,7 +131,7 @@ export const SetsTab = () => {
 
   const fetchFeaturedSearchResults = useCallback(async () => {
     fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.OBJECT],
+      filterEngineCategories: filterEngineCategories,
       setState: (newState: FetchMediaItemStates) => {
         setFeaturedSearchFetch((curr) => ({
           status: newState.status,
@@ -147,7 +148,7 @@ export const SetsTab = () => {
 
   const fetchUserSearchResults = useCallback(async () => {
     fetchUserMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.OBJECT],
+      filterEngineCategories: filterEngineCategories,
       setState: (newState: FetchMediaItemStates) => {
         setUserSearchFetch((curr) => ({
           status: newState.status,
@@ -264,10 +265,8 @@ export const SetsTab = () => {
         onClose={() => setOpenUploadModal(false)}
         onSuccess={fetchUserSetObjects}
         isOpen={openUploadModal}
-        fileTypes={[
-          ...Object.values(OBJECT_FILE_TYPE),
-          ...Object.values(CHARACTER_FILE_TYPE),
-        ]}
+        engineCategory={FilterEngineCategories.LOCATION}
+        fileTypes={Object.values(OBJECT_FILE_TYPE)}
         title="Upload Set Objects"
       />
     </>

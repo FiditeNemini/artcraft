@@ -14,6 +14,7 @@ interface Props {
   isOpen: boolean;
   title: string;
   fileTypes: string[];
+  engineCategory: FilterEngineCategories;
   options?: {
     fileSubtypes?: { [key: string]: string }[];
     hasLength?: boolean;
@@ -27,6 +28,7 @@ export function UploadModal3D({
   onSuccess,
   title,
   fileTypes,
+  engineCategory,
   options,
 }: Props) {
   const [uploaderState, setUploaderState] =
@@ -52,6 +54,7 @@ export function UploadModal3D({
         return (
           <UploadFiles3D
             title={title}
+            engineCategory={engineCategory}
             fileTypes={fileTypes}
             options={options}
             onClose={onClose}

@@ -29,6 +29,9 @@ export const SidePanelMenu = ({
   const showImagePlaneTab = usePosthogFeatureFlag(
     FeatureFlags.SHOW_IMAGEPLANE_TAB,
   );
+  const showCreaturesTab = usePosthogFeatureFlag(
+    FeatureFlags.SHOW_CREATURES_TAB,
+  );
   return (
     <div
       className={twMerge(
@@ -46,6 +49,9 @@ export const SidePanelMenu = ({
             return;
           }
           if (tab.title === TabTitles.IMAGE_PLANE && !showImagePlaneTab) {
+            return;
+          }
+          if (tab.title === TabTitles.CREATURES && !showCreaturesTab) {
             return;
           }
           return (

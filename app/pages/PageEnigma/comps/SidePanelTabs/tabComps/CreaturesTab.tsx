@@ -1,54 +1,53 @@
 import { useCallback, useEffect, useState } from "react";
+import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
-  IMAGEPLANE_FILE_TYPE,
+  OBJECT_FILE_TYPE,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
-import {
-  Button,
-  FilterButtons,
-  Pagination,
-  SearchFilter,
-  UploadModalImages,
-} from "~/components";
+
 import {
   TabTitle,
   ItemElements,
 } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import {
+  Button,
+  FilterButtons,
+  SearchFilter,
+  Pagination,
+  UploadModal3D,
+} from "~/components";
+import {
   fetchFeaturedMediaItems,
-  fetchUserMediaItems,
-  FetchMediaItemStates,
-  isAnyStatusFetching,
   fetchFeaturedMediaItemsSearchResults,
+  FetchMediaItemStates,
+  fetchUserMediaItems,
   fetchUserMediaItemsSearchResults,
+  isAnyStatusFetching,
 } from "../utilities";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 
-const filterEngineCategories = [
-  FilterEngineCategories.IMAGE_PLANE,
-  FilterEngineCategories.VIDEO_PLANE,
-];
+const filterEngineCategories = [FilterEngineCategories.CREATURE];
 
-export const ImagePlanesTab = () => {
+export const CreaturesTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
+
   const [searchTermFeatured, setSearchTermFeatured] = useState("");
   const [searchTermUser, setSearchTermUser] = useState("");
 
-  const [{ mediaItems: userImages, status: userFetchStatus }, setUserFetch] =
+  const [{ mediaItems: userObjects, status: userFetchStatus }, setUserFetch] =
     useState<FetchMediaItemStates>({
       mediaItems: undefined,
       status: FetchStatus.READY,
     });
   const [
-    { mediaItems: featuredImages, status: featuredFetchStatus },
+    { mediaItems: featuredObjects, status: featuredFetchStatus },
     setFeaturedFetch,
   ] = useState<FetchMediaItemStates>({
     mediaItems: undefined,
@@ -69,13 +68,15 @@ export const ImagePlanesTab = () => {
     status: FetchStatus.READY,
   });
 
-  const [selectedFilter, setSelectedFilter] = useState(AssetFilterOption.MINE);
+  const [selectedFilter, setSelectedFilter] = useState(
+    AssetFilterOption.FEATURED,
+  );
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? featuredImages ?? []
-      : userImages ?? [];
-
-  const [currentPage, setCurrentPage] = useState<number>(0);
+      ? featuredObjects ?? []
+      : userObjects ?? [];
 
   const pageSize = 21;
   const totalPages = Math.ceil(displayedItems.length / pageSize);
@@ -87,7 +88,7 @@ export const ImagePlanesTab = () => {
     userSearchFetchStatus,
   ]);
 
-  const fetchUserImages = useCallback(
+  const fetchUserObjects = useCallback(
     () =>
       fetchUserMediaItems({
         filterEngineCategories: filterEngineCategories,
@@ -99,12 +100,12 @@ export const ImagePlanesTab = () => {
               : curr.mediaItems,
           }));
         },
-        defaultErrorMessage: "Unknown Error in Fetching User Images",
+        defaultErrorMessage: "Unknown Error in Fetching User Set Objects",
       }),
     [],
   );
 
-  const fetchFeaturedImages = useCallback(
+  const fetchFeaturedObjects = useCallback(
     () =>
       fetchFeaturedMediaItems({
         filterEngineCategories: filterEngineCategories,
@@ -116,7 +117,7 @@ export const ImagePlanesTab = () => {
               : curr.mediaItems,
           }));
         },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Images",
+        defaultErrorMessage: "Unknown Error in Fetching Featured Set Objects",
       }),
     [],
   );
@@ -125,15 +126,13 @@ export const ImagePlanesTab = () => {
     fetchFeaturedMediaItemsSearchResults({
       filterEngineCategories: filterEngineCategories,
       setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch((curr) => ({
+        setFeaturedSearchFetch(() => ({
           status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
+          mediaItems: newState.mediaItems,
         }));
       },
       defaultErrorMessage:
-        "Unknown Error in Fetching Featured Images Search Results",
+        "Unknown Error in Fetching Featured Set Objects Search Results",
       searchTerm: searchTermFeatured,
     });
   }, [searchTermFeatured]);
@@ -150,19 +149,19 @@ export const ImagePlanesTab = () => {
         }));
       },
       defaultErrorMessage:
-        "Unknown Error in Fetching User Images Search Results",
+        "Unknown Error in Fetching User Set Objects Search Results",
       searchTerm: searchTermUser,
     });
   }, [searchTermUser]);
 
   useEffect(() => {
-    if (!userImages) {
-      fetchUserImages();
+    if (!userObjects) {
+      fetchUserObjects();
     }
-    if (!featuredImages) {
-      fetchFeaturedImages();
+    if (!featuredObjects) {
+      fetchFeaturedObjects();
     }
-  }, [userImages, fetchUserImages, featuredImages, fetchFeaturedImages]);
+  }, [userObjects, fetchUserObjects, featuredObjects, fetchFeaturedObjects]);
 
   useEffect(() => {
     if (selectedFilter === AssetFilterOption.FEATURED) {
@@ -182,15 +181,14 @@ export const ImagePlanesTab = () => {
 
   return (
     <>
-      <TabTitle title="Image Panels" />
-
+      <TabTitle title="Objects" />
       <FilterButtons
         value={selectedFilter}
-        onClick={(buttonIdx) => {
-          setSelectedFilter(Number(buttonIdx));
+        onClick={(button) => {
+          setSelectedFilter(Number(button));
+          setCurrentPage(0);
         }}
       />
-
       <div className="flex w-full flex-col gap-3 px-4">
         <Button
           icon={faCirclePlus}
@@ -198,7 +196,7 @@ export const ImagePlanesTab = () => {
           onClick={() => setOpenUploadModal(true)}
           className="w-full py-3 text-sm font-medium"
         >
-          Upload Image Panels
+          Upload Creature Objects
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
@@ -215,15 +213,16 @@ export const ImagePlanesTab = () => {
             key={selectedFilter}
             placeholder={
               selectedFilter === AssetFilterOption.FEATURED
-                ? "Search featured image panels"
-                : "Search my image panels"
+                ? "Search featured objects"
+                : "Search my objects"
             }
           />
         )}
       </div>
-      <div className="w-full grow overflow-y-auto px-4 pb-4">
+      <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
         <ItemElements
           busy={isFetching}
+          debug="objects tab"
           currentPage={currentPage}
           pageSize={pageSize}
           items={
@@ -247,12 +246,13 @@ export const ImagePlanesTab = () => {
           }}
         />
       )}
-      <UploadModalImages
+      <UploadModal3D
         onClose={() => setOpenUploadModal(false)}
-        onSuccess={fetchUserImages}
+        onSuccess={fetchUserObjects}
         isOpen={openUploadModal}
-        fileTypes={Object.values(IMAGEPLANE_FILE_TYPE)}
-        title="Upload Image Panels"
+        engineCategory={FilterEngineCategories.CREATURE}
+        fileTypes={Object.values(OBJECT_FILE_TYPE)}
+        title="Upload Creatures"
       />
     </>
   );

@@ -8,6 +8,7 @@ import {
   faCube,
   faVolume,
   faBrush,
+  faSpaghettiMonsterFlying,
   faPresentationScreen,
 } from "@fortawesome/pro-solid-svg-icons";
 
@@ -18,6 +19,7 @@ import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/AudioT
 import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/StylizeTab/StylizeTab";
 import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
 import { CharactersTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CharactersTab";
+import { CreaturesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CreaturesTab";
 import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
 import { ImagePlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ImagePlanesTab";
 
@@ -37,6 +39,11 @@ export const tabList = [
     icon: faPeople,
     title: TabTitles.CHARACTERS,
     component: <CharactersTab />,
+  },
+  {
+    icon: faSpaghettiMonsterFlying,
+    title: TabTitles.CREATURES,
+    component: <CreaturesTab />,
   },
   {
     icon: faRabbitRunning,

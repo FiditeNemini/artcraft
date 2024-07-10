@@ -6,10 +6,12 @@ import { v4 as uuidv4 } from "uuid";
 export const uploadAsset = async ({
   file,
   title,
+  engineCategory,
   animationType,
 }: {
   file: File;
   title: string;
+  engineCategory: FilterEngineCategories;
   animationType?: MediaFileAnimationType;
 }) => {
   const mediaUploadApi = new MediaUploadApi();
@@ -20,28 +22,16 @@ export const uploadAsset = async ({
         return mediaUploadApi.UploadPmx({
           file: file,
           fileName: file.name,
-          engine_category: FilterEngineCategories.CHARACTER,
+          engine_category: engineCategory,
           maybe_title: title,
           maybe_animation_type: animationType,
           uuid: uuidv4(),
         });
-      // case ".png":
-      // case ".gif":
-      // case ".jpg":
-      // case ".jpeg":
-      //   return mediaUploadApi.UploadNewEngineAsset({
-      //     file: file,
-      //     fileName: file.name,
-      //     engine_category: FilterEngineCategories.IMAGE_PLANE,
-      //     maybe_animation_type: animationType,
-      //     maybe_title: title,
-      //     uuid: uuidv4(),
-      //   });
       default:
         return mediaUploadApi.UploadNewEngineAsset({
           file: file,
           fileName: file.name,
-          engine_category: FilterEngineCategories.OBJECT,
+          engine_category: engineCategory,
           maybe_title: title,
           uuid: uuidv4(),
         });

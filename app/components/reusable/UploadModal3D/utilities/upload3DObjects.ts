@@ -1,4 +1,8 @@
-import { MediaFileAnimationType, UploaderStates } from "~/enums";
+import {
+  FilterEngineCategories,
+  MediaFileAnimationType,
+  UploaderStates,
+} from "~/enums";
 import { setThumbnail, uploadSnapshotAsThumbnail } from "./thumbnailHelpers";
 
 import { uploadAsset } from "./uploadAsset";
@@ -7,12 +11,14 @@ import { UploaderState } from "~/models";
 export const upload3DObjects = async ({
   title,
   assetFile,
+  engineCategory,
   thumbnailSnapshot,
   animationType,
   progressCallback,
 }: {
   title: string;
   assetFile: File;
+  engineCategory: FilterEngineCategories;
   thumbnailSnapshot: Blob | undefined;
   animationType?: MediaFileAnimationType;
   progressCallback: (newState: UploaderState) => void;
@@ -22,6 +28,7 @@ export const upload3DObjects = async ({
   const assetReponse = await uploadAsset({
     file: assetFile,
     title: title,
+    engineCategory: engineCategory,
     animationType: animationType,
   });
 
