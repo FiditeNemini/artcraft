@@ -201,10 +201,8 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
   // This shouldn't ever become a deeply nested tree of children, but rather a single root
   // with potentially many direct children.
   let style_transfer_source_media_file_token = args.download_videos
-      .input_video_media_file
-      .maybe_style_transfer_source_media_file_token
-      .as_ref()
-      .unwrap_or_else(|| &args.download_videos.input_video_media_file.token);
+      .input_video.record.maybe_style_transfer_source_media_file_token()?
+      .unwrap_or_else(|| args.download_videos.input_video.record.token());
 
   let prompt_token = PromptToken::generate();
 
@@ -212,12 +210,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     pool: &args.deps.db.mysql_pool,
     job: &args.job,
     maybe_mime_type: Some(&mimetype),
-    maybe_title: args.download_videos.input_video_media_file.maybe_title.as_deref(),
+    maybe_title: args.download_videos.input_video.record.maybe_title(),
     maybe_style_transfer_source_media_file_token: Some(&style_transfer_source_media_file_token),
     maybe_scene_source_media_file_token: args.download_videos
-        .input_video_media_file
-        .maybe_scene_source_media_file_token
-        .as_ref(),
+        .input_video.record.maybe_scene_source_media_file_token()?,
     file_size_bytes,
     sha256_checksum: &file_checksum,
     maybe_prompt_token: Some(&prompt_token),

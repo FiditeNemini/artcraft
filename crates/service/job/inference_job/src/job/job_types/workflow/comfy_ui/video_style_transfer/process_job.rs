@@ -236,7 +236,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         global_ipa_image = Some(results);
     }
 
-    // ==================== DOWNLOAD VIDEO ==================== //
+    // ==================== DOWNLOAD VIDEOS ==================== //
 
     let mut download_videos = download_input_videos(DownloadInputVideoArgs {
         job_args: &job_args,

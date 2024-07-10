@@ -14,7 +14,7 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::VideoDownloadDetails;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::secondary_video_and_paths::SecondaryVideoAndPaths;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::input_video_and_paths::InputVideoAndPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 
 pub struct ProcessTrimAndResampleVideoArgs<'a> {
@@ -174,7 +174,7 @@ fn preprocess_trim_and_resample_secondary_videos(
 fn preprocess_trim_and_resample_secondary_video(
   comfy_deps: &ComfyDependencies,
   resample_details: &ResampleDetails,
-  video: &SecondaryVideoAndPaths,
+  video: &InputVideoAndPaths,
 ) -> Result<PathBuf, ProcessSingleJobError> {
   info!("Calling video trim / resample...");
   info!("Script: {:?}", &comfy_deps.inference_command.processing_script);

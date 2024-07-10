@@ -15,14 +15,14 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::secondary_video_and_paths::SecondaryVideoAndPaths;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::input_video_and_paths::{InputVideoAndPaths, VideoMediaFileRecord};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::video_paths::VideoPaths;
 
 pub struct VideoDownloadDetails {
-  pub input_video_media_file: MediaFile,
-  pub maybe_depth: Option<SecondaryVideoAndPaths>,
-  pub maybe_normal: Option<SecondaryVideoAndPaths>,
-  pub maybe_outline: Option<SecondaryVideoAndPaths>,
+  pub input_video: InputVideoAndPaths,
+  pub maybe_depth: Option<InputVideoAndPaths>,
+  pub maybe_normal: Option<InputVideoAndPaths>,
+  pub maybe_outline: Option<InputVideoAndPaths>,
 }
 
 pub struct DownloadInputVideoArgs<'a> {
@@ -96,7 +96,11 @@ async fn download_primary_video(
   info!("Downloaded primary input video!");
 
   Ok(VideoDownloadDetails {
-    input_video_media_file: input_media_file,
+    input_video: InputVideoAndPaths {
+      record: VideoMediaFileRecord::Single(input_media_file),
+      original_download_path: args.videos.original_video_path.clone(),
+      maybe_processed_path: None,
+    },
     maybe_depth: None,
     maybe_normal: None,
     maybe_outline: None,
@@ -159,7 +163,7 @@ async fn download_secondary_video(
   desired_token: &MediaFileToken,
   all_video_media_files: &[MediaFilesByTokensRecord],
   args: &DownloadInputVideoArgs<'_>
-) -> Result<Option<SecondaryVideoAndPaths>, ProcessSingleJobError> {
+) -> Result<Option<InputVideoAndPaths>, ProcessSingleJobError> {
 
   let file_description = match secondary_video_type {
     SecondaryVideoType::Depth => "depth video",
@@ -200,8 +204,8 @@ async fn download_secondary_video(
     path_to_string(&download_path)
   ).await?;
 
-  Ok(Some(SecondaryVideoAndPaths {
-    media_file: media_file.clone(),
+  Ok(Some(InputVideoAndPaths {
+    record: VideoMediaFileRecord::Bulk(media_file.clone()),
     original_download_path: download_path,
     maybe_processed_path: None,
   }))
