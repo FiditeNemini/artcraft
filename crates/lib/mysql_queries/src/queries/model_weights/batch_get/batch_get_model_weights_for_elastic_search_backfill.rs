@@ -64,6 +64,11 @@ pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
 ) -> AnyhowResult<Vec<ModelWeightForElasticsearchRecord>>
   where E: 'e + Executor<'c, Database=MySql>
 {
+  if tokens.is_empty() {
+    // NB: We should always eagerly return, but if we don't, the query builder will build an
+    // invalid query.
+    return Ok(Vec::new());
+  }
 
   let maybe_models
       = list_model_weights(mysql_executor, tokens)

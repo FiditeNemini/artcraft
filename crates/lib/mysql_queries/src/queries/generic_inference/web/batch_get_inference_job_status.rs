@@ -23,6 +23,12 @@ use crate::queries::generic_inference::web::job_status::{GenericInferenceJobStat
 pub async fn batch_get_inference_job_status(job_tokens: &[InferenceJobToken], mysql_pool: &MySqlPool)
   -> AnyhowResult<Vec<GenericInferenceJobStatus>>
 {
+  if job_tokens.is_empty() {
+    // NB: We should always eagerly return, but if we don't, the query builder will build an
+    // invalid query.
+    return Ok(Vec::new());
+  }
+
   let mut connection = mysql_pool.acquire().await?;
   batch_get_inference_job_status_from_connection(job_tokens, &mut connection).await
 }
