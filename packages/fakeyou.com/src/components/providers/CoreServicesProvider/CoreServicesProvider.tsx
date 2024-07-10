@@ -6,7 +6,6 @@ import {
   SessionProvider,
 } from "components/providers";
 import ServerStatusChecker from "./ServerStatusChecker";
-import { useInferenceJobsPolling } from "hooks";
 
 interface Props {
   children?: any;
@@ -21,15 +20,6 @@ export default function CoreServicesProvider({
   querySubscriptions,
   state,
 }: Props) {
-  const {
-    byCategory,
-    clearJobs,
-    clearJobsStatus,
-    enqueueInferenceJob,
-    inferenceJobs,
-    someJobsAreDone,
-  } = useInferenceJobsPolling({ sessionWrapper: state.sessionWrapper });
-
   const sessionProps = {
     querySession: querySession,
     querySubscriptions,
@@ -37,23 +27,15 @@ export default function CoreServicesProvider({
     sessionWrapper: state.sessionWrapper,
     sessionFetched: state.sessionFetched,
   };
-  const inferenceJobsProps = {
-    enqueue: enqueueInferenceJob,
-    byCategory,
-    clearJobs,
-    clearJobsStatus,
-    inferenceJobs,
-    someJobsAreDone,
-  };
 
   return (
     <SessionProvider {...sessionProps}>
-      <InferenceJobsProvider {...inferenceJobsProps}>
-        <NotificationProvider>
-          <ServerStatusChecker />
-          <ModalProvider>{children}</ModalProvider>
-        </NotificationProvider>
-      </InferenceJobsProvider>
+      <NotificationProvider>
+        <ServerStatusChecker />
+        <ModalProvider>
+          <InferenceJobsProvider>{children}</InferenceJobsProvider>
+        </ModalProvider>
+      </NotificationProvider>
     </SessionProvider>
   );
 }

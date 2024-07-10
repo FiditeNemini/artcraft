@@ -33,6 +33,7 @@ interface SessionContextType {
   querySubscriptions?: any;
   sessionFetched: boolean;
   sessionSubscriptions?: any;
+  sessionWrapper: SessionWrapper;
   studioAccessCheck: (x: any) => any;
   user?: any;
   userTokenMatch: (token: string) => boolean;
@@ -51,6 +52,8 @@ interface Props {
 // These functions will never actually fire because they are immediately redefined in the provider below,
 // as they must be as they utilize the provider's state.
 
+// const thingy = new SessionWrapper()
+
 export const SessionContext = createContext<SessionContextType>({
   canAccessStudio: () => false,
   canEditTtsModel: () => false,
@@ -66,6 +69,7 @@ export const SessionContext = createContext<SessionContextType>({
     view: ModalView.Closed,
   },
   userTokenMatch: () => false,
+  sessionWrapper: SessionWrapper.emptySession(),
 });
 
 export default function SessionProvider({
@@ -98,9 +102,9 @@ export default function SessionProvider({
   };
   // NB: Since user token matching is used for ownership permission checking, neither may be undefined!
   const userTokenMatch = (otherUserToken?: string) =>
-    user?.user_token !== undefined && 
-      otherUserToken !== undefined && 
-      user.user_token === otherUserToken;
+    user?.user_token !== undefined &&
+    otherUserToken !== undefined &&
+    user.user_token === otherUserToken;
   const canEditTtsModel = (userToken: string) =>
     user?.can_delete_other_users_tts_models || userTokenMatch(userToken);
   const canEditMediaFile = (userToken?: string) =>
@@ -134,6 +138,7 @@ export default function SessionProvider({
           querySubscriptions,
           sessionFetched,
           sessionSubscriptions,
+          sessionWrapper,
           studioAccessCheck,
           user,
           userTokenMatch,
