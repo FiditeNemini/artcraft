@@ -131,6 +131,10 @@ async fn maybe_download_secondary_videos(
     tokens.push(token.clone());
   }
 
+  if tokens.is_empty() {
+    return Ok(video_downloads);
+  }
+
   let results = batch_get_media_files_by_tokens(args.mysql_pool, &tokens, CAN_SEE_DELETED)
       .await
       .map_err(|err| {

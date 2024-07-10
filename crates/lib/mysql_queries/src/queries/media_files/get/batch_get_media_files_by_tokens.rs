@@ -69,6 +69,9 @@ pub async fn batch_get_media_files_by_tokens(
   media_file_tokens: &[MediaFileToken],
   can_see_deleted: bool
 ) -> AnyhowResult<Vec<MediaFilesByTokensRecord>> {
+  if media_file_tokens.is_empty() {
+    return Ok(vec![]);
+  }
 
   let mut connection = mysql_pool.acquire().await?;
 
