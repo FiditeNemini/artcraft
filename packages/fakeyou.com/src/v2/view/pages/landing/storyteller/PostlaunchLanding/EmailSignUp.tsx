@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Widget } from "@typeform/embed-react";
 import ModalHeader from "components/modals/ModalHeader";
 import { set } from "local-storage";
@@ -9,12 +9,15 @@ interface EmailSignUpProps {
   handleClose?: any;
 }
 
-export default function EmailSignUp({
+export function EmailSignUp({
   mobile,
   showHanashi = true,
   handleClose,
 }: EmailSignUpProps) {
   const [isHanashiHovered, setIsHanashiHovered] = useState(false);
+
+  const handleMouseEnter = useCallback(() => setIsHanashiHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHanashiHovered(false), []);
 
   return (
     <div>
@@ -43,8 +46,8 @@ export default function EmailSignUp({
                 : "/images/landing/hanashi-demo-1.webp"
             }
             alt="Hanashi Demo"
-            onMouseEnter={() => setIsHanashiHovered(true)}
-            onMouseLeave={() => setIsHanashiHovered(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             draggable="false"
             style={{
               top: "-49%",
@@ -67,3 +70,5 @@ export default function EmailSignUp({
     </div>
   );
 }
+
+export default React.memo(EmailSignUp);

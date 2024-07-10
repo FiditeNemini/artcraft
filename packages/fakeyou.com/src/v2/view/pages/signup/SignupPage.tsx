@@ -262,15 +262,24 @@ function SignupPage(props: Props) {
   };
 
   const redirectLink = queryParams.get("redirect");
+  const redirectSignUpLink = "/beta-key/redeem?redirect=signup";
 
   const afterSignupRedirect = async () => {
     const maybeInternalPlanKey = parsedQueryString["sub"] as string | undefined;
 
-    if (maybeInternalPlanKey !== undefined) {
-      return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
+    if (domain.titlePart === "FakeYou") {
+      if (maybeInternalPlanKey !== undefined) {
+        return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
+      }
     }
 
-    let redirectUrl = redirectLink || WebUrl.pricingPageWithReferer("signup");
+    let redirectUrl = redirectLink || "/";
+    if (domain.titlePart === "Storyteller AI") {
+      redirectUrl = redirectSignUpLink;
+      if (redirectUrl === redirectSignUpLink) {
+        sessionStorage.setItem("redirected", "true");
+      }
+    }
     history.push(redirectUrl);
 
     return true;

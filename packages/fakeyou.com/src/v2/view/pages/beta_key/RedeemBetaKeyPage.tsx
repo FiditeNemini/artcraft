@@ -1,10 +1,7 @@
 import { Button, Container, Label, Panel, TempInput } from "components/common";
 import React, { useEffect, useState } from "react";
 import "./BetaKey.scss";
-import {
-  faKey,
-  faPersonWalkingArrowLoopLeft,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faArrowLeft, faKey } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { RedeemBetaKey } from "@storyteller/components/src/api/beta_key/RedeemBetaKey";
 import { Link, useHistory, useParams } from "react-router-dom";
@@ -226,9 +223,22 @@ export default function RedeemBetaKeyPage() {
               />
             </div>
           </Panel>
+          {/* <p className="fs-9 mt-3">
+            Don't have a beta key? Join the
+            <span
+              onClick={openModal}
+              className="text-red"
+              style={{ cursor: "pointer" }}
+            >
+              {" "}
+              waitlist
+            </span>{" "}
+            now!
+          </p> */}
           <p>
             <Link to="/">
-              <FontAwesomeIcon icon={faPersonWalkingArrowLoopLeft} /> Back Home
+              <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+              Back Home
             </Link>
           </p>
         </div>
