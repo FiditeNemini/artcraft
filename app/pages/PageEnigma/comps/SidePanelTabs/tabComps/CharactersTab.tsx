@@ -3,18 +3,19 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
-  AssetType,
+  CHARACTER_FILE_TYPE,
   FeatureFlags,
   FilterEngineCategories,
+  MediaFileAnimationType,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { characterItems as demoCharacterItems } from "~/pages/PageEnigma/signals";
 import {
   Button,
-  FileWrapper,
   FilterButtons,
   Pagination,
   SearchFilter,
+  UploadModal,
 } from "~/components";
 import {
   ItemElements,
@@ -36,6 +37,8 @@ export const CharactersTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
+
+  const [openUploadModal, setOpenUploadModal] = useState(false);
 
   const [searchTermFeatured, setSearchTermFeatured] = useState("");
   const [searchTermUser, setSearchTermUser] = useState("");
@@ -199,80 +202,90 @@ export const CharactersTab = () => {
 
   return (
     <>
-      <FileWrapper
-        onSuccess={fetchUserCharacters}
-        type={AssetType.CHARACTER}
-        render={(parentId) => (
-          <>
-            <TabTitle title="Characters" />
-            <div>
-              <FilterButtons
-                value={selectedFilter}
-                onClick={(button) => {
-                  setSelectedFilter(Number(button));
-                  setCurrentPage(0);
-                }}
-              />
-            </div>
-            <div className="flex w-full flex-col gap-3 px-4">
-              <Button
-                className="file-picker-button py-3"
-                htmlFor={parentId}
-                icon={faCirclePlus}
-                variant="action"
-              >
-                Upload Character
-              </Button>
-              {showSearchObjectComponent && (
-                <SearchFilter
-                  searchTerm={
-                    selectedFilter === AssetFilterOption.FEATURED
-                      ? searchTermFeatured
-                      : searchTermUser
-                  }
-                  onSearchChange={
-                    selectedFilter === AssetFilterOption.FEATURED
-                      ? setSearchTermFeatured
-                      : setSearchTermUser
-                  }
-                  key={selectedFilter}
-                  placeholder={
-                    selectedFilter === AssetFilterOption.FEATURED
-                      ? "Search featured characters"
-                      : "Search my characters"
-                  }
-                />
-              )}
-            </div>
-            <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
-              <ItemElements
-                busy={isFetching}
-                debug="characters tab"
-                currentPage={currentPage}
-                pageSize={pageSize}
-                items={
-                  selectedFilter === AssetFilterOption.FEATURED
-                    ? searchTermFeatured
-                      ? featuredSearchResults ?? []
-                      : displayedItems
-                    : searchTermUser
-                      ? userSearchResults ?? []
-                      : displayedItems
-                }
-              />
-            </div>
-            {totalPages > 1 && (
-              <Pagination
-                className="-mt-4 px-4"
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(newPage: number) => {
-                  setCurrentPage(newPage);
-                }}
-              />
-            )}
-          </>
+      <TabTitle title="Characters" />
+      <div>
+        <FilterButtons
+          value={selectedFilter}
+          onClick={(button) => {
+            setSelectedFilter(Number(button));
+            setCurrentPage(0);
+          }}
+        />
+      </div>
+      <div className="flex w-full flex-col gap-3 px-4">
+        <Button
+          icon={faCirclePlus}
+          variant="action"
+          onClick={() => setOpenUploadModal(true)}
+          className="w-full py-3 text-sm font-medium"
+        >
+          Upload Characters
+        </Button>
+        {showSearchObjectComponent && (
+          <SearchFilter
+            searchTerm={
+              selectedFilter === AssetFilterOption.FEATURED
+                ? searchTermFeatured
+                : searchTermUser
+            }
+            onSearchChange={
+              selectedFilter === AssetFilterOption.FEATURED
+                ? setSearchTermFeatured
+                : setSearchTermUser
+            }
+            key={selectedFilter}
+            placeholder={
+              selectedFilter === AssetFilterOption.FEATURED
+                ? "Search featured characters"
+                : "Search my characters"
+            }
+          />
         )}
+      </div>
+      <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
+        <ItemElements
+          busy={isFetching}
+          debug="characters tab"
+          currentPage={currentPage}
+          pageSize={pageSize}
+          items={
+            selectedFilter === AssetFilterOption.FEATURED
+              ? searchTermFeatured
+                ? featuredSearchResults ?? []
+                : displayedItems
+              : searchTermUser
+                ? userSearchResults ?? []
+                : displayedItems
+          }
+        />
+      </div>
+      {totalPages > 1 && (
+        <Pagination
+          className="-mt-4 px-4"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage: number) => {
+            setCurrentPage(newPage);
+          }}
+        />
+      )}
+      <UploadModal
+        onClose={() => setOpenUploadModal(false)}
+        onSuccess={fetchUserCharacters}
+        isOpen={openUploadModal}
+        type={FilterEngineCategories.CHARACTER}
+        options={{
+          hasThumbnailUpload: true,
+          fileSubtypes: [
+            { Mixamo: MediaFileAnimationType.Mixamo },
+            { MikuMikuDance: MediaFileAnimationType.MikuMikuDance },
+            { MoveAi: MediaFileAnimationType.MoveAi },
+            { Rigify: MediaFileAnimationType.Rigify },
+            { Rokoko: MediaFileAnimationType.Rokoko },
+          ],
+        }}
+        fileTypes={Object.values(CHARACTER_FILE_TYPE)}
+        title="Upload Characters"
       />
     </>
   );

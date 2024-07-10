@@ -25,24 +25,23 @@ export const uploadAsset = async ({
           maybe_animation_type: animationType,
           uuid: uuidv4(),
         });
-      case ".png":
-      case ".gif":
-      case ".jpg":
-      case ".jpeg":
-        return mediaUploadApi.UploadNewEngineAsset({
-          file: file,
-          fileName: file.name,
-          engine_category: FilterEngineCategories.IMAGE_PLANE,
-          maybe_animation_type: animationType,
-          maybe_title: title,
-          uuid: uuidv4(),
-        });
+      // case ".png":
+      // case ".gif":
+      // case ".jpg":
+      // case ".jpeg":
+      //   return mediaUploadApi.UploadNewEngineAsset({
+      //     file: file,
+      //     fileName: file.name,
+      //     engine_category: FilterEngineCategories.IMAGE_PLANE,
+      //     maybe_animation_type: animationType,
+      //     maybe_title: title,
+      //     uuid: uuidv4(),
+      //   });
       default:
         return mediaUploadApi.UploadNewEngineAsset({
           file: file,
           fileName: file.name,
           engine_category: FilterEngineCategories.OBJECT,
-          maybe_animation_type: animationType,
           maybe_title: title,
           uuid: uuidv4(),
         });

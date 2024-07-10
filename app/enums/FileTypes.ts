@@ -1,3 +1,8 @@
+export enum ANIMATION_FILE_TYPE {
+  GLB = "GLB",
+  VMD = "VMD",
+}
+
 export enum AUDIO_FILE_TYPE {
   MP3 = "MP3",
   WAV = "WAV",
@@ -5,7 +10,13 @@ export enum AUDIO_FILE_TYPE {
   OGG = "OGG",
 }
 
-export enum IMAGE_FILE_TYPE {
+export enum IMAGEPLANE_FILE_TYPE {
+  PNG = "PNG",
+  JPG = "JPG",
+  JPEG = "JPEG",
+}
+
+export enum THUMBNAILS_FILE_TYPE {
   PNG = "PNG",
   JPG = "JPG",
   JPEG = "JPEG",
@@ -14,5 +25,9 @@ export enum IMAGE_FILE_TYPE {
 
 export enum OBJECT_FILE_TYPE {
   GLB = "GLB",
-  FBX = "FBX",
+}
+
+export enum CHARACTER_FILE_TYPE {
+  PMD = "PMD",
+  ZIP = "ZIP",
 }

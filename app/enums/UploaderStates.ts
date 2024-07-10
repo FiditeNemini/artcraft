@@ -1,4 +1,4 @@
-export enum UploaderState {
+export enum UploaderStates {
   ready,
   uploadingAsset,
   uploadingCover,

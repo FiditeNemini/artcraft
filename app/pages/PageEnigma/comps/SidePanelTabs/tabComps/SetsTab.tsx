@@ -3,9 +3,9 @@ import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 
 import {
   AssetFilterOption,
+  CHARACTER_FILE_TYPE,
   FeatureFlags,
   FilterEngineCategories,
-  IMAGE_FILE_TYPE,
   OBJECT_FILE_TYPE,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
@@ -15,7 +15,7 @@ import {
   FilterButtons,
   Pagination,
   SearchFilter,
-  UploadModal3DPreview,
+  UploadModal3D,
 } from "~/components";
 
 import {
@@ -111,7 +111,10 @@ export const SetsTab = () => {
   const fetchFeaturedSetObjects = useCallback(
     () =>
       fetchFeaturedMediaItems({
-        filterEngineCategories: [FilterEngineCategories.OBJECT],
+        filterEngineCategories: [
+          FilterEngineCategories.OBJECT,
+          FilterEngineCategories.IMAGE_PLANE,
+        ],
         setState: (newState: FetchMediaItemStates) => {
           setFeaturedFetch((curr) => ({
             status: newState.status,
@@ -257,17 +260,15 @@ export const SetsTab = () => {
           }}
         />
       )}
-      <UploadModal3DPreview
+      <UploadModal3D
         onClose={() => setOpenUploadModal(false)}
         onSuccess={fetchUserSetObjects}
         isOpen={openUploadModal}
         fileTypes={[
           ...Object.values(OBJECT_FILE_TYPE),
-          "PMD",
-          ...Object.values(IMAGE_FILE_TYPE),
+          ...Object.values(CHARACTER_FILE_TYPE),
         ]}
         title="Upload Set Objects"
-        type={FilterEngineCategories.OBJECT}
       />
     </>
   );

@@ -4,7 +4,7 @@ import {
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
-  IMAGE_FILE_TYPE,
+  IMAGEPLANE_FILE_TYPE,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import {
@@ -246,9 +246,8 @@ export const ImagePlanesTab = () => {
         onClose={() => setOpenUploadModal(false)}
         onSuccess={fetchUserImages}
         isOpen={openUploadModal}
-        fileTypes={Object.values(IMAGE_FILE_TYPE)}
+        fileTypes={Object.values(IMAGEPLANE_FILE_TYPE)}
         title="Upload Image Panels"
-        type={FilterEngineCategories.IMAGE_PLANE}
       />
     </>
   );

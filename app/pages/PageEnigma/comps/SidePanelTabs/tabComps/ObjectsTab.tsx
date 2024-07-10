@@ -4,9 +4,9 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
-  AssetType,
   FeatureFlags,
   FilterEngineCategories,
+  OBJECT_FILE_TYPE,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { shapeItems } from "~/pages/PageEnigma/signals";
@@ -17,10 +17,10 @@ import {
 } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import {
   Button,
-  FileWrapper,
   FilterButtons,
   SearchFilter,
   Pagination,
+  UploadModal3D,
 } from "~/components";
 import {
   fetchFeaturedMediaItems,
@@ -37,6 +37,8 @@ export const ObjectsTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
+
+  const [openUploadModal, setOpenUploadModal] = useState(false);
 
   const [searchTermFeatured, setSearchTermFeatured] = useState("");
   const [searchTermUser, setSearchTermUser] = useState("");
@@ -188,78 +190,79 @@ export const ObjectsTab = () => {
   ]);
 
   return (
-    <FileWrapper
-      onSuccess={fetchUserObjects}
-      type={AssetType.OBJECT}
-      render={(parentId) => (
-        <>
-          <TabTitle title="Objects" />
-          <FilterButtons
-            value={selectedFilter}
-            onClick={(button) => {
-              setSelectedFilter(Number(button));
-              setCurrentPage(0);
-            }}
+    <>
+      <TabTitle title="Objects" />
+      <FilterButtons
+        value={selectedFilter}
+        onClick={(button) => {
+          setSelectedFilter(Number(button));
+          setCurrentPage(0);
+        }}
+      />
+      <div className="flex w-full flex-col gap-3 px-4">
+        <Button
+          icon={faCirclePlus}
+          variant="action"
+          onClick={() => setOpenUploadModal(true)}
+          className="w-full py-3 text-sm font-medium"
+        >
+          Upload Objects
+        </Button>
+        {showSearchObjectComponent && (
+          <SearchFilter
+            searchTerm={
+              selectedFilter === AssetFilterOption.FEATURED
+                ? searchTermFeatured
+                : searchTermUser
+            }
+            onSearchChange={
+              selectedFilter === AssetFilterOption.FEATURED
+                ? setSearchTermFeatured
+                : setSearchTermUser
+            }
+            key={selectedFilter}
+            placeholder={
+              selectedFilter === AssetFilterOption.FEATURED
+                ? "Search featured objects"
+                : "Search my objects"
+            }
           />
-          <div className="flex w-full flex-col gap-3 px-4">
-            <Button
-              className="file-picker-button py-3"
-              htmlFor={parentId}
-              icon={faCirclePlus}
-              variant="action"
-            >
-              Upload Object
-            </Button>
-            {showSearchObjectComponent && (
-              <SearchFilter
-                searchTerm={
-                  selectedFilter === AssetFilterOption.FEATURED
-                    ? searchTermFeatured
-                    : searchTermUser
-                }
-                onSearchChange={
-                  selectedFilter === AssetFilterOption.FEATURED
-                    ? setSearchTermFeatured
-                    : setSearchTermUser
-                }
-                key={selectedFilter}
-                placeholder={
-                  selectedFilter === AssetFilterOption.FEATURED
-                    ? "Search featured objects"
-                    : "Search my objects"
-                }
-              />
-            )}
-          </div>
-          <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
-            <ItemElements
-              busy={isFetching}
-              debug="objects tab"
-              currentPage={currentPage}
-              pageSize={pageSize}
-              items={
-                selectedFilter === AssetFilterOption.FEATURED
-                  ? searchTermFeatured
-                    ? featuredSearchResults ?? []
-                    : displayedItems
-                  : searchTermUser
-                    ? userSearchResults ?? []
-                    : displayedItems
-              }
-            />
-          </div>
-          {totalPages > 1 && (
-            <Pagination
-              className="-mt-4 px-4"
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(newPage: number) => {
-                setCurrentPage(newPage);
-              }}
-            />
-          )}
-        </>
+        )}
+      </div>
+      <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
+        <ItemElements
+          busy={isFetching}
+          debug="objects tab"
+          currentPage={currentPage}
+          pageSize={pageSize}
+          items={
+            selectedFilter === AssetFilterOption.FEATURED
+              ? searchTermFeatured
+                ? featuredSearchResults ?? []
+                : displayedItems
+              : searchTermUser
+                ? userSearchResults ?? []
+                : displayedItems
+          }
+        />
+      </div>
+      {totalPages > 1 && (
+        <Pagination
+          className="-mt-4 px-4"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage: number) => {
+            setCurrentPage(newPage);
+          }}
+        />
       )}
-    />
+      <UploadModal3D
+        onClose={() => setOpenUploadModal(false)}
+        onSuccess={fetchUserObjects}
+        isOpen={openUploadModal}
+        fileTypes={Object.values(OBJECT_FILE_TYPE)}
+        title="Upload Objects"
+      />
+    </>
   );
 };

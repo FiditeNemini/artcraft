@@ -36,6 +36,8 @@ export const ExpressionTab = () => {
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
 
+  const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
+
   const [open, setOpen] = useState(false);
   const [searchTermFeatured, setSearchTermFeatured] = useState("");
   const [searchTermUser, setSearchTermUser] = useState("");
@@ -197,14 +199,16 @@ export const ExpressionTab = () => {
         }}
       />
       <div className="flex w-full flex-col gap-3 px-4">
-        <Button
-          icon={faCirclePlus}
-          variant="action"
-          onClick={() => setOpen(true)}
-          className="w-full py-3 text-sm font-medium"
-        >
-          Upload Expression (Dev Only)
-        </Button>
+        {showUploadButton && (
+          <Button
+            icon={faCirclePlus}
+            variant="action"
+            onClick={() => setOpen(true)}
+            className="w-full py-3 text-sm font-medium"
+          >
+            Upload Expression (Dev Only)
+          </Button>
+        )}
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={

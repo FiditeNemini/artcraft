@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
+  ANIMATION_FILE_TYPE,
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
@@ -267,7 +268,7 @@ export const AnimationTab = () => {
         onClose={() => setOpen(false)}
         onSuccess={fetchUserAnimations}
         isOpen={open}
-        fileTypes={["GLB", "FBX", "VMD"]}
+        fileTypes={Object.values(ANIMATION_FILE_TYPE)}
         title="Upload Animation"
         options={{
           fileSubtypes: [

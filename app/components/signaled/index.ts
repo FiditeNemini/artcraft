@@ -6,4 +6,3 @@ export * from "./PremiumLock";
 // all the Upload stuff will depend on the API Manager Signal
 export * from "./UploadAudioButtonDialogue";
 export * from "./UploadAudioComponent";
-export * from "./UploadModalObject"; //need to rid of scss

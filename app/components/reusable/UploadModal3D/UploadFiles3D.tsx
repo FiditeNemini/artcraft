@@ -1,40 +1,31 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 
-import { MediaFileAnimationType } from "~/enums";
-
 import { Button, H6, Input, ListDropdown } from "~/components";
 import { FileUploader } from "../UploadModal/FileUploader";
-import { loadPreviewOnCanvas } from "./utilities";
+import { loadPreviewOnCanvas, snapshotCanvasAsThumbnail } from "./utilities";
+import { upload3DObjects } from "./utilities/upload3DObjects";
+import { UploaderState } from "~/models";
+import { MediaFileAnimationType } from "~/enums";
 
 interface Props {
   title: string;
   fileTypes: string[];
-  onClose: () => void;
   options?: {
     fileSubtypes?: { [key: string]: string }[];
     hasLength?: boolean;
     hasThumbnailUpload?: boolean;
   };
-  onSubmit: (options: {
-    title: string;
-    typeOption?: MediaFileAnimationType;
-    assetFile: File;
-    length: number;
-    thumbnailFile: File | null;
-  }) => void;
+  onClose: () => void;
+  onUploadProgress: (newState: UploaderState) => void;
 }
 
 export const UploadFiles3D = ({
-  fileTypes,
-  onClose,
   title,
+  fileTypes,
   options,
-  onSubmit,
+  onClose,
+  onUploadProgress,
 }: Props) => {
-  const fileSubtypes = options?.fileSubtypes;
-  const hasLength = options?.hasLength;
-  const hasThumbnailUpload = options?.hasThumbnailUpload;
-
   const canvasRef = useRef<HTMLCanvasElement | undefined>(undefined);
   const canvasCallbackRef = useCallback((node: HTMLCanvasElement) => {
     if (node !== null) {
@@ -42,13 +33,16 @@ export const UploadFiles3D = ({
     }
   }, []);
 
-  const [typeOption, setTypeOption] = useState<
-    MediaFileAnimationType | undefined
-  >(
+  const fileSubtypes = options?.fileSubtypes;
+  // const hasLength = options?.hasLength;
+  // const hasThumbnailUpload = options?.hasThumbnailUpload;
+
+  const [subtype, setSubtype] = useState<MediaFileAnimationType | undefined>(
     fileSubtypes
       ? (Object.values(fileSubtypes[0])[0] as MediaFileAnimationType)
       : undefined,
   );
+
   const [uploadTitle, setUploadTitle] = useState<{
     value: string;
     error?: string;
@@ -66,8 +60,9 @@ export const UploadFiles3D = ({
     message?: string;
   }>({ type: "init" });
 
-  const [uploadLength, setUploadLength] = useState<number>();
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<Blob | undefined>(
+    undefined,
+  );
 
   const handleSubmit = () => {
     if (!uploadTitle.value) {
@@ -86,12 +81,12 @@ export const UploadFiles3D = ({
       return;
     }
 
-    onSubmit({
+    upload3DObjects({
       title: uploadTitle.value,
       assetFile: assetFile.value,
-      thumbnailFile: thumbnailFile,
-      length: uploadLength ?? 1000,
-      typeOption,
+      thumbnailSnapshot: thumbnailFile,
+      animationType: subtype,
+      progressCallback: onUploadProgress,
     });
   };
 
@@ -107,6 +102,19 @@ export const UploadFiles3D = ({
     }
   }, [assetFile.value]);
 
+  useEffect(() => {
+    if (previewStatus.type === "OK" && canvasRef.current) {
+      snapshotCanvasAsThumbnail({
+        targetNode: canvasRef.current!,
+        resultCallback: (snapshotBlob) => {
+          if (snapshotBlob) {
+            setThumbnailFile(snapshotBlob);
+          }
+        },
+      });
+    }
+  }, [previewStatus]);
+
   return (
     <>
       <div className="mb-4 flex flex-col gap-4">
@@ -117,20 +125,7 @@ export const UploadFiles3D = ({
           onChange={(event) => setUploadTitle({ value: event.target.value })}
           className={uploadTitle.error ? "mb-3" : ""}
         />
-        {fileSubtypes && fileSubtypes.length > 1 && (
-          <ListDropdown
-            list={fileSubtypes}
-            onSelect={(value) => setTypeOption(value as MediaFileAnimationType)}
-          />
-        )}
-        {hasLength && (
-          <Input
-            type="number"
-            placeholder="Enter the length in ms (optional)"
-            value={uploadLength}
-            onChange={(event) => setUploadLength(parseInt(event.target.value))}
-          />
-        )}
+
         <FileUploader
           title={title}
           fileTypes={fileTypes}
@@ -141,6 +136,12 @@ export const UploadFiles3D = ({
             });
           }}
         />
+        {fileSubtypes && fileSubtypes.length > 1 && (
+          <ListDropdown
+            list={fileSubtypes}
+            onSelect={(value) => setSubtype(value as MediaFileAnimationType)}
+          />
+        )}
         {assetFile.error && (
           <H6 className="z-10 text-red">{assetFile.error}</H6>
         )}
@@ -163,14 +164,6 @@ export const UploadFiles3D = ({
           )}
         </div>
 
-        {hasThumbnailUpload && (
-          <FileUploader
-            title="Upload Thumbnail (optional)"
-            fileTypes={["PNG", "JGP", "GIF"]}
-            file={thumbnailFile}
-            setFile={setThumbnailFile}
-          />
-        )}
         <div className="flex justify-end gap-4">
           <Button variant="primary" onClick={handleSubmit}>
             Upload

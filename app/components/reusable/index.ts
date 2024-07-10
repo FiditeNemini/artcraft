@@ -7,7 +7,6 @@ export * from "./ButtonIconSelect";
 export * from "./ButtonLink";
 export * from "./ConfirmationModal";
 export * from "./FileUploader";
-export * from "./FileWrapper"; //need to rid of scss
 export * from "./FilterButtons"; //this relies on a list of filters locally, could be more flexible
 export * from "./Gravatar";
 export * from "./Input"; //need to decouple hotkey signal
@@ -26,7 +25,7 @@ export * from "./Tooltip";
 export * from "./TransitionDialogue"; //need to decouple hotkey signal
 export * from "./Typography";
 export * from "./UploadModal";
-export * from "./UploadModal3DPreview";
+export * from "./UploadModal3D";
 export * from "./UploadModalImages";
 export * from "./WaveformPlayer";
 

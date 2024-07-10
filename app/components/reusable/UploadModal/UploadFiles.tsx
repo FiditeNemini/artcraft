@@ -1,10 +1,17 @@
 import { Button, H6, Input, ListDropdown } from "~/components";
 import { FileUploader } from "./FileUploader";
 import { useState } from "react";
-import { MediaFileAnimationType } from "~/enums";
+import {
+  THUMBNAILS_FILE_TYPE,
+  MediaFileAnimationType,
+  FilterEngineCategories,
+} from "~/enums";
+import { uploadAssets } from "./uploadAssets";
+import { UploaderState } from "~/models";
 
 interface Props {
   title: string;
+  engineCategory: FilterEngineCategories;
   fileTypes: string[];
   onClose: () => void;
   options?: {
@@ -12,21 +19,16 @@ interface Props {
     hasLength?: boolean;
     hasThumbnailUpload?: boolean;
   };
-  onSubmit: (options: {
-    title: string;
-    typeOption?: MediaFileAnimationType;
-    assetFile: File;
-    length: number;
-    thumbnailFile: File | null;
-  }) => void;
+  onUploadProgress: (newState: UploaderState) => void;
 }
 
 export const UploadFiles = ({
   fileTypes,
+  engineCategory,
   onClose,
   title,
   options,
-  onSubmit,
+  onUploadProgress,
 }: Props) => {
   const fileSubtypes = options?.fileSubtypes;
   const hasLength = options?.hasLength;
@@ -69,12 +71,15 @@ export const UploadFiles = ({
       }));
       return;
     }
-    onSubmit({
+
+    uploadAssets({
       title: uploadTitle.value,
       assetFile: assetFile.value,
-      thumbnailFile: thumbnailFile,
-      length: uploadLength ?? 1000,
-      typeOption,
+      engineCategory: engineCategory,
+      animationType: typeOption,
+      thumbnailFile: thumbnailFile || undefined,
+      length: uploadLength,
+      progressCallback: onUploadProgress,
     });
   };
 
@@ -118,7 +123,7 @@ export const UploadFiles = ({
         {hasThumbnailUpload && (
           <FileUploader
             title="Upload Thumbnail (optional)"
-            fileTypes={["PNG", "JGP", "GIF"]}
+            fileTypes={Object.values(THUMBNAILS_FILE_TYPE)}
             file={thumbnailFile}
             setFile={setThumbnailFile}
           />

@@ -12,5 +12,5 @@ export * from "./MediaFileAnimationTypes";
 export * from "./QueryFilters";
 export * from "./Tabs";
 export * from "./toasts";
-export * from "./UploaderState";
+export * from "./UploaderStates";
 export * from "./Visibility";

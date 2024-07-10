@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { FontLoader } from "three/addons/loaders/FontLoader.js";
 import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 
@@ -46,8 +45,6 @@ export const loadPreviewOnCanvas = ({
   // load the file into the preview mini-scene depending of the file's type
   if (file.name.includes(".glb")) {
     glbLoader({ file, scene, camera, renderer, statusCallback });
-  } else if (file.name.includes(".fbx")) {
-    fbxLoader({ file, scene, camera, renderer, statusCallback });
   } else if (file.name.includes(".pmd")) {
     pmdLoader({ file, scene, camera, renderer, statusCallback });
   } else if (
@@ -87,7 +84,6 @@ const glbLoader = ({
   loader.load(
     URL.createObjectURL(file),
     (data) => {
-      console.log("preview object loader: onLoaded");
       data.scene.children.forEach((child) => {
         child.userData["color"] = "#FFFFFF";
         scene.add(child);
@@ -120,6 +116,10 @@ const glbLoader = ({
           });
         }
         renderer.render(scene, camera);
+        statusCallback({
+          type: "OK",
+          message: "Preview should be available",
+        });
       });
     },
     undefined, // nothing to-do onProgress
@@ -127,28 +127,6 @@ const glbLoader = ({
       /*onError*/
       statusCallback({
         type: "GLB Loader Error",
-        message: String(loaderError),
-      });
-    },
-  );
-};
-
-const fbxLoader = ({ file, statusCallback }: LoaderInterface) => {
-  const loader = new FBXLoader();
-  loader.load(
-    URL.createObjectURL(file),
-    (data) => {
-      console.log(data);
-      statusCallback({
-        type: "FBX Loader Error",
-        message: "Sorry, FBX Loader is still under development",
-      });
-    },
-    undefined, // nothing to-do onProgress
-    (loaderError) => {
-      /*onError*/
-      statusCallback({
-        type: "FBX Loader Error",
         message: String(loaderError),
       });
     },
@@ -186,6 +164,10 @@ const pmdLoader = ({
       textMesh.position.set(-22, -5, 0);
       scene.add(textMesh);
       renderer.render(scene, camera);
+      statusCallback({
+        type: "OK",
+        message: "Preview should be available",
+      });
     },
     undefined, // nothing on Progress
     (loaderError) => {
@@ -223,4 +205,8 @@ const imagePlaneLoader = ({ file, scene, statusCallback }: LoaderInterface) => {
   obj.receiveShadow = true;
   obj.castShadow = true;
   scene.add(obj);
+  statusCallback({
+    type: "OK",
+    message: "Preview should be available",
+  });
 };

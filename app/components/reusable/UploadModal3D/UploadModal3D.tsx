@@ -4,7 +4,7 @@ import { TransitionDialogue, LoadingDots } from "~/components";
 
 import { UploadAssetError } from "../UploadModal/UploadAssetError";
 import { UploadSuccess } from "../UploadModal/UploadSuccess";
-import { UploadFilesImages } from "./UploadFilesImages";
+import { UploadFiles3D } from "./UploadFiles3D";
 import { FilterEngineCategories, UploaderStates } from "~/enums";
 import { initialUploaderState, UploaderState } from "~/models";
 
@@ -16,15 +16,18 @@ interface Props {
   fileTypes: string[];
   options?: {
     fileSubtypes?: { [key: string]: string }[];
+    hasLength?: boolean;
+    hasThumbnailUpload?: boolean;
   };
 }
 
-export function UploadModalImages({
+export function UploadModal3D({
   isOpen,
   onClose,
   onSuccess,
   title,
   fileTypes,
+  options,
 }: Props) {
   const [uploaderState, setUploaderState] =
     useState<UploaderState>(initialUploaderState);
@@ -32,6 +35,7 @@ export function UploadModalImages({
   const updateUploaderState = (newState: UploaderState) => {
     setUploaderState(newState);
   };
+
   const resetModalState = () => {
     setUploaderState(initialUploaderState);
   };
@@ -46,9 +50,10 @@ export function UploadModalImages({
     switch (uploaderState.status) {
       case UploaderStates.ready:
         return (
-          <UploadFilesImages
+          <UploadFiles3D
             title={title}
             fileTypes={fileTypes}
+            options={options}
             onClose={onClose}
             onUploadProgress={updateUploaderState}
           />
@@ -79,7 +84,7 @@ export function UploadModalImages({
             onRetry={() => {
               resetModalState();
             }}
-            type={FilterEngineCategories.IMAGE_PLANE}
+            type={FilterEngineCategories.OBJECT}
             errorMessage={uploaderState.errorMessage}
           />
         );

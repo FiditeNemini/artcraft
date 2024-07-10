@@ -1,44 +1,23 @@
 import { useState } from "react";
 
-import { MediaFileAnimationType } from "~/enums";
-
-import { Button, H6, Input, ListDropdown } from "~/components";
+import { Button, H6, Input } from "~/components";
 import { FileUploader } from "../UploadModal/FileUploader";
+import { uploadImagePlane } from "./uploadImagePlane";
+import { UploaderState } from "~/models";
 
 interface Props {
   title: string;
   fileTypes: string[];
   onClose: () => void;
-  options?: {
-    fileSubtypes?: { [key: string]: string }[];
-    hasLength?: boolean;
-    hasThumbnailUpload?: boolean;
-  };
-  onSubmit: (options: {
-    title: string;
-    typeOption?: MediaFileAnimationType;
-    assetFile: File;
-    length: number;
-    thumbnailFile: File | null;
-  }) => void;
+  onUploadProgress: (newState: UploaderState) => void;
 }
 
 export const UploadFilesImages = ({
   fileTypes,
   onClose,
   title,
-  options,
-  onSubmit,
+  onUploadProgress,
 }: Props) => {
-  const fileSubtypes = options?.fileSubtypes;
-
-  const [typeOption, setTypeOption] = useState<
-    MediaFileAnimationType | undefined
-  >(
-    fileSubtypes
-      ? (Object.values(fileSubtypes[0])[0] as MediaFileAnimationType)
-      : undefined,
-  );
   const [uploadTitle, setUploadTitle] = useState<{
     value: string;
     error?: string;
@@ -68,10 +47,10 @@ export const UploadFilesImages = ({
       return;
     }
 
-    onSubmit({
+    uploadImagePlane({
       title: uploadTitle.value,
       assetFile: assetFile.value,
-      typeOption,
+      progressCallback: onUploadProgress,
     });
   };
 
@@ -85,12 +64,6 @@ export const UploadFilesImages = ({
           onChange={(event) => setUploadTitle({ value: event.target.value })}
           className={uploadTitle.error ? "mb-3" : ""}
         />
-        {fileSubtypes && fileSubtypes.length > 1 && (
-          <ListDropdown
-            list={fileSubtypes}
-            onSelect={(value) => setTypeOption(value as MediaFileAnimationType)}
-          />
-        )}
         <FileUploader
           title={title}
           fileTypes={fileTypes}
