@@ -250,7 +250,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     videos.debug_print_paths_after_download();
 
-    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.original_video_path) {
+    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&download_videos.input_video.original_download_path) {
         info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
     }
 
@@ -410,7 +410,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_file(&videos.comfy_input_video_path);
         safe_delete_temp_file(&videos.trimmed_resampled_video_path);
         safe_delete_temp_file(&videos.trimmed_audio_path);
-        safe_delete_temp_file(&videos.original_video_path);
+        //safe_delete_temp_file(&videos.original_video_path);
 
         let output_dir = root_comfy_path.join("output");
         safe_recursively_delete_files(&output_dir);
@@ -468,7 +468,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_file(&stdout_output_file);
-    safe_delete_temp_file(&videos.original_video_path);
+    //safe_delete_temp_file(&videos.original_video_path);
     safe_delete_temp_file(&videos.trimmed_resampled_video_path);
     safe_delete_temp_file(&videos.comfy_output_video_path);
     safe_delete_temp_file(videos.video_to_watermark());

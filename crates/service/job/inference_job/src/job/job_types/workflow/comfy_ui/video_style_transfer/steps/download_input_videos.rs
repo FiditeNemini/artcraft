@@ -86,11 +86,15 @@ async fn download_primary_video(
 
   info!("Primary input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
-  info!("Downloading primary input file to {:?}", args.videos.original_video_path);
+  // NB(bt,2024-07-09): This convention is muddled with the python side.
+  // We may not have flexibility to change this pathing for a while.
+  let download_path = args.videos.comfy_input_dir.join("video.mp4");
+
+  info!("Downloading primary input file to {:?}", download_path);
 
   args.remote_cloud_file_client.download_media_file(
     &media_file_bucket_path,
-    path_to_string(&args.videos.original_video_path)
+    path_to_string(&download_path)
   ).await?;
 
   info!("Downloaded primary input video!");
@@ -98,7 +102,7 @@ async fn download_primary_video(
   Ok(VideoDownloadDetails {
     input_video: InputVideoAndPaths {
       record: VideoMediaFileRecord::Single(input_media_file),
-      original_download_path: args.videos.original_video_path.clone(),
+      original_download_path: download_path,
       maybe_processed_path: None,
     },
     maybe_depth: None,

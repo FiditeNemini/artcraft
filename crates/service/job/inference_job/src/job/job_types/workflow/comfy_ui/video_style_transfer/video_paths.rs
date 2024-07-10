@@ -7,7 +7,8 @@ use filesys::file_exists::file_exists;
 pub struct VideoPaths {
   /// Filesystem path of the downloaded original video
   /// This is the input.
-  pub original_video_path: PathBuf,
+  #[deprecated(note = "Use InputVideoAndPaths")]
+  original_video_path: PathBuf,
 
   /// Filesystem path of the trimmed and resampled video
   /// This is the first output we generate.
@@ -21,6 +22,7 @@ pub struct VideoPaths {
   /// This is typically the `trimmed_resampled_video_path`, but since Comfy
   /// can overwrite the source, we'll keep a separate copy of that file for
   /// later downstream sound restoration (since comfy wipes sound).
+  #[deprecated(note = "Use InputVideoAndPaths")]
   pub comfy_input_video_path: PathBuf,
 
   /// Filesystem path of the style transfer output

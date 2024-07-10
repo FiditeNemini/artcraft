@@ -81,13 +81,13 @@ fn preprocess_trim_and_resample_primary_video(
     info!("Skipping video trim / resample...");
     info!("(This might break if we need to copy the video path. Salt's code implicitly expects videos to be in certain places, but doesn't allow passing of config, and that's horrible.)");
 
-    std::fs::copy(&args.primary_video_paths.original_video_path, &args.primary_video_paths.trimmed_resampled_video_path)
+    std::fs::copy(&args.download_videos.input_video.original_download_path, &args.primary_video_paths.trimmed_resampled_video_path)
         .map_err(|err| {
           error!("Error copying video (1): {:?}", err);
           ProcessSingleJobError::IoError(err)
         })?;
 
-    std::fs::copy(&args.primary_video_paths.original_video_path, &args.primary_video_paths.comfy_output_video_path)
+    std::fs::copy(&args.download_videos.input_video.original_download_path, &args.primary_video_paths.comfy_output_video_path)
         .map_err(|err| {
           error!("Error copying video (2): {:?}", err);
           ProcessSingleJobError::IoError(err)
@@ -96,6 +96,10 @@ fn preprocess_trim_and_resample_primary_video(
   } else {
     info!("Calling video trim / resample...");
     info!("Script: {:?}", &args.comfy_deps.inference_command.processing_script);
+
+    // NB(bt,2024-07-09): Despite what the comments on this field say, the script `format_video.py` writes
+    // to a file named 'input.mp4', not 'trimmed.mp4'. This pathing really needs to be cleaned up.
+    let comfy_input_video_path = args.primary_video_paths.comfy_input_dir.join("input.mp4");
 
     // shell out to python script
     let output = Command::new("python3")
@@ -107,11 +111,11 @@ fn preprocess_trim_and_resample_primary_video(
         .arg(format!("{:?}", resample_details.trim_end_millis))
         .arg(format!("{:?}", resample_details.target_fps))
         .arg("--input")
-        .arg(path_to_string(&args.primary_video_paths.original_video_path))
+        .arg(path_to_string(&args.download_videos.input_video.original_download_path))
         .arg("--output")
         // NB(bt,2024-07-09): Despite what the comments on this field say, the script `format_video.py` writes
         // to a file named 'input.mp4', not 'trimmed.mp4'. This pathing really needs to be cleaned up.
-        .arg(path_to_string(&args.primary_video_paths.comfy_input_video_path))
+        .arg(path_to_string(&comfy_input_video_path))
         .output()
         .map_err(|e| {
           error!("Error running inference: {:?}", e);
@@ -131,7 +135,7 @@ fn preprocess_trim_and_resample_primary_video(
 
     // NB: The process video script implicitly saves the above video as "input.mp4"
     // Comfy sometimes overwrites this, so we need to make a copy.
-    std::fs::copy(&args.primary_video_paths.comfy_input_video_path, &args.primary_video_paths.trimmed_resampled_video_path)
+    std::fs::copy(&comfy_input_video_path, &args.primary_video_paths.trimmed_resampled_video_path)
         .map_err(|err| {
           error!("Error copying trimmed video: {:?}", err);
           ProcessSingleJobError::IoError(err)
