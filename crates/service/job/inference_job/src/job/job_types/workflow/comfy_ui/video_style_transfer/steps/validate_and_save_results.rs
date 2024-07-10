@@ -55,7 +55,7 @@ pub struct SaveResultsArgs<'a> {
   pub comfy_deps: &'a ComfyDependencies,
   pub job_progress_reporter: &'a mut Box<dyn JobProgressReporter>,
 
-  pub download_videos: VideoDownloadDetails,
+  pub download_videos: &'a VideoDownloadDetails,
   pub videos: &'a VideoPaths,
   pub inference_duration: Duration,
 

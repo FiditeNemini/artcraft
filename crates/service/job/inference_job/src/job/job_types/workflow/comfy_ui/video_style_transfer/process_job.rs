@@ -47,7 +47,8 @@ use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProc
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs, VideoDownloadDetails};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::input_video_and_paths::InputVideoAndPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
@@ -395,6 +396,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_file(&stdout_output_file);
         safe_delete_temp_directory(&work_temp_dir);
         safe_delete_temp_file(&workflow_path);
+        safe_delete_all_input_videos(&download_videos);
 
         // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
         if let Some(lora_path) = maybe_lora_path {
@@ -449,7 +451,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         comfy_args,
         videos: &videos,
         job_progress_reporter: &mut job_progress_reporter,
-        download_videos,
+        download_videos: &download_videos,
         inference_duration,
     }).await?;
 
@@ -472,6 +474,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     safe_delete_temp_file(videos.video_to_watermark());
     safe_delete_temp_file(videos.get_final_video_to_upload());
     safe_delete_temp_file(videos.get_non_watermarked_video_to_upload());
+    safe_delete_all_input_videos(&download_videos);
 
     // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
 
@@ -510,4 +513,27 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }),
         inference_duration,
     })
+}
+
+fn safe_delete_all_input_videos(videos: &VideoDownloadDetails) {
+    safe_delete_videos(&videos.input_video);
+
+    if let Some(depth) = &videos.maybe_depth {
+        safe_delete_videos(depth);
+    }
+
+    if let Some(normal) = &videos.maybe_normal {
+        safe_delete_videos(normal);
+    }
+
+    if let Some(outline) = &videos.maybe_outline {
+        safe_delete_videos(outline);
+    }
+}
+
+fn safe_delete_videos(video: &InputVideoAndPaths) {
+    safe_delete_temp_file(&video.original_download_path);
+    if let Some(processed_path) = &video.maybe_processed_path {
+        safe_delete_temp_file(processed_path);
+    }
 }

@@ -11,7 +11,6 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 /// This is for the secondary depth, normal, and outline videos.
 /// We attach metadata as these videos progress through the system (if they're present).
 pub struct InputVideoAndPaths {
-  //pub media_file: MediaFile,
   pub record: VideoMediaFileRecord,
   pub original_download_path: PathBuf,
   pub maybe_processed_path: Option<PathBuf>,
