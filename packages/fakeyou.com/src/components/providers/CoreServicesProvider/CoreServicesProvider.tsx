@@ -30,12 +30,12 @@ export default function CoreServicesProvider({
 
   return (
     <SessionProvider {...sessionProps}>
-      <NotificationProvider>
-        <ServerStatusChecker />
-        <ModalProvider>
-          <InferenceJobsProvider>{children}</InferenceJobsProvider>
-        </ModalProvider>
-      </NotificationProvider>
+      <InferenceJobsProvider>
+        <NotificationProvider>
+          <ServerStatusChecker />
+          <ModalProvider>{children}</ModalProvider>
+        </NotificationProvider>
+      </InferenceJobsProvider>
     </SessionProvider>
   );
 }
