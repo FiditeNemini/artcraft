@@ -214,9 +214,9 @@ fn preprocess_trim_and_resample_secondary_video(
       .arg(format!("{:?}", resample_details.trim_end_millis))
       .arg(format!("{:?}", resample_details.target_fps))
       .arg("--input")
-      .arg(format!("{:?}", &video.original_download_path))
+      .arg(path_to_string(&video.original_download_path))
       .arg("--output")
-      .arg(format!("{:?}", &output_path))
+      .arg(path_to_string(&output_path))
       .output()
       .map_err(|e| {
         error!("Error running inference: {:?}", e);
