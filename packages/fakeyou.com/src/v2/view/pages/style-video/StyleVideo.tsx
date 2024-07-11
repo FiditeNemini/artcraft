@@ -84,184 +84,196 @@ export default function StyleVideo() {
   ];
 
   return studioAccessCheck(
-    <Container {...{ className: "fy-style-video-page mt-5", type: "panel" }}>
-      <Panel {...{ padding: true }}>
-        <header className="d-flex gap-3 flex-wrap">
-          <h1 className="fw-semibold">Style a Video</h1>
-        </header>
-        <EntityInput
-          {...{
-            accept: ["video"],
-            aspectRatio: "landscape",
-            className: "fy-style-video-page-video-input",
-            label: "Choose a video",
-            name: "mediaToken",
-            value: pageMediaToken,
-            onChange: ({ target }: { target: any }) => {
-              mediaTokenSet(target.value);
-            },
-            type: "media",
-          }}
-        />
-        <div {...{ className: "prompt-row mt-3" }}>
-          <div
-            {...{
-              className: "prompt-column",
-            }}
-          >
-            <EntityInput
-              {...{
-                accept: ["image"],
-                aspectRatio: "square",
-                className: "fy-style-video-page-ipa-input",
-                label: "IP Adapter Image",
-                name: "IPAToken",
-                value: IPAToken,
-                onChange: ({ target }: { target: any }) => {
-                  IPATokenSet(target.value);
-                },
-                type: "media",
-              }}
-            />
-          </div>
-          <div
-            {...{
-              className: "prompt-column flex-grow",
-            }}
-          >
-            <Select
-              {...{
-                label: "Style",
-                onChange: ({ target }: { target: any }) => {
-                  styleSet(target.value);
-                },
-                options: styleOptions,
-                value: style,
-              }}
-            />
-            <div {...{ className: "prompt-row" }}>
-              <TextArea
+    <>
+      <Container className="mt-3">
+        <div className="row flex-lg-row-reverse g-3">
+          <div className="col-12 col-lg-7 col-xl-9">
+            <Panel padding={true} className="rounded">
+              <h2 className="fw-bold mb-3 d-block d-lg-none">Style a Video</h2>
+              <EntityInput
                 {...{
-                  label: "Positive prompt",
-                  rows: 5,
+                  accept: ["video"],
+                  aspectRatio: "landscape",
+                  className: "fy-style-video-page-video-input",
+                  label: "Choose a video",
+                  name: "mediaToken",
+                  value: pageMediaToken,
                   onChange: ({ target }: { target: any }) => {
-                    promptSet(target.value);
+                    mediaTokenSet(target.value);
                   },
+                  type: "media",
                 }}
               />
-              <TextArea
+            </Panel>
+            <div className="d-none d-lg-flex justify-content-center w-100 mt-5">
+              <Button
                 {...{
-                  label: "Negative prompt",
-                  rows: 5,
-                  onChange: ({ target }: { target: any }) => {
-                    negativePromptSet(target.value);
-                  },
+                  disabled: !mediaToken,
+                  label: "Generate Styled Video",
+                  onClick,
+                  variant: "primary",
+                  className: "px-5",
                 }}
               />
             </div>
           </div>
-        </div>
-
-        <h6>Strength ({strength})</h6>
-        <div {...{ className: "prompt-row" }}>
-          <Slider
-            min={0.0}
-            max={1.0}
-            step={0.1}
-            onChange={({ target }: { target: any }) => {
-              setStrength(parseFloat(target.value));
-            }}
-            value={strength}
-          />
-        </div>
-
-        <br />
-
-        <h6>Quality Options</h6>
-        <div {...{ className: "prompt-row" }}>
-          <div className="form-check form-switch w-100">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="useFaceDetailer"
-              checked={useFaceDetailer}
-              onChange={() => setUseFaceDetailer(!useFaceDetailer)}
-            />
-            <label className="form-check-label" htmlFor="useFaceDetailer">
-              Use Face Detailer
-            </label>
+          <div className="col-12 col-lg-5 col-xl-3">
+            <Panel padding={true} className="rounded">
+              <div className="d-flex flex-column">
+                <h2 className="fw-bold mb-3 d-none d-lg-block">
+                  Style a Video
+                </h2>
+                <div>
+                  <Select
+                    {...{
+                      label: "Choose a Style",
+                      onChange: ({ target }: { target: any }) => {
+                        styleSet(target.value);
+                      },
+                      options: styleOptions,
+                      value: style,
+                    }}
+                  />
+                  <div>
+                    <TextArea
+                      {...{
+                        label: "Positive prompt",
+                        rows: 2,
+                        onChange: ({ target }: { target: any }) => {
+                          promptSet(target.value);
+                        },
+                      }}
+                    />
+                    <TextArea
+                      {...{
+                        label: "Negative prompt",
+                        rows: 1,
+                        onChange: ({ target }: { target: any }) => {
+                          negativePromptSet(target.value);
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3 w-100">
+                  <EntityInput
+                    {...{
+                      accept: ["image"],
+                      aspectRatio: "square",
+                      className: "w-100",
+                      label: "IP Adapter Image",
+                      name: "IPAToken",
+                      value: IPAToken,
+                      onChange: ({ target }: { target: any }) => {
+                        IPATokenSet(target.value);
+                      },
+                      type: "media",
+                    }}
+                  />
+                </div>
+                <h6 className="mt-4">Strength ({strength})</h6>
+                <div className="w-100">
+                  <Slider
+                    min={0.0}
+                    max={1.0}
+                    step={0.1}
+                    onChange={({ target }: { target: any }) => {
+                      setStrength(parseFloat(target.value));
+                    }}
+                    value={strength}
+                    className="w-100"
+                  />
+                </div>
+                <h6 className="mt-3 pb-2">Quality Options</h6>
+                <div>
+                  <div className="form-check form-switch w-100">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="useFaceDetailer"
+                      checked={useFaceDetailer}
+                      onChange={() => setUseFaceDetailer(!useFaceDetailer)}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="useFaceDetailer"
+                    >
+                      Use Face Detailer
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <div className="form-check form-switch w-100">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="useUpscaler"
+                      checked={useUpscaler}
+                      onChange={() => setUseUpscaler(!useUpscaler)}
+                    />
+                    <label className="form-check-label" htmlFor="useUpscaler">
+                      Use Upscaler
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <div className="form-check form-switch w-100">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="useCinematic"
+                      checked={useCinematic}
+                      onChange={() => setUseCinematic(!useCinematic)}
+                    />
+                    <label className="form-check-label" htmlFor="useCinematic">
+                      Use Cinematic
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <div className="form-check form-switch w-100">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="enableLipsync"
+                      checked={enableLipsync}
+                      onChange={() => setEnableLipsync(!enableLipsync)}
+                    />
+                    <label className="form-check-label" htmlFor="enableLipsync">
+                      Preserve Lip Movement
+                    </label>
+                  </div>
+                </div>
+                <br />
+                <div>
+                  <SegmentButtons
+                    {...{
+                      className: "fy-style-video-length",
+                      label: "Final video length",
+                      onChange: ({ target }: { target: any }) => {
+                        lengthSet(target.value);
+                      },
+                      options: lengthOptions,
+                      value: length,
+                    }}
+                  />
+                </div>
+              </div>
+            </Panel>
           </div>
         </div>
-        <div {...{ className: "prompt-row" }}>
-          <div className="form-check form-switch w-100">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="useUpscaler"
-              checked={useUpscaler}
-              onChange={() => setUseUpscaler(!useUpscaler)}
-            />
-            <label className="form-check-label" htmlFor="useUpscaler">
-              Use Upscaler
-            </label>
-          </div>
-        </div>
-        <div {...{ className: "prompt-row" }}>
-          <div className="form-check form-switch w-100">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="useCinematic"
-              checked={useCinematic}
-              onChange={() => setUseCinematic(!useCinematic)}
-            />
-            <label className="form-check-label" htmlFor="useCinematic">
-              Use Cinematic
-            </label>
-          </div>
-        </div>
-        <div {...{ className: "prompt-row" }}>
-          <div className="form-check form-switch w-100">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="enableLipsync"
-              checked={enableLipsync}
-              onChange={() => setEnableLipsync(!enableLipsync)}
-            />
-            <label className="form-check-label" htmlFor="enableLipsync">
-              Preserve Lip Movement
-            </label>
-          </div>
-        </div>
-
-        <br />
-
-        <div {...{ className: "prompt-row" }}>
-          <SegmentButtons
-            {...{
-              className: "fy-style-video-length",
-              label: "Final video length",
-              onChange: ({ target }: { target: any }) => {
-                lengthSet(target.value);
-              },
-              options: lengthOptions,
-              value: length,
-            }}
-          />
-        </div>
-
-        <div {...{ className: "d-flex justify-content-center mt-3" }}>
-          <Button
-            {...{
-              disabled: !mediaToken,
-              label: "Style",
-              onClick,
-              variant: "primary",
-            }}
-          />
-        </div>
-      </Panel>
-    </Container>
+      </Container>
+      <div className="d-flex d-lg-none justify-content-center w-100 mt-5 position-fixed bottom-0 p-3 bg-panel">
+        <Button
+          {...{
+            disabled: !mediaToken,
+            label: "Generate Styled Video",
+            onClick,
+            variant: "primary",
+            className: "px-5 w-100",
+          }}
+        />
+      </div>
+    </>
   );
 }
