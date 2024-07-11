@@ -128,6 +128,10 @@ async fn get_raw_media_files_by_tokens(
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
           entity_stats.bookmark_count as maybe_bookmark_count,
 
+          media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
+          media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
+          media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
+
           m.created_at,
           m.updated_at
 
@@ -139,6 +143,8 @@ async fn get_raw_media_files_by_tokens(
       LEFT OUTER JOIN entity_stats
           ON entity_stats.entity_type = "media_file"
           AND entity_stats.entity_token = m.token
+      LEFT OUTER JOIN media_files as media_file_cover_image
+          ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
       LEFT OUTER JOIN prompts
           ON prompts.token = m.maybe_prompt_token
       WHERE
