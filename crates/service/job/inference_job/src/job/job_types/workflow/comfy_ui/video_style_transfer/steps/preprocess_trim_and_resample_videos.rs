@@ -15,7 +15,6 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{SecondaryInputVideoAndPaths, VideoDownloads};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing_deprecated::VideoPaths;
 
 pub struct ProcessTrimAndResampleVideoArgs<'a> {
   pub comfy_args: &'a WorkflowArgs,

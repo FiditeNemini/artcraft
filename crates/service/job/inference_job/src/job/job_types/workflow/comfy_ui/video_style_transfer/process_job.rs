@@ -55,7 +55,6 @@ use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::vali
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoDownloads};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing_deprecated::VideoPaths;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
@@ -220,8 +219,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     info!("Root comfy path: {:?}", &root_comfy_path);
     info!("Job output path will be (fix this code! the job shouldn't set this path!): {:?}", &job_args.output_path);
 
-    //let mut videos = VideoPaths::new(&root_comfy_path, job_args.output_path);
-
     // TODO(bt,2024-04-20): Clean up this mess.
 
     // ==================== DOWNLOAD GLOBAL IPA IMAGE (IF SET) ==================== //
@@ -252,7 +249,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Downloaded video!");
 
-    //videos.debug_print_paths_after_download();
+    videos.debug_print_video_paths();
 
     if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.input_video.original_download_path) {
         info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
@@ -379,7 +376,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         info!("Captured stduout output: {}", contents);
     }
 
-    //videos.debug_print_paths_after_comfy();
+    videos.debug_print_video_paths();
 
     if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.input_video.comfy_output_video_path) {
         info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
@@ -433,7 +430,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== DEBUG ======================== //
 
-    //videos.debug_print_paths_after_post_processing();
+    videos.debug_print_video_paths();
 
     if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.input_video.get_final_video_to_upload()) {
         info!("Final video upload dimensions: {}x{}", dimensions.width, dimensions.height);

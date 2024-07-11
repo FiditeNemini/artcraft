@@ -18,7 +18,6 @@ use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDepen
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoDownloads};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing_deprecated::VideoPaths;
 
 pub struct DownloadInputVideoArgs<'a> {
   pub job_args: &'a JobArgs<'a>,

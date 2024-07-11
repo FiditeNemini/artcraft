@@ -1,12 +1,9 @@
 use std::path::{Path, PathBuf};
-
-use anyhow::anyhow;
-
+use log::info;
+use filesys::file_exists::file_exists;
 use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::MediaFilesByTokensRecord;
 use mysql_queries::queries::media_files::get::get_media_file::MediaFile;
-use tokens::tokens::media_files::MediaFileToken;
 
-use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
 
 /// Keep track of where we download videos to and where they end up after processing.
@@ -76,13 +73,80 @@ pub struct SecondaryInputVideoAndPaths {
   pub maybe_processed_path: Option<PathBuf>,
 }
 
-// Adapter enum
-// pub enum VideoMediaFileRecord {
-//   // Records returned by single lookup
-//   Single(MediaFile),
-//   // Records returned by batch query
-//   Bulk(MediaFilesByTokensRecord),
-// }
+impl VideoDownloads {
+  pub fn debug_print_video_paths(&self) {
+    self.debug_print_primary_video_paths();
+    self.debug_print_secondary_video_paths();
+  }
+
+  fn debug_print_primary_video_paths(&self) {
+    let mut log_lines = Vec::new();
+
+    if file_exists(&self.input_video.original_download_path) {
+      log_lines.push(format!("- original video download path: {:?} (exists)", &self.input_video.original_download_path));
+    }
+
+    if let Some(processed_path) = self.input_video.maybe_processed_path.as_deref() {
+      if file_exists(processed_path) {
+        log_lines.push(format!("- trimmed/resampled path: {:?} (exists)", &processed_path));
+      }
+    }
+
+    if file_exists(&self.input_video.trimmed_audio_path) {
+      log_lines.push(format!("- trimmed audio path: {:?} (exists)", &self.input_video.trimmed_audio_path));
+    }
+
+    if file_exists(&self.input_video.comfy_input_video_path) {
+      log_lines.push(format!("- comfy input video path: {:?} (exists)", &self.input_video.comfy_input_video_path));
+    }
+
+    if file_exists(&self.input_video.comfy_output_video_path) {
+      log_lines.push(format!("- comfy output video path: {:?} (exists)", &self.input_video.comfy_output_video_path));
+    }
+
+    if let Some(audio_restored_path) = self.input_video.audio_restored_video_path.as_deref() {
+      if file_exists(audio_restored_path) {
+        log_lines.push(format!("- audio restored video path: {:?} (exists)", &audio_restored_path));
+      }
+    }
+
+    if let Some(watermarked_video_path) = self.input_video.watermarked_video_path.as_deref() {
+      if file_exists(watermarked_video_path) {
+        log_lines.push(format!("- watermarked video path: {:?} (exists)", &watermarked_video_path));
+      }
+    }
+
+    info!("{}", format!("primary video paths:\n{}", log_lines.join("\n")));
+  }
+
+  fn debug_print_secondary_video_paths(&self) {
+    if let Some(videos) = self.maybe_depth.as_ref() {
+      Self::debug_print_secondary_path("depth", videos);
+    }
+    if let Some(videos) = self.maybe_normal.as_ref() {
+      Self::debug_print_secondary_path("normal", videos);
+    }
+    if let Some(videos) = self.maybe_outline.as_ref() {
+      Self::debug_print_secondary_path("outline", videos);
+    }
+  }
+
+  fn debug_print_secondary_path(name: &str, videos: &SecondaryInputVideoAndPaths) {
+    let mut log_lines = Vec::new();
+
+    if file_exists(&videos.original_download_path) {
+      log_lines.push(format!("- {} original video download path: {:?} (exists)", name, &videos.original_download_path));
+    }
+
+    if let Some(processed_path) = videos.maybe_processed_path.as_deref() {
+      if file_exists(processed_path) {
+        log_lines.push(format!("- {} trimmed/resampled path: {:?} (exists)", name, &processed_path));
+      }
+    }
+
+    info!("{}", format!("{} video paths:\n{}", name, log_lines.join("\n")));
+  }
+}
 
 pub trait CommonVideoPathing {
   fn original_video_path(&self) -> &Path;
@@ -142,36 +206,5 @@ impl PrimaryInputVideoAndPaths {
   }
 }
 
-// impl VideoMediaFileRecord {
-//   pub fn token(&self) -> &MediaFileToken {
-//     match self {
-//       VideoMediaFileRecord::Single(m) => &m.token,
-//       VideoMediaFileRecord::Bulk(m) => &m.token,
-//     }
-//   }
-//
-//   pub fn maybe_title(&self) -> Option<&str> {
-//     match self {
-//       VideoMediaFileRecord::Single(m) => m.maybe_title.as_deref(),
-//       VideoMediaFileRecord::Bulk(m) => m.maybe_title.as_deref(),
-//     }
-//   }
-//
-//   pub fn maybe_style_transfer_source_media_file_token(&self) -> Result<Option<&MediaFileToken>, ProcessSingleJobError> {
-//     // TODO(bt,2024-07-09): Future proofing this to deliberately explode in case I query the
-//     //  primary input media files with the bulk query.
-//     match self {
-//       VideoMediaFileRecord::Single(m) => Ok(m.maybe_style_transfer_source_media_file_token.as_ref()),
-//       VideoMediaFileRecord::Bulk(_m) => Err(ProcessSingleJobError::Other(anyhow!("bad refactor?: failed to query foreign key"))),
-//     }
-//   }
-//
-//   pub fn maybe_scene_source_media_file_token(&self) -> Result<Option<&MediaFileToken>, ProcessSingleJobError> {
-//     // TODO(bt,2024-07-09): Future proofing this to deliberately explode in case I query the
-//     //  primary input media files with the bulk query.
-//     match self {
-//       VideoMediaFileRecord::Single(m) => Ok(m.maybe_scene_source_media_file_token.as_ref()),
-//       VideoMediaFileRecord::Bulk(_m) => Err(ProcessSingleJobError::Other(anyhow!("bad refactor?: failed to query foreign key"))),
-//     }
-//   }
-// }
+impl SecondaryInputVideoAndPaths {
+}
