@@ -17,7 +17,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoDownloads};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 
 pub struct DownloadInputVideoArgs<'a> {
   pub job_args: &'a JobArgs<'a>,
@@ -28,7 +28,7 @@ pub struct DownloadInputVideoArgs<'a> {
 
 pub async fn download_input_videos(
   args: DownloadInputVideoArgs<'_>
-) -> Result<VideoDownloads, ProcessSingleJobError> {
+) -> Result<VideoPathing, ProcessSingleJobError> {
   let video_downloads = download_primary_video(&args).await?;
   let video_downloads = maybe_download_secondary_videos(video_downloads, &args).await?;
   Ok(video_downloads)
@@ -37,7 +37,7 @@ pub async fn download_input_videos(
 // TODO: Consolidate primary video download with secondary download logic.
 async fn download_primary_video(
   args: &DownloadInputVideoArgs<'_>,
-) -> Result<VideoDownloads, ProcessSingleJobError> {
+) -> Result<VideoPathing, ProcessSingleJobError> {
   let input_media_file_token = match args.job_args.maybe_input_file {
     None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("No primary input video file provided"))),
     Some(token) => token.clone(),
@@ -97,8 +97,8 @@ async fn download_primary_video(
   //  The upstream shouldn't be telling us what to do about this at all.
   let job_output_path = args.job_args.output_path;
 
-  Ok(VideoDownloads {
-    input_video: PrimaryInputVideoAndPaths::new(
+  Ok(VideoPathing {
+    primary_video: PrimaryInputVideoAndPaths::new(
       input_media_file, &args.comfy_dirs, job_output_path),
     maybe_depth: None,
     maybe_normal: None,
@@ -114,9 +114,9 @@ enum SecondaryVideoType {
 }
 
 async fn maybe_download_secondary_videos(
-  mut video_downloads: VideoDownloads,
+  mut video_downloads: VideoPathing,
   args: &DownloadInputVideoArgs<'_>
-) -> Result<VideoDownloads, ProcessSingleJobError> {
+) -> Result<VideoPathing, ProcessSingleJobError> {
   const CAN_SEE_DELETED : bool = true; // We don't need to care about the deleted flag.
 
   let mut tokens = Vec::with_capacity(3);

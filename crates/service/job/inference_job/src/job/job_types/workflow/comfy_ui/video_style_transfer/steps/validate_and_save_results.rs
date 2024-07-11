@@ -33,7 +33,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::VideoDownloads;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::VideoPathing;
 use crate::job_dependencies::JobDependencies;
 
 fn get_file_extension(mimetype: &str) -> anyhow::Result<&'static str> {
@@ -54,7 +54,7 @@ pub struct SaveResultsArgs<'a> {
   pub comfy_deps: &'a ComfyDependencies,
   pub job_progress_reporter: &'a mut Box<dyn JobProgressReporter>,
 
-  pub videos: &'a VideoDownloads,
+  pub videos: &'a VideoPathing,
   pub inference_duration: Duration,
 
   pub comfy_args: &'a WorkflowArgs,
@@ -69,7 +69,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
   info!("Interrogating result file size ...");
 
-  let final_video = args.videos.input_video.get_final_video_to_upload();
+  let final_video = args.videos.primary_video.get_final_video_to_upload();
 
   let file_size_bytes = file_size(final_video)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
@@ -173,7 +173,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
   let result = args.deps.buckets.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf.with_extension("no_watermark.mp4"),
-    &args.videos.input_video.get_non_watermarked_video_to_upload(),
+    &args.videos.primary_video.get_non_watermarked_video_to_upload(),
     &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
       .await;
 
@@ -199,8 +199,8 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
   // This shouldn't ever become a deeply nested tree of children, but rather a single root
   // with potentially many direct children.
   let style_transfer_source_media_file_token = args.videos
-      .input_video.record.maybe_style_transfer_source_media_file_token.as_ref()
-      .unwrap_or_else(|| &args.videos.input_video.record.token);
+      .primary_video.record.maybe_style_transfer_source_media_file_token.as_ref()
+      .unwrap_or_else(|| &args.videos.primary_video.record.token);
 
   let prompt_token = PromptToken::generate();
 
@@ -208,10 +208,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     pool: &args.deps.db.mysql_pool,
     job: &args.job,
     maybe_mime_type: Some(&mimetype),
-    maybe_title: args.videos.input_video.record.maybe_title.as_deref(),
+    maybe_title: args.videos.primary_video.record.maybe_title.as_deref(),
     maybe_style_transfer_source_media_file_token: Some(&style_transfer_source_media_file_token),
     maybe_scene_source_media_file_token: args.videos
-        .input_video.record.maybe_scene_source_media_file_token.as_ref(),
+        .primary_video.record.maybe_scene_source_media_file_token.as_ref(),
     file_size_bytes,
     sha256_checksum: &file_checksum,
     maybe_prompt_token: Some(&prompt_token),

@@ -14,13 +14,13 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{SecondaryInputVideoAndPaths, VideoDownloads};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{SecondaryInputVideoAndPaths, VideoPathing};
 
 pub struct ProcessTrimAndResampleVideoArgs<'a> {
   pub comfy_args: &'a WorkflowArgs,
   pub comfy_deps: &'a ComfyDependencies,
   pub comfy_dirs: &'a ComfyDirs,
-  pub videos: &'a mut VideoDownloads,
+  pub videos: &'a mut VideoPathing,
 }
 
 pub fn preprocess_trim_and_resample_videos(
@@ -76,7 +76,7 @@ fn preprocess_trim_and_resample_primary_video(
   comfy_dirs: &ComfyDirs,
   resample_details: &ResampleDetails,
   skip_process_video: bool,
-  videos: &mut VideoDownloads,
+  videos: &mut VideoPathing,
 ) -> Result<(), ProcessSingleJobError> {
 
   let resampled_path = comfy_dirs.comfy_input_dir.join("trimmed.mp4");
@@ -85,13 +85,13 @@ fn preprocess_trim_and_resample_primary_video(
     info!("Skipping video trim / resample...");
     info!("(This might break if we need to copy the video path. Salt's code implicitly expects videos to be in certain places, but doesn't allow passing of config, and that's horrible.)");
 
-    std::fs::copy(&videos.input_video.original_download_path, &resampled_path)
+    std::fs::copy(&videos.primary_video.original_download_path, &resampled_path)
         .map_err(|err| {
           error!("Error copying video (1): {:?}", err);
           ProcessSingleJobError::IoError(err)
         })?;
 
-    std::fs::copy(&videos.input_video.original_download_path, &videos.input_video.comfy_output_video_path)
+    std::fs::copy(&videos.primary_video.original_download_path, &videos.primary_video.comfy_output_video_path)
         .map_err(|err| {
           error!("Error copying video (2): {:?}", err);
           ProcessSingleJobError::IoError(err)
@@ -115,7 +115,7 @@ fn preprocess_trim_and_resample_primary_video(
         .arg(format!("{:?}", resample_details.trim_end_millis))
         .arg(format!("{:?}", resample_details.target_fps))
         .arg("--input")
-        .arg(path_to_string(&videos.input_video.original_download_path))
+        .arg(path_to_string(&videos.primary_video.original_download_path))
         .arg("--output")
         // NB(bt,2024-07-09): Despite what the comments on this field say, the script `format_video.py` writes
         // to a file named 'input.mp4', not 'trimmed.mp4'. This pathing really needs to be cleaned up.
@@ -153,7 +153,7 @@ fn preprocess_trim_and_resample_primary_video(
   }
 
   // NB(bt,2024-07-10): Even if we don't resample, the python side still expects certain pathing for now
-  videos.input_video.maybe_processed_path = Some(resampled_path);
+  videos.primary_video.maybe_trimmed_resampled_path = Some(resampled_path);
 
   Ok(())
 }
@@ -161,7 +161,7 @@ fn preprocess_trim_and_resample_primary_video(
 fn preprocess_trim_and_resample_secondary_videos(
   comfy_deps: &ComfyDependencies,
   resample_details: &ResampleDetails,
-  secondary_videos: &mut VideoDownloads,
+  secondary_videos: &mut VideoPathing,
 ) -> Result<(), ProcessSingleJobError> {
 
   if let Some(depth) = secondary_videos.maybe_depth.as_mut() {

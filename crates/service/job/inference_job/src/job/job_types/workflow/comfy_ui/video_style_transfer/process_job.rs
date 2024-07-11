@@ -54,7 +54,7 @@ use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::prep
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoDownloads};
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
@@ -251,7 +251,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     videos.debug_print_video_paths();
 
-    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.input_video.original_download_path) {
+    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.original_download_path) {
         info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
     }
 
@@ -378,13 +378,13 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     videos.debug_print_video_paths();
 
-    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.input_video.comfy_output_video_path) {
+    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.comfy_output_video_path) {
         info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
     }
 
     // ==================== CHECK OUTPUT FILE ======================== //
 
-    if let Err(err) = check_file_exists(&videos.input_video.comfy_output_video_path) {
+    if let Err(err) = check_file_exists(&videos.primary_video.comfy_output_video_path) {
         error!("Output file does not  exist: {:?}", err);
 
         error!("Inference failed: {:?}", command_exit_status);
@@ -411,7 +411,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_recursively_delete_files(&comfy_dirs.comfy_output_dir);
 
         return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
-            &videos.input_video.comfy_output_video_path)));
+            &videos.primary_video.comfy_output_video_path)));
     }
 
     // ==================== COPY BACK AUDIO ==================== //
@@ -432,7 +432,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     videos.debug_print_video_paths();
 
-    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.input_video.get_final_video_to_upload()) {
+    if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.get_final_video_to_upload()) {
         info!("Final video upload dimensions: {}x{}", dimensions.width, dimensions.height);
     }
 
@@ -503,8 +503,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn safe_delete_all_input_videos(videos: &VideoDownloads) {
-    safe_delete_primary_videos(&videos.input_video);
+fn safe_delete_all_input_videos(videos: &VideoPathing) {
+    safe_delete_primary_videos(&videos.primary_video);
 
     if let Some(depth) = &videos.maybe_depth {
         safe_delete_secondary_videos(depth);
@@ -525,7 +525,7 @@ fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
     safe_delete_temp_file(video.video_to_watermark());
     safe_delete_temp_file(video.get_final_video_to_upload());
     safe_delete_temp_file(video.get_non_watermarked_video_to_upload());
-    if let Some(processed_path) = &video.maybe_processed_path {
+    if let Some(processed_path) = &video.maybe_trimmed_resampled_path {
         safe_delete_temp_file(processed_path);
     }
 }

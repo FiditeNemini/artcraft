@@ -7,13 +7,13 @@ use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::VideoDownloads;
+use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::VideoPathing;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_extract_audio_args::FfmpegExtractAudioArgs;
 
 pub struct ProcessSaveAudioArgs<'a> {
     pub comfy_deps: &'a ComfyDependencies,
-    pub videos: &'a mut VideoDownloads,
+    pub videos: &'a mut VideoPathing,
 }
 
 pub fn preprocess_save_audio(
@@ -22,14 +22,7 @@ pub fn preprocess_save_audio(
     info!("Extracting audio...");
 
     // Use the original downloaded video if we didn't trim and resample it.
-    let input_video_file = args
-        .videos
-        .input_video
-        .maybe_processed_path
-        .as_deref()
-        .unwrap_or(
-          &args.videos.input_video.original_download_path
-        );
+    let input_video_file = args.videos.primary_video.input_video();
 
     let command_exit_status = args
         .comfy_deps
@@ -37,7 +30,7 @@ pub fn preprocess_save_audio(
         .run_with_subprocess(RunAsSubprocessArgs {
             args: Box::new(&FfmpegExtractAudioArgs {
                 input_video_file,
-                output_file: &args.videos.input_video.trimmed_audio_path
+                output_file: &args.videos.primary_video.trimmed_wav_audio_path
             }),
             stderr: StreamRedirection::None,
             stdout: StreamRedirection::None,
