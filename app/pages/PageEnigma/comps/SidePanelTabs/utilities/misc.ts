@@ -13,10 +13,18 @@ export const responseMapping = (
 ): MediaItem[] => {
   //TODO: ASSET TYPES and ENGINE CATEGORIES NEED TO MATCH!!!!
   //TODO: GET RID OF ASSET TYPES!!
-  const assetType =
-    filterEngineCategories[0] === FilterEngineCategories.IMAGE_PLANE
-      ? AssetType.OBJECT
-      : filterEngineCategories[0];
+  const objectCategories = [
+    FilterEngineCategories.CREATURE,
+    FilterEngineCategories.IMAGE_PLANE,
+    FilterEngineCategories.LOCATION,
+    FilterEngineCategories.OBJECT,
+    FilterEngineCategories.SET_DRESSING,
+    FilterEngineCategories.SKYBOX,
+    FilterEngineCategories.VIDEO_PLANE,
+  ];
+  const assetType = objectCategories.includes(filterEngineCategories[0])
+    ? AssetType.OBJECT
+    : filterEngineCategories[0];
 
   return data.map((item) => {
     const bucketConfig = new BucketConfig();
