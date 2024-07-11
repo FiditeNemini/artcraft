@@ -392,6 +392,10 @@ export default function MediaPage({
       value: EngineCategory.Location,
     },
     {
+      label: "Set Dressing",
+      value: EngineCategory.SetDressing,
+    },
+    {
       label: "Skybox",
       value: EngineCategory.Skybox,
     },
