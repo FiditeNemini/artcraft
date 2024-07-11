@@ -16,6 +16,7 @@ import {
   EnqueueVST,
   EnqueueVSTResponse,
 } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
+import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";
 import { STYLE_OPTIONS } from "common/StyleOptions";
@@ -83,6 +84,18 @@ export default function StyleVideo() {
     { label: "7 seconds", value: 7000 },
   ];
 
+  const onPromptUpdate = (prompt: Prompt | null) => {
+    promptSet(prompt?.maybe_positive_prompt || "");
+    negativePromptSet(prompt?.maybe_negative_prompt || "");
+    styleSet(prompt?.maybe_style_name || "");
+    IPATokenSet(prompt?.maybe_global_ipa_image_token || "");
+    setStrength(prompt?.maybe_strength || 1.0);
+    setUseFaceDetailer(!!prompt?.used_face_detailer);
+    setUseUpscaler(!!prompt?.used_upscaler);
+    setUseCinematic(!!prompt?.use_cinematic);
+    setEnableLipsync(!!prompt?.lipsync_enabled);
+  };
+
   return studioAccessCheck(
     <>
       <Container className="mt-3">
@@ -98,6 +111,7 @@ export default function StyleVideo() {
                   label: "Choose a video",
                   name: "mediaToken",
                   value: pageMediaToken,
+                  onPromptUpdate,
                   onChange: ({ target }: { target: any }) => {
                     mediaTokenSet(target.value);
                   },
@@ -142,6 +156,7 @@ export default function StyleVideo() {
                         onChange: ({ target }: { target: any }) => {
                           promptSet(target.value);
                         },
+                        value: prompt,
                       }}
                     />
                     <TextArea

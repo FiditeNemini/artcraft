@@ -13,16 +13,18 @@ import {
 } from "components/entities/EntityTypes";
 import { useMedia, useMediaUploader } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import EntityInputEmpty from "./EntityInputEmpty";
 import "./EntityInput.scss";
 
-interface Props {
+interface EntityInputProps {
   accept?: AcceptTypes | AcceptTypes[];
   aspectRatio?: "square" | "landscape" | "portrait";
   className?: string;
   label?: string;
   name?: string;
   onChange?: any;
+  onPromptUpdate?: (prompt: Prompt | null) => void;
   type: EntityModeProp;
   value?: string;
 }
@@ -128,16 +130,20 @@ export default function EntityInput({
   label,
   name = "",
   onChange,
+  onPromptUpdate,
   type,
   value,
   ...rest
-}: Props) {
+}: EntityInputProps) {
   const { search } = useLocation();
   const urlSearch = new URLSearchParams(search);
   const presetToken = search ? urlSearch.get("preset_token") : "";
   const queryUser = search ? urlSearch.get("query_user") : "";
   const [mediaToken, mediaTokenSet] = useState(presetToken || value || "");
-  const { media, mediaSet } = useMedia({ mediaToken });
+  const { media, mediaSet, prompt } = useMedia({
+    mediaToken: mediaToken || value,
+  });
+  const [updated, updatedSet] = useState(false);
   const clear = () => {
     mediaSet(undefined);
     mediaTokenSet("");
@@ -172,9 +178,20 @@ export default function EntityInput({
   });
 
   useEffect(() => {
-    if (presetToken && value !== presetToken)
+    if (onPromptUpdate) {
+      if (prompt && !updated) {
+        updatedSet(true);
+        onPromptUpdate(prompt);
+      } else if (!prompt && updated) {
+        updatedSet(false);
+        onPromptUpdate(null);
+      }
+    }
+
+    if (presetToken && value !== presetToken) {
       onChange({ target: { name, value: presetToken } });
-  }, [presetToken, name, onChange, value]);
+    }
+  }, [presetToken, prompt, name, onChange, onPromptUpdate, updated, value]);
 
   return (
     <>
