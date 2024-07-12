@@ -33,6 +33,11 @@ export interface TabItem {
 
 export const tabList = [
   {
+    icon: faBrush,
+    title: TabTitles.STYLIZE,
+    component: <StylizeTab />,
+  },
+  {
     icon: faGlobeSnow,
     title: TabTitles.OBJECTS_SETS,
     component: <SetsTab />,
@@ -71,10 +76,5 @@ export const tabList = [
     icon: faVolume,
     title: TabTitles.AUDIO,
     component: <AudioTab />,
-  },
-  {
-    icon: faBrush,
-    title: TabTitles.STYLIZE,
-    component: <StylizeTab />,
   },
 ];
