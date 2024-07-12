@@ -32,11 +32,13 @@ export enum OBJECT_FILE_TYPE {
 
 export enum CHARACTER_MMD_FILE_TYPE {
   PMD = "PMD",
+  PMX = "PMX",
   ZIP = "ZIP",
 }
 
 export enum CHARACTER_MIXAMO_FILE_TYPE {
-  FBX = "FBX",
-  OBJ = "OBJ",
-  ZIP = "ZIP",
+  GLB = "GLB",
+  // FBX = "FBX",
+  // OBJ = "OBJ",
+  // ZIP = "ZIP",
 }
