@@ -262,7 +262,7 @@ function SignupPage(props: Props) {
   };
 
   const redirectLink = queryParams.get("redirect");
-  const redirectSignUpLink = "/beta-key/redeem?redirect=signup";
+  const redirectSignUpLink = "/welcome";
 
   const afterSignupRedirect = async () => {
     const maybeInternalPlanKey = parsedQueryString["sub"] as string | undefined;

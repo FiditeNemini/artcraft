@@ -13,7 +13,7 @@ import {
 import RemixScenes from "components/common/RemixScenes";
 import { isMobile } from "react-device-detect";
 
-export default function RedeemSuccessPage() {
+export default function SignUpSuccessPage() {
   const handleWatchTutorial = () => {
     window.location.href = "/welcome-to-studio";
   };
@@ -33,7 +33,7 @@ export default function RedeemSuccessPage() {
               style={{ maxWidth: "300px" }}
             />
             <div className="d-flex flex-column align-items-center">
-              <h2 className="fw-bold mb-1">Redemption Success</h2>
+              <h2 className="fw-bold mb-1">Welcome!</h2>
               <p className="opacity-75 text-center fs-5 fw-medium">
                 You now have access to Storyteller Studio Beta!
                 {isMobile && " But..."}

@@ -128,6 +128,7 @@ import ProfileSidePanel from "components/layout/ProfileSidePanel/ProfileSidePane
 import CreatorToolsPage from "./pages/creator_tools/CreatorToolsPage";
 import WaitlistNextStepsPage from "./pages/waitlist_next_steps/WaitlistNextStepsPage";
 import { CreatorTypeformPage } from "./pages/landing/storyteller/PostlaunchLanding/CreatorTypeformPage";
+import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -947,6 +948,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/creator-onboarding">
                     <CreatorTypeformPage />
+                  </Route>
+
+                  <Route path="/welcome">
+                    <SignUpSuccessPage />
                   </Route>
 
                   <Route path="/beta-key/create">

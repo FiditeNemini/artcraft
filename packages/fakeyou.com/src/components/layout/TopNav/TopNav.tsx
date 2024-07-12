@@ -67,6 +67,7 @@ export default function TopNav({
   const isOnCreatorOnboardingPage = window.location.pathname.includes(
     "/creator-onboarding"
   );
+  const isOnWelcomePage = window.location.pathname === "/welcome";
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -208,7 +209,8 @@ export default function TopNav({
         isOnBetaKeyRedeemPage ||
         isOnCreatorOnboardingPage ||
         isOnLoginPage ||
-        isOnSignUpPage
+        isOnSignUpPage ||
+        isOnWelcomePage
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
@@ -223,6 +225,7 @@ export default function TopNav({
     isOnCreatorOnboardingPage,
     isOnLoginPage,
     isOnSignUpPage,
+    isOnWelcomePage,
   ]);
 
   if (
@@ -262,7 +265,8 @@ export default function TopNav({
     isOnWaitlistSuccessPage ||
     isOnCreatorOnboardingPage ||
     isOnSignUpPage ||
-    isOnLoginPage
+    isOnLoginPage ||
+    isOnWelcomePage
   ) {
     return null;
   }

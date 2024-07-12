@@ -61,6 +61,7 @@
 /waitlist-next-steps*   /index.html   200
 /weight*   /index.html   200
 /welcome-to-studio*   /index.html   200
+/welcome /index.html 200
 
 # Test paths
 /dev-tts*   /index.html   200
