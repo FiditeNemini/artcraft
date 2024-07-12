@@ -1,6 +1,9 @@
-export enum ANIMATION_FILE_TYPE {
-  GLB = "GLB",
+export enum ANIMATION_MMD_FILE_TYPE {
   VMD = "VMD",
+}
+export enum ANIMATION_MIXAMO_FILE_TYPE {
+  GLB = "GLB",
+  FBX = "FBX",
 }
 
 export enum AUDIO_FILE_TYPE {
@@ -27,7 +30,13 @@ export enum OBJECT_FILE_TYPE {
   GLB = "GLB",
 }
 
-export enum CHARACTER_FILE_TYPE {
+export enum CHARACTER_MMD_FILE_TYPE {
   PMD = "PMD",
+  ZIP = "ZIP",
+}
+
+export enum CHARACTER_MIXAMO_FILE_TYPE {
+  FBX = "FBX",
+  OBJ = "OBJ",
   ZIP = "ZIP",
 }

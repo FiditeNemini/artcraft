@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
-  ANIMATION_FILE_TYPE,
+  ANIMATION_MIXAMO_FILE_TYPE,
+  ANIMATION_MMD_FILE_TYPE,
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
@@ -289,7 +290,11 @@ export const AnimationTab = ({
         onSuccess={fetchUserAnimations}
         isOpen={open}
         type={FilterEngineCategories.ANIMATION}
-        fileTypes={Object.values(ANIMATION_FILE_TYPE)}
+        fileTypes={Object.values(
+          animationType === MediaFileAnimationType.Mixamo
+            ? ANIMATION_MIXAMO_FILE_TYPE
+            : ANIMATION_MMD_FILE_TYPE,
+        )}
         title="Upload Animation"
         options={{
           fileSubtypes: [

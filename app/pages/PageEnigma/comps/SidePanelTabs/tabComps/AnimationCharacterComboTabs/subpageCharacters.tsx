@@ -3,7 +3,8 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
-  CHARACTER_FILE_TYPE,
+  CHARACTER_MIXAMO_FILE_TYPE,
+  CHARACTER_MMD_FILE_TYPE,
   FeatureFlags,
   FilterEngineCategories,
   MediaFileAnimationType,
@@ -308,7 +309,11 @@ export const CharactersTab = ({
             // { Rokoko: MediaFileAnimationType.Rokoko },
           ],
         }}
-        fileTypes={Object.values(CHARACTER_FILE_TYPE)}
+        fileTypes={Object.values(
+          animationType === MediaFileAnimationType.Mixamo
+            ? CHARACTER_MIXAMO_FILE_TYPE
+            : CHARACTER_MMD_FILE_TYPE,
+        )}
         title="Upload Characters"
       />
     </>
