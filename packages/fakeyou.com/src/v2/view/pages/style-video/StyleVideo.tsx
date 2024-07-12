@@ -132,11 +132,11 @@ export default function StyleVideo() {
       <div className="col-12 col-md-8">
         <div className="d-flex flex-column justify-content-center h-100 w-100 p-3">
           <h3 className="fw-semibold">
-            Get Creative with 3D to Video Style Transfer!
+            If you like AI Video, you'll love Storyteller Studio!
           </h3>
           <p className="opacity-75">
-            Build simple 3D scenes, and turn them into incredible visuals using
-            Storyteller Studio!
+            Our AI creation engine lets you create videos from scratch. Build
+            simple scenes, and turn them into incredible visuals!
           </p>
           <div className="mt-3 d-flex">
             <Button
