@@ -40,6 +40,9 @@ export const responseMapping = (
       name: item.maybe_title ?? "Unknown",
       type: assetType as AssetType,
       media_type: item.media_type,
+      maybe_animation_type: item.maybe_animation_type
+        ? item.maybe_animation_type
+        : undefined,
       length: ((item.maybe_duration_millis ?? 1000) / 1000) * 60,
       version: 1,
       ...(item.cover_image.maybe_cover_image_public_bucket_path

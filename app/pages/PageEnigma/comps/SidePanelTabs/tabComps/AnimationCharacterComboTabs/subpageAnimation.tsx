@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
-import { useSignals } from "@preact/signals-react/runtime";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   ANIMATION_FILE_TYPE,
@@ -8,7 +7,6 @@ import {
   FilterEngineCategories,
   MediaFileAnimationType,
 } from "~/enums";
-import { animationItems } from "~/pages/PageEnigma/signals";
 import {
   Button,
   FilterButtons,
@@ -16,10 +14,7 @@ import {
   SearchFilter,
   UploadModal,
 } from "~/components";
-import {
-  TabTitle,
-  ItemElements,
-} from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import {
   fetchFeaturedMediaItems,
@@ -28,14 +23,31 @@ import {
   fetchUserMediaItems,
   fetchUserMediaItemsSearchResults,
   isAnyStatusFetching,
-} from "../utilities";
+} from "../../utilities";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
+import {
+  filterMixamoAnimations,
+  filterMMDAnimations,
+} from "./filterCharacterTypes";
+import { MediaItem } from "~/pages/PageEnigma/models";
 
-export const AnimationTab = () => {
-  useSignals();
-
+export const AnimationTab = ({
+  animationType,
+  demoAnimationItems = [],
+}: {
+  animationType: MediaFileAnimationType;
+  demoAnimationItems?: MediaItem[];
+}) => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
+  );
+  const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
+  const filterAnimationType = useMemo(
+    () =>
+      animationType === MediaFileAnimationType.Mixamo
+        ? filterMixamoAnimations
+        : filterMMDAnimations,
+    [animationType],
   );
 
   const [open, setOpen] = useState(false);
@@ -76,7 +88,7 @@ export const AnimationTab = () => {
   );
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? [...(featuredAnimations || []), ...animationItems.value]
+      ? [...(featuredAnimations || []), ...demoAnimationItems]
       : userAnimations ?? [];
 
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -96,10 +108,13 @@ export const AnimationTab = () => {
       fetchUserMediaItems({
         filterEngineCategories: [FilterEngineCategories.ANIMATION],
         setState: (newState: FetchMediaItemStates) => {
+          const filterNewMediaItems = newState.mediaItems
+            ? newState.mediaItems.filter(filterAnimationType)
+            : undefined;
           setUserFetch((curr) => ({
             status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
+            mediaItems: filterNewMediaItems
+              ? filterNewMediaItems
               : curr.mediaItems,
           }));
         },
@@ -113,10 +128,13 @@ export const AnimationTab = () => {
       fetchFeaturedMediaItems({
         filterEngineCategories: [FilterEngineCategories.ANIMATION],
         setState: (newState: FetchMediaItemStates) => {
+          const filterNewMediaItems = newState.mediaItems
+            ? newState.mediaItems.filter(filterAnimationType)
+            : undefined;
           setFeaturedFetch((curr) => ({
             status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
+            mediaItems: filterNewMediaItems
+              ? filterNewMediaItems
               : curr.mediaItems,
           }));
         },
@@ -126,7 +144,7 @@ export const AnimationTab = () => {
   );
 
   const filterAnimationItems = (searchTerm: string) =>
-    animationItems.value.filter((item) =>
+    demoAnimationItems.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
@@ -197,7 +215,7 @@ export const AnimationTab = () => {
 
   return (
     <>
-      <TabTitle title="Animation" />
+      {/* <TabTitle title="Animation" /> */}
 
       <FilterButtons
         value={selectedFilter}
@@ -208,14 +226,16 @@ export const AnimationTab = () => {
       />
 
       <div className="flex w-full flex-col gap-3 px-4">
-        <Button
-          icon={faCirclePlus}
-          variant="action"
-          onClick={() => setOpen(true)}
-          className="w-full py-3 text-sm font-medium"
-        >
-          Upload Animation
-        </Button>
+        {showUploadButton && (
+          <Button
+            icon={faCirclePlus}
+            variant="action"
+            onClick={() => setOpen(true)}
+            className="w-full py-3 text-sm font-medium"
+          >
+            Upload Animation (Dev Only)
+          </Button>
+        )}
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={
@@ -268,20 +288,21 @@ export const AnimationTab = () => {
         onClose={() => setOpen(false)}
         onSuccess={fetchUserAnimations}
         isOpen={open}
+        type={FilterEngineCategories.ANIMATION}
         fileTypes={Object.values(ANIMATION_FILE_TYPE)}
         title="Upload Animation"
         options={{
           fileSubtypes: [
-            { Mixamo: MediaFileAnimationType.Mixamo },
-            { MikuMikuDance: MediaFileAnimationType.MikuMikuDance },
-            { MoveAi: MediaFileAnimationType.MoveAi },
-            { Rigify: MediaFileAnimationType.Rigify },
-            { Rokoko: MediaFileAnimationType.Rokoko },
+            { [animationType]: animationType },
+            // { Mixamo: MediaFileAnimationType.Mixamo },
+            // { MikuMikuDance: MediaFileAnimationType.MikuMikuDance },
+            // { MoveAi: MediaFileAnimationType.MoveAi },
+            // { Rigify: MediaFileAnimationType.Rigify },
+            // { Rokoko: MediaFileAnimationType.Rokoko },
           ],
           hasLength: true,
           hasThumbnailUpload: true,
         }}
-        type={FilterEngineCategories.ANIMATION}
       />
     </>
   );

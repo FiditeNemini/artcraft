@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -9,7 +9,7 @@ import {
   MediaFileAnimationType,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
-import { characterItems as demoCharacterItems } from "~/pages/PageEnigma/signals";
+import { MediaItem } from "~/pages/PageEnigma/models";
 import {
   Button,
   FilterButtons,
@@ -17,10 +17,7 @@ import {
   SearchFilter,
   UploadModal,
 } from "~/components";
-import {
-  ItemElements,
-  TabTitle,
-} from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import {
   fetchFeaturedMediaItems,
@@ -29,13 +26,31 @@ import {
   fetchUserMediaItems,
   fetchUserMediaItemsSearchResults,
   isAnyStatusFetching,
-} from "../utilities";
+} from "../../utilities";
+import {
+  filterMixamoCharacters,
+  filterMMDCharacters,
+} from "./filterCharacterTypes";
 
-export const CharactersTab = () => {
+export const CharactersTab = ({
+  animationType,
+  demoCharacterItems = [],
+}: {
+  animationType: MediaFileAnimationType;
+  demoCharacterItems?: MediaItem[];
+}) => {
   useSignals();
 
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
+  );
+  const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
+  const filterCharacterType = useMemo(
+    () =>
+      animationType === MediaFileAnimationType.Mixamo
+        ? filterMixamoCharacters
+        : filterMMDCharacters,
+    [animationType],
   );
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
@@ -76,7 +91,7 @@ export const CharactersTab = () => {
     AssetFilterOption.FEATURED,
   );
   const allFeaturedCharacters = [
-    ...demoCharacterItems.value,
+    ...demoCharacterItems,
     ...(featuredCharacters ?? []),
   ];
   const displayedItems =
@@ -101,16 +116,19 @@ export const CharactersTab = () => {
       fetchUserMediaItems({
         filterEngineCategories: [FilterEngineCategories.CHARACTER],
         setState: (newState: FetchMediaItemStates) => {
+          const filterNewMediaItems = newState.mediaItems
+            ? newState.mediaItems.filter(filterCharacterType)
+            : undefined;
           setUserFetch((curr) => ({
             status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
+            mediaItems: filterNewMediaItems
+              ? filterNewMediaItems
               : curr.mediaItems,
           }));
         },
         defaultErrorMessage: "Unknown Error in Fetching User Characters",
       }),
-    [],
+    [filterCharacterType],
   );
 
   const fetchFeaturedCharacters = useCallback(
@@ -118,20 +136,23 @@ export const CharactersTab = () => {
       fetchFeaturedMediaItems({
         filterEngineCategories: [FilterEngineCategories.CHARACTER],
         setState: (newState: FetchMediaItemStates) => {
+          const filterNewMediaItems = newState.mediaItems
+            ? newState.mediaItems.filter(filterCharacterType)
+            : undefined;
           setFeaturedFetch((curr) => ({
             status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
+            mediaItems: filterNewMediaItems
+              ? filterNewMediaItems
               : curr.mediaItems,
           }));
         },
         defaultErrorMessage: "Unknown Error in Fetching Featured Characters",
       }),
-    [],
+    [filterCharacterType],
   );
 
   const filterCharacterItems = (searchTerm: string) =>
-    demoCharacterItems.value.filter((item) =>
+    demoCharacterItems.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
@@ -202,7 +223,7 @@ export const CharactersTab = () => {
 
   return (
     <>
-      <TabTitle title="Characters" />
+      {/* <TabTitle title="Characters" /> */}
       <div>
         <FilterButtons
           value={selectedFilter}
@@ -213,14 +234,16 @@ export const CharactersTab = () => {
         />
       </div>
       <div className="flex w-full flex-col gap-3 px-4">
-        <Button
-          icon={faCirclePlus}
-          variant="action"
-          onClick={() => setOpenUploadModal(true)}
-          className="w-full py-3 text-sm font-medium"
-        >
-          Upload Characters
-        </Button>
+        {showUploadButton && (
+          <Button
+            icon={faCirclePlus}
+            variant="action"
+            onClick={() => setOpenUploadModal(true)}
+            className="w-full py-3 text-sm font-medium"
+          >
+            Upload Character Model (Dev Only)
+          </Button>
+        )}
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={
@@ -277,11 +300,12 @@ export const CharactersTab = () => {
         options={{
           hasThumbnailUpload: true,
           fileSubtypes: [
-            { Mixamo: MediaFileAnimationType.Mixamo },
-            { MikuMikuDance: MediaFileAnimationType.MikuMikuDance },
-            { MoveAi: MediaFileAnimationType.MoveAi },
-            { Rigify: MediaFileAnimationType.Rigify },
-            { Rokoko: MediaFileAnimationType.Rokoko },
+            { [animationType]: animationType },
+            // { Mixamo: MediaFileAnimationType.Mixamo },
+            // { MikuMikuDance: MediaFileAnimationType.MikuMikuDance },
+            // { MoveAi: MediaFileAnimationType.MoveAi },
+            // { Rigify: MediaFileAnimationType.Rigify },
+            // { Rokoko: MediaFileAnimationType.Rokoko },
           ],
         }}
         fileTypes={Object.values(CHARACTER_FILE_TYPE)}

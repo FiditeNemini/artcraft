@@ -8,6 +8,9 @@ export enum FilterMediaType {
   SCENE_JSON = "scene_json",
   GLB = "glb",
   GLTF = "gltf",
+  PMX = "pmx",
+  PMD = "pmd",
+  VMD = "vmd",
 }
 
 export enum FilterEngineCategories {

@@ -12,7 +12,7 @@ export interface MediaInfo {
   token: string;
   media_type: MediaFileType;
   media_class: MediaFileClass | null;
-  // maybe_animation_type: string | null;
+  maybe_animation_type: string | null;
   maybe_media_subtype: MediaFileSubtype | null;
   maybe_engine_extension: string | null;
   maybe_batch_token: string;

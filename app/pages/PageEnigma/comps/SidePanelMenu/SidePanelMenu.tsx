@@ -45,13 +45,13 @@ export const SidePanelMenu = ({
     >
       <div className="flex w-full flex-col gap-2">
         {(tabs ?? []).map((tab) => {
-          if (tab.title === TabTitles.SET_OBJECTS && !showSetsTab) {
+          if (tab.title === TabTitles.OBJECTS_SETS && !showSetsTab) {
             return;
           }
           if (tab.title === TabTitles.IMAGE_PLANE && !showImagePlaneTab) {
             return;
           }
-          if (tab.title === TabTitles.CREATURES && !showCreaturesTab) {
+          if (tab.title === TabTitles.OBJECTS_CREATURES && !showCreaturesTab) {
             return;
           }
           return (

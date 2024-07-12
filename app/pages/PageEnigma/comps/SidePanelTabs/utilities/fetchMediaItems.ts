@@ -1,4 +1,4 @@
-import { FilterEngineCategories, ToastTypes } from "~/enums";
+import { FilterEngineCategories, FilterMediaType, ToastTypes } from "~/enums";
 import { addToast } from "~/signals";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { MediaFilesApi } from "~/Classes/ApiManager";
@@ -13,6 +13,7 @@ export interface FetchMediaItemStates {
 interface fetchMediaItemsInterface {
   setState: ({ mediaItems, status }: FetchMediaItemStates) => void;
   filterEngineCategories: FilterEngineCategories[];
+  filterMediaType?: FilterMediaType[];
   defaultErrorMessage?: string;
   searchTerm?: string;
 }

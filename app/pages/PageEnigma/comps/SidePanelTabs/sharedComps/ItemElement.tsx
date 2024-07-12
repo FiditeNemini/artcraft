@@ -10,6 +10,22 @@ interface Props {
   item: MediaItem;
 }
 
+const mapObejctType = (mediaType: string) => {
+  const typeCased = mediaType.toLowerCase();
+  switch (typeCased) {
+    case "fbx":
+    case "glb": {
+      return "Mixamo";
+    }
+    case "pmx": {
+      return "MMD";
+    }
+    default: {
+      return typeCased.toUpperCase();
+    }
+  }
+};
+
 export const ItemElement = ({ item }: Props) => {
   useSignals();
   const defaultThumb = `/resources/images/default-covers/${(item.imageIndex || 0) % 24}.webp`;
@@ -23,14 +39,9 @@ export const ItemElement = ({ item }: Props) => {
       {item.media_type && (
         <Badge
           label={
-            item.type === AssetType.OBJECT
-              ? item.media_type.toUpperCase()
-              : item.media_type === "fbx" ||
-                  item.media_type.toLowerCase() === "glb"
-                ? "Mixamo"
-                : item.media_type === "pmx"
-                  ? "MMD"
-                  : item.media_type.toUpperCase()
+            item.type === AssetType.CHARACTER
+              ? mapObejctType(item.media_type)
+              : item.media_type.toUpperCase()
           }
           className="absolute right-0 mr-[3px] mt-[3px]"
         />

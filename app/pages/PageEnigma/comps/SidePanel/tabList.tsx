@@ -1,27 +1,29 @@
 import { ReactNode } from "react";
 import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 import {
-  faGlobeSnow,
-  faPeople,
-  faRabbitRunning,
-  faFaceSmileWink,
-  faCube,
-  faVolume,
   faBrush,
-  faSpaghettiMonsterFlying,
+  faCatSpace,
+  faFaceSmileWink,
+  faGlobeSnow,
   faPresentationScreen,
+  faRaygun,
+  faSpaghettiMonsterFlying,
+  faUserAstronaut,
+  faVolume,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import { TabTitles } from "~/enums";
 import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ObjectsTab";
-import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/AnimationTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/AudioTab";
 import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/StylizeTab/StylizeTab";
 import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
-import { CharactersTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CharactersTab";
 import { CreaturesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CreaturesTab";
 import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
 import { ImagePlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ImagePlanesTab";
+import {
+  AnimeTab,
+  CartoonsTab,
+} from "../SidePanelTabs/tabComps/AnimationCharacterComboTabs";
 
 export interface TabItem {
   icon: FontAwesomeIconProps["icon"];
@@ -32,23 +34,23 @@ export interface TabItem {
 export const tabList = [
   {
     icon: faGlobeSnow,
-    title: TabTitles.SET_OBJECTS,
+    title: TabTitles.OBJECTS_SETS,
     component: <SetsTab />,
   },
   {
-    icon: faPeople,
-    title: TabTitles.CHARACTERS,
-    component: <CharactersTab />,
-  },
-  {
     icon: faSpaghettiMonsterFlying,
-    title: TabTitles.CREATURES,
+    title: TabTitles.OBJECTS_CREATURES,
     component: <CreaturesTab />,
   },
   {
-    icon: faRabbitRunning,
-    title: TabTitles.ANIMATION,
-    component: <AnimationTab />,
+    icon: faUserAstronaut,
+    title: TabTitles.CHARACTERS_ANIME,
+    component: <AnimeTab />,
+  },
+  {
+    icon: faCatSpace,
+    title: TabTitles.CHARACTERS_TOONS,
+    component: <CartoonsTab />,
   },
   {
     icon: faFaceSmileWink,
@@ -56,7 +58,7 @@ export const tabList = [
     component: <ExpressionTab />,
   },
   {
-    icon: faCube,
+    icon: faRaygun,
     title: TabTitles.OBJECTS,
     component: <ObjectsTab />,
   },
