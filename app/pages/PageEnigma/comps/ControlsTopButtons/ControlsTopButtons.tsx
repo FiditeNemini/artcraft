@@ -94,11 +94,17 @@ export const ControlsTopButtons = () => {
       return;
     }
     const sceneGenerationMetadata = getSceneGenereationMetaData(editorEngine);
+
     const retSceneMediaToken = await editorEngine.saveScene({
       sceneTitle: scene.value.title || "",
       sceneToken: scene.value.token,
       sceneGenerationMetadata,
     });
+
+    if (retSceneMediaToken === "") {
+      addToast(ToastTypes.ERROR, "Failed to Save Scene Try again Later!");
+    }
+
     if (retSceneMediaToken) {
       addToast(ToastTypes.SUCCESS, retSceneMediaToken);
       if (!scene.value.token) {

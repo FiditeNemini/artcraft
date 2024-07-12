@@ -120,11 +120,14 @@ export class SaveManager {
       sceneThumbnail,
     });
 
+    // this means error going to have to fix the plumbing on this because not using
+    // the api manager
+
     hideEditorLoader();
 
     this.editor.generating_preview = false; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
 
-    return result;
+    return result; // if this is an empty string it is an error. need to migrate to api manager.
   }
 
   // TODO Refactor remove editor.

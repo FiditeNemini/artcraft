@@ -141,11 +141,21 @@ export class APIManager {
       ? await updateExistingScene(file, sceneToken)
       : await uploadNewScene(file, sceneTitle);
 
+    // failed so catch this.
+    if (uploadSceneResponse["success"] == false) {
+      return "";
+    }
+
     if (sceneThumbnail) {
       const image_resp = await this.uploadMediaSceneThumbnail(
         sceneThumbnail,
         "render.png",
       );
+
+      if (image_resp["success"] == false) {
+        return "";
+      }
+
       if (image_resp["media_file_token"]) {
         const image_token = image_resp["media_file_token"];
         await fetch(uploadThumbnail + uploadSceneResponse["media_file_token"], {
