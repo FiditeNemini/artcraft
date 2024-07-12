@@ -9,6 +9,9 @@ class FreeCam extends EventDispatcher {
   rollSpeed = 0.005;
   dragToLook = false;
   autoForward = false;
+  dragging = false;
+  xOffset = 0;
+  yOffset = 0;
 
   lastMousePosition = new Vector2();
   mouseVelocity = new Vector2();
@@ -50,8 +53,17 @@ class FreeCam extends EventDispatcher {
     this.getContainerDimensions = this.getContainerDimensions.bind(this);
     this.dispose = this.dispose.bind(this);
 
-    window.addEventListener("keydown", this.keydown);
-    window.addEventListener("keyup", this.keyup);
+    this.domElement.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+    });
+
+    window.addEventListener("keydown", this.keydown.bind(this));
+    window.addEventListener("keyup", this.keyup.bind(this));
+
+    window.addEventListener("mousedown", this.mousedown.bind(this));
+    window.addEventListener("mouseup", this.mouseup.bind(this));
+    window.addEventListener("mousemove", this.mousemove.bind(this));
+    window.addEventListener("wheel", this.mousewheel.bind(this));
 
     this.updateMovementVector();
   }
@@ -146,6 +158,52 @@ class FreeCam extends EventDispatcher {
     this.updateMovementVector();
   }
 
+  mousedown(event: MouseEvent) {
+    if (!this.enabled) {
+      return;
+    }
+    if (event.button === 2) {
+      this.dragging = true;
+      this.xOffset = event.clientX;
+      this.yOffset = event.clientY;
+    }
+  }
+
+  mouseup(event: MouseEvent) {
+    if (!this.enabled) {
+      return;
+    }
+    if (event.button === 2) {
+      this.xOffset = event.clientX;
+      this.yOffset = event.clientY;
+    }
+    this.dragging = false;
+  }
+
+  mousemove(event: MouseEvent) {
+    if (!this.enabled) {
+      return;
+    }
+    if (this.dragging) {
+      const mouseX = event.clientX - this.xOffset;
+      const mouseY = event.clientY - this.yOffset;
+      this.xOffset = event.clientX;
+      this.yOffset = event.clientY;
+      if (Math.abs(mouseX + mouseY) > 0) {
+        this.object.translateX(-mouseX * (this.movementSpeed * 0.01));
+        this.object.translateY(mouseY * (this.movementSpeed * 0.01));
+      }
+    }
+  }
+
+  mousewheel(event: WheelEvent) {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.object.translateZ(event.deltaY / 120); // 120 is the lowest mouse wheel rot.
+  }
+
   reset() {
     this.moveState.forward = 0;
     this.moveState.back = 0;
@@ -204,6 +262,10 @@ class FreeCam extends EventDispatcher {
   }
 
   dispose() {
+    // window.addEventListener('contextmenu', function(event) {
+    //   event.preventDefault();
+    // });
+
     // this.domElement.removeEventListener("contextmenu", this.contextmenu);
     // this.domElement.removeEventListener("pointerdown", this.pointerdown);
     // this.domElement.removeEventListener("pointermove", this.pointermove);
