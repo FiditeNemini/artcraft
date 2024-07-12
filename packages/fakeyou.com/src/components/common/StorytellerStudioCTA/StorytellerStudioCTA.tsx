@@ -43,7 +43,7 @@ const StorytellerStudioCTA = ({
           <p className="opacity-75 text-center text-lg-start">
             {subText
               ? subText
-              : "Harness the power of AI to bring your creative visions to life. Craft stunning visuals by designing your own 3D scenes. Take control and effortlessly produce movies in any style you like."}
+              : "Build simple 3D scenes and harness the power of AI to transform them into incredible visuals using Storyteller Studio. Control it all with your own hands. Join the waitlist now!"}
           </p>
           {showButton && (
             <div className="d-flex justify-content-center justify-content-lg-start gap-3 mt-4">
