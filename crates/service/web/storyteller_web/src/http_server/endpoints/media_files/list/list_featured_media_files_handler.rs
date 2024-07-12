@@ -191,6 +191,8 @@ pub async fn list_featured_media_files_handler(
       .ok()
       .flatten();
 
+  let mut is_from_cache = maybe_cached_results.is_some();
+
   let results_page = match maybe_cached_results {
     Some(cached_results) => cached_results,
     None => database_lookup(&query, &server_state).await?,
@@ -291,7 +293,14 @@ pub async fn list_featured_media_files_handler(
   let body = serde_json::to_string(&response)
       .map_err(|e| ListFeaturedMediaFilesError::ServerError)?;
 
-  Ok(HttpResponse::Ok()
+  let mut response_builder = HttpResponse::Ok();
+
+  if is_from_cache {
+    // NB: Temporary debugging
+    response_builder.insert_header(("x-sieve", "true"));
+  }
+
+  Ok(response_builder
       .content_type("application/json")
       .body(body))
 }

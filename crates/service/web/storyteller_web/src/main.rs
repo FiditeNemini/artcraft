@@ -429,7 +429,9 @@ async fn main() -> AnyhowResult<()> {
           easyenv::get_env_duration_seconds_or_default(
             "QUEUE_STATS_CACHE_TTL_SECONDS",
             Duration::from_secs(60))),
-        featured_media_files_sieve: ArcSieve::with_capacity(100)?,
+        featured_media_files_sieve: ArcSieve::with_capacity(
+          easyenv::get_env_num("FEATURED_MEDIA_FILES_CACHE_SIZE", 25)?
+        )?,
       }
     },
     ip_ban_list,

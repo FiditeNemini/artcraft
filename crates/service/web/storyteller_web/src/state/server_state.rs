@@ -195,6 +195,7 @@ pub struct EphemeralInMemoryCaches {
 
   pub leaderboard: SingleItemTtlCache<LeaderboardInfo>,
 
+  /// Cache of featured media files
   pub featured_media_files_sieve: ArcSieve<ListFeaturedMediaFilesQueryParams, FeaturedMediaFileListPage>,
 }
 
