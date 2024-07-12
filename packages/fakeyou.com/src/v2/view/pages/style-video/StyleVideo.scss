@@ -1,26 +1,25 @@
 .fy-style-video-page {
-	.fy-style-video-page-ipa-input {
-		max-height: 33vh;
-		margin-bottom: 1rem;
-	}
+  .fy-style-video-page-ipa-input {
+    margin-bottom: 1rem;
+  }
 
-	.prompt-row {
-		display: flex;
-		gap: 1rem;
+  .prompt-row {
+    display: flex;
+    gap: 1rem;
 
-		.fy-textarea {
-			flex: 1;
-		}
-	}
+    .fy-textarea {
+      flex: 1;
+    }
+  }
 
-	.prompt-column {
-		display: inline-block;
-		&:nth-child(2) {
-			flex-grow: 1;
-		}
-	}
+  .prompt-column {
+    display: inline-block;
+    &:nth-child(2) {
+      flex-grow: 1;
+    }
+  }
 
-	.button {
-		width: 33%;
-	}
+  .button {
+    width: 33%;
+  }
 }

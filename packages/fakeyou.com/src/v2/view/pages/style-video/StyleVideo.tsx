@@ -10,6 +10,7 @@ import {
   TextArea,
   Slider,
   TempSelect as Select,
+  Label,
 } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -21,6 +22,7 @@ import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";
 import { STYLE_OPTIONS } from "common/StyleOptions";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -96,30 +98,92 @@ export default function StyleVideo() {
     setEnableLipsync(!!prompt?.lipsync_enabled);
   };
 
+  const storytellerCTA = (
+    <div className="row g-2 g-md-4">
+      <div className="col-12 col-md-4">
+        <div
+          className="overflow-hidden"
+          style={{
+            height: "20vh",
+            borderRadius: "0.5rem 0rem 0rem 0.5rem",
+          }}
+        >
+          <video
+            preload="metadata"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              overflow: "hidden",
+            }}
+            autoPlay={true}
+            controls={false}
+            muted={true}
+            loop={true}
+            playsInline={true}
+          >
+            <source
+              src="/videos/landing/hero_landing_video.mp4"
+              type="video/mp4"
+            />
+          </video>
+        </div>
+      </div>
+      <div className="col-12 col-md-8">
+        <div className="d-flex flex-column justify-content-center h-100 w-100 p-3">
+          <h3 className="fw-semibold">
+            Get Creative with 3D to Video Style Transfer!
+          </h3>
+          <p className="opacity-75">
+            Build simple 3D scenes, and turn them into incredible visuals using
+            Storyteller Studio!
+          </p>
+          <div className="mt-3 d-flex">
+            <Button
+              icon={faArrowRight}
+              iconFlip={true}
+              label="Go to Storyteller"
+              small={true}
+              href="https://storyteller.ai/"
+              variant="action"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return studioAccessCheck(
     <>
       <Container className="mt-3">
         <div className="row flex-lg-row-reverse g-3">
-          <div className="col-12 col-lg-7 col-xl-9">
-            <Panel padding={true} className="rounded">
-              <h2 className="fw-bold mb-3 d-block d-lg-none">Style a Video</h2>
-              <EntityInput
-                {...{
-                  accept: ["video"],
-                  aspectRatio: "landscape",
-                  className: "fy-style-video-page-video-input",
-                  label: "Choose a video",
-                  name: "mediaToken",
-                  value: pageMediaToken,
-                  onPromptUpdate,
-                  onChange: ({ target }: { target: any }) => {
-                    mediaTokenSet(target.value);
-                  },
-                  type: "media",
-                }}
-              />
+          <div className="col-12 col-lg-8 col-xl-9 d-flex flex-column gap-3">
+            <Panel className="rounded d-none d-lg-block">
+              {storytellerCTA}
             </Panel>
-            <div className="d-none d-lg-flex justify-content-center w-100 mt-5">
+
+            <Panel padding={true} className="rounded h-auto">
+              <h2 className="fw-bold mb-3 d-block d-lg-none">Style a Video</h2>
+              <Label label="Choose a Video" />
+              <div style={{ height: "calc(100vh - 20vh - 65px - 250px)" }}>
+                <EntityInput
+                  {...{
+                    accept: ["video"],
+                    aspectRatio: "landscape",
+                    name: "mediaToken",
+                    className: "h-100",
+                    value: pageMediaToken,
+                    onPromptUpdate,
+                    onChange: ({ target }: { target: any }) => {
+                      mediaTokenSet(target.value);
+                    },
+                    type: "media",
+                  }}
+                />
+              </div>
+            </Panel>
+
+            <div className="d-none d-lg-flex justify-content-center w-100 mt-3">
               <Button
                 {...{
                   disabled: !mediaToken,
@@ -131,7 +195,7 @@ export default function StyleVideo() {
               />
             </div>
           </div>
-          <div className="col-12 col-lg-5 col-xl-3">
+          <div className="col-12 col-lg-4 col-xl-3">
             <Panel padding={true} className="rounded">
               <div className="d-flex flex-column">
                 <h2 className="fw-bold mb-3 d-none d-lg-block">
@@ -277,8 +341,15 @@ export default function StyleVideo() {
             </Panel>
           </div>
         </div>
+        <Panel className="rounded d-block d-lg-none mt-5">
+          {storytellerCTA}
+        </Panel>
       </Container>
-      <div className="d-flex d-lg-none justify-content-center w-100 mt-5 position-fixed bottom-0 p-3 bg-panel">
+
+      <div
+        className="d-flex d-lg-none justify-content-center w-100 mt-5 position-fixed bottom-0 p-3 bg-panel"
+        style={{ zIndex: 3 }}
+      >
         <Button
           {...{
             disabled: !mediaToken,

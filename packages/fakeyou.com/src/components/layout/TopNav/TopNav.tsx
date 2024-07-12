@@ -9,7 +9,6 @@ import {
   faXmark,
   faClipboardList,
   faPortalEnter,
-  faHome,
   faCompass,
   faCloudUpload,
   faTrophy,
@@ -31,7 +30,6 @@ import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
 import "./TopNav.scss";
-import { Website } from "@storyteller/components/src/env/GetWebsite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
@@ -591,15 +589,15 @@ export default function TopNav({
             <li>
               <NavLink
                 exact={true}
-                to={domain.website === Website.FakeYou ? "/" : "/dashboard"}
+                to="/tools"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
                 <FontAwesomeIcon
-                  icon={faHome}
+                  icon={faScrewdriverWrench}
                   className="sidebar-heading-icon"
                 />
-                {domain.website === Website.FakeYou ? "Home" : "Dashboard"}
+                Creator Tools
               </NavLink>
             </li>
             <li>
