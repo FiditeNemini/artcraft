@@ -225,6 +225,7 @@ export default function StyleVideo() {
                     <TextArea
                       {...{
                         label: "Positive prompt",
+                        placeholder: "Describe your video here...",
                         rows: 2,
                         onChange: ({ target }: { target: any }) => {
                           promptSet(target.value);
@@ -239,6 +240,8 @@ export default function StyleVideo() {
                       <TextArea
                         {...{
                           label: "Negative prompt",
+                          placeholder:
+                            "Type what you don't want in your video...",
                           rows: 1,
                           onChange: ({ target }: { target: any }) => {
                             negativePromptSet(target.value);

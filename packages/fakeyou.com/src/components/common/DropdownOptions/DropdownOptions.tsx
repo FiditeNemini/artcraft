@@ -33,9 +33,15 @@ export const DropdownOptions: React.FC<DropdownOptionsProps> = ({
   });
 
   return (
-    <>
-      <animated.div style={{ ...animationProps, overflow: "hidden" }}>
-        <div ref={ref} className="pb-3">
+    <div>
+      <animated.div
+        style={{
+          ...animationProps,
+          overflowX: "visible",
+          overflowY: isOpen ? "visible" : "hidden",
+        }}
+      >
+        <div ref={ref} className="d-flex flex-column pb-3">
           {children}
         </div>
       </animated.div>
@@ -46,7 +52,7 @@ export const DropdownOptions: React.FC<DropdownOptionsProps> = ({
         icon={isOpen ? faChevronUp : faChevronDown}
         className="fs-7"
       />
-    </>
+    </div>
   );
 };
 
