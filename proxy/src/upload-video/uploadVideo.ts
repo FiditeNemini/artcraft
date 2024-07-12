@@ -136,7 +136,7 @@ async function stopPlaybackAndUploadVideo(
   const canvas = new Canvas(1024, 576);
   const context = canvas.getContext("2d");
   const folder = uuid.v4();
-
+  // use then...
   await new Promise<void>((resolve) => {
     fs.mkdir(`./${folder}`, () => {
       fs.mkdir(`./${folder}/images`, () => {
@@ -256,6 +256,7 @@ async function stopPlaybackAndUploadVideo(
       const media_token = video.current_scene_media_token || undefined;
 
       console.log("Upload file");
+      // TODO REPLACE
       const uploadData: any = await uploadMediaFile({
         blob,
         fileName: `${title}.mp4`,

@@ -12,6 +12,7 @@ import {
   lipSync,
   cinematic,
   globalIPAMediaToken,
+  enginePreProcessing,
 } from "~/pages/PageEnigma/signals/stylizeTab";
 import { useEffect, useRef } from "react";
 
@@ -59,6 +60,7 @@ export function GenerateMovieButton({
       lipSync.value,
       cinematic.value,
       globalIPAMediaToken.value,
+      enginePreProcessing.value,
     );
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,

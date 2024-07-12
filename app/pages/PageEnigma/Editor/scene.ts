@@ -27,8 +27,13 @@ class Scene {
   // loading indicator manager
   placeholder_manager: LoadingPlaceHolderManager | undefined;
 
+  updateSurfaceIdAttributeToMesh: Function;
 
-  constructor(name: string, camera_name: string) {
+  constructor(
+    name: string,
+    camera_name: string,
+    updateSurfaceIdAttributeToMesh: Function,
+  ) {
     this.name = name;
     this.gridHelper;
     this.scene = new THREE.Scene();
@@ -41,6 +46,7 @@ class Scene {
     // global names
     this.camera_name = camera_name;
     this.placeholder_manager = undefined;
+    this.updateSurfaceIdAttributeToMesh = updateSurfaceIdAttributeToMesh;
   }
 
   initialize() {
@@ -62,10 +68,7 @@ class Scene {
     this._create_camera_obj();
   }
 
-  instantiate(
-    name: string,
-    pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
-  ) {
+  instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
     const material = new THREE.MeshPhongMaterial({ color: 0xdacbce });
     material.shininess = 0.0;
     let geometry;
@@ -111,8 +114,7 @@ class Scene {
       obj.userData["base"] = new THREE.Color(0x00d8ff).getHex();
       this.shader_objects.push(obj);
       obj.userData["media_id"] = "Parim";
-    } 
-    else if (name.includes("Image::")) {
+    } else if (name.includes("Image::")) {
       const image_token = name.replace("Image::", "");
       const loader = new THREE.TextureLoader();
       const texture = loader.load(image_token);
@@ -120,7 +122,7 @@ class Scene {
       const image_material = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         map: texture,
-        transparent: true
+        transparent: true,
       });
       obj = new THREE.Mesh(geometry, image_material);
       obj.userData["media_id"] = name;
@@ -130,8 +132,7 @@ class Scene {
       });
       obj = new THREE.Mesh(geometry, light_material);
       obj.userData["media_id"] = "Parim";
-    } 
-    else {
+    } else {
       obj = new THREE.Mesh(geometry, material);
       obj.userData["media_id"] = "Parim";
     }
@@ -149,7 +150,7 @@ class Scene {
     this.scene.add(obj);
 
     if (name == "PointLight") {
-      const light = new THREE.PointLight( 0xffffff, 1, 100 );
+      const light = new THREE.PointLight(0xffffff, 1, 100);
       this.scene.add(light);
       light.position.copy(obj.position);
       obj.attach(light);
@@ -157,6 +158,7 @@ class Scene {
       obj.userData["light"] = light.uuid;
     }
 
+    this.updateSurfaceIdAttributeToMesh(this.scene);
     return obj;
   }
 
@@ -364,7 +366,7 @@ class Scene {
               c.material.color.set(new THREE.Color(hex_color));
             }
 
-            if(c.name == "PointLight") {
+            if (c.name == "PointLight") {
               const light = this.get_object_by_uuid(c.userData["light"]);
               if (light) {
                 (light as THREE.PointLight).color = new THREE.Color(hex_color);
@@ -432,6 +434,7 @@ class Scene {
     mmd.layers.enable(0);
     mmd.layers.enable(1);
     this.scene.add(mmd);
+    this.updateSurfaceIdAttributeToMesh(this.scene);
     return mmd;
   }
 
@@ -450,14 +453,13 @@ class Scene {
         auto_add,
         position,
       );
-    }
-    else if (
+    } else if (
       url.includes(".png") ||
       url.includes(".jpg") ||
       url.includes(".jpeg") ||
       url.includes(".gif")
     ) {
-      return this.instantiate("Image::"+url);
+      return this.instantiate("Image::" + url);
     }
     return await this.loadGlbWithPlaceholder(
       media_id,
@@ -587,7 +589,7 @@ class Scene {
     if (auto_add) {
       this.scene.add(child_result);
     }
-
+    this.updateSurfaceIdAttributeToMesh(this.scene);
     return child_result;
   }
 

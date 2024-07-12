@@ -24,7 +24,7 @@ import {
 import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/Editor/editor";
 import EmotionEngine from "./emotion_engine";
-import { GenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
+import { IGenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
 import { outlinerState } from "../signals";
@@ -156,7 +156,11 @@ export class TimeLine {
       case toEngineActions.ADD_CHARACTER: {
         const newObject = await this.addCharacter(data.data as MediaItem);
         if (newObject)
-          this.queueNewObjectMessage(newObject, data.data as MediaItem, AssetType.CHARACTER);
+          this.queueNewObjectMessage(
+            newObject,
+            data.data as MediaItem,
+            AssetType.CHARACTER,
+          );
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -166,7 +170,11 @@ export class TimeLine {
       case toEngineActions.ADD_OBJECT: {
         const newObject = await this.addObject(data.data as MediaItem);
         if (newObject)
-          this.queueNewObjectMessage(newObject, data.data as MediaItem, AssetType.OBJECT);
+          this.queueNewObjectMessage(
+            newObject,
+            data.data as MediaItem,
+            AssetType.OBJECT,
+          );
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -176,7 +184,11 @@ export class TimeLine {
       }
       case toEngineActions.ADD_SHAPE: {
         const newShape = await this.addShape(data.data as MediaItem);
-        this.queueNewObjectMessage(newShape, data.data as MediaItem, AssetType.SHAPE);
+        this.queueNewObjectMessage(
+          newShape,
+          data.data as MediaItem,
+          AssetType.SHAPE,
+        );
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
@@ -200,7 +212,7 @@ export class TimeLine {
       case toEngineActions.GENERATE_VIDEO: {
         const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
         // pass this in ... rather than doing it implicitly ...
-        this.editorEngine.generation_options = options as GenerationOptions;
+        this.editorEngine.generation_options = options as IGenerationOptions;
         this.editorEngine.generateVideo();
         break;
       }
@@ -266,7 +278,7 @@ export class TimeLine {
   queueNewObjectMessage(
     item: THREE.Object3D<THREE.Object3DEventMap>,
     data: MediaItem,
-    asset_type: AssetType.OBJECT | AssetType.CHARACTER | AssetType.SHAPE
+    asset_type: AssetType.OBJECT | AssetType.CHARACTER | AssetType.SHAPE,
   ) {
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,

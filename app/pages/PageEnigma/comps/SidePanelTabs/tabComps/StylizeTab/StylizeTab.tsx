@@ -21,6 +21,7 @@ import {
 
 export function StylizeTab() {
   useSignals();
+
   const [view, setView] = useState(StylizeTabPages.MAIN);
   const [generateSectionHeight, setGenerateSectionHeight] = useState(114);
 

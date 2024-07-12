@@ -41,11 +41,13 @@ import {
   signalScene,
 } from "~/signals";
 import { outlinerState, updateObjectPanel } from "../signals";
-import { GenerationOptions } from "../models/generationOptions";
+import { IGenerationOptions } from "../models/generationOptions";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { SceneGenereationMetaData } from "../models/sceneGenerationMetadata";
 import { MediaUploadApi } from "~/Classes/ApiManager";
 import { SceneManager } from "./scene_manager_api";
+import { CustomOutlinePass } from "./CustomOutlinePass.js";
+import FindSurfaces from "./FindSurfaces.js";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -68,11 +70,13 @@ class Editor {
   canvasRenderCamReference: HTMLCanvasElement | null = null;
 
   composer: EffectComposer | undefined;
+  render_composer: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
   last_cam_pos: THREE.Vector3;
   last_cam_rot: THREE.Euler;
   saoPass: SAOPass | undefined;
   outputPass: OutputPass | undefined;
+  renderOutputPass: OutputPass | undefined;
   bloomPass: UnrealBloomPass | undefined;
   smaaPass: SMAAPass | undefined;
   control: TransformControls | undefined;
@@ -87,7 +91,7 @@ class Editor {
   cameraViewControls: FreeCam | undefined;
   orbitControls: OrbitControls | undefined;
   locked: boolean;
-  frame_buffer: string[] = [];
+  frame_buffer: any[] = [];
   render_timer: number;
   fps_number: number;
   cap_fps: number;
@@ -124,6 +128,7 @@ class Editor {
   positive_prompt: string;
   negative_prompt: string;
   art_style: ArtStyle;
+  rawRenderPass: RenderPass | undefined;
 
   last_scrub: number;
   recorder: MediaRecorder | undefined;
@@ -143,7 +148,7 @@ class Editor {
   mouse_controls: MouseControls | undefined;
   save_manager: SaveManager;
 
-  generation_options: GenerationOptions;
+  generation_options: IGenerationOptions;
 
   // just a passive the image to be uploaded. we store the token and use that in snapshots.
   globalIpAdapterImage: File | undefined;
@@ -152,8 +157,19 @@ class Editor {
 
   sceneManager: SceneManager | undefined;
 
-  outliner_feature_flag: boolean;
+  ///////////////////////////////////////////////
+  ///////////////////////////////////////////////
+
+  public outliner_feature_flag: boolean;
+  public engine_preprocessing: boolean = false; // this is to do preprocessing also called render fast.
+
+  ///////////////////////////////////////////////
+  ///////////////////////////////////////////////
+
   focused: boolean = false;
+
+  customOutlinerPass: CustomOutlinePass | undefined;
+  surfaceFinder: FindSurfaces | undefined;
 
   constructor() {
     console.log(
@@ -175,7 +191,11 @@ class Editor {
     // global names
     this.camera_name = "::CAM::";
 
-    this.activeScene = new Scene("" + this.version, this.camera_name);
+    this.activeScene = new Scene(
+      "" + this.version,
+      this.camera_name,
+      this.updateSurfaceIdAttributeToMesh.bind(this),
+    );
     this.activeScene.initialize();
     this.generating_preview = false;
     this.last_cam_pos = new THREE.Vector3(0, 0, 0);
@@ -554,6 +574,8 @@ class Editor {
       }
     });
 
+    this._configurePostProcessingRaw();
+
     loadingBarData.value = {
       ...loadingBarData.value,
       progress: 100,
@@ -706,6 +728,77 @@ class Editor {
     loadingBarIsShowing.value = false;
   }
 
+  _configurePostProcessingRaw() {
+    const width = this.canvasRenderCamReference?.width ?? 0;
+    const height = this.canvasRenderCamReference?.height ?? 0;
+    if (
+      this.rawRenderer == undefined ||
+      this.render_camera == undefined ||
+      this.renderer == undefined
+    ) {
+      return;
+    }
+
+    const depthTexture = new THREE.DepthTexture(width, height);
+    depthTexture.type = THREE.UnsignedShortType;
+
+    const renderTarget = new THREE.WebGLRenderTarget(
+      window.innerWidth,
+      window.innerHeight,
+      {
+        depthTexture: depthTexture,
+        depthBuffer: true,
+      },
+    );
+
+    this.customOutlinerPass = new CustomOutlinePass(
+      new THREE.Vector2(width, height),
+      this.activeScene.scene,
+      this.render_camera,
+    );
+    this.render_composer = new EffectComposer(this.rawRenderer, renderTarget);
+    this.surfaceFinder = new FindSurfaces();
+    this.rawRenderPass = new RenderPass(
+      this.activeScene.scene,
+      this.render_camera,
+    );
+    this.render_composer.addPass(this.rawRenderPass);
+    this.render_composer.addPass(this.customOutlinerPass);
+
+    this.renderOutputPass = new OutputPass();
+    this.render_composer.addPass(this.renderOutputPass);
+
+    this.setColorMap();
+  }
+
+  setRenderDepth() {
+    this.updateSurfaceIdAttributeToMesh(this.activeScene.scene);
+    if (this.render_camera && this.customOutlinerPass) {
+      this.customOutlinerPass.fsQuad.material.uniforms.debugVisualize.value = 3; // Depth
+    }
+  }
+
+  setNormalMap() {
+    this.updateSurfaceIdAttributeToMesh(this.activeScene.scene);
+    if (this.render_camera && this.customOutlinerPass) {
+      this.customOutlinerPass.fsQuad.material.uniforms.debugVisualize.value = 4; // Normal Map
+    }
+  }
+
+  setColorMap() {
+    this.updateSurfaceIdAttributeToMesh(this.activeScene.scene);
+    if (this.render_camera && this.customOutlinerPass) {
+      this.customOutlinerPass.fsQuad.material.uniforms.debugVisualize.value = 2; // Renderd Color
+    }
+  }
+
+  setOutlineRender() {
+    this.updateSurfaceIdAttributeToMesh(this.activeScene.scene);
+    if (this.render_camera && this.customOutlinerPass) {
+      this.customOutlinerPass.fsQuad.material.uniforms.debugVisualize.value = 7; // Outlines Only
+    }
+  }
+
   // Configure post processing.
   _configurePostProcessing() {
     const width = this.canvReference?.width ?? 0;
@@ -717,6 +810,7 @@ class Editor {
 
     this.composer = new EffectComposer(this.renderer);
     this.renderPass = new RenderPass(this.activeScene.scene, this.camera);
+
     this.composer.addPass(this.renderPass);
 
     this.outlinePass = new OutlinePass(
@@ -777,18 +871,32 @@ class Editor {
     return this.activeScene.instantiate(name, pos);
   }
 
+  updateSurfaceIdAttributeToMesh(scene: THREE.Scene) {
+    if (this.surfaceFinder === undefined) {
+      return;
+    }
+    this.surfaceFinder.surfaceId = 0;
+    this.customOutlinerPass?.updateMaxSurfaceId(
+      this.surfaceFinder.surfaceId + 1,
+    );
+  }
+
   // Render the scene to the camera, this is called in the update.
   async renderScene() {
-    if (this.composer != null && !this.rendering && this.rawRenderer) {
+    if (
+      this.composer != null &&
+      !this.rendering &&
+      this.rawRenderer &&
+      this.render_composer
+    ) {
       this.composer.render();
-      this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
+      //this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
+      this.render_composer.render();
     } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.rendering && this.rawRenderer) {
-      this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
-    } else {
-      console.error("Could not render to canvas no render or composer!");
+    } else if (this.rendering && this.renderer){
+      this.renderer.setSize(this.render_width, this.render_height);
     }
 
     if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
@@ -815,9 +923,47 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // High quality png.
-      this.frame_buffer.push(imgData);
-      this.render_timer += this.clock.getDelta();
+
+      this.utils.removeTransformControls(true);
+
+      if (this.timeline.is_playing) {
+        this.setColorMap();
+        this.render_composer?.render();
+        const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // High quality png.
+
+        if (this.engine_preprocessing) {
+          this.setNormalMap();
+          this.render_composer?.render();
+          const normalImgData = this.rawRenderer.domElement.toDataURL(
+            "image/png",
+            1.0,
+          ); // High quality png.
+
+          this.setRenderDepth();
+          this.render_composer?.render();
+          const depthImgData = this.rawRenderer.domElement.toDataURL(
+            "image/png",
+            1.0,
+          ); // High quality png.
+
+          this.setOutlineRender();
+          this.render_composer?.render();
+          const outlineImgData = this.rawRenderer.domElement.toDataURL(
+            "image/png",
+            1.0,
+          ); // High quality png.
+
+          this.frame_buffer.push([
+            imgData,
+            normalImgData,
+            depthImgData,
+            outlineImgData,
+          ]);
+        } else {
+          this.frame_buffer.push([imgData]);
+        }
+        this.render_timer += this.clock.getDelta();
+      }
       if (!this.timeline.is_playing) {
         //this.recorder.stop();
         this.playback_location = 0;
@@ -936,7 +1082,11 @@ class Editor {
   }
 
   switchEdit() {
-    if (this.switchPreviewToggle && this.canvasRenderCamReference) {
+    if (
+      this.switchPreviewToggle &&
+      this.canvasRenderCamReference &&
+      this.rawRenderPass
+    ) {
       this.switchPreviewToggle = false;
       editorState.value = EditorStates.EDIT;
       setTimeout(() => {
@@ -950,6 +1100,8 @@ class Editor {
           canvas: this.canvasRenderCamReference || undefined,
           preserveDrawingBuffer: true,
         });
+        this._configurePostProcessingRaw();
+
         if (this.camera_person_mode) {
           this.switchCameraView();
         }
@@ -1112,10 +1264,13 @@ class Editor {
       this.composer.setSize(width, height);
     }
 
+    this.render_composer?.setSize(width, height);
+
     if (this.render_camera == undefined) {
       return;
     }
 
+    this.customOutlinerPass?.setSize(width, height);
     this.render_camera.aspect = this.getRenderDimensions().aspectRatio;
     this.render_camera.updateProjectionMatrix();
   }

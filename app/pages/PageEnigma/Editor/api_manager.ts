@@ -5,6 +5,24 @@ import { signalScene, startPollingActiveJobs } from "~/signals";
 import { updateExistingScene, uploadNewScene } from "./api_fetchers";
 import { uploadThumbnail } from "~/api";
 import environmentVariables from "~/Classes/EnvironmentVariables";
+
+interface StylizeVideoParams {
+  media_token: string;
+  style: ArtStyle;
+  positive_prompt: string;
+  negative_prompt: string;
+  visibility: Visibility;
+  use_face_detailer?: boolean;
+  use_upscaler?: boolean;
+  use_strength?: number;
+  use_lipsync?: boolean;
+  use_cinematic?: boolean;
+  use_global_ipa_media_token?: string | null;
+  input_depth_file?: string | null;
+  input_normal_file?: string | null;
+  input_outline_file?: string | null;
+}
+
 /**
  * Storyteller Studio API Manager
  * The source of truth of all these media items is the database in the cloud
@@ -358,19 +376,22 @@ export class APIManager {
     return result;
   }
 
-  public async stylizeVideo(
-    media_token: string,
-    style: ArtStyle,
-    positive_prompt: string,
-    negative_prompt: string,
-    visibility: Visibility,
-    use_face_detailer: boolean = false,
-    use_upscaler: boolean = false,
-    use_strength: number = 1.0,
-    use_lipsync: boolean = false,
-    use_cinematic: boolean = false,
-    use_global_ipa_media_token: string | null = null,
-  ) {
+  public async stylizeVideo({
+    media_token,
+    style,
+    positive_prompt,
+    negative_prompt,
+    visibility,
+    use_face_detailer = false,
+    use_upscaler = false,
+    use_strength = 1.0,
+    use_lipsync = false,
+    use_cinematic = false,
+    use_global_ipa_media_token = null,
+    input_depth_file = null,
+    input_normal_file = null,
+    input_outline_file = null,
+  }: StylizeVideoParams) {
     const uuid = uuidv4();
 
     const data = {
@@ -389,6 +410,9 @@ export class APIManager {
       use_lipsync: use_lipsync,
       global_ipa_media_token: use_global_ipa_media_token,
       use_cinematic: use_cinematic,
+      input_depth_file: input_depth_file,
+      input_normal_file: input_normal_file,
+      input_outline_file: input_outline_file,
     };
 
     const json_data = JSON.stringify(data);

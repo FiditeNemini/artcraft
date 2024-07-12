@@ -11,7 +11,7 @@ import {
 import { toTimelineActions } from "./toTimelineActions";
 
 import { ClipUI } from "../datastructures/clips/clip_ui";
-import { GenerationOptions } from "../models/generationOptions";
+import { IGenerationOptions } from "../models/generationOptions";
 import { ToastDataType } from "~/components";
 
 export type UnionedActionTypes =
@@ -26,7 +26,7 @@ export type UnionedDataTypes =
   | ClipUI[]
   | MediaItem
   | ToastDataType
-  | GenerationOptions
+  | IGenerationOptions
   | CameraAspectRatio
   | null;
 

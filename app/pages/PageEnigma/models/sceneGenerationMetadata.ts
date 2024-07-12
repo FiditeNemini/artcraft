@@ -14,4 +14,6 @@ export interface SceneGenereationMetaData {
   styleStrength: number;
   lipSync: boolean;
   cinematic: boolean;
+
+  enginePreProcessing: boolean;
 }

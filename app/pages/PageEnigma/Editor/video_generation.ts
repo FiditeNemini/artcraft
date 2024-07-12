@@ -26,6 +26,10 @@ export class VideoGeneration {
     this.mediaUploadAPI = new MediaUploadApi();
   }
 
+  sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   async generateFrame() {
     if (!this.editor.generating_preview && this.editor.rawRenderer) {
       this.editor.generating_preview = true;
@@ -189,190 +193,237 @@ export class VideoGeneration {
     //const videoURL = URL.createObjectURL(videoBlob);
 
     this.editor.generating_preview = true;
-    const ffmpeg = createFFmpeg({ log: false });
-    await ffmpeg.load();
 
-    this.editor.updateLoad(50, "Processing...");
+    this.editor.updateLoad({
+      progress: 50,
+      message: "Processing...",
+    });
 
-    // Write the Uint8Array to the FFmpeg file system
-    //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
-
-    for (let index = 0; index < this.editor.frame_buffer.length; index++) {
-      const element = this.editor.frame_buffer[index];
-      await ffmpeg.FS(
-        "writeFile",
-        `image${index}.png`,
-        await fetchFile(element),
-      );
-    }
-
-    await ffmpeg.run(
-      "-framerate",
-      "" + this.editor.cap_fps,
-      "-i",
-      "image%d.png",
-      "input.mp4",
-    );
-
-    await ffmpeg.run(
-      "-i",
-      "input.mp4",
-      "-f",
-      "lavfi",
-      "-i",
-      "anullsrc", // This adds a silent audio track
-      "-max_muxing_queue_size",
-      "999999",
-      "-vf", // WE REMOVED THE BLACK FRAME IN FFMEPG INSTEAD OF THE ENGINE
-      "select=gte(n\\,1)", // WE REMOVED THE BLACK FRAME IN FFMEPG INSTEAD OF THE ENGINE
-      // "select=gte(n\\,1),scale=1024:576",
-      "-c:v",
-      "libx264", // Specify video codec (optional, but recommended for MP4)
-      "-c:a",
-      "aac", // Specify audio codec (optional, but recommended for MP4)
-      "-shortest", // Ensure output duration matches the shortest stream (video or audio)
-      "-pix_fmt",
-      "yuv420p",
-      "-f",
-      "mp4",
-      "0tmp.mp4",
-    );
-
-    let itteration = 0;
-
-    if (compile_audio) {
-      for (const clip of this.editor.timeline.timeline_items) {
-        if (clip.type == ClipType.AUDIO) {
-          await this.convertAudioClip(itteration, ffmpeg, clip);
-          itteration += 1;
-        }
-      }
-    }
-
-    const output = ffmpeg.FS("readFile", itteration + "tmp.mp4");
-
-    ffmpeg.exit();
-    this.editor.generating_preview = false;
-
-    // Create a Blob from the output file for downloading
-    const blob = new Blob([output.buffer], { type: "video/mp4" });
-
-    const title = getSceneSignals().title || "Untitled";
-
-    const style_name = this.editor.art_style.toString();
-    const media_token = this.editor.current_scene_media_token || undefined;
-
-    // convert the ip adapter image and upload as a media token
-    const image_uuid = uuidv4();
-    let ipa_image_token = undefined;
-
-    if (this.editor.globalIpAdapterImage != undefined) {
-      const response = await this.mediaUploadAPI.UploadImage({
-        fileName: `${image_uuid}.ipa`,
-        blob: this.editor.globalIpAdapterImage,
-        uuid: image_uuid,
-      });
-      if (response.success) {
-        if (response.data) {
-          ipa_image_token = response.data;
-        }
-      }
-    }
-    if (ipa_image_token) {
-      globalIPAMediaToken.value = ipa_image_token;
-    }
-
-    // TODO Remove so many of these around wtf. SceneGenereationMetaData should only be one place
-    const metaData: SceneGenereationMetaData = {
-      artisticStyle: this.editor.art_style,
-      positivePrompt: this.editor.positive_prompt,
-      negativePrompt: this.editor.negative_prompt,
-      cameraAspectRatio: this.editor.render_camera_aspect_ratio,
-      upscale: this.editor.generation_options.upscale,
-      faceDetail: this.editor.generation_options.faceDetail,
-      styleStrength: this.editor.generation_options.styleStrength,
-      lipSync: this.editor.generation_options.lipSync,
-      cinematic: this.editor.generation_options.cinematic,
-      globalIPAMediaToken: globalIPAMediaToken.value,
+    const upload_tokens = {
+      color: "",
+      normal: "",
+      depth: "",
+      outline: "",
     };
 
-    // This is to save the snapshot of the scene for remixing...
-    const uuid_snapshot = uuidv4();
+    // TODO fix and ensure that render fast, would actually render fast.
+    for (
+      let image_index = 0;
+      image_index < this.editor.frame_buffer[0].length;
+      image_index++
+    ) {
+      // Write the Uint8Array to the FFmpeg file system
+      //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
 
-    const saveData = await this.editor.save_manager.saveData({
-      sceneTitle: title,
-      sceneToken: media_token,
-      sceneGenerationMetadata: metaData,
-    });
+      const ffmpeg = createFFmpeg({ log: false });
+      await ffmpeg.load();
 
-    console.log("SAVE DATA:");
-    console.log(saveData);
-    const file = new File([saveData], `${title}.glb`, {
-      type: "application/json",
-    });
+      for (let index = 0; index < this.editor.frame_buffer.length; index++) {
+        const element = this.editor.frame_buffer[index][image_index];
+        await ffmpeg.FS(
+          "writeFile",
+          `image${index}.png`,
+          await fetchFile(element),
+        );
+      }
 
-    const response =
-      await this.editor.media_upload.UploadSceneSnapshotMediaFileForm({
-        maybe_title: title,
-        maybe_scene_source_media_file_token: media_token, // can be undefined or null
-        uuid: uuid_snapshot,
-        blob: file,
+      await ffmpeg.run(
+        "-framerate",
+        "" + this.editor.cap_fps,
+        "-i",
+        "image%d.png",
+        "input.mp4",
+      );
+
+      await ffmpeg.run(
+        "-i",
+        "input.mp4",
+        "-f",
+        "lavfi",
+        "-i",
+        "anullsrc", // This adds a silent audio track
+        "-max_muxing_queue_size",
+        "999999",
+        "-vf", // WE REMOVED THE BLACK FRAME IN FFMEPG INSTEAD OF THE ENGINE
+        "select=gte(n\\,1)", // WE REMOVED THE BLACK FRAME IN FFMEPG INSTEAD OF THE ENGINE
+        // "select=gte(n\\,1),scale=1024:576",
+        "-c:v",
+        "libx264", // Specify video codec (optional, but recommended for MP4)
+        "-c:a",
+        "aac", // Specify audio codec (optional, but recommended for MP4)
+        "-shortest", // Ensure output duration matches the shortest stream (video or audio)
+        "-pix_fmt",
+        "yuv420p",
+        "-f",
+        "mp4",
+        "0tmp.mp4",
+      );
+
+      let itteration = 0;
+
+      if (compile_audio) {
+        for (const clip of this.editor.timeline.timeline_items) {
+          if (clip.type == ClipType.AUDIO) {
+            await this.convertAudioClip(itteration, ffmpeg, clip);
+            itteration += 1;
+          }
+        }
+      }
+
+      const output = ffmpeg.FS("readFile", itteration + "tmp.mp4");
+
+      ffmpeg.exit();
+      this.editor.generating_preview = false;
+
+      // Create a Blob from the output file for downloading
+      const blob = new Blob([output.buffer], { type: "video/mp4" });
+
+      const title = getSceneSignals().title || "Untitled";
+
+      const style_name = this.editor.art_style.toString();
+      const media_token = this.editor.current_scene_media_token || undefined;
+
+      // convert the ip adapter image and upload as a media token
+      const image_uuid = uuidv4();
+      let ipa_image_token = undefined;
+
+      if (this.editor.globalIpAdapterImage != undefined) {
+        const response = await this.mediaUploadAPI.UploadImage({
+          fileName: `${image_uuid}.ipa`,
+          blob: this.editor.globalIpAdapterImage,
+          uuid: image_uuid,
+        });
+        if (response.success) {
+          if (response.data) {
+            ipa_image_token = response.data;
+          }
+        }
+      }
+      if (ipa_image_token) {
+        globalIPAMediaToken.value = ipa_image_token;
+      }
+
+      // TODO Remove so many of these around wtf. SceneGenereationMetaData should only be one place
+      const metaData: SceneGenereationMetaData = {
+        artisticStyle: this.editor.art_style,
+        positivePrompt: this.editor.positive_prompt,
+        negativePrompt: this.editor.negative_prompt,
+        cameraAspectRatio: this.editor.render_camera_aspect_ratio,
+        upscale: this.editor.generation_options.upscale,
+        faceDetail: this.editor.generation_options.faceDetail,
+        styleStrength: this.editor.generation_options.styleStrength,
+        lipSync: this.editor.generation_options.lipSync,
+        cinematic: this.editor.generation_options.cinematic,
+        globalIPAMediaToken: globalIPAMediaToken.value,
+      };
+
+      // This is to save the snapshot of the scene for remixing...
+      const uuid_snapshot = uuidv4();
+
+      const saveData = await this.editor.save_manager.saveData({
+        sceneTitle: title,
+        sceneToken: media_token,
+        sceneGenerationMetadata: metaData,
       });
 
-    let immutable_media_token = undefined;
-    if (response.success) {
-      if (response.data) {
-        immutable_media_token = response.data;
+      const file = new File([saveData], `${title}.glb`, {
+        type: "application/json",
+      });
+
+      const response =
+        await this.editor.media_upload.UploadSceneSnapshotMediaFileForm({
+          maybe_title: title,
+          maybe_scene_source_media_file_token: media_token, // can be undefined or null
+          uuid: uuid_snapshot,
+          blob: file,
+        });
+
+      let immutable_media_token = undefined;
+      if (response.success) {
+        if (response.data) {
+          immutable_media_token = response.data;
+        }
+      } else {
+        console.log("ERROR:");
+        console.log(response.errorMessage);
       }
-    } else {
-      console.log("ERROR:");
-      console.log(response.errorMessage);
+
+      console.log("Immutable Token:");
+      console.log(immutable_media_token);
+
+      /// TODO refactor this whole thing extract this out.
+      const data: any = await this.editor.api_manager.uploadMedia({
+        blob,
+        fileName: `${title}.mp4`,
+        title,
+        styleName: style_name,
+        maybe_scene_source_media_file_token: immutable_media_token,
+      });
+
+      if (data == null) {
+        return;
+      }
+      const upload_token = data["media_file_token"];
+
+      console.log(upload_token);
+
+      if (image_index === 0) {
+        upload_tokens.color = upload_token;
+      } else if (image_index === 1) {
+        upload_tokens.normal = upload_token;
+      } else if (image_index === 2) {
+        upload_tokens.depth = upload_token;
+      } else if (image_index === 3) {
+        upload_tokens.outline = upload_token;
+      }
+
+      await this.sleep(2000); // TODO: REMOVE THIS WHEN TOO MANY REQUESTS ERROR IS SOLVED.
+      console.log("Waiting for server to catch up...");
     }
 
-    console.log("Immutable Token:");
-    console.log(immutable_media_token);
+    this.editor.onWindowResize();
 
-    /// TODO refactor this whole thing extract this out.
-    const data: any = await this.editor.api_manager.uploadMedia({
-      blob,
-      fileName: `${title}.mp4`,
-      title,
-      styleName: style_name,
-      maybe_scene_source_media_file_token: immutable_media_token,
-    });
+    console.log(upload_tokens);
+    this.editor.setColorMap();
 
-    if (data == null) {
-      return;
-    }
-    const upload_token = data["media_file_token"];
+    console.log("https://storyteller.ai/media/" + upload_tokens.color);
+    console.log("https://storyteller.ai/media/" + upload_tokens.normal);
+    console.log("https://storyteller.ai/media/" + upload_tokens.depth);
+    console.log("https://storyteller.ai/media/" + upload_tokens.outline);
 
-    // create the scene token from here then snapshot it associate with the video generation.
-    // send immutable token with the video ... TODO:
     await this.editor.api_manager
-      .stylizeVideo(
-        upload_token,
-        this.editor.art_style,
-        this.editor.positive_prompt,
-        this.editor.negative_prompt,
-        Visibility.Public,
-        this.editor.generation_options.faceDetail,
-        this.editor.generation_options.upscale,
-        this.editor.generation_options.styleStrength,
-        this.editor.generation_options.lipSync,
-        this.editor.generation_options.cinematic,
-        globalIPAMediaToken.value,
-      )
+      .stylizeVideo({
+        media_token: upload_tokens.color,
+        style: this.editor.art_style,
+        positive_prompt: this.editor.positive_prompt,
+        negative_prompt: this.editor.negative_prompt,
+        visibility: Visibility.Public,
+        use_face_detailer: this.editor.generation_options.faceDetail,
+        use_upscaler: this.editor.generation_options.upscale,
+        use_strength: this.editor.generation_options.styleStrength,
+        use_lipsync: this.editor.generation_options.lipSync,
+        use_cinematic: this.editor.generation_options.cinematic,
+        use_global_ipa_media_token: globalIPAMediaToken.value,
+        input_depth_file: upload_tokens.depth,
+        input_normal_file: upload_tokens.normal,
+        input_outline_file: upload_tokens.outline,
+      })
       .catch((error) => {
-        // TODO handle stylize error.
         console.log(error);
-        this.editor.updateLoad(100, "Failed To Render");
+        this.editor.updateLoad({
+          progress: 100,
+          message: "Failed To Render",
+          label: "Error",
+        });
         this.editor.endLoading();
       });
-    // Not sure if this is needed will double check TODO: MC
-    //this.editor.generating_preview = false;
 
-    // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
-    this.editor.updateLoad(100, "Done Check Your Media Tab On Profile.");
+    this.editor.updateLoad({
+      progress: 100,
+      message: "Done Check Your Media Tab On Profile.",
+      label: "Success",
+    });
+
     this.editor.endLoading();
 
     this.editor.recorder = undefined;
@@ -390,6 +441,8 @@ export class VideoGeneration {
       canvas: this.editor.canvasRenderCamReference || undefined,
       preserveDrawingBuffer: true,
     });
+    this.editor._configurePostProcessingRaw();
+
 
     this.editor.activeScene.renderMode(false);
 

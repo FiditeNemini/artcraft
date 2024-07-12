@@ -19,6 +19,7 @@ export const faceDetail = signal(false);
 export const styleStrength = signal(1.0);
 export const lipSync = signal(false);
 export const cinematic = signal(true);
+export const enginePreProcessing = signal(false);
 
 export const setArtStyleSelection = (newStyle: ArtStyle) => {
   if (selectedArtStyle.value !== newStyle) {
@@ -37,6 +38,7 @@ export const resetSceneGenerationMetadata = () => {
   styleStrength.value = 1.0;
   lipSync.value = false;
   cinematic.value = false;
+  enginePreProcessing.value = false;
 };
 
 export const restoreSceneGenerationMetadata = (
@@ -71,5 +73,8 @@ export const restoreSceneGenerationMetadata = (
   }
   if (newData.cinematic) {
     cinematic.value = newData.cinematic;
+  }
+  if (newData.enginePreProcessing) {
+    enginePreProcessing.value = newData.enginePreProcessing;
   }
 };
