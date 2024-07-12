@@ -14,22 +14,16 @@ use log::{info, warn};
 use sqlx::MySqlPool;
 
 use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
-use enums::by_table::users::user_feature_flag::UserFeatureFlag;
-use errors::AnyhowResult;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
-use mysql_queries::queries::users::user::set_can_access_studio_transactional::{set_can_access_studio_transactional, SetCanAccessStudioArgs};
-use mysql_queries::queries::users::user::set_user_feature_flags_transactional::{set_user_feature_flags_transactional, SetUserFeatureFlagTransactionalArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use tokens::tokens::user_sessions::UserSessionToken;
-use tokens::tokens::users::UserToken;
 use user_input_common::check_for_slurs::contains_slurs;
 
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
-use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
 use crate::http_server::validations::validate_passwords::validate_passwords;
 use crate::http_server::validations::validate_username::validate_username;
