@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,\n  password_version,\n  is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        ",
+  "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,\n  password_version,\n  is_banned,\n  maybe_feature_flags\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        ",
   "describe": {
     "columns": [
       {
@@ -62,6 +62,16 @@
           "char_set": 63,
           "max_size": 1
         }
+      },
+      {
+        "ordinal": 6,
+        "name": "maybe_feature_flags",
+        "type_info": {
+          "type": "VarString",
+          "flags": "BINARY",
+          "char_set": 224,
+          "max_size": 1020
+        }
       }
     ],
     "parameters": {
@@ -73,8 +83,9 @@
       false,
       false,
       false,
-      false
+      false,
+      true
     ]
   },
-  "hash": "e8705ee9b3bc3213e806946fef651e9bb8c2cb5cc2ac8eff3eaed82d9a88f90e"
+  "hash": "48889cc9c9b8dbe482e74687629a6958c1c9bf8a1cd5ae177afea0ad0709736d"
 }
