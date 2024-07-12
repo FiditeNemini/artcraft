@@ -11,6 +11,7 @@ import {
   Slider,
   TempSelect as Select,
   Label,
+  DropdownOptions,
 } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -35,9 +36,10 @@ export default function StyleVideo() {
   const [length, lengthSet] = useState(3000);
   const [useFaceDetailer, setUseFaceDetailer] = useState(false);
   const [useUpscaler, setUseUpscaler] = useState(false);
-  const [useCinematic, setUseCinematic] = useState(false);
+  const [useCinematic, setUseCinematic] = useState(true);
   const [enableLipsync, setEnableLipsync] = useState(false);
   const [strength, setStrength] = useState(1.0);
+  const [visualStrength, setVisualStrength] = useState(100);
   const { enqueue } = useInferenceJobs();
 
   usePrefixedDocumentTitle("Style Video");
@@ -96,6 +98,13 @@ export default function StyleVideo() {
     setUseUpscaler(!!prompt?.used_upscaler);
     setUseCinematic(!!prompt?.use_cinematic);
     setEnableLipsync(!!prompt?.lipsync_enabled);
+  };
+
+  const handleSliderChange = ({ target }: { target: any }) => {
+    const decimalValue = parseFloat(target.value);
+    const visualValue = Math.round(decimalValue * 100);
+    setStrength(decimalValue);
+    setVisualStrength(visualValue);
   };
 
   const storytellerCTA = (
@@ -223,15 +232,20 @@ export default function StyleVideo() {
                         value: prompt,
                       }}
                     />
-                    <TextArea
-                      {...{
-                        label: "Negative prompt",
-                        rows: 1,
-                        onChange: ({ target }: { target: any }) => {
-                          negativePromptSet(target.value);
-                        },
-                      }}
-                    />
+                    <DropdownOptions
+                      title="Show Negative Prompt"
+                      closeTitle="Hide Negative Prompt"
+                    >
+                      <TextArea
+                        {...{
+                          label: "Negative prompt",
+                          rows: 1,
+                          onChange: ({ target }: { target: any }) => {
+                            negativePromptSet(target.value);
+                          },
+                        }}
+                      />
+                    </DropdownOptions>
                   </div>
                 </div>
                 <div className="mt-3 w-100">
@@ -240,7 +254,7 @@ export default function StyleVideo() {
                       accept: ["image"],
                       aspectRatio: "square",
                       className: "w-100",
-                      label: "IP Adapter Image",
+                      label: "Additional Style Reference Image (Optional)",
                       name: "IPAToken",
                       value: IPAToken,
                       onChange: ({ target }: { target: any }) => {
@@ -250,85 +264,101 @@ export default function StyleVideo() {
                     }}
                   />
                 </div>
-                <h6 className="mt-4">Strength ({strength})</h6>
+                <h6 className="mt-4">Style Strength ({visualStrength}%)</h6>
                 <div className="w-100">
                   <Slider
                     min={0.0}
                     max={1.0}
-                    step={0.1}
-                    onChange={({ target }: { target: any }) => {
-                      setStrength(parseFloat(target.value));
-                    }}
+                    step={0.01}
+                    onChange={handleSliderChange}
                     value={strength}
                     className="w-100"
                   />
                 </div>
-                <h6 className="mt-3 pb-2">Quality Options</h6>
-                <div>
-                  <div className="form-check form-switch w-100">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="useFaceDetailer"
-                      checked={useFaceDetailer}
-                      onChange={() => setUseFaceDetailer(!useFaceDetailer)}
-                    />
-                    <label
-                      className="form-check-label"
-                      htmlFor="useFaceDetailer"
-                    >
-                      Use Face Detailer
-                    </label>
-                  </div>
+
+                <div className="mt-3">
+                  <DropdownOptions>
+                    <div>
+                      <h6 className="pb-2">Quality Options</h6>
+                      <div>
+                        <div className="form-check form-switch w-100">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="useFaceDetailer"
+                            checked={useFaceDetailer}
+                            onChange={() =>
+                              setUseFaceDetailer(!useFaceDetailer)
+                            }
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="useFaceDetailer"
+                          >
+                            Use Face Detailer
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="form-check form-switch w-100">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="useUpscaler"
+                            checked={useUpscaler}
+                            onChange={() => setUseUpscaler(!useUpscaler)}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="useUpscaler"
+                          >
+                            Use Upscaler
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="form-check form-switch w-100">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="useCinematic"
+                            checked={useCinematic}
+                            onChange={() => setUseCinematic(!useCinematic)}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="useCinematic"
+                          >
+                            Use Cinematic
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="form-check form-switch w-100">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="enableLipsync"
+                            checked={enableLipsync}
+                            onChange={() => setEnableLipsync(!enableLipsync)}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="enableLipsync"
+                          >
+                            Preserve Lip Movement
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </DropdownOptions>
                 </div>
-                <div>
-                  <div className="form-check form-switch w-100">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="useUpscaler"
-                      checked={useUpscaler}
-                      onChange={() => setUseUpscaler(!useUpscaler)}
-                    />
-                    <label className="form-check-label" htmlFor="useUpscaler">
-                      Use Upscaler
-                    </label>
-                  </div>
-                </div>
-                <div>
-                  <div className="form-check form-switch w-100">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="useCinematic"
-                      checked={useCinematic}
-                      onChange={() => setUseCinematic(!useCinematic)}
-                    />
-                    <label className="form-check-label" htmlFor="useCinematic">
-                      Use Cinematic
-                    </label>
-                  </div>
-                </div>
-                <div>
-                  <div className="form-check form-switch w-100">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="enableLipsync"
-                      checked={enableLipsync}
-                      onChange={() => setEnableLipsync(!enableLipsync)}
-                    />
-                    <label className="form-check-label" htmlFor="enableLipsync">
-                      Preserve Lip Movement
-                    </label>
-                  </div>
-                </div>
-                <br />
-                <div>
+
+                <div className="mt-4">
                   <SegmentButtons
                     {...{
                       className: "fy-style-video-length",
-                      label: "Final video length",
+                      label: "Video Duration",
                       onChange: ({ target }: { target: any }) => {
                         lengthSet(target.value);
                       },

@@ -12,6 +12,7 @@ import { MediaCards, SkeletonCard, WeightsCards } from "./Card";
 import Container from "./Container";
 import CoverImageInput from "./CoverImageInput";
 import DeviceNotSupported from "./DeviceNotSupported";
+import DropdownOptions from "./DropdownOptions";
 import ErrorMessage from "./ErrorMessage";
 import FileActions from "./FileActions";
 import FileDetails from "./FileDetails";
@@ -70,6 +71,7 @@ export {
   Button,
   //Cards
   DeviceNotSupported,
+  DropdownOptions,
   MediaCards,
   SkeletonCard,
   WeightsCards,

@@ -1,0 +1,53 @@
+import React, { useState, useRef } from "react";
+import { useSpring, animated, easings } from "@react-spring/web";
+import useMeasure from "react-use-measure";
+import Button from "../Button";
+import { faChevronDown, faChevronUp } from "@fortawesome/pro-solid-svg-icons";
+
+interface DropdownOptionsProps {
+  title?: string;
+  closeTitle?: string;
+  children: React.ReactNode;
+}
+
+export const DropdownOptions: React.FC<DropdownOptionsProps> = ({
+  title = "Show Advanced Options",
+  closeTitle = "Hide Advanced Options",
+  children,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [ref, { height: viewHeight }] = useMeasure();
+  const previousHeightRef = useRef(0);
+
+  const toggleDropdown = () => setIsOpen(!isOpen);
+
+  const animationProps = useSpring({
+    height: isOpen ? viewHeight : 0,
+    opacity: isOpen ? 1 : 0,
+    config: { duration: 200, easing: easings.easeInOutQuad },
+    onRest: () => {
+      if (isOpen) {
+        previousHeightRef.current = viewHeight;
+      }
+    },
+  });
+
+  return (
+    <>
+      <animated.div style={{ ...animationProps, overflow: "hidden" }}>
+        <div ref={ref} className="pb-3">
+          {children}
+        </div>
+      </animated.div>
+      <Button
+        onClick={toggleDropdown}
+        label={isOpen ? closeTitle : title}
+        variant="link"
+        icon={isOpen ? faChevronUp : faChevronDown}
+        className="fs-7"
+      />
+    </>
+  );
+};
+
+export default DropdownOptions;
