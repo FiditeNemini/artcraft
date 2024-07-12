@@ -5,5 +5,6 @@ pub mod check_creator_tokens;
 pub mod delete_role_disambiguation;
 pub mod email_to_gravatar;
 pub mod encrypted_sort_id;
+pub mod enroll_in_studio;
 pub mod placeholder_images;
 pub mod troll_user_bans;

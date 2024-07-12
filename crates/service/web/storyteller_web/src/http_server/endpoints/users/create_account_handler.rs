@@ -34,6 +34,7 @@ use crate::http_server::validations::is_reserved_username::is_reserved_username;
 use crate::http_server::validations::validate_passwords::validate_passwords;
 use crate::http_server::validations::validate_username::validate_username;
 use crate::util::email_to_gravatar::email_to_gravatar;
+use crate::util::enroll_in_studio::enroll_in_studio;
 
 #[derive(Deserialize)]
 pub struct CreateAccountRequest {
@@ -263,10 +264,10 @@ pub async fn create_account_handler(
     })?;
 
   // NB: Enroll new users in studio for a while.
-  //enroll_in_studio(&new_user_data.user_token, &ip_address, &mysql_pool).await
-  //  .map_err(|e| {
-  //    warn!("error enrolling in studio: {:?}", e);
-  //  }).ok();
+  enroll_in_studio(&new_user_data.user_token, &ip_address, &mysql_pool, None).await
+    .map_err(|e| {
+      warn!("error enrolling in studio: {:?}", e);
+    }).ok();
 
   let session_token = UserSessionToken::new_from_str(&session_token);
 
@@ -292,38 +293,4 @@ pub async fn create_account_handler(
     .cookie(session_cookie)
     .content_type("application/json")
     .body(body))
-}
-
-async fn enroll_in_studio(
-  user_token: &UserToken,
-  ip_address: &str,
-  mysql_pool: &MySqlPool,
-) -> AnyhowResult<()> {
-  let mut user_feature_flags = UserSessionFeatureFlags::empty();
-
-  user_feature_flags.add_flags([
-    UserFeatureFlag::Studio,
-    UserFeatureFlag::VideoStyleTransfer,
-  ]);
-
-  let mut transaction = mysql_pool.begin().await?;
-
-  set_user_feature_flags_transactional(SetUserFeatureFlagTransactionalArgs {
-    subject_user_token: user_token,
-    maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
-    maybe_mod_user_token: None,
-    ip_address: &ip_address,
-    transaction: &mut transaction,
-  }).await?;
-
-  // NB: This isn't a necessary field, but can be useful for analytics.
-  set_can_access_studio_transactional(SetCanAccessStudioArgs {
-    subject_user_token: user_token,
-    can_access_studio: true,
-    transaction: &mut transaction,
-  }).await?;
-
-  transaction.commit().await?;
-
-  Ok(())
 }

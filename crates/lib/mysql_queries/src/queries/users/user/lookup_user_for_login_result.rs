@@ -13,4 +13,7 @@ pub struct UserRecordForLogin {
   pub password_hash: VecBytes,
   pub password_version: u32,
   pub is_banned: i8,
+
+  /// Optional comma-separated list of parseable `UserFeatureFlag` enum features
+  pub maybe_feature_flags: Option<String>,
 }

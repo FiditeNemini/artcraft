@@ -16,7 +16,8 @@ SELECT
   email_address,
   password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,
   password_version,
-  is_banned
+  is_banned,
+  maybe_feature_flags
 FROM users
 WHERE username = ?
 LIMIT 1

@@ -23,6 +23,8 @@ use password::bcrypt_confirm_password::bcrypt_confirm_password;
 use tokens::tokens::user_sessions::UserSessionToken;
 
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
+use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
+use crate::util::enroll_in_studio::enroll_in_studio;
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {
@@ -174,6 +176,17 @@ pub async fn login_handler(
   };
 
   info!("login session created for user: {} / {:?}", &user.token, &user.token);
+
+
+  let user_feature_flags =
+      UserSessionFeatureFlags::new(user.maybe_feature_flags.as_deref());
+
+  // NB: Enroll new users in studio for a while.
+  enroll_in_studio(&user.token, &ip_address, &mysql_pool, Some(&user_feature_flags)).await
+      .map_err(|e| {
+        warn!("error enrolling in studio: {:?}", e);
+      }).ok();
+
 
   let session_token = UserSessionToken::new_from_str(&session_token);
 
