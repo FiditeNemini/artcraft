@@ -68,7 +68,7 @@ export const Remix = () => {
           Loading Scenes...
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4 overflow-y-auto pb-10">
+        <div className="grid grid-cols-3 gap-4 overflow-y-auto">
           {cards.map((card) => (
             <RemixVideo card={card} key={card.token} />
           ))}

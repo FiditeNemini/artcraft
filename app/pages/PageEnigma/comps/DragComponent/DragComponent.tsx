@@ -99,7 +99,7 @@ export const DragComponent = () => {
         alt={dragItem.value.name}
         className="pointer-events-none select-none rounded-t-lg bg-gradient-to-b from-[#CCCCCC] to-[#A0A0A0]"
       />
-      <div className="w-full truncate rounded-b-lg bg-ui-controls px-2 py-1 text-center text-[13px]">
+      <div className="w-full truncate rounded-b-lg bg-ui-controls px-2 py-1 text-center text-[12px]">
         {dragItem.value.name || dragItem.value.media_id}
       </div>
     </div>

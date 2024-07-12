@@ -48,7 +48,7 @@ export const ItemElement = ({ item, showDelete }: Props) => {
         alt={item.name}
         className="pointer-events-none aspect-[4.5/5] w-full select-none bg-gradient-to-b from-[#CCCCCC] to-[#A0A0A0] object-cover object-center"
       />
-      <div className="pointer-events-none w-full select-none truncate bg-ui-controls px-2 py-1 text-center text-[13px] transition-all duration-200 group-hover:bg-ui-controls-button/50">
+      <div className="pointer-events-none w-full select-none truncate bg-ui-controls px-2 py-1 text-center text-[12px] transition-all duration-200 group-hover:bg-ui-controls-button/50">
         {item.name || item.media_id}
       </div>
     </div>

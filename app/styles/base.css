@@ -1,6 +1,6 @@
 * {
   scrollbar-width: thin;
-  scrollbar-color: #676781 #39394d;
+  scrollbar-color: #676781 #39394d79;
 }
 
 /* Works on Chrome, Edge, and Safari */
@@ -31,7 +31,8 @@ input[type="number"] {
 }
 
 body {
-  font-family: "Fira Sans", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   color: #fff;
   color-scheme: dark;
   user-select: none;

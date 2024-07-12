@@ -44,7 +44,7 @@ export const MainPage = () => {
                   />
                 </svg>
                 <div className="mt-4 text-xl font-bold">Remix</div>
-                <div className="mt-4 px-6 text-sm text-white/70">
+                <div className="mt-4 px-8 text-sm text-white/70">
                   Create a scene from an existing scene
                 </div>
                 <div className="absolute bottom-[8px] right-[12px] text-lg text-white opacity-50 group-hover:opacity-100">
@@ -73,7 +73,7 @@ export const MainPage = () => {
                   />
                 </svg>
                 <div className="mt-4 text-xl font-bold">Blank Scene</div>
-                <div className="mt-4 px-6 text-sm text-white/70">
+                <div className="mt-4 px-8 text-sm text-white/70">
                   If you’re already familiar with Storyteller Studio.
                 </div>
                 <div className="absolute bottom-[8px] right-[12px] text-lg text-white opacity-50 group-hover:opacity-100">

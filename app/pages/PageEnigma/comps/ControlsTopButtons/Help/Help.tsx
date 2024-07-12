@@ -25,7 +25,7 @@ const Shortcut = (props: { label: string; children: React.ReactNode }) => (
 );
 
 const Key = (props: { button: string }) => (
-  <div className="flex h-7 w-auto min-w-7 items-center justify-center rounded-md border-b-2 border-[#9E9EA6] bg-white px-2 pt-1 text-center text-sm font-bold text-ui-background">
+  <div className="flex h-[30px] w-auto min-w-[30px] items-center justify-center rounded-md border-b-2 border-[#9E9EA6] bg-white px-2 text-center text-sm font-bold text-ui-background">
     {props.button}
   </div>
 );
