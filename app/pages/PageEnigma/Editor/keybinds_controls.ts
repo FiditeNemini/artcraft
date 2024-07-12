@@ -100,11 +100,11 @@ export class MouseControls {
   }
 
   focus() {
-    if(this.lockControls && this.selected) {
+    if (this.lockControls && this.selected) {
       this.lockControls.camera.lookAt(this.selected[0].position);
       this.lockControls.camera.position.copy(this.selected[0].position);
       this.lockControls.moveForward(-5);
-      this.lockControls.camera.position.add(new THREE.Vector3(0,5,0));
+      this.lockControls.camera.position.add(new THREE.Vector3(0, 5, 0));
       this.lockControls.camera.lookAt(this.selected[0].position);
     }
   }
@@ -231,7 +231,7 @@ export class MouseControls {
         return;
       }
     }
-    
+
     if (event.shiftKey) {
       this.cameraViewControls.movementSpeed = 4;
     } else {
@@ -252,7 +252,7 @@ export class MouseControls {
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     this.timeline_mouse = this.mouse;
 
-    if(this.isMouseClicked) {
+    if (this.isMouseClicked) {
       this.lockControls?.lock();
     } else {
       this.lockControls?.unlock();
@@ -323,7 +323,7 @@ export class MouseControls {
       this.selected = [];
       this.setSelected(this.selected);
       this.removeTransformControls();
-      hideObjectPanel();
+      //hideObjectPanel();
     }
 
     if (this.sceneManager) {
