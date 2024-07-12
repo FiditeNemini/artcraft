@@ -41,9 +41,12 @@ export function ButtonIconSelect({
               ? "border-brand-primary bg-ui-panel/[0.3]"
               : "border-transparent hover:bg-ui-panel/[0.4]",
           )}
-          onClick={() => handleOptionChange(value)}>
+          onClick={() => handleOptionChange(value)}
+        >
           <FontAwesomeIcon icon={icon} />
-          {text && <span className="text-sm font-medium">{text}</span>}
+          {text && (
+            <span className="text-nowrap text-sm font-medium">{text}</span>
+          )}
         </button>
       ))}
     </div>

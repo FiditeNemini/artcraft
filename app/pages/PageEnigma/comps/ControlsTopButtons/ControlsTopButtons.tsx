@@ -31,6 +31,7 @@ import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/Pag
 import {
   cameraAspectRatio,
   cinematic,
+  enginePreProcessing,
   faceDetail,
   globalIPAMediaToken,
   lipSync,
@@ -83,6 +84,7 @@ export const ControlsTopButtons = () => {
         styleStrength: styleStrength.value,
         lipSync: lipSync.value,
         cinematic: cinematic.value,
+        enginePreProcessing: enginePreProcessing.value,
       };
     },
     [],
@@ -150,6 +152,8 @@ export const ControlsTopButtons = () => {
   };
 
   useSignalEffect(() => {
+    //TODO: USE SIGNAL EFFECT SHOULD BE PERFORM ELSEWHERE
+    // WHERE THIS OPERATION IS EXPECTED
     if (!scene.value.isInitializing) {
       setSceneTitleInput(scene.value.title || "");
       const currentLocation = getCurrentLocationWithoutParams(

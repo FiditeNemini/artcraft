@@ -106,7 +106,7 @@ export const ControlsVideo = () => {
         </div>
         <div className="mr-2 flex items-center gap-1.5 text-sm font-medium">
           <span className="w-[54px]">{formatTime(scrubberTime.value)}</span>
-          <span className="opacity-50">/</span>
+          <span className="pl-2 opacity-50">/</span>
           <span className="w-[54px] opacity-50">
             {formatTime(filmLength.value * 60)}
           </span>
