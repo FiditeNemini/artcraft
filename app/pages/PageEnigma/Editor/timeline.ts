@@ -310,6 +310,7 @@ export class TimeLine {
   }
 
   public getPos() {
+    this.editorEngine.utils.removeTransformControls(true);
     const raycaster = new THREE.Raycaster();
     raycaster.layers.enable(0);
     raycaster.layers.enable(1);
@@ -317,9 +318,8 @@ export class TimeLine {
       raycaster.setFromCamera(this.editorEngine.mouse, this.camera);
       const intersects = raycaster.intersectObjects(
         this.scene.scene.children,
-        false,
+        true,
       );
-      console.log(intersects);
       if (intersects.length > 0) {
         return intersects[0].point;
       }
