@@ -224,7 +224,7 @@ export default function StyleVideo() {
                   <div>
                     <TextArea
                       {...{
-                        label: "Positive prompt",
+                        label: "Positive Prompt",
                         placeholder: "Describe your video here...",
                         rows: 2,
                         onChange: ({ target }: { target: any }) => {
@@ -239,7 +239,7 @@ export default function StyleVideo() {
                     >
                       <TextArea
                         {...{
-                          label: "Negative prompt",
+                          label: "Negative Prompt",
                           placeholder:
                             "Type what you don't want in your video...",
                           rows: 1,
