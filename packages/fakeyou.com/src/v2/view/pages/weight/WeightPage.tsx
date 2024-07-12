@@ -36,8 +36,6 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
-import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 //import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface WeightProps {
@@ -588,11 +586,6 @@ export default function WeightPage({
               )}
             </div>
           </div>
-        </div>
-
-        <div className="py-5 mt-5 d-flex flex-column gap-5">
-          <MentionsSection />
-          <StorytellerStudioCTA />
         </div>
       </Container>
 

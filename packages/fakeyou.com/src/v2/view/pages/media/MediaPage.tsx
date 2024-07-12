@@ -49,8 +49,6 @@ import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { faCube, faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
-import MentionsSection from "components/common/MentionsSection";
 
 export default function MediaPage({
   animationType,
@@ -927,11 +925,6 @@ export default function MediaPage({
               )}
             </div>
           </div>
-        </div>
-
-        <div className="py-5 mt-5 d-flex flex-column gap-5">
-          <MentionsSection />
-          <StorytellerStudioCTA />
         </div>
       </Container>
 
