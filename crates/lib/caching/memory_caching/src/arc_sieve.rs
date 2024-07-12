@@ -7,11 +7,11 @@ use sieve_cache::SieveCache;
 use errors::AnyhowResult;
 
 #[derive(Clone)]
-struct Sieve<K: Eq + Hash + Clone, V: Clone + ?Sized> {
+pub struct ArcSieve<K: Eq + Hash + Clone, V: Clone + ?Sized> {
   cache: Arc<Mutex<SieveCache<K, V>>>,
 }
 
-impl <K: Eq + Hash + Clone, V: Clone + ?Sized> Sieve<K, V> {
+impl <K: Eq + Hash + Clone, V: Clone + ?Sized> ArcSieve<K, V> {
 
   pub fn with_capacity(capacity: usize) -> AnyhowResult<Self> {
     let cache = SieveCache::new(capacity)
@@ -54,11 +54,11 @@ impl <K: Eq + Hash + Clone, V: Clone + ?Sized> Sieve<K, V> {
 
 #[cfg(test)]
 mod tests {
-  use crate::sieve::Sieve;
+  use crate::arc_sieve::ArcSieve;
 
   #[test]
   fn test_get_copy() {
-    let sieve : Sieve<String, String> = Sieve::with_capacity(1).unwrap();
+    let sieve : ArcSieve<String, String> = ArcSieve::with_capacity(1).unwrap();
     let key = "key".to_string();
     let value = "value".to_string();
 

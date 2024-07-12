@@ -20,21 +20,21 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::batch_get_media_files_by_tokens;
-use mysql_queries::queries::media_files::list::list_featured_media_files::{list_featured_media_files, ListFeaturedMediaFilesArgs};
+use mysql_queries::queries::media_files::list::list_featured_media_files::{FeaturedMediaFileListPage, list_featured_media_files, ListFeaturedMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
-#[derive(Deserialize, ToSchema, IntoParams)]
+#[derive(Deserialize, ToSchema, IntoParams, Hash, Clone, PartialEq, Eq)]
 pub struct ListFeaturedMediaFilesQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
@@ -181,72 +181,19 @@ pub async fn list_featured_media_files_handler(
   http_request: HttpRequest,
   query: Query<ListFeaturedMediaFilesQueryParams>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, impl ResponseError> {
+) -> Result<HttpResponse, ListFeaturedMediaFilesError> {
 
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
-      .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        ListFeaturedMediaFilesError::ServerError
-      })?;
+  let maybe_cached_results  = server_state
+      .caches
+      .ephemeral
+      .featured_media_files_sieve
+      .get_copy(&query)
+      .ok()
+      .flatten();
 
-  let mut is_mod = false;
-
-  match maybe_user_session {
-    None => {},
-    Some(session) => {
-      is_mod = session.can_ban_users;
-    },
-  };
-
-  // TODO(bt,2023-12-04): Enforce real maximums and defaults
-  let limit = query.page_size.unwrap_or(25);
-
-  let sort_ascending = query.sort_ascending.unwrap_or(false);
-  let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
-
-  let cursor = if let Some(cursor) = query.cursor.as_deref() {
-    let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ListFeaturedMediaFilesError::ServerError
-        })?;
-    Some(cursor as usize)
-  } else {
-    None
-  };
-
-  let view_as = if is_mod {
-    ViewAs::Moderator
-  } else {
-    ViewAs::AnotherUser
-  };
-
-  let mut maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
-  let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
-  let mut maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
-
-  let query_results =
-      list_featured_media_files(ListFeaturedMediaFilesArgs {
-        limit,
-        maybe_offset: cursor,
-        cursor_is_reversed,
-        sort_ascending,
-        view_as,
-        maybe_filter_media_types: maybe_filter_media_types.as_ref(),
-        maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
-        maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
-        mysql_pool: &server_state.mysql_pool,
-      }).await;
-
-  let results_page = match query_results {
-    Ok(results) => results,
-    Err(e) => {
-      warn!("Query error: {:?}", e);
-      return Err(ListFeaturedMediaFilesError::ServerError);
-    }
+  let results_page = match maybe_cached_results {
+    Some(cached_results) => cached_results,
+    None => database_lookup(&query, &server_state).await?,
   };
 
   let cursor_next = if let Some(id) = results_page.last_id {
@@ -270,6 +217,12 @@ pub async fn list_featured_media_files_handler(
   } else {
     None
   };
+
+  // TODO(bt,2023-12-04): Enforce real maximums and defaults
+  let limit = query.page_size.unwrap_or(25);
+
+  let sort_ascending = query.sort_ascending.unwrap_or(false);
+  let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
 
   let results = results_page.records.into_iter()
       .map(|m| {
@@ -341,4 +294,59 @@ pub async fn list_featured_media_files_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
+}
+
+async fn database_lookup(
+  query: &ListFeaturedMediaFilesQueryParams,
+  server_state: &ServerState,
+) -> Result<FeaturedMediaFileListPage, ListFeaturedMediaFilesError> {
+
+  // TODO(bt,2023-12-04): Enforce real maximums and defaults
+  let limit = query.page_size.unwrap_or(25);
+
+  let sort_ascending = query.sort_ascending.unwrap_or(false);
+  let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
+
+  let cursor = if let Some(cursor) = query.cursor.as_deref() {
+    let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
+        .map_err(|e| {
+          warn!("crypto error: {:?}", e);
+          ListFeaturedMediaFilesError::ServerError
+        })?;
+    Some(cursor as usize)
+  } else {
+    None
+  };
+
+  let mut maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
+  let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
+  let mut maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
+
+  // NB: No reason to show deleted or non-public featured items to mods or authors.
+  //  That's just confusing and wastes an extra query.
+  const VIEW_AS: ViewAs = ViewAs::AnotherUser;
+
+  let results = list_featured_media_files(ListFeaturedMediaFilesArgs {
+    limit,
+    maybe_offset: cursor,
+    cursor_is_reversed,
+    sort_ascending,
+    view_as: VIEW_AS,
+    maybe_filter_media_types: maybe_filter_media_types.as_ref(),
+    maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
+    maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
+    mysql_pool: &server_state.mysql_pool,
+  }).await.map_err(|err| {
+    error!("DB error: {:?}", err);
+    ListFeaturedMediaFilesError::ServerError
+  })?;
+
+  // NB: Fail open.
+  let _result = server_state
+      .caches
+      .ephemeral
+      .featured_media_files_sieve
+      .store_copy(&query, &results);
+
+  Ok(results)
 }

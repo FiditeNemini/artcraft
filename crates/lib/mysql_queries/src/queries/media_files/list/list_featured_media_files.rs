@@ -20,6 +20,8 @@ use tokens::tokens::users::UserToken;
 
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
+// NB: Clone is for caches.
+#[derive(Clone)]
 pub struct FeaturedMediaFileListPage {
   pub records: Vec<FeaturedMediaFileListItem>,
 
@@ -32,6 +34,7 @@ pub struct FeaturedMediaFileListPage {
   pub last_id: Option<i64>,
 }
 
+#[derive(Clone)]
 pub struct FeaturedMediaFileListItem {
   pub token: MediaFileToken,
 

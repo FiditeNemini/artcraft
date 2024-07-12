@@ -7,10 +7,12 @@ use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBan
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use email_sender::smtp_email_sender::SmtpEmailSender;
+use memory_caching::arc_sieve::ArcSieve;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::InferenceQueueLengthResult;
+use mysql_queries::queries::media_files::list::list_featured_media_files::FeaturedMediaFileListPage;
 use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
 use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
@@ -23,6 +25,7 @@ use crate::configs::static_api_tokens::StaticApiTokenSet;
 use crate::http_server::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo;
+use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::ListFeaturedMediaFilesQueryParams;
 use crate::http_server::endpoints::stats::result_transformer::CacheableQueueStats;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
@@ -191,6 +194,8 @@ pub struct EphemeralInMemoryCaches {
   pub tts_queue_length: SingleItemTtlCache<TtsQueueLengthResult>,
 
   pub leaderboard: SingleItemTtlCache<LeaderboardInfo>,
+
+  pub featured_media_files_sieve: ArcSieve<ListFeaturedMediaFilesQueryParams, FeaturedMediaFileListPage>,
 }
 
 #[derive(Clone)]
