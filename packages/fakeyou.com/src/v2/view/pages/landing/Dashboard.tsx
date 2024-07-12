@@ -113,7 +113,7 @@ export default function Dashboard(props: DashboardProps) {
       },
     },
     {
-      to: "/video-styletransfer",
+      to: "/style-video",
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
       imgSrc: "/images/landing/select-vst.webp",
