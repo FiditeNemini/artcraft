@@ -4,7 +4,10 @@ import environmentVariables from "~/Classes/EnvironmentVariables";
 
 export const usePosthogFeatureFlag = (flag: FeatureFlags): boolean => {
   const enabled = useFeatureFlagEnabled(flag) ?? false;
-  if (environmentVariables.values.CONTEXT !== "PRODUCTION") {
+  if (
+    environmentVariables.values.DEPLOY_CONTEXT &&
+    environmentVariables.values.DEPLOY_CONTEXT === "DEVELOPMENT"
+  ) {
     return true;
   }
   return enabled;

@@ -79,6 +79,8 @@ export async function loader() {
       "%REACT_APP_PUBLIC_POSTHOG_UI%",
     // @ts-expect-error ProvessEnv is correct
     CONTEXT: process.env.CONTEXT || "%CONTEXT%",
+    // @ts-expect-error ProvessEnv is correct
+    DEPLOY_CONTEXT: process.env.DEPLOY_CONTEXT || "%DEPLOY_CONTEXT%",
   } as Record<string, string | boolean>;
   return { ENV: env };
 }
