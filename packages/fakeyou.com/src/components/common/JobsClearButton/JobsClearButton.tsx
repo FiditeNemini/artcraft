@@ -36,9 +36,9 @@ export default function JobsClearButton({
                 {...{
                   icon: faTrash,
                   onClick: clearJobs,
-                  tooltip: "Clear completed jobs",
+                  label: "Clear completed jobs",
                   variant: "secondary",
-                  square: true,
+                  // square: true,
                 }}
               />
             </a.div>,

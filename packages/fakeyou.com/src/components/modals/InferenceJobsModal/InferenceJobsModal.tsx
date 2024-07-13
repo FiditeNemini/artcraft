@@ -1,10 +1,9 @@
-import React, { useState } from "react"; // useState
+import React from "react"; // useState
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { TempSelect as Select, JobsClearButton } from "components/common";
-import { enumToKeyArr } from "resources";
+import { JobsClearButton } from "components/common";
 import ModalHeader from "../ModalHeader";
-import { useInferenceJobs, useLocalize, useSession } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 
 interface Props {
   handleClose?: any;
@@ -18,19 +17,9 @@ export default function InferenceJobsModal({
   showModalHeader = true,
   ...rest
 }: Props) {
-  const { canAccessStudio } = useSession();
   const { clearJobs, clearJobsStatus, someJobsAreDone } = useInferenceJobs();
-  const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
-  const [jobType, jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
-  const typeObj = ["All", ...Object.values(FrontendInferenceJobType)];
-  const options = typeObj
-    .filter(val => isNaN(Number(val)))
-    .map(value => {
-      if (typeof value === "string") return { value, label: value };
-      return { label: "", value: "" };
-    });
   const { t } = useLocalize("InferenceJobs");
-  const selectedType = typeObj.indexOf(jobType) - 1;
+  const selectedType = 0;
   const failures = (fail = "") => {
     switch (fail) {
       default:
@@ -47,15 +36,6 @@ export default function InferenceJobsModal({
           />
         </ModalHeader>
       )}
-      {canAccessStudio() && (
-        <Select
-          {...{
-            onChange: ({ target }: { target: any }) => jobTypeSet(target.value),
-            options,
-            value: jobType,
-          }}
-        />
-      )}
       <InferenceJobsList
         {...{
           failures,
@@ -64,7 +44,7 @@ export default function InferenceJobsModal({
           },
           ...(selectedType > -1 ? { jobType: selectedType } : {}),
           showHeader: false,
-          showJobQueue: true,
+          showJobQueue: false,
           showNoJobs: true,
           panel: false,
           ...rest,

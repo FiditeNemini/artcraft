@@ -87,6 +87,15 @@
     "STARTED": "Please wait",
     "UNKNOWN": "Please wait or try again"
   },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Video Workflow Atempt Failed",
+    "COMPLETE_FAILURE": "Video Workflow Failed.",
+    "COMPLETE_SUCCESS": "Video Workflow Complete",
+    "PENDING": "Pending Video Workflow ",
+    "STARTED": "Video Workflow In Progress",
+    "UNKNOWN": "Video Workflow Status Uknown",
+    "heading": "Video Workflow Jobs"
+  },
   "voice_designer": {
     "ATTEMPT_FAILED": "Face Animation Atempt Failed",
     "COMPLETE_FAILURE": "Face Animation Failed.",

@@ -36,6 +36,7 @@ const UploadControl = ({ onClick, status }: UploadCtrlProps) => {
       <WorkIndicator
         {...{
           failure,
+          progressPercentage: 100,
           stage: success ? 2 : 1,
           success,
         }}
