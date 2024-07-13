@@ -10,13 +10,17 @@ import {
   CancelJobResponse,
 } from "@storyteller/components/src/api/jobs/CancelJob";
 import { useHover, useSlides } from "hooks";
-import { JobState } from "@storyteller/components/src/jobs/JobStates";
+import {
+  JobState,
+  jobStateCanChange,
+} from "@storyteller/components/src/jobs/JobStates";
 import { useHistory } from "react-router-dom";
 
 interface JobListItem extends InferenceJob {
   failures: (fail: string) => string;
   jobStatusDescription?: any;
   onSelect?: any;
+  progressPercentage: number;
   resultPaths: { [key: string]: string };
   t?: any;
 }
@@ -54,11 +58,13 @@ export default function JobItem({
   maybeModelTitle,
   maybeResultToken,
   onSelect,
+  progressPercentage,
   jobToken,
   jobState,
   jobStatusDescription,
   resultPaths,
   t,
+  ...rest
 }: JobListItem) {
   const history = useHistory();
   const [hover, hoverSet = {}] = useHover({});
@@ -118,6 +124,8 @@ export default function JobItem({
     }
   };
 
+  const jobIsAlive = jobStateCanChange(jobState);
+
   const makeBounce = (amount = 0, delay = 0) => ({
     delay,
     config: { tension: 250, friction: 12 },
@@ -125,6 +133,9 @@ export default function JobItem({
   });
   const headingBounce = useSpring(makeBounce(8));
   const subtitleBounce = useSpring(makeBounce(6, 30));
+  const percentFade = useSpring({
+    opacity: jobIsAlive ? 1 : 0,
+  });
   const subtitle = maybeFailureCategory
     ? `${failures(maybeFailureCategory)}`
     : t(`subtitles.${jobStatus}`);
@@ -174,7 +185,16 @@ export default function JobItem({
   return (
     <>
       <div {...{ ...outerProps("fy-inference-job-indicator"), ...hoverSet }}>
-        <WorkIndicator {...{ failure, stage: dashStatus(), success }} />
+        <div {...{ className: "fy-inference-job-indicator-container" }}>
+          <a.div
+            {...{ className: "fy-inference-job-progress", style: percentFade }}
+          >
+            {progressPercentage}%
+          </a.div>
+          <WorkIndicator
+            {...{ failure, progressPercentage, stage: dashStatus(), success }}
+          />
+        </div>
       </div>
       <div {...{ ...outerProps("fy-inference-job-details"), ...hoverSet }}>
         <a.h6 {...{ style: headingBounce }}>

@@ -34,6 +34,7 @@ export class InferenceJob {
   jobState: JobState;
   maybeExtraStatusDescription: string | null;
   attemptCount: number;
+  progressPercentage: number;
 
   // Request
   maybeModelType?: string;
@@ -56,6 +57,7 @@ export class InferenceJob {
     status: string = "unknown",
     maybeExtraStatusDescription: string | null = null,
     attemptCount: number = 0,
+    progressPercentage: number = 0,
     // Request
     maybeModelType: string | undefined = undefined,
     maybeModelToken: string | undefined = undefined,
@@ -72,6 +74,7 @@ export class InferenceJob {
     this.jobState = jobStateFromString(status);
     this.maybeExtraStatusDescription = maybeExtraStatusDescription;
     this.attemptCount = attemptCount;
+    this.progressPercentage = progressPercentage;
 
     if (!!maybeModelType) {
       this.maybeModelTitle = maybeModelType;
@@ -109,6 +112,7 @@ export class InferenceJob {
       response.status.status,
       response.status.maybe_extra_status_description || null,
       response.status.attempt_count || 0,
+      response.status.progress_percentage || 0,
       response.request.maybe_model_type,
       response.request.maybe_model_token,
       response.request.maybe_model_title,

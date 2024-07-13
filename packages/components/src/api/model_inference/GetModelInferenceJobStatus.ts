@@ -1,80 +1,88 @@
 import { ApiConfig } from "../ApiConfig";
 
 export interface GetModelInferenceJobStatusSuccessResponse {
-  success: boolean,
-  state: ModelInferenceJobStatus,
+  success: boolean;
+  state: ModelInferenceJobStatus;
 }
 
 export interface ModelInferenceJobStatus {
   // Job primary key
-  job_token: string,
+  job_token: string;
 
-  request: RequestDetails,
-  status: StatusDetails,
-  maybe_result?: ResultDetails,
-  
-  created_at: Date,
-  updated_at: Date,
+  request: RequestDetails;
+  status: StatusDetails;
+  maybe_result?: ResultDetails;
+
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface RequestDetails {
-  inference_category: string,
+  inference_category: string;
 
-  maybe_model_type?: string,
-  maybe_model_token?: string,
-  maybe_model_title?: string,
+  maybe_model_type?: string;
+  maybe_model_token?: string;
+  maybe_model_title?: string;
 
-  maybe_raw_inference_text?: string,
+  maybe_raw_inference_text?: string;
 }
 
 export interface StatusDetails {
-  status: string,
-  maybe_extra_status_description?: string,
-  maybe_failure_category?: string,
-  attempt_count: number,
+  status: string;
+  maybe_extra_status_description?: string;
+  maybe_failure_category?: string;
+  attempt_count: number;
+  progress_percentage: number;
 }
 
 export interface ResultDetails {
-  entity_type: string,
-  entity_token: string,
+  entity_type: string;
+  entity_token: string;
 
-  maybe_public_bucket_media_path?: string,
+  maybe_public_bucket_media_path?: string;
 }
 
 export interface GetModelInferenceJobStatusErrorResponse {
-  success: boolean,
+  success: boolean;
 }
 
-export type GetModelInferenceJobStatusResponse = GetModelInferenceJobStatusSuccessResponse | GetModelInferenceJobStatusErrorResponse;
+export type GetModelInferenceJobStatusResponse =
+  | GetModelInferenceJobStatusSuccessResponse
+  | GetModelInferenceJobStatusErrorResponse;
 
-export function GetModelInferenceJobStatusIsOk(response: GetModelInferenceJobStatusResponse): response is GetModelInferenceJobStatusSuccessResponse {
+export function GetModelInferenceJobStatusIsOk(
+  response: GetModelInferenceJobStatusResponse
+): response is GetModelInferenceJobStatusSuccessResponse {
   return response?.success === true;
 }
 
-export function GetModelInferenceJobStatusIsError(response: GetModelInferenceJobStatusResponse): response is GetModelInferenceJobStatusErrorResponse {
+export function GetModelInferenceJobStatusIsError(
+  response: GetModelInferenceJobStatusResponse
+): response is GetModelInferenceJobStatusErrorResponse {
   return response?.success === false;
 }
 
-export async function GetModelInferenceJobStatus(jobToken: string) : Promise<GetModelInferenceJobStatusResponse> 
-{
+export async function GetModelInferenceJobStatus(
+  jobToken: string
+): Promise<GetModelInferenceJobStatusResponse> {
   const endpoint = new ApiConfig().getModelInferenceJobStatus(jobToken);
-  
+
   return fetch(endpoint, {
-    method: 'GET',
-    credentials: 'include',
+    method: "GET",
+    credentials: "include",
     headers: {
-      'Accept': 'application/json',
+      Accept: "application/json",
     },
   })
-  .then(res => res.json())
-  .then(res => {
-    if (res && 'success' in res) {
-      return res;
-    } else {
-      return { success : false };
-    }
-  })
-  .catch(e => {
-    return { success : false };
-  });
+    .then(res => res.json())
+    .then(res => {
+      if (res && "success" in res) {
+        return res;
+      } else {
+        return { success: false };
+      }
+    })
+    .catch(e => {
+      return { success: false };
+    });
 }
