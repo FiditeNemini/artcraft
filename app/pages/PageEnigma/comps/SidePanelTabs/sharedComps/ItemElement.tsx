@@ -10,7 +10,7 @@ interface Props {
   item: MediaItem;
 }
 
-const mapObejctType = (mediaType: string) => {
+const mapCharacterObejctType = (mediaType: string) => {
   const typeCased = mediaType.toLowerCase();
   switch (typeCased) {
     case "fbx":
@@ -24,6 +24,13 @@ const mapObejctType = (mediaType: string) => {
       return typeCased.toUpperCase();
     }
   }
+};
+const patchExpressionObejctType = (mediaType: string) => {
+  const typeCased = mediaType.toLowerCase();
+  if (typeCased === "vmd") {
+    return "Mixamo";
+  }
+  return typeCased.toUpperCase();
 };
 
 export const ItemElement = ({ item }: Props) => {
@@ -40,8 +47,10 @@ export const ItemElement = ({ item }: Props) => {
         <Badge
           label={
             item.type === AssetType.CHARACTER
-              ? mapObejctType(item.media_type)
-              : item.media_type.toUpperCase()
+              ? mapCharacterObejctType(item.media_type)
+              : item.type === AssetType.EXPRESSION
+                ? patchExpressionObejctType(item.media_type)
+                : item.media_type.toUpperCase()
           }
           className="absolute right-0 mr-[3px] mt-[3px]"
         />

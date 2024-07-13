@@ -23,8 +23,8 @@ export const CartoonsTab = () => {
           className={twMerge(
             "h-10 w-1/2 cursor-pointer rounded-l-lg bg-brand-secondary p-2 text-sm font-medium transition-all",
             subPage === TabTitles.CHARACTERS
-              ? "bg-ui-controls-button"
-              : "hover:bg-ui-controls-button/50",
+              ? "bg-brand-primary"
+              : "hover:bg-brand-secondary-800",
           )}
           disabled={subPage === TabTitles.CHARACTERS}
           onClick={() => setSubPage(TabTitles.CHARACTERS)}
@@ -35,8 +35,8 @@ export const CartoonsTab = () => {
           className={twMerge(
             "h-10 w-1/2 cursor-pointer rounded-r-lg bg-brand-secondary p-2 text-sm font-medium transition-all",
             subPage === TabTitles.ANIMATION
-              ? "bg-ui-controls-button"
-              : "hover:bg-ui-controls-button/50",
+              ? "bg-brand-primary"
+              : "hover:bg-brand-secondary-800",
           )}
           disabled={subPage === TabTitles.ANIMATION}
           onClick={() => {
