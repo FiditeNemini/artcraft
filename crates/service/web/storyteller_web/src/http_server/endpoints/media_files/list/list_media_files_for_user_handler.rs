@@ -277,13 +277,13 @@ pub async fn list_media_files_for_user_handler(
           MediaFileType::SceneRon => return false,
           _ => {},
         }
-        // Don't allow access to certain products.
-        match record.origin_product_category {
-          MediaFileOriginProductCategory::VideoFilter |
-          MediaFileOriginProductCategory::Mocap |
-          MediaFileOriginProductCategory::Workflow => return false,
-          _ => {},
-        }
+        // // Don't allow access to certain products.
+        // match record.origin_product_category {
+        //   MediaFileOriginProductCategory::VideoFilter |
+        //   MediaFileOriginProductCategory::Mocap |
+        //   MediaFileOriginProductCategory::Workflow => return false,
+        //   _ => {},
+        // }
         true
       })
       .map(|record| MediaFileForUserListItem {
