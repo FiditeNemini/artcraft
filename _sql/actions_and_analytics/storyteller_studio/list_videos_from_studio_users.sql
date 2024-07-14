@@ -26,7 +26,7 @@ select
 from media_files as m
 join users as u
 on m.maybe_creator_user_token = u.token
-where u.can_access_studio = true
+where  u.maybe_feature_flags LIKE '%studio%'
 and m.created_at > (CURDATE() - INTERVAL 14 DAY)
 and m.is_intermediate_system_file = false
 and m.media_class = 'video'
@@ -48,3 +48,34 @@ and u.username NOT IN (
 )
 group by u.token
 order by created_at desc;
+
+-- See videos
+select
+  u.username,
+  u.maybe_source,
+  m.token,
+  m.created_at
+from media_files as m
+join users as u
+on m.maybe_creator_user_token = u.token
+where  u.maybe_feature_flags LIKE '%studio%'
+and m.created_at > (CURDATE() - INTERVAL 14 DAY)
+and m.is_intermediate_system_file IS TRUE
+and m.media_class = 'video'
+and u.username NOT IN (
+  'bflat',
+  'candyfoxxx',
+  'crossproduct1',
+  'echelon',
+  'endtimes',
+  'heart_ribbon',
+  'kasisnu',
+  'mechacosm',
+  'moonchamp',
+  'olivicmic',
+  'printrman',
+  'vegito1089',
+  'wilwong',
+  'yae_ph'
+)
+order by m.created_at desc;
