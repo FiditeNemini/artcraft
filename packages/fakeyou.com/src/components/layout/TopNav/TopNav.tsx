@@ -588,8 +588,11 @@ export default function TopNav({
         </div>
 
         {/* Mobile Menu */}
-        <div className={`${mobileMenu} d-lg-none`} style={{ height: "100vh" }}>
-          <ul className="sidebar-nav">
+        <div
+          className={`${mobileMenu} d-lg-none`}
+          style={{ height: "calc(100vh - 65px)" }}
+        >
+          <ul className="sidebar-nav overflow-auto">
             <li>
               <NavLink
                 exact={true}
@@ -687,7 +690,7 @@ export default function TopNav({
 
             <li>
               <NavLink
-                to="/video-styletransfer"
+                to="/style-video"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
@@ -763,7 +766,7 @@ export default function TopNav({
               </NavLink>
             </li>
 
-            <div className="px-4 d-flex d-lg-none gap-2 mb-2">
+            <div className="px-4 d-flex d-lg-none gap-2 mb-5 pb-3">
               {userOrLoginButton}
               {signupOrLogOutButton}
             </div>
