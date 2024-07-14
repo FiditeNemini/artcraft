@@ -26,10 +26,11 @@ import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
 import useStyleStore from "hooks/useStyleStore";
 import StyleOptionPicker from "./StyleSelection/StyleSelectionList";
+import LoadingSpinner from "components/common/LoadingSpinner";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { studioAccessCheck } = useSession();
+  const { styleVideoAccessCheck, sessionFetched } = useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -181,7 +182,25 @@ export default function StyleVideo() {
     close();
   };
 
-  return studioAccessCheck(
+  if (!sessionFetched) {
+    return (
+      <Container
+        type="panel"
+        className="narrow-container"
+        style={{ height: "calc(100vh - 65px)" }}
+      >
+        <div className="d-flex align-items-center justify-content-center h-100 gap-4">
+          <LoadingSpinner
+            label="Loading"
+            className="me-3 fs-6"
+            labelClassName="fs-4"
+          />
+        </div>
+      </Container>
+    );
+  }
+
+  return styleVideoAccessCheck(
     <>
       <Container className="mt-3">
         <div className="row flex-lg-row-reverse g-3">

@@ -7,6 +7,7 @@ import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { StudioRolloutHostnameAllowed } from "@storyteller/components/src/utils/StudioRolloutHostnameAllowed";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { StyleVideoNotAvailable } from "v2/view/_common/StyleVideoNotAvailable";
 
 export enum ModalView { // ignore this modal stuff for now -V
   Closed,
@@ -35,6 +36,7 @@ interface SessionContextType {
   sessionSubscriptions?: any;
   sessionWrapper: SessionWrapper;
   studioAccessCheck: (x: any) => any;
+  styleVideoAccessCheck: (x: any) => any;
   user?: any;
   userTokenMatch: (token: string) => boolean;
 }
@@ -63,6 +65,7 @@ export const SessionContext = createContext<SessionContextType>({
   loggedIn: false,
   sessionFetched: false,
   studioAccessCheck: () => null,
+  styleVideoAccessCheck: () => null,
   modal: {
     close: () => {},
     open: () => {},
@@ -121,6 +124,9 @@ export default function SessionProvider({
   const studioAccessCheck = (content: React.ElementType) =>
     canAccessStudio() ? content : <StudioNotAvailable />;
 
+  const styleVideoAccessCheck = (content: React.ElementType) =>
+    canAccessStudio() ? content : <StyleVideoNotAvailable />;
+
   const modal = { close, open, view };
 
   return (
@@ -140,6 +146,7 @@ export default function SessionProvider({
           sessionSubscriptions,
           sessionWrapper,
           studioAccessCheck,
+          styleVideoAccessCheck,
           user,
           userTokenMatch,
         },
