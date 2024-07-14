@@ -37,6 +37,15 @@
       &:hover {
         background-color: $secondary-very-light !important;
       }
+
+      &.fy-highlighted-segment {
+        background-color: rgba($primary, 80%);
+        color: $white;
+
+        &:hover {
+          background-color: rgba($primary, 80%) !important;
+        }
+      }
     }
 
     p {

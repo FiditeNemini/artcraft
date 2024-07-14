@@ -377,6 +377,7 @@ export default function StyleVideo() {
                       },
                       options: lengthOptions,
                       value: length,
+                      highlight: true,
                     }}
                   />
                 </div>
