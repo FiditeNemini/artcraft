@@ -120,42 +120,43 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
   const moveSecondDown = useTransform(scrollYProgress2, [0, 1], [-300, 100]);
   const moveThirdUp = useTransform(scrollYProgress2, [0, 1], [0, -300]);
 
-  const ctaButton = props.sessionWrapper.canAccessStudio() ? (
-    <div className="d-flex">
-      <Button
-        label="Enter Storyteller Studio"
-        className="mt-4"
-        fontLarge={true}
-        icon={faArrowRight}
-        iconFlip={true}
-        href="https://studio.storyteller.ai/"
-      />
-    </div>
-  ) : (
-    <div className="d-flex flex-column gap-3">
-      <div>
+  let ctaButton;
+
+  if (props.sessionWrapper.canAccessStudio()) {
+    // Logged in + can access studio
+    ctaButton = (
+      <div className="d-flex">
         <Button
-          label="Join the Waitlist"
+          label="Enter Storyteller Studio"
           className="mt-4"
           fontLarge={true}
           icon={faArrowRight}
           iconFlip={true}
-          onClick={openModal}
+          href="https://studio.storyteller.ai/"
         />
       </div>
-
-      <div className="d-flex align-items-center fs-7 gap-1">
-        <span className="opacity-75">Have a beta key?</span>
+    );
+  } else if (!props.sessionWrapper.isLoggedIn()) {
+    // User is not logged in. For now, we can give them 
+    // immediate access if they sign up. This will only be a 
+    // brief state.
+    ctaButton = (
+      <div className="d-flex">
         <Button
-          label="Redeem now!"
-          variant="link"
+          label="Sign Up for Studio"
+          className="mt-4"
           fontLarge={true}
-          className="fs-7"
-          to="/beta-key/redeem"
+          icon={faArrowRight}
+          iconFlip={true}
+          href="/signup"
         />
       </div>
-    </div>
-  );
+    );
+  } else {
+    // Logged in + cannot access studio - let's waitlist them
+    // This is typically the default secondary state.
+    ctaButton = <WaitlistHeroButton openModal={openModal} />;
+  }
 
   return (
     <>
@@ -678,6 +679,36 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
       )}
     </>
   );
+}
+
+interface WaitlistHeroButtonProps {
+  openModal: () => void,
+}
+
+function WaitlistHeroButton(props: WaitlistHeroButtonProps) {
+  return (<div className="d-flex flex-column gap-3">
+    <div>
+      <Button
+        label="Join the Waitlist"
+        className="mt-4"
+        fontLarge={true}
+        icon={faArrowRight}
+        iconFlip={true}
+        onClick={props.openModal}
+      />
+    </div>
+
+    <div className="d-flex align-items-center fs-7 gap-1">
+      <span className="opacity-75">Have a beta key?</span>
+      <Button
+        label="Redeem now!"
+        variant="link"
+        fontLarge={true}
+        className="fs-7"
+        to="/beta-key/redeem"
+      />
+    </div>
+  </div>);
 }
 
 //const firstTitle = "Control Your Movie";
