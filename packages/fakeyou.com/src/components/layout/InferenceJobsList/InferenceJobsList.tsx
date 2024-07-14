@@ -71,7 +71,7 @@ export default function InferenceJobsList({
   // });
 
   const jobContent = (
-    <>
+    <div style={{ minHeight: "40vh" }}>
       {showHeader && (
         <header>
           <h3 className="fw-semibold">{t("core.heading")}</h3>
@@ -109,8 +109,8 @@ export default function InferenceJobsList({
       </div>
       {(!selectedJobs || !selectedJobs.length) && showNoJobs && (
         <div
-          className="d-flex flex-column p-4 gap-3 text-center align-items-center"
-          style={{ minHeight: "35vh" }}
+          className="d-flex flex-column p-4 gap-3 text-center align-items-center justify-content-center"
+          style={{ minHeight: "38vh" }}
         >
           <FontAwesomeIcon icon={faClipboardList} className="display-6 mb-2" />
           <div>
@@ -122,7 +122,7 @@ export default function InferenceJobsList({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 
   if (selectedJobs || showNoJobs) {

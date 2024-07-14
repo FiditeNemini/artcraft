@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs, useSession } from "hooks";
+import { useInferenceJobs, useModal, useSession } from "hooks";
 import {
   Button,
   Container,
@@ -9,7 +9,6 @@ import {
   SegmentButtons,
   TextArea,
   Slider,
-  TempSelect as Select,
   Label,
   DropdownOptions,
 } from "components/common";
@@ -21,14 +20,16 @@ import {
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";
-import { STYLE_OPTIONS } from "common/StyleOptions";
+import { STYLE_OPTIONS, STYLES_BY_KEY } from "common/StyleOptions";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
+import useStyleStore from "hooks/useStyleStore";
+import StyleOptionPicker from "./StyleSelection/StyleSelectionList";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
   const { studioAccessCheck } = useSession();
-  const [style, styleSet] = useState("anime_2d_flat");
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -41,6 +42,18 @@ export default function StyleVideo() {
   const [strength, setStrength] = useState(1.0);
   const [visualStrength, setVisualStrength] = useState(100);
   const { enqueue } = useInferenceJobs();
+  const { setSelectedStyle, setCurrentImage, selectedStyleValue } =
+    useStyleStore();
+  const { open, close } = useModal();
+  const openModal = () =>
+    open({
+      component: StyleOptionPicker,
+      props: {
+        styleOptions: STYLE_OPTIONS,
+        selectedStyle: selectedStyleValue,
+        onStyleClick: handleStyleClick,
+      },
+    });
 
   usePrefixedDocumentTitle("Style Video");
 
@@ -53,7 +66,7 @@ export default function StyleVideo() {
         input_file: mediaToken,
         negative_prompt: negativePrompt,
         prompt,
-        style,
+        style: selectedStyleValue,
         trim_end_millis: length,
         trim_start_millis: 0,
         use_face_detailer: useFaceDetailer,
@@ -75,13 +88,6 @@ export default function StyleVideo() {
     }
   };
 
-  const styleOptions = STYLE_OPTIONS.map(option => {
-    return {
-      label: option.label,
-      value: option.value,
-    };
-  });
-
   const lengthOptions = [
     { label: "3 seconds", value: 3000 },
     { label: "5 seconds", value: 5000 },
@@ -91,7 +97,14 @@ export default function StyleVideo() {
   const onPromptUpdate = (prompt: Prompt | null) => {
     promptSet(prompt?.maybe_positive_prompt || "");
     negativePromptSet(prompt?.maybe_negative_prompt || "");
-    styleSet(prompt?.maybe_style_name || "");
+    const styleOption = STYLES_BY_KEY.get(prompt?.maybe_style_name || "");
+    if (styleOption) {
+      setSelectedStyle(
+        styleOption.value,
+        styleOption.label,
+        styleOption.image || ""
+      );
+    }
     IPATokenSet(prompt?.maybe_global_ipa_image_token || "");
     setStrength(prompt?.maybe_strength || 1.0);
     setUseFaceDetailer(!!prompt?.used_face_detailer);
@@ -162,6 +175,12 @@ export default function StyleVideo() {
     </div>
   );
 
+  const handleStyleClick = (style: string, label: string, image: string) => {
+    setSelectedStyle(style, label);
+    setCurrentImage(image);
+    close();
+  };
+
   return studioAccessCheck(
     <>
       <Container className="mt-3">
@@ -211,16 +230,7 @@ export default function StyleVideo() {
                   Style a Video
                 </h2>
                 <div>
-                  <Select
-                    {...{
-                      label: "Choose a Style",
-                      onChange: ({ target }: { target: any }) => {
-                        styleSet(target.value);
-                      },
-                      options: styleOptions,
-                      value: style,
-                    }}
-                  />
+                  <StyleSelectionButton onClick={openModal} className="mb-3" />
                   <div>
                     <TextArea
                       {...{

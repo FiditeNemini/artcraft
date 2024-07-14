@@ -31,9 +31,22 @@ export interface ModalUtilities {
   handleClose: HandleClose;
 }
 
-const ModalBody = ({ children, omitBody, padding }: { children: any, omitBody?: boolean, padding?: boolean }) => omitBody ? children : <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
-  { children }
-</div>;
+const ModalBody = ({
+  children,
+  omitBody,
+  padding,
+}: {
+  children: any;
+  omitBody?: boolean;
+  padding?: boolean;
+}) =>
+  omitBody ? (
+    children
+  ) : (
+    <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
+      {children}
+    </div>
+  );
 
 const Modal: React.FC<ModalProps> = ({
   autoWidth,
@@ -58,7 +71,7 @@ const Modal: React.FC<ModalProps> = ({
     opacity: show ? 1 : 0,
     config: { duration: 80, easing: t => t },
   });
-  const [loaded,loadedSet] = useState(false);
+  const [loaded, loadedSet] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -99,7 +112,12 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <a.div style={fadeIn} className="modal-backdrop">
-      <div {...{ className: `modal${ className ? " " + className : "" }`, role: "dialog" }}>
+      <div
+        {...{
+          className: `modal${className ? " " + className : ""}`,
+          role: "dialog",
+        }}
+      >
         <div
           className={`modal-dialog ${
             position === "center" ? "modal-dialog-centered" : ""
@@ -123,7 +141,9 @@ const Modal: React.FC<ModalProps> = ({
               </header>
             )}
             <ModalBody {...{ omitBody, padding }}>
-              {Content && <Content {...{ ...contentProps, ...modalUtilities }} />}
+              {Content && (
+                <Content {...{ ...contentProps, ...modalUtilities }} />
+              )}
             </ModalBody>
             {showButtons && (
               <div className="modal-footer">
