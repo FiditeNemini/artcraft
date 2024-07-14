@@ -1,7 +1,6 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
 
-
 .fy-slide-frame {
   position: absolute;
   height: 100%;
@@ -10,7 +9,7 @@
 
 .fy-entity-input {
   @include panel;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   overflow: hidden;
   position: relative;
   // background-color: $panel;
@@ -20,7 +19,8 @@
   aspect-ratio: 1/1;
   height: 300px;
 
-  .fy-entity-input-empty-controls {}
+  .fy-entity-input-empty-controls {
+  }
 }
 
 .fy-entity-input-landscape {
@@ -29,9 +29,11 @@
   max-height: 66vh;
 }
 
-.fy-entity-input-empty, .fy-entity-input-full {
+.fy-entity-input-empty,
+.fy-entity-input-full {
   // position: relative;
   // overflow: hidden;
+  justify-content: center;
 
   .fy-entity-input-icon {
     position: absolute;
@@ -41,20 +43,21 @@
     margin: auto;
     inset: 0;
 
-    path { fill: $panel-inner-border}
+    path {
+      fill: $panel-inner-border;
+    }
   }
-
 }
 
 .fy-entity-input-label-icon {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
   height: 1.25rem;
 }
 
 .fy-entity-input-mocap-preview {
   position: absolute;
-  border-radius: .5rem;
-  border: 1px solid rgba(#fff,.2);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(#fff, 0.2);
   display: block;
   vertical-align: bottom;
   height: 100%;
@@ -76,17 +79,17 @@
   justify-content: space-between;
   position: absolute;
   // background-color: red;
-  background-color: rgba(#000, .5);
+  background-color: rgba(#000, 0.5);
   padding: 1rem;
   // backdrop-filter: blur(2px);
   overflow: hidden;
-  border-radius: .5rem .5rem 0 0;
+  border-radius: 0.5rem 0.5rem 0 0;
   width: 100%;
 }
 
 .fy-entity-input-empty-controls {
   // background-color: red;
-    position: absolute;
+  position: absolute;
   height: 100%;
   width: 100%;
   display: flex;
@@ -96,36 +99,36 @@
   gap: 1rem;
 
   .fy-entity-input-row {
-
     height: 100%;
   }
 
   .fy-entity-input-button {
-    background-color: rgba(#000,.15);
-    border-radius: .5rem;
+    background-color: rgba(#000, 0.15);
+    border-radius: 0.5rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
-    transition: .25s all ease-in-out;
-    color: rgba(#fff, .66);
+    transition: 0.25s all ease-in-out;
+    color: rgba(#fff, 0.66);
 
     &:hover {
-      background-color: rgba(#000,.1);
+      background-color: rgba(#000, 0.1);
       color: rgba(#fff, 1);
     }
 
-    label { }
+    label {
+    }
   }
 
-  .fy-entity-input-upload-detail  {
+  .fy-entity-input-upload-detail {
     span {
-      opacity: .66;
+      opacity: 0.66;
       display: block;
-      font-size: .75rem;
+      font-size: 0.75rem;
       line-height: 1em;
-      height: .75rem;
+      height: 0.75rem;
     }
   }
 }
