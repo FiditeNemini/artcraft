@@ -434,7 +434,7 @@ export class TimeLine {
         element.type == ClipType.TRANSFORM &&
         element.object_uuid == object_uuid
       ) {
-        console.log(element);
+        // console.log(element);
         this.scene.deletePoint(element.clip_uuid);
       }
     });

@@ -67,7 +67,7 @@ class Queue {
       this._queue[queueName] = [];
     }
     this._queue[queueName].push({ action, data });
-    console.log("Queued", queueName, action, data);
+    // console.log("Queued", queueName, action, data);
 
     if (this._subscribers[queueName].length) {
       this._subscribers[queueName].forEach((item) =>

@@ -15,7 +15,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { useEffect, useState } from "react";
 import * as gpu from "detect-gpu";
 import { TurnOnGpu } from "~/pages/PageEnigma/TurnOnGpu";
-
+import { UsersApi } from "~/Classes/ApiManager";
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useSignals();
   useActiveJobs();
@@ -24,6 +24,16 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useQueueHandler();
 
   const [validGpu, setValidGpu] = useState("unknown");
+
+  useEffect(() => {
+    const usersApi = new UsersApi();
+    const sessionResponse = usersApi.GetSession();
+    sessionResponse.then((result) => {
+      console.log(
+        `User Info | Username: ${result.data?.user?.username}, Token: ${result.data?.user?.user_token}`,
+      );
+    });
+  });
 
   useEffect(() => {
     const { getGPUTier } = gpu;
