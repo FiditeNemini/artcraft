@@ -49,18 +49,19 @@ and u.username NOT IN (
 group by u.token
 order by created_at desc;
 
--- See videos
+-- See videos generated
+-- and m.is_intermediate_system_file IS TRUE
+-- where  u.maybe_feature_flags LIKE '%studio%'
 select
   u.username,
   u.maybe_source,
   m.token,
+  m.is_intermediate_system_file as sys_file,
   m.created_at
 from media_files as m
 join users as u
 on m.maybe_creator_user_token = u.token
-where  u.maybe_feature_flags LIKE '%studio%'
-and m.created_at > (CURDATE() - INTERVAL 14 DAY)
-and m.is_intermediate_system_file IS TRUE
+WHERE m.created_at > (CURDATE() - INTERVAL 1 DAY)
 and m.media_class = 'video'
 and u.username NOT IN (
   'bflat',
