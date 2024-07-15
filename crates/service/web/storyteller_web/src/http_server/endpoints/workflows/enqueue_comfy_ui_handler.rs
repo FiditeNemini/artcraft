@@ -28,22 +28,16 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
-use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
+use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
+use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
-
-/// Debug requests can get routed to special "debug-only" workers, which can
-/// be used to trial new code, run debugging, etc.
-const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
-
-/// The routing tag header can send workloads to particular k8s hosts.
-/// This is useful for catching the live logs or intercepting the job.
-const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
 #[derive(Deserialize)]
 pub struct EnqueueComfyRequest {
@@ -164,13 +158,9 @@ pub async fn enqueue_comfy_ui_handler(
 
     // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
-    let is_debug_request =
-        get_request_header_optional(&http_request, DEBUG_HEADER_NAME)
-            .is_some();
+    let is_debug_request = has_debug_header(&http_request);
 
-    let maybe_routing_tag=
-        get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME)
-            .map(|routing_tag| routing_tag.trim().to_string());
+    let maybe_routing_tag= get_routing_tag_header(&http_request);
 
     // ==================== RATE LIMIT ==================== //
 

@@ -22,14 +22,14 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-  GenericInferenceArgs,
-  InferenceCategoryAbbreviated,
-  PolymorphicInferenceArgs,
+    GenericInferenceArgs,
+    InferenceCategoryAbbreviated,
+    PolymorphicInferenceArgs,
 };
 use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
-  insert_generic_inference_job,
-  InsertGenericInferenceArgs,
+    insert_generic_inference_job,
+    InsertGenericInferenceArgs,
 };
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::str_to_bool::str_to_bool;
@@ -40,19 +40,12 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
+use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
-use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
-
-/// Debug requests can get routed to special "debug-only" workers, which can
-/// be used to trial new code, run debugging, etc.
-const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
-
-/// The routing tag header can send workloads to particular k8s hosts.
-/// This is useful for catching the live logs or intercepting the job.
-const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
-
 
 #[derive(Deserialize, ToSchema)]
 pub struct EnqueueWorkFlowRequest {
@@ -173,11 +166,9 @@ pub async fn enqueue_workflow_upload_request(
 
     // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
-    let is_debug_request = get_request_header_optional(&http_request, DEBUG_HEADER_NAME).is_some();
+    let is_debug_request = has_debug_header(&http_request);
 
-    let maybe_routing_tag = get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME).map(
-        |routing_tag| routing_tag.trim().to_string()
-    );
+    let maybe_routing_tag= get_routing_tag_header(&http_request);
 
     // ==================== BANNED USERS ==================== //
 
