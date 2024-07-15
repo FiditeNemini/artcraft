@@ -26,6 +26,7 @@ import EmailSignUp from "./EmailSignUp";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useModal } from "hooks";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { isMobile as isMobileDevice } from "react-device-detect";
 
 interface PostlaunchLandingProps {
   sessionWrapper: SessionWrapper;
@@ -125,20 +126,35 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
   if (props.sessionWrapper.canAccessStudio()) {
     // Logged in + can access studio
     ctaButton = (
-      <div className="d-flex">
-        <Button
-          label="Enter Storyteller Studio"
-          className="mt-4"
-          fontLarge={true}
-          icon={faArrowRight}
-          iconFlip={true}
-          href="https://studio.storyteller.ai/"
-        />
-      </div>
+      <>
+        {isMobileDevice ? (
+          <div className="d-flex">
+            <Button
+              label="Enter Storyteller Studio"
+              className="mt-4"
+              fontLarge={true}
+              icon={faArrowRight}
+              iconFlip={true}
+              to="/studio-mobile-check"
+            />
+          </div>
+        ) : (
+          <div className="d-flex">
+            <Button
+              label="Enter Storyteller Studio"
+              className="mt-4"
+              fontLarge={true}
+              icon={faArrowRight}
+              iconFlip={true}
+              href="https://studio.storyteller.ai/"
+            />
+          </div>
+        )}
+      </>
     );
   } else if (!props.sessionWrapper.isLoggedIn()) {
-    // User is not logged in. For now, we can give them 
-    // immediate access if they sign up. This will only be a 
+    // User is not logged in. For now, we can give them
+    // immediate access if they sign up. This will only be a
     // brief state.
     ctaButton = (
       <div className="d-flex">
@@ -682,33 +698,35 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
 }
 
 interface WaitlistHeroButtonProps {
-  openModal: () => void,
+  openModal: () => void;
 }
 
 function WaitlistHeroButton(props: WaitlistHeroButtonProps) {
-  return (<div className="d-flex flex-column gap-3">
-    <div>
-      <Button
-        label="Join the Waitlist"
-        className="mt-4"
-        fontLarge={true}
-        icon={faArrowRight}
-        iconFlip={true}
-        onClick={props.openModal}
-      />
-    </div>
+  return (
+    <div className="d-flex flex-column gap-3">
+      <div>
+        <Button
+          label="Join the Waitlist"
+          className="mt-4"
+          fontLarge={true}
+          icon={faArrowRight}
+          iconFlip={true}
+          onClick={props.openModal}
+        />
+      </div>
 
-    <div className="d-flex align-items-center fs-7 gap-1">
-      <span className="opacity-75">Have a beta key?</span>
-      <Button
-        label="Redeem now!"
-        variant="link"
-        fontLarge={true}
-        className="fs-7"
-        to="/beta-key/redeem"
-      />
+      <div className="d-flex align-items-center fs-7 gap-1">
+        <span className="opacity-75">Have a beta key?</span>
+        <Button
+          label="Redeem now!"
+          variant="link"
+          fontLarge={true}
+          className="fs-7"
+          to="/beta-key/redeem"
+        />
+      </div>
     </div>
-  </div>);
+  );
 }
 
 //const firstTitle = "Control Your Movie";

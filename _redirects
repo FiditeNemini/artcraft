@@ -44,6 +44,7 @@
 /signup*   /index.html   200
 /stream*   /index.html   200
 /studio*   /index.html   200
+/studio-mobile-check*  /index.html   200
 /style-video*   /index.html   200
 /terms*   /index.html   200
 /testing*   /index.html   200

@@ -4,6 +4,7 @@ import Panel from "../Panel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
+  faArrowRight,
   faMessageExclamation,
 } from "@fortawesome/pro-solid-svg-icons";
 import Button from "../Button";
@@ -12,11 +13,13 @@ import RemixScenes from "../RemixScenes";
 interface DeviceNotSupportedProps {
   showButton?: boolean;
   showRemixScenes?: boolean;
+  showVST?: boolean;
 }
 
 export default function DeviceNotSupported({
   showButton = true,
   showRemixScenes = true,
+  showVST = false,
 }: DeviceNotSupportedProps) {
   return (
     <Container type="panel">
@@ -65,6 +68,32 @@ export default function DeviceNotSupported({
             </p>
           </>
         )}
+
+        {showVST && (
+          <>
+            <hr />
+            <div>
+              <p className="px-2 fw-bold fs-5 text-center mb-3">
+                Would you like to try Video Style Transfer instead?
+              </p>
+              <p className="px-2 fw-normal fs-6 text-center">
+                Convert videos into any art style with AI. Choose a style, write
+                a prompt and apply it to your video, works on mobile!
+              </p>
+            </div>
+
+            <div className="d-flex justify-content-center mt-3">
+              <Button
+                to="/style-video"
+                label="Stylize a Video"
+                icon={faArrowRight}
+                iconFlip={true}
+                variant="primary"
+              />
+            </div>
+          </>
+        )}
+
         {showButton && (
           <div className="d-flex justify-content-center mt-3">
             <Button

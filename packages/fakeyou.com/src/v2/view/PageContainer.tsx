@@ -129,6 +129,7 @@ import CreatorToolsPage from "./pages/creator_tools/CreatorToolsPage";
 import WaitlistNextStepsPage from "./pages/waitlist_next_steps/WaitlistNextStepsPage";
 import { CreatorTypeformPage } from "./pages/landing/storyteller/PostlaunchLanding/CreatorTypeformPage";
 import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
+import { StudioMobileCheckPage } from "./pages/landing/storyteller/PostlaunchLanding/StudioMobileCheckPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -938,6 +939,10 @@ class PageContainer extends React.Component<
                         this.props.setSelectedTtsLanguageScope
                       }
                     />
+                  </Route>
+
+                  <Route path="/studio-mobile-check">
+                    <StudioMobileCheckPage />
                   </Route>
 
                   <Route path="/category/create">
