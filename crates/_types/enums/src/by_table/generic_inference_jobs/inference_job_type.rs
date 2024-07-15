@@ -15,7 +15,11 @@ use strum::EnumIter;
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum InferenceJobType {
+  /// Live Portrait Jobs. These still run in comfy, but we call it "live_portrait"
+  LivePortrait,
+
   /// Jobs that run ComfyUI workflows
+  /// This is actually just for Video Style Transfer and Storyteller Studio.
   ComfyUi,
 
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
@@ -72,6 +76,7 @@ impl_mysql_enum_coders!(InferenceJobType);
 impl InferenceJobType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::LivePortrait => "live_portrait",
       Self::ComfyUi => "comfy_ui",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
       Self::MocapNet => "mocap_net",
@@ -89,6 +94,7 @@ impl InferenceJobType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "live_portrait" => Ok(Self::LivePortrait),
       "comfy_ui" => Ok(Self::ComfyUi),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
       "mocap_net" => Ok(Self::MocapNet),
@@ -109,6 +115,7 @@ impl InferenceJobType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::LivePortrait,
       Self::ComfyUi,
       Self::ConvertFbxToGltf,
       Self::MocapNet,
@@ -140,6 +147,7 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceJobType::LivePortrait, "live_portrait");
       assert_serialization(InferenceJobType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceJobType::ConvertFbxToGltf, "convert_fbx_gltf");
       assert_serialization(InferenceJobType::MocapNet, "mocap_net");
@@ -156,6 +164,7 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceJobType::LivePortrait.to_str(), "live_portrait");
       assert_eq!(InferenceJobType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceJobType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
       assert_eq!(InferenceJobType::MocapNet.to_str(), "mocap_net");
@@ -172,6 +181,7 @@ mod tests {
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceJobType::from_str("live_portrait").unwrap(), InferenceJobType::LivePortrait);
       assert_eq!(InferenceJobType::from_str("comfy_ui").unwrap(), InferenceJobType::ComfyUi);
       assert_eq!(InferenceJobType::from_str("convert_fbx_gltf").unwrap(), InferenceJobType::ConvertFbxToGltf);
       assert_eq!(InferenceJobType::from_str("mocap_net").unwrap(), InferenceJobType::MocapNet);
@@ -190,7 +200,8 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobType::all_variants();
-      assert_eq!(variants.len(), 12);
+      assert_eq!(variants.len(), 13);
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::LivePortrait));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ConvertFbxToGltf));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::MocapNet));
