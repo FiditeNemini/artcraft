@@ -9,6 +9,14 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema, Debug)]
 pub enum PublicWeightsType {
+  // Renamed enum variants
+
+  /// Instead of "gpt_so_vits", we report this as "tacotron2.5"
+  #[serde(rename = "tacotron2.5")]
+  Tacotron2_5,
+
+  // Everything else is the same
+
   #[serde(rename = "hifigan_tt2")]
   HifiganTacotron2,
   #[serde(rename = "rvc_v2")]
@@ -27,15 +35,14 @@ pub enum PublicWeightsType {
   VallE,
   #[serde(rename = "comfy_ui")]
   ComfyUi,
-
-  /// Instead of "gpt_so_vits", we report this as "tacotron2.5"
-  #[serde(rename = "tacotron2.5")]
-  Tacotron2_5,
 }
 
 impl PublicWeightsType {
   pub fn from_enum(weights_type: WeightsType) -> Self {
     match weights_type {
+      // Renamed variants
+      WeightsType::GptSoVits => Self::Tacotron2_5,
+      // Conserved variants
       WeightsType::HifiganTacotron2 => Self::HifiganTacotron2,
       WeightsType::RvcV2 => Self::RvcV2,
       WeightsType::StableDiffusion15 => Self::StableDiffusion15,
@@ -45,12 +52,14 @@ impl PublicWeightsType {
       WeightsType::LoRA => Self::LoRA,
       WeightsType::VallE => Self::VallE,
       WeightsType::ComfyUi => Self::ComfyUi,
-      WeightsType::GptSoVits => Self::Tacotron2_5,
     }
   }
 
   pub fn to_enum(&self) -> WeightsType {
     match self {
+      // Renamed variants
+      Self::Tacotron2_5 => WeightsType::GptSoVits,
+      // Conserved variants
       Self::HifiganTacotron2 => WeightsType::HifiganTacotron2,
       Self::RvcV2 => WeightsType::RvcV2,
       Self::StableDiffusion15 => WeightsType::StableDiffusion15,
@@ -60,7 +69,6 @@ impl PublicWeightsType {
       Self::LoRA => WeightsType::LoRA,
       Self::VallE => WeightsType::VallE,
       Self::ComfyUi => WeightsType::ComfyUi,
-      Self::Tacotron2_5 => WeightsType::GptSoVits,
     }
   }
 }
@@ -118,6 +126,7 @@ mod tests {
         tested_count += 1;
       }
 
+      assert!(tested_count > 1);
       assert_eq!(tested_count, PublicWeightsType::iter().len() - override_enums().len());
     }
 
@@ -143,6 +152,7 @@ mod tests {
         tested_count += 1;
       }
 
+      assert!(tested_count > 1);
       assert_eq!(tested_count, WeightsType::all_variants().len() - override_enums().len());
     }
   }
