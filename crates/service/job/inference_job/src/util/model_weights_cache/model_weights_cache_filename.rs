@@ -33,6 +33,7 @@ impl ModelWeightsCacheMapping {
   fn extension(&self) -> &str {
     match self.weights_type {
       // Pt
+      WeightsType::GptSoVits => "pt", // TODO(bt,2024-07-15): Is this correct?
       WeightsType::HifiganTacotron2 => "pt",
       WeightsType::RvcV2 => "pt",
       WeightsType::SoVitsSvc => "pt",
