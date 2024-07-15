@@ -140,11 +140,7 @@ impl fmt::Display for InferTtsError {
   tag = "TTS",
   path = "/v1/tts/inference",
   responses(
-  (
-    status = 200,
-    description = "Success response",
-    body = InferTtsSuccessResponse,
-  ),
+    (status = 200, description = "Success response", body = InferTtsSuccessResponse),
     (status = 400, description = "Bad input", body = InferTtsError),
     (status = 401, description = "Not authorized", body = InferTtsError),
     (status = 429, description = "Rate limited", body = InferTtsError),
