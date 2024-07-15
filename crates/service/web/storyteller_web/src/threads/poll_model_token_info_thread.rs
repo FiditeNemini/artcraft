@@ -123,6 +123,7 @@ async fn query_model_weight_models(mysql_pool: &MySqlPool)
       WeightsType::LoRA => continue, // TODO(bt,2023-12-18): Not yet set up with enums for inference
       WeightsType::VallE => continue, // TODO(bt,2023-12-18): ??? We have vall-e weights?? Not sure what this means yet.
       WeightsType::ComfyUi => continue, // Not supported for inference
+      WeightsType::GptSoVits => continue, // TODO: FIXME
     };
 
     let info = ModelInfoForInferenceJob {

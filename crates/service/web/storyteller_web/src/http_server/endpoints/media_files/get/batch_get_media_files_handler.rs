@@ -22,16 +22,17 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::media_files::get::batch_get_media_files::batch_get_media_files;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -162,7 +163,7 @@ pub struct BatchMediaFileInfo {
 #[derive(Serialize, ToSchema)]
 pub struct BatchGetMediaFilesModelInfo {
   pub weight_token: ModelWeightToken,
-  pub weight_type: WeightsType,
+  pub weight_type: PublicWeightsType,
   pub weight_category: WeightsCategory,
   pub title: String,
 
@@ -329,7 +330,7 @@ pub async fn batch_get_media_files_handler(
               weight_token,
               // TODO(bt,2023-12-28): Instead of giving bogus defaults on None, make these optional or return
               //  None for *everything* on any field being absent.
-              weight_type: result.maybe_model_weights_type.unwrap_or(WeightsType::Tacotron2),
+              weight_type: PublicWeightsType::from_enum(result.maybe_model_weights_type.unwrap_or(WeightsType::Tacotron2)),
               weight_category: result.maybe_model_weights_category.unwrap_or(WeightsCategory::TextToSpeech),
               title: result.maybe_model_weights_title.unwrap_or_else(|| "model".to_string()),
               maybe_cover_image_public_bucket_path,

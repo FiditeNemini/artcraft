@@ -6813,6 +6813,7 @@ dependencies = [
  "elasticsearch_schema",
  "email_sender",
  "enums",
+ "enums_public",
  "errors",
  "filesys",
  "futures 0.1.31",

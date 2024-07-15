@@ -10,16 +10,17 @@ use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::{
-  weights_category::WeightsCategory,
-  weights_types::WeightsType,
+    weights_category::WeightsCategory,
+    weights_types::WeightsType,
 };
 use enums::common::visibility::Visibility;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::state::server_state::ServerState;
 
@@ -28,7 +29,7 @@ pub struct ListAvailableWeightsQuery {
     pub sort_ascending: Option<bool>,
     pub page_size: Option<u16>,
     pub username: Option<String>,
-    pub weight_type: Option<WeightsType>,
+    pub weight_type: Option<PublicWeightsType>,
     pub weight_category: Option<WeightsCategory>,
     pub cursor_is_reversed: Option<bool>,
     pub cursor: Option<String>,
@@ -161,7 +162,7 @@ pub async fn list_available_weights_handler(
         .sort_ascending(sort_ascending)
         .cursor_is_reversed(cursor_is_reversed)
         .weights_category(query.weight_category)
-        .weights_type(query.weight_type)
+        .weights_type(query.weight_type.map(|wt| wt.to_enum()))
         .scope_creator_username(None)
         .include_user_hidden(include_user_hidden)
         .include_user_deleted_results(false) // NB: Mods don't want to see deleted models. We'll improve this later.

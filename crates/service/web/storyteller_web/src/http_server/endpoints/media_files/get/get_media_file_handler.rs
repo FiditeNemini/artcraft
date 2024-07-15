@@ -19,16 +19,17 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -161,7 +162,7 @@ pub struct GetMediaFileModeratorFields {
 #[derive(Serialize, ToSchema)]
 pub struct GetMediaFileModelInfo {
   pub weight_token: ModelWeightToken,
-  pub weight_type: WeightsType,
+  pub weight_type: PublicWeightsType,
   pub weight_category: WeightsCategory,
   pub title: String,
 
@@ -369,7 +370,7 @@ async fn modern_media_file_lookup(
           weight_token,
           // TODO(bt,2023-12-28): Instead of giving bogus defaults on None, make these optional or return
           //  None for *everything* on any field being absent.
-          weight_type: result.maybe_model_weights_type.unwrap_or(WeightsType::Tacotron2),
+          weight_type: PublicWeightsType::from_enum(result.maybe_model_weights_type.unwrap_or(WeightsType::Tacotron2)),
           weight_category: result.maybe_model_weights_category.unwrap_or(WeightsCategory::TextToSpeech),
           title: result.maybe_model_weights_title.unwrap_or_else(|| "model".to_string()),
           maybe_cover_image_public_bucket_path,
@@ -468,7 +469,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
         // NB: These should be reasonable synthetic defaults for emulated TT2 results, even the "ModelWeightToken".
         weight_token: ModelWeightToken::new_from_str(&result.tts_model_token),
-        weight_type: WeightsType::Tacotron2,
+        weight_type: PublicWeightsType::Tacotron2,
         weight_category: WeightsCategory::TextToSpeech,
         title: result.tts_model_title.unwrap_or_else(|| "tacotron2 model".to_string()),
         maybe_cover_image_public_bucket_path: None,

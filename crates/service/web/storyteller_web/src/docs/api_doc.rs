@@ -25,6 +25,7 @@ use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use tokens::tokens::batch_generations::*;
 use tokens::tokens::beta_keys::*;
 use tokens::tokens::browser_session_logs::*;
@@ -242,6 +243,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileSubtype,
     MediaFileType,
     PromptType,
+    PublicWeightsType,
     StyleTransferName,
     UserFeatureFlag,
     WeightsCategory,

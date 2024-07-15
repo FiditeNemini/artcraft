@@ -78,6 +78,7 @@ impl VcModelLite {
         WeightsType::LoRA => None, // NB: not used directly in inference. Included in other models.
         WeightsType::VallE => None, // TODO(bt,2023-12-18): Does this mean speaker weights?
         WeightsType::ComfyUi => None, // NB: not used directly in inference. Included in other models.
+        WeightsType::GptSoVits => None, // TODO: Fixme
       }
     }
   }
@@ -99,6 +100,7 @@ impl VcModelLite {
         WeightsType::LoRA => None, // NB: not used directly in inference. Included in other models.
         WeightsType::VallE => None, // TODO(bt,2023-12-18): Does this mean speaker weights?
         WeightsType::ComfyUi => None, // NB: not used directly in inference. Included in other models.
+        WeightsType::GptSoVits => None, // TODO: Fixme
       }
     }
   }

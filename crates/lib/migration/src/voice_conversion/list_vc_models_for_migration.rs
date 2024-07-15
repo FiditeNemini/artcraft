@@ -68,6 +68,7 @@ impl VcModelForList {
         WeightsType::LoRA => None,
         WeightsType::VallE => None,
         WeightsType::ComfyUi => None,
+        WeightsType::GptSoVits => None,
       },
     }
   }

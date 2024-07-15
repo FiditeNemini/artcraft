@@ -19,10 +19,11 @@ use elasticsearch_schema::searches::search_model_weights::search_model_weights;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
@@ -39,7 +40,7 @@ pub struct SearchModelWeightsRequest {
 pub struct ModelWeightSearchResult {
   pub weight_token: ModelWeightToken,
 
-  pub weight_type: WeightsType,
+  pub weight_type: PublicWeightsType,
   pub weight_category: WeightsCategory,
 
   pub creator_set_visibility: Visibility,
@@ -148,7 +149,7 @@ pub async fn search_model_weights_handler(
 
         ModelWeightSearchResult {
           weight_token: result.token,
-          weight_type: result.weights_type,
+          weight_type: PublicWeightsType::from_enum(result.weights_type),
           weight_category: result.weights_category,
           title: result.title,
           creator: UserDetailsLight::from_db_fields(

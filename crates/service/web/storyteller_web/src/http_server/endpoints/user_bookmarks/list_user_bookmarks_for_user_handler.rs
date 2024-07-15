@@ -19,12 +19,13 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -111,7 +112,7 @@ pub struct MediaFileData {
 #[derive(Serialize, ToSchema)]
 pub struct WeightsData {
   pub title: String,
-  pub weight_type: WeightsType,
+  pub weight_type: PublicWeightsType,
   pub weight_category: WeightsCategory,
 
   /// Cover images are small descriptive images that can be set for any model.
@@ -255,7 +256,7 @@ pub async fn list_user_bookmarks_for_user_handler(
                 UserBookmarkEntityType::ModelWeight => Some(WeightsData {
                   // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
                   title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or_else(|| "weight".to_string()),
-                  weight_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
+                  weight_type: PublicWeightsType::from_enum(user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2)),
                   weight_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
                   maybe_cover_image_public_bucket_path: maybe_model_weight_cover_image,
                   maybe_creator: maybe_model_weight_creator,

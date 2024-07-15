@@ -107,6 +107,7 @@ impl VcModel {
         WeightsType::LoRA => VcModelType::Invalid,
         WeightsType::VallE => VcModelType::Invalid,
         WeightsType::ComfyUi => VcModelType::Invalid,
+        WeightsType::GptSoVits => VcModelType::Invalid,
       }
     }
   }

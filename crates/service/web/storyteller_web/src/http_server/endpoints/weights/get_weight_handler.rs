@@ -13,11 +13,12 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::state::server_state::ServerState;
 
@@ -26,7 +27,7 @@ pub struct GetWeightResponse {
     success: bool,
     weight_token: ModelWeightToken,
     title: String,
-    weight_type: WeightsType,
+    weight_type: PublicWeightsType,
     weight_category: WeightsCategory,
 
     // TODO(bt,2023-12-24): Migrated the column. We should return nullables, but I don't want to break the frontend
@@ -184,7 +185,7 @@ pub async fn get_weight_handler(
         success: true,
         weight_token: weight.token,
         title: weight.title,
-        weight_type: weight.weights_type,
+        weight_type: PublicWeightsType::from_enum(weight.weights_type),
         weight_category: weight.weights_category,
         // TODO(bt,2023-12-24): Migrated the column. We should return nullable fields, but I don't want to break the frontend
         description_markdown: weight.maybe_description_markdown.unwrap_or_else(|| "".to_string()),
