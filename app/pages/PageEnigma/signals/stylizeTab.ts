@@ -16,7 +16,7 @@ export const adapterImage = signal<string | null>(null);
 export const selectedArtStyle = signal<ArtStyle>(styleList[0].type);
 export const upscale = signal(false);
 export const faceDetail = signal(false);
-export const styleStrength = signal(1.0);
+export const styleStrength = signal(0.8);
 export const lipSync = signal(false);
 export const cinematic = signal(true);
 export const enginePreProcessing = signal(false);
@@ -35,7 +35,7 @@ export const resetSceneGenerationMetadata = () => {
   selectedArtStyle.value = styleList[0].type;
   upscale.value = false;
   faceDetail.value = false;
-  styleStrength.value = 1.0;
+  styleStrength.value = 0.8;
   lipSync.value = false;
   cinematic.value = false;
   enginePreProcessing.value = false;
