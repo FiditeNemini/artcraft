@@ -15,11 +15,18 @@ use strum::EnumIter;
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum InferenceJobType {
-  /// Live Portrait Jobs. These still run in comfy, but we call it "live_portrait"
+  /// Storyteller Studio and Video Style Transfer Jobs (which we may want to split).
+  /// These run in Comfy.
+  /// TODO(bt,2024-07-15): We may segregate these two job types in the future
+  VideoRender,
+
+  /// Live Portrait Jobs.
+  /// These run in Comfy.
   LivePortrait,
 
   /// Jobs that run ComfyUI workflows
   /// This is actually just for Video Style Transfer and Storyteller Studio.
+  #[deprecated(note = "Use VideoRender instead.")]
   ComfyUi,
 
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
@@ -76,6 +83,7 @@ impl_mysql_enum_coders!(InferenceJobType);
 impl InferenceJobType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::VideoRender => "video_render",
       Self::LivePortrait => "live_portrait",
       Self::ComfyUi => "comfy_ui",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
@@ -94,6 +102,7 @@ impl InferenceJobType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "video_render" => Ok(Self::VideoRender),
       "live_portrait" => Ok(Self::LivePortrait),
       "comfy_ui" => Ok(Self::ComfyUi),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
@@ -115,6 +124,7 @@ impl InferenceJobType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::VideoRender,
       Self::LivePortrait,
       Self::ComfyUi,
       Self::ConvertFbxToGltf,
@@ -147,6 +157,7 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceJobType::VideoRender, "video_render");
       assert_serialization(InferenceJobType::LivePortrait, "live_portrait");
       assert_serialization(InferenceJobType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceJobType::ConvertFbxToGltf, "convert_fbx_gltf");
@@ -164,6 +175,7 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceJobType::VideoRender.to_str(), "video_render");
       assert_eq!(InferenceJobType::LivePortrait.to_str(), "live_portrait");
       assert_eq!(InferenceJobType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceJobType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
@@ -181,6 +193,7 @@ mod tests {
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceJobType::from_str("video_render").unwrap(), InferenceJobType::VideoRender);
       assert_eq!(InferenceJobType::from_str("live_portrait").unwrap(), InferenceJobType::LivePortrait);
       assert_eq!(InferenceJobType::from_str("comfy_ui").unwrap(), InferenceJobType::ComfyUi);
       assert_eq!(InferenceJobType::from_str("convert_fbx_gltf").unwrap(), InferenceJobType::ConvertFbxToGltf);
@@ -200,7 +213,8 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobType::all_variants();
-      assert_eq!(variants.len(), 13);
+      assert_eq!(variants.len(), 14);
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::VideoRender));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::LivePortrait));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ConvertFbxToGltf));
