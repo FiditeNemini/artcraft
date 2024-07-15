@@ -69,6 +69,9 @@ fn handle_prompts(args: &mut CoordinatedWorkflowArgs) {
 }
 
 fn handle_flags(args: &mut CoordinatedWorkflowArgs, is_staff: bool) {
+  // TODO(bt,2024-07-15): Temporarily do this.
+  args.use_cinematic = Some(true);
+
   if !is_staff {
     // Non-staff cannot use these workflows
     args.disable_lcm = None;
@@ -229,7 +232,7 @@ mod tests {
       assert_eq!(coordinated_args.use_face_detailer, Some(true)); // TODO(bt): Possibly temporary
       assert_eq!(coordinated_args.use_upscaler, None);
       assert_eq!(coordinated_args.disable_lcm, None);
-      assert_eq!(coordinated_args.use_cinematic, None);
+      //assert_eq!(coordinated_args.use_cinematic, None); // TODO(bt): Possibly temporary
     }
   }
 }
