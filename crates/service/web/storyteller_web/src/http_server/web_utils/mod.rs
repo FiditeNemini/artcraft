@@ -5,6 +5,7 @@ pub mod read_multipart_field_bytes;
 pub mod redis_rate_limiter;
 pub mod require_moderator;
 pub mod require_user_session;
+pub mod require_user_session_using_connection;
 pub mod response_error_helpers;
 pub mod response_success_helpers;
 pub mod serialize_as_json_error;
