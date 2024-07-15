@@ -158,7 +158,7 @@ export const STYLE_OPTIONS: StyleOption[] = [
   {
     label: "Horror 2.5D",
     value: "25d_horror",
-    image: "/images/styles/gif/2_5d_horror.gif",
+    image: "",
   },
   {
     label: "Creepy",
