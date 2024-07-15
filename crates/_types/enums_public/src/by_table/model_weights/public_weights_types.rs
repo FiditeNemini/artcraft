@@ -6,12 +6,15 @@ use utoipa::ToSchema;
 
 use enums::by_table::model_weights::weights_types::WeightsType;
 
+/// Report certain models publicly as different from what we actually use.
+/// This is so we have an edge against the competition that might try to run
+/// the same models. This won't always make sense, but in some cases it will.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema, Debug)]
 pub enum PublicWeightsType {
   // Renamed enum variants
 
-  /// Instead of "gpt_so_vits", we report this as "tacotron2.5"
+  /// Instead of `WeightsType::GptSoVits` ("gpt_so_vits")
   #[serde(rename = "tacotron2.5")]
   Tacotron2_5,
 

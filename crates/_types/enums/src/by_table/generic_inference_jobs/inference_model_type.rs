@@ -17,6 +17,10 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceModelType {
+  // TODO(bt,2024-07-15): This is too generic. We probably need "StorytellerStudio", "LivePortrait", etc.
+  #[serde(rename = "comfy_ui")]
+  ComfyUi,
+
   #[serde(rename = "rvc_v2")]
   RvcV2,
   // NB: sad_talker does use user-supplied models, so there is no "model token"
@@ -37,8 +41,6 @@ pub enum InferenceModelType {
   StableDiffusion,
   #[serde(rename = "mocap_net")]
   MocapNet,
-  #[serde(rename = "comfy_ui")]
-  ComfyUi,
   #[serde(rename = "styletts2")]
   StyleTTS2,
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
