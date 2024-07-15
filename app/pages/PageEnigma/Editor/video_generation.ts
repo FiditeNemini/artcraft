@@ -344,7 +344,7 @@ export class VideoGeneration {
           immutable_media_token = response.data;
         }
       } else {
-        console.log("ERROR:");
+        //console.log("ERROR:");
         console.log(response.errorMessage);
       }
 
@@ -378,7 +378,7 @@ export class VideoGeneration {
       }
 
       await this.sleep(2000); // TODO: REMOVE THIS WHEN TOO MANY REQUESTS ERROR IS SOLVED.
-      console.log("Waiting for server to catch up...");
+      //console.log("Waiting for server to catch up...");
     }
 
     this.editor.onWindowResize();
@@ -386,10 +386,10 @@ export class VideoGeneration {
     console.log(upload_tokens);
     this.editor.setColorMap();
 
-    console.log("https://storyteller.ai/media/" + upload_tokens.color);
-    console.log("https://storyteller.ai/media/" + upload_tokens.normal);
-    console.log("https://storyteller.ai/media/" + upload_tokens.depth);
-    console.log("https://storyteller.ai/media/" + upload_tokens.outline);
+    // console.log("https://storyteller.ai/media/" + upload_tokens.color);
+    // console.log("https://storyteller.ai/media/" + upload_tokens.normal);
+    // console.log("https://storyteller.ai/media/" + upload_tokens.depth);
+    // console.log("https://storyteller.ai/media/" + upload_tokens.outline);
 
     await this.editor.api_manager
       .stylizeVideo({
@@ -442,7 +442,6 @@ export class VideoGeneration {
       preserveDrawingBuffer: true,
     });
     this.editor._configurePostProcessingRaw();
-
 
     this.editor.activeScene.renderMode(false);
 

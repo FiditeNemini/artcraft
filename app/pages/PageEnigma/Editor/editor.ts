@@ -460,7 +460,7 @@ class Editor {
     this.control.setScaleSnap(0.01);
     this.control.setTranslationSnap(0.01);
     this.control.setRotationSnap(0.01);
-    console.log("Control Sensitivity:", this.control.sensitivity);
+    //console.log("Control Sensitivity:", this.control.sensitivity);
 
     // Base control and debug stuff remove debug in prod.
     if (this.control == undefined) {
@@ -895,7 +895,7 @@ class Editor {
     } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.rendering && this.renderer){
+    } else if (this.rendering && this.renderer) {
       this.renderer.setSize(this.render_width, this.render_height);
     }
 
@@ -1116,7 +1116,7 @@ class Editor {
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-    console.log("Generating video...", this.frame_buffer);
+    console.log("Generating Video", this.frame_buffer);
 
     this.timeline.is_playing = false;
     this.timeline.scrubber_frame_position = 0;

@@ -178,7 +178,7 @@ export class TimeLine {
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
-        console.log(result);
+        //console.log(result);
         if (result) outlinerState.items.value = result.items;
         break;
       }
@@ -635,7 +635,7 @@ export class TimeLine {
 
   // should play from the clip that is closest to the to scrubber
   public async play(): Promise<void> {
-    console.log(`Starting Timeline`);
+    console.log(`Play - Starting Timeline`);
     this.is_playing = true;
   }
 
@@ -806,7 +806,7 @@ export class TimeLine {
   private async stop(): Promise<void> {
     await this.resetScene();
     this.is_playing = false;
-    console.log(`Stopping Timeline`);
+    console.log(`Stop - Stopping Timeline`);
     this.current_time = 0;
     this.pushEvent(fromEngineActions.UPDATE_TIME, {
       currentTime: this.current_time,

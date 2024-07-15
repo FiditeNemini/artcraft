@@ -13,7 +13,7 @@ export const TestFeaturesButtons = ({ debug }: { debug: boolean }) => {
   };
   const testStylizeRequest = () => {
     // editorEngine?.testStylizeRequest();
-    console.log("editorEnging does not have testStylizeRequest");
+    //console.log("editorEnging does not have testStylizeRequest");
   };
   const handleButtonRender = () => {
     editorEngine?.generateVideo();
@@ -21,12 +21,13 @@ export const TestFeaturesButtons = ({ debug }: { debug: boolean }) => {
 
   const handleButtonTakeFrame = () => {
     // editorEngine?.take_timeline_cam_clip();
-    console.log("editorEnging does not have take_timeline_cam_clip");
+    //console.log("editorEnging does not have take_timeline_cam_clip");
   };
 
   const handleButtonSingleFrame = () => {
     editorEngine?.generateFrame();
   };
+
   const handleButtonPlayBack = () => {
     editorEngine?.togglePlayback();
   };

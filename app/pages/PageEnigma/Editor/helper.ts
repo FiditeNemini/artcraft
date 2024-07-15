@@ -55,7 +55,7 @@ export class Utils {
       }
       return object.userData["locked"];
     }
-    console.log("No object found.");
+    //console.log("No object found.");
     return false;
   }
 
@@ -80,7 +80,7 @@ export class Utils {
 
       return object.userData["locked"];
     }
-    console.log("No object found.");
+    //console.log("No object found.");
     return false;
   }
 
@@ -152,10 +152,16 @@ export class Utils {
           });
         }
 
-      // Make a better solution later but for now this is so that in camera mode when you right click it does not bring up the context menu and allows you to pan.
-      setTimeout( () => document.getElementById("letterbox")?.addEventListener("contextmenu", function (event) {
-        event.preventDefault();
-      }), 250);
+        // Make a better solution later but for now this is so that in camera mode when you right click it does not bring up the context menu and allows you to pan.
+        setTimeout(
+          () =>
+            document
+              .getElementById("letterbox")
+              ?.addEventListener("contextmenu", function (event) {
+                event.preventDefault();
+              }),
+          250,
+        );
       } else if (this.editor.camera) {
         this.editor.camera.position.copy(this.editor.last_cam_pos);
         this.editor.camera.rotation.copy(this.editor.last_cam_rot);

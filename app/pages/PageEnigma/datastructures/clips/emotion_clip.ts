@@ -27,8 +27,8 @@ export class EmotionClip {
     const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
 
-    console.log(`API BASE URL? ${api_base_url}`);
-    console.log(`CALLED URL? ${url}`);
+    //console.log(`API BASE URL? ${api_base_url}`);
+    //console.log(`CALLED URL? ${url}`);
 
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());

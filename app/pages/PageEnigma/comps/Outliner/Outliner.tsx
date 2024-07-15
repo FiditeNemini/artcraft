@@ -38,13 +38,13 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
   // Delete object logic here
   const handleDeleteKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Delete") {
-      console.log("Delete key pressed for item:", item.id);
+      //console.log("Delete key pressed for item:", item.id);
     }
   };
 
   // Double click logic here
   const handleDoubleClick = () => {
-    console.log("Item double clicked:", item.id);
+    //console.log("Item double clicked:", item.id);
     editorEngine?.sceneManager?.double_click();
   };
 

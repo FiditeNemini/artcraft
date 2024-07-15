@@ -273,7 +273,7 @@ export class APIManager {
       throw new APIManagerResponseError("Upload Media Failed to send file");
     } else {
       const json_data = await response.json();
-      console.log(`uploadMedia: ${JSON.stringify(json_data)}`);
+      //console.log(`uploadMedia: ${JSON.stringify(json_data)}`);
       return json_data;
     }
   }
@@ -326,7 +326,7 @@ export class APIManager {
       throw new APIManagerResponseError("Upload Media Failed to send file");
     } else {
       const json_data = await response.json();
-      console.log(`uploadMedia: ${JSON.stringify(json_data)}`);
+      //console.log(`uploadMedia: ${JSON.stringify(json_data)}`);
       return json_data;
     }
   }

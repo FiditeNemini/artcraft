@@ -25,7 +25,7 @@ export const OpenDialog: Story = {
           label: "Open Dialog",
           description: "Desc 1",
           onDialogOpen: () => {
-            console.log("Opened Dialog");
+            //console.log("Opened Dialog");
           },
           dialogProps: {
             title: "Dialog Title",
@@ -34,7 +34,7 @@ export const OpenDialog: Story = {
               label: "Create",
               disabled: false,
               onClick: () => {
-                console.log("Action on Dialog");
+                //console.log("Action on Dialog");
               },
             },
             closeButtonProps: {
@@ -42,7 +42,7 @@ export const OpenDialog: Story = {
             },
             showClose: true,
             onClose: () => {
-              console.log("Closed Dialog");
+              //console.log("Closed Dialog");
             },
           },
         },
@@ -66,7 +66,7 @@ export const ClickEvent: Story = {
           label: "Click Event",
           description: "Desc",
           onClick: () => {
-            console.log("Clicked");
+            //console.log("Clicked");
           },
         },
       ]}

@@ -44,7 +44,7 @@ export function useQueueHandler() {
 
   const handleFromEngineActions = useCallback(
     ({ action, data }: QueueSubscribeType) => {
-      console.log("FROM ENGINE", action, data);
+      //console.log("FROM ENGINE", action, data);
       switch (action) {
         case fromEngineActions.ADD_OBJECT: {
           // this could be an object or character
@@ -99,7 +99,7 @@ export function useQueueHandler() {
 
   const handleToTimelineActions = useCallback(
     ({ action, data }: QueueSubscribeType) => {
-      console.log("TO TIMELINE", action, data);
+      //console.log("TO TIMELINE", action, data);
       switch (action) {
         case toTimelineActions.ADD_KEYFRAME:
           addKeyframe(data as QueueKeyframe, currentTime.value);
