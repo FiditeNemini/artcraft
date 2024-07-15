@@ -196,7 +196,8 @@ export class VideoGeneration {
 
     this.editor.updateLoad({
       progress: 50,
-      message: "Processing...",
+      message:
+        "Please stay on this screen while your video is being processed.",
     });
 
     const upload_tokens = {
