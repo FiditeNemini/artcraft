@@ -74,8 +74,6 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_user_tts_inference_results_handler;
-use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
 use crate::http_server::endpoints::tts::search_tts_models_handler::search_tts_models_handler;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler;
@@ -122,19 +120,15 @@ use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result
 use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
 use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
-use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
-use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::workflows::enqueue_comfy_ui_handler::enqueue_comfy_ui_handler;
-use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler;
-use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
 use crate::http_server::routes::beta_key_routes::add_beta_key_routes;
 use crate::http_server::routes::job_routes::add_job_routes;
 use crate::http_server::routes::media_files_routes::add_media_file_routes;
 use crate::http_server::routes::moderation_routes::add_moderator_routes;
 use crate::http_server::routes::user_routes::add_user_routes;
 use crate::http_server::routes::weights_routes::add_weights_routes;
+use crate::http_server::routes::workflow_routes::add_workflow_routes;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -959,41 +953,6 @@ fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
                 web::scope("/enqueue")
                     .route("/inference", web::post().to(enqueue_image_generation_request))
             )
-    )
-}
-
-
-fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
-    where
-        B: MessageBody,
-        T: ServiceFactory<
-            ServiceRequest,
-            Config = (),
-            Response = ServiceResponse<B>,
-            Error = Error,
-            InitError = (),
-        >,
-{
-
-    app.service(
-      // NB: We don't want this to live alongside the older endpoints for comfy and workflows -
-      // We don't want to give away that we're using Comfy or ComfyUI workflows as a technique.
-      web::scope("/v1/video")
-          .service(web::resource("/enqueue_vst")
-              .route(web::post().to(enqueue_video_style_transfer_handler))
-              .route(web::head().to(|| HttpResponse::Ok()))
-          )
-    ).service(
-      web::scope("/v1/workflow")
-          .service(
-              web::scope("/upload")
-                  .route("/prompt", web::post().to(enqueue_workflow_upload_request))
-          )
-          .service(
-              web::scope("/comfy")
-                  .route("/create", web::post().to(enqueue_comfy_ui_handler))
-
-        )
     )
 }
 

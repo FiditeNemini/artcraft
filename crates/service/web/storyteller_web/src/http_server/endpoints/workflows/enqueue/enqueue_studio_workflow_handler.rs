@@ -216,7 +216,7 @@ impl std::fmt::Display for EnqueueVideoStyleTransferError {
   ),
   params(("request" = EnqueueVideoStyleTransferRequest, description = "Payload for request"))
 )]
-pub async fn enqueue_video_style_transfer_workflow_handler(
+pub async fn enqueue_studio_workflow_handler(
   http_request: HttpRequest,
   request: web::Json<EnqueueVideoStyleTransferRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueVideoStyleTransferError>
