@@ -1,4 +1,4 @@
-import { Badge, Panel } from "components/common";
+import { Badge, Button, Panel } from "components/common";
 import React, { useState } from "react";
 import "./VstSectionV2.scss";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -12,9 +12,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
   faArrowDownLong,
+  faArrowRight,
   faArrowRightLong,
 } from "@fortawesome/pro-solid-svg-icons";
-import TypeformButton from "components/common/TypeformButton";
+// import TypeformButton from "components/common/TypeformButton";
 // import { Link } from "react-router-dom";
 
 interface VstSectionV2Props {}
@@ -120,18 +121,17 @@ export default function VstSectionV2(props: VstSectionV2Props) {
           unique styles and effects to create visually captivating content.
         </p>
         <div className="d-flex">
-          {/* <Button
-            onClick={openTypeform}
-            label="Join Waitlist for Video Style Transfer"
-            small={true}
-            icon={faArrowRight}
+          <Button
+            to="/style-video"
+            label="Stylize a Video"
             iconFlip={true}
-          /> */}
-          <TypeformButton
+            icon={faArrowRight}
+          />
+          {/* <TypeformButton
             label="Join the Waitlist"
             formId="oWnV91Z9"
             labelSubmitted="You're on the waitlist!"
-          />
+          /> */}
         </div>
       </div>
       <div className="row gx-0">

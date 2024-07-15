@@ -18,6 +18,7 @@ import {
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import MentionsSection from "components/common/MentionsSection";
+import VstSectionV2 from "./components/VstSectionV2";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -68,12 +69,14 @@ function LandingPage(props: Props) {
                   }
                 />
                 {/* <VstSectionV1 /> */}
-                {/* <VstSectionV2 /> */}
+                <VstSectionV2 />
                 <div className="py-5">
                   <StorytellerStudioCTA />
                 </div>
               </>
             )}
+
+            {isLoggedIn && <VstSectionV2 />}
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
 
