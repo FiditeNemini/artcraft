@@ -2315,6 +2315,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "enums_public"
+version = "0.0.1"
+dependencies = [
+ "enums",
+ "errors",
+ "my-workspace-hack",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "strum",
+ "toml 0.8.14",
+ "utoipa",
+]
+
+[[package]]
 name = "env_filter"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -7,6 +7,7 @@ members = [
   "crates/_types/buckets",
   "crates/_types/composite_identifiers",
   "crates/_types/enums",
+  "crates/_types/enums_public",
   "crates/_types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
   "crates/_types/tokens",
 
