@@ -41,7 +41,6 @@ export default function StyleVideo() {
   const [useCinematic, setUseCinematic] = useState(true);
   const [enableLipsync, setEnableLipsync] = useState(false);
   const [strength, setStrength] = useState(1.0);
-  const [visualStrength, setVisualStrength] = useState(100);
   const { enqueue } = useInferenceJobs();
   const { setSelectedStyle, setCurrentImage, selectedStyleValue } =
     useStyleStore();
@@ -115,10 +114,7 @@ export default function StyleVideo() {
   };
 
   const handleSliderChange = ({ target }: { target: any }) => {
-    const decimalValue = parseFloat(target.value);
-    const visualValue = Math.round(decimalValue * 100);
-    setStrength(decimalValue);
-    setVisualStrength(visualValue);
+    setStrength(parseFloat(target.value));
   };
 
   const storytellerCTA = (
@@ -219,7 +215,7 @@ export default function StyleVideo() {
                     aspectRatio: "landscape",
                     name: "mediaToken",
                     className: "h-100",
-                    value: pageMediaToken,
+                    value: mediaToken,
                     onPromptUpdate,
                     onChange: ({ target }: { target: any }) => {
                       mediaTokenSet(target.value);
@@ -296,7 +292,9 @@ export default function StyleVideo() {
                     }}
                   />
                 </div>
-                <h6 className="mt-4">Style Strength ({visualStrength}%)</h6>
+                <h6 className="mt-4">
+                  Style Strength ({Math.round(strength * 100)}%)
+                </h6>
                 <div className="w-100">
                   <Slider
                     min={0.0}
