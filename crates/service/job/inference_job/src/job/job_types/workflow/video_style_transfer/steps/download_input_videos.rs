@@ -14,10 +14,10 @@ use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
+use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
+use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::JobArgs;
+use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
+use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 
 pub struct DownloadInputVideoArgs<'a> {
   pub job_args: &'a JobArgs<'a>,

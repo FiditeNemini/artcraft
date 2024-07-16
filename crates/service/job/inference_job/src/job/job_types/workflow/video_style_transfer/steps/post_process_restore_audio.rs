@@ -5,8 +5,8 @@ use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowA
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::video_pathing::VideoPathing;
+use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
+use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::VideoPathing;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 
 pub struct PostProcessRestoreVideoArgs<'a> {

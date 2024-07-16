@@ -12,7 +12,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::steps::check_and_validate_job::JobArgs;
+use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::JobArgs;
 
 const DEFAULT_SUFFIX : &str = ".jpg";
 

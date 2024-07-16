@@ -18,15 +18,15 @@ use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_process_job_args::ComfyProcessJobArgs;
-use crate::job::job_types::workflow::process_single_wf_job::get_workflow_args_from_job;
+use crate::job::job_types::workflow::comfy_process_job_args::ComfyProcessJobArgs;
+use crate::job::job_types::workflow::get_workflow_args_from_job::get_workflow_args_from_job;
 
 pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError>{
    let job = args.job;
    let deps = args.job_dependencies;
    let mysql_pool = &deps.db.mysql_pool;
 
-    let wf_args = get_workflow_args_from_job(&args).await?;
+    let wf_args = get_workflow_args_from_job(&args)?;
 
     let title = match wf_args.maybe_title {
         Some(val) => {

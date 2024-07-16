@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
+use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
 
 /// This is a temporary measure until we start using tempdirs for intermediate inputs and outputs.
 pub struct ComfyDirs {

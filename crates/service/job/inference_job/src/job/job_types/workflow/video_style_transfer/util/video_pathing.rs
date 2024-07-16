@@ -6,7 +6,7 @@ use filesys::file_exists::file_exists;
 use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::MediaFilesByTokensRecord;
 use mysql_queries::queries::media_files::get::get_media_file::MediaFile;
 
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_dirs::ComfyDirs;
+use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
 
 /// Keep track of where we download videos to and where they end up after processing.
 pub struct VideoPathing {

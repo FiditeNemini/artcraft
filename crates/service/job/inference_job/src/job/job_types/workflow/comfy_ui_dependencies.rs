@@ -8,7 +8,7 @@ use tokio::time::sleep;
 use easyenv::get_env_string_optional;
 use errors::AnyhowResult;
 
-use crate::job::job_types::workflow::comfy_ui::video_style_transfer::util::comfy_ui_inference_command::ComfyInferenceCommand;
+use crate::job::job_types::workflow::video_style_transfer::util::comfy_ui_inference_command::ComfyInferenceCommand;
 use crate::util::common_commands::ffmpeg_command_runner::FfmpegCommandRunner;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 

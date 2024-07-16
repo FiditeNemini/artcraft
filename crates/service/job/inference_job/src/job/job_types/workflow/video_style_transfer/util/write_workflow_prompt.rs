@@ -10,7 +10,7 @@ use errors::AnyhowResult;
 use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
+use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
 
 pub struct WorkflowPromptArgs<'a> {
   pub workflow_path: &'a str,
