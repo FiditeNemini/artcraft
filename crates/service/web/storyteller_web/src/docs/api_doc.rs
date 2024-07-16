@@ -127,10 +127,13 @@ use crate::http_server::endpoints::weights::list_weights_by_user_handler::*;
 use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::*;
 use crate::http_server::endpoints::weights::update_weight_handler::*;
-use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::*;
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::*;
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_request::*;
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_response::*;
+use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 
 #[derive(OpenApi)]
@@ -326,6 +329,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     CreateUserBookmarkSuccessResponse,
     DeleteCommentError,
     DeleteCommentPathInfo,
+    VstError,
+    VstRequest,
+    VstSuccessResponse,
     DeleteCommentRequest,
     DeleteFeaturedItemError,
     DeleteFeaturedItemRequest,
@@ -358,18 +364,12 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueLivePortraitWorkflowError,
     EnqueueLivePortraitWorkflowRequest,
     EnqueueLivePortraitWorkflowSuccessResponse,
-    EnqueueStudioWorkflowError,
-    EnqueueStudioWorkflowRequest,
-    EnqueueStudioWorkflowSuccessResponse,
     EnqueueTTSRequest,
     EnqueueTTSRequestError,
     EnqueueTTSRequestSuccessResponse,
     EnqueueVideoStyleTransferError,
     EnqueueVideoStyleTransferRequest,
     EnqueueVideoStyleTransferSuccessResponse,
-    EnqueueVideoStyleTransferWorkflowError,
-    EnqueueVideoStyleTransferWorkflowRequest,
-    EnqueueVideoStyleTransferWorkflowSuccessResponse,
     EnqueueVoiceConversionInferenceError,
     EnqueueVoiceConversionInferenceRequest,
     EnqueueVoiceConversionInferenceSuccessResponse,
