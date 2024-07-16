@@ -13,6 +13,7 @@ use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_s
 use redis_common::redis_keys::RedisKeys;
 
 use crate::job::job_loop::determine_dependency_status::determine_dependency_status;
+use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job::job_types::format_conversion::process_single_format_conversion_job::process_single_format_conversion_job;
@@ -182,50 +183,10 @@ async fn do_process_single_job(
 
   // ==================== HANDLE DIFFERENT INFERENCE TYPES ==================== //
 
-  // TODO(bt,2024-07-16): This logic needs to be cleaned up and better coordinated with the setup env vars.
-
-  let job_success_result = match job.inference_category {
-    InferenceCategory::LipsyncAnimation => {
-      process_single_lipsync_job(job_dependencies, job).await?
-    }
-    InferenceCategory::TextToSpeech => {
-      process_single_tts_job(job_dependencies, job).await?
-    }
-    InferenceCategory::VoiceConversion => {
-      process_single_vc_job(job_dependencies, job).await?
-    }
-    InferenceCategory::VideoFilter => {
-      process_single_vf_job(job_dependencies, job).await?
-    }
-    InferenceCategory::ImageGeneration => {
-      process_single_ig_job(job_dependencies, job).await?
-    }
-    InferenceCategory::Mocap => {
-      process_single_mc_job(job_dependencies, job).await?
-    }
-    InferenceCategory::FormatConversion => {
-      process_single_format_conversion_job(job_dependencies, job).await?
-    }
-    InferenceCategory::ConvertBvhToWorkflow => {
-      process_single_render_engine_scene_job(job_dependencies, job).await?
-    }
-    InferenceCategory::Workflow => {
-      process_single_workflow_job(job_dependencies, job).await?
-    }
-    InferenceCategory::DeprecatedField => {
-      match job.job_type {
-        InferenceJobType::VideoRender
-        | InferenceJobType::LivePortrait
-        | InferenceJobType::ComfyUi => {
-          // NB: These are all comfy workflow jobs too
-          process_single_workflow_job(job_dependencies, job).await?
-        }
-        _ => {
-          return Err(ProcessSingleJobError::InvalidJob(
-            anyhow!("invalid job for dispatch. type: {:?}", job.job_type)))
-        }
-      }
-    }
+  let job_success_result = if can_use_new_dispatch(job) {
+    new_dispatch(job_dependencies, job).await?
+  } else {
+    old_dispatch(job_dependencies, job).await?
   };
 
   let maybe_entity_type = job_success_result.maybe_result_entity
@@ -287,4 +248,75 @@ async fn do_process_single_job(
   info!("Job done: {} : {:?}", job.id.0, job.inference_job_token);
 
   Ok(ProcessSingleJobSuccessCase::JobCompleted)
+}
+
+fn can_use_new_dispatch(job: &AvailableInferenceJob) -> bool {
+  match job.job_type {
+    InferenceJobType::VideoRender => true,
+    InferenceJobType::LivePortrait => true,
+    _ => false,
+  }
+}
+
+async fn new_dispatch(
+  job_dependencies: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
+  let job_success_result = match job.job_type {
+    InferenceJobType::VideoRender
+    | InferenceJobType::LivePortrait
+    | InferenceJobType::ComfyUi => {
+      // NB: These are all comfy workflow jobs too
+      process_single_workflow_job(job_dependencies, job).await?
+    }
+    _ => {
+      return Err(ProcessSingleJobError::InvalidJob(
+        anyhow!("invalid job type for dispatch: {:?}", job.job_type)))
+    }
+  };
+
+  Ok(job_success_result)
+}
+
+async fn old_dispatch(
+  job_dependencies: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> Result<JobSuccessResult, ProcessSingleJobError > {
+
+  let job_success_result = match job.inference_category {
+    InferenceCategory::LipsyncAnimation => {
+      process_single_lipsync_job(job_dependencies, job).await?
+    }
+    InferenceCategory::TextToSpeech => {
+      process_single_tts_job(job_dependencies, job).await?
+    }
+    InferenceCategory::VoiceConversion => {
+      process_single_vc_job(job_dependencies, job).await?
+    }
+    InferenceCategory::VideoFilter => {
+      process_single_vf_job(job_dependencies, job).await?
+    }
+    InferenceCategory::ImageGeneration => {
+      process_single_ig_job(job_dependencies, job).await?
+    }
+    InferenceCategory::Mocap => {
+      process_single_mc_job(job_dependencies, job).await?
+    }
+    InferenceCategory::FormatConversion => {
+      process_single_format_conversion_job(job_dependencies, job).await?
+    }
+    InferenceCategory::ConvertBvhToWorkflow => {
+      process_single_render_engine_scene_job(job_dependencies, job).await?
+    }
+    InferenceCategory::Workflow => {
+      process_single_workflow_job(job_dependencies, job).await?
+    }
+    InferenceCategory::DeprecatedField => {
+      return Err(ProcessSingleJobError::InvalidJob(
+        anyhow!("invalid job category for dispatch: {:?}", job.inference_category)))
+    }
+  };
+
+  Ok(job_success_result)
 }
