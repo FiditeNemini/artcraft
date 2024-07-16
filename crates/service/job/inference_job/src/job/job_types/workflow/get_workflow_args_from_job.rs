@@ -8,6 +8,7 @@ use crate::job::job_types::workflow::comfy_process_job_args::ComfyProcessJobArgs
 pub fn get_workflow_args_from_job(
   args: &ComfyProcessJobArgs<'_>
 ) -> Result<WorkflowArgs, ProcessSingleJobError> {
+
   let inference_args = args.job.maybe_inference_args
       .as_ref()
       .map(|args: &GenericInferenceArgs| args.args.as_ref())
