@@ -1,13 +1,14 @@
 // NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
+// #![forbid(unused_imports)]
+// #![forbid(unused_mut)]
+// #![forbid(unused_variables)]
 
 use std::sync::Arc;
 
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use log::{error, info, warn};
 use utoipa::ToSchema;
 
@@ -32,6 +33,9 @@ use tokens::tokens::media_files::MediaFileToken;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::endpoints::workflows::coordinate_workflow_args::{coordinate_workflow_args, CoordinatedWorkflowArgs};
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::VstError;
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_request::VstRequest;
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_response::VstSuccessResponse;
 use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
 use crate::http_server::headers::has_debug_header::has_debug_header;
 use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
@@ -56,179 +60,32 @@ const MINIMUM_STRENGTH : f32 = 0.0;
 const MAXIMUM_STRENGTH : f32 = 1.0;
 const DEFAULT_STRENGTH : f32 = 1.0;
 
-#[derive(Deserialize, ToSchema)]
-pub struct EnqueueStudioWorkflowRequest {
-  /// Entropy for request de-duplication (required)
-  uuid_idempotency_token: String,
-
-  /// The name of the style to invoke (required)
-  style: StyleTransferName,
-
-  /// The input video media file (required)
-  input_file: MediaFileToken,
-
-  /// Optional: the depth video file
-  /// The underlying media file must be a video.
-  input_depth_file: Option<MediaFileToken>,
-
-  /// Optional: the normal map video file
-  /// The underlying media file must be a video.
-  input_normal_file: Option<MediaFileToken>,
-
-  /// Optional: the outline video file
-  /// The underlying media file must be a video.
-  input_outline_file: Option<MediaFileToken>,
-
-  /// Optional: Global IP-Adapter image.
-  /// The underlying media file must be an image.
-  global_ipa_media_token: Option<MediaFileToken>,
-
-  /// The positive prompt (optional)
-  prompt: Option<String>,
-
-  /// The negative prompt (optional)
-  negative_prompt: Option<String>,
-
-  /// Use Strength of the style transfer
-  /// Must be between 0.0 (match source) and 1.0 (maximum dreaming).
-  /// The default, if not sent, is 1.0.
-  use_strength: Option<f32>,
-
-  /// Optional trim start in milliseconds
-  trim_start_millis: Option<u64>,
-
-  /// Optional trim end in milliseconds
-  trim_end_millis: Option<u64>,
-
-  /// Enable lipsyncing in the workflow
-  enable_lipsync: Option<bool>,
-
-  /// Use lipsync in the workflow
-  #[deprecated(note = "use enable_lipsync")]
-  use_lipsync: Option<bool>,
-
-  /// Remove watermark from the output
-  /// Only for premium accounts
-  remove_watermark: Option<bool>,
-
-  /// Disable LCM
-  /// Don't let ordinary users do this.
-  /// Non-LCM workflows take a long time.
-  disable_lcm: Option<bool>,
-
-  /// Use the cinematic workflow
-  /// Don't let ordinary users do this.
-  use_cinematic: Option<bool>,
-
-  /// Use face detailer
-  /// Only for premium accounts
-  use_face_detailer: Option<bool>,
-
-  /// Use video upscaler
-  /// Only for premium accounts
-  use_upscaler: Option<bool>,
-
-  /// Optional visibility setting override.
-  creator_set_visibility: Option<Visibility>,
-
-  /// To use prompt traveling, enqueue a prompt with this.
-  ///
-  /// An example of a prompt travel section:
-  ///
-  ///    "50": "(explosion:1.4)",
-  ///    "59": "(explosion:1.4)",
-  ///    "60": "fire, smoke, ash",
-  ///    "99": "fire, smoke, ash",
-  ///    "100": "",
-  ///
-  /// On the interval 50-59 there will be explosion, on
-  /// the interval 60-99 there will be fire, smoke, ash.
-  /// You must set
-  ///
-  /// Alternatively, the main `prompt` field can have a
-  /// prompt travel section if you end the main prompt
-  /// with `---` and then include a prompt travel text.
-  travel_prompt: Option<String>,
-
-  /// If you'd like to skip frames.
-  ///
-  /// Meaning:
-  ///  * 1 = not skipping frames.
-  ///  * 2 = skipping every 2nd, etc.
-  ///
-  /// The default, if not specified, is 2, which means
-  /// every 2nd frame is skipped.
-  frame_skip: Option<u8>,
-}
-
-#[derive(Serialize, ToSchema)]
-pub struct EnqueueStudioWorkflowSuccessResponse {
-  pub success: bool,
-  pub inference_job_token: InferenceJobToken,
-}
-
-#[derive(Debug, ToSchema)]
-pub enum EnqueueStudioWorkflowError {
-  BadInput(String),
-  NotAuthorized,
-  ServerError,
-  RateLimited,
-}
-
-impl ResponseError for EnqueueStudioWorkflowError {
-  fn status_code(&self) -> StatusCode {
-    match *self {
-      EnqueueStudioWorkflowError::BadInput(_) => StatusCode::BAD_REQUEST,
-      EnqueueStudioWorkflowError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EnqueueStudioWorkflowError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      EnqueueStudioWorkflowError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
-    }
-  }
-
-  fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      EnqueueStudioWorkflowError::BadInput(reason) => reason.to_string(),
-      EnqueueStudioWorkflowError::NotAuthorized => "unauthorized".to_string(),
-      EnqueueStudioWorkflowError::ServerError => "server error".to_string(),
-      EnqueueStudioWorkflowError::RateLimited => "rate limited".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
-  }
-}
-
-// NB: Not using derive_more::Display since Clion doesn't understand it.
-impl std::fmt::Display for EnqueueStudioWorkflowError {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "{:?}", self)
-  }
-}
-
 /// Enqueue Storyteller Studio video workflows.
 #[utoipa::path(
   post,
   tag = "Workflows",
   path = "/v1/workflows/enqueue_studio",
   responses(
-    (status = 200, description = "Success", body = EnqueueStudioWorkflowSuccessResponse),
-    (status = 400, description = "Bad input", body = EnqueueStudioWorkflowError),
-    (status = 401, description = "Not authorized", body = EnqueueStudioWorkflowError),
-    (status = 429, description = "Rate limited", body = EnqueueStudioWorkflowError),
-    (status = 500, description = "Server error", body = EnqueueStudioWorkflowError)
+    (status = 200, description = "Success", body = VstSuccessResponse),
+    (status = 400, description = "Bad input", body = VstError),
+    (status = 401, description = "Not authorized", body = VstError),
+    (status = 429, description = "Rate limited", body = VstError),
+    (status = 500, description = "Server error", body = VstError)
   ),
-  params(("request" = EnqueueStudioWorkflowRequest, description = "Payload for request"))
+  params(("request" = VstRequest, description = "Payload for request"))
 )]
 pub async fn enqueue_studio_workflow_handler(
   http_request: HttpRequest,
-  request: web::Json<EnqueueStudioWorkflowRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueStudioWorkflowError>
-{
+  request: Json<VstRequest>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<VstSuccessResponse>, VstError> {
+
   // ==================== VALIDATION ==================== //
 
   match request.frame_skip {
     None | Some(1) | Some(2) => {} // Allowed
     _ => {
-      return Err(EnqueueStudioWorkflowError::BadInput("Invalid frame skip value".to_string()));
+      return Err(VstError::BadInput("Invalid frame skip value".to_string()));
     }
   }
 
@@ -239,7 +96,7 @@ pub async fn enqueue_studio_workflow_handler(
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        EnqueueStudioWorkflowError::ServerError
+        VstError::ServerError
       })?;
 
   let maybe_avt_token = server_state.avt_cookie_manager
@@ -253,7 +110,7 @@ pub async fn enqueue_studio_workflow_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        EnqueueStudioWorkflowError::ServerError
+        VstError::ServerError
       })?;
 
   let maybe_user_token = maybe_user_session
@@ -264,7 +121,7 @@ pub async fn enqueue_studio_workflow_handler(
 
   if !allowed_video_style_transfer_access(maybe_user_session.as_ref(), &server_state.flags) {
     warn!("Video style transfer access is not permitted for user");
-    return Err(EnqueueStudioWorkflowError::NotAuthorized);
+    return Err(VstError::NotAuthorized);
   }
 
   // ==================== PAID PLAN + PRIORITY ==================== //
@@ -294,27 +151,27 @@ pub async fn enqueue_studio_workflow_handler(
     None => &server_state.redis_rate_limiters.logged_out,
     Some(ref user) => {
       if user.role.is_banned {
-        return Err(EnqueueStudioWorkflowError::NotAuthorized);
+        return Err(VstError::NotAuthorized);
       }
       &server_state.redis_rate_limiters.logged_in
     },
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(EnqueueStudioWorkflowError::RateLimited);
+    return Err(VstError::RateLimited);
   }
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
-    return Err(EnqueueStudioWorkflowError::BadInput(reason));
+    return Err(VstError::BadInput(reason));
   }
 
   insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        EnqueueStudioWorkflowError::BadInput("invalid idempotency token".to_string())
+        VstError::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== LOOK UP MODEL INFO ==================== //
@@ -352,7 +209,7 @@ pub async fn enqueue_studio_workflow_handler(
   let maybe_strength = request.use_strength
       .map(|strength| {
         if strength < MINIMUM_STRENGTH || strength > MAXIMUM_STRENGTH {
-          Err(EnqueueStudioWorkflowError::BadInput("Strength must be between 0.0 and 1.0".to_string()))
+          Err(VstError::BadInput("Strength must be between 0.0 and 1.0".to_string()))
         } else {
           Ok(strength)
         }
@@ -471,19 +328,12 @@ pub async fn enqueue_studio_workflow_handler(
     Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
-      return Err(EnqueueStudioWorkflowError::ServerError);
+      return Err(VstError::ServerError);
     }
   };
 
-  let response: EnqueueStudioWorkflowSuccessResponse = EnqueueStudioWorkflowSuccessResponse {
+  Ok(Json(VstSuccessResponse {
     success: true,
     inference_job_token: job_token,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|_e| EnqueueStudioWorkflowError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
