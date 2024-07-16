@@ -39,6 +39,7 @@ use crate::http_server::validations::validate_idempotency_token_format::validate
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
+use crate::util::cleaners::empty_media_file_token_to_null::empty_media_file_token_to_null;
 
 /// The default ending trim point of a video if not supplied in the request.
 const DEFAULT_TRIM_MILLISECONDS_END : u64 = 7_000;
@@ -393,10 +394,10 @@ pub async fn enqueue_studio_workflow_handler(
 
     // Input files
     maybe_input_file: Some(request.input_file.clone()),
-    maybe_input_depth_file: empty_token_to_null(request.input_depth_file.as_ref()),
-    maybe_input_normal_file: empty_token_to_null(request.input_normal_file.as_ref()),
-    maybe_input_outline_file: empty_token_to_null(request.input_outline_file.as_ref()),
-    global_ip_adapter_token: empty_token_to_null(request.global_ipa_media_token.as_ref()),
+    maybe_input_depth_file: empty_media_file_token_to_null(request.input_depth_file.as_ref()),
+    maybe_input_normal_file: empty_media_file_token_to_null(request.input_normal_file.as_ref()),
+    maybe_input_outline_file: empty_media_file_token_to_null(request.input_outline_file.as_ref()),
+    global_ip_adapter_token: empty_media_file_token_to_null(request.global_ipa_media_token.as_ref()),
 
     // Other inputs
     style_name: Some(request.style),
@@ -484,11 +485,4 @@ pub async fn enqueue_studio_workflow_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
-}
-
-// NB: Frontend is mistakenly sending empty string tokens - ignore those
-fn empty_token_to_null(maybe_token: Option<&MediaFileToken>) -> Option<MediaFileToken> {
-  maybe_token
-      .filter(|t| t.as_str().trim_or_empty().is_some())
-      .map(|t| t.clone())
 }

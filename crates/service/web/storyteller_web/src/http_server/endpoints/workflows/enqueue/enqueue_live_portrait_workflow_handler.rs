@@ -8,6 +8,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use log::{error, info, warn};
 use utoipa::ToSchema;
 
@@ -116,7 +117,7 @@ impl std::fmt::Display for EnqueueLivePortraitError {
 pub async fn enqueue_live_portrait_workflow_handler(
   http_request: HttpRequest,
   request: web::Json<EnqueueLivePortraitRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueLivePortraitError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<Json<EnqueueLivePortraitSuccessResponse>, EnqueueLivePortraitError>
 {
   // ==================== DB ==================== //
 
@@ -280,22 +281,8 @@ pub async fn enqueue_live_portrait_workflow_handler(
     }
   };
 
-  let response: EnqueueLivePortraitSuccessResponse = EnqueueLivePortraitSuccessResponse {
+  Ok(Json(EnqueueLivePortraitSuccessResponse {
     success: true,
     inference_job_token: job_token,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|_e| EnqueueLivePortraitError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
-}
-
-// NB: Frontend is mistakenly sending empty string tokens - ignore those
-fn empty_token_to_null(maybe_token: Option<&MediaFileToken>) -> Option<MediaFileToken> {
-  maybe_token
-      .filter(|t| t.as_str().trim_or_empty().is_some())
-      .map(|t| t.clone())
+  }))
 }
