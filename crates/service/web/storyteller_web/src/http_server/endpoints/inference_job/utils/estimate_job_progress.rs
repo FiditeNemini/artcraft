@@ -61,6 +61,7 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus) -> u8 {
     InferenceCategory::ImageGeneration => 0,
     InferenceCategory::VideoFilter => 0,
     InferenceCategory::ConvertBvhToWorkflow => 0,
+    InferenceCategory::DeprecatedField => 0, // TODO(bt,2024-07-16): Read job type instead.
   };
 
   // We shouldn't show 100% if the job isn't complete.

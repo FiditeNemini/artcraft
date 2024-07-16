@@ -348,6 +348,9 @@ fn record_to_payload(
         InferenceCategory::ConvertBvhToWorkflow => {
           "".to_string()
         }
+        InferenceCategory::DeprecatedField => {
+          "".to_string() // TODO(bt,2024-07-15): Fix. This should read job type.
+        }
       };
      
       ResultDetailsResponse {

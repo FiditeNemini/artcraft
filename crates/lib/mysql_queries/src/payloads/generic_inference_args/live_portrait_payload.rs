@@ -17,10 +17,6 @@ pub struct LivePortraitPayload {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub remove_watermark: Option<bool>,
 
-  #[serde(rename = "cv")]
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub creator_visibility: Option<Visibility>,
-
   /// This is a debugging flag.
   #[serde(rename = "sp")]
   #[serde(skip_serializing_if = "Option::is_none")]

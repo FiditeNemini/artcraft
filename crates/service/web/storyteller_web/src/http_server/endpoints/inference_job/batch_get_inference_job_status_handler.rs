@@ -358,8 +358,11 @@ fn db_record_to_response_payload(
         InferenceCategory::ConvertBvhToWorkflow => {
           "".to_string()
         }
+        InferenceCategory::DeprecatedField => {
+          "".to_string() // TODO(bt,2024-07-16): Read job type instead
+        }
       };
-     
+
       BatchResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,

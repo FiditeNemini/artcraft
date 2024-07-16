@@ -28,6 +28,7 @@ pub struct AvailableInferenceJob {
   pub uuid_idempotency_token: String, // TODO: This is temporarily being used for upload paths.
 
   // Inference class
+  pub job_type: InferenceJobType,
   pub inference_category: InferenceCategory,
 
   pub maybe_model_type: Option<InferenceModelType>,
@@ -124,6 +125,8 @@ pub async fn list_available_generic_inference_jobs(
               .map(|s| MediaFileToken::new_from_str(&s)),
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
+          job_type: InferenceJobType::from_str(&record.job_type)
+              .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           inference_category: InferenceCategory::from_str(&record.inference_category)
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           maybe_model_type: record.maybe_model_type
@@ -211,6 +214,7 @@ SELECT
   token as inference_job_token,
   uuid_idempotency_token,
 
+  job_type,
   inference_category,
   maybe_model_type,
   maybe_model_token,
@@ -308,6 +312,7 @@ struct AvailableInferenceJobRawInternal {
 
   // Inference information
   //pub inference_category: InferenceCategory,
+  pub job_type: String,
   pub inference_category: String,
 
   pub maybe_model_type: Option<String>,

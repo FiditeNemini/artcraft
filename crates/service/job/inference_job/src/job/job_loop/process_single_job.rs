@@ -6,6 +6,7 @@ use opentelemetry::KeyValue as OtelAttribute;
 use r2d2_redis::redis::Commands;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
@@ -181,6 +182,8 @@ async fn do_process_single_job(
 
   // ==================== HANDLE DIFFERENT INFERENCE TYPES ==================== //
 
+  // TODO(bt,2024-07-16): This logic needs to be cleaned up and better coordinated with the setup env vars.
+
   let job_success_result = match job.inference_category {
     InferenceCategory::LipsyncAnimation => {
       process_single_lipsync_job(job_dependencies, job).await?
@@ -200,14 +203,28 @@ async fn do_process_single_job(
     InferenceCategory::Mocap => {
       process_single_mc_job(job_dependencies, job).await?
     }
-    InferenceCategory::Workflow => {
-      process_single_workflow_job(job_dependencies, job).await?
-    }
     InferenceCategory::FormatConversion => {
       process_single_format_conversion_job(job_dependencies, job).await?
     }
     InferenceCategory::ConvertBvhToWorkflow => {
       process_single_render_engine_scene_job(job_dependencies, job).await?
+    }
+    InferenceCategory::Workflow => {
+      process_single_workflow_job(job_dependencies, job).await?
+    }
+    InferenceCategory::DeprecatedField => {
+      match job.job_type {
+        InferenceJobType::VideoRender
+        | InferenceJobType::LivePortrait
+        | InferenceJobType::ComfyUi => {
+          // NB: These are all comfy workflow jobs too
+          process_single_workflow_job(job_dependencies, job).await?
+        }
+        _ => {
+          return Err(ProcessSingleJobError::InvalidJob(
+            anyhow!("invalid job for dispatch. type: {:?}", job.job_type)))
+        }
+      }
     }
   };
 

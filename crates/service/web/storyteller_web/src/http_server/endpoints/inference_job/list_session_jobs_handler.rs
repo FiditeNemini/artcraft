@@ -414,6 +414,9 @@ fn db_record_to_response_payload(
         InferenceCategory::ConvertBvhToWorkflow => {
           "".to_string()
         }
+        InferenceCategory::DeprecatedField => {
+          "".to_string() // TODO(bt,2024-07-16): Read job type instead
+        }
       };
      
       ListSessionResultDetailsResponse {

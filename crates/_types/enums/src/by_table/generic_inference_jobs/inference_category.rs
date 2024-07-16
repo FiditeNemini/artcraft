@@ -16,6 +16,11 @@ use utoipa::ToSchema;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default, ToSchema)]
 pub enum InferenceCategory {
+  /// Deprecate this field !!!
+  /// We should drain all jobs from using this database field, then remove it.
+  #[serde(rename = "deprecated_field")]
+  DeprecatedField,
+
   /// Facial lipsync animation (eg. SadTalker, Wav2Lip)
   #[serde(rename = "lipsync_animation")]
   #[default]
@@ -68,6 +73,7 @@ impl_mysql_from_row!(InferenceCategory);
 impl InferenceCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::DeprecatedField => "deprecated_field",
       Self::LipsyncAnimation => "lipsync_animation",
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
@@ -82,6 +88,7 @@ impl InferenceCategory {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "deprecated_field" => Ok(Self::DeprecatedField),
       "lipsync_animation" => Ok(Self::LipsyncAnimation),
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
@@ -99,6 +106,7 @@ impl InferenceCategory {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::DeprecatedField,
       Self::LipsyncAnimation,
       Self::TextToSpeech,
       Self::VoiceConversion,
@@ -122,6 +130,7 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceCategory::DeprecatedField, "deprecated_field");
       assert_serialization(InferenceCategory::LipsyncAnimation, "lipsync_animation");
       assert_serialization(InferenceCategory::TextToSpeech, "text_to_speech");
       assert_serialization(InferenceCategory::VoiceConversion, "voice_conversion");
@@ -135,6 +144,7 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceCategory::DeprecatedField.to_str(), "deprecated_field");
       assert_eq!(InferenceCategory::LipsyncAnimation.to_str(), "lipsync_animation");
       assert_eq!(InferenceCategory::TextToSpeech.to_str(), "text_to_speech");
       assert_eq!(InferenceCategory::VoiceConversion.to_str(), "voice_conversion");
@@ -148,6 +158,7 @@ mod tests {
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceCategory::from_str("deprecated_field").unwrap(), InferenceCategory::DeprecatedField);
       assert_eq!(InferenceCategory::from_str("lipsync_animation").unwrap(), InferenceCategory::LipsyncAnimation);
       assert_eq!(InferenceCategory::from_str("text_to_speech").unwrap(), InferenceCategory::TextToSpeech);
       assert_eq!(InferenceCategory::from_str("voice_conversion").unwrap(), InferenceCategory::VoiceConversion);
@@ -163,7 +174,8 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceCategory::all_variants();
-      assert_eq!(variants.len(), 9);
+      assert_eq!(variants.len(), 10);
+      assert_eq!(variants.pop_first(), Some(InferenceCategory::DeprecatedField));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::LipsyncAnimation));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::TextToSpeech));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::VoiceConversion));
