@@ -69,14 +69,20 @@ fn handle_prompts(args: &mut CoordinatedWorkflowArgs) {
 }
 
 fn handle_flags(args: &mut CoordinatedWorkflowArgs, is_staff: bool) {
-  // TODO(bt,2024-07-15): Temporarily do this.
-  args.use_cinematic = Some(true);
 
   if !is_staff {
     // Non-staff cannot use these workflows
     args.disable_lcm = None;
     args.remove_watermark = None;
   }
+
+  if args.use_upscaler == Some(true) {
+    args.use_cinematic = None;
+  } else {
+    // TODO(bt,2024-07-15): Temporarily do this.
+    args.use_cinematic = Some(true);
+  }
+
 
   if args.use_cinematic == Some(true) {
     // use_cinematic has a built-in upscaler
@@ -182,11 +188,36 @@ mod tests {
 
       let coordinated_args = coordinate_workflow_args(args, true);
 
+      // By default, cinematic is on.
+      assert_eq!(coordinated_args.use_cinematic, Some(true));
+      
+      // Everything else is off.
       assert_eq!(coordinated_args.use_lipsync, None);
       assert_eq!(coordinated_args.use_face_detailer, None);
       assert_eq!(coordinated_args.use_upscaler, None);
       assert_eq!(coordinated_args.disable_lcm, None);
-      assert_eq!(coordinated_args.use_cinematic, Some(true));
+    }
+
+    #[test]
+    fn test_upscaler() {
+      let args = CoordinatedWorkflowArgs {
+        prompt: None,
+        travel_prompt: None,
+        use_lipsync: None,
+        use_face_detailer: None,
+        use_upscaler: Some(true),
+        disable_lcm: None,
+        use_cinematic: None,
+        remove_watermark: None,
+      };
+
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.use_lipsync, None);
+      assert_eq!(coordinated_args.use_face_detailer, None);
+      assert_eq!(coordinated_args.use_upscaler, Some(true));
+      assert_eq!(coordinated_args.disable_lcm, None);
+      assert_eq!(coordinated_args.use_cinematic, None);
     }
 
     #[test]
@@ -206,9 +237,9 @@ mod tests {
 
       assert_eq!(coordinated_args.use_lipsync, None);
       assert_eq!(coordinated_args.use_face_detailer, None);
-      assert_eq!(coordinated_args.use_upscaler, None);
+      assert_eq!(coordinated_args.use_upscaler, Some(true));
       assert_eq!(coordinated_args.disable_lcm, None);
-      assert_eq!(coordinated_args.use_cinematic, Some(true));
+      assert_eq!(coordinated_args.use_cinematic, None);
     }
 
     #[test]
@@ -249,11 +280,10 @@ mod tests {
       let coordinated_args = coordinate_workflow_args(args, true);
 
       assert_eq!(coordinated_args.use_lipsync, Some(true));
-      //assert_eq!(coordinated_args.use_face_detailer, None);
       assert_eq!(coordinated_args.use_face_detailer, Some(true)); // TODO(bt): Possibly temporary
       assert_eq!(coordinated_args.use_upscaler, None);
       assert_eq!(coordinated_args.disable_lcm, None);
-      //assert_eq!(coordinated_args.use_cinematic, None); // TODO(bt): Possibly temporary
+      assert_eq!(coordinated_args.use_cinematic, Some(true));
     }
   }
 }
