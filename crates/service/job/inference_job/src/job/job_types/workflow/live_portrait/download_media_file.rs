@@ -1,0 +1,69 @@
+use std::path::{Path, PathBuf};
+
+use anyhow::anyhow;
+use log::{error, info};
+use sqlx::MySqlPool;
+
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use errors::AnyhowResult;
+use filesys::path_to_string::path_to_string;
+use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::{batch_get_media_files_by_tokens, MediaFilesByTokensRecord};
+use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, MediaFile};
+use tokens::tokens::media_files::MediaFileToken;
+use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
+use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::JobArgs;
+use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
+use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
+
+pub struct DownloadMediaFileArgs<'a> {
+  pub mysql_pool: &'a MySqlPool,
+  pub remote_cloud_file_client: &'a RemoteCloudFileClient,
+  pub media_file_token: &'a MediaFileToken,
+  pub download_path: &'a Path,
+}
+
+pub struct MediaFileAndPath {
+  pub media_file: MediaFile,
+  pub download_path: PathBuf,
+}
+
+pub async fn download_media_file(
+  args: DownloadMediaFileArgs<'_>
+) -> Result<MediaFileAndPath, ProcessSingleJobError> {
+
+  info!("Querying media file by token: {:?} ...", &args.media_file_token);
+
+  let mut media_file =  get_media_file(
+    &args.media_file_token,
+    false,
+    args.mysql_pool
+  ).await?.ok_or_else(|| {
+    error!("primary input media_file not found: {:?}", &args.media_file_token);
+    ProcessSingleJobError::Other(anyhow!("media file not found: {:?}", &args.media_file_token))
+  })?;
+
+  let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
+    &media_file.public_bucket_directory_hash,
+    media_file.maybe_public_bucket_prefix.as_deref(),
+    media_file.maybe_public_bucket_extension.as_deref());
+
+  info!("Media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
+
+  info!("Downloading media file to {:?}", args.download_path);
+
+  args.remote_cloud_file_client.download_media_file(
+    &media_file_bucket_path,
+    path_to_string(&args.download_path)
+  ).await?;
+
+  info!("Downloaded media file!");
+
+  Ok(MediaFileAndPath {
+    media_file,
+    download_path: args.download_path.to_path_buf(),
+  })
+}

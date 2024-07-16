@@ -43,6 +43,7 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
 use crate::job::job_types::workflow::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
@@ -52,7 +53,6 @@ use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_sav
 use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_trim_and_resample_videos::{preprocess_trim_and_resample_videos, ProcessTrimAndResampleVideoArgs};
 use crate::job::job_types::workflow::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
 use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
-use crate::job::job_types::workflow::video_style_transfer::util::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::job_dependencies::JobDependencies;

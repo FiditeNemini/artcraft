@@ -1,0 +1,310 @@
+use std::collections::HashMap;
+use std::fs::{File, read_to_string};
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
+
+use anyhow::{anyhow, Result};
+use log::{debug, error, info, warn};
+use serde_json::Value;
+use walkdir::WalkDir;
+
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::prompts::prompt_type::PromptType;
+use errors::AnyhowResult;
+use filesys::check_file_exists::check_file_exists;
+use filesys::file_exists::file_exists;
+use filesys::file_size::file_size;
+use filesys::path_to_string::path_to_string;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::safe_recursively_delete_files::safe_recursively_delete_files;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
+use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
+use mysql_queries::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTransferName;
+use mysql_queries::payloads::prompt_args::prompt_inner_payload::{PromptInnerPayload, PromptInnerPayloadBuilder};
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
+use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
+use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
+use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::prompts::PromptToken;
+use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+
+use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
+use crate::job::job_types::workflow::live_portrait::download_media_file::{download_media_file, DownloadMediaFileArgs};
+use crate::job::job_types::workflow::live_portrait::extract_live_portrait_payload_from_job::extract_live_portrait_payload_from_job;
+use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
+use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
+use crate::job::job_types::workflow::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
+use crate::job::job_types::workflow::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
+use crate::job::job_types::workflow::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
+use crate::job::job_types::workflow::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
+use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
+use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_trim_and_resample_videos::{preprocess_trim_and_resample_videos, ProcessTrimAndResampleVideoArgs};
+use crate::job::job_types::workflow::video_style_transfer::steps::validate_and_save_results::{SaveResultsArgs, validate_and_save_results};
+use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
+use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
+use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
+use crate::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
+use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
+
+pub async fn process_live_portrait_job(
+  deps: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
+  let mut job_progress_reporter = deps
+      .clients
+      .job_progress_reporter
+      .new_generic_inference(job.inference_job_token.as_str())
+      .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+
+  let comfy_deps = deps
+      .job
+      .job_specific_dependencies
+      .maybe_comfy_ui_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("Missing ComfyUI dependencies".to_string())))?;
+
+  let job_payload = extract_live_portrait_payload_from_job(&job)?;
+
+  info!("Job payload: {:?}", job_payload);
+
+  // ==================== TEMP DIR ==================== //
+
+  let work_temp_dir = format!("temp_live_portrait_{}", job.id.0);
+
+  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
+  let work_temp_dir = deps
+      .fs
+      .scoped_temp_dir_creator_for_work
+      .new_tempdir(&work_temp_dir)
+      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
+  let output_dir = work_temp_dir.path().join("output");
+
+  if !output_dir.exists() {
+    std::fs::create_dir_all(&output_dir)
+        .map_err(|err| ProcessSingleJobError::IoError(err))?;
+  }
+
+  // ===================== DOWNLOAD REQUIRED FILES ===================== //
+
+  job_progress_reporter.log_status("downloading dependencies")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
+  let remote_cloud_file_client = match remote_cloud_file_client {
+    Ok(res) => res,
+    Err(_) => {
+      return Err(ProcessSingleJobError::from(anyhow!("failed to get remote cloud file client")));
+    }
+  };
+
+  info!("Preparing to download portrait media file...");
+
+  let portrait_media_token = job_payload.portrait_media_file_token.ok_or_else(|| anyhow!("no portrait media token"))?;
+  let portrait_file_path = work_temp_dir.path().join("portrait.bin");
+
+  download_media_file(DownloadMediaFileArgs {
+    mysql_pool: &deps.db.mysql_pool,
+    remote_cloud_file_client: &remote_cloud_file_client,
+    media_file_token: &portrait_media_token,
+    download_path: &portrait_file_path,
+  }).await?;
+
+  info!("Preparing to download driver media file...");
+
+  let driver_media_token = job_payload.driver_media_file_token.ok_or_else(|| anyhow!("no driver media token"))?;
+  let driver_file_path = work_temp_dir.path().join("driver.bin");
+
+  download_media_file(DownloadMediaFileArgs {
+    mysql_pool: &deps.db.mysql_pool,
+    remote_cloud_file_client: &remote_cloud_file_client,
+    media_file_token: &driver_media_token,
+    download_path: &driver_file_path,
+  }).await?;
+
+  // ==================== RUN COMFY INFERENCE ==================== //
+
+  info!("Preparing for ComfyUI inference...");
+
+  job_progress_reporter.log_status("running inference")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let stderr_output_file = work_temp_dir.path().join("stderr.txt");
+  let stdout_output_file = work_temp_dir.path().join("stdout.txt");
+
+  let inference_start_time = Instant::now();
+
+  info!("Running ComfyUI inference...");
+
+  // TODO TEMP
+  let media_file_token = MediaFileToken::generate();
+  let inference_duration = Instant::now().duration_since(inference_start_time);
+
+  // TODO:
+  // --portrait --driver --tempdir --output
+
+//  let command_exit_status = comfy_deps
+//      .inference_command
+//      .execute_inference(InferenceArgs {
+//        stderr_output_file: &stderr_output_file,
+//        stdout_output_file: &stdout_output_file,
+//        inference_details,
+//        face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
+//        upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
+//        lipsync_enabled,
+//        disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
+//        use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
+//        maybe_strength: comfy_args.strength,
+//        frame_skip: comfy_args.frame_skip,
+//        global_ipa_image_filename: global_ipa_image
+//            .as_ref()
+//            .map(|image| path_to_string(&image.ipa_image_path)),
+//        global_ipa_strength: None, // TODO: Expose a UI slider
+//        depth_video_path: videos.maybe_depth.as_ref()
+//            .map(|v| v.maybe_processed_path.as_deref())
+//            .flatten(),
+//        normal_video_path: videos.maybe_normal.as_ref()
+//            .map(|v| v.maybe_processed_path.as_deref())
+//            .flatten(),
+//        outline_video_path: videos.maybe_outline.as_ref()
+//            .map(|v| v.maybe_processed_path.as_deref())
+//            .flatten(),
+//      });
+//
+//  let inference_duration = Instant::now().duration_since(inference_start_time);
+//
+//  info!("Inference command exited with status: {:?}", command_exit_status);
+//
+//  info!("Inference took duration to complete: {:?}", &inference_duration);
+//
+//  // check stdout for success and check if file exists
+//  if let Ok(contents) = read_to_string(&stdout_output_file) {
+//    info!("Captured stduout output: {}", contents);
+//  }
+//
+//  videos.debug_print_video_paths();
+//
+//  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.comfy_output_video_path) {
+//    info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
+//  }
+//
+//  // ==================== CHECK OUTPUT FILE ======================== //
+//
+//  if let Err(err) = check_file_exists(&videos.primary_video.comfy_output_video_path) {
+//    error!("Output file does not  exist: {:?}", err);
+//
+//    error!("Inference failed: {:?}", command_exit_status);
+//
+//    if let Ok(contents) = read_to_string(&stderr_output_file) {
+//      warn!("Captured stderr output: {}", contents);
+//    }
+//
+//    safe_delete_temp_file(&stderr_output_file);
+//    safe_delete_temp_file(&stdout_output_file);
+//    safe_delete_temp_directory(&work_temp_dir);
+//    safe_delete_temp_file(&workflow_path);
+//    safe_delete_all_input_videos(&videos);
+//
+//    // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
+//    if let Some(lora_path) = maybe_lora_path {
+//      safe_delete_temp_file(&lora_path);
+//    }
+//
+//    if let Some(ipa_path) = global_ipa_image {
+//      safe_delete_temp_file(ipa_path.ipa_image_path);
+//    }
+//
+//    safe_recursively_delete_files(&comfy_dirs.comfy_output_dir);
+//
+//    return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
+//            &videos.primary_video.comfy_output_video_path)));
+//  }
+//
+//  // ==================== COPY BACK AUDIO ==================== //
+//
+//  post_process_restore_audio(PostProcessRestoreVideoArgs {
+//    comfy_deps,
+//    videos: &mut videos,
+//  });
+//
+//  // ==================== OPTIONAL WATERMARK ==================== //
+//
+//  post_process_add_watermark(PostProcessAddWatermarkArgs {
+//    comfy_deps,
+//    videos: &mut videos,
+//  });
+//
+//  // ==================== DEBUG ======================== //
+//
+//  videos.debug_print_video_paths();
+//
+//  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.get_final_video_to_upload()) {
+//    info!("Final video upload dimensions: {}x{}", dimensions.width, dimensions.height);
+//  }
+//
+//  // ==================== VALIDATE AND SAVE RESULTS ======================== //
+//
+//  let media_file_token = validate_and_save_results(SaveResultsArgs {
+//    job,
+//    deps: &deps,
+//    job_args: &job_args,
+//    comfy_deps,
+//    comfy_args,
+//    videos: &videos,
+//    job_progress_reporter: &mut job_progress_reporter,
+//    inference_duration,
+//  }).await?;
+
+  // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
+
+  if let Some(sleep_millis) = job_payload.sleep_millis {
+    info!("Sleeping for millis: {sleep_millis}");
+    thread::sleep(Duration::from_millis(sleep_millis));
+  }
+
+  // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
+
+  info!("Cleaning up temporary files...");
+
+  safe_delete_temp_file(&driver_file_path);
+  safe_delete_temp_file(&portrait_file_path);
+
+  safe_recursively_delete_files(&output_dir);
+  safe_delete_temp_directory(&work_temp_dir);
+
+  // ==================== DONE ==================== //
+
+  info!("Work Done.");
+
+  job_progress_reporter.log_status("done")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  info!("Result media token: {:?}", &media_file_token);
+
+  info!("Job {:?} complete success!", job.id);
+
+  Ok(JobSuccessResult {
+    maybe_result_entity: Some(ResultEntity {
+      entity_type: InferenceResultType::MediaFile,
+      entity_token: media_file_token.to_string(),
+    }),
+    inference_duration,
+  })
+}
