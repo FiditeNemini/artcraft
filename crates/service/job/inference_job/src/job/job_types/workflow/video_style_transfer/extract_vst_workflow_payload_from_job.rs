@@ -5,7 +5,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
 
-pub fn get_workflow_args_from_job(
+pub fn extract_vst_workflow_payload_from_job(
   job: &AvailableInferenceJob,
 ) -> Result<WorkflowArgs, ProcessSingleJobError> {
 

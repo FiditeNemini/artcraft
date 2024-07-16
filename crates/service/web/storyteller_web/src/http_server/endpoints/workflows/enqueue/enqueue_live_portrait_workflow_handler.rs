@@ -44,11 +44,11 @@ pub struct EnqueueLivePortraitWorkflowRequest {
 
   /// Source media token
   /// This can be an image or a video media file token
-  portrait_media_file: MediaFileToken,
+  portrait_media_file_token: MediaFileToken,
 
   /// Driving media token
   /// This must be a video media file token.
-  driver_media_file: MediaFileToken,
+  driver_media_file_token: MediaFileToken,
 
   /// Remove watermark from the output
   /// Only for premium accounts

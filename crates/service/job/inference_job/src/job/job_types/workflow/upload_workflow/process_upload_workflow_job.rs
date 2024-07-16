@@ -19,13 +19,13 @@ use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::get_workflow_args_from_job::get_workflow_args_from_job;
+use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_upload_workflow_job(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError>{
    let mysql_pool = &deps.db.mysql_pool;
 
-    let wf_args = get_workflow_args_from_job(&job)?;
+    let wf_args = extract_vst_workflow_payload_from_job(&job)?;
 
     let title = match wf_args.maybe_title {
         Some(val) => {

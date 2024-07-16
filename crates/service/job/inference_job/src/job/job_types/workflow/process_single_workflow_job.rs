@@ -2,9 +2,9 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::get_workflow_args_from_job::get_workflow_args_from_job;
 use crate::job::job_types::workflow::upload_workflow;
 use crate::job::job_types::workflow::video_style_transfer;
+use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_workflow_job(
@@ -12,7 +12,7 @@ pub async fn process_single_workflow_job(
   job: &AvailableInferenceJob
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
-  let workflow_args = get_workflow_args_from_job(&job)?;
+  let workflow_args = extract_vst_workflow_payload_from_job(&job)?;
 
   let job_success_result = match workflow_args.maybe_google_drive_link {
     Some(_link) => {

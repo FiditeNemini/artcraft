@@ -3,6 +3,7 @@ use errors::AnyhowResult;
 
 use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
+use crate::payloads::generic_inference_args::live_portrait_payload::LivePortraitPayload;
 use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
@@ -55,6 +56,10 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(rename = "wf")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "workflow")]
   Workflow,
+
+  #[serde(rename = "lp")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "live_portrait")]
+  LivePortrait,
 
   #[serde(rename = "fc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "format_conversion")]
@@ -125,6 +130,9 @@ pub enum PolymorphicInferenceArgs {
   /// ComfyUI (Short name to save space when serializing.)
   Cu(WorkflowArgs),
 
+  /// ComfyUI (Short name to save space when serializing.)
+  Lp(LivePortraitPayload),
+
   /// Render engine scene to video args
   Es(RenderEngineSceneToVideoArgs),
 }
@@ -164,6 +172,7 @@ impl InferenceCategoryAbbreviated {
       Self::ImageGeneration =>InferenceCategory::ImageGeneration,
       Self::Mocap => InferenceCategory::Mocap,
       Self::Workflow => InferenceCategory::Workflow,
+      Self::LivePortrait => InferenceCategory::Workflow, // TODO(bt,2024-07-16): Not bidirectional/reflective
       Self::FormatConversion => InferenceCategory::FormatConversion,
       Self::ConvertBvhToWorkflow => InferenceCategory::ConvertBvhToWorkflow,
     }

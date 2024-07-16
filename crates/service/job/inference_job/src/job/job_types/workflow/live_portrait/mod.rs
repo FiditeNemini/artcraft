@@ -1,1 +1,2 @@
+pub mod extract_live_portrait_payload_from_job;
 pub mod process_live_portrait_job;
