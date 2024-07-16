@@ -46,11 +46,16 @@ pub struct EnqueueLivePortraitWorkflowRequest {
 
   /// Source media token
   /// This can be an image or a video media file token
-  portrait_media_file_token: MediaFileToken,
+  /// This is what constitutes the "portrait" or the overall final video.
+  /// This video or image must contain a face.
+  source_media_file_token: MediaFileToken,
 
   /// Driving media token
   /// This must be a video media file token.
-  driver_media_file_token: MediaFileToken,
+  /// This drives the animation of the face, but the actor will disappear
+  /// and their facial expressions will be transferred to the source.
+  /// This video must contain a face.
+  face_driver_media_file_token: MediaFileToken,
 
   /// Remove watermark from the output
   /// Only for premium accounts
@@ -103,11 +108,13 @@ impl std::fmt::Display for EnqueueLivePortraitWorkflowError {
   }
 }
 
-/// Enqueue live portrait video workflows.
+/// Enqueue "live portrait" video workflows.
+///
+/// We've renamed this as to not give away what we're doing to users.
 #[utoipa::path(
   post,
   tag = "Workflows",
-  path = "/v1/workflows/enqueue_live_portrait",
+  path = "/v1/workflows/enqueue_acting_face",
   responses(
     (status = 200, description = "Success", body = EnqueueLivePortraitWorkflowSuccessResponse),
     (status = 400, description = "Bad input", body = EnqueueLivePortraitWorkflowError),
@@ -196,8 +203,8 @@ pub async fn enqueue_live_portrait_workflow_handler(
   let _is_allowed_expensive_generation = is_staff || has_paid_plan;
 
   let payload = LivePortraitPayload {
-    portrait_media_file_token: empty_media_file_token_to_null(Some(&request.portrait_media_file_token)),
-    driver_media_file_token: empty_media_file_token_to_null(Some(&request.driver_media_file_token)),
+    portrait_media_file_token: empty_media_file_token_to_null(Some(&request.source_media_file_token)),
+    driver_media_file_token: empty_media_file_token_to_null(Some(&request.face_driver_media_file_token)),
     remove_watermark: None,
     sleep_millis: None,
   };

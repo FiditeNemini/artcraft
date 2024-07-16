@@ -22,7 +22,7 @@ where
     >,
 {
   let app = app.service(web::scope("/v1/workflows")
-      .service(web::resource("/enqueue_live_portrait")
+      .service(web::resource("/enqueue_acting_face")
           .route(web::post().to(enqueue_live_portrait_workflow_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
