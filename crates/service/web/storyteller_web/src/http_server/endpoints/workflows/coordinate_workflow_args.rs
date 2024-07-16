@@ -168,6 +168,28 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_defaults() {
+      let args = CoordinatedWorkflowArgs {
+        prompt: None,
+        travel_prompt: None,
+        use_lipsync: None,
+        use_face_detailer: None,
+        use_upscaler: None,
+        disable_lcm: None,
+        use_cinematic: None,
+        remove_watermark: None,
+      };
+
+      let coordinated_args = coordinate_workflow_args(args, true);
+
+      assert_eq!(coordinated_args.use_lipsync, None);
+      assert_eq!(coordinated_args.use_face_detailer, None);
+      assert_eq!(coordinated_args.use_upscaler, None);
+      assert_eq!(coordinated_args.disable_lcm, None);
+      assert_eq!(coordinated_args.use_cinematic, Some(true));
+    }
+
+    #[test]
     fn test_cinematic_and_upscaler() {
       let args = CoordinatedWorkflowArgs {
         prompt: None,
