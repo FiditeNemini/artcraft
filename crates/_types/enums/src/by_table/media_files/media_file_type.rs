@@ -72,7 +72,10 @@ pub enum MediaFileType {
   Png,
 
   /// Gif images
-  Gif
+  Gif,
+
+  /// Mp4 videos
+  Mp4
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -100,6 +103,7 @@ impl MediaFileType {
       Self::Jpg => "jpg",
       Self::Png => "png",
       Self::Gif => "gif",
+      Self::Mp4 => "mp4",
     }
   }
 
@@ -121,6 +125,7 @@ impl MediaFileType {
       "jpg" => Ok(Self::Jpg),
       "png" => Ok(Self::Png),
       "gif" => Ok(Self::Gif),
+      "mp4" => Ok(Self::Mp4),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -145,6 +150,7 @@ impl MediaFileType {
       Self::Jpg,
       Self::Png,
       Self::Gif,
+      Self::Mp4,
     ])
   }
 }
@@ -175,6 +181,7 @@ mod tests {
       assert_serialization(MediaFileType::Jpg, "jpg");
       assert_serialization(MediaFileType::Png, "png");
       assert_serialization(MediaFileType::Gif, "gif");
+      assert_serialization(MediaFileType::Mp4, "mp4");
     }
   }
 
@@ -199,6 +206,7 @@ mod tests {
       assert_eq!(MediaFileType::Jpg.to_str(), "jpg");
       assert_eq!(MediaFileType::Png.to_str(), "png");
       assert_eq!(MediaFileType::Gif.to_str(), "gif");
+      assert_eq!(MediaFileType::Mp4.to_str(), "mp4");
     }
 
     #[test]
@@ -219,6 +227,7 @@ mod tests {
       assert_eq!(MediaFileType::from_str("jpg").unwrap(), MediaFileType::Jpg);
       assert_eq!(MediaFileType::from_str("png").unwrap(), MediaFileType::Png);
       assert_eq!(MediaFileType::from_str("gif").unwrap(), MediaFileType::Gif);
+      assert_eq!(MediaFileType::from_str("mp4").unwrap(), MediaFileType::Mp4);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -229,7 +238,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 16);
+      assert_eq!(variants.len(), 17);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
@@ -246,6 +255,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Jpg));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Png));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Gif));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Mp4));
       assert_eq!(variants.pop_first(), None);
     }
   }

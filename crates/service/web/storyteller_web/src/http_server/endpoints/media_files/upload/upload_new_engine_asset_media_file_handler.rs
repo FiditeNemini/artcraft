@@ -354,6 +354,15 @@ fn validate_and_process_form(
         return Err(MediaFileUploadError::BadInput("Image files are only allowed for image_plane.".to_string()));
       }
     }
+    Some("mp4") => {
+      if maybe_animation_type.is_some() {
+        return Err(MediaFileUploadError::BadInput("Video files cannot have an animation type.".to_string()));
+      }
+      let category = form.engine_category.0;
+      if category != MediaFileEngineCategory::VideoPlane {
+        return Err(MediaFileUploadError::BadInput("Video files are only allowed for video_plane.".to_string()));
+      }
+    }
     _ => {} // Allowed
   }
 
@@ -372,15 +381,18 @@ fn validate_and_process_form(
     Some("jpg") => (".jpg", MediaFileType::Jpg, "image/jpeg"),
     Some("png") => (".png", MediaFileType::Png, "image/png"),
     Some("gif") => (".gif", MediaFileType::Gif, "image/gif"),
+    // Video
+    Some("mp4") => (".mp4", MediaFileType::Mp4, "video/mp4"),
     _ => {
       return Err(MediaFileUploadError::BadInput(
-        "unsupported file extension. Must be bvh, glb, gltf, fbx, csv (for expressions), or jpg, png, gif (for image_plane)."
-            .to_string()));
+        "unsupported file extension. Must be bvh, glb, gltf, fbx, csv (for expressions), \
+        or jpg, png, gif (for image_plane), or mp4 (for video_plane).".to_string()));
     }
   };
 
   let media_class = match media_type {
     MediaFileType::Jpg | MediaFileType::Png | MediaFileType::Gif => MediaFileClass::Image,
+    MediaFileType::Mp4 => MediaFileClass::Video,
     _ => MediaFileClass::Dimensional,
   };
 
