@@ -75,7 +75,6 @@ fn handle_flags(args: &mut CoordinatedWorkflowArgs, is_staff: bool) {
   if !is_staff {
     // Non-staff cannot use these workflows
     args.disable_lcm = None;
-    args.use_cinematic = None;
     args.remove_watermark = None;
   }
 
