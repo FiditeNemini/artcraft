@@ -1,3 +1,4 @@
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
 
@@ -14,7 +15,8 @@ use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
 use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
-use crate::util::scoped_execution::ScopedExecution;
+use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
+use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
 
 pub struct JobSpecificDependencies {
   pub maybe_rvc_v2_dependencies: Option<RvcV2Dependencies>,
@@ -34,7 +36,10 @@ pub struct JobSpecificDependencies {
 
 impl JobSpecificDependencies {
 
-  pub async fn setup_for_jobs(scoped_execution: &ScopedExecution) -> AnyhowResult<Self> {
+  pub async fn setup_for_jobs(
+    scoped_job_type_execution: &ScopedJobTypeExecution,
+    scoped_model_type_execution: &ScopedModelTypeExecution
+  ) -> AnyhowResult<Self> {
     let mut maybe_rvc_v2_dependencies = None;
     let mut maybe_sad_talker_dependencies = None;
     let mut maybe_svc_dependencies = None;
@@ -49,67 +54,71 @@ impl JobSpecificDependencies {
     let mut maybe_convert_fbx_to_gltf_dependencies = None;
     let mut maybe_convert_bvh_to_workflow_dependencies = None;
 
-    if scoped_execution.can_run_job(InferenceModelType::RvcV2) {
-      print_with_space("Setting RVCv2 dependencies...");
-      maybe_rvc_v2_dependencies = Some(RvcV2Dependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::SadTalker) {
-      print_with_space("Setting SadTalker dependencies...");
-      maybe_sad_talker_dependencies = Some(SadTalkerDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::SoVitsSvc) {
-      print_with_space("Setting SVC dependencies...");
-      maybe_svc_dependencies = Some(SvcDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::Tacotron2) {
-      print_with_space("Setting Tacotron2 dependencies...");
-      maybe_tacotron2_dependencies = Some(Tacotron2Dependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::VallEX) {
-      print_with_space("Setting VALL-E-X dependencies...");
-      maybe_vall_e_x_dependencies = Some(VallExDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::StyleTTS2) {
-      print_with_space("Setting StyleTTS2 dependencies...");
-      maybe_styletts2_dependencies = Some(StyleTTS2Dependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::Vits) {
-      print_with_space("Setting Vits dependencies...");
-      maybe_vits_dependencies = Some(VitsDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::RerenderAVideo) {
-      print_with_space("Setting Rerender dependencies...");
-      maybe_rerender_dependencies = Some(RerenderDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::StableDiffusion) {
-      print_with_space("Setting Stable Diffusion dependencies...");
-      maybe_stable_diffusion_dependencies = Some(StableDiffusionDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::MocapNet) {
-      print_with_space("Setting MocapNet dependencies...");
-      maybe_mocapnet_dependencies = Some(MocapNetDependencies::setup()?);
-    }
-
-    if scoped_execution.can_run_job(InferenceModelType::ComfyUi) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::ComfyUi)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::LivePortrait)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::VideoRender)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::ComfyUi)
+    {
       print_with_space("Setting ComfyUI dependencies...");
       maybe_comfy_ui_dependencies = Some(ComfyDependencies::setup().await?);
     }
 
-    if scoped_execution.can_run_job(InferenceModelType::ConvertFbxToGltf) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::RvcV2) {
+      print_with_space("Setting RVCv2 dependencies...");
+      maybe_rvc_v2_dependencies = Some(RvcV2Dependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::SadTalker) {
+      print_with_space("Setting SadTalker dependencies...");
+      maybe_sad_talker_dependencies = Some(SadTalkerDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::SoVitsSvc) {
+      print_with_space("Setting SVC dependencies...");
+      maybe_svc_dependencies = Some(SvcDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::Tacotron2) {
+      print_with_space("Setting Tacotron2 dependencies...");
+      maybe_tacotron2_dependencies = Some(Tacotron2Dependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::VallEX) {
+      print_with_space("Setting VALL-E-X dependencies...");
+      maybe_vall_e_x_dependencies = Some(VallExDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::StyleTTS2) {
+      print_with_space("Setting StyleTTS2 dependencies...");
+      maybe_styletts2_dependencies = Some(StyleTTS2Dependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::Vits) {
+      print_with_space("Setting Vits dependencies...");
+      maybe_vits_dependencies = Some(VitsDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::RerenderAVideo) {
+      print_with_space("Setting Rerender dependencies...");
+      maybe_rerender_dependencies = Some(RerenderDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::StableDiffusion) {
+      print_with_space("Setting Stable Diffusion dependencies...");
+      maybe_stable_diffusion_dependencies = Some(StableDiffusionDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::MocapNet) {
+      print_with_space("Setting MocapNet dependencies...");
+      maybe_mocapnet_dependencies = Some(MocapNetDependencies::setup()?);
+    }
+
+    if scoped_model_type_execution.can_run_job(InferenceModelType::ConvertFbxToGltf) {
       print_with_space("Setting ConvertFbxToGltf dependencies...");
       maybe_convert_fbx_to_gltf_dependencies = Some(FbxToGltfDependencies::setup()?);
     }
 
-    if scoped_execution.can_run_job(InferenceModelType::BvhToWorkflow) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::BvhToWorkflow) {
       print_with_space("Setting ConvertBvhToWorkflow dependencies...");
       maybe_convert_bvh_to_workflow_dependencies = Some(RenderEngineSceneToVideoDependencies::setup()?);
     }

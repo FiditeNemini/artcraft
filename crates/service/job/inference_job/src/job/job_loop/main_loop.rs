@@ -48,7 +48,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       sort_by_priority = false;
     }
 
-    let maybe_scoped_model_types = job_dependencies.job.system.scoped_execution.get_scoped_model_types();
+    let maybe_scoped_job_types = job_dependencies.job.system.scoped_job_type_execution.get_scoped_job_types();
+    let maybe_scoped_model_types = job_dependencies.job.system.scoped_model_type_execution.get_scoped_model_types();
 
     let batch_query_start_time = Instant::now();
 
@@ -56,7 +57,7 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       num_records: job_dependencies.job.system.job_batch_size,
       is_debug_worker: false, // TODO
       sort_by_priority,
-      maybe_scope_by_job_type: None,
+      maybe_scope_by_job_type: maybe_scoped_job_types,
       maybe_scope_by_model_type: maybe_scoped_model_types,
       maybe_scope_by_job_category: None,
       mysql_pool: &job_dependencies.db.mysql_pool,

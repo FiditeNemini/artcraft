@@ -54,7 +54,8 @@ use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::instrumentation::{init_otel_metrics_pipeline, JobInstrumentLabels};
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
-use crate::util::scoped_execution::ScopedExecution;
+use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
+use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub mod http_server;
@@ -216,7 +217,9 @@ async fn main() -> AnyhowResult<()> {
     job_stats: job_stats.clone(),
   };
 
-  let scoped_execution = ScopedExecution::new_from_env()?;
+  // TODO(bt,2024-07-16): Phase out model type scoping in favor of job type scoping
+  let scoped_job_type_execution = ScopedJobTypeExecution::new_from_env()?;
+  let scoped_model_type_execution = ScopedModelTypeExecution::new_from_env()?;
 
   let build_sha = std::fs::read_to_string("/GIT_SHA")
       .unwrap_or(String::from("unknown"))
@@ -237,7 +240,8 @@ async fn main() -> AnyhowResult<()> {
 
   let meter = opentelemetry::global::meter("inference-job");
 
-  let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution).await?;
+  let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(
+    &scoped_job_type_execution, &scoped_model_type_execution).await?;
 
   let scoped_tempdir_for_downloads = ScopedTempDirCreator::for_directory(
     easyenv::get_env_pathbuf_or_default(
@@ -275,7 +279,8 @@ async fn main() -> AnyhowResult<()> {
     },
     job: JobSystemDependencies {
       system: JobSystemControls {
-        scoped_execution,
+        scoped_model_type_execution,
+        scoped_job_type_execution,
         always_allow_cold_filesystem_cache: easyenv::get_env_bool_or_default("ALWAYS_ALLOW_COLD_FILESYSTEM_CACHE", false),
         cold_filesystem_cache_starvation_threshold: easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
         job_batch_wait_millis: common_env.job_batch_wait_millis,

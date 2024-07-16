@@ -26,7 +26,8 @@ use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
-use crate::util::scoped_execution::ScopedExecution;
+use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
+use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobDependencies {
@@ -60,9 +61,13 @@ pub struct JobSystemDependencies {
 }
 
 pub struct JobSystemControls {
-  /// The job should only run on these types of models.
+  /// The application should only run jobs associated with these types of models.
   /// This is provided at job start.
-  pub scoped_execution: ScopedExecution,
+  pub scoped_model_type_execution: ScopedModelTypeExecution,
+
+  /// The application should only run on these types of jobs.
+  /// This is provided at job start.
+  pub scoped_job_type_execution: ScopedJobTypeExecution,
 
   // Allow for models not to exist on the filesystem. All jobs will execute when first tried
   // regardless of whether their models were previously downloaded.

@@ -215,7 +215,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: InferenceJobType::LivePortrait,
     inference_category: InferenceCategory::DeprecatedField,
-    maybe_model_type: Some(InferenceModelType::ComfyUi), // TODO(bt): Remove!
+    maybe_model_type: None,
     maybe_model_token: None,
     maybe_input_source_token: None,
     maybe_input_source_token_type: None,

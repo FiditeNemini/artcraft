@@ -8,20 +8,23 @@ use errors::AnyhowResult;
 
 /// Execution can be scoped down to run on only certain model types or inference categories.
 #[derive(Clone)]
-pub struct ScopedExecution {
+#[deprecated(note="Use ScopedJobTypeExecution instead.")]
+pub struct ScopedModelTypeExecution {
   /// If set, only these types of model type will be inferred.
   /// None means no scoping, so all types can execute.
   scoped_types: Option<BTreeSet<InferenceModelType>>,
 }
 
-impl ScopedExecution {
+impl ScopedModelTypeExecution {
 
+  #[deprecated(note="Use ScopedJobTypeExecution instead.")]
   pub fn new_from_set(scoped_types: BTreeSet<InferenceModelType>) -> Self {
     Self {
       scoped_types: Some(scoped_types),
     }
   }
 
+  #[deprecated(note="Use ScopedJobTypeExecution instead.")]
   pub fn new_from_env() -> AnyhowResult<Self> {
     let scoped_types =
         match easyenv::get_env_string_optional("SCOPED_EXECUTION_MODEL_TYPES") {
@@ -38,6 +41,7 @@ impl ScopedExecution {
     })
   }
 
+  #[deprecated(note="Use ScopedJobTypeExecution instead.")]
   pub fn can_run_job(&self, job_model_type: InferenceModelType) -> bool {
     match self.scoped_types {
       None => true,
@@ -45,6 +49,7 @@ impl ScopedExecution {
     }
   }
 
+  #[deprecated(note="Use ScopedJobTypeExecution instead.")]
   pub fn get_scoped_model_types(&self) -> Option<&BTreeSet<InferenceModelType>> {
     self.scoped_types.as_ref()
   }
@@ -77,7 +82,7 @@ mod tests {
 
   use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 
-  use crate::util::scoped_execution::{parse_model_types, ScopedExecution};
+  use crate::util::scoped_model_type_execution::{parse_model_types, ScopedModelTypeExecution};
 
   #[test]
   fn test_parse() {
@@ -87,7 +92,7 @@ mod tests {
 
   #[test]
   fn test_can_execute() {
-    let scoping = ScopedExecution::new_from_set(BTreeSet::from([
+    let scoping = ScopedModelTypeExecution::new_from_set(BTreeSet::from([
       InferenceModelType::RvcV2,
       InferenceModelType::Vits
     ]));
