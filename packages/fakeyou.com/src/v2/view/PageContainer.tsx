@@ -119,6 +119,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 import StyleVideo from "./pages/style-video";
+import ActingFace from "./pages/acting_face";
 import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
 import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
@@ -983,6 +984,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/waitlist-next-steps">
                     <WaitlistNextStepsPage />
+                  </Route>
+
+                  <Route path="/acting-face">
+                    <ActingFace />
                   </Route>
 
                   {/*

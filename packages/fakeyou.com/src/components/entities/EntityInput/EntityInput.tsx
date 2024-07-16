@@ -52,6 +52,9 @@ const EntityInputFull = ({ media, clear }: SlideProps) => {
     ? bucketConfig.getGcsUrl(media.public_bucket_path)
     : "";
   const mediaType = mediaCategoryfromString(media?.media_type || "");
+  const uploader = `Uploaded by ${
+    media?.maybe_creator_user?.display_name || "User"
+  }`;
 
   switch (mediaType) {
     case MediaFilters.image:
@@ -59,7 +62,10 @@ const EntityInputFull = ({ media, clear }: SlideProps) => {
         <>
           <img {...{ src: mediaUrl, alt: "Selected media file" }} />
           <div {...{ className: "fy-entity-input-full-controls" }}>
-            Your file
+            <div {...{ className: "fy-entity-input-file-details" }}>
+              {media?.maybe_title || "Untitled image"}
+              <div>{uploader}</div>
+            </div>
             <Button
               {...{
                 label: "Clear",
@@ -75,7 +81,10 @@ const EntityInputFull = ({ media, clear }: SlideProps) => {
         <>
           <video controls {...{ src: mediaUrl }} />
           <div {...{ className: "fy-entity-input-full-controls" }}>
-            Your file
+            <div {...{ className: "fy-entity-input-file-details" }}>
+              {media?.maybe_title || "Untitled video"}
+              <div>{uploader}</div>
+            </div>
             <Button
               {...{
                 label: "Clear",
