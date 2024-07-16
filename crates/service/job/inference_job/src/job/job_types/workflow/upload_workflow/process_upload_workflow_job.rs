@@ -22,7 +22,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::get_workflow_args_from_job::get_workflow_args_from_job;
 use crate::job_dependencies::JobDependencies;
 
-pub async fn upload_prompt(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError>{
+pub async fn process_upload_workflow_job(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError>{
    let mysql_pool = &deps.db.mysql_pool;
 
     let wf_args = get_workflow_args_from_job(&job)?;

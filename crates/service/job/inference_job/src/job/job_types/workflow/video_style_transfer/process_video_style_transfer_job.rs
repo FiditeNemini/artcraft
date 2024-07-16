@@ -59,7 +59,7 @@ use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 
-pub async fn process_job(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
     let mut job_progress_reporter = deps
         .clients

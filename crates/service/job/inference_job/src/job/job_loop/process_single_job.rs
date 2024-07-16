@@ -22,7 +22,7 @@ use crate::job::job_types::render_engine_scene::process_render_engine_scene::pro
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job::job_types::videofilter::process_single_vf_job::process_single_vf_job;
-use crate::job::job_types::workflow::process_single_wf_job::process_single_wf_job;
+use crate::job::job_types::workflow::process_single_workflow_job::process_single_workflow_job;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_job(
@@ -201,7 +201,7 @@ async fn do_process_single_job(
       process_single_mc_job(job_dependencies, job).await?
     }
     InferenceCategory::Workflow => {
-      process_single_wf_job(job_dependencies, job).await?
+      process_single_workflow_job(job_dependencies, job).await?
     }
     InferenceCategory::FormatConversion => {
       process_single_format_conversion_job(job_dependencies, job).await?
