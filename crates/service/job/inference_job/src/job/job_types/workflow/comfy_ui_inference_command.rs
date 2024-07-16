@@ -14,7 +14,9 @@ use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::command_exit_status::CommandExitStatus;
+use subprocess_common::command_runner::command_args::CommandArgs;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job::job_types::workflow::live_portrait::command_args::LivePortraitCommandArgs;
 
 // These environment vars are not copied over to the subprocess
 // TODO/FIXME(bt, 2023-05-28): This is horrific security!
@@ -427,4 +429,117 @@ impl ComfyInferenceCommand {
             }
         }
     }
+
+    // TODO(bt,2024-07-16): This belongs in another module / runner, and all of these need to be consolidated
+    pub fn execute_live_portrait_inference(
+        &self,
+        args: LivePortraitCommandArgs,
+    ) -> CommandExitStatus {
+        self.do_execute_live_portrait_inference(args).unwrap_or_else(|error| CommandExitStatus::FailureWithReason { reason: format!("error: {:?}", error) })
+    }
+
+    fn do_execute_live_portrait_inference(
+        &self,
+        args: LivePortraitCommandArgs,
+    ) -> AnyhowResult<CommandExitStatus> {
+
+        info!("InferenceArgs: {:?}", &args);
+
+        let mut command = String::new();
+        command.push_str(&format!("cd {}", path_to_string(&self.comfy_root_code_directory)));
+
+        if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
+            command.push_str(" && ");
+            command.push_str(venv_command);
+            command.push_str(" ");
+        }
+
+        command.push_str(" && ");
+
+        match self.executable_or_command {
+            ExecutableOrCommand::Executable(ref executable) => {
+                command.push_str(&path_to_string(executable));
+                command.push_str(" ");
+            }
+            ExecutableOrCommand::Command(ref cmd) => {
+                command.push_str(cmd);
+                command.push_str(" ");
+            }
+        }
+
+        let arguments = args.to_command_string();
+
+        command.push_str(&arguments);
+
+        if let Some(docker_options) = self.maybe_docker_options.as_ref() {
+            command = docker_options.to_command_string(&command);
+        }
+
+        info!("Command: {:?}", command);
+
+        let command_parts = [
+            "bash",
+            "-c",
+            &command
+        ];
+
+        let mut env_vars = Vec::new();
+
+        // Copy all environment variables from the parent process.
+        // This is necessary to send all the kubernetes settings for Nvidia / CUDA.
+        for (env_key, env_value) in env::vars() {
+            if IGNORED_ENVIRONMENT_VARS.contains(&env_key) {
+                continue;
+            }
+            env_vars.push((
+                OsString::from(env_key),
+                OsString::from(env_value),
+            ));
+        }
+
+        let mut config = PopenConfig::default();
+
+        info!("stderr will be written to file: {:?}", args.stderr_output_file.as_os_str());
+
+        let _stderr_file = File::create(&args.stderr_output_file)?;
+        let _stdout_file = File::create(&args.stdout_output_file)?;
+
+        // NB(bt, 2024-03-01): Let's actually emit these lots to the rust logs so we can see what happens.
+        //config.stderr = Redirection::File(stderr_file);
+        //config.stdout = Redirection::File(stdout_file);
+
+        if !env_vars.is_empty() {
+            config.env = Some(env_vars);
+        }
+
+        let mut p = Popen::create(&command_parts, config)?;
+
+        info!("Subprocess PID: {:?}", p.pid());
+
+        match self.maybe_execution_timeout {
+            None => {
+                let exit_status = p.wait()?;
+                info!("Subprocess exit status: {:?}", exit_status);
+                Ok(CommandExitStatus::from_exit_status(exit_status))
+            }
+            Some(timeout) => {
+                info!("Executing with timeout: {:?}", &timeout);
+                let exit_status = p.wait_timeout(timeout)?;
+
+                match exit_status {
+                    None => {
+                        // NB: If the program didn't successfully terminate, kill it.
+                        info!("Subprocess didn't end after timeout: {:?}; terminating...", &timeout);
+                        let _r = p.terminate()?;
+                        Ok(CommandExitStatus::Timeout)
+                    }
+                    Some(exit_status) => {
+                        info!("Subprocess timed wait exit status: {:?}", exit_status);
+                        Ok(CommandExitStatus::from_exit_status(exit_status))
+                    }
+                }
+            }
+        }
+    }
+
 }

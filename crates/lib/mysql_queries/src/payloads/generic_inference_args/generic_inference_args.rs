@@ -1,4 +1,3 @@
-use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
 
 use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;

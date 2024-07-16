@@ -44,6 +44,7 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
+use crate::job::job_types::workflow::live_portrait::command_args::LivePortraitCommandArgs;
 use crate::job::job_types::workflow::live_portrait::download_media_file::{download_media_file, DownloadMediaFileArgs};
 use crate::job::job_types::workflow::live_portrait::extract_live_portrait_payload_from_job::extract_live_portrait_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
@@ -96,6 +97,7 @@ pub async fn process_live_portrait_job(
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   let output_dir = work_temp_dir.path().join("output");
+  let output_file_path = work_temp_dir.path().join("output.mp4");
 
   if !output_dir.exists() {
     std::fs::create_dir_all(&output_dir)
@@ -155,88 +157,53 @@ pub async fn process_live_portrait_job(
 
   // TODO TEMP
   let media_file_token = MediaFileToken::generate();
+
+  let command_exit_status = comfy_deps
+      .inference_command
+      // TODO(bt,2024-07-15): Move this to its own runner. Just hacking this quickly.
+      .execute_live_portrait_inference(LivePortraitCommandArgs {
+        portrait_file: &portrait_file_path,
+        driver_file: &driver_file_path,
+        tempdir: work_temp_dir.path(),
+        output_file: &output_file_path,
+        stderr_output_file: &stderr_output_file,
+        stdout_output_file: &stdout_output_file,
+      });
+
   let inference_duration = Instant::now().duration_since(inference_start_time);
 
-  // TODO:
-  // --portrait --driver --tempdir --output
+  info!("Inference command exited with status: {:?}", command_exit_status);
 
-//  let command_exit_status = comfy_deps
-//      .inference_command
-//      .execute_inference(InferenceArgs {
-//        stderr_output_file: &stderr_output_file,
-//        stdout_output_file: &stdout_output_file,
-//        inference_details,
-//        face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
-//        upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
-//        lipsync_enabled,
-//        disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
-//        use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
-//        maybe_strength: comfy_args.strength,
-//        frame_skip: comfy_args.frame_skip,
-//        global_ipa_image_filename: global_ipa_image
-//            .as_ref()
-//            .map(|image| path_to_string(&image.ipa_image_path)),
-//        global_ipa_strength: None, // TODO: Expose a UI slider
-//        depth_video_path: videos.maybe_depth.as_ref()
-//            .map(|v| v.maybe_processed_path.as_deref())
-//            .flatten(),
-//        normal_video_path: videos.maybe_normal.as_ref()
-//            .map(|v| v.maybe_processed_path.as_deref())
-//            .flatten(),
-//        outline_video_path: videos.maybe_outline.as_ref()
-//            .map(|v| v.maybe_processed_path.as_deref())
-//            .flatten(),
-//      });
-//
-//  let inference_duration = Instant::now().duration_since(inference_start_time);
-//
-//  info!("Inference command exited with status: {:?}", command_exit_status);
-//
-//  info!("Inference took duration to complete: {:?}", &inference_duration);
-//
-//  // check stdout for success and check if file exists
-//  if let Ok(contents) = read_to_string(&stdout_output_file) {
-//    info!("Captured stduout output: {}", contents);
-//  }
-//
-//  videos.debug_print_video_paths();
-//
-//  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.comfy_output_video_path) {
-//    info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
-//  }
-//
-//  // ==================== CHECK OUTPUT FILE ======================== //
-//
-//  if let Err(err) = check_file_exists(&videos.primary_video.comfy_output_video_path) {
-//    error!("Output file does not  exist: {:?}", err);
-//
-//    error!("Inference failed: {:?}", command_exit_status);
-//
-//    if let Ok(contents) = read_to_string(&stderr_output_file) {
-//      warn!("Captured stderr output: {}", contents);
-//    }
-//
-//    safe_delete_temp_file(&stderr_output_file);
-//    safe_delete_temp_file(&stdout_output_file);
-//    safe_delete_temp_directory(&work_temp_dir);
-//    safe_delete_temp_file(&workflow_path);
-//    safe_delete_all_input_videos(&videos);
-//
-//    // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
-//    if let Some(lora_path) = maybe_lora_path {
-//      safe_delete_temp_file(&lora_path);
-//    }
-//
-//    if let Some(ipa_path) = global_ipa_image {
-//      safe_delete_temp_file(ipa_path.ipa_image_path);
-//    }
-//
-//    safe_recursively_delete_files(&comfy_dirs.comfy_output_dir);
-//
-//    return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
-//            &videos.primary_video.comfy_output_video_path)));
-//  }
-//
+  info!("Inference took duration to complete: {:?}", &inference_duration);
+
+  // check stdout for success and check if file exists
+  if let Ok(contents) = read_to_string(&stdout_output_file) {
+    info!("Captured stduout output: {}", contents);
+  }
+
+  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&output_file_path) {
+    info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
+  }
+
+  // ==================== CHECK OUTPUT FILE ======================== //
+
+  if let Err(err) = check_file_exists(&output_file_path) {
+    error!("Output file does not  exist: {:?}", err);
+
+    error!("Inference failed: {:?}", command_exit_status);
+
+    if let Ok(contents) = read_to_string(&stderr_output_file) {
+      warn!("Captured stderr output: {}", contents);
+    }
+
+    safe_delete_temp_file(&stderr_output_file);
+    safe_delete_temp_file(&stdout_output_file);
+    safe_delete_temp_directory(&work_temp_dir);
+
+    return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
+            &output_file_path)));
+  }
+
 //  // ==================== COPY BACK AUDIO ==================== //
 //
 //  post_process_restore_audio(PostProcessRestoreVideoArgs {
@@ -250,27 +217,79 @@ pub async fn process_live_portrait_job(
 //    comfy_deps,
 //    videos: &mut videos,
 //  });
-//
-//  // ==================== DEBUG ======================== //
-//
-//  videos.debug_print_video_paths();
-//
-//  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.get_final_video_to_upload()) {
-//    info!("Final video upload dimensions: {}x{}", dimensions.width, dimensions.height);
-//  }
-//
-//  // ==================== VALIDATE AND SAVE RESULTS ======================== //
-//
-//  let media_file_token = validate_and_save_results(SaveResultsArgs {
-//    job,
-//    deps: &deps,
-//    job_args: &job_args,
-//    comfy_deps,
-//    comfy_args,
-//    videos: &videos,
-//    job_progress_reporter: &mut job_progress_reporter,
-//    inference_duration,
-//  }).await?;
+
+
+  // ==================== VALIDATE AND SAVE RESULTS ======================== //
+
+  //let media_file_token = validate_and_save_results(SaveResultsArgs {
+  //  job,
+  //  deps: &deps,
+  //  job_args: &job_args,
+  //  comfy_deps,
+  //  comfy_args,
+  //  videos: &videos,
+  //  job_progress_reporter: &mut job_progress_reporter,
+  //  inference_duration,
+  //}).await?;
+
+  // TODO(bt,2024-07-16): Clean all of this up.
+
+  const PREFIX: &str = "storyteller_";
+  let ext_suffix = ".mp4";
+
+  let result_bucket_location = MediaFileBucketPath::generate_new(
+    Some(&PREFIX),
+    Some(&ext_suffix));
+
+  let file_checksum = sha256_hash_file(&output_file_path)
+      .map_err(|err| {
+        ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
+      })?;
+
+  let file_size_bytes = file_size(&output_file_path)
+      .map_err(|err| ProcessSingleJobError::Other(err))?;
+
+  let mimetype = get_mimetype_for_file(&output_file_path)
+      .map_err(|err| ProcessSingleJobError::from_io_error(err))?
+      .map(|mime| mime.to_string())
+      .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
+
+  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+
+  info!("Output file destination bucket path: {:?}", &result_bucket_object_pathbuf);
+
+  info!("Uploading media ...");
+
+  deps.buckets.public_bucket_client.upload_filename_with_content_type(
+    &result_bucket_object_pathbuf,
+    &output_file_path,
+    &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
+      .await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
+    pool: &deps.db.mysql_pool,
+    job: &job,
+    maybe_mime_type: Some(&mimetype),
+    maybe_title: None,
+    maybe_style_transfer_source_media_file_token: Some(&portrait_media_token),
+    maybe_scene_source_media_file_token: None,
+    file_size_bytes,
+    sha256_checksum: &file_checksum,
+    maybe_prompt_token: None,
+    public_bucket_directory_hash: result_bucket_location.get_object_hash(),
+    maybe_public_bucket_prefix: Some(PREFIX),
+    maybe_public_bucket_extension: Some(&ext_suffix),
+    is_on_prem: deps.job.info.container.is_on_prem,
+    worker_hostname: &deps.job.info.container.hostname,
+    worker_cluster: &deps.job.info.container.cluster_name,
+    extra_file_modification_info: None,
+  })
+      .await
+      .map_err(|e| {
+        error!("Error saving media file record: {:?}", e);
+        ProcessSingleJobError::Other(e)
+      })?;
 
   // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
 
