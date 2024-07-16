@@ -53,7 +53,8 @@ impl ScopedJobTypeExecution {
 pub fn parse_job_types(comma_separated_types: &str) -> AnyhowResult<BTreeSet<InferenceJobType>> {
   let scoped_types = comma_separated_types.trim()
       .split(",")
-      .map(|val| val.to_lowercase())
+      .map(|val| val.trim().to_lowercase())
+      .filter(|val| !val.is_empty())
       .collect::<Vec<String>>();
 
   let mut job_types = BTreeSet::new();
@@ -86,6 +87,13 @@ mod tests {
   }
 
   #[test]
+  fn test_parse_empty() {
+    assert_eq!(parse_job_types("").unwrap(), BTreeSet::from([]));
+    assert_eq!(parse_job_types("   ").unwrap(), BTreeSet::from([]));
+    assert_eq!(parse_job_types(" ,,, , ,  ").unwrap(), BTreeSet::from([]));
+  }
+
+  #[test]
   fn test_can_execute() {
     let scoping = ScopedJobTypeExecution::new_from_set(BTreeSet::from([
       InferenceJobType::RvcV2,
@@ -95,6 +103,16 @@ mod tests {
     assert_eq!(true, scoping.can_run_job(InferenceJobType::RvcV2));
     assert_eq!(true, scoping.can_run_job(InferenceJobType::SadTalker));
 
+    assert_eq!(false, scoping.can_run_job(InferenceJobType::SoVitsSvc));
+    assert_eq!(false, scoping.can_run_job(InferenceJobType::LivePortrait));
+  }
+
+  #[test]
+  fn test_can_execute_empty() {
+    let scoping = ScopedJobTypeExecution::new_from_set(BTreeSet::from([]));
+
+    assert_eq!(false, scoping.can_run_job(InferenceJobType::RvcV2));
+    assert_eq!(false, scoping.can_run_job(InferenceJobType::SadTalker));
     assert_eq!(false, scoping.can_run_job(InferenceJobType::SoVitsSvc));
     assert_eq!(false, scoping.can_run_job(InferenceJobType::LivePortrait));
   }

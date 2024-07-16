@@ -58,7 +58,8 @@ impl ScopedModelTypeExecution {
 pub fn parse_model_types(comma_separated_types: &str) -> AnyhowResult<BTreeSet<InferenceModelType>> {
   let scoped_types = comma_separated_types.trim()
       .split(",")
-      .map(|val| val.to_lowercase())
+      .map(|val| val.trim().to_lowercase())
+      .filter(|val| !val.is_empty())
       .collect::<Vec<String>>();
 
   let mut model_types = BTreeSet::new();
@@ -91,6 +92,13 @@ mod tests {
   }
 
   #[test]
+  fn test_parse_empty() {
+    assert_eq!(parse_model_types("").unwrap(), BTreeSet::from([]));
+    assert_eq!(parse_model_types("    ").unwrap(), BTreeSet::from([]));
+    assert_eq!(parse_model_types("  ,,,  , ,  ").unwrap(), BTreeSet::from([]));
+  }
+
+  #[test]
   fn test_can_execute() {
     let scoping = ScopedModelTypeExecution::new_from_set(BTreeSet::from([
       InferenceModelType::RvcV2,
@@ -100,6 +108,16 @@ mod tests {
     assert_eq!(true, scoping.can_run_job(InferenceModelType::RvcV2));
     assert_eq!(true, scoping.can_run_job(InferenceModelType::Vits));
 
+    assert_eq!(false, scoping.can_run_job(InferenceModelType::SoVitsSvc));
+    assert_eq!(false, scoping.can_run_job(InferenceModelType::Tacotron2));
+  }
+
+  #[test]
+  fn test_can_execute_empty() {
+    let scoping = ScopedModelTypeExecution::new_from_set(BTreeSet::from([]));
+
+    assert_eq!(false, scoping.can_run_job(InferenceModelType::RvcV2));
+    assert_eq!(false, scoping.can_run_job(InferenceModelType::Vits));
     assert_eq!(false, scoping.can_run_job(InferenceModelType::SoVitsSvc));
     assert_eq!(false, scoping.can_run_job(InferenceModelType::Tacotron2));
   }
