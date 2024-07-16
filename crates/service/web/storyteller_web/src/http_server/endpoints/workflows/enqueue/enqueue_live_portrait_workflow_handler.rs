@@ -38,7 +38,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
-pub struct EnqueueLivePortraitRequest {
+pub struct EnqueueLivePortraitWorkflowRequest {
   /// Entropy for request de-duplication (required)
   uuid_idempotency_token: String,
 
@@ -59,35 +59,35 @@ pub struct EnqueueLivePortraitRequest {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct EnqueueLivePortraitSuccessResponse {
+pub struct EnqueueLivePortraitWorkflowSuccessResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }
 
 #[derive(Debug, ToSchema)]
-pub enum EnqueueLivePortraitError {
+pub enum EnqueueLivePortraitWorkflowError {
   BadInput(String),
   NotAuthorized,
   ServerError,
   RateLimited,
 }
 
-impl ResponseError for EnqueueLivePortraitError {
+impl ResponseError for EnqueueLivePortraitWorkflowError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      EnqueueLivePortraitError::BadInput(_) => StatusCode::BAD_REQUEST,
-      EnqueueLivePortraitError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EnqueueLivePortraitError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      EnqueueLivePortraitError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      EnqueueLivePortraitWorkflowError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EnqueueLivePortraitWorkflowError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      EnqueueLivePortraitWorkflowError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EnqueueLivePortraitWorkflowError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      EnqueueLivePortraitError::BadInput(reason) => reason.to_string(),
-      EnqueueLivePortraitError::NotAuthorized => "unauthorized".to_string(),
-      EnqueueLivePortraitError::ServerError => "server error".to_string(),
-      EnqueueLivePortraitError::RateLimited => "rate limited".to_string(),
+      EnqueueLivePortraitWorkflowError::BadInput(reason) => reason.to_string(),
+      EnqueueLivePortraitWorkflowError::NotAuthorized => "unauthorized".to_string(),
+      EnqueueLivePortraitWorkflowError::ServerError => "server error".to_string(),
+      EnqueueLivePortraitWorkflowError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -95,29 +95,30 @@ impl ResponseError for EnqueueLivePortraitError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl std::fmt::Display for EnqueueLivePortraitError {
+impl std::fmt::Display for EnqueueLivePortraitWorkflowError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
+/// Enqueue live portrait video workflows.
 #[utoipa::path(
   post,
   tag = "Workflows",
   path = "/v1/workflows/enqueue_live_portrait",
   responses(
-    (status = 200, description = "Success", body = EnqueueLivePortraitSuccessResponse),
-    (status = 400, description = "Bad input", body = EnqueueLivePortraitError),
-    (status = 401, description = "Not authorized", body = EnqueueLivePortraitError),
-    (status = 429, description = "Rate limited", body = EnqueueLivePortraitError),
-    (status = 500, description = "Server error", body = EnqueueLivePortraitError)
+    (status = 200, description = "Success", body = EnqueueLivePortraitWorkflowSuccessResponse),
+    (status = 400, description = "Bad input", body = EnqueueLivePortraitWorkflowError),
+    (status = 401, description = "Not authorized", body = EnqueueLivePortraitWorkflowError),
+    (status = 429, description = "Rate limited", body = EnqueueLivePortraitWorkflowError),
+    (status = 500, description = "Server error", body = EnqueueLivePortraitWorkflowError)
   ),
-  params(("request" = EnqueueLivePortraitRequest, description = "Payload for request"))
+  params(("request" = EnqueueLivePortraitWorkflowRequest, description = "Payload for request"))
 )]
 pub async fn enqueue_live_portrait_workflow_handler(
   http_request: HttpRequest,
-  request: web::Json<EnqueueLivePortraitRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<Json<EnqueueLivePortraitSuccessResponse>, EnqueueLivePortraitError>
+  request: Json<EnqueueLivePortraitWorkflowRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<Json<EnqueueLivePortraitWorkflowSuccessResponse>, EnqueueLivePortraitWorkflowError>
 {
   // ==================== DB ==================== //
 
@@ -126,7 +127,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        EnqueueLivePortraitError::ServerError
+        EnqueueLivePortraitWorkflowError::ServerError
       })?;
 
   // ==================== USER SESSION ==================== //
@@ -140,8 +141,8 @@ pub async fn enqueue_live_portrait_workflow_handler(
     &mut mysql_connection)
       .await
       .map_err(|err| match err {
-        RequireUserSessionError::ServerError => EnqueueLivePortraitError::ServerError,
-        RequireUserSessionError::NotAuthorized => EnqueueLivePortraitError::NotAuthorized,
+        RequireUserSessionError::ServerError => EnqueueLivePortraitWorkflowError::ServerError,
+        RequireUserSessionError::NotAuthorized => EnqueueLivePortraitWorkflowError::NotAuthorized,
       })?;
 
   // ==================== PAID PLAN + PRIORITY ==================== //
@@ -163,20 +164,20 @@ pub async fn enqueue_live_portrait_workflow_handler(
   // ==================== RATE LIMIT ==================== //
 
   if let Err(_err) = server_state.redis_rate_limiters.logged_in.rate_limit_request(&http_request) {
-    return Err(EnqueueLivePortraitError::RateLimited);
+    return Err(EnqueueLivePortraitWorkflowError::RateLimited);
   }
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
-    return Err(EnqueueLivePortraitError::BadInput(reason));
+    return Err(EnqueueLivePortraitWorkflowError::BadInput(reason));
   }
 
   insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        EnqueueLivePortraitError::BadInput("invalid idempotency token".to_string())
+        EnqueueLivePortraitWorkflowError::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== LOOK UP MODEL INFO ==================== //
@@ -277,11 +278,11 @@ pub async fn enqueue_live_portrait_workflow_handler(
     Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
-      return Err(EnqueueLivePortraitError::ServerError);
+      return Err(EnqueueLivePortraitWorkflowError::ServerError);
     }
   };
 
-  Ok(Json(EnqueueLivePortraitSuccessResponse {
+  Ok(Json(EnqueueLivePortraitWorkflowSuccessResponse {
     success: true,
     inference_job_token: job_token,
   }))

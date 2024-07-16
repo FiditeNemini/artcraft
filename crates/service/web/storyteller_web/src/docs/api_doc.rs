@@ -128,6 +128,9 @@ use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::*;
 use crate::http_server::endpoints::weights::update_weight_handler::*;
 use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::*;
+use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
+use crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::*;
+use crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 
 #[derive(OpenApi)]
@@ -212,6 +215,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight_handler::update_weight_handler,
     crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
+    crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler,
+    crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::enqueue_studio_workflow_handler,
+    crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::enqueue_video_style_transfer_workflow_handler,
   ),
   components(schemas(
     // Tokens
@@ -349,12 +355,21 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueFbxToGltfRequest,
     EnqueueFbxToGltfRequestError,
     EnqueueFbxToGltfRequestSuccessResponse,
+    EnqueueLivePortraitWorkflowError,
+    EnqueueLivePortraitWorkflowRequest,
+    EnqueueLivePortraitWorkflowSuccessResponse,
+    EnqueueStudioWorkflowError,
+    EnqueueStudioWorkflowRequest,
+    EnqueueStudioWorkflowSuccessResponse,
     EnqueueTTSRequest,
     EnqueueTTSRequestError,
     EnqueueTTSRequestSuccessResponse,
     EnqueueVideoStyleTransferError,
     EnqueueVideoStyleTransferRequest,
     EnqueueVideoStyleTransferSuccessResponse,
+    EnqueueVideoStyleTransferWorkflowError,
+    EnqueueVideoStyleTransferWorkflowRequest,
+    EnqueueVideoStyleTransferWorkflowSuccessResponse,
     EnqueueVoiceConversionInferenceError,
     EnqueueVoiceConversionInferenceRequest,
     EnqueueVoiceConversionInferenceSuccessResponse,

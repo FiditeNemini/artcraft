@@ -57,7 +57,7 @@ const MAXIMUM_STRENGTH : f32 = 1.0;
 const DEFAULT_STRENGTH : f32 = 1.0;
 
 #[derive(Deserialize, ToSchema)]
-pub struct EnqueueVideoStyleTransferRequest {
+pub struct EnqueueStudioWorkflowRequest {
   /// Entropy for request de-duplication (required)
   uuid_idempotency_token: String,
 
@@ -162,35 +162,35 @@ pub struct EnqueueVideoStyleTransferRequest {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct EnqueueVideoStyleTransferSuccessResponse {
+pub struct EnqueueStudioWorkflowSuccessResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }
 
 #[derive(Debug, ToSchema)]
-pub enum EnqueueVideoStyleTransferError {
+pub enum EnqueueStudioWorkflowError {
   BadInput(String),
   NotAuthorized,
   ServerError,
   RateLimited,
 }
 
-impl ResponseError for EnqueueVideoStyleTransferError {
+impl ResponseError for EnqueueStudioWorkflowError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      EnqueueVideoStyleTransferError::BadInput(_) => StatusCode::BAD_REQUEST,
-      EnqueueVideoStyleTransferError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EnqueueVideoStyleTransferError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      EnqueueVideoStyleTransferError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      EnqueueStudioWorkflowError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EnqueueStudioWorkflowError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      EnqueueStudioWorkflowError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EnqueueStudioWorkflowError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      EnqueueVideoStyleTransferError::BadInput(reason) => reason.to_string(),
-      EnqueueVideoStyleTransferError::NotAuthorized => "unauthorized".to_string(),
-      EnqueueVideoStyleTransferError::ServerError => "server error".to_string(),
-      EnqueueVideoStyleTransferError::RateLimited => "rate limited".to_string(),
+      EnqueueStudioWorkflowError::BadInput(reason) => reason.to_string(),
+      EnqueueStudioWorkflowError::NotAuthorized => "unauthorized".to_string(),
+      EnqueueStudioWorkflowError::ServerError => "server error".to_string(),
+      EnqueueStudioWorkflowError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -198,36 +198,37 @@ impl ResponseError for EnqueueVideoStyleTransferError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl std::fmt::Display for EnqueueVideoStyleTransferError {
+impl std::fmt::Display for EnqueueStudioWorkflowError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
+/// Enqueue Storyteller Studio video workflows.
 #[utoipa::path(
   post,
   tag = "Workflows",
   path = "/v1/workflows/enqueue_studio",
   responses(
-    (status = 200, description = "Success", body = EnqueueVideoStyleTransferSuccessResponse),
-    (status = 400, description = "Bad input", body = EnqueueVideoStyleTransferError),
-    (status = 401, description = "Not authorized", body = EnqueueVideoStyleTransferError),
-    (status = 429, description = "Rate limited", body = EnqueueVideoStyleTransferError),
-    (status = 500, description = "Server error", body = EnqueueVideoStyleTransferError)
+    (status = 200, description = "Success", body = EnqueueStudioWorkflowSuccessResponse),
+    (status = 400, description = "Bad input", body = EnqueueStudioWorkflowError),
+    (status = 401, description = "Not authorized", body = EnqueueStudioWorkflowError),
+    (status = 429, description = "Rate limited", body = EnqueueStudioWorkflowError),
+    (status = 500, description = "Server error", body = EnqueueStudioWorkflowError)
   ),
-  params(("request" = EnqueueVideoStyleTransferRequest, description = "Payload for request"))
+  params(("request" = EnqueueStudioWorkflowRequest, description = "Payload for request"))
 )]
 pub async fn enqueue_studio_workflow_handler(
   http_request: HttpRequest,
-  request: web::Json<EnqueueVideoStyleTransferRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueVideoStyleTransferError>
+  request: web::Json<EnqueueStudioWorkflowRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueStudioWorkflowError>
 {
   // ==================== VALIDATION ==================== //
 
   match request.frame_skip {
     None | Some(1) | Some(2) => {} // Allowed
     _ => {
-      return Err(EnqueueVideoStyleTransferError::BadInput("Invalid frame skip value".to_string()));
+      return Err(EnqueueStudioWorkflowError::BadInput("Invalid frame skip value".to_string()));
     }
   }
 
@@ -238,7 +239,7 @@ pub async fn enqueue_studio_workflow_handler(
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        EnqueueVideoStyleTransferError::ServerError
+        EnqueueStudioWorkflowError::ServerError
       })?;
 
   let maybe_avt_token = server_state.avt_cookie_manager
@@ -252,7 +253,7 @@ pub async fn enqueue_studio_workflow_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        EnqueueVideoStyleTransferError::ServerError
+        EnqueueStudioWorkflowError::ServerError
       })?;
 
   let maybe_user_token = maybe_user_session
@@ -263,7 +264,7 @@ pub async fn enqueue_studio_workflow_handler(
 
   if !allowed_video_style_transfer_access(maybe_user_session.as_ref(), &server_state.flags) {
     warn!("Video style transfer access is not permitted for user");
-    return Err(EnqueueVideoStyleTransferError::NotAuthorized);
+    return Err(EnqueueStudioWorkflowError::NotAuthorized);
   }
 
   // ==================== PAID PLAN + PRIORITY ==================== //
@@ -293,27 +294,27 @@ pub async fn enqueue_studio_workflow_handler(
     None => &server_state.redis_rate_limiters.logged_out,
     Some(ref user) => {
       if user.role.is_banned {
-        return Err(EnqueueVideoStyleTransferError::NotAuthorized);
+        return Err(EnqueueStudioWorkflowError::NotAuthorized);
       }
       &server_state.redis_rate_limiters.logged_in
     },
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(EnqueueVideoStyleTransferError::RateLimited);
+    return Err(EnqueueStudioWorkflowError::RateLimited);
   }
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
-    return Err(EnqueueVideoStyleTransferError::BadInput(reason));
+    return Err(EnqueueStudioWorkflowError::BadInput(reason));
   }
 
   insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        EnqueueVideoStyleTransferError::BadInput("invalid idempotency token".to_string())
+        EnqueueStudioWorkflowError::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== LOOK UP MODEL INFO ==================== //
@@ -351,7 +352,7 @@ pub async fn enqueue_studio_workflow_handler(
   let maybe_strength = request.use_strength
       .map(|strength| {
         if strength < MINIMUM_STRENGTH || strength > MAXIMUM_STRENGTH {
-          Err(EnqueueVideoStyleTransferError::BadInput("Strength must be between 0.0 and 1.0".to_string()))
+          Err(EnqueueStudioWorkflowError::BadInput("Strength must be between 0.0 and 1.0".to_string()))
         } else {
           Ok(strength)
         }
@@ -470,17 +471,17 @@ pub async fn enqueue_studio_workflow_handler(
     Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
-      return Err(EnqueueVideoStyleTransferError::ServerError);
+      return Err(EnqueueStudioWorkflowError::ServerError);
     }
   };
 
-  let response: EnqueueVideoStyleTransferSuccessResponse = EnqueueVideoStyleTransferSuccessResponse {
+  let response: EnqueueStudioWorkflowSuccessResponse = EnqueueStudioWorkflowSuccessResponse {
     success: true,
     inference_job_token: job_token,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| EnqueueVideoStyleTransferError::ServerError)?;
+      .map_err(|_e| EnqueueStudioWorkflowError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")
