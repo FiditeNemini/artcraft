@@ -190,7 +190,7 @@ mod tests {
 
       // By default, cinematic is on.
       assert_eq!(coordinated_args.use_cinematic, Some(true));
-      
+
       // Everything else is off.
       assert_eq!(coordinated_args.use_lipsync, None);
       assert_eq!(coordinated_args.use_face_detailer, None);
