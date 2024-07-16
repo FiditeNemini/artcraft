@@ -26,6 +26,7 @@ export const SidePanelMenu = ({
 }) => {
   useSignals();
   const showSetsTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SETS_TAB);
+  const showSkyboxesTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SKYBOXES_TAB);
   const showImagePlaneTab = usePosthogFeatureFlag(
     FeatureFlags.SHOW_IMAGEPLANE_TAB,
   );
@@ -46,6 +47,9 @@ export const SidePanelMenu = ({
       <div className="flex w-full flex-col gap-2">
         {(tabs ?? []).map((tab) => {
           if (tab.title === TabTitles.OBJECTS_SETS && !showSetsTab) {
+            return;
+          }
+          if (tab.title === TabTitles.SKYBOXES && !showSkyboxesTab) {
             return;
           }
           if (tab.title === TabTitles.IMAGE_PLANE && !showImagePlaneTab) {

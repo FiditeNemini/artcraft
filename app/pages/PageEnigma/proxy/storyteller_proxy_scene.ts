@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GLTFLoader, GLTF } from "three/addons/loaders/GLTFLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
   StoryTellerProxy3DObject,
   ObjectJSON,
@@ -108,7 +108,11 @@ export class StoryTellerProxyScene {
     return results;
   }
 
-  public async loadFromSceneJson(scene_json: ObjectJSON[], version: number) {
+  public async loadFromSceneJson(
+    scene_json: ObjectJSON[],
+    skybox_media_id: string,
+    version: number,
+  ) {
     console.log(scene_json);
     if (scene_json != null && this.scene != null) {
       while (this.scene.scene.children.length > 0) {
@@ -145,9 +149,7 @@ export class StoryTellerProxyScene {
                 keyframe_uuid,
               );
             } else if (token.includes("Image::")) {
-              const prim_uuid = this.scene.instantiate(
-                token,
-              ).uuid;
+              const prim_uuid = this.scene.instantiate(token).uuid;
               obj = this.scene.get_object_by_uuid(prim_uuid);
             }
             break;
@@ -179,6 +181,7 @@ export class StoryTellerProxyScene {
         }
       }
       this.scene._createGrid();
+      this.scene.updateSkybox(skybox_media_id);
     }
   }
 }

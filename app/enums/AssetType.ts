@@ -5,5 +5,6 @@ export enum AssetType {
   CHARACTER = "character",
   EXPRESSION = "expression",
   OBJECT = "object",
+  SKYBOX = "skybox",
   SHAPE = "shape",
 }

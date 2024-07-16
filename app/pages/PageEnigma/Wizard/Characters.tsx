@@ -14,7 +14,7 @@ import {
   selectedCharacters,
 } from "~/pages/PageEnigma/Wizard/signals/wizard";
 import { useSignals } from "@preact/signals-react/runtime";
-import { characterItems } from "~/pages/PageEnigma/signals";
+import { demoCharacterItems } from "~/pages/PageEnigma/signals";
 
 export const Characters = () => {
   useSignals();
@@ -55,7 +55,7 @@ export const Characters = () => {
     if (response.success && response.data) {
       characterWizardItems.value = [
         ...responseMapping(response.data),
-        ...characterItems.value,
+        ...demoCharacterItems.value,
       ];
       return;
     }

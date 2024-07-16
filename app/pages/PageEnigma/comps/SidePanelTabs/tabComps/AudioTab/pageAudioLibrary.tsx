@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { useSignals } from "@preact/signals-react/runtime";
-import { audioItems } from "~/pages/PageEnigma/signals";
+import { demoAudioItems } from "~/pages/PageEnigma/signals";
 
 import {
   Button,
@@ -30,7 +30,7 @@ export const PageAudioLibrary = ({
   const [selectedFilter, setSelectedFilter] = useState(AssetFilterOption.MINE);
   const filteredAudioItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? audioItems.value ?? []
+      ? demoAudioItems.value ?? []
       : userAudioItems.value ?? [];
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 20;

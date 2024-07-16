@@ -52,6 +52,7 @@ export class SaveManager {
       scene: scene_json,
       ...sceneGenerationMetadata,
       timeline: timeline_json,
+      skybox: this.editor.activeScene.skybox,
       camera_data: {
         position: this.editor.camera?.position,
         rotation: this.editor.camera?.rotation,
@@ -98,6 +99,7 @@ export class SaveManager {
       scene: scene_json,
       ...sceneGenerationMetadata,
       timeline: timeline_json,
+      skybox: this.editor.activeScene.skybox,
       camera_data: {
         position: this.editor.camera?.position,
         rotation: this.editor.camera?.rotation,
@@ -150,6 +152,7 @@ export class SaveManager {
 
     await proxyScene.loadFromSceneJson(
       scene_json["scene"],
+      scene_json["skybox"],
       scene_json["version"],
     );
 
@@ -206,7 +209,7 @@ export class SaveManager {
       this.editor.emotion_engine,
     );
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
-
+    
     this.editor.timeline.checkEditorCanPlay();
 
     hideEditorLoader();

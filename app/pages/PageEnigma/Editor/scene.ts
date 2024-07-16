@@ -24,6 +24,8 @@ class Scene {
 
   shader_objects: Water[] = [];
 
+  skybox: string;
+
   // loading indicator manager
   placeholder_manager: LoadingPlaceHolderManager | undefined;
 
@@ -42,6 +44,7 @@ class Scene {
     this.message_mesh = undefined;
     this.loading_placeholder = undefined;
     this.message_font = undefined;
+    this.skybox = "Default";
 
     // global names
     this.camera_name = camera_name;
@@ -642,26 +645,45 @@ class Scene {
   _create_skybox() {
     const loader = new THREE.CubeTextureLoader();
 
-    // const texture = loader.load([
-    //     '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
-    //     '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
-    //     '/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png',
-    //     '/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png',
-    //     '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
-    //     '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
-    // ]);
+    if (this.skybox == "m_0") {
+      const texture = loader.load([
+        "/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png",
+        "/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png",
+        "/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png",
+        "/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png",
+        "/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png",
+        "/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png",
+      ]);
+      this.scene.background = texture;
+    }
+    else if (this.skybox == "m_1") {
+      const texture = loader.load([
+        "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
+        "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_3_Right-X.png",
+        "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_4_UpY.png",
+        "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_5_Down-Y.png",
+        "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_0_FrontZ.png",
+        "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_1_Back-Z.png",
+      ]);
+      this.scene.background = texture;
+    } else {
+      const texture = loader.load([
+        "/resources/skybox/day/px.png",
+        "/resources/skybox/day/nx.png",
+        "/resources/skybox/day/py.png",
+        "/resources/skybox/day/ny.png",
+        "/resources/skybox/day/pz.png",
+        "/resources/skybox/day/nz.png",
+      ]);
+      this.scene.background = texture;
+    }
 
-    const texture = loader.load([
-      "/resources/skybox/day/px.png",
-      "/resources/skybox/day/nx.png",
-      "/resources/skybox/day/py.png",
-      "/resources/skybox/day/ny.png",
-      "/resources/skybox/day/pz.png",
-      "/resources/skybox/day/nz.png",
-    ]);
-
-    this.scene.background = texture;
     console.log("Backround creation..");
+  }
+
+  updateSkybox(media_id: string) {
+    this.skybox = media_id;
+    this._create_skybox();
   }
 
   // deafult image skybox.

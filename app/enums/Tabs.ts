@@ -9,5 +9,6 @@ export enum TabTitles {
   OBJECTS = "Set Dressings",
   OBJECTS_CREATURES = "Creatures",
   OBJECTS_SETS = "Film Sets",
+  SKYBOXES = "Skyboxes",
   STYLIZE = "AI Stylize",
 }

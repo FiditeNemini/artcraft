@@ -5,7 +5,10 @@ import { MediaFileAnimationType, TabTitles } from "~/enums";
 import { TabTitle } from "../../sharedComps";
 import { AnimationTab } from "./subpageAnimation";
 import { CharactersTab } from "./subpageCharacters";
-import { characterItems, animationItems } from "~/pages/PageEnigma/signals";
+import {
+  demoCharacterItems,
+  demoAnimationItems,
+} from "~/pages/PageEnigma/signals";
 
 export const CartoonsTab = () => {
   useSignals();
@@ -49,13 +52,13 @@ export const CartoonsTab = () => {
       {subPage === TabTitles.CHARACTERS && (
         <CharactersTab
           animationType={MediaFileAnimationType.Mixamo}
-          demoCharacterItems={characterItems.value}
+          demoCharacterItems={demoCharacterItems.value}
         />
       )}
       {subPage === TabTitles.ANIMATION && (
         <AnimationTab
           animationType={MediaFileAnimationType.Mixamo}
-          demoAnimationItems={animationItems.value}
+          demoAnimationItems={demoAnimationItems.value}
         />
       )}
     </>

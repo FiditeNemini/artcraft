@@ -118,7 +118,11 @@ export class SceneManager implements SceneManagerAPI {
     name: string,
     position: THREE.Vector3,
   ): Promise<THREE.Object3D<THREE.Object3DEventMap>> {
-    if (media_token !== "Parim") {
+    if (media_token.includes("SKY::")){
+      const token = media_token.replace("SKY::", "");
+      this.scene.updateSkybox(token);
+    }
+    else if (media_token !== "Parim") {
       return await this.scene.loadObject(
         media_token,
         name,
@@ -129,6 +133,10 @@ export class SceneManager implements SceneManagerAPI {
     } else {
       return this.scene.instantiate(name, position);
     }
+  }
+
+  updateSkybox(media_id: string) {
+    this.scene.updateSkybox(media_id);
   }
 
   /* NEVER CALL THIS INTERNALLY */

@@ -89,6 +89,17 @@ class DndAsset {
         if (dragItem.value.type === AssetType.SHAPE) {
           addShape(dragItem.value);
         }
+
+        /*
+        
+         THIS IS A TEMPARARY SOLUTION TO A LONG PROBLEM WITH SKYBOXES
+         UPDATE THIS WHEN UPLOADING SKYBOXES ARE FULLY IMPLEMENTED.
+         THIS IS JUST TEMPARARY!!!
+        
+        */
+        if (dragItem.value.type === AssetType.SKYBOX) {
+          addObject(dragItem.value);
+        }
         this.endDrag();
         return;
       }

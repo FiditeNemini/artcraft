@@ -9,7 +9,7 @@ import {
   OBJECT_FILE_TYPE,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
-import { shapeItems } from "~/pages/PageEnigma/signals";
+import { demoShapeItems } from "~/pages/PageEnigma/signals";
 
 import {
   TabTitle,
@@ -82,7 +82,7 @@ export const ObjectsTab = () => {
 
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? [...shapeItems.value, ...(featuredObjects ?? [])]
+      ? [...demoShapeItems.value, ...(featuredObjects ?? [])]
       : userObjects ?? [];
 
   const pageSize = 21;
@@ -130,7 +130,7 @@ export const ObjectsTab = () => {
   );
 
   const filterObjectItems = (searchTerm: string) =>
-    shapeItems.value.filter((item) =>
+    demoShapeItems.value.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 

@@ -5,6 +5,7 @@ import {
   faCatSpace,
   faFaceSmileWink,
   faGlobeSnow,
+  faMountainCity,
   faPresentationScreen,
   faRaygun,
   faSpaghettiMonsterFlying,
@@ -13,13 +14,14 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 
 import { TabTitles } from "~/enums";
-import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ObjectsTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/AudioTab";
-import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/StylizeTab/StylizeTab";
-import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
 import { CreaturesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CreaturesTab";
-import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
+import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
 import { ImagePlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ImagePlanesTab";
+import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ObjectsTab";
+import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
+import { SkyboxesTab } from "../SidePanelTabs/tabComps/SkyboxesTab";
+import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/StylizeTab/StylizeTab";
 import {
   AnimeTab,
   CartoonsTab,
@@ -38,9 +40,14 @@ export const tabList = [
     component: <StylizeTab />,
   },
   {
-    icon: faGlobeSnow,
+    icon: faMountainCity,
     title: TabTitles.OBJECTS_SETS,
     component: <SetsTab />,
+  },
+  {
+    icon: faGlobeSnow,
+    title: TabTitles.SKYBOXES,
+    component: <SkyboxesTab />,
   },
   {
     icon: faSpaghettiMonsterFlying,
