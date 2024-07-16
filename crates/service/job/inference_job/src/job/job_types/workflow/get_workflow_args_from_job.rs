@@ -1,15 +1,15 @@
 use errors::anyhow;
 use mysql_queries::payloads::generic_inference_args::{generic_inference_args::PolymorphicInferenceArgs, workflow_payload::WorkflowArgs};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_process_job_args::ComfyProcessJobArgs;
 
 pub fn get_workflow_args_from_job(
-  args: &ComfyProcessJobArgs<'_>
+  job: &AvailableInferenceJob,
 ) -> Result<WorkflowArgs, ProcessSingleJobError> {
 
-  let inference_args = args.job.maybe_inference_args
+  let inference_args = job.maybe_inference_args
       .as_ref()
       .map(|args: &GenericInferenceArgs| args.args.as_ref())
       .flatten();

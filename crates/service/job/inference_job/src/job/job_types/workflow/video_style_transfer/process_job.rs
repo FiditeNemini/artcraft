@@ -43,7 +43,6 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
 use crate::job::job_types::workflow::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
@@ -60,18 +59,15 @@ use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 
-pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
-    let job = args.job;
-    let deps = args.job_dependencies;
+pub async fn process_job(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
-    let mut job_progress_reporter = args.job_dependencies
+    let mut job_progress_reporter = deps
         .clients
         .job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-    let comfy_deps = args
-        .job_dependencies
+    let comfy_deps = deps
         .job
         .job_specific_dependencies
         .maybe_comfy_ui_dependencies
@@ -88,7 +84,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let work_temp_dir = format!("temp_comfy_inference{}", job.id.0);
 
     // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-    let work_temp_dir = args.job_dependencies
+    let work_temp_dir = deps
         .fs
         .scoped_temp_dir_creator_for_work
         .new_tempdir(&work_temp_dir)
@@ -492,7 +488,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Result video media token: {:?}", &media_file_token);
 
-    info!("Job {:?} complete success!", args.job.id);
+    info!("Job {:?} complete success!", job.id);
 
     Ok(JobSuccessResult {
         maybe_result_entity: Some(ResultEntity {

@@ -11,6 +11,7 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use filesys::file_exists::file_exists;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::model_weights::create::create_weight;
 use mysql_queries::queries::model_weights::create::create_weight::CreateModelWeightsArgs;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -18,15 +19,13 @@ use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_process_job_args::ComfyProcessJobArgs;
 use crate::job::job_types::workflow::get_workflow_args_from_job::get_workflow_args_from_job;
+use crate::job_dependencies::JobDependencies;
 
-pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError>{
-   let job = args.job;
-   let deps = args.job_dependencies;
+pub async fn upload_prompt(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError>{
    let mysql_pool = &deps.db.mysql_pool;
 
-    let wf_args = get_workflow_args_from_job(&args)?;
+    let wf_args = get_workflow_args_from_job(&job)?;
 
     let title = match wf_args.maybe_title {
         Some(val) => {
@@ -86,7 +85,7 @@ pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessRe
     info!("Downloading {}", download_url);
 
     let work_temp_dir = format!("workflow_upload_{}", job.id.0);
-    let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
+    let work_temp_dir = deps.fs.scoped_temp_dir_creator_for_work
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
