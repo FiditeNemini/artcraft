@@ -5,19 +5,11 @@ use mysql_queries::payloads::generic_inference_args::image_generation_payload::S
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::process_job::StableDiffusionProcessArgs;
+use crate::util::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
 
 pub async fn validate_inputs(args: StableDiffusionProcessArgs<'_>) -> Result<(), ProcessSingleJobError> {
-    let inference_args = args.job.maybe_inference_args
-    .as_ref()
-    .map(|args| args.args.as_ref())
-    .flatten();
 
-    let polymorphic_args = match inference_args {
-        Some(args) => args,
-        None => {
-            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no inference args for job!")));
-        }
-    };
+    let polymorphic_args = get_polymorphic_args_from_job(&args.job)?;
 
     let sd_args = match polymorphic_args {
         PolymorphicInferenceArgs::Ig(args) => args,
@@ -27,6 +19,7 @@ pub async fn validate_inputs(args: StableDiffusionProcessArgs<'_>) -> Result<(),
     };
 
     let stable_diffusion_args: StableDiffusionArgs = StableDiffusionArgs::from(sd_args.clone());
+
     if stable_diffusion_args.type_of_inference == "checkpoint" {
         
     } else if stable_diffusion_args.type_of_inference == "lora" {
@@ -36,8 +29,6 @@ pub async fn validate_inputs(args: StableDiffusionProcessArgs<'_>) -> Result<(),
     } else {
         return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inference type for job!")));
     }
-
-
 
     Ok(())
 }
