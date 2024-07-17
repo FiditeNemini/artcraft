@@ -1,7 +1,6 @@
 use std::path::Path;
 
 use filesys::path_to_string::path_to_string;
-use primitives::bool_to_str::bool_to_str;
 use subprocess_common::command_runner::command_args::CommandArgs;
 
 #[derive(Debug)]

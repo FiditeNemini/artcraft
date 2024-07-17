@@ -117,7 +117,7 @@ mod test {
   use std::path::Path;
 
   use crate::job::job_types::lipsync::sad_talker::model_downloaders::{SadTalkerModelFirstMapping, SadTalkerModelSecondMapping};
-  use crate::util::model_downloader::ModelDownloader;
+  use crate::util::downloaders::model_downloader::ModelDownloader;
 
   #[test]
   fn test_downloader_model_first_mapping() {

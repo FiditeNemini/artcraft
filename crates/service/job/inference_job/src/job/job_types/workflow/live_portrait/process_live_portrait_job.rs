@@ -43,7 +43,9 @@ use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::lipsync::sad_talker::categorize_error::categorize_error;
 use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
+use crate::job::job_types::workflow::live_portrait::categorize_live_portrait_error::categorize_live_portrait_error;
 use crate::job::job_types::workflow::live_portrait::command_args::LivePortraitCommandArgs;
 use crate::job::job_types::workflow::live_portrait::extract_live_portrait_payload_from_job::extract_live_portrait_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
@@ -193,16 +195,19 @@ pub async fn process_live_portrait_job(
     info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
   }
 
+  // ==================== CHECK STATUS ======================== //
+
+  // if !command_exit_status.is_success() {
+  //   error!("Inference failed: {:?}", command_exit_status);
+  // }
+
   // ==================== CHECK OUTPUT FILE ======================== //
 
   if let Err(err) = check_file_exists(&output_file_path) {
     error!("Output file does not  exist: {:?}", err);
+    error!("Inference failed with exit status: {:?}", command_exit_status);
 
-    error!("Inference failed: {:?}", command_exit_status);
-
-    if let Ok(contents) = read_to_string(&stderr_output_file) {
-      warn!("Captured stderr output: {}", contents);
-    }
+    print_and_detect_stderr_issues(&stderr_output_file)?;
 
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_file(&stdout_output_file);
@@ -334,4 +339,25 @@ pub async fn process_live_portrait_job(
     }),
     inference_duration,
   })
+}
+
+fn print_and_detect_stderr_issues(stderr_output_file: &Path) -> Result<(), ProcessSingleJobError> {
+  let contents = match read_to_string(stderr_output_file) {
+    Ok(contents) => {
+      warn!("Captured stderr output: {}", contents);
+      contents
+    },
+    Err(err) => {
+      error!("Error reading stderr output: {:?}", err);
+      return Ok(());
+    }
+  };
+
+  match categorize_live_portrait_error(&contents) {
+    Some(ProcessSingleJobError::FaceDetectionFailure) => {
+      warn!("Face not detected in source");
+      Err(ProcessSingleJobError::FaceDetectionFailure)
+    }
+    _ => Ok(())
+  }
 }
