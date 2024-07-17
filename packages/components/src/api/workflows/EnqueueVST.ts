@@ -44,5 +44,5 @@ export const EnqueueVST = MakeRequest<
   {}
 >({
   method: "POST",
-  routingFunction: () => `/v1/video/enqueue_vst`,
+  routingFunction: () => `/v1/workflows/enqueue_vst`,
 });

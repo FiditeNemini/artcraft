@@ -25,7 +25,7 @@ import "./StudioTutorial.scss";
 import {
   EnqueueVST,
   EnqueueVSTResponse,
-} from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
+} from "@storyteller/components/src/api/workflows/EnqueueVST";
 
 interface Props {
   sessionWrapper: SessionWrapper;
