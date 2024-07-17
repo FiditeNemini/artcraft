@@ -16,6 +16,9 @@ use crate::http_server::http_server_shared_state::HttpServerSharedState;
 #[derive(Serialize)]
 pub struct HealthCheckResponse {
   pub success: bool,
+
+  /// The server goes unhealthy when the consecutive job failure count exceeds
+  /// a configured threshold.
   pub is_healthy: bool,
 
   pub consecutive_failure_count: u64,

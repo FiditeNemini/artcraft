@@ -32,8 +32,9 @@ impl CommandArgs for LivePortraitCommandArgs<'_> {
     command.push_str(" --output-filename ");
     command.push_str(&path_to_string(self.output_file));
 
-    command.push_str(" --input-is-image ");
-    command.push_str(bool_to_str(self.input_is_image));
+    if self.input_is_image {
+      command.push_str(" --input-is-image ");
+    }
 
     command.push_str(" ");
 
