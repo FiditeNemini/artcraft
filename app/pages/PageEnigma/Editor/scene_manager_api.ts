@@ -243,6 +243,7 @@ export class SceneManager implements SceneManagerAPI {
   }
 
   public async copy() {
+    // TODO MAKE BETTER FIX: Temp disables copy and paste of characters. 
     const object = this.mouse_controls.selected?.at(0)
     if(object !== undefined ){
       if(this.is_character(object.uuid) === false)
