@@ -18,6 +18,7 @@ import {
   lipSync,
   cinematic,
   enginePreProcessing,
+  engineRenderSeparately
 } from "~/pages/PageEnigma/signals/stylizeTab";
 import { twMerge } from "tailwind-merge";
 
@@ -79,6 +80,13 @@ export function StyleButtons() {
       editorEngine.engine_preprocessing = enginePreProcessing.value;
     }
   };
+
+  const engineRenderSeparatelyChange = () => {
+    engineRenderSeparately.value = !engineRenderSeparately.value;
+    if (editorEngine) {
+      editorEngine.engineRenderSeparately = engineRenderSeparately.value;
+    }
+  }
 
   const handleUpscaleChange = () => {
     upscale.value = !upscale.value;
@@ -198,6 +206,7 @@ export function StyleButtons() {
                   </Switch>
                 </Switch.Group>
               </div>
+              
               <hr className="opacity-[5%]" />
               <div className="flex w-full items-center">
                 <Switch.Group>
@@ -281,6 +290,36 @@ export function StyleButtons() {
                   <span
                     className={`${
                       enginePreProcessing.value
+                        ? "translate-x-6"
+                        : "translate-x-1"
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+              </Switch.Group>
+            </div>
+            <hr className="opacity-[5%]" />
+            <div className="flex w-full items-center">
+              <Switch.Group>
+                <Switch.Label
+                  className={twMerge(
+                    "mr-3 grow text-sm font-medium transition-opacity",
+                  )}
+                >
+                  Render Separately
+                </Switch.Label>
+                <Switch
+                  checked={engineRenderSeparately.value}
+                  onChange={engineRenderSeparatelyChange}
+                  className={twMerge(
+                    engineRenderSeparately.value
+                      ? "bg-brand-primary hover:bg-brand-primary-400"
+                      : "bg-gray-500 hover:bg-gray-400",
+                    "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
+                  )}
+                >
+                  <span
+                    className={`${
+                      engineRenderSeparately.value
                         ? "translate-x-6"
                         : "translate-x-1"
                     } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}

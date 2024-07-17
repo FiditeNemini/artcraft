@@ -370,12 +370,15 @@ export class VideoGeneration {
 
       if (image_index === 0) {
         upload_tokens.color = upload_token;
-      } else if (image_index === 1) {
+      } else if (image_index === 1 && this.editor.engineRenderSeparately == false) {
         upload_tokens.normal = upload_token;
       } else if (image_index === 2) {
         upload_tokens.depth = upload_token;
       } else if (image_index === 3) {
         upload_tokens.outline = upload_token;
+      } else if (this.editor.engineRenderSeparately ) {
+          console.log("https://storyteller.ai/media/" + upload_tokens.color);
+          console.log("https://storyteller.ai/media/" + upload_token);
       }
 
       await this.sleep(2000); // TODO: REMOVE THIS WHEN TOO MANY REQUESTS ERROR IS SOLVED.

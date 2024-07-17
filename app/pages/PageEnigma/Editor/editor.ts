@@ -110,6 +110,7 @@ class Editor {
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
+  engineRenderSeparately: boolean = false;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -928,45 +929,97 @@ class Editor {
 
       if (this.timeline.is_playing) {
         this.setColorMap();
-        this.render_composer?.render();
-        const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // High quality png.
+        if (this.engineRenderSeparately) {
+          this.timeline.loadCharacters();
+          this.render_camera?.layers.set(0);
 
-        if (this.engine_preprocessing) {
-          this.setNormalMap();
+          for (const key in this.timeline.characters) {
+            if (this.timeline.characters.hasOwnProperty(key)) {  // Check if the key is the object's own property
+              const char = this.activeScene.get_object_by_uuid(key);
+              char?.traverse( function(child) {
+                child.layers.set(6);
+              });
+            }
+          }
+          
+          this.activeScene.scene.children.forEach(child => {
+            if (child.type == "DirectionalLight" || child.type == "HemisphereLight"  || child.type == "PointLight") {
+              child.layers.set(0);
+              child.layers.enable(1);
+              child.layers.enable(6);
+            }
+          });
+          //this.rawRenderer.setSize(width, height);
           this.render_composer?.render();
-          const normalImgData = this.rawRenderer.domElement.toDataURL(
+          const imgData = this.rawRenderer.domElement.toDataURL(
             "image/png",
             1.0,
           ); // High quality png.
 
-          this.setRenderDepth();
+          this.render_camera?.layers.set(6);
+
           this.render_composer?.render();
-          const depthImgData = this.rawRenderer.domElement.toDataURL(
+          const imgDataChars = this.rawRenderer.domElement.toDataURL(
             "image/png",
             1.0,
           ); // High quality png.
 
-          this.setOutlineRender();
+          this.frame_buffer.push([imgData, imgDataChars]);
+        }
+        else {
+          this.setColorMap();
           this.render_composer?.render();
-          const outlineImgData = this.rawRenderer.domElement.toDataURL(
+          const imgData = this.rawRenderer.domElement.toDataURL(
             "image/png",
             1.0,
           ); // High quality png.
 
-          this.frame_buffer.push([
-            imgData,
-            normalImgData,
-            depthImgData,
-            outlineImgData,
-          ]);
-        } else {
-          this.frame_buffer.push([imgData]);
+          if (this.engine_preprocessing) {
+            this.setNormalMap();
+            this.render_composer?.render();
+            const normalImgData = this.rawRenderer.domElement.toDataURL(
+              "image/png",
+              1.0,
+            ); // High quality png.
+
+            this.setRenderDepth();
+            this.render_composer?.render();
+            const depthImgData = this.rawRenderer.domElement.toDataURL(
+              "image/png",
+              1.0,
+            ); // High quality png.
+
+            this.setOutlineRender();
+            this.render_composer?.render();
+            const outlineImgData = this.rawRenderer.domElement.toDataURL(
+              "image/png",
+              1.0,
+            ); // High quality png.
+
+            this.frame_buffer.push([
+              imgData,
+              normalImgData,
+              depthImgData,
+              outlineImgData,
+            ]);
+          } else {
+            this.frame_buffer.push([imgData]);
+          }
         }
         this.render_timer += this.clock.getDelta();
       }
       if (!this.timeline.is_playing) {
         //this.recorder.stop();
         this.playback_location = 0;
+        for (const key in this.timeline.characters) {
+          if (this.timeline.characters.hasOwnProperty(key)) {  // Check if the key is the object's own property
+            const char = this.activeScene.get_object_by_uuid(key);
+            char?.traverse( function(child) {
+              child.layers.set(0);
+            });
+          }
+        }
+        this.render_camera?.layers.set(0);
         this.stopPlaybackAndUploadVideo();
       }
     }
