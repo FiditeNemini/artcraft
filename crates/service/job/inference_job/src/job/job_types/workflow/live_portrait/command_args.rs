@@ -4,6 +4,15 @@ use filesys::path_to_string::path_to_string;
 use primitives::bool_to_str::bool_to_str;
 use subprocess_common::command_runner::command_args::CommandArgs;
 
+/*
+usage: ComfyLivePortraitRunner.py [-h] --portrait-media-filename
+                                  PORTRAIT_MEDIA_FILENAME
+                                  --driver-media-filename
+                                  DRIVER_MEDIA_FILENAME --input-is-image
+                                  [--tmpdir TMPDIR] --output-filename
+                                  OUTPUT_FILENAME
+ComfyLivePortraitRunner.py: error: unrecognized arguments: --tempdir /tmp/work/temp_live_portrait_40942003.6cEjwVEUG2aF true
+ */
 #[derive(Debug)]
 pub struct LivePortraitCommandArgs<'a> {
   pub portrait_file: &'a Path,
@@ -20,16 +29,16 @@ impl CommandArgs for LivePortraitCommandArgs<'_> {
   fn to_command_string(&self) -> String {
     let mut command = String::new();
 
-    command.push_str(" --portrait ");
+    command.push_str(" --portrait-media-filename ");
     command.push_str(&path_to_string(self.portrait_file));
 
-    command.push_str(" --driver ");
+    command.push_str(" --driver-media-filename ");
     command.push_str(&path_to_string(self.driver_file));
 
-    command.push_str(" --tempdir ");
+    command.push_str(" --tmpdir ");
     command.push_str(&path_to_string(self.tempdir));
 
-    command.push_str(" --output ");
+    command.push_str(" --output-filename ");
     command.push_str(&path_to_string(self.output_file));
 
     command.push_str(" --input-is-image ");
