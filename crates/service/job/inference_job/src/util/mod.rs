@@ -1,4 +1,5 @@
 pub mod common_commands;
+pub mod downloaders;
 pub mod file_cache_dir;
 pub mod from_env;
 pub mod get_polymorphic_args_from_job;

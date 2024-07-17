@@ -45,7 +45,6 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::live_portrait::command_args::LivePortraitCommandArgs;
-use crate::job::job_types::workflow::live_portrait::download_media_file::{download_media_file, DownloadMediaFileArgs};
 use crate::job::job_types::workflow::live_portrait::extract_live_portrait_payload_from_job::extract_live_portrait_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
@@ -62,6 +61,7 @@ use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
+use crate::util::downloaders::download_media_file::{download_media_file, DownloadMediaFileArgs};
 
 pub async fn process_live_portrait_job(
   deps: &JobDependencies,
@@ -126,6 +126,7 @@ pub async fn process_live_portrait_job(
     mysql_pool: &deps.db.mysql_pool,
     remote_cloud_file_client: &remote_cloud_file_client,
     media_file_token: &portrait_media_token,
+    can_see_deleted: true,
     download_path: &portrait_file_path,
   }).await?;
 
@@ -138,6 +139,7 @@ pub async fn process_live_portrait_job(
     mysql_pool: &deps.db.mysql_pool,
     remote_cloud_file_client: &remote_cloud_file_client,
     media_file_token: &driver_media_token,
+    can_see_deleted: true,
     download_path: &driver_file_path,
   }).await?;
 

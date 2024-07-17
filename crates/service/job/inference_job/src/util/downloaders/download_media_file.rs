@@ -23,6 +23,7 @@ pub struct DownloadMediaFileArgs<'a> {
   pub mysql_pool: &'a MySqlPool,
   pub remote_cloud_file_client: &'a RemoteCloudFileClient,
   pub media_file_token: &'a MediaFileToken,
+  pub can_see_deleted: bool,
   pub download_path: &'a Path,
 }
 
@@ -39,10 +40,10 @@ pub async fn download_media_file(
 
   let mut media_file =  get_media_file(
     &args.media_file_token,
-    false,
+    args.can_see_deleted,
     args.mysql_pool
   ).await?.ok_or_else(|| {
-    error!("primary input media_file not found: {:?}", &args.media_file_token);
+    error!("media file not found: {:?}", &args.media_file_token);
     ProcessSingleJobError::Other(anyhow!("media file not found: {:?}", &args.media_file_token))
   })?;
 
