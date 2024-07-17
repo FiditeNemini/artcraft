@@ -39,6 +39,7 @@ memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
+primitives = { path = "../../../lib/data/primitives" }
 redis_common = { path = "../../../lib/redis_common" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
 thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}

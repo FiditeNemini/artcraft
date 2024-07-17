@@ -122,7 +122,7 @@ pub async fn process_live_portrait_job(
   let portrait_media_token = job_payload.portrait_media_file_token.ok_or_else(|| anyhow!("no portrait media token"))?;
   let portrait_file_path = work_temp_dir.path().join("portrait.bin");
 
-  download_media_file(DownloadMediaFileArgs {
+  let portrait = download_media_file(DownloadMediaFileArgs {
     mysql_pool: &deps.db.mysql_pool,
     remote_cloud_file_client: &remote_cloud_file_client,
     media_file_token: &portrait_media_token,
@@ -134,12 +134,20 @@ pub async fn process_live_portrait_job(
   let driver_media_token = job_payload.driver_media_file_token.ok_or_else(|| anyhow!("no driver media token"))?;
   let driver_file_path = work_temp_dir.path().join("driver.bin");
 
-  download_media_file(DownloadMediaFileArgs {
+  let driver = download_media_file(DownloadMediaFileArgs {
     mysql_pool: &deps.db.mysql_pool,
     remote_cloud_file_client: &remote_cloud_file_client,
     media_file_token: &driver_media_token,
     download_path: &driver_file_path,
   }).await?;
+
+  let input_is_image = match portrait.media_file.media_type {
+    MediaFileType::Image
+    | MediaFileType::Jpg
+    | MediaFileType::Png
+    | MediaFileType::Gif => true,
+    _ => false,
+  };
 
   // ==================== RUN COMFY INFERENCE ==================== //
 
@@ -155,9 +163,6 @@ pub async fn process_live_portrait_job(
 
   info!("Running ComfyUI inference...");
 
-  // TODO TEMP
-  let media_file_token = MediaFileToken::generate();
-
   let command_exit_status = comfy_deps
       .inference_command
       // TODO(bt,2024-07-15): Move this to its own runner. Just hacking this quickly.
@@ -168,6 +173,7 @@ pub async fn process_live_portrait_job(
         output_file: &output_file_path,
         stderr_output_file: &stderr_output_file,
         stdout_output_file: &stdout_output_file,
+        input_is_image,
       });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);

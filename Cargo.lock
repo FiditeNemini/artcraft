@@ -3521,6 +3521,7 @@ dependencies = [
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry_sdk",
+ "primitives",
  "r2d2_redis",
  "rand 0.8.5",
  "redis_common",

@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use filesys::path_to_string::path_to_string;
+use primitives::bool_to_str::bool_to_str;
 use subprocess_common::command_runner::command_args::CommandArgs;
 
 #[derive(Debug)]
@@ -9,6 +10,7 @@ pub struct LivePortraitCommandArgs<'a> {
   pub driver_file: &'a Path,
   pub tempdir: &'a Path,
   pub output_file: &'a Path,
+  pub input_is_image: bool,
 
   pub stderr_output_file: &'a Path,
   pub stdout_output_file: &'a Path,
@@ -29,6 +31,9 @@ impl CommandArgs for LivePortraitCommandArgs<'_> {
 
     command.push_str(" --output ");
     command.push_str(&path_to_string(self.output_file));
+
+    command.push_str(" --input-is-image ");
+    command.push_str(bool_to_str(self.input_is_image));
 
     command.push_str(" ");
 
