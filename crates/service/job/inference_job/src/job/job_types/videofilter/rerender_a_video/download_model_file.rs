@@ -10,7 +10,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::model_weights::get::get_weight::RetrievedModelWeight;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
+use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct ModelFile {

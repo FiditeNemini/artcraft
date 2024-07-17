@@ -6,7 +6,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
+use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 pub struct StaticDependencies {
   pub waveglow_vocoder_model_fs_path : PathBuf,

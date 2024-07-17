@@ -23,7 +23,13 @@ pub struct DownloadMediaFileArgs<'a> {
   pub mysql_pool: &'a MySqlPool,
   pub remote_cloud_file_client: &'a RemoteCloudFileClient,
   pub media_file_token: &'a MediaFileToken,
+
+  /// Can query and download deleted media files.
   pub can_see_deleted: bool,
+
+  /// NB: We want to be intentional about where we download the file.
+  /// If we want to give it a proper extension that we didn't know
+  /// a priori, the caller can handle it.
   pub download_path: &'a Path,
 }
 

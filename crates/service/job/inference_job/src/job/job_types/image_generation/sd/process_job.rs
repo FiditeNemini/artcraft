@@ -10,7 +10,7 @@ use crate::job::job_types::image_generation::sd::process_job_inference::process_
 use crate::job::job_types::image_generation::sd::process_job_lora_upload::process_job_lora_upload;
 use crate::job::job_types::image_generation::sd::process_job_sd_upload::process_job_sd_upload;
 use crate::job_dependencies::JobDependencies;
-use crate::util::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
+use crate::util::extractors::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct InferenceValues {

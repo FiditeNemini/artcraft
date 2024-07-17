@@ -1,4 +1,4 @@
-use crate::util::model_downloader::ModelDownloader;
+use crate::util::downloaders::model_downloader::ModelDownloader;
 
 pub struct VallEXDownloaders {
     pub vall_e_x: VallEXModelMapping,

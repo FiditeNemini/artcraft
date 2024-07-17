@@ -5,7 +5,7 @@ use mysql_queries::payloads::generic_inference_args::image_generation_payload::S
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::process_job::StableDiffusionProcessArgs;
-use crate::util::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
+use crate::util::extractors::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
 
 pub async fn validate_inputs(args: StableDiffusionProcessArgs<'_>) -> Result<(), ProcessSingleJobError> {
 

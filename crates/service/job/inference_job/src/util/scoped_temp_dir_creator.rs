@@ -2,6 +2,9 @@ use std::path::{Path, PathBuf};
 
 use tempdir::TempDir;
 
+/// This utility will always create TempDirs at a specific mount path.
+/// This is useful for k8s deployments where we may need our TempDirs
+/// to live on a specific volume.
 #[derive(Clone)]
 pub struct ScopedTempDirCreator {
   base_dir: PathBuf,

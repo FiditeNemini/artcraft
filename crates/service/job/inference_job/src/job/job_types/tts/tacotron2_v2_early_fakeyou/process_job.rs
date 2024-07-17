@@ -28,7 +28,7 @@ use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::upload_results::{upload_results, UploadResultArgs};
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
+use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.

@@ -14,6 +14,7 @@ use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 // TODO(bt, 2022-07-15): Make a concrete type for bucket paths
 
+#[deprecated(note="Try to use a more modern downloader instead.")]
 pub struct MaybeDownloadArgs<'a> {
   pub name_or_description_of_file: &'a str,
   pub final_filesystem_file_path: &'a Path,
@@ -26,6 +27,7 @@ pub struct MaybeDownloadArgs<'a> {
   pub maybe_existing_file_minimum_size_required: Option<u64>,
 }
 
+#[deprecated(note="Try to use a more modern downloader instead.")]
 pub async fn maybe_download_file_from_bucket(
   args: MaybeDownloadArgs<'_>
 ) -> Result<(), ProcessSingleJobError> {

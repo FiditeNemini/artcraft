@@ -1,4 +1,4 @@
-use crate::util::model_downloader::ModelDownloader;
+use crate::util::downloaders::model_downloader::ModelDownloader;
 
 crate::impl_model_downloader!(
   RvcV2Rmvpe,

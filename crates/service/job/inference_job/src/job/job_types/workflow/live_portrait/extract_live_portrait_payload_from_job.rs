@@ -5,7 +5,7 @@ use mysql_queries::payloads::generic_inference_args::live_portrait_payload::Live
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::util::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
+use crate::util::extractors::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
 
 pub fn extract_live_portrait_payload_from_job(
   job: &AvailableInferenceJob,
