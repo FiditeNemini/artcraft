@@ -23,12 +23,12 @@ use migration::voice_conversion::query_vc_model_for_migration::VcModel;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 
-use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::state::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
-use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
-use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
+use crate::state::scoped_job_type_execution::ScopedJobTypeExecution;
+use crate::state::scoped_model_type_execution::ScopedModelTypeExecution;
 
 pub struct JobDependencies {
   /// Database dependencies.

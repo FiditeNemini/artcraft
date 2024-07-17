@@ -10,7 +10,7 @@ use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::format_conversion::fbx_to_gltf;
 use crate::job::job_types::format_conversion::fbx_to_gltf::process_job::FbxToGltfJobArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 // // NB: There will likely be lots of other format conversions for us to run, and there's probably lots of shared code between them.
 // // This enum lets us reuse the shared portions in this function before dispatching to the special parts.

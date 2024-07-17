@@ -26,7 +26,7 @@ use crate::job::job_types::lipsync::sad_talker::download_image_file::{download_i
 use crate::job::job_types::lipsync::sad_talker::resize_image::resize_image;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 
 /// The maximum that either width or height can be

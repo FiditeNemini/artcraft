@@ -21,7 +21,7 @@ use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_res
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::vits::vits_inference_command::{Device, VitsInferenceArgs};
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 /// Text starting with this will be treated as a test request.

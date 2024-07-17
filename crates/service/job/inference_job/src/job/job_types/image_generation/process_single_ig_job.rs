@@ -6,7 +6,7 @@ use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::process_job::process_job_selection;
 use crate::job::job_types::image_generation::sd::process_job::StableDiffusionProcessArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 pub async fn process_single_ig_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
     match job.maybe_model_type {

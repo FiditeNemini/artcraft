@@ -15,7 +15,7 @@ use crate::job::job_types::vc::{rvc_v2, so_vits_svc};
 use crate::job::job_types::vc::media_for_inference::MediaForInference;
 use crate::job::job_types::vc::rvc_v2::process_job::RvcV2ProcessJobArgs;
 use crate::job::job_types::vc::so_vits_svc::process_job::SoVitsSvcProcessJobArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let model_token = match job.maybe_model_token.as_deref() {

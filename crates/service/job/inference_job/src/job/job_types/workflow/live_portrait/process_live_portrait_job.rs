@@ -58,7 +58,7 @@ use crate::job::job_types::workflow::video_style_transfer::steps::validate_and_s
 use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 use crate::util::downloaders::download_media_file::{download_media_file, DownloadMediaFileArgs};

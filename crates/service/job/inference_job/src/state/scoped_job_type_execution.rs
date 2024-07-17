@@ -79,7 +79,7 @@ mod tests {
 
   use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 
-  use crate::util::scoped_job_type_execution::{parse_job_types, ScopedJobTypeExecution};
+  use crate::state::scoped_job_type_execution::{parse_job_types, ScopedJobTypeExecution};
 
   #[test]
   fn test_parse() {

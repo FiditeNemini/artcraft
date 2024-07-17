@@ -12,7 +12,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceError;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 pub struct DependencyStatus {
   /// The DB record for the model being used in this job.

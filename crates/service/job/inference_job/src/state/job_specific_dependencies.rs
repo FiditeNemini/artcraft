@@ -15,8 +15,8 @@ use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
 use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
-use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
-use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
+use crate::state::scoped_job_type_execution::ScopedJobTypeExecution;
+use crate::state::scoped_model_type_execution::ScopedModelTypeExecution;
 
 pub struct JobSpecificDependencies {
   pub maybe_rvc_v2_dependencies: Option<RvcV2Dependencies>,

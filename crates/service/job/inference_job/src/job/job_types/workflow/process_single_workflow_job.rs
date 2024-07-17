@@ -7,7 +7,7 @@ use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::p
 use crate::job::job_types::workflow::upload_workflow::process_upload_workflow_job::process_upload_workflow_job;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::process_video_style_transfer_job::process_video_style_transfer_job;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 pub async fn process_single_workflow_job(
   job_dependencies: &JobDependencies,

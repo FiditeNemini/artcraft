@@ -7,7 +7,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::vall_e_x::process_job_create_voice::process_create_voice;
 use crate::job::job_types::tts::vall_e_x::process_job_inference_voice::process_inference_voice;
 use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 use super::validate_job::JobType;
 

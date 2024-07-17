@@ -13,7 +13,7 @@ use crate::job::job_types::tts::styletts2::process_job::StyleTTS2ProcessJobArgs;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
 use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 use crate::job::job_types::tts::vits::process_job::VitsProcessJobArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 use super::vall_e_x;
 

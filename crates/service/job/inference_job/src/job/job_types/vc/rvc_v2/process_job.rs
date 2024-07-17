@@ -29,7 +29,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::vc::media_for_inference::MediaForInference;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::InferenceArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 const BUCKET_FILE_PREFIX : &str = "fakeyou_rvc_";

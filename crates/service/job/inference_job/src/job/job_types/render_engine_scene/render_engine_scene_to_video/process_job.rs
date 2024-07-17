@@ -26,7 +26,7 @@ use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::render_engine_scene::render_engine_scene_to_video::command_args::RenderEngineSceneToVideoCommandArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 const BUCKET_FILE_EXTENSION : &str = ".mp4";

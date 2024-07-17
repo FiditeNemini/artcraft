@@ -33,7 +33,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::JobArgs;
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::VideoPathing;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 fn get_file_extension(mimetype: &str) -> anyhow::Result<&'static str> {
   let ext = match mimetype {

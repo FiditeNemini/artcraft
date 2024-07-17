@@ -15,7 +15,7 @@ use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
 use crate::job::job_loop::process_single_job::process_single_job;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;

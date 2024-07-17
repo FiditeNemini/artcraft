@@ -24,7 +24,7 @@ use crate::job::job_types::videofilter::rerender_a_video::download_model_file::d
 use crate::job::job_types::videofilter::rerender_a_video::download_video_file::download_video_file;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_inference_command::InferenceArgs;
 use crate::job::job_types::videofilter::rerender_a_video::validate_job::validate_job;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 /// The maximum that either width or height can be
 const MAX_DIMENSION : u32 = 1500;

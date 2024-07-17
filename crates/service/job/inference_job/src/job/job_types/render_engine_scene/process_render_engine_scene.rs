@@ -9,7 +9,7 @@ use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::render_engine_scene::render_engine_scene_to_video;
 use crate::job::job_types::render_engine_scene::render_engine_scene_to_video::process_job::BvhToWorkflowJobArgs;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 pub async fn process_single_render_engine_scene_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 

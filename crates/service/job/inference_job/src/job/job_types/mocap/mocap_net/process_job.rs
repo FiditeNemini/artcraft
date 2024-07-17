@@ -23,7 +23,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::mocap::mocap_net::download_video_file::download_video_file;
 use crate::job::job_types::mocap::mocap_net::mocapnet_inference_command::InferenceArgs;
 use crate::job::job_types::mocap::mocap_net::validate_job::validate_job;
-use crate::job_dependencies::JobDependencies;
+use crate::state::job_dependencies::JobDependencies;
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".bvh";

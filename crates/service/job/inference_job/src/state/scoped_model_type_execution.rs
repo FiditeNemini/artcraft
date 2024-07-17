@@ -84,7 +84,7 @@ mod tests {
 
   use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 
-  use crate::util::scoped_model_type_execution::{parse_model_types, ScopedModelTypeExecution};
+  use crate::state::scoped_model_type_execution::{parse_model_types, ScopedModelTypeExecution};
 
   #[test]
   fn test_parse() {
