@@ -29,7 +29,9 @@
 /leaderboard*   /index.html   200
 /login*   /index.html   200
 /media*   /index.html   200
+/mirror-motion*   /index.html   200
 /moderation*   /index.html   200
+/motion-mirror*   /index.html   200
 /news*   /index.html   200
 /obs_configs*   /index.html   200
 /old*   /index.html   200
