@@ -60,6 +60,9 @@ export class TimeLine {
 
   camera_name: string;
   // ensure that the elements are loaded first.
+
+  private debounce_generate_video: boolean;
+
   constructor(
     editor: Editor,
     audio_engine: AudioEngine,
@@ -91,7 +94,7 @@ export class TimeLine {
     this.emotion_engine = emotion_engine;
 
     this.scene = scene;
-
+    this.debounce_generate_video = false;
     Queue.subscribe(
       QueueNames.TO_ENGINE,
       "engine",
@@ -226,10 +229,18 @@ export class TimeLine {
         }
         break;
       case toEngineActions.GENERATE_VIDEO: {
-        const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
-        // pass this in ... rather than doing it implicitly ...
-        this.editorEngine.generation_options = options as IGenerationOptions;
-        this.editorEngine.generateVideo();
+        console.log("Calling Generate Video");
+        // debounce generate video ...
+        if (this.debounce_generate_video == false) {
+          this.debounce_generate_video = true;
+          const options = data.data; // super overloaded talk to the devs about this. TODO... refactor
+          // pass this in ... rather than doing it implicitly ...
+          this.editorEngine.generation_options = options as IGenerationOptions;
+
+          await this.editorEngine.generateVideo();
+          this.debounce_generate_video = false;
+        }
+        console.log("Finished! Generate Video");
         break;
       }
       case toEngineActions.CHANGE_CAMERA_ASPECT_RATIO: {

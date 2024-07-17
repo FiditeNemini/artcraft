@@ -39,7 +39,7 @@ describe("VideoApi", () => {
         inference_job_token_type: "ijtt1",
         success: true,
       });
-      const response = await videoApi.GenerateVideoStyleTransfer({
+      const response = await videoApi.EnqueueStudio({
         enqueueVideo: mockRequest,
       });
       expect(videoApi.fetch).toHaveBeenCalledWith(
@@ -69,7 +69,7 @@ describe("VideoApi", () => {
         inference_job_token_type: "ijtt1",
         success: true,
       });
-      const response = await videoApi.GenerateVideoStyleTransfer({
+      const response = await videoApi.EnqueueStudio({
         enqueueVideo: {
           ...mockRequest,
           creator_set_visibility: Visibility.Private,
@@ -100,7 +100,7 @@ describe("VideoApi", () => {
       jest.spyOn(videoApi, "fetch").mockResolvedValue({
         BadInput: "error",
       });
-      const response = await videoApi.GenerateVideoStyleTransfer({
+      const response = await videoApi.EnqueueStudio({
         enqueueVideo: mockRequest,
       });
       expect(videoApi.fetch).toHaveBeenCalledWith(
@@ -129,7 +129,7 @@ describe("VideoApi", () => {
       jest.spyOn(videoApi, "fetch").mockResolvedValue({
         BadInput: "error",
       });
-      const response = await videoApi.GenerateVideoStyleTransfer({
+      const response = await videoApi.EnqueueStudio({
         enqueueVideo: mockRequest,
       });
       expect(videoApi.fetch).toHaveBeenCalledWith(

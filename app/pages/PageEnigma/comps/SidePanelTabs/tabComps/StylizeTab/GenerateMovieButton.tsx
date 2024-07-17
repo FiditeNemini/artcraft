@@ -52,7 +52,8 @@ export function GenerateMovieButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const generateMovie = async () => {
+  const generateMovie = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     const options = new GenerationOptions(
       upscale.value,
       faceDetail.value,

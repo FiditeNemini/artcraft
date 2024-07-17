@@ -253,6 +253,7 @@ export class MouseControls {
     this.timeline_mouse = this.mouse;
 
     if (this.isMouseClicked) {
+      // this causes an issue  https://discourse.threejs.org/t/unable-to-use-pointer-lock-api/11092
       this.lockControls?.lock();
     } else {
       this.lockControls?.unlock();

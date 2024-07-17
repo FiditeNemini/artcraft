@@ -31,6 +31,10 @@ class Scene {
 
   updateSurfaceIdAttributeToMesh: Function;
 
+  // This is used to ensure we do not rerender or process the video if we already have done so.
+  // This allows us to reprompt things quickly. This is only written when a snap shot is taken.
+  // Which guarentees that the scene is availible.
+  current_scene_checksum: string;
   constructor(
     name: string,
     camera_name: string,
@@ -50,6 +54,8 @@ class Scene {
     this.camera_name = camera_name;
     this.placeholder_manager = undefined;
     this.updateSurfaceIdAttributeToMesh = updateSurfaceIdAttributeToMesh;
+
+    this.current_scene_checksum = "";
   }
 
   initialize() {

@@ -22,7 +22,58 @@ export class SaveManager {
     this.editor = editor;
   }
 
-  // JSON structure
+  async computeHashForBrowser(data: string): Promise<string> {
+    // Encode the string data to a Uint8Array
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(data);
+
+    // Compute the hash using the SubtleCrypto.digest method
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encodedData);
+
+    // Convert the ArrayBuffer to a hexadecimal string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    return hashHex;
+  }
+
+  public async computeSceneChecksum(): Promise<string> {
+    const jsonString = await this.checkSumData();
+    return this.computeHashForBrowser(jsonString);
+  }
+
+  private async checkSumData(): Promise<string> {
+    const proxyScene = new StoryTellerProxyScene(
+      this.editor.version,
+      this.editor.activeScene,
+    );
+    const scene_json = await proxyScene.saveToScene(this.editor.version);
+
+    const proxyTimeline = new StoryTellerProxyTimeline(
+      this.editor.version,
+      this.editor.timeline,
+      this.editor.transform_engine,
+      this.editor.animation_engine,
+      this.editor.audio_engine,
+      this.editor.lipsync_engine,
+      this.editor.emotion_engine,
+    );
+    const timeline_json = await proxyTimeline.saveToJson();
+    const check_sum_data = {
+      scene: scene_json,
+      timeline: timeline_json,
+      camera_data: {
+        position: this.editor.camera?.position,
+        rotation: this.editor.camera?.rotation,
+      },
+    };
+    const jsonString = JSON.stringify(check_sum_data);
+    return jsonString;
+  }
+
+  // JSON structure should and can return snapshot
   public async saveData({
     sceneGenerationMetadata,
   }: {
@@ -58,8 +109,9 @@ export class SaveManager {
         rotation: this.editor.camera?.rotation,
       },
     };
-
-    return JSON.stringify(save_data);
+    // take json scene and figure out checksum
+    const jsonString = JSON.stringify(save_data);
+    return jsonString;
   }
 
   // TODO Move this function into scene manager.
@@ -214,6 +266,6 @@ export class SaveManager {
 
     hideEditorLoader();
     // TODO figure out if this is a bug.
-    this.editor.timeline.scrub({ data: { currentTime: 0 } });
+    this.editor.timeline.scrub({ currentTime: 0 });
   }
 }

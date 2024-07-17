@@ -1010,7 +1010,6 @@ class Editor {
         this.render_timer += this.clock.getDelta();
       }
       if (!this.timeline.is_playing) {
-        //this.recorder.stop();
         this.playback_location = 0;
         for (const key in this.timeline.characters) {
           if (this.timeline.characters.hasOwnProperty(key)) {  // Check if the key is the object's own property
@@ -1024,6 +1023,20 @@ class Editor {
         this.stopPlaybackAndUploadVideo();
       }
     }
+  }
+
+  async useCachedMediaTokens(): Promise<boolean> {
+    // if the preprecessing switch is not the same then we need to rerender
+    if (
+      this.videoGeneration.last_position_of_preprocessing !=
+      this.engine_preprocessing
+    ) {
+      return false;
+    }
+    // this is slower to do so do this last.
+    const checksum = await this.save_manager.computeSceneChecksum();
+    const decision = this.videoGeneration.shouldRenderScenesAgain(checksum);
+    return decision;
   }
 
   // Basicly Unity 3D's update loop.
@@ -1169,7 +1182,16 @@ class Editor {
   }
 
   // This initializes the generation of a video render scene is where the core work happens
-  generateVideo() {
+  async generateVideo() {
+    // cannot run this function reliably without ensuring state below doesn't blow everything up.
+    if (await this.checkAndUseCache()) {
+      console.log("Checking Cache");
+      await this.videoGeneration.handleCachedEnqueue();
+      return;
+    }
+
+    // some state changes below
+
     console.log("Generating Video", this.frame_buffer);
 
     this.timeline.is_playing = false;
@@ -1182,7 +1204,12 @@ class Editor {
 
     this.showLoading();
 
-    this.rendering = true; // has to go first to debounce
+    // This for debouncing and also trigging the toggle playback...
+    // has to be here or will break play back ...
+    this.rendering = true;
+
+    console.log("Running without Cache");
+
     this.togglePlayback();
     this.frame_buffer = [];
     this.render_timer = 0;
@@ -1195,12 +1222,27 @@ class Editor {
     }
   }
 
+  // In first case where if it cached data this is for people to reprompt without leaving the app
+  // Skip performing any of this because we have not changed the scene, then exit the scene.
+  // This avoids any unknown state issues from the resulting code below and escapes all the random state changes.
+  // This sadly doesn't cover camera framing style changes,
+  // Reasoning is that there is no defined interface to get changes like that.
+  async checkAndUseCache(): Promise<boolean> {
+    if (await this.useCachedMediaTokens()) {
+      console.log("Using Cache");
+      return true;
+    } else {
+      console.log("Not Using Cache");
+      return false;
+    }
+  }
+
   togglePlayback() {
     this.updateLoad({
       progress: 25,
       label: "Starting Processing",
       message:
-        "Please stay on this screen while your video is being processed.",
+        "Please stay on this screen and do not switch tabs! while your video is being processed.",
     });
     if (this.rawRenderer) {
       this.startRenderWidth = this.rawRenderer.domElement.width;

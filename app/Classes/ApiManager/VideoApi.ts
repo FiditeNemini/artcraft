@@ -2,27 +2,31 @@ import { ApiManager, ApiResponse } from "./ApiManager";
 import { Visibility } from "~/enums";
 
 interface GenerateVideoStyleTransferRequest {
-  creator_set_visibility?: Visibility;
+  creator_set_visibility: string;
   disable_lcm: boolean;
   enable_lipsync: boolean;
+  frame_skip: number;
+  global_ipa_media_token: string;
+  input_depth_file: string;
   input_file: string;
-  ipa_media_token: string;
+  input_normal_file: string;
+  input_outline_file: string;
   negative_prompt: string;
   prompt: string;
   remove_watermark: boolean;
   style: string;
+  travel_prompt: string;
   trim_end_millis: number;
   trim_start_millis: number;
   use_cinematic: boolean;
   use_face_detailer: boolean;
-  use_lipsync: boolean;
   use_strength: number;
   use_upscaler: boolean;
   uuid_idempotency_token: string;
 }
 
 export class VideoApi extends ApiManager {
-  public async GenerateVideoStyleTransfer({
+  public async EnqueueStudio({
     enqueueVideo,
   }: {
     enqueueVideo: GenerateVideoStyleTransferRequest;
@@ -32,7 +36,7 @@ export class VideoApi extends ApiManager {
       inference_job_token_type?: string;
     }>
   > {
-    const endpoint = `${this.ApiTargets.BaseApi}/v1/video/enqueue_vst`;
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/workflows/enqueue_studio`;
 
     const body = {
       ...enqueueVideo,
@@ -59,6 +63,7 @@ export class VideoApi extends ApiManager {
         errorMessage: response.BadInput,
       }))
       .catch((err) => {
+        console.log(err.message);
         return { success: false, error_reason: err.message };
       });
   }

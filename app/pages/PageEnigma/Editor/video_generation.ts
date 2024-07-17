@@ -11,19 +11,40 @@ import { Visibility } from "./api_manager.js";
 import * as THREE from "three";
 import { getSceneSignals } from "~/signals";
 import { v4 as uuidv4 } from "uuid";
-import { SceneGenereationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
-import { MediaUploadApi } from "~/Classes/ApiManager";
+import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
+import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
 import { globalIPAMediaToken } from "../signals";
+import { addToast } from "~/signals";
 
 // TODO THIS CLASS MAKES NO SENSE Refactor so we generate all the frames first. then pass it through this pipeline as a data structure process it. through this class.
+import { startPollingActiveJobs } from "~/signals";
+
+interface MediaTokens {
+  color: string;
+  normal: string;
+  depth: string;
+  outline: string;
+}
 
 export class VideoGeneration {
   editor: Editor;
   mediaUploadAPI: MediaUploadApi;
+  videoAPI: VideoApi;
+
+  // For cached style Re-Generation
+  private last_scene_check_sum: string;
+  // Last Media token IDs
+  private last_media_tokens: MediaTokens;
+  // Last toggle position for Render
+  public last_position_of_preprocessing: boolean;
 
   constructor(editor: Editor) {
     this.editor = editor;
     this.mediaUploadAPI = new MediaUploadApi();
+    this.videoAPI = new VideoApi();
+    this.last_scene_check_sum = "";
+    this.last_media_tokens = { color: "", normal: "", depth: "", outline: "" };
+    this.last_position_of_preprocessing = false;
   }
 
   sleep(ms: number): Promise<void> {
@@ -186,35 +207,165 @@ export class VideoGeneration {
     );
   }
 
-  async stopPlaybackAndUploadVideo(compile_audio: boolean = true) {
-    this.editor.rendering = false;
+  // to determine if we should capture frames again or not.
+  async shouldRenderScenesAgain(checkSumData: string): Promise<boolean> {
+    // Should skip to rendering the scene if already processed the frames inputs for running a new style.
+    if (this.last_scene_check_sum === "") {
+      // no token means input was not processed so lets go do the video re-render process
+      this.last_scene_check_sum = checkSumData;
+      return false;
+    } else {
+      if (this.last_scene_check_sum === checkSumData) {
+        return true;
+      } else {
+        this.last_scene_check_sum = checkSumData;
+        return false;
+      }
+    }
+  }
 
-    //const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
-    //const videoURL = URL.createObjectURL(videoBlob);
+  async stopPlaybackAndUploadVideo(compile_audio: boolean = true) {
+    this.editor.rendering = false; // not sure about this variable ... this has so many state issues.
+
+    // precondition checks, if we have no frames then we shouldn't try to do generations or snapshots
+    // This means no frames so error out
+
+    if (this.editor.frame_buffer.length <= 0) {
+      await this.handleError(
+        "Failed to Render Nothing to Animate in the Scene.",
+        5000,
+      );
+      return;
+    }
+
+    if (this.editor.frame_buffer[0].length <= 0) {
+      await this.handleError(
+        "Failed to Render Nothing to Animate in the Scene.",
+        5000,
+      );
+      return;
+    }
 
     this.editor.generating_preview = true;
 
-    this.editor.updateLoad({
+    await this.editor.updateLoad({
       progress: 50,
       message:
-        "Please stay on this screen while your video is being processed.",
+        "Please stay on this screen and do not switch tabs! while your video is being processed.",
     });
 
-    const upload_tokens = {
+    const media_tokens: MediaTokens = {
       color: "",
       normal: "",
       depth: "",
       outline: "",
     };
 
-    // TODO fix and ensure that render fast, would actually render fast.
+    // properties used by the external scope to the for loop.
+    const title = getSceneSignals().title || "Untitled";
+    const style_name = this.editor.art_style.toString();
+    const media_token = this.editor.current_scene_media_token || undefined;
+
+    // TAKE A snap shot of the scene then use this token across all videos
+    // convert the ip adapter image and upload as a media token
+    const image_uuid = uuidv4();
+    let ipa_image_token = undefined;
+
+    if (this.editor.globalIpAdapterImage != undefined) {
+      const response = await this.mediaUploadAPI.UploadImage({
+        fileName: `${image_uuid}.ipa`,
+        blob: this.editor.globalIpAdapterImage,
+        uuid: image_uuid,
+      });
+
+      if (response.success) {
+        if (response.data) {
+          ipa_image_token = response.data;
+        }
+      } else {
+        // ip adapter upload failed
+        await this.handleError(
+          "Reference Image Upload Failed Try Generating Movie Again.",
+          5000,
+        );
+        await this.handleSuccess(
+          "Done Check Your Movies Tab On Profile.",
+          5000,
+        );
+        return;
+      }
+    }
+
+    // update the signal with this information
+    if (ipa_image_token) {
+      globalIPAMediaToken.value = ipa_image_token;
+    }
+
+    // TODO Remove so many of these around wtf. SceneGenereationMetaData should only be one place
+    const metaData: SceneGenerationMetaData = {
+      artisticStyle: this.editor.art_style,
+      positivePrompt: this.editor.positive_prompt,
+      negativePrompt: this.editor.negative_prompt,
+      cameraAspectRatio: this.editor.render_camera_aspect_ratio,
+      upscale: this.editor.generation_options.upscale,
+      faceDetail: this.editor.generation_options.faceDetail,
+      styleStrength: this.editor.generation_options.styleStrength,
+      lipSync: this.editor.generation_options.lipSync,
+      cinematic: this.editor.generation_options.cinematic,
+      globalIPAMediaToken: ipa_image_token,
+      enginePreProcessing: this.editor.engine_preprocessing, // the only thing that will invalidate the cache
+    };
+
+    // for the one case where the engine preprecessing is turned we need to cache this.
+    this.last_position_of_preprocessing = this.editor.engine_preprocessing;
+
+    // This is to save the snapshot of the scene for remixing
+    const uuid_snapshot = uuidv4();
+
+    // Save the scene
+    const saveData = await this.editor.save_manager.saveData({
+      sceneTitle: title,
+      sceneToken: media_token,
+      sceneGenerationMetadata: metaData,
+    });
+
+    const file = new File([saveData], `${title}.glb`, {
+      type: "application/json",
+    });
+
+    const response =
+      await this.editor.media_upload.UploadSceneSnapshotMediaFileForm({
+        maybe_title: title,
+        maybe_scene_source_media_file_token: media_token, // can be undefined or null
+        uuid: uuid_snapshot,
+        blob: file,
+      });
+
+    let immutable_media_token = undefined;
+    if (response.success) {
+      if (response.data) {
+        immutable_media_token = response.data;
+      }
+    } else {
+      await this.handleError(
+        "Scene Snapshot Failed Try Generating Movie Again.",
+        5000,
+      );
+      return;
+    }
+
+    console.log(`Immutable Snapshot Token: ${immutable_media_token}`);
+
     for (
       let image_index = 0;
       image_index < this.editor.frame_buffer[0].length;
       image_index++
     ) {
-      // Write the Uint8Array to the FFmpeg file system
-      //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
+      await this.editor.updateLoad({
+        progress: 50 + image_index * 5,
+        message:
+          "Please stay on this screen and do not switch tabs! while your video is being processed.",
+      });
 
       const ffmpeg = createFFmpeg({ log: false });
       await ffmpeg.load();
@@ -260,176 +411,172 @@ export class VideoGeneration {
         "0tmp.mp4",
       );
 
-      let itteration = 0;
+      let iteration = 0;
 
       if (compile_audio) {
         for (const clip of this.editor.timeline.timeline_items) {
           if (clip.type == ClipType.AUDIO) {
-            await this.convertAudioClip(itteration, ffmpeg, clip);
-            itteration += 1;
+            await this.convertAudioClip(iteration, ffmpeg, clip);
+            iteration += 1;
           }
         }
       }
 
-      const output = ffmpeg.FS("readFile", itteration + "tmp.mp4");
-
+      // Upload individual videos or single color video
+      const output = ffmpeg.FS("readFile", iteration + "tmp.mp4");
       ffmpeg.exit();
-      this.editor.generating_preview = false;
 
+      this.editor.generating_preview = false;
       // Create a Blob from the output file for downloading
       const blob = new Blob([output.buffer], { type: "video/mp4" });
 
-      const title = getSceneSignals().title || "Untitled";
-
-      const style_name = this.editor.art_style.toString();
-      const media_token = this.editor.current_scene_media_token || undefined;
-
-      // convert the ip adapter image and upload as a media token
-      const image_uuid = uuidv4();
-      let ipa_image_token = undefined;
-
-      if (this.editor.globalIpAdapterImage != undefined) {
-        const response = await this.mediaUploadAPI.UploadImage({
-          fileName: `${image_uuid}.ipa`,
-          blob: this.editor.globalIpAdapterImage,
-          uuid: image_uuid,
-        });
-        if (response.success) {
-          if (response.data) {
-            ipa_image_token = response.data;
-          }
-        }
-      }
-      if (ipa_image_token) {
-        globalIPAMediaToken.value = ipa_image_token;
-      }
-
-      // TODO Remove so many of these around wtf. SceneGenereationMetaData should only be one place
-      const metaData: SceneGenereationMetaData = {
-        artisticStyle: this.editor.art_style,
-        positivePrompt: this.editor.positive_prompt,
-        negativePrompt: this.editor.negative_prompt,
-        cameraAspectRatio: this.editor.render_camera_aspect_ratio,
-        upscale: this.editor.generation_options.upscale,
-        faceDetail: this.editor.generation_options.faceDetail,
-        styleStrength: this.editor.generation_options.styleStrength,
-        lipSync: this.editor.generation_options.lipSync,
-        cinematic: this.editor.generation_options.cinematic,
-        globalIPAMediaToken: globalIPAMediaToken.value,
-      };
-
-      // This is to save the snapshot of the scene for remixing...
-      const uuid_snapshot = uuidv4();
-
-      const saveData = await this.editor.save_manager.saveData({
-        sceneTitle: title,
-        sceneToken: media_token,
-        sceneGenerationMetadata: metaData,
-      });
-
-      const file = new File([saveData], `${title}.glb`, {
-        type: "application/json",
-      });
-
-      const response =
-        await this.editor.media_upload.UploadSceneSnapshotMediaFileForm({
-          maybe_title: title,
-          maybe_scene_source_media_file_token: media_token, // can be undefined or null
-          uuid: uuid_snapshot,
-          blob: file,
-        });
-
-      let immutable_media_token = undefined;
-      if (response.success) {
-        if (response.data) {
-          immutable_media_token = response.data;
-        }
-      } else {
-        //console.log("ERROR:");
-        console.log(response.errorMessage);
-      }
-
-      console.log("Immutable Token:");
-      console.log(immutable_media_token);
-
-      /// TODO refactor this whole thing extract this out.
-      const data: any = await this.editor.api_manager.uploadMedia({
-        blob,
+      const video_upload_response = await this.mediaUploadAPI.UploadNewVideo({
+        blob: blob,
         fileName: `${title}.mp4`,
-        title,
-        styleName: style_name,
+        uuid: uuidv4(),
+        maybe_title: title,
+        maybe_visibility: Visibility.Public,
+        maybe_style_name: style_name,
         maybe_scene_source_media_file_token: immutable_media_token,
       });
 
-      if (data == null) {
+      if (video_upload_response.success) {
+        if (video_upload_response.data) {
+          const upload_token = video_upload_response.data;
+          console.log(upload_token);
+          // saves these tokens for a rerun.
+          if (image_index === 0) {
+            media_tokens.color = upload_token;
+          } else if (image_index === 1) {
+            media_tokens.normal = upload_token;
+          } else if (image_index === 2) {
+            media_tokens.depth = upload_token;
+          } else if (image_index === 3) {
+            media_tokens.outline = upload_token;
+          }
+        }
+      } else {
+        await this.handleError(
+          "Failed To Preprocess: Generate Please Try Again",
+          5000,
+        );
         return;
       }
-      const upload_token = data["media_file_token"];
-
-      console.log(upload_token);
-
-      if (image_index === 0) {
-        upload_tokens.color = upload_token;
-      } else if (image_index === 1 && this.editor.engineRenderSeparately == false) {
-        upload_tokens.normal = upload_token;
-      } else if (image_index === 2) {
-        upload_tokens.depth = upload_token;
-      } else if (image_index === 3) {
-        upload_tokens.outline = upload_token;
-      } else if (this.editor.engineRenderSeparately ) {
-          console.log("https://storyteller.ai/media/" + upload_tokens.color);
-          console.log("https://storyteller.ai/media/" + upload_token);
-      }
-
-      await this.sleep(2000); // TODO: REMOVE THIS WHEN TOO MANY REQUESTS ERROR IS SOLVED.
-      //console.log("Waiting for server to catch up...");
-    }
+    } // end generation for color or multiple channels of data.
 
     this.editor.onWindowResize();
 
-    console.log(upload_tokens);
+    console.log(media_tokens);
+
     this.editor.setColorMap();
 
-    // console.log("https://storyteller.ai/media/" + upload_tokens.color);
-    // console.log("https://storyteller.ai/media/" + upload_tokens.normal);
-    // console.log("https://storyteller.ai/media/" + upload_tokens.depth);
-    // console.log("https://storyteller.ai/media/" + upload_tokens.outline);
+    console.log(`https://storyteller.ai/media/${media_tokens.color}`);
+    console.log(`https://storyteller.ai/media/${media_tokens.normal}`);
+    console.log(`https://storyteller.ai/media/${media_tokens.depth}`);
+    console.log(`https://storyteller.ai/media/${media_tokens.outline}`);
 
-    await this.editor.api_manager
-      .stylizeVideo({
-        media_token: upload_tokens.color,
-        style: this.editor.art_style,
-        positive_prompt: this.editor.positive_prompt,
-        negative_prompt: this.editor.negative_prompt,
-        visibility: Visibility.Public,
-        use_face_detailer: this.editor.generation_options.faceDetail,
-        use_upscaler: this.editor.generation_options.upscale,
-        use_strength: this.editor.generation_options.styleStrength,
-        use_lipsync: this.editor.generation_options.lipSync,
-        use_cinematic: this.editor.generation_options.cinematic,
-        use_global_ipa_media_token: globalIPAMediaToken.value,
-        input_depth_file: upload_tokens.depth,
-        input_normal_file: upload_tokens.normal,
-        input_outline_file: upload_tokens.outline,
-      })
-      .catch((error) => {
-        console.log(error);
-        this.editor.updateLoad({
-          progress: 100,
-          message: "Failed To Render",
-          label: "Error",
-        });
-        this.editor.endLoading();
-      });
-
-    this.editor.updateLoad({
+    await this.editor.updateLoad({
       progress: 100,
-      message: "Done Check Your Media Tab On Profile.",
+      message: "Done Check Your Movies Tab On Profile.",
       label: "Success",
     });
 
-    this.editor.endLoading();
+    // this is so that its a check point just encase enqueue fails, if it does we can still restylize
+    this.last_media_tokens = media_tokens;
 
+    await this.handleEnqueue(media_tokens, ipa_image_token ?? "");
+
+    await this.EndLoadingState();
+  }
+
+  async handleCachedEnqueue() {
+    const enqueue_studio_response = await this.videoAPI.EnqueueStudio({
+      enqueueVideo: {
+        disable_lcm: false,
+        enable_lipsync: this.editor.generation_options.lipSync,
+        input_file: this.last_media_tokens.color,
+        negative_prompt: this.editor.negative_prompt,
+        prompt: this.editor.positive_prompt,
+        remove_watermark: false,
+        style: this.editor.art_style.toString(),
+        frame_skip: 2,
+        travel_prompt: "",
+        trim_end_millis: 7000,
+        trim_start_millis: 0,
+        use_cinematic: this.editor.generation_options.cinematic,
+        use_face_detailer: this.editor.generation_options.faceDetail,
+        use_strength: this.editor.generation_options.styleStrength,
+        use_upscaler: this.editor.generation_options.upscale,
+        uuid_idempotency_token: uuidv4(),
+        global_ipa_media_token: globalIPAMediaToken.value ?? "",
+        input_depth_file: this.last_media_tokens.depth,
+        input_normal_file: this.last_media_tokens.normal,
+        input_outline_file: this.last_media_tokens.outline,
+        creator_set_visibility: Visibility.Public,
+      },
+    });
+
+    if (enqueue_studio_response.success) {
+      console.log("Start Polling Active Jobs");
+      startPollingActiveJobs();
+      addToast(
+        ToastTypes.SUCCESS,
+        "Done Check Your Movies Tab On Profile.",
+        5000,
+      );
+    } else {
+      addToast(ToastTypes.ERROR, "Failed To Process Movie Try Again", 5000);
+    }
+  }
+
+  async handleEnqueue(upload_tokens: MediaTokens, ipa_image_token: string) {
+    const enqueue_studio_response = await this.videoAPI.EnqueueStudio({
+      enqueueVideo: {
+        disable_lcm: false,
+        enable_lipsync: this.editor.generation_options.lipSync,
+        input_file: upload_tokens.color,
+        negative_prompt: this.editor.negative_prompt,
+        prompt: this.editor.positive_prompt,
+        remove_watermark: false,
+        style: this.editor.art_style.toString(),
+        frame_skip: 2,
+        travel_prompt: "",
+        trim_end_millis: 7000,
+        trim_start_millis: 0,
+        use_cinematic: this.editor.generation_options.cinematic,
+        use_face_detailer: this.editor.generation_options.faceDetail,
+        use_strength: this.editor.generation_options.styleStrength,
+        use_upscaler: this.editor.generation_options.upscale,
+        uuid_idempotency_token: uuidv4(),
+        global_ipa_media_token: ipa_image_token,
+        input_depth_file: upload_tokens.depth,
+        input_normal_file: upload_tokens.normal,
+        input_outline_file: upload_tokens.outline,
+        creator_set_visibility: Visibility.Public,
+      },
+    });
+
+    if (enqueue_studio_response.success) {
+      startPollingActiveJobs();
+    } else {
+      await this.handleError("Failed To Process Movie Try Again", 5000);
+      return;
+    }
+
+    this.handleSuccess("Done Check Your Movies Tab On Profile.", 5000);
+  }
+
+  async handleSuccess(message: string, timeout: number) {
+    addToast(ToastTypes.SUCCESS, message, timeout);
+  }
+  async handleError(message: string, timeout: number) {
+    addToast(ToastTypes.ERROR, message, timeout);
+    await this.EndLoadingState();
+  }
+  async EndLoadingState() {
+    this.editor.generating_preview = false;
+    this.editor.endLoading();
+    this.editor.onWindowResize();
     this.editor.recorder = undefined;
     if (this.editor.rawRenderer) {
       this.editor.rawRenderer.setSize(
