@@ -18,16 +18,19 @@ import {
   EnqueueActingFaceResponse,
 } from "@storyteller/components/src/api/workflows/EnqueueActingFace";
 import { EntityInput } from "components/entities";
-import { useInferenceJobs, useSession } from "hooks";
+import {
+  useInferenceJobs,
+  // useSession
+} from "hooks";
 
 import { v4 as uuidv4 } from "uuid";
-import "./ActingFace.scss";
+import "./MotionMirror.scss";
 
 interface Props {
   value?: any;
 }
 
-export default function ActingFace({ value }: Props) {
+export default function MotionMirror({ value }: Props) {
   const [sourceMediaToken, sourceMediaTokenSet] = useState("");
   const [removeWatermark, removeWatermarkSet] = useState(false);
   const [faceDriverToken, faceDriverTokenSet] = useState(
@@ -35,7 +38,7 @@ export default function ActingFace({ value }: Props) {
   );
   const [visibility, visibilitySet] = useState<"private" | "public">("private");
   const { enqueue } = useInferenceJobs();
-  const { canBanUsers } = useSession();
+  // const { canBanUsers } = useSession();
 
   const visibilityOptions = [
     { label: "Private", value: "private" },
@@ -66,11 +69,11 @@ export default function ActingFace({ value }: Props) {
     }
   };
 
-  return canBanUsers() ? (
+  return (
     <Container className="mt-3">
       <Panel className="p-3">
         <header {...{ className: "fy-live-portrait-header" }}>
-          <h2 className="">Acting Face</h2>
+          <h2 className="">Motion Mirror</h2>
           <Button
             {...{
               disabled: !hasTokens,
@@ -143,5 +146,5 @@ export default function ActingFace({ value }: Props) {
         />
       </Panel>
     </Container>
-  ) : null;
+  );
 }
