@@ -47,6 +47,7 @@ impl ScopedJobTypeExecution {
 
   pub fn get_scoped_job_types(&self) -> Option<&BTreeSet<InferenceJobType>> {
     self.scoped_types.as_ref()
+        .filter(|scoped_types| !scoped_types.is_empty())
   }
 }
 
@@ -115,5 +116,25 @@ mod tests {
     assert_eq!(false, scoping.can_run_job(InferenceJobType::SadTalker));
     assert_eq!(false, scoping.can_run_job(InferenceJobType::SoVitsSvc));
     assert_eq!(false, scoping.can_run_job(InferenceJobType::LivePortrait));
+  }
+
+  #[test]
+  fn test_get_scoped_job_types() {
+    let scoping = ScopedJobTypeExecution::new_from_set(BTreeSet::from([
+      InferenceJobType::RvcV2,
+      InferenceJobType::SadTalker,
+    ]));
+
+    assert_eq!(scoping.get_scoped_job_types(), Some(&BTreeSet::from([
+      InferenceJobType::RvcV2,
+      InferenceJobType::SadTalker,
+    ])));
+  }
+
+  #[test]
+  fn test_get_scoped_job_types_empty() {
+    let scoping = ScopedJobTypeExecution::new_from_set(BTreeSet::from([]));
+
+    assert_eq!(scoping.get_scoped_job_types(), None);
   }
 }

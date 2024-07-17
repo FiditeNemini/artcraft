@@ -270,31 +270,37 @@ WHERE
   )
 "#.to_string();
 
-  if let Some(job_type) = args.maybe_scope_by_job_type {
-    query.push_str(&format!(r#"
+  if let Some(job_types) = args.maybe_scope_by_job_type {
+    if !job_types.is_empty() {
+      query.push_str(&format!(r#"
       AND
       (
         job_type IN ({})
       )
-    "#, job_type_predicate(job_type)));
+    "#, job_type_predicate(job_types)));
+    }
   }
 
   if let Some(model_types) = args.maybe_scope_by_model_type {
-    query.push_str(&format!(r#"
+    if !model_types.is_empty() {
+      query.push_str(&format!(r#"
       AND
       (
         maybe_model_type IN ({})
       )
     "#, model_type_predicate(model_types)));
+    }
   }
 
   if let Some(inference_categories) = args.maybe_scope_by_job_category {
-    query.push_str(&format!(r#"
+    if !inference_categories.is_empty() {
+      query.push_str(&format!(r#"
       AND
       (
         inference_category IN ({})
       )
     "#, inference_category_predicate(&inference_categories)));
+    }
   }
 
   query

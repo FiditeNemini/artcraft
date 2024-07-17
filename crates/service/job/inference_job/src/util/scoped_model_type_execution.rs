@@ -52,6 +52,7 @@ impl ScopedModelTypeExecution {
   #[deprecated(note="Use ScopedJobTypeExecution instead.")]
   pub fn get_scoped_model_types(&self) -> Option<&BTreeSet<InferenceModelType>> {
     self.scoped_types.as_ref()
+        .filter(|scoped_types| !scoped_types.is_empty())
   }
 }
 
@@ -120,5 +121,25 @@ mod tests {
     assert_eq!(false, scoping.can_run_job(InferenceModelType::Vits));
     assert_eq!(false, scoping.can_run_job(InferenceModelType::SoVitsSvc));
     assert_eq!(false, scoping.can_run_job(InferenceModelType::Tacotron2));
+  }
+
+  #[test]
+  fn test_get_scoped_model_types() {
+    let scoping = ScopedModelTypeExecution::new_from_set(BTreeSet::from([
+      InferenceModelType::RvcV2,
+      InferenceModelType::Vits
+    ]));
+
+    assert_eq!(scoping.get_scoped_model_types(), Some(&BTreeSet::from([
+      InferenceModelType::RvcV2,
+      InferenceModelType::Vits
+    ])));
+  }
+
+  #[test]
+  fn test_get_scoped_model_types_empty() {
+    let scoping = ScopedModelTypeExecution::new_from_set(BTreeSet::from([]));
+
+    assert_eq!(scoping.get_scoped_model_types(), None);
   }
 }
