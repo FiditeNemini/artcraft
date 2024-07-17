@@ -10,7 +10,7 @@ use filesys::rename_across_devices::rename_across_devices;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 #[derive(Clone)]
 pub struct PretrainedHubertModel {

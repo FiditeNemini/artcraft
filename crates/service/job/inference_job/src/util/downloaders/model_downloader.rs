@@ -11,7 +11,7 @@ use filesys::rename_across_devices::{rename_across_devices, RenameError};
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 /// Helper utility for downloading pretrained models from GCS.
 #[async_trait(?Send)] // NB: Marking async_trait as not needing Sync/Send. Hopefully this doesn't blow up on us.

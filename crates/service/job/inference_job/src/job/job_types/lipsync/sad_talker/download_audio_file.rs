@@ -20,7 +20,7 @@ use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct AudioFile {
   pub filesystem_path: PathBuf,

@@ -14,8 +14,8 @@ use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReport
 use mysql_queries::queries::model_weights::get::get_weight::RetrievedModelWeight;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::util::model_weights_cache::model_weights_cache_filename::ModelWeightsCacheMapping;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 #[derive(Clone)]
 pub struct ModelWeightsCacheDirectory {

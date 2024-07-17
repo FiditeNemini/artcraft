@@ -24,11 +24,11 @@ use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmen
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
 use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
 use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobDependencies {
   /// Database dependencies.

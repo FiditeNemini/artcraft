@@ -51,12 +51,12 @@ use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::util::instrumentation::{init_otel_metrics_pipeline, JobInstrumentLabels};
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
 use crate::util::scoped_job_type_execution::ScopedJobTypeExecution;
 use crate::util::scoped_model_type_execution::ScopedModelTypeExecution;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub mod http_server;
 pub mod job;

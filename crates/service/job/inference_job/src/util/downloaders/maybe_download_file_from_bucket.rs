@@ -10,7 +10,7 @@ use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 // TODO(bt, 2022-07-15): Make a concrete type for bucket paths
 
