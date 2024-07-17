@@ -10,22 +10,22 @@ const columns = [
   {
     title: "Original Video",
     videoSrc: "/videos/landing/vst/1-original.mp4",
-    ctaLink: "/video-styletransfer",
+    ctaLink: "/style-video",
   },
   {
     title: "2D Flat Anime",
     videoSrc: "/videos/landing/vst/1-2d_flat_anime.mp4",
-    ctaLink: "/video-styletransfer",
+    ctaLink: "/style-video",
   },
   {
     title: "Ink B&W",
     videoSrc: "/videos/landing/vst/1-ink_bw.mp4",
-    ctaLink: "/video-styletransfer",
+    ctaLink: "/style-video",
   },
   {
     title: "Origami",
     videoSrc: "/videos/landing/vst/1-origami.mp4",
-    ctaLink: "/video-styletransfer",
+    ctaLink: "/style-video",
   },
 ];
 
@@ -70,7 +70,7 @@ export default function VstSectionV1(props: VstSectionV1Props) {
             small={true}
             icon={faArrowRight}
             iconFlip={true}
-            to="/video-styletransfer"
+            to="/style-video"
           />
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function VstSectionV1(props: VstSectionV1Props) {
                   <Badge label={column.title} color="gray" />
                 </div>
                 {/* <div className="vst-sbs-video-overlay-cta">
-                  <Link to={column.ctaLink || "/video-styletransfer"}>
+                  <Link to={column.ctaLink || "/style-video"}>
                     <Badge label="Try this style" />
                   </Link>
                 </div> */}

@@ -9,7 +9,6 @@ import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
 import FaceAnimator from "./pages/face_animator";
 import VideoMocap from "./pages/video_mocap";
-import VideoStyleTransfer from "./pages/video_styletransfer";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -810,14 +809,6 @@ class PageContainer extends React.Component<
 
                   <Route path="/video-workflow">
                     <VideoWorkflowPage
-                      {...{
-                        sessionWrapper: this.props.sessionWrapper,
-                      }}
-                    />
-                  </Route>
-
-                  <Route path="/video-styletransfer">
-                    <VideoStyleTransfer
                       {...{
                         sessionWrapper: this.props.sessionWrapper,
                       }}

@@ -448,7 +448,7 @@ export default function SideNav({
 
             <li>
               <NavLink
-                to="/video-styletransfer"
+                to="/style-video"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >

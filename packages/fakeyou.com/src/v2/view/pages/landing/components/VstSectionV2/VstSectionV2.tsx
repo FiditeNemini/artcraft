@@ -61,22 +61,22 @@ export default function VstSectionV2(props: VstSectionV2Props) {
         {
           src: "/videos/landing/vst/1-2d_flat_anime.mp4",
           label: "2D Flat Anime",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
         {
           src: "/videos/landing/vst/1-3d_cartoon.mp4",
           label: "3D Cartoon",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
         {
           src: "/videos/landing/vst/1-ink_bw.mp4",
           label: "Ink B&W",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
         {
           src: "/videos/landing/vst/1-origami.mp4",
           label: "Origami",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
       ],
     },
@@ -87,22 +87,22 @@ export default function VstSectionV2(props: VstSectionV2Props) {
         {
           src: "/videos/landing/vst/2-2d_flat_anime.mp4",
           label: "2D Flat Anime",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
         {
           src: "/videos/landing/vst/2-pop_art.mp4",
           label: "Pop Art",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
         {
           src: "/videos/landing/vst/2-ink_splash.mp4",
           label: "Ink Splash",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
         {
           src: "/videos/landing/vst/2-origami.mp4",
           label: "Origami",
-          ctaLink: "/video-styletransfer",
+          ctaLink: "/style-video",
         },
       ],
     },
@@ -240,7 +240,7 @@ export default function VstSectionV2(props: VstSectionV2Props) {
                   <Badge label={styledVideo.label} color="gray" />
                 </div>
                 {/* <div className="vst-styled-videos-panel-overlay-cta">
-                  <Link to={styledVideo.ctaLink || "/video-styletransfer"}>
+                  <Link to={styledVideo.ctaLink || "/style-video"}>
                     <Badge label="Try this style" />
                   </Link>
                 </div> */}
