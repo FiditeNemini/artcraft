@@ -119,6 +119,22 @@ export class TimeLine {
     });
   }
 
+  public isCharacter(uuid: string): boolean {
+    this.timeline_items.forEach(clip => {
+      if (clip.group == ClipGroup.CHARACTER)
+      this.characters[clip.object_uuid] = ClipGroup.CHARACTER;
+    });
+
+    let result: boolean = false;
+    for (const key in this.characters) {
+      if (key === uuid) {
+        result = true;
+        return true;
+      }
+    }
+    return result
+  }
+
   public async handleTimelineActions(data: {
     action: UnionedActionTypes;
     data: UnionedDataTypes;

@@ -64,6 +64,7 @@ export class SceneManager implements SceneManagerAPI {
   private undoIndex: number = 0;
   private lastSceneState: SceneState;
   private copiedObject: THREE.Object3D | undefined;
+  private is_character: Function;
 
   constructor(
     version: number,
@@ -71,12 +72,14 @@ export class SceneManager implements SceneManagerAPI {
     scene: Scene,
     devMode: boolean = false,
     updateOutliner: UpdateOutliner,
+    is_character: Function,
   ) {
     this.mouse_controls = mouse_controls;
     this.scene = scene;
     this.version = version;
     this.lastSceneState = this.getSceneState();
     this.updateOutliner = updateOutliner;
+    this.is_character = is_character;
 
     if (devMode) {
       window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
@@ -240,7 +243,11 @@ export class SceneManager implements SceneManagerAPI {
   }
 
   public async copy() {
-    this.copiedObject = this.mouse_controls.selected?.at(0);
+    const object = this.mouse_controls.selected?.at(0)
+    if(object !== undefined ){
+      if(this.is_character(object.uuid) === false)
+      this.copiedObject = object;
+    }
   }
 
   public async paste() {

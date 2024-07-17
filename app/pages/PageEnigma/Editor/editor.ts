@@ -537,6 +537,7 @@ class Editor {
         this.activeScene,
         true,
         this.updateOutliner.bind(this),
+        this.timeline.isCharacter.bind(this.timeline)
       ); // Enabled dev mode.
       this.mouse_controls.sceneManager = this.sceneManager;
     }
