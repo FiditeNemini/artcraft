@@ -221,9 +221,6 @@ export default function FaceAnimator({
         large={true}
         showCtaButton={true}
       >
-        <div className="py-5">
-          <StorytellerStudioCTA />
-        </div>
         <div {...{ className: "panel face-animator-main" }}>
           {transitions((style, i) => {
             const Page = FaceAnimatorSubViews[page];
@@ -267,6 +264,10 @@ export default function FaceAnimator({
           title="Face Animator Sample"
           src="/videos/face-animator-instruction-en.mp4"
         />
+      </div>
+
+      <div className="py-5">
+        <StorytellerStudioCTA title="Try Storyteller Studio" />
       </div>
     </div>
   );
