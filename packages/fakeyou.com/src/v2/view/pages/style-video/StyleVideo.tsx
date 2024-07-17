@@ -16,7 +16,7 @@ import { EntityInput } from "components/entities";
 import {
   EnqueueVST,
   EnqueueVSTResponse,
-} from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
+} from "@storyteller/components/src/api/workflows/EnqueueVST";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";

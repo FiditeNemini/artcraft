@@ -8,7 +8,7 @@ import { useJobStatus, useInferenceJobs, useMedia } from "hooks";
 import {
   EnqueueVST,
   EnqueueVSTResponse,
-} from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
+} from "@storyteller/components/src/api/workflows/EnqueueVST";
 import { initialValues } from "./defaultValues";
 import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
