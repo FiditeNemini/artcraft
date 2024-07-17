@@ -41,12 +41,21 @@ pub struct ModernInferenceQueueStats {
 
 #[derive(Serialize, ToSchema)]
 pub struct ByQueueStats {
-  pub pending_face_animation_jobs: u64,
-  pub pending_rvc_jobs: u64,
-  pub pending_svc_jobs: u64,
+  // Text to Speech
   pub pending_tacotron2_jobs: u64,
   pub pending_voice_designer: u64,
+
+  // Voice Conversion
+  pub pending_rvc_jobs: u64,
+  pub pending_svc_jobs: u64,
+
+  // Image
   pub pending_stable_diffusion: u64,
+
+  // Video
+  pub pending_face_animation_jobs: u64,
+  pub pending_storyteller_studio: u64,
+  pub pending_acting_face: u64,
 }
 
 #[derive(Debug, ToSchema)]
@@ -105,11 +114,13 @@ pub async fn get_unified_queue_stats_handler(
         pending_job_count: 10_000,
         by_queue: ByQueueStats {
           pending_face_animation_jobs: 10_000,
+          pending_storyteller_studio: 10_000,
           pending_rvc_jobs: 10_000,
           pending_svc_jobs: 10_000,
           pending_tacotron2_jobs: 10_000,
           pending_voice_designer: 10_000,
           pending_stable_diffusion: 10_000,
+          pending_acting_face: 10_000,
         }
       },
       legacy_tts: LegacyQueueDetails {
@@ -212,6 +223,8 @@ pub async fn get_unified_queue_stats_handler(
         pending_tacotron2_jobs: cacheable_stats_result.queues.tacotron2,
         pending_voice_designer: cacheable_stats_result.queues.vall_e_x,
         pending_stable_diffusion: cacheable_stats_result.queues.stable_diffusion,
+        pending_storyteller_studio: cacheable_stats_result.queues.storyteller_studio,
+        pending_acting_face: cacheable_stats_result.queues.acting_face,
       }
     },
     legacy_tts: LegacyQueueDetails {

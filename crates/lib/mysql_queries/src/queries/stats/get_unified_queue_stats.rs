@@ -32,43 +32,25 @@ pub async fn get_unified_queue_stats(
       QueueStatsRowInternal,
         r#"
 SELECT
-    maybe_model_type as queue_type,
+    job_type as queue_type,
     count(*) as pending_job_count,
     NOW() as present_time
  FROM (
     SELECT
         token,
-        maybe_model_type
+        job_type
     FROM generic_inference_jobs
     WHERE status IN ("pending", "attempt_failed")
-    AND maybe_model_type IS NOT NULL
+    AND job_type IS NOT NULL
     UNION
     SELECT
         token,
-        maybe_model_type
+        job_type
     FROM generic_inference_jobs
     WHERE status IN ("started")
     AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
-    AND maybe_model_type IS NOT NULL
+    AND job_type IS NOT NULL
 ) as generic_inner
-GROUP BY queue_type
-UNION
-SELECT
-    "legacy_tts" as queue_type,
-    count(*) as pending_job_count,
-    NOW() as present_time
-FROM (
-     SELECT
-         token
-     FROM tts_inference_jobs
-     WHERE status IN ("pending", "attempt_failed")
-     UNION
-     SELECT
-         token
-     FROM tts_inference_jobs
-     WHERE status IN ("started")
-     AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
-) as legacy_inner
 GROUP BY queue_type
         "#,
     )
