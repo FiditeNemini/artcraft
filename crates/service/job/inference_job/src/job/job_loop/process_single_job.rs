@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use anyhow::anyhow;
-use log::{error, info, warn};
+use log::{debug, error, info, warn};
 use opentelemetry::KeyValue as OtelAttribute;
 use r2d2_redis::redis::Commands;
 
@@ -43,7 +43,7 @@ pub async fn process_single_job(
       info!("Job has routing tag ({}) for execution on this host ({})", routing_tag, hostname);
       force_execution = true;
     } else {
-      info!("Job routing tag ({}) doesn't match hostname ({}); skipping...", routing_tag, hostname);
+      debug!("Job routing tag ({}) doesn't match hostname ({}); skipping...", routing_tag, hostname);
       return Ok(ProcessSingleJobSuccessCase::JobSkippedForRoutingTagMismatch);
     }
   }
