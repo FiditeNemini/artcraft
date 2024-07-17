@@ -110,7 +110,6 @@ class Editor {
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
-  engineRenderSeparately: boolean = false;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -537,7 +536,7 @@ class Editor {
         this.activeScene,
         true,
         this.updateOutliner.bind(this),
-        this.timeline.isCharacter.bind(this.timeline)
+        this.timeline.isCharacter.bind(this.timeline),
       ); // Enabled dev mode.
       this.mouse_controls.sceneManager = this.sceneManager;
     }
@@ -930,96 +929,45 @@ class Editor {
 
       if (this.timeline.is_playing) {
         this.setColorMap();
-        if (this.engineRenderSeparately) {
-          this.timeline.loadCharacters();
-          this.render_camera?.layers.set(0);
+        this.render_composer?.render();
+        const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // High quality png.
 
-          for (const key in this.timeline.characters) {
-            if (this.timeline.characters.hasOwnProperty(key)) {  // Check if the key is the object's own property
-              const char = this.activeScene.get_object_by_uuid(key);
-              char?.traverse( function(child) {
-                child.layers.set(6);
-              });
-            }
-          }
-          
-          this.activeScene.scene.children.forEach(child => {
-            if (child.type == "DirectionalLight" || child.type == "HemisphereLight"  || child.type == "PointLight") {
-              child.layers.set(0);
-              child.layers.enable(1);
-              child.layers.enable(6);
-            }
-          });
-          //this.rawRenderer.setSize(width, height);
+        if (this.engine_preprocessing) {
+          this.setNormalMap();
           this.render_composer?.render();
-          const imgData = this.rawRenderer.domElement.toDataURL(
+          const normalImgData = this.rawRenderer.domElement.toDataURL(
             "image/png",
             1.0,
           ); // High quality png.
 
-          this.render_camera?.layers.set(6);
-
+          this.setRenderDepth();
           this.render_composer?.render();
-          const imgDataChars = this.rawRenderer.domElement.toDataURL(
+          const depthImgData = this.rawRenderer.domElement.toDataURL(
             "image/png",
             1.0,
           ); // High quality png.
 
-          this.frame_buffer.push([imgData, imgDataChars]);
+          this.setOutlineRender();
+          this.render_composer?.render();
+          const outlineImgData = this.rawRenderer.domElement.toDataURL(
+            "image/png",
+            1.0,
+          ); // High quality png.
+
+          this.frame_buffer.push([
+            imgData,
+            normalImgData,
+            depthImgData,
+            outlineImgData,
+          ]);
+        } else {
+          this.frame_buffer.push([imgData]);
         }
-        else {
-          this.setColorMap();
-          this.render_composer?.render();
-          const imgData = this.rawRenderer.domElement.toDataURL(
-            "image/png",
-            1.0,
-          ); // High quality png.
 
-          if (this.engine_preprocessing) {
-            this.setNormalMap();
-            this.render_composer?.render();
-            const normalImgData = this.rawRenderer.domElement.toDataURL(
-              "image/png",
-              1.0,
-            ); // High quality png.
-
-            this.setRenderDepth();
-            this.render_composer?.render();
-            const depthImgData = this.rawRenderer.domElement.toDataURL(
-              "image/png",
-              1.0,
-            ); // High quality png.
-
-            this.setOutlineRender();
-            this.render_composer?.render();
-            const outlineImgData = this.rawRenderer.domElement.toDataURL(
-              "image/png",
-              1.0,
-            ); // High quality png.
-
-            this.frame_buffer.push([
-              imgData,
-              normalImgData,
-              depthImgData,
-              outlineImgData,
-            ]);
-          } else {
-            this.frame_buffer.push([imgData]);
-          }
-        }
         this.render_timer += this.clock.getDelta();
       }
       if (!this.timeline.is_playing) {
         this.playback_location = 0;
-        for (const key in this.timeline.characters) {
-          if (this.timeline.characters.hasOwnProperty(key)) {  // Check if the key is the object's own property
-            const char = this.activeScene.get_object_by_uuid(key);
-            char?.traverse( function(child) {
-              child.layers.set(0);
-            });
-          }
-        }
-        this.render_camera?.layers.set(0);
         this.stopPlaybackAndUploadVideo();
       }
     }

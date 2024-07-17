@@ -641,13 +641,6 @@ export class TimeLine {
     this.timeline_items.push(clip);
   }
 
-  public loadCharacters() {
-    this.timeline_items.forEach(clip => {
-      if (clip.group == ClipGroup.CHARACTER)
-      this.characters[clip.object_uuid] = ClipGroup.CHARACTER;
-    });
-  }
-
   public async scrub(data: UpdateTime): Promise<void> {
     if (this.is_playing) {
       return;

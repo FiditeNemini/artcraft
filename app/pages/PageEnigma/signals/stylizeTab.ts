@@ -20,7 +20,6 @@ export const styleStrength = signal(0.8);
 export const lipSync = signal(false);
 export const cinematic = signal(true);
 export const enginePreProcessing = signal(false);
-export const engineRenderSeparately = signal(false);
 
 export const setArtStyleSelection = (newStyle: ArtStyle) => {
   if (selectedArtStyle.value !== newStyle) {
@@ -40,7 +39,6 @@ export const resetSceneGenerationMetadata = () => {
   lipSync.value = false;
   cinematic.value = false;
   enginePreProcessing.value = false;
-  engineRenderSeparately.value = false;
 };
 
 export const restoreSceneGenerationMetadata = (
