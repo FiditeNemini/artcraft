@@ -4,20 +4,16 @@ import {
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
-  IMAGEPLANE_FILE_TYPE,
+  VIDEOPLANE_FILE_TYPE,
 } from "~/enums";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import {
   Button,
-  FilterButtons,
   Pagination,
   SearchFilter,
-  UploadModalImages,
+  UploadModalMedia,
 } from "~/components";
-import {
-  TabTitle,
-  ItemElements,
-} from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import {
   fetchFeaturedMediaItems,
   fetchUserMediaItems,
@@ -25,15 +21,12 @@ import {
   isAnyStatusFetching,
   fetchFeaturedMediaItemsSearchResults,
   fetchUserMediaItemsSearchResults,
-} from "../utilities";
+} from "../../utilities";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 
-const filterEngineCategories = [
-  FilterEngineCategories.IMAGE_PLANE,
-  FilterEngineCategories.VIDEO_PLANE,
-];
+const filterEngineCategories = [FilterEngineCategories.VIDEO_PLANE];
 
-export const ImagePlanesTab = () => {
+export const VideoPlanesTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
@@ -69,7 +62,10 @@ export const ImagePlanesTab = () => {
     status: FetchStatus.READY,
   });
 
-  const [selectedFilter, setSelectedFilter] = useState(AssetFilterOption.MINE);
+  const [
+    selectedFilter,
+    //setSelectedFilter
+  ] = useState(AssetFilterOption.MINE);
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
       ? featuredImages ?? []
@@ -182,14 +178,14 @@ export const ImagePlanesTab = () => {
 
   return (
     <>
-      <TabTitle title="Image Panels" />
+      {/* <TabTitle title="Image Panels" /> */}
 
-      <FilterButtons
+      {/* <FilterButtons
         value={selectedFilter}
         onClick={(buttonIdx) => {
           setSelectedFilter(Number(buttonIdx));
         }}
-      />
+      /> */}
 
       <div className="flex w-full flex-col gap-3 px-4">
         <Button
@@ -198,7 +194,7 @@ export const ImagePlanesTab = () => {
           onClick={() => setOpenUploadModal(true)}
           className="w-full py-3 text-sm font-medium"
         >
-          Upload Image Panels
+          Upload Video Panels
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
@@ -215,8 +211,8 @@ export const ImagePlanesTab = () => {
             key={selectedFilter}
             placeholder={
               selectedFilter === AssetFilterOption.FEATURED
-                ? "Search featured image panels"
-                : "Search my image panels"
+                ? "Search featured video panels"
+                : "Search my video panels"
             }
           />
         )}
@@ -247,12 +243,12 @@ export const ImagePlanesTab = () => {
           }}
         />
       )}
-      <UploadModalImages
+      <UploadModalMedia
         onClose={() => setOpenUploadModal(false)}
         onSuccess={fetchUserImages}
         isOpen={openUploadModal}
-        fileTypes={Object.values(IMAGEPLANE_FILE_TYPE)}
-        title="Upload Image Panels"
+        fileTypes={Object.values(VIDEOPLANE_FILE_TYPE)}
+        title="Upload Video Panels"
       />
     </>
   );

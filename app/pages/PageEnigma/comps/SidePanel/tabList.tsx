@@ -17,7 +17,7 @@ import { TabTitles } from "~/enums";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/AudioTab";
 import { CreaturesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CreaturesTab";
 import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
-import { ImagePlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ImagePlanesTab";
+import { PlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/PlanesTab";
 import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ObjectsTab";
 import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
 import { SkyboxesTab } from "../SidePanelTabs/tabComps/SkyboxesTab";
@@ -56,12 +56,12 @@ export const tabList = [
   },
   {
     icon: faUserAstronaut,
-    title: TabTitles.CHARACTERS_ANIME,
+    title: TabTitles.GROUP_ANIME,
     component: <AnimeTab />,
   },
   {
     icon: faCatSpace,
-    title: TabTitles.CHARACTERS_TOONS,
+    title: TabTitles.GROUP_CARTOONS,
     component: <CartoonsTab />,
   },
   {
@@ -76,8 +76,8 @@ export const tabList = [
   },
   {
     icon: faPresentationScreen,
-    title: TabTitles.IMAGE_PLANE,
-    component: <ImagePlanesTab />,
+    title: TabTitles.PLANES,
+    component: <PlanesTab />,
   },
   {
     icon: faVolume,

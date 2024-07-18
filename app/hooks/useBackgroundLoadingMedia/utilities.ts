@@ -12,7 +12,7 @@ import {
 } from "~/signals";
 const { userInfo } = authentication;
 
-export async function PollUserMovies(): Promise<boolean> {
+export async function PollUserGeneratedMovies(): Promise<boolean> {
   if (!userInfo.value || isRetreivingUserMovies.value) {
     //do nothing return if login info does not exist
     return true;
@@ -25,7 +25,10 @@ export async function PollUserMovies(): Promise<boolean> {
   });
   isRetreivingUserMovies.value = false;
   if (response.success && response.data) {
-    setUserMovies(response.data);
+    const userGeneratedMovies = response.data.filter((movie) => {
+      return movie.origin_category === "inference";
+    });
+    setUserMovies(userGeneratedMovies);
     return true;
   }
   addToast(

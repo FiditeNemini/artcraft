@@ -77,7 +77,7 @@ class Scene {
     this._create_camera_obj();
   }
 
-  instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
+  async instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
     const material = new THREE.MeshPhongMaterial({ color: 0xdacbce });
     material.shininess = 0.0;
     let geometry;
@@ -125,8 +125,24 @@ class Scene {
       obj.userData["media_id"] = "Parim";
     } else if (name.includes("Image::")) {
       const image_token = name.replace("Image::", "");
-      const loader = new THREE.TextureLoader();
-      const texture = loader.load(image_token);
+      let texture;
+
+      if(image_token.includes(".mp4")) {
+        const Video_token = name.replace("Image::", "");
+        const videoElement = document.createElement('video');
+        videoElement.controls = true;
+        videoElement.muted = true;
+        videoElement.loop = true;
+        videoElement.autoplay = true;
+        videoElement.crossOrigin = "anonymous";
+        videoElement.src = Video_token;
+        await videoElement.play();
+
+        texture = new THREE.VideoTexture(videoElement);
+      } else {
+        const loader = new THREE.TextureLoader();
+        texture = loader.load(image_token);
+      }
       texture.colorSpace = THREE.SRGBColorSpace;
       const image_material = new THREE.MeshBasicMaterial({
         color: 0xffffff,
@@ -466,9 +482,9 @@ class Scene {
       url.includes(".png") ||
       url.includes(".jpg") ||
       url.includes(".jpeg") ||
-      url.includes(".gif")
+      url.includes(".mp4")
     ) {
-      return this.instantiate("Image::" + url);
+      return await this.instantiate("Image::" + url);
     }
     return await this.loadGlbWithPlaceholder(
       media_id,

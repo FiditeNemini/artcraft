@@ -92,7 +92,7 @@ export class StoryTellerProxyScene {
     console.log("Saving with version:", this.version);
     const results: ObjectJSON[] = [];
     if (this.scene.scene != null) {
-      for (let pchild of this.scene.scene.children) {
+      for (const pchild of this.scene.scene.children) {
         if (this.version >= 1.0) {
           if (pchild.userData["media_id"] != undefined) {
             results.push(await this.getChildren(pchild));
@@ -122,16 +122,19 @@ export class StoryTellerProxyScene {
         const token: string = json_object.media_file_token;
         let obj;
         switch (token) {
-          case "Parim":
-            const prim_uuid = this.scene.instantiate(
+          case "Parim": {
+            const newScene = await this.scene.instantiate(
               json_object.object_name,
-            ).uuid;
+            );
+            const prim_uuid = newScene.uuid;
             obj = this.scene.get_object_by_uuid(prim_uuid);
             break;
-          case "DirectionalLight":
+          }
+          case "DirectionalLight": {
             obj = this.scene._create_base_lighting();
             break;
-          default:
+          }
+          default: {
             if (token.includes("m_")) {
               obj = await this.scene.loadObject(
                 token,
@@ -149,10 +152,16 @@ export class StoryTellerProxyScene {
                 keyframe_uuid,
               );
             } else if (token.includes("Image::")) {
-              const prim_uuid = this.scene.instantiate(token).uuid;
+              const prim_uuid = (await this.scene.instantiate(token)).uuid;
               obj = this.scene.get_object_by_uuid(prim_uuid);
+
+              if (obj) {
+                obj.name = json_object.object_name;
+                obj.userData["name"] = json_object.object_name;
+              }
             }
             break;
+          }
         }
         if (obj) {
           obj.position.copy(json_object.position);

@@ -869,7 +869,7 @@ class Editor {
   }
 
   async create_parim(name: string, pos: THREE.Vector3) {
-    return this.activeScene.instantiate(name, pos);
+    return await this.activeScene.instantiate(name, pos);
   }
 
   updateSurfaceIdAttributeToMesh(scene: THREE.Scene) {

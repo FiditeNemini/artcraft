@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
-import { PollUserMovies, PollUserAudioItems } from "./utilities";
+import { PollUserGeneratedMovies, PollUserAudioItems } from "./utilities";
 
 import {
   completedAudioJobs,
@@ -24,7 +24,7 @@ export const useBackgroundLoadingMedia = () => {
     //CASE 1: first load
     // if myMovies undefined, poll for the first time
     if (!userMovies.value) {
-      PollUserMovies();
+      PollUserGeneratedMovies();
       return;
     }
 
@@ -45,7 +45,7 @@ export const useBackgroundLoadingMedia = () => {
 
     //there are videos newly completed, set and poll
     lastCompletedWorkflow.current = completedWorkflowJobs.value;
-    PollUserMovies().then((ret: boolean) => {
+    PollUserGeneratedMovies().then((ret: boolean) => {
       if (ret) {
         addToast(
           ToastTypes.SUCCESS,

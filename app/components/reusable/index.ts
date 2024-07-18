@@ -26,7 +26,7 @@ export * from "./TransitionDialogue"; //need to decouple hotkey signal
 export * from "./Typography";
 export * from "./UploadModal";
 export * from "./UploadModal3D";
-export * from "./UploadModalImages";
+export * from "./UploadModalMedia";
 export * from "./WaveformPlayer";
 
 //TODO: need to rewrite because it's against tailwind

@@ -4,7 +4,7 @@ import { TransitionDialogue, LoadingDots } from "~/components";
 
 import { UploadAssetError } from "../UploadModal/UploadAssetError";
 import { UploadSuccess } from "../UploadModal/UploadSuccess";
-import { UploadFilesImages } from "./UploadFilesImages";
+import { UploadFilesMedia } from "./UploadFilesMedia";
 import { FilterEngineCategories, UploaderStates } from "~/enums";
 import { initialUploaderState, UploaderState } from "~/models";
 
@@ -19,7 +19,7 @@ interface Props {
   };
 }
 
-export function UploadModalImages({
+export function UploadModalMedia({
   isOpen,
   onClose,
   onSuccess,
@@ -46,7 +46,7 @@ export function UploadModalImages({
     switch (uploaderState.status) {
       case UploaderStates.ready:
         return (
-          <UploadFilesImages
+          <UploadFilesMedia
             title={title}
             fileTypes={fileTypes}
             onClose={onClose}

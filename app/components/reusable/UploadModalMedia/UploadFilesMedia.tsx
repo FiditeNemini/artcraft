@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, H6, Input } from "~/components";
 import { FileUploader } from "../UploadModal/FileUploader";
-import { uploadImagePlane } from "./uploadImagePlane";
+import { uploadPlane } from "./uploadPlane";
 import { UploaderState } from "~/models";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   onUploadProgress: (newState: UploaderState) => void;
 }
 
-export const UploadFilesImages = ({
+export const UploadFilesMedia = ({
   fileTypes,
   onClose,
   title,
@@ -28,6 +28,7 @@ export const UploadFilesImages = ({
   const [assetFile, setAssetFile] = useState<{
     value: File | null;
     error?: string;
+    src?: string;
   }>({ value: null });
 
   const handleSubmit = () => {
@@ -47,7 +48,7 @@ export const UploadFilesImages = ({
       return;
     }
 
-    uploadImagePlane({
+    uploadPlane({
       title: uploadTitle.value,
       assetFile: assetFile.value,
       progressCallback: onUploadProgress,
@@ -69,9 +70,14 @@ export const UploadFilesImages = ({
           fileTypes={fileTypes}
           file={assetFile.value}
           setFile={(file: File | null) => {
-            setAssetFile({
-              value: file,
-            });
+            if (file !== null) {
+              setAssetFile({
+                value: file,
+                src: URL.createObjectURL(file),
+              });
+            } else {
+              setAssetFile({ value: null });
+            }
           }}
         />
         {assetFile.error && (
@@ -84,13 +90,25 @@ export const UploadFilesImages = ({
               File Preview
             </H6>
           )}
-          {assetFile.value && (
-            <img
-              alt="file upload preview"
-              className="m-auto max-h-full max-w-full"
-              src={URL.createObjectURL(assetFile.value)}
-            />
-          )}
+          {assetFile.value &&
+            (assetFile.value.type === "video/mp4" ? (
+              <video
+                muted
+                loop
+                autoPlay
+                className="m-auto max-h-full max-w-full"
+                id="thumbnail-video"
+                src={assetFile.src}
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <img
+                alt="file upload preview"
+                className="m-auto max-h-full max-w-full"
+                src={assetFile.src}
+              />
+            ))}
         </div>
 
         <div className="flex justify-end gap-4">

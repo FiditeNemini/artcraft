@@ -18,6 +18,9 @@ export enum IMAGEPLANE_FILE_TYPE {
   JPG = "JPG",
   JPEG = "JPEG",
 }
+export enum VIDEOPLANE_FILE_TYPE {
+  MP4 = "MP4",
+}
 
 export enum THUMBNAILS_FILE_TYPE {
   PNG = "PNG",

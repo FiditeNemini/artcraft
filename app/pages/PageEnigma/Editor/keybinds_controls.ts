@@ -252,11 +252,15 @@ export class MouseControls {
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     this.timeline_mouse = this.mouse;
 
-    if (this.isMouseClicked) {
-      // this causes an issue  https://discourse.threejs.org/t/unable-to-use-pointer-lock-api/11092
-      this.lockControls?.lock();
-    } else {
-      this.lockControls?.unlock();
+    // this causes an issue  https://discourse.threejs.org/t/unable-to-use-pointer-lock-api/11092
+    if (this.isMouseClicked && this.lockControls) {
+      if (this.lockControls.isLocked == false) {
+        this.lockControls.lock();
+      }
+    } else if (this.lockControls) {
+      if (this.lockControls.isLocked == true) {
+        this.lockControls.unlock();
+      }
     }
   }
 
