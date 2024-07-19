@@ -127,6 +127,7 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
               {...{
                 accept: ["video"],
                 aspectRatio: "landscape",
+                // debug: "AFM driver input",
                 name: "faceDriverToken",
                 value: faceDriverToken,
                 onChange: ({ target }: { target: any }) => {

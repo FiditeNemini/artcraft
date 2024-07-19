@@ -21,6 +21,7 @@ interface EntityInputProps {
   accept?: AcceptTypes | AcceptTypes[];
   aspectRatio?: "square" | "landscape" | "portrait";
   className?: string;
+  debug?: string;
   label?: string;
   name?: string;
   onChange?: any;
@@ -136,6 +137,7 @@ export default function EntityInput({
   accept,
   aspectRatio = "square",
   className,
+  debug,
   label,
   name = "",
   onChange,
@@ -149,7 +151,14 @@ export default function EntityInput({
   const presetToken = search ? urlSearch.get("preset_token") : "";
   const queryUser = search ? urlSearch.get("query_user") : "";
   const [mediaToken, mediaTokenSet] = useState(presetToken || value || "");
-  const { media, mediaSet, prompt } = useMedia({
+  const {
+    busy: mediaBusy,
+    media,
+    mediaSet,
+    prompt,
+    reload,
+  } = useMedia({
+    debug,
     mediaToken: mediaToken || value,
   });
   const [updated, updatedSet] = useState(false);
@@ -163,9 +172,12 @@ export default function EntityInput({
     onChange({ target: { name, value: token } });
   };
 
-  const { inputProps } = useMediaUploader({
+  const { busy: uploaderBusy, inputProps } = useMediaUploader({
     autoUpload: true,
-    onSuccess: (res: UploaderResponse) => selectToken(res.media_file_token),
+    onSuccess: (res: UploaderResponse) => {
+      reload();
+      selectToken(res.media_file_token);
+    },
   });
 
   const onSelect = (data: MediaFile) => {
@@ -173,9 +185,17 @@ export default function EntityInput({
     selectToken(data.token);
   };
 
-  const busy = false;
+  const busy = mediaBusy || uploaderBusy;
   const index = busy ? 0 : media ? 1 : 2;
   const [animating, animatingSet] = useState(false);
+
+  if (debug)
+    console.log(`🐞 EntityInput Debug at ${debug}`, {
+      index,
+      busy,
+      media,
+      view: ["busy slide", "full slide", "empty slide"][index],
+    });
 
   const transitions = useTransition(index, {
     config: { mass: 1, tension: 80, friction: 10 },
@@ -219,7 +239,8 @@ export default function EntityInput({
           return [
             <AnimatedSlide
               {...{
-                className: "fy-entity-input-busy",
+                className:
+                  "fy-entity-input-busy d-flex justify-content-center align-items-center",
                 render: MediaBusy,
                 ...sharedProps,
               }}
