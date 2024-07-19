@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { MediaFileAnimationType, TabTitles } from "~/enums";
 import { TabTitle } from "../../sharedComps";
-import { AnimationTab } from "./subtabAnimation";
+import { AnimationsTab } from "./subtabAnimations";
 import { CharactersTab } from "./subtabCharacters";
 import { SubTabButtons } from "../../sharedComps/SubTabButtons";
 
@@ -10,6 +10,7 @@ import {
   demoCharacterItems,
   demoAnimationItems,
 } from "~/pages/PageEnigma/signals";
+import { ExpressionTab } from "./subtabExpressions";
 
 export const CartoonsTab = () => {
   useSignals();
@@ -26,7 +27,11 @@ export const CartoonsTab = () => {
         setSubpage={(newPage) => {
           setCurrSubpage(newPage);
         }}
-        subPageTitles={[TabTitles.CHARACTERS, TabTitles.ANIMATION]}
+        subPageTitles={[
+          TabTitles.CHARACTERS,
+          TabTitles.ANIMATION,
+          TabTitles.EXPRESSIONS,
+        ]}
       />
 
       {currSubpage === TabTitles.CHARACTERS && (
@@ -36,9 +41,15 @@ export const CartoonsTab = () => {
         />
       )}
       {currSubpage === TabTitles.ANIMATION && (
-        <AnimationTab
+        <AnimationsTab
           animationType={MediaFileAnimationType.Mixamo}
           demoAnimationItems={demoAnimationItems.value}
+        />
+      )}
+      {currSubpage === TabTitles.EXPRESSIONS && (
+        <ExpressionTab
+        // animationType={MediaFileAnimationType.Mixamo}
+        // demoAnimationItems={demoAnimationItems.value}
         />
       )}
     </>

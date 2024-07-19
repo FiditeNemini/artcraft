@@ -16,13 +16,14 @@ function getAddCharacter(item: ClipUI) {
     object_uuid: item.object_uuid,
     name: item.object_name,
     media_id: item.media_id,
-    // maybe_animation_type: item.maybe_animation_type,
+    //maybe_animation_type: item.maybe_animation_type,
     muted: false,
     minimized: false,
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],
     expressionClips: [],
+    mediaType: item.media_file_type
   } as CharacterTrack;
 
   characterGroup.value = {
@@ -54,6 +55,7 @@ export function loadCharacterData(item: ClipUI) {
       name: item.name,
       offset: item.offset,
       length: item.length,
+      mediaType: item.media_file_type
     } as Clip;
     existingCharacter.animationClips.push(newItem);
     existingCharacter.animationClips.sort(

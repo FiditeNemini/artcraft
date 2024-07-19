@@ -3,7 +3,6 @@ import { FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 import {
   faBrush,
   faCatSpace,
-  faFaceSmileWink,
   faGlobeSnow,
   faMountainCity,
   faPresentationScreen,
@@ -16,7 +15,6 @@ import {
 import { TabTitles } from "~/enums";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/AudioTab";
 import { CreaturesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/CreaturesTab";
-import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ExpressionTab";
 import { PlanesTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/PlanesTab";
 import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/ObjectsTab";
 import { SetsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/SetsTab";
@@ -25,7 +23,7 @@ import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/Styl
 import {
   AnimeTab,
   CartoonsTab,
-} from "../SidePanelTabs/tabComps/AnimationCharacterComboTabs";
+} from "../SidePanelTabs/tabComps/CharactersComboTabs";
 
 export interface TabItem {
   icon: FontAwesomeIconProps["icon"];
@@ -63,11 +61,6 @@ export const tabList = [
     icon: faCatSpace,
     title: TabTitles.GROUP_CARTOONS,
     component: <CartoonsTab />,
-  },
-  {
-    icon: faFaceSmileWink,
-    title: TabTitles.EXPRESSIONS,
-    component: <ExpressionTab />,
   },
   {
     icon: faRaygun,

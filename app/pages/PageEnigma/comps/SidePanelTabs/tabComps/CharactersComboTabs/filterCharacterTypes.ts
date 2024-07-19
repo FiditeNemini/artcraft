@@ -26,7 +26,7 @@ export const filterMMDAnimations = (item: MediaItem) => {
 
 export const filterMixamoAnimations = (item: MediaItem) => {
   return (
-    item.maybe_animation_type === MediaFileAnimationType.Mixamo ||
+    // item.maybe_animation_type === MediaFileAnimationType.Mixamo &&
     item.media_type !== FilterMediaType.VMD
   );
 };

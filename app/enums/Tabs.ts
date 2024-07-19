@@ -4,7 +4,7 @@ export enum TabTitles {
   CHARACTERS = "Character",
   GROUP_ANIME = "Anime Characters & Animations",
   GROUP_CARTOONS = "Cartoon Characters & Animations",
-  EXPRESSIONS = "Facial Expression",
+  EXPRESSIONS = "Expressions",
   OBJECTS = "Set Dressings",
   OBJECTS_CREATURES = "Creatures",
   OBJECTS_SETS = "Film Sets",

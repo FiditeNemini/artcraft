@@ -20,6 +20,7 @@ import {
   CameraAspectRatio,
   ClipGroup,
   ClipType,
+  MediaFileType,
 } from "~/pages/PageEnigma/enums";
 import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/Editor/editor";
@@ -123,9 +124,9 @@ export class TimeLine {
   }
 
   public isCharacter(uuid: string): boolean {
-    this.timeline_items.forEach(clip => {
+    this.timeline_items.forEach((clip) => {
       if (clip.group == ClipGroup.CHARACTER)
-      this.characters[clip.object_uuid] = ClipGroup.CHARACTER;
+        this.characters[clip.object_uuid] = ClipGroup.CHARACTER;
     });
 
     let result: boolean = false;
@@ -135,7 +136,7 @@ export class TimeLine {
         return true;
       }
     }
-    return result
+    return result;
   }
 
   public async handleTimelineActions(data: {
@@ -294,6 +295,7 @@ export class TimeLine {
           0,
           0,
           0,
+          obj.userData["media_file_type"],
         ),
       );
 
@@ -319,21 +321,24 @@ export class TimeLine {
       } as MediaItem,
     });
 
-    this.addPlayableClip(
-      new ClipUI(
-        data["version"],
-        ClipType.FAKE,
-        ClipGroup.OBJECT,
-        "Default",
-        data.media_id,
-        item.uuid,
-        item.uuid,
-        item.name,
-        0,
-        0,
-        0,
-      ),
-    );
+    // this.addPlayableClip(
+    //   new ClipUI(
+    //     data["version"],
+    //     ClipType.FAKE,
+    //     ClipGroup.OBJECT,
+    //     "Default",
+    //     data.media_id,
+    //     item.uuid,
+    //     item.uuid,
+    //     item.name,
+    //     0,
+    //     0,
+    //     0,
+    //     this.scene.get_object_by_uuid(item.uuid)?.userData[
+    //       "media_file_type"
+    //     ],
+    //   ),
+    // );
   }
 
   public getPos() {
@@ -431,6 +436,7 @@ export class TimeLine {
         0,
         data_json["offset"],
         data_json["offset"],
+        MediaFileType.None,
       ),
     );
 
@@ -510,6 +516,10 @@ export class TimeLine {
               object_name,
               offset,
               end_offset,
+              0, // length
+              this.scene.get_object_by_uuid(object_uuid)?.userData[
+                "media_file_type"
+              ],
             ),
           );
           return;
@@ -531,7 +541,9 @@ export class TimeLine {
         object_uuid,
         object_name,
         offset,
-        end_offset,
+        end_offset, // length
+        0,
+        this.scene.get_object_by_uuid(object_uuid)?.userData["media_file_type"],
       ),
     );
 

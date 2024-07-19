@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { MediaFileAnimationType, TabTitles } from "~/enums";
 import { TabTitle } from "../../sharedComps";
-import { AnimationTab } from "./subtabAnimation";
+import { AnimationsTab } from "./subtabAnimations";
 import { CharactersTab } from "./subtabCharacters";
 import { SubTabButtons } from "../../sharedComps/SubTabButtons";
 
@@ -25,7 +25,7 @@ export const AnimeTab = () => {
         <CharactersTab animationType={MediaFileAnimationType.MikuMikuDance} />
       )}
       {currSubpage === TabTitles.ANIMATION && (
-        <AnimationTab animationType={MediaFileAnimationType.MikuMikuDance} />
+        <AnimationsTab animationType={MediaFileAnimationType.MikuMikuDance} />
       )}
     </>
   );

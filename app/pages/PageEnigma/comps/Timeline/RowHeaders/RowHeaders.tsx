@@ -17,6 +17,8 @@ import { CameraHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/Camer
 import { ObjectsHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/ObjectsHeader";
 import { CharacterHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CharacterHeader";
 import { LipSyncSubHeader } from "./LipSyncSubHeader";
+import { MediaFileAnimationType } from "~/enums";
+import { MediaFileType } from "~/pages/PageEnigma/enums";
 
 export const RowHeaders = () => {
   useSignals();
@@ -71,9 +73,12 @@ export const RowHeaders = () => {
               <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Position
               </div>
-              <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                Expression
-              </div>
+              {(character.animationType === MediaFileAnimationType.Mixamo ||
+                character.mediaType === MediaFileType.GLB) && (
+                <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                  Expression
+                </div>
+              )}
               <LipSyncSubHeader character={character} />
             </div>
           );

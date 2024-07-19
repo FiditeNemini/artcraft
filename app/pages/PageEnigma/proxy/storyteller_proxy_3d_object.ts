@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { MediaFileType } from "../enums";
 
 export interface ObjectJSON {
   version: number;
@@ -27,6 +28,7 @@ export interface ObjectJSON {
   specular: number;
   locked: boolean;
   visible: boolean | undefined;
+  media_file_type: MediaFileType;
 }
 
 export class StoryTellerProxy3DObject {
@@ -46,6 +48,7 @@ export class StoryTellerProxy3DObject {
   specular: number;
   locked: boolean;
   visible: boolean;
+  media_file_type: MediaFileType;
 
   constructor(version: number, media_file_token: string) {
     this.version = version;
@@ -66,6 +69,7 @@ export class StoryTellerProxy3DObject {
     this.specular = 0.5;
     this.locked = false;
     this.visible = true;
+    this.media_file_type = MediaFileType.None;
   }
 
   getColorAsHexString(object: THREE.Object3D): string {
@@ -121,6 +125,7 @@ export class StoryTellerProxy3DObject {
       specular: this.specular,
       locked: this.locked,
       visible: this.visible,
+      media_file_type: this.media_file_type,
     };
     return json;
   }

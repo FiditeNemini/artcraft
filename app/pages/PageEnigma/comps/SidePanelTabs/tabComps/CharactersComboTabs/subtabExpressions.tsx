@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
-  ANIMATION_MIXAMO_FILE_TYPE,
-  ANIMATION_MMD_FILE_TYPE,
   AssetFilterOption,
-  FeatureFlags,
   FilterEngineCategories,
   MediaFileAnimationType,
+  FeatureFlags,
 } from "~/enums";
 import {
   Button,
@@ -15,8 +13,11 @@ import {
   SearchFilter,
   UploadModal,
 } from "~/components";
-import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
-import { FetchStatus } from "~/pages/PageEnigma/enums";
+import {
+  ItemElements,
+  // TabTitle,
+} from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
+import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import {
   fetchFeaturedMediaItems,
   fetchFeaturedMediaItemsSearchResults,
@@ -25,45 +26,28 @@ import {
   fetchUserMediaItemsSearchResults,
   isAnyStatusFetching,
 } from "../../utilities";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
-import {
-  filterMixamoAnimations,
-  filterMMDAnimations,
-} from "./filterCharacterTypes";
-import { MediaItem } from "~/pages/PageEnigma/models";
+import { FetchStatus } from "~/pages/PageEnigma/enums";
 
-export const AnimationTab = ({
-  animationType,
-  demoAnimationItems = [],
-}: {
-  animationType: MediaFileAnimationType;
-  demoAnimationItems?: MediaItem[];
-}) => {
+export const ExpressionTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
+
   const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
-  const filterAnimationType = useMemo(
-    () =>
-      animationType === MediaFileAnimationType.Mixamo
-        ? filterMixamoAnimations
-        : filterMMDAnimations,
-    [animationType],
-  );
 
   const [open, setOpen] = useState(false);
   const [searchTermFeatured, setSearchTermFeatured] = useState("");
   const [searchTermUser, setSearchTermUser] = useState("");
 
   const [
-    { mediaItems: userAnimations, status: userFetchStatus },
+    { mediaItems: userExpressions, status: userFetchStatus },
     setUserFetch,
   ] = useState<FetchMediaItemStates>({
     mediaItems: undefined,
     status: FetchStatus.READY,
   });
   const [
-    { mediaItems: featuredAnimations, status: featuredFetchStatus },
+    { mediaItems: featuredExpressions, status: featuredFetchStatus },
     setFeaturedFetch,
   ] = useState<FetchMediaItemStates>({
     mediaItems: undefined,
@@ -89,11 +73,10 @@ export const AnimationTab = ({
   );
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? [...(featuredAnimations || []), ...demoAnimationItems]
-      : userAnimations ?? [];
+      ? featuredExpressions ?? []
+      : userExpressions ?? [];
 
   const [currentPage, setCurrentPage] = useState<number>(0);
-
   const pageSize = 21;
   const totalPages = Math.ceil(displayedItems.length / pageSize);
 
@@ -104,72 +87,60 @@ export const AnimationTab = ({
     userSearchFetchStatus,
   ]);
 
-  const fetchUserAnimations = useCallback(
+  const fetchUserExpressions = useCallback(
     () =>
       fetchUserMediaItems({
-        filterEngineCategories: [FilterEngineCategories.ANIMATION],
+        filterEngineCategories: [FilterEngineCategories.EXPRESSION],
         setState: (newState: FetchMediaItemStates) => {
-          const filterNewMediaItems = newState.mediaItems
-            ? newState.mediaItems.filter(filterAnimationType)
-            : undefined;
           setUserFetch((curr) => ({
             status: newState.status,
-            mediaItems: filterNewMediaItems
-              ? filterNewMediaItems
+            mediaItems: newState.mediaItems
+              ? newState.mediaItems
               : curr.mediaItems,
           }));
         },
-        defaultErrorMessage: "Unknown Error in Fetching User Set Objects",
+        defaultErrorMessage: "Unknown Error in Fetching User Expressions",
       }),
     [],
   );
 
-  const fetchFeaturedAnimations = useCallback(
+  const fetchFeaturedExpressions = useCallback(
     () =>
       fetchFeaturedMediaItems({
-        filterEngineCategories: [FilterEngineCategories.ANIMATION],
+        filterEngineCategories: [FilterEngineCategories.EXPRESSION],
         setState: (newState: FetchMediaItemStates) => {
-          const filterNewMediaItems = newState.mediaItems
-            ? newState.mediaItems.filter(filterAnimationType)
-            : undefined;
           setFeaturedFetch((curr) => ({
             status: newState.status,
-            mediaItems: filterNewMediaItems
-              ? filterNewMediaItems
+            mediaItems: newState.mediaItems
+              ? newState.mediaItems
               : curr.mediaItems,
           }));
         },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Set Objects",
+        defaultErrorMessage: "Unknown Error in Fetching Featured Expressions",
       }),
     [],
   );
 
-  const filterAnimationItems = (searchTerm: string) =>
-    demoAnimationItems.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-
-  const fetchFeaturedSearchResults = useCallback(async () => {
-    const filteredAnimationItems = filterAnimationItems(searchTermFeatured);
+  const fetchFeaturedSearchResults = useCallback(async (searchTerm: string) => {
     fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.ANIMATION],
+      filterEngineCategories: [FilterEngineCategories.EXPRESSION],
       setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch(() => ({
+        setFeaturedSearchFetch((curr) => ({
           status: newState.status,
           mediaItems: newState.mediaItems
-            ? [...filteredAnimationItems, ...newState.mediaItems]
-            : filteredAnimationItems,
+            ? newState.mediaItems
+            : curr.mediaItems,
         }));
       },
       defaultErrorMessage:
-        "Unknown Error in Fetching Featured Set Objects Search Results",
-      searchTerm: searchTermFeatured,
+        "Unknown Error in Fetching Featured Expressions Search Results",
+      searchTerm: searchTerm,
     });
-  }, [searchTermFeatured]);
+  }, []);
 
-  const fetchUserSearchResults = useCallback(async () => {
+  const fetchUserSearchResults = useCallback(async (searchTerm: string) => {
     fetchUserMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.ANIMATION],
+      filterEngineCategories: [FilterEngineCategories.EXPRESSION],
       setState: (newState: FetchMediaItemStates) => {
         setUserSearchFetch((curr) => ({
           status: newState.status,
@@ -179,32 +150,32 @@ export const AnimationTab = ({
         }));
       },
       defaultErrorMessage:
-        "Unknown Error in Fetching User Set Objects Search Results",
-      searchTerm: searchTermUser,
+        "Unknown Error in Fetching User Expressions Search Results",
+      searchTerm: searchTerm,
     });
-  }, [searchTermUser]);
+  }, []);
 
   useEffect(() => {
-    if (!userAnimations) {
-      fetchUserAnimations();
+    if (!userExpressions) {
+      fetchUserExpressions();
     }
-    if (!featuredAnimations) {
-      fetchFeaturedAnimations();
+    if (!featuredExpressions) {
+      fetchFeaturedExpressions();
     }
   }, [
-    userAnimations,
-    fetchUserAnimations,
-    featuredAnimations,
-    fetchFeaturedAnimations,
+    userExpressions,
+    fetchUserExpressions,
+    featuredExpressions,
+    fetchFeaturedExpressions,
   ]);
 
   useEffect(() => {
     if (selectedFilter === AssetFilterOption.FEATURED) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults();
+      fetchFeaturedSearchResults(searchTermFeatured);
     } else if (selectedFilter === AssetFilterOption.MINE) {
       setCurrentPage(0);
-      fetchUserSearchResults();
+      fetchUserSearchResults(searchTermUser);
     }
   }, [
     searchTermFeatured,
@@ -216,16 +187,14 @@ export const AnimationTab = ({
 
   return (
     <>
-      {/* <TabTitle title="Animation" /> */}
-
+      {/* <TabTitle title="Face Expression" /> */}
       <FilterButtons
         value={selectedFilter}
-        onClick={(buttonIdx) => {
-          setSelectedFilter(Number(buttonIdx));
+        onClick={(button) => {
+          setSelectedFilter(button);
           setCurrentPage(0);
         }}
       />
-
       <div className="flex w-full flex-col gap-3 px-4">
         {showUploadButton && (
           <Button
@@ -234,7 +203,7 @@ export const AnimationTab = ({
             onClick={() => setOpen(true)}
             className="w-full py-3 text-sm font-medium"
           >
-            Upload Animation (Dev Only)
+            Upload Expression (Dev Only)
           </Button>
         )}
         {showSearchObjectComponent && (
@@ -252,16 +221,15 @@ export const AnimationTab = ({
             key={selectedFilter}
             placeholder={
               selectedFilter === AssetFilterOption.FEATURED
-                ? "Search featured animations"
-                : "Search my animations"
+                ? "Search featured expressions"
+                : "Search my expressions"
             }
           />
         )}
       </div>
-      <div className="w-full grow overflow-y-auto px-4 pb-4">
+      <div className="h-full w-full overflow-y-auto px-4 pb-4">
         <ItemElements
           busy={isFetching}
-          debug="animations tab"
           currentPage={currentPage}
           pageSize={pageSize}
           items={
@@ -287,27 +255,16 @@ export const AnimationTab = ({
       )}
       <UploadModal
         onClose={() => setOpen(false)}
-        onSuccess={fetchUserAnimations}
+        onSuccess={fetchUserExpressions}
         isOpen={open}
-        type={FilterEngineCategories.ANIMATION}
-        fileTypes={Object.values(
-          animationType === MediaFileAnimationType.Mixamo
-            ? ANIMATION_MIXAMO_FILE_TYPE
-            : ANIMATION_MMD_FILE_TYPE,
-        )}
-        title="Upload Animation"
+        fileTypes={["CSV"]}
+        title="Upload Expression"
         options={{
-          fileSubtypes: [
-            { [animationType]: animationType },
-            // { Mixamo: MediaFileAnimationType.Mixamo },
-            // { MikuMikuDance: MediaFileAnimationType.MikuMikuDance },
-            // { MoveAi: MediaFileAnimationType.MoveAi },
-            // { Rigify: MediaFileAnimationType.Rigify },
-            // { Rokoko: MediaFileAnimationType.Rokoko },
-          ],
+          fileSubtypes: [{ ARKit: MediaFileAnimationType.ArKit }],
           hasLength: true,
           hasThumbnailUpload: true,
         }}
+        type={FilterEngineCategories.EXPRESSION}
       />
     </>
   );

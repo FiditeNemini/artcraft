@@ -152,30 +152,32 @@ export const CharactersTab = ({
     [filterCharacterType],
   );
 
-  const filterCharacterItems = (searchTerm: string) =>
-    demoCharacterItems.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+  const fetchFeaturedSearchResults = useCallback(
+    async (searchTerm: string) => {
+      const filterCharacterItems = (searchTerm: string) =>
+        demoCharacterItems.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+      const filteredCharacterItems = filterCharacterItems(searchTerm);
+      fetchFeaturedMediaItemsSearchResults({
+        filterEngineCategories: [FilterEngineCategories.CHARACTER],
+        setState: (newState: FetchMediaItemStates) => {
+          setFeaturedSearchFetch(() => ({
+            status: newState.status,
+            mediaItems: newState.mediaItems
+              ? [...filteredCharacterItems, ...newState.mediaItems]
+              : filteredCharacterItems,
+          }));
+        },
+        defaultErrorMessage:
+          "Unknown Error in Fetching Featured Characters Search Results",
+        searchTerm: searchTerm,
+      });
+    },
+    [demoCharacterItems],
+  );
 
-  const fetchFeaturedSearchResults = useCallback(async () => {
-    const filteredCharacterItems = filterCharacterItems(searchTermFeatured);
-    fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.CHARACTER],
-      setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch(() => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? [...filteredCharacterItems, ...newState.mediaItems]
-            : filteredCharacterItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching Featured Characters Search Results",
-      searchTerm: searchTermFeatured,
-    });
-  }, [searchTermFeatured]);
-
-  const fetchUserSearchResults = useCallback(async () => {
+  const fetchUserSearchResults = useCallback(async (searchTerm: string) => {
     fetchUserMediaItemsSearchResults({
       filterEngineCategories: [FilterEngineCategories.CHARACTER],
       setState: (newState: FetchMediaItemStates) => {
@@ -188,9 +190,9 @@ export const CharactersTab = ({
       },
       defaultErrorMessage:
         "Unknown Error in Fetching User Characters Search Results",
-      searchTerm: searchTermUser,
+      searchTerm: searchTerm,
     });
-  }, [searchTermUser]);
+  }, []);
 
   useEffect(() => {
     if (!userCharacters) {
@@ -209,10 +211,10 @@ export const CharactersTab = ({
   useEffect(() => {
     if (selectedFilter === AssetFilterOption.FEATURED) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults();
+      fetchFeaturedSearchResults(searchTermFeatured);
     } else if (selectedFilter === AssetFilterOption.MINE) {
       setCurrentPage(0);
-      fetchUserSearchResults();
+      fetchUserSearchResults(searchTermUser);
     }
   }, [
     searchTermFeatured,

@@ -98,16 +98,12 @@ export const fetchFeaturedMediaItemsSearchResults = async ({
   filterEngineCategories: FilterEngineCategories[];
   defaultErrorMessage?: string;
 }) => {
-  setState({ status: FetchStatus.IN_PROGRESS });
-
   if (!searchTerm.trim()) {
-    console.log("Search term is empty after trim");
-    setState({
-      mediaItems: [],
-      status: FetchStatus.SUCCESS,
-    });
+    //if after trim it's empty, do nothing
     return;
   }
+
+  setState({ status: FetchStatus.IN_PROGRESS });
 
   const mediaFilesApi = new MediaFilesApi();
   const response = await mediaFilesApi.SearchFeaturedMediaFiles({
@@ -146,14 +142,11 @@ export const fetchUserMediaItemsSearchResults = async ({
   filterEngineCategories: FilterEngineCategories[];
   defaultErrorMessage?: string;
 }) => {
-  setState({ status: FetchStatus.IN_PROGRESS });
   if (!searchTerm.trim()) {
-    setState({
-      mediaItems: [],
-      status: FetchStatus.SUCCESS,
-    });
-    return;
+    return; //if after trim it's empty, do nothing
   }
+
+  setState({ status: FetchStatus.IN_PROGRESS });
 
   const mediaFilesApi = new MediaFilesApi();
   const response = await mediaFilesApi.SearchUserMediaFiles({

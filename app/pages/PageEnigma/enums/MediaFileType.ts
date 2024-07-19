@@ -16,6 +16,10 @@ export enum MediaFileType {
   // open source 3D file format.
   GLB = "glb",
 
+  // MMD is the format for anime characters.
+  // open source 3D file format.
+  MMD = "mmd",
+
   // FBX isn't supported by Storyteller Engine, but we can get
   // uploads in this format. It's a very popular 3D graphics format.
   FBX = "fbx",

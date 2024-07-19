@@ -8,6 +8,7 @@ import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { generateUUID } from "three/src/math/MathUtils.js";
 import { LoadingPlaceHolderManager } from "./placeholder_manager";
 import { Water } from "three/examples/jsm/Addons.js";
+import { MediaFileType } from "../enums";
 class Scene {
   name: string;
   gridHelper: THREE.GridHelper | undefined;
@@ -171,6 +172,8 @@ class Scene {
     obj.userData["shininess"] = 0.5;
     obj.userData["specular"] = 0.0;
     obj.userData["locked"] = false;
+    obj.userData["media_file_type"] = MediaFileType.None;
+
 
     this.scene.add(obj);
 
@@ -456,6 +459,8 @@ class Scene {
     mmd.userData["shininess"] = 0.5;
     mmd.userData["specular"] = 0.5;
     mmd.userData["locked"] = false;
+    mmd.userData["media_file_type"] = MediaFileType.MMD;
+
     mmd.layers.enable(0);
     mmd.layers.enable(1);
     this.scene.add(mmd);
@@ -572,6 +577,7 @@ class Scene {
       child.userData["shininess"] = 0.5;
       child.userData["specular"] = 0.5;
       child.userData["locked"] = false;
+      child.userData["media_file_type"] = MediaFileType.GLB;
       child.layers.enable(0);
       child.layers.enable(1);
       if (load_version <= 1.0) {
@@ -602,6 +608,7 @@ class Scene {
       glb.scene.userData["specular"] = 0.5;
       glb.scene.userData["locked"] = false;
     }
+    glb.scene.userData["media_file_type"] = MediaFileType.GLB;
 
     if (load_version > 1.0) {
       child_result = glb.scene;

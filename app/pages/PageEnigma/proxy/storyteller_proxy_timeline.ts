@@ -89,6 +89,7 @@ export class StoryTellerProxyTimeline {
           element.start_offset,
           element.ending_offset,
           element.keyframe_offset,
+          element.media_file_type
         );
         new_clips.push(clip);
       }
