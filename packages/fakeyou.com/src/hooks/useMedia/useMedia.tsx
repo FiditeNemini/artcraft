@@ -9,9 +9,9 @@ import {
 } from "@storyteller/components/src/api/prompts/GetPrompts";
 import { DeleteMedia } from "@storyteller/components/src/api/media_files/DeleteMedia";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { usePrevious } from "hooks";
 
 export default function useMedia({
+  debug = "",
   mediaToken = "",
   onSuccess = (res: MediaFile) => {},
   onRemove = (res: any) => {},
@@ -20,6 +20,7 @@ export default function useMedia({
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const [media, mediaSet] = useState<MediaFile | undefined>();
   const [prompt, promptSet] = useState<Prompt | undefined>();
+
   const remove = (as_mod: boolean) => {
     writeStatusSet(FetchStatus.in_progress);
     DeleteMedia(mediaToken, {
@@ -31,19 +32,20 @@ export default function useMedia({
     });
   };
 
-  const previousToken = usePrevious(mediaToken);
-
   const reload = () => {
     statusSet(FetchStatus.ready);
     mediaSet(undefined);
   };
 
+  const busy =
+    status === FetchStatus.in_progress ||
+    writeStatus === FetchStatus.in_progress;
+
   useEffect(() => {
-    if (
-      status === FetchStatus.ready &&
-      mediaToken &&
-      (!media || previousToken !== mediaToken)
-    ) {
+    // this condidition handles all media file fetches
+    // it is triggered when status is ready and there is a media token but no media
+
+    if (status === FetchStatus.ready && mediaToken && !media) {
       statusSet(FetchStatus.in_progress);
       GetMedia(mediaToken, {})
         .then(res => {
@@ -51,6 +53,7 @@ export default function useMedia({
             statusSet(FetchStatus.success);
             onSuccess(res.media_file);
             mediaSet(res.media_file);
+
             if (res.media_file.maybe_prompt_token) {
               GetPrompts(res.media_file.maybe_prompt_token, {}).then(
                 promptRes => {
@@ -67,13 +70,16 @@ export default function useMedia({
         });
     }
 
+    // this triggers a media refetch when there is media, but the hook mediaToken param is updated
+
     if (media && media.token !== mediaToken) {
       mediaSet(undefined);
       statusSet(FetchStatus.ready);
     }
-  }, [media, mediaToken, previousToken, prompt, onSuccess, status, statusSet]);
+  }, [media, mediaToken, prompt, onSuccess, status, statusSet]);
 
   return {
+    busy,
     media,
     mediaFile: media,
     mediaSet,
@@ -81,6 +87,7 @@ export default function useMedia({
     remove,
     reload,
     status,
+    statusSet,
     writeStatus,
   };
 }
