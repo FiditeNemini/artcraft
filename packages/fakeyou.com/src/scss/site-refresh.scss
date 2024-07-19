@@ -11,9 +11,8 @@ styles with important tags:
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
 
-@mixin panel {
+@mixin panel-no-border-color {
   background-color: $panel;
-  border-color: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid;
   border-left: none;
   border-right: none;
@@ -26,6 +25,11 @@ styles with important tags:
     0 10px 8px rgb(0 0 0 / 3%),
     0 4px 4px rgb(0 0 0 / 2%),
     0 2px 2px rgb(0 0 0 / 1%) !important;
+}
+
+@mixin panel {
+  border-color: rgba(255, 255, 255, 0.04) !important;
+  @include panel-no-border-color;
 }
 
 @mixin medium-svg {

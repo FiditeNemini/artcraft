@@ -118,7 +118,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 import StyleVideo from "./pages/style-video";
-import MotionMirror from "./pages/motion_mirror";
+import AIFaceMirror from "./pages/ai_face_mirror";
 import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
 import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
@@ -977,8 +977,13 @@ class PageContainer extends React.Component<
                     <WaitlistNextStepsPage />
                   </Route>
 
-                  <Route path="/motion-mirror">
-                    <MotionMirror />
+                  <Route path="/ai-face-mirror">
+                    <AIFaceMirror
+                      {...{
+                        sessionSubscriptionsWrapper:
+                          this.props.sessionSubscriptionsWrapper,
+                      }}
+                    />
                   </Route>
 
                   {/*
