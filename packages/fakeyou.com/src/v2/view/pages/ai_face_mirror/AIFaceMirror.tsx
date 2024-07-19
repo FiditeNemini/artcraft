@@ -11,7 +11,7 @@ import {
   Label,
   // DropdownOptions,
 } from "components/common";
-
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import {
   EnqueueActingFace,
@@ -22,21 +22,21 @@ import {
   useInferenceJobs,
   // useSession
 } from "hooks";
-
+import PremiumLock from "components/PremiumLock";
 import { v4 as uuidv4 } from "uuid";
-import "./MotionMirror.scss";
+import "./AIFaceMirror.scss";
 
 interface Props {
-  value?: any;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
-export default function MotionMirror({ value }: Props) {
+export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
   const [sourceMediaToken, sourceMediaTokenSet] = useState("");
   const [removeWatermark, removeWatermarkSet] = useState(false);
   const [faceDriverToken, faceDriverTokenSet] = useState(
-    "m_g6adxppds5cgg02fjva3253ttp2c5r"
+    "m_41caq6n7nw15y9e68009bgkn23m3yf"
   );
-  const [visibility, visibilitySet] = useState<"private" | "public">("private");
+  const [visibility, visibilitySet] = useState<"private" | "public">("public");
   const { enqueue } = useInferenceJobs();
   // const { canBanUsers } = useSession();
 
@@ -71,25 +71,36 @@ export default function MotionMirror({ value }: Props) {
 
   return (
     <Container className="mt-3">
-      <Panel className="p-3">
-        <header {...{ className: "fy-live-portrait-header" }}>
-          <h2 className="">Motion Mirror</h2>
-          <Button
-            {...{
-              disabled: !hasTokens,
-              label: "Create",
-              onClick: enqueueClick,
-            }}
-          />
+      <Panel {...{ className: "fy-ai-face-mirror-panel" }}>
+        <header {...{ className: "fy-ai-face-mirror-header" }}>
+          <video autoPlay muted loop id="myVideo">
+            <source src="/videos/motion_mirror_bg_04.mp4" type="video/mp4" />
+          </video>
+          <div {...{ className: "fy-ai-face-mirror-header-content" }}>
+            <div {...{ className: "fy-ai-face-mirror-title" }}>
+              <h1>AI Face Mirror</h1>
+              <p>
+                Use AI to transfer motion from one face video to another
+                portrait image or video.
+              </p>
+            </div>
+            <Button
+              {...{
+                disabled: !hasTokens,
+                label: hasTokens ? "Create" : "Choose media to begin",
+                onClick: enqueueClick,
+              }}
+            />
+          </div>
         </header>
         <div
           {...{
-            className: "fy-live-portrait-inputs",
+            className: "fy-ai-face-mirror-main-inputs",
           }}
         >
           <div
             {...{
-              className: "fy-live-portrait-column",
+              className: "fy-ai-face-mirror-column",
             }}
           >
             <Label label="Choose a portrait video or image" />
@@ -108,7 +119,7 @@ export default function MotionMirror({ value }: Props) {
           </div>
           <div
             {...{
-              className: "fy-live-portrait-column",
+              className: "fy-ai-face-mirror-column",
             }}
           >
             <Label label="Then choose a motion reference" />
@@ -126,24 +137,39 @@ export default function MotionMirror({ value }: Props) {
             />
           </div>
         </div>
-        <Checkbox
+        <div
           {...{
-            label: "Remove watermark",
-            onChange: ({ target }: any) => {
-              removeWatermarkSet(target.value);
-            },
+            className: "fy-ai-face-mirror-secondary-inputs",
           }}
-        />
-        <Select
-          {...{
-            label: "visibility",
-            onChange: ({ target }: any) => {
-              visibilitySet(target.value);
-            },
-            options: visibilityOptions,
-            value: visibility,
-          }}
-        />
+        >
+          <Select
+            {...{
+              label: "visibility",
+              onChange: ({ target }: any) => {
+                visibilitySet(target.value);
+              },
+              options: visibilityOptions,
+              value: visibility,
+            }}
+          />
+          <PremiumLock
+            {...{
+              requiredPlan: "any",
+              sessionSubscriptionsWrapper,
+              large: true,
+              showCtaButton: true,
+            }}
+          >
+            <Checkbox
+              {...{
+                label: "Remove watermark",
+                onChange: ({ target }: any) => {
+                  removeWatermarkSet(target.value);
+                },
+              }}
+            />
+          </PremiumLock>
+        </div>
       </Panel>
     </Container>
   );

@@ -4,6 +4,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container } from "components/common";
+import { AIFaceMirrorCTA } from "components/marketing";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import { useDomainConfig } from "context/DomainConfigContext";
@@ -62,12 +63,19 @@ function LandingPage(props: Props) {
           <Container type="panel">
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
+              <FakeYouLandingHeader
+                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+              />
+            )}
+
+            <AIFaceMirrorCTA
+              {...{
+                ...(isLoggedIn ? { className: "mt-4" } : {}),
+              }}
+            />
+
+            {!isLoggedIn && (
               <>
-                <FakeYouLandingHeader
-                  sessionSubscriptionsWrapper={
-                    props.sessionSubscriptionsWrapper
-                  }
-                />
                 {/* <VstSectionV1 /> */}
                 <VstSectionV2 />
                 <div className="py-5">
