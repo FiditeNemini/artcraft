@@ -1,16 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
-import { useSignals } from "@preact/signals-react/runtime";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
   OBJECT_FILE_TYPE,
+  TabTitles,
 } from "~/enums";
-import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { demoShapeItems } from "~/pages/PageEnigma/signals";
-
 import {
   TabTitle,
   ItemElements,
@@ -22,14 +20,13 @@ import {
   Pagination,
   UploadModal3D,
 } from "~/components";
+import { isAnyStatusFetching } from "../utilities";
 import {
-  fetchFeaturedMediaItems,
-  fetchFeaturedMediaItemsSearchResults,
-  FetchMediaItemStates,
-  fetchUserMediaItems,
-  fetchUserMediaItemsSearchResults,
-  isAnyStatusFetching,
-} from "../utilities";
+  useUserObjects,
+  useFeaturedObjects,
+  useSearchFeaturedObjects,
+  useSearchUserdObjects,
+} from "../hooks";
 
 const filterEngineCategories = [
   FilterEngineCategories.SET_DRESSING,
@@ -37,166 +34,82 @@ const filterEngineCategories = [
 ];
 
 export const ObjectsTab = () => {
-  useSignals();
-
   const showSearchObjectComponent = usePosthogFeatureFlag(
     FeatureFlags.SHOW_SEARCH_OBJECTS,
   );
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 
-  const [searchTermFeatured, setSearchTermFeatured] = useState("");
-  const [searchTermUser, setSearchTermUser] = useState("");
+  const { userObjects, userFetchStatus, fetchUserObjects } = useUserObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching User Objects",
+  });
+  const { featuredObjects, featuredFetchStatus } = useFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching Featured Objects",
+  });
+  const {
+    searchTermForFeaturedObjects,
+    featuredObjectsSearchResults,
+    featuredObjectsSearchFetchStatus,
+    updateSearchTermForFeaturedObjects,
+  } = useSearchFeaturedObjects({
+    demoFeaturedObjects: demoShapeItems.value,
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching Featured Objects Search Results",
+  });
 
-  const [{ mediaItems: userObjects, status: userFetchStatus }, setUserFetch] =
-    useState<FetchMediaItemStates>({
-      mediaItems: undefined,
-      status: FetchStatus.READY,
-    });
-  const [
-    { mediaItems: featuredObjects, status: featuredFetchStatus },
-    setFeaturedFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
-  });
-  const [
-    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
-    setFeaturedSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
-  });
-  const [
-    { mediaItems: userSearchResults, status: userSearchFetchStatus },
-    setUserSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const {
+    searchTermForUserObjects,
+    userObjectsSearchResults,
+    userObjectsSearchFetchStatus,
+    updateSearchTermForUserObjects,
+  } = useSearchUserdObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching User Objects Search Results",
   });
 
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
-  const [currentPage, setCurrentPage] = useState<number>(0);
 
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? [...demoShapeItems.value, ...(featuredObjects ?? [])]
-      : userObjects ?? [];
+      ? searchTermForFeaturedObjects
+        ? featuredObjectsSearchResults ?? []
+        : [...demoShapeItems.value, ...(featuredObjects ?? [])]
+      : searchTermForUserObjects
+        ? userObjectsSearchResults ?? []
+        : userObjects ?? [];
 
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 21;
   const totalPages = Math.ceil(displayedItems.length / pageSize);
 
   const isFetching = isAnyStatusFetching([
     userFetchStatus,
     featuredFetchStatus,
-    featuredSearchFetchStatus,
-    userSearchFetchStatus,
+    featuredObjectsSearchFetchStatus,
+    userObjectsSearchFetchStatus,
   ]);
 
-  const fetchUserObjects = useCallback(
-    () =>
-      fetchUserMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setUserFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching User Objects",
-      }),
-    [],
-  );
-
-  const fetchFeaturedObjects = useCallback(
-    () =>
-      fetchFeaturedMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setFeaturedFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Objects",
-      }),
-    [],
-  );
-
-  const filterObjectItems = (searchTerm: string) =>
-    demoShapeItems.value.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-
-  const fetchFeaturedSearchResults = useCallback(async () => {
-    const filteredObjectItems = filterObjectItems(searchTermFeatured);
-    fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch(() => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? [...filteredObjectItems, ...newState.mediaItems]
-            : filteredObjectItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching Featured Objects Search Results",
-      searchTerm: searchTermFeatured,
-    });
-  }, [searchTermFeatured]);
-
-  const fetchUserSearchResults = useCallback(async () => {
-    fetchUserMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setUserSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching User Objects Search Results",
-      searchTerm: searchTermUser,
-    });
-  }, [searchTermUser]);
+  useEffect(() => {
+    if (searchTermForUserObjects.length > 0) {
+      setCurrentPage(0);
+    }
+  }, [searchTermForUserObjects]);
 
   useEffect(() => {
-    if (!userObjects) {
-      fetchUserObjects();
-    }
-    if (!featuredObjects) {
-      fetchFeaturedObjects();
-    }
-  }, [userObjects, fetchUserObjects, featuredObjects, fetchFeaturedObjects]);
-
-  useEffect(() => {
-    if (selectedFilter === AssetFilterOption.FEATURED) {
+    if (searchTermForFeaturedObjects.length > 0) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults();
-    } else if (selectedFilter === AssetFilterOption.MINE) {
-      setCurrentPage(0);
-      fetchUserSearchResults();
     }
-  }, [
-    searchTermFeatured,
-    searchTermUser,
-    fetchFeaturedSearchResults,
-    fetchUserSearchResults,
-    selectedFilter,
-  ]);
+  }, [searchTermForFeaturedObjects]);
 
   return (
     <>
-      <TabTitle title="Objects" />
+      <TabTitle title={TabTitles.OBJECTS} />
       <FilterButtons
         value={selectedFilter}
         onClick={(button) => {
@@ -211,19 +124,19 @@ export const ObjectsTab = () => {
           onClick={() => setOpenUploadModal(true)}
           className="w-full py-3 text-sm font-medium"
         >
-          Upload Set Dressing or Other Objects
+          Upload Props or Other Objects
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={
               selectedFilter === AssetFilterOption.FEATURED
-                ? searchTermFeatured
-                : searchTermUser
+                ? searchTermForFeaturedObjects
+                : searchTermForUserObjects
             }
             onSearchChange={
               selectedFilter === AssetFilterOption.FEATURED
-                ? setSearchTermFeatured
-                : setSearchTermUser
+                ? updateSearchTermForFeaturedObjects
+                : updateSearchTermForUserObjects
             }
             key={selectedFilter}
             placeholder={
@@ -240,15 +153,7 @@ export const ObjectsTab = () => {
           debug="objects tab"
           currentPage={currentPage}
           pageSize={pageSize}
-          items={
-            selectedFilter === AssetFilterOption.FEATURED
-              ? searchTermFeatured
-                ? featuredSearchResults ?? []
-                : displayedItems
-              : searchTermUser
-                ? userSearchResults ?? []
-                : displayedItems
-          }
+          items={displayedItems}
         />
       </div>
       {totalPages > 1 && (
@@ -267,7 +172,7 @@ export const ObjectsTab = () => {
         isOpen={openUploadModal}
         engineCategory={FilterEngineCategories.SET_DRESSING}
         fileTypes={Object.values(OBJECT_FILE_TYPE)}
-        title="Upload Objects"
+        title="Upload Props or Other Objects"
       />
     </>
   );

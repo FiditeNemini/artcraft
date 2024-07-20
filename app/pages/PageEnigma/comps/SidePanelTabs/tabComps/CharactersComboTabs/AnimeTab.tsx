@@ -1,4 +1,8 @@
 import { useState } from "react";
+import {
+  faPersonSimple,
+  faRabbitRunning,
+} from "@fortawesome/pro-solid-svg-icons";
 
 import { MediaFileAnimationType, TabTitles } from "~/enums";
 import { TabTitle } from "../../sharedComps";
@@ -20,6 +24,7 @@ export const AnimeTab = () => {
           setCurrSubpage(newPage);
         }}
         subPageTitles={[TabTitles.CHARACTERS, TabTitles.ANIMATION]}
+        subPageTitleIcons={[faPersonSimple, faRabbitRunning]}
       />
       {currSubpage === TabTitles.CHARACTERS && (
         <CharactersTab animationType={MediaFileAnimationType.MikuMikuDance} />

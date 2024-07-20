@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
+
+import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 
 import {
   AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
   OBJECT_FILE_TYPE,
+  TabTitles,
 } from "~/enums";
-import { FetchStatus } from "~/pages/PageEnigma/enums";
 
 import {
   Button,
@@ -22,20 +24,15 @@ import {
   ItemElements,
 } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 
+import { isAnyStatusFetching } from "../utilities";
 import {
-  fetchFeaturedMediaItems,
-  fetchUserMediaItems,
-  FetchMediaItemStates,
-  isAnyStatusFetching,
-  fetchFeaturedMediaItemsSearchResults,
-  fetchUserMediaItemsSearchResults,
-} from "../utilities";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
+  useUserObjects,
+  useFeaturedObjects,
+  useSearchFeaturedObjects,
+  useSearchUserdObjects,
+} from "../hooks";
 
-const filterEngineCategories = [
-  FilterEngineCategories.LOCATION,
-  FilterEngineCategories.SKYBOX,
-];
+const filterEngineCategories = [FilterEngineCategories.LOCATION];
 
 export const SetsTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
@@ -43,159 +40,76 @@ export const SetsTab = () => {
   );
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
-  const [searchTermFeatured, setSearchTermFeatured] = useState("");
-  const [searchTermUser, setSearchTermUser] = useState("");
 
-  const [
-    { mediaItems: userSetObjects, status: userFetchStatus },
-    setUserFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const { userObjects, userFetchStatus, fetchUserObjects } = useUserObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching User Film Sets",
   });
-  const [
-    { mediaItems: featuredSetObjects, status: featuredFetchStatus },
-    setFeaturedFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const { featuredObjects, featuredFetchStatus } = useFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching Featured Film Sets",
   });
-  const [
-    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
-    setFeaturedSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const {
+    searchTermForFeaturedObjects,
+    featuredObjectsSearchResults,
+    featuredObjectsSearchFetchStatus,
+    updateSearchTermForFeaturedObjects,
+  } = useSearchFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching Featured Film Sets Search Results",
   });
-  const [
-    { mediaItems: userSearchResults, status: userSearchFetchStatus },
-    setUserSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+
+  const {
+    searchTermForUserObjects,
+    userObjectsSearchResults,
+    userObjectsSearchFetchStatus,
+    updateSearchTermForUserObjects,
+  } = useSearchUserdObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching User Film Sets Search Results",
   });
 
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
+
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? featuredSetObjects ?? []
-      : userSetObjects ?? [];
+      ? searchTermForFeaturedObjects
+        ? featuredObjectsSearchResults ?? []
+        : featuredObjects ?? []
+      : searchTermForUserObjects
+        ? userObjectsSearchResults ?? []
+        : userObjects ?? [];
 
   const [currentPage, setCurrentPage] = useState<number>(0);
-
   const pageSize = 21;
   const totalPages = Math.ceil(displayedItems.length / pageSize);
 
   const isFetching = isAnyStatusFetching([
     userFetchStatus,
     featuredFetchStatus,
-    featuredSearchFetchStatus,
-    userSearchFetchStatus,
-  ]);
-
-  const fetchUserSetObjects = useCallback(
-    () =>
-      fetchUserMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setUserFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching User Set Objects",
-      }),
-    [],
-  );
-
-  const fetchFeaturedSetObjects = useCallback(
-    () =>
-      fetchFeaturedMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setFeaturedFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Set Objects",
-      }),
-    [],
-  );
-
-  const fetchFeaturedSearchResults = useCallback(async () => {
-    fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching Featured Set Objects Search Results",
-      searchTerm: searchTermFeatured,
-    });
-  }, [searchTermFeatured]);
-
-  const fetchUserSearchResults = useCallback(async () => {
-    fetchUserMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setUserSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching User Set Objects Search Results",
-      searchTerm: searchTermUser,
-    });
-  }, [searchTermUser]);
-
-  useEffect(() => {
-    if (!userSetObjects) {
-      fetchUserSetObjects();
-    }
-    if (!featuredSetObjects) {
-      fetchFeaturedSetObjects();
-    }
-  }, [
-    userSetObjects,
-    fetchUserSetObjects,
-    featuredSetObjects,
-    fetchFeaturedSetObjects,
+    featuredObjectsSearchFetchStatus,
+    userObjectsSearchFetchStatus,
   ]);
 
   useEffect(() => {
-    if (selectedFilter === AssetFilterOption.FEATURED) {
+    if (searchTermForUserObjects.length > 0) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults();
-    } else if (selectedFilter === AssetFilterOption.MINE) {
-      setCurrentPage(0);
-      fetchUserSearchResults();
     }
-  }, [
-    searchTermFeatured,
-    searchTermUser,
-    fetchFeaturedSearchResults,
-    fetchUserSearchResults,
-    selectedFilter,
-  ]);
+  }, [searchTermForUserObjects]);
+
+  useEffect(() => {
+    if (searchTermForFeaturedObjects.length > 0) {
+      setCurrentPage(0);
+    }
+  }, [searchTermForFeaturedObjects]);
 
   return (
     <>
-      <TabTitle title="Film Sets" />
+      <TabTitle title={TabTitles.OBJECTS_SETS} />
 
       <FilterButtons
         value={selectedFilter}
@@ -211,25 +125,25 @@ export const SetsTab = () => {
           onClick={() => setOpenUploadModal(true)}
           className="w-full py-3 text-sm font-medium"
         >
-          Upload Set Objects
+          Upload Film Sets
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={
               selectedFilter === AssetFilterOption.FEATURED
-                ? searchTermFeatured
-                : searchTermUser
+                ? searchTermForFeaturedObjects
+                : searchTermForUserObjects
             }
             onSearchChange={
               selectedFilter === AssetFilterOption.FEATURED
-                ? setSearchTermFeatured
-                : setSearchTermUser
+                ? updateSearchTermForFeaturedObjects
+                : updateSearchTermForUserObjects
             }
             key={selectedFilter}
             placeholder={
               selectedFilter === AssetFilterOption.FEATURED
-                ? "Search featured sets"
-                : "Search my sets"
+                ? "Search featured film sets"
+                : "Search my film sets"
             }
           />
         )}
@@ -240,15 +154,7 @@ export const SetsTab = () => {
           debug="sets tab"
           currentPage={currentPage}
           pageSize={pageSize}
-          items={
-            selectedFilter === AssetFilterOption.FEATURED
-              ? searchTermFeatured
-                ? featuredSearchResults ?? []
-                : displayedItems
-              : searchTermUser
-                ? userSearchResults ?? []
-                : displayedItems
-          }
+          items={displayedItems}
         />
       </div>
       {totalPages > 1 && (
@@ -263,11 +169,11 @@ export const SetsTab = () => {
       )}
       <UploadModal3D
         onClose={() => setOpenUploadModal(false)}
-        onSuccess={fetchUserSetObjects}
+        onSuccess={fetchUserObjects}
         isOpen={openUploadModal}
         engineCategory={FilterEngineCategories.LOCATION}
         fileTypes={Object.values(OBJECT_FILE_TYPE)}
-        title="Upload Set Objects"
+        title="Upload Film Sets"
       />
     </>
   );

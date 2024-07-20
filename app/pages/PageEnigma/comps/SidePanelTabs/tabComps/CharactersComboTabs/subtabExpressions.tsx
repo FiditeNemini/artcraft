@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
@@ -13,20 +13,17 @@ import {
   SearchFilter,
   UploadModal,
 } from "~/components";
-import {
-  ItemElements,
-  // TabTitle,
-} from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
+import { isAnyStatusFetching } from "../../utilities";
 import {
-  fetchFeaturedMediaItems,
-  fetchFeaturedMediaItemsSearchResults,
-  FetchMediaItemStates,
-  fetchUserMediaItems,
-  fetchUserMediaItemsSearchResults,
-  isAnyStatusFetching,
-} from "../../utilities";
-import { FetchStatus } from "~/pages/PageEnigma/enums";
+  useUserObjects,
+  useFeaturedObjects,
+  useSearchFeaturedObjects,
+  useSearchUserdObjects,
+} from "../../hooks";
+
+const filterEngineCategories = [FilterEngineCategories.EXPRESSION];
 
 export const ExpressionTab = () => {
   const showSearchObjectComponent = usePosthogFeatureFlag(
@@ -35,46 +32,50 @@ export const ExpressionTab = () => {
 
   const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
 
-  const [open, setOpen] = useState(false);
-  const [searchTermFeatured, setSearchTermFeatured] = useState("");
-  const [searchTermUser, setSearchTermUser] = useState("");
+  const [openUploadModal, setOpenUploadModal] = useState(false);
 
-  const [
-    { mediaItems: userExpressions, status: userFetchStatus },
-    setUserFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const { userObjects, userFetchStatus, fetchUserObjects } = useUserObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching User Expressions",
   });
-  const [
-    { mediaItems: featuredExpressions, status: featuredFetchStatus },
-    setFeaturedFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const { featuredObjects, featuredFetchStatus } = useFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching Featured Expressions",
   });
-  const [
-    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
-    setFeaturedSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
-  });
-  const [
-    { mediaItems: userSearchResults, status: userSearchFetchStatus },
-    setUserSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const {
+    searchTermForFeaturedObjects,
+    featuredObjectsSearchResults,
+    featuredObjectsSearchFetchStatus,
+    updateSearchTermForFeaturedObjects,
+  } = useSearchFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching Featured Expressions Search Results",
   });
 
-  const [selectedFilter, setSelectedFilter] = useState(
+  const {
+    searchTermForUserObjects,
+    userObjectsSearchResults,
+    userObjectsSearchFetchStatus,
+    updateSearchTermForUserObjects,
+  } = useSearchUserdObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching User Expressions Search Results",
+  });
+
+  const [filterOwnership, setFilterOwnership] = useState(
     AssetFilterOption.FEATURED,
   );
+
   const displayedItems =
-    selectedFilter === AssetFilterOption.FEATURED
-      ? featuredExpressions ?? []
-      : userExpressions ?? [];
+    filterOwnership === AssetFilterOption.FEATURED
+      ? searchTermForFeaturedObjects
+        ? featuredObjectsSearchResults ?? []
+        : featuredObjects ?? []
+      : searchTermForUserObjects
+        ? userObjectsSearchResults ?? []
+        : userObjects ?? [];
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 21;
@@ -83,115 +84,28 @@ export const ExpressionTab = () => {
   const isFetching = isAnyStatusFetching([
     userFetchStatus,
     featuredFetchStatus,
-    featuredSearchFetchStatus,
-    userSearchFetchStatus,
-  ]);
-
-  const fetchUserExpressions = useCallback(
-    () =>
-      fetchUserMediaItems({
-        filterEngineCategories: [FilterEngineCategories.EXPRESSION],
-        setState: (newState: FetchMediaItemStates) => {
-          setUserFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching User Expressions",
-      }),
-    [],
-  );
-
-  const fetchFeaturedExpressions = useCallback(
-    () =>
-      fetchFeaturedMediaItems({
-        filterEngineCategories: [FilterEngineCategories.EXPRESSION],
-        setState: (newState: FetchMediaItemStates) => {
-          setFeaturedFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Expressions",
-      }),
-    [],
-  );
-
-  const fetchFeaturedSearchResults = useCallback(async (searchTerm: string) => {
-    fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.EXPRESSION],
-      setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching Featured Expressions Search Results",
-      searchTerm: searchTerm,
-    });
-  }, []);
-
-  const fetchUserSearchResults = useCallback(async (searchTerm: string) => {
-    fetchUserMediaItemsSearchResults({
-      filterEngineCategories: [FilterEngineCategories.EXPRESSION],
-      setState: (newState: FetchMediaItemStates) => {
-        setUserSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching User Expressions Search Results",
-      searchTerm: searchTerm,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!userExpressions) {
-      fetchUserExpressions();
-    }
-    if (!featuredExpressions) {
-      fetchFeaturedExpressions();
-    }
-  }, [
-    userExpressions,
-    fetchUserExpressions,
-    featuredExpressions,
-    fetchFeaturedExpressions,
+    featuredObjectsSearchFetchStatus,
+    userObjectsSearchFetchStatus,
   ]);
 
   useEffect(() => {
-    if (selectedFilter === AssetFilterOption.FEATURED) {
+    if (searchTermForUserObjects.length > 0) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults(searchTermFeatured);
-    } else if (selectedFilter === AssetFilterOption.MINE) {
-      setCurrentPage(0);
-      fetchUserSearchResults(searchTermUser);
     }
-  }, [
-    searchTermFeatured,
-    searchTermUser,
-    fetchFeaturedSearchResults,
-    fetchUserSearchResults,
-    selectedFilter,
-  ]);
+  }, [searchTermForUserObjects]);
+
+  useEffect(() => {
+    if (searchTermForFeaturedObjects.length > 0) {
+      setCurrentPage(0);
+    }
+  }, [searchTermForFeaturedObjects]);
 
   return (
     <>
-      {/* <TabTitle title="Face Expression" /> */}
       <FilterButtons
-        value={selectedFilter}
+        value={filterOwnership}
         onClick={(button) => {
-          setSelectedFilter(button);
+          setFilterOwnership(button);
           setCurrentPage(0);
         }}
       />
@@ -200,7 +114,7 @@ export const ExpressionTab = () => {
           <Button
             icon={faCirclePlus}
             variant="action"
-            onClick={() => setOpen(true)}
+            onClick={() => setOpenUploadModal(true)}
             className="w-full py-3 text-sm font-medium"
           >
             Upload Expression (Dev Only)
@@ -209,18 +123,18 @@ export const ExpressionTab = () => {
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={
-              selectedFilter === AssetFilterOption.FEATURED
-                ? searchTermFeatured
-                : searchTermUser
+              filterOwnership === AssetFilterOption.FEATURED
+                ? searchTermForFeaturedObjects
+                : searchTermForUserObjects
             }
             onSearchChange={
-              selectedFilter === AssetFilterOption.FEATURED
-                ? setSearchTermFeatured
-                : setSearchTermUser
+              filterOwnership === AssetFilterOption.FEATURED
+                ? updateSearchTermForFeaturedObjects
+                : updateSearchTermForUserObjects
             }
-            key={selectedFilter}
+            key={filterOwnership}
             placeholder={
-              selectedFilter === AssetFilterOption.FEATURED
+              filterOwnership === AssetFilterOption.FEATURED
                 ? "Search featured expressions"
                 : "Search my expressions"
             }
@@ -232,15 +146,7 @@ export const ExpressionTab = () => {
           busy={isFetching}
           currentPage={currentPage}
           pageSize={pageSize}
-          items={
-            selectedFilter === AssetFilterOption.FEATURED
-              ? searchTermFeatured
-                ? featuredSearchResults ?? []
-                : displayedItems
-              : searchTermUser
-                ? userSearchResults ?? []
-                : displayedItems
-          }
+          items={displayedItems}
         />
       </div>
       {totalPages > 1 && (
@@ -254,9 +160,10 @@ export const ExpressionTab = () => {
         />
       )}
       <UploadModal
-        onClose={() => setOpen(false)}
-        onSuccess={fetchUserExpressions}
-        isOpen={open}
+        onClose={() => setOpenUploadModal(false)}
+        onSuccess={fetchUserObjects}
+        isOpen={openUploadModal}
+        type={FilterEngineCategories.EXPRESSION}
         fileTypes={["CSV"]}
         title="Upload Expression"
         options={{
@@ -264,7 +171,6 @@ export const ExpressionTab = () => {
           hasLength: true,
           hasThumbnailUpload: true,
         }}
-        type={FilterEngineCategories.EXPRESSION}
       />
     </>
   );

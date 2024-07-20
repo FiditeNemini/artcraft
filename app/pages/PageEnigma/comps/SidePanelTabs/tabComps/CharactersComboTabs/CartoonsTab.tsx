@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import {
+  faFaceSmileWink,
+  faPersonSimple,
+  faRabbitRunning,
+} from "@fortawesome/pro-solid-svg-icons";
+
 import { MediaFileAnimationType, TabTitles } from "~/enums";
 import { TabTitle } from "../../sharedComps";
 import { AnimationsTab } from "./subtabAnimations";
 import { CharactersTab } from "./subtabCharacters";
+import { ExpressionTab } from "./subtabExpressions";
 import { SubTabButtons } from "../../sharedComps/SubTabButtons";
 
 import {
   demoCharacterItems,
   demoAnimationItems,
 } from "~/pages/PageEnigma/signals";
-import { ExpressionTab } from "./subtabExpressions";
 
 export const CartoonsTab = () => {
   useSignals();
@@ -32,6 +38,7 @@ export const CartoonsTab = () => {
           TabTitles.ANIMATION,
           TabTitles.EXPRESSIONS,
         ]}
+        subPageTitleIcons={[faPersonSimple, faRabbitRunning, faFaceSmileWink]}
       />
 
       {currSubpage === TabTitles.CHARACTERS && (

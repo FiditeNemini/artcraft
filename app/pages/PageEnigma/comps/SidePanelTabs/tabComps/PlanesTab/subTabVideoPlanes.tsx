@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
-  AssetFilterOption,
   FeatureFlags,
   FilterEngineCategories,
   VIDEOPLANE_FILE_TYPE,
 } from "~/enums";
-import { FetchStatus } from "~/pages/PageEnigma/enums";
 import {
   Button,
   Pagination,
@@ -14,14 +12,8 @@ import {
   UploadModalMedia,
 } from "~/components";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
-import {
-  fetchFeaturedMediaItems,
-  fetchUserMediaItems,
-  FetchMediaItemStates,
-  isAnyStatusFetching,
-  fetchFeaturedMediaItemsSearchResults,
-  fetchUserMediaItemsSearchResults,
-} from "../../utilities";
+import { isAnyStatusFetching } from "../../utilities";
+import { useUserObjects, useSearchUserdObjects } from "../../hooks";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 
 const filterEngineCategories = [FilterEngineCategories.VIDEO_PLANE];
@@ -32,161 +24,44 @@ export const VideoPlanesTab = () => {
   );
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
-  const [searchTermFeatured, setSearchTermFeatured] = useState("");
-  const [searchTermUser, setSearchTermUser] = useState("");
 
-  const [{ mediaItems: userImages, status: userFetchStatus }, setUserFetch] =
-    useState<FetchMediaItemStates>({
-      mediaItems: undefined,
-      status: FetchStatus.READY,
-    });
-  const [
-    { mediaItems: featuredImages, status: featuredFetchStatus },
-    setFeaturedFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
-  });
-  const [
-    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
-    setFeaturedSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
-  });
-  const [
-    { mediaItems: userSearchResults, status: userSearchFetchStatus },
-    setUserSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const { userObjects, userFetchStatus, fetchUserObjects } = useUserObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching User Video Panels",
   });
 
-  const [
-    selectedFilter,
-    //setSelectedFilter
-  ] = useState(AssetFilterOption.MINE);
-  const displayedItems =
-    selectedFilter === AssetFilterOption.FEATURED
-      ? featuredImages ?? []
-      : userImages ?? [];
+  const {
+    searchTermForUserObjects,
+    userObjectsSearchResults,
+    userObjectsSearchFetchStatus,
+    updateSearchTermForUserObjects,
+  } = useSearchUserdObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching User Video Panel Search Results",
+  });
+
+  const displayedItems = searchTermForUserObjects
+    ? userObjectsSearchResults ?? []
+    : userObjects ?? [];
 
   const [currentPage, setCurrentPage] = useState<number>(0);
-
   const pageSize = 21;
   const totalPages = Math.ceil(displayedItems.length / pageSize);
 
   const isFetching = isAnyStatusFetching([
     userFetchStatus,
-    featuredFetchStatus,
-    featuredSearchFetchStatus,
-    userSearchFetchStatus,
+    userObjectsSearchFetchStatus,
   ]);
 
-  const fetchUserImages = useCallback(
-    () =>
-      fetchUserMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setUserFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching User Images",
-      }),
-    [],
-  );
-
-  const fetchFeaturedImages = useCallback(
-    () =>
-      fetchFeaturedMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setFeaturedFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Images",
-      }),
-    [],
-  );
-
-  const fetchFeaturedSearchResults = useCallback(async () => {
-    fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching Featured Images Search Results",
-      searchTerm: searchTermFeatured,
-    });
-  }, [searchTermFeatured]);
-
-  const fetchUserSearchResults = useCallback(async () => {
-    fetchUserMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setUserSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching User Images Search Results",
-      searchTerm: searchTermUser,
-    });
-  }, [searchTermUser]);
-
   useEffect(() => {
-    if (!userImages) {
-      fetchUserImages();
-    }
-    if (!featuredImages) {
-      fetchFeaturedImages();
-    }
-  }, [userImages, fetchUserImages, featuredImages, fetchFeaturedImages]);
-
-  useEffect(() => {
-    if (selectedFilter === AssetFilterOption.FEATURED) {
+    if (searchTermForUserObjects.length > 0) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults();
-    } else if (selectedFilter === AssetFilterOption.MINE) {
-      setCurrentPage(0);
-      fetchUserSearchResults();
     }
-  }, [
-    searchTermFeatured,
-    searchTermUser,
-    fetchFeaturedSearchResults,
-    fetchUserSearchResults,
-    selectedFilter,
-  ]);
+  }, [searchTermForUserObjects]);
 
   return (
     <>
-      {/* <TabTitle title="Image Panels" /> */}
-
-      {/* <FilterButtons
-        value={selectedFilter}
-        onClick={(buttonIdx) => {
-          setSelectedFilter(Number(buttonIdx));
-        }}
-      /> */}
-
       <div className="flex w-full flex-col gap-3 px-4">
         <Button
           icon={faCirclePlus}
@@ -198,22 +73,9 @@ export const VideoPlanesTab = () => {
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
-            searchTerm={
-              selectedFilter === AssetFilterOption.FEATURED
-                ? searchTermFeatured
-                : searchTermUser
-            }
-            onSearchChange={
-              selectedFilter === AssetFilterOption.FEATURED
-                ? setSearchTermFeatured
-                : setSearchTermUser
-            }
-            key={selectedFilter}
-            placeholder={
-              selectedFilter === AssetFilterOption.FEATURED
-                ? "Search featured video panels"
-                : "Search my video panels"
-            }
+            searchTerm={searchTermForUserObjects}
+            onSearchChange={updateSearchTermForUserObjects}
+            placeholder={"Search my video panels"}
           />
         )}
       </div>
@@ -222,15 +84,7 @@ export const VideoPlanesTab = () => {
           busy={isFetching}
           currentPage={currentPage}
           pageSize={pageSize}
-          items={
-            selectedFilter === AssetFilterOption.FEATURED
-              ? searchTermFeatured
-                ? featuredSearchResults ?? []
-                : displayedItems
-              : searchTermUser
-                ? userSearchResults ?? []
-                : displayedItems
-          }
+          items={displayedItems}
         />
       </div>
       {totalPages > 1 && (
@@ -245,7 +99,7 @@ export const VideoPlanesTab = () => {
       )}
       <UploadModalMedia
         onClose={() => setOpenUploadModal(false)}
-        onSuccess={fetchUserImages}
+        onSuccess={fetchUserObjects}
         isOpen={openUploadModal}
         fileTypes={Object.values(VIDEOPLANE_FILE_TYPE)}
         title="Upload Video Panels"

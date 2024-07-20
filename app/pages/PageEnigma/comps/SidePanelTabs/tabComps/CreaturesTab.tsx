@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -6,9 +6,8 @@ import {
   FeatureFlags,
   FilterEngineCategories,
   OBJECT_FILE_TYPE,
+  TabTitles,
 } from "~/enums";
-import { FetchStatus } from "~/pages/PageEnigma/enums";
-
 import {
   TabTitle,
   ItemElements,
@@ -20,14 +19,13 @@ import {
   Pagination,
   UploadModal3D,
 } from "~/components";
+import { isAnyStatusFetching } from "../utilities";
 import {
-  fetchFeaturedMediaItems,
-  fetchFeaturedMediaItemsSearchResults,
-  FetchMediaItemStates,
-  fetchUserMediaItems,
-  fetchUserMediaItemsSearchResults,
-  isAnyStatusFetching,
-} from "../utilities";
+  useUserObjects,
+  useFeaturedObjects,
+  useSearchFeaturedObjects,
+  useSearchUserdObjects,
+} from "../hooks";
 
 const filterEngineCategories = [FilterEngineCategories.CREATURE];
 
@@ -38,150 +36,77 @@ export const CreaturesTab = () => {
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 
-  const [searchTermFeatured, setSearchTermFeatured] = useState("");
-  const [searchTermUser, setSearchTermUser] = useState("");
+  const { userObjects, userFetchStatus, fetchUserObjects } = useUserObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching User Creature Objects",
+  });
 
-  const [{ mediaItems: userObjects, status: userFetchStatus }, setUserFetch] =
-    useState<FetchMediaItemStates>({
-      mediaItems: undefined,
-      status: FetchStatus.READY,
-    });
-  const [
-    { mediaItems: featuredObjects, status: featuredFetchStatus },
-    setFeaturedFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+  const { featuredObjects, featuredFetchStatus } = useFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage: "Unknown Error in Fetching Featured Creature Objects",
   });
-  const [
-    { mediaItems: featuredSearchResults, status: featuredSearchFetchStatus },
-    setFeaturedSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+
+  const {
+    searchTermForFeaturedObjects,
+    featuredObjectsSearchResults,
+    featuredObjectsSearchFetchStatus,
+    updateSearchTermForFeaturedObjects,
+  } = useSearchFeaturedObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching Featured Creature Objects Search Results",
   });
-  const [
-    { mediaItems: userSearchResults, status: userSearchFetchStatus },
-    setUserSearchFetch,
-  ] = useState<FetchMediaItemStates>({
-    mediaItems: undefined,
-    status: FetchStatus.READY,
+
+  const {
+    searchTermForUserObjects,
+    userObjectsSearchResults,
+    userObjectsSearchFetchStatus,
+    updateSearchTermForUserObjects,
+  } = useSearchUserdObjects({
+    filterEngineCategories: filterEngineCategories,
+    defaultErrorMessage:
+      "Unknown Error in Fetching User Creature Objects Search Results",
   });
 
   const [selectedFilter, setSelectedFilter] = useState(
     AssetFilterOption.FEATURED,
   );
-  const [currentPage, setCurrentPage] = useState<number>(0);
 
   const displayedItems =
     selectedFilter === AssetFilterOption.FEATURED
-      ? featuredObjects ?? []
-      : userObjects ?? [];
+      ? searchTermForFeaturedObjects
+        ? featuredObjectsSearchResults ?? []
+        : featuredObjects ?? []
+      : searchTermForUserObjects
+        ? userObjectsSearchResults ?? []
+        : userObjects ?? [];
 
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 21;
   const totalPages = Math.ceil(displayedItems.length / pageSize);
 
   const isFetching = isAnyStatusFetching([
     userFetchStatus,
     featuredFetchStatus,
-    featuredSearchFetchStatus,
-    userSearchFetchStatus,
+    featuredObjectsSearchFetchStatus,
+    userObjectsSearchFetchStatus,
   ]);
 
-  const fetchUserObjects = useCallback(
-    () =>
-      fetchUserMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setUserFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching User Set Objects",
-      }),
-    [],
-  );
-
-  const fetchFeaturedObjects = useCallback(
-    () =>
-      fetchFeaturedMediaItems({
-        filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setFeaturedFetch((curr) => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems
-              ? newState.mediaItems
-              : curr.mediaItems,
-          }));
-        },
-        defaultErrorMessage: "Unknown Error in Fetching Featured Set Objects",
-      }),
-    [],
-  );
-
-  const fetchFeaturedSearchResults = useCallback(async () => {
-    fetchFeaturedMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setFeaturedSearchFetch(() => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching Featured Set Objects Search Results",
-      searchTerm: searchTermFeatured,
-    });
-  }, [searchTermFeatured]);
-
-  const fetchUserSearchResults = useCallback(async () => {
-    fetchUserMediaItemsSearchResults({
-      filterEngineCategories: filterEngineCategories,
-      setState: (newState: FetchMediaItemStates) => {
-        setUserSearchFetch((curr) => ({
-          status: newState.status,
-          mediaItems: newState.mediaItems
-            ? newState.mediaItems
-            : curr.mediaItems,
-        }));
-      },
-      defaultErrorMessage:
-        "Unknown Error in Fetching User Set Objects Search Results",
-      searchTerm: searchTermUser,
-    });
-  }, [searchTermUser]);
+  useEffect(() => {
+    if (searchTermForUserObjects.length > 0) {
+      setCurrentPage(0);
+    }
+  }, [searchTermForUserObjects]);
 
   useEffect(() => {
-    if (!userObjects) {
-      fetchUserObjects();
-    }
-    if (!featuredObjects) {
-      fetchFeaturedObjects();
-    }
-  }, [userObjects, fetchUserObjects, featuredObjects, fetchFeaturedObjects]);
-
-  useEffect(() => {
-    if (selectedFilter === AssetFilterOption.FEATURED) {
+    if (searchTermForFeaturedObjects.length > 0) {
       setCurrentPage(0);
-      fetchFeaturedSearchResults();
-    } else if (selectedFilter === AssetFilterOption.MINE) {
-      setCurrentPage(0);
-      fetchUserSearchResults();
     }
-  }, [
-    searchTermFeatured,
-    searchTermUser,
-    fetchFeaturedSearchResults,
-    fetchUserSearchResults,
-    selectedFilter,
-  ]);
+  }, [searchTermForFeaturedObjects]);
 
   return (
     <>
-      <TabTitle title="Objects" />
+      <TabTitle title={TabTitles.OBJECTS_CREATURES} />
       <FilterButtons
         value={selectedFilter}
         onClick={(button) => {
@@ -196,25 +121,25 @@ export const CreaturesTab = () => {
           onClick={() => setOpenUploadModal(true)}
           className="w-full py-3 text-sm font-medium"
         >
-          Upload Creature Objects
+          Upload Creatures
         </Button>
         {showSearchObjectComponent && (
           <SearchFilter
             searchTerm={
               selectedFilter === AssetFilterOption.FEATURED
-                ? searchTermFeatured
-                : searchTermUser
+                ? searchTermForFeaturedObjects
+                : searchTermForUserObjects
             }
             onSearchChange={
               selectedFilter === AssetFilterOption.FEATURED
-                ? setSearchTermFeatured
-                : setSearchTermUser
+                ? updateSearchTermForFeaturedObjects
+                : updateSearchTermForUserObjects
             }
             key={selectedFilter}
             placeholder={
               selectedFilter === AssetFilterOption.FEATURED
-                ? "Search featured objects"
-                : "Search my objects"
+                ? "Search featured creature objects"
+                : "Search my creature objects"
             }
           />
         )}
@@ -225,15 +150,7 @@ export const CreaturesTab = () => {
           debug="objects tab"
           currentPage={currentPage}
           pageSize={pageSize}
-          items={
-            selectedFilter === AssetFilterOption.FEATURED
-              ? searchTermFeatured
-                ? featuredSearchResults ?? []
-                : displayedItems
-              : searchTermUser
-                ? userSearchResults ?? []
-                : displayedItems
-          }
+          items={displayedItems}
         />
       </div>
       {totalPages > 1 && (

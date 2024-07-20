@@ -2,15 +2,19 @@ import { demoSkyboxItems } from "~/pages/PageEnigma/signals";
 
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import { ItemElements } from "../sharedComps/ItemElements";
+import { TabTitles } from "~/enums";
 
 export const SkyboxesTab = () => {
   const displayedItems = demoSkyboxItems.value;
 
   return (
     <>
-      <TabTitle title="Skyboxes" />
+      <TabTitle title={TabTitles.SKYBOXES} />
       <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
-        <ItemElements items={displayedItems} />
+        <ItemElements
+          busy={!displayedItems || displayedItems.length === 0}
+          items={displayedItems}
+        />
       </div>
     </>
   );
