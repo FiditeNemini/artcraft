@@ -83,6 +83,7 @@ export const RemixVideo = ({
           crossOrigin="anonymous"
           autoPlay
           loop
+          muted
           style={{ opacity: hover ? 0 : 1 }}
         />
         <video
@@ -92,6 +93,7 @@ export const RemixVideo = ({
           crossOrigin="anonymous"
           autoPlay
           loop
+          muted
           style={{ opacity: hover ? 1 : 0 }}
         />
         {!isReady && (

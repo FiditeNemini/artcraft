@@ -45,6 +45,27 @@ const cards = [
     token: "m_tz8vm3vw3xsk5z5qvpq1y9cczdn2vp",
     text: "",
   },
+  {
+    title: "Cute Ghost",
+    defaultVideo: "/resources/videos/remix/cute_ghost_result.mp4",
+    hoverVideo: "/resources/videos/remix/cute_ghost_raw.mp4",
+    token: "m_6vcp2d5k2k9k0xmz6hm6r5vtr1vexx",
+    text: "",
+  },
+  {
+    title: "Japanese Schoolyard",
+    defaultVideo: "/resources/videos/remix/japanese_schoolyard_result.mp4",
+    hoverVideo: "/resources/videos/remix/japanese_schoolyard_raw.mp4",
+    token: "m_ftp3v0jgegtp6rsck4v8x5wm4vwvr1",
+    text: "",
+  },
+  {
+    title: "Desert Walk",
+    defaultVideo: "/resources/videos/remix/desert_walk_result.mp4",
+    hoverVideo: "/resources/videos/remix/desert_walk_raw.mp4",
+    token: "m_nhh5fym68sab83yg3a0z7hhm40p4jc",
+    text: "",
+  },
 ];
 export const Remix = () => {
   useSignals();
