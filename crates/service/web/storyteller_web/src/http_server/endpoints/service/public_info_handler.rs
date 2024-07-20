@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
-
+use actix_web::web::Json;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
 use crate::state::server_state::ServerState;
@@ -41,18 +41,11 @@ impl std::fmt::Display for PublicInfoError {
 pub async fn get_public_info_handler(
   _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, PublicInfoError> {
+) -> Result<Json<PublicInfoResponse>, PublicInfoError> {
 
-  let response = PublicInfoResponse {
+  Ok(Json(PublicInfoResponse {
     success: true,
     server_build_sha: server_state.server_info.build_sha.clone(),
     server_hostname: server_state.hostname.clone(),
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| PublicInfoError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }

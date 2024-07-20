@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use utoipa::ToSchema;
 
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -91,7 +92,7 @@ impl std::fmt::Display for StatusAlertError {
 pub async fn status_alert_handler(
   _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, StatusAlertError> {
+) -> Result<Json<StatusAlertResponse>, StatusAlertError> {
 
   let maybe_category = server_state
       .flags
@@ -114,18 +115,11 @@ pub async fn status_alert_handler(
     }),
   };
 
-  let response = StatusAlertResponse {
+  Ok(Json(StatusAlertResponse {
     success: true,
     maybe_alert,
     refresh_interval_millis: REFRESH_INTERVAL.as_millis() as u64,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| StatusAlertError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
 
 fn category_to_enum(category: &str) -> Option<StatusAlertCategory> {

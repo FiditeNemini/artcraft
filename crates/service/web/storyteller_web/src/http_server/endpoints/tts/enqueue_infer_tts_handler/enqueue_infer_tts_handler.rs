@@ -9,6 +9,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use rand::Rng;
@@ -150,8 +151,8 @@ impl fmt::Display for InferTtsError {
 )]
 pub async fn enqueue_infer_tts_handler(
   http_request: HttpRequest,
-  request: web::Json<InferTtsRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferTtsError>
+  request: Json<InferTtsRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<Json<InferTtsSuccessResponse>, InferTtsError>
 {
   let mut is_from_api = false;
   let mut maybe_user_token : Option<String> = None;
@@ -439,18 +440,11 @@ pub async fn enqueue_infer_tts_handler(
         InferTtsError::ServerError
       })?;
 
-  let response = InferTtsSuccessResponse {
+  Ok(Json(InferTtsSuccessResponse {
     success: true,
     inference_job_token: job_token,
     inference_job_token_type: InferenceJobTokenType::Generic,
-  };
-
-  let body = serde_json::to_string(&response)
-    .map_err(|_e| InferTtsError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+  }))
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

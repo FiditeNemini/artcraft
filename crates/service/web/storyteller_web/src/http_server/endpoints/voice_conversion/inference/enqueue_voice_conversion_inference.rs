@@ -9,6 +9,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use log::{error, info, warn};
 use r2d2_redis::redis::Commands;
 use sqlx::MySql;
@@ -150,8 +151,9 @@ impl fmt::Display for EnqueueVoiceConversionInferenceError {
 )]
 pub async fn enqueue_voice_conversion_inference_handler(
   http_request: HttpRequest,
-  request: web::Json<EnqueueVoiceConversionInferenceRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueVoiceConversionInferenceError>
+  request: Json<EnqueueVoiceConversionInferenceRequest>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<EnqueueVoiceConversionInferenceSuccessResponse>, EnqueueVoiceConversionInferenceError>
 {
   let mut maybe_user_token : Option<UserToken> = None;
   let mut priority_level ;
@@ -399,17 +401,10 @@ pub async fn enqueue_voice_conversion_inference_handler(
         EnqueueVoiceConversionInferenceError::ServerError
       })?;
 
-  let response = EnqueueVoiceConversionInferenceSuccessResponse {
+  Ok(Json(EnqueueVoiceConversionInferenceSuccessResponse {
     success: true,
     inference_job_token: job_token,
-  };
-
-  let body = serde_json::to_string(&response)
-    .map_err(|_e| EnqueueVoiceConversionInferenceError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+  }))
 }
 
 async fn lookup_model_info(

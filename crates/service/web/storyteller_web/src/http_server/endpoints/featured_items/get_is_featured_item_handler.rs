@@ -4,7 +4,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use log::{error, warn};
 use r2d2_redis::redis::transaction;
 use sqlx::Acquire;
@@ -100,7 +100,7 @@ pub async fn get_is_featured_item_handler(
   http_request: HttpRequest,
   path: Path<GetIsFeaturedItemPathInfo>,
   server_state: web::Data<Arc<ServerState>>,
-) -> Result<HttpResponse, GetIsFeaturedItemError>
+) -> Result<Json<GetIsFeaturedItemSuccessResponse>, GetIsFeaturedItemError>
 {
   // NB(bt,2023-12-14): Kasisnu found that we're getting entity type mismatches in production. Apart from
   // querying the database for entity existence, this is the next best way to prevent incorrect comment
@@ -127,15 +127,8 @@ pub async fn get_is_featured_item_handler(
         GetIsFeaturedItemError::ServerError
       })?;
 
-  let response = GetIsFeaturedItemSuccessResponse {
+  Ok(Json(GetIsFeaturedItemSuccessResponse {
     success: true,
     is_featured: is_featured.is_featured,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|_e| GetIsFeaturedItemError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
