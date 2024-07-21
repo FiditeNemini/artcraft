@@ -34,7 +34,7 @@ export default function StyleVideo() {
   const [prompt, promptSet] = useState("");
   const [negativePrompt, negativePromptSet] = useState("");
   const [length, lengthSet] = useState(3000);
-  const [useFaceDetailer, setUseFaceDetailer] = useState(false);
+  const [useFaceDetailer, setUseFaceDetailer] = useState(true);
   const [useUpscaler, setUseUpscaler] = useState(false);
   const [useCinematic, setUseCinematic] = useState(true);
   const [enableLipsync, setEnableLipsync] = useState(false);
