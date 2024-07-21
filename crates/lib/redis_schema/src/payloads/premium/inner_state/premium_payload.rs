@@ -4,6 +4,7 @@ use errors::AnyhowResult;
 
 use crate::payloads::premium::inner_state::product_by_week_store::ProductByWeekStore;
 use crate::payloads::premium::inner_state::product_by_week_subkey::ProductByWeekSubkey;
+use crate::traits::hkey_store_adapter::HkeyStoreAdapter;
 
 const PREMIUM_CREDITS_SUBKEY: &str = "credits";
 
@@ -26,7 +27,16 @@ impl PremiumPayload {
     }
   }
 
-  pub fn from_redis_hkey_map(map: &HashMap<String, String>) -> AnyhowResult<Self> {
+  pub fn maximum(&self, other: &Self) -> Self {
+    let premium_credits_used = self.premium_credits_used.max(other.premium_credits_used);
+    let free_uses = self.free_uses.maximum(&other.free_uses);
+    Self {
+      premium_credits_used,
+      free_uses
+    }
+  }
+
+  pub (crate) fn from_redis_hkey_map(map: &HashMap<String, String>) -> AnyhowResult<Self> {
     let mut credits = 0;
     let mut free_uses = ProductByWeekStore::new();
 
@@ -46,7 +56,7 @@ impl PremiumPayload {
     })
   }
 
-  pub fn to_redis_hkey_map(&self) -> HashMap<String, String> {
+  pub (crate) fn to_redis_hkey_map(&self) -> HashMap<String, String> {
     let mut map = HashMap::new();
     map.insert(PREMIUM_CREDITS_SUBKEY.to_string(), self.premium_credits_used.to_string());
     for (key, value) in self.free_uses.free_uses_per_product_map.iter() {
@@ -55,18 +65,19 @@ impl PremiumPayload {
     map
   }
 
-  pub fn to_redis_hkey_vec(&self) -> Vec<(String, String)> {
+  pub (crate) fn to_redis_hkey_vec(&self) -> Vec<(String, String)> {
     let map = self.to_redis_hkey_map();
     map.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
   }
+}
 
-  pub fn maximum(&self, other: &Self) -> Self {
-    let premium_credits_used = self.premium_credits_used.max(other.premium_credits_used);
-    let free_uses = self.free_uses.maximum(&other.free_uses);
-    Self {
-      premium_credits_used,
-      free_uses
-    }
+impl HkeyStoreAdapter for PremiumPayload {
+  fn serialize_payload(&self) -> AnyhowResult<Vec<(String, String)>> {
+    Ok(self.to_redis_hkey_vec())
+  }
+
+  fn hydrate_from_vec(values: HashMap<String, String>) -> AnyhowResult<Self> {
+    Self::from_redis_hkey_map(&values)
   }
 }
 

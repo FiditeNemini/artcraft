@@ -27,3 +27,4 @@ pub (crate) mod macros;
 
 pub mod keys;
 pub mod payloads;
+pub mod traits;

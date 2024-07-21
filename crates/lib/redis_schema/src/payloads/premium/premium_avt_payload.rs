@@ -6,26 +6,26 @@ use r2d2_redis::redis::Commands;
 use r2d2_redis::RedisConnectionManager;
 
 use errors::AnyhowResult;
-
+use crate::keys::premium::premium_avt_redis_key::PremiumAvtRedisKey;
 use crate::keys::premium::premium_user_redis_key::PremiumUserRedisKey;
 use crate::payloads::premium::inner_state::premium_payload::PremiumPayload;
 use crate::traits::hkey_store_adapter::HkeyStoreAdapter;
 
-pub struct PremiumUserPayload {
-  pub key: PremiumUserRedisKey,
+pub struct PremiumAvtPayload {
+  pub key: PremiumAvtRedisKey,
   pub payload: PremiumPayload,
 }
 
-impl PremiumUserPayload {
+impl PremiumAvtPayload {
 
-  pub fn new(key: PremiumUserRedisKey) -> Self {
+  pub fn new(key: PremiumAvtRedisKey) -> Self {
     Self {
       key,
       payload: PremiumPayload::new(),
     }
   }
 
-  pub fn read_from_redis(key: PremiumUserRedisKey, redis: &mut PooledConnection<RedisConnectionManager>) -> AnyhowResult<Self> {
+  pub fn read_from_redis(key: PremiumAvtRedisKey, redis: &mut PooledConnection<RedisConnectionManager>) -> AnyhowResult<Self> {
     let payload = PremiumPayload::read_from_redis(key.as_str(), redis)?;
     Ok(Self {
       key,

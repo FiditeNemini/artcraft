@@ -7,25 +7,26 @@ use r2d2_redis::RedisConnectionManager;
 
 use errors::AnyhowResult;
 
+use crate::keys::premium::premium_ip_address_redis_key::PremiumIpAddressRedisKey;
 use crate::keys::premium::premium_user_redis_key::PremiumUserRedisKey;
 use crate::payloads::premium::inner_state::premium_payload::PremiumPayload;
 use crate::traits::hkey_store_adapter::HkeyStoreAdapter;
 
-pub struct PremiumUserPayload {
-  pub key: PremiumUserRedisKey,
+pub struct PremiumIpAddressPayload {
+  pub key: PremiumIpAddressRedisKey,
   pub payload: PremiumPayload,
 }
 
-impl PremiumUserPayload {
+impl PremiumIpAddressPayload {
 
-  pub fn new(key: PremiumUserRedisKey) -> Self {
+  pub fn new(key: PremiumIpAddressRedisKey) -> Self {
     Self {
       key,
       payload: PremiumPayload::new(),
     }
   }
 
-  pub fn read_from_redis(key: PremiumUserRedisKey, redis: &mut PooledConnection<RedisConnectionManager>) -> AnyhowResult<Self> {
+  pub fn read_from_redis(key: PremiumIpAddressRedisKey, redis: &mut PooledConnection<RedisConnectionManager>) -> AnyhowResult<Self> {
     let payload = PremiumPayload::read_from_redis(key.as_str(), redis)?;
     Ok(Self {
       key,
