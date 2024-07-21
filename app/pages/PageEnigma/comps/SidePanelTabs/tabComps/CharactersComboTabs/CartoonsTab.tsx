@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
   faFaceSmileWink,
-  faPersonSimple,
+  faPerson,
   faRabbitRunning,
 } from "@fortawesome/pro-solid-svg-icons";
 
@@ -38,7 +38,7 @@ export const CartoonsTab = () => {
           TabTitles.ANIMATION,
           TabTitles.EXPRESSIONS,
         ]}
-        subPageTitleIcons={[faPersonSimple, faRabbitRunning, faFaceSmileWink]}
+        subPageTitleIcons={[faPerson, faRabbitRunning, faFaceSmileWink]}
       />
 
       {currSubpage === TabTitles.CHARACTERS && (

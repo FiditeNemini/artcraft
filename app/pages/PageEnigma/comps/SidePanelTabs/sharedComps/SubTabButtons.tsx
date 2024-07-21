@@ -23,22 +23,18 @@ export const SubTabButtons = ({
           <button
             key={idx}
             className={twMerge(
-              "h-10 grow cursor-pointer bg-brand-secondary p-2 text-sm font-medium transition-all",
-              subPageTitleIcons && "h-14",
+              "flex h-8 grow cursor-pointer items-center justify-center gap-2 bg-brand-secondary p-2 text-xs font-medium transition-all",
               idx === 0 && leftMostButtonCss,
               idx === subPageTitles.length - 1 && rightMostButtonCss,
               currSubpage === subPageTitle
-                ? "bg-brand-primary"
-                : "hover:bg-brand-secondary-800",
+                ? "bg-brand-primary/85"
+                : "hover:bg-brand-secondary-900",
             )}
             disabled={currSubpage === subPageTitle}
             onClick={() => setSubpage(subPageTitle)}
           >
             {subPageTitleIcons && subPageTitleIcons[idx] && (
-              <FontAwesomeIcon
-                className="w-full"
-                icon={subPageTitleIcons[idx]}
-              />
+              <FontAwesomeIcon icon={subPageTitleIcons[idx]} />
             )}
             {subPageTitle}
           </button>
