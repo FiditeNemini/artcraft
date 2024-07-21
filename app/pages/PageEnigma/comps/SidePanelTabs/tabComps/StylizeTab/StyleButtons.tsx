@@ -18,7 +18,6 @@ import {
   lipSync,
   cinematic,
   enginePreProcessing,
-  engineRenderSeparately
 } from "~/pages/PageEnigma/signals/stylizeTab";
 import { twMerge } from "tailwind-merge";
 
@@ -199,7 +198,7 @@ export function StyleButtons() {
                   </Switch>
                 </Switch.Group>
               </div>
-              
+
               <hr className="opacity-[5%]" />
               <div className="flex w-full items-center">
                 <Switch.Group>
@@ -259,36 +258,36 @@ export function StyleButtons() {
                 </Switch.Group>
               </div>
               <hr className="opacity-[5%]" />
-            </div>
-            <hr className="opacity-[5%]" />
-            <div className="flex w-full items-center">
-              <Switch.Group>
-                <Switch.Label
-                  className={twMerge(
-                    "mr-3 grow text-sm font-medium transition-opacity",
-                  )}
-                >
-                  Engine PreProcessing
-                </Switch.Label>
-                <Switch
-                  checked={enginePreProcessing.value}
-                  onChange={enginePreProcessingChange}
-                  className={twMerge(
-                    enginePreProcessing.value
-                      ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400",
-                    "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
-                  )}
-                >
-                  <span
-                    className={`${
+              <div className="flex w-full items-center">
+                <Switch.Group>
+                  <Switch.Label
+                    className={twMerge(
+                      "mr-3 grow text-sm font-medium transition-opacity",
+                    )}
+                  >
+                    Engine Preprocessing
+                  </Switch.Label>
+                  <Switch
+                    checked={enginePreProcessing.value}
+                    onChange={enginePreProcessingChange}
+                    className={twMerge(
                       enginePreProcessing.value
-                        ? "translate-x-6"
-                        : "translate-x-1"
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                  />
-                </Switch>
-              </Switch.Group>
+                        ? "bg-brand-primary hover:bg-brand-primary-400"
+                        : "bg-gray-500 hover:bg-gray-400",
+                      "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
+                    )}
+                  >
+                    <span
+                      className={`${
+                        enginePreProcessing.value
+                          ? "translate-x-6"
+                          : "translate-x-1"
+                      } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                    />
+                  </Switch>
+                </Switch.Group>
+              </div>
+              <hr className="opacity-[5%]" />
             </div>
           </PremiumLock>
         </div>
