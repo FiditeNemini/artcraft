@@ -5563,8 +5563,10 @@ name = "redis_schema"
 version = "0.0.1"
 dependencies = [
  "chrono",
+ "enums",
  "errors",
  "my-workspace-hack",
+ "r2d2_redis",
  "tokens",
 ]
 

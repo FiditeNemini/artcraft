@@ -5,7 +5,8 @@ pub struct PremiumAvtRedisKey(pub String);
 
 impl_string_key!(PremiumAvtRedisKey);
 
-const DURATION : Duration = Duration::milliseconds(1000 * 60 * 60 * 24 * 32); // 32 days
+// NB: 62 days to last over a month with enough time for debugging.
+const REDIS_KEY_TTL_DURATION: Duration = Duration::milliseconds(1000 * 60 * 60 * 24 * 62);
 
 impl PremiumAvtRedisKey {
   pub fn new_for_user(avt: &AnonymousVisitorTrackingToken, time: DateTime<Utc>) -> Self {
@@ -15,7 +16,7 @@ impl PremiumAvtRedisKey {
   }
 
   pub fn get_redis_ttl() -> Duration {
-    DURATION
+    REDIS_KEY_TTL_DURATION
   }
 }
 
@@ -35,6 +36,6 @@ mod tests {
 
   #[test]
   fn test_duration() {
-    assert_eq!(PremiumAvtRedisKey::get_redis_ttl().num_days(), 32);
+    assert_eq!(PremiumAvtRedisKey::get_redis_ttl().num_days(), 62);
   }
 }

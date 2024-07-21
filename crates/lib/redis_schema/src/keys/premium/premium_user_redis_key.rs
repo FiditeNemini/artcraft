@@ -2,13 +2,14 @@ use chrono::{Datelike, DateTime, Duration, Utc};
 
 use tokens::tokens::users::UserToken;
 
-pub struct PremiumUserTokenRedisKey(pub String);
+pub struct PremiumUserRedisKey(pub String);
 
-impl_string_key!(PremiumUserTokenRedisKey);
+impl_string_key!(PremiumUserRedisKey);
 
-const DURATION : Duration = Duration::milliseconds(1000 * 60 * 60 * 24 * 32); // 32 days
+// NB: 62 days to last over a month with enough time for debugging.
+const REDIS_KEY_TTL_DURATION: Duration = Duration::milliseconds(1000 * 60 * 60 * 24 * 62);
 
-impl PremiumUserTokenRedisKey {
+impl PremiumUserRedisKey {
   pub fn new_for_user(user_token: &UserToken, time: DateTime<Utc>) -> Self {
     let month = time.month();
     let key = format!("premium:user:{}:{}", user_token.as_str(), month);
@@ -16,7 +17,7 @@ impl PremiumUserTokenRedisKey {
   }
 
   pub fn get_redis_ttl() -> Duration {
-    DURATION
+    REDIS_KEY_TTL_DURATION
   }
 }
 
@@ -30,12 +31,12 @@ mod tests {
   fn test_new_for_user() {
     let user_token = UserToken::new_from_str("token");
     let time = Utc.with_ymd_and_hms(2021, 1, 1, 0, 0, 0).unwrap();
-    let key = PremiumUserTokenRedisKey::new_for_user(&user_token, time);
+    let key = PremiumUserRedisKey::new_for_user(&user_token, time);
     assert_eq!(key.as_str(), "premium:user:token:1");
   }
 
   #[test]
   fn test_duration() {
-    assert_eq!(PremiumUserTokenRedisKey::get_redis_ttl().num_days(), 32);
+    assert_eq!(PremiumUserRedisKey::get_redis_ttl().num_days(), 62);
   }
 }
