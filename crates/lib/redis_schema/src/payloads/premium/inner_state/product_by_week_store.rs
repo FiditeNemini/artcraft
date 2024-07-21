@@ -30,6 +30,20 @@ impl ProductByWeekStore {
     let key = ProductByWeekSubkey::new(name, week);
     *self.free_uses_per_product_map.get(&key).unwrap_or(&0)
   }
+
+  pub fn maximum(&self, other: &Self) -> Self {
+    let mut free_uses_per_product_map = HashMap::new();
+    for (key, value) in self.free_uses_per_product_map.iter() {
+      free_uses_per_product_map.insert(key.clone(), *value);
+    }
+    for (key, value) in other.free_uses_per_product_map.iter() {
+      let count = free_uses_per_product_map.entry(key.clone()).or_insert(0);
+      *count = (*count).max(*value);
+    }
+    Self {
+      free_uses_per_product_map,
+    }
+  }
 }
 
 #[cfg(test)]
@@ -57,5 +71,46 @@ mod tests {
     assert_eq!(store.get_use_count(PremiumProductName::FaceMirror, 11), 0);
     assert_eq!(store.get_use_count(PremiumProductName::Lipsync, 11), 1);
     assert_eq!(store.get_use_count(PremiumProductName::VideoStyleTransfer, 11), 0);
+  }
+
+  #[test]
+  fn test_maximum() {
+    let mut store1 = ProductByWeekStore::new();
+    store1.set_use_count(ProductByWeekSubkey::new(PremiumProductName::FaceAnimator, 1), 2);
+    store1.set_use_count(ProductByWeekSubkey::new(PremiumProductName::FaceMirror, 1), 10);
+    store1.set_use_count(ProductByWeekSubkey::new(PremiumProductName::VideoStyleTransfer, 1), 1);
+    store1.set_use_count(ProductByWeekSubkey::new(PremiumProductName::VideoStyleTransfer, 3), 30); // Week 3
+
+    let mut store2 = ProductByWeekStore::new();
+    store2.set_use_count(ProductByWeekSubkey::new(PremiumProductName::FaceAnimator, 1), 3);
+    store2.set_use_count(ProductByWeekSubkey::new(PremiumProductName::FaceMirror, 1), 5);
+    store2.set_use_count(ProductByWeekSubkey::new(PremiumProductName::Lipsync, 1), 1);
+    store2.set_use_count(ProductByWeekSubkey::new(PremiumProductName::Lipsync, 2), 20); // Week 2
+
+    let store = store1.maximum(&store2);
+
+    // Week 1
+    assert_eq!(store.get_use_count(PremiumProductName::FaceAnimator, 1), 3);
+    assert_eq!(store.get_use_count(PremiumProductName::FaceMirror, 1), 10);
+    assert_eq!(store.get_use_count(PremiumProductName::Lipsync, 1), 1);
+    assert_eq!(store.get_use_count(PremiumProductName::VideoStyleTransfer, 1), 1);
+
+    // Week 2
+    assert_eq!(store.get_use_count(PremiumProductName::FaceAnimator, 2), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::FaceMirror, 2), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::Lipsync, 2), 20);
+    assert_eq!(store.get_use_count(PremiumProductName::VideoStyleTransfer, 2), 0);
+
+    // Week 3
+    assert_eq!(store.get_use_count(PremiumProductName::FaceAnimator, 3), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::FaceMirror, 3), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::Lipsync, 3), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::VideoStyleTransfer, 3), 30);
+
+    // Week not recorded in either store
+    assert_eq!(store.get_use_count(PremiumProductName::FaceAnimator, 50), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::FaceMirror, 50), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::Lipsync, 50), 0);
+    assert_eq!(store.get_use_count(PremiumProductName::VideoStyleTransfer, 50), 0);
   }
 }

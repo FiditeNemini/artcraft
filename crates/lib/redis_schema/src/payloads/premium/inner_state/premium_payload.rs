@@ -59,6 +59,15 @@ impl PremiumPayload {
     let map = self.to_redis_hkey_map();
     map.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
   }
+
+  pub fn maximum(&self, other: &Self) -> Self {
+    let premium_credits_used = self.premium_credits_used.max(other.premium_credits_used);
+    let free_uses = self.free_uses.maximum(&other.free_uses);
+    Self {
+      premium_credits_used,
+      free_uses
+    }
+  }
 }
 
 #[cfg(test)]
