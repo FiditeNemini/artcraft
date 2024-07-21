@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use enums::no_table::premium_product::premium_product_name::PremiumProductName;
-use crate::payloads::premium::product_by_week_subkey::ProductByWeekSubkey;
+use crate::payloads::premium::inner_state::product_by_week_subkey::ProductByWeekSubkey;
 
+#[derive(Clone)]
 pub struct ProductByWeekStore {
-
   /// Key: "{product_id}:{iso_week_zero_index}"
   /// Value: count of uses
-  free_uses_per_product_map: HashMap<ProductByWeekSubkey, u64>,
+  pub free_uses_per_product_map: HashMap<ProductByWeekSubkey, u64>,
 }
 
 impl ProductByWeekStore {
@@ -14,6 +14,10 @@ impl ProductByWeekStore {
     Self {
       free_uses_per_product_map: HashMap::new(),
     }
+  }
+
+  pub fn set_use_count(&mut self, key: ProductByWeekSubkey, count: u64) {
+    self.free_uses_per_product_map.insert(key, count);
   }
 
   pub fn increment_use(&mut self, name: PremiumProductName, week: u32) {
