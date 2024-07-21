@@ -60,6 +60,7 @@ members = [
   "crates/lib/password",
   "crates/lib/prompt_engineering",
   "crates/lib/redis_common",
+  "crates/lib/redis_schema",
   "crates/lib/server_environment",
   "crates/lib/sqlx_mysql_helpers",
   "crates/lib/storyteller_root",

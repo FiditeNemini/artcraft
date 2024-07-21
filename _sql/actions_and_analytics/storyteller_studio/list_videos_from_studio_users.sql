@@ -27,7 +27,7 @@ from media_files as m
 join users as u
 on m.maybe_creator_user_token = u.token
 where  u.maybe_feature_flags LIKE '%studio%'
-and m.created_at > (CURDATE() - INTERVAL 14 DAY)
+and m.created_at > (CURDATE() - INTERVAL 1 DAY)
 and m.is_intermediate_system_file = false
 and m.media_class = 'video'
 and u.username NOT IN (
