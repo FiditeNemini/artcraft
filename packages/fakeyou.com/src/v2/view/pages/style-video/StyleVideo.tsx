@@ -18,11 +18,9 @@ import {
   EnqueueVSTResponse,
 } from "@storyteller/components/src/api/workflows/EnqueueVST";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
-import "./StyleVideo.scss";
 import { useParams } from "react-router-dom";
 import { STYLE_OPTIONS, STYLES_BY_KEY } from "common/StyleOptions";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
 import useStyleStore from "hooks/useStyleStore";
 import StyleOptionPicker from "./StyleSelection/StyleSelectionList";
@@ -117,22 +115,22 @@ export default function StyleVideo() {
     setStrength(parseFloat(target.value));
   };
 
-  const storytellerCTA = (
-    <div className="row g-2 g-md-4">
-      <div className="col-12 col-md-4">
+  const vstInfo = (
+    <div className="d-flex gap-3 justify-content-center">
+      <div>
         <div
           className="overflow-hidden"
           style={{
-            height: "20vh",
-            borderRadius: "0.5rem 0rem 0rem 0.5rem",
+            maxHeight: "250px",
+            height: "100%",
           }}
         >
           <video
             preload="metadata"
             style={{
-              width: "100%",
               height: "100%",
-              objectFit: "cover",
+              width: "100%",
+              objectFit: "contain",
               overflow: "hidden",
             }}
             autoPlay={true}
@@ -141,32 +139,8 @@ export default function StyleVideo() {
             loop={true}
             playsInline={true}
           >
-            <source
-              src="/videos/landing/hero_landing_video.mp4"
-              type="video/mp4"
-            />
+            <source src="/videos/vst_banner.mp4" type="video/mp4" />
           </video>
-        </div>
-      </div>
-      <div className="col-12 col-md-8">
-        <div className="d-flex flex-column justify-content-center h-100 w-100 p-3">
-          <h3 className="fw-semibold">
-            If you like AI Video, you'll love Storyteller Studio!
-          </h3>
-          <p className="opacity-75">
-            Our AI creation engine lets you create videos from scratch. Build
-            simple scenes, and turn them into incredible visuals!
-          </p>
-          <div className="mt-3 d-flex">
-            <Button
-              icon={faArrowRight}
-              iconFlip={true}
-              label="Go to Storyteller"
-              small={true}
-              href="https://storyteller.ai/"
-              variant="action"
-            />
-          </div>
         </div>
       </div>
     </div>
@@ -199,16 +173,23 @@ export default function StyleVideo() {
   return styleVideoAccessCheck(
     <>
       <Container className="mt-3">
+        <Panel className="rounded d-block d-lg-none mb-3">{vstInfo}</Panel>
         <div className="row flex-lg-row-reverse g-3">
           <div className="col-12 col-lg-8 col-xl-9 d-flex flex-column gap-3">
-            <Panel className="rounded d-none d-lg-block">
-              {storytellerCTA}
-            </Panel>
+            <Panel className="rounded d-none d-lg-block">{vstInfo}</Panel>
 
             <Panel padding={true} className="rounded h-auto">
               <h2 className="fw-bold mb-3 d-block d-lg-none">Style a Video</h2>
-              <Label label="Choose a Video" />
-              <div style={{ height: "calc(100vh - 20vh - 65px - 250px)" }}>
+              <div className="d-flex align-items-center">
+                {!mediaToken && (
+                  <div className="mb-2">
+                    <div className="focus-point" />
+                  </div>
+                )}
+                <Label label="Choose a Video" />
+              </div>
+
+              <div style={{ height: "calc(100vh - 250px - 65px - 240px)" }}>
                 <EntityInput
                   {...{
                     accept: ["video"],
@@ -249,7 +230,7 @@ export default function StyleVideo() {
                   <div>
                     <TextArea
                       {...{
-                        label: "Positive Prompt",
+                        label: "Text Prompt",
                         placeholder: "Describe your video here...",
                         rows: 2,
                         onChange: ({ target }: { target: any }) => {
@@ -402,9 +383,6 @@ export default function StyleVideo() {
             </Panel>
           </div>
         </div>
-        <Panel className="rounded d-block d-lg-none mt-5">
-          {storytellerCTA}
-        </Panel>
       </Container>
 
       <div

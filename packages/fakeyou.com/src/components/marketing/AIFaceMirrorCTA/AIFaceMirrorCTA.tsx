@@ -17,13 +17,19 @@ export default function AIFaceMirrorCTA({ className }: Props) {
       <Link
         {...{ className: "cta-ai-face-mirror-body", to: "/ai-face-mirror" }}
       >
-        <video autoPlay muted loop>
+        <video
+          autoPlay={true}
+          controls={false}
+          muted={true}
+          loop={true}
+          playsInline={true}
+        >
           <source src="/videos/motion_mirror_bg_04.mp4" type="video/mp4" />
         </video>
         <div {...{ className: "cta-ai-face-mirror-tint" }}></div>
         <div {...{ className: "cta-ai-face-mirror-overlay" }}>
           <div {...{ className: "cta-ai-face-mirror-copy" }}>
-            <h2>AI Face Mirror</h2>
+            <h1 className="fw-bold">AI Face Mirror</h1>
             <p>Reflect motion from one portrait to another</p>
           </div>
 
