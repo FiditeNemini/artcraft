@@ -5562,6 +5562,7 @@ dependencies = [
 name = "redis_schema"
 version = "0.0.1"
 dependencies = [
+ "chrono",
  "errors",
  "my-workspace-hack",
  "tokens",

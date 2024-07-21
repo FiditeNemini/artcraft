@@ -24,7 +24,7 @@ tokens = { path = "../../_types/tokens" }
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 # External
-# None yet
+chrono = { version = "0.4.22", features = ["serde"] }
 
 [dev-dependencies]
 # None yet
