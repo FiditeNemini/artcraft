@@ -55,3 +55,17 @@
   stroke: white;
   transition: 0.2s;
 }
+
+.fy-checkbox-disabled {
+  opacity: 0.25;
+  cursor: default;
+  label {
+    cursor: default;
+  }
+
+  &:hover {
+    .fy-checkbox {
+      background-color: $secondary;
+    }
+  }
+}
