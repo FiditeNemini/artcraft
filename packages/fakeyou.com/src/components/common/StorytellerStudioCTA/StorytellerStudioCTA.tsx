@@ -1,8 +1,8 @@
 import React from "react";
 import Button from "../Button";
 import { faArrowRight, faCube } from "@fortawesome/pro-solid-svg-icons";
-import useModal from "hooks/useModal";
-import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
+// import useModal from "hooks/useModal";
+// import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
 import ScrollingSceneCarousel from "v2/view/pages/landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Panel from "../Panel";
@@ -23,12 +23,14 @@ const StorytellerStudioCTA = ({
   showMarquee = true,
   showIcon = true,
 }: StorytellerStudioCTAProps) => {
-  const { open } = useModal();
-  const openModal = () =>
-    open({
-      component: EmailSignUp,
-      props: { mobile: true, showHanashi: false, handleClose: openModal },
-    });
+  // const { open } = useModal();
+  // const openModal = () =>
+  //   open({
+  //     component: EmailSignUp,
+  //     props: { mobile: true, showHanashi: false,
+  //       handleClose: openModal
+  //     },
+  //   });
 
   return (
     <Panel className="pb-5 pt-3 pt-lg-0">
@@ -51,11 +53,17 @@ const StorytellerStudioCTA = ({
               !get<boolean>("secondFormIsSubmitted") ? (
                 <>
                   {!get<boolean>("firstFormIsSubmitted") ? (
+                    // <Button
+                    //   label="Join the Waitlist"
+                    //   icon={faArrowRight}
+                    //   iconFlip={true}
+                    //   onClick={openModal}
+                    // />
                     <Button
-                      label="Join the Waitlist"
+                      label="Go to Storyteller"
                       icon={faArrowRight}
                       iconFlip={true}
-                      onClick={openModal}
+                      href="https://storyteller.ai/"
                     />
                   ) : (
                     <Button

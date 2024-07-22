@@ -138,8 +138,26 @@ export default function StyleVideo() {
             muted={true}
             loop={true}
             playsInline={true}
+            className="d-none d-md-block"
           >
-            <source src="/videos/vst_banner.mp4" type="video/mp4" />
+            <source src="/videos/vst_banner_desktop.mp4" type="video/mp4" />
+          </video>
+          <video
+            preload="metadata"
+            style={{
+              height: "100%",
+              width: "100%",
+              objectFit: "contain",
+              overflow: "hidden",
+            }}
+            autoPlay={true}
+            controls={false}
+            muted={true}
+            loop={true}
+            playsInline={true}
+            className="d-block d-md-none px-2"
+          >
+            <source src="/videos/vst_banner_mobile.mp4" type="video/mp4" />
           </video>
         </div>
       </div>

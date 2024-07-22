@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -45,10 +45,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1c1c25" />
-    <meta
-      name="description"
-      content="Storyteller.ai AI creation engine"
-    />
+    <meta name="description" content="Storyteller.ai AI creation engine" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -56,21 +53,33 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <!-- Google Tag Manager -->
     <!-- This *eventually* replaces gtag.js :/ -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-K62TJT9N');</script>
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-K62TJT9N");
+    </script>
     <!-- End Google Tag Manager -->
 
     <!-- Google tag (gtag.js) -->
     <!-- This replaces old universal analytics. -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-525G5MXFJG"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-525G5MXFJG"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-525G5MXFJG');
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-525G5MXFJG");
     </script>
 
     <!--
@@ -100,7 +109,6 @@
     <!-- Include this to make the og:image larger -->
     <meta name="twitter:card" content="summary_large_image" />
 
-
     <!-- OLD FakeYou; TODO(echelon): Remove when done. -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:ital,wght@0,300;0,400;1,300&family=Fugaz+One&family=Merriweather:wght@300&family=Fira+Sans:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&display=swap"
@@ -109,12 +117,16 @@
 
     <!-- New FakeYou -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap"
       rel="stylesheet"
     />
 
     <!-- Tolt Affiliate Program -->
-    <script async src="https://cdn.tolt.io/tolt.js" data-tolt="a221670f-8727-41bd-9ae9-e6cf9fe5e127"></script>
+    <script
+      async
+      src="https://cdn.tolt.io/tolt.js"
+      data-tolt="a221670f-8727-41bd-9ae9-e6cf9fe5e127"
+    ></script>
 
     <!-- import bootstrap
     <link
@@ -127,8 +139,14 @@
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K62TJT9N"
-      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-K62TJT9N"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>

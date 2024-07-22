@@ -9,8 +9,6 @@ import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import { useDomainConfig } from "context/DomainConfigContext";
 import "./LandingPage.scss";
-// import VstSectionV1 from "./components/VstSectionV1";
-// import VstSectionV2 from "./components/VstSectionV2";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import {
   WebsiteConfig,
@@ -19,7 +17,7 @@ import {
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import MentionsSection from "components/common/MentionsSection";
-import VstSectionV2 from "./components/VstSectionV2";
+import VstSectionV3 from "./components/VstSectionV3";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -77,14 +75,14 @@ function LandingPage(props: Props) {
             {!isLoggedIn && (
               <>
                 {/* <VstSectionV1 /> */}
-                <VstSectionV2 />
+                <VstSectionV3 />
                 <div className="py-5">
                   <StorytellerStudioCTA />
                 </div>
               </>
             )}
 
-            {isLoggedIn && <VstSectionV2 />}
+            {isLoggedIn && <VstSectionV3 />}
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
 
