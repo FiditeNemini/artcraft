@@ -7,6 +7,7 @@ import "./Checkbox.scss";
 interface Props {
   checked?: boolean;
   className?: string;
+  disabled?: boolean;
   label?: string;
   name?: string;
   onChange?: any;
@@ -16,13 +17,16 @@ interface Props {
 export default function Checkbox({
   checked,
   className = "",
+  disabled,
   label = "",
   name = "",
   onChange,
   variant = "secondary",
 }: Props) {
   const onClick = ({ target }: any) =>
-    onChange({ target: { checked: !checked, name, type: "checkbox" } });
+    !disabled
+      ? onChange({ target: { checked: !checked, name, type: "checkbox" } })
+      : {};
   const id = "checkbox-" + useId();
   return (
     <div
@@ -30,7 +34,7 @@ export default function Checkbox({
         ...makeClass(
           `fy-checkbox-frame fy-checkbox-${variant}-${
             checked ? "checked" : "unchecked"
-          }`,
+          } ${disabled ? "fy-checkbox-disabled" : ""}`,
           className
         ),
       }}

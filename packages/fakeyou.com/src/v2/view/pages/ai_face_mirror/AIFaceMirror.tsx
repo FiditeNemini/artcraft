@@ -22,7 +22,7 @@ import {
   useInferenceJobs,
   // useSession
 } from "hooks";
-import PremiumLock from "components/PremiumLock";
+import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import "./AIFaceMirror.scss";
 
@@ -45,7 +45,9 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
     { label: "Public", value: "public" },
   ];
 
-  const hasTokens = sourceMediaToken && faceDriverToken;
+  const hasTokens = !!sourceMediaToken && !!faceDriverToken;
+
+  const hasPremium = sessionSubscriptionsWrapper.hasPaidFeatures();
 
   const enqueueClick = () => {
     if (hasTokens) {
@@ -84,13 +86,6 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
                 portrait image or video.
               </p>
             </div>
-            <Button
-              {...{
-                disabled: !hasTokens,
-                label: hasTokens ? "Create" : "Choose media to begin",
-                onClick: enqueueClick,
-              }}
-            />
           </div>
         </header>
         <div
@@ -107,7 +102,7 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
             <EntityInput
               {...{
                 accept: ["video", "image"],
-                aspectRatio: "landscape",
+                // aspectRatio: "landscape",
                 name: "mediaToken",
                 value: sourceMediaToken,
                 onChange: ({ target }: { target: any }) => {
@@ -126,7 +121,7 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
             <EntityInput
               {...{
                 accept: ["video"],
-                aspectRatio: "landscape",
+                // aspectRatio: "landscape",
                 // debug: "AFM driver input",
                 name: "faceDriverToken",
                 value: faceDriverToken,
@@ -143,33 +138,43 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
             className: "fy-ai-face-mirror-secondary-inputs",
           }}
         >
-          <Select
-            {...{
-              label: "visibility",
-              onChange: ({ target }: any) => {
-                visibilitySet(target.value);
-              },
-              options: visibilityOptions,
-              value: visibility,
-            }}
-          />
-          <PremiumLock
-            {...{
-              requiredPlan: "any",
-              sessionSubscriptionsWrapper,
-              large: true,
-              showCtaButton: true,
-            }}
-          >
+          <fieldset {...{ className: "input-block" }}>
+            <Select
+              {...{
+                label: "Visibility",
+                onChange: ({ target }: any) => {
+                  visibilitySet(target.value);
+                },
+                options: visibilityOptions,
+                value: visibility,
+              }}
+            />
+          </fieldset>
+          <fieldset {...{ className: "input-block" }}>
+            <div {...{ className: "fy-ai-face-mirror-premium-label" }}>
+              Watermark
+              {!hasPremium ? (
+                <Link {...{ to: "pricing" }}>subscribe to remove</Link>
+              ) : null}
+            </div>
+
             <Checkbox
               {...{
-                label: "Remove watermark",
+                disabled: !hasPremium,
+                label: "Remove",
                 onChange: ({ target }: any) => {
                   removeWatermarkSet(target.value);
                 },
               }}
             />
-          </PremiumLock>
+          </fieldset>
+          <Button
+            {...{
+              disabled: !hasTokens,
+              label: "Create",
+              onClick: enqueueClick,
+            }}
+          />
         </div>
       </Panel>
     </Container>

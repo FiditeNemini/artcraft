@@ -165,6 +165,7 @@ export default function EntityInput({
   const clear = () => {
     mediaSet(undefined);
     mediaTokenSet("");
+    onChange({ target: { name, value: "" } });
   };
 
   const selectToken = (token: string) => {

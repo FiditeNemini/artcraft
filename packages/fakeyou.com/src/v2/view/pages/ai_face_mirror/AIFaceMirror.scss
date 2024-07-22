@@ -1,15 +1,21 @@
 @import "scss/colours.scss";
+
+@import "scss/_breakpoint.scss";
+@import "scss/breakpoints.scss";
+
 .fy-ai-face-mirror-panel {
-	overflow: hidden;
+	// overflow: hidden;
 }
 
 .fy-ai-face-mirror-header {
 	display: flex;
 	justify-content: center;
+	overflow: hidden;
 	position: relative;
 	height: 250px;
 	margin-bottom: 1rem;
 	background: #f8f4f3;
+	border-radius: 0.5rem 0.5rem 0 0;
 
 	video {
 		margin: auto;
@@ -56,20 +62,57 @@
 	width: 100%;
 	gap: 1rem;
 	grid-template-columns: auto auto;
-	margin-bottom: 1rem;
+	// margin-bottom: 1rem;
 	height: fit-content;
 	padding: 1rem;
 
 	.fy-ai-face-mirror-column {
 		// width: 33%;
 		display: inline-block;
+
+		.fy-entity-input {
+			width: 100%;
+		}
+	}
+
+	@include breakpoint($under992) {
+		display: block;
+
+		.fy-ai-face-mirror-column {
+			width: 100%;
+		}
 	}
 }
 
 .fy-ai-face-mirror-secondary-inputs {
+	display: flex;
+	// align-items: center;
+	// justify-content: space-between;
 	padding: 0 1rem 1rem;
+
+	legend {
+		color: #b6b6bb;
+		font-size: 0.75rem;
+	}
 
 	.fy-premium-lock {
 		height: 150px;
+	}
+
+	.input-block:nth-child(2) {
+		margin-left: 1rem;
+		margin-right: auto;
+	}
+
+	button {
+		margin: auto 0 0;
+		width: 25%;
+	}
+
+	.fy-ai-face-mirror-premium-label {
+		margin-bottom: 0.5rem;
+		a {
+			margin-left: 0.25em;
+		}
 	}
 }
