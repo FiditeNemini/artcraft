@@ -45,15 +45,14 @@ import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
 import { Container, Panel } from "components/common";
 import { useInferenceJobs } from "hooks";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
   "TM:7rrwdhdq8ezq", // Development: "Fake Donald Trump #2"
   //"TM:aejrk66wq3ss", // Production: "Donald Trump (bibby's model)"
-  "TM:pyzss4phqk6r", // Production: "Donald Trump (Sarcastic)"
-  "TM:4v0ft4j72y2g", // Production: "Donald Trump (Angry)"
-  "TM:03690khwpsbz", // Production: "Donald Trump (Casual Speech)"
+  "weight_jazc270pdr3qe0yer61a5cvh5", // Production: "Donald Trump (Sarcastic)"
+  "weight_x6r5w2tsxgcrrsgweva6dkrqj", // Production: "Donald Trump (Angry)"
+  "weight_vrx7j407cxk45jenkrd769h9b", // Production: "Donald Trump (Casual Speech)"
 ]);
 
 export interface EnqueueJobResponsePayload {
@@ -376,9 +375,6 @@ function TrumpTtsPage(props: Props) {
 
   return (
     <Container type="panel">
-      <div className="py-5">
-        <StorytellerStudioCTA />
-      </div>
       <PageHeaderWithImage
         headerImage="/mascot/trump.webp"
         titleIcon={faVolumeHigh}
