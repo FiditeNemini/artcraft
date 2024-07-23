@@ -190,13 +190,13 @@ export default function StyleVideo() {
 
   return styleVideoAccessCheck(
     <>
-      <Container className="mt-3">
-        <Panel className="rounded d-block d-lg-none mb-3">{vstInfo}</Panel>
+      <Container className="mt-3" type="panel">
+        <Panel className="d-block d-lg-none mb-3">{vstInfo}</Panel>
         <div className="row flex-lg-row-reverse g-3">
           <div className="col-12 col-lg-8 col-xl-9 d-flex flex-column gap-3">
-            <Panel className="rounded d-none d-lg-block">{vstInfo}</Panel>
+            <Panel className="d-none d-lg-block">{vstInfo}</Panel>
 
-            <Panel padding={true} className="rounded h-auto">
+            <Panel padding={true} className="h-auto">
               <h2 className="fw-bold mb-3 d-block d-lg-none">Style a Video</h2>
               <div className="d-flex align-items-center">
                 {!mediaToken && (
@@ -238,7 +238,7 @@ export default function StyleVideo() {
             </div>
           </div>
           <div className="col-12 col-lg-4 col-xl-3">
-            <Panel padding={true} className="rounded">
+            <Panel padding={true}>
               <div className="d-flex flex-column">
                 <h2 className="fw-bold mb-3 d-none d-lg-block">
                   Style a Video
