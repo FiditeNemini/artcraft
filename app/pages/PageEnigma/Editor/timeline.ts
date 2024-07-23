@@ -750,7 +750,25 @@ export class TimeLine {
     }
 
     if (this.scrubber_frame_position <= 0) {
+      for (const video_plane of this.scene.video_planes) {
+        video_plane.currentTime = 0;
+      }
       await this.resetScene();
+    }
+
+    for (const video_plane of this.scene.video_planes) {
+      // Caps to 10fps so that the buffering issue is solved and it plays i am not sure how to fix this.
+      // TODO: Fix buffering and make 30 fps.
+      const fixedPoint = 1;
+      
+      let pb = parseFloat(
+        (this.scrubber_frame_position / this.editorEngine.cap_fps).toFixed(fixedPoint),
+      );
+      pb = parseFloat((pb % video_plane.duration).toFixed(fixedPoint));
+      if (video_plane.currentTime !== pb) {
+        video_plane.playbackRate = 6;
+        video_plane.currentTime = pb;
+      }
     }
 
     //this.scrubber_frame_position += 1;
@@ -834,6 +852,12 @@ export class TimeLine {
         //this.timelineItems = this.timelineItems.filter(item => item !== element)
       }
     }
+
+    // if(isRendering === false){
+    //   for (const video_plane of this.scene.video_planes) {
+    //     video_plane.pause();
+    //   }
+    // }
 
     if (
       this.scrubber_frame_position >= this.timeline_limit &&

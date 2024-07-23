@@ -24,6 +24,7 @@ class Scene {
   camera_name: string;
 
   shader_objects: Water[] = [];
+  video_planes: HTMLVideoElement[] = [];
 
   skybox: string;
 
@@ -133,11 +134,14 @@ class Scene {
         const videoElement = document.createElement('video');
         videoElement.controls = true;
         videoElement.muted = true;
-        videoElement.loop = true;
-        videoElement.autoplay = true;
+        //videoElement.loop = true;
         videoElement.crossOrigin = "anonymous";
+        videoElement.preload = "auto";
         videoElement.src = Video_token;
-        await videoElement.play();
+        videoElement.preload = "auto";
+        videoElement.playbackRate = 6;
+        //await videoElement.play();
+        this.video_planes.push(videoElement);
 
         texture = new THREE.VideoTexture(videoElement);
       } else {
