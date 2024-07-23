@@ -128,8 +128,8 @@ export class VideoGeneration {
     const video_og: string = itteration + "tmp.mp4";
     const wav_name: string = itteration + "tmp.wav";
     const new_video: string = itteration + 1 + "tmp.mp4";
-    let startFrame: number = clip.offset;
-    let endFrame: number = clip.length;
+    let startFrame: number = clip.start_offset;
+    let endFrame: number = clip.ending_offset;
 
     if (endFrame > this.editor.timeline.timeline_limit) {
       endFrame = this.editor.timeline.timeline_limit;

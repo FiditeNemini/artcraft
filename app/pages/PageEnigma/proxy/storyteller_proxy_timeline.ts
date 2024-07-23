@@ -4,10 +4,10 @@ import { ClipUI } from "../datastructures/clips/clip_ui";
 import { EmotionClip } from "../datastructures/clips/emotion_clip";
 import { LipSyncClip } from "../datastructures/clips/lipsync_clip";
 import { TransformClip } from "../datastructures/clips/transform_clip";
-import AnimationEngine from "../Editor/animation_engine";
+import { AnimationEngine } from "../Editor/animation_engine";
 import AudioEngine from "../Editor/audio_engine";
 import EmotionEngine from "../Editor/emotion_engine";
-import LipSyncEngine from "../Editor/lip_sync_engine";
+import { LipSyncEngine } from "../Editor/lip_sync_engine";
 import { TimeLine } from "../Editor/timeline";
 import TransformEngine from "../Editor/transform_engine";
 
@@ -77,20 +77,20 @@ export class StoryTellerProxyTimeline {
     if (timeline_clips) {
       for (let index = 0; index < timeline_clips.length; index++) {
         const element = timeline_clips[index];
-        let clip = new ClipUI(
-          element.version,
-          element.type,
-          element.group,
-          element.name,
-          element.media_id,
-          element.clip_uuid,
-          element.object_uuid,
-          element.object_name,
-          element.start_offset,
-          element.ending_offset,
-          element.keyframe_offset,
-          element.media_file_type
-        );
+        let clip = new ClipUI({
+          version: element.version,
+          type: element.type,
+          group: element.group,
+          name: element.name,
+          media_id: element.media_id,
+          clip_uuid: element.clip_uuid,
+          object_uuid: element.object_uuid,
+          object_name: element.object_name,
+          start_offset: element.start_offset,
+          ending_offset: element.ending_offset,
+          keyframe_offset: element.keyframe_offset,
+          media_file_type: element.media_file_type,
+        });
         new_clips.push(clip);
       }
     }

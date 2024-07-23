@@ -144,8 +144,8 @@ export function loadAudioData(item: ClipUI) {
     object_uuid: item.object_uuid,
     media_id: item.media_id,
     name: item.name,
-    offset: item.offset,
-    length: item.length,
+    offset: item.start_offset,
+    length: item.ending_offset,
   } as Clip;
   existingAudio.clips.push(newItem);
   existingAudio.clips.sort((clipA, clipB) => clipA.offset - clipB.offset);

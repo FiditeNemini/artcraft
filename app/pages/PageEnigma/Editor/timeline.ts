@@ -283,20 +283,20 @@ export class TimeLine {
       });
 
       this.addPlayableClip(
-        new ClipUI(
-          data.version,
-          ClipType.FAKE,
-          ClipGroup.CHARACTER,
-          "Default",
-          media_id,
-          obj.uuid,
-          obj.uuid,
-          name,
-          0,
-          0,
-          0,
-          obj.userData["media_file_type"],
-        ),
+        new ClipUI({
+          version: data.version,
+          type: ClipType.FAKE,
+          group: ClipGroup.CHARACTER,
+          name: "Default",
+          media_id: media_id,
+          object_uuid: obj.uuid,
+          clip_uuid: obj.uuid,
+          object_name: name,
+          start_offset: 0,
+          ending_offset: 0,
+          keyframe_offset: 0,
+          media_file_type: obj.userData["media_file_type"],
+        }),
       );
 
       await this.editorEngine.sceneManager?.add_creation_undostack(obj);
@@ -424,20 +424,20 @@ export class TimeLine {
     );
 
     await this.addPlayableClip(
-      new ClipUI(
-        data_json["version"],
-        ClipType.TRANSFORM,
-        data_json["group"],
-        object_name,
-        "",
-        keyframe_uuid,
-        uuid,
-        object_name,
-        0,
-        data_json["offset"],
-        data_json["offset"],
-        MediaFileType.None,
-      ),
+      new ClipUI({
+        version: data_json["version"],
+        type: ClipType.TRANSFORM,
+        group: data_json["group"],
+        name: object_name,
+        media_id: "",
+        clip_uuid: keyframe_uuid,
+        object_uuid: uuid,
+        object_name: object_name,
+        start_offset: 0,
+        ending_offset: data_json["offset"],
+        keyframe_offset: data_json["offset"],
+        media_file_type: MediaFileType.None,
+      }),
     );
 
     const point = this.scene.createPoint(
@@ -484,8 +484,8 @@ export class TimeLine {
     const group = data.group;
     const version = 1;
     const type = data.type;
-    const offset = data.offset;
-    const end_offset = data.length + offset;
+    const offset = data.start_offset;
+    const end_offset = data.ending_offset + offset;
     const object_name =
       this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
     const clip_uuid = data.clip_uuid;
@@ -495,7 +495,7 @@ export class TimeLine {
         this.animation_engine.load_object(object_uuid, media_id, name);
         break;
       case "transform":
-        this.transform_engine.loadObject(object_uuid, data.length);
+        this.transform_engine.loadObject(object_uuid, data.ending_offset);
         break;
       case "expression":
         this.emotion_engine.loadClip(object_uuid, media_id);
@@ -505,22 +505,23 @@ export class TimeLine {
           this.lipSync_engine.load_object(object_uuid, media_id);
           // media id for this as well it can be downloaded
           this.addPlayableClip(
-            new ClipUI(
-              version,
-              ClipType.AUDIO,
-              ClipGroup.CHARACTER,
-              name,
-              media_id,
-              clip_uuid,
-              object_uuid,
-              object_name,
-              offset,
-              end_offset,
-              0, // length
-              this.scene.get_object_by_uuid(object_uuid)?.userData[
-                "media_file_type"
-              ],
-            ),
+            new ClipUI({
+              version: version,
+              type: ClipType.AUDIO,
+              group: ClipGroup.CHARACTER,
+              name: name,
+              media_id: media_id,
+              clip_uuid: clip_uuid,
+              object_uuid: object_uuid,
+              object_name: object_name,
+              start_offset: offset,
+              ending_offset: end_offset,
+              length: 0, // length
+              media_file_type:
+                this.scene.get_object_by_uuid(object_uuid)?.userData[
+                  "media_file_type"
+                ],
+            }),
           );
           return;
         } else {
@@ -531,20 +532,23 @@ export class TimeLine {
 
     // media id for this as well it can be downloaded
     this.addPlayableClip(
-      new ClipUI(
-        version,
-        type,
-        group,
-        name,
-        media_id,
-        clip_uuid,
-        object_uuid,
-        object_name,
-        offset,
-        end_offset, // length
-        0,
-        this.scene.get_object_by_uuid(object_uuid)?.userData["media_file_type"],
-      ),
+      new ClipUI({
+        version: version,
+        type: type,
+        group: group,
+        name: name,
+        media_id: media_id,
+        clip_uuid: clip_uuid,
+        object_uuid: object_uuid,
+        object_name: object_name,
+        start_offset: offset,
+        ending_offset: end_offset, // length
+        keyframe_offset: 0,
+        media_file_type:
+          this.scene.get_object_by_uuid(object_uuid)?.userData[
+            "media_file_type"
+          ],
+      }),
     );
 
     this.checkEditorCanPlay();
@@ -604,8 +608,8 @@ export class TimeLine {
     // only length and offset changes here.
     const object_uuid = data.object_uuid;
     const media_id = data.media_id;
-    const offset = data.offset;
-    const length = data.length + offset;
+    const offset = data.start_offset;
+    const length = data.ending_offset + offset;
     const clip_uuid = data.clip_uuid;
 
     for (const element of this.timeline_items) {
@@ -614,8 +618,8 @@ export class TimeLine {
         element.object_uuid === object_uuid &&
         element.clip_uuid == clip_uuid
       ) {
-        element.length = length;
-        element.offset = offset;
+        element.ending_offset = length;
+        element.start_offset = offset;
       }
     }
     this.checkEditorCanPlay();
@@ -718,8 +722,8 @@ export class TimeLine {
   public getEndPoint(): number {
     let longest = 0;
     for (const element of this.timeline_items) {
-      if (longest < element.length) {
-        longest = element.length;
+      if (longest < element.ending_offset) {
+        longest = element.ending_offset;
       }
     }
     return longest;
@@ -754,8 +758,8 @@ export class TimeLine {
     //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
     for (const element of this.timeline_items) {
       if (
-        element.offset <= this.scrubber_frame_position &&
-        this.scrubber_frame_position <= element.length &&
+        element.start_offset <= this.scrubber_frame_position &&
+        this.scrubber_frame_position <= element.ending_offset &&
         element.should_play
       ) {
         // run async
@@ -766,11 +770,11 @@ export class TimeLine {
           if (object && this.transform_engine.clips[element.object_uuid]) {
             this.transform_engine.clips[element.object_uuid].step(
               object,
-              element.offset,
+              element.start_offset,
               this.scrubber_frame_position,
               this.scene,
             );
-            element.length =
+            element.ending_offset =
               this.transform_engine.clips[element.object_uuid].length;
           }
         } else if (
@@ -790,7 +794,7 @@ export class TimeLine {
           await this.audio_engine.step(
             element.media_id,
             this.scrubber_frame_position,
-            element.offset,
+            element.start_offset,
           );
         } else if (
           element.type === ClipType.AUDIO &&
@@ -803,7 +807,7 @@ export class TimeLine {
             ].play(object);
             this.lipSync_engine.clips[
               element.object_uuid + element.media_id
-            ].step(this.scrubber_frame_position, element.offset);
+            ].step(this.scrubber_frame_position, element.start_offset);
           }
         } else if (element.type === ClipType.ANIMATION) {
           if (object) {
@@ -814,7 +818,7 @@ export class TimeLine {
             await this.animation_engine.clips[
               object.uuid + element.media_id
             ].step(
-              (this.scrubber_frame_position - element.offset) / fps,
+              (this.scrubber_frame_position - element.start_offset) / fps,
               this.is_playing,
               this.scrubber_frame_position, // Double FPS for best result.
             );
@@ -824,7 +828,7 @@ export class TimeLine {
           if (object) {
             await this.emotion_engine.clips[
               object.uuid + element.media_id
-            ].step(this.scrubber_frame_position - element.offset, object);
+            ].step(this.scrubber_frame_position - element.start_offset, object);
           }
         }
         //this.timelineItems = this.timelineItems.filter(item => item !== element)
