@@ -59,6 +59,19 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
         label: "NEW",
       },
     },
+
+    {
+      to: "/ai-face-mirror",
+      title: t("productFaceMirrorTitle"),
+      text: t("productFaceMirrorText"),
+      imgSrc: "/images/landing/select-fm.webp",
+      imgAlt: "AI Face Mirror",
+      badgeContent: {
+        type: "new",
+        icon: faSparkles,
+        label: "NEW",
+      },
+    },
   ];
 
   const voiceProducts = [
