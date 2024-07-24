@@ -59,6 +59,7 @@ import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
 import WeightCoverImage from "./WeightCoverImage";
+import ZoomSlider, { ZoomSliderOnChangeEvent } from "./ZoomSlider";
 
 export {
   Accordion,
@@ -127,6 +128,13 @@ export {
   VideoFakeyou,
   VideoInput,
   WeightCoverImage,
+  ZoomSlider,
 };
 
-export type { ActionButtonProps, ModalUtilities, SelectModalData, Socials };
+export type {
+  ActionButtonProps,
+  ModalUtilities,
+  SelectModalData,
+  Socials,
+  ZoomSliderOnChangeEvent,
+};
