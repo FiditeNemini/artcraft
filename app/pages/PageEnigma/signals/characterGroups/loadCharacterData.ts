@@ -23,7 +23,7 @@ function getAddCharacter(item: ClipUI) {
     positionKeyframes: [],
     lipSyncClips: [],
     expressionClips: [],
-    mediaType: item.media_file_type,
+    mediaType: item.media_file_type
   } as CharacterTrack;
 
   characterGroup.value = {
@@ -53,9 +53,9 @@ export function loadCharacterData(item: ClipUI) {
       object_uuid: item.object_uuid,
       media_id: item.media_id,
       name: item.name,
-      offset: item.start_offset,
-      length: item.ending_offset,
-      mediaType: item.media_file_type,
+      offset: item.offset,
+      length: item.length,
+      mediaType: item.media_file_type
     } as Clip;
     existingCharacter.animationClips.push(newItem);
     existingCharacter.animationClips.sort(
@@ -71,8 +71,8 @@ export function loadCharacterData(item: ClipUI) {
       object_uuid: item.object_uuid,
       media_id: item.media_id,
       name: item.name,
-      offset: item.start_offset,
-      length: item.ending_offset,
+      offset: item.offset,
+      length: item.length,
     } as Clip;
     existingCharacter.expressionClips.push(newItem);
     existingCharacter.expressionClips.sort(
@@ -101,8 +101,8 @@ export function loadCharacterData(item: ClipUI) {
       object_uuid: item.object_uuid,
       media_id: item.media_id,
       name: item.name,
-      offset: item.start_offset,
-      length: item.ending_offset,
+      offset: item.offset,
+      length: item.length,
     } as Clip;
     existingCharacter.lipSyncClips.push(newItem);
     existingCharacter.lipSyncClips.sort(
