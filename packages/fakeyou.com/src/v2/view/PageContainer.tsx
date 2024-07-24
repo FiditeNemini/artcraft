@@ -727,8 +727,20 @@ class PageContainer extends React.Component<
                     <DevMediaInput />
                   </Route>
 
-                  <Route path="/dev-tts">
-                    <DevTTS />
+                  <Route path="/dev-tts/:weight_token">
+                    <DevTTS
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  <Route exact path="/dev-tts">
+                    <DevTTS
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
                   </Route>
 
                   {/* Route for initial voice creation */}

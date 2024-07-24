@@ -1,37 +1,81 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
 
+.fy-featured-voices-section {
+  background-color: rgba($action, 0.25);
+  border-radius: 0.5rem;
+  padding: 20px;
+}
+
+.fy-featured-voices {
+  background-color: $secondary-light;
+  border-radius: 0.5rem;
+  padding: 0.6rem;
+  border: 2px solid $action;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  height: 100%;
+
+  &:hover {
+    border-color: $primary;
+    background-color: rgba($action, 0.7);
+  }
+
+  .fy-select-voice {
+    color: $white;
+    padding: 1px 8px;
+    background-color: lighten($action, 5%);
+    border-radius: 0.35rem;
+    font-size: 13px !important;
+  }
+}
+
 .fy-weight-picker {
-	
   @include panel;
-	border-radius: .5rem;
-	background-color: rgba($secondary, .6);
+  border-radius: 0.5rem;
+  background-color: rgba($secondary, 0.6);
 
-	&.fy-weight-picker-full {
-		.fy-input input { border-radius: .5rem .5rem 0 0 }
-	}
+  .fy-card-badge {
+    display: inline-flex;
+    margin-left: 0.5rem;
+  }
 
-	.fy-weight-picker-preview {
-		border-top: 1px solid rgba(#fff,.15);
-		display: flex;
-	}
+  .fy-input {
+    margin-bottom: 0;
+  }
+}
 
-	.fy-card-badge {
-		display: inline-flex;
-		margin-left: .5rem;
-	}
+.fy-weight-picker-preview {
+  border-radius: 0 0 0.5rem 0.5rem;
+  padding: 0.6rem;
+  background-color: rgba($action, 0.8);
+  border: 2px solid lighten($action, 12%);
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  cursor: pointer;
 
-	.fy-input { margin-bottom: 0 }
+  &:hover {
+    background-color: rgba($action, 1);
+    border: 2px solid $primary;
+  }
+}
 
-	.fy-weight-picker-reselect {
-		background-color: $secondary-light;
-		border-radius: .5rem;
-		padding: .5rem;
-		margin: 0 0 auto auto;
-	}
+.fy-weight-picker-reselect {
+  background-color: $secondary;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin: 0 0 auto auto;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $action;
+  }
 }
 
 .fy-card-badge {
-	display: flex;
-	height: min-content;
+  display: flex;
+  height: min-content;
 }

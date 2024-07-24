@@ -68,6 +68,7 @@ export default function TopNav({
     "/creator-onboarding"
   );
   const isOnWelcomePage = window.location.pathname === "/welcome";
+  const isOnTtsPage = window.location.pathname.includes("/dev-tts");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -481,11 +482,13 @@ export default function TopNav({
                   {(!isOnLandingPage &&
                     !isOnLoginPage &&
                     !isOnSignUpPage &&
-                    !isOnStudioPage) ||
+                    !isOnStudioPage &&
+                    !isOnTtsPage) ||
                   (loggedIn &&
                     !isOnLoginPage &&
                     !isOnSignUpPage &&
-                    !isOnStudioPage) ||
+                    !isOnStudioPage &&
+                    !isOnTtsPage) ||
                   (isOnLandingPage &&
                     isScrolled &&
                     !isOnLoginPage &&

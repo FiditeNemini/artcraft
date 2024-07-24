@@ -3,11 +3,7 @@ import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faClock,
-  faLink,
-  faHeadphonesSimple,
-} from "@fortawesome/free-solid-svg-icons";
+import { faClock, faHeadphonesSimple } from "@fortawesome/free-solid-svg-icons";
 
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
@@ -23,6 +19,11 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { useInferenceJobs, useLocalize } from "hooks";
+import { Button } from "components/common";
+import {
+  faArrowDownToLine,
+  faArrowRight,
+} from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -115,11 +116,7 @@ function SessionTtsInferenceResultList(props: Props) {
 
         results.push(
           <div key={job.jobToken}>
-            <div>
-              <div>
-                <div className={cssStyle}>{stateDescription}</div>
-              </div>
-            </div>
+            <div className={cssStyle}>{stateDescription}</div>
           </div>
         );
       } else {
@@ -145,27 +142,41 @@ function SessionTtsInferenceResultList(props: Props) {
               <button className="delete" aria-label="delete"></button>
             </div>*/}
             <div>
-              <div className="panel panel-tts-results p-4 gap-3 d-flex flex-column">
+              <div className="panel panel-tts-results p-3 gap-3 d-flex flex-column">
                 <div>
-                  <h5 className="mb-2">{job.maybeModelTitle}</h5>
-                  <p>{job.maybeRawInferenceText}</p>
+                  <div className="d-flex align-items-center gap-1">
+                    <h6 className="mb-1 fw-semibold flex-grow-1">
+                      {job.maybeModelTitle}
+                    </h6>
+                    <Button
+                      iconFlip={true}
+                      variant="link"
+                      label="More details"
+                      className="fs-7"
+                      icon={faArrowRight}
+                      to={ttsPermalink}
+                    />
+                  </div>
+
+                  <p className="fs-7">{job.maybeRawInferenceText}</p>
                 </div>
 
-                {/* <audio
-                className="w-100"
-                controls
-                src={audioLink}
-                onClick={() => {
-                  Analytics.ttsClickResultInlinePlay();
-                }}
-              >
-                Your browser does not support the
-                <code>audio</code> element.
-              </audio> */}
+                <div className="d-flex gap-3 align-items-center">
+                  {wavesurfers}
+                  <Button
+                    variant="action"
+                    small={true}
+                    square={true}
+                    icon={faArrowDownToLine}
+                    fontLarge={true}
+                    to={ttsPermalink}
+                    onClick={() => {
+                      Analytics.ttsClickResultLink();
+                    }}
+                  />
+                </div>
 
-                {wavesurfers}
-
-                <div className="mt-2">
+                {/* <div className="mt-2">
                   <Link
                     to={ttsPermalink}
                     onClick={() => {
@@ -176,7 +187,7 @@ function SessionTtsInferenceResultList(props: Props) {
                     <FontAwesomeIcon icon={faLink} className="me-2" />
                     {t("resultsAudioShareDownload")}
                   </Link>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -227,13 +238,9 @@ function SessionTtsInferenceResultList(props: Props) {
   }
 
   return (
-    <div>
-      <div>
-        <div className="d-flex flex-column gap-3">
-          {upgradeNotice}
-          <div className="d-flex flex-column gap-3">{results}</div>
-        </div>
-      </div>
+    <div className="d-flex flex-column gap-3">
+      {upgradeNotice}
+      <div className="d-flex flex-column gap-3">{results}</div>
     </div>
   );
 }
