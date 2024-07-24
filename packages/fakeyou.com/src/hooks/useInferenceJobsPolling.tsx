@@ -86,7 +86,8 @@ export default function useInferenceJobsPolling({
     }
   }, [initialized, keepAlive, user]);
 
-  if (debug) console.log("☠️ keepAlive", keepAlive, inferenceJobs, byCategory);
+  if (debug)
+    console.log("💀 keepAlive", { keepAlive, inferenceJobs, byCategory });
 
   const updateCategoryMap = (
     categoryMap: CategoryMap,

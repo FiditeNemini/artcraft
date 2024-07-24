@@ -16,10 +16,6 @@ import {
 import { Analytics } from "common/Analytics";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import DemoTtsAudioPlayer from "./DemoAudioPlayer";
-import {
-  GetTtsInferenceJobStatus,
-  GetTtsInferenceJobStatusIsOk,
-} from "@storyteller/components/src/api/jobs/GetTtsInferenceJobStatus";
 import { RandomTexts, PlaceholderTexts } from "./RandomTexts";
 import "./LandingDemo.scss";
 import { isMobile } from "react-device-detect";
@@ -142,29 +138,25 @@ export default function LandingDemo({
     if (!jobToken) return;
 
     const fetch = async () => {
-      const jobStatusResponse = await GetTtsInferenceJobStatus(jobToken);
+      const job = inferenceJobs.find(
+        (job: InferenceJob) => job.jobToken === jobToken
+      );
 
-      if (GetTtsInferenceJobStatusIsOk(jobStatusResponse)) {
-        const job = inferenceJobs.find(
-          (job: InferenceJob) => job.jobToken === jobToken
+      if (job && job.maybeResultPublicBucketMediaPath) {
+        const audioLink = new BucketConfig().getGcsUrl(
+          job.maybeResultPublicBucketMediaPath
         );
-        if (job && jobStatusResponse.state.maybe_public_bucket_wav_audio_path) {
-          const audioLink = new BucketConfig().getGcsUrl(
-            jobStatusResponse.state.maybe_public_bucket_wav_audio_path
-          );
-          setCurrentAudioUrl(audioLink);
+        setCurrentAudioUrl(audioLink);
 
-          if (audioLink !== currentAudioUrl) {
-            setIsAudioLoading(false);
-            setIsPlaying(true);
-          }
+        if (audioLink !== currentAudioUrl) {
+          setIsAudioLoading(false);
+          setIsPlaying(true);
         }
       }
     };
 
     fetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobToken, inferenceJobs, isPlaying]);
+  }, [currentAudioUrl, jobToken, inferenceJobs]);
 
   const handleAudioFinish = () => {
     setIsPlaying(false);
