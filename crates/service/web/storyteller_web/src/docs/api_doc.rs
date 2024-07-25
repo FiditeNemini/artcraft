@@ -12,7 +12,6 @@ use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationT
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
-use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
@@ -25,6 +24,7 @@ use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use enums_public::by_table::media_files::public_media_file_model_type::PublicMediaFileModelType;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use tokens::tokens::batch_generations::*;
 use tokens::tokens::beta_keys::*;
@@ -245,11 +245,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileClass,
     MediaFileEngineCategory,
     MediaFileOriginCategory,
-    MediaFileOriginModelType,
     MediaFileOriginProductCategory,
     MediaFileSubtype,
     MediaFileType,
     PromptType,
+    PublicMediaFileModelType,
     PublicWeightsType,
     StyleTransferName,
     UserFeatureFlag,
