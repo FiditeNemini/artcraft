@@ -25,12 +25,15 @@ const Cards = ({ props, type }: MediaCardsProps) => {
   switch (type) {
     case "audio":
       return <CardWrapper {...{ ...props, card: AudioCard, padding: true }} />;
+    case "gif":
     case "image":
+    case "jpg":
       return (
         <CardWrapper
           {...{ ...props, card: OverlayCard, preview: ImagePreview }}
         />
       );
+    case "mp4":
     case "video":
       return (
         <CardWrapper

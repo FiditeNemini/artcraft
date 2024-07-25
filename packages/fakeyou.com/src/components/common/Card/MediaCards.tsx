@@ -21,6 +21,9 @@ export default function MediaCards({ props, type }: Props) {
   switch (type) {
     case "audio":
       return <AudioCard {...props} />;
+    case "gif":
+    case "jpg":
+    case "png":
     case "image":
       return <ImageCard {...props} />;
     case "bvh":
@@ -42,6 +45,7 @@ export default function MediaCards({ props, type }: Props) {
     case "vmd":
       // TODO(bt,2024-05-09): This is a temporary hack. ARKit files are uploaded as these
       return <ArKitCard {...props} />;
+    case "mp4":
     case "video":
       return <VideoCard {...props} key={`video-${keySuffix}`} />;
     default:
