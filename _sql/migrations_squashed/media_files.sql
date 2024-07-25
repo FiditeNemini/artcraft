@@ -57,6 +57,7 @@ CREATE TABLE media_files (
   origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- For inference that can be tied back to a model, the type of model.
+  -- DO NOT EXPOSE THIS TO USERS VIA THE API, as we may leak secrets in doing so.
   --   * 'sad_talker', which doesn't have a value for maybe_origin_model_token (!!!)
   --   * (more tome come)
   maybe_origin_model_type VARCHAR(32) DEFAULT NULL,

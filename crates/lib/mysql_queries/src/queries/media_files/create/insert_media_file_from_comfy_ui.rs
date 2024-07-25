@@ -28,6 +28,7 @@ pub struct InsertArgs<'a> {
 
     /// What product generated the result.
     pub maybe_product_category: Option<MediaFileOriginProductCategory>,
+    pub maybe_model_type: Option<MediaFileOriginModelType>,
 
     pub maybe_title: Option<&'a str>,
     pub maybe_style_transfer_source_media_file_token: Option<&'a MediaFileToken>,
@@ -74,10 +75,12 @@ pub async fn insert_media_file_from_comfy_ui(args: InsertArgs<'_>) -> AnyhowResu
         maybe_creator_category_synthetic_id = Some(next_comfy_ui_id);
     }
 
+    const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
+
     let product = args.maybe_product_category
         .unwrap_or(MediaFileOriginProductCategory::Unknown);
-    const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
-    const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::ComfyUi;
+
+    let maybe_model_type = args.maybe_model_type.map(|m| m.to_str());
 
     let record_id = {
         let query_result = sqlx::query!(
@@ -130,7 +133,7 @@ SET
 
       ORIGIN_CATEGORY.to_str(),
       product.to_str(),
-      ORIGIN_MODEL_TYPE.to_str(),
+      maybe_model_type,
 
       args.maybe_mime_type,
       args.file_size_bytes,

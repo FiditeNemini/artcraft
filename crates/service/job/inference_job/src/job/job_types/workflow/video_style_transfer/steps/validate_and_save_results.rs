@@ -8,6 +8,7 @@ use tempdir::TempDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
@@ -190,10 +191,17 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     None => None,
   };
 
+  let maybe_model_type = match args.comfy_args.workflow_type {
+    Some(WorkflowType::StorytellerStudio) => Some(MediaFileOriginModelType::StorytellerStudio),
+    Some(WorkflowType::VideoStyleTransfer) => Some(MediaFileOriginModelType::VideoStyleTransfer),
+    None => None,
+  };
+
   let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
     pool: &args.deps.db.mysql_pool,
     job: &args.job,
     maybe_product_category: product,
+    maybe_model_type,
     maybe_mime_type: Some(&mimetype),
     maybe_title: args.videos.primary_video.record.maybe_title.as_deref(),
     maybe_style_transfer_source_media_file_token: Some(&style_transfer_source_media_file_token),
