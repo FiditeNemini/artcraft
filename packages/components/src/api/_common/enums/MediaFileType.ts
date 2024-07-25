@@ -37,4 +37,9 @@ export enum MediaFileType {
   Vmd = "vmd",
 
   None = "none",
+
+  Jpg = "jpg",
+  Png = "png",
+  Gif = "gif",
+  Mp4 = "mp4",
 }
