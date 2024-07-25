@@ -16,7 +16,6 @@ use utoipa::ToSchema;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
-use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
