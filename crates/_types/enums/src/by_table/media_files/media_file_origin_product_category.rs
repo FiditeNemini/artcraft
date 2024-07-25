@@ -224,5 +224,15 @@ mod tests {
         assert_eq!(variant, MediaFileOriginProductCategory::from_str(&format!("{:?}", variant)).unwrap());
       }
     }
+
+    #[test]
+    fn serialized_length_ok_for_database() {
+      const MAX_LENGTH : usize = 16;
+      for variant in MediaFileOriginProductCategory::all_variants() {
+        let serialized = variant.to_str();
+        assert!(serialized.len() > 0, "variant {:?} is too short", variant);
+        assert!(serialized.len() <= MAX_LENGTH, "variant {:?} is too long", variant);
+      }
+    }
   }
 }

@@ -30,6 +30,7 @@ CREATE TABLE media_files (
   --   * 'processed' for processed file (eg. mp3 encoding, stem splitting, etc.)
   --   * 'upload' for direct user upload (from the filesystem)
   --   * 'device_api' for direct user uploads recorded using Browser/Device APIs.
+  --   * 'studio' for storyteller studio jobs
   origin_category VARCHAR(16) NOT NULL,
 
   -- TODO(bt,2024-01-12): Rename to origin_product.
@@ -46,8 +47,8 @@ CREATE TABLE media_files (
   --   * 'unknown' for legacy records without an associated product
   --   * 'face_animator' for uploads and outputs
   --   * 'face_mirror' for uploads and outputs
-  --   * 'video_style_transfer' for uploads and outputs
-  --   * 'storyteller_studio' for engine renders and outputs
+  --   * 'vst' for uploads and outputs
+  --   * 'studio' for engine renders and outputs
   --   * 'tts' for text to speech outputs
   --   * 'voice_conversion' for uploads or outputs (RVC or SVC)
   --   * 'zs_voice' for uploads or outputs for zero shot voice products
