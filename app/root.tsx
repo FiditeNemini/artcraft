@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { LinksFunction } from "@remix-run/deno";
+import { posthog } from "posthog-js";
+import { PostHogProvider } from "posthog-js/react";
 import {
   Links,
   Meta,
@@ -99,7 +101,9 @@ export default function App() {
       <body className="overflow-hidden bg-ui-background">
         {data && <GlobalSettingsManager env={data.ENV} />}
         <div className="topbar-spacer" />
-        <Outlet />
+        <PostHogProvider client={posthog}>
+          <Outlet />
+        </PostHogProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -109,33 +113,44 @@ export default function App() {
 
 const GlobalSettingsManager = ({ env }: { env: Record<string, string> }) => {
   useSignals();
-  useEffect(() => {
-    function setPage() {
-      // TODO address this issue with zooming
-      pageHeight.value = window.innerHeight;
-      pageWidth.value = window.innerWidth;
-    }
 
-    setPage();
-
-    window.addEventListener("resize", setPage);
-
-    return () => {
-      window.removeEventListener("resize", setPage);
-    };
-  }, []);
-
+  /// Initizations that depends on ENV vars ///
+  function PostHogInit() {
+    const data = EnvironmentVariables.values;
+    const apiKey = data.REACT_APP_PUBLIC_POSTHOG_KEY as string;
+    posthog.init(apiKey, {
+      //HACK: This is the default host from Netlify, but need to figure out why it isn't working on prod.
+      // api_host: data.DEPLOY_PRIME_URL + "/ingest" as string,
+      api_host: "https://studio.storyteller.ai/ingest" as string,
+      ui_host: data.REACT_APP_PUBLIC_POSTHOG_UI as string,
+    });
+  }
   useEffect(() => {
     EnvironmentVariables.initialize(env);
+    PostHogInit();
   }, [env]);
 
-  useEffect(() => {
+  /// Initizations that run only once on 1ST mount ///
+  function setPage() {
+    // TODO address this issue with zooming
+    pageHeight.value = window.innerHeight;
+    pageWidth.value = window.innerWidth;
+  }
+  function initWizard() {
     if (showWizard.value) {
       return;
     }
     const wizard = localStorage.getItem("storyteller-wizard");
     showWizard.value = wizard ? "" : "initial";
     localStorage.setItem("storyteller-wizard", "shown");
+  }
+  useEffect(() => {
+    initWizard();
+    setPage();
+    window.addEventListener("resize", setPage);
+    return () => {
+      window.removeEventListener("resize", setPage);
+    };
   }, []);
 
   return null;

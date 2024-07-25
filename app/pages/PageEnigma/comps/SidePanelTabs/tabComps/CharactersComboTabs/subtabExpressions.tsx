@@ -4,7 +4,6 @@ import {
   AssetFilterOption,
   FilterEngineCategories,
   MediaFileAnimationType,
-  FeatureFlags,
 } from "~/enums";
 import {
   Button,
@@ -14,23 +13,20 @@ import {
   UploadModal,
 } from "~/components";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import { isAnyStatusFetching } from "../../utilities";
 import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
   useSearchUserdObjects,
+  useFeatureFlags,
 } from "../../hooks";
 
 const filterEngineCategories = [FilterEngineCategories.EXPRESSION];
 
 export const ExpressionTab = () => {
-  const showSearchObjectComponent = usePosthogFeatureFlag(
-    FeatureFlags.SHOW_SEARCH_OBJECTS,
-  );
+  const { showSearchObjectComponent, showUploadButton } = useFeatureFlags();
 
-  const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 

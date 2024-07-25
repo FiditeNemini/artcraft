@@ -4,7 +4,6 @@ import {
   AssetFilterOption,
   CHARACTER_MIXAMO_FILE_TYPE,
   CHARACTER_MMD_FILE_TYPE,
-  FeatureFlags,
   FilterEngineCategories,
   MediaFileAnimationType,
 } from "~/enums";
@@ -17,13 +16,13 @@ import {
   UploadModal,
 } from "~/components";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import { isAnyStatusFetching } from "../../utilities";
 import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
   useSearchUserdObjects,
+  useFeatureFlags,
 } from "../../hooks";
 import {
   filterMixamoCharacters,
@@ -39,10 +38,7 @@ export const CharactersTab = ({
   animationType: MediaFileAnimationType;
   demoCharacterItems?: MediaItem[];
 }) => {
-  const showSearchObjectComponent = usePosthogFeatureFlag(
-    FeatureFlags.SHOW_SEARCH_OBJECTS,
-  );
-  const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
+  const { showSearchObjectComponent, showUploadButton } = useFeatureFlags();
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 

@@ -1,8 +1,6 @@
-import { authentication } from "~/signals";
-
 import { AUTH_STATUS } from "~/enums";
 import { UserInfo, ActiveSubscriptions } from "~/models";
-import { flushAllBackgroundLoadedMedia } from "~/signals";
+import { authentication, flushAllBackgroundLoadedMedia } from "~/signals";
 
 export const updateAuthStatus = (newStatus: AUTH_STATUS) => {
   authentication.status.value = newStatus;

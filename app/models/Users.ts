@@ -1,3 +1,5 @@
+import { USER_FEATURE_FLAGS } from "~/enums";
+
 export interface CoreInfo {
   default_avatar: {
     color_index: number;
@@ -19,7 +21,7 @@ export interface UserInfo {
 
   // Rollout feature flags
   can_access_studio: boolean;
-  maybe_feature_flags: string[];
+  maybe_feature_flags: USER_FEATURE_FLAGS[];
 
   // Usage
   can_use_tts: boolean;

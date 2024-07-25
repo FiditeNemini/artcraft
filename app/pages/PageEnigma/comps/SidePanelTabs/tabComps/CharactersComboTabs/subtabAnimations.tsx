@@ -4,7 +4,6 @@ import {
   ANIMATION_MIXAMO_FILE_TYPE,
   ANIMATION_MMD_FILE_TYPE,
   AssetFilterOption,
-  FeatureFlags,
   FilterEngineCategories,
   MediaFileAnimationType,
 } from "~/enums";
@@ -22,8 +21,8 @@ import {
   useFeaturedObjects,
   useSearchFeaturedObjects,
   useSearchUserdObjects,
+  useFeatureFlags,
 } from "../../hooks";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 import {
   filterMixamoAnimations,
   filterMMDAnimations,
@@ -39,10 +38,7 @@ export const AnimationsTab = ({
   animationType: MediaFileAnimationType;
   demoAnimationItems?: MediaItem[];
 }) => {
-  const showSearchObjectComponent = usePosthogFeatureFlag(
-    FeatureFlags.SHOW_SEARCH_OBJECTS,
-  );
-  const showUploadButton = usePosthogFeatureFlag(FeatureFlags.DEV_ONLY);
+  const { showSearchObjectComponent, showUploadButton } = useFeatureFlags();
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 
