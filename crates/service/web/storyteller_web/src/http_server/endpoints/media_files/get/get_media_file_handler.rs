@@ -341,7 +341,8 @@ async fn modern_media_file_lookup(
       media_type: result.media_type,
       maybe_engine_category: result.maybe_engine_category,
       maybe_animation_type: result.maybe_animation_type,
-      maybe_media_subtype: result.maybe_media_subtype,
+      // maybe_media_subtype: result.maybe_media_subtype,
+      maybe_media_subtype: None, // NB(bt,2024-07-25): Stop populating field for consumers.
       maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
       maybe_scene_source_media_file_token: result.maybe_scene_source_media_file_token,

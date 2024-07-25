@@ -71,7 +71,6 @@ use crate::http_server::endpoints::inference_job::terminate_inference_job_handle
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_animation_type_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::*;
-use crate::http_server::endpoints::stats::get_unified_queue_stats_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::*;
 use crate::http_server::endpoints::media_files::edit::rename_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::*;
@@ -102,6 +101,7 @@ use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file:
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
+use crate::http_server::endpoints::stats::get_unified_queue_stats_handler::*;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
@@ -128,8 +128,6 @@ use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::*;
 use crate::http_server::endpoints::weights::update_weight_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
-use crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::*;
-use crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::*;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_request::*;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_response::*;

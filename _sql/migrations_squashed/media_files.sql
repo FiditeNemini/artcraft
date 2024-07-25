@@ -45,11 +45,14 @@ CREATE TABLE media_files (
   -- Possible values:
   --   * 'unknown' for legacy records without an associated product
   --   * 'face_animator' for uploads and outputs
+  --   * 'face_mirror' for uploads and outputs
+  --   * 'video_style_transfer' for uploads and outputs
+  --   * 'storyteller_studio' for engine renders and outputs
   --   * 'tts' for text to speech outputs
   --   * 'voice_conversion' for uploads or outputs (RVC or SVC)
   --   * 'zs_voice' for uploads or outputs for zero shot voice products
-  --   * 'video_filter' filters on videos
   --   * 'mocap' for files uploaded or processed by motion capture
+  --   * 'image_gen' for image generation
   origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- For inference that can be tied back to a model, the type of model.
