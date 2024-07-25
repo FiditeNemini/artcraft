@@ -245,6 +245,7 @@ pub async fn enqueue_comfy_ui_handler(
     }
 
     let inference_args = WorkflowArgs {
+        workflow_type: None, // Is this endpoint even used anymore?
         maybe_lora_model: request.maybe_lora_model.clone(),
         maybe_json_modifications: request.maybe_json_modifications.clone(),
         maybe_workflow_config: request.maybe_workflow_config.clone(),

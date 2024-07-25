@@ -40,8 +40,23 @@ impl NewValue {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub enum WorkflowType {
+    /// For jobs that power Storyteller Studio
+    #[serde(rename = "s")]
+    StorytellerStudio,
+
+    /// For jobs that power video style transfer
+    #[serde(rename = "vst")]
+    VideoStyleTransfer,
+}
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct WorkflowArgs {
+    #[serde(rename = "w")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_type: Option<WorkflowType>,
+
     #[serde(rename = "lora")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_model: Option<ModelWeightToken>,
