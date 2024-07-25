@@ -36,7 +36,7 @@ export default function PromptViewer({
 
   return (
     <>
-      {prompt.maybe_positive_prompt && (
+      {prompt && (
         <Panel padding={true} className="mt-3">
           {isModerator && (
             <>
@@ -45,9 +45,17 @@ export default function PromptViewer({
               </div>
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
-                  <a href={
-                    new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path.replace('.mp4', '.no_watermark.mp4'))
-                  }>Download Without Watermark</a> (Staff Only)
+                  <a
+                    href={new BucketConfig().getGcsUrl(
+                      mediaFile?.public_bucket_path.replace(
+                        ".mp4",
+                        ".no_watermark.mp4"
+                      )
+                    )}
+                  >
+                    Download Without Watermark
+                  </a>{" "}
+                  (Staff Only)
                 </p>
               </div>
             </>
@@ -121,20 +129,19 @@ export default function PromptViewer({
               </div>
             </>
           )}
-          {isModerator &&
-            prompt?.maybe_moderator_fields?.main_ipa_workflow && (
-              <>
-                <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                  <h6 className="fw-semibold mb-0 flex-grow-1">
-                    Main Workflow
-                  </h6>
-                </div>
-                <div className="panel-inner p-2 rounded">
-                  <p className="fs-7">
-                    <code>{prompt?.maybe_moderator_fields?.main_ipa_workflow}</code>
-                  </p>
-                </div>
-              </>
+          {isModerator && prompt?.maybe_moderator_fields?.main_ipa_workflow && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">Main Workflow</h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  <code>
+                    {prompt?.maybe_moderator_fields?.main_ipa_workflow}
+                  </code>
+                </p>
+              </div>
+            </>
           )}
           {prompt?.used_face_detailer && (
             <>
@@ -146,13 +153,18 @@ export default function PromptViewer({
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
                   {prompt?.used_face_detailer ? "Yes" : "No"}
-                  {
-                  isModerator && 
-                  prompt?.maybe_moderator_fields?.face_detailer_workflow && (
-                    <>
-                      &nbsp;| <code>{prompt?.maybe_moderator_fields?.face_detailer_workflow}</code>
-                    </>
-                  )}
+                  {isModerator &&
+                    prompt?.maybe_moderator_fields?.face_detailer_workflow && (
+                      <>
+                        &nbsp;|{" "}
+                        <code>
+                          {
+                            prompt?.maybe_moderator_fields
+                              ?.face_detailer_workflow
+                          }
+                        </code>
+                      </>
+                    )}
                 </p>
               </div>
             </>
@@ -165,9 +177,7 @@ export default function PromptViewer({
                 </h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">
-                  {prompt?.use_cinematic ? "Yes" : "No"}
-                </p>
+                <p className="fs-7">{prompt?.use_cinematic ? "Yes" : "No"}</p>
               </div>
             </>
           )}
@@ -179,13 +189,15 @@ export default function PromptViewer({
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
                   {prompt?.used_upscaler ? "Yes" : "No"}
-                  {
-                  isModerator && 
-                  prompt?.maybe_moderator_fields?.upscaler_workflow && (
-                    <>
-                      &nbsp;| <code>{prompt?.maybe_moderator_fields?.upscaler_workflow}</code>
-                    </>
-                  )}
+                  {isModerator &&
+                    prompt?.maybe_moderator_fields?.upscaler_workflow && (
+                      <>
+                        &nbsp;|{" "}
+                        <code>
+                          {prompt?.maybe_moderator_fields?.upscaler_workflow}
+                        </code>
+                      </>
+                    )}
                 </p>
               </div>
             </>
@@ -198,9 +210,7 @@ export default function PromptViewer({
                 </h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">
-                  {prompt?.lipsync_enabled ? "Yes" : "No"}
-                </p>
+                <p className="fs-7">{prompt?.lipsync_enabled ? "Yes" : "No"}</p>
               </div>
             </>
           )}
@@ -210,9 +220,7 @@ export default function PromptViewer({
                 <h6 className="fw-semibold mb-0 flex-grow-1">LCM Disabled</h6>
               </div>
               <div className="panel-inner p-2 rounded">
-                <p className="fs-7">
-                  {prompt?.lcm_disabled ? "Yes" : "No"}
-                </p>
+                <p className="fs-7">{prompt?.lcm_disabled ? "Yes" : "No"}</p>
               </div>
             </>
           )}
@@ -234,18 +242,25 @@ export default function PromptViewer({
                 </div>
               </>
             )}
-            {isModerator && prompt?.maybe_inference_duration_millis && (
-              <>
-                <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                  <h6 className="fw-semibold mb-0 flex-grow-1">Inference Duration</h6>
-                </div>
-                <div className="panel-inner p-2 rounded">
-                  <p className="fs-7">
-                    {(prompt?.maybe_inference_duration_millis / 1000 / 60).toFixed(2)} minutes
-                  </p>
-                </div>
-              </>
-            )}
+          {isModerator && prompt?.maybe_inference_duration_millis && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">
+                  Inference Duration
+                </h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">
+                  {(
+                    prompt?.maybe_inference_duration_millis /
+                    1000 /
+                    60
+                  ).toFixed(2)}{" "}
+                  minutes
+                </p>
+              </div>
+            </>
+          )}
         </Panel>
       )}
     </>
