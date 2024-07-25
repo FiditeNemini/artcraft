@@ -17,10 +17,9 @@ use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobTyp
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::live_portrait_payload::LivePortraitPayload;
+use mysql_queries::payloads::generic_inference_args::live_portrait_payload::{CropDimensions, LivePortraitPayload};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
@@ -63,6 +62,22 @@ pub struct EnqueueLivePortraitWorkflowRequest {
 
   /// Optional visibility setting override.
   creator_set_visibility: Option<Visibility>,
+
+  /// Optional crop dimensions from the top left corner.
+  maybe_crop: Option<EnqueueLivePortraitCropDimensions>,
+}
+
+// Top left corner, height  + width  of crop area
+#[derive(Deserialize, ToSchema)]
+pub struct EnqueueLivePortraitCropDimensions {
+  /// X coordinate of the top left corner of the cropped area
+  x: u32,
+  /// Y coordinate of the top left corner of the cropped area
+  y: u32,
+  /// Width in pixels of the cropped area
+  width: u32,
+  /// Height in pixels of the cropped area
+  height: u32,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -108,13 +123,13 @@ impl std::fmt::Display for EnqueueLivePortraitWorkflowError {
   }
 }
 
-/// Enqueue "live portrait" video workflows.
+/// Enqueue "face mirror" (Live Portrait) video workflows.
 ///
 /// We've renamed this as to not give away what we're doing to users.
 #[utoipa::path(
   post,
   tag = "Workflows",
-  path = "/v1/workflows/enqueue_acting_face",
+  path = "/v1/workflows/enqueue_face_mirror",
   responses(
     (status = 200, description = "Success", body = EnqueueLivePortraitWorkflowSuccessResponse),
     (status = 400, description = "Bad input", body = EnqueueLivePortraitWorkflowError),
@@ -202,9 +217,20 @@ pub async fn enqueue_live_portrait_workflow_handler(
 
   let _is_allowed_expensive_generation = is_staff || has_paid_plan;
 
+  let maybe_crop = request.maybe_crop.as_ref()
+      .map(|crop| {
+        CropDimensions {
+          x: crop.x,
+          y: crop.y,
+          width: crop.width,
+          height: crop.height,
+        }
+      });
+
   let payload = LivePortraitPayload {
     portrait_media_file_token: empty_media_file_token_to_null(Some(&request.source_media_file_token)),
     driver_media_file_token: empty_media_file_token_to_null(Some(&request.face_driver_media_file_token)),
+    crop: maybe_crop,
     remove_watermark: None,
     sleep_millis: None,
   };

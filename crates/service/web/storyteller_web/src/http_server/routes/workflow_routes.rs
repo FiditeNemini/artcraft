@@ -23,6 +23,10 @@ where
 {
   let app = app.service(web::scope("/v1/workflows")
       .service(web::resource("/enqueue_acting_face")
+          .route(web::post().to(enqueue_live_portrait_workflow_handler)) // TODO: Rename to below
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/enqueue_face_mirror")
           .route(web::post().to(enqueue_live_portrait_workflow_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
