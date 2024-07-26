@@ -71,7 +71,7 @@ export function StylizeTab() {
             "/resources/placeholders/style_placeholder.png"
           }
         />
-        <Prompts selection={selectedArtStyle.value} />
+        <Prompts />
         <IPAdapter />
         <StyleButtons />
       </div>

@@ -15,13 +15,8 @@ import Queue, {
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { AssetType } from "~/enums";
-import {
-  CameraAspectRatio,
-  ClipGroup,
-  ClipType,
-  MediaFileType,
-} from "~/pages/PageEnigma/enums";
+import { ClipGroup, ClipType, AssetType } from "~/enums";
+import { CameraAspectRatio, MediaFileType } from "~/pages/PageEnigma/enums";
 import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/Editor/editor";
 import EmotionEngine from "./emotion_engine";
@@ -38,6 +33,7 @@ export class TimeLine {
   absolute_end: number;
   scrubber_frame_position: number;
   is_playing: boolean;
+  is_repeating: boolean = true;
 
   // plays audio
   audio_engine: AudioEngine;
@@ -223,6 +219,9 @@ export class TimeLine {
         break;
       case toEngineActions.TOGGLE_CAMERA_STATE:
         this.editorEngine.switchCameraView();
+        break;
+      case toEngineActions.TOGGLE_REPEATING:
+        this.is_repeating = !this.is_repeating;
         break;
       case toEngineActions.REFRESH_PREVIEW:
         if (this.editorEngine.switchPreviewToggle) {

@@ -42,7 +42,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
         "relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out ",
         selectedSceneId === scene.token
           ? "border-brand-primary"
-          : "border-[#4B4B5C] hover:border-ui-controls-button",
+          : "border-ui-controls-button/25 hover:border-ui-controls-button",
       )}
       onClick={() => handleSelected(scene)}
     >
@@ -56,7 +56,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
         onError={() => setLoadError(true)}
         loading="lazy"
       />
-      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-ui-panel to-transparent" />
+      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-black/80 to-transparent" />
       <div className="absolute bottom-[8px] left-[10px] text-start text-sm drop-shadow-md">
         <div className="flex  flex-col">
           <span className="w-60 truncate text-sm font-medium">

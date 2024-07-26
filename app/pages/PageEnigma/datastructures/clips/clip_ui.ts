@@ -1,6 +1,7 @@
 // Clip offsets represent the state of the clip on the timeline as well as what type of clip it is.
 // it is created from a media id.
-import { ClipGroup, ClipType, MediaFileType } from "~/pages/PageEnigma/enums";
+import { MediaFileType } from "~/pages/PageEnigma/enums";
+import { ClipGroup, ClipType } from "~/enums";
 
 export class ClipUI {
   version: number;
@@ -29,7 +30,7 @@ export class ClipUI {
     offset: number,
     length: number,
     keyframe_offset: number = 0,
-    media_file_type: MediaFileType
+    media_file_type: MediaFileType,
   ) {
     this.version = version;
     this.group = group; // Only needed for UI
@@ -62,7 +63,7 @@ export class ClipUI {
       start_offset: this.offset,
       ending_offset: this.length,
       keyframe_offset: this.keyframe_offset,
-      media_file_type: this.media_file_type
+      media_file_type: this.media_file_type,
     };
   }
 }

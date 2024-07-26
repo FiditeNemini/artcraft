@@ -1,6 +1,6 @@
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 import { CharacterTrack, Clip, Keyframe } from "~/pages/PageEnigma/models";
-import { ClipType } from "~/pages/PageEnigma/enums";
+import { ClipType } from "~/enums";
 import { characterGroup } from "~/pages/PageEnigma/signals";
 
 function getAddCharacter(item: ClipUI) {
@@ -16,14 +16,14 @@ function getAddCharacter(item: ClipUI) {
     object_uuid: item.object_uuid,
     name: item.object_name,
     media_id: item.media_id,
-    //maybe_animation_type: item.maybe_animation_type,
+    // animation_type: item.maybe_animation_type,
     muted: false,
     minimized: false,
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],
     expressionClips: [],
-    mediaType: item.media_file_type
+    mediaType: item.media_file_type,
   } as CharacterTrack;
 
   characterGroup.value = {
@@ -55,7 +55,7 @@ export function loadCharacterData(item: ClipUI) {
       name: item.name,
       offset: item.offset,
       length: item.length,
-      mediaType: item.media_file_type
+      mediaType: item.media_file_type,
     } as Clip;
     existingCharacter.animationClips.push(newItem);
     existingCharacter.animationClips.sort(

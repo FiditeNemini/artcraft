@@ -4,4 +4,5 @@ export enum ClipType {
   ANIMATION = "animation",
   EXPRESSION = "expression",
   FAKE = "fake",
+  PROMPT_TRAVEL = "prompt",
 }

@@ -7,7 +7,7 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { useSignals } from "@preact/signals-react/runtime";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { ClipGroup } from "~/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 

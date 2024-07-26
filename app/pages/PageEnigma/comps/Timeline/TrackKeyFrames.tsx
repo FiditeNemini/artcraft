@@ -2,8 +2,7 @@ import { Keyframe } from "~/pages/PageEnigma/models";
 import { TrackKeyFrame } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrame";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 import { dragItem } from "~/pages/PageEnigma/signals";
-import { AssetType } from "~/enums";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { AssetType, ClipGroup } from "~/enums";
 
 interface Props {
   id: string;

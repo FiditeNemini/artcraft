@@ -232,7 +232,7 @@ export const IPAdapter: React.FC = () => {
             name="file"
             types={FILE_TYPES}
           >
-            <div className="relative h-[150px] cursor-pointer overflow-hidden rounded-lg border-2 border-white/10 bg-black/25">
+            <div className="relative h-[88px] cursor-pointer overflow-hidden rounded-lg border-2 border-white/10 bg-black/25">
               <img
                 src={adapterImage.value}
                 alt="IPAdapter"

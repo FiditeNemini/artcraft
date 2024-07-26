@@ -63,18 +63,18 @@ export const Tooltip = ({
       {children}
       <Transition
         show={isShowing}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 scale-95"
-        enterTo="opacity-100 scale-100"
+        enter="transition ease-out duration-200 delay-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
         leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 scale-100"
-        leaveTo="opacity-0 scale-95"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
       >
         <div
           ref={tooltipRef}
           style={getStyleForPosition()}
           className={twMerge(
-            "absolute z-10 w-max rounded-lg bg-ui-controls px-2.5 py-1.5 text-sm font-medium text-white shadow-xl",
+            "pointer-events-none absolute z-10 w-max rounded-lg bg-ui-controls px-2.5 py-1.5 text-sm font-medium text-white shadow-xl",
             className ? className : "",
           )}
         >

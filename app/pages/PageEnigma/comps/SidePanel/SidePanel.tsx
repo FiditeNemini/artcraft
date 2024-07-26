@@ -16,7 +16,7 @@ export const SidePanel = () => {
   useSignals();
   const initialTabIdx = usePosthogFeatureFlag(FeatureFlags.SHOW_SETS_TAB)
     ? 0
-    : 1;
+    : 0;
   const [selectedTab, setSelectedTab] = useState<TabItem>(
     tabList[initialTabIdx],
   );
@@ -31,7 +31,7 @@ export const SidePanel = () => {
       <div
         className={[
           "fixed",
-          "z-20 border-l border-l-ui-panel-border bg-ui-panel",
+          "z-[60] border-l border-l-ui-panel-border bg-ui-panel",
           "flex",
           "transition-all duration-300 ease-in-out",
         ].join(" ")}

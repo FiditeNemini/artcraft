@@ -8,12 +8,12 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { CharacterTrack } from "~/pages/PageEnigma/models";
-import { ClipGroup, ClipType, MediaFileType } from "~/pages/PageEnigma/enums";
+import { MediaFileType } from "~/pages/PageEnigma/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
-import { MediaFileAnimationType } from "~/enums";
+import { MediaFileAnimationType, ClipGroup, ClipType } from "~/enums";
 
 function buildUpdaters(
   updateCharacters: (options: {

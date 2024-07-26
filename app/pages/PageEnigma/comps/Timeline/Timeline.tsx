@@ -1,13 +1,10 @@
-import { UIEvent, useCallback, useEffect, useRef, useState } from "react";
+import { UIEvent, useCallback, useEffect, useRef } from "react";
 import { LowerPanel } from "~/pages/PageEnigma/comps/LowerPanel";
 
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
-import { ConfirmationModal } from "~/components";
 import {
   characterGroup,
-  deleteAudioClip,
-  deleteCharacterClip,
   filmLength,
   ignoreKeyDelete,
   isHotkeyDisabled,
@@ -15,32 +12,24 @@ import {
   scale,
   selectedItem,
   selectedObject,
+  sidePanelVisible,
+  sidePanelWidth,
   timelineHeight,
   timelineScrollX,
   timelineScrollY,
-  sidePanelVisible,
-  sidePanelWidth,
 } from "~/pages/PageEnigma/signals";
-import { useSignals } from "@preact/signals-react/runtime";
-import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
+import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
-import { Clip, Keyframe } from "~/pages/PageEnigma/models";
 import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHeaders";
-import { pageWidth } from "~/signals";
+import { currentPage, pageWidth } from "~/signals";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import PremiumLockTimeline from "./PremiumLockTimeline";
 import { AssetType } from "~/enums";
-import { DoNotShow } from "~/constants";
-import { deleteKeyframe } from "~/pages/PageEnigma/signals/timeline";
-
-function getItemType(item: Clip | Keyframe | null) {
-  if (!item) {
-    return "";
-  }
-  return (item as Clip).clip_uuid ? "clip" : "keyframe";
-}
+import { PromptTravel } from "~/pages/PageEnigma/comps/Timeline/PromptTravel";
+import { useOnDelete } from "~/pages/PageEnigma/comps/Timeline/utils/useOnDelete";
 
 function scrollItem(itemId: string) {
   const element = document.getElementById(itemId);
@@ -52,7 +41,6 @@ function scrollItem(itemId: string) {
 
 export const Timeline = () => {
   useSignals();
-  const [dialogOpen, setDialogOpen] = useState(false);
   const lastSelectedObject = useRef(selectedObject.value);
 
   if (selectedObject.value !== lastSelectedObject.current) {
@@ -91,21 +79,13 @@ export const Timeline = () => {
     timelineScrollY.value = event.currentTarget.scrollTop;
   }, []);
 
-  useEffect(() => {
-    timelineHeight.value = 208;
-  }, []);
+  useSignalEffect(() => {
+    timelineHeight.value = currentPage.value === Pages.EDIT ? 208 : 120;
+  });
 
-  const onDelete = useCallback(() => {
-    if ((selectedItem.value as Clip).clip_uuid) {
-      deleteCharacterClip(selectedItem.value as Clip);
-      deleteAudioClip(selectedItem.value as Clip);
-    } else {
-      deleteKeyframe(selectedItem.value as Keyframe);
-    }
-    selectedItem.value = null;
-  }, []);
+  const { onDeleteAsk, confirmationModal } = useOnDelete();
 
-  const onDeleteAsk = useCallback(
+  const onDeleteKey = useCallback(
     (event: KeyboardEvent) => {
       if (ignoreKeyDelete.value || isHotkeyDisabled()) {
         return;
@@ -114,28 +94,19 @@ export const Timeline = () => {
         ["Backspace", "Delete"].indexOf(event.key) > -1 &&
         selectedItem.value !== null
       ) {
-        event.stopPropagation();
-        event.preventDefault();
-        const show = localStorage.getItem(
-          `Delete-${getItemType(selectedItem.value)}`,
-        );
-        if (show === DoNotShow) {
-          onDelete();
-          return;
-        }
-        setDialogOpen(true);
+        onDeleteAsk(event, selectedItem.value);
       }
     },
-    [onDelete],
+    [onDeleteAsk],
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", onDeleteAsk);
+    document.addEventListener("keydown", onDeleteKey);
 
     return () => {
-      document.removeEventListener("keydown", onDeleteAsk);
+      document.removeEventListener("keydown", onDeleteKey);
     };
-  }, [onDeleteAsk]);
+  }, [onDeleteKey]);
 
   const sidebarAdjustment = sidePanelVisible.value
     ? sidePanelWidth.value + 84
@@ -146,10 +117,11 @@ export const Timeline = () => {
       <LowerPanel>
         <div
           style={{
-            marginRight: sidebarAdjustment,
+            marginRight:
+              currentPage.value === Pages.EDIT ? sidebarAdjustment : 16,
           }}
         >
-          <TimerGrid page={Pages.EDIT} />
+          <TimerGrid />
           <div className="flex">
             <div
               className="ml-[60px] mt-2 w-[144px] min-w-[144px] overflow-hidden"
@@ -160,7 +132,7 @@ export const Timeline = () => {
               <RowHeaders />
             </div>
             <div
-              className="mb-20 mt-2 overflow-auto"
+              className="relative mt-2 overflow-auto"
               onScroll={onScroll}
               style={{
                 width: pageWidth.value - 204,
@@ -168,38 +140,34 @@ export const Timeline = () => {
               }}
             >
               <div
-                className="relative"
+                className=""
                 style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}
               >
-                <PremiumLockTimeline locked={false} />
-                <Characters />
-                <div className="pb-1 pr-8">
-                  <Camera />
-                </div>
-                <div className="pb-1 pr-8">
-                  <Audio />
-                </div>
-                <ObjectGroups />
+                {currentPage.value === Pages.EDIT ? (
+                  <>
+                    <PremiumLockTimeline locked={false} />
+                    <Characters />
+                    <div className="pb-1 pr-8">
+                      <Camera />
+                    </div>
+                    <div className="pb-1 pr-8">
+                      <Audio />
+                    </div>
+                    <ObjectGroups />
+                  </>
+                ) : (
+                  <>
+                    <PremiumLockTimeline locked={false} />
+                    <PromptTravel />
+                  </>
+                )}
               </div>
             </div>
-            <Scrubber page={Pages.EDIT} />
+            <Scrubber />
           </div>
         </div>
       </LowerPanel>
-      <ConfirmationModal
-        title={`Delete ${getItemType(selectedItem.value)}`}
-        text={`Are you sure you want to delete the selected ${getItemType(selectedItem.value)}?`}
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onOk={() => {
-          onDelete();
-          setDialogOpen(false);
-        }}
-        okText="Delete"
-        okColor="bg-brand-primary"
-        onCancel={() => setDialogOpen(false)}
-        canHide
-      />
+      {confirmationModal()}
     </>
   );
 };

@@ -14,6 +14,7 @@ import {
   selectedObject,
   addKeyframe,
   selectedItem,
+  generateProgress,
 } from "~/pages/PageEnigma/signals";
 import Queue, { QueueSubscribeType } from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -25,18 +26,20 @@ import {
   QueueKeyframe,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
-import { CameraAspectRatio, ClipGroup } from "~/pages/PageEnigma/enums";
+import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { addToast } from "~/signals";
-import { ToastTypes } from "~/enums";
+import { ToastTypes, ClipGroup } from "~/enums";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 import { cameraAspectRatio } from "../signals/engine";
+import { loadPromptTravelData } from "~/pages/PageEnigma/signals/promptTravelGroup";
 
 const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
   [ClipGroup.CHARACTER]: loadCharacterData,
   [ClipGroup.OBJECT]: loadObjectData,
   [ClipGroup.CAMERA]: loadCameraData,
   [ClipGroup.GLOBAL_AUDIO]: loadAudioData,
+  [ClipGroup.PROMPT_TRAVEL]: loadPromptTravelData,
 };
 
 export function useQueueHandler() {
@@ -103,6 +106,11 @@ export function useQueueHandler() {
       switch (action) {
         case toTimelineActions.ADD_KEYFRAME:
           addKeyframe(data as QueueKeyframe, currentTime.value);
+          break;
+        case toTimelineActions.GENERATE_PROGRESS:
+          generateProgress.value = (
+            data as { currentTime: number }
+          ).currentTime;
           break;
         default:
           throw new Error(`Unknown action ${action}`);

@@ -1,4 +1,4 @@
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
+import { ClipGroup, ClipType } from "~/enums";
 import { XYZ } from "~/pages/PageEnigma/datastructures/common";
 
 export interface QueueClip {

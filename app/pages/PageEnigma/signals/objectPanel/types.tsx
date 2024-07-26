@@ -1,5 +1,5 @@
 import { Simple3DVector } from "~/pages/PageEnigma/datastructures/common";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { ClipGroup } from "~/enums";
 
 export type ControlPanel = {
   isShowing: boolean;

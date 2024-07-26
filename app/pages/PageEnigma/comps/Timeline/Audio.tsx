@@ -6,7 +6,7 @@ import {
   minimizeIconPosition,
   updateAudio,
 } from "~/pages/PageEnigma/signals";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { ClipGroup } from "~/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 import { useSignals } from "@preact/signals-react/runtime";

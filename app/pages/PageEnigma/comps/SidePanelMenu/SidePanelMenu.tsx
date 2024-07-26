@@ -13,7 +13,8 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 import { TabItem } from "../SidePanel/tabList";
-import { pageHeight } from "~/signals";
+import { currentPage, pageHeight } from "~/signals";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
 export const SidePanelMenu = ({
   tabs,
@@ -27,16 +28,14 @@ export const SidePanelMenu = ({
   useSignals();
   const showSetsTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SETS_TAB);
   const showSkyboxesTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SKYBOXES_TAB);
-  const showImagePlaneTab = usePosthogFeatureFlag(
-    FeatureFlags.SHOW_IMAGEPLANE_TAB,
-  );
   const showCreaturesTab = usePosthogFeatureFlag(
     FeatureFlags.SHOW_CREATURES_TAB,
   );
+  const showStylePage = usePosthogFeatureFlag(FeatureFlags.SHOW_STYLE_PAGE);
   return (
     <div
       className={twMerge(
-        "fixed z-20 bg-assets-background",
+        "fixed z-[60] bg-assets-background",
         "right-0 top-[64px] w-[84px] px-2 py-2",
         "overflow-y-auto",
       )}
@@ -52,10 +51,10 @@ export const SidePanelMenu = ({
           if (tab.title === TabTitles.SKYBOXES && !showSkyboxesTab) {
             return;
           }
-          if (tab.title === TabTitles.IMAGE_PLANE && !showImagePlaneTab) {
+          if (tab.title === TabTitles.OBJECTS_CREATURES && !showCreaturesTab) {
             return;
           }
-          if (tab.title === TabTitles.OBJECTS_CREATURES && !showCreaturesTab) {
+          if (tab.title === TabTitles.RENDER && !showStylePage) {
             return;
           }
           return (
@@ -66,14 +65,18 @@ export const SidePanelMenu = ({
                 tab.title === selectedTab.title
                   ? "bg-assets-selectedTab opacity-100 hover:bg-assets-selectedTab"
                   : "opacity-60",
-                tab.title === TabTitles.STYLIZE &&
+                tab.title === TabTitles.RENDER &&
                   "bg-brand-primary font-medium opacity-90 hover:border-white/25 hover:bg-brand-primary hover:opacity-100",
                 tab.title === selectedTab.title &&
-                tab.title === TabTitles.STYLIZE
+                tab.title === TabTitles.RENDER
                   ? "border-white/50 opacity-100 hover:border-white/50"
                   : "",
               ])}
               onClick={() => {
+                if (tab.title === TabTitles.RENDER) {
+                  currentPage.value = Pages.STYLE;
+                  return;
+                }
                 selectTab(tab);
                 if (!sidePanelVisible.value) {
                   sidePanelVisible.value = true;

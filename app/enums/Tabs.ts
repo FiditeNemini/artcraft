@@ -11,6 +11,7 @@ export enum TabTitles {
   PLANES = "Image & Video Panels",
   PLANES_IMAGE = "Image Panels",
   PLANES_VIDEO = "Video Panels",
+  RENDER = "AI Preview",
   SKYBOXES = "Skyboxes",
   STYLIZE = "AI Stylize",
 }

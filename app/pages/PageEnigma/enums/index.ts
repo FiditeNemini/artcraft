@@ -1,7 +1,5 @@
 export * from "./ArtStyle";
 export * from "./AudioTabPages";
-export * from "./ClipGroup";
-export * from "./ClipType";
 export * from "./EditorState";
 export * from "./FetchStatus";
 export * from "./GenerateTtsAudioErrorType";

@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { QueueKeyframe, Keyframe, MediaItem } from "~/pages/PageEnigma/models";
 import {
   addCameraKeyframe,
@@ -13,7 +12,7 @@ import {
   deleteObjectKeyframe,
   objectGroup,
 } from "~/pages/PageEnigma/signals";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { ClipGroup } from "~/enums";
 import { deleteObject } from "~/pages/PageEnigma/signals/objectGroup/deleteObject";
 
 const ADD_KEYFRAME: Record<
@@ -24,6 +23,7 @@ const ADD_KEYFRAME: Record<
   [ClipGroup.CHARACTER]: addCharacterKeyframe,
   [ClipGroup.OBJECT]: addObjectKeyframe,
   [ClipGroup.GLOBAL_AUDIO]: () => {},
+  [ClipGroup.PROMPT_TRAVEL]: () => {},
 };
 
 const DELETE_KEYFRAME: Record<ClipGroup, (keyframe: Keyframe) => void> = {
@@ -31,6 +31,7 @@ const DELETE_KEYFRAME: Record<ClipGroup, (keyframe: Keyframe) => void> = {
   [ClipGroup.CHARACTER]: deleteCharacterKeyframe,
   [ClipGroup.OBJECT]: deleteObjectKeyframe,
   [ClipGroup.GLOBAL_AUDIO]: () => {},
+  [ClipGroup.PROMPT_TRAVEL]: () => {},
 };
 
 export function addKeyframe(keyframe: QueueKeyframe, offset: number) {

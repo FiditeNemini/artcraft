@@ -1,4 +1,3 @@
-import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 import { EngineProvider } from "./contexts/EngineContext";
@@ -14,8 +13,10 @@ import { Wizard } from "~/pages/PageEnigma/Wizard/Wizard";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useEffect, useState } from "react";
 import * as gpu from "detect-gpu";
-import { TurnOnGpu } from "~/pages/PageEnigma/TurnOnGpu";
 import { UsersApi } from "~/Classes/ApiManager";
+import { PageEnigmaComponent } from "~/pages/PageEnigma/PageEnigmaComponent";
+import { TurnOnGpu } from "~/pages/PageEnigma/TurnOnGpu";
+
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useSignals();
   useActiveJobs();
@@ -56,7 +57,7 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   return (
     <TrackProvider>
       <EngineProvider sceneToken={sceneToken}>
-        <PageEditor />
+        <PageEnigmaComponent />
         <DragComponent />
         <GenerateModals />
         <ErrorDialog />

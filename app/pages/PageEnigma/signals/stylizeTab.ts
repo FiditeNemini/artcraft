@@ -21,6 +21,8 @@ export const lipSync = signal(false);
 export const cinematic = signal(true);
 export const enginePreProcessing = signal(false);
 
+export const generateProgress = signal(-1);
+
 export const setArtStyleSelection = (newStyle: ArtStyle) => {
   if (selectedArtStyle.value !== newStyle) {
     selectedArtStyle.value = newStyle;

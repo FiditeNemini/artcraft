@@ -54,7 +54,7 @@ export const useMouseEventsClip = (
       }
       if (isActive.current === "left") {
         if (
-          initLength.current - delta < 30 / 4 / scale.value ||
+          initLength.current - delta < 90 / 4 / scale.value ||
           deltaOffset < min
         ) {
           return;
@@ -64,7 +64,7 @@ export const useMouseEventsClip = (
       }
       if (isActive.current === "right") {
         if (
-          initLength.current + delta < 30 / 4 / scale.value ||
+          initLength.current + delta < 90 / 4 / scale.value ||
           currOffset.current + initLength.current + delta > max
         ) {
           return;

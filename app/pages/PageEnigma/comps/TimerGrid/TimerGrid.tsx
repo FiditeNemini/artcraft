@@ -2,21 +2,15 @@ import {
   filmLength,
   fullHeight,
   scale,
-  stylizeScrollX,
   timelineScrollX,
 } from "~/pages/PageEnigma/signals";
 import { Fragment } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { Pages } from "~/pages/PageEnigma/constants/page";
 
-interface Props {
-  page: Pages;
-}
-export const TimerGrid = ({ page }: Props) => {
+export const TimerGrid = () => {
   useSignals();
   const sectionWidth = 60 * 4 * scale.value;
-  const scrollX =
-    page === Pages.EDIT ? timelineScrollX.value : stylizeScrollX.value;
+  const scrollX = timelineScrollX.value;
 
   return (
     <div

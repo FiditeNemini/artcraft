@@ -18,12 +18,8 @@ import { TimeLine } from "./timeline.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import {
-  ClipGroup,
-  EditorStates,
-  CameraAspectRatio,
-} from "~/pages/PageEnigma/enums";
-import { AssetType } from "~/enums";
+import { EditorStates, CameraAspectRatio } from "~/pages/PageEnigma/enums";
+import { AssetType, ClipGroup } from "~/enums";
 import { XYZ } from "../datastructures/common";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";

@@ -1,23 +1,21 @@
 import Editor from "./editor";
-import { EditorStates, ClipType } from "~/pages/PageEnigma/enums";
+import { EditorStates } from "~/pages/PageEnigma/enums";
 import { editorState, previewSrc } from "../signals/engine";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
-import { ToastTypes } from "~/enums";
+import { ToastTypes, ClipType } from "~/enums";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { Visibility } from "./api_manager.js";
 import * as THREE from "three";
-import { getSceneSignals } from "~/signals";
+import { getSceneSignals, addToast, startPollingActiveJobs } from "~/signals";
 import { v4 as uuidv4 } from "uuid";
 import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
 import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
 import { globalIPAMediaToken } from "../signals";
-import { addToast } from "~/signals";
 
 // TODO THIS CLASS MAKES NO SENSE Refactor so we generate all the frames first. then pass it through this pipeline as a data structure process it. through this class.
-import { startPollingActiveJobs } from "~/signals";
 
 interface MediaTokens {
   color: string;

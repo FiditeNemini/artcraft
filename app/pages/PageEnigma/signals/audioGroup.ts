@@ -1,5 +1,5 @@
 import { AudioGroup, Clip, MediaItem } from "~/pages/PageEnigma/models";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/enums";
+import { ClipGroup, ClipType } from "~/enums";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";

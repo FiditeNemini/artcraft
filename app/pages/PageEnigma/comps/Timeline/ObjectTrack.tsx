@@ -1,6 +1,6 @@
 import { updateObject } from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { ClipGroup } from "~/pages/PageEnigma/enums";
+import { ClipGroup } from "~/enums";
 import { ObjectTrack } from "~/pages/PageEnigma/models";
 
 interface Props {

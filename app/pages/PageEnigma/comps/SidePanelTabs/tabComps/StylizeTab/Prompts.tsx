@@ -8,16 +8,13 @@ import {
   faRandom,
 } from "@fortawesome/pro-solid-svg-icons";
 import { RandomTextsPositive } from "~/pages/PageEnigma/constants/RandomTexts";
-import { ArtStyle } from "~/pages/PageEnigma/Editor/api_manager";
-import { promptsStore } from "~/pages/PageEnigma/signals";
+import { promptsStore, selectedArtStyle } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Transition } from "@headlessui/react";
+import { currentPage } from "~/signals";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
-interface Props {
-  selection: ArtStyle;
-}
-
-export const Prompts = ({ selection }: Props) => {
+export const Prompts = () => {
   useSignals();
   const editorEngine = useContext(EngineContext);
 
@@ -28,14 +25,14 @@ export const Prompts = ({ selection }: Props) => {
 
     if (!promptsStore.isUserInputPositive.value) {
       const randomIndexPositive = Math.floor(
-        Math.random() * RandomTextsPositive[selection].length,
+        Math.random() * RandomTextsPositive[selectedArtStyle.value].length,
       );
       const randomTextPositive =
-        RandomTextsPositive[selection][randomIndexPositive];
+        RandomTextsPositive[selectedArtStyle.value][randomIndexPositive];
       editorEngine.positive_prompt = randomTextPositive;
       promptsStore.textBufferPositive.value = randomTextPositive;
     }
-  }, [selection, editorEngine]);
+  }, [editorEngine]);
 
   const onChangeHandlerNegative = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (editorEngine === null) {
@@ -59,9 +56,9 @@ export const Prompts = ({ selection }: Props) => {
 
   const generateRandomTextPositive = () => {
     const randomIndex = Math.floor(
-      Math.random() * RandomTextsPositive[selection].length,
+      Math.random() * RandomTextsPositive[selectedArtStyle.value].length,
     );
-    const randomText = RandomTextsPositive[selection][randomIndex];
+    const randomText = RandomTextsPositive[selectedArtStyle.value][randomIndex];
     if (editorEngine === null) {
       console.log("Editor is null");
       return;
@@ -83,6 +80,7 @@ export const Prompts = ({ selection }: Props) => {
           onChange={onChangeHandlerPositive}
           required
           value={promptsStore.textBufferPositive.value}
+          resize="none"
         />
         <div className="absolute right-0 top-[2px]">
           <button
@@ -94,15 +92,52 @@ export const Prompts = ({ selection }: Props) => {
           </button>
         </div>
       </div>
-      <Transition
-        show={promptsStore.showNegativePrompt.value === true}
-        enter="transition-all duration-200 ease-in-out"
-        enterFrom="opacity-0 max-h-0"
-        enterTo="opacity-100 max-h-36"
-        leave="transition-all duration-200 ease-in-out"
-        leaveFrom="opacity-100 max-h-36"
-        leaveTo="opacity-0 max-h-0"
-      >
+      {currentPage.value === Pages.EDIT ? (
+        <>
+          <Transition
+            show={promptsStore.showNegativePrompt.value}
+            enter="transition-all duration-200 ease-in-out"
+            enterFrom="opacity-0 max-h-0"
+            enterTo="opacity-100 max-h-36"
+            leave="transition-all duration-200 ease-in-out"
+            leaveFrom="opacity-100 max-h-36"
+            leaveTo="opacity-0 max-h-0"
+          >
+            <div className="relative w-full">
+              <Textarea
+                label="Negative Prompt"
+                className="w-full"
+                rows={2}
+                name="negative-prompt"
+                placeholder="Type here to filter out the things you don't want in the scene"
+                onChange={onChangeHandlerNegative}
+                value={promptsStore.textBufferNegative.value}
+                resize="none"
+              />
+            </div>
+          </Transition>
+          <div>
+            <button
+              className="flex items-center text-xs font-medium text-brand-primary transition-colors duration-100 hover:text-brand-primary-400"
+              onClick={() =>
+                (promptsStore.showNegativePrompt.value =
+                  !promptsStore.showNegativePrompt.value)
+              }
+            >
+              {promptsStore.showNegativePrompt.value ? "Hide" : "Show"} Negative
+              Prompt
+              <FontAwesomeIcon
+                icon={
+                  promptsStore.showNegativePrompt.value
+                    ? faChevronUp
+                    : faChevronDown
+                }
+                className="ms-1.5"
+              />
+            </button>
+          </div>
+        </>
+      ) : (
         <div className="relative w-full">
           <Textarea
             label="Negative Prompt"
@@ -112,29 +147,10 @@ export const Prompts = ({ selection }: Props) => {
             placeholder="Type here to filter out the things you don't want in the scene"
             onChange={onChangeHandlerNegative}
             value={promptsStore.textBufferNegative.value}
+            resize="none"
           />
         </div>
-      </Transition>
-      <div>
-        <button
-          className="flex items-center text-xs font-medium text-brand-primary transition-colors duration-100 hover:text-brand-primary-400"
-          onClick={() =>
-            (promptsStore.showNegativePrompt.value =
-              !promptsStore.showNegativePrompt.value)
-          }
-        >
-          {promptsStore.showNegativePrompt.value === true ? "Hide" : "Show"}{" "}
-          Negative Prompt
-          <FontAwesomeIcon
-            icon={
-              promptsStore.showNegativePrompt.value === true
-                ? faChevronUp
-                : faChevronDown
-            }
-            className="ms-1.5"
-          />
-        </button>
-      </div>
+      )}
     </div>
   );
 };

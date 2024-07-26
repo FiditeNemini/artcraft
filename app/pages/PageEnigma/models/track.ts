@@ -1,6 +1,6 @@
-import { MediaFileAnimationType } from "~/enums";
+import { MediaFileAnimationType, ClipGroup, ClipType } from "~/enums";
 import { XYZ } from "../datastructures/common";
-import { ClipGroup, ClipType, MediaFileType } from "~/pages/PageEnigma/enums";
+import { MediaFileType } from "~/pages/PageEnigma/enums";
 
 export interface Clip {
   version: number;
@@ -36,7 +36,7 @@ export interface CharacterTrack {
   object_uuid: string;
   media_id: string;
   mediaType: MediaFileType;
-  animationType: MediaFileAnimationType;
+  animationType?: MediaFileAnimationType;
   name: string;
   muted: boolean;
   minimized: boolean;
@@ -66,6 +66,11 @@ export interface ObjectTrack {
   object_uuid: string;
   name: string;
   keyframes: Keyframe[];
+}
+
+export interface PromptTravelGroup {
+  id: string;
+  clips: Clip[];
 }
 
 export interface UpdateTime {

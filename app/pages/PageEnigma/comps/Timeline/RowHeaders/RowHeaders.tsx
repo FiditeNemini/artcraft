@@ -7,7 +7,6 @@ import {
   objectsMinimized,
   timelineScrollY,
   toggleAudioMute,
-  // toggleLipSyncMute,
 } from "~/pages/PageEnigma/signals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
@@ -19,6 +18,9 @@ import { CharacterHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/Ch
 import { LipSyncSubHeader } from "./LipSyncSubHeader";
 import { MediaFileAnimationType } from "~/enums";
 import { MediaFileType } from "~/pages/PageEnigma/enums";
+import { currentPage } from "~/signals";
+import { Pages } from "~/pages/PageEnigma/constants/page";
+import { PromptTravelHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/PromptTravelHeader";
 
 export const RowHeaders = () => {
   useSignals();
@@ -27,6 +29,30 @@ export const RowHeaders = () => {
     "flex h-[30px] items-center gap-2 pl-2 text-xs rounded-tl-lg font-medium text-white w-32";
   const uncompressedHeaderClasses =
     "flex h-[30px] items-center gap-2 rounded-br-lg rounded-tl-lg pl-2 text-xs font-medium text-white w-32";
+
+  if (currentPage.value === Pages.STYLE) {
+    return (
+      <div className="relative">
+        <div className="absolute mt-2 w-[146px]" style={{ top: -8 }}>
+          <div className="mb-1 h-[72px] w-full rounded-l-lg bg-prompt-groupBg">
+            <div className="h-[30px]  text-xs font-medium text-white">
+              <div
+                className={[
+                  uncompressedHeaderClasses,
+                  "bg-prompt-titleBg",
+                ].join(" ")}
+              >
+                <PromptTravelHeader />
+              </div>
+            </div>
+            <div className="flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+              Text Prompt
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

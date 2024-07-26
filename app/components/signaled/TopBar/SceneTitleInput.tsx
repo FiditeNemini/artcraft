@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faPencil, faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { scene, signalScene, authentication } from "~/signals";
+import { scene, signalScene, authentication, currentPage } from "~/signals";
 import {
   showErrorDialog,
   errorDialogMessage,
@@ -11,6 +11,7 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { Input } from "~/components";
 import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
 interface Props {
   pageName: string;
@@ -95,8 +96,9 @@ export const SceneTitleInput = ({ pageName }: Props) => {
   return (
     <div
       className={twMerge(
-        "mr-[74px] flex w-full items-center justify-center gap-1.5",
+        "flex w-full items-center justify-center gap-1.5",
         isSaving && "ml-3",
+        currentPage.value === Pages.STYLE ? "mr-0" : "mr-[70px]",
       )}
     >
       {!showInput && (

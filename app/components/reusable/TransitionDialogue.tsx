@@ -63,7 +63,7 @@ export const TransitionDialogue = ({
 }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-40 " onClose={onClose}>
+      <Dialog as="div" className="relative z-[70]" onClose={onClose}>
         <DialogBackdrop />
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">

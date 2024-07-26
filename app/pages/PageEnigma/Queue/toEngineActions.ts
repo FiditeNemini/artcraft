@@ -27,6 +27,8 @@ export enum toEngineActions {
   // data=QueueClip
   TOGGLE_CAMERA_STATE = "toggle_camera",
   // data=null
+  TOGGLE_REPEATING = "toggle_repeating",
+  // data=null
 
   CHANGE_CAMERA_ASPECT_RATIO = "change_camera_aspect_ratio",
   // data=CamperaAspectRatio

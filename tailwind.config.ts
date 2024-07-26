@@ -147,6 +147,13 @@ export default {
         groupBg: "#372E32",
         titleBg: "#514248",
       },
+      prompt: {
+        unselected: "#5D4583",
+        selected: "#AD7EF9",
+        clip: "#926CCF",
+        groupBg: "#362D51",
+        titleBg: "#634E84",
+      },
       keyframe: {
         unselected: "#EEEEEE",
         selected: "#FFDE67",
@@ -219,6 +226,9 @@ export default {
     "bg-object-selected",
     "bg-object-unselected",
     "bg-object-clip",
+    "bg-prompt-selected",
+    "bg-prompt-unselected",
+    "bg-prompt-clip",
     "bg-facebook",
     "bg-reddit",
     "bg-whatsapp",
