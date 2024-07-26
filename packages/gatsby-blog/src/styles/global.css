@@ -2,11 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap");
 
 body {
-  font-family: 'Source Sans 3', sans-serif;
+  font-family: "Source Sans 3", sans-serif;
   color: #242433;
   min-height: 100vh;
+}
+
+.mdx-styles {
+  p {
+    @apply leading-[1.7rem];
+  }
+
+  p:not(:last-child) {
+    @apply mb-6;
+  }
+
+  h1:not(:last-child) {
+    @apply mb-6;
+  }
+
+  h1:not(:first-child) {
+    @apply mt-10;
+  }
+
+  h2:not(:last-child) {
+    @apply mb-6;
+  }
+
+  h2:not(:first-child) {
+    @apply mt-10;
+  }
+
+  h3:not(:last-child) {
+    @apply mb-6;
+  }
+
+  h3:not(:first-child) {
+    @apply mt-6;
+  }
+
+  span:not(:last-child) {
+    @apply mb-6;
+  }
+
+  .youtube-video:not(:last-child) {
+    @apply mb-6;
+  }
 }

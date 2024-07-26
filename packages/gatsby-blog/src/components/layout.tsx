@@ -4,29 +4,33 @@ import React, { ReactNode } from "react";
 import SocialIcons from "./SocialIcons";
 
 export default function Layout({ children }: { children: ReactNode }) {
-
   return (
-    <div className="font-sans min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col font-sans">
       <nav className="bg-panel">
-        <div className="mx-auto max-w-screen-xl py-3.5 px-4 flex items-center">
+        <div className="mx-auto flex max-w-screen-xl items-center px-4 py-3.5">
           <div className="grow">
             <Link to="/">
-               <StaticImage alt="Logo" src="../images/Storyteller-Logo.png" height={36} />
+              <StaticImage
+                alt="Logo"
+                src="../images/Storyteller-Logo.png"
+                height={36}
+              />
             </Link>
           </div>
           <SocialIcons />
         </div>
       </nav>
-      <div className="grow mx-auto max-w-screen-xl px-4 my-4 md:my-8 w-full">
+      <div className="mx-auto my-4 w-full max-w-screen-xl grow px-4 md:my-8">
         {children}
       </div>
       <footer className="bg-panel">
-        <div className="text-white/80 text-sm mx-auto max-w-screen-xl py-3 px-4 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3">
-        © 2024 All Rights Reserved, Storyteller.ai
-        <SocialIcons />
+        <div className="mx-auto max-w-screen-xl">
+          <div className="flex flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-white/80 lg:flex-row lg:py-3">
+            <span>© 2024 All Rights Reserved, Storyteller.ai</span>
+            <SocialIcons />
+          </div>
         </div>
       </footer>
     </div>
-    
   );
 }

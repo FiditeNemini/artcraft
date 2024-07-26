@@ -16,6 +16,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "6.2.1",
+    "@fortawesome/free-brands-svg-icons": "6.2.1",
+    "@fortawesome/free-solid-svg-icons": "6.2.1",
     "@mdx-js/react": "^3.0.1",
     "autoprefixer": "^10.4.19",
     "gatsby": "^5.13.5",

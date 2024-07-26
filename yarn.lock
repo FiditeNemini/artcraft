@@ -3733,7 +3733,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/fontawesome-svg-core@npm:^6.2.1":
+"@fortawesome/fontawesome-svg-core@npm:6.2.1, @fortawesome/fontawesome-svg-core@npm:^6.2.1":
   version: 6.2.1
   resolution: "@fortawesome/fontawesome-svg-core@npm:6.2.1::__archiveUrl=https%3A%2F%2Fnpm.fontawesome.com%2F%40fortawesome%2Ffontawesome-svg-core%2F-%2F6.2.1%2Ffontawesome-svg-core-6.2.1.tgz"
   dependencies:
@@ -3742,7 +3742,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/free-brands-svg-icons@npm:^6.2.1":
+"@fortawesome/free-brands-svg-icons@npm:6.2.1, @fortawesome/free-brands-svg-icons@npm:^6.2.1":
   version: 6.2.1
   resolution: "@fortawesome/free-brands-svg-icons@npm:6.2.1::__archiveUrl=https%3A%2F%2Fnpm.fontawesome.com%2F%40fortawesome%2Ffree-brands-svg-icons%2F-%2F6.2.1%2Ffree-brands-svg-icons-6.2.1.tgz"
   dependencies:
@@ -3751,7 +3751,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/free-solid-svg-icons@npm:^6.2.1":
+"@fortawesome/free-solid-svg-icons@npm:6.2.1, @fortawesome/free-solid-svg-icons@npm:^6.2.1":
   version: 6.2.1
   resolution: "@fortawesome/free-solid-svg-icons@npm:6.2.1::__archiveUrl=https%3A%2F%2Fnpm.fontawesome.com%2F%40fortawesome%2Ffree-solid-svg-icons%2F-%2F6.2.1%2Ffree-solid-svg-icons-6.2.1.tgz"
   dependencies:
@@ -30245,6 +30245,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "storyteller-ai-blog@workspace:packages/gatsby-blog"
   dependencies:
+    "@fortawesome/fontawesome-svg-core": 6.2.1
+    "@fortawesome/free-brands-svg-icons": 6.2.1
+    "@fortawesome/free-solid-svg-icons": 6.2.1
     "@mdx-js/react": ^3.0.1
     "@types/node": ^20.11.19
     "@types/react": ^18.2.55
