@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { FBXLoader } from "three/examples/jsm/Addons.js";
+import { FBXLoader, MMDAnimationHelper } from "three/examples/jsm/Addons.js";
 import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
 
 import { MoveAIResult, Retarget } from "../../Editor/retargeting";
@@ -21,6 +21,8 @@ export class AnimationClip {
   special_properties: MoveAIResult[];
   retargeted: boolean;
   last_frame: number;
+
+  private isMMD: boolean = false;
 
   constructor(
     version: number,
@@ -94,7 +96,7 @@ export class AnimationClip {
         } else if (url.includes(".vmd")) {
           console.log("VMD Loader");
           const root = this.mixer?.getRoot();
-          console.log(root);
+          this.isMMD = true;
           if (root) {
             const mmdLoader = new MMDLoader();
             mmdLoader.loadAnimation(url, root as THREE.SkinnedMesh, (mmd) => {
@@ -129,9 +131,16 @@ export class AnimationClip {
       }
       this.clip_action = this.mixer?.clipAction(anim_clip);
       if (this.clip_action) {
-        if (this.clip_action?.isRunning() == false) {
-          this.clip_action.play();
-        }
+          if (this.clip_action?.isRunning() == false) {
+            if(this.isMMD) {
+              const helper: MMDAnimationHelper = object.parent?.userData["helper"];
+              const obj = helper.objects.get((object as THREE.SkinnedMesh));
+              if(obj) {
+                obj.mixer = this.mixer;
+              }
+            }
+            this.clip_action.play();
+          }
       }
     }
   }

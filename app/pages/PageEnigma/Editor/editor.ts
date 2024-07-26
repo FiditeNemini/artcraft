@@ -172,8 +172,9 @@ class Editor {
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
 
-    // Special async react lifecycle fix
-    // For making sure the editor only gets created onece.
+    // TODO: REMOVE LATER WITH BETTER FIX FOR IMPORTING AMMOJS
+    document.body.appendChild(Object.assign(document.createElement('script'), {src: 'jsm/libs/ammo.wasm.js'}));
+
     this.can_initialize = false;
     this.can_initialize = true;
     const newElement = document.createElement("div");

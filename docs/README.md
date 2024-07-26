@@ -9,3 +9,5 @@ This is the official documentation for the storyteller studio engine.
 [Copy & Paste](./DOCS/COPYPASTE.md)
 
 [Video Planes](./DOCS/VIDEOPLANES.md)
+
+[MMD IK](./DOCS/MMD.md)

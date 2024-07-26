@@ -835,6 +835,11 @@ export class TimeLine {
               this.is_playing,
               this.scrubber_frame_position, // Double FPS for best result.
             );
+            let mmdDelta = delta_time;
+            if(mmdDelta == 0){
+              mmdDelta = 0.001;
+            }
+            this.scene.helper.update(mmdDelta);
             //this.animation_engine.clips[object.uuid + element.media_id].update_bones();
           }
         } else if (element.type === ClipType.EXPRESSION) {

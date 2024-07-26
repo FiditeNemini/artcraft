@@ -7,7 +7,7 @@ import environmentVariables from "~/Classes/EnvironmentVariables";
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { generateUUID } from "three/src/math/MathUtils.js";
 import { LoadingPlaceHolderManager } from "./placeholder_manager";
-import { Water } from "three/examples/jsm/Addons.js";
+import { MMDAnimationHelper, Water } from "three/examples/jsm/Addons.js";
 import { MediaFileType } from "../enums";
 class Scene {
   name: string;
@@ -32,6 +32,7 @@ class Scene {
   placeholder_manager: LoadingPlaceHolderManager | undefined;
 
   updateSurfaceIdAttributeToMesh: Function;
+  helper: MMDAnimationHelper;
 
   // This is used to ensure we do not rerender or process the video if we already have done so.
   // This allows us to reprompt things quickly. This is only written when a snap shot is taken.
@@ -69,6 +70,9 @@ class Scene {
     this._create_base_lighting();
     this._create_skybox();
     this._create_camera_obj();
+
+    this.helper = new MMDAnimationHelper( { afterglow: 2.0 } );
+    this.scene.userData["helper"] = this.helper;
   }
 
   clear() {
@@ -654,15 +658,48 @@ class Scene {
     });
   }
 
-  private load_mmd_wrapped(
+  // This allows to wait for Ammo to fully load.
+  delay_mmd(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private async load_mmd_wrapped(
     media_url: string,
     progress: (event: ProgressEvent) => void,
   ): Promise<THREE.SkinnedMesh> {
+    console.log('Load MMD')
+    const scriptModule = document.createElement('script');
+    scriptModule.type = 'module';
+    scriptModule.textContent = `
+      Ammo().then(function (AmmoLib) {
+        Ammo = AmmoLib;
+    });
+    `;
+    document.head.appendChild(scriptModule);
+
+    // TODO: When converted to ts remove this and make ammo await instead.
+    await this.delay_mmd(500);
+
     return new Promise((resolve, reject) => {
       const mmdLoader = new MMDLoader();
       mmdLoader.load(
         media_url,
         (mesh: THREE.SkinnedMesh) => {
+          this.helper.add(mesh, {
+             physics: true
+          })
+          const ikHelper = this.helper.objects.get(mesh)?.ikSolver.createHelper();
+          if(ikHelper){
+            ikHelper.visible = false;
+            this.scene.add( ikHelper );
+          }
+
+          const physicsHelper = this.helper.objects.get(mesh)?.physics?.createHelper();
+          if(physicsHelper){
+            physicsHelper.visible = false;
+            this.scene.add( physicsHelper );
+          }
+
           mesh.scale.set(0.1, 0.1, 0.1);
           resolve(mesh);
         },
