@@ -45,6 +45,9 @@ $primary-light: desaturate(lighten($primary, 20%), 15%);
 $primary-dark: saturate(darken($primary, 15%), 10%);
 $primary-very-light: desaturate(lighten($primary, 45%), 35%);
 
+$secondary-dark: saturate(darken($secondary, 6%), 2%);
+$secondary-darker: saturate(darken($secondary, 9%), 2%);
+$secondary-very-dark: saturate(darken($secondary, 12%), 2%);
 $secondary-light: lighten($secondary, 5%);
 $secondary-lighter: lighten($secondary, 12%);
 $secondary-very-light: lighten($secondary, 24%);

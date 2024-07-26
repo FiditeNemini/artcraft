@@ -1,14 +1,21 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 interface Props {
   onEnded?: any;
+  videoRef?: React.RefObject<HTMLVideoElement>;
 }
 
-export default function useVideo({ onEnded }: Props) {
-  const ref = useRef<HTMLVideoElement>(null);
-  const playCtrl = (toDo = (b:any) => {}) => {
-    if (ref.current) {  
-      let isPlaying = !!(ref.current.currentTime > 0 && !ref.current.paused && !ref.current.ended && ref.current.readyState > 2);
+export default function useVideo({ onEnded, videoRef }: Props) {
+  const internalRef = useRef<HTMLVideoElement>(null);
+  const ref = videoRef || internalRef;
+  const playCtrl = (toDo = (b: any) => {}) => {
+    if (ref.current) {
+      let isPlaying = !!(
+        ref.current.currentTime > 0 &&
+        !ref.current.paused &&
+        !ref.current.ended &&
+        ref.current.readyState > 2
+      );
       if (!isPlaying) {
         toDo(false);
         ref.current.play();
@@ -19,5 +26,5 @@ export default function useVideo({ onEnded }: Props) {
     }
   };
 
-  return [{ playCtrl },{ onEnded, ref }];
-};
+  return [{ playCtrl }, { onEnded, ref }];
+}

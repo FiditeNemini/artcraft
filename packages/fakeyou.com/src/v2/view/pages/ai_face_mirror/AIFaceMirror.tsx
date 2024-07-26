@@ -14,9 +14,10 @@ import {
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import {
-  EnqueueActingFace,
-  EnqueueActingFaceResponse,
-} from "@storyteller/components/src/api/workflows/EnqueueActingFace";
+  MediaFileCropArea,
+  EnqueueFaceMirror,
+  EnqueueFaceMirrorResponse,
+} from "@storyteller/components/src/api/workflows/EnqueueFaceMirror";
 import { EntityInput } from "components/entities";
 import {
   useInferenceJobs,
@@ -37,6 +38,13 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
     "m_41caq6n7nw15y9e68009bgkn23m3yf"
   );
   const [visibility, visibilitySet] = useState<"private" | "public">("public");
+  const [cropArea, cropAreaSet] = useState<MediaFileCropArea>({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
+
   const { enqueue } = useInferenceJobs();
   // const { canBanUsers } = useSession();
 
@@ -51,13 +59,14 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
 
   const enqueueClick = () => {
     if (hasTokens) {
-      EnqueueActingFace("", {
+      EnqueueFaceMirror("", {
         creator_set_visibility: visibility,
         face_driver_media_file_token: faceDriverToken,
+        maybe_crop: cropArea,
         remove_watermark: removeWatermark,
         source_media_file_token: sourceMediaToken,
         uuid_idempotency_token: uuidv4(),
-      }).then((res: EnqueueActingFaceResponse) => {
+      }).then((res: EnqueueFaceMirrorResponse) => {
         if (res.success && res.inference_job_token) {
           enqueue(
             res.inference_job_token,
@@ -121,6 +130,12 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
             <EntityInput
               {...{
                 accept: ["video"],
+                cropProps: {
+                  aspect: 1,
+                  onCropComplete: (croppedArea, croppedAreaPixels) => {
+                    cropAreaSet(croppedAreaPixels);
+                  },
+                },
                 // aspectRatio: "landscape",
                 // debug: "AFM driver input",
                 name: "faceDriverToken",

@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
-import { Button, Label, Spinner } from "components/common";
+import { Area, Point } from "react-easy-crop";
+import { Label, Spinner, ZoomSliderOnChangeEvent } from "components/common";
 import {
   AcceptTypes,
   EntityModeProp,
@@ -15,12 +16,25 @@ import { useMedia, useMediaUploader } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import EntityInputEmpty from "./EntityInputEmpty";
+import EntityInputSidePanel from "./EntityInputSidePanel";
+import EntityInputImageVideoPreview from "./EntityInputImageVideoPreview";
 import "./EntityInput.scss";
+
+export type OnCropComplete = (
+  croppedArea: Area,
+  croppedAreaPixels: Area
+) => void;
+
+export interface CropProps {
+  aspect: number;
+  onCropComplete?: OnCropComplete;
+}
 
 interface EntityInputProps {
   accept?: AcceptTypes | AcceptTypes[];
   aspectRatio?: "square" | "landscape" | "portrait";
   className?: string;
+  cropProps?: CropProps;
   debug?: string;
   label?: string;
   name?: string;
@@ -31,14 +45,16 @@ interface EntityInputProps {
 }
 
 export interface SlideProps {
-  media?: MediaFile;
   clear: () => void;
+  cropProps?: CropProps;
+  media?: MediaFile;
 }
 
 interface AniProps {
   animating: boolean;
   className: string;
   isLeaving: boolean;
+  onCropComplete?: OnCropComplete;
   render: any;
   style: any;
 }
@@ -47,53 +63,68 @@ const MediaBusy = () => {
   return <Spinner />;
 };
 
-const EntityInputFull = ({ media, clear }: SlideProps) => {
+const EntityInputFull = ({ clear, cropProps, media }: SlideProps) => {
   const bucketConfig = new BucketConfig();
   const mediaUrl = media?.public_bucket_path
     ? bucketConfig.getGcsUrl(media.public_bucket_path)
     : "";
   const mediaType = mediaCategoryfromString(media?.media_type || "");
-  const uploader = `Uploaded by ${
-    media?.maybe_creator_user?.display_name || "User"
-  }`;
+
+  const [crop, cropSet] = useState<Point>({ x: 0, y: 0 });
+  const [zoom, zoomSet] = useState(1);
+
+  const zoomSliderChange = ({ target }: ZoomSliderOnChangeEvent) =>
+    zoomSet(target.value);
 
   switch (mediaType) {
     case MediaFilters.image:
       return (
         <>
-          <img {...{ src: mediaUrl, alt: "Selected media file" }} />
-          <div {...{ className: "fy-entity-input-full-controls" }}>
-            <div {...{ className: "fy-entity-input-file-details" }}>
-              {media?.maybe_title || "Untitled image"}
-              <div>{uploader}</div>
-            </div>
-            <Button
-              {...{
-                label: "Clear",
-                variant: "secondary",
-                onClick: () => clear(),
-              }}
-            />
-          </div>
+          <EntityInputImageVideoPreview
+            {...{
+              crop,
+              cropProps,
+              cropSet,
+              image: mediaUrl,
+              zoom,
+              zoomSet,
+            }}
+          />
+          <EntityInputSidePanel
+            {...{
+              clear,
+              entityType: "image",
+              media,
+              showCrop: !!cropProps,
+              zoomSliderChange,
+              zoom,
+            }}
+          />
         </>
       );
     case MediaFilters.video:
       return (
         <>
-          <video controls {...{ src: mediaUrl }} />
-          <div {...{ className: "fy-entity-input-full-controls" }}>
-            <div {...{ className: "fy-entity-input-file-details" }}>
-              {media?.maybe_title || "Untitled video"}
-              <div>{uploader}</div>
-            </div>
-            <Button
-              {...{
-                label: "Clear",
-                variant: "secondary",
-                onClick: () => clear(),
-              }}
-            />
-          </div>
+          <EntityInputImageVideoPreview
+            {...{
+              crop,
+              cropProps,
+              cropSet,
+              video: mediaUrl,
+              zoom,
+              zoomSet,
+            }}
+          />
+          <EntityInputSidePanel
+            {...{
+              clear,
+              entityType: "video",
+              media,
+              showCrop: !!cropProps,
+              zoomSliderChange,
+              zoom,
+            }}
+          />
         </>
       );
     case MediaFilters.engine_asset:
@@ -105,7 +136,7 @@ const EntityInputFull = ({ media, clear }: SlideProps) => {
               className: "fy-entity-input-mocap-preview",
             }}
           />
-          <div {...{ className: "fy-entity-input-full-controls" }}>
+          <div {...{ className: ".fy-entity-input-preview-info" }}>
             Your file
           </div>
         </>
@@ -137,6 +168,7 @@ export default function EntityInput({
   accept,
   aspectRatio = "square",
   className,
+  cropProps,
   debug,
   label,
   name = "",
@@ -250,6 +282,7 @@ export default function EntityInput({
               {...{
                 className: "fy-entity-input-full",
                 clear,
+                cropProps,
                 media,
                 render: EntityInputFull,
                 ...sharedProps,
