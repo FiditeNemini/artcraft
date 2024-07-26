@@ -73,6 +73,7 @@ export default function JobItem({
   const [index, indexSet] = useState(0);
   const jobType = FrontendInferenceJobType[frontendJobType];
   const jobStatus = jobStatusDescription(jobState);
+
   // const jobStatusClass = jobStatus.toLowerCase().replace("_", "-");
   const resultPath = resultPaths[jobType];
   const success = jobState === JobState.COMPLETE_SUCCESS;
