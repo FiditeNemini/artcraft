@@ -41,7 +41,7 @@ const JobCategoryToType = (jobCategory: string) => {
     case "convert_bvh_to_workflow":
       return FrontendInferenceJobType.EngineComposition;
     default:
-      return FrontendInferenceJobType.TextToSpeech;
+      return FrontendInferenceJobType.Unknown;
   }
 };
 

@@ -73,9 +73,10 @@
     "ATTEMPT_FAILED": "Face Animation Atempt Failed",
     "COMPLETE_FAILURE": "Face Animation Failed.",
     "COMPLETE_SUCCESS": "Face Animation Complete",
+    "DEAD": "Face Animation Dead",
     "PENDING": "Pending Face Animation",
     "STARTED": "Face Animation In Progress",
-    "UNKNOWN": "Animation Status Uknown",
+    "UNKNOWN": "Animation Status Unknown",
     "heading": "Face Animator Jobs"
   },
   "subtitles": {
@@ -91,18 +92,30 @@
     "ATTEMPT_FAILED": "Video Workflow Atempt Failed",
     "COMPLETE_FAILURE": "Video Workflow Failed.",
     "COMPLETE_SUCCESS": "Video Workflow Complete",
+    "DEAD": "Videow Workflow Dead",
     "PENDING": "Pending Video Workflow ",
     "STARTED": "Video Workflow In Progress",
-    "UNKNOWN": "Video Workflow Status Uknown",
+    "UNKNOWN": "Video Workflow Status Unknown",
     "heading": "Video Workflow Jobs"
   },
   "voice_designer": {
-    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
-    "COMPLETE_FAILURE": "Face Animation Failed.",
-    "COMPLETE_SUCCESS": "Face Animation Complete",
+    "ATTEMPT_FAILED": "Voice Deisgner Atempt Failed",
+    "COMPLETE_FAILURE": "Voice Designer Failed.",
+    "COMPLETE_SUCCESS": "Voice Designer Complete",
+    "DEAD": "Voice Designer Dead",
     "PENDING": "Voice Designer Pending",
     "STARTED": "Voice Designer In Progress",
-    "UNKNOWN": "Voice Designer Status Uknown",
+    "UNKNOWN": "Voice Designer Status Unknown",
     "heading": "Voice Designer Jobs"
+  },
+  "Unknown": {
+    "ATTEMPT_FAILED": "Job Atempt Failed",
+    "COMPLETE_FAILURE": "Job Failed.",
+    "COMPLETE_SUCCESS": "Job Complete",
+    "DEAD": "Job Dead",
+    "PENDING": "Pending Job ",
+    "STARTED": "Job In Progress",
+    "UNKNOWN": "Job Status Unknown",
+    "heading": "Jobs"
   }
 }

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { a, config, useSpring } from "@react-spring/web";
 import Cropper, { Point } from "react-easy-crop";
 import { Button } from "components/common";
-import { useVideo } from "hooks";
+import { useHover, useVideo } from "hooks";
 import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
 import { CropProps } from "./EntityInput";
 
@@ -32,9 +33,14 @@ export default function EntityInputImageVideoPreview({
     videoRef,
     onEnded: (playPause: boolean) => isPlayingSet(!playPause),
   });
+  const [hover, hoverProps = {}] = useHover({});
+  const cropTipStyle = useSpring({
+    opacity: hover ? 0 : 1,
+    config: config.gentle,
+  });
 
   return (
-    <div {...{ className: "fy-entity-input-media-preview" }}>
+    <div {...{ className: "fy-entity-input-media-preview", ...hoverProps }}>
       <Cropper
         {...{
           aspect: cropProps?.aspect || 1,
@@ -92,9 +98,11 @@ export default function EntityInputImageVideoPreview({
         />
       ) : null}
       {cropProps ? (
-        <div {...{ className: "fy-entity-input-crop-tip" }}>
+        <a.div
+          {...{ className: "fy-entity-input-crop-tip", style: cropTipStyle }}
+        >
           Drag and scroll to crop
-        </div>
+        </a.div>
       ) : null}
     </div>
   );
