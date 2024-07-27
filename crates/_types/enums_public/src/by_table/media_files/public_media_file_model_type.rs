@@ -48,6 +48,9 @@ pub enum PublicMediaFileModelType {
   #[serde(rename = "stable_diffusion_1_5")]
   StableDiffusion15,
 
+  #[serde(rename = "gpt_sovits")]
+  GptSovits,
+
   #[serde(rename = "studio")]
   StorytellerStudio,
 
@@ -81,6 +84,7 @@ impl PublicMediaFileModelType {
       MediaFileOriginModelType::Tacotron2 => Self::Tacotron2,
       MediaFileOriginModelType::MocapNet => Self::MocapNet,
       MediaFileOriginModelType::StableDiffusion15 => Self::StableDiffusion15,
+      MediaFileOriginModelType::GptSovits => Self::GptSovits,
       MediaFileOriginModelType::StorytellerStudio => Self::StorytellerStudio,
       MediaFileOriginModelType::VideoStyleTransfer => Self::VideoStyleTransfer,
       MediaFileOriginModelType::ComfyUi => Self::ComfyUi,
@@ -92,20 +96,21 @@ impl PublicMediaFileModelType {
   pub fn to_enum(&self) -> MediaFileOriginModelType {
     match self {
       // Renamed variants
-      PublicMediaFileModelType::FaceMirror => MediaFileOriginModelType::LivePortrait,
-      PublicMediaFileModelType::FaceAnimator => MediaFileOriginModelType::SadTalker,
-      PublicMediaFileModelType::VoiceDesigner => MediaFileOriginModelType::StyleTTS2,
+      Self::FaceMirror => MediaFileOriginModelType::LivePortrait,
+      Self::FaceAnimator => MediaFileOriginModelType::SadTalker,
+      Self::VoiceDesigner => MediaFileOriginModelType::StyleTTS2,
       // Conserved variants
-      PublicMediaFileModelType::RvcV2 => MediaFileOriginModelType::RvcV2,
-      PublicMediaFileModelType::SoVitsSvc => MediaFileOriginModelType::SoVitsSvc,
-      PublicMediaFileModelType::Tacotron2 => MediaFileOriginModelType::Tacotron2,
-      PublicMediaFileModelType::MocapNet => MediaFileOriginModelType::MocapNet,
-      PublicMediaFileModelType::StableDiffusion15 => MediaFileOriginModelType::StableDiffusion15,
-      PublicMediaFileModelType::StorytellerStudio => MediaFileOriginModelType::StorytellerStudio,
-      PublicMediaFileModelType::VideoStyleTransfer => MediaFileOriginModelType::VideoStyleTransfer,
-      PublicMediaFileModelType::ComfyUi => MediaFileOriginModelType::ComfyUi,
-      PublicMediaFileModelType::VallEX => MediaFileOriginModelType::VallEX,
-      PublicMediaFileModelType::Rerender => MediaFileOriginModelType::Rerender,
+      Self::RvcV2 => MediaFileOriginModelType::RvcV2,
+      Self::SoVitsSvc => MediaFileOriginModelType::SoVitsSvc,
+      Self::Tacotron2 => MediaFileOriginModelType::Tacotron2,
+      Self::MocapNet => MediaFileOriginModelType::MocapNet,
+      Self::StableDiffusion15 => MediaFileOriginModelType::StableDiffusion15,
+      Self::GptSovits => MediaFileOriginModelType::GptSovits,
+      Self::StorytellerStudio => MediaFileOriginModelType::StorytellerStudio,
+      Self::VideoStyleTransfer => MediaFileOriginModelType::VideoStyleTransfer,
+      Self::ComfyUi => MediaFileOriginModelType::ComfyUi,
+      Self::VallEX => MediaFileOriginModelType::VallEX,
+      Self::Rerender => MediaFileOriginModelType::Rerender,
     }
   }
 }
