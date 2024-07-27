@@ -36,6 +36,7 @@ const resultPaths = {
   VoiceDesignerTts: "/media",
   VideoWorkflow: "/media",
   ImageGeneration: "/media",
+  Unknown: "/media",
 };
 
 export default function InferenceJobsList({
