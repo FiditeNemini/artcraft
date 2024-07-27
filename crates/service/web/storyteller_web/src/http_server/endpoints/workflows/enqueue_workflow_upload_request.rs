@@ -257,6 +257,7 @@ pub async fn enqueue_workflow_upload_request(
         use_cinematic: None,
         strength: None,
         frame_skip: None,
+        watermark_type: None,
     };
    
     // create the inference args here

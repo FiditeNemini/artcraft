@@ -18,6 +18,7 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::live_portrait_payload::{CropDimensions, LivePortraitPayload};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
@@ -31,6 +32,7 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
 use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::requests::get_request_domain_branding::{DomainBranding, get_request_domain_branding};
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::require_user_session::RequireUserSessionError;
 use crate::http_server::web_utils::require_user_session_using_connection::require_user_session_using_connection;
@@ -204,7 +206,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
         EnqueueLivePortraitWorkflowError::BadInput("invalid idempotency token".to_string())
       })?;
 
-  // ==================== LOOK UP MODEL INFO ==================== //
+  // ==================== HANDLE REQUEST ==================== //
 
   // TODO(bt): CHECK DATABASE FOR TOKENS!
 
@@ -216,6 +218,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
   let has_paid_plan = plan.plan_slug() == "fakeyou_contributor" || plan.plan_category() == PlanCategory::Paid;
 
   let _is_allowed_expensive_generation = is_staff || has_paid_plan;
+  let is_allowed_no_watermark = is_staff || has_paid_plan;
 
   let maybe_crop = request.maybe_crop.as_ref()
       .map(|crop| {
@@ -227,10 +230,23 @@ pub async fn enqueue_live_portrait_workflow_handler(
         }
       });
 
+  let branding = get_request_domain_branding(&http_request);
+
+  let mut watermark_type = match branding {
+    Some(DomainBranding::FakeYou) => Some(WatermarkType::FakeYou),
+    Some(DomainBranding::Storyteller) => Some(WatermarkType::Storyteller),
+    None => Some(WatermarkType::Storyteller),
+  };
+
+  if request.remove_watermark.unwrap_or(false) && is_allowed_no_watermark {
+    watermark_type = None;
+  }
+
   let payload = LivePortraitPayload {
     portrait_media_file_token: empty_media_file_token_to_null(Some(&request.source_media_file_token)),
     driver_media_file_token: empty_media_file_token_to_null(Some(&request.face_driver_media_file_token)),
     crop: maybe_crop,
+    watermark_type,
     remove_watermark: None,
     sleep_millis: None,
   };

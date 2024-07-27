@@ -287,6 +287,7 @@ pub async fn enqueue_comfy_ui_handler(
         use_cinematic: None,
         strength: None,
         frame_skip: None,
+        watermark_type: None,
     };
 
     info!("Creating ComfyUI job record...");

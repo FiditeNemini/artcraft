@@ -1,4 +1,5 @@
 use tokens::tokens::media_files::MediaFileToken;
+use crate::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 
 // **DO NOT CHANGE THE NAMES OF FIELDS WITHOUT A MIGRATION STRATEGY**
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -20,6 +21,10 @@ pub struct LivePortraitPayload {
   #[serde(rename = "rm")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub remove_watermark: Option<bool>,
+
+  #[serde(rename = "w")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub watermark_type: Option<WatermarkType>,
 
   /// This is a debugging flag.
   #[serde(rename = "sp")]

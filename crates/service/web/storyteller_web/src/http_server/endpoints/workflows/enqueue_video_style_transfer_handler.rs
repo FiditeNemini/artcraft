@@ -440,6 +440,7 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
+        watermark_type: None,
     };
 
     info!("Creating ComfyUI job record...");

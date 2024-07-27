@@ -273,9 +273,10 @@ pub async fn enqueue_studio_workflow_handler(
     use_cinematic: coordinated_args.use_cinematic,
     use_face_detailer: coordinated_args.use_face_detailer,
     use_upscaler: coordinated_args.use_upscaler,
-    remove_watermark: coordinated_args.remove_watermark,
     lipsync_enabled: coordinated_args.use_lipsync,
     enable_lipsync: coordinated_args.use_lipsync, // TODO(bt): We can stop writing this flag after we re-deploy the job.
+    remove_watermark: coordinated_args.remove_watermark,
+    watermark_type: None,
 
     // TODO: Get rid of the temporary flags.
     rollout_python_workflow_args: None,
