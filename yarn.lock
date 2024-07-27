@@ -17431,6 +17431,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"gatsby-plugin-resolve-src@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "gatsby-plugin-resolve-src@npm:2.1.0"
+  peerDependencies:
+    gatsby: ">2.0.0-alpha"
+  checksum: df02440f4b703d9323bffc3db6f02d8db0401281afd220d7857547de28cf7cf9c97454f604e9cdb8686dcc898624bfb0164d28b04f938b339515b9ece1e0908c
+  languageName: node
+  linkType: hard
+
 "gatsby-plugin-sharp@npm:^5.13.1":
   version: 5.13.1
   resolution: "gatsby-plugin-sharp@npm:5.13.1"
@@ -30255,6 +30264,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "storyteller-ai-blog@workspace:packages/gatsby-blog"
   dependencies:
+    "@babel/runtime": ^7.25.0
     "@fortawesome/fontawesome-svg-core": 6.2.1
     "@fortawesome/free-brands-svg-icons": 6.2.1
     "@fortawesome/free-solid-svg-icons": 6.2.1
@@ -30268,6 +30278,7 @@ __metadata:
     gatsby-plugin-manifest: ^5.13.1
     gatsby-plugin-mdx: ^5.13.1
     gatsby-plugin-postcss: ^6.13.1
+    gatsby-plugin-resolve-src: ^2.1.0
     gatsby-plugin-sharp: ^5.13.1
     gatsby-plugin-sitemap: ^6.13.1
     gatsby-remark-images: ^7.13.1

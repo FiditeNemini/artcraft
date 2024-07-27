@@ -1,9 +1,10 @@
-
-const path = require("path")
-const postTemplate = path.resolve(`${__dirname}/src/components/postTemplate.tsx`)
+const path = require("path");
+const postTemplate = path.resolve(
+  `${__dirname}/src/components/postTemplate.tsx`,
+);
 
 exports.createPages = async ({ graphql, actions, reporter }) => {
-  const { createPage } = actions
+  const { createPage } = actions;
 
   const result = await graphql(`
     query {
@@ -21,17 +22,27 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
         }
       }
     }
-  `)
+  `);
+
+  exports.onCreateWebpackConfig = ({ actions }) => {
+    actions.setWebpackConfig({
+      resolve: {
+        alias: {
+          "@babel/runtime": require.resolve("@babel/runtime"),
+        },
+      },
+    });
+  };
 
   if (result.errors) {
-    reporter.panicOnBuild('Error loading MDX result', result.errors)
+    reporter.panicOnBuild("Error loading MDX result", result.errors);
   }
 
   // Create blog post pages.
-  const posts = result.data.allMdx.nodes
+  const posts = result.data.allMdx.nodes;
 
   // you'll call `createPage` for each result
-  posts.forEach(node => {
+  posts.forEach((node) => {
     createPage({
       // As mentioned above you could also query something else like frontmatter.title above and use a helper function
       // like slugify to create a slug
@@ -41,6 +52,6 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
       // You can use the values in this context in
       // our page layout component
       context: { id: node.id },
-    })
-  })
-}
+    });
+  });
+};
