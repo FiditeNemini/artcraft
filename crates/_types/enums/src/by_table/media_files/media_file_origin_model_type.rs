@@ -42,6 +42,9 @@ pub enum MediaFileOriginModelType {
   #[serde(rename = "stable_diffusion_1_5")]
   StableDiffusion15,
 
+  #[serde(rename = "gpt_sovits")]
+  GptSovits,
+
   #[serde(rename = "studio")]
   StorytellerStudio,
 
@@ -78,6 +81,7 @@ impl MediaFileOriginModelType {
       Self::MocapNet => "mocap_net",
       Self::StyleTTS2 => "styletts2",
       Self::StableDiffusion15 => "stable_diffusion_1_5",
+      Self::GptSovits => "gpt_sovits",
       Self::StorytellerStudio => "studio",
       Self::VideoStyleTransfer => "vst",
       Self::ComfyUi => "comfy_ui",
@@ -96,6 +100,7 @@ impl MediaFileOriginModelType {
       "mocap_net" => Ok(Self::MocapNet),
       "styletts2" => Ok(Self::StyleTTS2),
       "stable_diffusion_1_5" => Ok(Self::StableDiffusion15),
+      "gpt_sovits" => Ok(Self::GptSovits),
       "studio" => Ok(Self::StorytellerStudio),
       "vst" => Ok(Self::VideoStyleTransfer),
       "comfy_ui" => Ok(Self::ComfyUi),
@@ -117,6 +122,7 @@ impl MediaFileOriginModelType {
       Self::MocapNet,
       Self::StyleTTS2,
       Self::StableDiffusion15,
+      Self::GptSovits,
       Self::StorytellerStudio,
       Self::VideoStyleTransfer,
       Self::ComfyUi,
@@ -149,6 +155,7 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::MocapNet.to_str(), "mocap_net");
       assert_eq!(MediaFileOriginModelType::StyleTTS2.to_str(), "styletts2");
       assert_eq!(MediaFileOriginModelType::StableDiffusion15.to_str(), "stable_diffusion_1_5");
+      assert_eq!(MediaFileOriginModelType::GptSovits.to_str(), "gpt_sovits");
       assert_eq!(MediaFileOriginModelType::StorytellerStudio.to_str(), "studio");
       assert_eq!(MediaFileOriginModelType::VideoStyleTransfer.to_str(), "vst");
       assert_eq!(MediaFileOriginModelType::ComfyUi.to_str(), "comfy_ui");
@@ -166,6 +173,7 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::from_str("mocap_net").unwrap(), MediaFileOriginModelType::MocapNet);
       assert_eq!(MediaFileOriginModelType::from_str("styletts2").unwrap(), MediaFileOriginModelType::StyleTTS2);
       assert_eq!(MediaFileOriginModelType::from_str("stable_diffusion_1_5").unwrap(), MediaFileOriginModelType::StableDiffusion15);
+      assert_eq!(MediaFileOriginModelType::from_str("gpt_sovits").unwrap(), MediaFileOriginModelType::GptSovits);
       assert_eq!(MediaFileOriginModelType::from_str("studio").unwrap(), MediaFileOriginModelType::StorytellerStudio);
       assert_eq!(MediaFileOriginModelType::from_str("vst").unwrap(), MediaFileOriginModelType::VideoStyleTransfer);
       assert_eq!(MediaFileOriginModelType::from_str("comfy_ui").unwrap(), MediaFileOriginModelType::ComfyUi);
@@ -177,7 +185,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 13);
+      assert_eq!(variants.len(), 14);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::LivePortrait));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
@@ -186,6 +194,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::MocapNet));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::StyleTTS2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::StableDiffusion15));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::GptSovits));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::StorytellerStudio));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::VideoStyleTransfer));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::ComfyUi));
