@@ -3,6 +3,9 @@
 
 set -euxo pipefail
 
+echo 'Current working directory:'
+pwd
+
 # Add the GIT SHA to the build
 # This must be done before everything else, or it will get cached with the build.
 # (This might be making the builds less performant?)
