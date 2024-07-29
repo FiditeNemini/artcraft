@@ -21,7 +21,7 @@ export default function ModalLayer({
   const tintTransition = useTransition(modalOpen, {
     config: {
       easing: modalOpen ? easings.easeOutQuad : easings.easeInQuad,
-      duration: 175,
+      duration: 250,
     },
     from: { opacity: 0 },
     enter: { opacity: 1 },

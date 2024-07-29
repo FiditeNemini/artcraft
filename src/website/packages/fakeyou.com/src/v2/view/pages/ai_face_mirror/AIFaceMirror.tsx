@@ -84,7 +84,9 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
     <Container className="mt-3">
       <Panel {...{ className: "fy-ai-face-mirror-panel" }}>
         <header {...{ className: "fy-ai-face-mirror-header" }}>
-          <video autoPlay muted loop id="myVideo">
+          <video
+            {...{ autoPlay: true, muted: true, loop: true, playsInline: true }}
+          >
             <source src="/videos/motion_mirror_bg_04.mp4" type="video/mp4" />
           </video>
           <div {...{ className: "fy-ai-face-mirror-header-content" }}>
