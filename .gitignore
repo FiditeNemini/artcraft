@@ -8,6 +8,8 @@ node_modules/
 .yarn/cache
 .yarn/install-state.gz
 .yarn/releases/
+src/website/.yarn/cache
+src/website/.yarn/install-state.gz
 yarn-error.log
 
 # Windows
