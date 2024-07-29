@@ -3,7 +3,7 @@
 
 set -euxo pipefail
 
-echo 'Current working directory:'
+echo "Current working directory:"
 pwd
 
 # Add the GIT SHA to the build
@@ -17,12 +17,19 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 # The above command won't work with Mac's version of find/sed. The following is a Mac-friendly version:
 # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 
+echo "Building website..."
+
+# Move to project root
+pushd src/website
+
 # --ignore-engines: https://stackoverflow.com/a/59615348
 yarn build-storyteller --verbose --ignore-optional --ignore-engines
 
+popd
+
 mkdir storyteller.io
-mv packages/storyteller.io/build/ storyteller.io/build/
+mv src/websites/packages/storyteller.io/build/ storyteller.io/build/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp _redirects storyteller.io/build/
+cp src/websites/_redirects storyteller.io/build/
 

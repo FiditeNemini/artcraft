@@ -3,7 +3,7 @@
 
 set -euxo pipefail
 
-echo 'Current working directory:'
+echo "Current working directory:"
 pwd
 
 # Add the GIT SHA to the build
@@ -17,12 +17,19 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 # The above command won't work with Mac's version of find/sed. The following is a Mac-friendly version:
 # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 
+echo "Building website..."
+
+# Move to project root
+pushd src/website
+
 # --ignore-engines: https://stackoverflow.com/a/59615348
 yarn build-trumped --verbose --ignore-optional --ignore-engines
 
+popd
+
 mkdir trumped.com
-mv packages/trumped.com/build/ trumped.com/build/
+mv src/websites/packages/trumped.com/build/ trumped.com/build/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp _redirects trumped.com/build/
+cp src/websites/_redirects trumped.com/build/
 
