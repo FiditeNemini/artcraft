@@ -22,6 +22,8 @@ echo "Building website..."
 # Move to project root
 pushd src/website
 
+yarn install 
+
 # Run tests first
 yarn test-fakeyou --verbose
 
