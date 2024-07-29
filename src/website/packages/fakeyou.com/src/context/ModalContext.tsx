@@ -1,20 +1,26 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
 export enum ModalView {
   Closed,
   Signup,
-  Login
+  Login,
 }
 
 interface ModalConfig {
-  component: React.ElementType,
-  props?: any
+  component: React.ElementType;
+  props?: any;
 }
 
-interface AccountModalContext { close: () => void, modalState: ModalConfig | null, open: (comp: any) => void  }
+interface AccountModalContext {
+  close: () => void;
+  modalOpen: boolean;
+  modalState: ModalConfig | null;
+  open: (comp: any) => void;
+}
 
 export default createContext<AccountModalContext>({
-	close: () => {},
-	open: () => {},
-	modalState: null,
+  close: () => {},
+  open: () => {},
+  modalOpen: false,
+  modalState: null,
 });
