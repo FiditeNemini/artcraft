@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { FBXLoader, MMDAnimationHelper } from "three/examples/jsm/Addons.js";
+import { FBXLoader, MMDAnimationHelper, MMDAnimationHelperMixer } from "three/examples/jsm/Addons.js";
 import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
 
 import { MoveAIResult, Retarget } from "../../Editor/retargeting";
@@ -23,6 +23,7 @@ export class AnimationClip {
   last_frame: number;
 
   private isMMD: boolean = false;
+  private obj: MMDAnimationHelperMixer | undefined;
 
   constructor(
     version: number,
@@ -132,13 +133,6 @@ export class AnimationClip {
       this.clip_action = this.mixer?.clipAction(anim_clip);
       if (this.clip_action) {
           if (this.clip_action?.isRunning() == false) {
-            if(this.isMMD) {
-              const helper: MMDAnimationHelper = object.parent?.userData["helper"];
-              const obj = helper.objects.get((object as THREE.SkinnedMesh));
-              if(obj) {
-                obj.mixer = this.mixer;
-              }
-            }
             this.clip_action.play();
           }
       }
@@ -202,6 +196,14 @@ export class AnimationClip {
   }
 
   animate(deltatime: number) {
+    if(this.isMMD && this.mixer) {
+      const helper: MMDAnimationHelper = this.mixer?.getRoot().parent?.userData["helper"];
+      this.obj = helper.objects.get((this.mixer?.getRoot() as THREE.SkinnedMesh));
+      if(this.obj && this.obj.mixer !== this.mixer) {
+        this.obj.mixer = this.mixer;
+      }
+    }
+
     this.mixer?.setTime(deltatime);
     this.update_bones();
   }

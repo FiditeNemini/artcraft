@@ -667,6 +667,10 @@ class Scene {
     media_url: string,
     progress: (event: ProgressEvent) => void,
   ): Promise<THREE.SkinnedMesh> {
+
+    // TODO: When converted to ts remove this and make ammo await instead.
+    await this.delay_mmd(100);
+
     console.log('Load MMD')
     const scriptModule = document.createElement('script');
     scriptModule.type = 'module';

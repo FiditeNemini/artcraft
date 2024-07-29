@@ -835,11 +835,6 @@ export class TimeLine {
               this.is_playing,
               this.scrubber_frame_position, // Double FPS for best result.
             );
-            let mmdDelta = delta_time;
-            if(mmdDelta == 0){
-              mmdDelta = 0.001;
-            }
-            this.scene.helper.update(mmdDelta);
             //this.animation_engine.clips[object.uuid + element.media_id].update_bones();
           }
         } else if (element.type === ClipType.EXPRESSION) {
@@ -849,15 +844,11 @@ export class TimeLine {
             ].step(this.scrubber_frame_position - element.offset, object);
           }
         }
-        //this.timelineItems = this.timelineItems.filter(item => item !== element)
       }
     }
 
-    // if(isRendering === false){
-    //   for (const video_plane of this.scene.video_planes) {
-    //     video_plane.pause();
-    //   }
-    // }
+
+    this.scene.helper.update(0.1);
 
     if (
       this.scrubber_frame_position >= this.timeline_limit &&
