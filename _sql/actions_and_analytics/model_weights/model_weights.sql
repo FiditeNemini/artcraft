@@ -35,7 +35,7 @@ from (
     select maybe_model_token, count(*) as use_count
     from generic_inference_jobs
     where maybe_model_token IS NOT NULL
-        and created_at > NOW() - INTERVAL 1 DAY
+        and created_at > NOW() - INTERVAL 7 DAY
         and id > 40000000
     group by maybe_model_token
 ) as r

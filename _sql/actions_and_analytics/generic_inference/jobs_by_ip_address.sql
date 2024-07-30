@@ -12,7 +12,7 @@ SELECT
     maybe_creator_user_token,
     users.username as maybe_creator_username,
     creator_ip_address,
-    count(*) as attempts
+    count(*) as total_job_count
 FROM (
     SELECT
         maybe_creator_user_token,
@@ -22,15 +22,16 @@ FROM (
             creator_ip_address,
             created_at
         FROM generic_inference_jobs
+        where status = 'pending'
         ORDER BY id DESC
-        LIMIT 10000
+        LIMIT 50000
     ) as j
     WHERE j.created_at > NOW() - INTERVAL 30 MINUTE
 ) as jobs
 LEFT OUTER JOIN users
 ON users.token = jobs.maybe_creator_user_token
 group by maybe_creator_user_token, maybe_creator_username, creator_ip_address
-order by attempts desc;
+order by total_job_count desc;
 
 
 -- Bin histogram by creator user (including logged out)
@@ -38,7 +39,7 @@ order by attempts desc;
 SELECT
     users.username as maybe_creator_username,
     maybe_creator_user_token,
-    count(*) as attempts
+    count(*) as total_job_count
 FROM (
     SELECT
         maybe_creator_user_token,
@@ -56,7 +57,7 @@ FROM (
 LEFT OUTER JOIN users
 ON users.token = jobs.maybe_creator_user_token
 group by maybe_creator_user_token, maybe_creator_username
-order by attempts desc;
+order by total_job_count desc;
 
 
 -- Bin histogram by IP (logged in and non-logged in)

@@ -2,7 +2,19 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
--- Histogram by type
+-- Pending jobs
+select
+    count(*),
+    job_type
+from generic_inference_jobs
+where status in ('pending', 'started', 'attempt_failed')
+group by job_type;
+
+update generic_inference_jobs
+set status = 'dead'
+where status in ('pending', 'started', 'attempt_failed')
+
+-- Histogram by type over last 50,000 jobs
 -- NB: no index on ip, hence subquery
 select
     job_type,
@@ -20,7 +32,7 @@ FROM (
     ) as j
 group by job_type, inference_category, maybe_model_type;
 
--- Histogram by type (still processing)
+-- Histogram by type over last 50,000 jobs that are "still processing"
 -- NB: no index on ip, hence subquery
 select
     job_type,
