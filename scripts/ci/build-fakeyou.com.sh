@@ -15,11 +15,20 @@ function replace_commit_ref {
   # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 }
 
-function build_project {
+function build_website {
+  pushd src/website
   yarn install 
   yarn test-fakeyou --verbose
   # --ignore-engines: https://stackoverflow.com/a/59615348
   yarn build-fakeyou --verbose --ignore-optional --ignore-engines
+  popd
+}
+
+function build_blog {
+  pushd src/gatsby-blog
+  yarn install 
+  yarn build
+  popd
 }
 
 echo "Current working directory:"
@@ -28,15 +37,21 @@ pwd
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
-echo "Building project..."
-pushd src/website
-build_project
-popd
+echo "Building blog..."
+build_blog
 
-echo "Copying built artifacts..."
-mkdir fakeyou.com
-mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/
+echo "Building website..."
+build_website
+
+echo "Create final output directory..."
+mkdir -p fakeyou.com/build/blog
+mkdir -p fakeyou.com/build/website
+
+echo "Copying blog artifacts..."
+mv src/gatsby-blog/public/ fakeyou.com/build/blog/
+
+echo "Copying website artifacts..."
+mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp src/website/_redirects fakeyou.com/build/
-
+cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/build/
