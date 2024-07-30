@@ -27,7 +27,7 @@ function build_website {
 function build_blog {
   pushd src/gatsby-blog
   yarn install 
-  yarn build
+  yarn build-pp
   popd
 }
 
