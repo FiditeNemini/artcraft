@@ -1,3 +1,5 @@
+# FakeYou.com Netlify Redirects File
+
 # Netlify docs: 
 #   The redirects engine will process the first matching rule it 
 #   finds, reading from top to bottom. Rules in the _redirects file 
