@@ -44,18 +44,18 @@ echo "Building website..."
 build_website
 
 echo "Create final output directory..."
-mkdir -p fakeyou.com/build/blog
-mkdir -p fakeyou.com/build/website
+mkdir -p fakeyou.com/blog
+mkdir -p fakeyou.com/website
 
 echo "Copying blog artifacts..."
-mv src/gatsby-blog/public/ fakeyou.com/build/blog/
+mv src/gatsby-blog/public/* fakeyou.com/blog/
 
 echo "Copying website artifacts..."
 #mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/
-mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/
+mv src/website/packages/fakeyou.com/build/* fakeyou.com/website/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/build/
+cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/
 
 echo "List files in build directory"
-find fakeyou.com/build
+find fakeyou.com/
