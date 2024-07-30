@@ -1,5 +1,4 @@
 # We can't redirect everything until legacy vocodes is dead
-# /*                 /website            200
 
 # Blog redirects
 /blog                /blog   200!
@@ -8,6 +7,7 @@
 
 # Website redirects
 /                  /website/index.html   200
+/*                 /website/:splat       200
 /tts*              /website/index.html   200
 /about*            /website/index.html   200
 /acting-face*      /website/index.html   200
