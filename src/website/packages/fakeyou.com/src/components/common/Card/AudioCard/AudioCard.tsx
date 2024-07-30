@@ -140,8 +140,8 @@ export default function AudioCard({
             {showCover && (
               <WeightCoverImage
                 src={coverImage}
-                height={90}
-                width={90}
+                height={96}
+                width={96}
                 coverIndex={data?.cover_image?.default_cover?.image_index}
               />
             )}
@@ -179,7 +179,7 @@ export default function AudioCard({
             {inSelectModal && (
               <div
                 className="position-absolute fs-7 fw-medium fy-select-voice"
-                style={{ bottom: "8px", right: "8px" }}
+                style={{ bottom: "14px", right: "14px" }}
               >
                 Use
               </div>
@@ -193,7 +193,7 @@ export default function AudioCard({
               entityType: "model_weight",
               makeBookmarksProps: bookmarks?.makeProps,
               makeRatingsProps: ratings?.makeProps,
-              showCreator,
+              showCreator: true,
             }}
           />
         </>

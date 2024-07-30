@@ -26,6 +26,7 @@ export default function WeightCard({
     created_at,
     details,
     maybe_creator,
+    creator,
     title,
     token,
     weight_type,
@@ -73,17 +74,18 @@ export default function WeightCard({
         </div>
         <div
           className="position-absolute fs-7 fw-medium fy-select-voice"
-          style={{ bottom: "8px", right: "8px" }}
+          style={{ bottom: "14px", right: "14px" }}
         >
           Use
         </div>
       </div>
       <CardFooter
         {...{
-          creator: maybe_creator,
+          creator: maybe_creator || creator,
           entityToken: token,
           entityType: "media_file",
           makeRatingsProps,
+          showCreator: true,
         }}
       />
     </>

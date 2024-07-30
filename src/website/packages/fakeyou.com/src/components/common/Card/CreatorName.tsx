@@ -19,14 +19,15 @@ export default function CreatorName({
   backgroundIndex,
   username,
   className,
-  noHeight
+  noHeight,
 }: CreatorNameProps) {
   const handleInnerClick = (event: any) => {
-    event.stopPropagation();
+    // event.stopPropagation();
   };
 
   const gravatar = (
-    <Gravatar {...{ noHeight }}
+    <Gravatar
+      {...{ noHeight }}
       size={22}
       email_hash={gravatarHash}
       avatarIndex={avatarIndex || 0}

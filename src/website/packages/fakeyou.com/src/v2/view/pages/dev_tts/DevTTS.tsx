@@ -82,21 +82,23 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
     close();
   };
 
+  const mediaBrowserProps = {
+    onSelect: (weight: any) => setSelectedVoice(weight),
+    inputMode: 3,
+    onSearchChange: searchChange(false),
+    search,
+    emptyContent: <ExploreTts onResultSelect={handleResultSelect} />,
+    showFilters: false,
+    showPagination: false,
+  };
+
   useDebounce({
     blocked: !(updated && !modalState && search),
     onTimeout: () => {
       updatedSet(false);
       open({
         component: MediaBrowser,
-        props: {
-          onSelect: (weight: any) => setSelectedVoice(weight),
-          inputMode: 3,
-          onSearchChange: searchChange(false),
-          search,
-          emptyContent: <div>Helloworld</div>,
-          showFilters: false,
-          showPagination: false,
-        },
+        props: mediaBrowserProps,
       });
     },
   });
@@ -104,15 +106,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
   const openModal = () => {
     open({
       component: MediaBrowser,
-      props: {
-        onSelect: (weight: any) => setSelectedVoice(weight),
-        inputMode: 3,
-        onSearchChange: searchChange(false),
-        search,
-        emptyContent: <ExploreTts onResultSelect={handleResultSelect} />,
-        showFilters: false,
-        showPagination: false,
-      },
+      props: mediaBrowserProps,
     });
   };
 
