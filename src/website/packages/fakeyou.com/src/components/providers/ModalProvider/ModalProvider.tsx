@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { ModalContext } from "context";
+import React, { createContext, useEffect, useState } from "react";
 
 import ModalLayer from "./ModalLayer";
 import { isMobile } from "react-device-detect";
@@ -10,8 +9,23 @@ interface ModalProviderProps {
 
 export interface ModalConfig {
   component: React.ElementType;
+  lockTint?: boolean;
   props?: any;
 }
+
+export interface ModalContextShared {
+  close: () => void;
+  modalOpen: boolean;
+  modalState: ModalConfig | null;
+  open: (cfg: ModalConfig) => void;
+}
+
+export const ModalContext = createContext<ModalContextShared>({
+  close: () => {},
+  open: () => {},
+  modalOpen: false,
+  modalState: null,
+});
 
 // how this works
 //
@@ -27,6 +41,7 @@ export default function ModalProvider({ children }: ModalProviderProps) {
   const [modalState, modalStateSet] = useState<ModalConfig | null>(null);
   const [modalOpen, modalOpenSet] = useState(false);
   const [killModal, killModalSet] = useState(false);
+
   const open = (cfg: ModalConfig) => modalStateSet(cfg);
   const close = () => {
     modalOpenSet(false);
@@ -40,19 +55,17 @@ export default function ModalProvider({ children }: ModalProviderProps) {
   };
 
   useEffect(() => {
-    if (!killModal && modalState && !modalOpen) {
-      modalOpenSet(true);
-    }
-  }, [killModal, modalOpen, modalState]);
-
-  // Prevent body scrolling when modal is open on mobile
-  useEffect(() => {
+    // Prevent body scrolling when modal is open on mobile
     if (modalOpen && isMobile) {
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
     }
-  }, [modalOpen]);
+
+    if (!killModal && modalState && !modalOpen) {
+      modalOpenSet(true);
+    }
+  }, [killModal, modalOpen, modalState]);
 
   return (
     <ModalContext.Provider
@@ -63,10 +76,10 @@ export default function ModalProvider({ children }: ModalProviderProps) {
         {...{
           content: modalState?.component,
           contentProps: modalState?.props,
-          handleClose: close,
+          close,
           killModal,
+          lockTint: modalState?.lockTint,
           modalOpen,
-          modalState,
           onModalCloseEnd,
         }}
       />

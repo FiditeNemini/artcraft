@@ -1,1 +1,1 @@
-export { default } from "./ModalProvider";
+export { default, ModalContext } from "./ModalProvider";
