@@ -6,6 +6,7 @@ import {
   ActionButton,
   Button,
   TempInput as Input,
+  Panel,
   SocialButton,
   Socials,
   Spinner,
@@ -23,6 +24,7 @@ import PromptViewer from "./PromptViewer";
 import { MediaSubViewProps } from "./MediaPageSwitch";
 import { a, useTransition } from "@react-spring/web";
 import { basicTransition } from "resources";
+import { isMobile } from "react-device-detect";
 
 import {
   faArrowRightArrowLeft,
@@ -132,201 +134,223 @@ export default function DevMediaPage({
   const shareText = "Check out this media on FakeYou.com!";
 
   return (
-    <>
+    <div className="pt-3 media-page-container d-flex">
       <div
         {...{
           className: `video-page-main-content  video-page-theater-mode`,
         }}
       >
-        <div
-          {...{
-            className: "video-page-media-content",
-          }}
-        >
-          <MediaVideoComponent mediaFile={mediaFile} />
-        </div>
-        <header>
-          {transitions(
-            (style: any, yah) =>
-              [
-                <a.div {...{ className: "fy-title-editor", style }}>
-                  <div {...{ className: "video-page-title" }}>
-                    <h2>{title}</h2>
-                    <span>{`Created ${moment(
-                      mediaFile?.created_at || ""
-                    ).fromNow()}`}</span>
-                  </div>
-                  {canEdit && (
-                    <Button
+        <Panel clear={true}>
+          <div
+            {...{
+              className: "video-page-media-content",
+            }}
+          >
+            <MediaVideoComponent mediaFile={mediaFile} />
+          </div>
+          <header>
+            {transitions(
+              (style: any, yah) =>
+                [
+                  <a.div {...{ className: "fy-title-editor", style }}>
+                    <div {...{ className: "video-page-title" }}>
+                      <h2 className="fw-semibold">{title}</h2>
+                      <span>{`Created ${moment(
+                        mediaFile?.created_at || ""
+                      ).fromNow()}`}</span>
+                    </div>
+                    <div className="d-flex gap-2">
+                      {canEdit && (
+                        <Button
+                          {...{
+                            icon: faPen,
+                            onClick: () => {
+                              if (titlePaused) {
+                                editingTitleSet(EditingTitleState.editing);
+                              }
+                            },
+                            square: true,
+                            small: isMobile && true,
+                            variant: "secondary",
+                          }}
+                        />
+                      )}
+                      <div {...{ className: "video-page-file-tools" }}>
+                        {canEdit && (
+                          <Button
+                            {...{
+                              icon: faTrash,
+                              square: true,
+                              small: isMobile && true,
+                              onClick: openDeleteModal,
+                              variant: "danger",
+                            }}
+                          />
+                        )}
+                        {canAccessStudio() && (
+                          <Button
+                            {...{
+                              icon: faArrowRightArrowLeft,
+                              label: "Prompt Again",
+                              small: isMobile && true,
+                              to: `/style-video/${mediaFile?.token || ""}`,
+                              variant: "secondary",
+                            }}
+                          />
+                        )}
+                        {canAccessStudio() &&
+                          mediaFile?.maybe_scene_source_media_file_token && (
+                            <Button
+                              {...{
+                                icon: faStars,
+                                label: "Remix",
+                                small: isMobile && true,
+                                href: `https://studio.storyteller.ai/${
+                                  mediaFile?.maybe_scene_source_media_file_token ||
+                                  ""
+                                }`,
+                              }}
+                            />
+                          )}
+                      </div>
+                    </div>
+                  </a.div>,
+                  <a.div {...{ className: "fy-title-editor", style }}>
+                    <Input
                       {...{
-                        icon: faPen,
-                        onClick: () => {
-                          if (titlePaused) {
-                            editingTitleSet(EditingTitleState.editing);
-                          }
+                        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                          titleSet(e.target.value);
                         },
-                        square: true,
-                        variant: "secondary",
+                        value: title,
                       }}
                     />
-                  )}
-                </a.div>,
-                <a.div {...{ className: "fy-title-editor", style }}>
-                  <Input
+                    <div className="d-flex gap-2 justify-content-end w-100">
+                      <Button
+                        {...{
+                          square: true,
+                          small: isMobile && true,
+                          icon: faCheck,
+                          onClick: () => saveTitle(),
+                        }}
+                      />
+                      <Button
+                        {...{
+                          square: true,
+                          small: isMobile && true,
+                          icon: faX,
+                          onClick: () => {
+                            if (titlePaused) {
+                              editingTitleSet(EditingTitleState.closed);
+                              titleSet(
+                                mediaFile?.maybe_title || "Untitled video"
+                              );
+                            }
+                          },
+                          variant: "secondary",
+                        }}
+                      />
+                    </div>
+                  </a.div>,
+                  <a.div
                     {...{
-                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                        titleSet(e.target.value);
-                      },
-                      value: title,
+                      className: "fy-title-editor title-editor-spinner",
+                      style,
                     }}
-                  />{" "}
-                  <Button
-                    {...{
-                      square: true,
-                      icon: faCheck,
-                      onClick: () => saveTitle(),
-                    }}
-                  />
-                  <Button
-                    {...{
-                      square: true,
-                      icon: faX,
-                      onClick: () => {
-                        if (titlePaused) {
-                          editingTitleSet(EditingTitleState.closed);
-                          titleSet(mediaFile?.maybe_title || "Untitled video");
-                        }
-                      },
-                      variant: "secondary",
-                    }}
-                  />
-                </a.div>,
-                <a.div
-                  {...{
-                    className: "fy-title-editor title-editor-spinner",
-                    style,
-                  }}
-                >
-                  <Spinner />
-                </a.div>,
-              ][yah]
-          )}
-          <div {...{ className: "video-page-file-tools" }}>
-            {canEdit && (
-              <Button
-                {...{
-                  icon: faTrash,
-                  square: true,
-                  onClick: openDeleteModal,
-                  variant: "danger",
-                }}
-              />
+                  >
+                    <Spinner />
+                  </a.div>,
+                ][yah]
             )}
-            {canAccessStudio() && (
-              <Button
-                {...{
-                  icon: faArrowRightArrowLeft,
-                  label: "Prompt Again",
-                  to: `/style-video/${mediaFile?.token || ""}`,
-                  variant: "secondary",
-                }}
-              />
-            )}
-            {canAccessStudio() &&
-              mediaFile?.maybe_scene_source_media_file_token && (
-                <Button
-                  {...{
-                    icon: faStars,
-                    label: "Remix",
-                    href: `https://studio.storyteller.ai/${
-                      mediaFile?.maybe_scene_source_media_file_token || ""
-                    }`,
-                  }}
-                />
-              )}
-          </div>
-        </header>
-        <div
-          {...{
-            className: "video-page-media-details",
-          }}
-        >
+          </header>
           <div
             {...{
-              className: "video-page-creator",
+              className: "video-page-media-details",
             }}
           >
-            <Link
-              {...{
-                className: "video-page-creator-avatar",
-                to: `/profile/${mediaFile?.maybe_creator_user?.display_name}`,
-              }}
-            >
-              <Gravatar
-                {...{
-                  noHeight: true,
-                  size: 56,
-                }}
-                username={mediaFile?.maybe_creator_user?.username || ""}
-                email_hash={mediaFile?.maybe_creator_user?.gravatar_hash || ""}
-                avatarIndex={
-                  mediaFile?.maybe_creator_user?.default_avatar.image_index || 0
-                }
-                backgroundIndex={
-                  mediaFile?.maybe_creator_user?.default_avatar.color_index || 0
-                }
-              />
-            </Link>
-            <Link
-              {...{
-                className: "video-page-creator-info",
-                to: `/profile/${mediaFile?.maybe_creator_user?.display_name}`,
-              }}
-            >
-              <h3>{mediaFile?.maybe_creator_user?.username || ""}</h3>
-            </Link>
-          </div>
-          <div
-            {...{
-              className: "video-page-share-container",
-            }}
-          >
-            <div {...{ className: "media-share-label" }}>Share</div>
             <div
               {...{
-                className: "video-page-share-links",
+                className: "video-page-creator",
               }}
             >
-              {shareLinks.map((social, i) => (
-                <SocialButton
+              <Link
+                {...{
+                  className: "video-page-creator-avatar",
+                  to: `/profile/${mediaFile?.maybe_creator_user?.display_name}`,
+                }}
+              >
+                <Gravatar
                   {...{
-                    downloadLink,
-                    hideLabel: true,
-                    social,
-                    shareUrl,
-                    shareText,
+                    noHeight: true,
+                    size: 42,
                   }}
+                  username={mediaFile?.maybe_creator_user?.username || ""}
+                  email_hash={
+                    mediaFile?.maybe_creator_user?.gravatar_hash || ""
+                  }
+                  avatarIndex={
+                    mediaFile?.maybe_creator_user?.default_avatar.image_index ||
+                    0
+                  }
+                  backgroundIndex={
+                    mediaFile?.maybe_creator_user?.default_avatar.color_index ||
+                    0
+                  }
                 />
-              ))}
+              </Link>
+              <Link
+                {...{
+                  className: "video-page-creator-info",
+                  to: `/profile/${mediaFile?.maybe_creator_user?.display_name}`,
+                }}
+              >
+                <h3 className="fw-semibold">
+                  {mediaFile?.maybe_creator_user?.display_name || ""}
+                </h3>
+              </Link>
             </div>
-          </div>
-          <div
-            {...{
-              className: "video-page-actions-container",
-            }}
-          >
-            <div {...{ className: "media-share-label" }}>Actions</div>
             <div
               {...{
-                className: "video-page-share-links",
+                className: "video-page-share-container",
               }}
             >
-              <ActionButton {...ratingButtonProps} />
-              <ActionButton {...bookmarkButtonProps} />
-              {isModerator && <ActionButton {...featureButtonProps} />}
+              <div {...{ className: "media-share-label" }}>Share</div>
+              <div
+                {...{
+                  className: "video-page-share-links",
+                }}
+              >
+                {shareLinks.map((social, i) => (
+                  <SocialButton
+                    {...{
+                      downloadLink,
+                      hideLabel: true,
+                      social,
+                      shareUrl,
+                      shareText,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            <div
+              {...{
+                className: "video-page-actions-container",
+              }}
+            >
+              <div {...{ className: "media-share-label" }}>Actions</div>
+              <div
+                {...{
+                  className: "video-page-share-links",
+                }}
+              >
+                <ActionButton {...ratingButtonProps} />
+                <ActionButton {...bookmarkButtonProps} />
+                {isModerator && <ActionButton {...featureButtonProps} />}
+              </div>
             </div>
           </div>
-        </div>
+        </Panel>
+
         {prompt && (
           <PromptViewer
             {...{
@@ -336,13 +360,16 @@ export default function DevMediaPage({
             }}
           />
         )}
-        <div {...{ className: "video-page-comments panel" }}>
-          <h5>Comments</h5>
-          <CommentComponent
-            entityType="media_file"
-            entityToken={mediaFile?.token || ""}
-          />
-        </div>
+
+        <Panel className="mt-5">
+          <div {...{ className: "video-page-comments" }}>
+            <h5>Comments</h5>
+            <CommentComponent
+              entityType="media_file"
+              entityToken={mediaFile?.token || ""}
+            />
+          </div>
+        </Panel>
       </div>
       {/*      <div
         {...{
@@ -366,6 +393,6 @@ export default function DevMediaPage({
           </div>
         ))}
       </div>*/}
-    </>
+    </div>
   );
 }

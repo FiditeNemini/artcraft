@@ -19,7 +19,7 @@ import {
   EditEngineCategoryResponse,
 } from "@storyteller/components/src/api/media_files/EditEngineCategory";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { ActionButtonProps, Container, Modal, Panel } from "components/common";
+import { ActionButtonProps, Container, Modal } from "components/common";
 import MediaPage from "./MediaPage";
 import VideoMediaPage from "./VideoMediaPage";
 
@@ -206,9 +206,7 @@ export default function MediaPageSwitch() {
   return (
     <>
       <Container type="panel" className="mb-5">
-        <Panel clear={true} className="py-4 media-page-container d-flex">
-          {MediaSwitch()}
-        </Panel>
+        {MediaSwitch()}
       </Container>
       <Modal
         {...{

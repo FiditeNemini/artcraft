@@ -269,7 +269,7 @@ export default function MediaPage({
   if (status < 3)
     return (
       <>
-        <Container type="padded" className="pt-4 pt-lg-5">
+        <Container type="panel" className="pt-4 pt-lg-5">
           <div className="row g-4">
             <div className="col-12 col-xl-8">
               <div className="panel p-3 py-4 p-md-4">

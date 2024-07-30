@@ -37,7 +37,7 @@ export default function PromptViewer({
   return (
     <>
       {prompt && (
-        <Panel padding={true} className="mt-3">
+        <Panel padding={true} className="mt-4">
           {isModerator && (
             <>
               <div className="d-flex gap-3 align-items-center mb-2">
