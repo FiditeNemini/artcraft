@@ -3,7 +3,7 @@ import { Link } from "gatsby";
 import React, { ReactNode } from "react";
 import SocialIcons from "./SocialIcons";
 
-export default function Layout({ children }: { children: ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col font-sans">
       <nav className="bg-panel">

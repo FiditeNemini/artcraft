@@ -3,7 +3,7 @@ import { graphql, Link } from "gatsby"
 import type { HeadFC, PageProps } from "gatsby"
 import { GatsbyImage, getImage } from "gatsby-plugin-image"
 
-import Layout from "../components/layout"
+import { Layout } from "../components/layout"
 
 export const Head: HeadFC = () => <title>News Page</title>
 const NewsPage = ({data}:PageProps<Queries.NewsPageQuery>) =>{

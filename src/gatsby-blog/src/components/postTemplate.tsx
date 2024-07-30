@@ -1,16 +1,30 @@
 import React from "react";
 import { MDXProvider } from "@mdx-js/react";
 import { graphql, Link } from "gatsby";
-import type { PageProps } from "gatsby";
+import type { HeadProps, PageProps } from "gatsby";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
-import Layout from "./layout";
+import { Layout } from "./layout";
 import { Youtube } from "./Youtube";
 import * as MdTypography from "./MdTypography";
 import Button from "./Button";
+import { CATEGORY } from "../models";
 
 const shortcodes = { Link, Youtube }; // Provide common components here
+export const Head = ({data}:HeadProps<Queries.PostTemplateQuery>) => {
+  const category = data?.mdx?.frontmatter?.category ?? CATEGORY.BLOG;
+  const subTitle = data?.mdx?.frontmatter?.title ? ` - ${data.mdx.frontmatter.title}` : "";
+  const title = `Storyteller ${category}${subTitle}`;
+  const metaText = data?.mdx?.frontmatter?.metaText ? data.mdx.frontmatter.metaText : "Blog Post of Storyteller.AI";
+  return(
+    <>
+      <html lang="en" />
+      <title>{title}</title>
+      <meta name="description" content={metaText} />
+    </>
+  );
+};
 
 export default function PostTemplate({
   data,
@@ -113,7 +127,9 @@ export const query = graphql`
     mdx(id: { eq: $id }) {
       frontmatter {
         title
+        metaText
         author
+        category
         date(formatString: "MMMM DD, YYYY")
         featuredImage {
           childImageSharp {
