@@ -51,7 +51,11 @@ echo "Copying blog artifacts..."
 mv src/gatsby-blog/public/ fakeyou.com/build/blog/
 
 echo "Copying website artifacts..."
-mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/
+#mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/
+mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/
 
 echo "Copying redirects configuration to Netlify build dir..."
 cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/build/
+
+echo "List files in build directory"
+find fakeyou.com/build

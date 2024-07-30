@@ -1,7 +1,8 @@
 # We can't redirect everything until legacy vocodes is dead
 
 # Website redirects
-/                  /website/index.html   200
+/                  /index.html   200
+/tts*              /index.html   200
 /about*            /website/index.html   200
 /acting-face*      /website/index.html   200
 /ai-face-mirror*   /website/index.html   200
@@ -63,7 +64,6 @@
 /testing*   /index.html   200
 /text-to-image*   /index.html   200
 /tools*   /index.html   200
-/tts*   /index.html   200
 /tts_configs*   /index.html   200
 /twitch*   /index.html   200
 /upload*   /index.html   200
