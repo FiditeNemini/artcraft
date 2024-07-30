@@ -1,17 +1,19 @@
 # We can't redirect everything until legacy vocodes is dead
+# /*                 /website            200
+
+# Blog redirects
+/blog                /blog   200!
+/blog/*              /blog/index.html   200!
+# /blog              /blog   200!
 
 # Website redirects
 /                  /website/index.html   200
-/*                 /website              200
 /tts*              /website/index.html   200
 /about*            /website/index.html   200
 /acting-face*      /website/index.html   200
 /ai-face-mirror*   /website/index.html   200
 /beta-key*         /website/index.html   200
 
-# Blog redirects
-/blog              /blog/index.html   200!
-/blog*             /blog   200!
 
 # TODO: Fix these - 
 
