@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Card from "../Card";
 import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
@@ -22,8 +22,8 @@ interface AudioCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
-  onResultSelect?: (data: { token: string; title: string }) => void;
-  onResultBookmarkSelect?: (data: { token: string; title: string }) => void;
+  onResultSelect?: (data: any) => void;
+  onResultBookmarkSelect?: (data: any) => void;
   // onClick?: (e:any) => any;
 }
 
@@ -41,15 +41,10 @@ export default function AudioCard({
   onResultBookmarkSelect,
 }: AudioCardProps) {
   const linkUrl = getCardUrl(data, source, type);
-  const history = useHistory();
 
   const handleSelectModalResultSelect = () => {
     if (inSelectModal) {
-      onResultSelect &&
-        onResultSelect({
-          token: data.weight_token,
-          title: data.title,
-        });
+      onResultSelect && onResultSelect(data);
 
       onResultBookmarkSelect &&
         onResultBookmarkSelect({
@@ -117,10 +112,18 @@ export default function AudioCard({
               </p>
             )}
           </div>
-          <AudioPlayer src={data.details?.maybe_media_file_data?.public_bucket_path || data.public_bucket_path} id={data.token} />
+          <AudioPlayer
+            src={
+              data.details?.maybe_media_file_data?.public_bucket_path ||
+              data.public_bucket_path
+            }
+            id={data.token}
+          />
           <CardFooter
             {...{
-              creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
+              creator:
+                data?.maybe_creator ||
+                data.details?.maybe_media_file_data?.maybe_creator,
               entityToken: data.details?.entity_token || data.token,
               entityType: "media_file",
               makeBookmarksProps: bookmarks?.makeProps,
@@ -137,8 +140,8 @@ export default function AudioCard({
             {showCover && (
               <WeightCoverImage
                 src={coverImage}
-                height={110}
-                width={110}
+                height={90}
+                width={90}
                 coverIndex={data?.cover_image?.default_cover?.image_index}
               />
             )}
@@ -146,20 +149,13 @@ export default function AudioCard({
             <div className="flex-grow-1">
               <div className="d-flex align-items-center">
                 <div className="d-flex flex-grow-1">
-                  <Badge label={weightBadgeLabel} color={weightBadgeColor} />
-                </div>
-                {inSelectModal ? (
-                  <Button
-                    icon={faArrowRight}
-                    iconFlip={true}
-                    variant="link"
-                    label="Select"
-                    className="fs-7"
-                    onClick={() => {
-                      history.push(linkUrl);
-                    }}
+                  <Badge
+                    small={true}
+                    label={weightBadgeLabel}
+                    color={weightBadgeColor}
                   />
-                ) : (
+                </div>
+                {inSelectModal ? null : (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
@@ -171,19 +167,28 @@ export default function AudioCard({
                 )}
               </div>
 
-              <div className="d-flex align-items-center mt-3">
+              <div className="d-flex align-items-center mt-2">
                 <div className="flex-grow-1">
                   <h6 className="fw-semibold text-white mb-1">
-                    {data.title || data.details.maybe_weight_data.title}
+                    {data.title || data?.details?.maybe_weight_data?.title}
                   </h6>
                   <p className="fs-7 opacity-75">{timeAgo}</p>
                 </div>
               </div>
             </div>
+            {inSelectModal && (
+              <div
+                className="position-absolute fs-7 fw-medium fy-select-voice"
+                style={{ bottom: "8px", right: "8px" }}
+              >
+                Use
+              </div>
+            )}
           </div>
           <CardFooter
             {...{
-              creator: data?.creator || data.details.maybe_weight_data?.maybe_creator,
+              creator:
+                data?.creator || data.details.maybe_weight_data?.maybe_creator,
               entityToken: data.weight_token || data.details?.entity_token,
               entityType: "model_weight",
               makeBookmarksProps: bookmarks?.makeProps,

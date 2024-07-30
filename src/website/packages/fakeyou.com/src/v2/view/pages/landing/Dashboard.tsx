@@ -101,11 +101,11 @@ export default function Dashboard(props: DashboardProps) {
       imgAlt: "Face Animator",
     },
     {
-      to: "/text-to-image",
-      title: t("productImageGenTitle"),
-      text: t("productImageGenText"),
-      imgSrc: "/images/landing/select-tti.webp",
-      imgAlt: "AI Image Generation",
+      to: "/style-video",
+      title: t("productVideoStyleTransferTitle"),
+      text: t("productVideoStyleTransferText"),
+      imgSrc: "/images/landing/select-vst.webp",
+      imgAlt: "Video Style Transfer",
       badgeContent: {
         type: "new",
         icon: faSparkles,
@@ -113,11 +113,11 @@ export default function Dashboard(props: DashboardProps) {
       },
     },
     {
-      to: "/style-video",
-      title: t("productVideoStyleTransferTitle"),
-      text: t("productVideoStyleTransferText"),
-      imgSrc: "/images/landing/select-vst.webp",
-      imgAlt: "Video Style Transfer",
+      to: "/ai-face-mirror",
+      title: t("productFaceMirrorTitle"),
+      text: t("productFaceMirrorText"),
+      imgSrc: "/images/landing/select-fm.webp",
+      imgAlt: "AI Face Mirror",
       badgeContent: {
         type: "new",
         icon: faSparkles,

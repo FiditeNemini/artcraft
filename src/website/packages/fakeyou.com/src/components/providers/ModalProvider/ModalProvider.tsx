@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ModalContext } from "context";
 
 import ModalLayer from "./ModalLayer";
+import { isMobile } from "react-device-detect";
 
 interface ModalProviderProps {
   children?: any;
@@ -43,6 +44,15 @@ export default function ModalProvider({ children }: ModalProviderProps) {
       modalOpenSet(true);
     }
   }, [killModal, modalOpen, modalState]);
+
+  // Prevent body scrolling when modal is open on mobile
+  useEffect(() => {
+    if (modalOpen && isMobile) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+  }, [modalOpen]);
 
   return (
     <ModalContext.Provider

@@ -6,14 +6,28 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 interface Props {
   props: any;
   type: string;
+  inSelectModal?: boolean;
+  onResultSelect?: (data: any) => void;
 }
 
-export default function WeightsCards({ props, type }: Props) {
+export default function WeightsCards({
+  props,
+  type,
+  inSelectModal,
+  onResultSelect,
+}: Props) {
   switch (type) {
     case WeightCategory.TTS:
     case WeightCategory.VC:
     case WeightCategory.ZS:
-      return <AudioCard { ...props} showCover />;
+      return (
+        <AudioCard
+          {...props}
+          showCover
+          inSelectModal={inSelectModal}
+          onResultSelect={onResultSelect}
+        />
+      );
     case WeightCategory.SD:
     case WeightCategory.WF:
       return <ImageCard {...props} />;

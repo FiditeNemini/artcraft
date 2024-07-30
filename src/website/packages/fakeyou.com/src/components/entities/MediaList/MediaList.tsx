@@ -19,6 +19,7 @@ interface Props {
   entityType: EntityType;
   list: MediaFile[];
   success?: boolean;
+  emptyContent?: React.ReactNode;
 }
 
 const Cards = ({ props, type }: MediaCardsProps) => {
@@ -62,12 +63,19 @@ export default function MediaList({
   entityType,
   list,
   success,
+  emptyContent,
   ...rest
 }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   return list.length === 0 && success ? (
-    <div className="text-center mt-4 opacity-75">No media created yet.</div>
+    <>
+      {emptyContent ? (
+        emptyContent
+      ) : (
+        <div className="text-center mt-4 opacity-75">No media created yet.</div>
+      )}
+    </>
   ) : (
     <MasonryGrid {...{ gridRef }}>
       {list.map((data: any, key: number) => {
@@ -79,8 +87,7 @@ export default function MediaList({
         return (
           <div
             {...{
-              className:
-                "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
+              className: "col-12 col-sm-6 col-lg-6 col-xl-4 grid-item",
               key,
             }}
           >

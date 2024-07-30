@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { MediaList } from "components/entities";
-import { AcceptTypes, EntityInputMode, EntityFilterOptions, } from "components/entities/EntityTypes";
+import {
+  AcceptTypes,
+  EntityInputMode,
+  EntityFilterOptions,
+} from "components/entities/EntityTypes";
 import { ModalUtilities, Pagination, TempSelect } from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
@@ -10,10 +14,15 @@ import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWei
 import { SearchWeight } from "@storyteller/components/src/api/weights/Search";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useDebounce, useListContent,
+import {
+  useDebounce,
+  useListContent,
   // useRatings
 } from "hooks";
-import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownWideShort,
+  faFilter,
+} from "@fortawesome/pro-solid-svg-icons";
 import prepFilter from "resources/prepFilter";
 import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
@@ -21,13 +30,16 @@ import "./MediaBrowser.scss";
 const n = () => {};
 
 export interface MediaBrowserProps {
-  accept?: AcceptTypes[],
+  accept?: AcceptTypes[];
   inputMode: EntityInputMode;
   onSearchChange?: (e: any) => void;
   onSelect?: any;
   owner?: string;
   search?: string;
   username: string;
+  emptyContent?: React.ReactNode;
+  showFilters?: boolean;
+  showPagination?: boolean;
 }
 
 interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps {}
@@ -40,21 +52,28 @@ export default function MediaBrowser({
   onSelect,
   owner,
   search,
-  username
+  username,
+  emptyContent,
+  showFilters = true,
+  showPagination = true,
 }: MediaBrowserInternal) {
-
   console.log(
     "🐢",
-    inputMode,
+    inputMode
     // getMediaTypesByCategory(inputMode)
   );
   // const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [filterType, filterTypeSet] = useState(accept ? accept[0] : "all");
   const [list, listSet] = useState<MediaFile | Weight[]>([]);
-  const [localSearch,localSearchSet] = useState(search);
-  const [searchUpdated,searchUpdatedSet] = useState(false);
-  const fetcher = [GetBookmarksByUser,GetMediaByUser,GetWeightsByUser,SearchWeight][inputMode];
+  const [localSearch, localSearchSet] = useState(search);
+  const [searchUpdated, searchUpdatedSet] = useState(false);
+  const fetcher = [
+    GetBookmarksByUser,
+    GetMediaByUser,
+    GetWeightsByUser,
+    SearchWeight,
+  ][inputMode];
 
   const entities = useListContent({
     debug: "media browser",
@@ -62,7 +81,12 @@ export default function MediaBrowser({
       ...(localSearch ? {} : { page_size: 24 }),
       ...prepFilter(
         filterType,
-        ["maybe_scoped_weight_type", "filter_media_type", "maybe_scoped_weight_type","abc"][inputMode]
+        [
+          "maybe_scoped_weight_type",
+          "filter_media_type",
+          "maybe_scoped_weight_type",
+          "weight_category",
+        ][inputMode]
       ),
     },
     addSetters: { filterTypeSet },
@@ -75,7 +99,14 @@ export default function MediaBrowser({
       // ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
-    ...(localSearch ? { request: { search_term: localSearch } } : {}),
+    ...(localSearch
+      ? {
+          request: {
+            search_term: localSearch,
+            weight_category: "text_to_speech",
+          },
+        }
+      : {}),
     requestList: true,
     ...(localSearch ? { resultsKey: "weights" } : {}),
     urlParam: owner || username || "",
@@ -87,8 +118,8 @@ export default function MediaBrowser({
     onTimeout: () => {
       searchUpdatedSet(false);
       entities.reFetch();
-    }
-  })
+    },
+  });
 
   const localSearchChange = ({ target }: { target: any }) => {
     searchUpdatedSet(true);
@@ -113,13 +144,14 @@ export default function MediaBrowser({
     // { value: "mostliked", label: "Most Liked" },
   ];
 
-  const onwerTxt = (entityName: string) => `${ owner ? owner + "'s " : "" }${ entityName }`;
+  const onwerTxt = (entityName: string) =>
+    `${owner ? owner + "'s " : ""}${entityName}`;
 
   const title = [
     onwerTxt("Bookmarks"),
     onwerTxt("Media"),
     onwerTxt("Weights"),
-    "Search"
+    "Search",
   ][inputMode];
 
   const onClick = (data: any) => {
@@ -127,40 +159,48 @@ export default function MediaBrowser({
     handleClose();
   };
 
-  const filterOptions = accept ? accept.map((value: string) => ({
-      value,
-      label: value
-    })) : EntityFilterOptions(inputMode);
+  const filterOptions = accept
+    ? accept.map((value: string) => ({
+        value,
+        label: value,
+      }))
+    : EntityFilterOptions(inputMode);
 
   return (
     <>
-      <ModalHeader {...{
-        onSearchChange: localSearchChange,
-        handleClose,
-        search: localSearch,
-        title
-      }}>
-        <TempSelect
-          {...{
-            icon: faArrowDownWideShort,
-            options: sortOptions,
-            name: "sort",
-            onChange: entities.onChange,
-            value: entities.sort,
-          }}
-        />
-        {(!accept || (accept && accept.length) ) && (
-          <TempSelect
-            {...{
-              icon: faFilter,
-              options: filterOptions,
-              name: "filterType",
-              onChange: entities.onChange,
-              value: filterType,
-            }}
-          />
+      <ModalHeader
+        {...{
+          onSearchChange: localSearchChange,
+          handleClose,
+          search: localSearch,
+          title,
+        }}
+      >
+        {showFilters && (
+          <>
+            <TempSelect
+              {...{
+                icon: faArrowDownWideShort,
+                options: sortOptions,
+                name: "sort",
+                onChange: entities.onChange,
+                value: entities.sort,
+              }}
+            />
+            {(!accept || (accept && accept.length)) && (
+              <TempSelect
+                {...{
+                  icon: faFilter,
+                  options: filterOptions,
+                  name: "filterType",
+                  onChange: entities.onChange,
+                  value: filterType,
+                }}
+              />
+            )}
+          </>
         )}
-        <Pagination {...paginationProps} />
+        {showPagination && <Pagination {...paginationProps} />}
       </ModalHeader>
       <AudioPlayerProvider>
         {entities.isLoading ? (
@@ -179,6 +219,7 @@ export default function MediaBrowser({
                     list: entities.list,
                     success: entities.status === 3,
                     onClick,
+                    emptyContent: emptyContent,
                   }}
                 />
               </div>
@@ -190,7 +231,7 @@ export default function MediaBrowser({
       <footer
         {...{ className: "fy-media-browser-footer fy-media-browser-tools" }}
       >
-        <Pagination {...paginationProps} />
+        {showPagination && <Pagination {...paginationProps} />}
       </footer>
     </>
   );

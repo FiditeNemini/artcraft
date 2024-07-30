@@ -22,7 +22,14 @@ export default function ModalHeader({
     <header {...{ className: "fy-media-browser-header" }}>
       <div {...{ className: "fy-media-browser-tools" }}>
         {search !== undefined ? (
-          <Input autoFocus {...{ onChange: onSearchChange, value: search }} />
+          <Input
+            autoFocus
+            {...{
+              onChange: onSearchChange,
+              value: search,
+              placeholder: "Search...",
+            }}
+          />
         ) : (
           title && <h3 className="fw-semibold">{title}</h3>
         )}

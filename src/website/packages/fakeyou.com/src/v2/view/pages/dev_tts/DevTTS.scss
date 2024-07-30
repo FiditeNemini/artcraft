@@ -21,14 +21,14 @@
     border-color: $primary;
     background-color: rgba($action, 0.7);
   }
+}
 
-  .fy-select-voice {
-    color: $white;
-    padding: 1px 8px;
-    background-color: lighten($action, 5%);
-    border-radius: 0.35rem;
-    font-size: 13px !important;
-  }
+.fy-select-voice {
+  color: $white;
+  padding: 1px 8px;
+  background-color: lighten($action, 5%);
+  border-radius: 0.35rem;
+  font-size: 13px !important;
 }
 
 .fy-weight-picker {
@@ -48,13 +48,26 @@
 
 .fy-weight-picker-preview {
   border-radius: 0 0 0.5rem 0.5rem;
-  padding: 0.6rem;
+  padding: 0.75rem;
   background-color: rgba($action, 0.8);
   border: 2px solid lighten($action, 12%);
   display: flex;
   align-items: center;
   transition: all 0.2s;
   cursor: pointer;
+
+  .cover-img {
+    margin-right: 16px;
+  }
+
+  .fy-weight-picker-preview-text {
+    font-size: 20px !important;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+      font-size: 16px !important;
+    }
+  }
 
   &:hover {
     background-color: rgba($action, 1);

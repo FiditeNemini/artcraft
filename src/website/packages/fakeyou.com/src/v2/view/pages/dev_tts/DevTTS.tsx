@@ -13,7 +13,6 @@ import {
 } from "components/common";
 import { useDebounce, useInferenceJobs, useModal } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -39,6 +38,9 @@ import { v4 as uuidv4 } from "uuid";
 import { WeightType } from "@storyteller/components/src/api/_common/enums";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { isMobile } from "react-device-detect";
+import { useTtsStore } from "hooks";
+import ExploreTts from "./ExploreTts";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -46,11 +48,10 @@ interface Props {
 
 export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
   const { enqueueInferenceJob } = useInferenceJobs();
-  const { modalState, open } = useModal();
+  const { modalState, open, close } = useModal();
   const [search, searchSet] = useState("");
   const [updated, updatedSet] = useState(false);
-  const [selectedVoice, selectedVoiceSet] = useState<Weight | undefined>();
-  const [text, textSet] = useState("");
+  const { selectedVoice, setSelectedVoice, text, setText } = useTtsStore();
   const bucketConfig = new BucketConfig();
   const preview = selectedVoice?.cover_image
     ?.maybe_cover_image_public_bucket_path
@@ -59,7 +60,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
       )
     : "/images/avatars/default-pfp.png";
   const textChange = ({ target }: { target: any }) => {
-    textSet(target.value);
+    setText(target.value);
   };
   const [isGenerating, setIsGenerating] = useState(false);
   usePrefixedDocumentTitle(
@@ -80,6 +81,11 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
       searchSet(target.value);
     };
 
+  const handleResultSelect = (data: any) => {
+    setSelectedVoice(data);
+    close();
+  };
+
   useDebounce({
     blocked: !(updated && !modalState && search),
     onTimeout: () => {
@@ -87,10 +93,13 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
       open({
         component: MediaBrowser,
         props: {
-          onSelect: (weight: any) => selectedVoiceSet(weight),
+          onSelect: (weight: any) => setSelectedVoice(weight),
           inputMode: 3,
           onSearchChange: searchChange(false),
           search,
+          emptyContent: <div>Helloworld</div>,
+          showFilters: false,
+          showPagination: false,
         },
       });
     },
@@ -100,12 +109,13 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
     open({
       component: MediaBrowser,
       props: {
-        onSelect: (weight: any) => selectedVoiceSet(weight),
+        onSelect: (weight: any) => setSelectedVoice(weight),
         inputMode: 3,
         onSearchChange: searchChange(false),
         search,
-        accept: ["tts"],
-        title: "Select a Voice",
+        emptyContent: <ExploreTts onResultSelect={handleResultSelect} />,
+        showFilters: false,
+        showPagination: false,
       },
     });
   };
@@ -116,9 +126,9 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
     "weight_3k28fws0v6r1ke3p0w0vw48gm",
     "weight_0f762jdzgsy1dhpb86qxy4ssm",
     "weight_1ptwk6pa8krh3ykfr7rztf3pz",
-    "weight_b8rncypy7gw6nb0wthnwe2kk4",
-    "weight_3k28fws0v6r1ke3p0w0vw48gm",
-    "weight_0f762jdzgsy1dhpb86qxy4ssm",
+    "weight_2qbzp2nmrbbsxrxq7m53y4zan",
+    "weight_msq6440ch8hj862nz5y255n8j",
+    "weight_6jvgbqkzschw55qdg7exnx7zx",
   ];
 
   const handleSpeak = async () => {
@@ -156,7 +166,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
     <>
       <Container type="panel" className="mt-3 mt-lg-5">
         <Panel padding={true}>
-          <h1 className="fw-bold mb-1">Text to Speech</h1>
+          <h1 className="fw-bold fs-1 mb-0">Text to Speech</h1>
           <p className="mb-4 opacity-75 fw-medium">
             Make your favorite characters speak!
           </p>
@@ -169,137 +179,140 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
                   <FeaturedVoice
                     key={token}
                     token={token}
-                    onClick={selectedVoiceSet}
+                    onClick={setSelectedVoice}
                   />
                 ))}
               </div>
             </div>
 
-            <div className="row">
-              <div className="d-flex flex-column gap-3 col-12 col-lg-6">
-                <div>
-                  <div className="d-flex align-items-center">
-                    {!selectedVoice && (
-                      <div className="mb-2">
-                        <div className="focus-point" />
-                      </div>
-                    )}
+            <div>
+              <div className="d-flex align-items-center">
+                {!selectedVoice && (
+                  <div className="mb-2">
+                    <div className="focus-point" />
+                  </div>
+                )}
 
-                    <div className="d-flex gap-2 align-items-center w-100">
-                      <div className="flex-grow-1">
-                        <Label
-                          label={`${
-                            selectedVoice ? "Selected Voice" : "Select a Voice"
-                          }`}
-                        />
-                      </div>
-
-                      <div className="d-flex gap-2">
-                        {selectedVoice && (
-                          <Button
-                            icon={faBell}
-                            variant="link"
-                            label="Notify me when this voice improves"
-                            className="fs-7"
-                          />
-                        )}
-                      </div>
-                    </div>
+                <div className="d-flex gap-2 align-items-center w-100">
+                  <div className="flex-grow-1">
+                    <Label
+                      label={`${
+                        selectedVoice ? "Selected Voice" : "Select a Voice"
+                      }`}
+                    />
                   </div>
 
-                  <div className="position-relative">
-                    <Input
-                      autoFocus
-                      icon={faSearch}
-                      placeholder={"Search from 3000+ voices"}
-                      onChange={searchChange()}
-                      value={search}
-                      style={{ borderRadius: "0.5rem 0.5rem 0 0" }}
-                    />
-                    {search && (
-                      <FontAwesomeIcon
-                        icon={faXmark}
-                        className="position-absolute opacity-75 fs-5"
-                        style={{
-                          right: "1rem",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => searchSet("")}
+                  <div className="d-flex gap-2">
+                    {selectedVoice && (
+                      <Button
+                        icon={faBell}
+                        variant="link"
+                        label="Notify me when this voice improves"
+                        className="fs-7"
                       />
                     )}
                   </div>
-                  <div className="fy-weight-picker-preview" onClick={openModal}>
-                    <WeightCoverImage
-                      {...{ src: preview, height: 80, width: 80 }}
-                    />
-                    <div className="d-flex flex-column justify-content-center flex-grow-1">
-                      <h6 className="mb-1 fw-semibold d-flex gap-2 align-items-center">
-                        <div>{selectedVoice?.title || "No Voice Selected"}</div>
-
-                        {selectedVoice?.weight_type && (
-                          <CardBadge
-                            className={`fy-entity-type-${
-                              selectedVoice?.weight_type || ""
-                            }`}
-                            label={weightType || ""}
-                            small={true}
-                            color={weightTagColor || ""}
-                          />
-                        )}
-                      </h6>
-                      {selectedVoice ? (
-                        <span className="fs-7 d-flex gap-1 flex-column flex-lg-row">
-                          <div className="d-flex gap-1">
-                            by
-                            <Link
-                              className="fw-medium"
-                              to={`/profile/${
-                                selectedVoice?.creator?.username || ""
-                              }`}
-                              onClick={e => e.stopPropagation()}
-                            >
-                              {" " + selectedVoice?.creator?.display_name || ""}
-                            </Link>
-                          </div>
-
-                          {/* <span className="opacity-25">|</span>
-                          <span>English</span> */}
-                          <div className="d-flex gap-1 align-items-center">
-                            <span className="d-none d-lg-block px-1 opacity-50">
-                              |
-                            </span>
-                            <Link
-                              to={`/weight/${selectedVoice.weight_token}`}
-                              className="fw-medium"
-                              onClick={e => e.stopPropagation()}
-                            >
-                              View voice details
-                              <FontAwesomeIcon
-                                icon={faArrowRight}
-                                className="ms-2"
-                              />
-                            </Link>
-                          </div>
-                        </span>
-                      ) : (
-                        <span className="fs-7 opacity-75">
-                          Click to select a voice
-                        </span>
-                      )}
-                    </div>
-                    <FontAwesomeIcon
-                      icon={faChevronRight}
-                      className="fs-5 me-1"
-                    />
-                  </div>
                 </div>
+              </div>
+
+              <div className="position-relative">
+                <Input
+                  autoFocus={isMobile ? false : selectedVoice ? false : true}
+                  icon={faSearch}
+                  placeholder={"Search from 3000+ voices"}
+                  onChange={searchChange()}
+                  value={search}
+                  style={{ borderRadius: "0.5rem 0.5rem 0 0" }}
+                />
+                {search && (
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    className="position-absolute opacity-75 fs-5"
+                    style={{
+                      right: "1rem",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => searchSet("")}
+                  />
+                )}
+              </div>
+              <div className="fy-weight-picker-preview" onClick={openModal}>
+                <WeightCoverImage
+                  {...{
+                    src: preview,
+                    height: isMobile ? 70 : 80,
+                    width: isMobile ? 70 : 80,
+                  }}
+                />
+                <div className="d-flex flex-column justify-content-center flex-grow-1">
+                  <h2 className="mb-1 fw-semibold d-flex gap-2 align-items-center fs-5 fy-weight-picker-preview-text">
+                    <div>{selectedVoice?.title || "No Voice Selected"}</div>
+
+                    {selectedVoice?.weight_type && (
+                      <CardBadge
+                        className={`fy-entity-type-${
+                          selectedVoice?.weight_type || ""
+                        }`}
+                        label={weightType || ""}
+                        small={true}
+                        color={weightTagColor || ""}
+                      />
+                    )}
+                  </h2>
+                  {selectedVoice ? (
+                    <span className="fs-7 d-flex gap-1 flex-column flex-lg-row">
+                      <div className="d-flex gap-1">
+                        by
+                        <Link
+                          className="fw-medium"
+                          to={`/profile/${
+                            selectedVoice?.creator?.username || ""
+                          }`}
+                          onClick={e => e.stopPropagation()}
+                        >
+                          {" " + selectedVoice?.creator?.display_name || ""}
+                        </Link>
+                      </div>
+
+                      {/* <span className="opacity-25">|</span>
+                          <span>English</span> */}
+                      <div className="d-flex gap-1 align-items-center">
+                        <span className="d-none d-lg-block px-1 opacity-50">
+                          |
+                        </span>
+                        <Link
+                          to={`/weight/${selectedVoice.weight_token}`}
+                          className="fw-medium"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          View voice details
+                          <FontAwesomeIcon
+                            icon={faArrowRight}
+                            className="ms-2"
+                          />
+                        </Link>
+                      </div>
+                    </span>
+                  ) : (
+                    <span className="fs-7 opacity-75">
+                      Click to select a voice
+                    </span>
+                  )}
+                </div>
+                <FontAwesomeIcon icon={faChevronRight} className="fs-5 me-1" />
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="d-flex flex-column gap-3 col-12 col-lg-6">
                 <TextArea
+                  autoFocus={selectedVoice ? true : false}
                   label="Enter Text"
                   onChange={textChange}
                   value={text}
-                  rows={5}
+                  rows={isMobile ? 5 : 13}
                   placeholder={`Enter the text you want ${
                     selectedVoice ? selectedVoice.title : "your character"
                   } to say...`}
@@ -311,7 +324,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
                     label="Clear"
                     disabled={!text}
                     variant="secondary"
-                    onClick={() => textSet("")}
+                    onClick={() => setText("")}
                   />
                   <Button
                     icon={faWaveformLines}
@@ -339,7 +352,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
 
       <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
         {/* <MentionsSection /> */}
-        <StorytellerStudioCTA />.
+        <StorytellerStudioCTA />
       </Container>
     </>
   );
