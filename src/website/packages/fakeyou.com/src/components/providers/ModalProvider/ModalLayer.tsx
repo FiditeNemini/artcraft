@@ -5,8 +5,9 @@ import "./ModalLayer.scss";
 interface Props {
   content?: React.ElementType | null;
   contentProps?: any;
-  handleClose: () => void;
+  close: () => void;
   killModal: boolean;
+  lockTint?: boolean;
   modalOpen: boolean;
   onModalCloseEnd: (x: any) => void;
 }
@@ -14,10 +15,12 @@ interface Props {
 export default function ModalLayer({
   content: Content,
   contentProps,
-  handleClose,
+  close,
+  lockTint,
   modalOpen,
   onModalCloseEnd,
 }: Props) {
+  const mainClassName = "fy-modal-layer";
   const tintTransition = useTransition(modalOpen, {
     config: {
       easing: modalOpen ? easings.easeOutQuad : easings.easeInQuad,
@@ -30,11 +33,27 @@ export default function ModalLayer({
   });
 
   return tintTransition(
-    (tinter, shade) =>
-      shade && (
-        <a.div {...{ className: "fy-modal-layer", style: { ...tinter } }}>
+    (tintStyle, modalIsOpen) =>
+      modalIsOpen && (
+        <a.div
+          {...{
+            className: mainClassName,
+            style: tintStyle,
+            onClick: ({ target }) => {
+              if (
+                !lockTint &&
+                target instanceof HTMLElement &&
+                target.className === mainClassName
+              ) {
+                close();
+              }
+            },
+          }}
+        >
           <div {...{ className: "fy-modal-body" }}>
-            {Content && <Content {...{ ...contentProps, handleClose }} />}
+            {Content && (
+              <Content {...{ ...contentProps, handleClose: close }} />
+            )}
           </div>
         </a.div>
       )

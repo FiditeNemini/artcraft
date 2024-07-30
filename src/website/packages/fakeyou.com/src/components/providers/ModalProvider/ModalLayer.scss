@@ -19,6 +19,7 @@
 	.fy-modal-body {
 		width: 100%;
 		height: fit-content;
+		overflow: hidden;
 		background-color: $panel;
 		border-color: lighten($panel, 8%) !important;
 		border: 1px solid;
