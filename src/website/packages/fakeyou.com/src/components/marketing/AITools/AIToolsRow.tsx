@@ -10,7 +10,7 @@ interface BadgeContent {
   label: string;
 }
 
-interface DashboardItemProps {
+interface AIToolsItemProps {
   to: string;
   title: string;
   text?: string;
@@ -19,14 +19,14 @@ interface DashboardItemProps {
   badgeContent?: BadgeContent;
 }
 
-export function DashboardItem({
+export function AIToolsItem({
   to,
   title,
   text,
   imgSrc,
   imgAlt,
   badgeContent,
-}: DashboardItemProps) {
+}: AIToolsItemProps) {
   return (
     <div className="col-12 col-md-6 col-lg-4">
       <Link
@@ -66,21 +66,21 @@ export function DashboardItem({
   );
 }
 
-interface DashboardRowProps {
-  items: DashboardItemProps[];
+interface AIToolsRowProps {
+  items: AIToolsItemProps[];
   bgDotsLeft?: boolean;
   bgDotsRight?: boolean;
 }
 
-export function DashboardRow({
+export default function AIToolsRow({
   items,
   bgDotsLeft,
   bgDotsRight,
-}: DashboardRowProps) {
+}: AIToolsRowProps) {
   return (
     <div className="row g-4 position-relative">
       {items.map((item, index) => (
-        <DashboardItem key={index} {...item} />
+        <AIToolsItem key={index} {...item} />
       ))}
       {bgDotsLeft && (
         <img
@@ -99,5 +99,3 @@ export function DashboardRow({
     </div>
   );
 }
-
-export default DashboardRow;

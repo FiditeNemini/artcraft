@@ -57,9 +57,10 @@ import { SearchOmnibar } from "./search/SearchOmnibar";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useInferenceJobs, useLocalize } from "hooks";
 import { Container, Panel } from "components/common";
+import { AITools } from "components/marketing";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faMessageDots } from "@fortawesome/pro-solid-svg-icons";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+// import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -611,8 +612,10 @@ function TtsModelListPage(props: Props) {
         {/* <SessionTtsModelUploadResultList /> */}
       </Container>
 
-      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
-        <StorytellerStudioCTA />
+      <Container type="panel" className="py-5 gap-5">
+        <h2 {...{ className: "mb-3" }}>Try our other AI tools</h2>
+        <AITools />
+        {/*<StorytellerStudioCTA />*/}
       </Container>
     </>
   );
