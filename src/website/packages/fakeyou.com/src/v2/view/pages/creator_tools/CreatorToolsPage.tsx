@@ -15,7 +15,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel } from "components/common";
 import { useLocalize } from "hooks";
 import React from "react";
-import DashboardRow from "../landing/components/DashboardRow";
+import { AIToolsRow } from "components/marketing";
 import "./CreatorTools.scss";
 
 interface CreatorToolsPageProps {
@@ -119,11 +119,11 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
         <div className="d-flex flex-column gap-5">
           <div>
             <h2 className="fw-bold mb-3 mt-4">Video</h2>
-            <DashboardRow items={videoProducts} />
+            <AIToolsRow items={videoProducts} />
           </div>
           <div>
             <h2 className="fw-bold mb-3 mt-4">Voice & Audio</h2>
-            <DashboardRow items={voiceProducts} />
+            <AIToolsRow items={voiceProducts} />
           </div>
           <div>
             <h2 className="fw-bold mb-3 mt-4">

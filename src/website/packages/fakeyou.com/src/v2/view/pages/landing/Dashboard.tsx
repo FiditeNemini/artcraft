@@ -9,10 +9,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Panel } from "components/common";
+import { AITools } from "components/marketing";
 import { useLocalize } from "hooks";
 import React from "react";
 import { Link } from "react-router-dom";
-import DashboardRow from "./components/DashboardRow";
 
 interface DashboardProps {
   sessionWrapper: SessionWrapper;
@@ -66,71 +66,11 @@ export default function Dashboard(props: DashboardProps) {
     );
   }
 
-  const dashboardProducts = [
-    {
-      to: "/tts",
-      title: t("productTtsTitle"),
-      text: t("productTtsText"),
-      imgSrc: "/images/landing/select-tts.webp",
-      imgAlt: "Text to Speech",
-    },
-    {
-      to: "/voice-conversion",
-      title: t("productVcTitle"),
-      text: t("productVcText"),
-      imgSrc: "/images/landing/select-v2v.webp",
-      imgAlt: "Voice Conversion",
-    },
-    {
-      to: "/voice-designer",
-      title: t("productVdTitle"),
-      text: t("productVdText"),
-      imgSrc: "/images/landing/select-vd.webp",
-      imgAlt: "Voice Cloning",
-      badgeContent: {
-        type: "beta",
-        icon: faFlask,
-        label: "BETA",
-      },
-    },
-    {
-      to: "/face-animator",
-      title: t("productFaceAnimatorTitle"),
-      text: t("productFaceAnimatorText"),
-      imgSrc: "/images/landing/select-fa.webp",
-      imgAlt: "Face Animator",
-    },
-    {
-      to: "/style-video",
-      title: t("productVideoStyleTransferTitle"),
-      text: t("productVideoStyleTransferText"),
-      imgSrc: "/images/landing/select-vst.webp",
-      imgAlt: "Video Style Transfer",
-      badgeContent: {
-        type: "new",
-        icon: faSparkles,
-        label: "NEW",
-      },
-    },
-    {
-      to: "/ai-face-mirror",
-      title: t("productFaceMirrorTitle"),
-      text: t("productFaceMirrorText"),
-      imgSrc: "/images/landing/select-fm.webp",
-      imgAlt: "AI Face Mirror",
-      badgeContent: {
-        type: "new",
-        icon: faSparkles,
-        label: "NEW",
-      },
-    },
-  ];
-
   return (
     <Panel clear={true} className={`${!isLoggedIn ? "section" : "mt-5"}`}>
       <h1 className="fw-bold mb-4">{t("productsTitle")}</h1>
 
-      <DashboardRow items={dashboardProducts} />
+      <AITools />
 
       {uploadModelSection}
     </Panel>

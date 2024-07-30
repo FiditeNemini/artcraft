@@ -1,3 +1,4 @@
 import AIFaceMirrorCTA from "./AIFaceMirrorCTA";
+import AITools, { AIToolsRow } from "./AITools";
 
-export { AIFaceMirrorCTA };
+export { AIFaceMirrorCTA, AITools, AIToolsRow };
