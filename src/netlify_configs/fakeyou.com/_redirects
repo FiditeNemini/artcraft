@@ -1,19 +1,26 @@
+# Netlify docs: 
+#   The redirects engine will process the first matching rule it 
+#   finds, reading from top to bottom. Rules in the _redirects file 
+#   are always processed first, followed by rules in the Netlify 
+#   configuration file.
+
 # We can't redirect everything until legacy vocodes is dead
 
 # Blog redirects
-/blog                /blog   200!
-/blog/*              /blog/index.html   200!
-# /blog              /blog   200!
+/blog                /blog             200!
+/blog/*              /blog/:splat      200!
+#/blog/*              /blog/index.html   200!
 
 # Website redirects
 /                  /website/index.html   200
-/*                 /website/:splat       200
 /tts*              /website/index.html   200
 /about*            /website/index.html   200
 /acting-face*      /website/index.html   200
 /ai-face-mirror*   /website/index.html   200
 /beta-key*         /website/index.html   200
 
+# Finally, all the media files need to be loaded:
+/*                 /website/:splat       200
 
 # TODO: Fix these - 
 
