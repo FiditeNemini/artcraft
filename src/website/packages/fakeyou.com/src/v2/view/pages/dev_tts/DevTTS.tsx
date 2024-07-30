@@ -63,11 +63,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
     setText(target.value);
   };
   const [isGenerating, setIsGenerating] = useState(false);
-  usePrefixedDocumentTitle(
-    selectedVoice
-      ? selectedVoice.title + " Text to Speech"
-      : "FakeYou. Deep Fake Text to Speech."
-  );
+  usePrefixedDocumentTitle("FakeYou. Deep Fake Text to Speech.");
 
   const weightTypeInfo = useWeightTypeInfo(
     selectedVoice?.weight_type || WeightType.NONE

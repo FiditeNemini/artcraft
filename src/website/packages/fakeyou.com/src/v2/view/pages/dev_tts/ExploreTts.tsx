@@ -14,6 +14,7 @@ const ExploreTts = ({ onResultSelect }: ExploreTtsProps) => {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 
   const weights = useLazyLists({
+    urlUpdate: false,
     addQueries: {
       page_size: "48",
       ...prepFilter("text_to_speech", "weight_category"),

@@ -59,7 +59,6 @@ import { useInferenceJobs, useLocalize } from "hooks";
 import { Container, Panel } from "components/common";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faMessageDots } from "@fortawesome/pro-solid-svg-icons";
-import MentionsSection from "components/common/MentionsSection";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
 export interface EnqueueJobResponsePayload {
@@ -613,7 +612,6 @@ function TtsModelListPage(props: Props) {
       </Container>
 
       <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
-        <MentionsSection />
         <StorytellerStudioCTA />
       </Container>
     </>
