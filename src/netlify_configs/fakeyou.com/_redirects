@@ -7,10 +7,10 @@
 #   configuration file.
 
 # Blog paths:
-/blog                  /gatsby               200!
-/blog/*                /gatsby/:splat        200!
-/ai-tools              /gatsby               200!
-/ai-tools/*            /gatsby/:splat        200!
+/blog                  /gatsby                   200!
+/blog/*                /gatsby/blog/:splat       200!
+/ai-tools              /gatsby                   200!
+/ai-tools/*            /gatsby/ai-tools/:splat   200!
 
 # Website root:
 /                      /website/index.html   200
