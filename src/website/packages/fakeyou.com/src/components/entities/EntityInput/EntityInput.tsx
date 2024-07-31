@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
+import useMeasure from "react-use-measure";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
 import { Area, Point } from "react-easy-crop";
@@ -32,7 +33,7 @@ export interface CropProps {
 
 interface EntityInputProps {
   accept?: AcceptTypes | AcceptTypes[];
-  aspectRatio?: "square" | "landscape" | "portrait";
+  // aspectRatio?: "square" | "landscape" | "portrait";
   className?: string;
   cropProps?: CropProps;
   debug?: string;
@@ -47,6 +48,7 @@ interface EntityInputProps {
 export interface SlideProps {
   clear: () => void;
   cropProps?: CropProps;
+  isNarrow: boolean;
   media?: MediaFile;
 }
 
@@ -63,7 +65,7 @@ const MediaBusy = () => {
   return <Spinner />;
 };
 
-const EntityInputFull = ({ clear, cropProps, media }: SlideProps) => {
+const EntityInputFull = ({ clear, cropProps, isNarrow, media }: SlideProps) => {
   const bucketConfig = new BucketConfig();
   const mediaUrl = media?.public_bucket_path
     ? bucketConfig.getGcsUrl(media.public_bucket_path)
@@ -94,6 +96,7 @@ const EntityInputFull = ({ clear, cropProps, media }: SlideProps) => {
             {...{
               clear,
               entityType: "image",
+              isNarrow,
               media,
               showCrop: !!cropProps,
               zoomSliderChange,
@@ -119,6 +122,7 @@ const EntityInputFull = ({ clear, cropProps, media }: SlideProps) => {
             {...{
               clear,
               entityType: "video",
+              isNarrow,
               media,
               showCrop: !!cropProps,
               zoomSliderChange,
@@ -166,7 +170,6 @@ const AnimatedSlide = ({
 
 export default function EntityInput({
   accept,
-  aspectRatio = "square",
   className,
   cropProps,
   debug,
@@ -194,6 +197,10 @@ export default function EntityInput({
     mediaToken: mediaToken || value,
   });
   const [updated, updatedSet] = useState(false);
+  const [outerRef, { width }] = useMeasure();
+
+  const isNarrow = (width || 0) <= 480;
+
   const clear = () => {
     mediaSet(undefined);
     mediaTokenSet("");
@@ -260,9 +267,10 @@ export default function EntityInput({
       <Label {...{ label }} />
       <div
         {...{
-          className: `fy-entity-input panel-inner${
-            aspectRatio ? " fy-entity-input-" + aspectRatio : ""
-          }${className ? " " + className : ""}`,
+          className: `fy-entity-input ${className ? " " + className : ""}${
+            isNarrow ? " fy-entity-input-narrow" : " fy-entity-input-wide"
+          }`,
+          ref: outerRef,
         }}
       >
         {transitions((style: any, i: number, state: any) => {
@@ -283,6 +291,7 @@ export default function EntityInput({
                 className: "fy-entity-input-full",
                 clear,
                 cropProps,
+                isNarrow,
                 media,
                 render: EntityInputFull,
                 ...sharedProps,
