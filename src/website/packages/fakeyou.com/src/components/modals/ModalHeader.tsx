@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { TempInput as Input } from "components/common";
-import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/pro-solid-svg-icons";
+import {
+  FontAwesomeIcon,
+  FontAwesomeIcon as Icon,
+} from "@fortawesome/react-fontawesome";
+import { faSearch, faXmark } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   children?: any;
@@ -15,21 +18,49 @@ export default function ModalHeader({
   children,
   handleClose,
   onSearchChange = () => {},
-  search,
+  search: initialSearch,
   title,
 }: Props) {
+  const [search, setSearch] = useState(initialSearch);
+
+  const handleInputChange = (e: any) => {
+    setSearch(e.target.value);
+    onSearchChange(e);
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    onSearchChange({ target: { value: "" } });
+  };
+
   return (
     <header {...{ className: "fy-media-browser-header" }}>
       <div {...{ className: "fy-media-browser-tools" }}>
         {search !== undefined ? (
-          <Input
-            autoFocus
-            {...{
-              onChange: onSearchChange,
-              value: search,
-              placeholder: "Search...",
-            }}
-          />
+          <div className="position-relative w-100">
+            <Input
+              autoFocus
+              {...{
+                onChange: handleInputChange,
+                value: search,
+                placeholder: "Search...",
+                icon: faSearch,
+              }}
+            />
+            {search && (
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="position-absolute opacity-75 fs-5"
+                style={{
+                  right: "1rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                }}
+                onClick={clearSearch}
+              />
+            )}
+          </div>
         ) : (
           title && <h3 className="fw-semibold">{title}</h3>
         )}

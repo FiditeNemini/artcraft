@@ -25,6 +25,7 @@ export interface Weight {
     };
   };
   version: number;
+  is_featured: boolean;
 }
 
 export interface GetWeightRequest {}

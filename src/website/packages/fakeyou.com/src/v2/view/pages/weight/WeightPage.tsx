@@ -12,6 +12,7 @@ import {
   faImage,
   faMicrophone,
   faVolumeHigh,
+  // faStarShooting,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -36,6 +37,9 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+// import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
+// import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
 //import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface WeightProps {
@@ -68,6 +72,27 @@ export default function WeightPage({
   const dateCreated = moment(weight?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // const viewerCanMakeFeatured = canBanUsers() || false;
+
+  let pageTitle;
+
+  switch (weight?.weight_type) {
+    case WeightType.TT2:
+    case WeightType.HIFIGAN_TT2:
+      pageTitle = weight?.title + " AI TTS Model" || "TTS Model Weight";
+      break;
+    case WeightType.RVCv2:
+      pageTitle = weight?.title + " AI RVC Model" || "V2V Model Weight";
+      break;
+    case WeightType.SVC:
+      pageTitle = weight?.title + " AI SVC Model" || "V2V Model Weight";
+      break;
+    default:
+      pageTitle = weight?.title || "Model Weight";
+      break;
+  }
+
+  usePrefixedDocumentTitle(pageTitle);
 
   const bucketConfig = new BucketConfig();
 
@@ -401,6 +426,29 @@ export default function WeightPage({
     }
   };
 
+  // const handleFeatureWeight = async () => {
+  //   setFeatureWeight(!weight?.is_featured);
+  // };
+
+  // const setFeatureWeight = async (setFeatured: boolean) => {
+  //   if (weight === undefined) {
+  //     return;
+  //   }
+
+  //   const request = {
+  //     entity_type: "model_weight",
+  //     entity_token: weight.weight_token,
+  //   };
+
+  //   if (setFeatured) {
+  //     await CreateFeaturedItem("", request);
+  //     // window.location.reload();
+  //   } else {
+  //     await DeleteFeaturedItem("", request);
+  //     // window.location.reload();
+  //   }
+  // };
+
   return (
     <div>
       <Container type="panel" className="mb-5">
@@ -584,6 +632,22 @@ export default function WeightPage({
                   />
                 </div>
               )}
+
+              {/* {viewerCanMakeFeatured && (
+                <>
+                  <div className="d-flex gap-2">
+                    <Button
+                      full={true}
+                      variant="secondary"
+                      icon={faStarShooting}
+                      label={
+                        weight?.is_featured ? "Remove Featured" : "Set Featured"
+                      }
+                      onClick={handleFeatureWeight}
+                    />
+                  </div>
+                </>
+              )} */}
             </div>
           </div>
         </div>

@@ -39,7 +39,7 @@ export default function ModalLayer({
           {...{
             className: mainClassName,
             style: tintStyle,
-            onClick: ({ target }) => {
+            onMouseDown: ({ target }) => {
               if (
                 !lockTint &&
                 target instanceof HTMLElement &&

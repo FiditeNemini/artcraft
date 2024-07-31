@@ -32,13 +32,25 @@ export default function WeightCard({
     weight_type,
   } = data || {};
   const timeCreated = moment(created_at || "").fromNow();
-  const path =
-    cover_image.maybe_cover_image_public_bucket_path ||
-    details?.cover_image?.maybe_cover_image_public_bucket_path;
   const bucketConfig = new BucketConfig();
-  const coverImage = path
-    ? bucketConfig.getCdnUrl(path, 110, 100)
-    : "/images/avatars/default-pfp.png";
+  let coverImage = undefined;
+  if (cover_image) {
+    if (cover_image?.maybe_cover_image_public_bucket_path) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.cover_image.maybe_cover_image_public_bucket_path,
+        110,
+        100
+      );
+    } else if (
+      details?.maybe_weight_data?.maybe_cover_image_public_bucket_path
+    ) {
+      coverImage = bucketConfig.getCdnUrl(
+        details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
+        110,
+        100
+      );
+    }
+  }
 
   const weightTypeInfo = useWeightTypeInfo(weight_type || WeightType.NONE);
   const { label: weightType, color: weightTagColor } = weightTypeInfo;
@@ -49,9 +61,9 @@ export default function WeightCard({
         {showCover && (
           <WeightCoverImage
             src={coverImage}
-            height={96}
-            width={96}
-            coverIndex={cover_image?.default_cover?.image_index}
+            height={100}
+            width={100}
+            coverIndex={data?.cover_image?.default_cover?.image_index}
           />
         )}
 

@@ -140,8 +140,8 @@ export default function AudioCard({
             {showCover && (
               <WeightCoverImage
                 src={coverImage}
-                height={96}
-                width={96}
+                height={100}
+                width={100}
                 coverIndex={data?.cover_image?.default_cover?.image_index}
               />
             )}

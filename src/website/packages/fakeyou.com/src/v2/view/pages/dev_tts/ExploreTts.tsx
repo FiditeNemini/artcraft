@@ -1,7 +1,7 @@
-import { ListWeights, Weight } from "@storyteller/components/src/api";
-import { useLazyLists } from "hooks";
+import { ListFeaturedWeights, Weight } from "@storyteller/components/src/api";
+import { useListContent } from "hooks";
 import React, { useRef, useState } from "react";
-import prepFilter from "resources/prepFilter";
+// import prepFilter from "resources/prepFilter";
 import { MasonryGrid, WeightsCards } from "components/common";
 
 interface ExploreTtsProps {
@@ -13,20 +13,21 @@ const ExploreTts = ({ onResultSelect }: ExploreTtsProps) => {
   const [showMasonryGrid, setShowMasonryGrid] = useState(false);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const weights = useLazyLists({
+  const weights = useListContent({
     urlUpdate: false,
     addQueries: {
       page_size: "48",
-      ...prepFilter("text_to_speech", "weight_category"),
+      // ...prepFilter("text_to_speech", "weight_category"),
     },
-    fetcher: ListWeights,
+    fetcher: ListFeaturedWeights,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: res => {
+    onSuccess: () => {
       setShowMasonryGrid(true);
     },
     requestList: true,
+    urlParam: "",
   });
 
   return (
@@ -38,39 +39,47 @@ const ExploreTts = ({ onResultSelect }: ExploreTtsProps) => {
               No weight created yet.
             </div>
           ) : (
-            <>
-              <h4 className="fw-bold">Newest Community Voices</h4>
-              <MasonryGrid
-                gridRef={gridContainerRef}
-                onLayoutComplete={() => console.log("Layout complete!")}
+            <div className="overflow-hidden h-100">
+              <h4 className="fw-bold pt-1 pb-2">Featured Community Voices</h4>
+              <div
+                style={{
+                  overflowX: "hidden",
+                  overflowY: "auto",
+                  height: "calc(100% - 50px)",
+                }}
               >
-                {weights.list.map((data: any, key: number) => {
-                  let props = {
-                    data,
-                    type: "weights",
-                  };
+                <MasonryGrid
+                  gridRef={gridContainerRef}
+                  onLayoutComplete={() => console.log("Layout complete!")}
+                >
+                  {weights.list.map((data: any, key: number) => {
+                    let props = {
+                      data,
+                      type: "weights",
+                    };
 
-                  return (
-                    <div
-                      {...{
-                        className:
-                          "col-12 col-sm-6 col-lg-6 col-xl-4 grid-item",
-                        key,
-                      }}
-                    >
-                      <WeightsCards
+                    return (
+                      <div
                         {...{
-                          type: data.weight_category,
-                          props,
-                          inSelectModal: true,
-                          onResultSelect: onResultSelect,
+                          className:
+                            "col-12 col-sm-6 col-lg-6 col-xl-4 grid-item",
+                          key,
                         }}
-                      />
-                    </div>
-                  );
-                })}
-              </MasonryGrid>
-            </>
+                      >
+                        <WeightsCards
+                          {...{
+                            type: data.weight_category,
+                            props,
+                            inSelectModal: true,
+                            onResultSelect: onResultSelect,
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </MasonryGrid>
+              </div>
+            </div>
           )}
         </>
       )}
