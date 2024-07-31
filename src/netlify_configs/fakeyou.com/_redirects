@@ -73,7 +73,7 @@
 /tts_configs*          /website/index.html   200
 /twitch*               /website/index.html   200
 /upload*               /website/index.html   200
-/video*                /website/index.html   200
+# /video*                /website/index.html   200
 /video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
 /voice-designer*       /website/index.html   200
