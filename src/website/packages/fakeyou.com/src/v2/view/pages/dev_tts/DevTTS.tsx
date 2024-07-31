@@ -290,11 +290,19 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
                     </span>
                   ) : (
                     <span className="fs-7 opacity-75">
-                      Click to select a voice
+                      Click here to select a voice
                     </span>
                   )}
                 </div>
-                <FontAwesomeIcon icon={faChevronRight} className="fs-5 me-1" />
+                <div className="d-flex gap-2 align-items-center">
+                  <span className="fw-medium opacity-75 pe-1 d-none d-lg-block">
+                    {selectedVoice ? "Change voice" : "Select voice"}
+                  </span>
+                  <FontAwesomeIcon
+                    icon={faChevronRight}
+                    className="fs-5 me-1"
+                  />
+                </div>
               </div>
             </div>
 
