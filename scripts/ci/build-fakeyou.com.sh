@@ -44,7 +44,7 @@ echo "Building website..."
 build_website
 
 echo "Create final output directory..."
-mkdir -p fakeyou.com/blog
+mkdir -p fakeyou.com/gatsby
 mkdir -p fakeyou.com/website
 
 echo "Copying blog artifacts..."
