@@ -8,9 +8,21 @@ import { BlogRoll, HeroPost, Layout } from "../components";
 import "../styles/global.css";
 import { staiFrontmatter } from "../models/frontmatter";
 
-const {P, H1} = MdTypography;
+const { P, H1 } = MdTypography;
 
-export const Head: HeadFC = () => <title>Storyteller Blog</title>;
+export const Head: HeadFC = () => {
+  return(
+    <>
+      <html lang="en" />
+      <title>Storyteller Blog</title>
+      <meta
+        name="description"
+        content="Blog of Storyteller.ai, including tutorials, press releases, etc."
+      />
+    </>
+  );
+};
+
 const IndexPage = ({ data }: PageProps<Queries.IndexPageQuery>) => {
   const allPosts = data.allMdx.nodes;
   const heroPost = allPosts.find((post)=>post?.frontmatter?.featured);

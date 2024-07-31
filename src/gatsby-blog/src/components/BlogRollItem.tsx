@@ -13,7 +13,7 @@ export const BlogRollItem = ({postFrontmatter: pfm}:{postFrontmatter: staiFrontm
 
     return (
       <li className="group">
-        <Link to={pfm.slug}>
+        <Link to={pfm.slug} title={pfm.title}>
           <div className="h-32 overflow-hidden rounded-lg bg-panel/5 sm:h-52">
             {featuredImage && (
               <GatsbyImage
@@ -23,7 +23,7 @@ export const BlogRollItem = ({postFrontmatter: pfm}:{postFrontmatter: staiFrontm
               />
             )}
           </div>
-
+        </Link>
           <div className="mt-3 flex flex-col">
             <div>
               <Link
@@ -33,14 +33,15 @@ export const BlogRollItem = ({postFrontmatter: pfm}:{postFrontmatter: staiFrontm
                 {category.displayName}
               </Link>
             </div>
-            <H4 className="my-0 text-[16px] transition-all group-hover:text-link md:text-[18px]">
-              {pfm.title}
-            </H4>
-            
+            <Link to={pfm.slug}>
+              <H4 className="my-0 text-[16px] transition-all group-hover:text-link md:text-[18px]">
+                {pfm.title}
+              </H4>
+            </Link>
           </div>
           {/* <p>{frontmatter.date}</p> */}
           {/* <p className="italic">by {frontmatter.author ?? "unknown"}</p> */}
-        </Link>
+        
       </li>
     );
 }

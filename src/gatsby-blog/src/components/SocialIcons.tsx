@@ -1,17 +1,17 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFacebook,
+  // faFacebook,
   faInstagram,
-  faLinkedin,
+  // faLinkedin,
   faTiktok,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 
 const socialMedia = [
-  { icon: faTwitter, link: "https://twitter.com" },
-  { icon: faInstagram, link: "https://instagram.com" },
-  { icon: faTiktok, link: "https://tiktok.com" },
+  { name: "Twitter", icon: faTwitter, link: "https://twitter.com" },
+  { name: "Instagram", icon: faInstagram, link: "https://instagram.com" },
+  { name: "Tiktok", icon: faTiktok, link: "https://tiktok.com" },
 ];
 
 const SocialIcons = () => {
@@ -25,7 +25,7 @@ const SocialIcons = () => {
           rel="noopener noreferrer"
           className="text-md flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all hover:bg-white/20"
         >
-          <FontAwesomeIcon icon={social.icon} />
+          <FontAwesomeIcon icon={social.icon} title={social.name}/>
         </a>
       ))}
     </div>

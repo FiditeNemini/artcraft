@@ -8,7 +8,7 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import * as MdTypography from "./MdTypography";
 import { staiFrontmatter } from "../models/frontmatter";
 import { getCateogry } from "../models";
-const {P, H2} = MdTypography;
+const { P, H2 } = MdTypography;
 
 export const HeroPost = ({postFrontmatter}:{postFrontmatter:staiFrontmatter})=>{
   const pfm = postFrontmatter;
