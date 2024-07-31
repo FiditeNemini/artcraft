@@ -160,7 +160,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
             Make your favorite characters speak!
           </p>
 
-          <div className="d-flex flex-column gap-4">
+          <div className="d-flex flex-column gap-3">
             <div className="fy-featured-voices-section d-none d-lg-block">
               <h5 className="fw-bold">Featured Voices</h5>
               <div className="row g-3">
@@ -174,28 +174,30 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
               </div>
             </div>
 
-            <div className="position-relative">
+            <div>
               <Label label="Search for a Voice" />
-              <Input
-                autoFocus={isMobile ? false : selectedVoice ? false : true}
-                icon={faSearch}
-                placeholder={"Search from 3500+ voices"}
-                onChange={searchChange()}
-                value={search}
-              />
-              {search && (
-                <FontAwesomeIcon
-                  icon={faXmark}
-                  className="position-absolute opacity-75 fs-5"
-                  style={{
-                    right: "1rem",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => searchSet("")}
+              <div className="position-relative">
+                <Input
+                  autoFocus={isMobile ? false : selectedVoice ? false : true}
+                  icon={faSearch}
+                  placeholder={"Search from 3500+ voices"}
+                  onChange={searchChange()}
+                  value={search}
                 />
-              )}
+                {search && (
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    className="position-absolute opacity-75 fs-5"
+                    style={{
+                      right: "1rem",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => searchSet("")}
+                  />
+                )}
+              </div>
             </div>
 
             <div>
