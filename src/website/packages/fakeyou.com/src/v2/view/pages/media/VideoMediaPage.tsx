@@ -362,8 +362,8 @@ export default function DevMediaPage({
         )}
 
         <Panel className="mt-5">
-          <div {...{ className: "video-page-comments" }}>
-            <h5>Comments</h5>
+          <div>
+            <h5 className="fw-semibold">Comments</h5>
             <CommentComponent
               entityType="media_file"
               entityToken={mediaFile?.token || ""}

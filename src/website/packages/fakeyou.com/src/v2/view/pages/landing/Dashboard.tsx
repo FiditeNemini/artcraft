@@ -1,8 +1,6 @@
 import {
-  faFlask,
   faImage,
   faMessageDots,
-  faSparkles,
   faWaveform,
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";

@@ -26,7 +26,6 @@ import {
 import "./DevTTS.scss";
 import { FeaturedVoice } from "./FeaturedVoice";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import {
   GenerateTtsAudio,
@@ -41,6 +40,7 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { isMobile } from "react-device-detect";
 import { useTtsStore } from "hooks";
 import ExploreTts from "./ExploreTts";
+import { AITools } from "components/marketing";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -340,9 +340,11 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
         </Panel>
       </Container>
 
-      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
+      <Container type="panel" className="pt-5 mt-5">
+        <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+        <AITools />
         {/* <MentionsSection /> */}
-        <StorytellerStudioCTA />
+        {/* <StorytellerStudioCTA /> */}
       </Container>
     </>
   );

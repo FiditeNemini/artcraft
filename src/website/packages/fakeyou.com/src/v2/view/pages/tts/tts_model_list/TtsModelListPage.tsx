@@ -612,8 +612,8 @@ function TtsModelListPage(props: Props) {
         {/* <SessionTtsModelUploadResultList /> */}
       </Container>
 
-      <Container type="panel" className="py-5 gap-5">
-        <h2 {...{ className: "mb-3" }}>Try our other AI tools</h2>
+      <Container type="panel" className="pt-5 mt-5">
+        <h2 className="fw-bold mb-3">Try our other AI tools</h2>
         <AITools />
         {/*<StorytellerStudioCTA />*/}
       </Container>
