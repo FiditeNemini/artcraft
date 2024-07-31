@@ -16,7 +16,6 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
-  faBell,
   faChevronRight,
   faDeleteLeft,
   faSearch,
@@ -175,6 +174,30 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
               </div>
             </div>
 
+            <div className="position-relative">
+              <Label label="Search for a Voice" />
+              <Input
+                autoFocus={isMobile ? false : selectedVoice ? false : true}
+                icon={faSearch}
+                placeholder={"Search from 3500+ voices"}
+                onChange={searchChange()}
+                value={search}
+              />
+              {search && (
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  className="position-absolute opacity-75 fs-5"
+                  style={{
+                    right: "1rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => searchSet("")}
+                />
+              )}
+            </div>
+
             <div>
               <div className="d-flex align-items-center">
                 {!selectedVoice && (
@@ -192,7 +215,8 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
                     />
                   </div>
 
-                  <div className="d-flex gap-2">
+                  {/* Commented out notify voice improvement for now */}
+                  {/* <div className="d-flex gap-2">
                     {selectedVoice && (
                       <Button
                         icon={faBell}
@@ -201,33 +225,10 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
                         className="fs-7"
                       />
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
-              <div className="position-relative">
-                <Input
-                  autoFocus={isMobile ? false : selectedVoice ? false : true}
-                  icon={faSearch}
-                  placeholder={"Search from 3000+ voices"}
-                  onChange={searchChange()}
-                  value={search}
-                  style={{ borderRadius: "0.5rem 0.5rem 0 0" }}
-                />
-                {search && (
-                  <FontAwesomeIcon
-                    icon={faXmark}
-                    className="position-absolute opacity-75 fs-5"
-                    style={{
-                      right: "1rem",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => searchSet("")}
-                  />
-                )}
-              </div>
               <div className="fy-weight-picker-preview" onClick={openModal}>
                 <WeightCoverImage
                   {...{

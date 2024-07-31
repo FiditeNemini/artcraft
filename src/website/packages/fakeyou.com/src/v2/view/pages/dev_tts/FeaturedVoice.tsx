@@ -6,7 +6,6 @@ import { CardBadge } from "components/entities";
 import { useWeightFetch } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 
 interface FeaturedVoiceProps {
   token: string;
@@ -60,11 +59,8 @@ export const FeaturedVoice = ({ token, onClick }: FeaturedVoiceProps) => {
                   small={true}
                 />
               </h6>
-              <span className="fs-7 fw-medium">
-                by{" "}
-                <Link to={`/profile/${weight?.creator.display_name}`}>
-                  {weight?.creator.display_name}
-                </Link>
+              <span className="fs-7 fw-medium" style={{ opacity: 0.6 }}>
+                by {weight?.creator.display_name}
               </span>
             </div>
             <div
