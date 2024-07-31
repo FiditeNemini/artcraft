@@ -48,7 +48,7 @@ mkdir -p fakeyou.com/blog
 mkdir -p fakeyou.com/website
 
 echo "Copying blog artifacts..."
-cp -r src/gatsby-blog/public/blog/* fakeyou.com/blog/
+cp -r src/gatsby-blog/public/* fakeyou.com/gatsby/
 
 echo "Copying website artifacts..."
 #mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/

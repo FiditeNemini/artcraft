@@ -7,8 +7,10 @@
 #   configuration file.
 
 # Blog paths:
-/blog                  /blog                 200!
-/blog/*                /blog/:splat          200!
+/blog                  /gatsby               200!
+/blog/*                /gatsby/:splat        200!
+/ai-tools              /gatsby               200!
+/ai-tools/*            /gatsby/:splat        200!
 
 # Website root:
 /                      /website/index.html   200
@@ -73,7 +75,6 @@
 /tts_configs*          /website/index.html   200
 /twitch*               /website/index.html   200
 /upload*               /website/index.html   200
-# /video*                /website/index.html   200
 /video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
 /voice-designer*       /website/index.html   200
@@ -82,6 +83,9 @@
 /weight*               /website/index.html   200
 /welcome               /website/index.html   200
 /welcome-to-studio*    /website/index.html   200
+
+# Broken paths that collide with the FakeYou /public/ folder:
+# /video*                /website/index.html   200
 
 # Test paths
 /dev-tts*              /website/index.html   200
