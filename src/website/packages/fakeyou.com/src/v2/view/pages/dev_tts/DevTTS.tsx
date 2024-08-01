@@ -114,7 +114,7 @@ export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
     "weight_b8rncypy7gw6nb0wthnwe2kk4",
     "weight_3k28fws0v6r1ke3p0w0vw48gm",
     "weight_0f762jdzgsy1dhpb86qxy4ssm",
-    "weight_1ptwk6pa8krh3ykfr7rztf3pz",
+    "weight_tq6pwerrbr4mvbjmtyhbsqe6t",
     "weight_2qbzp2nmrbbsxrxq7m53y4zan",
     "weight_msq6440ch8hj862nz5y255n8j",
     "weight_6jvgbqkzschw55qdg7exnx7zx",
