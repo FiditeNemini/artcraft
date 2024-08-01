@@ -13,13 +13,12 @@ interface Props {
 
 export default function InferenceJobsModal({
   handleClose,
-  jobType: inJobType = -1,
+  jobType = -1,
   showModalHeader = true,
   ...rest
 }: Props) {
   const { clearJobs, clearJobsStatus, someJobsAreDone } = useInferenceJobs();
   const { t } = useLocalize("InferenceJobs");
-  const selectedType = 0;
   const failures = (fail = "") => {
     switch (fail) {
       default:
@@ -42,7 +41,7 @@ export default function InferenceJobsModal({
           onSelect: () => {
             if (handleClose) handleClose();
           },
-          ...(selectedType > -1 ? { jobType: selectedType } : {}),
+          ...(jobType > -1 ? { jobType } : {}),
           showHeader: false,
           showJobQueue: false,
           showNoJobs: true,
