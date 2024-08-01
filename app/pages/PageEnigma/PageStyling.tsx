@@ -51,8 +51,6 @@ export const PageStyling = () => {
     }, 500);
   };
 
-  console.log("per", generateProgress.value);
-
   const switchEdit = () => {
     editorEngine?.switchEdit();
     currentPage.value = Pages.EDIT;

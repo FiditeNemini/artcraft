@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
 import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
 import { globalIPAMediaToken } from "../signals";
+import { VideoPreProcessorError } from "./video_audio_preprocessor";
 
 // TODO THIS CLASS MAKES NO SENSE Refactor so we generate all the frames first. then pass it through this pipeline as a data structure process it. through this class.
 
@@ -49,6 +50,7 @@ export class VideoGeneration {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  // this is to generate previews
   async generateFrame() {
     if (!this.editor.generating_preview && this.editor.rawRenderer) {
       this.editor.generating_preview = true;
@@ -121,90 +123,6 @@ export class VideoGeneration {
     }
   }
 
-  async convertAudioClip(itteration: number, ffmpeg: FFmpeg, clip: ClipUI) {
-    // Base audio clip names.
-    const video_og: string = itteration + "tmp.mp4";
-    const wav_name: string = itteration + "tmp.wav";
-    const new_video: string = itteration + 1 + "tmp.mp4";
-    let startFrame: number = clip.offset;
-    let endFrame: number = clip.length;
-
-    if (endFrame > this.editor.timeline.timeline_limit) {
-      endFrame = this.editor.timeline.timeline_limit;
-    }
-    if (startFrame > this.editor.timeline.timeline_limit) {
-      startFrame = this.editor.timeline.timeline_limit - 1;
-    }
-
-    const startTime: number = startFrame / this.editor.cap_fps;
-    const endTime: number = endFrame / this.editor.cap_fps;
-    const end: number = endTime - startTime;
-
-    // Use ffmpeg to convert audio to video.
-    const audioSegment: string = "as_" + wav_name;
-    await ffmpeg.FS(
-      "writeFile",
-      wav_name,
-      await fetchFile(
-        await this.editor.api_manager.getMediaFile(clip.media_id),
-      ),
-    );
-    await ffmpeg.run(
-      "-i",
-      wav_name,
-      "-ss",
-      "0",
-      "-to",
-      "" + end,
-      "-max_muxing_queue_size",
-      "999999",
-      audioSegment,
-    );
-
-    await ffmpeg.run(
-      "-i",
-      video_og,
-      "-max_muxing_queue_size",
-      "999999",
-      `${itteration}empty_tmp.wav`,
-    );
-
-    await ffmpeg.run(
-      "-i",
-      `${itteration}empty_tmp.wav`,
-      "-i",
-      audioSegment,
-      "-filter_complex",
-      "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
-      "-map",
-      "[a]",
-      `${itteration}final_tmp.wav`,
-    );
-
-    // Combine final audio with video.
-    await ffmpeg.run(
-      "-i",
-      video_og,
-      "-i",
-      `${itteration}final_tmp.wav`,
-      "-c:v",
-      "copy",
-      "-c:a",
-      "aac",
-      "-map",
-      "0:v:0",
-      "-map",
-      "1:a:0",
-      "-strict",
-      "experimental",
-      new_video,
-    );
-  }
-
   // to determine if we should capture frames again or not.
   async shouldRenderScenesAgain(checkSumData: string): Promise<boolean> {
     // Should skip to rendering the scene if already processed the frames inputs for running a new style.
@@ -222,24 +140,15 @@ export class VideoGeneration {
     }
   }
 
-  async stopPlaybackAndUploadVideo(compile_audio: boolean = true) {
+  async stopPlaybackAndUploadVideo() {
     this.editor.rendering = false; // not sure about this variable ... this has so many state issues.
 
     // precondition checks, if we have no frames then we shouldn't try to do generations or snapshots
     // This means no frames so error out
-
-    if (this.editor.frame_buffer.length <= 0) {
+    if (this.editor.engineFrameBuffers.colorFrames.length <= 0) {
       await this.handleError(
         "Failed to Render Nothing to Animate in the Scene.",
-        5000,
-      );
-      return;
-    }
-
-    if (this.editor.frame_buffer[0].length <= 0) {
-      await this.handleError(
-        "Failed to Render Nothing to Animate in the Scene.",
-        5000,
+        3000,
       );
       return;
     }
@@ -276,22 +185,20 @@ export class VideoGeneration {
         uuid: image_uuid,
       });
 
-      if (response.success) {
-        if (response.data) {
-          ipa_image_token = response.data;
-        }
-      } else {
+      if (!response.success) {
         // ip adapter upload failed
         await this.handleError(
           "Reference Image Upload Failed Try Generating Movie Again.",
-          5000,
-        );
-        await this.handleSuccess(
-          "Done Check Your Movies Tab On Profile.",
-          5000,
+          3000,
         );
         return;
       }
+
+      if (!response.data) {
+        console.log("IPA Image Token Missing");
+      }
+
+      ipa_image_token = response.data;
     }
 
     // update the signal with this information
@@ -347,131 +254,216 @@ export class VideoGeneration {
     } else {
       await this.handleError(
         "Scene Snapshot Failed Try Generating Movie Again.",
-        5000,
+        3000,
       );
       return;
     }
 
     console.log(`Immutable Snapshot Token: ${immutable_media_token}`);
 
-    for (
-      let image_index = 0;
-      image_index < this.editor.frame_buffer[0].length;
-      image_index++
-    ) {
-      await this.editor.updateLoad({
-        progress: 50 + image_index * 5,
-        message:
-          "Please stay on this screen and do not switch tabs! while your video is being processed.",
-      });
+    await this.editor.updateLoad({
+      progress: 50,
+      message:
+        "Please stay on this screen and do not switch tabs! while your video is being processed.",
+    });
 
-      const ffmpeg = createFFmpeg({ log: false });
-      await ffmpeg.load();
-
-      for (let index = 0; index < this.editor.frame_buffer.length; index++) {
-        const element = this.editor.frame_buffer[index][image_index];
-        await ffmpeg.FS(
-          "writeFile",
-          `image${index}.png`,
-          await fetchFile(element),
+    try {
+      // Sound is only on the color not the other maps
+      const colorBlob =
+        await this.editor.videoAudioPreProcessor.processVideoWithBuffer(
+          this.editor.engineFrameBuffers.colorFrames,
+          "color",
+          "color",
+          "colorFrame",
         );
-      }
 
-      await ffmpeg.run(
-        "-framerate",
-        "" + this.editor.cap_fps,
-        "-i",
-        "image%d.png",
-        "input.mp4",
-      );
+      await this.editor.videoAudioPreProcessor.removeInMemoryImages();
+      //await this.editor.videoAudioPreProcessor.debugListFiles();
 
-      await ffmpeg.run(
-        "-i",
-        "input.mp4",
-        "-f",
-        "lavfi",
-        "-i",
-        "anullsrc", // This adds a silent audio track
-        "-max_muxing_queue_size",
-        "999999",
-        "-vf", // WE REMOVED THE BLACK FRAME IN FFMEPG INSTEAD OF THE ENGINE
-        "select=gte(n\\,1)", // WE REMOVED THE BLACK FRAME IN FFMEPG INSTEAD OF THE ENGINE
-        // "select=gte(n\\,1),scale=1024:576",
-        "-c:v",
-        "libx264", // Specify video codec (optional, but recommended for MP4)
-        "-c:a",
-        "aac", // Specify audio codec (optional, but recommended for MP4)
-        "-shortest", // Ensure output duration matches the shortest stream (video or audio)
-        "-pix_fmt",
-        "yuv420p",
-        "-f",
-        "mp4",
-        "0tmp.mp4",
-      );
-
-      let iteration = 0;
-
-      if (compile_audio) {
-        for (const clip of this.editor.timeline.timeline_items) {
-          if (clip.type == ClipType.AUDIO) {
-            await this.convertAudioClip(iteration, ffmpeg, clip);
-            iteration += 1;
-          }
-        }
-      }
-
-      // Upload individual videos or single color video
-      const output = ffmpeg.FS("readFile", iteration + "tmp.mp4");
-      ffmpeg.exit();
-
-      this.editor.generating_preview = false;
-      // Create a Blob from the output file for downloading
-      const blob = new Blob([output.buffer], { type: "video/mp4" });
-
-      const video_upload_response = await this.mediaUploadAPI.UploadNewVideo({
-        blob: blob,
-        fileName: `${title}.mp4`,
-        uuid: uuidv4(),
-        maybe_title: title,
-        maybe_visibility: Visibility.Public,
-        maybe_style_name: style_name,
-        maybe_scene_source_media_file_token: immutable_media_token,
+      let shouldProcessAudio = false;
+      const audioClips = this.editor.timeline.timeline_items.filter((clip) => {
+        return clip.type == ClipType.AUDIO;
       });
+      // If there are any audio clips continue processing otherwise this whole process of combining the video
+      if (audioClips.length > 0) {
+        shouldProcessAudio = true;
+      }
 
-      if (video_upload_response.success) {
-        if (video_upload_response.data) {
-          const upload_token = video_upload_response.data;
-          console.log(upload_token);
-          // saves these tokens for a rerun.
-          if (image_index === 0) {
-            media_tokens.color = upload_token;
-          } else if (image_index === 1) {
-            media_tokens.normal = upload_token;
-          } else if (image_index === 2) {
-            media_tokens.depth = upload_token;
-          } else if (image_index === 3) {
-            media_tokens.outline = upload_token;
-          }
+      if (shouldProcessAudio) {
+        const audioBuffer =
+          await this.editor.videoAudioPreProcessor.audioClipsToAudioBuffer(
+            audioClips,
+          );
+
+        await this.editor.videoAudioPreProcessor.processAudioWithBuffer(
+          audioBuffer,
+          "wav_track",
+          false,
+        );
+
+        // debug
+        //await this.editor.videoAudioPreProcessor.outputWav("wav_track");
+        const combinedVideoBlob =
+          await this.editor.videoAudioPreProcessor.combineAudioAndVideo(
+            "wav_track",
+            "color",
+            "output", // in memory output
+          );
+
+        // debug
+        //await this.editor.videoAudioPreProcessor.outputMp4("output");
+
+        const video_upload_response = await this.mediaUploadAPI.UploadNewVideo({
+          blob: combinedVideoBlob,
+          fileName: `${title}.mp4`,
+          uuid: uuidv4(),
+          maybe_title: title,
+          maybe_visibility: Visibility.Public,
+          maybe_style_name: style_name,
+          maybe_scene_source_media_file_token: immutable_media_token,
+        });
+
+        if (!video_upload_response.data) {
+          console.log("Missing media_tokens.color Token");
+          await this.handleError("Failed to Process to Server", 3000);
+          return;
         }
+
+        media_tokens.color = video_upload_response.data;
+        console.log(`https://storyteller.ai/media/${media_tokens.color}`);
+        console.log("Uploaded with Audio");
       } else {
-        await this.handleError(
-          "Failed To Preprocess: Generate Please Try Again",
-          5000,
-        );
-        return;
+        // no audio
+        const video_upload_response = await this.mediaUploadAPI.UploadNewVideo({
+          blob: colorBlob,
+          fileName: `${title}.mp4`,
+          uuid: uuidv4(),
+          maybe_title: title,
+          maybe_visibility: Visibility.Public,
+          maybe_style_name: style_name,
+          maybe_scene_source_media_file_token: immutable_media_token,
+        });
+
+        if (!video_upload_response.data) {
+          await this.handleError("Failed to Process to Server", 3000);
+          return;
+        }
+
+        media_tokens.color = video_upload_response.data;
+        console.log(`https://storyteller.ai/media/${media_tokens.color}`);
+        console.log("Uploaded No Audio");
       }
-    } // end generation for color or multiple channels of data.
+    } catch (error) {
+      const err = error as VideoPreProcessorError;
+      console.log(error);
+      await this.handleError(
+        `Failed PreProcess Operation: ${err.message}`,
+        3000,
+      );
+    } finally {
+      // Remove all images in memory for color
+      await this.editor.videoAudioPreProcessor.removeInMemoryImages();
+      this.editor.engineFrameBuffers.colorFrames = []; // possibly allocate up front
+    }
+
+    if (this.editor.engine_preprocessing) {
+      try {
+        const depthBlob = await this.enginePreProcessingStep(
+          "depth",
+          this.editor.engineFrameBuffers.depthFrames,
+        );
+
+        const depth_video_upload_response =
+          await this.mediaUploadAPI.UploadNewVideo({
+            blob: depthBlob,
+            fileName: `${title}.mp4`,
+            uuid: uuidv4(),
+            maybe_title: title,
+            maybe_visibility: Visibility.Public,
+            maybe_style_name: style_name,
+            maybe_scene_source_media_file_token: immutable_media_token,
+          });
+
+        if (!depth_video_upload_response.data) {
+          this.handleError("Failed to Upload PreProcessing 9D", 3000);
+          return;
+        }
+        media_tokens.depth = depth_video_upload_response.data;
+
+        const outlineBlob = await await this.enginePreProcessingStep(
+          "outline",
+          this.editor.engineFrameBuffers.outlineFrames,
+        );
+
+        const outline_video_upload_response =
+          await this.mediaUploadAPI.UploadNewVideo({
+            blob: outlineBlob,
+            fileName: `${title}.mp4`,
+            uuid: uuidv4(),
+            maybe_title: title,
+            maybe_visibility: Visibility.Public,
+            maybe_style_name: style_name,
+            maybe_scene_source_media_file_token: immutable_media_token,
+          });
+
+        if (!outline_video_upload_response.data) {
+          this.handleError("Failed to Upload PreProcessing 9O", 3000);
+          return;
+        }
+        media_tokens.outline = outline_video_upload_response.data;
+
+        const normalBlob = await this.enginePreProcessingStep(
+          "normal",
+          this.editor.engineFrameBuffers.normalFrames,
+        );
+
+        const normal_video_upload_response =
+          await this.mediaUploadAPI.UploadNewVideo({
+            blob: normalBlob,
+            fileName: `${title}.mp4`,
+            uuid: uuidv4(),
+            maybe_title: title,
+            maybe_visibility: Visibility.Public,
+            maybe_style_name: style_name,
+            maybe_scene_source_media_file_token: immutable_media_token,
+          });
+
+        if (!normal_video_upload_response.data) {
+          this.handleError("Failed to Upload PreProcessing 9N", 3000);
+          return;
+        }
+        media_tokens.normal = normal_video_upload_response.data;
+      } catch (err) {
+        console.log(err);
+        console.log("Could Not Engine PreProcess");
+        // At any point if it fails we need to clear and clean up tokens
+        media_tokens.depth = "";
+        media_tokens.outline = "";
+        media_tokens.outline = "";
+      } finally {
+        this.editor.engineFrameBuffers.normalFrames = [];
+        this.editor.engineFrameBuffers.outlineFrames = [];
+        this.editor.engineFrameBuffers.depthFrames = [];
+
+        console.log(
+          `https://storyteller.ai/media/${media_tokens.normal} Normal`,
+        );
+
+        console.log(`https://storyteller.ai/media/${media_tokens.depth} Depth`);
+
+        console.log(
+          `https://storyteller.ai/media/${media_tokens.outline} Outline`,
+        );
+
+        await this.editor.videoAudioPreProcessor.removeInMemoryImages();
+      }
+    }
+
+    await this.editor.videoAudioPreProcessor.removeAllVideos();
 
     this.editor.onWindowResize();
 
-    console.log(media_tokens);
-
     this.editor.setColorMap();
-
-    console.log(`https://storyteller.ai/media/${media_tokens.color}`);
-    console.log(`https://storyteller.ai/media/${media_tokens.normal}`);
-    console.log(`https://storyteller.ai/media/${media_tokens.depth}`);
-    console.log(`https://storyteller.ai/media/${media_tokens.outline}`);
 
     await this.editor.updateLoad({
       progress: 100,
@@ -485,6 +477,22 @@ export class VideoGeneration {
     await this.handleEnqueue(media_tokens, ipa_image_token ?? "");
 
     await this.EndLoadingState();
+  }
+
+  // returns the media token
+  async enginePreProcessingStep(
+    frameType: string,
+    frameBuffer: (string | null)[],
+  ): Promise<Blob> {
+    const preProcessBlob =
+      await this.editor.videoAudioPreProcessor.processVideoWithBuffer(
+        frameBuffer,
+        `${frameType}`,
+        `${frameType}`,
+        `${frameType}Frame`,
+      );
+    await this.editor.videoAudioPreProcessor.removeInMemoryImages();
+    return preProcessBlob;
   }
 
   async handleCachedEnqueue() {
@@ -520,10 +528,10 @@ export class VideoGeneration {
       addToast(
         ToastTypes.SUCCESS,
         "Done Check Your Movies Tab On Profile.",
-        5000,
+        3000,
       );
     } else {
-      addToast(ToastTypes.ERROR, "Failed To Process Movie Try Again", 5000);
+      addToast(ToastTypes.ERROR, "Failed To Process Movie Try Again", 3000);
     }
   }
 
@@ -557,11 +565,11 @@ export class VideoGeneration {
     if (enqueue_studio_response.success) {
       startPollingActiveJobs();
     } else {
-      await this.handleError("Failed To Process Movie Try Again", 5000);
+      await this.handleError("Failed To Process Movie Try Again", 3000);
       return;
     }
 
-    this.handleSuccess("Done Check Your Movies Tab On Profile.", 5000);
+    this.handleSuccess("Done Check Your Movies Tab On Profile.", 3000);
   }
 
   async handleSuccess(message: string, timeout: number) {

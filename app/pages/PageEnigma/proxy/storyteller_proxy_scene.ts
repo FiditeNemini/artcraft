@@ -48,7 +48,7 @@ export class StoryTellerProxyScene {
     proxyObject3D.specular = child.userData["specular"];
     proxyObject3D.locked = child.userData["locked"];
     proxyObject3D.visible = child.visible;
-    if(child.userData["media_file_type"] !== undefined){
+    if (child.userData["media_file_type"] !== undefined) {
       proxyObject3D.media_file_type = child.userData["media_file_type"];
     }
     const json_data = await proxyObject3D.toJSON();
@@ -186,7 +186,7 @@ export class StoryTellerProxyScene {
           obj.userData["shininess"] = json_object.shininess;
           obj.userData["specular"] = json_object.specular;
           obj.userData["media_file_type"] = json_object.media_file_type;
-          console.log(obj)
+          //console.log(obj)
 
           if (json_object.visible !== undefined) {
             this.scene.setVisible(obj.uuid, json_object.visible);

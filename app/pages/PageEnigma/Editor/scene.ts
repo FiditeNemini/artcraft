@@ -71,7 +71,7 @@ class Scene {
     this._create_skybox();
     this._create_camera_obj();
 
-    this.helper = new MMDAnimationHelper( { afterglow: 2.0 } );
+    this.helper = new MMDAnimationHelper({ afterglow: 2.0 });
     this.scene.userData["helper"] = this.helper;
   }
 
@@ -83,7 +83,10 @@ class Scene {
     this._create_camera_obj();
   }
 
-  async instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
+  async instantiate(
+    name: string,
+    pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
+  ) {
     const material = new THREE.MeshPhongMaterial({ color: 0xdacbce });
     material.shininess = 0.0;
     let geometry;
@@ -133,9 +136,9 @@ class Scene {
       const image_token = name.replace("Image::", "");
       let texture;
 
-      if(image_token.includes(".mp4")) {
+      if (image_token.includes(".mp4")) {
         const Video_token = name.replace("Image::", "");
-        const videoElement = document.createElement('video');
+        const videoElement = document.createElement("video");
         videoElement.controls = true;
         videoElement.muted = true;
         //videoElement.loop = true;
@@ -181,7 +184,6 @@ class Scene {
     obj.userData["specular"] = 0.0;
     obj.userData["locked"] = false;
     obj.userData["media_file_type"] = MediaFileType.None;
-
 
     this.scene.add(obj);
 
@@ -660,7 +662,7 @@ class Scene {
 
   // This allows to wait for Ammo to fully load.
   delay_mmd(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private async load_mmd_wrapped(
@@ -674,6 +676,7 @@ class Scene {
     console.log('Load MMD')
     const scriptModule = document.createElement('script');
     scriptModule.type = 'module';
+
     scriptModule.textContent = `
       Ammo().then(function (AmmoLib) {
         Ammo = AmmoLib;
@@ -690,19 +693,23 @@ class Scene {
         media_url,
         (mesh: THREE.SkinnedMesh) => {
           this.helper.add(mesh, {
-             physics: true
-          })
-          const ikHelper = this.helper.objects.get(mesh)?.ikSolver.createHelper();
-          if(ikHelper){
-            ikHelper.visible = false;
-            this.scene.add( ikHelper );
-          }
+            physics: false,
+          });
+          // const ikHelper = this.helper.objects
+          //   .get(mesh)
+          //   ?.ikSolver.createHelper();
+          // if (ikHelper) {
+          //   ikHelper.visible = false;
+          //   this.scene.add(ikHelper);
+          // }
 
-          const physicsHelper = this.helper.objects.get(mesh)?.physics?.createHelper();
-          if(physicsHelper){
-            physicsHelper.visible = false;
-            this.scene.add( physicsHelper );
-          }
+          // const physicsHelper = this.helper.objects
+          //   .get(mesh)
+          //   ?.physics?.createHelper();
+          // if (physicsHelper) {
+          //   physicsHelper.visible = false;
+          //   this.scene.add(physicsHelper);
+          // }
 
           mesh.scale.set(0.1, 0.1, 0.1);
           resolve(mesh);
@@ -729,8 +736,7 @@ class Scene {
         "/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png",
       ]);
       this.scene.background = texture;
-    }
-    else if (this.skybox == "m_1") {
+    } else if (this.skybox == "m_1") {
       const texture = loader.load([
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_3_Right-X.png",

@@ -44,6 +44,11 @@ import { MediaUploadApi } from "~/Classes/ApiManager";
 import { SceneManager } from "./scene_manager_api";
 import { CustomOutlinePass } from "./CustomOutlinePass.js";
 import FindSurfaces from "./FindSurfaces.js";
+import {
+  EngineFrameBuffers,
+  VideoAudioPreProcessor,
+} from "./video_audio_preprocessor";
+import { forEach } from "lodash";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -87,7 +92,7 @@ class Editor {
   cameraViewControls: FreeCam | undefined;
   orbitControls: OrbitControls | undefined;
   locked: boolean;
-  frame_buffer: any[] = [];
+  frame_buffer: string[][] = []; // Contains a single frame with 4 channels or a signle frame with 1 channel color | depth | outline | normal.
   render_timer: number;
   fps_number: number;
   cap_fps: number;
@@ -167,13 +172,52 @@ class Editor {
   customOutlinerPass: CustomOutlinePass | undefined;
   surfaceFinder: FindSurfaces | undefined;
 
+  // New Rendering Pipeline Engine Work
+  videoAudioPreProcessor: VideoAudioPreProcessor;
+  colorRenderQueue: Array<Promise<string> | null>;
+  depthRenderQueue: Array<Promise<string> | null>;
+  normalRenderQueue: Array<Promise<string> | null>;
+  outlineRenderQueue: Array<Promise<string> | null>;
+  engineFrameBuffers: EngineFrameBuffers;
+  renderIndex: number;
+  // this should be set in the future to extend the lenght of the track for rendering engine
+  globalSetTrackLengthSeconds: number;
+
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
 
+    // New Rendering Pipeline Engine Work
+    this.globalSetTrackLengthSeconds = 7;
+    this.cap_fps = 60;
+    const frames = this.globalSetTrackLengthSeconds * this.cap_fps;
+
+    this.videoAudioPreProcessor = new VideoAudioPreProcessor();
+    this.videoAudioPreProcessor.initialize();
+
+    // number of frames max in a scene
+    this.colorRenderQueue = new Array(frames).fill(null);
+    this.depthRenderQueue = new Array(frames).fill(null);
+    this.normalRenderQueue = new Array(frames).fill(null);
+    this.outlineRenderQueue = new Array(frames).fill(null);
+    this.renderIndex = 0;
+
+    this.engineFrameBuffers = {
+      colorFrames: new Array(frames).fill(null),
+      normalFrames: new Array(frames).fill(null),
+      outlineFrames: new Array(frames).fill(null),
+      depthFrames: new Array(frames).fill(null),
+    };
+
+    // New Rendering Pipeline Engine Work
+
     // TODO: REMOVE LATER WITH BETTER FIX FOR IMPORTING AMMOJS
-    document.body.appendChild(Object.assign(document.createElement('script'), {src: 'jsm/libs/ammo.wasm.js'}));
+    document.body.appendChild(
+      Object.assign(document.createElement("script"), {
+        src: "jsm/libs/ammo.wasm.js",
+      }),
+    );
 
     this.can_initialize = false;
     this.can_initialize = true;
@@ -373,6 +417,7 @@ class Editor {
       console.log("Editor Already Initialized");
       return;
     }
+
     this.can_initialize = false;
 
     // Gets the canvas.
@@ -879,24 +924,8 @@ class Editor {
     );
   }
 
-  // Render the scene to the camera, this is called in the update.
-  async renderScene() {
-    if (
-      this.composer != null &&
-      !this.rendering &&
-      this.rawRenderer &&
-      this.render_composer
-    ) {
-      this.composer.render();
-      //this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
-      this.render_composer.render();
-    } else if (this.renderer && this.render_camera && !this.rendering) {
-      this.renderer.setSize(this.render_width, this.render_height);
-      this.renderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.rendering && this.renderer) {
-      this.renderer.setSize(this.render_width, this.render_height);
-    }
-
+  async recordScene() {
+    // Preconditions required to record the scene when generating the movie.
     if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
       if (this.recorder === undefined && this.render_camera) {
         const width =
@@ -927,47 +956,113 @@ class Editor {
       if (this.timeline.is_playing) {
         this.setColorMap();
         this.render_composer?.render();
-        const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // High quality png.
+
+        // TODO we can fix this, we need to create a bunch of off screen canvas elements
+        // then in parallel have them be peeled off of there
+        const renderTask = this.videoAudioPreProcessor.retrieveFrame(
+          this.rawRenderer,
+        );
+        // await for now race condition with frame retrival on the buffer.
+        this.engineFrameBuffers.colorFrames[this.renderIndex] =
+          await renderTask;
 
         if (this.engine_preprocessing) {
+          // Normals
           this.setNormalMap();
           this.render_composer?.render();
-          const normalImgData = this.rawRenderer.domElement.toDataURL(
-            "image/png",
-            1.0,
-          ); // High quality png.
 
+          const normalRenderTask = this.videoAudioPreProcessor.retrieveFrame(
+            this.rawRenderer,
+          );
+          this.engineFrameBuffers.normalFrames[this.renderIndex] =
+            await normalRenderTask;
+
+          //this.normalRenderQueue[this.renderIndex] = normalRenderTask;
+
+          // Depth
           this.setRenderDepth();
           this.render_composer?.render();
-          const depthImgData = this.rawRenderer.domElement.toDataURL(
-            "image/png",
-            1.0,
-          ); // High quality png.
+          const depthRenderTask = this.videoAudioPreProcessor.retrieveFrame(
+            this.rawRenderer,
+          );
+          this.engineFrameBuffers.depthFrames[this.renderIndex] =
+            await depthRenderTask;
+          // this.depthRenderQueue[this.renderIndex] = depthRenderTask;
 
+          // Outline
           this.setOutlineRender();
           this.render_composer?.render();
-          const outlineImgData = this.rawRenderer.domElement.toDataURL(
-            "image/png",
-            1.0,
-          ); // High quality png.
+          const outlineRenderTask = this.videoAudioPreProcessor.retrieveFrame(
+            this.rawRenderer,
+          );
+          this.engineFrameBuffers.outlineFrames[this.renderIndex] =
+            await outlineRenderTask;
 
-          this.frame_buffer.push([
-            imgData,
-            normalImgData,
-            depthImgData,
-            outlineImgData,
-          ]);
+          //this.outlineRenderQueue[this.renderIndex] = outlineRenderTask;
+
+          this.renderIndex += 1;
         } else {
-          this.frame_buffer.push([imgData]);
+          this.renderIndex += 1;
         }
 
         this.render_timer += this.clock.getDelta();
       }
       if (!this.timeline.is_playing) {
         this.playback_location = 0;
-        this.stopPlaybackAndUploadVideo();
+        try {
+          this.renderIndex = 0;
+          // collect all frames here
+          console.time("RenderQueueTime");
+          //const colors = await Promise.all(this.colorRenderQueue);
+          console.timeEnd("RenderQueueTime");
+          // console.log(`Number of Frames: ${colors.length}`);
+
+          // We are doing it sync now.
+          // this.engineFrameBuffers.colorFrames = colors;
+          this.colorRenderQueue.fill(null);
+
+          if (this.engine_preprocessing) {
+            console.time("EnginePreProcessingTime");
+            //const normals = await Promise.all(this.normalRenderQueue);
+            //this.engineFrameBuffers.normalFrames = normals;
+            //this.normalRenderQueue.fill(null);
+
+            //const depth = await Promise.all(this.depthRenderQueue);
+            //this.engineFrameBuffers.depthFrames = depth;
+            //this.depthRenderQueue.fill(null);
+
+            //const outlines = await Promise.all(this.outlineRenderQueue);
+            //this.engineFrameBuffers.outlineFrames = outlines;
+            //this.outlineRenderQueue.fill(null);
+            console.timeEnd("EnginePreProcessingTime");
+          }
+
+          await this.stopPlaybackAndUploadVideo();
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
+  }
+
+  // Render the scene to the camera, this is called in the update.
+  async renderScene() {
+    if (
+      this.composer != null &&
+      !this.rendering &&
+      this.rawRenderer &&
+      this.render_composer
+    ) {
+      this.composer.render();
+      //this.rawRenderer.render(this.activeScene.scene, this.render_camera!);
+      this.render_composer.render();
+    } else if (this.renderer && this.render_camera && !this.rendering) {
+      this.renderer.setSize(this.render_width, this.render_height);
+      this.renderer.render(this.activeScene.scene, this.render_camera);
+    } else if (this.rendering && this.renderer) {
+      this.renderer.setSize(this.render_width, this.render_height);
+    }
+    await this.recordScene();
   }
 
   async useCachedMediaTokens(): Promise<boolean> {
@@ -986,13 +1081,8 @@ class Editor {
 
   // Basicly Unity 3D's update loop.
   async updateLoop() {
-    setTimeout(
-      () => {
-        requestAnimationFrame(this.updateLoop.bind(this));
-      },
-      1000 / (this.cap_fps * 2),
-    ); // Get the most FPS we can out of the renderer.
-
+    //console.timeEnd("Single Frame Time");
+    //console.time("Single Frame Time");
     this.containerMayReset();
 
     if (!this.rendering && this.container) {
@@ -1071,6 +1161,13 @@ class Editor {
 
     await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
+
+    setTimeout(
+      () => {
+        requestAnimationFrame(this.updateLoop.bind(this));
+      },
+      1000 / (this.cap_fps * 2),
+    ); // Get the most FPS we can out of the renderer.
   }
 
   change_mode(type: "translate" | "rotate" | "scale") {
@@ -1081,8 +1178,8 @@ class Editor {
     this.transform_interaction = true;
   }
 
-  async stopPlaybackAndUploadVideo(compile_audio: boolean = true) {
-    this.videoGeneration.stopPlaybackAndUploadVideo(compile_audio);
+  async stopPlaybackAndUploadVideo() {
+    await this.videoGeneration.stopPlaybackAndUploadVideo();
   }
 
   async switchPreview() {
@@ -1195,10 +1292,7 @@ class Editor {
     }
     if (!this.rendering && this.timeline.is_playing) {
       this.timeline.is_playing = false;
-      // this.timeline.scrubber_frame_position = 0;
-      // this.timeline.current_time = 0;
-      // this.timeline.stepFrame(0);
-      // this.timeline.resetScene();
+
       this.switchCameraView();
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach((element) => {
