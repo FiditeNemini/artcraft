@@ -30,9 +30,8 @@ export interface Weight {
 
 export interface GetWeightRequest {}
 
-export interface GetWeightResponse {
+export interface GetWeightResponse extends Weight {
   success: boolean;
-  weight?: Weight;
 }
 
 export const GetWeight = MakeRequest<

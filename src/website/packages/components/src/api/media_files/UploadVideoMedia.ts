@@ -1,0 +1,20 @@
+import MakeMultipartRequest from "../MakeMultipartRequest";
+
+export interface UploadVideoMediaRequest {
+  file: any;
+  is_intermediate_system_file?: boolean;
+  maybe_scene_source_media_file_token?: string;
+  maybe_style_name?: string;
+  maybe_title?: string;
+  maybe_visibility?: "public" | "private";
+  uuid_idempotency_token: string;
+}
+
+export interface UploadVideoMediaResponse {
+  media_file_token: string;
+  success: boolean;
+}
+
+export const UploadVideoMedia = (request: UploadVideoMediaRequest) => {
+  return MakeMultipartRequest("/v1/media_files/upload/video", request);
+};

@@ -65,74 +65,76 @@ export default function WeightEditPage({
   let weightToken = weight?.creator?.user_token;
 
   if (isLoading) {
-    return <Panel padding={true}>
-      <div className="d-flex flex-column gap-3">
-        <Skeleton type="short" />
-        <Skeleton height="40px" />
-        <Skeleton type="short" />
-        <Skeleton height="40px" />
-        <div className="d-flex justify-content-end mt-3 gap-2">
-          <Skeleton height="40px" width="120px" />
-          <Skeleton height="40px" width="120px" />
+    return (
+      <Panel padding={true}>
+        <div className="d-flex flex-column gap-3">
+          <Skeleton type="short" />
+          <Skeleton height="40px" />
+          <Skeleton type="short" />
+          <Skeleton height="40px" />
+          <div className="d-flex justify-content-end mt-3 gap-2">
+            <Skeleton height="40px" width="120px" />
+            <Skeleton height="40px" width="120px" />
+          </div>
         </div>
-      </div>
-    </Panel>;
+      </Panel>
+    );
   } else {
-      if (!weightToken) {
-    return (
-      <Container type="panel">
-        <PageHeader
-          titleIcon={faCircleExclamation}
-          title="Access Denied"
-          subText="This weight does not exist or is not owned by you."
-          panel={true}
-          extension={
-            <div className="d-flex">
-              <Button
-                label="Back to homepage"
-                to={`/weight/{}`}
-                className="d-flex"
-              />
-            </div>
-          }
-        />
-      </Container>
-    );
-  }
+    if (!weightToken) {
+      return (
+        <Container type="panel">
+          <PageHeader
+            titleIcon={faCircleExclamation}
+            title="Access Denied"
+            subText="This weight does not exist or is not owned by you."
+            panel={true}
+            extension={
+              <div className="d-flex">
+                <Button
+                  label="Back to homepage"
+                  to={`/weight/{}`}
+                  className="d-flex"
+                />
+              </div>
+            }
+          />
+        </Container>
+      );
+    }
 
-  if (!canEditTtsModel(user?.user_token || "")) {
-    return (
-      <Container type="panel">
-        <PageHeader
-          titleIcon={faCircleExclamation}
-          title="Access Denied"
-          subText="You do not have permission to edit this model."
-          panel={true}
-          extension={
-            <div className="d-flex">
-              <Button
-                label="Back to homepage"
-                to={`/weight/{}`}
-                className="d-flex"
-              />
-            </div>
-          }
-        />
-      </Container>
-    );
-  }
+    if (!canEditTtsModel(user?.user_token || "")) {
+      return (
+        <Container type="panel">
+          <PageHeader
+            titleIcon={faCircleExclamation}
+            title="Access Denied"
+            subText="You do not have permission to edit this model."
+            panel={true}
+            extension={
+              <div className="d-flex">
+                <Button
+                  label="Back to homepage"
+                  to={`/weight/{}`}
+                  className="d-flex"
+                />
+              </div>
+            }
+          />
+        </Container>
+      );
+    }
 
-  return (
-    <Container type="panel" className="mb-5">
-      <PageHeader
-        title="Edit Weight"
-        titleIcon={faWaveform}
-        subText="Make changes to your weight details"
-        panel={false}
-        showBackButton={true}
-        backbuttonLabel="Back"
-        backbuttonTo={`/weight/${weight_token}`}
-      />
+    return (
+      <Container type="panel" className="mb-5">
+        <PageHeader
+          title="Edit Weight"
+          titleIcon={faWaveform}
+          subText="Make changes to your weight details"
+          panel={false}
+          showBackButton={true}
+          backbuttonLabel="Back"
+          backbuttonTo={`/weight/${weight_token}`}
+        />
         <SplitPanel {...{ busy: writeStatus > 0, dividerFooter: true }}>
           <SplitPanel.Body padding={true}>
             <div {...{ className: "weight-editor row gy-3 gx-4" }}>
@@ -198,7 +200,7 @@ export default function WeightEditPage({
             </div>
           </SplitPanel.Footer>
         </SplitPanel>
-    </Container>
-  );
+      </Container>
+    );
   }
 }
