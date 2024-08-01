@@ -8,16 +8,20 @@
 
 # Gatsby blog paths:
 # /static/*              /gatsby/static/:splat     200!
-/blog                  /gatsby/blog/index.html   200!
-/blog/*                /gatsby/blog/:splat       200!
-/ai-tools              /gatsby                   200!
-/ai-tools/*            /gatsby/ai-tools/:splat   200!
+#/blog                  /gatsby/blog/index.html   200!
+#/blog/*                /gatsby/blog/:splat       200!
+#/ai-tools              /gatsby                   200!
+#/ai-tools/*            /gatsby/ai-tools/:splat   200!
 
 # Zola blog paths:
 /foo                /zola/foo/index.html     200!
 /foo/*              /zola/foo/:splat         200!
 /bar                /zola/bar/index.html     200!
 /bar/*              /zola/bar/:splat         200!
+/ai-tools           /zola/foo/index.html     200!
+/ai-tools/*         /zola/foo/:splat         200!
+/blog               /zola/blog/index.html    200!
+/blog/*             /zola/blog/:splat        200!
 
 # Zola static assets from theme:
 /zola/*             /zola/zola/:splat        200!
