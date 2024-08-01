@@ -22,7 +22,7 @@ import {
   faWaveformLines,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
-import "./DevTTS.scss";
+import "./NewTTS.scss";
 import { FeaturedVoice } from "./FeaturedVoice";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
@@ -45,7 +45,7 @@ interface Props {
   sessionSubscriptionsWrapper: any;
 }
 
-export default function DevTTS({ sessionSubscriptionsWrapper }: Props) {
+export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
   const { enqueueInferenceJob } = useInferenceJobs();
   const { modalState, open, close } = useModal();
   const [search, searchSet] = useState("");

@@ -40,7 +40,7 @@ import { W2lTemplateDeletePage } from "./pages/w2l/w2l_template_delete/W2lTempla
 import { W2lTemplateEditPage } from "./pages/w2l/w2l_template_edit/W2lTemplateEditPage";
 import { W2lResultDeletePage } from "./pages/w2l/w2l_result_delete/W2lResultDeletePage";
 import { W2lTemplateApprovePage } from "./pages/w2l/w2l_template_approve/W2lTemplateApprovePage";
-import { TtsModelListPage } from "./pages/tts/tts_model_list/TtsModelListPage";
+// import { TtsModelListPage } from "./pages/tts/tts_model_list/TtsModelListPage";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { ProfileBanFc } from "./pages/profile/profile_ban/ProfileBanFc";
 import { ModerationUserListFc } from "./pages/moderation/moderation_user_list/ModerationUserList";
@@ -113,7 +113,7 @@ import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
-import DevTTS from "./pages/dev_tts/DevTTS";
+import NewTTS from "./pages/new_tts/NewTTS";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
@@ -728,15 +728,16 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/dev-tts/:weight_token">
-                    <DevTTS
+                    <NewTTS
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
                     />
                   </Route>
 
-                  <Route exact path="/dev-tts">
-                    <DevTTS
+                  {/* NEW TTS PAGE */}
+                  <Route exact path="/tts">
+                    <NewTTS
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
@@ -879,7 +880,8 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/tts" exact={true}>
+                  {/* OLD TTS PAGE */}
+                  {/* <Route path="/tts" exact={true}>
                     <TtsModelListPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
@@ -943,7 +945,7 @@ class PageContainer extends React.Component<
                         this.props.setSelectedTtsLanguageScope
                       }
                     />
-                  </Route>
+                  </Route> */}
 
                   <Route path="/studio-mobile-check">
                     <StudioMobileCheckPage />
