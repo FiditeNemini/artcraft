@@ -60,7 +60,7 @@
   {% endif %}
 
   <!-- CSS & JS -->
-  <link rel="preload stylesheet" as="style" href="{{ get_url(path=`main.css`) }}" />
+  <link rel="preload stylesheet" as="style" href="{{ get_url(path=`zola/main.css`) }}" />
   <style>
     :root {
       --bg: {{ config.extra.style.bg_color | default(value="#f4f4f5") }};
@@ -88,7 +88,7 @@
   {% endif %}
 
   <!-- Dark Icon -->
-  <link rel="preload" as="image" href="{{ get_url(path=`icons/` ~ `theme.svg`) }}" />
+  <link rel="preload" as="image" href="{{ get_url(path=`zola/icons/` ~ `theme.svg`) }}" />
 
   <!-- Math -->
   {% if page.extra.math | default(value=config.extra.math) %}
@@ -107,8 +107,8 @@
   <!---->
 
   <!-- Favicon -->
-  <link rel="icon" href="{{ get_url(path=`favicon.ico`) }}" />
-  <link rel="apple-touch-icon" href="{{ get_url(path=`apple-touch-icon.png`) }}" />
+  <link rel="icon" href="{{ get_url(path=`zola/favicon.ico`) }}" />
+  <link rel="apple-touch-icon" href="{{ get_url(path=`zola/apple-touch-icon.png`) }}" />
 
   <!-- Feeds -->
   {% if config.generate_feed %}
@@ -118,14 +118,14 @@
     rel="alternate"
     type="application/atom+xml"
     title="Atom"
-    href="{{ get_url(path=`atom.xml`) }}"
+    href="{{ get_url(path=`zola/atom.xml`) }}"
   />
   {% endif %} {% if "rss.xml" in config.feed_filenames %}
   <link
     rel="alternate"
     type="application/rss+xml"
     title="RSS"
-    href="{{ get_url(path=`rss.xml`) }}"
+    href="{{ get_url(path=`zola/rss.xml`) }}"
   />
   {% endif %}
   <!---->

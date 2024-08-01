@@ -19,6 +19,9 @@
 /bar                /zola/bar/index.html     200!
 /bar/*              /zola/bar/:splat         200!
 
+# Zola static assets from theme:
+/zola/*             /zola/zola/:splat        200!
+
 # Website root:
 /                      /website/index.html   200
 
