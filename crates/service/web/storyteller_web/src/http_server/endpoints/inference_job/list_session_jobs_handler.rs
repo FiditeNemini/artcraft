@@ -293,6 +293,13 @@ fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<Json<L
     if record.status.status != JobStatusPlus::CompleteSuccess {
       return true;
     }
+    match record.request.inference_category {
+      // Show all audio results
+      InferenceCategory::TextToSpeech
+      | InferenceCategory::VoiceConversion => return true,
+      // Fall through for everything else
+      _ => {},
+    }
     success_count += 1;
     success_count <= 3
   });
