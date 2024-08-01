@@ -7,6 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { useHistory } from "react-router-dom";
+import { isMobile } from "react-device-detect";
 
 interface VstSectionV3Props {}
 
@@ -63,28 +64,31 @@ export default function VstSectionV3(props: VstSectionV3Props) {
         </div>
 
         <div>
-          <video
-            preload="metadata"
-            autoPlay={true}
-            controls={false}
-            muted={true}
-            loop={true}
-            playsInline={true}
-            className="w-100 d-none d-md-block"
-          >
-            <source src="/videos/vst_banner_desktop.mp4" type="video/mp4" />
-          </video>
-          <video
-            preload="metadata"
-            autoPlay={true}
-            controls={false}
-            muted={true}
-            loop={true}
-            playsInline={true}
-            className="w-100 d-block d-md-none px-3 pb-2"
-          >
-            <source src="/videos/vst_banner_mobile.mp4" type="video/mp4" />
-          </video>
+          {!isMobile ? (
+            <video
+              preload="metadata"
+              autoPlay={true}
+              controls={false}
+              muted={true}
+              loop={true}
+              playsInline={true}
+              className="w-100"
+            >
+              <source src="/videos/vst_banner_desktop.mp4" type="video/mp4" />
+            </video>
+          ) : (
+            <video
+              preload="metadata"
+              autoPlay={true}
+              controls={false}
+              muted={true}
+              loop={true}
+              playsInline={true}
+              className="w-100 px-3"
+            >
+              <source src="/videos/vst_banner_mobile.mp4" type="video/mp4" />
+            </video>
+          )}
         </div>
       </Panel>
     </div>
