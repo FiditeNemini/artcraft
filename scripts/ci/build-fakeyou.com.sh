@@ -32,7 +32,7 @@ function build_blog {
 }
 
 function build_zola {
-  zola --root zola --output-dir public build 
+  zola --root zola build 
 }
 
 echo "Current working directory:"
