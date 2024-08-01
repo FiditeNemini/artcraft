@@ -52,14 +52,17 @@ export default function CoverImageInput({
   status,
   ...rest
 }: Props) {
-  const [editingImg, editingImgSet] = useState(0);
-  const transitions = useTransition(editingImg, basicTransition({}));
+  const [editingImg, editingImgSet] = useState(currentPath ? 0 : 1);
+  const transitions = useTransition(
+    editingImg,
+    basicTransition({ enter: { opacity: 1.0, position: "absolute" } })
+  );
 
   return (
     <div {...{ className: "fy-cover-img-input" }}>
       {transitions((style, i) =>
         !currentPath || i ? (
-          <a.div {...{ style }}>
+          <a.div {...{ className: "fy-cover-img-empty", style }}>
             <ImageInput
               {...{ ...rest, disabled: status > 1, placeholderIcon: faImage }}
             >

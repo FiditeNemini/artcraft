@@ -6,7 +6,9 @@ import {
   MediaFilters,
   UploaderResponse,
 } from "components/entities/EntityTypes";
-import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
+import { UploadAudioMedia } from "@storyteller/components/src/api/media_files/UploadAudioMedia";
+import { UploadImageMedia } from "@storyteller/components/src/api/media_files/UploadImageMedia";
+import { UploadVideoMedia } from "@storyteller/components/src/api/media_files/UploadVideoMedia";
 import { UploadEngineAsset } from "@storyteller/components/src/api/media_files/UploadEngineAsset";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { GetFileTypeByExtension as extension } from "@storyteller/components/src/utils/GetFileTypeByExtension";
@@ -29,35 +31,6 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
     MediaFileSubtype | undefined
   >();
 
-  const createUpload = (inputFile: File, todo = n) => {
-    statusSet(FetchStatus.in_progress);
-    const fileExtension = extension(inputFile.name || "");
-    const isEngineAsset = isSelectedType(
-      MediaFilters.engine_asset,
-      fileExtension
-    );
-    const baseConfig = { uuid_idempotency_token: uuidv4(), file: inputFile };
-    const engineConfig = {
-      ...baseConfig,
-      media_file_subtype: engineSubtype,
-      media_file_class: mediaClass,
-    };
-    const mediaConfig = { ...baseConfig, source: "file" };
-    const uploader = isEngineAsset
-      ? UploadEngineAsset(engineConfig)
-      : UploadMedia(mediaConfig);
-
-    if (inputFile) {
-      uploader.then((res: UploaderResponse) => {
-        if ("media_file_token" in res) {
-          statusSet(FetchStatus.success);
-          onSuccess(res);
-          todo();
-        }
-      });
-    }
-  };
-
   const { file, clear, inputProps } = useFile({
     ...(autoUpload
       ? {
@@ -67,6 +40,42 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
         }
       : {}),
   });
+
+  const createUpload = (inputFile: File, todo = n) => {
+    statusSet(FetchStatus.in_progress);
+    const fileExtension = extension(inputFile.name || "");
+    const isAudio = isSelectedType(MediaFilters.audio, fileExtension);
+    const isEngineAsset = isSelectedType(
+      MediaFilters.engine_asset,
+      fileExtension
+    );
+    const isImage = isSelectedType(MediaFilters.image, fileExtension);
+    // const isVideo = isSelectedType(MediaFilters.video, fileExtension);
+    const baseConfig = { uuid_idempotency_token: uuidv4(), file: inputFile };
+    const engineConfig = {
+      ...baseConfig,
+      media_file_subtype: engineSubtype,
+      media_file_class: mediaClass,
+    };
+    const mediaConfig = { ...baseConfig, source: "file" };
+
+    const uploader = () => {
+      if (isAudio) return UploadAudioMedia(mediaConfig);
+      if (isEngineAsset) return UploadEngineAsset(engineConfig);
+      if (isImage) return UploadImageMedia(mediaConfig);
+      else return UploadVideoMedia(mediaConfig);
+    };
+
+    if (inputFile) {
+      uploader().then((res: UploaderResponse) => {
+        if ("media_file_token" in res) {
+          statusSet(FetchStatus.success);
+          onSuccess(res);
+          todo();
+        }
+      });
+    }
+  };
 
   const upload = () => {
     createUpload(file, clear);

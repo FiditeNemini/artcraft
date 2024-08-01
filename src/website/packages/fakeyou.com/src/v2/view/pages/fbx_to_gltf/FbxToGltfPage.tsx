@@ -10,7 +10,6 @@ import { Button, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 // import { useHistory, useParams } from "react-router-dom";
 // import { v4 as uuidv4 } from "uuid";
-// import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
 // import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import FbxToGltfJobList from "./components/FbxToGltfJobList";
 import // EnqueueFbxToGltf,
