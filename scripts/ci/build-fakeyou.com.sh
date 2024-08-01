@@ -31,24 +31,35 @@ function build_blog {
   popd
 }
 
+function build_zola {
+  zola --root zola --output-dir public build 
+}
+
 echo "Current working directory:"
 pwd
 
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
-echo "Building blog..."
+echo "Building gatsby blog..."
 build_blog
+
+echo "Building zola blog..."
+build_zola
 
 echo "Building website..."
 build_website
 
 echo "Create final output directory..."
 mkdir -p fakeyou.com/gatsby
+mkdir -p fakeyou.com/zola
 mkdir -p fakeyou.com/website
 
-echo "Copying blog artifacts..."
+echo "Copying gatsby blog artifacts..."
 cp -r src/gatsby-blog/public/* fakeyou.com/gatsby/
+
+echo "Copying gatsby blog artifacts..."
+cp -r zola/public/* fakeyou.com/zola/
 
 echo "Copying website artifacts..."
 #mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/
