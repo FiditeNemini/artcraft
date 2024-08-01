@@ -5,6 +5,7 @@ import { Button, ZoomSlider, ZoomSliderOnChangeEvent } from "components/common";
 interface Props {
   clear: () => void;
   entityType: "image" | "video";
+  isNarrow: boolean;
   media?: MediaFile;
   showCrop: boolean;
   zoom: number;
@@ -14,6 +15,7 @@ interface Props {
 export default function EntityInputSidePanel({
   clear,
   entityType,
+  isNarrow,
   media,
   showCrop,
   zoomSliderChange,
@@ -24,9 +26,9 @@ export default function EntityInputSidePanel({
   }`;
   return (
     <div {...{ className: "fy-entity-input-preview-controls" }}>
-      <div {...{ className: "fy-entity-input-preview-tools" }}>
+      <div {...{ className: `fy-entity-input-preview-tools${ isNarrow ? "-narrow" : "-wide" }` }}>
         {showCrop && (
-          <ZoomSlider {...{ onChange: zoomSliderChange, value: zoom }} />
+          <ZoomSlider {...{ ...isNarrow ? {horizontal: true } : {}, onChange: zoomSliderChange, value: zoom }} />
         )}
 
         <div {...{ className: "fy-entity-input-file-details" }}>
