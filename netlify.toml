@@ -9,7 +9,7 @@ environment = { GENERATE_SOURCEMAP = "false" }
 YARN_VERSION = "3.3.1"
 
 # https://www.getzola.org/documentation/deployment/netlify/
-ZOLA_VERSION = "0.13.0"
+ZOLA_VERSION = "0.19.1"
 
 [[redirects]]
 # NB: storyteller.ai replaces storyteller.io

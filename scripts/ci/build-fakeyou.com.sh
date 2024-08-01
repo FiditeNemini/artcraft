@@ -41,8 +41,8 @@ pwd
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
-echo "Building gatsby blog..."
-build_blog
+#echo "Building gatsby blog..."
+#build_blog
 
 echo "Building zola blog..."
 build_zola
@@ -55,8 +55,8 @@ mkdir -p fakeyou.com/gatsby
 mkdir -p fakeyou.com/zola
 mkdir -p fakeyou.com/website
 
-echo "Copying gatsby blog artifacts..."
-cp -r src/gatsby-blog/public/* fakeyou.com/gatsby/
+#echo "Copying gatsby blog artifacts..."
+#cp -r src/gatsby-blog/public/* fakeyou.com/gatsby/
 
 echo "Copying gatsby blog artifacts..."
 cp -r zola/public/* fakeyou.com/zola/
