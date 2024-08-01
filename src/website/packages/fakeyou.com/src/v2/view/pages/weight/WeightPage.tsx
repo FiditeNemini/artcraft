@@ -377,7 +377,7 @@ export default function WeightPage({
   if (weight?.cover_image?.maybe_cover_image_public_bucket_path !== null) {
     audioWeightCoverImage = bucketConfig.getCdnUrl(
       weight?.cover_image?.maybe_cover_image_public_bucket_path || "",
-      100,
+      140,
       100
     );
   }
