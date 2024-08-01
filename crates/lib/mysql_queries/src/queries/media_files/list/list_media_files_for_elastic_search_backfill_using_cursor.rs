@@ -112,6 +112,8 @@ pub struct MediaFileForElasticsearchRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  pub database_read_time: DateTime<Utc>,
 }
 
 pub struct ListArgs<'a> {
@@ -197,6 +199,7 @@ pub async fn list_media_files_for_elastic_search_backfill_using_cursor(
           updated_at: record.updated_at,
           user_deleted_at: record.user_deleted_at,
           mod_deleted_at: record.mod_deleted_at,
+          database_read_time: record.database_read_time,
         }
       })
       .collect::<Vec<MediaFileForElasticsearchRecord>>())
@@ -277,7 +280,9 @@ SELECT
     m.created_at,
     m.updated_at,
     m.user_deleted_at,
-    m.mod_deleted_at
+    m.mod_deleted_at,
+
+    NOW() as database_read_time
 
 FROM media_files as m
 
@@ -434,6 +439,8 @@ struct RawRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  pub database_read_time: DateTime<Utc>,
 }
 
 impl FromRow<'_, MySqlRow> for RawRecord {
@@ -509,6 +516,8 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       updated_at: row.try_get("updated_at")?,
       user_deleted_at: row.try_get("user_deleted_at")?,
       mod_deleted_at: row.try_get("mod_deleted_at")?,
+
+      database_read_time: row.try_get("database_read_time")?,
     })
   }
 }

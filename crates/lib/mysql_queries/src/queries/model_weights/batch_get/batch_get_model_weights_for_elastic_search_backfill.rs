@@ -56,6 +56,8 @@ pub struct ModelWeightForElasticsearchRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  pub database_read_time: DateTime<Utc>,
 }
 
 pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
@@ -111,6 +113,7 @@ pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
           updated_at: model.updated_at,
           user_deleted_at: model.user_deleted_at,
           mod_deleted_at: model.mod_deleted_at,
+          database_read_time: model.database_read_time,
         }
       })
       .collect::<Vec<ModelWeightForElasticsearchRecord>>())
@@ -162,7 +165,9 @@ SELECT
     w.created_at,
     w.updated_at,
     w.user_deleted_at,
-    w.mod_deleted_at
+    w.mod_deleted_at,
+
+    NOW() as database_read_time
 
 FROM model_weights as w
 
@@ -242,6 +247,8 @@ struct RawRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  pub database_read_time: DateTime<Utc>,
 }
 
 // NB(bt,2023-12-05): There's an issue with type hinting in the `as` clauses with QueryBuilder (or
@@ -296,6 +303,7 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       updated_at: row.try_get("updated_at")?,
       user_deleted_at: row.try_get("user_deleted_at")?,
       mod_deleted_at: row.try_get("mod_deleted_at")?,
+      database_read_time: row.try_get("database_read_time")?,
     })
   }
 }

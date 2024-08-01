@@ -63,6 +63,9 @@ pub struct ModelWeightDocument {
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 
+  /// When we read the record from the database
+  pub database_read_time: DateTime<Utc>,
+
   /// Calculated as "either user or mod deleted"
   pub is_deleted: bool,
 }

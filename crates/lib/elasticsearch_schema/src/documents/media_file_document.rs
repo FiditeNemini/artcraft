@@ -64,6 +64,9 @@ pub struct MediaFileDocument {
   /// Whether the file is featured.
   pub is_featured: bool,
 
+  /// When we read the record from the database
+  pub database_read_time: DateTime<Utc>,
+
   /// Calculated as "either user or mod deleted"
   pub is_deleted: bool,
 }
