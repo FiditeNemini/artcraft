@@ -16,5 +16,5 @@ export interface UploadVideoMediaResponse {
 }
 
 export const UploadVideoMedia = (request: UploadVideoMediaRequest) => {
-  return MakeMultipartRequest("/v1/media_files/upload/video", request);
+  return MakeMultipartRequest("/v1/media_files/upload/new_video", request);
 };
