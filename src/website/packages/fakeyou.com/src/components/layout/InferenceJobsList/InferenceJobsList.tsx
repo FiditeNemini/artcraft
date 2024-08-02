@@ -21,6 +21,7 @@ interface JobsListProps {
   jobType?: FrontendInferenceJobType | AllInferenceJobs;
   onSelect?: (e: any) => any;
   panel?: boolean;
+  scroll?: boolean;
   showJobQueue?: boolean;
   showNoJobs?: boolean;
   showHeader?: boolean;
@@ -44,6 +45,7 @@ export default function InferenceJobsList({
   jobType,
   onSelect,
   panel = true,
+  scroll = false,
   showHeader = true,
   showJobQueue = false,
   showNoJobs = false,
@@ -72,7 +74,13 @@ export default function InferenceJobsList({
   // });
 
   const jobContent = (
-    <div style={{ minHeight: "40vh" }}>
+    <div
+      {...{
+        className: `fy-inference-jobs-content${
+          scroll ? " fy-inference-jobs-scroll-list" : ""
+        }`,
+      }}
+    >
       {showHeader && (
         <header>
           <h3 className="fw-semibold">{t("core.heading")}</h3>
