@@ -8,12 +8,14 @@ import { useInferenceJobs, useLocalize } from "hooks";
 interface Props {
   handleClose?: any;
   jobType?: FrontendInferenceJobType;
+  scroll?: boolean;
   showModalHeader?: boolean;
 }
 
 export default function InferenceJobsModal({
   handleClose,
   jobType = -1,
+  scroll,
   showModalHeader = true,
   ...rest
 }: Props) {
@@ -42,6 +44,7 @@ export default function InferenceJobsModal({
             if (handleClose) handleClose();
           },
           ...(jobType > -1 ? { jobType } : {}),
+          scroll,
           showHeader: false,
           showJobQueue: false,
           showNoJobs: true,

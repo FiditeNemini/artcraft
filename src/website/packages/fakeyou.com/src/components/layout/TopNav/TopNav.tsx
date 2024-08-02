@@ -71,7 +71,8 @@ export default function TopNav({
   const isOnTtsPage = window.location.pathname.includes("/dev-tts");
 
   const { open } = useModal();
-  const openModal = () => open({ component: InferenceJobsModal });
+  const openModal = () =>
+    open({ component: InferenceJobsModal, props: { scroll: true } });
   const [isScrolled, setIsScrolled] = useState(false);
   const loggedIn = sessionWrapper.isLoggedIn();
   const showNavItem =
