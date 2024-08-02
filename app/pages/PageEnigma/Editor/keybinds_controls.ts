@@ -204,18 +204,19 @@ export class MouseControls {
       return;
     }
 
-    if (event.ctrlKey && !this.isProcessing) {
-      if (event.key === "z") {
-        // undo
-        this.isProcessing = true;
-        await this.sceneManager?.undo();
-        this.isProcessing = false;
-        return;
-      } else if (event.key === "y") {
-        // redo
-        this.isProcessing = true;
-        await this.sceneManager?.redo();
-        this.isProcessing = false;
+    if ((event.ctrlKey || event.metaKey) && !this.isProcessing) {
+      if (event.key === "Z" || event.key === "z") {
+        if (event.shiftKey) {
+          // redo
+          this.isProcessing = true;
+          await this.sceneManager?.redo();
+          this.isProcessing = false;
+        } else {
+          // undo
+          this.isProcessing = true;
+          await this.sceneManager?.undo();
+          this.isProcessing = false;
+        }
         return;
       } else if (event.key === "c") {
         // redo

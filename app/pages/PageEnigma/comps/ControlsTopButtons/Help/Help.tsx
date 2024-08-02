@@ -115,6 +115,8 @@ export const Help = () => {
           <Shortcut label="Paste">
             <Key button="Ctrl" />
             <Plus></Plus>
+            <Key button="Shift" />
+            <Plus></Plus>
             <Key button="V" />
           </Shortcut>
         </ShortcutsGroup>
