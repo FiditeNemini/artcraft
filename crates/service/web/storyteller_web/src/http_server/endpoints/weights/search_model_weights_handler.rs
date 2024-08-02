@@ -15,7 +15,7 @@ use log::error;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use elasticsearch_schema::searches::search_model_weights::search_model_weights;
+use elasticsearch_schema::searches::search_model_weights::{search_model_weights, SearchArgs};
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
@@ -115,12 +115,28 @@ pub async fn search_model_weights_handler(
   request: web::Json<SearchModelWeightsRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, SearchModelWeightsError>
 {
-  let results = search_model_weights(
-    &server_state.elasticsearch,
-    &request.search_term,
-    request.ietf_language_subtag.as_deref(),
-    request.weight_type,
-    request.weight_category)
+  let maybe_weights_categories = request.weight_category
+      .map(|weight_category| {
+        let mut set = HashSet::new();
+        set.insert(weight_category);
+        set
+      });
+
+  let maybe_weights_types = request.weight_type
+      .map(|weight_type| {
+        let mut set = HashSet::new();
+        set.insert(weight_type);
+        set
+      });
+
+  let results = search_model_weights(SearchArgs {
+    search_term: &request.search_term,
+    maybe_creator_user_token: None,
+    maybe_ietf_primary_language_subtag: request.ietf_language_subtag.as_deref(),
+    maybe_weights_categories,
+    maybe_weights_types,
+    client: &server_state.elasticsearch,
+  })
       .await
       .map_err(|err| {
         error!("Searching error: {:?}", err);

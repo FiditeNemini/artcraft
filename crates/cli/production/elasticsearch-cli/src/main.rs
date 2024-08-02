@@ -5,6 +5,9 @@
 //!
 //! The intent is to be able to quickly populate documents and indices.
 //!
+
+use std::collections::HashSet;
+use std::iter::FromIterator;
 use elasticsearch::Elasticsearch;
 use elasticsearch::http::transport::Transport;
 use log::info;
@@ -12,7 +15,7 @@ use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::DEFAULT_RUST_LOG;
-use elasticsearch_schema::searches::search_model_weights::search_model_weights;
+use elasticsearch_schema::searches::search_model_weights::{search_model_weights, SearchArgs};
 use elasticsearch_schema::searches::search_tts_models::search_tts_models;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
@@ -58,8 +61,16 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::SearchModelWeights => {
       info!("Searching model weights...");
-      //let results = search_model_weights(&elasticsearch, "zel", Some("en"), Some(WeightsType::SoVitsSvc)).await?;
-      let results = search_model_weights(&elasticsearch, "zel", None, Some(WeightsType::RvcV2), None).await?;
+
+      let results = search_model_weights(SearchArgs {
+        search_term: "zel",
+        maybe_creator_user_token: None,
+        maybe_ietf_primary_language_subtag: None,
+        maybe_weights_categories: None,
+        maybe_weights_types: Some(HashSet::from_iter(vec![WeightsType::RvcV2])),
+        client: &elasticsearch,
+      }).await?;
+
       for result in results {
         println!("Result: {:#?}", result);
       }

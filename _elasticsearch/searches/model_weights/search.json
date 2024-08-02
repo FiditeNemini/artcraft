@@ -4,6 +4,13 @@
       "must": [
         {
           "bool": {
+            "must" : [
+              {
+                "term": {
+                  "is_deleted": false
+                }
+              }
+            ],
             "should": [
               {
                 "fuzzy": {
