@@ -213,7 +213,7 @@ export default function StyleVideo() {
               <div
                 style={{
                   height: "calc(100vh - 250px - 65px - 240px)",
-                  minHeight: "300px",
+                  minHeight: "400px",
                 }}
               >
                 <EntityInput
