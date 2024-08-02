@@ -24,6 +24,7 @@ export class AnimationClip {
 
   private isMMD: boolean = false;
   private obj: MMDAnimationHelperMixer | undefined;
+  private helper: MMDAnimationHelper | undefined;
 
   constructor(
     version: number,
@@ -131,7 +132,7 @@ export class AnimationClip {
         return;
       }
       this.clip_action = this.mixer?.clipAction(anim_clip);
-      if (this.clip_action) {
+      if (this.clip_action && this.isMMD === false) {
           if (this.clip_action?.isRunning() == false) {
             this.clip_action.play();
           }
@@ -195,17 +196,41 @@ export class AnimationClip {
       }
   }
 
-  animate(deltatime: number) {
-    if(this.isMMD && this.mixer) {
-      const helper: MMDAnimationHelper = this.mixer?.getRoot().parent?.userData["helper"];
-      this.obj = helper.objects.get((this.mixer?.getRoot() as THREE.SkinnedMesh));
-      if(this.obj && this.obj.mixer !== this.mixer) {
-        this.obj.mixer = this.mixer;
-      }
-    }
+  private async load_vpd_wrapped(): Promise<object> {
+    return new Promise((resolve) => {
+      const poseLoader = new MMDLoader();
+      poseLoader.loadVPD(
+        "/resources/pose/7.vpd", 
+        false, 
+        (vpd) => {
+          resolve(vpd);
+        }
+      ); // End of loadVPD call
+    }); // End of new Promise
+  }
+  
+  async animate(deltatime: number) {
+
 
     this.mixer?.setTime(deltatime);
     this.update_bones();
+
+    if(this.isMMD && this.mixer) {
+      if(this.obj  === undefined){
+        this.helper = (this.mixer.getRoot() as THREE.Object3D).parent?.userData["helper"];
+        this.obj = this.helper?.objects.get((this.mixer?.getRoot() as THREE.SkinnedMesh));
+      }
+
+      if(this.obj && this.obj.mixer !== this.mixer && this.obj.mixer !== undefined && this.helper) {
+        this.obj.mixer?.stopAllAction();
+        this.obj.mixer = undefined;
+        const pose = await this.load_vpd_wrapped();
+        this.helper.pose((this.mixer?.getRoot() as THREE.SkinnedMesh), pose);
+      } else if (this.obj && this.obj.mixer === undefined) {
+        this.obj.mixer = this.mixer;
+        this.clip_action?.play();
+      }
+    }
   }
 
   async step(deltatime: number, isPlaying: boolean, frame: number) {
@@ -215,11 +240,11 @@ export class AnimationClip {
     if (this.retargeted) {
       if (isPlaying || Math.floor(frame) != this.last_frame) {
         if (Math.floor(frame) != 0) {
-          this.animate(deltatime);
+          await this.animate(deltatime);
         }
       }
     } else {
-      this.animate(deltatime);
+      await this.animate(deltatime);
     }
     this.last_frame = frame;
   }

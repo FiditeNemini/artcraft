@@ -470,7 +470,6 @@ class Scene {
     mmd.userData["specular"] = 0.5;
     mmd.userData["locked"] = false;
     mmd.userData["media_file_type"] = MediaFileType.MMD;
-
     mmd.layers.enable(0);
     mmd.layers.enable(1);
     this.scene.add(mmd);
@@ -588,6 +587,7 @@ class Scene {
       child.userData["specular"] = 0.5;
       child.userData["locked"] = false;
       child.userData["media_file_type"] = MediaFileType.GLB;
+      
       child.layers.enable(0);
       child.layers.enable(1);
       if (load_version <= 1.0) {
