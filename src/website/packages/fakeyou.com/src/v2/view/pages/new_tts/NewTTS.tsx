@@ -352,8 +352,10 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
       </Container>
 
       <Container type="panel" className="pt-5 mt-5">
-        <h2 className="fw-bold mb-3">Try our other AI tools</h2>
-        <AITools />
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+          <AITools />
+        </Panel>
         {/* <MentionsSection /> */}
         {/* <StorytellerStudioCTA /> */}
       </Container>

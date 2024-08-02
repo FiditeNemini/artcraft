@@ -29,7 +29,7 @@ import { isMobile } from "react-device-detect";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { styleVideoAccessCheck, sessionFetched } = useSession();
+  const { sessionFetched } = useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -191,7 +191,7 @@ export default function StyleVideo() {
     );
   }
 
-  return styleVideoAccessCheck(
+  return (
     <>
       <Container className="mt-3" type="panel">
         <Panel className="d-block d-lg-none mb-3">{vstInfo}</Panel>
