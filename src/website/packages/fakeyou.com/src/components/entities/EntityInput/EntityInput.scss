@@ -46,6 +46,10 @@
     min-height: 400px;
     // background-color: red;
 
+    @media (max-width: 992px) {
+      min-height: 240px;
+    }
+
     .fy-entity-input-full {
       grid-template-columns: 1fr;
       grid-template-rows: 1fr auto;

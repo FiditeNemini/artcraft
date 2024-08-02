@@ -210,7 +210,12 @@ export default function StyleVideo() {
                 <Label label="Choose a Video" />
               </div>
 
-              <div style={{ height: "calc(100vh - 250px - 65px - 240px)" }}>
+              <div
+                style={{
+                  height: "calc(100vh - 250px - 65px - 240px)",
+                  minHeight: "300px",
+                }}
+              >
                 <EntityInput
                   {...{
                     accept: ["video"],
@@ -278,22 +283,7 @@ export default function StyleVideo() {
                     </DropdownOptions>
                   </div>
                 </div>
-                <div className="mt-3 w-100">
-                  <EntityInput
-                    {...{
-                      accept: ["image"],
-                      aspectRatio: "square",
-                      className: "w-100",
-                      label: "Additional Style Reference Image (Optional)",
-                      name: "IPAToken",
-                      value: IPAToken,
-                      onChange: ({ target }: { target: any }) => {
-                        IPATokenSet(target.value);
-                      },
-                      type: "media",
-                    }}
-                  />
-                </div>
+
                 <h6 className="mt-4">
                   Style Strength ({Math.round(strength * 100)}%)
                 </h6>
@@ -382,6 +372,23 @@ export default function StyleVideo() {
                           </label>
                         </div>
                       </div>
+                    </div>
+                    <div className="w-100 mt-3">
+                      <EntityInput
+                        {...{
+                          accept: ["image"],
+                          aspectRatio: "square",
+                          className: "w-100",
+                          label: "Additional Style Reference Image (Optional)",
+                          name: "IPAToken",
+                          value: IPAToken,
+                          onChange: ({ target }: { target: any }) => {
+                            IPATokenSet(target.value);
+                          },
+
+                          type: "media",
+                        }}
+                      />
                     </div>
                   </DropdownOptions>
                 </div>
