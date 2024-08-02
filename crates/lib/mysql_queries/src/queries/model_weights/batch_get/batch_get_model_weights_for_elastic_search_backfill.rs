@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use log::warn;
 use sqlx::{Executor, FromRow, MySql, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
@@ -113,7 +113,7 @@ pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
           updated_at: model.updated_at,
           user_deleted_at: model.user_deleted_at,
           mod_deleted_at: model.mod_deleted_at,
-          database_read_time: model.database_read_time,
+          database_read_time: model.database_read_time.and_utc(),
         }
       })
       .collect::<Vec<ModelWeightForElasticsearchRecord>>())
@@ -248,7 +248,7 @@ struct RawRecord {
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 
-  pub database_read_time: DateTime<Utc>,
+  pub database_read_time: NaiveDateTime,
 }
 
 // NB(bt,2023-12-05): There's an issue with type hinting in the `as` clauses with QueryBuilder (or

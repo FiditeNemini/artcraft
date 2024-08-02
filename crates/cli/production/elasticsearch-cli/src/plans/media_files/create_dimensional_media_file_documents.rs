@@ -135,6 +135,8 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Medi
     user_deleted_at: record.user_deleted_at,
     mod_deleted_at: record.mod_deleted_at,
 
+    database_read_time: record.database_read_time,
+
     is_deleted,
   };
 

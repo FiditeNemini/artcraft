@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use log::{info, warn};
 use sqlx::{Execute, FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
@@ -199,7 +199,7 @@ pub async fn list_media_files_for_elastic_search_backfill_using_cursor(
           updated_at: record.updated_at,
           user_deleted_at: record.user_deleted_at,
           mod_deleted_at: record.mod_deleted_at,
-          database_read_time: record.database_read_time,
+          database_read_time: record.database_read_time.and_utc(),
         }
       })
       .collect::<Vec<MediaFileForElasticsearchRecord>>())
@@ -440,7 +440,7 @@ struct RawRecord {
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 
-  pub database_read_time: DateTime<Utc>,
+  pub database_read_time: NaiveDateTime,
 }
 
 impl FromRow<'_, MySqlRow> for RawRecord {

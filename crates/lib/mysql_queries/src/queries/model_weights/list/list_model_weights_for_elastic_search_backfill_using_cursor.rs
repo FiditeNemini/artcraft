@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use log::warn;
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
@@ -55,6 +55,8 @@ pub struct ModelWeightForElasticsearchRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  pub database_read_time: DateTime<Utc>,
 }
 
 pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
@@ -105,6 +107,7 @@ pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
           updated_at: model.updated_at,
           user_deleted_at: model.user_deleted_at,
           mod_deleted_at: model.mod_deleted_at,
+          database_read_time: model.database_read_time.and_utc(),
         }
       })
       .collect::<Vec<ModelWeightForElasticsearchRecord>>())
@@ -152,7 +155,9 @@ SELECT
     w.created_at,
     w.updated_at,
     w.user_deleted_at,
-    w.mod_deleted_at
+    w.mod_deleted_at,
+
+    NOW() as database_read_time
 
 FROM model_weights as w
 
@@ -222,4 +227,6 @@ struct RawRecord {
 
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  pub database_read_time: NaiveDateTime,
 }
