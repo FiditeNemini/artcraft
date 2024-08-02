@@ -17,6 +17,7 @@
 //#![forbid(warnings)]
 
 use std::sync::Arc;
+
 use elasticsearch::Elasticsearch;
 use elasticsearch::http::transport::Transport;
 use log::info;
@@ -29,8 +30,10 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
 use crate::job_state::{JobState, SleepConfigs};
-use crate::tasks::update_all_model_weights::update_all_model_weights::update_all_model_weights;
+use crate::tasks::model_weights::update_all_model_weights::update_all_model_weights;
+use crate::tasks::model_weights::update_recently_written_model_weights::update_recently_written_model_weights;
 use crate::tasks::update_engine_media_files::update_engine_media_files::update_engine_media_files;
+
 pub mod job_state;
 pub mod tasks;
 
@@ -60,23 +63,35 @@ async fn main() -> AnyhowResult<()> {
     },
   });
 
-  info!("Starting thread to update all model weights...");
+  info!("Starting thread to update recently updated model weights...");
 
   let job_state_1 = job_state.clone();
 
   let handle_1 = tokio::task::spawn(async move {
-    let _r = update_all_model_weights(job_state_1).await;
+    let _r = update_recently_written_model_weights(job_state_1).await;
   });
 
-  info!("Starting thread to update engine media files...");
+  info!("Starting thread to update all model weights...");
 
   let job_state_2 = job_state.clone();
 
   let handle_2 = tokio::task::spawn(async move {
-    let _r = update_engine_media_files(job_state_2).await;
+    let _r = update_all_model_weights(job_state_2).await;
   });
 
-  futures::future::join_all([handle_1, handle_2]).await;
+  info!("Starting thread to update engine media files...");
+
+  let job_state_3 = job_state.clone();
+
+  let handle_3 = tokio::task::spawn(async move {
+    let _r = update_engine_media_files(job_state_3).await;
+  });
+
+  futures::future::join_all([
+    handle_1,
+    handle_2,
+    handle_3,
+  ]).await;
 
   Ok(())
 }
