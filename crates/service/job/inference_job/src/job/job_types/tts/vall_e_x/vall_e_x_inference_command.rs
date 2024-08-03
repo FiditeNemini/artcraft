@@ -15,6 +15,8 @@ use filesys::path_to_string::path_to_string;
 use subprocess_common::command_exit_status::CommandExitStatus;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
+use crate::util::get_filtered_env_vars::get_filtered_env_vars;
+
 #[derive(Clone)]
 pub enum ExecutableOrCommand {
     /// Eg. `inference.py`
@@ -22,17 +24,6 @@ pub enum ExecutableOrCommand {
     /// Eg. `python3 inference.py`
     Command(String),
 }
-
-// These environment vars are not copied over to the subprocess
-// TODO/FIXME(bt, 2023-05-28): This is horrific security!
-static IGNORED_ENVIRONMENT_VARS: Lazy<HashSet<String>> = Lazy::new(|| {
-    let env_var_names = ["MYSQL_URL", "ACCESS_KEY", "SECRET_KEY", "NEWRELIC_API_KEY"];
-
-    env_var_names
-        .iter()
-        .map(|value| value.to_string())
-        .collect::<HashSet<String>>()
-});
 
 // The inference command assumes everything has been setup to run inference
 // so we have all the files downloaded for the inputs.
@@ -246,16 +237,7 @@ impl VallEXInferenceCommand {
 
         let command_parts = ["bash", "-c", &command];
 
-        let mut env_vars = Vec::new();
-
-        // Copy all environment variables from the parent process.
-        // This is necessary to send all the kubernetes settings for Nvidia / CUDA.
-        for (env_key, env_value) in env::vars() {
-            if IGNORED_ENVIRONMENT_VARS.contains(&env_key) {
-                continue;
-            }
-            env_vars.push((OsString::from(env_key), OsString::from(env_value)));
-        }
+        let env_vars = get_filtered_env_vars();
 
         let mut config = PopenConfig::default();
 
@@ -491,16 +473,7 @@ impl VallEXCreateEmbeddingCommand {
 
         let command_parts = ["bash", "-c", &command];
 
-        let mut env_vars = Vec::new();
-
-        // Copy all environment variables from the parent process.
-        // This is necessary to send all the kubernetes settings for Nvidia / CUDA.
-        for (env_key, env_value) in env::vars() {
-            if IGNORED_ENVIRONMENT_VARS.contains(&env_key) {
-                continue;
-            }
-            env_vars.push((OsString::from(env_key), OsString::from(env_value)));
-        }
+        let env_vars = get_filtered_env_vars();
 
         let mut config = PopenConfig::default();
 
