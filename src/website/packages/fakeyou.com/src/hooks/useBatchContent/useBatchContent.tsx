@@ -109,7 +109,7 @@ export default function useBatchContent({
     });
 
   const toggle: BatchToggle = (entity_token, entity_type) => {
-    if (session.check()) {
+    if (session.loggedInOrModal({})) {
       let inLibrary = library[entity_token];
       statusSet(FetchStatus.in_progress);
       busyAdd(entity_token);

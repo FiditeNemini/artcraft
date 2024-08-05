@@ -9,26 +9,27 @@ import SignupView from "./SignupView";
 import { Analytics } from "common/Analytics";
 import "./AccountModal.scss";
 
-interface AniProps {
+interface AccountModalSubviewProps {
   animating: boolean;
   isLeaving: boolean;
+  loginMessage?: string;
   render: any;
+  signupMessage?: string;
   style: any;
 }
 
 export enum AccountModalView {
-  Closed,
   Signup,
   Login,
 }
 
-const AniMod = ({
+const AccountModalSubview = ({
   animating,
   isLeaving,
   render: Render,
   style,
   ...rest
-}: AniProps) => (
+}: AccountModalSubviewProps) => (
   <a.div
     {...{
       style: {
@@ -48,15 +49,22 @@ const Loader = ({ viewLogin }: { viewLogin: boolean }) => (
   </div>
 );
 
-export default function LoginModal({
+export default function AccountModal({
   handleClose,
-  view,
-  viewSwitch,
+  loginMessage,
+  signupMessage,
 }: {
   handleClose: any;
-  view: AccountModalView;
-  viewSwitch: () => void;
+  loginMessage?: string;
+  signupMessage?: string;
 }) {
+  const [view, viewSet] = useState(AccountModalView.Signup);
+  const viewSwitch = () =>
+    viewSet(
+      view === AccountModalView.Signup
+        ? AccountModalView.Login
+        : AccountModalView.Signup
+    );
   const viewLogin = view === AccountModalView.Login;
   const [status, statusSet] = useState(FetchStatus.paused);
   // const [viewLogin,viewLoginSet] = useState(false);
@@ -114,16 +122,23 @@ export default function LoginModal({
         switch (i) {
           case 0:
             return (
-              <AniMod
-                {...{ render: SignupView, signupProps, signup, ...sharedProps }}
+              <AccountModalSubview
+                {...{
+                  render: SignupView,
+                  signupProps,
+                  signup,
+                  signupMessage,
+                  ...sharedProps,
+                }}
               />
             );
           case 1:
             return (
-              <AniMod
+              <AccountModalSubview
                 {...{
                   errorType,
                   login,
+                  loginMessage,
                   loginProps,
                   render: LoginView,
                   ...sharedProps,
@@ -131,7 +146,9 @@ export default function LoginModal({
               />
             );
           case 2:
-            return <AniMod {...{ render: Loader, ...sharedProps }} />;
+            return (
+              <AccountModalSubview {...{ render: Loader, ...sharedProps }} />
+            );
         }
       })}
     </div>

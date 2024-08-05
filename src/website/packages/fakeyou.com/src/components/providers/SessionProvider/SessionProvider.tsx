@@ -1,25 +1,16 @@
-import React, { createContext, useState } from "react";
-// import { SessionContext } from "context";
-import { Modal } from "components/common";
+import React, { createContext } from "react";
+import ModalLayer from "components/providers/ModalProvider/ModalLayer";
+import { ModalConfig, useModalState } from "hooks";
 import AccountModal from "components/layout/AccountModal";
-// import { ModalView } from "context/SessionContext";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { StudioRolloutHostnameAllowed } from "@storyteller/components/src/utils/StudioRolloutHostnameAllowed";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StyleVideoNotAvailable } from "v2/view/_common/StyleVideoNotAvailable";
 
-export enum ModalView { // ignore this modal stuff for now -V
-  Closed,
-  Signup,
-  Login,
-}
-
-interface ModalProps {
-  // this too
-  close: () => void;
-  open: () => void;
-  view: ModalView;
+export interface AccountModalMessages {
+  loginMessage?: string;
+  signupMessage?: string;
 }
 
 interface SessionContextType {
@@ -27,9 +18,12 @@ interface SessionContextType {
   canEditTtsModel: (creatorUserToken: string) => boolean;
   canEditMediaFile: (creatorUserToken?: string) => boolean;
   canBanUsers: () => boolean;
-  check: () => boolean;
+  loggedInOrModal: (acctMsgs: AccountModalMessages) => boolean;
   loggedIn: boolean;
-  modal: ModalProps;
+  modal: {
+    close: () => void;
+    open: (cfg: ModalConfig) => void;
+  };
   querySession?: any;
   querySubscriptions?: any;
   sessionFetched: boolean;
@@ -61,7 +55,7 @@ export const SessionContext = createContext<SessionContextType>({
   canEditTtsModel: () => false,
   canEditMediaFile: () => false,
   canBanUsers: () => false,
-  check: () => false,
+  loggedInOrModal: () => false,
   loggedIn: false,
   sessionFetched: false,
   studioAccessCheck: () => null,
@@ -69,7 +63,6 @@ export const SessionContext = createContext<SessionContextType>({
   modal: {
     close: () => {},
     open: () => {},
-    view: ModalView.Closed,
   },
   userTokenMatch: () => false,
   sessionWrapper: SessionWrapper.emptySession(),
@@ -88,18 +81,19 @@ export default function SessionProvider({
     user: null,
   };
   const { logged_in: loggedIn, user } = sessionResponse;
-  const [view, viewSet] = useState(ModalView.Closed);
-  const open = () => viewSet(ModalView.Signup);
-  const close = () => {
-    viewSet(ModalView.Closed);
-  };
-  const viewSwitch = () =>
-    viewSet(view === ModalView.Signup ? ModalView.Login : ModalView.Signup);
-  const check = () => {
+
+  const { close, killModal, modalOpen, modalState, onModalCloseEnd, open } =
+    useModalState({ debug: "SessionProvider" });
+
+  const loggedInOrModal = (accountModalMessages: AccountModalMessages) => {
     if (user) {
       return true;
     } else {
-      open();
+      open({
+        component: AccountModal,
+        width: "narrow",
+        props: { ...accountModalMessages },
+      });
       return false;
     }
   };
@@ -127,7 +121,7 @@ export default function SessionProvider({
   const styleVideoAccessCheck = (content: React.ElementType) =>
     canAccessStudio() ? content : <StyleVideoNotAvailable />;
 
-  const modal = { close, open, view };
+  const modal = { close, open };
 
   return (
     <SessionContext.Provider
@@ -137,7 +131,7 @@ export default function SessionProvider({
           canEditTtsModel,
           canEditMediaFile,
           canBanUsers,
-          check,
+          loggedInOrModal,
           loggedIn,
           modal,
           querySession,
@@ -153,19 +147,19 @@ export default function SessionProvider({
       }}
     >
       {children}
-      {
-        <Modal
-          {...{
-            content: AccountModal,
-            contentProps: { view, viewSwitch },
-            handleClose: close,
-            noHeader: true,
-            show: view > 0,
-            showButtons: false,
-            // title: "You need to login",
-          }}
-        />
-      }
+      <ModalLayer
+        {...{
+          content: modalState?.component,
+          contentProps: modalState?.props,
+          close,
+          // debug: "SessionProvider",
+          killModal,
+          lockTint: modalState?.lockTint,
+          modalOpen,
+          onModalCloseEnd,
+          width: modalState?.width,
+        }}
+      />
     </SessionContext.Provider>
   );
 }

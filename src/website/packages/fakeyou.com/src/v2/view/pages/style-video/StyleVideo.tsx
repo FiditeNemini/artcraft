@@ -29,7 +29,7 @@ import { isMobile } from "react-device-detect";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { styleVideoAccessCheck, sessionFetched } = useSession();
+  const { loggedInOrModal, sessionFetched } = useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -57,7 +57,13 @@ export default function StyleVideo() {
   usePrefixedDocumentTitle("Style Video");
 
   const onClick = () => {
-    if (mediaToken) {
+    if (
+      loggedInOrModal({
+        loginMessage: "Login to finish your video",
+        signupMessage: "Signup to finish your video",
+      }) &&
+      mediaToken
+    ) {
       EnqueueVST("", {
         creator_set_visibility: "private",
         enable_lipsync: enableLipsync,
@@ -191,7 +197,7 @@ export default function StyleVideo() {
     );
   }
 
-  return styleVideoAccessCheck(
+  return (
     <>
       <Container className="mt-3" type="panel">
         <Panel className="d-block d-lg-none mb-3">{vstInfo}</Panel>
