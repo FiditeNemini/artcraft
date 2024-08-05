@@ -35,7 +35,7 @@ export const Scrubber = () => {
     <>
       {pointerScrubber.value * 4 * scale.value - scrollX >= 0 && (
         <div
-          className="absolute z-50 flex cursor-ew-resize flex-col items-center"
+          className="absolute z-[20] flex cursor-ew-resize flex-col items-center"
           style={{
             top: 8,
             left: pointerScrubber.value * 4 * scale.value + 199 - scrollX,
@@ -71,7 +71,7 @@ export const Scrubber = () => {
       {secondaryScrubber.value * 4 * scale.value - scrollX >= 0 &&
         currentPage.value === Pages.STYLE && (
           <div
-            className="absolute z-50 flex cursor-ew-resize flex-col items-center"
+            className="absolute z-[20] flex cursor-ew-resize flex-col items-center"
             style={{
               top: 28,
               left: secondaryScrubber.value * 4 * scale.value + 204 - scrollX,

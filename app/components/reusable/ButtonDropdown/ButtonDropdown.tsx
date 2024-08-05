@@ -100,7 +100,7 @@ export const ButtonDropdown = ({
           <Menu.Items
             static
             className={twMerge(
-              "absolute z-20 mt-1 w-max divide-y divide-gray-100 overflow-hidden rounded-lg bg-brand-secondary py-1.5 shadow-xl focus:outline-none",
+              "absolute mt-1 w-max divide-y divide-gray-100 overflow-hidden rounded-lg bg-brand-secondary py-1.5 shadow-xl focus:outline-none",
               align === "left" ? "left-0" : "right-0",
             )}
           >

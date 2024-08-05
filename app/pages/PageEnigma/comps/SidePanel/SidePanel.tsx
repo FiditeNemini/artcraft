@@ -31,7 +31,7 @@ export const SidePanel = () => {
       <div
         className={[
           "fixed",
-          "z-[60] border-l border-l-ui-panel-border bg-ui-panel",
+          "z-[25] border-l border-l-ui-panel-border bg-ui-panel",
           "flex",
           "transition-all duration-300 ease-in-out",
         ].join(" ")}
