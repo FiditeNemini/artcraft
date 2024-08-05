@@ -52,6 +52,7 @@ pub struct InferenceArgs<'s> {
   pub gpt_model_path: &'s Path,
   pub sovits_model_path: &'s Path,
   pub reference_audio_path: &'s Path,
+  pub reference_transcript_path: &'s Path,
   pub output_audio_directory: &'s Path,
 
   pub maybe_reference_free: Option<bool>,
@@ -154,6 +155,7 @@ impl GptSovitsInferenceCommand {
     command.push_str(&format!(" --gpt_model {}", path_to_string(args.gpt_model_path)));
     command.push_str(&format!(" --sovits_model {}", path_to_string(args.sovits_model_path)));
     command.push_str(&format!(" --ref_audio {}", path_to_string(args.reference_audio_path)));
+    //command.push_str(&format!(" --ref_transcript {}", path_to_string(args.reference_transcript_path)));
     command.push_str(&format!(" --output_path {}", path_to_string(args.output_audio_directory)));
 
     if let Some(reference_free) = args.maybe_reference_free {

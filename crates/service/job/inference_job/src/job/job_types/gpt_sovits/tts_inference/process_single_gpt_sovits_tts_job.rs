@@ -90,12 +90,14 @@ pub async fn process_single_gpt_sovits_tts_job(
   let stderr_output_file = work_temp_dir.path().join("stderr.txt");
   let stdout_output_file = work_temp_dir.path().join("stdout.txt");
   let text_input_fs_path = work_temp_dir.path().join("inference_input.txt");
+
   std::fs::write(&text_input_fs_path, &input_text)
     .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   let gpt_model_path = weights_directory.join(format!("{}{}", model_token.as_str(), GptSovitsPackageFileType::GptModel.get_expected_package_suffix()));
   let sovits_model_path = weights_directory.join(format!("{}{}", model_token.as_str(), GptSovitsPackageFileType::SovitsCheckpoint.get_expected_package_suffix()));
   let reference_audio_path = weights_directory.join(format!("{}{}", model_token.as_str(), GptSovitsPackageFileType::ReferenceAudio.get_expected_package_suffix()));
+  let reference_transcript_path = weights_directory.join(format!("{}{}", model_token.as_str(), GptSovitsPackageFileType::ReferenceTranscript.get_expected_package_suffix()));
 
   let inference_start_time = Instant::now();
   let command_exit_status = gpt_sovits_deps
@@ -107,6 +109,7 @@ pub async fn process_single_gpt_sovits_tts_job(
       gpt_model_path: &gpt_model_path,
       sovits_model_path: &sovits_model_path,
       reference_audio_path: &reference_audio_path,
+      reference_transcript_path: &reference_transcript_path,
       output_audio_directory: &output_dir,
       maybe_reference_free: None,
       maybe_temperature: None,

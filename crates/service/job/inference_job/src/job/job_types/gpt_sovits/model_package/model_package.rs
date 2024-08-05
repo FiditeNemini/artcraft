@@ -24,11 +24,18 @@ static ALLOWED_TYPES_REF_AUDIO : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   ])
 });
 
+static ALLOWED_TYPES_REF_TRANSCRIPT : Lazy<HashSet<&'static str>> = Lazy::new(|| {
+  HashSet::from([
+    "txt",
+  ])
+});
+
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum GptSovitsPackageFileType {
   GptModel,
   SovitsCheckpoint,
   ReferenceAudio,
+  ReferenceTranscript,
 }
 
 impl GptSovitsPackageFileType {
@@ -39,6 +46,8 @@ impl GptSovitsPackageFileType {
       Some(GptSovitsPackageFileType::SovitsCheckpoint)
     } else if ALLOWED_TYPES_REF_AUDIO.contains(extension) {
       Some(GptSovitsPackageFileType::ReferenceAudio)
+    } else if ALLOWED_TYPES_REF_TRANSCRIPT.contains(extension) {
+      Some(GptSovitsPackageFileType::ReferenceTranscript)
     } else {
       None
     }
@@ -49,6 +58,7 @@ impl GptSovitsPackageFileType {
       GptSovitsPackageFileType::GptModel => ALLOWED_TYPES_GPT.contains(extension),
       GptSovitsPackageFileType::SovitsCheckpoint => ALLOWED_TYPES_SOVITS.contains(extension),
       GptSovitsPackageFileType::ReferenceAudio => ALLOWED_TYPES_REF_AUDIO.contains(extension),
+      GptSovitsPackageFileType::ReferenceTranscript => ALLOWED_TYPES_REF_TRANSCRIPT.contains(extension),
     }
   }
 
@@ -60,6 +70,7 @@ impl GptSovitsPackageFileType {
       Self::GptModel,
       Self::SovitsCheckpoint,
       Self::ReferenceAudio,
+      Self::ReferenceTranscript,
     ])
   }
 
@@ -68,6 +79,7 @@ impl GptSovitsPackageFileType {
       GptSovitsPackageFileType::GptModel => "gpt_model",
       GptSovitsPackageFileType::SovitsCheckpoint => "sovits_checkpoint",
       GptSovitsPackageFileType::ReferenceAudio => "reference_audio",
+      GptSovitsPackageFileType::ReferenceTranscript => "reference_transcript",
     }
   }
 
@@ -82,6 +94,7 @@ pub enum GptSovitsPackageError {
   InvalidGPTModel(String),
   InvalidSovitsCheckpoint(String),
   InvalidReferenceAudio(String),
+  InvalidReferenceTranscript(String),
   UploadError,
   TooManyFiles,
   ExtractionError,
@@ -98,5 +111,6 @@ pub struct GptSovitsPackageDetails {
   pub gpt_model: GptSovitsPackageFile,
   pub sovits_checkpoint: GptSovitsPackageFile,
   pub reference_audio: GptSovitsPackageFile,
+  pub reference_transcript: GptSovitsPackageFile,
 }
 

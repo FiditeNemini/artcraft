@@ -32,6 +32,7 @@ pub async fn extract_and_upload_gpt_sovits_package_files(
   let mut gpt_model: Option<GptSovitsPackageFile> = None;
   let mut sovits_checkpoint: Option<GptSovitsPackageFile> = None;
   let mut reference_audio: Option<GptSovitsPackageFile> = None;
+  let mut reference_transcript : Option<GptSovitsPackageFile> = None;
 
   let entries = get_relevant_zip_entries(&mut archive)?;
 
@@ -39,12 +40,12 @@ pub async fn extract_and_upload_gpt_sovits_package_files(
     info!("Entry: {:?}", entry);
 
     let enclosed_name = path_to_string(&entry.enclosed_name);
+
     let mut file = archive.by_name(&enclosed_name)
       .map_err(|err| {
         error!("Problem reading file from archive: {:?}", err);
         GptSovitsPackageError::InvalidArchive
       })?;
-
 
     let mut zip_item_bytes = Vec::new();
 
@@ -145,6 +146,36 @@ pub async fn extract_and_upload_gpt_sovits_package_files(
           file_size_bytes: file_size_bytes as u64,
         });
       },
+      GptSovitsPackageFileType::ReferenceTranscript => {
+        let bucket_public_upload_path = WeightFileBucketPath::from_object_hash(
+          weights_file_bucket_directory.get_object_hash(),
+          Some("weight_"),
+          Some(&entry.package_type.get_expected_package_suffix()),
+        );
+        info!("Uploading reference transcript package to {:?}", bucket_public_upload_path.get_full_object_path_str());
+        bucket_client.upload_file(
+          bucket_public_upload_path.get_full_object_path_str(),
+          zip_item_bytes.as_ref())
+            .await
+            .map_err(|e| {
+              warn!("Upload reference transcript package to bucket error: {:?}", e);
+              GptSovitsPackageError::UploadError
+            })?;
+
+        let hash = sha256_hash_bytes(&zip_item_bytes)
+            .map_err(|io_error| {
+              error!("Problem hashing bytes: {:?}", io_error);
+              GptSovitsPackageError::UploadError
+            })?;
+
+        let file_size_bytes = zip_item_bytes.len();
+
+        reference_transcript = Some(GptSovitsPackageFile {
+          public_upload_path: bucket_public_upload_path,
+          sha256_checksum: hash,
+          file_size_bytes: file_size_bytes as u64,
+        });
+      },
     }
   }
 
@@ -152,6 +183,7 @@ pub async fn extract_and_upload_gpt_sovits_package_files(
     gpt_model: gpt_model.ok_or(GptSovitsPackageError::InvalidArchive)?,
     sovits_checkpoint: sovits_checkpoint.ok_or(GptSovitsPackageError::InvalidArchive)?,
     reference_audio: reference_audio.ok_or(GptSovitsPackageError::InvalidArchive)?,
+    reference_transcript: reference_transcript.ok_or(GptSovitsPackageError::InvalidArchive)?,
   })
 }
 
@@ -219,6 +251,9 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
             }
             GptSovitsPackageFileType::ReferenceAudio => {
               Err(GptSovitsPackageError::InvalidReferenceAudio("Multiple reference audio files found".to_string()))
+            }
+            GptSovitsPackageFileType::ReferenceTranscript => {
+              Err(GptSovitsPackageError::InvalidReferenceTranscript("Multiple reference transcript files found".to_string()))
             }
           }
         }
