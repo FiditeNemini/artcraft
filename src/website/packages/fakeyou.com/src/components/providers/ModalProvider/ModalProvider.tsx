@@ -1,16 +1,10 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext } from "react";
+import { ModalConfig, useModalState } from "hooks";
 
 import ModalLayer from "./ModalLayer";
-import { isMobile } from "react-device-detect";
 
 interface ModalProviderProps {
   children?: any;
-}
-
-export interface ModalConfig {
-  component: React.ElementType;
-  lockTint?: boolean;
-  props?: any;
 }
 
 export interface ModalContextShared {
@@ -38,34 +32,8 @@ export const ModalContext = createContext<ModalContextShared>({
 // modalState will be cleared, ensuring the state is cleared only when the modal is no longer rendered.
 
 export default function ModalProvider({ children }: ModalProviderProps) {
-  const [modalState, modalStateSet] = useState<ModalConfig | null>(null);
-  const [modalOpen, modalOpenSet] = useState(false);
-  const [killModal, killModalSet] = useState(false);
-
-  const open = (cfg: ModalConfig) => modalStateSet(cfg);
-  const close = () => {
-    modalOpenSet(false);
-    killModalSet(true);
-  };
-  const onModalCloseEnd = () => {
-    if (killModal && modalState) {
-      killModalSet(false);
-      modalStateSet(null);
-    }
-  };
-
-  useEffect(() => {
-    // Prevent body scrolling when modal is open on mobile
-    if (modalOpen && isMobile) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-
-    if (!killModal && modalState && !modalOpen) {
-      modalOpenSet(true);
-    }
-  }, [killModal, modalOpen, modalState]);
+  const { close, killModal, modalOpen, modalState, onModalCloseEnd, open } =
+    useModalState({});
 
   return (
     <ModalContext.Provider
@@ -77,10 +45,12 @@ export default function ModalProvider({ children }: ModalProviderProps) {
           content: modalState?.component,
           contentProps: modalState?.props,
           close,
+          // debug: "ModalProvider",
           killModal,
           lockTint: modalState?.lockTint,
           modalOpen,
           onModalCloseEnd,
+          width: modalState?.width,
         }}
       />
     </ModalContext.Provider>

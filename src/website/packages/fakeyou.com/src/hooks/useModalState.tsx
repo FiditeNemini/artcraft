@@ -1,0 +1,72 @@
+import { useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
+
+export type ModalWidth = "wide" | "narrow";
+
+export interface ModalConfig {
+  component: React.ElementType;
+  lockTint?: boolean;
+  props?: any;
+  width?: ModalWidth;
+}
+
+export default function useModalState({ debug = "" }) {
+  const [modalState, modalStateSet] = useState<ModalConfig | null>(null);
+  const [modalOpen, modalOpenSet] = useState(false);
+  const [killModal, killModalSet] = useState(false);
+
+  if (debug) {
+    console.log(`💬 useModalState at ${debug}`, {
+      modalState,
+      modalOpen,
+      killModal,
+    });
+  }
+
+  const open = (cfg: ModalConfig) => {
+    if (debug) {
+      console.log(`🚪 useModalState open() at ${debug}`, { cfg });
+    }
+    modalStateSet(cfg);
+  };
+
+  const close = () => {
+    if (debug) {
+      console.log(`🔥 useModalState close() at ${debug}`);
+    }
+    killModalSet(true);
+    modalOpenSet(false);
+  };
+
+  const onModalCloseEnd = () => {
+    if (killModal && modalState) {
+      killModalSet(false);
+      modalStateSet(null);
+    }
+  };
+
+  useEffect(() => {
+    // Prevent body scrolling when modal is open on mobile
+    if (modalOpen && isMobile) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    if (!killModal && modalState && !modalOpen) {
+      modalOpenSet(true);
+    }
+  }, [killModal, modalOpen, modalOpenSet, modalState]);
+
+  return {
+    close,
+    killModal,
+    killModalSet,
+    modalOpen,
+    modalOpenSet,
+    modalState,
+    modalStateSet,
+    onModalCloseEnd,
+    open,
+  };
+}

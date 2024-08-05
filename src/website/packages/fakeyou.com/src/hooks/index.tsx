@@ -21,6 +21,7 @@ import useLocalize from "./useLocalize";
 import useMedia from "./useMedia";
 import useMediaUploader from "./useMediaUploader";
 import useModal from "./useModal";
+import useModalState, { ModalConfig, ModalWidth } from "./useModalState";
 import useNotifications from "./useNotifications";
 import useOnScreen from "./useOnScreen";
 import usePrevious from "./usePrevious";
@@ -56,6 +57,7 @@ export {
   useMedia,
   useMediaUploader,
   useModal,
+  useModalState,
   useNotifications,
   useOnScreen,
   usePrevious,
@@ -70,4 +72,10 @@ export {
   useWeightFetch,
 };
 
-export type { AnimationEvents, MakeBookmarksProps, MakeRatingsProps };
+export type {
+  AnimationEvents,
+  MakeBookmarksProps,
+  MakeRatingsProps,
+  ModalConfig,
+  ModalWidth,
+};
