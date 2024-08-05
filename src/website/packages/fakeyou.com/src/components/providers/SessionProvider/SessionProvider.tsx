@@ -83,7 +83,7 @@ export default function SessionProvider({
   const { logged_in: loggedIn, user } = sessionResponse;
 
   const { close, killModal, modalOpen, modalState, onModalCloseEnd, open } =
-    useModalState({ debug: "SessionProvider" });
+    useModalState({});
 
   const loggedInOrModal = (accountModalMessages: AccountModalMessages) => {
     if (user) {

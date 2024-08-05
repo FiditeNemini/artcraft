@@ -46,7 +46,6 @@ export default function LoginView({
               className: "login-modal-login-link",
               onClick: () => {
                 if (!animating) {
-                  console.log("💓");
                   viewSwitch();
                 }
               },
