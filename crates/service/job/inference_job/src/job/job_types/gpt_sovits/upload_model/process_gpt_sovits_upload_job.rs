@@ -34,27 +34,14 @@ pub async fn process_gpt_sovits_upload_job(deps: &JobDependencies, job: &Availab
 
   let upload_args = extract_gpt_sovits_payload_from_job(&job)?;
 
-  let title = match upload_args.maybe_title {
-    Some(val) => {
-      val
-    },
-    None => { "".to_string() }
-  };
+  let title = upload_args.maybe_title
+      .unwrap_or_else(|| "untitled model".to_string());
 
-  let description = match upload_args.maybe_description {
-    Some(val) => {
-      val
-    },
-    None => { "".to_string() }
-  };
+  let description = upload_args.maybe_description
+      .unwrap_or_else(|| "".to_string());
 
-  let visibility = match upload_args.creator_visibility {
-    Some(val) => {
-      val
-    },
-    None => { Visibility::Public }
-  };
-
+  let visibility = upload_args.creator_visibility
+      .unwrap_or(Visibility::Public);
 
   let file_name = "model.zip";
 
@@ -65,17 +52,13 @@ pub async fn process_gpt_sovits_upload_job(deps: &JobDependencies, job: &Availab
 
   let creator_ip_address = &job.creator_ip_address;
 
-  let creator_user_token = match &job.maybe_creator_user_token {
-    Some(token) => UserToken::new_from_str(token),
-    None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token"))),
-  };
+  let creator_user_token = job.maybe_creator_user_token_typed
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")))?;
 
-  let download_url = match &job.maybe_download_url {
-    Some(val) => val.to_string(),
-    None => {
-      return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Download URL")));
-    }
-  };
+  let download_url = job.maybe_download_url
+      .as_deref()
+      .ok_or_else(|| ProcessSingleJobError::InvalidJob(anyhow!("Missing Download URL")))?;
 
   if download_url.len() == 0 {
     return Err(ProcessSingleJobError::InvalidJob(anyhow!("Download URL Too Short")));
@@ -138,6 +121,7 @@ pub async fn process_gpt_sovits_upload_job(deps: &JobDependencies, job: &Availab
 
   let file_size_bytes = file_size(&download_file_path)
     .map_err(|e| ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to get file size")))?;
+
   let file_checksum = sha256_hash_file(&download_file_path)
     .map_err(|e| ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to process archive checksum")))?;
 
@@ -149,14 +133,13 @@ pub async fn process_gpt_sovits_upload_job(deps: &JobDependencies, job: &Availab
     maybe_cover_image_media_file_token: job.maybe_cover_image_media_file_token.clone(),
     maybe_description_markdown: Some(description),
     maybe_description_rendered_html: None,
-    creator_user_token: Some(&creator_user_token),
+    creator_user_token: Some(creator_user_token),
     creator_ip_address,
     creator_set_visibility: visibility,
     maybe_last_update_user_token: None,
-    original_download_url: Some(download_url),
+    original_download_url: Some(download_url.to_string()),
     original_filename: None,
-    // file_size_bytes: metadata.file_size_bytes, // TODO(bt,2024-02-03): We need to migrate the column to be BIGINT
-    file_size_bytes: 0,
+    file_size_bytes,
     file_checksum_sha2: file_checksum,
     public_bucket_hash: bucket_public_upload_path.get_object_hash().to_string(),
     maybe_public_bucket_prefix: Some(PREFIX.unwrap().to_string()),

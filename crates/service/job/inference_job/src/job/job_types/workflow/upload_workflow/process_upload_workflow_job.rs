@@ -135,8 +135,7 @@ pub async fn process_upload_workflow_job(deps: &JobDependencies, job: &Available
         maybe_last_update_user_token: None,
         original_download_url: Some(download_url),
         original_filename: None,
-        // file_size_bytes: metadata.file_size_bytes, // TODO(bt,2024-02-03): We need to migrate the column to be BIGINT
-        file_size_bytes: 0,
+        file_size_bytes: metadata.file_size_bytes,
         file_checksum_sha2: commit_hash,
         public_bucket_hash: bucket_details.object_hash,
         maybe_public_bucket_prefix: Some(bucket_details.prefix),
