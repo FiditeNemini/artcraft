@@ -34,10 +34,10 @@ export default function AITools() {
     },
     {
       to: "/face-animator",
-      title: t("productFaceAnimatorTitle"),
-      text: t("productFaceAnimatorText"),
+      title: t("productLipsyncTitle"),
+      text: t("productLipsyncText"),
       imgSrc: "/images/landing/select-fa.webp",
-      imgAlt: "Face Animator",
+      imgAlt: "Lipsync",
     },
     {
       to: "/style-video",
@@ -53,10 +53,10 @@ export default function AITools() {
     },
     {
       to: "/ai-face-mirror",
-      title: t("productFaceMirrorTitle"),
-      text: t("productFaceMirrorText"),
+      title: t("productLivePortraitTitle"),
+      text: t("productLivePortraitText"),
       imgSrc: "/images/landing/select-fm.webp",
-      imgAlt: "AI Face Mirror",
+      imgAlt: "Live Portrait",
       badgeContent: {
         type: "new",
         icon: faSparkles,
