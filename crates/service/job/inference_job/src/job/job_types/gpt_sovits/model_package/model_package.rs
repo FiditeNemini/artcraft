@@ -30,7 +30,7 @@ static ALLOWED_TYPES_REF_TRANSCRIPT : Lazy<HashSet<&'static str>> = Lazy::new(||
   ])
 });
 
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum GptSovitsPackageFileType {
   GptModel,
   SovitsCheckpoint,

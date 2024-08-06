@@ -100,7 +100,16 @@ pub async fn process_single_gpt_sovits_tts_job(
   let reference_audio_path = weights_directory.join(format!("{}{}", model_token.as_str(), GptSovitsPackageFileType::ReferenceAudio.get_expected_package_suffix()));
   let reference_transcript_path = weights_directory.join(format!("{}{}", model_token.as_str(), GptSovitsPackageFileType::ReferenceTranscript.get_expected_package_suffix()));
 
+  // NB: Reference files might not exist.
+  let (reference_audio_path, reference_transcript_path) =
+      match (reference_audio_path.exists(), reference_transcript_path.exists()) {
+        (true, true) => (Some(reference_audio_path), Some(reference_transcript_path)),
+        (true, false) => (Some(reference_audio_path), None),
+        _ => (None, None),
+      };
+
   let inference_start_time = Instant::now();
+
   let command_exit_status = gpt_sovits_deps
     .inference_command
     .execute_inference(InferenceArgs{
@@ -109,13 +118,14 @@ pub async fn process_single_gpt_sovits_tts_job(
       input_text_file: &text_input_fs_path,
       gpt_model_path: &gpt_model_path,
       sovits_model_path: &sovits_model_path,
-      reference_audio_path: &reference_audio_path,
-      reference_transcript_path: &reference_transcript_path,
+      reference_audio_path: reference_audio_path.as_deref(),
+      reference_transcript_path: reference_transcript_path.as_deref(),
       output_audio_directory: &output_dir,
       maybe_reference_free: None,
       maybe_temperature: None,
       maybe_target_language: Some("english".to_string()),
     });
+
   let inference_duration = Instant::now().duration_since(inference_start_time);
 
   info!("Inference command exited with status: {:?}", command_exit_status);

@@ -2,9 +2,9 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use anyhow::anyhow;
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 use once_cell::sync::Lazy;
-
+use tempdir::TempDir;
 use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
@@ -31,49 +31,89 @@ pub async fn download_package(
   }
 
   let temp_dir_name = format!("model_download_{}", model_weight_token.entropy_suffix());
+
   let temp_dir = scoped_tempdir_creator.new_tempdir(&temp_dir_name)
     .map_err(|e| anyhow!("problem creating tempdir: {:?}", e))?;
 
   for entry in GptSovitsPackageFileType::all_variants() {
-    let suffix_with_package_identifier = entry.get_expected_package_suffix();
-    let temp_path = temp_dir.path().join(format!("{}{}", model_weight_token.to_string(), suffix_with_package_identifier));
-    let final_download_path = download_directory.join(format!("{}{}", model_weight_token.to_string(), suffix_with_package_identifier));
+    let result = do_download_package(
+      model_weight_token.clone(),
+      weights_file_bucket_directory,
+      download_directory,
+      bucket_client,
+      &temp_dir,
+      force_download,
+      entry,
+    ).await;
 
-    if final_download_path.exists() && !force_download {
-      info!("Skipping download of {} because it already exists", final_download_path.display().to_string());
-      continue;
+    if let Err(err) = result {
+      match entry {
+        GptSovitsPackageFileType::GptModel | GptSovitsPackageFileType::SovitsCheckpoint => {
+          // NB: The models are essential and are actual failures.
+          error!("Error downloading model: {:?}", err);
+          return Err(err);
+        }
+        GptSovitsPackageFileType::ReferenceAudio | GptSovitsPackageFileType::ReferenceTranscript => {
+          // NB: The reference files are not essential and can be skipped
+          warn!("Error downloading reference file: {:?}", err);
+          continue;
+        }
+      }
     }
+  }
 
-    if final_download_path.exists() {
-      debug!("Deleting existing file at {:?}", final_download_path.display().to_string());
-      std::fs::remove_file(&final_download_path)
+  safe_delete_temp_directory(&temp_dir);
+
+  Ok(())
+}
+
+pub async fn do_download_package(
+  model_weight_token: ModelWeightToken,
+  weights_file_bucket_directory: &WeightFileBucketDirectory,
+  download_directory: &Path,
+  bucket_client: &BucketClient,
+  temp_dir: &TempDir,
+  force_download: bool,
+  entry: GptSovitsPackageFileType,
+) -> Result<(), ProcessSingleJobError> {
+
+  let suffix_with_package_identifier = entry.get_expected_package_suffix();
+  let temp_path = temp_dir.path().join(format!("{}{}", model_weight_token.to_string(), suffix_with_package_identifier));
+  let final_download_path = download_directory.join(format!("{}{}", model_weight_token.to_string(), suffix_with_package_identifier));
+
+  if final_download_path.exists() && !force_download {
+    info!("Skipping download of {} because it already exists", final_download_path.display().to_string());
+    return Ok(())
+  }
+
+  if final_download_path.exists() {
+    debug!("Deleting existing file at {:?}", final_download_path.display().to_string());
+    std::fs::remove_file(&final_download_path)
         .map_err(|err| ProcessSingleJobError::IoError(err))?;
-    }
+  }
 
-    let bucket_public_download_path = WeightFileBucketPath::from_object_hash(
-      weights_file_bucket_directory.get_object_hash(),
-      Some("weight_"),
-      Some(&suffix_with_package_identifier),
-    );
+  let bucket_public_download_path = WeightFileBucketPath::from_object_hash(
+    weights_file_bucket_directory.get_object_hash(),
+    Some("weight_"),
+    Some(&suffix_with_package_identifier),
+  );
 
-    debug!("Downloading to {} from bucket path: {:?}", temp_path.display().to_string(), &bucket_public_download_path.get_full_object_path_str());
-    bucket_client.download_file_to_disk(bucket_public_download_path.get_full_object_path_str(), &temp_path)
+  debug!("Downloading to {} from bucket path: {:?}", temp_path.display().to_string(), &bucket_public_download_path.get_full_object_path_str());
+  bucket_client.download_file_to_disk(bucket_public_download_path.get_full_object_path_str(), &temp_path)
       .await
       .map_err(|e| {
         anyhow!("couldn't download {} cloud object to disk: {:?}", &bucket_public_download_path.get_full_object_path_str(), e)
       })?;
 
-    debug!("Renaming file from {:?} to {:?}!", &temp_path, final_download_path.display().to_string());
+  debug!("Renaming file from {:?} to {:?}!", &temp_path, final_download_path.display().to_string());
 
-    rename_across_devices(&temp_path, final_download_path)
+  rename_across_devices(&temp_path, final_download_path)
       .map_err(|err| {
         safe_delete_temp_directory(&temp_dir);
         match err {
           RenameError::StorageFull => ProcessSingleJobError::FilesystemFull,
           RenameError::IoError(err) => ProcessSingleJobError::from_io_error(err),
         }})?;
-  }
 
-  safe_delete_temp_directory(&temp_dir);
   Ok(())
 }
