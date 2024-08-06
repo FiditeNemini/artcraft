@@ -208,7 +208,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                   <Input
                     autoFocus={isMobile ? false : selectedVoice ? false : true}
                     icon={faSearch}
-                    placeholder={"Search from 3500+ voices"}
+                    placeholder={"Search from 8500+ voices"}
                     onChange={searchChange()}
                     value={search}
                   />
