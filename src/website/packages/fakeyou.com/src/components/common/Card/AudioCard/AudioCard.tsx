@@ -5,12 +5,13 @@ import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CardFooter } from "components/entities";
 import Badge from "components/common/Badge";
-import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowRight, faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import getCardUrl from "../getCardUrl";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
@@ -148,26 +149,6 @@ export default function AudioCard({
 
             <div className="flex-grow-1">
               <div className="d-flex align-items-center">
-                <div className="d-flex flex-grow-1">
-                  <Badge
-                    small={true}
-                    label={weightBadgeLabel}
-                    color={weightBadgeColor}
-                  />
-                </div>
-                {inSelectModal ? null : (
-                  <Button
-                    icon={faArrowRight}
-                    iconFlip={true}
-                    variant="link"
-                    label="Use"
-                    className="fs-7"
-                    onClick={handleSelectModalResultSelect}
-                  />
-                )}
-              </div>
-
-              <div className="d-flex align-items-center mt-2">
                 <div className="flex-grow-1">
                   <h6 className="fw-semibold text-white mb-1">
                     {data.title || data?.details?.maybe_weight_data?.title}
@@ -190,6 +171,29 @@ export default function AudioCard({
                       }}
                     />
                   )}
+                  <div className="d-flex align-items-center mt-2">
+                    <div className="d-flex flex-grow-1 align-items-center gap-2">
+                      <Badge
+                        small={true}
+                        label={weightBadgeLabel}
+                        color={weightBadgeColor}
+                      />
+                      <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50">
+                        <FontAwesomeIcon icon={faThumbsUp} />
+                        {data?.stats?.positive_rating_count}
+                      </span>
+                    </div>
+                    {inSelectModal ? null : (
+                      <Button
+                        icon={faArrowRight}
+                        iconFlip={true}
+                        variant="link"
+                        label="Use"
+                        className="fs-7"
+                        onClick={handleSelectModalResultSelect}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

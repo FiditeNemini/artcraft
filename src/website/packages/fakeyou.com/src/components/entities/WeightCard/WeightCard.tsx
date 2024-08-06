@@ -7,6 +7,8 @@ import CardFooter from "../CardFooter";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import { WeightType } from "@storyteller/components/src/api/_common/enums";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   data: any;
@@ -68,14 +70,7 @@ export default function WeightCard({
         )}
 
         <div className="flex-grow-1">
-          <CardBadge
-            className={`fy-entity-type-${weight_type || ""}`}
-            label={weightType || ""}
-            small={true}
-            color={weightTagColor || ""}
-          />
-
-          <div className="d-flex align-items-center mt-2">
+          <div className="d-flex align-items-center">
             <div className="flex-grow-1">
               <h6 className="fw-semibold text-white mb-1">
                 {title || details.maybe_weight_data.title}
@@ -93,6 +88,18 @@ export default function WeightCard({
                   showGravatar: false,
                 }}
               />
+              <div className="d-flex flex-grow-1 align-items-center gap-2 mt-2">
+                <CardBadge
+                  className={`fy-entity-type-${weight_type || ""}`}
+                  label={weightType || ""}
+                  small={true}
+                  color={weightTagColor || ""}
+                />
+                <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50">
+                  <FontAwesomeIcon icon={faThumbsUp} />
+                  {data?.stats?.positive_rating_count}
+                </span>
+              </div>
             </div>
           </div>
         </div>
