@@ -24,13 +24,6 @@ function build_website {
   popd
 }
 
-function build_blog {
-  pushd src/gatsby-blog
-  yarn install 
-  yarn build-pp
-  popd
-}
-
 function build_zola {
   zola --root zola build 
 }
@@ -41,9 +34,6 @@ pwd
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
-#echo "Building gatsby blog..."
-#build_blog
-
 echo "Building zola blog..."
 build_zola
 
@@ -51,18 +41,13 @@ echo "Building website..."
 build_website
 
 echo "Create final output directory..."
-mkdir -p fakeyou.com/gatsby
 mkdir -p fakeyou.com/zola
 mkdir -p fakeyou.com/website
 
-#echo "Copying gatsby blog artifacts..."
-#cp -r src/gatsby-blog/public/* fakeyou.com/gatsby/
-
-echo "Copying gatsby blog artifacts..."
+echo "Copying zola blog artifacts..."
 cp -r zola/public/* fakeyou.com/zola/
 
 echo "Copying website artifacts..."
-#mv src/website/packages/fakeyou.com/build/ fakeyou.com/build/website/
 mv src/website/packages/fakeyou.com/build/* fakeyou.com/website/
 
 echo "Copying redirects configuration to Netlify build dir..."

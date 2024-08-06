@@ -16,9 +16,15 @@ function replace_commit_ref {
 }
 
 function build_project {
+  pushd src/website
   yarn install 
   # --ignore-engines: https://stackoverflow.com/a/59615348
-  yarn build-storyteller --verbose --ignore-optional --ignore-engines
+  yarn build-fakeyou --verbose --ignore-optional --ignore-engines
+  popd
+}
+
+function build_zola {
+  zola --root zola build 
 }
 
 echo "Current working directory:"
@@ -27,16 +33,24 @@ pwd
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
+echo "Building zola blog..."
+build_zola
 
-echo "Building project..."
-pushd src/website
-build_project
-popd
+echo "Building website..."
+build_website
 
-echo "Copying built artifacts..."
-mkdir storyteller.io
-mv src/websites/packages/storyteller.io/build/ storyteller.io/build/
+echo "Create final output directory..."
+mkdir -p storyteller.ai/zola
+mkdir -p storyteller.ai/website
+
+echo "Copying zola blog artifacts..."
+cp -r zola/public/* storyteller.ai/zola/
+
+echo "Copying website artifacts..."
+mv src/website/packages/fakeyou.com/build/* storyteller.ai/website/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp src/websites/_redirects storyteller.io/build/
+cp src/netlify_configs/storyteller.ai/_redirects storyteller.ai/
 
+echo "List files in build directory"
+find storyteller.ai/
