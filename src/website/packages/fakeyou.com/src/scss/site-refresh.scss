@@ -917,6 +917,13 @@ styles with important tags:
     overscroll-behavior: contain;
   }
 
+  .session-vc-section {
+    // height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
   .direct-view-link {
     background-color: lighten($panel, 4%);
     border: 1px solid #39394c;

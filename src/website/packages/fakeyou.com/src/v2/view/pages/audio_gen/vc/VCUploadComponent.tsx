@@ -14,7 +14,7 @@ import {
   UploadAudioIsOk,
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
-import { useLocalize } from "hooks";
+import { useLocalize, useVcStore } from "hooks";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
@@ -27,12 +27,16 @@ interface Props {
 
 function VCUploadComponent(props: Props) {
   const { t } = useLocalize("UploadComponent");
-
-  const [file, setFile] = useState<any>(undefined);
-  const [audioLink, setAudioLink] = useState<string>();
-  const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(uuidv4());
+  const {
+    isUploadDisabled,
+    setIsUploadDisabled,
+    file,
+    setFile,
+    audioLink,
+    setAudioLink,
+  } = useVcStore();
 
   const handleChange = (file: any) => {
     console.log("handle change");

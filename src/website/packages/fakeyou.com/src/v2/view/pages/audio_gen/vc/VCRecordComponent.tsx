@@ -10,7 +10,7 @@ import {
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
 import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useLocalize } from "hooks";
+import { useLocalize, useVcStore } from "hooks";
 import { Button } from "components/common";
 
 interface Props {
@@ -25,15 +25,21 @@ interface Props {
 export default function VCRecordComponent(props: Props) {
   const { t } = useLocalize("RecordComponent");
   const [uploadLoading, setUploadLoading] = useState(false);
-  const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
+
+  const {
+    recordingBlobStore,
+    setRecordingBlobStore,
+    isUploadDisabled,
+    setIsUploadDisabled,
+  } = useVcStore();
 
   useEffect(() => {
     if (!recordingBlob) {
       return;
-    }
-  }, [recordingBlob]);
+    } else setRecordingBlobStore(recordingBlob);
+  }, [recordingBlob, setRecordingBlobStore]);
 
   const handleStartRecording = async () => {
     startRecording();
@@ -57,7 +63,7 @@ export default function VCRecordComponent(props: Props) {
   const handleUpload = async () => {
     const request: UploadAudioRequest = {
       uuid_idempotency_token: uuidv4(),
-      file: recordingBlob,
+      file: recordingBlobStore,
       source: "device",
     };
 
@@ -74,9 +80,10 @@ export default function VCRecordComponent(props: Props) {
     setUploadLoading(false);
   };
 
-  const enableMediaReview = !props.formIsCleared && recordingBlob !== undefined;
+  const enableMediaReview =
+    !props.formIsCleared && recordingBlobStore !== undefined;
   const enableUploadButton =
-    !props.formIsCleared && recordingBlob !== undefined && !isRecording;
+    !props.formIsCleared && recordingBlobStore !== undefined && !isRecording;
 
   const speakButtonClass = isUploadDisabled
     ? "btn btn-uploaded w-100 disabled"
@@ -116,7 +123,7 @@ export default function VCRecordComponent(props: Props) {
 
       {enableMediaReview ? (
         <>
-          <RecordedAudioComponent recordingBlob={recordingBlob} />
+          <RecordedAudioComponent recordingBlob={recordingBlobStore} />
 
           <div className="d-flex gap-3">
             <button

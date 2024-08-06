@@ -19,6 +19,14 @@ interface VcStoreState {
   setHasUploadedFile: (value: boolean) => void;
   hasRecordedFile: boolean;
   setHasRecordedFile: (value: boolean) => void;
+  recordingBlobStore: Blob | undefined;
+  setRecordingBlobStore: (blob: Blob | undefined) => void;
+  isUploadDisabled: boolean;
+  setIsUploadDisabled: (value: boolean) => void;
+  file: any;
+  setFile: (file: any) => void;
+  audioLink: string | undefined;
+  setAudioLink: (link: string | undefined) => void;
 }
 
 const useVcStore = create<VcStoreState>(set => ({
@@ -36,6 +44,14 @@ const useVcStore = create<VcStoreState>(set => ({
   setHasUploadedFile: value => set({ hasUploadedFile: value }),
   hasRecordedFile: false,
   setHasRecordedFile: value => set({ hasRecordedFile: value }),
+  recordingBlobStore: undefined,
+  setRecordingBlobStore: blob => set({ recordingBlobStore: blob }),
+  isUploadDisabled: false,
+  setIsUploadDisabled: value => set({ isUploadDisabled: value }),
+  file: undefined,
+  setFile: file => set({ file: file }),
+  audioLink: undefined,
+  setAudioLink: link => set({ audioLink: link }),
 }));
 
 export default useVcStore;
