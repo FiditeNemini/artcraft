@@ -18,6 +18,7 @@ function replace_commit_ref {
 function build_project {
   pushd src/website
   yarn install 
+  # NB: storyteller is part of the "fakeyou.com" build
   # --ignore-engines: https://stackoverflow.com/a/59615348
   yarn build-fakeyou --verbose --ignore-optional --ignore-engines
   popd
@@ -47,6 +48,7 @@ echo "Copying zola blog artifacts..."
 cp -r zola/public/* storyteller.ai/zola/
 
 echo "Copying website artifacts..."
+# NB: storyteller is part of the "fakeyou.com" build
 mv src/website/packages/fakeyou.com/build/* storyteller.ai/website/
 
 echo "Copying redirects configuration to Netlify build dir..."
