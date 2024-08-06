@@ -427,15 +427,18 @@ export class APIManager {
 
     const json_data = JSON.stringify(data);
 
-    const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${this.baseUrl}/v1/workflows/enqueue_studio`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: json_data,
       },
-      body: json_data,
-    });
+    );
 
     startPollingActiveJobs();
 
