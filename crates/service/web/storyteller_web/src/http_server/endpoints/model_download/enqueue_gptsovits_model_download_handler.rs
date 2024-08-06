@@ -4,6 +4,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use log::{info, log, warn};
 use utoipa::ToSchema;
 
@@ -19,6 +20,8 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::payloads::generic_inference_args::gptsovits_payload::GptSovitsPayload;
 use mysql_queries::queries::generic_download::web::insert_generic_download_job::{insert_generic_download_job, InsertGenericDownloadJobArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
+use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
@@ -31,37 +34,40 @@ use crate::http_server::web_utils::require_user_session_using_connection::requir
 use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema)]
-pub struct EnqueueGptSovitsModelUploadRequest {
+pub struct EnqueueGptSovitsModelDownloadRequest {
+  // Required fields
   pub uuid_idempotency_token: String,
   pub download_url: String,
 
+  // Optional fields
   pub maybe_title: Option<String>,
+  pub maybe_description: Option<String>,
   pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
   pub creator_set_visibility: Option<Visibility>,
 }
 
-#[derive(Serialize)]
-pub struct EnqueueGptSovitsModelUploadSuccessResponse {
+#[derive(Serialize, ToSchema)]
+pub struct EnqueueGptSovitsModelDownloadSuccessResponse {
   pub success: bool,
   /// This is how frontend clients can request the job execution status.
-  pub job_token: String,
+  pub job_token: InferenceJobToken,
 }
 
-#[derive(Debug, Serialize)]
-pub enum EnqueueGptSovitsModelUploadError {
+#[derive(Debug, Serialize, ToSchema)]
+pub enum EnqueueGptSovitsModelDownloadError {
   BadInput(String),
   NotAuthorized,
   ServerError,
   RateLimited,
 }
 
-impl ResponseError for EnqueueGptSovitsModelUploadError {
+impl ResponseError for EnqueueGptSovitsModelDownloadError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      EnqueueGptSovitsModelUploadError::BadInput(_) => StatusCode::BAD_REQUEST,
-      EnqueueGptSovitsModelUploadError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EnqueueGptSovitsModelUploadError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      EnqueueGptSovitsModelUploadError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      EnqueueGptSovitsModelDownloadError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EnqueueGptSovitsModelDownloadError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      EnqueueGptSovitsModelDownloadError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EnqueueGptSovitsModelDownloadError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -70,16 +76,27 @@ impl ResponseError for EnqueueGptSovitsModelUploadError {
   }
 }
 
-impl fmt::Display for EnqueueGptSovitsModelUploadError {
+impl fmt::Display for EnqueueGptSovitsModelDownloadError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn enqueue_gptsovits_model_upload_handler(
+/// Enqueue a GptSoVits model for download (eg. from Google Drive)
+#[utoipa::path(
+  post,
+  tag = "Model Downloads",
+  path = "/v1/model_download/gsv",
+  request_body = EnqueueGptSovitsModelDownloadRequest,
+  responses(
+    (status = 200, body = EnqueueGptSovitsModelDownloadSuccessResponse),
+    (status = 400, body = EnqueueGptSovitsModelDownloadError),
+  )
+)]
+pub async fn enqueue_gptsovits_model_download_handler(
   http_request: HttpRequest,
-  request: web::Json<EnqueueGptSovitsModelUploadRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueGptSovitsModelUploadError>
+  request: Json<EnqueueGptSovitsModelDownloadRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<Json<EnqueueGptSovitsModelDownloadSuccessResponse>, EnqueueGptSovitsModelDownloadError>
 {
   // ==================== DB ==================== //
 
@@ -88,7 +105,7 @@ pub async fn enqueue_gptsovits_model_upload_handler(
     .await
     .map_err(|err| {
       warn!("MySql pool error: {:?}", err);
-      EnqueueGptSovitsModelUploadError::ServerError
+      EnqueueGptSovitsModelDownloadError::ServerError
     })?;
 
   // ==================== USER SESSION ==================== //
@@ -102,57 +119,53 @@ pub async fn enqueue_gptsovits_model_upload_handler(
     &mut mysql_connection)
     .await
     .map_err(|err| match err {
-      RequireUserSessionError::ServerError => EnqueueGptSovitsModelUploadError::ServerError,
-      RequireUserSessionError::NotAuthorized => EnqueueGptSovitsModelUploadError::NotAuthorized,
+      RequireUserSessionError::ServerError => EnqueueGptSovitsModelDownloadError::ServerError,
+      RequireUserSessionError::NotAuthorized => EnqueueGptSovitsModelDownloadError::NotAuthorized,
     })?;
 
   // ==================== PAID PLAN + PRIORITY ==================== //
 
-  // TODO: Plan should handle "first anonymous use" and "investor" cases.
   let plan = get_correct_plan_for_session(server_state.server_environment, Some(&user_session));
-
-  // TODO: Separate priority for animation.
   let priority_level = plan.web_vc_base_priority_level();
-
-  let is_staff = user_session.role.can_ban_users;
 
   // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
   let is_debug_request = has_debug_header(&http_request);
 
   let maybe_routing_tag= get_routing_tag_header(&http_request);
+
   if let Err(_err) = server_state.redis_rate_limiters.model_upload.rate_limit_request(&http_request) {
-    return Err(EnqueueGptSovitsModelUploadError::RateLimited);
+    return Err(EnqueueGptSovitsModelDownloadError::RateLimited);
   }
-
-
 
   let ip_address = get_request_ip(&http_request);
   let uuid = request.uuid_idempotency_token.to_string();
-  let title = request.maybe_title.clone();
   let download_url = request.download_url.trim().to_string();
 
-  let creator_set_visibility = request.creator_set_visibility
-    .unwrap_or(Visibility::Public);
+  let title = request.maybe_title.trim_or_empty();
+  let description = request.maybe_description.trim_or_empty();
+  let creator_set_visibility = request.creator_set_visibility.unwrap_or(Visibility::Public);
 
   if let Err(reason) = validate_idempotency_token_format(&uuid) {
-    return Err(EnqueueGptSovitsModelUploadError::BadInput(reason));
+    return Err(EnqueueGptSovitsModelDownloadError::BadInput(reason));
   }
 
-  // if let Err(reason) = validate_model_title(&title) {
-  //   return Err(EnqueueGptSovitsModelUploadError::BadInput(reason));
-  // }
+  if let Some(title) = title {
+    if let Err(reason) = validate_model_title(title) {
+      return Err(EnqueueGptSovitsModelDownloadError::BadInput(reason));
+    }
+  }
 
-  // match is_bad_tts_model_download_url(&download_url) {
-  //   Ok(false) => {} // Ok case
-  //   Ok(true) => {
-  //     return Err(EnqueueGptSovitsModelUploadError::BadInput("Bad model download URL".to_string()));
-  //   }
-  //   Err(err) => {
-  //     warn!("Error parsing url: {:?}", err);
-  //     return Err(EnqueueGptSovitsModelUploadError::BadInput("Bad model download URL".to_string()));
-  //   }
-  // }
+  match is_bad_tts_model_download_url(&download_url) {
+    Ok(false) => {} // Ok case
+    Ok(true) => {
+      return Err(EnqueueGptSovitsModelDownloadError::BadInput("Bad model download URL".to_string()));
+    }
+    Err(err) => {
+      warn!("Error parsing url: {:?}", err);
+      return Err(EnqueueGptSovitsModelDownloadError::BadInput("Bad model download URL".to_string()));
+    }
+  }
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
@@ -170,20 +183,18 @@ pub async fn enqueue_gptsovits_model_upload_handler(
       inference_category: Some(InferenceCategoryAbbreviated::GptSovits),
       args: Some(PolymorphicInferenceArgs::Gs(
         GptSovitsPayload {
-          maybe_title: title,
-          maybe_description: None,
+          maybe_title: title.map(|s| s.to_string()),
+          maybe_description: description.map(|s| s.to_string()),
           creator_visibility: Some(creator_set_visibility),
         })
       ),
     }),
-
     maybe_creator_user_token: Some(&user_session.user_token_typed),
     maybe_avt_token: maybe_avt_token.as_ref(),
-
     creator_ip_address: &ip_address,
-    creator_set_visibility: creator_set_visibility,
+    creator_set_visibility,
     priority_level,
-    requires_keepalive: false, //reverse ...  TODO fix this. we set it base on account is premium or not ...
+    requires_keepalive: false,
     is_debug_request,
     maybe_routing_tag: maybe_routing_tag.as_deref(),
     mysql_pool: &server_state.mysql_pool,
@@ -193,20 +204,12 @@ pub async fn enqueue_gptsovits_model_upload_handler(
     Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
-      return Err(EnqueueGptSovitsModelUploadError::ServerError);
+      return Err(EnqueueGptSovitsModelDownloadError::ServerError);
     }
   };
 
-
-  let response = EnqueueGptSovitsModelUploadSuccessResponse {
+  Ok(Json(EnqueueGptSovitsModelDownloadSuccessResponse {
     success: true,
-    job_token: job_token.to_string(),
-  };
-
-  let body = serde_json::to_string(&response)
-    .map_err(|e| EnqueueGptSovitsModelUploadError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+    job_token,
+  }))
 }

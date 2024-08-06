@@ -98,6 +98,7 @@ use crate::http_server::endpoints::media_files::upload::upload_video::upload_vid
 use crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::*;
+use crate::http_server::endpoints::model_download::enqueue_gptsovits_model_download_handler::*;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
@@ -165,7 +166,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::edit::rename_media_file_handler::rename_media_file_handler,
     crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::set_media_file_cover_image_handler,
     crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::batch_get_media_files_handler,
-    crate::http_server::endpoints::stats::get_unified_queue_stats_handler::get_unified_queue_stats_handler,
     crate::http_server::endpoints::media_files::get::get_media_file_handler::get_media_file_handler,
     crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::list_media_files_by_batch_token_handler,
@@ -187,9 +187,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::write_scene_file_media_file_handler,
+    crate::http_server::endpoints::model_download::enqueue_gptsovits_model_download_handler::enqueue_gptsovits_model_download_handler,
     crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::edit_user_feature_flags_handler,
     crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handler,
     crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
+    crate::http_server::endpoints::stats::get_unified_queue_stats_handler::get_unified_queue_stats_handler,
     crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
@@ -215,8 +217,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler,
     crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight_handler::update_weight_handler,
-    crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler,
+    crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::enqueue_studio_workflow_handler,
     crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::enqueue_video_style_transfer_workflow_handler,
   ),
@@ -356,6 +358,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueFbxToGltfRequest,
     EnqueueFbxToGltfRequestError,
     EnqueueFbxToGltfRequestSuccessResponse,
+    EnqueueGptSovitsModelDownloadError,
+    EnqueueGptSovitsModelDownloadRequest,
+    EnqueueGptSovitsModelDownloadSuccessResponse,
     EnqueueLivePortraitCropDimensions,
     EnqueueLivePortraitWorkflowError,
     EnqueueLivePortraitWorkflowRequest,

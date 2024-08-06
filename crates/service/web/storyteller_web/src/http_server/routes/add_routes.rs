@@ -65,7 +65,6 @@ use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handl
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
-use crate::http_server::endpoints::tts::enqueue_gptsovits_model_upload::enqueue_gptsovits_model_upload_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count_handler;
@@ -123,10 +122,10 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::workflows::enqueue::get_inference_preview_status_ws::ws_progress_route;
 use crate::http_server::routes::beta_key_routes::add_beta_key_routes;
 use crate::http_server::routes::job_routes::add_job_routes;
 use crate::http_server::routes::media_files_routes::add_media_file_routes;
+use crate::http_server::routes::model_download_routes::add_model_download_routes;
 use crate::http_server::routes::moderation_routes::add_moderator_routes;
 use crate::http_server::routes::user_routes::add_user_routes;
 use crate::http_server::routes::weights_routes::add_weights_routes;
@@ -166,6 +165,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_beta_key_routes(app); /* /v1/beta_keys */
   app = add_image_gen_routes(app);
   app = add_weights_routes(app);
+  app = add_model_download_routes(app);
   app = add_workflow_routes(app);
   app = add_job_routes(app);
   app = add_engine_routes(app); /* /v1/engine/... */
@@ -338,11 +338,6 @@ fn add_tts_routes<T, B> (app: App<T>) -> App<T>
       .service(
         web::resource("/model/{model_token}/edit")
             .route(web::post().to(edit_tts_model_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(
-        web::resource("/model/gptsovits/upload")
-            .route(web::post().to(enqueue_gptsovits_model_upload_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(

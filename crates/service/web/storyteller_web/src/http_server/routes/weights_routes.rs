@@ -27,7 +27,6 @@ pub fn add_weights_routes<T, B>(app: App<T>) -> App<T>
   app.service(
     web
     ::scope("/v1/weights")
-        //.route("/upload", web::post().to(upload_weights_handler))
         .service(web::resource("/weight/{weight_token}")
             .route(web::get().to(get_weight_handler))
             .route(web::post().to(update_weight_handler))
