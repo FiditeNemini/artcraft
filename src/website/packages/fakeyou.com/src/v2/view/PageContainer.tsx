@@ -131,6 +131,7 @@ import WaitlistNextStepsPage from "./pages/waitlist_next_steps/WaitlistNextSteps
 import { CreatorTypeformPage } from "./pages/landing/storyteller/PostlaunchLanding/CreatorTypeformPage";
 import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
 import { StudioMobileCheckPage } from "./pages/landing/storyteller/PostlaunchLanding/StudioMobileCheckPage";
+import { UploadNewTtsModelPage } from "./pages/upload/UploadNewTtsModelPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -498,6 +499,12 @@ class PageContainer extends React.Component<
 
                   <Route path="/upload/tts">
                     <UploadTtsModelPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
+
+                  <Route path="/upload/tts_model">
+                    <UploadNewTtsModelPage
                       sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>

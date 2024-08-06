@@ -15,7 +15,6 @@ import {
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import MentionsSection from "components/common/MentionsSection";
 import VstSectionV3 from "./components/VstSectionV3";
 
@@ -76,9 +75,9 @@ function LandingPage(props: Props) {
               <>
                 {/* <VstSectionV1 /> */}
                 <VstSectionV3 />
-                <div className="py-5">
+                {/*<div className="py-5">
                   <StorytellerStudioCTA />
-                </div>
+                </div>*/}
               </>
             )}
 
@@ -97,13 +96,13 @@ function LandingPage(props: Props) {
               <MentionsSection />
             </Container>
           )}
-          {isLoggedIn && (
+          {/*isLoggedIn && (
             <Container type="panel" className="pt-5">
               <div className="py-5">
                 <StorytellerStudioCTA />
               </div>
             </Container>
-          )}
+          )*/}
         </>
       )}
     </>

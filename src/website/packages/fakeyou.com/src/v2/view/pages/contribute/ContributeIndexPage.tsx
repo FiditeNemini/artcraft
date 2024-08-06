@@ -101,6 +101,13 @@ function ContributeIndexPage(props: Props) {
               </Trans>
             </p>
             <div className="row gx-3 gy-3">
+              <div className="col-12 col-md-12">
+                <Button
+                  icon={faMicrophone}
+                  label="Upload New TTS Voice Model"
+                  to="/upload/tts_model"
+                />
+              </div>
               <div className="col-12 col-md-6">
                 <Button
                   icon={faMicrophone}
