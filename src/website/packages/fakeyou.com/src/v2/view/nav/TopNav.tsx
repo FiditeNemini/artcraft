@@ -260,7 +260,7 @@ function TopNav(props: Props) {
                           icon={faFaceViewfinder}
                           className="me-2"
                         />
-                        {t("productFaceAnimator")}
+                        {t("productLipsync")}
                       </Link>
                     </li>
                     <hr className="my-2" />

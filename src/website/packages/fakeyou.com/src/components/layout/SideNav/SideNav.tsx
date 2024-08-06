@@ -470,7 +470,7 @@ export default function SideNav({
                   icon={faFaceViewfinder}
                   className="sidebar-heading-icon"
                 />
-                {t("videoFaceAnimator")}
+                {t("lipsync")}
               </NavLink>
             </li>
 

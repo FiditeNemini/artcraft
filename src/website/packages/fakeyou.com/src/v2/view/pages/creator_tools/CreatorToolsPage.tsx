@@ -30,10 +30,10 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
   const videoProducts = [
     {
       to: "/face-animator",
-      title: t("productFaceAnimatorTitle"),
-      text: t("productFaceAnimatorText"),
+      title: t("productLipsyncTitle"),
+      text: t("productLipsyncText"),
       imgSrc: "/images/landing/select-fa.webp",
-      imgAlt: "Face Animator",
+      imgAlt: "Lipsync",
     },
     // {
     //   to: "/text-to-image",
@@ -62,10 +62,10 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
 
     {
       to: "/ai-face-mirror",
-      title: t("productFaceMirrorTitle"),
-      text: t("productFaceMirrorText"),
+      title: t("productLivePortraitTitle"),
+      text: t("productLivePortraitText"),
       imgSrc: "/images/landing/select-fm.webp",
-      imgAlt: "AI Face Mirror",
+      imgAlt: "Live Portrait",
       badgeContent: {
         type: "new",
         icon: faSparkles,

@@ -37,8 +37,8 @@ export default function FaceAnimator({
 }: FaceAnimatorCore) {
   const { mediaToken } = useParams<{ mediaToken: string }>();
   const { media: presetAudio } = useMedia({ mediaToken });
-  const { t } = useLocalize("FaceAnimator");
-  usePrefixedDocumentTitle("AI Face Animator");
+  const { t } = useLocalize("Lipsync");
+  usePrefixedDocumentTitle("Lipsync");
 
   // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
 

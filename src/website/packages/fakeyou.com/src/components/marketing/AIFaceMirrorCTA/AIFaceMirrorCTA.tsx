@@ -29,7 +29,7 @@ export default function AIFaceMirrorCTA({ className }: Props) {
         <div {...{ className: "cta-ai-face-mirror-tint" }}></div>
         <div {...{ className: "cta-ai-face-mirror-overlay" }}>
           <div {...{ className: "cta-ai-face-mirror-copy" }}>
-            <h1 className="fw-bold">AI Face Mirror</h1>
+            <h1 className="fw-bold">Live Portrait</h1>
             <p>Reflect motion from one portrait to another</p>
           </div>
 
@@ -37,7 +37,7 @@ export default function AIFaceMirrorCTA({ className }: Props) {
             {...{
               className: "cta-ai-face-mirror-button",
               label: "Create now",
-              to: "/ai-face-mirror",
+              // to: "/ai-face-mirror",
             }}
           />
         </div>

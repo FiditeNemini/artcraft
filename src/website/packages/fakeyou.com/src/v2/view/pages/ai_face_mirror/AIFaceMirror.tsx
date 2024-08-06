@@ -91,7 +91,7 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
           </video>
           <div {...{ className: "fy-ai-face-mirror-header-content" }}>
             <div {...{ className: "fy-ai-face-mirror-title" }}>
-              <h1>AI Face Mirror</h1>
+              <h1>Live Portrait</h1>
               <p>
                 Use AI to transfer facial expressions, audio, and vocals from
                 one face video to an image or a video
