@@ -1,8 +1,9 @@
+use std::fs::read_to_string;
 use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::anyhow;
-use log::info;
+use log::{error, info};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
@@ -133,12 +134,20 @@ pub async fn process_single_gpt_sovits_tts_job(
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
-  info!("Checking that output files exist...");
+  info!("Checking that inference output files exist...");
 
-  check_file_exists(&output_file_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+  if let Err(err) = check_file_exists(&output_file_path) {
+    if let Ok(contents) = read_to_string(&stdout_output_file) {
+      error!("Captured stdout output: {}", contents);
+    }
+    if let Ok(contents) = read_to_string(&stderr_output_file) {
+      error!("Captured stderr output: {}", contents);
+    }
+    return Err(ProcessSingleJobError::Other(err));
+  }
 
   // upload audio to bucket
-  info!("Uploading media ...");
+  info!("Inference was successful. Uploading media ...");
 
   let result_bucket_location = MediaFileBucketPath::generate_new(
     Some(BUCKET_FILE_PREFIX),
