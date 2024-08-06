@@ -15,7 +15,7 @@ function replace_commit_ref {
   # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 }
 
-function build_project {
+function build_website {
   pushd src/website
   yarn install 
   # NB: storyteller is part of the "fakeyou.com" build
