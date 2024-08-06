@@ -26,6 +26,10 @@ export interface Weight {
   };
   version: number;
   is_featured: boolean;
+  stats: {
+    bookmark_count: number;
+    positive_rating_count: number;
+  };
 }
 
 export interface GetWeightRequest {}

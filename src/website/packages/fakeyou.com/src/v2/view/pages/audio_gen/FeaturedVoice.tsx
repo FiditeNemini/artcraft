@@ -50,18 +50,30 @@ export const FeaturedVoice = ({ token, onClick }: FeaturedVoiceProps) => {
         ) : (
           <>
             <WeightCoverImage {...{ src: coverImage, height: 50, width: 50 }} />
-            <div className="d-flex flex-column justify-content-center">
-              <h6 className="mb-1 fw-semibold d-flex align-items-center gap-2">
+            <div className="d-flex flex-column justify-content-center overflow-hidden">
+              <h6
+                className="mb-1 fw-semibold"
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: "265px",
+                }}
+              >
                 {weight?.title}
-                <CardBadge
-                  label={weightType}
-                  color={weightTagColor}
-                  small={true}
-                />
               </h6>
-              <span className="fs-7 fw-medium" style={{ opacity: 0.6 }}>
-                by {weight?.creator.display_name}
-              </span>
+              <div className="d-inline-flex gap-2">
+                <span className="fs-7 fw-medium" style={{ opacity: 0.6 }}>
+                  by {weight?.creator.display_name}
+                </span>
+                <span className="d-inline-flex align-items-center">
+                  <CardBadge
+                    label={weightType}
+                    color={weightTagColor}
+                    small={true}
+                  />
+                </span>
+              </div>
             </div>
             <div
               className="position-absolute fs-7 fw-medium fy-select-voice"

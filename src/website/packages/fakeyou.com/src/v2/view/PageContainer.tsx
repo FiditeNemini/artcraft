@@ -113,7 +113,8 @@ import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
-import NewTTS from "./pages/new_tts/NewTTS";
+import NewTTS from "./pages/audio_gen/tts/NewTTS";
+import NewVC from "./pages/audio_gen/vc/NewVC";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
@@ -727,7 +728,8 @@ class PageContainer extends React.Component<
                     <DevMediaInput />
                   </Route>
 
-                  <Route path="/dev-tts/:weight_token">
+                  {/* NEW TTS PAGE */}
+                  <Route exact path="/tts">
                     <NewTTS
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
@@ -735,9 +737,9 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  {/* NEW TTS PAGE */}
-                  <Route exact path="/tts">
-                    <NewTTS
+                  {/* NEW VC PAGE */}
+                  <Route exact path="/dev-vc">
+                    <NewVC
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }

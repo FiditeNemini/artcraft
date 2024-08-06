@@ -40,6 +40,7 @@ export interface MediaBrowserProps {
   emptyContent?: React.ReactNode;
   showFilters?: boolean;
   showPagination?: boolean;
+  searchFilter?: string;
 }
 
 interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps {}
@@ -56,6 +57,7 @@ export default function MediaBrowser({
   emptyContent,
   showFilters = true,
   showPagination = true,
+  searchFilter,
 }: MediaBrowserInternal) {
   console.log(
     "🐢",
@@ -103,7 +105,7 @@ export default function MediaBrowser({
       ? {
           request: {
             search_term: localSearch,
-            weight_category: "text_to_speech",
+            weight_category: searchFilter ? searchFilter : "text_to_speech",
           },
         }
       : {}),

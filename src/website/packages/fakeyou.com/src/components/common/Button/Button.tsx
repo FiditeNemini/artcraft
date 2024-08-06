@@ -25,6 +25,7 @@ export default function Button({
   isActive,
   type = "button",
   fontLarge,
+  iconClassName,
   ...rest
 }: ButtonProps) {
   let variant = variantProps;
@@ -44,7 +45,10 @@ export default function Button({
   }
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
   let IconComponent = icon ? (
-    <FontAwesomeIcon icon={icon} className={iconMarginClass} />
+    <FontAwesomeIcon
+      icon={icon}
+      className={`${iconMarginClass} ${iconClassName}`.trim()}
+    />
   ) : null;
 
   let LabelComponent = !square ? label : null;

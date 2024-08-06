@@ -51,6 +51,7 @@ const Cards = ({ props, type }: MediaCardsProps) => {
         />
       );
     case "rvc_v2":
+    case "so_vits_svc":
       return <CardWrapper {...{ ...props, card: WeightCard, padding: true }} />;
     case "tt2":
       return <CardWrapper {...{ ...props, card: WeightCard, padding: true }} />;

@@ -32,6 +32,7 @@ import useSession from "./useSession";
 import useSlides from "./useSlides";
 import useStatusPoll from "./useStatusPoll";
 import useTtsStore from "./useTtsStore";
+import useVcStore from "./useVcStore";
 import useVideo from "./useVideo";
 import useWeightFetch from "./useWeightFetch";
 
@@ -68,6 +69,7 @@ export {
   useSlides,
   useStatusPoll,
   useTtsStore,
+  useVcStore,
   useVideo,
   useWeightFetch,
 };

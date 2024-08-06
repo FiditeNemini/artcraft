@@ -31,7 +31,9 @@ function Gravatar(props: Props) {
 
   return (
     <img
-      className={`rounded-circle border border-2 ${ props.noHeight ? "" : "h-100" } gravatar-img`}
+      className={`rounded-circle border ${
+        props.noHeight ? "" : "h-100"
+      } gravatar-img`}
       alt={altText}
       src={gravatarUrl}
       height={props.size}

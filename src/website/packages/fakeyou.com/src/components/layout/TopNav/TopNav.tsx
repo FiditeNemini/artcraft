@@ -68,7 +68,10 @@ export default function TopNav({
     "/creator-onboarding"
   );
   const isOnWelcomePage = window.location.pathname === "/welcome";
-  const isOnTtsPage = window.location.pathname.includes("/dev-tts");
+  const isOnTtsPage = window.location.pathname.includes("/tts");
+  const isOnVcPage =
+    window.location.pathname.includes("/voice-conversion") ||
+    window.location.pathname.includes("/dev-vc");
 
   const { open } = useModal();
   const openModal = () =>
@@ -484,12 +487,14 @@ export default function TopNav({
                     !isOnLoginPage &&
                     !isOnSignUpPage &&
                     !isOnStudioPage &&
-                    !isOnTtsPage) ||
+                    !isOnTtsPage &&
+                    !isOnVcPage) ||
                   (loggedIn &&
                     !isOnLoginPage &&
                     !isOnSignUpPage &&
                     !isOnStudioPage &&
-                    !isOnTtsPage) ||
+                    !isOnTtsPage &&
+                    !isOnVcPage) ||
                   (isOnLandingPage &&
                     isScrolled &&
                     !isOnLoginPage &&

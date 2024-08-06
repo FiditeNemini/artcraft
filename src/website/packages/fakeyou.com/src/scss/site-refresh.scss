@@ -263,6 +263,11 @@ styles with important tags:
     padding-bottom: 0.4rem !important;
   }
 
+  .text-truncate {
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
   .lead {
     color: rgba($white, 0.8);
     font-size: 17px;
@@ -410,11 +415,13 @@ styles with important tags:
 
     .panel-inner {
       background-color: $panel-inner;
+      box-shadow: none !important;
     }
 
-    .panel-tts-results {
+    .panel-results {
       border-radius: 0.5rem;
       background-color: lighten($panel, 4%);
+      box-shadow: none !important;
     }
 
     .panel-title {
@@ -1403,6 +1410,14 @@ styles with important tags:
         background-color: lighten($panel, 6%);
         cursor: pointer;
       }
+
+      &.empty-zone {
+        height: 323px;
+
+        @media (max-width: 768px) {
+          height: 100px;
+        }
+      }
     }
 
     .upload-zone-drag {
@@ -1819,7 +1834,7 @@ textarea {
     }
 
     .session-vc-section {
-      height: 660px;
+      height: 511px;
     }
 
     .session-tts-section::-webkit-scrollbar {

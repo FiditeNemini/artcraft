@@ -14,6 +14,9 @@ interface CardFooterProps {
   makeBookmarksProps?: MakeBatchProps;
   makeRatingsProps?: MakeRatingsProps; // this is MakeBatchProps extended to include likeCount
   showCreator?: boolean;
+  showDivider?: boolean;
+  creatorLink?: boolean;
+  showGravatar?: boolean;
 }
 
 export default function CardFooter({
@@ -23,6 +26,9 @@ export default function CardFooter({
   makeBookmarksProps,
   makeRatingsProps,
   showCreator,
+  showDivider = true,
+  creatorLink,
+  showGravatar,
 }: CardFooterProps) {
   const {
     default_avatar,
@@ -34,7 +40,7 @@ export default function CardFooter({
   const eitherOn = showCreator || togglesOn;
   return (
     <>
-      {eitherOn && <hr className="my-2" />}
+      {eitherOn && showDivider && <hr className="my-2" />}
       <div {...{ className: `fy-card-footer` }}>
         {showCreator && (
           <CreatorName
@@ -45,6 +51,8 @@ export default function CardFooter({
               gravatarHash: gravatar_hash || "",
               noHeight: true,
               username,
+              creatorLink,
+              showGravatar,
             }}
           />
         )}

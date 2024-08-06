@@ -34,8 +34,7 @@ import { useInferenceJobs, useLocalize } from "hooks";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Container, Panel } from "components/common";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
-import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { AITools } from "components/marketing";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -520,9 +519,13 @@ function VcModelListPage(props: Props) {
         </Panel>
       </Container>
 
-      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
-        <MentionsSection />
-        <StorytellerStudioCTA />
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+          <AITools />
+        </Panel>
+        {/* <MentionsSection /> */}
+        {/* <StorytellerStudioCTA /> */}
       </Container>
     </>
   );

@@ -172,7 +172,24 @@ export default function AudioCard({
                   <h6 className="fw-semibold text-white mb-1">
                     {data.title || data?.details?.maybe_weight_data?.title}
                   </h6>
-                  <p className="fs-7 opacity-75">{timeAgo}</p>
+                  {inSelectModal && (
+                    <CardFooter
+                      {...{
+                        creator:
+                          data?.creator ||
+                          data.details.maybe_weight_data?.maybe_creator,
+                        entityToken:
+                          data.weight_token || data.details?.entity_token,
+                        entityType: "model_weight",
+                        makeBookmarksProps: bookmarks?.makeProps,
+                        makeRatingsProps: ratings?.makeProps,
+                        showCreator: true,
+                        showDivider: false,
+                        creatorLink: false,
+                        showGravatar: false,
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -185,17 +202,20 @@ export default function AudioCard({
               </div>
             )}
           </div>
-          <CardFooter
-            {...{
-              creator:
-                data?.creator || data.details.maybe_weight_data?.maybe_creator,
-              entityToken: data.weight_token || data.details?.entity_token,
-              entityType: "model_weight",
-              makeBookmarksProps: bookmarks?.makeProps,
-              makeRatingsProps: ratings?.makeProps,
-              showCreator: true,
-            }}
-          />
+          {!inSelectModal && (
+            <CardFooter
+              {...{
+                creator:
+                  data?.creator ||
+                  data.details.maybe_weight_data?.maybe_creator,
+                entityToken: data.weight_token || data.details?.entity_token,
+                entityType: "model_weight",
+                makeBookmarksProps: bookmarks?.makeProps,
+                makeRatingsProps: ratings?.makeProps,
+                showCreator: true,
+              }}
+            />
+          )}
         </>
       )}
     </Card>

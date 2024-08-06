@@ -21,4 +21,5 @@ export default interface ButtonProps
   isLoading?: boolean;
   isActive?: boolean;
   fontLarge?: boolean;
+  iconClassName?: string;
 }

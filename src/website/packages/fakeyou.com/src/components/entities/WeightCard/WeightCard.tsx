@@ -1,5 +1,5 @@
 import React from "react";
-import moment from "moment";
+// import moment from "moment";
 import { MakeRatingsProps } from "hooks/useRatings";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import CardBadge from "../CardBadge";
@@ -23,7 +23,7 @@ export default function WeightCard({
 }: Props) {
   const {
     cover_image,
-    created_at,
+    // created_at,
     details,
     maybe_creator,
     creator,
@@ -31,7 +31,7 @@ export default function WeightCard({
     token,
     weight_type,
   } = data || {};
-  const timeCreated = moment(created_at || "").fromNow();
+  // const timeCreated = moment(created_at || "").fromNow();
   const bucketConfig = new BucketConfig();
   let coverImage = undefined;
   if (cover_image) {
@@ -80,7 +80,19 @@ export default function WeightCard({
               <h6 className="fw-semibold text-white mb-1">
                 {title || details.maybe_weight_data.title}
               </h6>
-              <p className="fs-7 opacity-75">{timeCreated}</p>
+              {/* <p className="fs-7 opacity-75">{timeCreated}</p> */}
+              <CardFooter
+                {...{
+                  creator: maybe_creator || creator,
+                  entityToken: token,
+                  entityType: "media_file",
+                  makeRatingsProps,
+                  showCreator: true,
+                  showDivider: false,
+                  creatorLink: false,
+                  showGravatar: false,
+                }}
+              />
             </div>
           </div>
         </div>
@@ -91,15 +103,6 @@ export default function WeightCard({
           Use
         </div>
       </div>
-      <CardFooter
-        {...{
-          creator: maybe_creator || creator,
-          entityToken: token,
-          entityType: "media_file",
-          makeRatingsProps,
-          showCreator: true,
-        }}
-      />
     </>
   );
 }

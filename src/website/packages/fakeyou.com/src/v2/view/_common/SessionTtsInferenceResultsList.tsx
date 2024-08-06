@@ -142,7 +142,7 @@ function SessionTtsInferenceResultList(props: Props) {
               <button className="delete" aria-label="delete"></button>
             </div>*/}
             <div>
-              <div className="panel panel-tts-results p-3 gap-3 d-flex flex-column">
+              <div className="panel panel-results p-3 gap-3 d-flex flex-column">
                 <div>
                   <div className="d-flex align-items-center gap-1 mb-2">
                     <h6 className="mb-0 fw-semibold flex-grow-1">
