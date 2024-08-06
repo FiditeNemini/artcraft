@@ -1,6 +1,9 @@
 # VIM
 *~
 
+# VSCode
+.favorites.json
+
 # NPM
 node_modules/
 
