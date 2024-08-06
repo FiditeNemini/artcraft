@@ -76,9 +76,9 @@ const MentionsSection: React.FC<MentionsSectionProps> = () => {
                   alt="Gigazine Logo"
                 />
                 <p className="swiper-text">
-                  "無料でビル・ゲイツやアーノルド・シュワルツネッガーなど有名人に好きな台詞をしゃべらせることができる「Vocodes」レビュー"
+                  "無料でビル・ゲイツやアーノルド・シュワルツネッガーなど有名人に好きな台詞をしゃべらせることができる「FakeYou」レビュー"
                   <br />
-                  ("Vocodes" [now FakeYou] allows users to use celebrities such
+                  ([FakeYou] allows users to use celebrities such
                   as Bill Gates and Arnold Schwarzenegger to speak their
                   favorite lines for free.)
                 </p>
@@ -137,9 +137,8 @@ const MentionsSection: React.FC<MentionsSectionProps> = () => {
                   height="40"
                 />
                 <p className="swiper-text">
-                  We’ve previously seen apps like this, but Vocodes [now
-                  FakeYou] impresses with the sheer volume of voices available
-                  to test out.
+                  We’ve previously seen apps like this, but [FakeYou] impresses 
+                  with the sheer volume of voices available to test out.
                 </p>
               </div>
             </div>
@@ -153,7 +152,7 @@ const MentionsSection: React.FC<MentionsSectionProps> = () => {
                   classic 19th-century poem as AI-imaging fuel alongside an
                   uncanny narration from an artificial Christopher Lee. To make
                   "In the Bleak Midwinter" even more, uh, bleak, Marshall then
-                  employed software called vo.codes [now FakeYou] to approximate
+                  employed software called [FakeYou] to approximate
                   a poetic narration in the voice of the late Sir Christopher
                   Lee. [...] to be honest with you, we initially thought
                   Marshall simply dubbed an old audio recording of Lee actually
