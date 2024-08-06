@@ -61,9 +61,10 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
     setHasUploadedFile,
     hasRecordedFile,
     setHasRecordedFile,
+    formIsCleared,
+    setFormIsCleared,
   } = useVcStore();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [formIsCleared, setFormIsCleared] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isRecordingAudio, setIsRecordingAudio] = useState(false);
   usePrefixedDocumentTitle("AI Voice Conversion");

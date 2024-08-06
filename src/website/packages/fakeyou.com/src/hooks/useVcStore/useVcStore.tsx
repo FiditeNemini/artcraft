@@ -27,6 +27,8 @@ interface VcStoreState {
   setFile: (file: any) => void;
   audioLink: string | undefined;
   setAudioLink: (link: string | undefined) => void;
+  formIsCleared: boolean;
+  setFormIsCleared: (cleared: boolean) => void;
 }
 
 const useVcStore = create<VcStoreState>(set => ({
@@ -52,6 +54,8 @@ const useVcStore = create<VcStoreState>(set => ({
   setFile: file => set({ file: file }),
   audioLink: undefined,
   setAudioLink: link => set({ audioLink: link }),
+  formIsCleared: false,
+  setFormIsCleared: cleared => set({ formIsCleared: cleared }),
 }));
 
 export default useVcStore;
