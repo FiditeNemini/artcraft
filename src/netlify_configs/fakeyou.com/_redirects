@@ -103,6 +103,7 @@
 
 # Test paths
 /dev-tts*              /website/index.html   200
+/dev-vc*               /website/index.html   200
 /dev-upload*           /website/index.html   200
 /dev-upload-alt*       /website/index.html   200
 /tts-dev*              /website/index.html   200
