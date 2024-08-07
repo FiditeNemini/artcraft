@@ -109,6 +109,8 @@ pub async fn process_single_gpt_sovits_tts_job(
         _ => (None, None),
       };
 
+  const DEFAULT_LANGUAGE : &str = "english";
+
   let inference_start_time = Instant::now();
 
   let command_exit_status = gpt_sovits_deps
@@ -121,10 +123,11 @@ pub async fn process_single_gpt_sovits_tts_job(
       sovits_model_path: &sovits_model_path,
       reference_audio_path: reference_audio_path.as_deref(),
       reference_transcript_path: reference_transcript_path.as_deref(),
+      reference_language: Some(DEFAULT_LANGUAGE),
       output_audio_directory: &output_dir,
       maybe_reference_free: None,
       maybe_temperature: None,
-      maybe_target_language: Some("english".to_string()),
+      maybe_target_language: Some(DEFAULT_LANGUAGE),
     });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
