@@ -88,7 +88,7 @@ impl GptSovitsPackageFileType {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum GptSovitsPackageError {
   InvalidArchive,
   InvalidGPTModel(String),

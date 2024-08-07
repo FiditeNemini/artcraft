@@ -1,4 +1,4 @@
-use std::io::{BufReader, Cursor, Read};
+use std::io::{BufReader, Cursor, Read, Seek};
 use std::path::PathBuf;
 
 use log::{error, info, warn};
@@ -188,7 +188,7 @@ pub async fn extract_and_upload_gpt_sovits_package_files(
 }
 
 #[derive(Debug,Clone)]
-struct PackageZipEntryDetails {
+pub struct PackageZipEntryDetails {
   package_type: GptSovitsPackageFileType,
   enclosed_name: PathBuf,
   maybe_better_alternative_output_name: String,
@@ -196,7 +196,7 @@ struct PackageZipEntryDetails {
   is_valid_file_extension: bool,
 }
 
-fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) -> Result<Vec<PackageZipEntryDetails>, GptSovitsPackageError> {
+fn get_relevant_zip_entries<R: Read + Seek>(archive: &mut ZipArchive<BufReader<R>>) -> Result<Vec<PackageZipEntryDetails>, GptSovitsPackageError> {
   let mut entries: Vec<PackageZipEntryDetails> = Vec::new();
 
   for i in 0..archive.len() {
@@ -269,7 +269,16 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
     }
   }
 
-  if entries.len() < GptSovitsPackageFileType::all_variants().len() {
+  // Only the model files are truly essential
+  let has_no_gpt = entries.iter()
+      .find(|entry| entry.package_type == GptSovitsPackageFileType::GptModel)
+      .is_none();
+
+  let has_no_sovits = entries.iter()
+      .find(|entry| entry.package_type == GptSovitsPackageFileType::SovitsCheckpoint)
+      .is_none();
+
+  if has_no_gpt || has_no_sovits {
     return Err(GptSovitsPackageError::InvalidArchive);
   }
 
@@ -278,4 +287,72 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
   }
 
   Ok(entries)
+}
+
+#[cfg(test)]
+mod tests {
+  use std::fs::File;
+  use std::io::BufReader;
+
+  use zip::ZipArchive;
+
+  use testing::test_file_path::test_file_path;
+
+  use crate::job::job_types::gpt_sovits::model_package::model_package::{GptSovitsPackageError, GptSovitsPackageFileType};
+  use crate::job::job_types::gpt_sovits::upload_model::extract_and_upload_gpt_sovits_package::{get_relevant_zip_entries, PackageZipEntryDetails};
+
+  fn read_archive(path: &str) -> ZipArchive<BufReader<File>> {
+    let path = test_file_path(path).unwrap();
+    let file = File::open(path).unwrap();
+    let reader = BufReader::new(file);
+    ZipArchive::new(reader).unwrap()
+  }
+
+  #[test]
+  fn test_empty_archive() {
+    let mut archive = read_archive("test_data/archive/zip/empty.zip");
+    let result = get_relevant_zip_entries(&mut archive);
+    assert!(result.is_err());
+    assert_eq!(result.err().unwrap(), GptSovitsPackageError::InvalidArchive);
+  }
+
+  #[test]
+  fn test_archive_with_just_model() {
+    let mut archive = read_archive("test_data/archive/zip/gptsovits/just_model.zip");
+    let result = get_relevant_zip_entries(&mut archive);
+
+    assert!(result.is_ok());
+
+    let result = result.unwrap();
+    assert_eq!(result.len(), 2);
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::GptModel).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "just_model/gpt.ckpt");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::SovitsCheckpoint).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "just_model/sovits.pth");
+  }
+
+  #[test]
+  fn test_archive_with_single_files() {
+    let mut archive = read_archive("test_data/archive/zip/gptsovits/all_files.zip");
+    let result = get_relevant_zip_entries(&mut archive);
+
+    assert!(result.is_ok());
+
+    let result = result.unwrap();
+    assert_eq!(result.len(), 4);
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::GptModel).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "all_files/gpt.ckpt");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::SovitsCheckpoint).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "all_files/sovits.pth");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::ReferenceAudio).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "all_files/reference.wav");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::ReferenceTranscript).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "all_files/reference.txt");
+  }
 }
