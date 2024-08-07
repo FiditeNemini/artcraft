@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "components/common";
+import { Button, Panel } from "components/common";
 import "./AIFaceMirrorCTA.scss";
 
 interface Props {
@@ -9,11 +9,7 @@ interface Props {
 
 export default function AIFaceMirrorCTA({ className }: Props) {
   return (
-    <div
-      {...{
-        className: `cta-ai-face-mirror${className ? " " + className : ""}`,
-      }}
-    >
+    <Panel className="cta-ai-face-mirror">
       <Link
         {...{ className: "cta-ai-face-mirror-body", to: "/ai-face-mirror" }}
       >
@@ -42,6 +38,6 @@ export default function AIFaceMirrorCTA({ className }: Props) {
           />
         </div>
       </Link>
-    </div>
+    </Panel>
   );
 }

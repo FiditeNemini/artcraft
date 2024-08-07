@@ -2,10 +2,14 @@ import React from "react";
 import { faFlask, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { useLocalize } from "hooks";
 import AIToolsRow from "./AIToolsRow";
+import { useLocation } from "react-router-dom";
 
 export default function AITools() {
   const { t } = useLocalize("LandingPage");
-  const items = [
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  let items = [
     {
       to: "/tts",
       title: t("productTtsTitle"),
@@ -33,13 +37,6 @@ export default function AITools() {
       },
     },
     {
-      to: "/face-animator",
-      title: t("productLipsyncTitle"),
-      text: t("productLipsyncText"),
-      imgSrc: "/images/landing/select-fa.webp",
-      imgAlt: "Lipsync",
-    },
-    {
       to: "/style-video",
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
@@ -63,7 +60,29 @@ export default function AITools() {
         label: "NEW",
       },
     },
+    {
+      to: "/face-animator",
+      title: t("productLipsyncTitle"),
+      text: t("productLipsyncText"),
+      imgSrc: "/images/landing/select-fa.webp",
+      imgAlt: "Lipsync",
+    },
   ];
+
+  if (currentPath === "/tts") {
+    items = items.filter(item => item.to !== "/tts");
+  }
+  if (currentPath === "/voice-conversion") {
+    items = items.filter(item => item.to !== "/voice-conversion");
+  }
+
+  if (currentPath === "/tts") {
+    items = [items[0], items[2], items[3], items[4], items[1]];
+  }
+
+  if (currentPath === "/voice-conversion") {
+    items = [items[0], items[2], items[3], items[4], items[1]];
+  }
 
   return <AIToolsRow {...{ items }} />;
 }
