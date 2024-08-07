@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { faLongArrowRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface BadgeContent {
   type: string;
@@ -14,9 +14,11 @@ interface AIToolsItemProps {
   to: string;
   title: string;
   text?: string;
-  imgSrc: string;
+  imgSrc?: string;
   imgAlt: string;
   badgeContent?: BadgeContent;
+  videoSrc?: string;
+  videoPosterSrc?: string;
 }
 
 export function AIToolsItem({
@@ -26,14 +28,69 @@ export function AIToolsItem({
   imgSrc,
   imgAlt,
   badgeContent,
+  videoSrc,
+  videoPosterSrc,
 }: AIToolsItemProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showPoster, setShowPoster] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current && !isPlaying) {
+      setShowPoster(false);
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleTouchStart = () => {
+    if (videoRef.current && !isPlaying) {
+      setShowPoster(false);
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleVideoEnded = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setShowPoster(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+        }
+        setIsPlaying(false);
+      }, 200);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      const timeRemaining =
+        videoRef.current.duration - videoRef.current.currentTime;
+      if (timeRemaining <= 0.2) {
+        setShowPoster(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.addEventListener("timeupdate", handleTimeUpdate);
+      return () => {
+        videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+      };
+    }
+  }, []);
+
   return (
     <div className="col-12 col-md-6 col-lg-4">
       <Link
         to={to}
         className="panel panel-select d-flex flex-column align-items-center"
       >
-        <div className="d-flex px-4 pt-4 align-items-start w-100">
+        <div className="d-flex px-3 pt-3 px-xl-4 pt-xl-4 align-items-start w-100">
           <div className="flex-grow-1">
             {badgeContent && (
               <div className="mb-1">
@@ -57,10 +114,63 @@ export function AIToolsItem({
             )}
           </div>
           <Link to={to} className="btn btn-square mt-1">
-            <FontAwesomeIcon icon={faArrowRight} />
+            <FontAwesomeIcon
+              icon={faLongArrowRight}
+              className="btn-icon fs-5"
+            />
           </Link>
         </div>
-        <img className="img-fluid" src={imgSrc} alt={imgAlt} />
+        {imgSrc && <img className="img-fluid" src={imgSrc} alt={imgAlt} />}
+        {videoSrc && (
+          <div
+            className="w-100 mt-3 px-3 px-xl-4 overflow-hidden"
+            onMouseEnter={handleMouseEnter}
+            onTouchStart={handleTouchStart}
+          >
+            <div
+              className="w-100 h-100 position-relative overflow-hidden"
+              style={{
+                borderTopLeftRadius: "0.5rem",
+                borderTopRightRadius: "0.5rem",
+              }}
+            >
+              {videoPosterSrc && (
+                <div
+                  className={`h-100 w-100 ${
+                    showPoster ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    opacity: 0,
+                    transition: "opacity 0.2s ease-in-out",
+                  }}
+                >
+                  <img
+                    src={videoPosterSrc}
+                    className="h-100 w-100 object-fit-cover"
+                    alt={imgAlt}
+                  />
+                </div>
+              )}
+
+              <video
+                ref={videoRef}
+                muted={true}
+                playsInline={true}
+                className="w-100 h-100 object-fit-cover"
+                style={{
+                  borderTopLeftRadius: "0.5rem",
+                  borderTopRightRadius: "0.5rem",
+                }}
+                onEnded={handleVideoEnded}
+              >
+                <source src={videoSrc} type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        )}
       </Link>
     </div>
   );

@@ -40,7 +40,8 @@ export default function AITools() {
       to: "/style-video",
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
-      imgSrc: "/images/landing/select-vst.webp",
+      videoSrc: "/videos/ai-tools/vst_video.mp4",
+      videoPosterSrc: "/images/ai-tools/vst_video_poster.jpg",
       imgAlt: "Video Style Transfer",
       badgeContent: {
         type: "new",
@@ -52,7 +53,8 @@ export default function AITools() {
       to: "/ai-face-mirror",
       title: t("productLivePortraitTitle"),
       text: t("productLivePortraitText"),
-      imgSrc: "/images/landing/select-fm.webp",
+      videoSrc: "/videos/ai-tools/lp_video.mp4",
+      videoPosterSrc: "/images/ai-tools/lp_video_poster.jpg",
       imgAlt: "Live Portrait",
       badgeContent: {
         type: "new",

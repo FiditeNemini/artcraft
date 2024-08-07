@@ -1567,7 +1567,7 @@ styles with important tags:
     transition: 0.2s all;
     border-radius: 0.5rem !important;
     border-width: 2px !important;
-    height: 320px;
+    height: 330px;
     overflow: hidden;
     z-index: 2;
 
@@ -1589,6 +1589,18 @@ styles with important tags:
     &:hover .btn {
       transition: 0.2s all;
       background-color: lighten($primary, 5%);
+    }
+
+    .btn-icon {
+      transition: 0.2s all;
+    }
+
+    &:hover .btn .btn-icon {
+      transform: translateX(3px);
+    }
+
+    @media (max-width: 768px) {
+      height: 280px;
     }
   }
 

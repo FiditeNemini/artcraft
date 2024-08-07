@@ -4,7 +4,6 @@ import {
   faScrewdriverWrench,
   faSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import {
   GetWebsite,
@@ -17,6 +16,7 @@ import { useLocalize } from "hooks";
 import React from "react";
 import { AIToolsRow } from "components/marketing";
 import "./CreatorTools.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface CreatorToolsPageProps {
   sessionWrapper: SessionWrapper;
@@ -28,13 +28,6 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
   usePrefixedDocumentTitle("Creator Tools");
 
   const videoProducts = [
-    {
-      to: "/face-animator",
-      title: t("productLipsyncTitle"),
-      text: t("productLipsyncText"),
-      imgSrc: "/images/landing/select-fa.webp",
-      imgAlt: "Lipsync",
-    },
     // {
     //   to: "/text-to-image",
     //   title: t("productImageGenTitle"),
@@ -51,7 +44,8 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
       to: "/style-video",
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
-      imgSrc: "/images/landing/select-vst.webp",
+      videoSrc: "/videos/ai-tools/vst_video.mp4",
+      videoPosterSrc: "/images/ai-tools/vst_video_poster.jpg",
       imgAlt: "Video Style Transfer",
       badgeContent: {
         type: "new",
@@ -64,13 +58,22 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
       to: "/ai-face-mirror",
       title: t("productLivePortraitTitle"),
       text: t("productLivePortraitText"),
-      imgSrc: "/images/landing/select-fm.webp",
+      videoSrc: "/videos/ai-tools/lp_video.mp4",
+      videoPosterSrc: "/images/ai-tools/lp_video_poster.jpg",
       imgAlt: "Live Portrait",
       badgeContent: {
         type: "new",
         icon: faSparkles,
         label: "NEW",
       },
+    },
+
+    {
+      to: "/face-animator",
+      title: t("productLipsyncTitle"),
+      text: t("productLipsyncText"),
+      imgSrc: "/images/landing/select-fa.webp",
+      imgAlt: "Lipsync",
     },
   ];
 
@@ -111,10 +114,15 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
   return (
     <Container type="panel">
       <Panel clear={true} className="mt-5">
-        <h1 className="fw-bold mb-4">
-          <FontAwesomeIcon icon={faScrewdriverWrench} className="me-3" />
-          Creator Tools
-        </h1>
+        <div className="mb-4">
+          <h1 className="fw-bold mb-1 d-flex align-items-center">
+            <FontAwesomeIcon icon={faScrewdriverWrench} className="me-3 fs-2" />
+            Creator Tools
+          </h1>
+          <h5 className="opacity-75">
+            AI-powered tools for video and voice creation.
+          </h5>
+        </div>
 
         <div className="d-flex flex-column gap-5">
           <div>
