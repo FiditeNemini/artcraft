@@ -186,6 +186,8 @@ pub async fn enqueue_gptsovits_model_download_handler(
           maybe_title: title.map(|s| s.to_string()),
           maybe_description: description.map(|s| s.to_string()),
           creator_visibility: Some(creator_set_visibility),
+          // Inference only args:
+          append_advertisement: None,
         })
       ),
     }),

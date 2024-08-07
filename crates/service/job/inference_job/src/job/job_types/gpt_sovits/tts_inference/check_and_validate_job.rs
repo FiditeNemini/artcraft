@@ -13,7 +13,7 @@ pub struct JobArgs {
   pub reference_free: Option<bool>,
   pub temperature: Option<f32>,
   pub target_language: Option<String>,
-  pub maybe_truncate_seconds: Option<u64>,
+  pub maybe_truncate_seconds: Option<u32>,
   pub maybe_append_advertisement: Option<bool>,
 }
 
@@ -56,13 +56,19 @@ pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, Pr
     }
   };
 
+  let maybe_truncate_seconds = if job.max_duration_seconds <= 0 {
+    None
+  } else {
+    Some(job.max_duration_seconds as u32)
+  };
+
   Ok(JobArgs {
     input_text,
     gpt_sovits_model,
     reference_free: None,
     temperature: None,
     target_language: None,
-    maybe_truncate_seconds: inference_args.truncate_seconds.clone(),
+    maybe_truncate_seconds,
     maybe_append_advertisement: inference_args.append_advertisement.clone(),
   })
 }

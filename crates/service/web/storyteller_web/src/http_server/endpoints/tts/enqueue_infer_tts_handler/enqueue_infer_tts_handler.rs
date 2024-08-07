@@ -24,7 +24,8 @@ use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use migration::text_to_speech::get_tts_model_for_enqueue_inference_migration::TtsModelForEnqueueInferenceMigrationWrapper;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::gptsovits_payload::GptSovitsPayload;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::users::UserToken;
@@ -383,7 +384,6 @@ pub async fn enqueue_infer_tts_handler(
 
   // ==================== ENQUEUE APPROPRIATE TTS TYPE ==================== //
 
-
   let max_duration_seconds = plan.tts_max_duration_seconds();
 
   // This branch uses the `generic-inference-job` service and tables.
@@ -393,17 +393,38 @@ pub async fn enqueue_infer_tts_handler(
       .as_deref()
       .map(|token| UserToken::new_from_str(token));
 
-  let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
+  let maybe_avt_token = server_state
+      .avt_cookie_manager
+      .get_avt_token_from_request(&http_request);
+
   let maybe_model_type = match tts_model.job_type() {
-    InferenceJobType::GptSovits => None,
+    InferenceJobType::GptSovits => None, // TODO(bt,2024-08-07): why don't we set this?
     _ => Some(InferenceModelType::Tacotron2)
+  };
+
+  let maybe_inference_args = match tts_model.job_type() {
+    InferenceJobType::Tacotron2 => Some(GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
+      args: None, // NB: We don't need to encode any args yet for TT2.
+    }),
+    InferenceJobType::GptSovits => Some(GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::GptSovits),
+      args: Some(PolymorphicInferenceArgs::Gs(GptSovitsPayload {
+        append_advertisement: None,
+        // Model download only args:
+        creator_visibility: None,
+        maybe_title: None,
+        maybe_description: None,
+      })),
+    }),
+    _ => None, // NB: Shouldn't occur
   };
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: tts_model.job_type(),
     inference_category: InferenceCategory::TextToSpeech,
-    maybe_model_type: maybe_model_type,
+    maybe_model_type,
     maybe_model_token: Some(request.tts_model_token.as_str()),
     maybe_input_source_token: None, // NB: TTS doesn't have input media
     maybe_input_source_token_type: None, // NB: TTS doesn't have input media
@@ -411,10 +432,7 @@ pub async fn enqueue_infer_tts_handler(
     maybe_cover_image_media_file_token: None,
     maybe_raw_inference_text: Some(inference_text.as_str()),
     maybe_max_duration_seconds: Some(max_duration_seconds),
-    maybe_inference_args: Some(GenericInferenceArgs {
-      inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
-      args: None, // NB: We don't need to encode any args yet.
-    }),
+    maybe_inference_args,
     maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
     maybe_avt_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
