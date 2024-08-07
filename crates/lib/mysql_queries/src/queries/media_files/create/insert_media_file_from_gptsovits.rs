@@ -23,8 +23,9 @@ pub struct InsertGptSoVitsArgs<'a> {
   // Probably wav, but could change.
   pub media_type: MediaFileType,
   pub maybe_mime_type: Option<&'a str>,
+  pub maybe_audio_encoding: Option<&'a str>,
 
-  pub duration_millis: u64,
+  pub maybe_duration_millis: Option<u64>,
   pub file_size_bytes: u64,
   pub sha256_checksum: &'a str,
 
@@ -48,8 +49,9 @@ pub async fn insert_media_file_from_gptsovits(
     // Dynamic bits (file type and details)
     media_type: args.media_type,
     maybe_mime_type: args.maybe_mime_type,
+    maybe_audio_encoding: args.maybe_audio_encoding,
     file_size_bytes: args.file_size_bytes,
-    maybe_duration_millis: Some(args.duration_millis),
+    maybe_duration_millis: args.maybe_duration_millis,
     checksum_sha2: args.sha256_checksum,
 
     // Dynamic bits (inference and model details)
@@ -79,7 +81,6 @@ pub async fn insert_media_file_from_gptsovits(
     // Static bits (unused misc)
     maybe_origin_filename: None,
     maybe_batch_token: None,
-    maybe_audio_encoding: None, // TODO(bt): Populate this?
     maybe_video_encoding: None,
     maybe_frame_width: None,
     maybe_frame_height: None,

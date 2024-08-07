@@ -3,7 +3,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::anyhow;
-use log::{error, info};
+use log::{error, info, warn};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
@@ -13,10 +13,12 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_gptsovits::{insert_media_file_from_gptsovits, InsertGptSoVitsArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
+
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::gpt_sovits::gpt_sovits_inference_command::InferenceArgs;
@@ -40,7 +42,6 @@ pub async fn process_single_gpt_sovits_tts_job(
     .job_progress_reporter
     .new_generic_inference(job.inference_job_token.as_str())
     .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-
 
   let gpt_sovits_deps = job_dependencies
     .job
@@ -176,6 +177,26 @@ pub async fn process_single_gpt_sovits_tts_job(
   //    });
 
 
+  // ==================== DECODE AUDIO FILE ==================== //
+
+  let maybe_audio_info = decode_basic_audio_file_info(
+    &output_file_path, Some(MIME_TYPE), Some("wav"))
+      .map_err(|err| {
+        warn!("Error decoding audio info: {:?}", err);
+        err
+      })
+      .ok(); // Fail open
+
+  let mut maybe_duration_millis = None;
+  let mut maybe_audio_codec_name = None;
+
+  if let Some(audio_info) = maybe_audio_info {
+    if audio_info.required_full_decode {
+      warn!("Required a full decode of the output data to get duration! That's inefficient! Fix this code.");
+    }
+    maybe_duration_millis = audio_info.duration_millis;
+    maybe_audio_codec_name = audio_info.codec_name
+  }
 
   // ==================== UPLOAD TO BUCKET ==================== //
 
@@ -222,7 +243,8 @@ pub async fn process_single_gpt_sovits_tts_job(
     text_transcript: &input_text,
     media_type: MediaFileType::Wav,
     maybe_mime_type: Some(&MIME_TYPE),
-    duration_millis: 0, // TODO
+    maybe_audio_encoding: maybe_audio_codec_name.as_deref(),
+    maybe_duration_millis,
     file_size_bytes,
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
