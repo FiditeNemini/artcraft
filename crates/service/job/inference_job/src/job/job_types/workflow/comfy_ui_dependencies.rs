@@ -9,8 +9,8 @@ use easyenv::get_env_string_optional;
 use errors::AnyhowResult;
 
 use crate::job::job_types::workflow::comfy_ui_inference_command::ComfyInferenceCommand;
-use crate::util::common_commands::ffmpeg_command_runner::FfmpegCommandRunner;
-use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
+use crate::util::common_commands::ffmpeg::old::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
+use crate::util::common_commands::ffmpeg::runner::ffmpeg_command_runner::FfmpegCommandRunner;
 
 pub struct ComfyDependencies {
     pub inference_command: ComfyInferenceCommand,

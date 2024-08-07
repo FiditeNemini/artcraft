@@ -2,7 +2,7 @@ use errors::AnyhowResult;
 
 use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
-use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
+use crate::util::common_commands::ffmpeg::old::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 
 pub struct SadTalkerDependencies {
   pub downloaders: SadTalkerDownloaders,

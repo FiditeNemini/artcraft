@@ -7,7 +7,7 @@ use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::VideoPathing;
-use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 
 pub struct PostProcessRestoreVideoArgs<'a> {
   pub comfy_deps: &'a ComfyDependencies,

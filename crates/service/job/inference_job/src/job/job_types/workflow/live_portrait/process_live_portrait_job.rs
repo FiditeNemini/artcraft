@@ -63,8 +63,8 @@ use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::Com
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_prompt::{WorkflowPromptArgs, write_workflow_prompt};
 use crate::state::job_dependencies::JobDependencies;
-use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
-use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
+use crate::util::common_commands::ffmpeg::old::ffmpeg_logo_watermark_command::WatermarkArgs;
 use crate::util::downloaders::download_media_file::{download_media_file, DownloadMediaFileArgs};
 
 pub async fn process_live_portrait_job(
