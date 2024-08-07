@@ -154,38 +154,6 @@ impl GenericInferenceArgs {
   }
 }
 
-//impl InferenceCategoryAbbreviated {
-//  pub fn from_inference_category(category: InferenceCategory) -> Self {
-//    match category {
-//      InferenceCategory::LipsyncAnimation => Self::LipsyncAnimation,
-//      InferenceCategory::TextToSpeech => Self::TextToSpeech,
-//      InferenceCategory::VoiceConversion => Self::VoiceConversion,
-//      InferenceCategory::VideoFilter => Self::VideoFilter,
-//      InferenceCategory::ImageGeneration => Self::ImageGeneration,
-//      InferenceCategory::Mocap => Self::Mocap,
-//      InferenceCategory::Workflow => Self::Workflow,
-//      InferenceCategory::FormatConversion => Self::FormatConversion,
-//      InferenceCategory::ConvertBvhToWorkflow => Self::ConvertBvhToWorkflow,
-//      InferenceCategory::DeprecatedField => Self::LivePortrait, // TODO(bt,2024-07-16): This isn't correct
-//    }
-//  }
-//
-//  pub fn to_inference_category(self) -> InferenceCategory {
-//    match self {
-//      Self::LipsyncAnimation => InferenceCategory::LipsyncAnimation,
-//      Self::TextToSpeech => InferenceCategory::TextToSpeech,
-//      Self::VoiceConversion => InferenceCategory::VoiceConversion,
-//      Self::VideoFilter => InferenceCategory::VideoFilter,
-//      Self::ImageGeneration =>InferenceCategory::ImageGeneration,
-//      Self::Mocap => InferenceCategory::Mocap,
-//      Self::Workflow => InferenceCategory::Workflow,
-//      Self::LivePortrait => InferenceCategory::DeprecatedField, // TODO(bt,2024-07-16): This isn't correct
-//      Self::FormatConversion => InferenceCategory::FormatConversion,
-//      Self::ConvertBvhToWorkflow => InferenceCategory::ConvertBvhToWorkflow,
-//    }
-//  }
-//}
-
 #[cfg(test)]
 mod tests {
   use tokens::tokens::{media_files::MediaFileToken, model_weights::ModelWeightToken};

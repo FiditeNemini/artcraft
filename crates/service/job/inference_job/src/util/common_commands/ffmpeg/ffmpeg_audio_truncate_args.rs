@@ -3,13 +3,13 @@ use std::path::Path;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::command_runner::command_args::CommandArgs;
 
-pub struct FfmpegAudioReplaceArgs<'a> {
+pub struct FfmpegAudioTruncateArgs<'a> {
   pub input_audio_file: &'a Path,
   pub output_audio_file: &'a Path,
   pub truncate_seconds: usize,
 }
 
-impl CommandArgs for FfmpegAudioReplaceArgs<'_> {
+impl CommandArgs for FfmpegAudioTruncateArgs<'_> {
 
   // eg. ffmpeg -i input-audio.aac -t 15 -c copy output.aac
   // time is in seconds

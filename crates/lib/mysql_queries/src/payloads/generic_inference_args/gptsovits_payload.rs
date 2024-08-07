@@ -13,5 +13,16 @@ pub struct GptSovitsPayload {
   #[serde(rename = "cv")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub creator_visibility: Option<Visibility>,
+
+  // For free users, we may truncate long TTS inferences.
+  #[serde(rename = "s")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub truncate_seconds: Option<u64>,
+
+  // For free users, we may occasionally append an advertisement
+  // to sign in or upgrade.
+  #[serde(rename = "a")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub append_advertisement: Option<bool>,
 }
 

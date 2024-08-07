@@ -11,6 +11,7 @@ use enums::by_table::generic_inference_jobs::inference_result_type::InferenceRes
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use filesys::check_file_exists::check_file_exists;
+use filesys::file_exists::file_exists;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
@@ -27,6 +28,7 @@ use crate::job::job_types::gpt_sovits::model_package::model_package::GptSovitsPa
 use crate::job::job_types::gpt_sovits::tts_inference::check_and_validate_job::check_and_validate_job;
 use crate::state::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_audio_truncate_args::FfmpegAudioTruncateArgs;
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".wav";
@@ -132,7 +134,6 @@ pub async fn process_single_gpt_sovits_tts_job(
       reference_audio_path: reference_audio_path.as_deref(),
       reference_transcript_path: reference_transcript_path.as_deref(),
       reference_language: Some(DEFAULT_LANGUAGE),
-      //output_audio_directory: &output_dir,
       output_file_path: &output_file_path,
       maybe_reference_free: None,
       maybe_temperature: None,
@@ -160,27 +161,44 @@ pub async fn process_single_gpt_sovits_tts_job(
 
   info!("Inference was successful.");
 
-
   // ==================== MAYBE TRUNCATE FILE ==================== //
 
-  //let command_exit_status = args
-  //    .comfy_deps
-  //    .ffmpeg_command_runner
-  //    .run_with_subprocess(RunAsSubprocessArgs {
-  //      args: Box::new(&FfmpegAudioReplaceArgs {
-  //        input_video_file: &args.videos.primary_video.comfy_output_video_path,
-  //        input_audio_file: &input_video_file,
-  //        output_video_file: &output_video_fs_path_restored,
-  //      }),
-  //      stderr: StreamRedirection::None,
-  //      stdout: StreamRedirection::None,
-  //    });
+  // NB: This will be the final audio file we upload to the bucket
+  let mut audio_for_upload_path = output_file_path.clone();
 
+  if let Some(truncate_seconds) = job_args.maybe_truncate_seconds {
+    if truncate_seconds > 0 {
+      let truncated_audio_output_path = output_dir.join("truncated.wav");
+
+      let command_exit_status = gpt_sovits_deps
+          .ffmpeg_command_runner
+          .run_with_subprocess(RunAsSubprocessArgs {
+            args: Box::new(&FfmpegAudioTruncateArgs {
+              input_audio_file: &output_file_path,
+              output_audio_file: &truncated_audio_output_path,
+              truncate_seconds: truncate_seconds as usize,
+            }),
+            stderr: StreamRedirection::Pipe,
+            stdout: StreamRedirection::Pipe,
+          });
+
+      if !command_exit_status.is_success() {
+        warn!("Error truncating audio file. Exit status: {:?}", command_exit_status);
+      }
+
+      if file_exists(&truncated_audio_output_path) {
+        info!("Truncated audio file created successfully.");
+        audio_for_upload_path = truncated_audio_output_path;
+      } else {
+        warn!("Truncated audio file does not exist: {:?}", &truncated_audio_output_path);
+      }
+    }
+  }
 
   // ==================== DECODE AUDIO FILE ==================== //
 
   let maybe_audio_info = decode_basic_audio_file_info(
-    &output_file_path, Some(MIME_TYPE), Some("wav"))
+    &audio_for_upload_path, Some(MIME_TYPE), Some("wav"))
       .map_err(|err| {
         warn!("Error decoding audio info: {:?}", err);
         err
@@ -210,13 +228,13 @@ pub async fn process_single_gpt_sovits_tts_job(
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
   // Finished file path
+  info!("Upload File Path: {:?}", &audio_for_upload_path);
   info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
-  info!("Upload File Path: {:?}", &output_file_path);
 
   job_dependencies.buckets.public_bucket_client
     .upload_filename_with_content_type(
       &result_bucket_object_pathbuf,
-      &output_file_path,
+      &audio_for_upload_path,
       &MIME_TYPE
     )
     .await
@@ -226,11 +244,11 @@ pub async fn process_single_gpt_sovits_tts_job(
 
   info!("Calculating sha256...");
 
-  let file_checksum = sha256_hash_file(&output_file_path).map_err(|err| {
+  let file_checksum = sha256_hash_file(&audio_for_upload_path).map_err(|err| {
     ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
   })?;
 
-  let file_size_bytes = file_size(&output_file_path).map_err(|err|
+  let file_size_bytes = file_size(&audio_for_upload_path).map_err(|err|
     ProcessSingleJobError::Other(err)
   )?;
 

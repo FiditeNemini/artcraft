@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::InferenceCategoryAbbreviated;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use tokens::tokens::model_weights::ModelWeightToken;
 
@@ -13,14 +13,11 @@ pub struct JobArgs {
   pub reference_free: Option<bool>,
   pub temperature: Option<f32>,
   pub target_language: Option<String>,
+  pub maybe_truncate_seconds: Option<u64>,
+  pub maybe_append_advertisement: Option<bool>,
 }
 
 pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
-  let inference_args = job.maybe_inference_args
-    .as_ref()
-    .map(|args| args.args.as_ref())
-    .flatten();
-
   let inference_category = job.maybe_inference_args
     .as_ref()
     .map(|args| args.inference_category)
@@ -34,20 +31,17 @@ pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, Pr
     }
   };
 
-  // let inference_args = match inference_args {
-  //   Some(args) => args,
-  //   None => {
-  //     return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no inference args for job!")));
-  //   }
-  // };
-  //
-  // let inference_args = match inference_args {
-  //   PolymorphicInferenceArgs::Gs(inference_args) => inference_args,
-  //   _ => {
-  //     return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inner args for job!")));
-  //   }
-  // };
-  //
+  let inference_args = job.maybe_inference_args
+      .as_ref()
+      .map(|args| args.args.as_ref())
+      .flatten()
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Gs(args) => Ok(args),
+        _ => Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong payload for job!"))),
+      })
+      .transpose()?
+      .ok_or_else(|| ProcessSingleJobError::from_anyhow_error(anyhow!("no inference args for job!")))?;
+
   let input_text = match &job.maybe_raw_inference_text {
     Some(text) => text.clone(),
     None => {
@@ -62,12 +56,13 @@ pub fn check_and_validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, Pr
     }
   };
 
-
   Ok(JobArgs {
-    input_text: input_text,
-    gpt_sovits_model: gpt_sovits_model,
+    input_text,
+    gpt_sovits_model,
     reference_free: None,
     temperature: None,
     target_language: None,
+    maybe_truncate_seconds: inference_args.truncate_seconds.clone(),
+    maybe_append_advertisement: inference_args.append_advertisement.clone(),
   })
 }
