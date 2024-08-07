@@ -165,6 +165,8 @@ impl RawUserBookmarkRecord {
               MediaFileType::Png => Some("image media file".to_string()),
               MediaFileType::Gif => Some("image media file".to_string()),
               MediaFileType::Mp4 => Some("video media file".to_string()),
+              MediaFileType::Wav => Some("audio media file".to_string()),
+              MediaFileType::Mp3 => Some("audio media file".to_string()),
             }),
         UserBookmarkEntityType::VoiceConversionModel => self.maybe_descriptive_text_voice_conversion_model_title,
         UserBookmarkEntityType::ZsVoice => self.maybe_descriptive_text_zs_voice_title,

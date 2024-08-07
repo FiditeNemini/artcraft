@@ -308,6 +308,8 @@ pub async fn process_upload_media_file(
     MediaFileType::Png => MediaFileClass::Image,
     MediaFileType::Gif => MediaFileClass::Image,
     MediaFileType::Mp4 => MediaFileClass::Video,
+    MediaFileType::Wav => MediaFileClass::Audio,
+    MediaFileType::Mp3 => MediaFileClass::Audio,
   };
 
   let upload_type = match upload_media_request.media_source {

@@ -17,6 +17,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
+use crate::queries::media_files::create::insert_media_file_from_tacotron2::InsertMediaFileArgs;
 
 // thought about this it seems like this can be a bit more geneneric instead of having this we can ...
 pub struct InsertArgs<'a> {
@@ -30,7 +31,7 @@ pub struct InsertArgs<'a> {
     pub origin_category: MediaFileOriginCategory,
     pub origin_product_category: MediaFileOriginProductCategory,
     pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
-    pub maybe_origin_model_token: Option<ModelWeightToken>,
+    pub maybe_origin_model_token: Option<&'a ModelWeightToken>,
     pub maybe_origin_filename: Option<String>,
 
     // If batch generated, this is the batch token.
@@ -46,6 +47,8 @@ pub struct InsertArgs<'a> {
     pub maybe_frame_height: Option<u32>,
     pub maybe_prompt_token: Option<&'a PromptToken>,
     pub checksum_sha2: &'a str,
+
+    pub maybe_text_transcript: Option<&'a str>,
 
     // Storage details
     pub public_bucket_directory_hash: &'a str,
@@ -124,6 +127,8 @@ pub async fn insert_media_file_generic(
             maybe_prompt_token = ?,
             checksum_sha2 = ?,
 
+            maybe_text_transcript = ?,
+
             public_bucket_directory_hash = ?, 
             maybe_public_bucket_prefix = ?, 
             maybe_public_bucket_extension = ?, 
@@ -166,6 +171,8 @@ pub async fn insert_media_file_generic(
         args.maybe_frame_height,
         args.maybe_prompt_token.map(|e| e.as_str()),
         args.checksum_sha2,
+
+        args.maybe_text_transcript,
 
         args.public_bucket_directory_hash,
         args.maybe_public_bucket_prefix,

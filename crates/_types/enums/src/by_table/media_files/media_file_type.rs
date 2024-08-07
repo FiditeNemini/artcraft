@@ -75,7 +75,13 @@ pub enum MediaFileType {
   Gif,
 
   /// Mp4 videos
-  Mp4
+  Mp4,
+
+  /// Wav audio
+  Wav,
+
+  /// Mp3 audio
+  Mp3,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -104,6 +110,8 @@ impl MediaFileType {
       Self::Png => "png",
       Self::Gif => "gif",
       Self::Mp4 => "mp4",
+      Self::Wav => "wav",
+      Self::Mp3 => "mp3",
     }
   }
 
@@ -126,6 +134,8 @@ impl MediaFileType {
       "png" => Ok(Self::Png),
       "gif" => Ok(Self::Gif),
       "mp4" => Ok(Self::Mp4),
+      "wav" => Ok(Self::Wav),
+      "mp3" => Ok(Self::Mp3),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -151,6 +161,8 @@ impl MediaFileType {
       Self::Png,
       Self::Gif,
       Self::Mp4,
+      Self::Wav,
+      Self::Mp3,
     ])
   }
 }
@@ -182,6 +194,8 @@ mod tests {
       assert_serialization(MediaFileType::Png, "png");
       assert_serialization(MediaFileType::Gif, "gif");
       assert_serialization(MediaFileType::Mp4, "mp4");
+      assert_serialization(MediaFileType::Wav, "wav");
+      assert_serialization(MediaFileType::Mp3, "mp3");
     }
   }
 
@@ -207,6 +221,8 @@ mod tests {
       assert_eq!(MediaFileType::Png.to_str(), "png");
       assert_eq!(MediaFileType::Gif.to_str(), "gif");
       assert_eq!(MediaFileType::Mp4.to_str(), "mp4");
+      assert_eq!(MediaFileType::Wav.to_str(), "wav");
+      assert_eq!(MediaFileType::Mp3.to_str(), "mp3");
     }
 
     #[test]
@@ -228,6 +244,8 @@ mod tests {
       assert_eq!(MediaFileType::from_str("png").unwrap(), MediaFileType::Png);
       assert_eq!(MediaFileType::from_str("gif").unwrap(), MediaFileType::Gif);
       assert_eq!(MediaFileType::from_str("mp4").unwrap(), MediaFileType::Mp4);
+      assert_eq!(MediaFileType::from_str("wav").unwrap(), MediaFileType::Wav);
+      assert_eq!(MediaFileType::from_str("mp3").unwrap(), MediaFileType::Mp3);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -238,7 +256,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 17);
+      assert_eq!(variants.len(), 19);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
@@ -256,6 +274,8 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Png));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Gif));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Mp4));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Wav));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Mp3));
       assert_eq!(variants.pop_first(), None);
     }
   }

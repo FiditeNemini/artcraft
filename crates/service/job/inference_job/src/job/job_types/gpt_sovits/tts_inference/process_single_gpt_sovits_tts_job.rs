@@ -9,13 +9,14 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::create::insert_media_file_from_zero_shot_tts::{insert_media_file_from_zero_shot, InsertArgs};
+use mysql_queries::queries::media_files::create::insert_media_file_from_gptsovits::{insert_media_file_from_gptsovits, InsertGptSoVitsArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
-
+use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::gpt_sovits::gpt_sovits_inference_command::InferenceArgs;
@@ -23,6 +24,7 @@ use crate::job::job_types::gpt_sovits::model_package::download_package::download
 use crate::job::job_types::gpt_sovits::model_package::model_package::GptSovitsPackageFileType;
 use crate::job::job_types::gpt_sovits::tts_inference::check_and_validate_job::check_and_validate_job;
 use crate::state::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".wav";
@@ -155,8 +157,29 @@ pub async fn process_single_gpt_sovits_tts_job(
     return Err(ProcessSingleJobError::Other(err));
   }
 
-  // upload audio to bucket
-  info!("Inference was successful. Uploading media ...");
+  info!("Inference was successful.");
+
+
+  // ==================== MAYBE TRUNCATE FILE ==================== //
+
+  //let command_exit_status = args
+  //    .comfy_deps
+  //    .ffmpeg_command_runner
+  //    .run_with_subprocess(RunAsSubprocessArgs {
+  //      args: Box::new(&FfmpegAudioReplaceArgs {
+  //        input_video_file: &args.videos.primary_video.comfy_output_video_path,
+  //        input_audio_file: &input_video_file,
+  //        output_video_file: &output_video_fs_path_restored,
+  //      }),
+  //      stderr: StreamRedirection::None,
+  //      stdout: StreamRedirection::None,
+  //    });
+
+
+
+  // ==================== UPLOAD TO BUCKET ==================== //
+
+  info!("Uploading media ...");
 
   let result_bucket_location = MediaFileBucketPath::generate_new(
     Some(BUCKET_FILE_PREFIX),
@@ -191,11 +214,15 @@ pub async fn process_single_gpt_sovits_tts_job(
   )?;
 
   job_progress_reporter.log_status("done").map_err(|e| ProcessSingleJobError::Other(e))?;
-  let (media_file_token, id) = insert_media_file_from_zero_shot(InsertArgs {
+
+  let media_file_token = insert_media_file_from_gptsovits(InsertGptSoVitsArgs {
     pool: &job_dependencies.db.mysql_pool,
     job: &job,
-    origin_model_type: MediaFileOriginModelType::GptSovits,
+    model_token: &model_token,
+    text_transcript: &input_text,
+    media_type: MediaFileType::Wav,
     maybe_mime_type: Some(&MIME_TYPE),
+    duration_millis: 0, // TODO
     file_size_bytes,
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
@@ -207,11 +234,9 @@ pub async fn process_single_gpt_sovits_tts_job(
   }).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!(
-        "Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
-        job.id,
-        id,
-        &media_file_token
-    );
+    "Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model token: {}",
+    job.id,
+    &media_file_token);
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {

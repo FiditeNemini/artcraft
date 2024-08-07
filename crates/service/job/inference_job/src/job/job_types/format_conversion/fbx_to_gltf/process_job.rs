@@ -214,6 +214,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
     checksum_sha2: &upload_details.checksum,
     generated_by_worker: Some(&args.job_dependencies.job.info.container.hostname),
     generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
+    maybe_text_transcript: None,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

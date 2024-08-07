@@ -283,6 +283,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     checksum_sha2: &file_checksum,
     generated_by_worker: Some(&args.job_dependencies.job.info.container.hostname),
     generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
+    maybe_text_transcript: None,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

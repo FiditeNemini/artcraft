@@ -39,7 +39,6 @@ pub async fn insert_media_file_from_zero_shot(
     args: InsertArgs<'_>
   ) -> AnyhowResult<(MediaFileToken, u64)>
   {
-
     let result_token = MediaFileToken::generate();
 
     let mut maybe_creator_file_synthetic_id : Option<u64> = None;
