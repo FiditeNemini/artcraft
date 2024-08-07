@@ -66,6 +66,11 @@ pub async fn process_single_gpt_sovits_tts_job(
       .map_err(|err| ProcessSingleJobError::IoError(err))?;
   }
 
+  if output_file_path.exists() {
+    std::fs::remove_file(&output_file_path)
+      .map_err(|err| ProcessSingleJobError::IoError(err))?;
+  }
+
   let input_text = job_args.input_text;
   let gpt_sovits_model = job_args.gpt_sovits_model;
 
@@ -124,7 +129,8 @@ pub async fn process_single_gpt_sovits_tts_job(
       reference_audio_path: reference_audio_path.as_deref(),
       reference_transcript_path: reference_transcript_path.as_deref(),
       reference_language: Some(DEFAULT_LANGUAGE),
-      output_audio_directory: &output_dir,
+      //output_audio_directory: &output_dir,
+      output_file_path: &output_file_path,
       maybe_reference_free: None,
       maybe_temperature: None,
       maybe_target_language: Some(DEFAULT_LANGUAGE),
