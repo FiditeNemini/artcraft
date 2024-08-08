@@ -146,6 +146,8 @@ export default function MediaPage({
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
       case MediaFileType.Audio:
+      case MediaFileType.Mp3:
+      case MediaFileType.Wav:
         return (
           <div className="panel p-3 p-lg-4 d-flex flex-column">
             {/* Voice model name that is used to generate the audio */}

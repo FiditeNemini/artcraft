@@ -42,4 +42,7 @@ export enum MediaFileType {
   Png = "png",
   Gif = "gif",
   Mp4 = "mp4",
+
+  Mp3 = "mp3",
+  Wav = "wav",
 }
