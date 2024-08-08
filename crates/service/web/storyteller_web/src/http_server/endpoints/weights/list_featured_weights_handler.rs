@@ -21,8 +21,11 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::ListFeaturedMediaFilesError;
 use crate::http_server::endpoints::media_files::list::list_media_files_handler::{ListMediaFilesError, ListMediaFilesQueryParams};
+use crate::http_server::endpoints::weights::helpers::get_scoped_weights_categories::get_scoped_weights_categories;
+use crate::http_server::endpoints::weights::helpers::get_scoped_weights_types::get_scoped_weights_types;
 use crate::state::server_state::ServerState;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
@@ -32,35 +35,24 @@ pub struct ListFeaturedWeightsQueryParams {
   pub cursor: Option<String>,
   pub cursor_is_reversed: Option<bool>,
 
-  // TODO(bt,2024-05-05): This isn't used or relevant. Switch to correct filters.
-  /// NB: This can be one (or more comma-separated values) from `MediaFileClass`,
-  /// which are the broad category of media files: image, video, etc.
+  /// NB: This can be one (or more comma-separated values) from `WeightsCategory`,
+  /// which are the broad classes of model: text_to_speech, voice_conversion,
+  /// image_generation, etc.
   ///
   /// Usage:
-  ///   - `?filter_media_classes=audio`
-  ///   - `?filter_media_classes=image,video`
+  ///   - `?filter_weights_categories=text_to_speech`
+  ///   - `?filter_weights_categories=text_to_speech,voice_conversion`
   ///   - etc.
-  pub filter_media_classes: Option<String>,
+  pub filter_weights_categories: Option<String>,
 
-  // TODO(bt,2024-05-05): This isn't used or relevant. Switch to correct filters.
-  /// NB: This can be one (or more comma-separated values) from `MediaFileType`,
-  /// which are mimetype-like / format-like categories of media files: glb, gltf,
-  /// scene_json, etc.
+  /// NB: This can be one (or more comma-separated values) from `PublicWeightsType`,
+  /// which are the types of models.
   ///
   /// Usage:
-  ///   - `?filter_media_type=scene_json`
-  ///   - `?filter_media_type=glb,gltf`
+  ///   - `?filter_weights_types=rvc_v2`
+  ///   - `?filter_weights_types=tt2,rvc_v2,vall_e`
   ///   - etc.
-  pub filter_media_type: Option<String>,
-
-  // TODO(bt,2024-05-05): This isn't used or relevant. Switch to correct filters.
-  /// NB: This can be one (or more comma-separated values) from `MediaFileEngineCategory`.
-  ///
-  /// Usage:
-  ///   - `?filter_engine_categories=scene`
-  ///   - `?filter_engine_categories=animation,character,object`
-  ///   - etc.
-  pub filter_engine_categories: Option<String>,
+  pub filter_weights_types: Option<String>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -148,6 +140,9 @@ pub async fn list_featured_weights_handler(
 
   let mut is_mod = false;
 
+  let maybe_scoped_weights_types = get_scoped_weights_types(query.filter_weights_types.as_deref());
+  let maybe_scoped_weights_categories = get_scoped_weights_categories(query.filter_weights_categories.as_deref());
+
   match maybe_user_session {
     None => {},
     Some(session) => {
@@ -184,11 +179,8 @@ pub async fn list_featured_weights_handler(
     sort_ascending,
     cursor_is_reversed,
     view_as,
-    //maybe_filter_media_types: maybe_filter_media_types.as_ref(),
-    //maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
-    //maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
-    maybe_scoped_weight_type: None,
-    maybe_scoped_weight_category: None,
+    maybe_scoped_weight_types: maybe_scoped_weights_types.as_ref(),
+    maybe_scoped_weight_categories: maybe_scoped_weights_categories.as_ref(),
     mysql_pool: &server_state.mysql_pool,
   }).await;
 

@@ -1,5 +1,6 @@
 pub mod delete_weight_handler;
 pub mod get_weight_handler;
+pub mod helpers;
 pub mod list_available_weights_handler;
 pub mod list_featured_weights_handler;
 pub mod list_pinned_weights_handler;

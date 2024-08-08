@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
@@ -85,8 +86,8 @@ pub struct ListFeaturedWeightsArgs<'a> {
 
   pub view_as: ViewAs,
 
-  pub maybe_scoped_weight_type: Option<WeightsType>,
-  pub maybe_scoped_weight_category: Option<WeightsCategory>,
+  pub maybe_scoped_weight_types: Option<&'a HashSet<WeightsType>>,
+  pub maybe_scoped_weight_categories: Option<&'a HashSet<WeightsCategory>>,
 
   pub mysql_pool: &'a MySqlPool,
 }
@@ -116,8 +117,8 @@ pub async fn list_featured_weights(args: ListFeaturedWeightsArgs<'_>) -> AnyhowR
       args.sort_ascending,
       result_fields.as_str(),
       args.view_as,
-      args.maybe_scoped_weight_type,
-      args.maybe_scoped_weight_category,
+      args.maybe_scoped_weight_types,
+      args.maybe_scoped_weight_categories,
   );
 
   let query = query.build_query_as::<RawWeightJoinUser>();
@@ -192,8 +193,8 @@ fn query_builder<'a>(
   sort_ascending: bool,
   select_fields: &'a str,
   view_as: ViewAs,
-  maybe_scoped_weight_type: Option<WeightsType>,
-  maybe_scoped_weight_category: Option<WeightsCategory>,
+  maybe_scoped_weight_types: Option<&'a HashSet<WeightsType>>,
+  maybe_scoped_weight_categories: Option<&'a HashSet<WeightsCategory>>,
 ) -> QueryBuilder<'a, MySql> {
 
   // NB: Query cannot be statically checked by sqlx
@@ -244,26 +245,42 @@ LEFT OUTER JOIN entity_stats
     }
   }
 
-  if let Some(weight_type) = maybe_scoped_weight_type {
-    if !first_predicate_added {
-      query_builder.push(" WHERE ");
-      first_predicate_added = true;
-    } else {
-      query_builder.push(" AND ");
+  if let Some(weight_types) = maybe_scoped_weight_types {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !weight_types.is_empty() {
+      if !first_predicate_added {
+        query_builder.push(" WHERE ");
+        first_predicate_added = true;
+      } else {
+        query_builder.push(" AND ");
+      }
+      query_builder.push(" mw.weights_type IN ( ");
+      let mut separated = query_builder.separated(", ");
+      for weight_type in weight_types.iter() {
+        separated.push_bind(weight_type.to_str());
+      }
+      separated.push_unseparated(") ");
     }
-    query_builder.push(" mw.weights_type = ");
-    query_builder.push_bind(weight_type.to_str());
   }
 
-  if let Some(weight_category) = maybe_scoped_weight_category {
-    if !first_predicate_added {
-      query_builder.push(" WHERE ");
-      first_predicate_added = true;
-    } else {
-      query_builder.push(" AND ");
+  if let Some(weight_categories) = maybe_scoped_weight_categories {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !weight_categories.is_empty() {
+      if !first_predicate_added {
+        query_builder.push(" WHERE ");
+        first_predicate_added = true;
+      } else {
+        query_builder.push(" AND ");
+      }
+      query_builder.push(" mw.weights_category IN ( ");
+      let mut separated = query_builder.separated(", ");
+      for weights_category in weight_categories.iter() {
+        separated.push_bind(weights_category.to_str());
+      }
+      separated.push_unseparated(") ");
     }
-    query_builder.push(" mw.weights_category = ");
-    query_builder.push_bind(weight_category.to_str());
   }
 
   if let Some(offset) = maybe_offset {

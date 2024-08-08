@@ -41,6 +41,41 @@ pub enum PublicWeightsType {
 }
 
 impl PublicWeightsType {
+  pub fn to_str(&self) -> &'static str {
+    match self {
+      // Renamed variants
+      Self::Tacotron2_5 => "tacotron2.5",
+      // Conserved variants
+      Self::HifiganTacotron2 => "hifigan_tt2",
+      Self::RvcV2 => "rvc_v2",
+      Self::StableDiffusion15 => "sd_1.5",
+      Self::StableDiffusionXL => "sdxl",
+      Self::SoVitsSvc => "so_vits_svc",
+      Self::Tacotron2 => "tt2",
+      Self::LoRA => "loRA",
+      Self::VallE => "vall_e",
+      Self::ComfyUi => "comfy_ui",
+    }
+  }
+
+  pub fn from_str(value: &str) -> Result<Self, String> {
+    match value {
+      // Renamed variants
+      "tacotron2.5" => Ok(Self::Tacotron2_5),
+      // Conserved variants
+      "hifigan_tt2" => Ok(Self::HifiganTacotron2),
+      "rvc_v2" => Ok(Self::RvcV2),
+      "sd_1.5" => Ok(Self::StableDiffusion15),
+      "sdxl" => Ok(Self::StableDiffusionXL),
+      "so_vits_svc" => Ok(Self::SoVitsSvc),
+      "tt2" => Ok(Self::Tacotron2),
+      "loRA" => Ok(Self::LoRA),
+      "vall_e" => Ok(Self::VallE),
+      "comfy_ui" => Ok(Self::ComfyUi),
+      _ => Err(format!("invalid value: {:?}", value)),
+    }
+  }
+
   pub fn from_enum(weights_type: WeightsType) -> Self {
     match weights_type {
       // Renamed variants
@@ -157,6 +192,17 @@ mod tests {
 
       assert!(tested_count > 1);
       assert_eq!(tested_count, WeightsType::all_variants().len() - override_enums().len());
+    }
+
+    #[test]
+    fn str_round_trip() {
+      for variant in WeightsType::all_variants() {
+        let variant = PublicWeightsType::from_enum(variant);
+        assert_eq!(variant, PublicWeightsType::from_str(variant.to_str()).unwrap());
+        // NB: Debug and Display are broken:
+        //assert_eq!(variant, PublicWeightsType::from_str(&format!("{}", variant)).unwrap());
+        //assert_eq!(variant, PublicWeightsType::from_str(&format!("{:?}", variant)).unwrap());
+      }
     }
   }
 }
