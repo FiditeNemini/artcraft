@@ -39,7 +39,7 @@ pub async fn create_model_weight_document_from_record(
     creator_display_name: record.creator_display_name,
     creator_gravatar_hash: record.creator_gravatar_hash,
 
-    is_featured: record.is_featured,
+    is_featured: Some(record.is_featured),
 
     ratings_positive_count: record.maybe_ratings_positive_count.unwrap_or(0),
     ratings_negative_count: record.maybe_ratings_negative_count.unwrap_or(0),

@@ -179,7 +179,7 @@ pub async fn search_model_weights_handler(
           ),
           cover_image: cover_image_details,
           maybe_cover_image_public_bucket_path: maybe_cover_image,
-          is_featured: result.is_featured,
+          is_featured: result.is_featured.unwrap_or(false),
           stats: SimpleEntityStats {
             positive_rating_count: result.ratings_positive_count,
             bookmark_count: result.bookmark_count,

@@ -49,7 +49,8 @@ pub struct ModelWeightDocument {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  pub is_featured: bool,
+  // TODO(bt,2024-08-08): This should be migrated to non-nullable soon. Turn this into a strict `bool` and drop the Option<T>
+  pub is_featured: Option<bool>,
 
   // Statistics
   pub ratings_positive_count: u32,
