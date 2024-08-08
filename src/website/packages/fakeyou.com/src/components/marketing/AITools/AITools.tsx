@@ -11,32 +11,6 @@ export default function AITools() {
 
   let items = [
     {
-      to: "/tts",
-      title: t("productTtsTitle"),
-      text: t("productTtsText"),
-      imgSrc: "/images/landing/select-tts.webp",
-      imgAlt: "Text to Speech",
-    },
-    {
-      to: "/voice-conversion",
-      title: t("productVcTitle"),
-      text: t("productVcText"),
-      imgSrc: "/images/landing/select-v2v.webp",
-      imgAlt: "Voice Conversion",
-    },
-    {
-      to: "/voice-designer",
-      title: t("productVdTitle"),
-      text: t("productVdText"),
-      imgSrc: "/images/landing/select-vd.webp",
-      imgAlt: "Voice Cloning",
-      badgeContent: {
-        type: "beta",
-        icon: faFlask,
-        label: "BETA",
-      },
-    },
-    {
       to: "/style-video",
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
@@ -70,6 +44,32 @@ export default function AITools() {
       videoPosterSrc: "/images/ai-tools/ls_video_poster.jpg",
       imgAlt: "Lipsync",
     },
+    {
+      to: "/tts",
+      title: t("productTtsTitle"),
+      text: t("productTtsText"),
+      imgSrc: "/images/landing/select-tts.webp",
+      imgAlt: "Text to Speech",
+    },
+    {
+      to: "/voice-conversion",
+      title: t("productVcTitle"),
+      text: t("productVcText"),
+      imgSrc: "/images/landing/select-v2v.webp",
+      imgAlt: "Voice Conversion",
+    },
+    {
+      to: "/voice-designer",
+      title: t("productVdTitle"),
+      text: t("productVdText"),
+      imgSrc: "/images/landing/select-vd.webp",
+      imgAlt: "Voice Cloning",
+      badgeContent: {
+        type: "beta",
+        icon: faFlask,
+        label: "BETA",
+      },
+    },
   ];
 
   if (currentPath === "/tts") {
@@ -80,11 +80,11 @@ export default function AITools() {
   }
 
   if (currentPath === "/tts") {
-    items = [items[0], items[2], items[3], items[4], items[1]];
+    items = [items[0], items[2], items[1], items[3], items[4]];
   }
 
   if (currentPath === "/voice-conversion") {
-    items = [items[0], items[2], items[3], items[4], items[1]];
+    items = [items[0], items[2], items[1], items[3], items[4]];
   }
 
   return <AIToolsRow {...{ items }} />;

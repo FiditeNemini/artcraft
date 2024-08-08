@@ -65,23 +65,13 @@ function LandingPage(props: Props) {
               />
             )}
 
-            <AIFaceMirrorCTA
-              {...{
-                ...(isLoggedIn ? { className: "mt-4" } : {}),
-              }}
-            />
+            <div className="mt-5">
+              <VstSectionV3 />
+            </div>
 
-            {!isLoggedIn && (
-              <>
-                {/* <VstSectionV1 /> */}
-                <VstSectionV3 />
-                {/*<div className="py-5">
-                  <StorytellerStudioCTA />
-                </div>*/}
-              </>
-            )}
-
-            {isLoggedIn && <VstSectionV3 />}
+            <div className="mt-5">
+              <AIFaceMirrorCTA />
+            </div>
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
 

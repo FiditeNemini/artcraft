@@ -65,7 +65,7 @@ export default function Dashboard(props: DashboardProps) {
   }
 
   return (
-    <Panel clear={true} className={`${!isLoggedIn ? "section" : "mt-5"}`}>
+    <Panel clear={true} className="section">
       <h1 className="fw-bold mb-4">{t("productsTitle")}</h1>
 
       <AITools />
