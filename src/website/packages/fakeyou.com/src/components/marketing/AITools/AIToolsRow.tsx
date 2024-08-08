@@ -36,18 +36,22 @@ export function AIToolsItem({
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleMouseEnter = () => {
-    if (videoRef.current && !isPlaying) {
-      setShowPoster(false);
-      videoRef.current.play();
-      setIsPlaying(true);
+    if (videoSrc) {
+      if (videoRef.current && !isPlaying) {
+        setShowPoster(false);
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
     }
   };
 
   const handleTouchStart = () => {
-    if (videoRef.current && !isPlaying) {
-      setShowPoster(false);
-      videoRef.current.play();
-      setIsPlaying(true);
+    if (videoSrc) {
+      if (videoRef.current && !isPlaying) {
+        setShowPoster(false);
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -89,6 +93,8 @@ export function AIToolsItem({
       <Link
         to={to}
         className="panel panel-select d-flex flex-column align-items-center"
+        onMouseEnter={handleMouseEnter}
+        onTouchStart={handleTouchStart}
       >
         <div className="d-flex px-3 pt-3 px-xl-4 pt-xl-4 align-items-start w-100">
           <div className="flex-grow-1">
@@ -122,11 +128,7 @@ export function AIToolsItem({
         </div>
         {imgSrc && <img className="img-fluid" src={imgSrc} alt={imgAlt} />}
         {videoSrc && (
-          <div
-            className="w-100 mt-3 px-3 px-xl-4 overflow-hidden"
-            onMouseEnter={handleMouseEnter}
-            onTouchStart={handleTouchStart}
-          >
+          <div className="w-100 mt-3 px-3 px-xl-4 overflow-hidden">
             <div
               className="w-100 h-100 position-relative overflow-hidden"
               style={{
