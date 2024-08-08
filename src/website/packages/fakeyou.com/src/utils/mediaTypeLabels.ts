@@ -10,6 +10,7 @@ export const mediaTypeLabels = {
   [MediaFileType.GLB]: "GLB",
   [MediaFileType.GLTF]: "glTF",
   [MediaFileType.Jpg]: "jpg",
+  [MediaFileType.Mp3]: "mp3",
   [MediaFileType.Mp4]: "mp4",
   [MediaFileType.Pmd]: "PMD",
   [MediaFileType.Pmx]: "PMX",
@@ -18,5 +19,6 @@ export const mediaTypeLabels = {
   [MediaFileType.SceneJson]: "Scene",
   [MediaFileType.FBX]: "FBX",
   [MediaFileType.Vmd]: "Expression", // TODO(bt,2024-05-09): This is a hack. ARKit are mistakenly vmd
+  [MediaFileType.Wav]: "WAV",
   [MediaFileType.None]: "Unknown",
 };

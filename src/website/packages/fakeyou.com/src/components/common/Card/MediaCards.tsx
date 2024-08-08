@@ -20,6 +20,8 @@ export default function MediaCards({ props, type }: Props) {
 
   switch (type) {
     case "audio":
+    case "mp3":
+    case "wav":
       return <AudioCard {...props} />;
     case "gif":
     case "jpg":
