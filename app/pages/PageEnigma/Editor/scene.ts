@@ -71,7 +71,7 @@ class Scene {
     this._create_skybox();
     this._create_camera_obj();
 
-    this.helper = new MMDAnimationHelper({ afterglow: 2.0 });
+    this.helper = new MMDAnimationHelper({ afterglow: 0.0 });
     this.scene.userData["helper"] = this.helper;
   }
 
@@ -689,30 +689,16 @@ class Scene {
 
     return new Promise((resolve, reject) => {
       const mmdLoader = new MMDLoader();
-      mmdLoader.load(
-        media_url,
-        (mesh: THREE.SkinnedMesh) => {
-          this.helper.add(mesh, {
+      mmdLoader.loadWithAnimation(
+        media_url, ["/resources/pose/Lumine Idle cycle.vmd"],
+        (mmd) => {
+          this.helper.add(mmd.mesh, {
+            animation: mmd.animation,
             physics: false,
           });
-          // const ikHelper = this.helper.objects
-          //   .get(mesh)
-          //   ?.ikSolver.createHelper();
-          // if (ikHelper) {
-          //   ikHelper.visible = false;
-          //   this.scene.add(ikHelper);
-          // }
 
-          // const physicsHelper = this.helper.objects
-          //   .get(mesh)
-          //   ?.physics?.createHelper();
-          // if (physicsHelper) {
-          //   physicsHelper.visible = false;
-          //   this.scene.add(physicsHelper);
-          // }
-
-          mesh.scale.set(0.1, 0.1, 0.1);
-          resolve(mesh);
+          mmd.mesh.scale.set(0.1, 0.1, 0.1);
+          resolve(mmd.mesh);
         },
         progress,
         (error) => {

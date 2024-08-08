@@ -848,7 +848,7 @@ export class TimeLine {
     }
 
 
-    this.scene.helper.update(0.1);
+    //this.scene.helper.update(0.1);
 
     if (
       this.scrubber_frame_position >= this.timeline_limit &&
