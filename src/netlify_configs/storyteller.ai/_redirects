@@ -77,7 +77,7 @@
 /terms*                /website/index.html   200
 /testing*              /website/index.html   200
 /text-to-image*        /website/index.html   200
-/ai-tools*                /website/index.html   200
+/tools*                /website/index.html   200
 /tts*                  /website/index.html   200
 /tts_configs*          /website/index.html   200
 /twitch*               /website/index.html   200
