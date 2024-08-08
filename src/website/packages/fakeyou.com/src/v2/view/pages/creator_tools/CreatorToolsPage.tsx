@@ -72,7 +72,8 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
       to: "/face-animator",
       title: t("productLipsyncTitle"),
       text: t("productLipsyncText"),
-      imgSrc: "/images/landing/select-fa.webp",
+      videoSrc: "/videos/ai-tools/ls_video.mp4",
+      videoPosterSrc: "/images/ai-tools/ls_video_poster.jpg",
       imgAlt: "Lipsync",
     },
   ];
