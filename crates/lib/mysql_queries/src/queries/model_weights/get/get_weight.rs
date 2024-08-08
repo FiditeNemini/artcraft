@@ -10,6 +10,8 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
+use crate::helpers::boolean_converters::i64_to_bool;
+
 // Notes ensure that Enums have sqlx::Type
 //  'weights_type: enums::by_table::model_weights::weights_types::WeightsType' use this to map
 // Retrieved Model Weight can be constrained to the fields that are needed
@@ -48,6 +50,8 @@ pub struct RetrievedModelWeight {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+
+    pub is_featured: bool,
 
     pub version: i32,
     pub created_at: DateTime<Utc>,
@@ -117,6 +121,7 @@ pub async fn get_weights_by_token_with_connection(
             maybe_ratings_positive_count: record.maybe_ratings_positive_count,
             maybe_ratings_negative_count: record.maybe_ratings_negative_count,
             maybe_bookmark_count: record.maybe_bookmark_count,
+            is_featured: i64_to_bool(record.is_featured),
             version: record.version,
             created_at: record.created_at,
             updated_at: record.updated_at,
@@ -167,11 +172,14 @@ async fn select_include_deleted(
         entity_stats.ratings_negative_count as maybe_ratings_negative_count,
         entity_stats.bookmark_count as maybe_bookmark_count,
 
+        featured_items.entity_token IS NOT NULL AS is_featured,
+
         wt.version,
         wt.created_at,
         wt.updated_at,
         wt.user_deleted_at,
         wt.mod_deleted_at
+
         FROM model_weights as wt
         JOIN users
             ON users.token = wt.creator_user_token
@@ -180,6 +188,10 @@ async fn select_include_deleted(
         LEFT OUTER JOIN entity_stats
             ON entity_stats.entity_type = "model_weight"
             AND entity_stats.entity_token = wt.token
+        LEFT OUTER JOIN featured_items
+            ON featured_items.entity_type = "model_weight"
+            AND featured_items.entity_token = wt.token
+            AND featured_items.deleted_at IS NULL
         WHERE
             wt.token = ?
             "#,
@@ -230,11 +242,14 @@ async fn select_without_deleted(
         entity_stats.ratings_negative_count as maybe_ratings_negative_count,
         entity_stats.bookmark_count as maybe_bookmark_count,
 
+        featured_items.entity_token IS NOT NULL AS is_featured,
+
         wt.version,
         wt.created_at,
         wt.updated_at,
         wt.user_deleted_at,
         wt.mod_deleted_at
+
         FROM model_weights as wt
         JOIN users
             ON users.token = wt.creator_user_token
@@ -243,6 +258,10 @@ async fn select_without_deleted(
         LEFT OUTER JOIN entity_stats
             ON entity_stats.entity_type = "model_weight"
             AND entity_stats.entity_token = wt.token
+        LEFT OUTER JOIN featured_items
+            ON featured_items.entity_type = "model_weight"
+            AND featured_items.entity_token = wt.token
+            AND featured_items.deleted_at IS NULL
         WHERE
             wt.token = ?
             AND wt.user_deleted_at IS NULL
@@ -286,6 +305,8 @@ pub struct RawWeight {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+
+    pub is_featured: i64,
 
     pub version: i32,
     pub created_at: DateTime<Utc>,

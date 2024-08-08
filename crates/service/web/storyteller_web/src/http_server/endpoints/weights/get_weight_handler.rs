@@ -50,6 +50,9 @@ pub struct GetWeightResponse {
     #[deprecated(note="switch to CoverImageDetails")]
     maybe_cover_image_public_bucket_path: Option<String>,
 
+    /// Whether the weight is featured by staff (the featured_items API) or not.
+    is_featured: bool,
+
     /// Statistics about the weights
     stats: SimpleEntityStats,
 
@@ -196,13 +199,14 @@ pub async fn get_weight_handler(
         creator_set_visibility: weight.creator_set_visibility,
         file_size_bytes: weight.file_size_bytes,
         file_checksum_sha2: weight.file_checksum_sha2,
+        is_featured: weight.is_featured,
         stats: SimpleEntityStats {
             positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
             bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
         },
         version: weight.version,
         created_at: weight.created_at,
-        updated_at: weight.updated_at
+        updated_at: weight.updated_at,
     };
 
     let body = serde_json::to_string(&response)
