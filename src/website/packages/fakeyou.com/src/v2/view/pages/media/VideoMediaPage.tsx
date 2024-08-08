@@ -361,7 +361,7 @@ export default function DevMediaPage({
           />
         )}
 
-        <Panel className="mt-5">
+        <Panel padding={true} className="mt-5">
           <div>
             <h5 className="fw-semibold">Comments</h5>
             <CommentComponent
