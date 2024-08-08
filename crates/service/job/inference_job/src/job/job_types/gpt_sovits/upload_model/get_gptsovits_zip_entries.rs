@@ -6,9 +6,14 @@ use zip::ZipArchive;
 
 use crate::job::job_types::gpt_sovits::model_package::model_package::{GptSovitsPackageError, GptSovitsPackageFileType};
 
-// The reference audio and transcript are expected to be "reference.wav" and "reference.txt",
-// but we can tolerate other names.
+// We want most of our users to name the reference audio and text transcript files as
+// "reference.wav" and "reference.txt" respectively. (Even if this isn't universally
+// adopted as standard, we can use heuristics to make other inputs work.)
 const EXPECTED_REFERENCE_FILE_STEM : &str = "reference";
+
+// Justin's files start with "ref_audio" and "ref_text". He packs other audio files in
+// as well, so we'll want to ignore those.
+const BACKUP_REFERENCE_FILE_PREFIX: &str = "ref_";
 
 #[derive(Debug,Clone)]
 pub struct PackageZipEntryDetails {
@@ -24,6 +29,7 @@ pub struct PackageZipEntryDetails {
 pub fn get_gptsovits_zip_entries<R: Read + Seek>(archive: &mut ZipArchive<BufReader<R>>) -> Result<Vec<PackageZipEntryDetails>, GptSovitsPackageError> {
   let entries = find_archive_files_of_interest(archive)?;
   let entries = filter_expected_reference_file_names(entries)?;
+  let entries = filter_prefixed_reference_file_names(entries)?;
   let entries = filter_matching_reference_file_names(entries)?;
   let entries = fail_on_duplicate_files(entries)?;
   let entries = fail_on_no_models(entries)?;
@@ -139,13 +145,13 @@ fn filter_expected_reference_file_names(entries: Vec<PackageZipEntryDetails>) ->
   }
 
   let maybe_audio = audio_reference_files.iter()
-      .find(|audio| {
-        &audio.stem == EXPECTED_REFERENCE_FILE_STEM
+      .find(|file| {
+        &file.stem == EXPECTED_REFERENCE_FILE_STEM
       });
 
   let maybe_text = text_reference_files.iter()
-      .find(|audio| {
-        &audio.stem == EXPECTED_REFERENCE_FILE_STEM
+      .find(|file| {
+        &file.stem == EXPECTED_REFERENCE_FILE_STEM
       });
 
   // If we find both names as expected, discard any and all other audio and text files.
@@ -163,6 +169,45 @@ fn filter_expected_reference_file_names(entries: Vec<PackageZipEntryDetails>) ->
 }
 
 fn filter_matching_reference_file_names(entries: Vec<PackageZipEntryDetails>) -> Result<Vec<PackageZipEntryDetails>, GptSovitsPackageError> {
+  let mut filtered = Vec::with_capacity(entries.len());
+  let mut audio_reference_files = Vec::with_capacity(entries.len());
+  let mut text_reference_files = Vec::with_capacity(entries.len());
+
+  for entry in entries {
+    if let Some(package_type) = GptSovitsPackageFileType::for_extension(&entry.extension) {
+      match package_type {
+        GptSovitsPackageFileType::GptModel | GptSovitsPackageFileType::SovitsCheckpoint => filtered.push(entry),
+        GptSovitsPackageFileType::ReferenceAudio => audio_reference_files.push(entry),
+        GptSovitsPackageFileType::ReferenceTranscript => text_reference_files.push(entry),
+      }
+    }
+  }
+
+  let maybe_audio = audio_reference_files.iter()
+      .find(|file| {
+        file.stem.starts_with(BACKUP_REFERENCE_FILE_PREFIX)
+      });
+
+  let maybe_text = text_reference_files.iter()
+      .find(|file| {
+        file.stem.starts_with(BACKUP_REFERENCE_FILE_PREFIX)
+      });
+
+  // If we find both names as expected, discard any and all other audio and text files.
+  if let Some(audio) = maybe_audio {
+    if let Some(text) = maybe_text {
+      audio_reference_files = vec![audio.clone()];
+      text_reference_files = vec![text.clone()];
+    }
+  }
+
+  filtered.extend(audio_reference_files);
+  filtered.extend(text_reference_files);
+
+  Ok(filtered)
+}
+
+fn filter_prefixed_reference_file_names(entries: Vec<PackageZipEntryDetails>) -> Result<Vec<PackageZipEntryDetails>, GptSovitsPackageError> {
   let mut filtered = Vec::with_capacity(entries.len());
   let mut audio_reference_files = Vec::with_capacity(entries.len());
   let mut text_reference_files = Vec::with_capacity(entries.len());
@@ -348,5 +393,28 @@ mod tests {
 
     let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::ReferenceTranscript).unwrap();
     assert_eq!(entry.enclosed_name.to_str().unwrap(), "many_files/reference_file_matching_name.txt");
+  }
+
+  #[test]
+  fn test_justin_archive_format() {
+    let mut archive = read_archive("test_data/archive/zip/gptsovits/justin_archive_format.zip");
+    let result = get_gptsovits_zip_entries(&mut archive);
+
+    assert!(result.is_ok());
+
+    let result = result.unwrap();
+    assert_eq!(result.len(), 4);
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::GptModel).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "justin_archive_format/GokuV2-e100.ckpt");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::SovitsCheckpoint).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "justin_archive_format/GokuV2_e100_s9000.pth");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::ReferenceAudio).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "justin_archive_format/ref_audio.wav");
+
+    let entry = result.iter().find(|entry| entry.package_type == GptSovitsPackageFileType::ReferenceTranscript).unwrap();
+    assert_eq!(entry.enclosed_name.to_str().unwrap(), "justin_archive_format/ref_text.txt");
   }
 }
