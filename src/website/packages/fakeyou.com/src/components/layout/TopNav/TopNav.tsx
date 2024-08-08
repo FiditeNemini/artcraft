@@ -458,7 +458,7 @@ export default function TopNav({
                   <NavItem
                     icon={faScrewdriverWrench}
                     label="Creator Tools"
-                    link="/ai-tools"
+                    link="/tools"
                   />
                 </div>
               )}
@@ -605,7 +605,7 @@ export default function TopNav({
             <li>
               <NavLink
                 exact={true}
-                to="/ai-tools"
+                to="/tools"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
