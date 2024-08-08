@@ -990,7 +990,7 @@ class PageContainer extends React.Component<
                     <BetaKeysListPage />
                   </Route>
 
-                  <Route path="/ai-tools">
+                  <Route path="/tools">
                     <CreatorToolsPage
                       sessionWrapper={this.props.sessionWrapper}
                     />
