@@ -32,6 +32,11 @@
       "maybe_ietf_language_tag" : { "type" : "keyword" },
       "maybe_ietf_primary_language_subtag" : { "type" : "keyword" },
 
+      "is_featured" : {
+        "type": "boolean",
+        "index": true
+      },
+
       "created_at" : { "type" : "date" },
       "updated_at" : { "type" : "date" },
       "user_deleted_at" : { "type" : "date" },

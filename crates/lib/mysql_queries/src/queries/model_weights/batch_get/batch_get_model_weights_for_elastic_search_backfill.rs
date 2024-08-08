@@ -12,6 +12,7 @@ use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
+use crate::helpers::boolean_converters::i64_to_bool;
 
 /// This is meant to be the entire table
 #[derive(Debug)]
@@ -37,6 +38,9 @@ pub struct ModelWeightForElasticsearchRecord {
   pub creator_username: String,
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
+
+  // Featured state
+  pub is_featured: bool,
 
   // Statistics
   pub maybe_ratings_positive_count: Option<u32>,
@@ -101,6 +105,7 @@ pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
           creator_username: model.creator_username,
           creator_display_name: model.creator_display_name,
           creator_gravatar_hash: model.creator_gravatar_hash,
+          is_featured: i64_to_bool(model.is_featured),
           maybe_tts_ietf_language_tag: model.maybe_tts_ietf_language_tag,
           maybe_tts_ietf_primary_language_subtag: model.maybe_tts_ietf_primary_language_subtag,
           maybe_voice_conversion_ietf_language_tag: model.maybe_vc_ietf_language_tag,
@@ -152,6 +157,8 @@ SELECT
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
 
+    featured_items.entity_token IS NOT NULL AS is_featured,
+
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
     entity_stats.bookmark_count as maybe_bookmark_count,
@@ -179,10 +186,14 @@ LEFT OUTER JOIN model_weights_extension_tts_details as extension_tts
 LEFT OUTER JOIN model_weights_extension_voice_conversion_details as extension_vc
     ON extension_vc.model_weights_token = w.token
 LEFT OUTER JOIN entity_stats
-    ON entity_stats.entity_type = "model_weights"
+    ON entity_stats.entity_type = "model_weight"
     AND entity_stats.entity_token = w.token
 LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = w.maybe_cover_image_media_file_token
+LEFT OUTER JOIN featured_items
+    ON featured_items.entity_type = "model_weight"
+    AND featured_items.entity_token = w.token
+    AND featured_items.deleted_at IS NULL
 
 WHERE w.token IN (
         "#);
@@ -228,6 +239,9 @@ struct RawRecord {
   pub creator_username: String,
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
+
+  // Featured state
+  pub is_featured: i64,
 
   // Statistics
   pub maybe_ratings_positive_count: Option<u32>,
@@ -288,6 +302,8 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       creator_username: row.try_get("creator_username")?,
       creator_display_name: row.try_get("creator_display_name")?,
       creator_gravatar_hash: row.try_get("creator_gravatar_hash")?,
+
+      is_featured: row.try_get("is_featured")?,
 
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
       maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,

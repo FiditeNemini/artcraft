@@ -49,6 +49,8 @@ pub struct ModelWeightDocument {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
+  pub is_featured: bool,
+
   // Statistics
   pub ratings_positive_count: u32,
   pub ratings_negative_count: u32,

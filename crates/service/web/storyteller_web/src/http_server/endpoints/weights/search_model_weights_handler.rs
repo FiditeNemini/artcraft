@@ -55,6 +55,9 @@ pub struct ModelWeightSearchResult {
   #[deprecated(note="switch to CoverImageDetails")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
+  // Whether the model weight is featured.
+  pub is_featured: bool,
+
   pub stats: SimpleEntityStats,
 
   pub maybe_ietf_language_tag: Option<String>,
@@ -176,6 +179,7 @@ pub async fn search_model_weights_handler(
           ),
           cover_image: cover_image_details,
           maybe_cover_image_public_bucket_path: maybe_cover_image,
+          is_featured: result.is_featured,
           stats: SimpleEntityStats {
             positive_rating_count: result.ratings_positive_count,
             bookmark_count: result.bookmark_count,
