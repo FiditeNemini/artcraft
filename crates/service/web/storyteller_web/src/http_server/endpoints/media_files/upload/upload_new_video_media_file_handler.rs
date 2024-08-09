@@ -21,6 +21,7 @@ use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCat
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use errors::AnyhowResult;
 use filesys::directory_exists::directory_exists;
 use filesys::file_exists::file_exists;
 use filesys::path_to_string::path_to_string;
@@ -35,6 +36,7 @@ use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use thumbnail_generator::task_client::thumbnail_task::{ThumbnailTaskBuilder, ThumbnailTaskInputMimeType};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+use videos::ffprobe_get_info::ffprobe_get_info;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
@@ -207,36 +209,15 @@ pub async fn upload_new_video_media_file_handler(
 
   // ==================== FILE VALIDATION ==================== //
 
-  let path = form.file.file.path();
+  let mut maybe_duration_millis = None;
 
-  info!("temporary file location: {:?}", path);
-
-  info!("path exists: {}", path.exists());
-  info!("path is file: {}", path.is_file());
-  info!("path is dir: {}", path.is_dir());
-  info!("path is symlink: {}", path.is_symlink());
-
-  let maybe_path_meta = path.metadata().ok();
-  let maybe_file_type = maybe_path_meta.as_ref().map(|m| m.file_type());
-  let maybe_permissions = maybe_path_meta.as_ref().map(|m| m.permissions());
-
-  info!("path permissions: {:?}", maybe_permissions);
-  info!("path file type: {:?}", maybe_file_type);
-
-  let copy_path = PathBuf::from("/tmp/test.mp4");
-  let result = fs::copy(path, &copy_path);
-
-  info!("copy result: {:?}", result);
-
-  match ffprobe_get_dimensions(&copy_path) {
-    Err(err) => {
-      warn!("Error reading video dimensions with ffprobe: {:?}", err);
+  match ffprobe_get_info(form.file.file.path()) {
+    Ok(video_info) => {
+      maybe_duration_millis = video_info.duration
+          .map(|duration| duration.millis as u64);
     }
-    Ok(Some(dims)) => {
-      info!("Video dimensions: {}x{}", dims.width, dims.height);
-    }
-    Ok(None) => {
-      warn!("No video dimensions found");
+    Err(error) => {
+      warn!("Error reading video dimensions with ffprobe: {:?}", error);
     }
   }
 
@@ -263,15 +244,6 @@ pub async fn upload_new_video_media_file_handler(
         .collect::<String>();
     return Err(MediaFileUploadError::BadInput(format!("unpermitted mime type: {}", &filtered_mimetype)));
   }
-
-  // ==================== DURATION DETECTION ==================== //
-
-
-  let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
-      .map_err(|err| {
-        warn!("Error reading mp4 info: {:?}", err);
-        MediaFileUploadError::ServerError
-      })?;
 
   // ==================== OTHER FILE METADATA ==================== //
 
@@ -341,7 +313,7 @@ pub async fn upload_new_video_media_file_handler(
     maybe_animation_type: None,
     maybe_mime_type: Some(&mimetype),
     file_size_bytes: file_size_bytes as u64,
-    maybe_duration_millis:  Some(mp4_info.duration_millis as u64),
+    maybe_duration_millis,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     maybe_scene_source_media_file_token: maybe_scene_source_media_file_token,
