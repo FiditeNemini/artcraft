@@ -1,3 +1,31 @@
+# =============================================================
+# ======= (0) install packages in the final build image =======
+# =============================================================
+
+# Final image - we build it upfront to cache dependencies
+FROM ubuntu:jammy as final-container
+
+# See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+LABEL org.opencontainers.image.title='Storyteller Rust (CPU)'
+LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
+LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo (CPU)'
+LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
+
+WORKDIR /
+
+# Install ffmpeg because rust's (symphonia, mp4 crate, etc.) all fail to decode video metadata
+# Install rsync to copy files to other containers
+# Install vim for debugging
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+        ffmpeg \
+        rsync \
+        vim \
+        --no-install-recommends \
+    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+
 # ================================================================
 # =============== (1) set up core rust build image ===============
 # ================================================================
@@ -18,6 +46,7 @@ RUN apt-get update \
         build-essential \
         cmake \
         curl \
+        ffmpeg \
         fontconfig \
         libfontconfig1-dev \
         libssl-dev \
@@ -120,12 +149,6 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin tts-download-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
   --bin email-sender-job
 
 RUN SQLX_OFFLINE=true \
@@ -133,12 +156,6 @@ RUN SQLX_OFFLINE=true \
   $HOME/.cargo/bin/cargo build \
   --release \
   --bin es-update-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin tts-inference-job
 
 # Print a report on disk space
 RUN echo "Disk usage at current directory (after all builds):"
@@ -150,24 +167,24 @@ RUN du -hsc * | sort -hr
 # =============================================================
 
 # Final image
-FROM ubuntu:jammy as final
+FROM final-container as final
 
-# See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
-LABEL org.opencontainers.image.title='Storyteller Rust (CPU)'
-LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
-LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo (CPU)'
-LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
-LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
-LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
+# # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+# LABEL org.opencontainers.image.title='Storyteller Rust (CPU)'
+# LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
+# LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo (CPU)'
+# LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
+# LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
+# LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
+#
+# WORKDIR /
 
-WORKDIR /
-
-# Install rsync to copy files to other containers
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
-        rsync \
-        --no-install-recommends \
-    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+# # Install rsync to copy files to other containers
+# RUN apt-get update \
+#     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+#         rsync \
+#         --no-install-recommends \
+#     && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # Give the container its version so it can report over HTTP.
 ARG GIT_SHA
