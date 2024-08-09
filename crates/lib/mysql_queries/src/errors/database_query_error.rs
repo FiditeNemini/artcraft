@@ -27,6 +27,9 @@ impl From<sqlx::Error> for DatabaseQueryError {
       // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
       let is_integrity_violation = db_err.code().as_deref() == Some("23000");
       let is_duplicate_key = db_err.message().contains("Duplicate entry");
+
+      // We currently only detect idempotency token errors in a cross-cutting fashion, but
+      // we could easily add detection for other fields.
       let is_idempotency_error = db_err.message().contains("uuid_idempotency_token");
 
       if is_integrity_violation && is_duplicate_key && is_idempotency_error {
