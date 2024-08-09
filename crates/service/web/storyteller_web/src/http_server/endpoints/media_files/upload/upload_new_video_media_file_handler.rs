@@ -19,6 +19,8 @@ use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCat
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use filesys::directory_exists::directory_exists;
+use filesys::file_exists::file_exists;
 use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -203,9 +205,23 @@ pub async fn upload_new_video_media_file_handler(
 
   // ==================== FILE VALIDATION ==================== //
 
-  info!("temporary file location: {:?}", form.file.file.path());
+  let path = form.file.file.path();
 
-  match ffprobe_get_dimensions(form.file.file.path()) {
+  info!("temporary file location: {:?}", path);
+
+  info!("path exists: {}", path.exists());
+  info!("path is file: {}", path.is_file());
+  info!("path is dir: {}", path.is_dir());
+  info!("path is symlink: {}", path.is_symlink());
+
+  let maybe_path_meta = path.metadata().ok();
+  let maybe_file_type = maybe_path_meta.as_ref().map(|m| m.file_type());
+  let maybe_permissions = maybe_path_meta.as_ref().map(|m| m.permissions());
+
+  info!("path permissions: {:?}", maybe_permissions);
+  info!("path file type: {:?}", maybe_file_type);
+
+  match ffprobe_get_dimensions(path) {
     Err(err) => {
       warn!("Error reading video dimensions with ffprobe: {:?}", err);
     }
