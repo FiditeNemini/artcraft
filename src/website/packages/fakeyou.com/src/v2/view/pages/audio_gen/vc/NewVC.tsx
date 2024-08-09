@@ -171,7 +171,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
         console.log("VC queued successfully:", response.inference_job_token);
         enqueueInferenceJob(
           response.inference_job_token,
-          FrontendInferenceJobType.TextToSpeech
+          FrontendInferenceJobType.VoiceConversion
         );
         setIsGenerating(false);
       } else {

@@ -229,9 +229,7 @@ function SessionTtsInferenceResultList(props: Props) {
             className="alert-link fw-semibold"
           >
             {t("resultsUpgradeLinkText")}
-          </Link>{" "}
-          ({t("resultsTtsQueued")}{" "}
-          <span className="text-red">~{pendingTtsJobs.pending_job_count}</span>)
+          </Link>
         </div>
       </div>
     );
