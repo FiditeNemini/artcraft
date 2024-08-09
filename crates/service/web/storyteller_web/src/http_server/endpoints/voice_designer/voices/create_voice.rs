@@ -206,6 +206,9 @@ pub async fn create_voice_handler(
         Ok((job_token, _id)) => job_token,
         Err(err) => {
             warn!("New generic inference job creation DB error: {:?}", err);
+            if err.had_duplicate_idempotency_token() {
+                return Err(EnqueueCreateVoiceRequestError::BadInput("Duplicate idempotency token".to_string()));
+            }
             return Err(EnqueueCreateVoiceRequestError::ServerError);
         }
     };

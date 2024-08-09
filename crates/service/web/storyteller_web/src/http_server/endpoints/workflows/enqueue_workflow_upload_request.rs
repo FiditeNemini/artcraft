@@ -299,6 +299,9 @@ pub async fn enqueue_workflow_upload_request(
         Ok((job_token, _id)) => job_token,
         Err(err) => {
             warn!("New generic inference job creation DB error: {:?}", err);
+            if err.had_duplicate_idempotency_token() {
+                return Err(EnqueueWorkFlowRequestError::BadInput("Duplicate idempotency token".to_string()));
+            }
             return Err(EnqueueWorkFlowRequestError::ServerError);
         }
     };

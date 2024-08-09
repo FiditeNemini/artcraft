@@ -448,6 +448,9 @@ pub async fn enqueue_infer_tts_handler(
     Ok((inference_job_token, _id)) => inference_job_token,
     Err(err) => {
       warn!("New (generic) tts inference job creation DB error: {:?}", err);
+      if err.had_duplicate_idempotency_token() {
+        return Err(InferTtsError::BadInput("Duplicate idempotency token".to_string()));
+      }
       return Err(InferTtsError::ServerError);
     }
   };

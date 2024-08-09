@@ -7,6 +7,7 @@ pub mod common_inputs;
 pub mod complex_models;
 pub mod composite_keys;
 pub mod config;
+pub mod errors;
 pub mod helpers;
 pub mod mediators;
 pub mod payloads;

@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use sqlx::error::DatabaseError;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
@@ -6,12 +7,12 @@ use enums::by_table::generic_inference_jobs::inference_input_source_token_type::
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
-use errors::AnyhowResult;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
+use crate::errors::database_query_error::DatabaseQueryError;
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
 
 pub struct InsertGenericInferenceArgs<'a> {
@@ -30,7 +31,7 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub maybe_input_source_token_type: Option<InferenceInputSourceTokenType>,
 
   // For jobs that perform "downloads", this is the URL to download.
-  // NB: Some jobs aren't using this field yet and will pack the URL inside of
+  // NB: Some jobs aren't using this field yet and will pack the URL inside
   //   the "GenericInferenceArgs" field. The goal is to migrate them to this
   //   top-level field eventually.
   pub maybe_download_url: Option<&'a str>,
@@ -58,7 +59,9 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) -> AnyhowResult<(InferenceJobToken, u64)> {
+pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>)
+  -> Result<(InferenceJobToken, u64), DatabaseQueryError>
+{
   let job_token = InferenceJobToken::generate();
 
   let serialized_args_payload = serde_json::ser::to_string(&args.maybe_inference_args)
@@ -157,7 +160,19 @@ SET
       res.last_insert_id()
     },
     Err(err) => {
-      return Err(anyhow!("error inserting new generic inference job: {:?}", err));
+      if let Some(db_err) = err.as_database_error() {
+        // NB: SQLSTATE[23000]: Integrity constraint violation
+        // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
+        let is_integrity_violation = db_err.code().as_deref() == Some("23000");
+        let is_duplicate_key = db_err.message().contains("Duplicate entry");
+        let is_idempotency_error = db_err.message().contains("uuid_idempotency_token");
+
+        if is_integrity_violation && is_duplicate_key && is_idempotency_error {
+          return Err(DatabaseQueryError::IdempotencyDuplicateKeyError);
+        }
+      }
+
+      return Err(DatabaseQueryError::SqlxError(err));
     }
   };
 

@@ -30,6 +30,7 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
+use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::VstError;
 use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
 use crate::http_server::headers::has_debug_header::has_debug_header;
 use crate::http_server::requests::get_request_domain_branding::{DomainBranding, get_request_domain_branding};
@@ -284,6 +285,9 @@ pub async fn enqueue_live_portrait_workflow_handler(
     Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
+      if err.had_duplicate_idempotency_token() {
+        return Err(EnqueueLivePortraitWorkflowError::BadInput("Duplicate idempotency token".to_string()));
+      }
       return Err(EnqueueLivePortraitWorkflowError::ServerError);
     }
   };
