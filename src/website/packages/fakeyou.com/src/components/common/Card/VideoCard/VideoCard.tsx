@@ -142,6 +142,22 @@ export default function VideoCard({
     ? STYLES_BY_KEY.get(data.maybe_style_name)?.label
     : "Unknown Style";
 
+  const getLabel = (data: any) => {
+    if (data.origin_product_category === "face_animator") {
+      return "Lipsync";
+    } else if (data.origin_product_category === "workflow") {
+      return "Workflow";
+    } else if (data.origin_product_category === "unknown") {
+      return data.origin_category === "upload"
+        ? "Upload"
+        : data.origin_category;
+    } else {
+      return data.origin_product_category;
+    }
+  };
+
+  const productCategory = getLabel(data);
+
   const card = (
     <Card
       padding={false}
@@ -162,8 +178,9 @@ export default function VideoCard({
             <div className="card-img-gradient" />
 
             <div className="d-flex align-items-center">
-              <div className="d-flex flex-grow-1">
+              <div className="d-flex flex-grow-1 gap-2">
                 <Badge label="Video" color="purple" overlay={true} />
+                <Badge label={productCategory} color="gray" overlay={true} />
               </div>
               {inSelectModal && (
                 <Button
