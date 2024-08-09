@@ -1,5 +1,5 @@
 use std::path::Path;
-
+use log::info;
 use errors::AnyhowResult;
 
 pub struct VideoDimensions {
@@ -22,6 +22,16 @@ pub fn ffprobe_get_dimensions(
           None
         }
       });
+
+  let video_streams = result.streams.iter()
+      .filter(|stream| stream.codec_type.as_deref() == Some("video"));
+
+  for stream in video_streams {
+    info!("r_frame_rate: {}", stream.r_frame_rate);
+    info!("avg_frame_rate: {}", stream.avg_frame_rate);
+    info!("duration_ts: {:?}", stream.duration_ts);
+    info!("durations: {:?}", stream.duration);
+  }
 
   match maybe_dimensions {
     None => Ok(None),

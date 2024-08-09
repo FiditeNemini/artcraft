@@ -30,6 +30,7 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_file_upl
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use thumbnail_generator::task_client::thumbnail_task::{ThumbnailTaskBuilder, ThumbnailTaskInputMimeType};
 use tokens::tokens::media_files::MediaFileToken;
+use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
@@ -227,6 +228,18 @@ pub async fn upload_new_video_media_file_handler(
   }
 
   // ==================== DURATION DETECTION ==================== //
+
+  match ffprobe_get_dimensions(form.file.file.path()) {
+    Err(err) => {
+      warn!("Error reading video dimensions with ffprobe: {:?}", err);
+    }
+    Ok(Some(dims)) => {
+      info!("Video dimensions: {}x{}", dims.width, dims.height);
+    }
+    Ok(None) => {
+      warn!("No video dimensions found");
+    }
+  }
 
   let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
       .map_err(|err| {
