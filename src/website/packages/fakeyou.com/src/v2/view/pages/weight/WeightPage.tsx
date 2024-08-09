@@ -12,8 +12,13 @@ import {
   faImage,
   faMicrophone,
   faVolumeHigh,
-  // faStarShooting,
+  faStarShooting,
+  faThumbsUp,
 } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faStarShooting as faStarShootingOutline,
+  faThumbsUp as faThumbsUpOutline,
+} from "@fortawesome/pro-regular-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -22,8 +27,6 @@ import { WeightType } from "@storyteller/components/src/api/_common/enums/Weight
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import Badge from "components/common/Badge";
-import BookmarkButton from "components/common/BookmarkButton";
-import LikeButton from "components/common/LikeButton";
 import VdInferencePanel from "./inference_panels/VdInferencePanel";
 import VcInferencePanel from "./inference_panels/VcInferencePanel";
 import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
@@ -38,9 +41,9 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-// import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
-// import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
-//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+import { ActionButton, ActionButtonProps } from "components/common";
+import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
+import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
 
 interface WeightProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -56,6 +59,7 @@ export default function WeightPage({
   const history = useHistory();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
+  const [isFeatured, isFeaturedSet] = useState(false);
   const fetchedWeight = useWeightFetch({
     onRemove: () => {
       history.push(source || "");
@@ -72,7 +76,7 @@ export default function WeightPage({
   const dateCreated = moment(weight?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  // const viewerCanMakeFeatured = canBanUsers() || false;
+  const isModerator = canBanUsers() || false;
 
   let pageTitle;
 
@@ -426,28 +430,46 @@ export default function WeightPage({
     }
   };
 
-  // const handleFeatureWeight = async () => {
-  //   setFeatureWeight(!weight?.is_featured);
-  // };
+  const featureButtonProps: ActionButtonProps = {
+    actionType: "feature",
+    isToggled: isFeatured,
+    labelOff: "Feature",
+    labelOn: "Featured",
+    iconOn: faStarShooting,
+    iconOff: faStarShootingOutline,
+    toggle: () => {
+      (isFeatured ? DeleteFeaturedItem : CreateFeaturedItem)("", {
+        entity_type: "model_weight",
+        entity_token: weight?.weight_token || "",
+      }).then(() => {
+        isFeaturedSet((current: boolean) => {
+          return !current;
+        });
+      });
+    },
+    toolTipOff: "Feature this",
+    toolTipOn: "Remove from featured",
+  };
 
-  // const setFeatureWeight = async (setFeatured: boolean) => {
-  //   if (weight === undefined) {
-  //     return;
-  //   }
+  const bookmarkButtonProps: ActionButtonProps = {
+    ...bookmarks.makeProps({
+      entityToken: weight?.weight_token,
+      entityType: "model_weight",
+    }),
+    toolTipOff: "Add to bookmarks",
+    toolTipOn: "Remove bookmark",
+  };
 
-  //   const request = {
-  //     entity_type: "model_weight",
-  //     entity_token: weight.weight_token,
-  //   };
-
-  //   if (setFeatured) {
-  //     await CreateFeaturedItem("", request);
-  //     // window.location.reload();
-  //   } else {
-  //     await DeleteFeaturedItem("", request);
-  //     // window.location.reload();
-  //   }
-  // };
+  const ratingButtonProps: ActionButtonProps = {
+    ...ratings.makeProps({
+      entityToken: weight?.weight_token,
+      entityType: "model_weight",
+    }),
+    toolTipOff: "Like this",
+    toolTipOn: "Unlike this",
+    iconOn: faThumbsUp,
+    iconOff: faThumbsUpOutline,
+  };
 
   return (
     <div>
@@ -474,24 +496,9 @@ export default function WeightPage({
                   <p>{weightCategory}</p>
                   {subtitleDivider}
                   <div className="d-flex align-items-center gap-2">
-                    <LikeButton
-                      {...{
-                        ...ratings.makeProps({
-                          entityToken: weight_token,
-                          entityType: "model_weight",
-                        }),
-                        large: true,
-                      }}
-                    />
-                    <BookmarkButton
-                      {...{
-                        ...bookmarks.makeProps({
-                          entityToken: weight_token,
-                          entityType: "model_weight",
-                        }),
-                        large: true,
-                      }}
-                    />
+                    <ActionButton {...ratingButtonProps} />
+                    <ActionButton {...bookmarkButtonProps} />
+                    {isModerator && <ActionButton {...featureButtonProps} />}
                   </div>
                 </div>
               </div>
@@ -632,22 +639,6 @@ export default function WeightPage({
                   />
                 </div>
               )}
-
-              {/* {viewerCanMakeFeatured && (
-                <>
-                  <div className="d-flex gap-2">
-                    <Button
-                      full={true}
-                      variant="secondary"
-                      icon={faStarShooting}
-                      label={
-                        weight?.is_featured ? "Remove Featured" : "Set Featured"
-                      }
-                      onClick={handleFeatureWeight}
-                    />
-                  </div>
-                </>
-              )} */}
             </div>
           </div>
         </div>

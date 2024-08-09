@@ -89,6 +89,7 @@ export default function MasonryGrid({
       ref={gridRef}
       className="row gy-3 gx-3"
       data-masonry='{"percentPosition": true}'
+      style={{ marginBottom: "1px" }}
     >
       {children}
     </div>
