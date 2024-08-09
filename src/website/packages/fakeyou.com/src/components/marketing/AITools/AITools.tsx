@@ -80,11 +80,11 @@ export default function AITools() {
   }
 
   if (currentPath === "/tts") {
-    items = [items[0], items[2], items[1], items[3], items[4]];
+    items = [items[0], items[1], items[2], items[3], items[4]];
   }
 
   if (currentPath === "/voice-conversion") {
-    items = [items[0], items[2], items[1], items[3], items[4]];
+    items = [items[0], items[1], items[2], items[3], items[4]];
   }
 
   return <AIToolsRow {...{ items }} />;
