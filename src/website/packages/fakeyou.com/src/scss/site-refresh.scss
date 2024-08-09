@@ -1144,7 +1144,7 @@ styles with important tags:
   }
 
   .tippy-box[data-theme~="fakeyou"] {
-    background-color: darken($secondary, 12%);
+    background-color: lighten($secondary, 5%);
     color: $white;
   }
 
