@@ -178,7 +178,7 @@ export default function AudioCard({
                         label={weightBadgeLabel}
                         color={weightBadgeColor}
                       />
-                      <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50">
+                      <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50 text-white">
                         <FontAwesomeIcon icon={faThumbsUp} />
                         {data?.stats?.positive_rating_count}
                       </span>

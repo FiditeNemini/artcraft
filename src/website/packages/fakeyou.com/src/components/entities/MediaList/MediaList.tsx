@@ -54,6 +54,8 @@ const Cards = ({ props, type }: MediaCardsProps) => {
     case "so_vits_svc":
       return <CardWrapper {...{ ...props, card: WeightCard, padding: true }} />;
     case "tt2":
+    case "tacotron2.5":
+    case "gpt_so_vits":
       return <CardWrapper {...{ ...props, card: WeightCard, padding: true }} />;
     default:
       return <div>Unsupported type</div>;

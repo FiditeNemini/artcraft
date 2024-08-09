@@ -8,9 +8,15 @@ const weightTypeInfo: WeightTypeInfo = {
   [WeightType.TT2]: { label: "TT2", color: "teal", fullLabel: "Tacotron 2" },
   [WeightType.HIFIGAN_TT2]: {
     label: "HifiGAN TT2",
-    color: "blue",
+    color: "aqua",
     fullLabel: "HifiGAN Tacotron 2",
   },
+  [WeightType.GPT_SO_VITS]: {
+    label: "TT+",
+    color: "blue",
+    fullLabel: "Tacotron+",
+  },
+  [WeightType.TT2_5]: { label: "TT+", color: "blue", fullLabel: "Tacotron+" },
   [WeightType.RVCv2]: { label: "RVC v2", color: "orange", fullLabel: "RVC v2" },
   [WeightType.SD_15]: {
     label: "SD 1.5",

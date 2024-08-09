@@ -1,14 +1,18 @@
 import { ListFeaturedWeights, Weight } from "@storyteller/components/src/api";
 import { useListContent } from "hooks";
 import React, { useRef, useState } from "react";
-// import prepFilter from "resources/prepFilter";
 import { MasonryGrid, WeightsCards } from "components/common";
+import prepFilter from "resources/prepFilter";
 
-interface ExploreTtsProps {
+interface ExploreVoicesProps {
   onResultSelect?: (data: any) => void;
+  filterCategory?: string;
 }
 
-const ExploreTts = ({ onResultSelect }: ExploreTtsProps) => {
+const ExploreVoices = ({
+  onResultSelect,
+  filterCategory,
+}: ExploreVoicesProps) => {
   const [list, listSet] = useState<Weight[]>([]);
   const [showMasonryGrid, setShowMasonryGrid] = useState(false);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -17,7 +21,9 @@ const ExploreTts = ({ onResultSelect }: ExploreTtsProps) => {
     urlUpdate: false,
     addQueries: {
       page_size: "48",
-      // ...prepFilter("image", "filter_media_classes"),
+      ...(filterCategory
+        ? prepFilter(filterCategory, "filter_weights_categories")
+        : {}),
     },
     fetcher: ListFeaturedWeights,
     list,
@@ -87,4 +93,4 @@ const ExploreTts = ({ onResultSelect }: ExploreTtsProps) => {
   );
 };
 
-export default ExploreTts;
+export default ExploreVoices;

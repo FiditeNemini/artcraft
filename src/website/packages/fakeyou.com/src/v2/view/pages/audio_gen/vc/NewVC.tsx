@@ -28,7 +28,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { isMobile } from "react-device-detect";
 import { useVcStore } from "hooks";
-import ExploreTts from "../ExploreTts";
+import ExploreVoices from "../ExploreVoices";
 import { AITools } from "components/marketing";
 import VoicePickerPreview from "../VoicePickerPreview";
 import VCRecordComponent from "./VCRecordComponent";
@@ -86,7 +86,12 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
     inputMode: 3,
     onSearchChange: searchChange(false),
     search,
-    emptyContent: <ExploreTts onResultSelect={handleResultSelect} />,
+    emptyContent: (
+      <ExploreVoices
+        onResultSelect={handleResultSelect}
+        filterCategory="voice_conversion"
+      />
+    ),
     showFilters: false,
     showPagination: false,
     searchFilter: "voice_conversion",
