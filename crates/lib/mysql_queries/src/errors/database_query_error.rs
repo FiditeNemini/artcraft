@@ -22,7 +22,19 @@ impl From<anyhow::Error> for DatabaseQueryError {
 
 impl From<sqlx::Error> for DatabaseQueryError {
   fn from(err: sqlx::Error) -> Self {
-    DatabaseQueryError::SqlxError(err)
+    if let Some(db_err) = err.as_database_error() {
+      // NB: SQLSTATE[23000]: Integrity constraint violation
+      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
+      let is_integrity_violation = db_err.code().as_deref() == Some("23000");
+      let is_duplicate_key = db_err.message().contains("Duplicate entry");
+      let is_idempotency_error = db_err.message().contains("uuid_idempotency_token");
+
+      if is_integrity_violation && is_duplicate_key && is_idempotency_error {
+        return Self::IdempotencyDuplicateKeyError;
+      }
+    }
+
+    Self::SqlxError(err)
   }
 }
 
