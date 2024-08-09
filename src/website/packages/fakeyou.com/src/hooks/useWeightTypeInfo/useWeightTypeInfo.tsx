@@ -14,9 +14,9 @@ const weightTypeInfo: WeightTypeInfo = {
   [WeightType.GPT_SO_VITS]: {
     label: "TTS+",
     color: "blue",
-    fullLabel: "Tacotron+",
+    fullLabel: "TTS+",
   },
-  [WeightType.TT2_5]: { label: "TTS+", color: "blue", fullLabel: "Tacotron+" },
+  [WeightType.TT2_5]: { label: "TTS+", color: "blue", fullLabel: "TTS+" },
   [WeightType.RVCv2]: { label: "RVC v2", color: "orange", fullLabel: "RVC v2" },
   [WeightType.SD_15]: {
     label: "SD 1.5",
