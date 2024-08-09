@@ -4,20 +4,30 @@ interface LoadingSpinnerProps {
   className?: string;
   label?: string;
   labelClassName?: string;
+  size?: number;
+  padding?: boolean;
+  thin?: boolean;
 }
 
 export default function LoadingSpinner({
   className,
   label,
   labelClassName,
+  size = 36,
+  padding = true,
+  thin = false,
 }: LoadingSpinnerProps) {
   return (
     <div
-      className={`pt-2 d-flex justify-content-center align-items-center overflow-hidden gap-3 ${
+      className={`d-flex justify-content-center align-items-center overflow-hidden gap-3 ${
         className ? className : ""
-      }`.trim()}
+      } ${padding ? "pt-2" : ""}`.trim()}
     >
-      <div className="spinner-border text-light" role="status">
+      <div
+        className="spinner-border"
+        role="status"
+        style={{ height: size, width: size, borderWidth: thin ? 2 : "0.25em" }}
+      >
         <span className="visually-hidden">Loading...</span>
       </div>
       {label && (

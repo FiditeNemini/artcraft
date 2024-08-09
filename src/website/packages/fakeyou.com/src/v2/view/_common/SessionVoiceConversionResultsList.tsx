@@ -24,6 +24,7 @@ import {
   faArrowDownToLine,
   faArrowRight,
 } from "@fortawesome/pro-solid-svg-icons";
+import LoadingSpinner from "components/common/LoadingSpinner";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -79,6 +80,8 @@ function SessionVoiceConversionResultsList(props: Props) {
       if (!job.maybeResultToken) {
         let cssStyle = "alert alert-secondary mb-0";
         let stateDescription = "Pending...";
+        let loadingSpinner = null;
+        let percentage = job.progressPercentage;
 
         switch (job.jobState) {
           case JobState.PENDING:
@@ -87,6 +90,14 @@ function SessionVoiceConversionResultsList(props: Props) {
               job.maybeExtraStatusDescription == null
                 ? t("resultsProgressPending")
                 : job.maybeExtraStatusDescription;
+            loadingSpinner = (
+              <LoadingSpinner
+                className="fs-6"
+                padding={false}
+                thin={true}
+                size={16}
+              />
+            );
             break;
           case JobState.STARTED:
             cssStyle = "alert alert-success mb-0";
@@ -94,12 +105,28 @@ function SessionVoiceConversionResultsList(props: Props) {
               job.maybeExtraStatusDescription == null
                 ? t("resultsProgressStarted")
                 : job.maybeExtraStatusDescription;
+            loadingSpinner = (
+              <LoadingSpinner
+                className="fs-6"
+                padding={false}
+                thin={true}
+                size={16}
+              />
+            );
             break;
           case JobState.ATTEMPT_FAILED:
             cssStyle = "alert alert-danger mb-0";
             stateDescription = `${
               (t("resultsProgressFail"), { 0: job.attemptCount || "0" })
             }}`;
+            loadingSpinner = (
+              <LoadingSpinner
+                className="fs-6"
+                padding={false}
+                thin={true}
+                size={16}
+              />
+            );
             break;
           case JobState.COMPLETE_FAILURE:
           case JobState.DEAD:
@@ -116,10 +143,10 @@ function SessionVoiceConversionResultsList(props: Props) {
 
         results.push(
           <div key={job.jobToken}>
-            <div>
-              <div>
-                <div className={cssStyle}>{stateDescription}</div>
-              </div>
+            <div className={`d-flex gap-2 ${cssStyle} fw-medium`.trim()}>
+              {loadingSpinner}
+              {stateDescription}
+              {percentage !== 0 && ` (${percentage}%)`}
             </div>
           </div>
         );

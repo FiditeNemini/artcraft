@@ -27,6 +27,7 @@ export default function WeightCoverImage({
     height: `${height}px`,
     width: `${width}px`,
     minWidth: `${width}px`,
+    backgroundColor: src ? "#F3F4F6" : "",
   };
 
   let image = `/images/default-covers/${coverIndex || 0}.webp`;
