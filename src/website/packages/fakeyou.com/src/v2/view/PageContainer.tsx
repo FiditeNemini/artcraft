@@ -72,7 +72,7 @@ import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
 //import { LandingPage } from "./pages/landing/LandingPage";
-import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
+// import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
@@ -648,7 +648,7 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/voice-conversion">
+                  {/* <Route path="/voice-conversion">
                     <VcModelListPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
@@ -665,7 +665,7 @@ class PageContainer extends React.Component<
                         this.props.setMaybeSelectedVoiceConversionModel
                       }
                     />
-                  </Route>
+                  </Route> */}
 
                   <Route path="/dashboard">
                     <DashboardPage sessionWrapper={this.props.sessionWrapper} />
@@ -745,7 +745,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   {/* NEW VC PAGE */}
-                  <Route exact path="/dev-vc">
+                  <Route exact path="/voice-conversion">
                     <NewVC
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
