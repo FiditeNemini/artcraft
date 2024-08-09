@@ -20,3 +20,4 @@
 
 pub mod ffprobe_get_dimensions;
 pub mod get_mp4_info;
+pub mod get_mp4_info_symphonia;

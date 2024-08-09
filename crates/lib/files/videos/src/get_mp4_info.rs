@@ -69,18 +69,10 @@ pub fn get_mp4_info<T: Seek + Read>(reader: T, file_size: u64) -> AnyhowResult<M
 pub mod tests {
   use std::fs::File;
   use std::io::BufReader;
-  use std::path::PathBuf;
 
   use testing::test_file_path::test_file_path;
 
   use crate::get_mp4_info::get_mp4_info;
-
-  fn test_file(path_from_repo_root: &str) -> PathBuf {
-    // https://doc.rust-lang.org/cargo/reference/environment-variables.html
-    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    path.push(format!("../../../{}", path_from_repo_root));
-    path
-  }
 
   #[test]
   pub fn test_decode_mp4() {
