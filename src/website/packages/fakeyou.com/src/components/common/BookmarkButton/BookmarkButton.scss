@@ -9,7 +9,7 @@
   border: none;
   padding: 0;
   font: inherit;
-  font-size: 14px !important;
+  font-size: 15px !important;
   cursor: pointer;
   outline: inherit;
   transition: 0.2s;
@@ -36,18 +36,15 @@
   }
 
   &:hover .icon-default {
-    color: map-get($badge-colors, "yellow");
+    color: $white;
     opacity: 1;
   }
 
   &.toggled {
-    background-color: darken(rgba(map-get($badge-colors, "yellow"), 0.9), 32%);
+    background-color: darken(rgba(map-get($badge-colors, "yellow"), 1), 15%);
 
     &:hover {
-      background-color: darken(
-        rgba(map-get($badge-colors, "yellow"), 0.9),
-        25%
-      );
+      background-color: darken(rgba(map-get($badge-colors, "yellow"), 1), 20%);
     }
   }
 
@@ -58,24 +55,24 @@
 }
 
 .favorite-button .icon-default {
-  color: map-get($badge-colors, "yellow");
+  color: $white;
   opacity: 0.7;
   transition: 0.2s;
 }
 
 .favorite-button .icon-toggled {
-  color: map-get($badge-colors, "yellow");
+  color: $white;
   animation: pulse 0.3s ease;
 }
 
 .favorite-button .icon-toggled:hover {
-  color: map-get($badge-colors, "yellow");
+  color: $white;
 }
 
 .favorite-text {
   color: $white;
   font-size: 14px;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
   height: 100%;
   opacity: 0.9;
   transition: 0.2s;

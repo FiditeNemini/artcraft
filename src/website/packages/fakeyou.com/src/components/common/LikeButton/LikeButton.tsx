@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/pro-solid-svg-icons";
-import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
+import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
+import { faThumbsUp as faThumbsUpOutline } from "@fortawesome/pro-regular-svg-icons";
 import { WorkDots } from "components/svg";
 import { AnimationStatus, useAnimationStatus } from "hooks";
 import Tippy from "@tippyjs/react";
@@ -76,8 +76,8 @@ export default function LikeButton({
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >
           <FontAwesomeIcon
-            icon={isToggled ? faHeart : faHeartOutline}
-            className={`${iconClass} me-2`}
+            icon={isToggled ? faThumbsUp : faThumbsUpOutline}
+            className={`${iconClass} me-2 fw-bold`}
           />
           <div className="like-number">
             <div className="like-number-wrapper">
