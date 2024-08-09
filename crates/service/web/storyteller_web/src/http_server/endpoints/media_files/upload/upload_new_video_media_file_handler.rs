@@ -209,18 +209,6 @@ pub async fn upload_new_video_media_file_handler(
 
   // ==================== FILE VALIDATION ==================== //
 
-  let mut maybe_duration_millis = None;
-
-  match ffprobe_get_info(form.file.file.path()) {
-    Ok(video_info) => {
-      maybe_duration_millis = video_info.duration
-          .map(|duration| duration.millis as u64);
-    }
-    Err(error) => {
-      warn!("Error reading video dimensions with ffprobe: {:?}", error);
-    }
-  }
-
   let mut file_bytes = Vec::new();
   form.file.file.read_to_end(&mut file_bytes)
       .map_err(|e| {
@@ -246,6 +234,18 @@ pub async fn upload_new_video_media_file_handler(
   }
 
   // ==================== OTHER FILE METADATA ==================== //
+
+  let mut maybe_duration_millis = None;
+
+  match ffprobe_get_info(form.file.file.path()) {
+    Ok(video_info) => {
+      maybe_duration_millis = video_info.duration
+          .map(|duration| duration.millis as u64);
+    }
+    Err(error) => {
+      warn!("Error reading video dimensions with ffprobe: {:?}", error);
+    }
+  }
 
   let maybe_filename = form.file.file_name.as_deref()
       .as_deref()
@@ -316,7 +316,7 @@ pub async fn upload_new_video_media_file_handler(
     maybe_duration_millis,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
-    maybe_scene_source_media_file_token: maybe_scene_source_media_file_token,
+    maybe_scene_source_media_file_token,
     is_intermediate_system_file,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
