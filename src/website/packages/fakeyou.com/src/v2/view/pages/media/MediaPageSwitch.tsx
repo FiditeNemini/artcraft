@@ -28,6 +28,8 @@ import { faStarShooting as faStarShootingOutline } from "@fortawesome/pro-regula
 
 import "./MediaPage.scss";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
+import { faThumbsUp as faThumbsUpOutline } from "@fortawesome/pro-regular-svg-icons";
 
 type AnimationOptions = AnimationType | null;
 type EngineCategoryOptions = EngineCategory | null;
@@ -121,6 +123,8 @@ export default function MediaPageSwitch() {
     }),
     toolTipOff: "Like this",
     toolTipOn: "Unlike this",
+    iconOn: faThumbsUp,
+    iconOff: faThumbsUpOutline,
   };
 
   const animationTypeChange = ({

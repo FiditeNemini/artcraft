@@ -38,7 +38,7 @@ export default function WorkDots({
             className: "fy-workdots-label",
             style: {
               ...style,
-              ...(!noPad ? { right: ".5rem" } : {}),
+              ...(!noPad ? { right: "12px" } : {}),
             },
           }}
         >
