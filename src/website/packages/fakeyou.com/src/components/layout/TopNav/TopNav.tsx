@@ -721,7 +721,7 @@ export default function TopNav({
                   icon={faFaceViewfinder}
                   className="sidebar-heading-icon"
                 />
-                {t("productLipsync")}
+                {t("lipsync")}
               </NavLink>
             </li>
 
