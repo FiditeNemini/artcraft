@@ -1,6 +1,8 @@
 use std::collections::HashSet;
+use std::fs;
 use std::io::{BufReader, Bytes, Cursor, Read};
 use std::path::PathBuf;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use actix_multipart::form::MultipartForm;
@@ -221,7 +223,12 @@ pub async fn upload_new_video_media_file_handler(
   info!("path permissions: {:?}", maybe_permissions);
   info!("path file type: {:?}", maybe_file_type);
 
-  match ffprobe_get_dimensions(path) {
+  let copy_path = PathBuf::from("/tmp/test.mp4");
+  let result = fs::copy(path, &copy_path);
+
+  info!("copy result: {:?}", result);
+
+  match ffprobe_get_dimensions(&copy_path) {
     Err(err) => {
       warn!("Error reading video dimensions with ffprobe: {:?}", err);
     }
