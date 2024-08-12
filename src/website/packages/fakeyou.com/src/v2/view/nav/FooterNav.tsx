@@ -94,7 +94,7 @@ function FooterNav(props: Props) {
         },
         { link: "/explore", text: "Explore Videos", icon: null },
         ...(domain.titlePart === "FakeYou"
-          ? [{ link: "/ai-tools", text: "AI Tools", icon: null }]
+          ? [{ link: "/tools", text: "AI Tools", icon: null }]
           : []),
         // { link: "/upload-assets", text: "Upload Assets", icon: null },
       ],
