@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use log::info;
+use log::{info, warn};
 
 use errors::{anyhow, AnyhowResult};
 use server_environment::ServerEnvironment;
@@ -124,7 +124,11 @@ fn load_env_config_files<P: AsRef<Path>>(server_environment: ServerEnvironment, 
       &env_config_file,
       args.config_search_directories)?;
 
-    info!("Environment config file {} was read: {}", &env_config_file, was_read);
+    if was_read {
+      info!("Environment config file `{}` was read.", &env_config_file);
+    } else {
+      warn!("Could not read environment config file: `{}`", &env_config_file);
+    }
   }
 
   Ok(())
