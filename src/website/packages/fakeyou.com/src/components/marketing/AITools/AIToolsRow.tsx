@@ -11,7 +11,7 @@ interface BadgeContent {
 }
 
 interface AIToolsItemProps {
-  to: string;
+  to?: string;
   title: string;
   text?: string;
   imgSrc?: string;
@@ -19,6 +19,7 @@ interface AIToolsItemProps {
   badgeContent?: BadgeContent;
   videoSrc?: string;
   videoPosterSrc?: string;
+  externalLink?: string;
 }
 
 export function AIToolsItem({
@@ -30,6 +31,7 @@ export function AIToolsItem({
   badgeContent,
   videoSrc,
   videoPosterSrc,
+  externalLink,
 }: AIToolsItemProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPoster, setShowPoster] = useState(true);
@@ -88,92 +90,107 @@ export function AIToolsItem({
     }
   }, []);
 
-  return (
-    <div className="col-12 col-md-6 col-lg-4">
-      <Link
-        to={to}
-        className="panel panel-select d-flex flex-column align-items-center"
-        onMouseEnter={handleMouseEnter}
-        onTouchStart={handleTouchStart}
-      >
-        <div className="d-flex px-3 pt-3 px-xl-4 pt-xl-4 align-items-start w-100">
-          <div className="flex-grow-1">
-            {badgeContent && (
-              <div className="mb-1">
-                <span
-                  className={`badge-${badgeContent.type} d-inline-flex align-items-center mb-2 me-2`}
-                >
-                  <FontAwesomeIcon icon={badgeContent.icon} className="me-1" />
-                  {badgeContent.label}
-                </span>
-                <h4 className="fw-bold text-white d-inline-flex align-items-center mb-0">
-                  <span>{title}</span>
-                </h4>
-                <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+  const item = (
+    <>
+      <div className="d-flex px-3 pt-3 px-xl-4 pt-xl-4 align-items-start w-100">
+        <div className="flex-grow-1">
+          {badgeContent && (
+            <div className="mb-1">
+              <span
+                className={`badge-${badgeContent.type} d-inline-flex align-items-center mb-2 me-2`}
+              >
+                <FontAwesomeIcon icon={badgeContent.icon} className="me-1" />
+                {badgeContent.label}
+              </span>
+              <h4 className="fw-bold text-white d-inline-flex align-items-center mb-0">
+                <span>{title}</span>
+              </h4>
+              <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+            </div>
+          )}
+          {!badgeContent && (
+            <>
+              <h3 className="fw-bold text-white mb-1">{title}</h3>
+              <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+            </>
+          )}
+        </div>
+        <Link to={to || "/"} className="btn btn-square mt-1">
+          <FontAwesomeIcon icon={faLongArrowRight} className="btn-icon fs-5" />
+        </Link>
+      </div>
+      {imgSrc && <img className="img-fluid" src={imgSrc} alt={imgAlt} />}
+      {videoSrc && (
+        <div className="w-100 mt-3 px-3 px-xl-4 overflow-hidden">
+          <div
+            className="w-100 h-100 position-relative overflow-hidden"
+            style={{
+              borderTopLeftRadius: "0.5rem",
+              borderTopRightRadius: "0.5rem",
+            }}
+          >
+            {videoPosterSrc && (
+              <div
+                className={`h-100 w-100 ${
+                  showPoster ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  opacity: 0,
+                  transition: "opacity 0.2s ease-in-out",
+                }}
+              >
+                <img
+                  src={videoPosterSrc}
+                  className="h-100 w-100 object-fit-cover"
+                  alt={imgAlt}
+                />
               </div>
             )}
-            {!badgeContent && (
-              <>
-                <h3 className="fw-bold text-white mb-1">{title}</h3>
-                <h6 className="fw-normal opacity-75 text-white">{text}</h6>
-              </>
-            )}
-          </div>
-          <Link to={to} className="btn btn-square mt-1">
-            <FontAwesomeIcon
-              icon={faLongArrowRight}
-              className="btn-icon fs-5"
-            />
-          </Link>
-        </div>
-        {imgSrc && <img className="img-fluid" src={imgSrc} alt={imgAlt} />}
-        {videoSrc && (
-          <div className="w-100 mt-3 px-3 px-xl-4 overflow-hidden">
-            <div
-              className="w-100 h-100 position-relative overflow-hidden"
+
+            <video
+              ref={videoRef}
+              muted={true}
+              playsInline={true}
+              className="w-100 h-100 object-fit-cover"
               style={{
                 borderTopLeftRadius: "0.5rem",
                 borderTopRightRadius: "0.5rem",
               }}
+              onEnded={handleVideoEnded}
             >
-              {videoPosterSrc && (
-                <div
-                  className={`h-100 w-100 ${
-                    showPoster ? "opacity-100" : "opacity-0"
-                  }`}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    opacity: 0,
-                    transition: "opacity 0.2s ease-in-out",
-                  }}
-                >
-                  <img
-                    src={videoPosterSrc}
-                    className="h-100 w-100 object-fit-cover"
-                    alt={imgAlt}
-                  />
-                </div>
-              )}
-
-              <video
-                ref={videoRef}
-                muted={true}
-                playsInline={true}
-                className="w-100 h-100 object-fit-cover"
-                style={{
-                  borderTopLeftRadius: "0.5rem",
-                  borderTopRightRadius: "0.5rem",
-                }}
-                onEnded={handleVideoEnded}
-              >
-                <source src={videoSrc} type="video/mp4" />
-              </video>
-            </div>
+              <source src={videoSrc} type="video/mp4" />
+            </video>
           </div>
-        )}
-      </Link>
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <div className="col-12 col-md-6 col-lg-4">
+      {!externalLink ? (
+        <Link
+          to={to || "/"}
+          className="panel panel-select d-flex flex-column align-items-center"
+          onMouseEnter={handleMouseEnter}
+          onTouchStart={handleTouchStart}
+        >
+          {item}
+        </Link>
+      ) : (
+        <div
+          onClick={() => window.open(externalLink, "_blank")}
+          className="panel panel-select d-flex flex-column align-items-center"
+          style={{ cursor: "pointer" }}
+          onMouseEnter={handleMouseEnter}
+          onTouchStart={handleTouchStart}
+        >
+          {item}
+        </div>
+      )}
     </div>
   );
 }

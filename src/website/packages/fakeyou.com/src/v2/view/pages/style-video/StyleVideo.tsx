@@ -26,6 +26,7 @@ import useStyleStore from "hooks/useStyleStore";
 import StyleOptionPicker from "./StyleSelection/StyleSelectionList";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import { isMobile } from "react-device-detect";
+import { AITools } from "components/marketing";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -231,22 +232,25 @@ export default function StyleVideo() {
                   }}
                 />
               </div>
-            </Panel>
 
-            <div className="d-none d-lg-flex justify-content-center w-100 mt-3">
-              <Button
-                {...{
-                  disabled: !mediaToken,
-                  label: "Generate Styled Video",
-                  onClick,
-                  variant: "primary",
-                  className: "px-5",
-                }}
-              />
-            </div>
+              <div className="d-none d-lg-flex justify-content-center w-100 mt-3">
+                <Button
+                  {...{
+                    disabled: !mediaToken,
+                    label: "Generate Styled Video",
+                    onClick,
+                    variant: "primary",
+                    className: "px-5 mt-2",
+                  }}
+                />
+              </div>
+            </Panel>
           </div>
           <div className="col-12 col-lg-4 col-xl-3">
-            <Panel padding={true}>
+            <Panel
+              padding={true}
+              style={{ height: "100%", minHeight: "calc(100vh-500px)" }}
+            >
               <div className="d-flex flex-column">
                 <h2 className="fw-bold mb-3 d-none d-lg-block">
                   Style a Video
@@ -265,10 +269,12 @@ export default function StyleVideo() {
                         value: prompt,
                       }}
                     />
-                    <DropdownOptions
-                      title="Show Negative Prompt"
-                      closeTitle="Hide Negative Prompt"
-                    >
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <DropdownOptions buttonPosition="top">
+                    <div className="mt-3">
                       <TextArea
                         {...{
                           label: "Negative Prompt",
@@ -280,26 +286,22 @@ export default function StyleVideo() {
                           },
                         }}
                       />
-                    </DropdownOptions>
-                  </div>
-                </div>
+                    </div>
 
-                <h6 className="mt-4">
-                  Style Strength ({Math.round(strength * 100)}%)
-                </h6>
-                <div className="w-100">
-                  <Slider
-                    min={0.0}
-                    max={1.0}
-                    step={0.01}
-                    onChange={handleSliderChange}
-                    value={strength}
-                    className="w-100"
-                  />
-                </div>
+                    <div className="my-3">
+                      <h6>Style Strength ({Math.round(strength * 100)}%)</h6>
+                      <div className="w-100">
+                        <Slider
+                          min={0.0}
+                          max={1.0}
+                          step={0.01}
+                          onChange={handleSliderChange}
+                          value={strength}
+                          className="w-100"
+                        />
+                      </div>
+                    </div>
 
-                <div className="mt-3">
-                  <DropdownOptions>
                     <div>
                       <h6 className="pb-2">Quality Options</h6>
                       <div>
@@ -393,7 +395,7 @@ export default function StyleVideo() {
                   </DropdownOptions>
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-3">
                   <SegmentButtons
                     {...{
                       className: "fy-style-video-length",
@@ -427,6 +429,15 @@ export default function StyleVideo() {
           }}
         />
       </div>
+
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try other AI video tools</h2>
+          <AITools />
+        </Panel>
+        {/* <MentionsSection /> */}
+        {/* <StorytellerStudioCTA /> */}
+      </Container>
     </>
   );
 }

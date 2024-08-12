@@ -26,6 +26,7 @@ import {
 import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import "./AIFaceMirror.scss";
+import { AITools } from "components/marketing";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -81,119 +82,135 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
   };
 
   return (
-    <Container type="panel" className="mt-3">
-      <Panel {...{ className: "fy-ai-face-mirror-panel" }}>
-        <header {...{ className: "fy-ai-face-mirror-header" }}>
-          <video
-            {...{ autoPlay: true, muted: true, loop: true, playsInline: true }}
-          >
-            <source src="/videos/motion_mirror_bg_04.mp4" type="video/mp4" />
-          </video>
-          <div {...{ className: "fy-ai-face-mirror-header-content" }}>
-            <div {...{ className: "fy-ai-face-mirror-title" }}>
-              <h1 className="fw-bold">Live Portrait</h1>
-              <p>
-                Use AI to transfer facial expressions, audio, and vocals from
-                one face video to an image or a video
-              </p>
-            </div>
-          </div>
-        </header>
-        <div
-          {...{
-            className: "fy-ai-face-mirror-main-inputs",
-          }}
-        >
-          <div
-            {...{
-              className: "fy-ai-face-mirror-column",
-            }}
-          >
-            <Label label="Choose a portrait video or image" />
-            <EntityInput
+    <>
+      <Container type="panel" className="mt-3">
+        <Panel {...{ className: "fy-ai-face-mirror-panel" }}>
+          <header {...{ className: "fy-ai-face-mirror-header" }}>
+            <video
               {...{
-                accept: ["video", "image"],
-                // aspectRatio: "landscape",
-                name: "mediaToken",
-                value: sourceMediaToken,
-                onChange: ({ target }: { target: any }) => {
-                  sourceMediaTokenSet(target.value);
-                },
-                type: "media",
+                autoPlay: true,
+                muted: true,
+                loop: true,
+                playsInline: true,
               }}
-            />
-          </div>
+            >
+              <source src="/videos/motion_mirror_bg_04.mp4" type="video/mp4" />
+            </video>
+            <div {...{ className: "fy-ai-face-mirror-header-content" }}>
+              <div {...{ className: "fy-ai-face-mirror-title" }}>
+                <h1 className="fw-bold">Live Portrait</h1>
+                <p>
+                  Use AI to transfer facial expressions, audio, and vocals from
+                  one face video to an image or a video
+                </p>
+              </div>
+            </div>
+          </header>
           <div
             {...{
-              className: "fy-ai-face-mirror-column",
+              className: "fy-ai-face-mirror-main-inputs",
             }}
           >
-            <Label label="Then choose a motion reference" />
-            <EntityInput
+            <div
               {...{
-                accept: ["video"],
-                cropProps: {
-                  aspect: 1,
-                  onCropComplete: (croppedArea, croppedAreaPixels) => {
-                    cropAreaSet(croppedAreaPixels);
+                className: "fy-ai-face-mirror-column",
+              }}
+            >
+              <Label label="Choose a portrait video or image" />
+              <EntityInput
+                {...{
+                  accept: ["video", "image"],
+                  // aspectRatio: "landscape",
+                  name: "mediaToken",
+                  value: sourceMediaToken,
+                  onChange: ({ target }: { target: any }) => {
+                    sourceMediaTokenSet(target.value);
                   },
-                },
-                // aspectRatio: "landscape",
-                // debug: "AFM driver input",
-                name: "faceDriverToken",
-                value: faceDriverToken,
-                onChange: ({ target }: { target: any }) => {
-                  faceDriverTokenSet(target.value);
-                },
-                type: "media",
+                  type: "media",
+                }}
+              />
+            </div>
+            <div
+              {...{
+                className: "fy-ai-face-mirror-column",
+              }}
+            >
+              <Label label="Then choose a motion reference" />
+              <EntityInput
+                {...{
+                  accept: ["video"],
+                  cropProps: {
+                    aspect: 1,
+                    onCropComplete: (croppedArea, croppedAreaPixels) => {
+                      cropAreaSet(croppedAreaPixels);
+                    },
+                  },
+                  // aspectRatio: "landscape",
+                  // debug: "AFM driver input",
+                  name: "faceDriverToken",
+                  value: faceDriverToken,
+                  onChange: ({ target }: { target: any }) => {
+                    faceDriverTokenSet(target.value);
+                  },
+                  type: "media",
+                }}
+              />
+            </div>
+          </div>
+          <div
+            {...{
+              className: "fy-ai-face-mirror-secondary-inputs",
+            }}
+          >
+            <fieldset {...{ className: "input-block" }}>
+              <Select
+                {...{
+                  label: "Visibility",
+                  onChange: ({ target }: any) => {
+                    visibilitySet(target.value);
+                  },
+                  options: visibilityOptions,
+                  value: visibility,
+                }}
+              />
+            </fieldset>
+            <fieldset {...{ className: "input-block" }}>
+              <div {...{ className: "fy-ai-face-mirror-premium-label" }}>
+                Watermark
+                {!hasPremium ? (
+                  <Link {...{ to: "pricing" }}>subscribe to remove</Link>
+                ) : null}
+              </div>
+
+              <Checkbox
+                {...{
+                  disabled: !hasPremium,
+                  label: "Remove",
+                  onChange: ({ target }: any) => {
+                    removeWatermarkSet(target.value);
+                  },
+                }}
+              />
+            </fieldset>
+            <Button
+              {...{
+                disabled: !hasTokens,
+                label: "Create",
+                onClick: enqueueClick,
               }}
             />
           </div>
-        </div>
-        <div
-          {...{
-            className: "fy-ai-face-mirror-secondary-inputs",
-          }}
-        >
-          <fieldset {...{ className: "input-block" }}>
-            <Select
-              {...{
-                label: "Visibility",
-                onChange: ({ target }: any) => {
-                  visibilitySet(target.value);
-                },
-                options: visibilityOptions,
-                value: visibility,
-              }}
-            />
-          </fieldset>
-          <fieldset {...{ className: "input-block" }}>
-            <div {...{ className: "fy-ai-face-mirror-premium-label" }}>
-              Watermark
-              {!hasPremium ? (
-                <Link {...{ to: "pricing" }}>subscribe to remove</Link>
-              ) : null}
-            </div>
+        </Panel>
+      </Container>
 
-            <Checkbox
-              {...{
-                disabled: !hasPremium,
-                label: "Remove",
-                onChange: ({ target }: any) => {
-                  removeWatermarkSet(target.value);
-                },
-              }}
-            />
-          </fieldset>
-          <Button
-            {...{
-              disabled: !hasTokens,
-              label: "Create",
-              onClick: enqueueClick,
-            }}
-          />
-        </div>
-      </Panel>
-    </Container>
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try other AI video tools</h2>
+          <AITools />
+        </Panel>
+        {/* <MentionsSection /> */}
+        {/* <StorytellerStudioCTA /> */}
+      </Container>
+    </>
   );
 }

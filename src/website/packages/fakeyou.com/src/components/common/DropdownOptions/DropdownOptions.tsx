@@ -8,12 +8,14 @@ interface DropdownOptionsProps {
   title?: string;
   closeTitle?: string;
   children: React.ReactNode;
+  buttonPosition?: "top" | "bottom";
 }
 
 export const DropdownOptions: React.FC<DropdownOptionsProps> = ({
   title = "Show Advanced Options",
   closeTitle = "Hide Advanced Options",
   children,
+  buttonPosition = "bottom",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [ref, { height: viewHeight }] = useMeasure();
@@ -34,6 +36,15 @@ export const DropdownOptions: React.FC<DropdownOptionsProps> = ({
 
   return (
     <div>
+      {buttonPosition === "top" && (
+        <Button
+          onClick={toggleDropdown}
+          label={isOpen ? closeTitle : title}
+          variant="link"
+          icon={isOpen ? faChevronUp : faChevronDown}
+          className="fs-7"
+        />
+      )}
       <animated.div
         style={{
           ...animationProps,
@@ -45,13 +56,15 @@ export const DropdownOptions: React.FC<DropdownOptionsProps> = ({
           {children}
         </div>
       </animated.div>
-      <Button
-        onClick={toggleDropdown}
-        label={isOpen ? closeTitle : title}
-        variant="link"
-        icon={isOpen ? faChevronUp : faChevronDown}
-        className="fs-7"
-      />
+      {buttonPosition === "bottom" && (
+        <Button
+          onClick={toggleDropdown}
+          label={isOpen ? closeTitle : title}
+          variant="link"
+          icon={isOpen ? faChevronUp : faChevronDown}
+          className="fs-7"
+        />
+      )}
     </div>
   );
 };

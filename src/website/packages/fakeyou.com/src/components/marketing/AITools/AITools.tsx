@@ -9,7 +9,23 @@ export default function AITools() {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  let items = [
+  type Item = {
+    to?: string;
+    externalLink?: string;
+    title: string;
+    text: string;
+    imgSrc?: string;
+    imgAlt: string;
+    videoSrc?: string;
+    videoPosterSrc?: string;
+    badgeContent?: {
+      type: string;
+      icon: any;
+      label: string;
+    };
+  };
+
+  let items: Item[] = [
     {
       to: "/style-video",
       title: t("productVideoStyleTransferTitle"),
@@ -72,19 +88,43 @@ export default function AITools() {
     },
   ];
 
-  if (currentPath === "/tts") {
+  if (
+    currentPath.includes("/style-video") ||
+    currentPath.includes("/ai-face-mirror") ||
+    currentPath.includes("/voice-conversion") ||
+    currentPath.includes("/tts")
+  ) {
+    items.push({
+      externalLink: "https://discord.gg/fakeyou",
+      title: "Join Our Discord",
+      text: "Be a part of our community",
+      imgSrc: "/images/landing/select-discord.webp",
+      imgAlt: "Discord Link",
+    });
+  }
+
+  if (currentPath.includes("/tts")) {
     items = items.filter(item => item.to !== "/tts");
   }
-  if (currentPath === "/voice-conversion") {
+
+  if (currentPath.includes("/voice-conversion")) {
     items = items.filter(item => item.to !== "/voice-conversion");
   }
 
-  if (currentPath === "/tts") {
-    items = [items[0], items[1], items[2], items[3], items[4]];
+  if (currentPath.includes("/tts")) {
+    items = [items[0], items[1], items[2], items[3], items[4], items[5]];
   }
 
-  if (currentPath === "/voice-conversion") {
-    items = [items[0], items[1], items[2], items[3], items[4]];
+  if (currentPath.includes("/voice-conversion")) {
+    items = [items[0], items[1], items[2], items[3], items[4], items[5]];
+  }
+
+  if (currentPath.includes("/style-video")) {
+    items = [items[1], items[2], items[6]];
+  }
+
+  if (currentPath.includes("/ai-face-mirror")) {
+    items = [items[0], items[2], items[6]];
   }
 
   return <AIToolsRow {...{ items }} />;
