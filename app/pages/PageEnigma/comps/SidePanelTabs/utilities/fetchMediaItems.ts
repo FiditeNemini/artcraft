@@ -2,12 +2,18 @@ import { FilterEngineCategories, FilterMediaType, ToastTypes } from "~/enums";
 import { addToast } from "~/signals";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { MediaFilesApi } from "~/Classes/ApiManager";
-import { MediaItem } from "~/pages/PageEnigma/models";
+import {
+  MediaItem,
+  Pagination,
+  PaginationInfinite,
+} from "~/pages/PageEnigma/models";
 
 import { responseMapping } from "./misc";
 
 export interface FetchMediaItemStates {
   mediaItems?: MediaItem[];
+  nextPageInf?: PaginationInfinite;
+  nextPage?: Pagination;
   status: FetchStatus;
 }
 interface fetchMediaItemsInterface {
@@ -17,17 +23,25 @@ interface fetchMediaItemsInterface {
   defaultErrorMessage?: string;
   searchTerm?: string;
 }
+interface fetchMediaItemsInterfaceV2 {
+  filterEngineCategories: FilterEngineCategories[];
+  filterMediaType?: FilterMediaType[];
+  defaultErrorMessage?: string;
+  searchTerm?: string; // for searches
+  nextPageCursor?: string; // for featured items' infinite pagination
+  nextPageIndex?: number; // for user item's normal pagination
+}
 
 export const fetchUserMediaItems = async ({
-  setState,
   filterEngineCategories,
   defaultErrorMessage,
-}: fetchMediaItemsInterface) => {
-  setState({ status: FetchStatus.IN_PROGRESS });
+  nextPageIndex,
+}: fetchMediaItemsInterfaceV2): Promise<FetchMediaItemStates> => {
   const mediaFilesApi = new MediaFilesApi();
 
   const response = await mediaFilesApi.ListUserMediaFiles({
-    page_size: 100,
+    page_size: 1000,
+    page_index: nextPageIndex,
     filter_engine_categories: filterEngineCategories,
   });
 
@@ -36,11 +50,10 @@ export const fetchUserMediaItems = async ({
       response.data,
       filterEngineCategories,
     );
-    setState({
+    return {
       mediaItems: newSetObjects,
       status: FetchStatus.SUCCESS,
-    });
-    return;
+    };
   }
   addToast(
     ToastTypes.ERROR,
@@ -48,21 +61,19 @@ export const fetchUserMediaItems = async ({
       defaultErrorMessage ??
       "Unknown Error in Fetching Media Items",
   );
-  setState({ status: FetchStatus.ERROR });
-  return;
+  return { status: FetchStatus.ERROR };
 };
 
 export const fetchFeaturedMediaItems = async ({
-  setState,
   filterEngineCategories,
   defaultErrorMessage,
-}: fetchMediaItemsInterface) => {
-  setState({ status: FetchStatus.IN_PROGRESS });
+  nextPageCursor,
+}: fetchMediaItemsInterfaceV2): Promise<FetchMediaItemStates> => {
   const mediaFilesApi = new MediaFilesApi();
-
   const response = await mediaFilesApi.ListFeaturedMediaFiles({
-    page_size: 100,
+    page_size: 1000,
     filter_engine_categories: filterEngineCategories,
+    cursor: nextPageCursor,
   });
 
   if (response.success && response.data) {
@@ -70,11 +81,11 @@ export const fetchFeaturedMediaItems = async ({
       response.data,
       filterEngineCategories,
     );
-    setState({
+    return {
       mediaItems: newSetObjects,
       status: FetchStatus.SUCCESS,
-    });
-    return;
+      nextPageInf: response.pagination,
+    };
   }
   addToast(
     ToastTypes.ERROR,
@@ -82,8 +93,7 @@ export const fetchFeaturedMediaItems = async ({
       defaultErrorMessage ??
       "Unknown Error in Fetching Media Items",
   );
-  setState({ status: FetchStatus.ERROR });
-  return;
+  return { status: FetchStatus.ERROR };
 };
 
 // Search Results
@@ -92,13 +102,8 @@ export const fetchFeaturedMediaItemsSearchResults = async ({
   searchTerm,
   filterEngineCategories,
   defaultErrorMessage,
-}: {
-  setState: ({ mediaItems, status }: FetchMediaItemStates) => void;
-  searchTerm: string;
-  filterEngineCategories: FilterEngineCategories[];
-  defaultErrorMessage?: string;
-}) => {
-  if (!searchTerm.trim()) {
+}: fetchMediaItemsInterface) => {
+  if (!searchTerm || !searchTerm.trim()) {
     //if after trim it's empty, do nothing
     return;
   }
@@ -136,13 +141,8 @@ export const fetchUserMediaItemsSearchResults = async ({
   searchTerm,
   filterEngineCategories,
   defaultErrorMessage,
-}: {
-  setState: ({ mediaItems, status }: FetchMediaItemStates) => void;
-  searchTerm: string;
-  filterEngineCategories: FilterEngineCategories[];
-  defaultErrorMessage?: string;
-}) => {
-  if (!searchTerm.trim()) {
+}: fetchMediaItemsInterface) => {
+  if (!searchTerm || !searchTerm.trim()) {
     return; //if after trim it's empty, do nothing
   }
 

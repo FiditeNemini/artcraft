@@ -155,7 +155,7 @@ export class MediaFilesApi extends ApiManager {
 
   public async ListFeaturedMediaFiles(
     query: ListMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
+  ): Promise<ApiResponse<MediaInfo[], PaginationInfinite>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list_featured`;
     const queryWithStrings = {
       ...query,
@@ -172,7 +172,7 @@ export class MediaFilesApi extends ApiManager {
     return await this.get<{
       success: boolean;
       results: MediaInfo[];
-      pagination: Pagination;
+      pagination: PaginationInfinite;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({
         success: true,
@@ -189,7 +189,7 @@ export class MediaFilesApi extends ApiManager {
 
   public async ListUserMediaFiles(
     query: ListUserMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], PaginationInfinite>> {
+  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
     const userName = authentication.userInfo.value?.username;
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list/user/${userName}`;
     const queryWithStrings = {
@@ -207,7 +207,7 @@ export class MediaFilesApi extends ApiManager {
     return await this.get<{
       success: boolean;
       results: MediaInfo[];
-      pagination?: PaginationInfinite;
+      pagination?: Pagination;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({
         success: response.success,

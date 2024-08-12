@@ -42,14 +42,22 @@ export const CharactersTab = ({
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 
-  const { userObjects, userFetchStatus, fetchUserObjects } = useUserObjects({
-    filterEngineCategories: filterEngineCategories,
-    defaultErrorMessage: "Unknown Error in Fetching User Characters",
-  });
-  const { featuredObjects, featuredFetchStatus } = useFeaturedObjects({
+  const { userObjects, nextUserObjects, userFetchStatus, fetchUserObjects } =
+    useUserObjects({
+      filterEngineCategories: filterEngineCategories,
+      defaultErrorMessage: "Unknown Error in Fetching User Characters",
+    });
+
+  const {
+    featuredObjects,
+    nextFeaturedObjects,
+    fetchFeaturedObjects,
+    featuredFetchStatus,
+  } = useFeaturedObjects({
     filterEngineCategories: filterEngineCategories,
     defaultErrorMessage: "Unknown Error in Fetching Featured Characters",
   });
+
   const {
     searchTermForFeaturedObjects,
     featuredObjectsSearchResults,
@@ -96,6 +104,15 @@ export const CharactersTab = ({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 21;
   const totalPages = Math.ceil(filteredDisplayItems.length / pageSize);
+  const fetchMorePages =
+    filterOwnership === AssetFilterOption.FEATURED
+      ? nextFeaturedObjects?.maybe_next
+        ? fetchFeaturedObjects
+        : undefined
+      : nextUserObjects &&
+          nextUserObjects.current !== nextUserObjects.total_page_count
+        ? fetchUserObjects
+        : undefined;
 
   const isFetching = isAnyStatusFetching([
     userFetchStatus,
@@ -176,6 +193,7 @@ export const CharactersTab = ({
           onPageChange={(newPage: number) => {
             setCurrentPage(newPage);
           }}
+          onFetchMorePages={fetchMorePages}
         />
       )}
       <UploadModal
