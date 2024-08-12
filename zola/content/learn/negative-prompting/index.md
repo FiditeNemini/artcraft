@@ -14,6 +14,3 @@ Negative prompting helps remove unwanted elements in your images. To use it, go 
 
 For example, if your character has green hair and you don't want it, enter '(green hair:1.5)' in the negative prompt field. Parentheses emphasize the words, and ':1.5' indicates how strongly to focus on it. A good range is 1.1-1.5. You can also use extra parentheses for emphasis, like '(((green hair)))’.
 
-Here’s an example video of before and after a negative prompt was used. As you can see, -unwanted element- was removed from the generation.
--> video example
-

@@ -9,9 +9,10 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 +++
 
-# Audio & Audio Generation Guide
+# Audio and Audio Generation Guide
+In the Audio tab, you have two choices: Upload audio and Generate audio. Let's explore what each option does.
 
 ## Generate Audio
-Create AI speech here. Enter text to generate audio or upload audio to convert it to a different voice. Conversion is recommended for the best results.
+Generate AI speech here. You can select from a variety of AI voices. Enter text to generate audio or upload your own audio to convert it to a different voice. Conversion is recommended for the best results.
 
 

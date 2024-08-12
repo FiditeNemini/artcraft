@@ -15,9 +15,9 @@ Image and Video Panels allow you to import your own images and videos into the s
 Once you’ve uploaded your selected media, click on it and drag it onto the scene. You can click to select it and press either T, R or G to adjust position, rotation or scale. Alternatively, you can use the transform panel on the right hand side to adjust it as well. 
 
 You can combine multiple image and video panels to create interesting outputs. 
-Here’s an example of a video generated using image panels and one with video panels:
--> video example
-
+Here’s an example of a video generated using video panels and one with image panels:
+{{ youtube(id="cJnxiF4NEhQ") }}
+{{ youtube(id="Tw0aiTSNyQw") }}
 
 
 

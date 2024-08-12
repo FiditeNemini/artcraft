@@ -18,8 +18,5 @@ To de-emphasize a word, use brackets. For example, [red hair:-1.5] makes 'red ha
 Recommended values are 1.1-1.5 for emphasis and -1.1 to -1.5 for de-emphasis. 
 When using the Negative Prompt Field use positive weights to emphasize the negative effect instead of brackets.
 
-Watch how prompt emphasis highlights -this element-.
--> video example
-
 
 

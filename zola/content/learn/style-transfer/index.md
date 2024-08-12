@@ -18,3 +18,4 @@ To use Style Transfer, go to the "Stylize" tab. Drag and drop an image into the 
 After entering your image, you don't need to add the qualities of the image to the prompt, as they'll automatically be handled. You can also choose not to prompt at all if you want it to solely focus on the image you inputted. Once you're satisfied, press "Generate Movie."
 
 Here’s an example of before and after style transfer:
+{{ youtube(id="WjFjOGAD8lA") }}

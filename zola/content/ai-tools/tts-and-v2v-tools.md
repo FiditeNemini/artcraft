@@ -2,16 +2,17 @@
 title = "The best TTS and V2V tools for AI"
 date = "2024-08-08"
 description = "A short guide on where to make the best text to speech voices for AI"
+authors = [" Moonchamp "]
+
 [taxonomies]
 tags = ["tts", "v2v", "ai", "voice", "text to speech", "voice to voice"]
-authors = [" Moonchamp "]
 +++
 
-<FakeYou.com> is a versatile AI voice platform which allows users to generate speech from thousands of different characters and voices of your choosing. Our service caters to a wide range of applications from entertainment and content creation, to spreading education and accessibility at your comfort. Using our interface, users can input text and select a character to generate realistic speech outputs.
+[FakeYou TTS](https://fakeyou.com/tts) is a versatile AI voice platform which allows users to generate speech from thousands of different characters and voices of your choosing. Our service caters to a wide range of applications from entertainment and content creation, to spreading education and accessibility at your comfort. Using our interface, users can input text and select a character to generate realistic speech outputs.
 
 # Search for Your Voice:
 
-To begin with using FakeYou.com, you can search for and select from a vast library of voices ranging from fictional characters, well-known celebrities to more generic options and broad options to read out your text. Your options can be created through the use of Text-to-Speech (TTS) or by Voice-to-voice (V2V) conversion.
+To begin with using [FakeYou](https://fakeyou.com/tts), you can search for and select from a vast library of voices ranging from fictional characters, well-known celebrities to more generic options and broad options to read out your text. Your options can be created through the use of Text-to-Speech (TTS) or by Voice-to-voice (V2V) conversion.
 
 # Creating Text-to-Speech
 
@@ -39,9 +40,3 @@ You can use FakeYou.com TTS and voice-to-voice conversion for the following thin
 - Provide an alternate voice option for those with impairments.
 - Entertainment to create fun videos or engaging with character voices.
 - Create educational material or make engaging content through the use of AI voices.
-
-
-<svg class="canon" xmlns="http://www.w3.org/2000/svg" overflow="visible" viewBox="0 0 496 373" height="373" width="496"><g fill="none"><path stroke="#000" stroke-width=".75" d="M.599 372.348L495.263 1.206M.312.633l494.95 370.853M.312 372.633L247.643.92M248.502.92l246.76 370.566M330.828 123.869V1.134M330.396 1.134L165.104 124.515"></path><path stroke="#ED1C24" stroke-width=".75" d="M275.73 41.616h166.224v249.05H275.73zM54.478 41.616h166.225v249.052H54.478z"></path><path stroke="#000" stroke-width=".75" d="M.479.375h495v372h-495zM247.979.875v372"></path><ellipse cx="498.729" cy="177.625" rx=".75" ry="1.25"></ellipse><ellipse cx="247.229" cy="377.375" rx=".75" ry="1.25"></ellipse></g></svg>
-
-<!-- [The Van de Graaf Canon](https://en.wikipedia.org/wiki/Canons_of_page_construction#Van_de_Graaf_canon) -->
-
