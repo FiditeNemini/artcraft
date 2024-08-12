@@ -38,6 +38,7 @@ taxonomies = [
   { name= "featured", feed = true, paginate_by = 5},
   { name= "categories", paginate_by = 5},
   { name = "tags", rss = true, paginate_by = 5 },
+  { name = "authors", paginate_by = 5 },
 ]
 
 [markdown]
