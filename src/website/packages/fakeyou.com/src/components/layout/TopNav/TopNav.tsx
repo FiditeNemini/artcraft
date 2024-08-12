@@ -383,7 +383,7 @@ export default function TopNav({
     <div className="d-flex align-items-center ms-2">
       <span className={"badge-new d-inline-flex align-items-center py-0 px-1"}>
         <FontAwesomeIcon icon={faSparkles} className="me-1" />
-        New
+        NEW
       </span>
     </div>
   );
