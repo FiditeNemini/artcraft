@@ -17,6 +17,8 @@ import {
   faUser,
   faSignOutAlt,
   faScrewdriverWrench,
+  faImageUser,
+  faSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -377,6 +379,15 @@ export default function TopNav({
     );
   }
 
+  const newBadge = (
+    <div className="d-flex align-items-center ms-2">
+      <span className={"badge-new d-inline-flex align-items-center py-0 px-1"}>
+        <FontAwesomeIcon icon={faSparkles} className="me-1" />
+        New
+      </span>
+    </div>
+  );
+
   return (
     <>
       {/* {domain.titlePart === "Storyteller AI" &&
@@ -655,7 +666,57 @@ export default function TopNav({
                 My Jobs
               </NavLink>
             </li>
+
+            <li className="sidebar-heading">{t("videoTitle")}</li>
+
+            <li>
+              <NavLink
+                to="/style-video"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+                className="d-flex align-items-center"
+              >
+                <FontAwesomeIcon
+                  icon={faFilms}
+                  className="sidebar-heading-icon"
+                />
+                {t("videoStyleTransfer")}
+                {newBadge}
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink
+                to="/ai-face-mirror"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+                className="d-flex align-items-center"
+              >
+                <FontAwesomeIcon
+                  icon={faImageUser}
+                  className="sidebar-heading-icon"
+                />
+                Live Portrait
+                {newBadge}
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink
+                to="/face-animator"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faFaceViewfinder}
+                  className="sidebar-heading-icon"
+                />
+                {t("lipsync")}
+              </NavLink>
+            </li>
+
             <li className="sidebar-heading">{t("speechTitle")}</li>
+
             <li>
               <NavLink
                 to="/tts"
@@ -693,35 +754,6 @@ export default function TopNav({
                   className="sidebar-heading-icon"
                 />
                 {"Voice Designer"}
-              </NavLink>
-            </li>
-            <li className="sidebar-heading">{t("videoTitle")}</li>
-
-            <li>
-              <NavLink
-                to="/style-video"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faFilms}
-                  className="sidebar-heading-icon"
-                />
-                {t("videoStyleTransfer")}
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to="/face-animator"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faFaceViewfinder}
-                  className="sidebar-heading-icon"
-                />
-                {t("lipsync")}
               </NavLink>
             </li>
 
