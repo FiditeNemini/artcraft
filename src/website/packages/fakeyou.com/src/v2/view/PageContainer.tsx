@@ -132,6 +132,7 @@ import { CreatorTypeformPage } from "./pages/landing/storyteller/PostlaunchLandi
 import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
 import { StudioMobileCheckPage } from "./pages/landing/storyteller/PostlaunchLanding/StudioMobileCheckPage";
 import { UploadNewTtsModelPage } from "./pages/upload/UploadNewTtsModelPage";
+import LivePortrait from "./pages/live_portrait/LivePortrait";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -747,6 +748,15 @@ class PageContainer extends React.Component<
                   {/* NEW VC PAGE */}
                   <Route exact path="/voice-conversion">
                     <NewVC
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  {/* NEW LIVE PORTRAIT PAGE */}
+                  <Route exact path="/dev-lp">
+                    <LivePortrait
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }

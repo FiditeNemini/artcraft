@@ -28,8 +28,13 @@
     max-width: 50vw;
   }
 
+  .fy-modal-body-small {
+    max-width: 600px;
+  }
+
   .fy-modal-body-wide,
-  .fy-modal-body-narrow {
+  .fy-modal-body-narrow,
+  .fy-modal-body-small {
     width: 100%;
     height: fit-content;
     overflow: hidden;

@@ -97,6 +97,7 @@
 # /video*                /website/index.html   200
 
 # Test paths
+/dev-lp*               /website/index.html   200
 /dev-tts*              /website/index.html   200
 /dev-vc*               /website/index.html   200
 /dev-upload*           /website/index.html   200

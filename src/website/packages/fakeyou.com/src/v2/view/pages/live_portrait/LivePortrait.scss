@@ -1,0 +1,68 @@
+@import "scss/colours.scss";
+
+.lp-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: lighten($panel, 15%) solid 2px;
+  background-color: darken($panel, 4%);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.lp-section-between {
+  padding-top: 15%;
+
+  @media (max-width: 992px) {
+    padding-top: 0;
+  }
+}
+
+.lp-thumbnail {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s;
+  border: lighten($panel, 15%) solid 2px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+
+  &:hover {
+    border-color: lighten($panel, 30%);
+    opacity: 0.75;
+  }
+
+  &.active {
+    opacity: 1;
+    border: 2px solid $primary;
+  }
+
+  &.lp-add-media {
+    background-color: lighten($panel, 6%);
+  }
+}
+
+.lp-tag {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-top: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
+  z-index: 2;
+}
+
+.cursor-default {
+  cursor: default;
+}

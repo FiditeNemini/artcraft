@@ -1,6 +1,8 @@
 @import "scss/colours.scss";
 
 .fy-checkbox-frame {
+  display: flex;
+  align-items: center;
   margin-bottom: 0.5rem;
   white-space: nowrap;
   cursor: pointer;
