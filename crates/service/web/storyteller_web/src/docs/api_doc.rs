@@ -125,7 +125,9 @@ use crate::http_server::endpoints::weights::list::list_available_weights_handler
 use crate::http_server::endpoints::weights::list::list_featured_weights_handler::*;
 use crate::http_server::endpoints::weights::list::list_pinned_weights_handler::*;
 use crate::http_server::endpoints::weights::list::list_weights_by_user_handler::*;
-use crate::http_server::endpoints::weights::search::search_model_weights_handler::*;
+use crate::http_server::endpoints::weights::search::search_model_weights_http_get_handler::*;
+use crate::http_server::endpoints::weights::search::search_model_weights_http_post_handler::*;
+use crate::http_server::endpoints::weights::search::search_model_weights_impl::*;
 use crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::*;
 use crate::http_server::endpoints::weights::update::update_weight_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
@@ -214,7 +216,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::list::list_featured_weights_handler::list_featured_weights_handler,
     crate::http_server::endpoints::weights::list::list_pinned_weights_handler::list_pinned_weights_handler,
     crate::http_server::endpoints::weights::list::list_weights_by_user_handler::list_weights_by_user_handler,
-    crate::http_server::endpoints::weights::search::search_model_weights_handler::search_model_weights_handler,
+    crate::http_server::endpoints::weights::search::search_model_weights_http_get_handler::search_model_weights_http_get_handler,
+    crate::http_server::endpoints::weights::search::search_model_weights_http_post_handler::search_model_weights_http_post_handler,
     crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update::update_weight_handler::update_weight_handler,
     crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler,

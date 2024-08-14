@@ -7,9 +7,10 @@ use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
+use actix_web::{web, HttpResponse};
 use chrono::{DateTime, Utc};
 use log::error;
 use utoipa::ToSchema;
@@ -101,22 +102,9 @@ impl fmt::Display for SearchModelWeightsError {
   }
 }
 
-#[utoipa::path(
-  post,
-  tag = "Model Weights",
-  path = "/v1/weights/search",
-  responses(
-    (status = 200, description = "Successful search", body = SearchModelWeightsSuccessResponse),
-    (status = 500, description = "Server error", body = SearchModelWeightsError),
-  ),
-  params(
-    ("request" = SearchModelWeightsRequest, description = "Payload for Request"),
-  )
-)]
-pub async fn search_model_weights_handler(
-  _http_request: HttpRequest,
-  request: web::Json<SearchModelWeightsRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, SearchModelWeightsError>
+pub async fn search_model_weights_impl(
+  request: SearchModelWeightsRequest,
+  server_state: web::Data<Arc<ServerState>>) -> Result<Json<SearchModelWeightsSuccessResponse>, SearchModelWeightsError>
 {
   let maybe_weights_categories = request.weight_category
       .map(|weight_category| {
@@ -208,15 +196,8 @@ pub async fn search_model_weights_handler(
     new_results.push(result);
   }
 
-  let response = SearchModelWeightsSuccessResponse {
+  Ok(Json(SearchModelWeightsSuccessResponse {
     success: true,
     weights: new_results,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|_e| SearchModelWeightsError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
