@@ -9,6 +9,8 @@ import { generateUUID } from "three/src/math/MathUtils.js";
 import { LoadingPlaceHolderManager } from "./placeholder_manager";
 import { MMDAnimationHelper, Water } from "three/examples/jsm/Addons.js";
 import { MediaFileType } from "../enums";
+import {ChromaKeyMaterial} from './chromakey'
+
 class Scene {
   name: string;
   gridHelper: THREE.GridHelper | undefined;
@@ -150,19 +152,26 @@ class Scene {
         //await videoElement.play();
         this.video_planes.push(videoElement);
 
+
         texture = new THREE.VideoTexture(videoElement);
+
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const image_material = new ChromaKeyMaterial(texture, 0x00ff00, 1920, 1080, 0.159, 0.082, 0.0);
+        obj = new THREE.Mesh(geometry, image_material);
+        obj.userData["media_id"] = name;
+
       } else {
         const loader = new THREE.TextureLoader();
         texture = loader.load(image_token);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const image_material = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          map: texture,
+          transparent: true,
+        });
+        obj = new THREE.Mesh(geometry, image_material);
+        obj.userData["media_id"] = name;
       }
-      texture.colorSpace = THREE.SRGBColorSpace;
-      const image_material = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        map: texture,
-        transparent: true,
-      });
-      obj = new THREE.Mesh(geometry, image_material);
-      obj.userData["media_id"] = name;
     } else if (name == "PointLight") {
       const light_material = new THREE.MeshBasicMaterial({
         color: 0xffffff,
