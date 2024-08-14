@@ -119,15 +119,15 @@ use crate::http_server::endpoints::users::session_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::*;
-use crate::http_server::endpoints::weights::delete_weight_handler::*;
-use crate::http_server::endpoints::weights::get_weight_handler::*;
-use crate::http_server::endpoints::weights::list_available_weights_handler::*;
-use crate::http_server::endpoints::weights::list_featured_weights_handler::*;
-use crate::http_server::endpoints::weights::list_pinned_weights_handler::*;
-use crate::http_server::endpoints::weights::list_weights_by_user_handler::*;
-use crate::http_server::endpoints::weights::search_model_weights_handler::*;
-use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::*;
-use crate::http_server::endpoints::weights::update_weight_handler::*;
+use crate::http_server::endpoints::weights::delete::delete_weight_handler::*;
+use crate::http_server::endpoints::weights::get::get_weight_handler::*;
+use crate::http_server::endpoints::weights::list::list_available_weights_handler::*;
+use crate::http_server::endpoints::weights::list::list_featured_weights_handler::*;
+use crate::http_server::endpoints::weights::list::list_pinned_weights_handler::*;
+use crate::http_server::endpoints::weights::list::list_weights_by_user_handler::*;
+use crate::http_server::endpoints::weights::search::search_model_weights_handler::*;
+use crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::*;
+use crate::http_server::endpoints::weights::update::update_weight_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::*;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::*;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_request::*;
@@ -208,15 +208,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler,
-    crate::http_server::endpoints::weights::delete_weight_handler::delete_weight_handler,
-    crate::http_server::endpoints::weights::get_weight_handler::get_weight_handler,
-    crate::http_server::endpoints::weights::list_available_weights_handler::list_available_weights_handler,
-    crate::http_server::endpoints::weights::list_featured_weights_handler::list_featured_weights_handler,
-    crate::http_server::endpoints::weights::list_pinned_weights_handler::list_pinned_weights_handler,
-    crate::http_server::endpoints::weights::list_weights_by_user_handler::list_weights_by_user_handler,
-    crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler,
-    crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
-    crate::http_server::endpoints::weights::update_weight_handler::update_weight_handler,
+    crate::http_server::endpoints::weights::delete::delete_weight_handler::delete_weight_handler,
+    crate::http_server::endpoints::weights::get::get_weight_handler::get_weight_handler,
+    crate::http_server::endpoints::weights::list::list_available_weights_handler::list_available_weights_handler,
+    crate::http_server::endpoints::weights::list::list_featured_weights_handler::list_featured_weights_handler,
+    crate::http_server::endpoints::weights::list::list_pinned_weights_handler::list_pinned_weights_handler,
+    crate::http_server::endpoints::weights::list::list_weights_by_user_handler::list_weights_by_user_handler,
+    crate::http_server::endpoints::weights::search::search_model_weights_handler::search_model_weights_handler,
+    crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
+    crate::http_server::endpoints::weights::update::update_weight_handler::update_weight_handler,
     crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler,
     crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::enqueue_studio_workflow_handler,

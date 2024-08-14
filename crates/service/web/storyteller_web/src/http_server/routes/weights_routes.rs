@@ -3,15 +3,15 @@ use actix_service::ServiceFactory;
 use actix_web::{App, Error, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 
-use crate::http_server::endpoints::weights::delete_weight_handler::delete_weight_handler;
-use crate::http_server::endpoints::weights::get_weight_handler::get_weight_handler;
-use crate::http_server::endpoints::weights::list_available_weights_handler::list_available_weights_handler;
-use crate::http_server::endpoints::weights::list_featured_weights_handler::list_featured_weights_handler;
-use crate::http_server::endpoints::weights::list_pinned_weights_handler::list_pinned_weights_handler;
-use crate::http_server::endpoints::weights::list_weights_by_user_handler::list_weights_by_user_handler;
-use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
-use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler;
-use crate::http_server::endpoints::weights::update_weight_handler::update_weight_handler;
+use crate::http_server::endpoints::weights::delete::delete_weight_handler::delete_weight_handler;
+use crate::http_server::endpoints::weights::get::get_weight_handler::get_weight_handler;
+use crate::http_server::endpoints::weights::list::list_available_weights_handler::list_available_weights_handler;
+use crate::http_server::endpoints::weights::list::list_featured_weights_handler::list_featured_weights_handler;
+use crate::http_server::endpoints::weights::list::list_pinned_weights_handler::list_pinned_weights_handler;
+use crate::http_server::endpoints::weights::list::list_weights_by_user_handler::list_weights_by_user_handler;
+use crate::http_server::endpoints::weights::search::search_model_weights_handler::search_model_weights_handler;
+use crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler;
+use crate::http_server::endpoints::weights::update::update_weight_handler::update_weight_handler;
 
 pub fn add_weights_routes<T, B>(app: App<T>) -> App<T>
   where
