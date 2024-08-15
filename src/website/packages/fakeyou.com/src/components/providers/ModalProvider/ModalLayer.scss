@@ -37,6 +37,17 @@
   .fy-modal-body-small {
     width: 100%;
     height: fit-content;
+  }
+
+  .fy-modal-body-square {
+    width: 75vh;
+    height: 75vh;
+  }
+
+  .fy-modal-body-wide,
+  .fy-modal-body-narrow,
+  .fy-modal-body-small,
+  .fy-modal-body-square {
     overflow: hidden;
     background-color: $panel;
     border-color: lighten($panel, 8%) !important;
@@ -53,5 +64,9 @@
       height: 100%;
       border-radius: 0;
     }
+  }
+
+  .fy-modal-no-padding {
+    padding: 0;
   }
 }

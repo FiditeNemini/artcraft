@@ -58,6 +58,11 @@ styles with important tags:
   }
 }
 
+@mixin video-tint {
+  background-color: rgba($secondary-very-dark, 0.5);
+  backdrop-filter: blur(5px);
+}
+
 .fakeyou-refresh {
   //- BS5 classnames -//
   .object-fit-cover {
