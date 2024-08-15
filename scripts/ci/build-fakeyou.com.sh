@@ -24,8 +24,8 @@ function build_website {
   popd
 }
 
-function build_zola {
-  zola --root zola build 
+function build_blog {
+  zola --root blog/fakeyou build 
 }
 
 echo "Current working directory:"
@@ -34,18 +34,18 @@ pwd
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
-echo "Building zola blog..."
-build_zola
+echo "Building blog..."
+build_blog
 
 echo "Building website..."
 build_website
 
 echo "Create final output directory..."
-mkdir -p fakeyou.com/zola
+mkdir -p fakeyou.com/blog
 mkdir -p fakeyou.com/website
 
-echo "Copying zola blog artifacts..."
-cp -r zola/public/* fakeyou.com/zola/
+echo "Copying blog artifacts..."
+cp -r blog/fakeyou/public/* fakeyou.com/blog/
 
 echo "Copying website artifacts..."
 mv src/website/packages/fakeyou.com/build/* fakeyou.com/website/

@@ -24,8 +24,8 @@ function build_website {
   popd
 }
 
-function build_zola {
-  zola --root zola build 
+function build_blog {
+  zola --root blog/storyteller build 
 }
 
 echo "Current working directory:"
@@ -34,18 +34,18 @@ pwd
 echo "Labelling build with short SHA..."
 replace_commit_ref
 
-echo "Building zola blog..."
-build_zola
+echo "Building blog..."
+build_blog
 
 echo "Building website..."
 build_website
 
 echo "Create final output directory..."
-mkdir -p storyteller.ai/zola
+mkdir -p storyteller.ai/blog
 mkdir -p storyteller.ai/website
 
-echo "Copying zola blog artifacts..."
-cp -r zola/public/* storyteller.ai/zola/
+echo "Copying blog artifacts..."
+cp -r blog/storyteller/public/* storyteller.ai/blog/
 
 echo "Copying website artifacts..."
 # NB: storyteller is part of the "fakeyou.com" build

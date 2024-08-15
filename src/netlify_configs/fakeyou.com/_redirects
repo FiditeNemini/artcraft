@@ -7,19 +7,19 @@
 #   configuration file.
 
 # Zola blog paths:
-/foo                /zola/foo/index.html          200!
-/foo/*              /zola/foo/:splat              200!
-/bar                /zola/bar/index.html          200!
-/bar/*              /zola/bar/:splat              200!
-/ai-tools           /zola/ai-tools/index.html     200!
-/ai-tools/*         /zola/ai-tools/:splat         200!
-/blog               /zola/blog/index.html         200!
-/blog/*             /zola/blog/:splat             200!
-/learn               /zola/learn/index.html         200!
-/learn/*             /zola/learn/:splat             200!
+/foo                 /blog/foo/index.html          200!
+/foo/*               /blog/foo/:splat              200!
+/bar                 /blog/bar/index.html          200!
+/bar/*               /blog/bar/:splat              200!
+/ai-tools            /blog/ai-tools/index.html     200!
+/ai-tools/*          /blog/ai-tools/:splat         200!
+/blog                /blog/blog/index.html         200!
+/blog/*              /blog/blog/:splat             200!
+/learn               /blog/learn/index.html        200!
+/learn/*             /blog/learn/:splat            200!
 
 # Zola static assets from theme:
-/zola/*             /zola/zola/:splat        200!
+/zola/*              /blog/zola/:splat             200!
 
 # Website root:
 /                      /website/index.html   200
