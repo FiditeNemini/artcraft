@@ -20,8 +20,6 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
-import useModal from "hooks/useModal";
-import EmailSignUp from "v2/view/pages/landing/storyteller/PostlaunchLanding/EmailSignUp";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -286,12 +284,12 @@ function SignupPage(props: Props) {
   };
 
   const betaKeyRedirect = redirectLink?.includes("/beta-key/redeem");
-  const { open } = useModal();
-  const openModal = () =>
-    open({
-      component: EmailSignUp,
-      props: { mobile: true, showHanashi: false, handleClose: openModal },
-    });
+  // const { open } = useModal();
+  // const openModal = () =>
+  //   open({
+  //     component: EmailSignUp,
+  //     props: { mobile: true, showHanashi: false, handleClose: openModal },
+  //   });
 
   usePrefixedDocumentTitle("Create an account");
 
@@ -376,25 +374,115 @@ function SignupPage(props: Props) {
     <div className="overflow-hidden auth-page-left">
       <div className="row h-100 g-0">
         <div className="col-12 col-lg-6 col-xl-7 bg-panel d-flex flex-column align-items-center justify-content-center order-2 order-lg-1 p-5 p-lg-0">
-          <a href="https://storyteller.ai" style={{ marginBottom: "20px" }}>
-            <img
-              src="/fakeyou/Storyteller-Logo-1.png"
-              alt="Storyteller Logo"
-              style={{ maxWidth: "280px" }}
-            />
-          </a>
-          <p className="fw-medium fs-5 text-center">
-            Check out what our new AI creation engine can make!
-          </p>
+          {domain.titlePart === "Storyteller AI" ? (
+            <>
+              <a href="https://storyteller.ai" style={{ marginBottom: "20px" }}>
+                <img
+                  src="/fakeyou/Storyteller-Logo-1.png"
+                  alt="Storyteller Logo"
+                  style={{ maxWidth: "280px" }}
+                />
+              </a>
+              <p className="fw-medium fs-5 text-center">
+                Check out what our new AI creation engine can make!
+              </p>
+              <div className="w-100 d-none d-lg-block">
+                <ScrollingSceneCarousel gradientColor="#262636" />
+              </div>
+              <div className="w-100 d-block d-lg-none">
+                <ScrollingSceneCarousel gradientColor="#262636" small={true} />
+              </div>
+            </>
+          ) : (
+            <>
+              <a href="https://fakeyou.com" style={{ marginBottom: "20px" }}>
+                <img
+                  src="/fakeyou/FakeYou-Logo-2.png"
+                  alt="FakeYou Logo"
+                  style={{ maxWidth: "200px" }}
+                />
+              </a>
+              <p className="fw-medium fs-5 text-center">
+                Sign up and use our AI video tools!
+              </p>
+              <div className="mt-5 mx-5 px-xl-5 w-100">
+                <div className="row g-5">
+                  <div className="col-12 col-lg-4">
+                    <div className="px-lg-3">
+                      <div
+                        style={{
+                          aspectRatio: "4/3",
+                          backgroundColor: "rgba(255, 255, 255, 0.06)",
+                          borderRadius: "0.5rem",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <video
+                          autoPlay
+                          muted
+                          loop
+                          className="object-fit-cover w-100 h-100"
+                        >
+                          <source src="/videos/ai-tools/vst_video.mp4" />
+                        </video>
+                      </div>
+                      <h4 className="fw-bold mt-3 text-center">
+                        Video Style Transfer
+                      </h4>
+                    </div>
+                  </div>
+                  <div className="col-12 col-lg-4">
+                    <div className="px-lg-3">
+                      <div
+                        style={{
+                          aspectRatio: "4/3",
+                          backgroundColor: "rgba(255, 255, 255, 0.06)",
+                          borderRadius: "0.5rem",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <video
+                          autoPlay
+                          muted
+                          loop
+                          className="object-fit-cover w-100 h-100"
+                        >
+                          <source src="/videos/ai-tools/lp_video.mp4" />
+                        </video>
+                      </div>
+                      <h4 className="fw-bold mt-3 text-center">
+                        Live Portrait
+                      </h4>
+                    </div>
+                  </div>
+                  <div className="col-12 col-lg-4">
+                    <div className="px-lg-3">
+                      <div
+                        style={{
+                          aspectRatio: "4/3",
+                          backgroundColor: "rgba(255, 255, 255, 0.06)",
+                          borderRadius: "0.5rem",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <video
+                          autoPlay
+                          muted
+                          loop
+                          className="object-fit-cover w-100 h-100"
+                        >
+                          <source src="/videos/ai-tools/ls_video.mp4" />
+                        </video>
+                      </div>
+                      <h4 className="fw-bold mt-3 text-center">Lipsync</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
-          <div className="w-100 d-none d-lg-block">
-            <ScrollingSceneCarousel gradientColor="#262636" />
-          </div>
-          <div className="w-100 d-block d-lg-none">
-            <ScrollingSceneCarousel gradientColor="#262636" small={true} />
-          </div>
-
-          {!betaKeyRedirect && (
+          {/* {!betaKeyRedirect && (
             <p className="fs-7 mt-5">
               Interested? Join the
               <span
@@ -407,7 +495,7 @@ function SignupPage(props: Props) {
               </span>{" "}
               now!
             </p>
-          )}
+          )} */}
         </div>
         <div className="col-12 col-lg-6 col-xl-5 d-flex flex-column justify-content-center align-items-center align-items-lg-start order-lg-2 order-1 auth-page-right">
           <h2 className="fw-bold mb-0 mt-5 mb-4">
