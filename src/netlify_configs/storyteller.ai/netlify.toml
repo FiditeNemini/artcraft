@@ -26,7 +26,7 @@ status = 301
 force = true
 
 [[redirects]]
-from = "/bar"
+from = "/testing"
 to = "/bar-bar-bar"
 status = 301
 force = true
