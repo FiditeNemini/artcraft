@@ -41,7 +41,6 @@
 /engine-compositor*    /website/index.html   200
 /explore*              /website/index.html   200
 /fbx-to-gltf*          /website/index.html   200
-/firehose*             /website/index.html   200
 /guide*                /website/index.html   200
 /inference-jobs-list*  /website/index.html   200
 /jobs*                 /website/index.html   200
@@ -49,15 +48,11 @@
 /leaderboard*          /website/index.html   200
 /login*                /website/index.html   200
 /media*                /website/index.html   200
-/mirror-motion*        /website/index.html   200
 /moderation*           /website/index.html   200
-/motion-mirror*        /website/index.html   200
 /news*                 /website/index.html   200
 /obs_configs*          /website/index.html   200
 /old*                  /website/index.html   200
 /password-reset*       /website/index.html   200
-/patrons*              /website/index.html   200
-/pending*              /website/index.html   200
 /portal_success*       /website/index.html   200
 /pricing*              /website/index.html   200
 /privacy*              /website/index.html   200
@@ -75,7 +70,6 @@
 /tools*                /website/index.html   200
 /tts*                  /website/index.html   200
 /tts_configs*          /website/index.html   200
-/twitch*               /website/index.html   200
 /upload*               /website/index.html   200
 /video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
