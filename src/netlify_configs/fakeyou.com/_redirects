@@ -109,10 +109,13 @@
 
 # Finally, all the website resources (images, 
 # css, scripts) need to be loaded:
-/fakeyou/*              /website/fakeyou/:splat        200
-/mascot/*               /website/mascot/:splat         200
 /apple-touch-icon.png   /website/apple-touch-icon.png  200
+/fakeyou/*              /website/fakeyou/:splat        200
 /favicon-32x32.png      /website/favicon-32x32.png     200
+/images/*               /website/images/:splat         200
+/locales/*              /website/locales/:splat        200
+/mascot/*               /website/mascot/:splat         200
+/videos/*               /website/videos/:splat         200
 
 # Ideally we could place all of the above under 'static': 
 /static/*               /website/static/:splat         200
