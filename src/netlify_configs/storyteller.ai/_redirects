@@ -30,7 +30,6 @@
 /checkout_cancel*      /website/index.html   200
 /checkout_success*     /website/index.html   200
 /clone*                /website/index.html   200
-/commissions*          /website/index.html   200
 /contribute*           /website/index.html   200
 /creator-onboarding*   /website/index.html   200
 /dashboard*            /website/index.html   200
@@ -38,10 +37,6 @@
 /engine-compositor*    /website/index.html   200
 /explore*              /website/index.html   200
 /fbx-to-gltf*          /website/index.html   200
-/guide*                /website/index.html   200
-/inference-jobs-list*  /website/index.html   200
-/jobs*                 /website/index.html   200
-/landing*              /website/index.html   200
 /leaderboard*          /website/index.html   200
 /login*                /website/index.html   200
 /media*                /website/index.html   200
@@ -81,6 +76,7 @@
 /dev-upload*           /website/index.html   200
 /dev-upload-alt*       /website/index.html   200
 /dev-vc*               /website/index.html   200
+/testing*              /website/index.html   200
 /tts-dev*              /website/index.html   200
 
 # Old paths

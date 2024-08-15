@@ -53,7 +53,6 @@
 /news*                 /website/index.html   200
 /old*                  /website/index.html   200
 /password-reset*       /website/index.html   200
-/patrons*              /website/index.html   200
 /portal_success*       /website/index.html   200
 /pricing*              /website/index.html   200
 /privacy*              /website/index.html   200
@@ -66,7 +65,6 @@
 /studio-mobile-check*  /website/index.html   200
 /style-video*          /website/index.html   200
 /terms*                /website/index.html   200
-/testing*              /website/index.html   200
 /text-to-image*        /website/index.html   200
 /tools*                /website/index.html   200
 /tts*                  /website/index.html   200
@@ -87,6 +85,7 @@
 /dev-upload*           /website/index.html   200
 /dev-upload-alt*       /website/index.html   200
 /dev-vc*               /website/index.html   200
+/testing*              /website/index.html   200
 /tts-dev*              /website/index.html   200
 
 # Old paths - Live Portrait
@@ -99,6 +98,7 @@
 
 # Older paths we should reclaim
 /w2l*                  /ai-live-portrait     301
+/patrons*              /pricing              301
 
 # Finally, all the website resources (images, 
 # css, scripts) need to be loaded:
