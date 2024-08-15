@@ -26,7 +26,7 @@ status = 301
 force = true
 
 [[redirects]]
-from = "/testing-about"
+from = "/asdf"
 to = "https://fakeyou.com/about"
 status = 301
 force = true
