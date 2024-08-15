@@ -22,8 +22,6 @@
 
 # Website paths:
 /about*                /website/index.html   200
-/acting-face*          /website/index.html   200
-/ai-face-mirror*       /website/index.html   200
 /ai-live-portrait*     /website/index.html   200
 /beta-key*             /website/index.html   200
 /beta-keys*            /website/index.html   200
@@ -45,7 +43,6 @@
 /guide*                /website/index.html   200
 /inference-jobs-list*  /website/index.html   200
 /jobs*                 /website/index.html   200
-/landing*              /website/index.html   200
 /leaderboard*          /website/index.html   200
 /login*                /website/index.html   200
 /media*                /website/index.html   200
@@ -89,6 +86,7 @@
 /tts-dev*              /website/index.html   200
 
 # Old paths - Live Portrait
+/acting-face*          /ai-live-portrait     301
 /ai-face-mirror*       /ai-live-portrait     301
 /mirror-motion*        /ai-live-portrait     301
 /motion-mirror*        /ai-live-portrait     301
