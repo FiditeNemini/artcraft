@@ -8,7 +8,12 @@ import {
   GetMedia,
   MediaFile,
 } from "@storyteller/components/src/api/media_files/GetMedia";
-import { faUpload } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faUpload,
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isMobile } from "react-device-detect";
 
 interface ThumbnailMediaPickerProps {
@@ -27,6 +32,10 @@ interface ThumbnailMediaPickerProps {
     height: number;
     width: number;
   }) => void;
+  stepNumber?: number;
+  onUploadClick?: () => void;
+  onSelectedMediaChange?: (media: any) => void;
+  uploadFocusPoint?: boolean;
 }
 
 interface MediaData {
@@ -45,13 +54,21 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     setCropArea,
     mediaTokens,
     showCropButton = true,
+    stepNumber,
+    onUploadClick,
+    onSelectedMediaChange,
+    uploadFocusPoint,
   }) => {
     const [zoom, setZoom] = useState(1);
     const [isCropping, setIsCropping] = useState(false);
     const [mediaData, setMediaData] = useState<{ [key: string]: any }>({});
+    const [isLoadingMedia, setIsLoadingUserMedia] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 8;
 
     useEffect(() => {
       const fetchMediaData = async () => {
+        setIsLoadingUserMedia(true);
         const mediaDataPromises = mediaTokens.map(async token => {
           const response = await GetMedia(token, {});
           return { token, media: response.media_file };
@@ -67,15 +84,27 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
         );
 
         setMediaData(mediaDataObject);
+        setIsLoadingUserMedia(false);
       };
 
       fetchMediaData();
+    }, [mediaTokens]);
+
+    useEffect(() => {
+      // Automatically change to the last page when mediaTokens change
+      setCurrentPage(Math.ceil(mediaTokens.length / itemsPerPage) - 1);
     }, [mediaTokens]);
 
     const selectedMedia = mediaData[mediaTokens[selectedIndex]];
     const mediaLink = selectedMedia?.public_bucket_path
       ? new BucketConfig().getGcsUrl(selectedMedia.public_bucket_path)
       : null;
+
+    useEffect(() => {
+      if (onSelectedMediaChange) {
+        onSelectedMediaChange(selectedMedia);
+      }
+    }, [selectedMedia, onSelectedMediaChange]);
 
     useEffect(() => {
       if (setCropArea) {
@@ -105,8 +134,23 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     );
 
     const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-      console.log(croppedArea, croppedAreaPixels, "HELLO");
+      console.log(croppedArea, croppedAreaPixels);
     }, []);
+
+    const handleNextPage = () => {
+      setCurrentPage(prevPage =>
+        Math.min(prevPage + 1, Math.ceil(mediaTokens.length / itemsPerPage) - 1)
+      );
+    };
+
+    const handlePreviousPage = () => {
+      setCurrentPage(prevPage => Math.max(prevPage - 1, 0));
+    };
+
+    const paginatedMediaTokens = mediaTokens.slice(
+      currentPage * itemsPerPage,
+      (currentPage + 1) * itemsPerPage
+    );
 
     return (
       <div className="d-flex gap-3 flex-column">
@@ -151,6 +195,8 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                   mediaProps={{
                     autoPlay: true,
                     loop: true,
+                    controls: false,
+                    playsInline: true,
                   }}
                 />
               ) : (
@@ -159,42 +205,52 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
             </>
           ) : (
             <div className="w-100 h-100 object-fit-contain d-flex align-items-center justify-content-center">
-              {mediaLink ? (
-                selectedMedia?.media_type === "image" ? (
-                  <img
-                    key={selectedIndex}
-                    src={mediaLink}
-                    alt="Selected media"
-                  />
-                ) : (
-                  <video
-                    key={selectedIndex}
-                    autoPlay={true}
-                    muted
-                    loop={true}
-                    playsInline
-                    controls={false}
-                    preload="auto"
-                    draggable="false"
-                  >
-                    <source src={mediaLink} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                )
+              {isLoadingMedia ? (
+                <LoadingSpinner />
               ) : (
-                <LoadingSpinner padding={false} />
+                <>
+                  {mediaLink ? (
+                    selectedMedia?.media_type === "image" ? (
+                      <img
+                        key={selectedIndex}
+                        src={mediaLink}
+                        alt="Selected media"
+                      />
+                    ) : (
+                      <video
+                        key={selectedIndex}
+                        autoPlay={true}
+                        muted
+                        loop={true}
+                        playsInline
+                        controls={false}
+                        preload="auto"
+                        draggable="false"
+                      >
+                        <source src={mediaLink} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )
+                  ) : (
+                    <LoadingSpinner padding={false} />
+                  )}
+                </>
               )}
             </div>
           )}
         </div>
 
         <div className="order-1 order-lg-2">
-          <h2 className="fs-5 mb-1 fw-semibold">{title}</h2>
+          <div className="d-flex gap-2 align-items-center mb-1">
+            {stepNumber && <div className="lp-step">{stepNumber}</div>}
+            <h2 className="fs-5 mb-0 fw-semibold">{title}</h2>
+          </div>
+
           <p className="fw-medium fs-7 opacity-75">{description}</p>
         </div>
 
-        <div className="row g-2 order-2 order-lg-3">
-          {mediaTokens.map((token, index) => {
+        <div className="row g-2 order-2 order-lg-3 position-relative">
+          {paginatedMediaTokens.map((token, index) => {
             const media = mediaData[token];
             const mediaLink = media?.public_bucket_path
               ? new BucketConfig().getGcsUrl(media.public_bucket_path)
@@ -203,7 +259,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
             return (
               <ThumbnailItem
                 key={index}
-                index={index}
+                index={index + currentPage * itemsPerPage}
                 selectedIndex={selectedIndex}
                 handleThumbnailClick={handleThumbnailClick}
                 poster={mediaLink || ""}
@@ -212,23 +268,29 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
             );
           })}
 
-          {/* <div className="col-3">
-            <div className="lp-thumbnail lp-add-media ratio ratio-1x1">
-              <div className="d-flex gap-1 flex-column align-items-center justify-content-center">
-                <FontAwesomeIcon icon={faCirclePlus} className="fs-4 mt-1" />
-                <span className="fw-medium mb-0 user-select-none fs-7">
-                  Upload
-                </span>
-              </div>
+          {mediaTokens.length > itemsPerPage && (
+            <div className="thumbnail-pagination">
+              <FontAwesomeIcon
+                icon={faChevronLeft}
+                onClick={handlePreviousPage}
+                className="thumbnail-pagination-icon left-arrow"
+              />
+              <FontAwesomeIcon
+                icon={faChevronRight}
+                onClick={handleNextPage}
+                className="thumbnail-pagination-icon right-arrow"
+              />
             </div>
-          </div> */}
+          )}
         </div>
 
         <Button
           icon={faUpload}
-          label="Upload your own"
+          label="Upload your media"
           variant="secondary"
           className="order-3 order-lg-4"
+          onClick={onUploadClick}
+          focusPoint={uploadFocusPoint}
         />
       </div>
     );

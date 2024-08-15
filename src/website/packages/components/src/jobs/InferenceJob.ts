@@ -14,7 +14,8 @@ export enum FrontendInferenceJobType {
   ConvertFbxtoGltf, // format_conversion
   EngineComposition, // convert_bvh_to_workflow ?
   VideoWorkflow, // workflow ?
-  VideoStyleTransfer, // video_filter ?
+  VideoStyleTransfer, // video_filter
+  LivePortrait, // live_portrait
 }
 
 export enum AllInferenceJobs {

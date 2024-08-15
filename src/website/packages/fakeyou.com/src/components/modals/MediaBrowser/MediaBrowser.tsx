@@ -59,11 +59,6 @@ export default function MediaBrowser({
   showPagination = true,
   searchFilter,
 }: MediaBrowserInternal) {
-  console.log(
-    "🐢",
-    inputMode
-    // getMediaTypesByCategory(inputMode)
-  );
   // const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [filterType, filterTypeSet] = useState(accept ? accept[0] : "all");
@@ -78,7 +73,7 @@ export default function MediaBrowser({
   ][inputMode];
 
   const entities = useListContent({
-    debug: "media browser",
+    // debug: "media browser",
     addQueries: {
       ...(localSearch ? {} : { page_size: 24 }),
       ...prepFilter(

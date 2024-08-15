@@ -63,7 +63,7 @@ export default function JobItem({
   jobState,
   jobStatusDescription,
   resultPaths,
-  t,
+  t = (key: string) => key,
   ...rest
 }: JobListItem) {
   const history = useHistory();

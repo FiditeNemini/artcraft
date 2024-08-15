@@ -22,4 +22,5 @@ export default interface ButtonProps
   isActive?: boolean;
   fontLarge?: boolean;
   iconClassName?: string;
+  focusPoint?: boolean;
 }

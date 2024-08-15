@@ -92,7 +92,9 @@ export default function AITools() {
     currentPath.includes("/style-video") ||
     currentPath.includes("/ai-face-mirror") ||
     currentPath.includes("/voice-conversion") ||
-    currentPath.includes("/tts")
+    currentPath.includes("/tts") ||
+    currentPath.includes("/live-portrait") ||
+    currentPath.includes("/dev-lp")
   ) {
     items.push({
       externalLink: "https://discord.gg/fakeyou",
@@ -123,7 +125,11 @@ export default function AITools() {
     items = [items[1], items[2], items[6]];
   }
 
-  if (currentPath.includes("/ai-face-mirror")) {
+  if (
+    currentPath.includes("/ai-face-mirror") ||
+    currentPath.includes("/live-portrait") ||
+    currentPath.includes("/dev-lp")
+  ) {
     items = [items[0], items[2], items[6]];
   }
 

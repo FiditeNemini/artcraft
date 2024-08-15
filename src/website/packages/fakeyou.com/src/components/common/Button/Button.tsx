@@ -26,6 +26,7 @@ export default function Button({
   type = "button",
   fontLarge,
   iconClassName,
+  focusPoint,
   ...rest
 }: ButtonProps) {
   let variant = variantProps;
@@ -79,12 +80,14 @@ export default function Button({
 
   const ButtonContent = iconFlip ? (
     <>
+      {focusPoint ? <div className="focus-point" /> : null}
       {LabelComponent}
       {IconComponent}
       {SpinnerComponent}
     </>
   ) : (
     <>
+      {focusPoint ? <div className="focus-point" /> : null}
       {isLoading ? null : IconComponent}
       {LabelComponent}
       {SpinnerComponent}

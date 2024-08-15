@@ -194,7 +194,7 @@ export default function StyleVideo() {
 
   return styleVideoAccessCheck(
     <>
-      <Container className="mt-3" type="panel">
+      <Container className="mt-3 mt-lg-5" type="panel">
         <Panel className="d-block d-lg-none mb-3">{vstInfo}</Panel>
         <div className="row flex-lg-row-reverse g-3">
           <div className="col-12 col-lg-8 col-xl-9 d-flex flex-column gap-3">
