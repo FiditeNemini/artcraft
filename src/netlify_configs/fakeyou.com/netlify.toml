@@ -30,3 +30,9 @@ from = "/asdf"
 to = "https://fakeyou.com/about"
 status = 301
 force = true
+
+[[redirects]]
+from = "https://staging.fakeyou.com/doesitwork"
+to = "https://fakeyou.com/about"
+status = 301
+force = true

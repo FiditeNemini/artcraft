@@ -30,3 +30,9 @@ from = "/asdf"
 to = "https://storyteller.ai/about"
 status = 301
 force = true
+
+[[redirects]]
+from = "https://staging.storyteller.ai/doesitwork"
+to = "https://storyteller.ai/about"
+status = 301
+force = true
