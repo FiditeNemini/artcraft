@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
 
-export type ModalWidth = "wide" | "narrow" | "small";
+export type ModalWidth = "wide" | "narrow" | "small" | "square";
 
 export interface ModalConfig {
   component: React.ElementType;
   lockTint?: boolean;
+  padding?: boolean;
   props?: any;
   width?: ModalWidth;
 }

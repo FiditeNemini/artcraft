@@ -41,6 +41,7 @@ interface EntityInputProps {
   name?: string;
   onChange?: any;
   onPromptUpdate?: (prompt: Prompt | null) => void;
+  showWebcam?: boolean;
   type: EntityModeProp;
   value?: string;
 }
@@ -177,6 +178,7 @@ export default function EntityInput({
   name = "",
   onChange,
   onPromptUpdate,
+  showWebcam = false,
   type,
   value,
   ...rest
@@ -305,6 +307,7 @@ export default function EntityInput({
                 onSelect,
                 queryUser,
                 render: EntityInputEmpty,
+                showWebcam,
                 type,
                 ...sharedProps,
                 ...rest,

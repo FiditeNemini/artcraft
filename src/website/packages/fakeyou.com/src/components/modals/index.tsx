@@ -1,4 +1,7 @@
+import CameraCapture from "./CameraCapture";
 import InferenceJobsModal from "./InferenceJobsModal";
-import MediaBrowser from "./MediaBrowser";
+import MediaBrowser, { MediaBrowserProps } from "./MediaBrowser";
 
-export { InferenceJobsModal, MediaBrowser };
+export { CameraCapture, InferenceJobsModal, MediaBrowser };
+
+export type { MediaBrowserProps };

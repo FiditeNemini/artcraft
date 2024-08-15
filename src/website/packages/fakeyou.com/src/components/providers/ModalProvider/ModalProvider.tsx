@@ -50,6 +50,7 @@ export default function ModalProvider({ children }: ModalProviderProps) {
           lockTint: modalState?.lockTint,
           modalOpen,
           onModalCloseEnd,
+          padding: modalState?.padding,
           width: modalState?.width,
         }}
       />
