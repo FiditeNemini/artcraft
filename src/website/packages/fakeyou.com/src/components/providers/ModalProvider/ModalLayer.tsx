@@ -12,6 +12,7 @@ interface Props {
   lockTint?: boolean;
   modalOpen: boolean;
   onModalCloseEnd: (x: any) => void;
+  padding?: boolean;
   width?: ModalWidth;
 }
 
@@ -23,6 +24,7 @@ export default function ModalLayer({
   lockTint,
   modalOpen,
   onModalCloseEnd,
+  padding = true,
   width = "wide",
 }: Props) {
   const mainClassName = "fy-modal-layer";
@@ -57,7 +59,13 @@ export default function ModalLayer({
             },
           }}
         >
-          <div {...{ className: `fy-modal-body-${width}` }}>
+          <div
+            {...{
+              className: `fy-modal-body-${width}${
+                padding ? "" : " fy-modal-no-padding"
+              }`,
+            }}
+          >
             {Content && (
               <Content {...{ ...contentProps, handleClose: close }} />
             )}

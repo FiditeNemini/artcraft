@@ -5,9 +5,11 @@ import {
   useModal,
   useSession,
 } from "hooks";
-import MediaBrowser, {
+import {
+  CameraCapture,
+  MediaBrowser,
   MediaBrowserProps,
-} from "components/modals/MediaBrowser";
+} from "components/modals";
 import { FileWrapper } from "components/common";
 import {
   AcceptTypes,
@@ -20,6 +22,7 @@ import {
 } from "components/entities/EntityTypes";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import {
+  faCamera,
   faDiagramSankey,
   faFile,
   faFileArrowUp,
@@ -33,6 +36,7 @@ interface EmptySlideProps extends SlideProps {
   accept: AcceptTypes | AcceptTypes[];
   inputProps?: any;
   queryUser?: string;
+  showWebcam: boolean;
   type: EntityModeProp;
 }
 
@@ -40,6 +44,7 @@ export default function EntityInputEmpty({
   accept,
   inputProps,
   queryUser,
+  showWebcam,
   type,
   ...rest
 }: EmptySlideProps) {
@@ -69,6 +74,13 @@ export default function EntityInputEmpty({
     open({
       component: MediaBrowser,
       props,
+    });
+
+  const cameraClick = () =>
+    open({
+      component: CameraCapture,
+      padding: false,
+      width: "square",
     });
 
   const mediaIcons = () => {
@@ -130,6 +142,19 @@ export default function EntityInputEmpty({
           />
           Choose from your {["bookmarks", "media", "weights"][inputMode]}
         </div>
+        {showWebcam && (
+          <div
+            {...{
+              className: "fy-entity-input-row fy-entity-input-button",
+              onClick: cameraClick,
+            }}
+          >
+            <Icon
+              {...{ className: "fy-entity-input-label-icon", icon: faCamera }}
+            />
+            Record with your camera
+          </div>
+        )}
       </div>
     </>
   );

@@ -4487,6 +4487,7 @@ __metadata:
     "@babel/runtime": ^7.25.0
     "@react-spring/types": ^9.7.3
     "@typeform/embed": ^4.8.1
+    "@types/dom-mediacapture-record": ^1.0.19
     craco: ^0.0.3
     cross-env: ^7.0.3
     framer-motion: 6.5.1
@@ -4497,6 +4498,7 @@ __metadata:
     prettier: ^3.1.0
     pretty-quick: ^3.1.3
     react-easy-crop: ^5.0.7
+    react-webcam: ^7.2.0
     universal-cookie: ^6.1.1
     yarn: ^1.22.19
   languageName: unknown
@@ -5097,6 +5099,13 @@ __metadata:
   version: 1.0.3
   resolution: "@types/deep-equal@npm:1.0.3"
   checksum: eddd9a381dac9d2bb99846e8f42a5e568f54610485cdcb6dd08ae60e597d406331f25f3bb1e63d0ecf28b6376d304ac635106b9a86a25c43d496406c4f29f298
+  languageName: node
+  linkType: hard
+
+"@types/dom-mediacapture-record@npm:^1.0.19":
+  version: 1.0.19
+  resolution: "@types/dom-mediacapture-record@npm:1.0.19"
+  checksum: 4fb7b0bb7bcc6378fa9f0cfce2e144fcc41b5df3c7842bab07f6b812084bd41c18110ed27043ab28b24e2c251233fe4ae5ab0597e6b8509fef9647b29eed2d40
   languageName: node
   linkType: hard
 
@@ -18204,6 +18213,16 @@ __metadata:
     react-dom: ">=17.0.2"
     wavesurfer.js: 5.x.x || 6.x.x
   checksum: f6e0d36d02555c1452da35a2f9cadda4a5c51705f25cdd602e15baf6663bcbdc3bf04dba5142069f695515c72ed54fe2d30f95d7ecfe61091ca44bfb17f6afd0
+  languageName: node
+  linkType: hard
+
+"react-webcam@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "react-webcam@npm:7.2.0"
+  peerDependencies:
+    react: ">=16.2.0"
+    react-dom: ">=16.2.0"
+  checksum: 55aecc9e33ea711525f9b68a7c14c9cf4089777b9edd6d9c93813568d701a101f3da09ffd7df04b64eca8c9783a37830522376049589699c6015555ec8d7ccd8
   languageName: node
   linkType: hard
 
