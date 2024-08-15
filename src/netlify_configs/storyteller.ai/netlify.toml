@@ -17,7 +17,7 @@ TESTING_TEST = "1.2.3"
 [[redirects]]
 # NB: storyteller.ai replaces storyteller.io
 from = "https://storyteller.io/*"
-to = "https://storyteller.ai/:splat?from=storyteller.io"
+to = "https://storyteller.ai/:splat?from=storyteller.io&test=testing4"
 status = 301
 force = true
 
@@ -35,7 +35,19 @@ status = 301
 force = true
 
 [[redirects]]
+from = "/foobarbaz"
+to = "/about"
+status = 301
+force = true
+
+[[redirects]]
 from = "https://staging.storyteller.ai/doesitwork"
+to = "https://storyteller.ai/about"
+status = 301
+force = true
+
+[[redirects]]
+from = "https://staging.storyteller.ai/itdoeswork"
 to = "https://storyteller.ai/about"
 status = 301
 force = true
