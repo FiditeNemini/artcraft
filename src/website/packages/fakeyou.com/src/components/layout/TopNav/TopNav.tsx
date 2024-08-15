@@ -687,7 +687,7 @@ export default function TopNav({
 
             <li>
               <NavLink
-                to="/ai-face-mirror"
+                to="/ai-live-portrait"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
                 className="d-flex align-items-center"

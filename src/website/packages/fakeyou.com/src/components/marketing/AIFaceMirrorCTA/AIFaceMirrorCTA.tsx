@@ -11,7 +11,7 @@ export default function AIFaceMirrorCTA({ className }: Props) {
   return (
     <Panel className="cta-ai-face-mirror">
       <Link
-        {...{ className: "cta-ai-face-mirror-body", to: "/ai-face-mirror" }}
+        {...{ className: "cta-ai-face-mirror-body", to: "/ai-live-portrait" }}
       >
         <video
           autoPlay={true}

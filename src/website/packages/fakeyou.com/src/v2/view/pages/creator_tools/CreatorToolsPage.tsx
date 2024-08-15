@@ -55,7 +55,7 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
     },
 
     {
-      to: "/ai-face-mirror",
+      to: "/ai-live-portrait",
       title: t("productLivePortraitTitle"),
       text: t("productLivePortraitText"),
       videoSrc: "/videos/ai-tools/lp_video.mp4",

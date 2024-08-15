@@ -40,7 +40,7 @@ export default function AITools() {
       },
     },
     {
-      to: "/ai-face-mirror",
+      to: "/ai-live-portrait",
       title: t("productLivePortraitTitle"),
       text: t("productLivePortraitText"),
       videoSrc: "/videos/ai-tools/lp_video.mp4",
@@ -91,6 +91,7 @@ export default function AITools() {
   if (
     currentPath.includes("/style-video") ||
     currentPath.includes("/ai-face-mirror") ||
+    currentPath.includes("/ai-live-portrait") ||
     currentPath.includes("/voice-conversion") ||
     currentPath.includes("/tts") ||
     currentPath.includes("/live-portrait") ||
@@ -126,6 +127,7 @@ export default function AITools() {
   }
 
   if (
+    currentPath.includes("/ai-live-portrait") ||
     currentPath.includes("/ai-face-mirror") ||
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp")
