@@ -30,3 +30,7 @@ from = "/asdf"
 to = "https://storyteller.ai/about"
 status = 301
 force = true
+
+[build]
+publish = "this-should-also-fail/"
+command = "echo 'this should also fail'"
