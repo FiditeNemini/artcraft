@@ -1010,7 +1010,7 @@ class PageContainer extends React.Component<
                     <WaitlistNextStepsPage />
                   </Route>
 
-                  <Route path="/ai-face-mirror">
+                  <Route path="/ai-live-portrait">
                     <AIFaceMirror
                       {...{
                         sessionSubscriptionsWrapper:

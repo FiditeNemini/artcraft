@@ -7,10 +7,6 @@
 #   configuration file.
 
 # Zola blog paths:
-/foo                 /blog/foo/index.html          200!
-/foo/*               /blog/foo/:splat              200!
-/bar                 /blog/bar/index.html          200!
-/bar/*               /blog/bar/:splat              200!
 /ai-tools            /blog/ai-tools/index.html     200!
 /ai-tools/*          /blog/ai-tools/:splat         200!
 /blog                /blog/blog/index.html         200!
@@ -27,7 +23,6 @@
 # Website paths:
 /about*                /website/index.html   200
 /acting-face*          /website/index.html   200
-/ai-face-mirror*       /website/index.html   200
 /beta-key*             /website/index.html   200
 /beta-keys*            /website/index.html   200
 /category*             /website/index.html   200
@@ -45,14 +40,12 @@
 /edit-cover-image*     /website/index.html   200
 /engine-compositor*    /website/index.html   200
 /explore*              /website/index.html   200
-/face-animator*        /website/index.html   200
 /fbx-to-gltf*          /website/index.html   200
 /firehose*             /website/index.html   200
 /guide*                /website/index.html   200
 /inference-jobs-list*  /website/index.html   200
 /jobs*                 /website/index.html   200
 /landing*              /website/index.html   200
-/landing_temp*         /website/index.html   200
 /leaderboard*          /website/index.html   200
 /login*                /website/index.html   200
 /media*                /website/index.html   200
@@ -98,13 +91,13 @@
 
 # Test paths
 /dev-tts*              /website/index.html   200
-/dev-vc*               /website/index.html   200
 /dev-upload*           /website/index.html   200
 /dev-upload-alt*       /website/index.html   200
+/dev-vc*               /website/index.html   200
 /tts-dev*              /website/index.html   200
 
 # Old paths
-/face-animation*       /face-animator        302
+# (None with Storyteller.ai yet...)
 
 # Finally, all the website resources (images, 
 # css, scripts) need to be loaded:

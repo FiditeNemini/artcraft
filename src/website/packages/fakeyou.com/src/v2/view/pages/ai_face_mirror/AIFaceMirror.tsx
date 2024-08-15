@@ -27,6 +27,7 @@ import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import "./AIFaceMirror.scss";
 import { AITools } from "components/marketing";
+import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -45,6 +46,8 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
     x: 0,
     y: 0,
   });
+
+  useDocumentTitle("Live Portrait AI. Free Video Animation");
 
   const { enqueue } = useInferenceJobs();
   // const { canBanUsers } = useSession();
