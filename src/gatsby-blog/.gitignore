@@ -1,6 +1,0 @@
-node_modules/
-.cache/
-.vscode
-public
-dist
-src/gatsby-types.d.ts
