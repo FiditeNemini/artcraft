@@ -53,6 +53,7 @@ mv src/website/packages/fakeyou.com/build/* fakeyou.com/website/
 echo "Copying redirects configuration to Netlify build dir..."
 cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/
 cp src/netlify_configs/fakeyou.com/netlify.toml fakeyou.com/
+cp src/netlify_configs/fakeyou.com/netlify.toml /
 
 echo "List files in build directory"
 find fakeyou.com/

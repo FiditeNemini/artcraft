@@ -11,6 +11,9 @@ YARN_VERSION = "3.3.1"
 # https://www.getzola.org/documentation/deployment/netlify/
 ZOLA_VERSION = "0.19.1"
 
+# TODO: This is just temporary for testing the build
+TESTING_TEST = "1.2.3"
+
 [[redirects]]
 # NB: storyteller.ai replaces storyteller.io
 from = "https://storyteller.io/*"
@@ -21,7 +24,7 @@ force = true
 [[redirects]]
 # NB: storyteller.ai replaces storyteller.io
 from = "https://staging.storyteller.io/*"
-to = "https://staging.storyteller.ai/:splat?from=staging.storyteller.io"
+to = "https://staging.storyteller.ai/:splat?from=staging.storyteller.io&test=testing1"
 status = 301
 force = true
 
