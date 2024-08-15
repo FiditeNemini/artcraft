@@ -26,13 +26,10 @@
 /beta-key*             /website/index.html   200
 /beta-keys*            /website/index.html   200
 /category*             /website/index.html   200
-/channel*              /website/index.html   200
-/channels*             /website/index.html   200
 /character*            /website/index.html   200
 /checkout_cancel*      /website/index.html   200
 /checkout_success*     /website/index.html   200
 /clone*                /website/index.html   200
-/coming-soon*          /website/index.html   200
 /commissions*          /website/index.html   200
 /contribute*           /website/index.html   200
 /creator-onboarding*   /website/index.html   200
@@ -50,7 +47,6 @@
 /media*                /website/index.html   200
 /moderation*           /website/index.html   200
 /news*                 /website/index.html   200
-/obs_configs*          /website/index.html   200
 /old*                  /website/index.html   200
 /password-reset*       /website/index.html   200
 /portal_success*       /website/index.html   200
@@ -58,7 +54,6 @@
 /privacy*              /website/index.html   200
 /product-usage*        /website/index.html   200
 /profile*              /website/index.html   200
-/search*               /website/index.html   200
 /signup*               /website/index.html   200
 /stream*               /website/index.html   200
 /studio*               /website/index.html   200
@@ -73,8 +68,6 @@
 /upload*               /website/index.html   200
 /video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
-/voice-designer*       /website/index.html   200
-/w2l*                  /website/index.html   200
 /waitlist-next-steps*  /website/index.html   200
 /weight*               /website/index.html   200
 /welcome               /website/index.html   200

@@ -28,13 +28,10 @@
 /beta-key*             /website/index.html   200
 /beta-keys*            /website/index.html   200
 /category*             /website/index.html   200
-/channel*              /website/index.html   200
-/channels*             /website/index.html   200
 /character*            /website/index.html   200
 /checkout_cancel*      /website/index.html   200
 /checkout_success*     /website/index.html   200
 /clone*                /website/index.html   200
-/coming-soon*          /website/index.html   200
 /commissions*          /website/index.html   200
 /contribute*           /website/index.html   200
 /creator-onboarding*   /website/index.html   200
@@ -54,7 +51,6 @@
 /media*                /website/index.html   200
 /moderation*           /website/index.html   200
 /news*                 /website/index.html   200
-/obs_configs*          /website/index.html   200
 /old*                  /website/index.html   200
 /password-reset*       /website/index.html   200
 /patrons*              /website/index.html   200
@@ -79,11 +75,8 @@
 /video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
 /voice-designer*       /website/index.html   200
-/w2l*                  /website/index.html   200
 /waitlist-next-steps*  /website/index.html   200
 /weight*               /website/index.html   200
-/welcome               /website/index.html   200
-/welcome-to-studio*    /website/index.html   200
 
 # Broken paths that collide with the FakeYou /public/ folder:
 # /video*                /website/index.html   200
@@ -97,12 +90,15 @@
 /tts-dev*              /website/index.html   200
 
 # Old paths - Live Portrait
-/ai-face-mirror        /ai-live-portrait     301
+/ai-face-mirror*       /ai-live-portrait     301
 /mirror-motion*        /ai-live-portrait     301
 /motion-mirror*        /ai-live-portrait     301
 
 # Old paths - Face Animator
 /face-animation*       /face-animator        301
+
+# Older paths we should reclaim
+/w2l*                  /ai-live-portrait     301
 
 # Finally, all the website resources (images, 
 # css, scripts) need to be loaded:
