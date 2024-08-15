@@ -30,7 +30,3 @@ from = "/asdf"
 to = "https://fakeyou.com/about"
 status = 301
 force = true
-
-[build]
-publish = "this-should-fail/"
-command = "echo 'this should fail'"
