@@ -109,4 +109,4 @@
 
 # Finally, all the website resources (images, 
 # css, scripts) need to be loaded:
-/*                     /website/:splat       200
+#/*                     /website/:splat       200
