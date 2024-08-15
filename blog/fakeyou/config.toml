@@ -2,8 +2,8 @@
 base_url = "/"
 
 # The site title and description; used in feeds by default.
-title = "Storyteller.ai"
-description = "Blog posts and tutorials of Storyteller.ai"
+title = "FakeYou"
+description = "Blog posts and tutorials of FakeYou"
 
 # The default language; used in feeds.
 default_language = "en"
