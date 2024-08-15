@@ -17,37 +17,19 @@ TESTING_TEST = "1.2.3"
 [[redirects]]
 # NB: storyteller.ai replaces storyteller.io
 from = "https://storyteller.io/*"
-to = "https://storyteller.ai/:splat?from=storyteller.io&test=testing3"
+to = "https://storyteller.ai/:splat?from=storyteller.io"
 status = 301
 force = true
 
 [[redirects]]
 # NB: storyteller.ai replaces storyteller.io
 from = "https://staging.storyteller.io/*"
-to = "https://staging.storyteller.ai/:splat?from=staging.storyteller.io&test=testing1"
+to = "https://staging.storyteller.ai/:splat?from=staging.storyteller.io"
 status = 301
 force = true
 
 [[redirects]]
 from = "/asdf"
-to = "https://fakeyou.com/about"
-status = 301
-force = true
-
-[[redirects]]
-from = "/foobarbaz"
-to = "/about"
-status = 301
-force = true
-
-[[redirects]]
-from = "https://staging.fakeyou.com/doesitwork"
-to = "https://fakeyou.com/about"
-status = 301
-force = true
-
-[[redirects]]
-from = "https://fakeyou.com/itdoeswork"
 to = "https://fakeyou.com/about"
 status = 301
 force = true
