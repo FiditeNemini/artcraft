@@ -25,3 +25,7 @@ packages/fakeyou.com/.env
 packages/storyteller.io/.env
 packages/power.stream/.env
 packages/trumped.com/.env
+
+# old files
+/src/gatsby-blog
+/zola/
