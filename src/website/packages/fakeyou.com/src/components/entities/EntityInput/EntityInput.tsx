@@ -44,6 +44,7 @@ interface EntityInputProps {
   showWebcam?: boolean;
   type: EntityModeProp;
   value?: string;
+  showMediaBrowserFilters?: boolean;
 }
 
 export interface SlideProps {
@@ -181,6 +182,7 @@ export default function EntityInput({
   showWebcam = false,
   type,
   value,
+  showMediaBrowserFilters,
   ...rest
 }: EntityInputProps) {
   const { search } = useLocation();
@@ -277,7 +279,12 @@ export default function EntityInput({
       >
         {transitions((style: any, i: number, state: any) => {
           let isLeaving = state.phase === "leave";
-          let sharedProps = { animating, isLeaving, style };
+          let sharedProps = {
+            animating,
+            isLeaving,
+            style,
+            showFilters: showMediaBrowserFilters,
+          };
 
           return [
             <AnimatedSlide

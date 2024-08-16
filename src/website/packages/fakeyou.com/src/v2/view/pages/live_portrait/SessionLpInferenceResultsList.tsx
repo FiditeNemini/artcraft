@@ -87,9 +87,6 @@ export default function SessionLpInferenceResultsList({
 
       if (job.jobState === JobState.STARTED && currentProgress !== null) {
         if (lastProgressRef.current[job.jobToken] !== currentProgress) {
-          console.log(
-            `Updating progress for Job ${job.jobToken}: ${currentProgress}%`
-          );
           onJobProgress(currentProgress);
           lastProgressRef.current[job.jobToken] = currentProgress;
         }
@@ -100,9 +97,6 @@ export default function SessionLpInferenceResultsList({
           job.jobState === JobState.COMPLETE_FAILURE) &&
         lastProgressRef.current[job.jobToken] !== null
       ) {
-        console.log(
-          `Job ${job.jobToken} is complete. Resetting progress to null.`
-        );
         onJobProgress(null);
         lastProgressRef.current[job.jobToken] = null;
       }
@@ -116,7 +110,6 @@ export default function SessionLpInferenceResultsList({
       try {
         const response = await GetMedia(token, {});
         const publicBucketPath = response.media_file?.public_bucket_path || "";
-        console.log(`Fetched media for token ${token}: ${publicBucketPath}`);
         setMediaSrc(prev => ({ ...prev, [token]: publicBucketPath }));
       } catch (error) {
         console.error("Error fetching media:", error);

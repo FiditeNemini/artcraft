@@ -12,6 +12,7 @@ interface Props {
   onSearchChange?: (e: any) => void;
   search?: string;
   title?: string;
+  titleClassName?: string;
 }
 
 export default function ModalHeader({
@@ -20,6 +21,7 @@ export default function ModalHeader({
   onSearchChange = () => {},
   search: initialSearch,
   title,
+  titleClassName,
 }: Props) {
   const [search, setSearch] = useState(initialSearch);
 
@@ -62,7 +64,9 @@ export default function ModalHeader({
             )}
           </div>
         ) : (
-          title && <h3 className="fw-semibold">{title}</h3>
+          title && (
+            <h3 className={`fw-semibold ${titleClassName}`.trim()}>{title}</h3>
+          )
         )}
 
         {children && (

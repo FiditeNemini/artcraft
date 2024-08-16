@@ -1,0 +1,31 @@
+import React from "react";
+import { EntityInput } from "components/entities";
+import ModalHeader from "components/modals/ModalHeader";
+import { useModal } from "hooks";
+
+interface SourceEntityInputProps {
+  onChange: ({ target }: { target: any }) => void;
+}
+
+export default function SourceEntityInput({
+  onChange,
+}: SourceEntityInputProps) {
+  const { close } = useModal();
+
+  return (
+    <div>
+      <ModalHeader
+        title="Upload Source Image or Video"
+        handleClose={close}
+        titleClassName="fw-semibold fs-5"
+      />
+      <EntityInput
+        accept={["image", "video"]}
+        className="w-100"
+        onChange={onChange}
+        type="media"
+        showMediaBrowserFilters={false}
+      />
+    </div>
+  );
+}

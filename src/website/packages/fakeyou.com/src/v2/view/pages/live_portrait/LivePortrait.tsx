@@ -39,7 +39,6 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
-import { EntityInput } from "components/entities";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import SessionLpInferenceResultsList from "./SessionLpInferenceResultsList";
@@ -47,6 +46,8 @@ import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useLocation } from "react-router-dom";
 import { LivePortraitDetails } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
+import SourceEntityInput from "./SourceEntityInput";
+import MotionEntityInput from "./MotionEntityInput";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -197,8 +198,6 @@ export default function LivePortrait({
           FrontendInferenceJobType.LivePortrait,
           false
         );
-
-        console.log("Job enqueued:", res.inference_job_token);
       } else {
         console.error("Failed to enqueue job", res);
         setIsGenerating(false);
@@ -214,10 +213,6 @@ export default function LivePortrait({
       setIsEnqueuing(false);
     });
   };
-
-  useEffect(() => {
-    console.log("Updated jobProgressPercentage:", jobProgressPercentage);
-  }, [jobProgressPercentage]);
 
   const renderVideoOrPlaceholder = () => {
     // Check if the current combination is being generated
@@ -372,40 +367,28 @@ export default function LivePortrait({
     selectedSourceIndex >= numberOfInitialSourceTokens ||
     selectedMotionIndex >= numberOfInitialMotionTokens;
 
-  const sourceInputProps = {
-    accept: ["image", "video"],
-    className: "w-100",
-    label: "Upload Source Media (Image or Video)",
-    onChange: ({ target }: { target: any }) => {
-      setUserSourceToken(target.value);
-      close();
-    },
-    type: "media",
-  };
-
-  const motionInputProps = {
-    accept: ["video"],
-    className: "w-100",
-    label: "Upload Motion Reference Video",
-    onChange: ({ target }: { target: any }) => {
-      setUserMotionToken(target.value);
-      close();
-    },
-    type: "media",
-  };
-
   const handleOpenUploadSourceModal = () => {
     open({
-      component: EntityInput,
-      props: sourceInputProps,
+      component: SourceEntityInput,
+      props: {
+        onChange: ({ target }: { target: any }) => {
+          setUserSourceToken(target.value);
+          close();
+        },
+      },
       width: "small",
     });
   };
 
   const handleOpenUploadMotionModal = () => {
     open({
-      component: EntityInput,
-      props: motionInputProps,
+      component: MotionEntityInput,
+      props: {
+        onChange: ({ target }: { target: any }) => {
+          setUserMotionToken(target.value);
+          close();
+        },
+      },
       width: "small",
     });
   };
