@@ -1,17 +1,29 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
 
+.work-indicator-label {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .work-indicator {
   @include medium-svg;
-  // height: 2.25rem;
-  // width: 2.25rem;
-  // fill: none;
+  position: relative;
 
-  // circle, line, polyline {
-  //   stroke-width: 4px;
-  //   stroke-linecap: round;
-  //   stroke: #fff;
-  // }
+  .work-indicator-progress {
+    text-align: center;
+    position: absolute;
+    font-size: 0.625rem;
+    line-height: 0.625rem;
+    height: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 
   polyline {
     transform: translate(6px, 6px);

@@ -36,6 +36,7 @@ interface EmptySlideProps extends SlideProps {
   accept: AcceptTypes | AcceptTypes[];
   inputProps?: any;
   queryUser?: string;
+  selectToken: (token: string) => void;
   showWebcam: boolean;
   type: EntityModeProp;
 }
@@ -44,6 +45,7 @@ export default function EntityInputEmpty({
   accept,
   inputProps,
   queryUser,
+  selectToken,
   showWebcam,
   type,
   ...rest
@@ -80,6 +82,7 @@ export default function EntityInputEmpty({
     open({
       component: CameraCapture,
       padding: false,
+      props: { selectToken },
       width: "square",
     });
 
