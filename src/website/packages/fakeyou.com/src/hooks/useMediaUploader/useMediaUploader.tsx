@@ -30,6 +30,7 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
   const [engineSubtype, engineSubtypeSet] = useState<
     MediaFileSubtype | undefined
   >();
+  const [uploadProgress, uploadProgressSet] = useState(0);
 
   const { file, clear, inputProps } = useFile({
     ...(autoUpload
@@ -63,7 +64,12 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
       if (isAudio) return UploadAudioMedia(mediaConfig);
       if (isEngineAsset) return UploadEngineAsset(engineConfig);
       if (isImage) return UploadImageMedia(mediaConfig);
-      else return UploadVideoMedia(mediaConfig);
+      else
+        return UploadVideoMedia(mediaConfig, uploadEvent =>
+          uploadProgressSet(
+            Math.round((uploadEvent.loaded * 100) / (uploadEvent?.total || 0))
+          )
+        );
     };
 
     if (inputFile) {
@@ -72,6 +78,8 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
           statusSet(FetchStatus.success);
           onSuccess(res);
           todo();
+        } else {
+          statusSet(FetchStatus.error);
         }
       });
     }
@@ -92,6 +100,7 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
     clear,
     engineSubtype,
     engineSubtypeChange,
+    error: status === FetchStatus.error,
     mediaClass,
     mediaClassChange,
     file,
@@ -103,6 +112,12 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
     ),
     isImage: isSelectedType(MediaFilters.image, extension(file?.name || "")),
     isVideo: isSelectedType(MediaFilters.video, extension(file?.name || "")),
+    reset: () => {
+      clear();
+      statusSet(FetchStatus.ready);
+    },
+    status,
     upload,
+    uploadProgress,
   };
 }

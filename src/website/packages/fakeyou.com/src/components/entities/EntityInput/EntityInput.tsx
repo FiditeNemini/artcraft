@@ -5,7 +5,12 @@ import useMeasure from "react-use-measure";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
 import { Area, Point } from "react-easy-crop";
-import { Label, Spinner, ZoomSliderOnChangeEvent } from "components/common";
+import {
+  Button,
+  Label,
+  Spinner,
+  ZoomSliderOnChangeEvent,
+} from "components/common";
 import {
   AcceptTypes,
   EntityModeProp,
@@ -13,6 +18,7 @@ import {
   MediaFilters,
   UploaderResponse,
 } from "components/entities/EntityTypes";
+import { WorkIndicator } from "components/svg";
 import { useMedia, useMediaUploader } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
@@ -52,6 +58,9 @@ export interface SlideProps {
   cropProps?: CropProps;
   isNarrow: boolean;
   media?: MediaFile;
+  resetUploader: () => void;
+  uploaderBusy: boolean;
+  uploadProgress: number;
 }
 
 interface AniProps {
@@ -63,8 +72,47 @@ interface AniProps {
   style: any;
 }
 
-const MediaBusy = () => {
-  return <Spinner />;
+const MediaError = ({ resetUploader }: SlideProps) => {
+  return (
+    <>
+      <h4>There was a problem with your upload</h4>
+      <Button
+        {...{
+          label: "Try another upload",
+          onClick: resetUploader,
+          variant: "secondary",
+        }}
+      />
+    </>
+  );
+};
+
+const MediaBusy = ({ uploaderBusy, uploadProgress }: SlideProps) => {
+  return (
+    <div {...{ className: "fy-entity-input-loader" }}>
+      {uploaderBusy ? (
+        <>
+          Uploading
+          <div {...{ className: "fy-entity-input-progress-indicator" }}>
+            <div {...{ className: "fy-entity-input-progress-number" }}>
+              {uploadProgress}%
+            </div>
+            <WorkIndicator
+              {...{
+                failure: false,
+                max: 100,
+                progressPercentage: uploadProgress,
+                stage: 1,
+                success: false,
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
+    </div>
+  );
 };
 
 const EntityInputFull = ({ clear, cropProps, isNarrow, media }: SlideProps) => {
@@ -216,7 +264,13 @@ export default function EntityInput({
     onChange({ target: { name, value: token } });
   };
 
-  const { busy: uploaderBusy, inputProps } = useMediaUploader({
+  const {
+    busy: uploaderBusy,
+    error: uploaderError,
+    inputProps,
+    uploadProgress,
+    reset: resetUploader,
+  } = useMediaUploader({
     autoUpload: true,
     onSuccess: (res: UploaderResponse) => {
       reload();
@@ -230,7 +284,7 @@ export default function EntityInput({
   };
 
   const busy = mediaBusy || uploaderBusy;
-  const index = busy ? 0 : media ? 1 : 2;
+  const index = uploaderError ? 3 : busy ? 0 : media ? 1 : 2;
   const [animating, animatingSet] = useState(false);
 
   if (debug)
@@ -284,6 +338,7 @@ export default function EntityInput({
             isLeaving,
             style,
             showFilters: showMediaBrowserFilters,
+            uploaderBusy,
           };
 
           return [
@@ -292,6 +347,7 @@ export default function EntityInput({
                 className:
                   "fy-entity-input-busy d-flex justify-content-center align-items-center",
                 render: MediaBusy,
+                uploadProgress,
                 ...sharedProps,
               }}
             />,
@@ -318,6 +374,14 @@ export default function EntityInput({
                 type,
                 ...sharedProps,
                 ...rest,
+              }}
+            />,
+            <AnimatedSlide
+              {...{
+                className: "fy-entity-input-error",
+                render: MediaError,
+                resetUploader,
+                ...sharedProps,
               }}
             />,
           ][i];

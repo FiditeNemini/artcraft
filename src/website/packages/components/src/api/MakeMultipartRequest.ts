@@ -1,33 +1,39 @@
 import GetApiHost from "./GetApiHost";
+import axios, { AxiosProgressEvent } from "axios";
 
-const { formatUrl, host = "" } = GetApiHost();
+const { formatUrl } = GetApiHost();
 
-const MakeMultipartRequest = (endpoint = "", body: any) => {
+export type OnUploadProgress = (progressEvent: AxiosProgressEvent) => void;
+
+const MakeMultipartRequest = (
+  endpoint = "",
+  body: any,
+  onUploadProgress?: OnUploadProgress
+) => {
   const formData = new FormData();
 
-  Object.keys(body).forEach((key) => formData.append(key, body[key]));
+  Object.keys(body).forEach(key => formData.append(key, body[key]));
 
-  formData.append('source', "file");
+  formData.append("source", "file");
 
-  return fetch(formatUrl(endpoint), {
-      method: 'POST',
-      credentials: 'include',
+  return axios
+    .post(formatUrl(endpoint), formData, {
+      withCredentials: true,
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      body: formData,
-  })
-  .then(res => res.json())
-  .then(res => {
-    if (res && res.success) {
-      return res;
-    } else {
-      return { success : false };
-    }
-  })
-  .catch(e => {
-    return { success : false };
-  });
-}
+      ...(onUploadProgress ? { onUploadProgress } : {}),
+    })
+    .then(({ data }) => {
+      if (data && data.success) {
+        return data;
+      } else {
+        return { success: false };
+      }
+    })
+    .catch(e => {
+      return { success: false };
+    });
+};
 
 export default MakeMultipartRequest;
