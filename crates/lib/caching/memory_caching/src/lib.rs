@@ -15,6 +15,7 @@
 #![allow(non_snake_case)]
 
 pub mod arc_sieve;
+pub mod arc_ttl_sieve;
 pub mod multi_item_ttl_cache;
 pub mod single_item_ttl_cache;
 pub mod ttl_key_counter;

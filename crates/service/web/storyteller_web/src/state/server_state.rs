@@ -7,7 +7,7 @@ use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBan
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use email_sender::smtp_email_sender::SmtpEmailSender;
-use memory_caching::arc_sieve::ArcSieve;
+use memory_caching::arc_ttl_sieve::ArcTtlSieve;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -197,7 +197,7 @@ pub struct EphemeralInMemoryCaches {
   pub leaderboard: SingleItemTtlCache<LeaderboardInfo>,
 
   /// Cache of featured media files
-  pub featured_media_files_sieve: ArcSieve<ListFeaturedMediaFilesQueryParams, FeaturedMediaFileListPage>,
+  pub featured_media_files_sieve: ArcTtlSieve<ListFeaturedMediaFilesQueryParams, FeaturedMediaFileListPage>,
 }
 
 #[derive(Clone)]

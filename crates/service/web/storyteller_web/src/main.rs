@@ -61,6 +61,7 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use email_sender::smtp_email_sender::SmtpEmailSender;
 use errors::AnyhowResult;
 use memory_caching::arc_sieve::ArcSieve;
+use memory_caching::arc_ttl_sieve::ArcTtlSieve;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -449,8 +450,9 @@ async fn main() -> AnyhowResult<()> {
           easyenv::get_env_duration_seconds_or_default(
             "QUEUE_STATS_CACHE_TTL_SECONDS",
             Duration::from_secs(60))),
-        featured_media_files_sieve: ArcSieve::with_capacity(
-          easyenv::get_env_num("FEATURED_MEDIA_FILES_CACHE_SIZE", 25)?
+        featured_media_files_sieve: ArcTtlSieve::with_capacity_and_ttl_duration(
+          easyenv::get_env_num("FEATURED_MEDIA_FILES_CACHE_SIZE", 25)?,
+          easyenv::get_env_duration_seconds_or_default("FEATURED_MEDIA_FILES_TTL_SECONDS", Duration::from_secs(60)),
         )?,
       }
     },
