@@ -43,7 +43,6 @@ use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs
 use thumbnail_generator::task_client::thumbnail_task::{ThumbnailTaskBuilder, ThumbnailTaskInputMimeType};
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::prompts::PromptToken;
-use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use videos::ffprobe_get_info::ffprobe_get_info;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -201,10 +200,6 @@ pub async fn process_live_portrait_job(
     info!("Captured stderr output: {}", contents);
   }
 
-  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&output_file_path) {
-    info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
-  }
-
   // ==================== CHECK STATUS ======================== //
 
   // if !command_exit_status.is_success() {
@@ -226,6 +221,25 @@ pub async fn process_live_portrait_job(
 
     return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
             &output_file_path)));
+  }
+
+  // ==================== INSPECT VIDEO ======================== //
+
+  let maybe_ffprobe_info = match ffprobe_get_info(&output_file_path) {
+    Ok(info) => Some(info),
+    Err(err) => {
+      error!("Error reading video info with ffprobe: {:?}", err);
+      None // NB: Fail open instead of failing the job on ffprobe errors.
+    }
+  };
+
+  if let Some(info) = &maybe_ffprobe_info {
+    if let Some(dimensions) = info.dimensions.as_ref() {
+      info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
+    }
+    if let Some(duration) = info.duration.as_ref() {
+      info!("Comfy output duration seconds: {}", &duration.seconds_original);
+    }
   }
 
 //  // ==================== COPY BACK AUDIO ==================== //
@@ -264,23 +278,17 @@ pub async fn process_live_portrait_job(
   let mut maybe_frame_width = None;
   let mut maybe_frame_height = None;
 
-  match ffprobe_get_info(&output_file_path) {
-    Ok(video_info) => {
-      maybe_duration_millis = video_info.duration
-          .map(|duration| duration.millis as u64);
+  if let Some(video_info) = maybe_ffprobe_info {
+    maybe_duration_millis = video_info.duration
+        .map(|duration| duration.millis as u64);
 
-      maybe_frame_width = video_info.dimensions
-          .as_ref()
-          .map(|dimensions| dimensions.width as u32);
+    maybe_frame_width = video_info.dimensions
+        .as_ref()
+        .map(|dimensions| dimensions.width as u32);
 
-      maybe_frame_height = video_info.dimensions
-          .as_ref()
-          .map(|dimensions| dimensions.height as u32);
-    }
-    Err(error) => {
-      // NB: Fail open instead of failing the job on decode errors.
-      warn!("Error reading video dimensions with ffprobe: {:?}", error);
-    }
+    maybe_frame_height = video_info.dimensions
+        .as_ref()
+        .map(|dimensions| dimensions.height as u32);
   }
 
   let file_checksum = sha256_hash_file(&output_file_path)
@@ -303,11 +311,11 @@ pub async fn process_live_portrait_job(
   // ==================== UPLOAD AND SAVE ==================== //
 
   const PREFIX: &str = "storyteller_";
-  let ext_suffix = ".mp4";
+  const EXT_SUFFIX: &str = ".mp4";
 
   let result_bucket_location = MediaFileBucketPath::generate_new(
-    Some(&PREFIX),
-    Some(&ext_suffix));
+    Some(PREFIX),
+    Some(EXT_SUFFIX));
 
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
@@ -337,7 +345,7 @@ pub async fn process_live_portrait_job(
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(PREFIX),
-    maybe_public_bucket_extension: Some(&ext_suffix),
+    maybe_public_bucket_extension: Some(EXT_SUFFIX),
     is_on_prem: deps.job.info.container.is_on_prem,
     worker_hostname: &deps.job.info.container.hostname,
     worker_cluster: &deps.job.info.container.cluster_name,

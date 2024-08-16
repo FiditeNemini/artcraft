@@ -21,15 +21,18 @@ pub struct Mp4Info {
   pub height: u16,
 }
 
+#[deprecated(note = "The `mp4` crate doesn't handle a lot of real world mp4s. Transition to ffprobe instead.")]
 pub fn get_mp4_info_for_bytes(file_bytes: &[u8]) -> AnyhowResult<Mp4Info> {
   get_mp4_info_for_bytes_and_len(file_bytes, file_bytes.len())
 }
 
+#[deprecated(note = "The `mp4` crate doesn't handle a lot of real world mp4s. Transition to ffprobe instead.")]
 pub fn get_mp4_info_for_bytes_and_len(file_bytes: &[u8], file_size: usize) -> AnyhowResult<Mp4Info> {
   let reader = BufReader::new(Cursor::new(file_bytes));
   get_mp4_info(reader, file_size as u64)
 }
 
+#[deprecated(note = "The `mp4` crate doesn't handle a lot of real world mp4s. Transition to ffprobe instead.")]
 pub fn get_mp4_info<T: Seek + Read>(reader: T, file_size: u64) -> AnyhowResult<Mp4Info> {
   let mp4 = mp4::Mp4Reader::read_header(reader, file_size)?;
 
