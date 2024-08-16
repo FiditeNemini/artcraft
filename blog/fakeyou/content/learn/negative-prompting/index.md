@@ -7,6 +7,9 @@ authors = ["Heart Ribbon"]
 
 [taxonomies]
 categories = ["tutorial"]
+
+[extra]
+cover_image = "/learn/negative-prompting-guide/negativecover.png"
 +++
 
 # Negative Prompting Guide

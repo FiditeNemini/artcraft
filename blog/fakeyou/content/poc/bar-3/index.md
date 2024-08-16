@@ -9,7 +9,7 @@ tags = ["featured"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/bar-3/2D_many_phases.png"
+cover_image = "/poc/bar-3/2D_many_phases.png"
 +++
 
 # Main Heading 1

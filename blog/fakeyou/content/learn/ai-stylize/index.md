@@ -7,6 +7,9 @@ authors = ["Heart Ribbon"]
 
 [taxonomies]
 categories = ["tutorial"]
+
+[extra]
+cover_image = "/learn/ai-stylize-guide/aistylize.png"
 +++
 
 # AI Stylize

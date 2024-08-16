@@ -7,6 +7,9 @@ authors = ["Heart Ribbon"]
 
 [taxonomies]
 categories = ["tutorial"]
+
+[extra]
+cover_image = "/learn/prompting-guide/promptingcover.png"
 +++
 
 # General Prompting Guide

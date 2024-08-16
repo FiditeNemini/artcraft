@@ -7,6 +7,9 @@ authors = ["Moonchamp "]
 
 [taxonomies]
 categories = ["tutorial"]
+
+[extra]
+cover_image = "/learn/ai-live-portrait-guide/liveportrait1.png"
 +++
 
 [AI Face Mirror](https://fakeyou.com/ai-face-mirror) is a tool used to transfer facial expressions, audio, and vocal lip movement from one face video to an image. This feature is ideal for creating realistic animations by mapping the motion from a “driver” video onto a target face.

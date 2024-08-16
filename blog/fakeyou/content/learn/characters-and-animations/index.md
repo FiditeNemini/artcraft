@@ -7,6 +7,9 @@ authors = ["Heart Ribbon"]
 
 [taxonomies]
 categories = ["tutorial"]
+
+[extra]
+cover_image = "/learn/character-and-animation-guide/charcover.png"
 +++
 
 # Characters & Animations
