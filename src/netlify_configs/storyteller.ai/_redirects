@@ -94,8 +94,10 @@
 /static/*               /website/static/:splat         200
 
 # Sitemaps:
-/sitemap_index.xml       /website/sitemap_index.xml    200
-/sitemaps/*              /website/sitemaps/:splat      200
+/sitemap_index.xml           /website/sitemap_index.xml                    200
+/sitemap_popular_models.xml  /website/sitemaps/sitemap_popular_models.xml  200
+/sitemap_static_pages.xml    /website/sitemaps/sitemap_static_pages.xml    200
+/sitemaps/*                  /website/sitemaps/:splat                      200
 
 # Well-known resources:
 /manifest.json           /website/manifest.json        200
