@@ -63,6 +63,7 @@ use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::featured_items::create_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::delete_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::get_is_featured_item_handler::*;
+use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
 use crate::http_server::endpoints::inference_job::delete::dismiss_finished_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::delete::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::inference_job::get::batch_get_inference_job_status_handler::*;
@@ -265,6 +266,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileTokenPathInfo,
 
     // Common response structs
+    JobDetailsLivePortraitRequest,
     MediaFileModelDetails,
     MediaFileOriginDetails,
     MediaFileSocialMetaLight,

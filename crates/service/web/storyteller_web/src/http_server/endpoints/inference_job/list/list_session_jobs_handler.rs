@@ -25,7 +25,10 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
+use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
 use crate::http_server::endpoints::inference_job::utils::estimate_job_progress::estimate_job_progress;
+use crate::http_server::endpoints::inference_job::utils::extract_live_portrait_details::extract_live_portrait_details;
+use crate::http_server::endpoints::inference_job::utils::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
 use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
@@ -78,15 +81,19 @@ pub struct ListSessionRequestDetailsResponse {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
-  /// Title of the model, if it has one
+
+  /// OPTIONAL. Title of the model, if it has one
   pub maybe_model_title: Option<String>,
 
-  /// If the result was TTS, this is the raw inference text.
+  /// OPTIONAL. If the result was TTS, this is the raw inference text.
   pub maybe_raw_inference_text: Option<String>,
 
-  /// For Comfy / Video Style Transfer jobs, this might include
+  /// OPTIONAL. For Comfy / Video Style Transfer jobs, this might include
   /// the name of the selected style.
   pub maybe_style_name: Option<StyleTransferName>,
+
+  /// OPTIONAL. For Live Portrait jobs, this is additional information on the request.
+  pub maybe_live_portrait_details: Option<JobDetailsLivePortraitRequest>,
 }
 
 /// Details about the ongoing job status
@@ -130,6 +137,7 @@ pub struct ListSessionResultDetailsResponse {
 
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
+
 
 #[derive(Debug, ToSchema)]
 pub enum ListSessionJobsError {
@@ -316,6 +324,11 @@ fn db_record_to_response_payload(
 ) -> ListSessionJobsItem {
   let inference_category = record.request_details.inference_category;
 
+  // NB: Fail open. We don't want to fail the request if we can't extract the args.
+  let maybe_polymorphic_args = extract_polymorphic_inference_args(&record)
+      .ok()
+      .flatten();
+
   let progress_percentage = estimate_job_progress(&record);
 
   ListSessionJobsItem {
@@ -327,6 +340,8 @@ fn db_record_to_response_payload(
       maybe_model_title: record.request_details.maybe_model_title,
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
       maybe_style_name: record.request_details.maybe_style_name,
+      maybe_live_portrait_details: maybe_polymorphic_args
+          .and_then(|ref args| extract_live_portrait_details(args)),
     },
     status: ListSessionStatusDetailsResponse {
       status: record.status,
