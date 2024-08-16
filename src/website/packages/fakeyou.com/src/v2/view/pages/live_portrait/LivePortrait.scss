@@ -138,3 +138,35 @@
     }
   }
 }
+
+.lp-jobs-list {
+  background-color: lighten($panel, 5%);
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  padding: 10px;
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  border: 2px solid transparent;
+
+  &:hover {
+    background-color: lighten($panel, 10%);
+    border: 2px solid lighten($panel, 15%);
+  }
+
+  img {
+    border: lighten($panel, 15%) solid 2px;
+    background-color: rgba($white, 0.06);
+  }
+
+  &.no-hover {
+    background-color: lighten($panel, 3%) !important;
+
+    &:hover {
+      cursor: default;
+      background-color: lighten($panel, 3%) !important;
+      border: 2px solid lighten($panel, 3%) !important;
+    }
+  }
+}

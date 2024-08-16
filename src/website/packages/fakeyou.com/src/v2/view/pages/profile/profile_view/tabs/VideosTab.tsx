@@ -19,7 +19,7 @@ export default function VideosTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [mediaType, mediaTypeSet] = useState(
-    urlQueries.get("filter_media_type") || "video"
+    urlQueries.get("filter_media_type") || "video,mp4"
   );
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useListContent({

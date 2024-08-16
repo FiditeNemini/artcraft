@@ -25,6 +25,8 @@ export interface RequestDetails {
   maybe_model_title?: string;
 
   maybe_raw_inference_text?: string;
+
+  maybe_live_portrait_details?: LivePortraitDetails;
 }
 
 export interface StatusDetails {
@@ -41,6 +43,11 @@ export interface ResultDetails {
 
   maybe_public_bucket_media_path?: string;
 }
+
+export type LivePortraitDetails = {
+  source_media_file_token: string;
+  face_driver_media_file_token: string;
+};
 
 export interface GetModelInferenceJobStatusErrorResponse {
   success: boolean;

@@ -133,9 +133,10 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
       [isCropping]
     );
 
-    const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-      console.log(croppedArea, croppedAreaPixels);
-    }, []);
+    const onCropComplete = useCallback(
+      (_croppedArea, _croppedAreaPixels) => {},
+      []
+    );
 
     const handleNextPage = () => {
       setCurrentPage(prevPage =>
@@ -161,7 +162,9 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                 <Badge label={badgeLabel} color="ultramarine" overlay={true} />
               ) : (
                 <Badge
-                  label={`${isMobile ? "Pinch" : "Scroll"} and drag to crop`}
+                  label={`${
+                    isMobile ? "Pinch" : "Scroll zoom"
+                  } and drag to crop`}
                   color="gray"
                   overlay={true}
                 />

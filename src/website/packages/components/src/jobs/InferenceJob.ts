@@ -1,4 +1,7 @@
-import { ModelInferenceJobStatus } from "../api/model_inference/GetModelInferenceJobStatus";
+import {
+  LivePortraitDetails,
+  ModelInferenceJobStatus,
+} from "../api/model_inference/GetModelInferenceJobStatus";
 import { JobState, jobStateFromString } from "./JobStates";
 
 // Type of inference job (specified by the frontend, not backend)
@@ -29,6 +32,7 @@ export type JobListOptions = FrontendInferenceJobType | AllInferenceJobs;
 export class InferenceJob {
   // PK
   jobToken: string;
+  createdAt: Date;
 
   frontendJobType: FrontendInferenceJobType;
 
@@ -43,6 +47,7 @@ export class InferenceJob {
   maybeModelToken?: string;
   maybeModelTitle?: string;
   maybeRawInferenceText?: string;
+  maybeLivePortraitDetails?: LivePortraitDetails;
 
   // Result
   maybeResultType: string | undefined | null;
@@ -53,6 +58,7 @@ export class InferenceJob {
   constructor(
     // PK
     jobToken: string,
+    createdAt: Date,
     // Frontend state
     frontendJobType: FrontendInferenceJobType,
     // Status
@@ -65,6 +71,7 @@ export class InferenceJob {
     maybeModelToken: string | undefined = undefined,
     maybeModelTitle: string | undefined = undefined,
     maybeRawInferenceText: string | undefined = undefined,
+    maybeLivePortraitDetails: LivePortraitDetails | undefined = undefined,
     // Result
     maybeResultEntityType: string | undefined | null = null,
     maybeResultEntityToken: string | undefined | null = null,
@@ -72,6 +79,7 @@ export class InferenceJob {
     maybeFailureCategory: string | undefined | null = null
   ) {
     this.jobToken = jobToken;
+    this.createdAt = createdAt;
     this.frontendJobType = frontendJobType;
     this.jobState = jobStateFromString(status);
     this.maybeExtraStatusDescription = maybeExtraStatusDescription;
@@ -89,6 +97,8 @@ export class InferenceJob {
     }
 
     this.maybeRawInferenceText = maybeRawInferenceText;
+
+    this.maybeLivePortraitDetails = maybeLivePortraitDetails;
 
     if (!!maybeResultEntityType) {
       this.maybeResultType = maybeResultEntityType;
@@ -110,6 +120,7 @@ export class InferenceJob {
   ): InferenceJob {
     return new InferenceJob(
       response.job_token,
+      response.created_at,
       frontendJobType,
       response.status.status,
       response.status.maybe_extra_status_description || null,
@@ -119,6 +130,7 @@ export class InferenceJob {
       response.request.maybe_model_token,
       response.request.maybe_model_title,
       response.request.maybe_raw_inference_text,
+      response.request.maybe_live_portrait_details,
       response.maybe_result?.entity_type,
       response.maybe_result?.entity_token,
       response.maybe_result?.maybe_public_bucket_media_path,

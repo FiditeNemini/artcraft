@@ -19,15 +19,30 @@ const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
   const [isThumbReady, setIsThumbReady] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     const checkImage = () => {
       const img = new Image();
       img.src = poster + "-thumb.jpg";
-      img.onload = () => setIsThumbReady(true);
-      img.onerror = () => setTimeout(checkImage, 1000); // Retry after 1 second if the image is not available
+      img.onload = () => {
+        if (isMounted) {
+          setIsThumbReady(true);
+        }
+      };
+      img.onerror = () => {
+        if (isMounted && !isThumbReady) {
+          setTimeout(checkImage, 1000); // Retry after 1 second if the image is not available
+        }
+      };
     };
 
-    checkImage();
-  }, [poster]);
+    if (poster && mediaType === "video") {
+      checkImage();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [poster, mediaType, isThumbReady]);
 
   return (
     <div className="col-3" key={index}>

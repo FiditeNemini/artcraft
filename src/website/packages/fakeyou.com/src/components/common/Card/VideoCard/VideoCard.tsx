@@ -145,6 +145,8 @@ export default function VideoCard({
   const getLabel = (data: any) => {
     if (data.origin_product_category === "face_animator") {
       return "Lipsync";
+    } else if (data.origin_product_category === "face_mirror") {
+      return "Live Portrait";
     } else if (data.origin_product_category === "workflow") {
       return "Workflow";
     } else if (data.origin_product_category === "unknown") {

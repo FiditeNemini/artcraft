@@ -95,6 +95,7 @@ export default function MediaPageSwitch() {
       pageTitle = mediaFile?.maybe_title || "Audio File";
       break;
     case MediaFileType.Video:
+    case MediaFileType.Mp4:
       pageTitle = mediaFile?.maybe_title || "Video File";
       break;
     case MediaFileType.Image:
@@ -201,6 +202,7 @@ export default function MediaPageSwitch() {
   const MediaSwitch = () => {
     switch (mediaFile?.media_type) {
       case MediaFileType.Video:
+      case MediaFileType.Mp4:
         return <VideoMediaPage {...subViewProps} />;
       default:
         return <MediaPage {...subViewProps} />;

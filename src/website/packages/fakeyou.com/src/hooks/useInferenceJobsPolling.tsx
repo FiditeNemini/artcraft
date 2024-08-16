@@ -40,6 +40,8 @@ const JobCategoryToType = (jobCategory: string) => {
       return FrontendInferenceJobType.ConvertFbxtoGltf;
     case "convert_bvh_to_workflow":
       return FrontendInferenceJobType.EngineComposition;
+    case "live_portrait":
+      return FrontendInferenceJobType.LivePortrait;
     default:
       return FrontendInferenceJobType.Unknown;
   }
@@ -95,23 +97,23 @@ export default function useInferenceJobsPolling({
     frontendJobType: FrontendInferenceJobType
   ) => {
     const categoryArray = categoryMap.get(frontendJobType) || [];
-  
-    if (user) {
-      categoryMap.set(frontendJobType, [
-        ...categoryArray,
-        updatedJob,
-      ]);
-    } else {
 
-      const inArray = categoryArray.find((job,i) => job.jobToken === updatedJob.jobToken );
+    if (user) {
+      categoryMap.set(frontendJobType, [...categoryArray, updatedJob]);
+    } else {
+      const inArray = categoryArray.find(
+        (job, i) => job.jobToken === updatedJob.jobToken
+      );
 
       if (!inArray) {
-        categoryMap.set(frontendJobType, [
-          updatedJob,
-          ...categoryArray,
-        ]);
+        categoryMap.set(frontendJobType, [updatedJob, ...categoryArray]);
       } else {
-        categoryMap.set(frontendJobType,categoryArray.map((job,i) => job.jobToken === updatedJob.jobToken ? updatedJob : job) )
+        categoryMap.set(
+          frontendJobType,
+          categoryArray.map((job, i) =>
+            job.jobToken === updatedJob.jobToken ? updatedJob : job
+          )
+        );
       }
     }
   };
@@ -150,7 +152,10 @@ export default function useInferenceJobsPolling({
       }
     });
 
-  const noSessionJobs = async (currentQueue: InferenceJob[], currentCategoryMap: CategoryMap) => {
+  const noSessionJobs = async (
+    currentQueue: InferenceJob[],
+    currentCategoryMap: CategoryMap
+  ) => {
     let categoryMap = new Map(currentCategoryMap);
     Promise.all(
       currentQueue.map(async (job: InferenceJob) => {
@@ -165,18 +170,17 @@ export default function useInferenceJobsPolling({
           }
         );
       })
-    ).then((updatedJobs) => {
+    ).then(updatedJobs => {
       if (updatedJobs.length) {
-        updateState(updatedJobs, categoryMap)
+        updateState(updatedJobs, categoryMap);
       }
     });
-
   };
 
   const onTick = async ({
     eventProps: { inferenceJobs: currentQueue, byCategory: currentCategoryMap },
   }: {
-    eventProps: { inferenceJobs: InferenceJob[], byCategory: CategoryMap };
+    eventProps: { inferenceJobs: InferenceJob[]; byCategory: CategoryMap };
   }) => {
     if (user) {
       sessionJobs();
@@ -187,14 +191,15 @@ export default function useInferenceJobsPolling({
 
   const enqueueInferenceJob = (
     jobToken: string,
-    frontendJobType: FrontendInferenceJobType
+    frontendJobType: FrontendInferenceJobType,
+    createdAt: Date
   ) => {
     onTick({ eventProps: { byCategory, inferenceJobs: [] } });
     if (user) {
       // reserving this space for later uses
     } else {
       keepAliveSet(false);
-      const newJob = new InferenceJob(jobToken, frontendJobType);
+      const newJob = new InferenceJob(jobToken, createdAt, frontendJobType);
       inferenceJobsSet([newJob, ...(inferenceJobs || [])]);
     }
 
@@ -207,7 +212,9 @@ export default function useInferenceJobsPolling({
       clearJobsStatusSet(FetchStatus.in_progress);
       DismissFinishedJobs("", {}).then((res: DismissFinishedJobsResponse) => {
         if (res.success) {
-          onTick({ eventProps: { byCategory: newJobCategoryMap(), inferenceJobs: [] } });
+          onTick({
+            eventProps: { byCategory: newJobCategoryMap(), inferenceJobs: [] },
+          });
           keepAliveSet(true);
           clearJobsStatusSet(FetchStatus.ready);
         }
