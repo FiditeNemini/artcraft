@@ -60,7 +60,6 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use email_sender::smtp_email_sender::SmtpEmailSender;
 use errors::AnyhowResult;
-use memory_caching::arc_sieve::ArcSieve;
 use memory_caching::arc_ttl_sieve::ArcTtlSieve;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;

@@ -47,6 +47,7 @@ pub struct InsertArgs<'a> {
     pub maybe_prompt_token: Option<&'a PromptToken>,
     pub checksum_sha2: &'a str,
 
+    pub maybe_title: Option<&'a str>,
     pub maybe_text_transcript: Option<&'a str>,
 
     // Storage details
@@ -126,6 +127,7 @@ pub async fn insert_media_file_generic(
             maybe_prompt_token = ?,
             checksum_sha2 = ?,
 
+            maybe_title = ?,
             maybe_text_transcript = ?,
 
             public_bucket_directory_hash = ?, 
@@ -171,6 +173,7 @@ pub async fn insert_media_file_generic(
         args.maybe_prompt_token.map(|e| e.as_str()),
         args.checksum_sha2,
 
+        args.maybe_title,
         args.maybe_text_transcript,
 
         args.public_bucket_directory_hash,

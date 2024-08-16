@@ -215,6 +215,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
     generated_by_worker: Some(&args.job_dependencies.job.info.container.hostname),
     generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
     maybe_text_transcript: None,
+    maybe_title: None,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

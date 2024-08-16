@@ -3,6 +3,7 @@ pub mod insert_media_file_from_comfy_ui;
 pub mod insert_media_file_from_face_animation;
 pub mod insert_media_file_from_file_upload;
 pub mod insert_media_file_from_gptsovits;
+pub mod insert_media_file_from_live_portrait;
 pub mod insert_media_file_from_mocapnet;
 pub mod insert_media_file_from_rerender;
 pub mod insert_media_file_from_tacotron2;

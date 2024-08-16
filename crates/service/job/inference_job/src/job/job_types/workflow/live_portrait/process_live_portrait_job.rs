@@ -34,14 +34,17 @@ use mysql_queries::payloads::prompt_args::encoded_style_transfer_name::EncodedSt
 use mysql_queries::payloads::prompt_args::prompt_inner_payload::{PromptInnerPayload, PromptInnerPayloadBuilder};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
+use mysql_queries::queries::media_files::create::insert_media_file_from_live_portrait::{insert_media_file_from_live_portrait, InsertLivePortraitArgs};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
+use primitives::trim_or_empty::trim_or_empty;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use thumbnail_generator::task_client::thumbnail_task::{ThumbnailTaskBuilder, ThumbnailTaskInputMimeType};
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::prompts::PromptToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+use videos::ffprobe_get_info::ffprobe_get_info;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -50,6 +53,7 @@ use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs,
 use crate::job::job_types::workflow::live_portrait::categorize_live_portrait_error::categorize_live_portrait_error;
 use crate::job::job_types::workflow::live_portrait::command_args::LivePortraitCommandArgs;
 use crate::job::job_types::workflow::live_portrait::extract_live_portrait_payload_from_job::extract_live_portrait_payload_from_job;
+use crate::job::job_types::workflow::live_portrait::live_portrait_title::live_portrait_title;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
@@ -254,12 +258,30 @@ pub async fn process_live_portrait_job(
 
   // TODO(bt,2024-07-16): Clean all of this up.
 
-  const PREFIX: &str = "storyteller_";
-  let ext_suffix = ".mp4";
+  // ==================== OTHER FILE METADATA ==================== //
 
-  let result_bucket_location = MediaFileBucketPath::generate_new(
-    Some(&PREFIX),
-    Some(&ext_suffix));
+  let mut maybe_duration_millis = None;
+  let mut maybe_frame_width = None;
+  let mut maybe_frame_height = None;
+
+  match ffprobe_get_info(&output_file_path) {
+    Ok(video_info) => {
+      maybe_duration_millis = video_info.duration
+          .map(|duration| duration.millis as u64);
+
+      maybe_frame_width = video_info.dimensions
+          .as_ref()
+          .map(|dimensions| dimensions.width as u32);
+
+      maybe_frame_height = video_info.dimensions
+          .as_ref()
+          .map(|dimensions| dimensions.height as u32);
+    }
+    Err(error) => {
+      // NB: Fail open instead of failing the job on decode errors.
+      warn!("Error reading video dimensions with ffprobe: {:?}", error);
+    }
+  }
 
   let file_checksum = sha256_hash_file(&output_file_path)
       .map_err(|err| {
@@ -274,6 +296,19 @@ pub async fn process_live_portrait_job(
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
+  let maybe_portrait_title = portrait.media_file.maybe_title.as_deref();
+  let maybe_driver_title = driver.media_file.maybe_title.as_deref();
+  let result_video_title = live_portrait_title(maybe_portrait_title, maybe_driver_title);
+
+  // ==================== UPLOAD AND SAVE ==================== //
+
+  const PREFIX: &str = "storyteller_";
+  let ext_suffix = ".mp4";
+
+  let result_bucket_location = MediaFileBucketPath::generate_new(
+    Some(&PREFIX),
+    Some(&ext_suffix));
+
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
   info!("Output file destination bucket path: {:?}", &result_bucket_object_pathbuf);
@@ -287,32 +322,33 @@ pub async fn process_live_portrait_job(
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
+  let media_file_token = insert_media_file_from_live_portrait(InsertLivePortraitArgs {
     pool: &deps.db.mysql_pool,
     job: &job,
-    maybe_product_category: Some(MediaFileOriginProductCategory::FaceMirror), // Live Portrait named "Face Mirror" on the site
-    maybe_model_type: Some(MediaFileOriginModelType::LivePortrait),
+    media_type: MediaFileType::Mp4,
     maybe_mime_type: Some(&mimetype),
-    maybe_title: None,
-    maybe_style_transfer_source_media_file_token: Some(&portrait_media_token),
-    maybe_scene_source_media_file_token: None,
+    maybe_audio_encoding: None, // TODO
+    maybe_video_encoding: None, // TODO
+    maybe_frame_width,
+    maybe_frame_height,
+    maybe_title: Some(&result_video_title),
     file_size_bytes,
+    maybe_duration_millis,
     sha256_checksum: &file_checksum,
-    maybe_prompt_token: None,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(PREFIX),
     maybe_public_bucket_extension: Some(&ext_suffix),
     is_on_prem: deps.job.info.container.is_on_prem,
     worker_hostname: &deps.job.info.container.hostname,
     worker_cluster: &deps.job.info.container.cluster_name,
-    extra_file_modification_info: None,
+    // TODO: maybe_style_transfer_source_media_file_token: Some(&portrait_media_token),
+    // TODO: store both tokens from the sources.
   })
       .await
       .map_err(|e| {
         error!("Error saving media file record: {:?}", e);
         ProcessSingleJobError::Other(e)
       })?;
-
 
   // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
 

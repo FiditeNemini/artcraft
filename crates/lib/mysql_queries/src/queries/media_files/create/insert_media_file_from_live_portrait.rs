@@ -1,3 +1,4 @@
+use sqlx;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
@@ -8,26 +9,27 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 
-pub struct InsertGptSoVitsArgs<'a> {
+pub struct InsertLivePortraitArgs<'a> {
   pub pool: &'a MySqlPool,
   pub job: &'a AvailableInferenceJob,
 
-  pub model_token: &'a ModelWeightToken,
-  pub text_transcript: &'a str,
-
-  // Probably wav, but could change.
+  // Probably mp4, but could change.
   pub media_type: MediaFileType,
   pub maybe_mime_type: Option<&'a str>,
   pub maybe_audio_encoding: Option<&'a str>,
+  pub maybe_video_encoding: Option<&'a str>,
+  pub maybe_frame_width: Option<u32>,
+  pub maybe_frame_height: Option<u32>,
 
   pub maybe_duration_millis: Option<u64>,
   pub file_size_bytes: u64,
   pub sha256_checksum: &'a str,
+
+  pub maybe_title: Option<&'a str>,
 
   pub public_bucket_directory_hash: &'a str,
   pub maybe_public_bucket_prefix: Option<&'a str>,
@@ -38,10 +40,11 @@ pub struct InsertGptSoVitsArgs<'a> {
   pub worker_cluster: &'a str,
 }
 
-pub async fn insert_media_file_from_gptsovits(
-  args: InsertGptSoVitsArgs<'_>
+pub async fn insert_media_file_from_live_portrait(
+  args: InsertLivePortraitArgs<'_>
 ) -> AnyhowResult<MediaFileToken>
 {
+
   let (new_media_token, _id) = insert_media_file_generic(InsertArgs {
     pool: &args.pool,
     job: &args.job,
@@ -50,13 +53,15 @@ pub async fn insert_media_file_from_gptsovits(
     media_type: args.media_type,
     maybe_mime_type: args.maybe_mime_type,
     maybe_audio_encoding: args.maybe_audio_encoding,
+    maybe_video_encoding: args.maybe_video_encoding,
     file_size_bytes: args.file_size_bytes,
     maybe_duration_millis: args.maybe_duration_millis,
+    maybe_frame_width: args.maybe_frame_width,
+    maybe_frame_height: args.maybe_frame_height,
     checksum_sha2: args.sha256_checksum,
 
-    // Dynamic bits (inference and model details)
-    maybe_origin_model_token: Some(args.model_token),
-    maybe_text_transcript: Some(args.text_transcript),
+    // Dynamic bits (file data)
+    maybe_title: args.maybe_title,
 
     // Dynamic bits (bucket storage)
     public_bucket_directory_hash: args.public_bucket_directory_hash,
@@ -69,24 +74,22 @@ pub async fn insert_media_file_from_gptsovits(
     generated_by_cluster: Some(args.worker_cluster),
 
     // Static bits (lookup)
-    media_class: MediaFileClass::Audio,
+    media_class: MediaFileClass::Video,
     origin_category: MediaFileOriginCategory::Inference,
-    origin_product_category: MediaFileOriginProductCategory::TextToSpeech,
-    maybe_origin_model_type: Some(MediaFileOriginModelType::GptSovits),
+    origin_product_category: MediaFileOriginProductCategory::FaceMirror, // NB: Live Portrait
+    maybe_origin_model_type: Some(MediaFileOriginModelType::LivePortrait),
 
     // Static bits (counters)
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
-    maybe_creator_category_synthetic_id_category: IdCategory::TtsResult,
+    maybe_creator_category_synthetic_id_category: IdCategory::LivePortraitResult,
 
     // Static bits (unused misc)
+    maybe_origin_model_token: None,
+    maybe_text_transcript: None,
     maybe_origin_filename: None,
-    maybe_title: None,
     maybe_batch_token: None,
-    maybe_video_encoding: None,
-    maybe_frame_width: None,
-    maybe_frame_height: None,
     maybe_prompt_token: None,
-    extra_file_modification_info: None,
+    extra_file_modification_info: None, // TODO ???
     maybe_mod_user_token: None,
   }).await?;
 

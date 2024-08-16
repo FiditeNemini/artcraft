@@ -292,6 +292,7 @@ pub async fn process_job_inference(
       is_generated_on_prem: args.job_dependencies.job.info.container.is_on_prem,
       generated_by_worker: Some(&args.job_dependencies.job.info.container.hostname),
       generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
+      maybe_title: None,
     }).await?;
 
     if maybe_first_media_file_token.is_none() {
