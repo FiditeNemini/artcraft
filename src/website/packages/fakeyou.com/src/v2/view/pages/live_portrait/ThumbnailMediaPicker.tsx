@@ -163,7 +163,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
               ) : (
                 <Badge
                   label={`${
-                    isMobile ? "Pinch" : "Scroll zoom"
+                    isMobile ? "Zoom" : "Scroll zoom"
                   } and drag to crop`}
                   color="gray"
                   overlay={true}
