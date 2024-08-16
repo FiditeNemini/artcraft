@@ -20,10 +20,11 @@ use mysql_queries::queries::generic_inference::web::get_inference_job_status::ge
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+
 use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
-use crate::http_server::endpoints::inference_job::utils::estimate_job_progress::estimate_job_progress;
-use crate::http_server::endpoints::inference_job::utils::extract_live_portrait_details::extract_live_portrait_details;
-use crate::http_server::endpoints::inference_job::utils::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
+use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
 use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
@@ -254,7 +255,7 @@ fn record_to_payload(
       .ok()
       .flatten();
 
-  let progress_percentage = estimate_job_progress(&record);
+  let progress_percentage = estimate_job_progress(&record, maybe_polymorphic_args.as_ref());
 
   InferenceJobStatusResponsePayload {
     job_token: record.job_token,

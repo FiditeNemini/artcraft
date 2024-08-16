@@ -23,10 +23,11 @@ use mysql_queries::queries::generic_inference::web::job_status::GenericInference
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
+
 use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
-use crate::http_server::endpoints::inference_job::utils::estimate_job_progress::estimate_job_progress;
-use crate::http_server::endpoints::inference_job::utils::extract_live_portrait_details::extract_live_portrait_details;
-use crate::http_server::endpoints::inference_job::utils::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
+use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
 use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::BatchGetMediaFilesQueryParams;
 use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -264,7 +265,7 @@ fn db_record_to_response_payload(
       .ok()
       .flatten();
 
-  let progress_percentage = estimate_job_progress(&record);
+  let progress_percentage = estimate_job_progress(&record, maybe_polymorphic_args.as_ref());
 
   BatchInferenceJobStatusResponsePayload {
     job_token: record.job_token,

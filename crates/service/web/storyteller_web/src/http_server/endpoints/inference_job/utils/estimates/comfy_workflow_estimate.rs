@@ -1,10 +1,10 @@
 use std::cmp::max;
 
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
-use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 
-use crate::http_server::endpoints::inference_job::utils::extract_comfy_workflow_args::extract_comfy_workflow_args;
-use crate::http_server::endpoints::inference_job::utils::percent::percent;
+use crate::http_server::endpoints::inference_job::utils::estimates::percent::percent;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_comfy_workflow_args::extract_comfy_workflow_args;
 
 const COMFY_JOB_DEFAULT_VIDEO_LENGTH_SECONDS : u64 = 3;
 
@@ -16,8 +16,13 @@ const COMFY_JOB_AVERAGE_FACE_FUSION_EXECUTION_SECONDS_PER_SECOND: u64 = 40;
 // TODO: These numbers are made up. We should measure the average job durations.
 const COMFY_FALLBACK_AVERAGE_JOB_DURATION_SECONDS: u64 = 60 * 5;
 
-pub fn comfy_workflow_estimate(job: &GenericInferenceJobStatus, job_duration_seconds: u64) -> u8 {
-  let args = match extract_comfy_workflow_args(job) {
+pub fn comfy_workflow_estimate(maybe_args: Option<&PolymorphicInferenceArgs>, job_duration_seconds: u64) -> u8 {
+  let args = match maybe_args {
+    Some(args) => args,
+    None => return percent(job_duration_seconds, COMFY_FALLBACK_AVERAGE_JOB_DURATION_SECONDS),
+  };
+
+  let args = match extract_comfy_workflow_args(args) {
     Some(args) => args,
     None => return percent(job_duration_seconds, COMFY_FALLBACK_AVERAGE_JOB_DURATION_SECONDS),
   };

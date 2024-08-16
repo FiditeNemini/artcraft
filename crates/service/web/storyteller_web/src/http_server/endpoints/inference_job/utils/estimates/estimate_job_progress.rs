@@ -2,17 +2,18 @@ use std::cmp::min;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 
-use crate::http_server::endpoints::inference_job::utils::comfy_workflow_estimate::comfy_workflow_estimate;
-use crate::http_server::endpoints::inference_job::utils::percent::percent;
+use crate::http_server::endpoints::inference_job::utils::estimates::comfy_workflow_estimate::comfy_workflow_estimate;
+use crate::http_server::endpoints::inference_job::utils::estimates::percent::percent;
 
 // TODO: These numbers are made up. We should measure the average job durations.
 const LIPSYNC_JOB_AVERAGE_SECONDS : u64 = 60 * 3;
 const TTS_JOB_AVERAGE_SECONDS : u64 = 7;
 const VC_JOB_AVERAGE_SECONDS : u64 = 90;
 
-pub fn estimate_job_progress(job: &GenericInferenceJobStatus) -> u8 {
+pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option<&PolymorphicInferenceArgs>) -> u8 {
   match job.status {
     // Jobs that haven't started
     JobStatusPlus::Pending
@@ -53,7 +54,7 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus) -> u8 {
     InferenceCategory::VoiceConversion => percent(duration_seconds, VC_JOB_AVERAGE_SECONDS),
 
     // TODO: Better estimate using video duration, params, etc.
-    InferenceCategory::Workflow => comfy_workflow_estimate(job, duration_seconds),
+    InferenceCategory::Workflow => comfy_workflow_estimate(maybe_args, duration_seconds),
 
     // NB: We don't run these job types anymore.
     InferenceCategory::FormatConversion => 0,
@@ -75,20 +76,20 @@ mod tests {
   use enums::common::job_status_plus::JobStatusPlus;
   use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 
-  use crate::http_server::endpoints::inference_job::utils::estimate_job_progress::estimate_job_progress;
+  use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
 
   #[test]
   fn test_pending() {
     let mut job = GenericInferenceJobStatus::default();
     job.status = JobStatusPlus::Pending;
-    assert_eq!(0, estimate_job_progress(&job));
+    assert_eq!(0, estimate_job_progress(&job, None));
   }
 
   #[test]
   fn test_complete_success() {
     let mut job = GenericInferenceJobStatus::default();
     job.status = JobStatusPlus::CompleteSuccess;
-    assert_eq!(100, estimate_job_progress(&job));
+    assert_eq!(100, estimate_job_progress(&job, None));
   }
 
   mod running_jobs {
@@ -101,7 +102,7 @@ mod tests {
       job.created_at = Utc::now();
       job.maybe_first_started_at = Some(Utc::now());
       job.database_clock = Utc::now();
-      assert_eq!(0, estimate_job_progress(&job));
+      assert_eq!(0, estimate_job_progress(&job, None));
     }
 
     #[test]
@@ -111,7 +112,7 @@ mod tests {
       job.created_at = Utc::now() - Duration::seconds(10);
       job.maybe_first_started_at = Some(Utc::now() - Duration::seconds(10));
       job.database_clock = Utc::now();
-      assert_eq!(5, estimate_job_progress(&job));
+      assert_eq!(5, estimate_job_progress(&job, None));
     }
 
     #[test]
@@ -121,7 +122,7 @@ mod tests {
       job.created_at = Utc::now() - Duration::days(10);
       job.maybe_first_started_at = Some(Utc::now() - Duration::days(10));
       job.database_clock = Utc::now();
-      assert_eq!(95, estimate_job_progress(&job));
+      assert_eq!(95, estimate_job_progress(&job, None));
     }
   }
 }
