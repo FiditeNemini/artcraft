@@ -419,6 +419,7 @@ function SignupPage(props: Props) {
                       >
                         <video
                           autoPlay
+                          playsInline
                           muted
                           loop
                           className="object-fit-cover w-100 h-100"
@@ -443,6 +444,7 @@ function SignupPage(props: Props) {
                       >
                         <video
                           autoPlay
+                          playsInline
                           muted
                           loop
                           className="object-fit-cover w-100 h-100"
@@ -467,6 +469,7 @@ function SignupPage(props: Props) {
                       >
                         <video
                           autoPlay
+                          playsInline
                           muted
                           loop
                           className="object-fit-cover w-100 h-100"
