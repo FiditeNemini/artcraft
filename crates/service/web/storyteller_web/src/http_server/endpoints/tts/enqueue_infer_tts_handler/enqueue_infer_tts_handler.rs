@@ -25,7 +25,7 @@ use http_server_common::request::get_request_header_optional::get_request_header
 use http_server_common::request::get_request_ip::get_request_ip;
 use migration::text_to_speech::get_tts_model_for_enqueue_inference_migration::TtsModelForEnqueueInferenceMigrationWrapper;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::gptsovits_payload::GptSovitsPayload;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::gptsovits_payload::GptSovitsPayload;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::users::UserToken;

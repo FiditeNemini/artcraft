@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
-use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::image_generation_payload::StableDiffusionArgs;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::process_job::StableDiffusionProcessArgs;

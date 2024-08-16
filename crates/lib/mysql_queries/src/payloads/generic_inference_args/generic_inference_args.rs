@@ -1,13 +1,14 @@
 use errors::AnyhowResult;
-use crate::payloads::generic_inference_args::gptsovits_payload::GptSovitsPayload;
-use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
-use crate::payloads::generic_inference_args::live_portrait_payload::LivePortraitPayload;
-use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
-use crate::payloads::generic_inference_args::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
-use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
-use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
-use crate::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
+
+use crate::payloads::generic_inference_args::inner_payloads::gptsovits_payload::GptSovitsPayload;
+use crate::payloads::generic_inference_args::inner_payloads::image_generation_payload::StableDiffusionArgs;
+use crate::payloads::generic_inference_args::inner_payloads::lipsync_payload::LipsyncArgs;
+use crate::payloads::generic_inference_args::inner_payloads::live_portrait_payload::LivePortraitPayload;
+use crate::payloads::generic_inference_args::inner_payloads::mocap_payload::MocapArgs;
+use crate::payloads::generic_inference_args::inner_payloads::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
+use crate::payloads::generic_inference_args::inner_payloads::tts_payload::TTSArgs;
+use crate::payloads::generic_inference_args::inner_payloads::videofilter_payload::RerenderArgs;
+use crate::payloads::generic_inference_args::inner_payloads::workflow_payload::WorkflowArgs;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -159,9 +160,9 @@ mod tests {
   use tokens::tokens::{media_files::MediaFileToken, model_weights::ModelWeightToken};
 
   use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-  use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-  use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
-  use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
+  use crate::payloads::generic_inference_args::inner_payloads::image_generation_payload::StableDiffusionArgs;
+  use crate::payloads::generic_inference_args::inner_payloads::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
+  use crate::payloads::generic_inference_args::inner_payloads::tts_payload::TTSArgs;
 
   #[test]
   fn typical_lipsync_animation_args_serialize() {

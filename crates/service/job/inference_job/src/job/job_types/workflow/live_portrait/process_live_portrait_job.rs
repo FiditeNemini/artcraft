@@ -29,7 +29,7 @@ use filesys::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::NewValue;
 use mysql_queries::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTransferName;
 use mysql_queries::payloads::prompt_args::prompt_inner_payload::{PromptInnerPayload, PromptInnerPayloadBuilder};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;

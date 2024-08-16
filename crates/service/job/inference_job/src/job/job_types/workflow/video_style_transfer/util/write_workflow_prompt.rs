@@ -7,7 +7,7 @@ use log::info;
 use serde_json::Value;
 
 use errors::AnyhowResult;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::{NewValue, WorkflowArgs};
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui_dependencies::ComfyDependencies;

@@ -24,7 +24,7 @@ pub fn extract_live_portrait_details(args: &PolymorphicInferenceArgs) -> Option<
 #[cfg(test)]
 mod tests {
   use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
-  use mysql_queries::payloads::generic_inference_args::live_portrait_payload::LivePortraitPayload;
+  use mysql_queries::payloads::generic_inference_args::inner_payloads::live_portrait_payload::LivePortraitPayload;
   use tokens::tokens::media_files::MediaFileToken;
 
   use super::extract_live_portrait_details;

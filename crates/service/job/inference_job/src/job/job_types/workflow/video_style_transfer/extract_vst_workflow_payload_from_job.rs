@@ -1,5 +1,6 @@
 use errors::anyhow;
-use mysql_queries::payloads::generic_inference_args::{generic_inference_args::PolymorphicInferenceArgs, workflow_payload::WorkflowArgs};
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::WorkflowArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

@@ -1,7 +1,7 @@
 use log::{error, info};
 
 use filesys::check_file_exists::check_file_exists;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::WorkflowArgs;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

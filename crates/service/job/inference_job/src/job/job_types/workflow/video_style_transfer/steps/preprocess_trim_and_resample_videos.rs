@@ -7,7 +7,7 @@ use sqlx::MySqlPool;
 
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use filesys::path_to_string::path_to_string;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::WorkflowArgs;
 use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 

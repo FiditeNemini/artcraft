@@ -21,7 +21,7 @@ use http_server_common::request::get_request_header_optional::get_request_header
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::workflow_payload::{WorkflowArgs, WorkflowType};
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::{WorkflowArgs, WorkflowType};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::lazy_any_option_true::lazy_any_option_true;

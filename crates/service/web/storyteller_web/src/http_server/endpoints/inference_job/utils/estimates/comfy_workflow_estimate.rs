@@ -1,7 +1,7 @@
 use std::cmp::max;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::WorkflowArgs;
 
 use crate::http_server::endpoints::inference_job::utils::estimates::percent::percent;
 use crate::http_server::endpoints::inference_job::utils::extractors::extract_comfy_workflow_args::extract_comfy_workflow_args;

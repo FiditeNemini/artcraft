@@ -9,7 +9,7 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
 use cloud_storage::bucket_client::BucketClient;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
-use mysql_queries::payloads::generic_inference_args::lipsync_payload::LipsyncAnimationImageSource;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::lipsync_payload::LipsyncAnimationImageSource;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;

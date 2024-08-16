@@ -25,7 +25,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
   InferenceCategoryAbbreviated,
   PolymorphicInferenceArgs,
 };
-use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
   insert_generic_inference_job,
   InsertGenericInferenceArgs,

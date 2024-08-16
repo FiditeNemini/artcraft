@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
-use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;

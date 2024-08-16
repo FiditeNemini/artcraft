@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
-use mysql_queries::payloads::generic_inference_args::live_portrait_payload::LivePortraitPayload;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::live_portrait_payload::LivePortraitPayload;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

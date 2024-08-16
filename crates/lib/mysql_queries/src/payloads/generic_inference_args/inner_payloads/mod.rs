@@ -1,0 +1,9 @@
+pub mod gptsovits_payload;
+pub mod image_generation_payload;
+pub mod lipsync_payload;
+pub mod live_portrait_payload;
+pub mod mocap_payload;
+pub mod render_engine_scene_to_video_payload;
+pub mod tts_payload;
+pub mod videofilter_payload;
+pub mod workflow_payload;

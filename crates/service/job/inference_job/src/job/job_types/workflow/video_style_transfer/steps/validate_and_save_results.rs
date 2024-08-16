@@ -21,7 +21,7 @@ use filesys::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::{WorkflowArgs, WorkflowType};
+use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::{WorkflowArgs, WorkflowType};
 use mysql_queries::payloads::prompt_args::prompt_inner_payload::PromptInnerPayloadBuilder;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};

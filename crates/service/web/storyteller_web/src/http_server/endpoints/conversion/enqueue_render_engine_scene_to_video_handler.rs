@@ -20,7 +20,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
   insert_generic_inference_job,
   InsertGenericInferenceArgs,

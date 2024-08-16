@@ -152,7 +152,7 @@ impl LipsyncAnimationImageSource {
 
 #[cfg(test)]
 mod tests {
-  use crate::payloads::generic_inference_args::lipsync_payload::{FaceEnhancer, LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
+  use crate::payloads::generic_inference_args::inner_payloads::lipsync_payload::{FaceEnhancer, LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
 
   fn assert_json_deserializes_to_match(json: &str, original: &LipsyncArgs) {
     let duplicate : LipsyncArgs = serde_json::de::from_str(json).unwrap();
