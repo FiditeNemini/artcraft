@@ -3,7 +3,7 @@ use actix_service::ServiceFactory;
 use actix_web::{App, Error, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 
-use crate::http_server::endpoints::inference_job::kill_inference_jobs_handler::kill_generic_inference_jobs_handler;
+use crate::http_server::endpoints::inference_job::admin::kill_inference_jobs_handler::kill_generic_inference_jobs_handler;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;

@@ -49,6 +49,7 @@ impl fmt::Display for GetPendingInferenceJobCountError {
   }
 }
 
+#[deprecated(note="There's a better job stats endpoint")]
 pub async fn get_pending_inference_job_count_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>

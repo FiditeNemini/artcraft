@@ -63,11 +63,11 @@ use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::featured_items::create_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::delete_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::get_is_featured_item_handler::*;
-use crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::*;
-use crate::http_server::endpoints::inference_job::dismiss_finished_session_jobs_handler::*;
-use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::*;
-use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
-use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
+use crate::http_server::endpoints::inference_job::delete::dismiss_finished_session_jobs_handler::*;
+use crate::http_server::endpoints::inference_job::delete::terminate_inference_job_handler::*;
+use crate::http_server::endpoints::inference_job::get::batch_get_inference_job_status_handler::*;
+use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::*;
+use crate::http_server::endpoints::inference_job::list::list_session_jobs_handler::*;
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_animation_type_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::*;
@@ -156,11 +156,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler,
     crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler,
     crate::http_server::endpoints::featured_items::get_is_featured_item_handler::get_is_featured_item_handler,
-    crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
-    crate::http_server::endpoints::inference_job::dismiss_finished_session_jobs_handler::dismiss_finished_session_jobs_handler,
-    crate::http_server::endpoints::inference_job::get_inference_job_status_handler::get_inference_job_status_handler,
-    crate::http_server::endpoints::inference_job::list_session_jobs_handler::list_session_jobs_handler,
-    crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
+    crate::http_server::endpoints::inference_job::delete::dismiss_finished_session_jobs_handler::dismiss_finished_session_jobs_handler,
+    crate::http_server::endpoints::inference_job::delete::terminate_inference_job_handler::terminate_inference_job_handler,
+    crate::http_server::endpoints::inference_job::get::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
+    crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::get_inference_job_status_handler,
+    crate::http_server::endpoints::inference_job::list::list_session_jobs_handler::list_session_jobs_handler,
     crate::http_server::endpoints::media_files::delete::delete_media_file_handler::delete_media_file_handler,
     crate::http_server::endpoints::media_files::edit::change_media_file_animation_type_handler::change_media_file_animation_type_handler,
     crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::change_media_file_engine_category_handler,
