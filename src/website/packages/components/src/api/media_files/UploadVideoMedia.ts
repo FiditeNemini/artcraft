@@ -1,4 +1,6 @@
-import MakeMultipartRequest from "../MakeMultipartRequest";
+import MakeMultipartRequest, {
+  OnUploadProgress,
+} from "../MakeMultipartRequest";
 
 export interface UploadVideoMediaRequest {
   file: any;
@@ -15,6 +17,13 @@ export interface UploadVideoMediaResponse {
   success: boolean;
 }
 
-export const UploadVideoMedia = (request: UploadVideoMediaRequest) => {
-  return MakeMultipartRequest("/v1/media_files/upload/new_video", request);
+export const UploadVideoMedia = (
+  request: UploadVideoMediaRequest,
+  onUploadProgress?: OnUploadProgress
+) => {
+  return MakeMultipartRequest(
+    "/v1/media_files/upload/new_video",
+    request,
+    onUploadProgress
+  );
 };

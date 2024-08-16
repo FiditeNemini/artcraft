@@ -4,16 +4,17 @@ import { circle } from "../sharedSVGProps";
 
 interface Props {
   className?: string;
+  max?: number;
   progressPercentage: number;
   stage: number;
 }
 
 export default function DashedCircle({
   className = "",
+  max = 87,
   progressPercentage,
   stage = 0,
 }: Props) {
-  const max = 87;
   const progressBar = (max - 16) * (progressPercentage / 100);
   const progressSegment = progressBar / 3;
 

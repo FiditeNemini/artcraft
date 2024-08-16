@@ -5,6 +5,7 @@ import "./WorkIndicator.scss";
 
 interface Props {
   failure: boolean;
+  max?: number;
   progressPercentage: number;
   stage: number;
   success: boolean;
@@ -12,6 +13,7 @@ interface Props {
 
 export default function WorkIndicator({
   failure = false,
+  max,
   progressPercentage,
   stage = 0,
   success = false,
@@ -23,6 +25,7 @@ export default function WorkIndicator({
       <DashedCircle
         {...{
           className: "work-indicator-circle-marker",
+          max,
           progressPercentage,
           stage,
         }}
