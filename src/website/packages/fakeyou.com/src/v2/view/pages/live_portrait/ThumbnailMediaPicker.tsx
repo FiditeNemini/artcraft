@@ -36,6 +36,7 @@ interface ThumbnailMediaPickerProps {
   onUploadClick?: () => void;
   onSelectedMediaChange?: (media: any) => void;
   uploadFocusPoint?: boolean;
+  uploadButtonText?: string;
 }
 
 interface MediaData {
@@ -58,6 +59,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     onUploadClick,
     onSelectedMediaChange,
     uploadFocusPoint,
+    uploadButtonText = "Upload your own media",
   }) => {
     const [zoom, setZoom] = useState(1);
     const [isCropping, setIsCropping] = useState(false);
@@ -289,8 +291,8 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
 
         <Button
           icon={faUpload}
-          label="Upload your media"
-          variant="secondary"
+          label={uploadButtonText}
+          variant="action"
           className="order-3 order-lg-4"
           onClick={onUploadClick}
           focusPoint={uploadFocusPoint}

@@ -46,6 +46,7 @@ import SessionLpInferenceResultsList from "./SessionLpInferenceResultsList";
 import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useLocation } from "react-router-dom";
 import { LivePortraitDetails } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
+import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -64,6 +65,7 @@ interface GeneratedVideo {
 export default function LivePortrait({
   sessionSubscriptionsWrapper,
 }: LivePortraitProps) {
+  useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
   const { open, close } = useModal();
   const [isEnqueuing, setIsEnqueuing] = useState(false);
@@ -99,6 +101,9 @@ export default function LivePortrait({
   const [currentlyGeneratingList, setCurrentlyGeneratingList] = useState<
     { sourceIndex: number; motionIndex: number }[]
   >([]);
+  const [jobProgressPercentage, setJobProgressPercentage] = useState<
+    number | null
+  >(null);
 
   const location = useLocation();
 
@@ -144,6 +149,15 @@ export default function LivePortrait({
         setSelectedMotionIndex(motionTokens.length);
       }
     }
+  };
+
+  const handleJobProgress = (progress: number | null) => {
+    setJobProgressPercentage(prevProgress => {
+      if (prevProgress !== progress) {
+        return progress;
+      }
+      return prevProgress;
+    });
   };
 
   const handleSourceSelect = (index: number) => {
@@ -201,6 +215,10 @@ export default function LivePortrait({
     });
   };
 
+  useEffect(() => {
+    console.log("Updated jobProgressPercentage:", jobProgressPercentage);
+  }, [jobProgressPercentage]);
+
   const renderVideoOrPlaceholder = () => {
     // Check if the current combination is being generated
     const isCurrentlyGenerating = currentlyGeneratingList.some(
@@ -225,7 +243,9 @@ export default function LivePortrait({
             <h4 className="fw-medium">
               <div className="d-flex flex-column align-items-center gap-3 justify-content-center">
                 <LoadingSpinner padding={false} />
-                Generating video...
+                {jobProgressPercentage !== null
+                  ? `Generating video... ${jobProgressPercentage}%`
+                  : "Generating video..."}
               </div>
             </h4>
           </div>
@@ -238,7 +258,7 @@ export default function LivePortrait({
         </div>
       );
     } else if (generatedVideoSrc) {
-      // Show dynamically generated video if available
+      // Show generated video if available
       return (
         <video
           loop
@@ -270,7 +290,7 @@ export default function LivePortrait({
         </video>
       );
     } else {
-      // Show "Click to Animate" if nothing is generating or precomputed
+      // Show "Click to Animate" if nothing is generating or samples
       return (
         <div className="w-100 h-100 position-relative">
           <div
@@ -440,7 +460,7 @@ export default function LivePortrait({
         sourceToken: livePortraitDetails.source_media_file_token,
         motionToken: livePortraitDetails.face_driver_media_file_token,
         videoSrc: mediaLink,
-        jobToken, // Store the job token with the video
+        jobToken,
         createdAt,
       };
 
@@ -678,6 +698,7 @@ export default function LivePortrait({
                   onUploadClick={handleOpenUploadSourceModal}
                   onSelectedMediaChange={handleSelectedMediaChange}
                   uploadFocusPoint={uploadFocusPointSource}
+                  uploadButtonText="Upload your image/video"
                 />
               </div>
 
@@ -705,6 +726,7 @@ export default function LivePortrait({
                   stepNumber={2}
                   onUploadClick={handleOpenUploadMotionModal}
                   uploadFocusPoint={uploadFocusPointMotion}
+                  uploadButtonText="Upload your motion video"
                 />
               </div>
 
@@ -822,6 +844,7 @@ export default function LivePortrait({
                       )
                     }
                     onJobClick={handleJobClick}
+                    onJobProgress={handleJobProgress}
                   />
                 </div>
               </div>

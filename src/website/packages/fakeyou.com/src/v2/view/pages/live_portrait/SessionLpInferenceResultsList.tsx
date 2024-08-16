@@ -25,6 +25,7 @@ interface SessionLpInferenceResultsListProps {
   addSourceToken: (token: string) => void;
   addMotionToken: (token: string) => void;
   onJobClick: (job: InferenceJob) => void;
+  onJobProgress: (progress: number | null) => void;
 }
 
 export default function SessionLpInferenceResultsList({
@@ -33,9 +34,12 @@ export default function SessionLpInferenceResultsList({
   addMotionToken,
   addSourceToken,
   onJobClick,
+  onJobProgress,
 }: SessionLpInferenceResultsListProps) {
   const { inferenceJobsByCategory } = useInferenceJobs();
   const hasInitialized = useRef(false);
+
+  const lastProgressRef = useRef<{ [key: string]: number | null }>({});
 
   const livePortraitJobs = useMemo(() => {
     return (
@@ -76,6 +80,34 @@ export default function SessionLpInferenceResultsList({
       });
     }
   }, [livePortraitJobs, onJobTokens, addSourceToken, addMotionToken]);
+
+  useEffect(() => {
+    livePortraitJobs.forEach((job: InferenceJob) => {
+      const currentProgress = job.progressPercentage;
+
+      if (job.jobState === JobState.STARTED && currentProgress !== null) {
+        if (lastProgressRef.current[job.jobToken] !== currentProgress) {
+          console.log(
+            `Updating progress for Job ${job.jobToken}: ${currentProgress}%`
+          );
+          onJobProgress(currentProgress);
+          lastProgressRef.current[job.jobToken] = currentProgress;
+        }
+      }
+
+      if (
+        (job.jobState === JobState.COMPLETE_SUCCESS ||
+          job.jobState === JobState.COMPLETE_FAILURE) &&
+        lastProgressRef.current[job.jobToken] !== null
+      ) {
+        console.log(
+          `Job ${job.jobToken} is complete. Resetting progress to null.`
+        );
+        onJobProgress(null);
+        lastProgressRef.current[job.jobToken] = null;
+      }
+    });
+  }, [livePortraitJobs, onJobProgress]);
 
   const [mediaSrc, setMediaSrc] = useState<{ [key: string]: string }>({});
 
@@ -166,7 +198,9 @@ export default function SessionLpInferenceResultsList({
                           More Details
                         </Link>
                       ) : (
-                        <div className="fs-7 opacity-50 mt-1">Waiting...</div>
+                        <div className="fs-7 opacity-50 fw-medium mt-1">
+                          {job.progressPercentage}% complete
+                        </div>
                       )}
                     </div>
                   </div>
