@@ -84,6 +84,7 @@ export enum AudioTypes {
 
 export enum ImageTypes {
   jpg,
+  jpeg,
   png,
 }
 
