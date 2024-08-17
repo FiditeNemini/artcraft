@@ -30,6 +30,7 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
 use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::NewValue;
+use mysql_queries::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
 use mysql_queries::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTransferName;
 use mysql_queries::payloads::prompt_args::prompt_inner_payload::{PromptInnerPayload, PromptInnerPayloadBuilder};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -330,9 +331,15 @@ pub async fn process_live_portrait_job(
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  let live_portrait_video_info = LivePortraitVideoExtraInfo {
+    maybe_portrait_media_token: Some(portrait.media_file.token.clone()),
+    maybe_driver_video_media_token: Some(driver.media_file.token.clone()),
+  };
+
   let media_file_token = insert_media_file_from_live_portrait(InsertLivePortraitArgs {
     pool: &deps.db.mysql_pool,
     job: &job,
+    live_portrait_video_info: &live_portrait_video_info,
     media_type: MediaFileType::Mp4,
     maybe_mime_type: Some(&mimetype),
     maybe_audio_encoding: None, // TODO
@@ -349,8 +356,6 @@ pub async fn process_live_portrait_job(
     is_on_prem: deps.job.info.container.is_on_prem,
     worker_hostname: &deps.job.info.container.hostname,
     worker_cluster: &deps.job.info.container.cluster_name,
-    // TODO: maybe_style_transfer_source_media_file_token: Some(&portrait_media_token),
-    // TODO: store both tokens from the sources.
   })
       .await
       .map_err(|e| {

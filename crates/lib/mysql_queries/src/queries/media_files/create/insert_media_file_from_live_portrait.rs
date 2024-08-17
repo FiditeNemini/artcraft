@@ -10,12 +10,17 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
+use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 
 pub struct InsertLivePortraitArgs<'a> {
   pub pool: &'a MySqlPool,
   pub job: &'a AvailableInferenceJob,
+
+  // Live portrait specific info
+  pub live_portrait_video_info: &'a LivePortraitVideoExtraInfo,
 
   // Probably mp4, but could change.
   pub media_type: MediaFileType,
@@ -44,10 +49,14 @@ pub async fn insert_media_file_from_live_portrait(
   args: InsertLivePortraitArgs<'_>
 ) -> AnyhowResult<MediaFileToken>
 {
+  let extra_media_info = MediaFileExtraInfo::L(args.live_portrait_video_info.clone());
 
   let (new_media_token, _id) = insert_media_file_generic(InsertArgs {
     pool: &args.pool,
     job: &args.job,
+
+    // Dynamic bits (live portrait specific)
+    maybe_extra_media_info: Some(&extra_media_info),
 
     // Dynamic bits (file type and details)
     media_type: args.media_type,
@@ -89,7 +98,6 @@ pub async fn insert_media_file_from_live_portrait(
     maybe_origin_filename: None,
     maybe_batch_token: None,
     maybe_prompt_token: None,
-    maybe_extra_media_info: None, // TODO
     maybe_mod_user_token: None,
   }).await?;
 
