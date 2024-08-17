@@ -7,6 +7,7 @@ export enum FileType {
   Wav = "wav",
 
   // Images
+  Jpeg = "jpeg",
   Jpg = "jpg",
   Png = "png",
 
@@ -28,27 +29,28 @@ export enum FileType {
   Unknown = "unknown",
 }
 
-const FILE_TYPE_MAP : Record<string, FileType> = {
-  "bvh": FileType.Bvh,
-  "fbx": FileType.Fbx,
-  "glb": FileType.Glb,
-  "gltf": FileType.Gltf,
-  "jpg": FileType.Jpg,
-  "mp3": FileType.Mp3,
-  "mp4": FileType.Mp4,
-  "obj": FileType.Obj,
-  "png": FileType.Png,
-  "ron": FileType.Ron,
-  "wav": FileType.Wav,
-  "pmd": FileType.Pmd,
-  "vmd": FileType.Vmd,
-  "pmx": FileType.Pmx,
+const FILE_TYPE_MAP: Record<string, FileType> = {
+  bvh: FileType.Bvh,
+  fbx: FileType.Fbx,
+  glb: FileType.Glb,
+  gltf: FileType.Gltf,
+  jpeg: FileType.Jpeg,
+  jpg: FileType.Jpg,
+  mp3: FileType.Mp3,
+  mp4: FileType.Mp4,
+  obj: FileType.Obj,
+  png: FileType.Png,
+  ron: FileType.Ron,
+  wav: FileType.Wav,
+  pmd: FileType.Pmd,
+  vmd: FileType.Vmd,
+  pmx: FileType.Pmx,
 
   // TODO: This is temporary
-  "zip": FileType.Pmx,
-}
+  zip: FileType.Pmx,
+};
 
-export function GetFileTypeByExtension(filename: string) : FileType {
+export function GetFileTypeByExtension(filename: string): FileType {
   const extension = GetFileExtension(filename).toLocaleLowerCase();
   return FILE_TYPE_MAP[extension] || FileType.Unknown;
 }
