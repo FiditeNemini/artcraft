@@ -30,6 +30,7 @@ enum FieldTriState {
 interface Props {
   sessionWrapper: SessionWrapper;
   querySessionCallback: () => void;
+  querySessionAction: () => void;
 }
 
 function SignupPage(props: Props) {
@@ -247,6 +248,7 @@ function SignupPage(props: Props) {
       }
     } else if (CreateAccountIsSuccess(response)) {
       props.querySessionCallback();
+      props.querySessionAction();
 
       Analytics.accountSignupComplete();
 
@@ -604,7 +606,7 @@ function SignupPage(props: Props) {
                 <p className="fs-7 mt-2">
                   <Trans i18nKey="account.SignUpPage.signInInstead">
                     Already have an account?{" "}
-                    <Link to="/login">Log in instead.</Link>
+                    <Link to={`/login${location.search}`}>Log in instead.</Link>
                   </Trans>
                 </p>
               </div>

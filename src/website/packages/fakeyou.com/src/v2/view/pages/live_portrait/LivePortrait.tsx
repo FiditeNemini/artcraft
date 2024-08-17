@@ -11,7 +11,9 @@ import {
   Checkbox,
   Container,
   Label,
+  LoginBlock,
   Panel,
+  SessionFetchingSpinner,
 } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -32,7 +34,7 @@ import {
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs, useModal } from "hooks";
+import { useInferenceJobs, useModal, useSession } from "hooks";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -68,6 +70,7 @@ export default function LivePortrait({
 }: LivePortraitProps) {
   useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
+  const { loggedIn, sessionFetched } = useSession();
   const { open, close } = useModal();
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(0);
@@ -651,6 +654,19 @@ export default function LivePortrait({
       console.error("No video source available for download");
     }
   };
+
+  if (!sessionFetched) {
+    return <SessionFetchingSpinner />;
+  }
+
+  if (!loggedIn) {
+    return (
+      <LoginBlock
+        title="You need to be logged in to use Live Portrait"
+        redirect="/dev-lp"
+      />
+    );
+  }
 
   return (
     <>

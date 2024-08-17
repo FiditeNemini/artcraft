@@ -9,6 +9,8 @@ import {
   // TextArea,
   // Slider,
   Label,
+  SessionFetchingSpinner,
+  LoginBlock,
   // DropdownOptions,
 } from "components/common";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -21,6 +23,7 @@ import {
 import { EntityInput } from "components/entities";
 import {
   useInferenceJobs,
+  useSession,
   // useSession
 } from "hooks";
 import { Link } from "react-router-dom";
@@ -34,6 +37,7 @@ interface Props {
 }
 
 export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
+  const { loggedIn, sessionFetched } = useSession();
   const [sourceMediaToken, sourceMediaTokenSet] = useState("");
   const [removeWatermark, removeWatermarkSet] = useState(false);
   const [faceDriverToken, faceDriverTokenSet] = useState(
@@ -50,7 +54,6 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
   useDocumentTitle("Live Portrait AI. Free Video Animation");
 
   const { enqueue } = useInferenceJobs();
-  // const { canBanUsers } = useSession();
 
   const visibilityOptions = [
     { label: "Private", value: "private" },
@@ -83,6 +86,19 @@ export default function AIFaceMirror({ sessionSubscriptionsWrapper }: Props) {
       });
     }
   };
+
+  if (!sessionFetched) {
+    return <SessionFetchingSpinner />;
+  }
+
+  if (!loggedIn) {
+    return (
+      <LoginBlock
+        title="You need to be logged in to use Live Portrait"
+        redirect="/ai-live-portrait"
+      />
+    );
+  }
 
   return (
     <>

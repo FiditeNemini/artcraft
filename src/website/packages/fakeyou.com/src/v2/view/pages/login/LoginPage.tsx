@@ -287,7 +287,7 @@ function LoginPage(props: Props) {
                         <div className="d-none d-xxl-block">
                           Don't have an account?
                         </div>
-                        <Link to="/signup">Sign up</Link>
+                        <Link to={`/signup${location.search}`}>Sign up</Link>
                       </div>
                     </span>
                   </p>

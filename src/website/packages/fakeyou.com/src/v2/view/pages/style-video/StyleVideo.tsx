@@ -11,6 +11,8 @@ import {
   Slider,
   Label,
   DropdownOptions,
+  SessionFetchingSpinner,
+  LoginBlock,
 } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -24,13 +26,12 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
 import useStyleStore from "hooks/useStyleStore";
 import StyleOptionPicker from "./StyleSelection/StyleSelectionList";
-import LoadingSpinner from "components/common/LoadingSpinner";
 import { isMobile } from "react-device-detect";
 import { AITools } from "components/marketing";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { styleVideoAccessCheck, sessionFetched } = useSession();
+  const { loggedIn, sessionFetched } = useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -175,24 +176,19 @@ export default function StyleVideo() {
   };
 
   if (!sessionFetched) {
+    return <SessionFetchingSpinner />;
+  }
+
+  if (!loggedIn) {
     return (
-      <Container
-        type="panel"
-        className="narrow-container"
-        style={{ height: "calc(100vh - 65px)" }}
-      >
-        <div className="d-flex align-items-center justify-content-center h-100 gap-4">
-          <LoadingSpinner
-            label="Loading"
-            className="me-3 fs-6"
-            labelClassName="fs-4"
-          />
-        </div>
-      </Container>
+      <LoginBlock
+        title="You need to be logged in to use Video Style Transfer"
+        redirect="/style-video"
+      />
     );
   }
 
-  return styleVideoAccessCheck(
+  return (
     <>
       <Container className="mt-3 mt-lg-5" type="panel">
         <Panel className="d-block d-lg-none mb-3">{vstInfo}</Panel>

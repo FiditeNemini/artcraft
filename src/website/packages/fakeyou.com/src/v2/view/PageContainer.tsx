@@ -331,6 +331,7 @@ class PageContainer extends React.Component<
                     <SignupPage
                       querySessionCallback={() => {}}
                       sessionWrapper={this.props.sessionWrapper}
+                      querySessionAction={this.props.querySessionAction}
                     />
                   </Route>
 
