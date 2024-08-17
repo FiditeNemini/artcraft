@@ -25,6 +25,7 @@ use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 use tokens::traits::mysql_token_from_row::MySqlTokenFromRow;
 
+use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 #[derive(Serialize, Debug)]
@@ -80,6 +81,10 @@ pub struct MediaFile {
   pub maybe_model_weight_creator_username: Option<String>,
   pub maybe_model_weight_creator_display_name: Option<String>,
   pub maybe_model_weight_creator_gravatar_hash: Option<String>,
+
+  /// Not all files have extra info.
+  /// This is a polymorphic JSON blob that gets hydrated into structs.
+  pub extra_media_file_info: Option<MediaFileExtraInfo>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -157,6 +162,8 @@ pub struct MediaFileRaw {
   pub maybe_model_weight_creator_username: Option<String>,
   pub maybe_model_weight_creator_display_name: Option<String>,
   pub maybe_model_weight_creator_gravatar_hash: Option<String>,
+
+  pub extra_file_modification_info: Option<String>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -253,6 +260,9 @@ pub async fn batch_get_media_files(
         maybe_model_weight_creator_username: record.maybe_model_weight_creator_username,
         maybe_model_weight_creator_display_name: record.maybe_model_weight_creator_display_name,
         maybe_model_weight_creator_gravatar_hash: record.maybe_model_weight_creator_gravatar_hash,
+        extra_media_file_info: record.extra_file_modification_info
+            .map(|info| MediaFileExtraInfo::from_json_str(&info).ok())
+            .flatten(), // NB: Fail open. Do not fail the query if we can't hydrate the JSON.
         public_bucket_directory_hash: record.public_bucket_directory_hash,
         maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
         maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -313,6 +323,8 @@ SELECT
     model_weight_creator.username as maybe_model_weight_creator_username,
     model_weight_creator.display_name as maybe_model_weight_creator_display_name,
     model_weight_creator.email_gravatar_hash as maybe_model_weight_creator_gravatar_hash,
+
+    m.extra_file_modification_info,
 
     m.public_bucket_directory_hash,
     m.maybe_public_bucket_prefix,
@@ -400,6 +412,8 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
       maybe_model_weight_creator_username: row.try_get("maybe_model_weight_creator_username")?,
       maybe_model_weight_creator_display_name: row.try_get("maybe_model_weight_creator_display_name")?,
       maybe_model_weight_creator_gravatar_hash: row.try_get("maybe_model_weight_creator_gravatar_hash")?,
+
+      extra_file_modification_info: row.try_get("extra_file_modification_info")?,
 
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
