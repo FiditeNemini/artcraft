@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetFilterOption,
   CHARACTER_MIXAMO_FILE_TYPE,
   CHARACTER_MMD_FILE_TYPE,
   FilterEngineCategories,
+  FilterMediaType,
   MediaFileAnimationType,
 } from "~/enums";
 import { MediaItem } from "~/pages/PageEnigma/models";
@@ -21,13 +22,9 @@ import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
-  useSearchUserdObjects,
+  useSearchUserObjects,
   useFeatureFlags,
 } from "../../hooks";
-import {
-  filterMixamoCharacters,
-  filterMMDCharacters,
-} from "./filterCharacterTypes";
 
 const filterEngineCategories = [FilterEngineCategories.CHARACTER];
 
@@ -38,6 +35,11 @@ export const CharactersTab = ({
   animationType: MediaFileAnimationType;
   demoCharacterItems?: MediaItem[];
 }) => {
+  const fileTypes = Object.values(
+    animationType === MediaFileAnimationType.Mixamo
+      ? CHARACTER_MIXAMO_FILE_TYPE
+      : CHARACTER_MMD_FILE_TYPE,
+  );
   const { showSearchObjectComponent, showUploadButton } = useFeatureFlags();
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
@@ -45,6 +47,7 @@ export const CharactersTab = ({
   const { userObjects, nextUserObjects, userFetchStatus, fetchUserObjects } =
     useUserObjects({
       filterEngineCategories: filterEngineCategories,
+      filterMediaTypes: fileTypes as FilterMediaType[],
       defaultErrorMessage: "Unknown Error in Fetching User Characters",
     });
 
@@ -55,6 +58,7 @@ export const CharactersTab = ({
     featuredFetchStatus,
   } = useFeaturedObjects({
     filterEngineCategories: filterEngineCategories,
+    filterMediaTypes: fileTypes as FilterMediaType[],
     defaultErrorMessage: "Unknown Error in Fetching Featured Characters",
   });
 
@@ -66,6 +70,7 @@ export const CharactersTab = ({
   } = useSearchFeaturedObjects({
     demoFeaturedObjects: demoCharacterItems,
     filterEngineCategories: filterEngineCategories,
+    filterMediaTypes: fileTypes as FilterMediaType[],
     defaultErrorMessage:
       "Unknown Error in Fetching Featured Characters Search Results",
   });
@@ -75,8 +80,9 @@ export const CharactersTab = ({
     userObjectsSearchResults,
     userObjectsSearchFetchStatus,
     updateSearchTermForUserObjects,
-  } = useSearchUserdObjects({
+  } = useSearchUserObjects({
     filterEngineCategories: filterEngineCategories,
+    filterMediaTypes: fileTypes as FilterMediaType[],
     defaultErrorMessage:
       "Unknown Error in Fetching User Characters Search Results",
   });
@@ -84,13 +90,7 @@ export const CharactersTab = ({
   const [filterOwnership, setFilterOwnership] = useState(
     AssetFilterOption.FEATURED,
   );
-  const filterCharacterType = useMemo(
-    () =>
-      animationType === MediaFileAnimationType.Mixamo
-        ? filterMixamoCharacters
-        : filterMMDCharacters,
-    [animationType],
-  );
+
   const displayedItems =
     filterOwnership === AssetFilterOption.FEATURED
       ? searchTermForFeaturedObjects
@@ -99,11 +99,10 @@ export const CharactersTab = ({
       : searchTermForUserObjects
         ? userObjectsSearchResults ?? []
         : userObjects ?? [];
-  const filteredDisplayItems = displayedItems.filter(filterCharacterType);
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const pageSize = 21;
-  const totalPages = Math.ceil(filteredDisplayItems.length / pageSize);
+  const totalPages = Math.ceil(displayedItems.length / pageSize);
   const fetchMorePages =
     filterOwnership === AssetFilterOption.FEATURED
       ? nextFeaturedObjects?.maybe_next
@@ -111,7 +110,7 @@ export const CharactersTab = ({
         : undefined
       : nextUserObjects &&
           nextUserObjects.current !== nextUserObjects.total_page_count
-        ? fetchUserObjects
+        ? () => fetchUserObjects(nextUserObjects.current)
         : undefined;
 
   const isFetching = isAnyStatusFetching([
@@ -182,7 +181,7 @@ export const CharactersTab = ({
           debug="characters tab"
           currentPage={currentPage}
           pageSize={pageSize}
-          items={filteredDisplayItems}
+          items={displayedItems}
         />
       </div>
       {totalPages > 1 && (
@@ -212,11 +211,7 @@ export const CharactersTab = ({
             // { Rokoko: MediaFileAnimationType.Rokoko },
           ],
         }}
-        fileTypes={Object.values(
-          animationType === MediaFileAnimationType.Mixamo
-            ? CHARACTER_MIXAMO_FILE_TYPE
-            : CHARACTER_MMD_FILE_TYPE,
-        )}
+        fileTypes={fileTypes}
         title="Upload Characters"
       />
     </>

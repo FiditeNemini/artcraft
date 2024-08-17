@@ -25,7 +25,7 @@ import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
-  useSearchUserdObjects,
+  useSearchUserObjects,
 } from "../hooks";
 
 const filterEngineCategories = [
@@ -65,7 +65,7 @@ export const ObjectsTab = () => {
     userObjectsSearchResults,
     userObjectsSearchFetchStatus,
     updateSearchTermForUserObjects,
-  } = useSearchUserdObjects({
+  } = useSearchUserObjects({
     filterEngineCategories: filterEngineCategories,
     defaultErrorMessage:
       "Unknown Error in Fetching User Objects Search Results",

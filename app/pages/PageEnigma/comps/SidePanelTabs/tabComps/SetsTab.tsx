@@ -29,7 +29,7 @@ import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
-  useSearchUserdObjects,
+  useSearchUserObjects,
 } from "../hooks";
 
 const filterEngineCategories = [FilterEngineCategories.LOCATION];
@@ -65,7 +65,7 @@ export const SetsTab = () => {
     userObjectsSearchResults,
     userObjectsSearchFetchStatus,
     updateSearchTermForUserObjects,
-  } = useSearchUserdObjects({
+  } = useSearchUserObjects({
     filterEngineCategories: filterEngineCategories,
     defaultErrorMessage:
       "Unknown Error in Fetching User Film Sets Search Results",

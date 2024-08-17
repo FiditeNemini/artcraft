@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import {
   FetchMediaItemStates,
   fetchUserMediaItemsSearchResults,
 } from "../utilities";
-import { FilterEngineCategories } from "~/enums";
+import { FilterEngineCategories, FilterMediaType } from "~/enums";
 
-export const useSearchUserdObjects = ({
-  filterEngineCategories,
-  defaultErrorMessage,
-}: {
-  filterEngineCategories: FilterEngineCategories[];
+interface useSearchUserObjectsProps {
   defaultErrorMessage: string;
-}) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  filterEngineCategories: FilterEngineCategories[];
+  filterMediaTypes?: FilterMediaType[];
+}
 
+export const useSearchUserObjects = (props: useSearchUserObjectsProps) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const lastSearchTerm = useRef(searchTerm);
   const updateSearchTermForUserObjects = (newTerm: string) => {
     setSearchTerm(newTerm);
   };
@@ -31,23 +31,58 @@ export const useSearchUserdObjects = ({
 
   const fetchUserObjectsSearchResults = useCallback(
     async (term: string) => {
-      fetchUserMediaItemsSearchResults({
+      if (!term || !term.trim()) {
+        //if after trim it's empty, do nothing
+        return;
+      }
+
+      let breakFlag = false;
+      setUserSearchFetch((curr) => {
+        if (curr.status === FetchStatus.IN_PROGRESS) {
+          breakFlag = true;
+          return curr;
+        }
+        return {
+          ...curr,
+          status: FetchStatus.IN_PROGRESS,
+        };
+      });
+      if (breakFlag) {
+        return;
+      }
+
+      const { filterEngineCategories, filterMediaTypes, defaultErrorMessage } =
+        props;
+      const result = await fetchUserMediaItemsSearchResults({
         filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setUserSearchFetch(() => ({
-            status: newState.status,
-            mediaItems: newState.mediaItems,
-          }));
-        },
+        filterMediaType: filterMediaTypes,
         defaultErrorMessage: defaultErrorMessage,
         searchTerm: term,
       });
+      setUserSearchFetch({
+        status: result.status,
+        mediaItems: result.mediaItems,
+      });
     },
-    [defaultErrorMessage, filterEngineCategories],
+    [props],
   );
 
   useEffect(() => {
-    fetchUserObjectsSearchResults(searchTerm);
+    let timer: NodeJS.Timeout;
+    const KEY_DELAY = 500;
+    const delayedFetch = (term: string) => {
+      if (term === lastSearchTerm.current) {
+        fetchUserObjectsSearchResults(searchTerm);
+      }
+    };
+    if (searchTerm !== lastSearchTerm.current) {
+      lastSearchTerm.current = searchTerm;
+      timer = setTimeout(() => delayedFetch(searchTerm), KEY_DELAY);
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [fetchUserObjectsSearchResults, searchTerm]);
 
   return {

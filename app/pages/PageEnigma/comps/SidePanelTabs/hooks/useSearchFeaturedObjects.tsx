@@ -1,23 +1,26 @@
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import {
   FetchMediaItemStates,
   fetchFeaturedMediaItemsSearchResults,
 } from "../utilities";
-import { FilterEngineCategories } from "~/enums";
+import { FilterEngineCategories, FilterMediaType } from "~/enums";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import deepEqual from "deep-equal";
 
-export const useSearchFeaturedObjects = ({
-  filterEngineCategories,
-  defaultErrorMessage,
-  demoFeaturedObjects,
-}: {
-  filterEngineCategories: FilterEngineCategories[];
+interface useSearchFeaturedObjectsProps {
   defaultErrorMessage: string;
+  filterEngineCategories: FilterEngineCategories[];
   demoFeaturedObjects?: MediaItem[];
-}) => {
+  filterMediaTypes?: FilterMediaType[];
+}
+
+export const useSearchFeaturedObjects = ({
+  demoFeaturedObjects,
+  ...props
+}: useSearchFeaturedObjectsProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const lastSearchTerm = useRef(searchTerm);
   const updateSearchTermForFeaturedObjects = (newTerm: string) => {
     setSearchTerm(newTerm);
   };
@@ -46,26 +49,60 @@ export const useSearchFeaturedObjects = ({
       const filteredObjectItems = demoItemsRef.current.filter((item) =>
         item.name.toLowerCase().includes(term.toLowerCase()),
       );
-      fetchFeaturedMediaItemsSearchResults({
+
+      if (!term || !term.trim()) {
+        //if after trim it's empty, do nothing
+        return;
+      }
+
+      let breakFlag = false;
+      setFeaturedSearchFetch((curr) => {
+        if (curr.status === FetchStatus.IN_PROGRESS) {
+          breakFlag = true;
+          return curr;
+        }
+        return {
+          ...curr,
+          status: FetchStatus.IN_PROGRESS,
+        };
+      });
+      if (breakFlag) {
+        return;
+      }
+
+      const { filterEngineCategories, filterMediaTypes, defaultErrorMessage } =
+        props;
+      const result = await fetchFeaturedMediaItemsSearchResults({
         filterEngineCategories: filterEngineCategories,
-        setState: (newState: FetchMediaItemStates) => {
-          setFeaturedSearchFetch(() => ({
-            status: newState.status,
-            mediaItems: [
-              ...filteredObjectItems,
-              ...(newState.mediaItems ?? []),
-            ],
-          }));
-        },
+        filterMediaType: filterMediaTypes,
         defaultErrorMessage: defaultErrorMessage,
         searchTerm: term,
       });
+
+      setFeaturedSearchFetch({
+        status: result.status,
+        mediaItems: [...filteredObjectItems, ...(result.mediaItems ?? [])],
+      });
     },
-    [defaultErrorMessage, filterEngineCategories],
+    [props],
   );
 
   useEffect(() => {
-    fetchFeaturedObjectSearchResults(searchTerm);
+    let timer: NodeJS.Timeout;
+    const KEY_DELAY = 500;
+    const delayedFetch = (term: string) => {
+      if (term === lastSearchTerm.current) {
+        fetchFeaturedObjectSearchResults(searchTerm);
+      }
+    };
+    if (searchTerm !== lastSearchTerm.current) {
+      lastSearchTerm.current = searchTerm;
+      timer = setTimeout(() => delayedFetch(searchTerm), KEY_DELAY);
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [fetchFeaturedObjectSearchResults, searchTerm]);
 
   return {

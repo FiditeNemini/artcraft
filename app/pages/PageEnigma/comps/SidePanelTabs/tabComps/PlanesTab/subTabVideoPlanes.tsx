@@ -13,7 +13,7 @@ import {
 } from "~/components";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/sharedComps";
 import { isAnyStatusFetching } from "../../utilities";
-import { useUserObjects, useSearchUserdObjects } from "../../hooks";
+import { useUserObjects, useSearchUserObjects } from "../../hooks";
 import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
 
 const filterEngineCategories = [FilterEngineCategories.VIDEO_PLANE];
@@ -35,7 +35,7 @@ export const VideoPlanesTab = () => {
     userObjectsSearchResults,
     userObjectsSearchFetchStatus,
     updateSearchTermForUserObjects,
-  } = useSearchUserdObjects({
+  } = useSearchUserObjects({
     filterEngineCategories: filterEngineCategories,
     defaultErrorMessage:
       "Unknown Error in Fetching User Video Panel Search Results",

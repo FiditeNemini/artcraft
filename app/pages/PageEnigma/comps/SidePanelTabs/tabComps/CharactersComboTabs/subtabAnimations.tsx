@@ -20,7 +20,7 @@ import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
-  useSearchUserdObjects,
+  useSearchUserObjects,
   useFeatureFlags,
 } from "../../hooks";
 import {
@@ -67,7 +67,7 @@ export const AnimationsTab = ({
     userObjectsSearchResults,
     userObjectsSearchFetchStatus,
     updateSearchTermForUserObjects,
-  } = useSearchUserdObjects({
+  } = useSearchUserObjects({
     filterEngineCategories: filterEngineCategories,
     defaultErrorMessage:
       "Unknown Error in Fetching User Animation Search Results",

@@ -27,7 +27,7 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
             <u>Upload a file</u> or drop it here
           </P>
           <P className="flex items-center gap-2 text-sm font-normal opacity-50">
-            {fileTypes.join(", ").toString()} supported
+            {fileTypes.join(", ").toString().toUpperCase()} supported
           </P>
         </div>
       </div>

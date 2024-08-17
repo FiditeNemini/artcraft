@@ -18,7 +18,7 @@ import {
   useUserObjects,
   useFeaturedObjects,
   useSearchFeaturedObjects,
-  useSearchUserdObjects,
+  useSearchUserObjects,
   useFeatureFlags,
 } from "../../hooks";
 
@@ -26,7 +26,6 @@ const filterEngineCategories = [FilterEngineCategories.EXPRESSION];
 
 export const ExpressionTab = () => {
   const { showSearchObjectComponent, showUploadButton } = useFeatureFlags();
-
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
 
@@ -54,7 +53,7 @@ export const ExpressionTab = () => {
     userObjectsSearchResults,
     userObjectsSearchFetchStatus,
     updateSearchTermForUserObjects,
-  } = useSearchUserdObjects({
+  } = useSearchUserObjects({
     filterEngineCategories: filterEngineCategories,
     defaultErrorMessage:
       "Unknown Error in Fetching User Expressions Search Results",

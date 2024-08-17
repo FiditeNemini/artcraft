@@ -16,33 +16,29 @@ export interface FetchMediaItemStates {
   nextPage?: Pagination;
   status: FetchStatus;
 }
+
 interface fetchMediaItemsInterface {
-  setState: ({ mediaItems, status }: FetchMediaItemStates) => void;
   filterEngineCategories: FilterEngineCategories[];
   filterMediaType?: FilterMediaType[];
   defaultErrorMessage?: string;
-  searchTerm?: string;
-}
-interface fetchMediaItemsInterfaceV2 {
-  filterEngineCategories: FilterEngineCategories[];
-  filterMediaType?: FilterMediaType[];
-  defaultErrorMessage?: string;
-  searchTerm?: string; // for searches
   nextPageCursor?: string; // for featured items' infinite pagination
   nextPageIndex?: number; // for user item's normal pagination
+  searchTerm?: string; //for searches
 }
 
 export const fetchUserMediaItems = async ({
   filterEngineCategories,
+  filterMediaType,
   defaultErrorMessage,
   nextPageIndex,
-}: fetchMediaItemsInterfaceV2): Promise<FetchMediaItemStates> => {
+}: fetchMediaItemsInterface): Promise<FetchMediaItemStates> => {
   const mediaFilesApi = new MediaFilesApi();
 
   const response = await mediaFilesApi.ListUserMediaFiles({
-    page_size: 1000,
+    page_size: 100,
     page_index: nextPageIndex,
     filter_engine_categories: filterEngineCategories,
+    filter_media_type: filterMediaType,
   });
 
   if (response.success && response.data) {
@@ -65,14 +61,16 @@ export const fetchUserMediaItems = async ({
 };
 
 export const fetchFeaturedMediaItems = async ({
+  filterMediaType,
   filterEngineCategories,
   defaultErrorMessage,
   nextPageCursor,
-}: fetchMediaItemsInterfaceV2): Promise<FetchMediaItemStates> => {
+}: fetchMediaItemsInterface): Promise<FetchMediaItemStates> => {
   const mediaFilesApi = new MediaFilesApi();
   const response = await mediaFilesApi.ListFeaturedMediaFiles({
-    page_size: 1000,
+    page_size: 100,
     filter_engine_categories: filterEngineCategories,
+    filter_media_type: filterMediaType,
     cursor: nextPageCursor,
   });
 
@@ -98,21 +96,15 @@ export const fetchFeaturedMediaItems = async ({
 
 // Search Results
 export const fetchFeaturedMediaItemsSearchResults = async ({
-  setState,
   searchTerm,
   filterEngineCategories,
+  filterMediaType,
   defaultErrorMessage,
-}: fetchMediaItemsInterface) => {
-  if (!searchTerm || !searchTerm.trim()) {
-    //if after trim it's empty, do nothing
-    return;
-  }
-
-  setState({ status: FetchStatus.IN_PROGRESS });
-
+}: fetchMediaItemsInterface): Promise<FetchMediaItemStates> => {
   const mediaFilesApi = new MediaFilesApi();
   const response = await mediaFilesApi.SearchFeaturedMediaFiles({
-    search_term: searchTerm,
+    search_term: searchTerm || "",
+    filter_media_type: filterMediaType,
     filter_engine_categories: filterEngineCategories,
   });
 
@@ -121,10 +113,10 @@ export const fetchFeaturedMediaItemsSearchResults = async ({
       response.data,
       filterEngineCategories,
     );
-    setState({
+    return {
       mediaItems: newSearchObjects,
       status: FetchStatus.SUCCESS,
-    });
+    };
   } else {
     addToast(
       ToastTypes.ERROR,
@@ -132,25 +124,20 @@ export const fetchFeaturedMediaItemsSearchResults = async ({
         defaultErrorMessage ||
         "Failed to fetch search results",
     );
-    setState({ status: FetchStatus.ERROR });
+    return { status: FetchStatus.ERROR };
   }
 };
 
 export const fetchUserMediaItemsSearchResults = async ({
-  setState,
   searchTerm,
   filterEngineCategories,
+  filterMediaType,
   defaultErrorMessage,
 }: fetchMediaItemsInterface) => {
-  if (!searchTerm || !searchTerm.trim()) {
-    return; //if after trim it's empty, do nothing
-  }
-
-  setState({ status: FetchStatus.IN_PROGRESS });
-
   const mediaFilesApi = new MediaFilesApi();
   const response = await mediaFilesApi.SearchUserMediaFiles({
-    search_term: searchTerm,
+    search_term: searchTerm || "",
+    filter_media_type: filterMediaType,
     filter_engine_categories: filterEngineCategories,
   });
 
@@ -159,10 +146,10 @@ export const fetchUserMediaItemsSearchResults = async ({
       response.data,
       filterEngineCategories,
     );
-    setState({
+    return {
       mediaItems: newSearchObjects,
       status: FetchStatus.SUCCESS,
-    });
+    };
   } else {
     addToast(
       ToastTypes.ERROR,
@@ -170,6 +157,6 @@ export const fetchUserMediaItemsSearchResults = async ({
         defaultErrorMessage ||
         "Failed to fetch search results",
     );
-    setState({ status: FetchStatus.ERROR });
+    return { status: FetchStatus.ERROR };
   }
 };

@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { FetchMediaItemStates, fetchUserMediaItems } from "../utilities";
-import { FilterEngineCategories } from "~/enums";
+import { FilterEngineCategories, FilterMediaType } from "~/enums";
 
-const maxFailedFetches = 5;
+import { MAX_FAILED_FETCHES } from "~/constants";
 
-export const useUserObjects = ({
-  filterEngineCategories,
-  defaultErrorMessage,
-}: {
-  filterEngineCategories: FilterEngineCategories[];
+interface useUserObjectsProps {
   defaultErrorMessage: string;
-}) => {
+  filterEngineCategories: FilterEngineCategories[];
+  filterMediaTypes?: FilterMediaType[];
+}
+
+export const useUserObjects = (props: useUserObjectsProps) => {
   const failedFetches = useRef<number>(0);
   const [
     {
@@ -24,16 +24,29 @@ export const useUserObjects = ({
     mediaItems: undefined,
     status: FetchStatus.READY,
   });
-  const nextPageIndex = nextUserObjects?.current
-    ? nextUserObjects.current + 1
-    : undefined;
 
-  const fetchUserObjects = useCallback(async () => {
-    if (userFetchStatus !== FetchStatus.IN_PROGRESS) {
-      setUserFetch({ status: FetchStatus.IN_PROGRESS });
+  const fetchUserObjects = useCallback(
+    async (nextPageIndex?: number) => {
+      let breakFlag = false;
+      setUserFetch((curr) => {
+        if (curr.status === FetchStatus.IN_PROGRESS) {
+          breakFlag = true;
+          return curr;
+        }
+        return {
+          ...curr,
+          status: FetchStatus.IN_PROGRESS,
+        };
+      });
+      if (breakFlag) {
+        return;
+      }
 
+      const { filterEngineCategories, filterMediaTypes, defaultErrorMessage } =
+        props;
       const result = await fetchUserMediaItems({
         filterEngineCategories: filterEngineCategories,
+        filterMediaType: filterMediaTypes,
         defaultErrorMessage: defaultErrorMessage,
         nextPageIndex: nextPageIndex,
       });
@@ -44,25 +57,20 @@ export const useUserObjects = ({
         failedFetches.current = 0;
       }
 
-      setUserFetch({
+      setUserFetch((curr) => ({
         status: result.status,
         mediaItems: result.mediaItems
-          ? userObjects
-            ? [...userObjects, ...result.mediaItems]
+          ? curr.mediaItems && nextPageIndex
+            ? [...curr.mediaItems, ...result.mediaItems]
             : result.mediaItems
-          : userObjects,
-      });
-    }
-  }, [
-    userObjects,
-    userFetchStatus,
-    filterEngineCategories,
-    defaultErrorMessage,
-    nextPageIndex,
-  ]);
+          : curr.mediaItems,
+      }));
+    },
+    [props],
+  );
 
   useEffect(() => {
-    if (!userObjects && failedFetches.current <= maxFailedFetches) {
+    if (!userObjects && failedFetches.current <= MAX_FAILED_FETCHES) {
       fetchUserObjects();
     }
   }, [userObjects, fetchUserObjects]);

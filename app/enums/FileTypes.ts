@@ -1,46 +1,48 @@
+// File Types has to be lower case for server to accept
+
 export enum ANIMATION_MMD_FILE_TYPE {
-  VMD = "VMD",
+  VMD = "vmd",
 }
 export enum ANIMATION_MIXAMO_FILE_TYPE {
-  GLB = "GLB",
-  FBX = "FBX",
+  GLB = "glb",
+  FBX = "fbx",
 }
 
 export enum AUDIO_FILE_TYPE {
-  MP3 = "MP3",
-  WAV = "WAV",
-  FLAC = "FLAC",
-  OGG = "OGG",
+  MP3 = "mp3",
+  WAV = "wav",
+  FLAC = "flac",
+  OGG = "ogg",
 }
 
 export enum IMAGEPLANE_FILE_TYPE {
-  PNG = "PNG",
-  JPG = "JPG",
-  JPEG = "JPEG",
+  PNG = "png",
+  JPG = "jpg",
+  JPEG = "jpeg",
 }
 export enum VIDEOPLANE_FILE_TYPE {
-  MP4 = "MP4",
+  MP4 = "mp4",
 }
 
 export enum THUMBNAILS_FILE_TYPE {
-  PNG = "PNG",
-  JPG = "JPG",
-  JPEG = "JPEG",
-  GIF = "GIF",
+  PNG = "png",
+  JPG = "jpg",
+  JPEG = "jpeg",
+  GIF = "gif",
 }
 
 export enum OBJECT_FILE_TYPE {
-  GLB = "GLB",
+  GLB = "glb",
 }
 
 export enum CHARACTER_MMD_FILE_TYPE {
-  PMD = "PMD",
-  PMX = "PMX",
-  ZIP = "ZIP",
+  PMD = "pmd",
+  PMX = "pmx",
+  ZIP = "zip",
 }
 
 export enum CHARACTER_MIXAMO_FILE_TYPE {
-  GLB = "GLB",
+  GLB = "glb",
   // FBX = "FBX",
   // OBJ = "OBJ",
   // ZIP = "ZIP",
