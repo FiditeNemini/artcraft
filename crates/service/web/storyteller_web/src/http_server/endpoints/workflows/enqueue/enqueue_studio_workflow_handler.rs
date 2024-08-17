@@ -19,6 +19,7 @@ use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::{WorkflowArgs, WorkflowType};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
@@ -216,6 +217,20 @@ pub async fn enqueue_studio_workflow_handler(
       })
       .transpose()?;
 
+  let watermark_type ;
+  let remove_watermark ;
+
+  let is_requested_to_remove_watermark = request.remove_watermark.unwrap_or(false);
+  let is_allowed_to_remove_watermark = is_staff; // TODO: Paid permission instead
+
+  if  is_requested_to_remove_watermark && is_allowed_to_remove_watermark {
+    watermark_type = None;
+    remove_watermark = Some(true);
+  } else {
+    watermark_type = Some(WatermarkType::Storyteller); // Studio is only on Storyteller.
+    remove_watermark = None; // NB: Smaller payload, defaults to false
+  }
+
   let coordinated_args = CoordinatedWorkflowArgs {
     prompt: request.prompt.new_string_trim_or_empty(),
     travel_prompt: request.travel_prompt.new_string_trim_or_empty(),
@@ -237,7 +252,7 @@ pub async fn enqueue_studio_workflow_handler(
     ]),
     use_face_detailer: request.use_face_detailer,
     use_upscaler: request.use_upscaler,
-    remove_watermark: request.remove_watermark,
+    remove_watermark,
   };
 
   let is_allowed_expensive_generation = is_staff || has_paid_plan;
@@ -276,7 +291,7 @@ pub async fn enqueue_studio_workflow_handler(
     lipsync_enabled: coordinated_args.use_lipsync,
     enable_lipsync: coordinated_args.use_lipsync, // TODO(bt): We can stop writing this flag after we re-deploy the job.
     remove_watermark: coordinated_args.remove_watermark,
-    watermark_type: None,
+    watermark_type,
 
     // TODO: Get rid of the temporary flags.
     rollout_python_workflow_args: None,
