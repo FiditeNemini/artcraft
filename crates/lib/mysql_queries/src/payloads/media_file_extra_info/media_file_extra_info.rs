@@ -1,4 +1,5 @@
-use anyhow::{anyhow, bail};
+use anyhow::bail;
+
 use errors::AnyhowResult;
 
 use crate::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
@@ -20,7 +21,7 @@ pub enum MediaFileExtraInfo {
 }
 
 impl MediaFileExtraInfo {
-  pub fn from_str(value: &str) -> AnyhowResult<Self> {
+  pub fn from_json_str(value: &str) -> AnyhowResult<Self> {
     let result = serde_json::from_str(value);
     let err = match result {
       Ok(value) => return Ok(value),
@@ -35,7 +36,7 @@ impl MediaFileExtraInfo {
     }
   }
 
-  pub fn to_string(&self) -> AnyhowResult<String> {
+  pub fn to_json_string(&self) -> AnyhowResult<String> {
     Ok(serde_json::to_string(self)?)
   }
 }

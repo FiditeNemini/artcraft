@@ -69,6 +69,7 @@ use crate::http_server::endpoints::inference_job::delete::terminate_inference_jo
 use crate::http_server::endpoints::inference_job::get::batch_get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::list::list_session_jobs_handler::*;
+use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_animation_type_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::*;
@@ -267,6 +268,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
 
     // Common response structs
     JobDetailsLivePortraitRequest,
+    MediaFileLivePortraitDetails,
     MediaFileModelDetails,
     MediaFileOriginDetails,
     MediaFileSocialMetaLight,

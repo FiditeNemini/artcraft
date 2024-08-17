@@ -30,6 +30,7 @@ use tokens::tokens::prompts::PromptToken;
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -111,6 +112,10 @@ pub struct MediaFileInfo {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+
+  /// OPTIONAL. Details on live portrait generated media files,
+  /// if this is a live portrait generated file.
+  pub maybe_live_portrait_details: Option<MediaFileLivePortraitDetails>,
 
   /// For Comfy / Video Style Transfer jobs, this might include
   /// the name of the selected style.
@@ -355,6 +360,10 @@ async fn modern_media_file_lookup(
       ),
       maybe_title: result.maybe_title,
       maybe_text_transcript: result.maybe_text_transcript,
+      maybe_live_portrait_details: result.extra_media_file_info
+          .as_ref()
+          .map(|info| MediaFileLivePortraitDetails::maybe_from_extra_info(&info))
+          .flatten(),
       maybe_style_name: result.maybe_prompt_args
           .as_ref()
           .and_then(|args| args.style_name.as_ref())
@@ -484,6 +493,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
         result.maybe_creator_display_name,
         result.maybe_creator_gravatar_hash,
       ),
+      maybe_live_portrait_details: None,
       maybe_prompt_token: None,
       maybe_style_name: None,
       used_face_detailer: false,

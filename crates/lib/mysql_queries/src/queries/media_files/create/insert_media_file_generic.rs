@@ -77,7 +77,7 @@ pub async fn insert_media_file_generic(
     let result_token = MediaFileToken::generate();
 
     let extra_file_modification_info = args
-        .maybe_extra_media_info.map(|extra| extra.to_string())
+        .maybe_extra_media_info.map(|extra| extra.to_json_string())
         .transpose()?;
 
     let mut maybe_creator_file_synthetic_id : Option<u64> = None;

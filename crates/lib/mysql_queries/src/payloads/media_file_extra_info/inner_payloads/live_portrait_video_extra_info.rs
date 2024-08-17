@@ -30,10 +30,10 @@ mod tests {
 
     let json = r#"{"L":{"p":"portrait","d":"driver"}}"#;
 
-    let serialized = payload.to_string().unwrap();
+    let serialized = payload.to_json_string().unwrap();
     assert_eq!(&serialized, json);
 
-    let deserialized = MediaFileExtraInfo::from_str(&json).unwrap();
+    let deserialized = MediaFileExtraInfo::from_json_str(&json).unwrap();
     assert_eq!(deserialized, payload);
   }
 }

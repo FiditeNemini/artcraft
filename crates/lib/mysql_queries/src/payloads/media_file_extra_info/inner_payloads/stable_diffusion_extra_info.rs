@@ -50,17 +50,17 @@ mod tests {
 
     let json = r#"{"S":{"prompt":"foo bar baz"}}"#;
 
-    let serialized = payload.to_string().unwrap();
+    let serialized = payload.to_json_string().unwrap();
     assert_eq!(&serialized, json);
 
-    let deserialized = MediaFileExtraInfo::from_str(&json).unwrap();
+    let deserialized = MediaFileExtraInfo::from_json_str(&json).unwrap();
     assert_eq!(deserialized, payload);
   }
 
   #[test]
   fn unwrapped_enum() {
     let json = r#"{"prompt":"foo bar baz"}"#;
-    let deserialized = MediaFileExtraInfo::from_str(&json).unwrap();
+    let deserialized = MediaFileExtraInfo::from_json_str(&json).unwrap();
 
     let expected = MediaFileExtraInfo::S(StableDiffusionExtraInfo {
       prompt: Some("foo bar baz".to_string()),
