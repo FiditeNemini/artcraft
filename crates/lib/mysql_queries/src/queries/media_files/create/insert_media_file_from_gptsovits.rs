@@ -86,7 +86,7 @@ pub async fn insert_media_file_from_gptsovits(
     maybe_frame_width: None,
     maybe_frame_height: None,
     maybe_prompt_token: None,
-    extra_file_modification_info: None,
+    maybe_extra_media_info: None,
     maybe_mod_user_token: None,
   }).await?;
 

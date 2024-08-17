@@ -273,7 +273,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     public_bucket_directory_hash: result_video_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: result_video_bucket_location.get_optional_prefix(),
     maybe_public_bucket_extension: result_video_bucket_location.get_optional_extension(),
-    extra_file_modification_info: None,
+    maybe_extra_media_info: None,
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
     maybe_creator_category_synthetic_id_category: IdCategory::MocapResult,
     maybe_mod_user_token: None,

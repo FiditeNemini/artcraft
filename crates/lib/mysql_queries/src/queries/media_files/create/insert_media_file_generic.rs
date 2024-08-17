@@ -14,7 +14,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
-
+use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
@@ -54,10 +54,14 @@ pub struct InsertArgs<'a> {
     pub public_bucket_directory_hash: &'a str,
     pub maybe_public_bucket_prefix: Option<&'a str>,
     pub maybe_public_bucket_extension: Option<&'a str>,
-    pub extra_file_modification_info: Option<&'a str>,  // Assuming TEXT type can be represented by &str
 
     pub maybe_creator_file_synthetic_id_category: IdCategory,
     pub maybe_creator_category_synthetic_id_category: IdCategory,
+
+    /// Extra polymorphic data stored in `extra_file_modification_info`
+    /// This differs on a per media type basis and can depend on the product
+    /// that generates the media file.
+    pub maybe_extra_media_info: Option<&'a MediaFileExtraInfo>,
 
     // Modification and generation info
     pub maybe_mod_user_token: Option<&'a UserToken>,
@@ -71,6 +75,10 @@ pub async fn insert_media_file_generic(
 ) -> AnyhowResult<(MediaFileToken, u64)>
 {
     let result_token = MediaFileToken::generate();
+
+    let extra_file_modification_info = args
+        .maybe_extra_media_info.map(|extra| extra.to_string())
+        .transpose()?;
 
     let mut maybe_creator_file_synthetic_id : Option<u64> = None;
     let mut maybe_creator_category_synthetic_id : Option<u64> = None;
@@ -133,7 +141,6 @@ pub async fn insert_media_file_generic(
             public_bucket_directory_hash = ?, 
             maybe_public_bucket_prefix = ?, 
             maybe_public_bucket_extension = ?, 
-            extra_file_modification_info = ?, 
 
             maybe_creator_user_token = ?, 
             maybe_creator_anonymous_visitor_token = ?, 
@@ -143,6 +150,8 @@ pub async fn insert_media_file_generic(
 
             maybe_creator_file_synthetic_id = ?, 
             maybe_creator_category_synthetic_id = ?,
+
+            extra_file_modification_info = ?,
 
             maybe_mod_user_token = ?, 
             is_generated_on_prem = ?, 
@@ -179,7 +188,6 @@ pub async fn insert_media_file_generic(
         args.public_bucket_directory_hash,
         args.maybe_public_bucket_prefix,
         args.maybe_public_bucket_extension,
-        args.extra_file_modification_info,
 
         args.job.maybe_creator_user_token.as_deref(),
         args.job.maybe_creator_anonymous_visitor_token.as_deref(),
@@ -189,6 +197,8 @@ pub async fn insert_media_file_generic(
 
         maybe_creator_file_synthetic_id,
         maybe_creator_category_synthetic_id,
+
+        extra_file_modification_info,
 
         args.maybe_mod_user_token,
         args.is_generated_on_prem,

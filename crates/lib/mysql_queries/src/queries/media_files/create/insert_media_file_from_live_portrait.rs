@@ -89,7 +89,7 @@ pub async fn insert_media_file_from_live_portrait(
     maybe_origin_filename: None,
     maybe_batch_token: None,
     maybe_prompt_token: None,
-    extra_file_modification_info: None, // TODO ???
+    maybe_extra_media_info: None, // TODO
     maybe_mod_user_token: None,
   }).await?;
 

@@ -17,6 +17,8 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::prompts::prompt_type::PromptType;
 use filesys::path_to_string::path_to_string;
+use mysql_queries::payloads::media_file_extra_info::inner_payloads::stable_diffusion_extra_info::StableDiffusionExtraInfo;
+use mysql_queries::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
@@ -25,7 +27,7 @@ use tokens::tokens::prompts::PromptToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::image_generation::sd::process_job::{InferenceValues, sd_args_from_job, StableDiffusionProcessArgs};
+use crate::job::job_types::image_generation::sd::process_job::{sd_args_from_job, StableDiffusionProcessArgs};
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
 
 pub async fn process_job_inference(
@@ -212,27 +214,18 @@ pub async fn process_job_inference(
 
   let mut entries = vec![];
 
-  let inputs = InferenceValues {
-    prompt: prompt.clone(),
-    cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
+  let inputs = MediaFileExtraInfo::S(StableDiffusionExtraInfo {
+    prompt: Some(prompt.clone()),
+    cfg_scale: Some(sd_args.maybe_cfg_scale.unwrap_or(7)),
     negative_prompt: sd_args.maybe_n_prompt,
     lora_model_weight_token: Some(lora_token),
     lora_name: Some(lora_name),
-    sampler: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
-    width: sd_args.maybe_width.unwrap_or(512),
-    height: sd_args.maybe_height.unwrap_or(512),
-    seed: sd_args.maybe_seed.unwrap_or(1),
-    number_of_samples,
-  };
-
-  let inputs = match serde_json::to_string(&inputs) {
-    Ok(result) => result,
-    Err(_err) => {
-      return Err(
-        ProcessSingleJobError::from_anyhow_error(anyhow!("couldn't serialize metadata."))
-      );
-    }
-  };
+    sampler: Some(sd_args.maybe_sampler.unwrap_or(String::from("Euler a"))),
+    width: Some(sd_args.maybe_width.unwrap_or(512)),
+    height: Some(sd_args.maybe_height.unwrap_or(512)),
+    seed: Some(sd_args.maybe_seed.unwrap_or(1)),
+    number_of_samples: Some(number_of_samples),
+  });
 
   let batch_token = BatchGenerationToken::generate();
   let prompt_token = PromptToken::generate();
@@ -285,7 +278,7 @@ pub async fn process_job_inference(
       public_bucket_directory_hash: bucket_details.object_hash.as_str(),
       maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
       maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
-      extra_file_modification_info: Some(&inputs),
+      maybe_extra_media_info: Some(&inputs),
       maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
       maybe_creator_category_synthetic_id_category: IdCategory::ModelWeights,
       maybe_mod_user_token: None,

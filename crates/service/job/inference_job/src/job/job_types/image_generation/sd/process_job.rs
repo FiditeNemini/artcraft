@@ -12,20 +12,6 @@ use crate::job::job_types::image_generation::sd::process_job_sd_upload::process_
 use crate::state::job_dependencies::JobDependencies;
 use crate::util::extractors::get_polymorphic_args_from_job::get_polymorphic_args_from_job;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
-pub struct InferenceValues {
-    pub prompt: String,
-    pub cfg_scale: u32,
-    pub negative_prompt: Option<String>,
-    pub lora_model_weight_token: Option<String>,
-    pub lora_name: Option<String>,
-    pub sampler: String,
-    pub width: u32,
-    pub height: u32,
-    pub seed: i64,
-    pub number_of_samples: u32,
-}
-
 pub struct StableDiffusionProcessArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
