@@ -1,4 +1,5 @@
 use actix_web::HttpRequest;
+use log::info;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DomainBranding {
@@ -7,13 +8,18 @@ pub enum DomainBranding {
 }
 
 pub fn get_request_domain_branding(http_request: &HttpRequest) -> Option<DomainBranding> {
-  http_request.uri()
-      .host()
-      .and_then(|host| match host {
+  let maybe_hostname = http_request.uri()
+      .host();
+
+  let maybe_branding = maybe_hostname.and_then(|host| match host {
         host if host.contains("fakeyou") => Some(DomainBranding::FakeYou),
         host if host.contains("storyteller") => Some(DomainBranding::Storyteller),
         _ => None,
-      })
+      });
+
+  info!("Hostname: {:?} Branding for hostname: {:?}", maybe_hostname, maybe_branding);
+
+  maybe_branding
 }
 
 #[cfg(test)]
