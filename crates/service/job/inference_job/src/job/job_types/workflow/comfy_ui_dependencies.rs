@@ -5,7 +5,7 @@ use reqwest::StatusCode;
 use tokio::process::Command;
 use tokio::time::sleep;
 
-use easyenv::get_env_string_optional;
+use easyenv::{get_env_pathbuf_required, get_env_string_optional};
 use errors::AnyhowResult;
 
 use crate::job::job_types::workflow::comfy_ui_inference_command::ComfyInferenceCommand;
@@ -17,6 +17,9 @@ pub struct ComfyDependencies {
     pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
     pub ffmpeg_command_runner: FfmpegCommandRunner,
     pub configs: ComfyConfigs,
+
+    pub fakeyou_watermark_path: PathBuf,
+    pub storyteller_watermark_path: PathBuf,
 }
 
 /// NB: These are used for logging and debugging by the art team
@@ -97,6 +100,8 @@ impl ComfyDependencies {
                 face_detailer_workflow: get_env_string_optional("FACE_DETAILER_WORKFLOW"),
                 upscaler_workflow: get_env_string_optional("UPSCALER_WORKFLOW"),
             },
+            fakeyou_watermark_path: get_env_pathbuf_required("FAKEYOU_WATERMARK_PATH")?,
+            storyteller_watermark_path: get_env_pathbuf_required("STORYTELLER_WATERMARK_PATH")?,
         })
     }
 }

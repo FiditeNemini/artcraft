@@ -28,6 +28,7 @@ use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use filesys::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
 use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::NewValue;
 use mysql_queries::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
@@ -224,9 +225,46 @@ pub async fn process_live_portrait_job(
             &output_file_path)));
   }
 
+  // ==================== OPTIONAL WATERMARK ======================== //
+
+  let mut final_video_path = output_file_path.clone();
+
+  let maybe_watermark_logo_path = match job_payload.watermark_type {
+    Some(WatermarkType::FakeYou) => Some(&comfy_deps.fakeyou_watermark_path),
+    Some(WatermarkType::Storyteller) => Some(&comfy_deps.storyteller_watermark_path),
+    _ => None,
+  };
+
+  if let Some(watermark_logo_path) = maybe_watermark_logo_path {
+    info!("Adding watermark to video...");
+
+    let watermark_output_file = work_temp_dir.path().join("watermark.mp4");
+
+    let watermark_command_exit_status = comfy_deps
+        .ffmpeg_watermark_command
+        .execute(WatermarkArgs {
+          video_path: &output_file_path,
+          maybe_override_logo_path: Some(watermark_logo_path),
+          alpha: 0.6,
+          scale: 0.1,
+          output_path: &watermark_output_file,
+        });
+
+    match check_file_exists(&watermark_output_file) {
+      Err(err) => error!("Watermarking failed to produce file: {:?}", err),
+      Ok(()) => {
+        if watermark_command_exit_status.is_success() {
+          final_video_path = watermark_output_file;
+        } else {
+          error!("Watermarking failed: {:?}", watermark_command_exit_status);
+        }
+      }
+    }
+  }
+
   // ==================== INSPECT VIDEO ======================== //
 
-  let maybe_ffprobe_info = match ffprobe_get_info(&output_file_path) {
+  let maybe_ffprobe_info = match ffprobe_get_info(&final_video_path) {
     Ok(info) => Some(info),
     Err(err) => {
       error!("Error reading video info with ffprobe: {:?}", err);
@@ -242,36 +280,6 @@ pub async fn process_live_portrait_job(
       info!("Comfy output duration seconds: {}", &duration.seconds_original);
     }
   }
-
-//  // ==================== COPY BACK AUDIO ==================== //
-//
-//  post_process_restore_audio(PostProcessRestoreVideoArgs {
-//    comfy_deps,
-//    videos: &mut videos,
-//  });
-//
-//  // ==================== OPTIONAL WATERMARK ==================== //
-//
-//  post_process_add_watermark(PostProcessAddWatermarkArgs {
-//    comfy_deps,
-//    videos: &mut videos,
-//  });
-
-
-  // ==================== VALIDATE AND SAVE RESULTS ======================== //
-
-  //let media_file_token = validate_and_save_results(SaveResultsArgs {
-  //  job,
-  //  deps: &deps,
-  //  job_args: &job_args,
-  //  comfy_deps,
-  //  comfy_args,
-  //  videos: &videos,
-  //  job_progress_reporter: &mut job_progress_reporter,
-  //  inference_duration,
-  //}).await?;
-
-  // TODO(bt,2024-07-16): Clean all of this up.
 
   // ==================== OTHER FILE METADATA ==================== //
 
@@ -292,15 +300,15 @@ pub async fn process_live_portrait_job(
         .map(|dimensions| dimensions.height as u32);
   }
 
-  let file_checksum = sha256_hash_file(&output_file_path)
+  let file_checksum = sha256_hash_file(&final_video_path)
       .map_err(|err| {
         ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
       })?;
 
-  let file_size_bytes = file_size(&output_file_path)
+  let file_size_bytes = file_size(&final_video_path)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
-  let mimetype = get_mimetype_for_file(&output_file_path)
+  let mimetype = get_mimetype_for_file(&final_video_path)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
@@ -326,7 +334,7 @@ pub async fn process_live_portrait_job(
 
   deps.buckets.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
-    &output_file_path,
+    &final_video_path,
     &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
