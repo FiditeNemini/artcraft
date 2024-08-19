@@ -7,6 +7,7 @@ use actix_web::http::{StatusCode, Uri};
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
+use url::Url;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -91,7 +92,7 @@ pub struct MediaFileInfo {
   pub public_bucket_path: String,
 
   /// Full URL to the media file
-  pub public_bucket_url: String,
+  pub public_bucket_url: Url,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -357,7 +358,11 @@ async fn modern_media_file_lookup(
       maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
       maybe_scene_source_media_file_token: result.maybe_scene_source_media_file_token,
-      public_bucket_url: aws_bucket_url_from_str_path(&public_bucket_path),
+      public_bucket_url: aws_bucket_url_from_str_path(&public_bucket_path)
+          .map_err(|err| {
+            warn!("error creating URL: {:?}", err);
+            GetMediaFileError::ServerError
+          })?,
       public_bucket_path,
       cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
         &result.token,
@@ -483,7 +488,11 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_engine_extension: None,
       maybe_batch_token: None,
       maybe_scene_source_media_file_token: None,
-      public_bucket_url: aws_bucket_url_from_str_path(&public_bucket_path),
+      public_bucket_url: aws_bucket_url_from_str_path(&public_bucket_path)
+          .map_err(|err| {
+            warn!("error creating URL: {:?}", err);
+            GetMediaFileError::ServerError
+          })?,
       public_bucket_path,
       cover_image: MediaFileCoverImageDetails::from_token_str(&result.tts_result_token),
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
