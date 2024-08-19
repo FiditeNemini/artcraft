@@ -119,7 +119,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 import StyleVideo from "./pages/style-video";
-import AIFaceMirror from "./pages/ai_face_mirror";
+// import AIFaceMirror from "./pages/ai_face_mirror";
 import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
 import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
@@ -756,7 +756,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   {/* NEW LIVE PORTRAIT PAGE */}
-                  <Route exact path="/dev-lp">
+                  <Route exact path="/ai-live-portrait">
                     <LivePortrait
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
@@ -1011,14 +1011,14 @@ class PageContainer extends React.Component<
                     <WaitlistNextStepsPage />
                   </Route>
 
-                  <Route path="/ai-live-portrait">
+                  {/* <Route path="/ai-live-portrait">
                     <AIFaceMirror
                       {...{
                         sessionSubscriptionsWrapper:
                           this.props.sessionSubscriptionsWrapper,
                       }}
                     />
-                  </Route>
+                  </Route> */}
 
                   {/*
                   // <Route path="/engine-compositor">
