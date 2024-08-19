@@ -15,7 +15,8 @@ class BucketConfig {
     if (path !== undefined && path !== null && !path.startsWith("/")) {
       path = "/" + path;
     }
-    return `https://storage.googleapis.com/${bucket}${path}`;
+    //return `https://storage.googleapis.com/${bucket}${path}`;
+    return `https://vocode.s3.amazonaws.com/${bucket}${path}`;
   }
 
   private getBucket(): string {
