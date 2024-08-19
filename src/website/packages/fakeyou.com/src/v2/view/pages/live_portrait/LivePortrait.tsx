@@ -663,7 +663,7 @@ export default function LivePortrait({
     return (
       <LoginBlock
         title="You need to be logged in to use Live Portrait"
-        redirect="/dev-lp"
+        redirect="/ai-live-portrait"
       />
     );
   }
