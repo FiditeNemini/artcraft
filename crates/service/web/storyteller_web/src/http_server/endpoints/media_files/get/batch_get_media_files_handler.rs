@@ -10,6 +10,7 @@ use actix_web_lab::extract::Query;
 use chrono::{DateTime, Utc};
 use futures_old_for_limiter::future::result;
 use log::warn;
+use url::Url;
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -34,6 +35,9 @@ use crate::http_server::common_responses::media_file_cover_image_details::{Media
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;
+use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
+use crate::http_server::web_utils::bucket_urls::bucket_url_from_str_path::bucket_url_from_str_path;
+use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -94,8 +98,13 @@ pub struct BatchMediaFileInfo {
   /// If the file was generated as part of a batch, this is the token for the batch.
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
-  /// URL to the media file
+  /// (DEPRECATED) URL path to the media file
+  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
   pub public_bucket_path: String,
+
+  // NB: Should be of type URL, but making infallible for faster port
+  /// Full URL to the media file
+  pub public_bucket_url: String,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -281,9 +290,7 @@ pub async fn batch_get_media_files_handler(
         let public_bucket_path = MediaFileBucketPath::from_object_hash(
           &result.public_bucket_directory_hash,
           result.maybe_public_bucket_prefix.as_deref(),
-          result.maybe_public_bucket_extension.as_deref())
-            .get_full_object_path_str()
-            .to_string();
+          result.maybe_public_bucket_extension.as_deref());
 
         let maybe_cover_image_public_bucket_path = match result.maybe_model_cover_image_public_bucket_hash
             .as_deref()
@@ -316,7 +323,10 @@ pub async fn batch_get_media_files_handler(
           maybe_media_subtype: result.maybe_media_subtype,
           maybe_engine_extension,
           maybe_batch_token: result.maybe_batch_token,
-          public_bucket_path,
+          public_bucket_path: public_bucket_path
+              .get_full_object_path_str()
+              .to_string(),
+          public_bucket_url: bucket_url_string_from_media_path(&public_bucket_path),
           cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
             &result.token,
             result.maybe_file_cover_image_public_bucket_hash.as_deref(),

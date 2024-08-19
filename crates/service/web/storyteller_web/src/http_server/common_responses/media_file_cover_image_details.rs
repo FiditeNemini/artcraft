@@ -1,10 +1,11 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-
+use url::Url;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 
 /// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
@@ -22,7 +23,11 @@ const NUMBER_OF_COLORS_SALT_OFFSET : u8 = 1;
 pub struct MediaFileCoverImageDetails {
   // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
   /// If a cover image is set, this is the path to the asset.
+  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
+
+  /// If a cover image is set, this is the URL to the asset.
+  pub maybe_cover_image_public_bucket_url: Option<Url>,
 
   /// For items without a cover image, we can use one of our own.
   pub default_cover: MediaFileDefaultCover,
@@ -47,6 +52,7 @@ impl MediaFileCoverImageDetails {
     Self {
       // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
       maybe_cover_image_public_bucket_path: None,
+      maybe_cover_image_public_bucket_url: None,
       default_cover: MediaFileDefaultCover::from_token_str(token),
     }
   }
@@ -79,12 +85,20 @@ impl MediaFileCoverImageDetails {
         ));
 
     let maybe_cover_image_public_bucket_path = maybe_bucket_path
+        .as_ref()
         .map(|bucket_path| bucket_path
             .get_full_object_path_str()
             .to_string());
 
+    // NB: Fail construction open.
+    let maybe_cover_image_public_bucket_url = maybe_bucket_path
+        .as_ref()
+        .map(|bucket_path| bucket_url_from_media_path(bucket_path).ok())
+        .flatten();
+
     Self {
       maybe_cover_image_public_bucket_path,
+      maybe_cover_image_public_bucket_url,
       default_cover: MediaFileDefaultCover::from_token_str(token),
     }
   }

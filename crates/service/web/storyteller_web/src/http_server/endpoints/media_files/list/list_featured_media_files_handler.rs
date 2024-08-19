@@ -31,6 +31,7 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
+use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
@@ -98,8 +99,13 @@ pub struct FeaturedMediaFile {
   /// this describes the animation regime used or supported.
   pub maybe_animation_type: Option<MediaFileAnimationType>,
 
-  /// URL to the media file
+  /// (DEPRECATED) URL path to the media file
+  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
   pub public_bucket_path: String,
+
+  // NB: Should be of type URL, but making infallible for faster port
+  /// Full URL to the media file
+  pub public_bucket_url: String,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -231,17 +237,18 @@ pub async fn list_featured_media_files_handler(
         let public_bucket_path = MediaFileBucketPath::from_object_hash(
           &m.public_bucket_directory_hash,
           m.maybe_public_bucket_prefix.as_deref(),
-          m.maybe_public_bucket_extension.as_deref())
-            .get_full_object_path_str()
-            .to_string();
-
+          m.maybe_public_bucket_extension.as_deref(),
+        );
         FeaturedMediaFile {
           token: m.token.clone(),
           media_class: m.media_class,
           media_type: m.media_type,
           maybe_engine_category: m.maybe_engine_category,
           maybe_animation_type: m.maybe_animation_type,
-          public_bucket_path,
+          public_bucket_path: public_bucket_path
+              .get_full_object_path_str()
+              .to_string(),
+          public_bucket_url: bucket_url_string_from_media_path(&public_bucket_path),
           cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
             &m.token,
             m.maybe_file_cover_image_public_bucket_hash.as_deref(),

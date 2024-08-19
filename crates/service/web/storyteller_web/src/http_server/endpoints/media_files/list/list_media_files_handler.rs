@@ -30,6 +30,7 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
+use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
@@ -114,8 +115,13 @@ pub struct MediaFileListItem {
   /// Details where the media file came from.
   pub origin: MediaFileOriginDetails,
 
-  /// URL to the media file.
+  /// (DEPRECATED) URL path to the media file
+  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
   pub public_bucket_path: String,
+
+  // NB: Should be of type URL, but making infallible for faster port
+  /// Full URL to the media file
+  pub public_bucket_url: String,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -292,55 +298,60 @@ pub async fn list_media_files_handler(
   };
 
   let results = results_page.records.into_iter()
-      .map(|record| MediaFileListItem {
-        token: record.token.clone(),
-        media_class: record.media_class,
-        media_type: record.media_type,
-        maybe_engine_category: record.maybe_engine_category,
-        maybe_animation_type: record.maybe_animation_type,
-        origin: MediaFileOriginDetails::from_db_fields_str(
-          record.origin_category,
-          record.origin_product_category,
-          record.maybe_origin_model_type,
-          record.maybe_origin_model_token.as_deref(),
-          record.maybe_origin_model_title.as_deref()),
-        origin_category: record.origin_category,
-        origin_product_category: record.origin_product_category,
-        maybe_origin_model_type: record.maybe_origin_model_type
-            .map(|m| PublicMediaFileModelType::from_enum(m)),
-        maybe_origin_model_token: record.maybe_origin_model_token,
-        public_bucket_path: MediaFileBucketPath::from_object_hash(
+      .map(|record| {
+        let public_bucket_path = MediaFileBucketPath::from_object_hash(
           &record.public_bucket_directory_hash,
           record.maybe_public_bucket_prefix.as_deref(),
-          record.maybe_public_bucket_extension.as_deref())
-            .get_full_object_path_str()
-            .to_string(),
-        cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
-          &record.token,
-          record.maybe_file_cover_image_public_bucket_hash.as_deref(),
-          record.maybe_file_cover_image_public_bucket_prefix.as_deref(),
-          record.maybe_file_cover_image_public_bucket_extension.as_deref(),
-        ),
-        maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
-          record.maybe_creator_user_token,
-          record.maybe_creator_username,
-          record.maybe_creator_display_name,
-          record.maybe_creator_gravatar_hash,
-        ),
-        stats: SimpleEntityStats {
-          positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
-          bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
-        },
-        creator_set_visibility: record.creator_set_visibility,
-        maybe_title: record.maybe_title,
-        maybe_text_transcript: record.maybe_text_transcript,
-        maybe_style_name: record.maybe_prompt_args
-            .as_ref()
-            .and_then(|args| args.style_name.as_ref())
-            .and_then(|style| style.to_style_name()),
-        maybe_duration_millis: record.maybe_duration_millis,
-        created_at: record.created_at,
-        updated_at: record.updated_at,
+          record.maybe_public_bucket_extension.as_deref(),
+        );
+        MediaFileListItem {
+          token: record.token.clone(),
+          media_class: record.media_class,
+          media_type: record.media_type,
+          maybe_engine_category: record.maybe_engine_category,
+          maybe_animation_type: record.maybe_animation_type,
+          origin: MediaFileOriginDetails::from_db_fields_str(
+            record.origin_category,
+            record.origin_product_category,
+            record.maybe_origin_model_type,
+            record.maybe_origin_model_token.as_deref(),
+            record.maybe_origin_model_title.as_deref()),
+          origin_category: record.origin_category,
+          origin_product_category: record.origin_product_category,
+          maybe_origin_model_type: record.maybe_origin_model_type
+              .map(|m| PublicMediaFileModelType::from_enum(m)),
+          maybe_origin_model_token: record.maybe_origin_model_token,
+          public_bucket_path: public_bucket_path
+              .get_full_object_path_str()
+              .to_string(),
+          public_bucket_url: bucket_url_string_from_media_path(&public_bucket_path),
+          cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
+            &record.token,
+            record.maybe_file_cover_image_public_bucket_hash.as_deref(),
+            record.maybe_file_cover_image_public_bucket_prefix.as_deref(),
+            record.maybe_file_cover_image_public_bucket_extension.as_deref(),
+          ),
+          maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
+            record.maybe_creator_user_token,
+            record.maybe_creator_username,
+            record.maybe_creator_display_name,
+            record.maybe_creator_gravatar_hash,
+          ),
+          stats: SimpleEntityStats {
+            positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
+            bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
+          },
+          creator_set_visibility: record.creator_set_visibility,
+          maybe_title: record.maybe_title,
+          maybe_text_transcript: record.maybe_text_transcript,
+          maybe_style_name: record.maybe_prompt_args
+              .as_ref()
+              .and_then(|args| args.style_name.as_ref())
+              .and_then(|style| style.to_style_name()),
+          maybe_duration_millis: record.maybe_duration_millis,
+          created_at: record.created_at,
+          updated_at: record.updated_at,
+        }
       })
       .collect::<Vec<_>>();
 
