@@ -28,10 +28,6 @@ import { Button, ButtonIcon, Tooltip } from "~/components";
 export const PreviewEngineCamera = () => {
   useSignals();
 
-  if (editorState.value === EditorStates.PREVIEW) {
-    return null;
-  }
-
   const handleButtonCameraView = () => {
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
@@ -72,7 +68,15 @@ export const PreviewEngineCamera = () => {
   };
 
   return (
-    <div id="preview-engine-camera" className="origin-bottom-left shadow-lg">
+    <div
+      id="preview-engine-camera"
+      className={twMerge(
+        "origin-bottom-left shadow-lg",
+        editorState.value === EditorStates.PREVIEW
+          ? "invisible h-0 w-0"
+          : "visible",
+      )}
+    >
       <div
         className={twMerge(
           "relative",

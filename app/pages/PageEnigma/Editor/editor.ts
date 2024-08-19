@@ -1217,12 +1217,12 @@ class Editor {
         //     document.getElementById("camera-view");
         // }
         this.camViewCanvasMayReset();
-        this.rawRenderer = new THREE.WebGLRenderer({
-          antialias: true,
-          canvas: this.canvasRenderCamReference || undefined,
-          preserveDrawingBuffer: true,
-        });
-        this._configurePostProcessingRaw();
+        // this.rawRenderer = new THREE.WebGLRenderer({
+        //   antialias: true,
+        //   canvas: this.canvasRenderCamReference || undefined,
+        //   preserveDrawingBuffer: true,
+        // });
+        // this._configurePostProcessingRaw();
 
         if (this.camera_person_mode) {
           this.switchCameraView();
