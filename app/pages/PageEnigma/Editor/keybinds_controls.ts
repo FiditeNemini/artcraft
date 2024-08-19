@@ -13,6 +13,7 @@ import {
 import { TransformControls } from "./TransformControls";
 import { SceneManager, SceneObject } from "./scene_manager_api";
 import { FreeCam } from "./free_cam";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export class MouseControls {
   camera: THREE.PerspectiveCamera | null;
@@ -44,6 +45,7 @@ export class MouseControls {
   private cameraViewControls: FreeCam;
   private isMouseClicked: boolean = false;
   private isMovable: Function;
+  enable_stats: Function;
 
   constructor(
     camera: THREE.PerspectiveCamera | null,
@@ -70,6 +72,7 @@ export class MouseControls {
     getAssetType: Function,
     setSelected: Function,
     isMovable: Function,
+    enable_stats: Function
   ) {
     this.camera = camera;
     this.camera_person_mode = camera_person_mode;
@@ -97,6 +100,7 @@ export class MouseControls {
     this.setSelected = setSelected;
     this.sceneManager = undefined;
     this.isMovable = isMovable;
+    this.enable_stats = enable_stats;
   }
 
   focus() {
@@ -230,6 +234,9 @@ export class MouseControls {
         await this.sceneManager?.paste();
         this.isProcessing = false;
         return;
+      } else if (event.key === "0") {
+        // Stats Menu
+        this.enable_stats();
       }
     }
 

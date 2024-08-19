@@ -49,6 +49,7 @@ import {
   VideoAudioPreProcessor,
 } from "./video_audio_preprocessor";
 import { forEach } from "lodash";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -183,10 +184,15 @@ class Editor {
   // this should be set in the future to extend the lenght of the track for rendering engine
   globalSetTrackLengthSeconds: number;
 
+  stats: Stats;
+
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
+
+    this.stats = new Stats();
+
 
     // New Rendering Pipeline Engine Work
     this.globalSetTrackLengthSeconds = 7;
@@ -569,6 +575,7 @@ class Editor {
       this.getAssetType.bind(this),
       this.setSelected.bind(this),
       this.isMovable.bind(this),
+      this.enable_stats.bind(this)
     );
 
     if (this.outliner_feature_flag) {
@@ -628,6 +635,10 @@ class Editor {
 
   public isMovable(): boolean {
     return this.focused;
+  }
+
+  public enable_stats() {
+    document.body.appendChild(this.stats.dom)
   }
 
   public async newScene(sceneTitleInput: string) {
@@ -1161,6 +1172,8 @@ class Editor {
 
     await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
+
+    this.stats.update();
 
     setTimeout(
       () => {
