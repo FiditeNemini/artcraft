@@ -230,30 +230,62 @@ function removeObject3D(object3D) {
 
  */
 
-  deleteObject(uuid: string) {
-    const obj = this.scene.get_object_by_uuid(uuid);
-    this.removeTransformControls();
-    if (obj?.name === this.editor.camera_name) {
-      return;
-    }
-    if (obj) {
-      this.scene.scene.remove(obj);
-    }
-    this.editor.timeline.deleteObject(uuid);
-    Queue.publish({
-      queueName: QueueNames.FROM_ENGINE,
-      action: fromEngineActions.DELETE_OBJECT,
-      data: {
-        version: 1,
-        type: AssetType.OBJECT,
-        media_id: "",
-        object_uuid: uuid,
-        name: "",
-      } as MediaItem,
-    });
-    this.editor.selected = undefined;
-    this.editor.publishSelect();
-    hideObjectPanel();
-    this.editor.timeline.deleteObject(uuid);
+deleteObject(uuid: string) {
+  const obj = this.scene.get_object_by_uuid(uuid);
+  this.removeTransformControls();
+  if (obj?.name === this.editor.camera_name) {
+    return;
   }
+  if (obj) {
+    // Finally remove the object from the scene
+    this.scene.scene.remove(obj);
+
+    obj.traverse(child => {
+      (child as THREE.Mesh)?.geometry?.dispose()
+      if (Array.isArray((child as THREE.Mesh).texture)) {
+        (child as THREE.Mesh).texture.forEach(mat => mat.dispose());
+      } else if ((child as THREE.Mesh).texture) {
+        (child as THREE.Mesh).texture.dispose();
+      }
+
+      if (Array.isArray((child as THREE.Mesh).material)) {
+        (child as THREE.Mesh).material.forEach(mat => mat.dispose());
+      } else if ((child as THREE.Mesh).material) {
+        (child as THREE.Mesh).material.dispose();
+      }
+    })
+
+    if (Array.isArray((obj as THREE.Mesh).texture)) {
+      (obj as THREE.Mesh).texture.forEach(mat => mat.dispose());
+    } else if ((obj as THREE.Mesh).texture) {
+      (obj as THREE.Mesh).texture.dispose();
+    }
+
+    if (Array.isArray((obj as THREE.Mesh).material)) {
+      (obj as THREE.Mesh).material.forEach(mat => mat.dispose());
+    } else if ((obj as THREE.Mesh).material) {
+      (obj as THREE.Mesh).material.dispose();
+    }
+
+    if((obj as THREE.Mesh).geometry){
+      (obj as THREE.Mesh).geometry.dispose()
+    }
+  }
+  this.editor.timeline.deleteObject(uuid);
+  Queue.publish({
+    queueName: QueueNames.FROM_ENGINE,
+    action: fromEngineActions.DELETE_OBJECT,
+    data: {
+      version: 1,
+      type: AssetType.OBJECT,
+      media_id: "",
+      object_uuid: uuid,
+      name: "",
+    } as MediaItem,
+  });
+  this.editor.selected = undefined;
+  this.editor.publishSelect();
+  hideObjectPanel();
+  this.editor.timeline.deleteObject(uuid);
+}
 }
