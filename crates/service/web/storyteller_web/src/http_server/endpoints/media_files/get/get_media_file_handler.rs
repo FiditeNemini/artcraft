@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
+use actix_web::http::{StatusCode, Uri};
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
@@ -31,6 +31,8 @@ use crate::http_server::common_responses::media_file_cover_image_details::{Media
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;
+use crate::http_server::web_utils::bucket_urls::aws_bucket_url_from_media_path::aws_bucket_url_from_media_path;
+use crate::http_server::web_utils::bucket_urls::aws_bucket_url_from_str_path::aws_bucket_url_from_str_path;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -85,7 +87,11 @@ pub struct MediaFileInfo {
   pub maybe_scene_source_media_file_token: Option<MediaFileToken>,
 
   /// URL to the media file
+  #[deprecated(note="Please never use this field. It doesn't point to the full URL.")]
   pub public_bucket_path: String,
+
+  /// Full URL to the media file
+  pub public_bucket_url: String,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -351,6 +357,7 @@ async fn modern_media_file_lookup(
       maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
       maybe_scene_source_media_file_token: result.maybe_scene_source_media_file_token,
+      public_bucket_url: aws_bucket_url_from_str_path(&public_bucket_path),
       public_bucket_path,
       cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
         &result.token,
@@ -476,6 +483,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_engine_extension: None,
       maybe_batch_token: None,
       maybe_scene_source_media_file_token: None,
+      public_bucket_url: aws_bucket_url_from_str_path(&public_bucket_path),
       public_bucket_path,
       cover_image: MediaFileCoverImageDetails::from_token_str(&result.tts_result_token),
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
