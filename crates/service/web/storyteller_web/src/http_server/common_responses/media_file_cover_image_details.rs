@@ -23,7 +23,7 @@ const NUMBER_OF_COLORS_SALT_OFFSET : u8 = 1;
 pub struct MediaFileCoverImageDetails {
   // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
   /// If a cover image is set, this is the path to the asset.
-  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
+  #[deprecated(note="This field doesn't point to the full URL. Use maybe_cover_image_public_bucket_url instead.")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
   /// If a cover image is set, this is the URL to the asset.

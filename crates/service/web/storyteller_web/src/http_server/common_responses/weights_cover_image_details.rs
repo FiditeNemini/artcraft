@@ -1,8 +1,9 @@
+use url::Url;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::model_weights::ModelWeightToken;
-
+use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use crate::util::placeholder_images::cover_images::default_cover_image_color_from_token::default_cover_image_color_from_token;
 use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
 
@@ -12,7 +13,11 @@ use crate::util::placeholder_images::cover_images::default_cover_image_from_toke
 #[derive(Clone, Serialize, ToSchema)]
 pub struct WeightsCoverImageDetails {
   /// If a cover image is set, this is the path to the asset.
+  #[deprecated(note="This field doesn't point to the full URL. Use maybe_cover_image_public_bucket_url instead.")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
+
+  /// If a cover image is set, this is the URL to the asset.
+  pub maybe_cover_image_public_bucket_url: Option<Url>,
 
   /// For items without a cover image, we can use one of our own.
   pub default_cover: WeightsDefaultCoverInfo,
@@ -43,14 +48,22 @@ impl WeightsCoverImageDetails {
         ));
 
     let maybe_cover_image_public_bucket_path = maybe_bucket_path
+        .as_ref()
         .map(|bucket_path| bucket_path
             .get_full_object_path_str()
             .to_string());
+
+    // NB: Fail construction open.
+    let maybe_cover_image_public_bucket_url = maybe_bucket_path
+        .as_ref()
+        .map(|bucket_path| bucket_url_from_media_path(bucket_path).ok())
+        .flatten();
 
     let image_index = default_cover_image_from_token(model_weight_token);
 
     Self {
       maybe_cover_image_public_bucket_path,
+      maybe_cover_image_public_bucket_url,
       default_cover: WeightsDefaultCoverInfo::from_token(model_weight_token),
     }
   }
@@ -67,6 +80,7 @@ impl WeightsDefaultCoverInfo {
 
 #[cfg(test)]
 mod tests {
+  use url::Url;
   use tokens::tokens::model_weights::ModelWeightToken;
 
   use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
@@ -86,6 +100,8 @@ mod tests {
     );
 
     assert_eq!(cover_image.maybe_cover_image_public_bucket_path, Some("/media/b/u/c/k/e/bucket_hash/image_bucket_hash.png".to_string()));
+    assert_eq!(cover_image.maybe_cover_image_public_bucket_url,
+               Some(Url::parse("https://storage.googleapis.com/vocodes-public/media/b/u/c/k/e/bucket_hash/image_bucket_hash.png").unwrap()));
     assert_eq!(cover_image.default_cover.image_index, 18);
   }
 }
