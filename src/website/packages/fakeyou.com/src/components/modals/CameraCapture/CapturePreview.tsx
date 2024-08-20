@@ -22,24 +22,37 @@ export default function CapturePreview({
       <a.div {...{ className: "fy-camera-capture-slide", style }}>
         <video
           controls
-          {...{ className: "fy-camera-capture-preview", src: url }}
-        />
-        <Button
+          playsInline
           {...{
-            className: "fy-camera-capture-float-button",
-            label: "Try again",
-            onClick: () => resetCapture(),
-            variant: "secondary",
+            // onClick,
+            // onPlay: () => isPlayingSet(true),
+            // onPause: () => isPlayingSet(false),
+            className: "fy-camera-capture-preview",
+            src: url,
           }}
         />
-        <Button
+        <div
           {...{
-            className: "fy-camera-capture-float-button",
-            label: "Upload and use",
-            variant: "primary",
-            onClick: upload,
+            className: `fy-camera-capture-preview-actions`,
           }}
-        />
+        >
+          <Button
+            {...{
+              className: "fy-camera-capture-float-button",
+              label: "Try again",
+              onClick: () => resetCapture(),
+              variant: "secondary",
+            }}
+          />
+          <Button
+            {...{
+              className: "fy-camera-capture-float-button",
+              label: "Upload and use",
+              variant: "primary",
+              onClick: upload,
+            }}
+          />
+        </div>
       </a.div>
     );
   } else return null;

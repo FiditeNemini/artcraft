@@ -1,10 +1,14 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
+@import "scss/_breakpoint.scss";
+@import "scss/breakpoints.scss";
 
 .fy-camera-capture-modal {
 	// background: red;
-	width: 75vh;
-	height: 75vh;
+	width: 85vw;
+	aspect-ratio: 1/1;
+	max-height: 95vh;
+	// height: 75vh;
 
 	position: relative;
 
@@ -51,6 +55,13 @@
 		width: 50%;
 		display: flex;
 		justify-content: center;
+		gap: 1rem;
+		align-items: center;
+		// justify-content: space-between;
+
+		@include breakpoint($under992) {
+			width: 75%;
+		}
 	}
 
 	.fy-camera-capture-record-toggle {
@@ -123,19 +134,18 @@
 		position: absolute;
 	}
 
-	.fy-camera-capture-float-button {
+	.fy-camera-capture-preview-actions {
 		position: absolute;
+		display: flex;
 		top: 1rem;
+		left: 1rem;
+		gap: 1rem;
 
-		&:first-of-type {
-			left: 1rem;
-		}
-
-		&:last-of-type {
-			margin: auto;
-			width: fit-content;
+		@include breakpoint($under768) {
+			justify-content: center;
+			top: 4.5rem;
 			left: 0;
-			right: 0;
+			width: 100%;
 		}
 	}
 }

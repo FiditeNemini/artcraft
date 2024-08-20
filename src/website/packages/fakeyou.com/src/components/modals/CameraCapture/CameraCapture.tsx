@@ -4,7 +4,12 @@ import { a, TransitionFn, useSpring, useTransition } from "@react-spring/web";
 import { WorkIndicator } from "components/svg";
 import { useInterval, useMediaUploader } from "hooks";
 import { UploaderResponse } from "components/entities/EntityTypes";
-import { Button, ModalUtilities, Spinner } from "components/common";
+import {
+  Button,
+  ModalUtilities,
+  Spinner,
+  SegmentButtons,
+} from "components/common";
 import { faClose } from "@fortawesome/pro-solid-svg-icons";
 import CapturePreview from "./CapturePreview";
 import "./CameraCapture.scss";
@@ -24,6 +29,7 @@ export default function CameraCapture({
   const [counter, counterSet] = useState(0);
   const [blob, blobSet] = useState<Blob | null>(null);
   const [cameraStarted, cameraStartedSet] = useState(false);
+  const [cameraPosition, cameraPositionSet] = useState("user");
 
   const hours = Math.floor(counter / 3600);
   const minutes = Math.floor((counter - hours * 3600) / 60);
@@ -119,6 +125,15 @@ export default function CameraCapture({
     leave: { opacity: 0, transform: `translateX(${5}rem)` },
   });
 
+  const supports = navigator.mediaDevices.getSupportedConstraints();
+
+  const cameraOptions = [
+    { label: "Selfie camera", value: "user" },
+    { label: "Rear camera", value: "enviroment" },
+  ];
+
+  console.log("😶‍🌫️", supports, !supports.facingMode);
+
   useInterval({
     eventProps: { capturing, counter },
     interval: 1000,
@@ -168,7 +183,10 @@ export default function CameraCapture({
                 videoConstraints: {
                   width: 512,
                   height: 512,
-                  facingMode: "user",
+                  facingMode:
+                    cameraPosition === "user"
+                      ? cameraPosition
+                      : { exact: cameraPosition },
                 },
               }}
             />
@@ -206,6 +224,16 @@ export default function CameraCapture({
                   </svg>
                   {capturing ? timeString : "Record"}
                 </button>
+                {!supports.facingMode && (
+                  <SegmentButtons
+                    {...{
+                      value: cameraPosition,
+                      onChange: ({ target }: { target: { value: string } }) =>
+                        cameraPositionSet(target.value),
+                      options: cameraOptions,
+                    }}
+                  />
+                )}
               </div>
             ) : (
               <div {...{ className: "fy-camera-capture-centered" }}>
