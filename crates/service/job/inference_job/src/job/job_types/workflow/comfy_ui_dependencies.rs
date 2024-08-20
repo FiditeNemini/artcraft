@@ -9,6 +9,7 @@ use easyenv::{get_env_pathbuf_required, get_env_string_optional};
 use errors::AnyhowResult;
 
 use crate::job::job_types::workflow::comfy_ui_inference_command::ComfyInferenceCommand;
+use crate::state::common::watermark_configs::WatermarkConfigs;
 use crate::util::common_commands::ffmpeg::old::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::common_commands::ffmpeg::runner::ffmpeg_command_runner::FfmpegCommandRunner;
 
@@ -18,8 +19,8 @@ pub struct ComfyDependencies {
     pub ffmpeg_command_runner: FfmpegCommandRunner,
     pub configs: ComfyConfigs,
 
-    pub fakeyou_watermark_path: PathBuf,
-    pub storyteller_watermark_path: PathBuf,
+    /// Watermarks added to videos (or perhaps images in the future)
+    pub watermarks: WatermarkConfigs,
 }
 
 /// NB: These are used for logging and debugging by the art team
@@ -100,8 +101,7 @@ impl ComfyDependencies {
                 face_detailer_workflow: get_env_string_optional("FACE_DETAILER_WORKFLOW"),
                 upscaler_workflow: get_env_string_optional("UPSCALER_WORKFLOW"),
             },
-            fakeyou_watermark_path: get_env_pathbuf_required("FAKEYOU_WATERMARK_PATH")?,
-            storyteller_watermark_path: get_env_pathbuf_required("STORYTELLER_WATERMARK_PATH")?,
+            watermarks: WatermarkConfigs::from_env()?,
         })
     }
 }

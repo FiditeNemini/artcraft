@@ -1,3 +1,4 @@
+pub mod common;
 pub mod job_dependencies;
 pub mod job_specific_dependencies;
 pub mod scoped_job_type_execution;

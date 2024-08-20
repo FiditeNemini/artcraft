@@ -229,13 +229,13 @@ pub async fn process_live_portrait_job(
 
   let mut final_video_path = output_file_path.clone();
 
-  let maybe_watermark_logo_path = match job_payload.watermark_type {
-    Some(WatermarkType::FakeYou) => Some(&comfy_deps.fakeyou_watermark_path),
-    Some(WatermarkType::Storyteller) => Some(&comfy_deps.storyteller_watermark_path),
+  let maybe_watermark_details = match job_payload.watermark_type {
+    Some(WatermarkType::FakeYou) => Some(&comfy_deps.watermarks.fakeyou),
+    Some(WatermarkType::Storyteller) => Some(&comfy_deps.watermarks.storyteller),
     _ => None,
   };
 
-  if let Some(watermark_logo_path) = maybe_watermark_logo_path {
+  if let Some(watermark_details) = maybe_watermark_details {
     info!("Adding watermark to video...");
 
     let watermark_output_file = work_temp_dir.path().join("watermark.mp4");
@@ -244,9 +244,9 @@ pub async fn process_live_portrait_job(
         .ffmpeg_watermark_command
         .execute(WatermarkArgs {
           video_path: &output_file_path,
-          maybe_override_logo_path: Some(watermark_logo_path),
-          alpha: 0.6,
-          scale: 0.1,
+          maybe_override_logo_path: Some(&watermark_details.path),
+          alpha: watermark_details.alpha,
+          scale: watermark_details.scale,
           output_path: &watermark_output_file,
         });
 
