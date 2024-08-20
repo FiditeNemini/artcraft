@@ -4,28 +4,44 @@ import { STYLE_OPTIONS } from "common/StyleOptions";
 const initialStyle = STYLE_OPTIONS[0];
 
 interface StyleStore {
-  currentImage: string;
-  selectedStyleValue: string;
-  selectedStyleLabel: string;
-  setCurrentImage: (imageSrc: string) => void;
-  setSelectedStyle: (value: string, label?: string, image?: string) => void;
-  resetImage: () => void;
+  currentImages: string[];
+  selectedStyleValues: string[];
+  selectedStyleLabels: string[];
+  setCurrentImages: (images: string[]) => void;
+  setSelectedStyles: (
+    values: string[],
+    labels?: string[],
+    images?: string[]
+  ) => void;
+  resetImages: () => void;
 }
 
 const useStyleStore = create<StyleStore>(set => ({
-  currentImage:
+  currentImages: [
     initialStyle.image || "/images/placeholders/style_placeholder.png",
-  selectedStyleValue: initialStyle.value,
-  selectedStyleLabel: initialStyle.label,
-  setCurrentImage: (imageSrc: string) => set({ currentImage: imageSrc }),
-  setSelectedStyle: (value: string, label?: string, image?: string) =>
+  ],
+  selectedStyleValues: [initialStyle.value],
+  selectedStyleLabels: [initialStyle.label],
+  setCurrentImages: (images: string[]) => {
+    console.log("Setting current images:", images); // Debugging
+    set({ currentImages: images });
+  },
+  setSelectedStyles: (
+    values: string[],
+    labels: string[] = [],
+    images: string[] = []
+  ) => {
+    console.log("Setting selected styles:", values, labels, images); // Debugging
     set({
-      selectedStyleValue: value,
-      selectedStyleLabel: label,
-      currentImage: image,
-    }),
-  resetImage: () =>
-    set({ currentImage: "/images/placeholders/style_placeholder.png" }),
+      selectedStyleValues: values,
+      selectedStyleLabels: labels.length ? labels : values.map(() => ""),
+      currentImages: images.length
+        ? images
+        : values.map(() => "/images/placeholders/style_placeholder.png"),
+    });
+  },
+  resetImages: () =>
+    set({ currentImages: ["/images/placeholders/style_placeholder.png"] }),
 }));
 
 export default useStyleStore;

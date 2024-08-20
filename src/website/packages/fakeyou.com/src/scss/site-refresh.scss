@@ -1053,16 +1053,8 @@ styles with important tags:
     -moz-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
   }
 
-  .modal-header {
-    border-bottom: 1px solid lighten($panel, 8%);
-  }
-
   .modal-header .btn-close {
     filter: brightness(0) invert(1);
-  }
-
-  .modal-footer {
-    border-top: 1px solid lighten($panel, 8%);
   }
 
   .rounded-top-0 {

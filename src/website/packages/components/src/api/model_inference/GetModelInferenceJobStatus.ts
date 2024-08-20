@@ -27,6 +27,8 @@ export interface RequestDetails {
   maybe_raw_inference_text?: string;
 
   maybe_live_portrait_details?: LivePortraitDetails;
+
+  maybe_style_name?: string;
 }
 
 export interface StatusDetails {

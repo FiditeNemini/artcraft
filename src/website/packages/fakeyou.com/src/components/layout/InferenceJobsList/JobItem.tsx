@@ -15,6 +15,7 @@ import {
   jobStateCanChange,
 } from "@storyteller/components/src/jobs/JobStates";
 import { useHistory } from "react-router-dom";
+import { STYLES_BY_KEY } from "common/StyleOptions";
 
 interface JobListItem extends InferenceJob {
   failures: (fail: string) => string;
@@ -56,6 +57,7 @@ export default function JobItem({
   frontendJobType,
   maybeFailureCategory,
   maybeModelTitle,
+  maybeStyleName,
   maybeResultToken,
   onSelect,
   progressPercentage,
@@ -201,14 +203,23 @@ export default function JobItem({
         <a.h6 {...{ style: headingBounce }}>
           {t(`${jobType}.${jobStatus}`)}
         </a.h6>
-        <a.span
-          {...{
-            style: subtitleBounce,
-            className: `fy-inference-job-subtitle${success ? "-success" : ""}`,
-          }}
-        >
-          {subtitle}
-        </a.span>
+        <div className="d-flex align-items-center gap-2">
+          <a.span
+            {...{
+              style: subtitleBounce,
+              className: `fy-inference-job-subtitle${
+                success ? "-success" : ""
+              }`,
+            }}
+          >
+            {subtitle}
+          </a.span>
+          {maybeStyleName && (
+            <span className="opacity-75 fs-7">
+              ({STYLES_BY_KEY.get(maybeStyleName)?.label || maybeStyleName})
+            </span>
+          )}
+        </div>
       </div>
       <div {...{ ...outerProps("fy-inference-job-info"), ...hoverSet }}>
         {showModel() && (

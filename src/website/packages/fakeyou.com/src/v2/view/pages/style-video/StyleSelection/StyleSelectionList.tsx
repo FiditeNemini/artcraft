@@ -1,47 +1,70 @@
 import React from "react";
 import { StyleOption } from "common/StyleOptions";
-import ModalHeader from "components/modals/ModalHeader";
 
 interface StyleSelectionListProps {
   styleOptions: StyleOption[];
-  selectedStyle: string;
-  onStyleClick: (style: string, label: string, image: string) => void;
+  selectedStyles: string[];
+  onStyleClick: (styles: string[], labels: string[], images: string[]) => void;
   handleClose?: any;
 }
 
+const MAX_STYLES = 3;
+
 const StyleSelectionList = ({
   styleOptions,
-  selectedStyle,
+  selectedStyles,
   onStyleClick,
   handleClose,
 }: StyleSelectionListProps) => {
-  return (
-    <>
-      <ModalHeader {...{ handleClose, title: "Choose a Style" }} />
+  const handleStyleSelection = (style: StyleOption) => {
+    let updatedStyles = [...selectedStyles];
+    let updatedLabels: string[] = [];
+    let updatedImages: string[] = [];
 
-      <div className="row g-2 style-options-list">
-        {styleOptions.map(option => (
+    if (updatedStyles.includes(style.value)) {
+      updatedStyles = updatedStyles.filter(s => s !== style.value);
+    } else {
+      if (updatedStyles.length >= MAX_STYLES) {
+        updatedStyles.shift();
+      }
+      updatedStyles.push(style.value);
+    }
+
+    updatedLabels = updatedStyles.map(
+      s => styleOptions.find(option => option.value === s)?.label || ""
+    );
+    updatedImages = updatedStyles.map(
+      s => styleOptions.find(option => option.value === s)?.image || ""
+    );
+
+    onStyleClick(updatedStyles, updatedLabels, updatedImages);
+  };
+
+  return (
+    <div className="row g-2 style-options-list">
+      {styleOptions.map(option => (
+        <div
+          key={option.value}
+          className="col-6 col-md-4 col-lg-4 col-xl-3"
+          onClick={() => handleStyleSelection(option)}
+        >
           <div
-            key={option.value}
-            className="col-6 col-md-4 col-lg-4 col-xl-3"
-            onClick={() =>
-              onStyleClick(option.value, option.label, option.image || "")
-            }
+            className={`style-option ${
+              selectedStyles.includes(option.value) ? "selected" : ""
+            }`}
           >
+            <img src={option.image} alt={option.label} />
             <div
-              className={`style-option ${
-                option.value === selectedStyle ? "selected" : ""
+              className={`style-gradient ${
+                selectedStyles.includes(option.value) ? "selected" : ""
               }`}
-            >
-              <img src={option.image} alt={option.label} />
-              <div className="style-gradient" />
-              <h6 className="style-title">{option.label}</h6>
+            />
+            <h6 className="style-title">{option.label}</h6>
+            {selectedStyles.includes(option.value) && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
-                className={`selected-style ${
-                  option.value === selectedStyle ? "opacity-100" : "opacity-0"
-                }`}
+                className="selected-style opacity-100"
               >
                 <path
                   opacity="1"
@@ -53,11 +76,11 @@ const StyleSelectionList = ({
                   fill="#FFFFFF"
                 />
               </svg>
-            </div>
+            )}
           </div>
-        ))}
-      </div>
-    </>
+        </div>
+      ))}
+    </div>
   );
 };
 

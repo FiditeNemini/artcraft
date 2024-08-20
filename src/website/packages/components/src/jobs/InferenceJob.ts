@@ -48,6 +48,7 @@ export class InferenceJob {
   maybeModelTitle?: string;
   maybeRawInferenceText?: string;
   maybeLivePortraitDetails?: LivePortraitDetails;
+  maybeStyleName?: string;
 
   // Result
   maybeResultType: string | undefined | null;
@@ -72,6 +73,7 @@ export class InferenceJob {
     maybeModelTitle: string | undefined = undefined,
     maybeRawInferenceText: string | undefined = undefined,
     maybeLivePortraitDetails: LivePortraitDetails | undefined = undefined,
+    maybeStyleName: string | undefined = undefined,
     // Result
     maybeResultEntityType: string | undefined | null = null,
     maybeResultEntityToken: string | undefined | null = null,
@@ -99,6 +101,10 @@ export class InferenceJob {
     this.maybeRawInferenceText = maybeRawInferenceText;
 
     this.maybeLivePortraitDetails = maybeLivePortraitDetails;
+
+    if (!!maybeResultEntityType) {
+      this.maybeStyleName = maybeStyleName;
+    }
 
     if (!!maybeResultEntityType) {
       this.maybeResultType = maybeResultEntityType;
@@ -131,6 +137,7 @@ export class InferenceJob {
       response.request.maybe_model_title,
       response.request.maybe_raw_inference_text,
       response.request.maybe_live_portrait_details,
+      response.request.maybe_style_name,
       response.maybe_result?.entity_type,
       response.maybe_result?.entity_token,
       response.maybe_result?.maybe_public_bucket_media_path,

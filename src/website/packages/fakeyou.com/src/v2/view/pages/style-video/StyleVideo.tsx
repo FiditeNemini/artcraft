@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs, useModal, useSession } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 import {
   Button,
   Container,
@@ -13,6 +13,7 @@ import {
   DropdownOptions,
   SessionFetchingSpinner,
   LoginBlock,
+  Modal,
 } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -25,7 +26,7 @@ import { STYLE_OPTIONS, STYLES_BY_KEY } from "common/StyleOptions";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
 import useStyleStore from "hooks/useStyleStore";
-import StyleOptionPicker from "./StyleSelection/StyleSelectionList";
+import StyleSelectionList from "./StyleSelection/StyleSelectionList";
 import { isMobile } from "react-device-detect";
 import { AITools } from "components/marketing";
 
@@ -43,49 +44,69 @@ export default function StyleVideo() {
   const [enableLipsync, setEnableLipsync] = useState(false);
   const [strength, setStrength] = useState(1.0);
   const { enqueue } = useInferenceJobs();
-  const { setSelectedStyle, setCurrentImage, selectedStyleValue } =
-    useStyleStore();
-  const { open, close } = useModal();
-  const openModal = () =>
-    open({
-      component: StyleOptionPicker,
-      props: {
-        styleOptions: STYLE_OPTIONS,
-        selectedStyle: selectedStyleValue,
-        onStyleClick: handleStyleClick,
-      },
-    });
+  const {
+    setSelectedStyles,
+    setCurrentImages,
+    selectedStyleValues,
+    selectedStyleLabels,
+  } = useStyleStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    if (selectedStyleValues.length === 0) {
+      // If no styles are selected, select the first one by default
+      const firstStyle = STYLE_OPTIONS[0];
+      setSelectedStyles(
+        [firstStyle.value],
+        [firstStyle.label],
+        [firstStyle.image || ""]
+      );
+      setCurrentImages([firstStyle.image || ""]);
+    }
+    setIsModalOpen(false);
+  };
 
   usePrefixedDocumentTitle("Style Video");
 
-  const onClick = () => {
-    if (mediaToken) {
-      EnqueueVST("", {
-        creator_set_visibility: "private",
-        enable_lipsync: enableLipsync,
-        ...(IPAToken ? { global_ipa_media_token: IPAToken } : {}),
-        input_file: mediaToken,
-        negative_prompt: negativePrompt,
-        prompt,
-        style: selectedStyleValue,
-        trim_end_millis: length,
-        trim_start_millis: 0,
-        use_face_detailer: useFaceDetailer,
-        use_cinematic: useCinematic,
-        use_upscaler: useUpscaler,
-        use_strength: strength,
-        uuid_idempotency_token: uuidv4(),
-      }).then((res: EnqueueVSTResponse) => {
-        if (res.success && res.inference_job_token) {
-          enqueue(
-            res.inference_job_token,
-            FrontendInferenceJobType.VideoStyleTransfer,
-            true
-          );
-        } else {
-          console.log("Failed to enqueue job", res);
+  const onClick = async () => {
+    if (mediaToken && selectedStyleValues.length > 0) {
+      const maxJobs = Math.min(3, selectedStyleValues.length);
+      for (let i = 0; i < maxJobs; i++) {
+        try {
+          const res: EnqueueVSTResponse = await EnqueueVST("", {
+            creator_set_visibility: "private",
+            enable_lipsync: enableLipsync,
+            ...(IPAToken ? { global_ipa_media_token: IPAToken } : {}),
+            input_file: mediaToken,
+            negative_prompt: negativePrompt,
+            prompt,
+            style: selectedStyleValues[i],
+            trim_end_millis: length,
+            trim_start_millis: 0,
+            use_face_detailer: useFaceDetailer,
+            use_cinematic: useCinematic,
+            use_upscaler: useUpscaler,
+            use_strength: strength,
+            uuid_idempotency_token: uuidv4(),
+          });
+
+          if (res.success && res.inference_job_token) {
+            enqueue(
+              res.inference_job_token,
+              FrontendInferenceJobType.VideoStyleTransfer,
+              true
+            );
+          } else {
+            console.log("Failed to enqueue job", res);
+          }
+        } catch (error) {
+          console.error("Error enqueuing job", error);
         }
-      });
+      }
     }
   };
 
@@ -100,10 +121,10 @@ export default function StyleVideo() {
     negativePromptSet(prompt?.maybe_negative_prompt || "");
     const styleOption = STYLES_BY_KEY.get(prompt?.maybe_style_name || "");
     if (styleOption) {
-      setSelectedStyle(
-        styleOption.value,
-        styleOption.label,
-        styleOption.image || ""
+      setSelectedStyles(
+        [styleOption.value],
+        [styleOption.label],
+        [styleOption.image || ""]
       );
     }
     IPATokenSet(prompt?.maybe_global_ipa_image_token || "");
@@ -116,6 +137,15 @@ export default function StyleVideo() {
 
   const handleSliderChange = ({ target }: { target: any }) => {
     setStrength(parseFloat(target.value));
+  };
+
+  const handleStyleClick = (
+    updatedStyles: string[],
+    updatedLabels: string[],
+    updatedImages: string[]
+  ) => {
+    setSelectedStyles(updatedStyles, updatedLabels, updatedImages);
+    setCurrentImages(updatedImages);
   };
 
   const vstInfo = (
@@ -168,12 +198,6 @@ export default function StyleVideo() {
       </div>
     </div>
   );
-
-  const handleStyleClick = (style: string, label: string, image: string) => {
-    setSelectedStyle(style, label);
-    setCurrentImage(image);
-    close();
-  };
 
   if (!sessionFetched) {
     return <SessionFetchingSpinner />;
@@ -241,6 +265,29 @@ export default function StyleVideo() {
                 />
               </div>
             </Panel>
+
+            <Modal
+              show={isModalOpen}
+              handleClose={closeModal}
+              large={true}
+              content={StyleSelectionList}
+              title="Select Style(s)"
+              subtitle="You may choose up to three styles to generate multiple videos at once."
+              contentProps={{
+                styleOptions: STYLE_OPTIONS,
+                selectedStyles: selectedStyleValues,
+                onStyleClick: handleStyleClick,
+              }}
+              showButtons={false}
+              footerContent={
+                <div className="d-flex w-100 justify-content-between align-items-center gap-2">
+                  <div className="fw-medium opacity-75">
+                    Selected: {selectedStyleLabels.join(", ") || "None"}
+                  </div>
+                  <Button label="Done" onClick={closeModal} />
+                </div>
+              }
+            />
           </div>
           <div className="col-12 col-lg-4 col-xl-3">
             <Panel

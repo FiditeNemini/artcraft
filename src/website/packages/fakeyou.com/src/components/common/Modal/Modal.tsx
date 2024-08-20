@@ -18,6 +18,7 @@ interface ModalProps {
   onCancel?: (e: React.MouseEvent<HTMLElement>) => any;
   onConfirm?: (e: React.MouseEvent<HTMLElement>) => any;
   title?: string;
+  subtitle?: string;
   icon?: IconDefinition;
   autoWidth?: boolean;
   showButtons?: boolean;
@@ -25,6 +26,7 @@ interface ModalProps {
   large?: boolean;
   position?: "center" | "top";
   mobileFullscreen?: boolean;
+  footerContent?: React.ReactNode;
 }
 
 export interface ModalUtilities {
@@ -43,7 +45,7 @@ const ModalBody = ({
   omitBody ? (
     children
   ) : (
-    <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
+    <div {...{ className: `modal-body ${padding ? "px-3" : ""}` }}>
       {children}
     </div>
   );
@@ -62,10 +64,12 @@ const Modal: React.FC<ModalProps> = ({
   show,
   showButtons = true,
   title,
+  subtitle,
   padding = true,
   large = false,
   position = "center",
   mobileFullscreen = false,
+  footerContent,
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
@@ -127,32 +131,47 @@ const Modal: React.FC<ModalProps> = ({
         >
           <div className={`modal-content`.trim()}>
             {!noHeader && (
-              <header className="modal-header">
-                <h5 className="modal-title">
-                  {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
-                  {title || ""}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleClose}
-                  aria-label="Close"
-                />
-              </header>
+              <div className="mb-3">
+                <header className="modal-header">
+                  <h4 className="modal-title fw-bold">
+                    {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
+                    {title || ""}
+                  </h4>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={handleClose}
+                    aria-label="Close"
+                  />
+                </header>
+                {subtitle && <p className="px-3">{subtitle}</p>}
+              </div>
             )}
             <ModalBody {...{ omitBody, padding }}>
               {Content && (
                 <Content {...{ ...contentProps, ...modalUtilities }} />
               )}
             </ModalBody>
-            {showButtons && (
-              <div className="modal-footer">
-                <Button variant="secondary" label="Cancel" onClick={onCancel} />
-                {onConfirm && (
-                  <Button variant="danger" label="Delete" onClick={onConfirm} />
-                )}
-              </div>
-            )}
+
+            <div className="modal-footer">
+              {showButtons && (
+                <>
+                  <Button
+                    variant="secondary"
+                    label="Cancel"
+                    onClick={onCancel}
+                  />
+                  {onConfirm && (
+                    <Button
+                      variant="danger"
+                      label="Delete"
+                      onClick={onConfirm}
+                    />
+                  )}
+                </>
+              )}
+              {footerContent && footerContent}
+            </div>
           </div>
         </div>
       </div>
