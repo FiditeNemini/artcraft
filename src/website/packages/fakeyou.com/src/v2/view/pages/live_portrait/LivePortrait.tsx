@@ -310,7 +310,13 @@ export default function LivePortrait({
             </h4>
           </div>
           <img
-            src={selectedSourceMediaLink || ""}
+            src={
+              selectedSourceMediaLink
+                ? selectedSourceMediaLink.toLowerCase().endsWith(".mp4")
+                  ? `${selectedSourceMediaLink}-thumb.jpg`
+                  : selectedSourceMediaLink
+                : ""
+            }
             alt="Preview"
             style={{ opacity: 0.15 }}
             draggable={false}

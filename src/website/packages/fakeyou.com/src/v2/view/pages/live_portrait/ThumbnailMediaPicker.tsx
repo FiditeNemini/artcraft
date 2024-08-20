@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isMobile } from "react-device-detect";
+import { Area } from "react-easy-crop";
 
 interface ThumbnailMediaPickerProps {
   mediaTokens: string[];
@@ -61,12 +62,12 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     uploadFocusPoint,
     uploadButtonText = "Upload your own media",
   }) => {
-    const [zoom, setZoom] = useState(1);
     const [isCropping, setIsCropping] = useState(false);
     const [mediaData, setMediaData] = useState<{ [key: string]: any }>({});
     const [isLoadingMedia, setIsLoadingUserMedia] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 8;
+    const [resetTrigger, setResetTrigger] = useState<number>(0);
 
     useEffect(() => {
       const fetchMediaData = async () => {
@@ -97,6 +98,11 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
       setCurrentPage(Math.ceil(mediaTokens.length / itemsPerPage) - 1);
     }, [mediaTokens]);
 
+    useEffect(() => {
+      // Update the reset trigger whenever selectedIndex changes
+      setResetTrigger(prev => prev + 1);
+    }, [selectedIndex]);
+
     const selectedMedia = mediaData[mediaTokens[selectedIndex]];
     const mediaLink = selectedMedia?.public_bucket_path
       ? new BucketConfig().getGcsUrl(selectedMedia.public_bucket_path)
@@ -108,36 +114,18 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
       }
     }, [selectedMedia, onSelectedMediaChange]);
 
-    useEffect(() => {
-      if (setCropArea) {
-        setCropArea({ x: 0, y: 0, height: 0, width: 0 });
-        setZoom(1);
-      }
-    }, [selectedIndex, setCropArea]);
-
-    const onCropChange = useCallback(
-      crop => {
-        if (setCropArea) {
-          if (isCropping) {
-            setCropArea(crop);
-          }
-        }
-      },
-      [isCropping, setCropArea]
-    );
-
-    const onZoomChange = useCallback(
-      zoom => {
-        if (isCropping) {
-          setZoom(zoom);
-        }
-      },
-      [isCropping]
-    );
-
     const onCropComplete = useCallback(
-      (_croppedArea, _croppedAreaPixels) => {},
-      []
+      (_croppedArea: Area, croppedAreaPixels: Area) => {
+        if (setCropArea) {
+          setCropArea({
+            x: croppedAreaPixels.x,
+            y: croppedAreaPixels.y,
+            width: croppedAreaPixels.width,
+            height: croppedAreaPixels.height,
+          });
+        }
+      },
+      [setCropArea]
     );
 
     const handleNextPage = () => {
@@ -189,10 +177,6 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
               {mediaLink ? (
                 <FaceCropper
                   videoSrc={mediaLink}
-                  crop={cropArea}
-                  zoom={zoom}
-                  onCropChange={onCropChange}
-                  onZoomChange={onZoomChange}
                   onCropComplete={onCropComplete}
                   showGrid={isCropping ? true : false}
                   zoomWithScroll={isCropping ? true : false}
@@ -203,6 +187,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                     controls: false,
                     playsInline: true,
                   }}
+                  resetTrigger={resetTrigger}
                 />
               ) : (
                 <LoadingSpinner padding={false} />

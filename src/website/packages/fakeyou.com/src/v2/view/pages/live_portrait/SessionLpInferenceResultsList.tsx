@@ -157,15 +157,21 @@ export default function SessionLpInferenceResultsList({
                     <img
                       src={
                         job.maybeLivePortraitDetails?.source_media_file_token
-                          ? new BucketConfig().getGcsUrl(
-                              mediaSrc[
-                                job.maybeLivePortraitDetails
-                                  .source_media_file_token
-                              ] || ""
-                            )
+                          ? (() => {
+                              const mediaPath =
+                                mediaSrc[
+                                  job.maybeLivePortraitDetails
+                                    .source_media_file_token
+                                ] || "";
+                              const isVideo = mediaPath.endsWith(".mp4");
+                              const finalPath = isVideo
+                                ? `${mediaPath}-thumb.jpg`
+                                : mediaPath;
+                              return new BucketConfig().getGcsUrl(finalPath);
+                            })()
                           : ""
                       }
-                      alt=""
+                      alt="Job Thumbnail"
                       className="object-fit-cover w-100 h-100 rounded"
                     />
                   </div>

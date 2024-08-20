@@ -37,6 +37,7 @@ const resultPaths = {
   VoiceDesignerTts: "/media",
   VideoWorkflow: "/media",
   ImageGeneration: "/media",
+  LivePortrait: "/media",
   Unknown: "/media",
 };
 
