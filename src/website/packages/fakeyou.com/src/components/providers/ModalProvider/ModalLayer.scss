@@ -40,8 +40,8 @@
   }
 
   .fy-modal-body-square {
-    width: 75vh;
-    height: 75vh;
+    // width: 75vh;
+    // height: 75vh;
   }
 
   .fy-modal-body-wide,
@@ -56,7 +56,11 @@
     box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
     -webkit-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
     -moz-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+  }
 
+  .fy-modal-body-wide,
+  .fy-modal-body-narrow,
+  .fy-modal-body-small {
     padding: 1rem;
 
     @include breakpoint($under992) {

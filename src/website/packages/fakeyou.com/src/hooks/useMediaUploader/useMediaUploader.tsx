@@ -98,6 +98,7 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
   return {
     busy: status === FetchStatus.in_progress,
     clear,
+    createUpload,
     engineSubtype,
     engineSubtypeChange,
     error: status === FetchStatus.error,

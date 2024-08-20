@@ -91,23 +91,17 @@ const MediaBusy = ({ uploaderBusy, uploadProgress }: SlideProps) => {
   return (
     <div {...{ className: "fy-entity-input-loader" }}>
       {uploaderBusy ? (
-        <>
-          Uploading
-          <div {...{ className: "fy-entity-input-progress-indicator" }}>
-            <div {...{ className: "fy-entity-input-progress-number" }}>
-              {uploadProgress}%
-            </div>
-            <WorkIndicator
-              {...{
-                failure: false,
-                max: 100,
-                progressPercentage: uploadProgress,
-                stage: 1,
-                success: false,
-              }}
-            />
-          </div>
-        </>
+        <WorkIndicator
+          {...{
+            failure: false,
+            label: "Uploading",
+            max: 100,
+            progressPercentage: uploadProgress,
+            stage: 1,
+            showPercentage: true,
+            success: false,
+          }}
+        />
       ) : (
         <Spinner />
       )}
@@ -370,6 +364,7 @@ export default function EntityInput({
                 onSelect,
                 queryUser,
                 render: EntityInputEmpty,
+                selectToken,
                 showWebcam,
                 type,
                 ...sharedProps,

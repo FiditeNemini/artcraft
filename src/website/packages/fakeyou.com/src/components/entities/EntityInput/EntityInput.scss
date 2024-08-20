@@ -82,25 +82,25 @@
     pointer-events: none;
   }
 
-  .fy-entity-input-progress-indicator {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+  // .fy-entity-input-progress-indicator {
+  //   align-items: center;
+  //   display: flex;
+  //   flex-direction: column;
+  //   position: relative;
 
-    .fy-entity-input-progress-number {
-      position: absolute;
-      text-align: center;
-      font-size: 0.625rem;
-      line-height: 0.625rem;
-      height: 0.625rem;
-      top: 50%;
-      transform: translateY(-50%);
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-  }
+  //   .fy-entity-input-progress-number {
+  //     position: absolute;
+  //     text-align: center;
+  //     font-size: 0.625rem;
+  //     line-height: 0.625rem;
+  //     height: 0.625rem;
+  //     top: 50%;
+  //     transform: translateY(-50%);
+  //     left: 0;
+  //     right: 0;
+  //     bottom: 0;
+  //   }
+  // }
 }
 
 .fy-entity-input-landscape {
