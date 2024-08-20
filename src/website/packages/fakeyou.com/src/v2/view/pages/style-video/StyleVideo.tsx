@@ -272,6 +272,11 @@ export default function StyleVideo() {
               large={true}
               content={StyleSelectionList}
               title="Select Style(s)"
+              titleAfter={
+                <div className="opacity-75">
+                  — ({selectedStyleValues.length}/3)
+                </div>
+              }
               subtitle="You may choose up to three styles to generate multiple videos at once."
               contentProps={{
                 styleOptions: STYLE_OPTIONS,

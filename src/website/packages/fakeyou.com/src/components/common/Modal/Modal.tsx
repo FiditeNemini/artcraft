@@ -27,6 +27,7 @@ interface ModalProps {
   position?: "center" | "top";
   mobileFullscreen?: boolean;
   footerContent?: React.ReactNode;
+  titleAfter?: React.ReactNode;
 }
 
 export interface ModalUtilities {
@@ -70,6 +71,7 @@ const Modal: React.FC<ModalProps> = ({
   position = "center",
   mobileFullscreen = false,
   footerContent,
+  titleAfter,
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
@@ -135,7 +137,10 @@ const Modal: React.FC<ModalProps> = ({
                 <header className="modal-header">
                   <h4 className="modal-title fw-bold">
                     {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
-                    {title || ""}
+                    <div className="d-flex gap-2">
+                      {title || ""}
+                      {titleAfter && titleAfter}
+                    </div>
                   </h4>
                   <button
                     type="button"
