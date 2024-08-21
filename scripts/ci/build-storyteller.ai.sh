@@ -47,6 +47,10 @@ mkdir -p storyteller.ai/website
 echo "Copying blog artifacts..."
 cp -r blog/storyteller/public/* storyteller.ai/blog/
 
+echo "Copying 404 page..."
+# NB: storyteller is part of the "fakeyou.com" build
+cp src/website/packages/fakeyou.com/build/public/404_fakeyou.html storyteller.ai/404.html
+
 echo "Copying website artifacts..."
 # NB: storyteller is part of the "fakeyou.com" build
 mv src/website/packages/fakeyou.com/build/* storyteller.ai/website/
@@ -55,10 +59,6 @@ echo "Copying redirects configuration to Netlify build dir..."
 cp src/netlify_configs/storyteller.ai/_redirects storyteller.ai/
 cp src/netlify_configs/storyteller.ai/netlify.toml storyteller.ai/
 cp src/netlify_configs/storyteller.ai/netlify.toml ./
-
-echo "Copying 404 page..."
-# NB: storyteller is part of the "fakeyou.com" build
-mv src/website/packages/fakeyou.com/build/public/404_fakeyou.html storyteller.ai/404.html
 
 echo "List files in build directory"
 find storyteller.ai/

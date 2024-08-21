@@ -47,16 +47,16 @@ mkdir -p fakeyou.com/website
 echo "Copying blog artifacts..."
 cp -r blog/fakeyou/public/* fakeyou.com/blog/
 
-echo "Copying website artifacts..."
+echo "Copying 404 page..."
+cp src/website/packages/fakeyou.com/build/public/404_fakeyou.html fakeyou.com/404.html
+
+echo "Moving website artifacts..."
 mv src/website/packages/fakeyou.com/build/* fakeyou.com/website/
 
 echo "Copying redirects configuration to Netlify build dir..."
 cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/
 cp src/netlify_configs/fakeyou.com/netlify.toml fakeyou.com/
 cp src/netlify_configs/fakeyou.com/netlify.toml ./
-
-echo "Copying 404 page..."
-mv src/website/packages/fakeyou.com/build/public/404_fakeyou.html fakeyou.com/404.html
 
 echo "List files in build directory"
 find fakeyou.com/
