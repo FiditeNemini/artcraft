@@ -528,7 +528,7 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
 
     // ==================== VALIDATE AND SAVE RESULTS ======================== //
 
-    let media_file_token = validate_and_save_results(SaveResultsArgs {
+    let result = validate_and_save_results(SaveResultsArgs {
         job,
         deps: &deps,
         job_args: &job_args,
@@ -537,7 +537,24 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         videos: &videos,
         job_progress_reporter: &mut job_progress_reporter,
         inference_duration,
-    }).await?;
+    }).await;
+
+    let media_file_token = match result {
+        Ok(token) => token,
+        Err(err) => {
+            error!("Error validating and saving results: {:?}", err);
+            safe_delete_all_input_videos(&videos);
+            safe_delete_files_and_directories(&[
+                positive_prompt_file.as_path(),
+                &negative_prompt_file,
+                &travel_prompt_file,
+                &preview_frames_dir,
+                &output_dir,
+                work_temp_dir.path(),
+            ]);
+            return Err(err);
+        }
+    };
 
     // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
 
@@ -591,6 +608,20 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         }),
         inference_duration,
     })
+}
+
+fn safe_delete_files_and_directories<P: AsRef<Path>>(paths: &[P]) {
+    for path in paths {
+        let p = path.as_ref();
+        if p.is_file() {
+            safe_delete_temp_file(p);
+        } else if p.is_dir() {
+            safe_recursively_delete_files(p);
+            safe_delete_temp_directory(p);
+        } else {
+            warn!("Path {:?} is neither a file nor a directory", p);
+        }
+    }
 }
 
 fn safe_delete_all_input_videos(videos: &VideoPathing) {
