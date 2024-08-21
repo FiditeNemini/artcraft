@@ -12,7 +12,6 @@ import {
   Label,
   DropdownOptions,
   SessionFetchingSpinner,
-  LoginBlock,
   Modal,
 } from "components/common";
 import { EntityInput } from "components/entities";
@@ -32,7 +31,7 @@ import { AITools } from "components/marketing";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { loggedIn, sessionFetched } = useSession();
+  const { loggedInOrModal, sessionFetched } = useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -73,7 +72,14 @@ export default function StyleVideo() {
   usePrefixedDocumentTitle("Style Video");
 
   const onClick = async () => {
-    if (mediaToken && selectedStyleValues.length > 0) {
+    if (
+      loggedInOrModal({
+        loginMessage: "Login to finish styling your video",
+        signupMessage: "Signup to finish styling your video",
+      }) &&
+      mediaToken &&
+      selectedStyleValues.length > 0
+    ) {
       const maxJobs = Math.min(3, selectedStyleValues.length);
       for (let i = 0; i < maxJobs; i++) {
         try {
@@ -201,15 +207,6 @@ export default function StyleVideo() {
 
   if (!sessionFetched) {
     return <SessionFetchingSpinner />;
-  }
-
-  if (!loggedIn) {
-    return (
-      <LoginBlock
-        title="You need to be logged in to use Video Style Transfer"
-        redirect="/style-video"
-      />
-    );
   }
 
   return (
