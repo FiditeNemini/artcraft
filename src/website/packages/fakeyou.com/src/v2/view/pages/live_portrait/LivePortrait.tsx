@@ -64,6 +64,10 @@ interface GeneratedVideo {
   createdAt: Date;
 }
 
+interface JobProgress {
+  [key: string]: number | null;
+}
+
 export default function LivePortrait({
   sessionSubscriptionsWrapper,
 }: LivePortraitProps) {
@@ -104,9 +108,11 @@ export default function LivePortrait({
   const [currentlyGeneratingList, setCurrentlyGeneratingList] = useState<
     { sourceIndex: number; motionIndex: number }[]
   >([]);
-  const [jobProgressPercentage, setJobProgressPercentage] = useState<
-    number | null
-  >(null);
+  const [jobProgress, setJobProgress] = useState<JobProgress>({});
+  const [currentCombinationKey, setCurrentCombinationKey] = useState("");
+
+  const getCombinationKey = (sourceIndex: number, motionIndex: number) =>
+    `s${sourceIndex}_m${motionIndex}`;
 
   const location = useLocation();
 
@@ -125,52 +131,74 @@ export default function LivePortrait({
   const handleJobClick = (job: InferenceJob) => {
     const livePortraitDetails = job.maybeLivePortraitDetails;
     if (livePortraitDetails) {
-      const sourceIndex = sourceTokens.indexOf(
-        livePortraitDetails.source_media_file_token
-      );
-      const motionIndex = motionTokens.indexOf(
-        livePortraitDetails.face_driver_media_file_token
-      );
+      const { source_media_file_token, face_driver_media_file_token } =
+        livePortraitDetails;
 
-      if (sourceIndex !== -1) {
+      // Check if source exists in the tokens list
+      let sourceIndex = sourceTokens.indexOf(source_media_file_token);
+      if (sourceIndex === -1) {
+        // If not found, add it and set the sourceIndex to the new token
+        setSourceTokens(prevTokens => {
+          const updatedTokens = [...prevTokens, source_media_file_token];
+          sourceIndex = updatedTokens.length - 1;
+          return updatedTokens;
+        });
+      }
+
+      // Check if motion exists in the tokens list
+      let motionIndex = motionTokens.indexOf(face_driver_media_file_token);
+      if (motionIndex === -1) {
+        setMotionTokens(prevTokens => {
+          const updatedTokens = [...prevTokens, face_driver_media_file_token];
+          motionIndex = updatedTokens.length - 1;
+          return updatedTokens;
+        });
+      }
+
+      setTimeout(() => {
         setSelectedSourceIndex(sourceIndex);
-      } else {
-        setSourceTokens(prevTokens => [
-          ...prevTokens,
-          livePortraitDetails.source_media_file_token,
-        ]);
-        setSelectedSourceIndex(sourceTokens.length);
-      }
-
-      if (motionIndex !== -1) {
         setSelectedMotionIndex(motionIndex);
-      } else {
-        setMotionTokens(prevTokens => [
-          ...prevTokens,
-          livePortraitDetails.face_driver_media_file_token,
-        ]);
-        setSelectedMotionIndex(motionTokens.length);
-      }
+        setCurrentCombinationKey(getCombinationKey(sourceIndex, motionIndex));
+
+        const latestVideoSrc = getLatestVideoForCombination(
+          sourceIndex,
+          motionIndex
+        );
+        if (latestVideoSrc) {
+          setGeneratedVideoSrc(latestVideoSrc);
+          setIsGenerating(false);
+        } else {
+          setGeneratedVideoSrc("");
+          setIsGenerating(true);
+        }
+
+        const progress =
+          jobProgress[getCombinationKey(sourceIndex, motionIndex)] || null;
+        setJobProgress(prevProgress => ({
+          ...prevProgress,
+          [getCombinationKey(sourceIndex, motionIndex)]: progress,
+        }));
+      }, 0);
     }
   };
 
   const handleJobProgress = (progress: number | null) => {
-    setJobProgressPercentage(prevProgress => {
-      if (prevProgress !== progress) {
-        return progress;
-      }
-      return prevProgress;
-    });
+    setJobProgress(prevProgress => ({
+      ...prevProgress,
+      [currentCombinationKey]: progress,
+    }));
   };
 
   const handleSourceSelect = (index: number) => {
     setIsUserUploaded(index >= numberOfInitialSourceTokens);
     setSelectedSourceIndex(index);
+    setCurrentCombinationKey(getCombinationKey(index, selectedMotionIndex));
   };
 
   const handleMotionSelect = (index: number) => {
     setIsUserUploaded(index >= numberOfInitialMotionTokens);
     setSelectedMotionIndex(index);
+    setCurrentCombinationKey(getCombinationKey(selectedSourceIndex, index));
   };
 
   const enqueueClick = () => {
@@ -225,12 +253,13 @@ export default function LivePortrait({
   };
 
   const renderVideoOrPlaceholder = () => {
-    // Check if the current combination is being generated
     const isCurrentlyGenerating = currentlyGeneratingList.some(
       gen =>
         gen.sourceIndex === selectedSourceIndex &&
         gen.motionIndex === selectedMotionIndex
     );
+
+    const currentProgress = jobProgress[currentCombinationKey] || null;
 
     if (isCurrentlyGenerating) {
       // Show "Generating Video..." if the combination is currently generating
@@ -248,8 +277,8 @@ export default function LivePortrait({
             <h4 className="fw-medium">
               <div className="d-flex flex-column align-items-center gap-3 justify-content-center">
                 <LoadingSpinner padding={false} />
-                {jobProgressPercentage !== null
-                  ? `Generating video... ${jobProgressPercentage}%`
+                {currentProgress !== null
+                  ? `Generating video... ${currentProgress}%`
                   : "Generating video..."}
               </div>
             </h4>
@@ -262,7 +291,11 @@ export default function LivePortrait({
           />
         </div>
       );
-    } else if (generatedVideoSrc) {
+    } else if (
+      generatedVideoSrc &&
+      currentCombinationKey ===
+        getCombinationKey(selectedSourceIndex, selectedMotionIndex)
+    ) {
       // Show generated video if available
       return (
         <video
@@ -512,27 +545,29 @@ export default function LivePortrait({
     }
   };
 
-  useEffect(() => {
-    const getLatestVideoForCombination = (
-      sourceIndex: number,
-      motionIndex: number
-    ) => {
-      // Filter generated videos by sourceIndex and motionIndex
+  const getLatestVideoForCombination = useCallback(
+    (sourceIndex: number, motionIndex: number) => {
       const matchingVideos = generatedVideos.filter(
         video =>
           video.sourceIndex === sourceIndex && video.motionIndex === motionIndex
       );
-
-      // Sort the videos by createdAt to get the latest one
       const sortedVideos = matchingVideos.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+      const latestVideo =
+        sortedVideos.length > 0 ? sortedVideos[0].videoSrc : null;
 
-      // Return the latest video source if it exists
-      return sortedVideos.length > 0 ? sortedVideos[0].videoSrc : null;
-    };
+      // Debugging output
+      console.log("Matching videos:", matchingVideos);
+      console.log("Latest video:", latestVideo);
 
+      return latestVideo;
+    },
+    [generatedVideos]
+  );
+
+  useEffect(() => {
     const latestVideoSrc = getLatestVideoForCombination(
       selectedSourceIndex,
       selectedMotionIndex
@@ -552,6 +587,7 @@ export default function LivePortrait({
     selectedMotionIndex,
     generatedVideos,
     isUserUploaded,
+    getLatestVideoForCombination,
   ]);
 
   useEffect(() => {
