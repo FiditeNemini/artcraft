@@ -38,7 +38,7 @@ export default function JobsClearButton({
                   onClick: clearJobs,
                   label: "Clear completed jobs",
                   variant: "secondary",
-                  // square: true,
+                  small: true,
                 }}
               />
             </a.div>,

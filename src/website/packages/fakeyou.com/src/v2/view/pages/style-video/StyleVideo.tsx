@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs, useSession } from "hooks";
+import { useInferenceJobs, useModal, useSession } from "hooks";
 import {
   Button,
   Container,
@@ -12,7 +12,6 @@ import {
   Label,
   DropdownOptions,
   SessionFetchingSpinner,
-  Modal,
 } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -43,31 +42,18 @@ export default function StyleVideo() {
   const [enableLipsync, setEnableLipsync] = useState(false);
   const [strength, setStrength] = useState(1.0);
   const { enqueue } = useInferenceJobs();
-  const {
-    setSelectedStyles,
-    setCurrentImages,
-    selectedStyleValues,
-    selectedStyleLabels,
-  } = useStyleStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { setSelectedStyles, setCurrentImages, selectedStyleValues } =
+    useStyleStore();
+  const { open, modalOpen } = useModal();
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    if (selectedStyleValues.length === 0) {
-      // If no styles are selected, select the first one by default
-      const firstStyle = STYLE_OPTIONS[0];
-      setSelectedStyles(
-        [firstStyle.value],
-        [firstStyle.label],
-        [firstStyle.image || ""]
-      );
-      setCurrentImages([firstStyle.image || ""]);
-    }
-    setIsModalOpen(false);
-  };
+  const openStyleSelection = () =>
+    open({
+      component: StyleSelectionList,
+      props: {
+        styleOptions: STYLE_OPTIONS,
+        onStyleClick: handleStyleClick,
+      },
+    });
 
   usePrefixedDocumentTitle("Style Video");
 
@@ -75,7 +61,7 @@ export default function StyleVideo() {
     if (
       loggedInOrModal({
         loginMessage: "Login to finish styling your video",
-        signupMessage: "Signup to finish styling your video",
+        signupMessage: "Sign Up to finish styling your video",
       }) &&
       mediaToken &&
       selectedStyleValues.length > 0
@@ -153,6 +139,20 @@ export default function StyleVideo() {
     setSelectedStyles(updatedStyles, updatedLabels, updatedImages);
     setCurrentImages(updatedImages);
   };
+
+  useEffect(() => {
+    if (!modalOpen) {
+      if (selectedStyleValues.length === 0) {
+        const firstStyle = STYLE_OPTIONS[0];
+        setSelectedStyles(
+          [firstStyle.value],
+          [firstStyle.label],
+          [firstStyle.image || ""]
+        );
+        setCurrentImages([firstStyle.image || ""]);
+      }
+    }
+  }, [modalOpen, selectedStyleValues, setSelectedStyles, setCurrentImages]);
 
   const vstInfo = (
     <div className="d-flex gap-3 justify-content-center">
@@ -262,34 +262,6 @@ export default function StyleVideo() {
                 />
               </div>
             </Panel>
-
-            <Modal
-              show={isModalOpen}
-              handleClose={closeModal}
-              large={true}
-              content={StyleSelectionList}
-              title="Select Style(s)"
-              titleAfter={
-                <div className="opacity-75">
-                  — ({selectedStyleValues.length}/3)
-                </div>
-              }
-              subtitle="You may choose up to three styles to generate multiple videos at once."
-              contentProps={{
-                styleOptions: STYLE_OPTIONS,
-                selectedStyles: selectedStyleValues,
-                onStyleClick: handleStyleClick,
-              }}
-              showButtons={false}
-              footerContent={
-                <div className="d-flex w-100 justify-content-between align-items-center gap-2">
-                  <div className="fw-medium opacity-75">
-                    Selected: {selectedStyleLabels.join(", ") || "None"}
-                  </div>
-                  <Button label="Done" onClick={closeModal} />
-                </div>
-              }
-            />
           </div>
           <div className="col-12 col-lg-4 col-xl-3">
             <Panel
@@ -301,7 +273,10 @@ export default function StyleVideo() {
                   Style a Video
                 </h2>
                 <div>
-                  <StyleSelectionButton onClick={openModal} className="mb-3" />
+                  <StyleSelectionButton
+                    onClick={openStyleSelection}
+                    className="mb-3"
+                  />
                   <div>
                     <TextArea
                       {...{

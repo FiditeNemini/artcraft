@@ -91,7 +91,7 @@ export default function SessionProvider({
     } else {
       open({
         component: AccountModal,
-        width: "narrow",
+        width: "small",
         props: { ...accountModalMessages },
       });
       return false;

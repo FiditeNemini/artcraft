@@ -13,6 +13,7 @@ interface Props {
   search?: string;
   title?: string;
   titleClassName?: string;
+  titleAfter?: React.ReactNode;
 }
 
 export default function ModalHeader({
@@ -22,6 +23,7 @@ export default function ModalHeader({
   search: initialSearch,
   title,
   titleClassName,
+  titleAfter,
 }: Props) {
   const [search, setSearch] = useState(initialSearch);
 
@@ -64,9 +66,14 @@ export default function ModalHeader({
             )}
           </div>
         ) : (
-          title && (
-            <h3 className={`fw-semibold ${titleClassName}`.trim()}>{title}</h3>
-          )
+          <div className="d-flex gap-2 align-items-center">
+            {title && (
+              <h4 className={`mb-0 fw-bold ${titleClassName}`.trim()}>
+                {title}
+              </h4>
+            )}
+            {titleAfter && titleAfter}
+          </div>
         )}
 
         {children && (

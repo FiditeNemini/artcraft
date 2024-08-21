@@ -39,7 +39,7 @@ export default function LoginView({
     >
       <header>
         <div {...{ className: "login-modal-title-row" }}>
-          <h2>{loginMessage || "Login"}</h2>
+          <h3 className="fw-bold">{loginMessage || "Login"}</h3>
           <button
             {...{
               ariaLabel: "Close",
@@ -49,7 +49,7 @@ export default function LoginView({
             }}
           />
         </div>
-        <div {...{ className: "login-modal-subtitle-row" }}>
+        <div {...{ className: "login-modal-subtitle-row mt-3 fw-medium" }}>
           <span {...{ className: "login-modal-subtitle" }}>
             Log into your account
           </span>
@@ -61,7 +61,7 @@ export default function LoginView({
               },
             }}
           >
-            Signup instead
+            Sign up instead
           </span>
         </div>
       </header>

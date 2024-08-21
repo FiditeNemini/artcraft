@@ -59,9 +59,18 @@
   }
 
   .fy-modal-body-wide,
-  .fy-modal-body-narrow,
-  .fy-modal-body-small {
+  .fy-modal-body-narrow {
     padding: 1rem;
+
+    @include breakpoint($under992) {
+      max-width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+  }
+
+  .fy-modal-body-small {
+    padding: 1.25rem;
 
     @include breakpoint($under992) {
       max-width: 100%;
