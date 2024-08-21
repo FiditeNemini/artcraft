@@ -6,8 +6,8 @@ use tempdir::TempDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;

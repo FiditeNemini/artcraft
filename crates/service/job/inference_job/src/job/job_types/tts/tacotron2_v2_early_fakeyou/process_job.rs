@@ -9,8 +9,8 @@ use tempdir::TempDir;
 
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use mysql_queries::column_types::vocoder_type::VocoderType;

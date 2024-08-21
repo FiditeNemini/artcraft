@@ -8,8 +8,8 @@ use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
 use filesys::file_size::file_size;
 use filesys::rename_across_devices::{rename_across_devices, RenameError};
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::queries::model_weights::get::get_weight::RetrievedModelWeight;
 

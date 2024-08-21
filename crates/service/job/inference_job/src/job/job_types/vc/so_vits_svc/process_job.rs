@@ -10,8 +10,8 @@ use enums::by_table::generic_inference_jobs::inference_result_type::InferenceRes
 use filesys::check_file_exists::check_file_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use migration::voice_conversion::query_vc_model_for_migration::VcModel;

@@ -4,7 +4,7 @@ use log::warn;
 
 use collections::multiple_random_from_vec::multiple_random_from_vec;
 use errors::AnyhowResult;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 
 pub fn clear_full_filesystem(cache_dir: &SemiPersistentCacheDir) -> AnyhowResult<()> {

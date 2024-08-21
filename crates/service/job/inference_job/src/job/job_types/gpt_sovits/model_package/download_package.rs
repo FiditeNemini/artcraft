@@ -9,7 +9,7 @@ use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use filesys::rename_across_devices::{rename_across_devices, RenameError};
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

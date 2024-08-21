@@ -6,7 +6,7 @@ use tempdir::TempDir;
 
 use config::is_bad_download_url::is_bad_download_url;
 use container_common::anyhow_result::AnyhowResult;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;

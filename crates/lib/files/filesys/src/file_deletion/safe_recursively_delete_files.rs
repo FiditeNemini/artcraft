@@ -2,7 +2,7 @@ use std::path::Path;
 
 use walkdir::WalkDir;
 
-use crate::safe_delete_temp_file::safe_delete_temp_file;
+use crate::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 
 pub fn safe_recursively_delete_files(path: &Path) {
   if !path.exists() || !path.is_dir() {

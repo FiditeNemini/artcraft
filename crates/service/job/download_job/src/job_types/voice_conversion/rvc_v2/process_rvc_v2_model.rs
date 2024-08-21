@@ -12,10 +12,10 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
+use filesys::file_deletion::safe_delete_possible_temp_file::safe_delete_possible_temp_file;
 use filesys::file_size::file_size;
-use filesys::safe_delete_possible_temp_file::safe_delete_possible_temp_file;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;

@@ -5,8 +5,8 @@ use log::{error, info, warn};
 use cloud_storage::bucket_client::BucketClient;
 use filesys::file_size::file_size;
 use filesys::rename_across_devices::{rename_across_devices, RenameError};
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

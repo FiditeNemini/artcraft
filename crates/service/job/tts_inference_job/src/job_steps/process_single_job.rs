@@ -14,8 +14,8 @@ use tempdir::TempDir;
 
 use container_common::anyhow_result::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
