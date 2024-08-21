@@ -47,7 +47,10 @@ mkdir -p fakeyou.com/website
 echo "Copying blog artifacts..."
 cp -r blog/fakeyou/public/* fakeyou.com/blog/
 
-echo "Copying website artifacts..."
+echo "Copying 404 page..."
+cp src/website/packages/fakeyou.com/build/404_fakeyou.html fakeyou.com/404.html
+
+echo "Moving website artifacts..."
 mv src/website/packages/fakeyou.com/build/* fakeyou.com/website/
 
 echo "Copying redirects configuration to Netlify build dir..."
