@@ -24,7 +24,6 @@ export default function MotionEntityInput({
         className="w-100"
         onChange={onChange}
         type="media"
-        showWebcam={false}
         showMediaBrowserFilters={false}
       />
     </div>
