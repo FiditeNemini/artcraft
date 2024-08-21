@@ -58,7 +58,7 @@ cp src/netlify_configs/storyteller.ai/netlify.toml ./
 
 echo "Copying 404 page..."
 # NB: storyteller is part of the "fakeyou.com" build
-mv src/website/packages/fakeyou.com/build/404_fakeyou.html storyteller.ai/404.html
+mv src/website/packages/fakeyou.com/build/public/404_fakeyou.html storyteller.ai/404.html
 
 echo "List files in build directory"
 find storyteller.ai/
