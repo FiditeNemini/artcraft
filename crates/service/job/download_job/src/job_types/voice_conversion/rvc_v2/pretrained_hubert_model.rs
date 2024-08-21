@@ -8,7 +8,7 @@ use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
 
 #[derive(Clone)]
 pub struct PretrainedHubertModel {
@@ -58,7 +58,7 @@ impl PretrainedHubertModel {
     bucket_client.download_file_to_disk(&self.cloud_bucket_path, &temp_path)
         .await
         .map_err(|e| {
-          safe_delete_temp_directory(&temp_dir);
+          safe_delete_directory(&temp_dir);
           anyhow!("couldn't download cloud object to disk: {:?}", e)
         })?;
 
@@ -68,7 +68,7 @@ impl PretrainedHubertModel {
 
     std::fs::rename(&temp_path, &self.filesystem_path)
         .map_err(|e| {
-          safe_delete_temp_directory(&temp_dir);
+          safe_delete_directory(&temp_dir);
           anyhow!("couldn't rename disk files: {:?}", e)
         })?;
 

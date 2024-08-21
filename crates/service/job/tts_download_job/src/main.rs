@@ -39,8 +39,8 @@ use container_common::anyhow_result::AnyhowResult;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use filesys::check_directory_exists::check_directory_exists;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::noop_logger::NoOpLogger;
@@ -354,7 +354,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
     Ok(filename) => filename,
     Err(e) => {
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_directory(&temp_dir);
       return Err(e);
     }
   };
@@ -389,8 +389,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
       );
 
       if let Err(e) = result {
-        safe_delete_temp_file(&file_path);
-        safe_delete_temp_directory(&temp_dir);
+        safe_delete_file(&file_path);
+        safe_delete_directory(&temp_dir);
       }
     },
     _ => {
@@ -408,9 +408,9 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
     Ok(metadata) => metadata,
     Err(e) => {
-      safe_delete_temp_file(&file_path);
-      safe_delete_temp_file(&output_metadata_fs_path);
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_file(&file_path);
+      safe_delete_file(&output_metadata_fs_path);
+      safe_delete_directory(&temp_dir);
       return Err(e);
     }
   };
@@ -433,18 +433,18 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   redis_logger.log_status("uploading model")?;
 
   if let Err(e) = downloader.bucket_client.upload_filename(&synthesizer_model_bucket_path, &file_path).await {
-    safe_delete_temp_file(&output_metadata_fs_path);
-    safe_delete_temp_file(&file_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&output_metadata_fs_path);
+    safe_delete_file(&file_path);
+    safe_delete_directory(&temp_dir);
     return Err(e);
   }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_file(&output_metadata_fs_path);
-  safe_delete_temp_file(&file_path);
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_file(&output_metadata_fs_path);
+  safe_delete_file(&file_path);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

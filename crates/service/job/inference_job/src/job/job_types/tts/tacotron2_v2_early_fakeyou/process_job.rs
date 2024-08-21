@@ -9,8 +9,8 @@ use tempdir::TempDir;
 
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use mysql_queries::column_types::vocoder_type::VocoderType;
@@ -58,7 +58,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   // NB: The first time TT2 on inference-job was deployed, the filesystem filled up with
   // temporary directories. This is just being abundantly safe.
   info!("(After job cleanup) Deleting temp directory: {:?}", work_temp_dir.path());
-  safe_delete_temp_directory(&work_temp_dir);
+  safe_delete_directory(&work_temp_dir);
 
   result
 }
@@ -308,7 +308,7 @@ async fn process_job_with_cleanup(
 
   info!("Deleting metadata file...");
 
-  safe_delete_temp_file(&output_metadata_fs_path);
+  safe_delete_file(&output_metadata_fs_path);
 
   info!("Decoding audio info...");
 

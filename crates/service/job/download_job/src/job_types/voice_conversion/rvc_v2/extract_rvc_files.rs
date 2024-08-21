@@ -4,7 +4,7 @@ use log::{info, warn};
 use tempdir::TempDir;
 
 use errors::AnyhowResult;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 
 #[derive(Debug)]
@@ -91,7 +91,7 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
     None => {
       // It isn't valid to not have a model file.
       if let Some(path_to_index) = maybe_path_to_index {
-        safe_delete_temp_file(&path_to_index);
+        safe_delete_file(&path_to_index);
       }
       warn!("Archive did not have a model file within.");
       return Ok(DownloadedRvcFile::InvalidModel);

@@ -1,11 +1,19 @@
 use std::path::Path;
 
+use log::warn;
 use walkdir::WalkDir;
 
-use crate::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use crate::file_deletion::safe_delete_file::safe_delete_file;
 
+/// Deletes all files in the directory tree at the given path without deleting the directory itself.
+/// This is an infallible, idempotent function.
 pub fn safe_recursively_delete_files(path: &Path) {
-  if !path.exists() || !path.is_dir() {
+  if !path.exists() {
+    warn!("Path does not exist: {:?}", path);
+    return;
+  }
+  if !path.is_dir() {
+    warn!("Path is not a directory: {:?}", path);
     return;
   }
 
@@ -14,7 +22,7 @@ pub fn safe_recursively_delete_files(path: &Path) {
   for entry in walk {
     if let Ok(entry) = entry {
       if entry.path().is_file() {
-        safe_delete_temp_file(entry.path());
+        safe_delete_file(entry.path());
       }
     }
   }

@@ -23,8 +23,8 @@ use filesys::check_file_exists::check_file_exists;
 use filesys::file_exists::file_exists;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
@@ -217,9 +217,9 @@ pub async fn process_live_portrait_job(
     print_and_detect_stderr_issues(&stderr_output_file)?;
     print_and_detect_stderr_issues(&stdout_output_file)?;
 
-    safe_delete_temp_file(&stderr_output_file);
-    safe_delete_temp_file(&stdout_output_file);
-    safe_delete_temp_directory(&work_temp_dir);
+    safe_delete_file(&stderr_output_file);
+    safe_delete_file(&stdout_output_file);
+    safe_delete_directory(&work_temp_dir);
 
     return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
             &output_file_path)));
@@ -401,11 +401,11 @@ pub async fn process_live_portrait_job(
 
   info!("Cleaning up temporary files...");
 
-  safe_delete_temp_file(&driver_file_path);
-  safe_delete_temp_file(&portrait_file_path);
+  safe_delete_file(&driver_file_path);
+  safe_delete_file(&portrait_file_path);
 
   safe_recursively_delete_files(&output_dir);
-  safe_delete_temp_directory(&work_temp_dir);
+  safe_delete_directory(&work_temp_dir);
 
   // ==================== DONE ==================== //
 

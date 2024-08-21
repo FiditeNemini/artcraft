@@ -13,8 +13,8 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
@@ -167,9 +167,9 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
       warn!("Captured stderr output: {}", contents);
     }
 
-    safe_delete_temp_file(&original_media_upload_fs_path);
-    safe_delete_temp_directory(&output_directory_actual);
-    safe_delete_temp_directory(&work_temp_dir);
+    safe_delete_file(&original_media_upload_fs_path);
+    safe_delete_directory(&output_directory_actual);
+    safe_delete_directory(&work_temp_dir);
 
     return Err(error);
   }
@@ -240,14 +240,14 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_video_file);
-  safe_delete_temp_file(&output_frames_zip_file);
-  safe_delete_temp_directory(&output_directory_actual);
+  safe_delete_file(&output_video_file);
+  safe_delete_file(&output_frames_zip_file);
+  safe_delete_directory(&output_directory_actual);
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&work_temp_dir);
+  safe_delete_directory(&work_temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

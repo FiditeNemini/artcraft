@@ -3,8 +3,8 @@ use tempdir::TempDir;
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use errors::AnyhowResult;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_tts_model::CopiedTtsFileData;
 use mysql_queries::queries::tts::tts_models::migration::list_whole_tts_models_using_cursor::WholeTtsModelRecord;
@@ -36,8 +36,8 @@ async fn copy_model(model: &WholeTtsModelRecord, deps: &Deps) -> AnyhowResult<Co
     &model_temp_fs_path,
     "application/octet-stream").await?;
 
-  safe_delete_temp_file(&model_temp_fs_path);
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_file(&model_temp_fs_path);
+  safe_delete_directory(&temp_dir);
 
   Ok(CopiedTtsFileData {
     bucket_path: new_model_bucket_path,

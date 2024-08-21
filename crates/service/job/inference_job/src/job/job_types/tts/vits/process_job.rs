@@ -10,8 +10,8 @@ use tempdir::TempDir;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use mysql_queries::column_types::vocoder_type::VocoderType;
@@ -157,7 +157,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
   let file_metadata = read_metadata_file(&output_metadata_fs_path)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_metadata_fs_path);
+  safe_delete_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
@@ -178,7 +178,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_audio_fs_path);
+  safe_delete_file(&output_audio_fs_path);
 
 //  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 //
@@ -196,12 +196,12 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
 //      .await
 //      .map_err(|e| ProcessSingleJobError::Other(e))?;
 //
-//  safe_delete_temp_file(&output_spectrogram_fs_path);
+//  safe_delete_file(&output_spectrogram_fs_path);
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

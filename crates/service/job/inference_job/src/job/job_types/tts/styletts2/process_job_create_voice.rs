@@ -219,12 +219,12 @@ pub async fn process_create_voice(
     //thread::sleep(Duration::from_secs(300));
 
     // Clean up temp files
-    //safe_delete_temp_file(&audio_path.filesystem_path);
-    //safe_delete_temp_file(&image_path.filesystem_path);
-    //safe_delete_temp_file(&usable_image_path);
-    //safe_delete_temp_file(&output_video_fs_path);
-    //safe_delete_temp_file(&stderr_output_file);
-    //safe_delete_temp_directory(&work_temp_dir);
+    //safe_delete_file(&audio_path.filesystem_path);
+    //safe_delete_file(&image_path.filesystem_path);
+    //safe_delete_file(&usable_image_path);
+    //safe_delete_file(&output_video_fs_path);
+    //safe_delete_file(&stderr_output_file);
+    //safe_delete_directory(&work_temp_dir);
 
     return Err(error);
   }

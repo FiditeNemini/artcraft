@@ -4,8 +4,9 @@ use std::path::Path;
 use log::info;
 use log::warn;
 
-pub fn safe_delete_temp_directory<P: AsRef<Path>>(directory_path: P) {
-  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+/// Safely deletes a directory without panicking. Errors are logged.
+/// This is an infallible, idempotent function.
+pub fn safe_delete_directory<P: AsRef<Path>>(directory_path: P) {
   let printable_name = directory_path.as_ref().to_str().unwrap_or("bad directory");
   match fs::remove_dir_all(&directory_path) {
     Ok(_) => info!("Temp directory deleted: {}", printable_name),

@@ -37,8 +37,8 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::check_directory_exists::check_directory_exists;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::noop_logger::NoOpLogger;
@@ -404,7 +404,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
     Ok(filename) => filename,
     Err(e) => {
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_directory(&temp_dir);
       return Err(e);
     }
   };
@@ -442,7 +442,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       // Permanently fail.
       warn!("Permanently failed due to no face detection!");
 
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_directory(&temp_dir);
 
       mark_w2l_template_upload_job_permanently_dead(
         &downloader.mysql_pool,
@@ -508,9 +508,9 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     );
 
     if let Err(e) = preview_result {
-      safe_delete_temp_file(&download_filename);
-      safe_delete_temp_file(&preview_filename);
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_file(&download_filename);
+      safe_delete_file(&preview_filename);
+      safe_delete_directory(&temp_dir);
     }
 
     let video_preview_path = PathBuf::from(&preview_filename);
@@ -566,7 +566,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &video_or_image_path,
     original_mime_type).await?;
 
-  safe_delete_temp_file(&video_or_image_path);
+  safe_delete_file(&video_or_image_path);
 
   info!("Uploading cached faces...");
   let path_copy: PathBuf = cached_faces_path.clone();
@@ -574,7 +574,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &full_object_path_cached_faces,
     &path_copy).await?;
 
-  safe_delete_temp_file(&path_copy);
+  safe_delete_file(&path_copy);
 
   // TODO: Fix this ugh.
   if let Some(image_preview_filename) = maybe_image_preview_filename.as_deref() {
@@ -592,7 +592,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
         "image/webp").await?;
     }
 
-    safe_delete_temp_file(&image_preview_filename);
+    safe_delete_file(&image_preview_filename);
   }
 
   // TODO: Fix this ugh.
@@ -611,13 +611,13 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
         "image/webp").await?;
     }
 
-    safe_delete_temp_file(&video_preview_filename);
+    safe_delete_file(&video_preview_filename);
   }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

@@ -9,8 +9,8 @@ use enums::by_table::generic_inference_jobs::inference_result_type::InferenceRes
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -153,9 +153,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     match result {
       Err(err) => {
         error!("Image resize failure: {:?}", err);
-        safe_delete_temp_file(&audio_path.filesystem_path);
-        safe_delete_temp_file(&image_path.filesystem_path);
-        safe_delete_temp_directory(&work_temp_dir);
+        safe_delete_file(&audio_path.filesystem_path);
+        safe_delete_file(&image_path.filesystem_path);
+        safe_delete_directory(&work_temp_dir);
         return Err(ProcessSingleJobError::Other(anyhow!("image resize failure: {:?}", err)));
       }
       Ok(resized_image_path) => {
@@ -227,12 +227,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       }
     }
 
-    safe_delete_temp_file(&audio_path.filesystem_path);
-    safe_delete_temp_file(&image_path.filesystem_path);
-    safe_delete_temp_file(&usable_image_path);
-    safe_delete_temp_file(&output_video_fs_path);
-    safe_delete_temp_file(&stderr_output_file);
-    safe_delete_temp_directory(&work_temp_dir);
+    safe_delete_file(&audio_path.filesystem_path);
+    safe_delete_file(&image_path.filesystem_path);
+    safe_delete_file(&usable_image_path);
+    safe_delete_file(&output_video_fs_path);
+    safe_delete_file(&stderr_output_file);
+    safe_delete_directory(&work_temp_dir);
 
     return Err(error);
   }
@@ -264,12 +264,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     if !command_exit_status.is_success() {
       error!("Watermark failed: {:?}", command_exit_status);
-      safe_delete_temp_file(&audio_path.filesystem_path);
-      safe_delete_temp_file(&image_path.filesystem_path);
-      safe_delete_temp_file(&usable_image_path);
-      safe_delete_temp_file(&output_video_fs_path);
-      safe_delete_temp_file(&output_video_fs_path_watermark);
-      safe_delete_temp_directory(&work_temp_dir);
+      safe_delete_file(&audio_path.filesystem_path);
+      safe_delete_file(&image_path.filesystem_path);
+      safe_delete_file(&usable_image_path);
+      safe_delete_file(&output_video_fs_path);
+      safe_delete_file(&output_video_fs_path_watermark);
+      safe_delete_directory(&work_temp_dir);
       return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
     }
   }
@@ -339,12 +339,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   }
   // ==================== DELETE TEMP FILES ==================== //
 
-  safe_delete_temp_file(&output_video_fs_path);
-  safe_delete_temp_file(&output_video_fs_path_watermark);
-  safe_delete_temp_file(&usable_image_path);
+  safe_delete_file(&output_video_fs_path);
+  safe_delete_file(&output_video_fs_path_watermark);
+  safe_delete_file(&usable_image_path);
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&work_temp_dir);
+  safe_delete_directory(&work_temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

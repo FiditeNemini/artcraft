@@ -7,7 +7,7 @@ use cloud_storage::bucket_client::BucketClient;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
 use filesys::rename_across_devices::rename_across_devices;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::filesystem::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -66,7 +66,7 @@ impl PretrainedHubertModel {
         .await
         .map_err(|e| {
           error!("could not download hubert model to disk: {:?}", e);
-          safe_delete_temp_directory(&temp_dir);
+          safe_delete_directory(&temp_dir);
           anyhow!("couldn't download cloud object to disk: {:?}", e)
         })?;
 
@@ -77,13 +77,13 @@ impl PretrainedHubertModel {
     rename_across_devices(&temp_path, &self.filesystem_path)
         .map_err(|e| {
           error!("could rename hubert model on disk: {:?}", e);
-          safe_delete_temp_directory(&temp_dir);
+          safe_delete_directory(&temp_dir);
           anyhow!("couldn't rename disk files: {:?}", e)
         })?;
 
     info!("Finished downloading hubert file to {:?}", &self.filesystem_path);
 
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_directory(&temp_dir);
 
     Ok(())
   }

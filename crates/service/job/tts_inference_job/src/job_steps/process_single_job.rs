@@ -14,8 +14,8 @@ use tempdir::TempDir;
 
 use container_common::anyhow_result::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
@@ -319,7 +319,7 @@ pub async fn process_single_job(
   let file_metadata = read_metadata_file(&output_metadata_fs_path)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_metadata_fs_path);
+  safe_delete_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
@@ -340,7 +340,7 @@ pub async fn process_single_job(
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_audio_fs_path);
+  safe_delete_file(&output_audio_fs_path);
 
   // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 
@@ -358,12 +358,12 @@ pub async fn process_single_job(
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_spectrogram_fs_path);
+  safe_delete_file(&output_spectrogram_fs_path);
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

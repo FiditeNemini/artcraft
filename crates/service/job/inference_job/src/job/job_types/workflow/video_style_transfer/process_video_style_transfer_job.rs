@@ -27,8 +27,8 @@ use filesys::file_exists::file_exists;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
@@ -483,19 +483,19 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
             warn!("Captured stderr output: {}", contents);
         }
 
-        safe_delete_temp_file(&stderr_output_file);
-        safe_delete_temp_file(&stdout_output_file);
-        safe_delete_temp_directory(&work_temp_dir);
-        safe_delete_temp_file(&workflow_path);
+        safe_delete_file(&stderr_output_file);
+        safe_delete_file(&stdout_output_file);
+        safe_delete_directory(&work_temp_dir);
+        safe_delete_file(&workflow_path);
         safe_delete_all_input_videos(&videos);
 
         // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
         if let Some(lora_path) = maybe_lora_path {
-            safe_delete_temp_file(&lora_path);
+            safe_delete_file(&lora_path);
         }
 
         if let Some(ipa_path) = global_ipa_image {
-            safe_delete_temp_file(ipa_path.ipa_image_path);
+            safe_delete_file(ipa_path.ipa_image_path);
         }
 
         safe_recursively_delete_files(&comfy_dirs.comfy_output_dir);
@@ -567,28 +567,28 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
 
     info!("Cleaning up temporary files...");
 
-    safe_delete_temp_file(&stderr_output_file);
-    safe_delete_temp_file(&stdout_output_file);
+    safe_delete_file(&stderr_output_file);
+    safe_delete_file(&stdout_output_file);
     safe_delete_all_input_videos(&videos);
 
     // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
 
-    safe_delete_temp_file(&workflow_path);
+    safe_delete_file(&workflow_path);
 
     // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
     if let Some(lora_path) = maybe_lora_path {
-        safe_delete_temp_file(lora_path);
+        safe_delete_file(lora_path);
     }
 
     if let Some(ipa_path) = global_ipa_image {
-        safe_delete_temp_file(ipa_path.ipa_image_path);
+        safe_delete_file(ipa_path.ipa_image_path);
     }
 
     let output_dir = root_comfy_path.join("output");
     safe_recursively_delete_files(&output_dir);
 
     // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-    safe_delete_temp_directory(&work_temp_dir);
+    safe_delete_directory(&work_temp_dir);
 
     // ==================== DONE ==================== //
 
@@ -614,10 +614,10 @@ fn safe_delete_files_and_directories<P: AsRef<Path>>(paths: &[P]) {
     for path in paths {
         let p = path.as_ref();
         if p.is_file() {
-            safe_delete_temp_file(p);
+            safe_delete_file(p);
         } else if p.is_dir() {
             safe_recursively_delete_files(p);
-            safe_delete_temp_directory(p);
+            safe_delete_directory(p);
         } else {
             warn!("Path {:?} is neither a file nor a directory", p);
         }
@@ -641,19 +641,19 @@ fn safe_delete_all_input_videos(videos: &VideoPathing) {
 }
 
 fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
-    safe_delete_temp_file(&video.original_download_path);
-    safe_delete_temp_file(&video.comfy_output_video_path);
-    safe_delete_temp_file(video.video_to_watermark());
-    safe_delete_temp_file(video.get_final_video_to_upload());
-    safe_delete_temp_file(video.get_non_watermarked_video_to_upload());
+    safe_delete_file(&video.original_download_path);
+    safe_delete_file(&video.comfy_output_video_path);
+    safe_delete_file(video.video_to_watermark());
+    safe_delete_file(video.get_final_video_to_upload());
+    safe_delete_file(video.get_non_watermarked_video_to_upload());
     if let Some(processed_path) = &video.maybe_trimmed_resampled_path {
-        safe_delete_temp_file(processed_path);
+        safe_delete_file(processed_path);
     }
 }
 
 fn safe_delete_secondary_videos(video: &SecondaryInputVideoAndPaths) {
-    safe_delete_temp_file(&video.original_download_path);
+    safe_delete_file(&video.original_download_path);
     if let Some(processed_path) = &video.maybe_processed_path {
-        safe_delete_temp_file(processed_path);
+        safe_delete_file(processed_path);
     }
 }

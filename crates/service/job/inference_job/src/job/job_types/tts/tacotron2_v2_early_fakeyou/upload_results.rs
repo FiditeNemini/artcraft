@@ -6,8 +6,8 @@ use tempdir::TempDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
@@ -89,7 +89,7 @@ async fn upload_as_media_file(args: UploadResultArgs<'_>) -> Result<ResultDetail
     ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
   })?;
 
-  safe_delete_temp_file(&args.output_audio_fs_path);
+  safe_delete_file(&args.output_audio_fs_path);
 
   // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 
@@ -98,7 +98,7 @@ async fn upload_as_media_file(args: UploadResultArgs<'_>) -> Result<ResultDetail
   // ==================== DELETE WORK DIRECTORY ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&args.work_temp_dir.path());
+  safe_delete_directory(&args.work_temp_dir.path());
 
   // ==================== SAVE RECORDS ==================== //
 
@@ -150,7 +150,7 @@ async fn upload_as_legacy_tts_result(args: UploadResultArgs<'_>) -> Result<Resul
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&args.output_audio_fs_path);
+  safe_delete_file(&args.output_audio_fs_path);
 
   // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 
@@ -168,12 +168,12 @@ async fn upload_as_legacy_tts_result(args: UploadResultArgs<'_>) -> Result<Resul
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&args.output_spectrogram_fs_path);
+  safe_delete_file(&args.output_spectrogram_fs_path);
 
   // ==================== DELETE WORK DIRECTORY ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&args.work_temp_dir.path());
+  safe_delete_directory(&args.work_temp_dir.path());
 
   // ==================== SAVE RECORDS ==================== //
 

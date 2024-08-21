@@ -4,7 +4,7 @@ use log::warn;
 
 use collections::multiple_random_from_vec::multiple_random_from_vec;
 use errors::AnyhowResult;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 
 pub fn clear_full_filesystem(cache_dir: &SemiPersistentCacheDir) -> AnyhowResult<()> {
@@ -31,7 +31,7 @@ fn decimate_directory(path: &Path) -> AnyhowResult<()> {
     warn!("Deleting cached model file: {:?}", model_to_delete);
 
     let full_model_path = path.join(model_to_delete);
-    safe_delete_temp_file(full_model_path);
+    safe_delete_file(full_model_path);
   }
 
   Ok(())

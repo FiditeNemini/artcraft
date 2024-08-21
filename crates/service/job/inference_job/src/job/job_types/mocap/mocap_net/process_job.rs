@@ -10,8 +10,8 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Mc;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -169,10 +169,10 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
             warn!("Captured stderr output: {}", contents);
         }
 
-        safe_delete_temp_file(&video_path.filesystem_path);
-        safe_delete_temp_file(&output_bvh_path);
-        safe_delete_temp_file(&stderr_output_file);
-        safe_delete_temp_directory(&work_temp_dir);
+        safe_delete_file(&video_path.filesystem_path);
+        safe_delete_file(&output_bvh_path);
+        safe_delete_file(&stderr_output_file);
+        safe_delete_directory(&work_temp_dir);
 
         return Err(error);
     }
@@ -232,13 +232,13 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // ==================== DELETE TEMP FILES ==================== //
 
-    safe_delete_temp_file(&video_path.filesystem_path);
-    safe_delete_temp_file(&output_bvh_path);
-    safe_delete_temp_file(&stderr_output_file);
-    safe_delete_temp_directory(&work_temp_dir);
+    safe_delete_file(&video_path.filesystem_path);
+    safe_delete_file(&output_bvh_path);
+    safe_delete_file(&stderr_output_file);
+    safe_delete_directory(&work_temp_dir);
 
     // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-    safe_delete_temp_directory(&work_temp_dir);
+    safe_delete_directory(&work_temp_dir);
 
     // ==================== SAVE RECORDS ==================== //
 

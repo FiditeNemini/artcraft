@@ -8,8 +8,8 @@ use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
 use filesys::file_size::file_size;
 use filesys::rename_across_devices::{rename_across_devices, RenameError};
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::queries::model_weights::get::get_weight::RetrievedModelWeight;
 
@@ -125,7 +125,7 @@ impl ModelWeightsCacheDirectory {
     self.public_bucket_client.download_file_to_disk(&bucket_object_path, &temp_path)
         .await
         .map_err(|e| {
-          safe_delete_temp_directory(&temp_dir);
+          safe_delete_directory(&temp_dir);
           ProcessSingleJobError::Other(e)
         })?;
 
@@ -141,8 +141,8 @@ impl ModelWeightsCacheDirectory {
     rename_across_devices(&temp_path, &cache_filesystem_path)
         .map_err(|err| {
           error!("could not rename on disk: {:?}", err);
-          safe_delete_temp_file(&temp_path);
-          safe_delete_temp_directory(&temp_dir);
+          safe_delete_file(&temp_path);
+          safe_delete_directory(&temp_dir);
           match err {
             RenameError::StorageFull => ProcessSingleJobError::FilesystemFull,
             RenameError::IoError(err) => ProcessSingleJobError::from_io_error(err),
@@ -151,8 +151,8 @@ impl ModelWeightsCacheDirectory {
 
     info!("Finished downloading and moving file to {:?}", &cache_filesystem_path);
 
-    safe_delete_temp_file(&temp_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&temp_path);
+    safe_delete_directory(&temp_dir);
 
     Ok(cache_filesystem_path)
   }

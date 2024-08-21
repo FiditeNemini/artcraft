@@ -5,8 +5,8 @@ use log::{error, info, warn};
 use cloud_storage::bucket_client::BucketClient;
 use filesys::file_size::file_size;
 use filesys::rename_across_devices::{rename_across_devices, RenameError};
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -83,7 +83,7 @@ pub async fn maybe_download_file_from_bucket(
   args.bucket_client.download_file_to_disk(&args.bucket_object_path, &temp_path)
       .await
       .map_err(|e| {
-        safe_delete_temp_directory(&temp_dir);
+        safe_delete_directory(&temp_dir);
         ProcessSingleJobError::Other(e)
       })?;
 
@@ -101,8 +101,8 @@ pub async fn maybe_download_file_from_bucket(
   rename_across_devices(&temp_path, &args.final_filesystem_file_path)
       .map_err(|err| {
         error!("could not rename on disk: {:?}", err);
-        safe_delete_temp_file(&temp_path);
-        safe_delete_temp_directory(&temp_dir);
+        safe_delete_file(&temp_path);
+        safe_delete_directory(&temp_dir);
         match err {
           RenameError::StorageFull => ProcessSingleJobError::FilesystemFull,
           RenameError::IoError(err) => ProcessSingleJobError::from_io_error(err),
@@ -118,8 +118,8 @@ pub async fn maybe_download_file_from_bucket(
 //      error!("Error Copying {} temp file from {:?} to {:?}! {err}",
 //        args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
 //
-//      safe_delete_temp_file(&temp_path);
-//      safe_delete_temp_directory(&temp_dir);
+//      safe_delete_file(&temp_path);
+//      safe_delete_directory(&temp_dir);
 //
 //      return Err(ProcessSingleJobError::from_anyhow_error(err));
 //    }
@@ -136,8 +136,8 @@ pub async fn maybe_download_file_from_bucket(
 
   info!("Finished downloading {} file to {:?}", args.name_or_description_of_file, &args.final_filesystem_file_path);
 
-  safe_delete_temp_file(&temp_path);
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_file(&temp_path);
+  safe_delete_directory(&temp_dir);
 
   Ok(())
 }
@@ -151,8 +151,8 @@ pub async fn maybe_download_file_from_bucket(
 //     args.name_or_description_of_file, &args.final_filesystem_file_path);
 //
 //   if copied_size != 0 {
-//     safe_delete_temp_file(&temp_path);
-//     safe_delete_temp_directory(&temp_dir);
+//     safe_delete_file(&temp_path);
+//     safe_delete_directory(&temp_dir);
 //
 //     return Ok(());
 //   }
@@ -168,8 +168,8 @@ pub async fn maybe_download_file_from_bucket(
 //         warn!("File couldn't be removed: it's already gone.")
 //       },
 //       _ => {
-//         safe_delete_temp_file(&temp_path);
-//         safe_delete_temp_directory(&temp_dir);
+//         safe_delete_file(&temp_path);
+//         safe_delete_directory(&temp_dir);
 //         return Err(ProcessSingleJobError::from_io_error(err));
 //       }
 //     }
@@ -182,8 +182,8 @@ pub async fn maybe_download_file_from_bucket(
 //   rename_across_devices(&temp_path, &args.final_filesystem_file_path)
 //       .map_err(|err| {
 //         error!("could not rename on disk: {:?}", err);
-//         safe_delete_temp_file(&temp_path);
-//         safe_delete_temp_directory(&temp_dir);
+//         safe_delete_file(&temp_path);
+//         safe_delete_directory(&temp_dir);
 //         match err {
 //           RenameError::StorageFull => ProcessSingleJobError::FilesystemFull,
 //           RenameError::IoError(err) => ProcessSingleJobError::from_io_error(err),

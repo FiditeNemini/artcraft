@@ -39,8 +39,8 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::check_directory_exists::check_directory_exists;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
@@ -564,9 +564,9 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   );
 
   if let Err(e) = inference_result {
-    safe_delete_temp_file(&audio_fs_path);
-    safe_delete_temp_file(&output_video_fs_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&audio_fs_path);
+    safe_delete_file(&output_video_fs_path);
+    safe_delete_directory(&temp_dir);
     return Err(e);
   }
 
@@ -581,7 +581,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
-  safe_delete_temp_file(&output_metadata_fs_path);
+  safe_delete_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD TO BUCKETS ==================== //
 
@@ -605,18 +605,18 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     .await;
 
   if let Err(e) = upload_result {
-    safe_delete_temp_file(&audio_fs_path);
-    safe_delete_temp_file(&output_video_fs_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&audio_fs_path);
+    safe_delete_file(&output_video_fs_path);
+    safe_delete_directory(&temp_dir);
     return Err(e);
   }
 
-  safe_delete_temp_file(&output_video_fs_path);
+  safe_delete_file(&output_video_fs_path);
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

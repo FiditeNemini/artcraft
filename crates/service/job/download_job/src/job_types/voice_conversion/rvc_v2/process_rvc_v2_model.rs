@@ -12,10 +12,10 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_possible_temp_file::safe_delete_possible_temp_file;
+use filesys::file_deletion::safe_delete_possible_file::safe_delete_possible_file;
 use filesys::file_size::file_size;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
@@ -91,10 +91,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   });
 
   if let Err(e) = model_check_result {
-    safe_delete_temp_file(&original_model_file_path);
-    safe_delete_possible_temp_file(maybe_original_model_index_file_path.as_deref());
-    safe_delete_temp_file(&output_wav_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&original_model_file_path);
+    safe_delete_possible_file(maybe_original_model_index_file_path.as_deref());
+    safe_delete_file(&output_wav_path);
+    safe_delete_directory(&temp_dir);
     return Err(anyhow!("model check error: {:?}", e));
   }
 
@@ -123,10 +123,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   if let Err(err) = job_state.private_bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
     error!("Problem uploading model file: {:?}", err);
-    safe_delete_temp_file(&original_model_file_path);
-    safe_delete_possible_temp_file(maybe_original_model_index_file_path.as_deref());
-    safe_delete_temp_file(&output_wav_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&original_model_file_path);
+    safe_delete_possible_file(maybe_original_model_index_file_path.as_deref());
+    safe_delete_file(&output_wav_path);
+    safe_delete_directory(&temp_dir);
     return Err(err);
   }
 
@@ -136,9 +136,9 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   if let Err(err) = job_state.public_bucket_client.upload_filename(new_model_bucket_path.get_full_object_path_str(), &original_model_file_path).await {
     error!("Problem uploading original model to NEW bucket: {:?}", err);
-    safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&output_wav_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&original_model_file_path);
+    safe_delete_file(&output_wav_path);
+    safe_delete_directory(&temp_dir);
     return Err(err);
   }
 
@@ -151,10 +151,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
     if let Err(err) = job_state.private_bucket_client.upload_filename(&model_index_bucket_path, &original_index_file_path).await {
       error!("Problem uploading index file: {:?}", err);
-      safe_delete_temp_file(&original_model_file_path);
-      safe_delete_temp_file(&original_index_file_path);
-      safe_delete_temp_file(&output_wav_path);
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_file(&original_model_file_path);
+      safe_delete_file(&original_index_file_path);
+      safe_delete_file(&output_wav_path);
+      safe_delete_directory(&temp_dir);
       return Err(err);
     }
 
@@ -165,10 +165,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
     if let Err(err) = job_state.public_bucket_client.upload_filename(new_index_bucket_path.get_full_object_path_str(), &original_index_file_path).await {
       error!("Problem uploading original model to NEW bucket: {:?}", err);
-      safe_delete_temp_file(&original_model_file_path);
-      safe_delete_temp_file(&original_index_file_path);
-      safe_delete_temp_file(&output_wav_path);
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_file(&original_model_file_path);
+      safe_delete_file(&original_index_file_path);
+      safe_delete_file(&output_wav_path);
+      safe_delete_directory(&temp_dir);
       return Err(err);
     }
   }
@@ -177,10 +177,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   info!("Done uploading; deleting temporary files and paths...");
-  safe_delete_temp_file(&original_model_file_path);
-  safe_delete_possible_temp_file(maybe_original_model_index_file_path.as_deref());
-  safe_delete_temp_file(&output_wav_path);
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_file(&original_model_file_path);
+  safe_delete_possible_file(maybe_original_model_index_file_path.as_deref());
+  safe_delete_file(&output_wav_path);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

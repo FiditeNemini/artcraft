@@ -9,8 +9,8 @@ use tempdir::TempDir;
 use enums::common::vocoder_type::VocoderType;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::file_deletion::safe_delete_temp_file::safe_delete_temp_file;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
@@ -44,8 +44,8 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
   );
 
   if let Err(e) = model_check_result {
-    safe_delete_temp_file(&file_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&file_path);
+    safe_delete_directory(&temp_dir);
     return Err(anyhow!("model check error: {:?}", e));
   }
 
@@ -58,9 +58,9 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
   let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
     Ok(metadata) => metadata,
     Err(e) => {
-      safe_delete_temp_file(&file_path);
-      safe_delete_temp_file(&output_metadata_fs_path);
-      safe_delete_temp_directory(&temp_dir);
+      safe_delete_file(&file_path);
+      safe_delete_file(&output_metadata_fs_path);
+      safe_delete_directory(&temp_dir);
       return Err(e);
     }
   };
@@ -80,18 +80,18 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
   redis_logger.log_status("uploading hifigan model")?;
 
   if let Err(e) = job_state.private_bucket_client.upload_filename(&model_bucket_path, &file_path).await {
-    safe_delete_temp_file(&output_metadata_fs_path);
-    safe_delete_temp_file(&file_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_file(&output_metadata_fs_path);
+    safe_delete_file(&file_path);
+    safe_delete_directory(&temp_dir);
     return Err(e);
   }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_file(&output_metadata_fs_path);
-  safe_delete_temp_file(&file_path);
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_file(&output_metadata_fs_path);
+  safe_delete_file(&file_path);
+  safe_delete_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
