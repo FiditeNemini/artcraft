@@ -55,5 +55,8 @@ cp src/netlify_configs/fakeyou.com/_redirects fakeyou.com/
 cp src/netlify_configs/fakeyou.com/netlify.toml fakeyou.com/
 cp src/netlify_configs/fakeyou.com/netlify.toml ./
 
+echo "Copying 404 page..."
+mv src/website/packages/fakeyou.com/build/404_fakeyou.html fakeyou.com/404.html
+
 echo "List files in build directory"
 find fakeyou.com/
