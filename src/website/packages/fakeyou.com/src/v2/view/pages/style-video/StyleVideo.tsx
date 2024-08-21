@@ -61,7 +61,7 @@ export default function StyleVideo() {
     if (
       loggedInOrModal({
         loginMessage: "Login to finish styling your video",
-        signupMessage: "Sign Up to finish styling your video",
+        signupMessage: "Sign up to finish styling your video",
       }) &&
       mediaToken &&
       selectedStyleValues.length > 0

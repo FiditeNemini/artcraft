@@ -11,9 +11,7 @@ import {
   Checkbox,
   Container,
   Label,
-  LoginBlock,
   Panel,
-  SessionFetchingSpinner,
 } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -50,6 +48,7 @@ import { LivePortraitDetails } from "@storyteller/components/src/api/model_infer
 import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
 import SourceEntityInput from "./SourceEntityInput";
 import MotionEntityInput from "./MotionEntityInput";
+import OutputThumbnailImage from "./OutputThumbnailImage";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -70,7 +69,7 @@ export default function LivePortrait({
 }: LivePortraitProps) {
   useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
-  const { loggedIn, sessionFetched } = useSession();
+  const { loggedInOrModal } = useSession();
   const { open, close } = useModal();
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(0);
@@ -175,6 +174,14 @@ export default function LivePortrait({
   };
 
   const enqueueClick = () => {
+    if (
+      !loggedInOrModal({
+        loginMessage: "Login to finish animating your portrait",
+        signupMessage: "Sign up to finish animating your portrait",
+      })
+    ) {
+      return;
+    }
     // Clear the generated video when reanimating
     setGeneratedVideoSrc("");
     setIsGenerating(true);
@@ -247,7 +254,7 @@ export default function LivePortrait({
               </div>
             </h4>
           </div>
-          <img
+          <OutputThumbnailImage
             src={selectedSourceMediaLink || ""}
             alt="Preview"
             style={{ opacity: 0.15 }}
@@ -309,14 +316,8 @@ export default function LivePortrait({
               to start generating
             </h4>
           </div>
-          <img
-            src={
-              selectedSourceMediaLink
-                ? selectedSourceMediaLink.toLowerCase().endsWith(".mp4")
-                  ? `${selectedSourceMediaLink}-thumb.jpg`
-                  : selectedSourceMediaLink
-                : ""
-            }
+          <OutputThumbnailImage
+            src={selectedSourceMediaLink || ""}
             alt="Preview"
             style={{ opacity: 0.15 }}
             draggable={false}
@@ -660,19 +661,6 @@ export default function LivePortrait({
       console.error("No video source available for download");
     }
   };
-
-  if (!sessionFetched) {
-    return <SessionFetchingSpinner />;
-  }
-
-  if (!loggedIn) {
-    return (
-      <LoginBlock
-        title="You need to be logged in to use Live Portrait"
-        redirect="/ai-live-portrait"
-      />
-    );
-  }
 
   return (
     <>

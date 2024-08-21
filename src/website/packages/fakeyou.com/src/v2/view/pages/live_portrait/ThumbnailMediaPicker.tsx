@@ -213,7 +213,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                         muted
                         loop={true}
                         playsInline
-                        controls={false}
+                        controls={true}
                         preload="auto"
                         draggable="false"
                       >
