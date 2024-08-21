@@ -24,13 +24,14 @@ use enums::common::job_status_plus::JobStatusPlus;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_deletion::safe_delete_all_files_and_directories::safe_delete_all_files_and_directories;
+use filesys::file_deletion::safe_delete_all_possible_files_and_directories::safe_delete_all_possible_files_and_directories;
+use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
+use filesys::file_deletion::safe_delete_file::safe_delete_file;
+use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
 use filesys::file_exists::file_exists;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
-use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
-use filesys::file_deletion::safe_delete_file::safe_delete_file;
-use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
@@ -391,7 +392,6 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         }
     });
 
-
     let mut preview_processor = PreviewProcessor::new(
         job.inference_job_token.clone(),
         redis,
@@ -419,34 +419,34 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
     let command_exit_status = comfy_deps
         .inference_command
         .execute_inference(
-                           tx,
-                           &mut cancel_rx,
-                          InferenceArgs {
-            generate_previews: comfy_args.generate_fast_previews.unwrap_or(false),
-            preview_frames_directory: Some(preview_frames_dir.as_ref()),
-            stderr_output_file: &stderr_output_file,
-            stdout_output_file: &stdout_output_file,
-            inference_details,
-            face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
-            upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
-            lipsync_enabled,
-            disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
-            use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
-            maybe_strength: comfy_args.strength,
-            frame_skip: comfy_args.frame_skip,
-            global_ipa_image_filename: global_ipa_image
-                .as_ref()
-                .map(|image| path_to_string(&image.ipa_image_path)),
-            global_ipa_strength: None, // TODO: Expose a UI slider
-            depth_video_path: videos.maybe_depth.as_ref()
-                .map(|v| v.maybe_processed_path.as_deref())
-                .flatten(),
-            normal_video_path: videos.maybe_normal.as_ref()
-                .map(|v| v.maybe_processed_path.as_deref())
-                .flatten(),
-            outline_video_path: videos.maybe_outline.as_ref()
-                .map(|v| v.maybe_processed_path.as_deref())
-                .flatten(),
+            tx,
+            &mut cancel_rx,
+            InferenceArgs {
+                generate_previews: comfy_args.generate_fast_previews.unwrap_or(false),
+                preview_frames_directory: Some(preview_frames_dir.as_ref()),
+                stderr_output_file: &stderr_output_file,
+                stdout_output_file: &stdout_output_file,
+                inference_details,
+                face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
+                upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
+                lipsync_enabled,
+                disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
+                use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
+                maybe_strength: comfy_args.strength,
+                frame_skip: comfy_args.frame_skip,
+                global_ipa_image_filename: global_ipa_image
+                    .as_ref()
+                    .map(|image| path_to_string(&image.ipa_image_path)),
+                global_ipa_strength: None, // TODO: Expose a UI slider
+                depth_video_path: videos.maybe_depth.as_ref()
+                    .map(|v| v.maybe_processed_path.as_deref())
+                    .flatten(),
+                normal_video_path: videos.maybe_normal.as_ref()
+                    .map(|v| v.maybe_processed_path.as_deref())
+                    .flatten(),
+                outline_video_path: videos.maybe_outline.as_ref()
+                    .map(|v| v.maybe_processed_path.as_deref())
+                    .flatten(),
         }).await;
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
@@ -470,7 +470,6 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
     }
 
-
     preview_frames_uploader.await.map_err(|e| ProcessSingleJobError::Other(anyhow!("bucket uploader error: {:?}", e)))?;
 
     // ==================== CHECK OUTPUT FILE ======================== //
@@ -484,22 +483,23 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
             warn!("Captured stderr output: {}", contents);
         }
 
-        safe_delete_file(&stderr_output_file);
-        safe_delete_file(&stdout_output_file);
-        safe_delete_directory(&work_temp_dir);
-        safe_delete_file(&workflow_path);
         safe_delete_all_input_videos(&videos);
+        safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
 
-        // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
-        if let Some(lora_path) = maybe_lora_path {
-            safe_delete_file(&lora_path);
-        }
-
-        if let Some(ipa_path) = global_ipa_image {
-            safe_delete_file(ipa_path.ipa_image_path);
-        }
-
-        safe_recursively_delete_files(&comfy_dirs.comfy_output_dir);
+        // NB: Forcing generic type to `&Path` with turbofish
+        safe_delete_all_possible_files_and_directories::<&Path>(&[
+            Some(&negative_prompt_file),
+            Some(&output_dir),
+            Some(&positive_prompt_file),
+            Some(&preview_frames_dir),
+            Some(&stderr_output_file),
+            Some(&stdout_output_file),
+            Some(&travel_prompt_file),
+            Some(work_temp_dir.path()),
+            Some(workflow_path.as_ref()),
+            global_ipa_image.as_ref().map(|ipa| ipa.ipa_image_path.as_path()),
+            maybe_lora_path.as_deref(),
+        ]);
 
         return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
             &videos.primary_video.comfy_output_video_path)));
@@ -545,17 +545,24 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         Err(err) => {
             error!("Error validating and saving results: {:?}", err);
             safe_delete_all_input_videos(&videos);
+            safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
 
-            // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
-            safe_delete_all_files_and_directories(&[
-                positive_prompt_file.as_path(),
-                &negative_prompt_file,
-                &travel_prompt_file,
-                &preview_frames_dir,
-                workflow_path.as_ref(),
-                &output_dir,
-                work_temp_dir.path(),
+            // NB: Forcing generic type to `&Path` with turbofish
+            safe_delete_all_possible_files_and_directories::<&Path>(&[
+                Some(&comfy_dirs.comfy_output_dir),
+                Some(&negative_prompt_file),
+                Some(&output_dir),
+                Some(&preview_frames_dir),
+                Some(&stderr_output_file),
+                Some(&stdout_output_file),
+                Some(&travel_prompt_file),
+                Some(&positive_prompt_file),
+                Some(work_temp_dir.path()),
+                Some(workflow_path.as_ref()),
+                global_ipa_image.as_ref().map(|ipa| ipa.ipa_image_path.as_path()),
+                maybe_lora_path.as_deref(),
             ]);
+
             return Err(err);
         }
     };
@@ -571,28 +578,23 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
 
     info!("Cleaning up temporary files...");
 
-    safe_delete_file(&stderr_output_file);
-    safe_delete_file(&stdout_output_file);
     safe_delete_all_input_videos(&videos);
+    safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
 
-    // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
-    if let Some(lora_path) = maybe_lora_path {
-        safe_delete_file(lora_path);
-    }
-
-    if let Some(ipa_path) = global_ipa_image {
-        safe_delete_file(ipa_path.ipa_image_path);
-    }
-
-    // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
-    safe_delete_all_files_and_directories(&[
-        positive_prompt_file.as_path(),
-        &negative_prompt_file,
-        &travel_prompt_file,
-        &preview_frames_dir,
-        workflow_path.as_ref(),
-        &output_dir,
-        work_temp_dir.path(),
+    // NB: Forcing generic type to `&Path` with turbofish
+    safe_delete_all_possible_files_and_directories::<&Path>(&[
+        Some(&comfy_dirs.comfy_output_dir),
+        Some(&negative_prompt_file),
+        Some(&output_dir),
+        Some(&preview_frames_dir),
+        Some(&stderr_output_file),
+        Some(&stdout_output_file),
+        Some(&travel_prompt_file),
+        Some(&positive_prompt_file),
+        Some(work_temp_dir.path()),
+        Some(workflow_path.as_ref()),
+        global_ipa_image.as_ref().map(|ipa| ipa.ipa_image_path.as_path()),
+        maybe_lora_path.as_deref(),
     ]);
 
     // ==================== DONE ==================== //
@@ -617,42 +619,35 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
 
 fn safe_delete_all_input_videos(videos: &VideoPathing) {
     safe_delete_primary_videos(&videos.primary_video);
-
     if let Some(depth) = &videos.maybe_depth {
         safe_delete_secondary_videos(depth);
     }
-
     if let Some(normal) = &videos.maybe_normal {
         safe_delete_secondary_videos(normal);
     }
-
     if let Some(outline) = &videos.maybe_outline {
         safe_delete_secondary_videos(outline);
     }
 }
 
 fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
-    safe_delete_file(&video.comfy_input_video_path);
-    safe_delete_file(&video.comfy_output_video_path);
-    safe_delete_file(&video.original_download_path);
-    safe_delete_file(&video.trimmed_wav_audio_path);
-    safe_delete_file(video.video_to_watermark());
-    safe_delete_file(video.get_final_video_to_upload());
-    safe_delete_file(video.get_non_watermarked_video_to_upload());
-    if let Some(path) = &video.maybe_trimmed_resampled_path {
-        safe_delete_file(path);
-    }
-    if let Some(path) = &video.audio_restored_video_path {
-        safe_delete_file(path);
-    }
-    if let Some(path) = &video.watermarked_video_path{
-        safe_delete_file(path);
-    }
+    safe_delete_all_possible_files_and_directories::<&Path>(&[
+        Some(&video.comfy_input_video_path),
+        Some(&video.comfy_output_video_path),
+        Some(&video.original_download_path),
+        Some(&video.trimmed_wav_audio_path),
+        Some(video.get_final_video_to_upload()),
+        Some(video.get_non_watermarked_video_to_upload()),
+        Some(video.video_to_watermark()),
+        video.audio_restored_video_path.as_deref(),
+        video.maybe_trimmed_resampled_path.as_deref(),
+        video.watermarked_video_path.as_deref(),
+    ]);
 }
 
 fn safe_delete_secondary_videos(video: &SecondaryInputVideoAndPaths) {
-    safe_delete_file(&video.original_download_path);
-    if let Some(processed_path) = &video.maybe_processed_path {
-        safe_delete_file(processed_path);
-    }
+    safe_delete_all_possible_files_and_directories::<&Path>(&[
+        Some(&video.original_download_path),
+        video.maybe_processed_path.as_deref(),
+    ]);
 }
