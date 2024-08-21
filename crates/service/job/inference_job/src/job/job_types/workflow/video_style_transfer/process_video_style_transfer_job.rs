@@ -23,8 +23,8 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::job_status_plus::JobStatusPlus;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
-use filesys::file_deletion::safe_delete_all_files_and_directories::safe_delete_all_files_and_directories;
-use filesys::file_deletion::safe_delete_all_possible_files_and_directories::safe_delete_all_possible_files_and_directories;
+use filesys::file_deletion::safe_delete_files_and_directories::safe_delete_files_and_directories;
+use filesys::file_deletion::safe_delete_possible_files_and_directories::safe_delete_possible_files_and_directories;
 use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
 use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
@@ -487,7 +487,7 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
 
         // NB: Forcing generic type to `&Path` with turbofish
-        safe_delete_all_possible_files_and_directories::<&Path>(&[
+        safe_delete_possible_files_and_directories::<&Path>(&[
             Some(&negative_prompt_file),
             Some(&output_dir),
             Some(&positive_prompt_file),
@@ -548,7 +548,7 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
             safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
 
             // NB: Forcing generic type to `&Path` with turbofish
-            safe_delete_all_possible_files_and_directories::<&Path>(&[
+            safe_delete_possible_files_and_directories::<&Path>(&[
                 Some(&comfy_dirs.comfy_output_dir),
                 Some(&negative_prompt_file),
                 Some(&output_dir),
@@ -582,7 +582,7 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
     safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
 
     // NB: Forcing generic type to `&Path` with turbofish
-    safe_delete_all_possible_files_and_directories::<&Path>(&[
+    safe_delete_possible_files_and_directories::<&Path>(&[
         Some(&comfy_dirs.comfy_output_dir),
         Some(&negative_prompt_file),
         Some(&output_dir),
@@ -631,7 +631,7 @@ fn safe_delete_all_input_videos(videos: &VideoPathing) {
 }
 
 fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
-    safe_delete_all_possible_files_and_directories::<&Path>(&[
+    safe_delete_possible_files_and_directories::<&Path>(&[
         Some(&video.comfy_input_video_path),
         Some(&video.comfy_output_video_path),
         Some(&video.original_download_path),
@@ -646,7 +646,7 @@ fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
 }
 
 fn safe_delete_secondary_videos(video: &SecondaryInputVideoAndPaths) {
-    safe_delete_all_possible_files_and_directories::<&Path>(&[
+    safe_delete_possible_files_and_directories::<&Path>(&[
         Some(&video.original_download_path),
         video.maybe_processed_path.as_deref(),
     ]);

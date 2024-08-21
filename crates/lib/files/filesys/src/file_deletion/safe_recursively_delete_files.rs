@@ -5,8 +5,8 @@ use walkdir::WalkDir;
 
 use crate::file_deletion::safe_delete_file::safe_delete_file;
 
-/// Deletes all files in the directory tree at the given path without deleting the directory itself.
-/// This is an infallible, idempotent function.
+/// Deletes all files in the directory tree at the given path *without deleting the directory itself*,
+/// and *without deleting any subdirectories*. This is an infallible, idempotent function.
 pub fn safe_recursively_delete_files(path: &Path) {
   if !path.exists() {
     warn!("Path does not exist: {:?}", path);

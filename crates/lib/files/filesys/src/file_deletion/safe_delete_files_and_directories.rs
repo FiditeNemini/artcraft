@@ -17,20 +17,15 @@ use crate::file_deletion::safe_recursively_delete_files::safe_recursively_delete
 ///
 /// ```rust
 /// use std::path::{Path, PathBuf};
-/// use filesys::file_deletion::safe_delete_all_possible_files_and_directories::safe_delete_all_possible_files_and_directories;
+/// use filesys::file_deletion::safe_delete_files_and_directories::safe_delete_files_and_directories;
 ///
-/// safe_delete_all_possible_files_and_directories(&[
-///   Some(Path::new("1234_foo_bar_baz.bash")),
-///   Some(&PathBuf::from("1234_foo_bar_baz.bin")),
-///   None,
+/// safe_delete_files_and_directories(&[
+///   Path::new("1234_foo_bar_baz.bash"),
+///   &PathBuf::from("1234_foo_bar_baz.bin"),
 /// ]);
 /// ```
-pub fn safe_delete_all_possible_files_and_directories<P: AsRef<Path>>(possible_paths: &[Option<P>]) {
-  for possible_path in possible_paths {
-    let path = match possible_path {
-      None => continue,
-      Some(path) => path,
-    };
+pub fn safe_delete_files_and_directories<P: AsRef<Path>>(paths: &[P]) {
+  for path in paths {
     let p = path.as_ref();
     if p.is_file() {
       safe_delete_file(p);
