@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::Path;
 
 use log::info;
@@ -8,7 +7,7 @@ use log::warn;
 /// This is an infallible, idempotent function.
 pub fn safe_delete_file<P: AsRef<Path>>(file_path: P) {
   let printable_name = file_path.as_ref().to_str().unwrap_or("bad filename");
-  match fs::remove_file(&file_path) {
+  match std::fs::remove_file(&file_path) {
     Ok(_) => info!("Temp file deleted: {}", printable_name),
     Err(e) => warn!("Could not delete temp file {:?} (not a fatal error): {:?}",
                     printable_name, e),

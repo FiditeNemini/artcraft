@@ -23,6 +23,7 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::job_status_plus::JobStatusPlus;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
+use filesys::file_deletion::safe_delete_all_files_and_directories::safe_delete_all_files_and_directories;
 use filesys::file_exists::file_exists;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
@@ -544,11 +545,14 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         Err(err) => {
             error!("Error validating and saving results: {:?}", err);
             safe_delete_all_input_videos(&videos);
-            safe_delete_files_and_directories(&[
+
+            // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
+            safe_delete_all_files_and_directories(&[
                 positive_prompt_file.as_path(),
                 &negative_prompt_file,
                 &travel_prompt_file,
                 &preview_frames_dir,
+                workflow_path.as_ref(),
                 &output_dir,
                 work_temp_dir.path(),
             ]);
@@ -571,10 +575,6 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
     safe_delete_file(&stdout_output_file);
     safe_delete_all_input_videos(&videos);
 
-    // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
-
-    safe_delete_file(&workflow_path);
-
     // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
     if let Some(lora_path) = maybe_lora_path {
         safe_delete_file(lora_path);
@@ -584,11 +584,16 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         safe_delete_file(ipa_path.ipa_image_path);
     }
 
-    let output_dir = root_comfy_path.join("output");
-    safe_recursively_delete_files(&output_dir);
-
-    // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-    safe_delete_directory(&work_temp_dir);
+    // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
+    safe_delete_all_files_and_directories(&[
+        positive_prompt_file.as_path(),
+        &negative_prompt_file,
+        &travel_prompt_file,
+        &preview_frames_dir,
+        workflow_path.as_ref(),
+        &output_dir,
+        work_temp_dir.path(),
+    ]);
 
     // ==================== DONE ==================== //
 
@@ -610,20 +615,6 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
     })
 }
 
-fn safe_delete_files_and_directories<P: AsRef<Path>>(paths: &[P]) {
-    for path in paths {
-        let p = path.as_ref();
-        if p.is_file() {
-            safe_delete_file(p);
-        } else if p.is_dir() {
-            safe_recursively_delete_files(p);
-            safe_delete_directory(p);
-        } else {
-            warn!("Path {:?} is neither a file nor a directory", p);
-        }
-    }
-}
-
 fn safe_delete_all_input_videos(videos: &VideoPathing) {
     safe_delete_primary_videos(&videos.primary_video);
 
@@ -641,13 +632,21 @@ fn safe_delete_all_input_videos(videos: &VideoPathing) {
 }
 
 fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
-    safe_delete_file(&video.original_download_path);
+    safe_delete_file(&video.comfy_input_video_path);
     safe_delete_file(&video.comfy_output_video_path);
+    safe_delete_file(&video.original_download_path);
+    safe_delete_file(&video.trimmed_wav_audio_path);
     safe_delete_file(video.video_to_watermark());
     safe_delete_file(video.get_final_video_to_upload());
     safe_delete_file(video.get_non_watermarked_video_to_upload());
-    if let Some(processed_path) = &video.maybe_trimmed_resampled_path {
-        safe_delete_file(processed_path);
+    if let Some(path) = &video.maybe_trimmed_resampled_path {
+        safe_delete_file(path);
+    }
+    if let Some(path) = &video.audio_restored_video_path {
+        safe_delete_file(path);
+    }
+    if let Some(path) = &video.watermarked_video_path{
+        safe_delete_file(path);
     }
 }
 
