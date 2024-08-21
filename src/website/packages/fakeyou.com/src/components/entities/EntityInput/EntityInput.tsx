@@ -221,7 +221,7 @@ export default function EntityInput({
   name = "",
   onChange,
   onPromptUpdate,
-  showWebcam = false,
+  showWebcam = true,
   type,
   value,
   showMediaBrowserFilters,

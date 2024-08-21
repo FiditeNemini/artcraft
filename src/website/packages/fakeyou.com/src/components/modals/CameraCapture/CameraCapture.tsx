@@ -11,6 +11,7 @@ import {
   SegmentButtons,
 } from "components/common";
 import { faClose } from "@fortawesome/pro-solid-svg-icons";
+import { isMobile } from "react-device-detect";
 import CapturePreview from "./CapturePreview";
 import "./CameraCapture.scss";
 
@@ -125,14 +126,10 @@ export default function CameraCapture({
     leave: { opacity: 0, transform: `translateX(${5}rem)` },
   });
 
-  const supports = navigator.mediaDevices.getSupportedConstraints();
-
   const cameraOptions = [
     { label: "Selfie camera", value: "user" },
     { label: "Rear camera", value: "enviroment" },
   ];
-
-  console.log("😶‍🌫️", supports, !supports.facingMode);
 
   useInterval({
     eventProps: { capturing, counter },
@@ -175,7 +172,6 @@ export default function CameraCapture({
             <Webcam
               audio
               {...{
-                mirrored: true,
                 muted: true,
                 className: "fy-camera-capture-display",
                 onUserMedia: () => cameraStartedSet(true),
@@ -224,7 +220,7 @@ export default function CameraCapture({
                   </svg>
                   {capturing ? timeString : "Record"}
                 </button>
-                {!supports.facingMode && (
+                {isMobile && (
                   <SegmentButtons
                     {...{
                       value: cameraPosition,
