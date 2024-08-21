@@ -49,9 +49,9 @@ cp -r blog/storyteller/public/* storyteller.ai/blog/
 
 echo "Copying 404 page..."
 # NB: storyteller is part of the "fakeyou.com" build
-cp src/website/packages/fakeyou.com/build/public/404_fakeyou.html storyteller.ai/404.html
+cp src/website/packages/fakeyou.com/build/404_storyteller.html storyteller.ai/404.html
 
-echo "Copying website artifacts..."
+echo "Moving website artifacts..."
 # NB: storyteller is part of the "fakeyou.com" build
 mv src/website/packages/fakeyou.com/build/* storyteller.ai/website/
 
