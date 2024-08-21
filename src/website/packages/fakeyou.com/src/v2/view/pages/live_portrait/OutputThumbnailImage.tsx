@@ -27,18 +27,15 @@ const OutputThumbnailImage: React.FC<OutputThumbnailImageProps> = ({
       img.src = thumbSrc;
       img.onload = () => {
         if (isMounted) {
-          console.log("Thumbnail loaded successfully");
           setThumbnailSrc(thumbSrc);
           setIsLoading(false);
         }
       };
       img.onerror = () => {
         if (isMounted && attempts < maxAttempts) {
-          console.log(`Attempt ${attempts + 1} failed, retrying...`);
           setTimeout(checkImage, 1000);
           attempts += 1;
         } else {
-          console.log("Max attempts reached or component unmounted");
           setIsLoading(false);
         }
       };
