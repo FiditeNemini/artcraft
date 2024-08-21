@@ -69,7 +69,7 @@ export default function LivePortrait({
 }: LivePortraitProps) {
   useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
-  const { loggedInOrModal } = useSession();
+  const { loggedIn, loggedInOrModal } = useSession();
   const { open, close } = useModal();
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(0);
@@ -761,11 +761,13 @@ export default function LivePortrait({
                     <Button
                       icon={isUserContent ? faSparkles : undefined}
                       label={
-                        isUserContent
-                          ? generatedVideoSrc
-                            ? "Re-animate"
-                            : "Animate"
-                          : "Upload your media to generate"
+                        !loggedIn && isUserContent
+                          ? "Sign Up and Animate"
+                          : isUserContent
+                            ? generatedVideoSrc
+                              ? "Re-animate"
+                              : "Animate"
+                            : "Upload your media to generate"
                       }
                       onClick={enqueueClick}
                       className="flex-grow-1"
