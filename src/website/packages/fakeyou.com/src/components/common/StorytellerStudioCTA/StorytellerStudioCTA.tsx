@@ -95,6 +95,7 @@ const StorytellerStudioCTA = ({
             }}
           >
             <video
+              className="ratio-16x9"
               preload="metadata"
               style={{
                 width: "100%",

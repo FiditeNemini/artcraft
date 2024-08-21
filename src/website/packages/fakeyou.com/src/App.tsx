@@ -31,6 +31,8 @@ import {
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
+import { FooterNav } from "./v2/view/nav/FooterNav";
+
 import { CoreServicesProvider } from "components/providers";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
@@ -447,29 +449,6 @@ class App extends React.Component<Props, State> {
                       clearBootstrapLanguageNotice={
                         this.clearBootstrapLanguageNotice
                       }
-                      // enqueueInferenceJob={this.enqueueInferenceJob}
-                      // inferenceJobs={this.state.inferenceJobs}
-                      // inferenceJobsByCategory={
-                      //   this.state.inferenceJobsByCategory
-                      // }
-                      // enqueueTtsJob={this.enqueueTtsJob}
-                      // ttsInferenceJobs={this.state.ttsInferenceJobs}
-                      // enqueueW2lJob={this.enqueueW2lJob}
-                      // w2lInferenceJobs={this.state.w2lInferenceJobs}
-                      // enqueueTtsModelUploadJob={this.enqueueTtsModelUploadJob}
-                      // ttsModelUploadJobs={this.state.ttsModelUploadJobs}
-                      // enqueueW2lTemplateUploadJob={
-                      //   this.enqueueW2lTemplateUploadJob
-                      // }
-                      // w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
-                      // enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
-                      // vocoderUploadJobs={this.state.vocoderUploadJobs}
-                      // enqueueVoiceConversionModelUploadJob={
-                      //   this.enqueueVoiceConversionModelUploadJob
-                      // }
-                      // voiceConversionModelUploadJobs={
-                      //   this.state.voiceConversionModelUploadJobs
-                      // }
                       textBuffer={this.state.textBuffer}
                       setTextBuffer={this.setTextBuffer}
                       clearTextBuffer={this.clearTextBuffer}
@@ -517,6 +496,8 @@ class App extends React.Component<Props, State> {
                     />
                   </Route>
                 </Switch>
+
+                <FooterNav sessionWrapper={this.state.sessionWrapper} />
               </CoreServicesProvider>
             </div>
           </div>
