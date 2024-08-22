@@ -3,7 +3,7 @@
 // Old design parents all elements with class "fakeyou-old"
 // Refresh design parents all elements with class "fakeyou-refresh"
 //
-// The reason for this is that WebPack imports and packs all SCSS files, which 
+// The reason for this is that WebPack imports and packs all SCSS files, which
 // makes it impossible to dynamically change styles.
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
@@ -21,14 +21,14 @@
   $light-text-color: #777;
   $button-text-color: #666;
 
-  $body-font-family: 'Fira Sans', serif;
-  $nav-font-family: 'Fira Sans', sans-serif;
-  $footer-font-family: 'Fira Sans Condensed', sans-serif;
-  $textarea-font-family: 'Fira Sans', sans-serif;
-  $headings-font-family: 'Merriweather', serif;
+  // $body-font-family: 'Fira Sans', serif;
+  // $nav-font-family: 'Fira Sans', sans-serif;
+  // $footer-font-family: 'Fira Sans Condensed', sans-serif;
+  // $textarea-font-family: 'Fira Sans', sans-serif;
+  // $headings-font-family: 'Merriweather', serif;
 
   body {
-    font-family: $body-font-family;
+    // font-family: $body-font-family;
     font-weight: 300; // For Fira Sans
   }
 
@@ -65,7 +65,7 @@
 
   p {
     a:before {
-      content: ' ';
+      content: " ";
     }
   }
 
@@ -81,14 +81,14 @@
   }
 
   footer {
-    font-family: $footer-font-family;
+    // font-family: $footer-font-family;
     text-align: center;
     width: 100%;
     position: absolute; // Footer attachment.
     bottom: 0;
     // NB: Setting explicit height doesn't appear to be necessary, and
     // it was creating an annoying scrollbar.
-    //height: $footer-height; 
+    //height: $footer-height;
     color: $light-text-color;
   }
 
@@ -119,7 +119,7 @@
       color: #da4f18;
     }
     a:hover.signup,
-    a:active.signup{
+    a:active.signup {
       color: #da4f18;
       text-decoration: underlinegt;
     }
@@ -135,7 +135,7 @@
         background-color: #fff;
       }
       a:active,
-      a:hover{
+      a:hover {
         text-decoration: underline;
         background-color: #fff;
       }
@@ -146,7 +146,7 @@
       cursor: pointer;
     }
     a:after {
-      content: '';
+      content: "";
       width: 99.5%;
     }
     a:hover,
@@ -196,7 +196,7 @@
 
     .selected {
       filter: brightness(100%) grayscale(0);
-      box-shadow: 0px 0px 25px #209CEE
+      box-shadow: 0px 0px 25px #209cee;
     }
   }
 
@@ -208,8 +208,9 @@
   #updates,
   #help-wanted,
   #terms {
-    h1, h2 {
-      font-family: $headings-font-family;
+    h1,
+    h2 {
+      // font-family: $headings-font-family;
     }
     p {
       text-align: justify;
@@ -268,7 +269,7 @@
       display: inline;
     }
     footer p:after {
-      content: ' '; // Not sure why the space disappears when inline.
+      content: " "; // Not sure why the space disappears when inline.
     }
 
     .social {

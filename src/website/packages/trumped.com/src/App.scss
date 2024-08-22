@@ -3,11 +3,11 @@
 $light-text-color: #777;
 $button-text-color: #666;
 
-$body-font-family: "Fira Sans", sans-serif;
-$nav-font-family: "Fira Sans", sans-serif;
-$footer-font-family: "Fira Sans", sans-serif;
-$textarea-font-family: "Fira Sans", sans-serif;
-$headings-font-family: "Fira Sans", sans-serif;
+// $body-font-family: "Fira Sans", sans-serif;
+// $nav-font-family: "Fira Sans", sans-serif;
+// $footer-font-family: "Fira Sans", sans-serif;
+// $textarea-font-family: "Fira Sans", sans-serif;
+// $headings-font-family: "Fira Sans", sans-serif;
 
 body {
   margin: 0 auto;
@@ -64,7 +64,7 @@ $footer-height: 6rem;
 }
 
 footer {
-  font-family: $footer-font-family;
+  // font-family: $footer-font-family;
   text-align: center;
   bottom: 0;
   // NB: Setting explicit height doesn't appear to be necessary, and
