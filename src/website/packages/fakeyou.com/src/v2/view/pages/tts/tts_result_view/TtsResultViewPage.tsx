@@ -57,7 +57,7 @@ function TtsResultViewPage(props: Props) {
   >(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
-  const getTtsResult = useCallback(async (token) => {
+  const getTtsResult = useCallback(async token => {
     const result = await GetTtsResult(token);
     if (GetTtsResultIsOk(result)) {
       setTtsInferenceResult(result);
@@ -73,13 +73,15 @@ function TtsResultViewPage(props: Props) {
   const documentTitle =
     ttsInferenceResult?.tts_model_title === undefined
       ? undefined
-      : `Deep Fake ${ttsInferenceResult.tts_model_title
-      } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
+      : `Deep Fake ${
+          ttsInferenceResult.tts_model_title
+        } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
   usePrefixedDocumentTitle(documentTitle);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(token)}`;
-  const shareTitle = `I just used FakeYou to generate speech as ${ttsInferenceResult?.tts_model_title || "one of my favorite characters"
-    }!`;
+  const shareTitle = `I just used FakeYou to generate speech as ${
+    ttsInferenceResult?.tts_model_title || "one of my favorite characters"
+  }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -108,17 +110,17 @@ function TtsResultViewPage(props: Props) {
     );
   }
 
-  if (!ttsInferenceResult) {
-    return <div />;
-  }
+  // if (!ttsInferenceResult) {
+  //   return <div />;
+  // }
 
   let audioLink = new BucketConfig().getGcsUrl(
     ttsInferenceResult?.public_bucket_wav_audio_path
   );
-  let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
+  let modelLink = `/tts/${ttsInferenceResult?.tts_model_token || ""}`;
 
   // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
-  let audioDownloadFilename = `fakeyou-${ttsInferenceResult.tts_model_token.replace(
+  let audioDownloadFilename = `fakeyou-${ttsInferenceResult?.tts_model_token.replace(
     ":",
     ""
   )}.wav`;
@@ -127,9 +129,9 @@ function TtsResultViewPage(props: Props) {
     ttsInferenceResult?.public_bucket_spectrogram_path
   );
 
-  let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
+  let durationSeconds = (ttsInferenceResult?.duration_millis || 0) / 1000;
 
-  let modelName = ttsInferenceResult.tts_model_title;
+  let modelName = ttsInferenceResult?.tts_model_title || 0;
 
   let vocoderUsed = "unknown";
   switch (ttsInferenceResult?.maybe_pretrained_vocoder_used) {
@@ -217,7 +219,7 @@ function TtsResultViewPage(props: Props) {
   }
 
   let creatorDetails = <span>Anonymous user</span>;
-  if (!!ttsInferenceResult.maybe_creator_user_token) {
+  if (!!ttsInferenceResult?.maybe_creator_user_token) {
     let creatorLink = `/profile/${ttsInferenceResult.maybe_creator_username}`;
     creatorDetails = (
       <div className="d-flex align-items-center gap-2">
@@ -234,7 +236,7 @@ function TtsResultViewPage(props: Props) {
   }
 
   let modelCreatorDetails = <span>Anonymous user</span>;
-  if (!!ttsInferenceResult.maybe_model_creator_user_token) {
+  if (!!ttsInferenceResult?.maybe_model_creator_user_token) {
     let modelCreatorLink = `/profile/${ttsInferenceResult.maybe_model_creator_username}`;
     modelCreatorDetails = (
       <div className="d-flex align-items-center gap-2">
@@ -263,15 +265,15 @@ function TtsResultViewPage(props: Props) {
       </span>
     );
 
-  let headingTitle = "TTS Result";
-  let subtitle = <span />;
-  if (
-    ttsInferenceResult.tts_model_title !== undefined &&
-    ttsInferenceResult.tts_model_title !== null
-  ) {
-    headingTitle = `${ttsInferenceResult.tts_model_title}`;
-    subtitle = <h2 className="panel-title fw-bold">TTS Result</h2>;
-  }
+  let headingTitle = ttsInferenceResult?.tts_model_title || "TTS Result";
+  let subtitle = <h2 className="panel-title fw-bold">TTS Result</h2>;
+  // if (
+  //   ttsInferenceResult.tts_model_title !== undefined &&
+  //   ttsInferenceResult.tts_model_title !== null
+  // ) {
+  //   headingTitle = `${}`;
+  //   subtitle = <h2 className="panel-title fw-bold">TTS Result</h2>;
+  // }
 
   const currentlyDeleted =
     !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at ||
@@ -323,7 +325,9 @@ function TtsResultViewPage(props: Props) {
     );
   }
 
-  const createdAt = new Date(ttsInferenceResult.created_at);
+  const createdAt = ttsInferenceResult
+    ? new Date(ttsInferenceResult.created_at)
+    : Date.now();
   const createdAtRelative = formatDistance(createdAt, new Date(), {
     addSuffix: true,
   });
@@ -433,11 +437,11 @@ function TtsResultViewPage(props: Props) {
     <div>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <h1 className=" fw-bold mb-2">{headingTitle}</h1>
+          <h1 className=" fw-bold mb-2">{headingTitle || "Loading ..."}</h1>
 
           <p className="mb-3 result-text pt-2">
             <TextExpander
-              text={ttsInferenceResult.raw_inference_text}
+              text={ttsInferenceResult?.raw_inference_text || ""}
               cutLength={240}
             />
           </p>
@@ -445,10 +449,12 @@ function TtsResultViewPage(props: Props) {
       </div>
 
       <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
+        <div className="fy-tts-results-player panel p-3 p-lg-4">
           {subtitle}
           <div className="py-6">
-            <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+            {ttsInferenceResult ? (
+              <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+            ) : null}
             {downloadButton}
           </div>
         </div>
@@ -487,7 +493,7 @@ function TtsResultViewPage(props: Props) {
                 </tr>
                 <tr>
                   <th scope="row">Created (UTC)</th>
-                  <td>{ttsInferenceResult.created_at}</td>
+                  <td>{ttsInferenceResult?.created_at || ""}</td>
                 </tr>
               </tbody>
             </table>
@@ -517,7 +523,7 @@ function TtsResultViewPage(props: Props) {
                 </tr>
                 <tr>
                   <th scope="row">Worker</th>
-                  <td>{ttsInferenceResult.generated_by_worker}</td>
+                  <td>{ttsInferenceResult?.generated_by_worker || ""}</td>
                 </tr>
 
                 {debugRows}
@@ -549,7 +555,7 @@ function TtsResultViewPage(props: Props) {
           <div className="py-6">
             <CommentComponent
               entityType="user"
-              entityToken={ttsInferenceResult.tts_result_token}
+              entityToken={ttsInferenceResult?.tts_result_token || ""}
             />
           </div>
         </div>
