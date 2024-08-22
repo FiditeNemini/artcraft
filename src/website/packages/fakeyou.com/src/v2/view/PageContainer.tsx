@@ -441,7 +441,6 @@ class PageContainer extends React.Component<
 
                 <Route path="/tts/:token">
                   <TtsModelViewPage
-                    sessionWrapper={this.props.sessionWrapper}
                     sessionSubscriptionsWrapper={
                       this.props.sessionSubscriptionsWrapper
                     }

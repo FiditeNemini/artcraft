@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { EnqueueJobResponsePayload } from "../tts_model_list/TtsModelListPage";
 import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInferenceResultsList";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { LanguageCodeToDescriptionWithDefault } from "@storyteller/components/src/i18n/SupportedModelLanguages";
 import {
@@ -17,7 +16,6 @@ import {
   GetTtsModelIsErr,
   GetTtsModelIsOk,
   TtsModel,
-  TtsModelLookupError,
 } from "@storyteller/components/src/api/tts/GetTtsModel";
 import { GetTtsModelUseCount } from "@storyteller/components/src/api/tts/GetTtsModelUseCount";
 import { BackLink } from "../../../_common/BackLink";
@@ -69,9 +67,11 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { useInferenceJobs } from "hooks";
 import MentionsSection from "components/common/MentionsSection";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
+import { AITools } from "components/marketing";
+import { useSession } from "hooks";
 
 interface Props {
-  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
@@ -80,6 +80,7 @@ interface Props {
 
 function TtsModelViewPage(props: Props) {
   let { token } = useParams() as { token: string };
+  const { loggedIn, sessionWrapper } = useSession();
   PosthogClient.recordPageview();
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
@@ -96,7 +97,7 @@ function TtsModelViewPage(props: Props) {
     Map<string, TtsCategory>
   >(new Map());
 
-  const [notFoundState, setNotFoundState] = useState<boolean>(false);
+  const [status, statusSet] = useState(FetchStatus.ready);
 
   const { enqueueInferenceJob } = useInferenceJobs();
 
@@ -108,15 +109,19 @@ function TtsModelViewPage(props: Props) {
 
   const getModel = useCallback(async token => {
     const model = await GetTtsModel(token);
+    statusSet(FetchStatus.in_progress);
 
     if (GetTtsModelIsOk(model)) {
+      statusSet(FetchStatus.success);
       setTtsModel(model);
     } else if (GetTtsModelIsErr(model)) {
-      switch (model) {
-        case TtsModelLookupError.NotFound:
-          setNotFoundState(true);
-          break;
-      }
+      statusSet(FetchStatus.error);
+      // @ts-ignore
+      window.dataLayer.push({
+        event: "be_api_call_failure",
+        page: "/tts",
+        user_id: "$user_id",
+      });
     }
   }, []);
 
@@ -172,8 +177,9 @@ function TtsModelViewPage(props: Props) {
   ]);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(token)}`;
-  const shareTitle = `Use FakeYou to generate speech as ${ttsModel?.title || "your favorite characters"
-    }!`;
+  const shareTitle = `Use FakeYou to generate speech as ${
+    ttsModel?.title || "your favorite characters"
+  }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -182,27 +188,6 @@ function TtsModelViewPage(props: Props) {
     setTimeout(() => (copyBtn!.innerHTML = "Copy"), 2000);
     Analytics.ttsModelPageClickShareLink();
   };
-
-  if (notFoundState) {
-    //useDocumentTitle("FakeYou - Not Found");
-
-    return (
-      <div className="container py-5">
-        <div className="py-5">
-          <h1 className="fw-semibold text-center mb-4">Model not found</h1>
-          <div className="text-center">
-            <Link className="btn btn-primary" to="/">
-              Back to main
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!ttsModel) {
-    return <div />;
-  }
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
@@ -258,7 +243,7 @@ function TtsModelViewPage(props: Props) {
           FrontendInferenceJobType.TextToSpeech
         );
       })
-      .catch(e => { });
+      .catch(e => {});
 
     return false;
   };
@@ -292,7 +277,7 @@ function TtsModelViewPage(props: Props) {
 
   let moderatorRows = null;
 
-  let canEditModel = props.sessionWrapper.canEditTtsModelByUserToken(
+  let canEditModel = sessionWrapper.canEditTtsModelByUserToken(
     ttsModel?.creator_user_token
   );
 
@@ -315,9 +300,7 @@ function TtsModelViewPage(props: Props) {
   let deleteModelButton = <span />;
 
   if (
-    props.sessionWrapper.canDeleteTtsModelByUserToken(
-      ttsModel?.creator_user_token
-    )
+    sessionWrapper.canDeleteTtsModelByUserToken(ttsModel?.creator_user_token)
   ) {
     const currentlyDeleted =
       !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
@@ -362,7 +345,7 @@ function TtsModelViewPage(props: Props) {
     );
   }
 
-  const isCategoryModerator = props.sessionWrapper.canEditCategories();
+  const isCategoryModerator = sessionWrapper.canEditCategories();
 
   const showCategorySection = canEditModel || assignedCategories.length !== 0;
   let modelCategoriesSection = <></>;
@@ -472,11 +455,10 @@ function TtsModelViewPage(props: Props) {
     </>
   );
 
-  const textPipelineConfigured = ttsModel.text_pipeline_type; // NB: Might not bet set
+  const textPipelineConfigured = ttsModel?.text_pipeline_type || ""; // NB: Might not bet set
 
-  const textPipelineUsed = !!ttsModel.text_pipeline_type
-    ? ttsModel.text_pipeline_type
-    : ttsModel.text_pipeline_type_guess;
+  const textPipelineUsed =
+    ttsModel?.text_pipeline_type || ttsModel?.text_pipeline_type_guess || "";
 
   const UNKNOWN = "Unknown";
 
@@ -495,8 +477,8 @@ function TtsModelViewPage(props: Props) {
   }
 
   if (
-    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
-    props.sessionWrapper.canDeleteOtherUsersTtsModels()
+    sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    sessionWrapper.canDeleteOtherUsersTtsModels()
   ) {
     moderatorRows = (
       <>
@@ -577,7 +559,7 @@ function TtsModelViewPage(props: Props) {
   // Custom vocoder vs. legacy default pretrained vocoders
   let vocoderRows = undefined;
 
-  if (!!ttsModel.maybe_custom_vocoder) {
+  if (!!ttsModel?.maybe_custom_vocoder) {
     const vocoderCreatorUrl = WebUrl.userProfilePage(
       ttsModel.maybe_custom_vocoder.creator_username
     );
@@ -698,7 +680,7 @@ function TtsModelViewPage(props: Props) {
   );
 
   let ratingButtons = <></>;
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     ratingButtons = (
       <RatingButtons
         entity_type="tts_model"
@@ -711,168 +693,194 @@ function TtsModelViewPage(props: Props) {
   //const createdAt = new Date(ttsModel?.created_at);
   //const createdAtRelative = createdAt !== undefined ? formatDistance(createdAt, new Date(), { addSuffix: true }) : undefined;
 
-  return (
-    <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="fw-bold mb-3">{title}</h1>
-          {/* Rate Voice Model Buttons */}
-          <div className="d-flex gap-3">
-            {ratingButtons}
+  if (status !== FetchStatus.success) {
+    return (
+      <div {...{ className: "tts-model-view-no-access container py-5" }}>
+        <div {...{ className: "panel p-3 mb-4" }}>
+          <h1>You cannot access this TTS Model</h1>
+          <p>
+            {loggedIn ? (
+              "It may be restricted or removed"
+            ) : (
+              <>
+                <span>Please </span>
+                <Link to="/signup">signup</Link>
+                <span> or </span>
+                <Link to="/login">login</Link>
+                <span> to view</span>
+              </>
+            )}
+          </p>
+        </div>
 
-            <RatingStats
-              positive_votes={ttsModel?.user_ratings?.positive_count || 0}
-              negative_votes={ttsModel?.user_ratings?.negative_count || 0}
-              total_votes={ttsModel?.user_ratings?.total_count || 0}
-            />
+        <h3>Or checkout our collection of AI tools</h3>
+        <AITools />
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <div className="container py-5">
+          <div className="d-flex flex-column">
+            <h1 className="fw-bold mb-3">{title}</h1>
+            {/* Rate Voice Model Buttons */}
+            <div className="d-flex gap-3">
+              {ratingButtons}
+
+              <RatingStats
+                positive_votes={ttsModel?.user_ratings?.positive_count || 0}
+                negative_votes={ttsModel?.user_ratings?.negative_count || 0}
+                total_votes={ttsModel?.user_ratings?.total_count || 0}
+              />
+            </div>
+          </div>
+          <div className="mb-3 mt-4 pt-2">
+            <BackLink link="/" text="Back to all models" />
           </div>
         </div>
-        <div className="mb-3 mt-4 pt-2">
+
+        <div>{modelDescription}</div>
+
+        <div>{modelCategoriesSection}</div>
+
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">TTS Model Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Creator</th>
+                    <td>{creatorLink}</td>
+                  </tr>
+                  <tr>
+                    <th>Use count</th>
+                    <td>{humanUseCount}</td>
+                  </tr>
+                  <tr>
+                    <th>Title</th>
+                    <td>{ttsModel?.title}</td>
+                  </tr>
+                  <tr>
+                    <th>Spoken Language</th>
+                    <td>{language}</td>
+                  </tr>
+                  <tr>
+                    <th>Model type</th>
+                    <td>{ttsModel?.tts_model_type}</td>
+                  </tr>
+                  <tr>
+                    <th>Text pipeline</th>
+                    <td>{textPipelineName}</td>
+                  </tr>
+                  <tr>
+                    <th>Upload date (UTC)</th>
+                    <td>{ttsModel?.created_at}</td>
+                  </tr>
+                  <tr>
+                    <th>Visibility</th>
+                    <td>{resultVisibility}</td>
+                  </tr>
+                  <tr>
+                    <th>
+                      Bot TTS Command for <FontAwesomeIcon icon={faDiscord} /> /{" "}
+                      <FontAwesomeIcon icon={faTwitch} />
+                    </th>
+                    <td>{discordCommand}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Vocoder Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>{vocoderRows}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div>{moderatorRows}</div>
+
+        <div className="container pb-4">
+          <div className="d-flex flex-column flex-md-row gap-3">
+            {editModelButton}
+            {deleteModelButton}
+          </div>
+        </div>
+
+        <div className="container-panel py-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Use Model</h2>
+            <div className="py-6">
+              <form onSubmit={handleFormSubmit}>
+                <textarea
+                  onChange={handleChangeText}
+                  value={props.textBuffer}
+                  className="form-control text-message"
+                  placeholder="Textual shenanigans go here..."
+                  rows={6}
+                ></textarea>
+                <div className="d-flex gap-3 mt-3">
+                  <button className="btn btn-primary w-100">
+                    <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
+                    Speak
+                  </button>
+
+                  <button
+                    className="btn btn-destructive w-100"
+                    onClick={handleClearClick}
+                  >
+                    <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
+                    Clear
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div className="container-panel pt-4 pb-5">{socialSharing}</div>
+
+        <div className="container pb-5">
           <BackLink link="/" text="Back to all models" />
         </div>
-      </div>
 
-      <div>{modelDescription}</div>
-
-      <div>{modelCategoriesSection}</div>
-
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">TTS Model Details</h2>
-          <div className="py-6">
-            <table className="table">
-              <tbody>
-                <tr>
-                  <th>Creator</th>
-                  <td>{creatorLink}</td>
-                </tr>
-                <tr>
-                  <th>Use count</th>
-                  <td>{humanUseCount}</td>
-                </tr>
-                <tr>
-                  <th>Title</th>
-                  <td>{ttsModel?.title}</td>
-                </tr>
-                <tr>
-                  <th>Spoken Language</th>
-                  <td>{language}</td>
-                </tr>
-                <tr>
-                  <th>Model type</th>
-                  <td>{ttsModel?.tts_model_type}</td>
-                </tr>
-                <tr>
-                  <th>Text pipeline</th>
-                  <td>{textPipelineName}</td>
-                </tr>
-                <tr>
-                  <th>Upload date (UTC)</th>
-                  <td>{ttsModel?.created_at}</td>
-                </tr>
-                <tr>
-                  <th>Visibility</th>
-                  <td>{resultVisibility}</td>
-                </tr>
-                <tr>
-                  <th>
-                    Bot TTS Command for <FontAwesomeIcon icon={faDiscord} /> /{" "}
-                    <FontAwesomeIcon icon={faTwitch} />
-                  </th>
-                  <td>{discordCommand}</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="fw-bold panel-title">Comments</h2>
+            <div className="py-6">
+              <CommentComponent
+                entityType="user"
+                entityToken={ttsModel?.model_token || ""}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Vocoder Details</h2>
-          <div className="py-6">
-            <table className="table">
-              <tbody>{vocoderRows}</tbody>
-            </table>
-          </div>
+        <div className="container">
+          <h4 className="text-center text-lg-start mb-4">
+            <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
+            Session TTS Results
+          </h4>
+          <SessionTtsInferenceResultList
+            sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+          />
+        </div>
+        <>
+          <MentionsSection />
+        </>
+        <div className="py-5">
+          <StorytellerStudioCTA />
         </div>
       </div>
-
-      <div>{moderatorRows}</div>
-
-      <div className="container pb-4">
-        <div className="d-flex flex-column flex-md-row gap-3">
-          {editModelButton}
-          {deleteModelButton}
-        </div>
-      </div>
-
-      <div className="container-panel py-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Use Model</h2>
-          <div className="py-6">
-            <form onSubmit={handleFormSubmit}>
-              <textarea
-                onChange={handleChangeText}
-                value={props.textBuffer}
-                className="form-control text-message"
-                placeholder="Textual shenanigans go here..."
-                rows={6}
-              ></textarea>
-              <div className="d-flex gap-3 mt-3">
-                <button className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                  Speak
-                </button>
-
-                <button
-                  className="btn btn-destructive w-100"
-                  onClick={handleClearClick}
-                >
-                  <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
-                  Clear
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div className="container-panel pt-4 pb-5">{socialSharing}</div>
-
-      <div className="container pb-5">
-        <BackLink link="/" text="Back to all models" />
-      </div>
-
-      <div className="container-panel pt-4 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="fw-bold panel-title">Comments</h2>
-          <div className="py-6">
-            <CommentComponent
-              entityType="user"
-              entityToken={ttsModel.model_token}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="container">
-        <h4 className="text-center text-lg-start mb-4">
-          <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
-          Session TTS Results
-        </h4>
-        <SessionTtsInferenceResultList
-          sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-        />
-      </div>
-      <>
-        <MentionsSection />
-      </>
-      <div className="py-5">
-        <StorytellerStudioCTA />
-      </div>
-    </div>
-  );
+    );
+  }
 }
 
 // FIXME: This has been implemented three times, slightly differently
