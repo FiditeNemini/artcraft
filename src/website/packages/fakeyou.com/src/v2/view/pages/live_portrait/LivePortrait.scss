@@ -170,3 +170,21 @@
     }
   }
 }
+
+.lp-signup-cta {
+  background-color: lighten($panel, 5%);
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  padding: 10px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid transparent;
+  justify-content: center;
+  padding: 3rem;
+  border: 2px solid lighten($panel, 15%);
+
+  @media (max-width: 992px) {
+    padding: 2rem;
+  }
+}

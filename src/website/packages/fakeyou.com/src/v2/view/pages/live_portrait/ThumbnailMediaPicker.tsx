@@ -16,6 +16,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isMobile } from "react-device-detect";
 import { Area } from "react-easy-crop";
+import { useSession } from "hooks";
 
 interface ThumbnailMediaPickerProps {
   mediaTokens: string[];
@@ -68,6 +69,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 8;
     const [resetTrigger, setResetTrigger] = useState<number>(0);
+    const { loggedIn } = useSession();
 
     useEffect(() => {
       const fetchMediaData = async () => {
@@ -281,6 +283,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
           className="order-3 order-lg-4"
           onClick={onUploadClick}
           focusPoint={uploadFocusPoint}
+          disabled={!loggedIn}
         />
       </div>
     );

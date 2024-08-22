@@ -12,7 +12,6 @@ import {
   Container,
   Label,
   Panel,
-  SessionFetchingSpinner,
 } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,6 +19,7 @@ import {
   faArrowDownToLine,
   faEquals,
   faImageUser,
+  faLock,
   faPlus,
   faSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -50,7 +50,8 @@ import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentT
 import SourceEntityInput from "./SourceEntityInput";
 import MotionEntityInput from "./MotionEntityInput";
 import OutputThumbnailImage from "./OutputThumbnailImage";
-import LoginBlock from "components/common/LoginBlock";
+import { useHistory } from "react-router-dom";
+import { isMobile } from "react-device-detect";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -92,6 +93,7 @@ export default function LivePortrait({
   const [generatedVideoSrc, setGeneratedVideoSrc] = useState("");
   const [sourceTokens, setSourceTokens] = useState<string[]>([
     "m_2xrse9799wvy8hkv8tbxqxct8089t7",
+    // "m_pt99cdgcanv1m8yejdr3yzxyv5jmps",
   ]);
   const [motionTokens, setMotionTokens] = useState<string[]>([
     "m_z278r5b1r2279xqkxszxjkqhc1dg2g",
@@ -117,6 +119,7 @@ export default function LivePortrait({
     `s${sourceIndex}_m${motionIndex}`;
 
   const location = useLocation();
+  const history = useHistory();
 
   const precomputedVideos = useMemo(
     () => [
@@ -126,6 +129,12 @@ export default function LivePortrait({
       {
         src: "/videos/live-portrait/1_2.mp4",
       },
+      // {
+      //   src: "/videos/live-portrait/2_1.mp4",
+      // },
+      // {
+      //   src: "/videos/live-portrait/2_2.mp4",
+      // },
     ],
     []
   );
@@ -700,18 +709,40 @@ export default function LivePortrait({
     }
   };
 
-  if (!sessionFetched) {
-    return <SessionFetchingSpinner />;
-  }
-
-  if (!loggedIn) {
-    return (
-      <LoginBlock
-        title="You need to be logged in to use Live Portrait"
-        redirect="/ai-live-portrait"
-      />
-    );
-  }
+  const signupCTA = (
+    <>
+      {!sessionFetched ? (
+        <div className="lp-signup-cta text-center">
+          <LoadingSpinner padding={false} />
+        </div>
+      ) : (
+        <div className="lp-signup-cta text-center">
+          <FontAwesomeIcon icon={faLock} className="fs-2 mb-4" />
+          <h4 className="mb-1 fw-bold">
+            You need to be logged in to use Live Portrait
+          </h4>
+          <p className="mb-4 opacity-75">
+            Please login or sign up to continue.
+          </p>
+          <div className="d-flex gap-2">
+            <Button
+              label="Login"
+              variant="action"
+              onClick={() => {
+                history.push("/login?redirect=/ai-live-portrait");
+              }}
+            />
+            <Button
+              label="Sign up now"
+              onClick={() => {
+                history.push("/signup?redirect=/ai-live-portrait");
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -721,10 +752,17 @@ export default function LivePortrait({
             <FontAwesomeIcon icon={faImageUser} className="me-3 fs-2" />
             Live Portrait
           </h1>
-          <p className="opacity-75 fw-medium" style={{ marginBottom: "3rem" }}>
+          <p
+            className="opacity-75 fw-medium"
+            style={{ marginBottom: "2.5rem" }}
+          >
             Use AI to transfer facial expressions, audio, and vocals from one
             face video to an image or video.
           </p>
+
+          {!loggedIn && isMobile && (
+            <div style={{ marginBottom: "2.5rem" }}>{signupCTA}</div>
+          )}
           <div>
             <div className="row gx-0 gy-4">
               <div
@@ -818,13 +856,15 @@ export default function LivePortrait({
                             ? generatedVideoSrc
                               ? "Re-animate"
                               : "Animate"
-                            : "Upload your media to generate"
+                            : !loggedIn
+                              ? "Sign up to Animate"
+                              : "Upload your media to generate"
                       }
                       onClick={enqueueClick}
                       className="flex-grow-1"
                       // disabled={!isUserContent}
                       isLoading={isEnqueuing || isGenerating}
-                      disabled={!isUserContent}
+                      disabled={!isUserContent || !loggedIn}
                     />
                     <Tippy theme="fakeyou" content="Download video">
                       <div>
@@ -833,12 +873,15 @@ export default function LivePortrait({
                           icon={faArrowDownToLine}
                           variant="action"
                           onClick={handleDownloadClick}
+                          disabled={!loggedIn}
                         />
                       </div>
                     </Tippy>
                   </div>
+
                   <div className="d-flex gap-3">
                     <Checkbox
+                      disabled={!hasPremium}
                       label={"Make Private"}
                       onChange={() => {
                         setVisibility(prevVisibility =>
@@ -869,31 +912,36 @@ export default function LivePortrait({
                   </div>
                 </div>
               </div>
-              <div className="mt-5 pt-3 order-3">
-                <Label label="Latest Outputs" />
-                <div>
-                  <SessionLpInferenceResultsList
-                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                    onJobTokens={handleJobTokens}
-                    addSourceToken={(newToken: string) =>
-                      setSourceTokens(prevTokens =>
-                        prevTokens.includes(newToken)
-                          ? prevTokens
-                          : [...prevTokens, newToken]
-                      )
-                    }
-                    addMotionToken={(newToken: string) =>
-                      setMotionTokens(prevTokens =>
-                        prevTokens.includes(newToken)
-                          ? prevTokens
-                          : [...prevTokens, newToken]
-                      )
-                    }
-                    onJobClick={handleJobClick}
-                    onJobProgress={handleJobProgress}
-                  />
+
+              {!loggedIn && <>{signupCTA}</>}
+
+              {loggedIn && (
+                <div className="mt-5 pt-3 order-3">
+                  <Label label="Latest Outputs" />
+                  <div>
+                    <SessionLpInferenceResultsList
+                      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                      onJobTokens={handleJobTokens}
+                      addSourceToken={(newToken: string) =>
+                        setSourceTokens(prevTokens =>
+                          prevTokens.includes(newToken)
+                            ? prevTokens
+                            : [...prevTokens, newToken]
+                        )
+                      }
+                      addMotionToken={(newToken: string) =>
+                        setMotionTokens(prevTokens =>
+                          prevTokens.includes(newToken)
+                            ? prevTokens
+                            : [...prevTokens, newToken]
+                        )
+                      }
+                      onJobClick={handleJobClick}
+                      onJobProgress={handleJobProgress}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </Panel>
