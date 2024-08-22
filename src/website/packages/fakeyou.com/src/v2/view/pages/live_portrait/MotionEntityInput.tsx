@@ -19,6 +19,10 @@ export default function MotionEntityInput({
         handleClose={close}
         titleClassName="fw-semibold fs-5"
       />
+      <p className="mb-3 opacity-75">
+        Please upload a video with clear facial expressions that focuses on the
+        head with the least shoulder movements or it may not work.
+      </p>
       <EntityInput
         accept={["video"]}
         className="w-100"

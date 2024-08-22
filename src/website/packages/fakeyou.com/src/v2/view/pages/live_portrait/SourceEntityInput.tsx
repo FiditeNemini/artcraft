@@ -19,6 +19,9 @@ export default function SourceEntityInput({
         handleClose={close}
         titleClassName="fw-semibold fs-5"
       />
+      <p className="mb-3 opacity-75">
+        Please upload an image or video with a clear face or it may not work.
+      </p>
       <EntityInput
         accept={["image", "video"]}
         className="w-100"
