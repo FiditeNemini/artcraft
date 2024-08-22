@@ -144,51 +144,38 @@ export default function LivePortrait({
       const { source_media_file_token, face_driver_media_file_token } =
         livePortraitDetails;
 
-      // Check if source exists in the tokens list
-      let sourceIndex = sourceTokens.indexOf(source_media_file_token);
-      if (sourceIndex === -1) {
-        // If not found, add it and set the sourceIndex to the new token
-        setSourceTokens(prevTokens => {
-          const updatedTokens = [...prevTokens, source_media_file_token];
-          sourceIndex = updatedTokens.length - 1;
-          return updatedTokens;
-        });
-      }
+      const sourceIndex = sourceTokens.indexOf(source_media_file_token);
+      const motionIndex = motionTokens.indexOf(face_driver_media_file_token);
+      setSelectedSourceIndex(sourceIndex);
+      setSelectedMotionIndex(motionIndex);
+      setCurrentCombinationKey(getCombinationKey(sourceIndex, motionIndex));
 
-      // Check if motion exists in the tokens list
-      let motionIndex = motionTokens.indexOf(face_driver_media_file_token);
-      if (motionIndex === -1) {
-        setMotionTokens(prevTokens => {
-          const updatedTokens = [...prevTokens, face_driver_media_file_token];
-          motionIndex = updatedTokens.length - 1;
-          return updatedTokens;
-        });
-      }
-
-      setTimeout(() => {
-        setSelectedSourceIndex(sourceIndex);
-        setSelectedMotionIndex(motionIndex);
-        setCurrentCombinationKey(getCombinationKey(sourceIndex, motionIndex));
-
-        const latestVideoSrc = getLatestVideoForCombination(
-          sourceIndex,
-          motionIndex
+      // Find the video for the clicked job
+      const videoFromJob = generatedVideos.find(
+        video => video.jobToken === job.jobToken
+      );
+      if (videoFromJob) {
+        setGeneratedVideoSrc(videoFromJob.videoSrc);
+        setIsGenerating(false);
+      } else {
+        // If there's no video and the job is still in the generating list, show progress
+        const isGenerating = currentlyGeneratingList.some(
+          gen =>
+            gen.sourceIndex === sourceIndex && gen.motionIndex === motionIndex
         );
-        if (latestVideoSrc) {
-          setGeneratedVideoSrc(latestVideoSrc);
-          setIsGenerating(false);
-        } else {
-          setGeneratedVideoSrc("");
+        if (isGenerating) {
+          const progress =
+            jobProgress[getCombinationKey(sourceIndex, motionIndex)] || 0;
+          setJobProgress({
+            ...jobProgress,
+            [getCombinationKey(sourceIndex, motionIndex)]: progress,
+          });
           setIsGenerating(true);
+        } else {
+          setIsGenerating(false);
+          setGeneratedVideoSrc("");
         }
-
-        const progress =
-          jobProgress[getCombinationKey(sourceIndex, motionIndex)] || null;
-        setJobProgress(prevProgress => ({
-          ...prevProgress,
-          [getCombinationKey(sourceIndex, motionIndex)]: progress,
-        }));
-      }, 0);
+      }
     }
   };
 
@@ -270,9 +257,30 @@ export default function LivePortrait({
     );
 
     const currentProgress = jobProgress[currentCombinationKey] || null;
+    const latestVideoSrc = getLatestVideoForCombination(
+      selectedSourceIndex,
+      selectedMotionIndex
+    );
 
-    if (isCurrentlyGenerating) {
-      // Show "Generating Video..." if the combination is currently generating
+    const precomputedVideoSrc = getPrecomputedVideoSrc();
+
+    // Show generated or precomputed video if available
+    if (latestVideoSrc && !isCurrentlyGenerating) {
+      return (
+        <video
+          loop
+          autoPlay
+          muted
+          playsInline
+          controls={true}
+          preload="auto"
+          key={latestVideoSrc}
+        >
+          <source src={latestVideoSrc} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else if (isCurrentlyGenerating) {
       return (
         <div className="w-100 h-100 position-relative">
           <div
@@ -301,12 +309,7 @@ export default function LivePortrait({
           />
         </div>
       );
-    } else if (
-      generatedVideoSrc &&
-      currentCombinationKey ===
-        getCombinationKey(selectedSourceIndex, selectedMotionIndex)
-    ) {
-      // Show generated video if available
+    } else if (precomputedVideoSrc) {
       return (
         <video
           loop
@@ -315,30 +318,14 @@ export default function LivePortrait({
           playsInline
           controls={true}
           preload="auto"
-          key={generatedVideoSrc}
+          key={precomputedVideoSrc}
         >
-          <source src={generatedVideoSrc} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      );
-    } else if (getPrecomputedVideoSrc()) {
-      // Show precomputed video if it exists
-      return (
-        <video
-          loop
-          autoPlay
-          muted
-          playsInline
-          controls={true}
-          preload="auto"
-          key={getPrecomputedVideoSrc()}
-        >
-          <source src={getPrecomputedVideoSrc()} type="video/mp4" />
+          <source src={precomputedVideoSrc} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       );
     } else {
-      // Show "Click to Animate" if nothing is generating or samples
+      // Show "Click to Animate" if no video is available
       return (
         <div className="w-100 h-100 position-relative">
           <div
@@ -464,11 +451,12 @@ export default function LivePortrait({
     createdAt: Date,
     livePortraitDetails?: LivePortraitDetails
   ) => {
-    if (jobProcessedTokens.includes(jobToken)) {
+    if (!livePortraitDetails) {
       return;
     }
 
-    if (!livePortraitDetails) {
+    // makes sure that it only processes each job once and exactly when needed
+    if (jobProcessedTokens.includes(jobToken)) {
       return;
     }
 
@@ -501,50 +489,21 @@ export default function LivePortrait({
       };
 
       setGeneratedVideos(prevGeneratedVideos => {
-        const existingVideoIndex = prevGeneratedVideos.findIndex(
-          video =>
-            video.sourceIndex === newGeneratedVideo.sourceIndex &&
-            video.motionIndex === newGeneratedVideo.motionIndex
-        );
-
-        if (existingVideoIndex !== -1) {
-          const existingVideo = prevGeneratedVideos[existingVideoIndex];
-
-          // Replace the existing video only if the new jobToken is more recent
-          if (
-            new Date(existingVideo.createdAt).getTime() <
-            new Date(newGeneratedVideo.createdAt).getTime()
-          ) {
-            const updatedVideos = [...prevGeneratedVideos];
-            updatedVideos[existingVideoIndex] = newGeneratedVideo;
-            return updatedVideos;
-          }
-          return prevGeneratedVideos;
-        } else {
-          // Add the new video if it doesn't already exist
-          return [...prevGeneratedVideos, newGeneratedVideo];
-        }
+        return [
+          ...prevGeneratedVideos.filter(v => v.jobToken !== jobToken),
+          newGeneratedVideo,
+        ];
       });
 
-      // Set the new video for display if it's the latest
+      // Set the video source from the clicked job, regardless of its timestamp relative to others
       if (
         selectedSourceIndex === newGeneratedVideo.sourceIndex &&
         selectedMotionIndex === newGeneratedVideo.motionIndex
       ) {
         setGeneratedVideoSrc(mediaLink);
         setIsGenerating(false);
-
-        // Remove from generating list as job is complete
-        setCurrentlyGeneratingList(prevList =>
-          prevList.filter(
-            gen =>
-              gen.sourceIndex !== newGeneratedVideo.sourceIndex ||
-              gen.motionIndex !== newGeneratedVideo.motionIndex
-          )
-        );
       }
 
-      // Mark the job as processed
       setJobProcessedTokens(prevTokens => [...prevTokens, jobToken]);
     } else {
       console.error(
@@ -693,6 +652,49 @@ export default function LivePortrait({
     currentlyGeneratingList,
     generatedVideoSrc,
     isUserUploaded,
+  ]);
+
+  useEffect(() => {
+    if (generatedVideos.length > 0) {
+      const relevantVideos = generatedVideos.filter(video =>
+        currentlyGeneratingList.some(
+          gen =>
+            gen.sourceIndex === video.sourceIndex &&
+            gen.motionIndex === video.motionIndex
+        )
+      );
+
+      relevantVideos.forEach(video => {
+        if (video.jobToken) {
+          const jobIndex = currentlyGeneratingList.findIndex(
+            gen =>
+              gen.sourceIndex === video.sourceIndex &&
+              gen.motionIndex === video.motionIndex
+          );
+          if (jobIndex !== -1) {
+            const updatedGeneratingList = [...currentlyGeneratingList];
+            updatedGeneratingList.splice(jobIndex, 1);
+            setCurrentlyGeneratingList(updatedGeneratingList);
+
+            const isCurrentJobGenerating = currentlyGeneratingList.some(
+              gen =>
+                gen.sourceIndex === selectedSourceIndex &&
+                gen.motionIndex === selectedMotionIndex
+            );
+
+            if (!isCurrentJobGenerating) {
+              setGeneratedVideoSrc(video.videoSrc);
+              setIsGenerating(false);
+            }
+          }
+        }
+      });
+    }
+  }, [
+    generatedVideos,
+    currentlyGeneratingList,
+    selectedSourceIndex,
+    selectedMotionIndex,
   ]);
 
   const handleDownloadClick = () => {
