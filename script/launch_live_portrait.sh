@@ -49,5 +49,7 @@ export COMFY_ROOT_DIRECTORY="/home/bt/dev/storyteller/storyteller-ml/workflows/c
 export FAKEYOU_WATERMARK_PATH="/home/bt/dev/storyteller/storyteller-rust/includes/container_includes/image_assets/fakeyou_watermark.png"
 export STORYTELLER_WATERMARK_PATH="/home/bt/dev/storyteller/storyteller-rust/includes/container_includes/image_assets/storyteller_watermark.png"
 
+export FAKEYOU_WATERMARK_SCALE="0.2"
+
 cargo run --bin inference-job
 
