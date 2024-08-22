@@ -710,11 +710,7 @@ export default function LivePortrait({
 
   const signupCTA = (
     <>
-      {!sessionFetched ? (
-        <div className="lp-signup-cta text-center">
-          <LoadingSpinner padding={false} />
-        </div>
-      ) : (
+      {!sessionFetched ? null : (
         <div className="lp-signup-cta text-center">
           <FontAwesomeIcon icon={faLock} className="fs-3 mb-3" />
           <h4 className="mb-1 fw-bold">
@@ -780,7 +776,11 @@ export default function LivePortrait({
                   onUploadClick={handleOpenUploadSourceModal}
                   onSelectedMediaChange={handleSelectedMediaChange}
                   uploadFocusPoint={uploadFocusPointSource}
-                  uploadButtonText="Upload your image/video"
+                  uploadButtonText={
+                    loggedIn
+                      ? "Upload your image/video"
+                      : "Sign up to upload image/video"
+                  }
                 />
               </div>
 
@@ -808,7 +808,11 @@ export default function LivePortrait({
                   stepNumber={2}
                   onUploadClick={handleOpenUploadMotionModal}
                   uploadFocusPoint={uploadFocusPointMotion}
-                  uploadButtonText="Upload your motion video"
+                  uploadButtonText={
+                    loggedIn
+                      ? "Upload your motion video"
+                      : "Sign up to upload image/video"
+                  }
                 />
               </div>
 
@@ -857,14 +861,19 @@ export default function LivePortrait({
                               ? "Re-animate"
                               : "Animate"
                             : !loggedIn
-                              ? "Sign up to Animate"
+                              ? "Sign up now to Animate"
                               : "Upload your media to generate"
                       }
-                      onClick={enqueueClick}
+                      onClick={
+                        loggedIn
+                          ? enqueueClick
+                          : () =>
+                              history.push("/signup?redirect=/ai-live-portrait")
+                      }
                       className="flex-grow-1"
                       // disabled={!isUserContent}
                       isLoading={isEnqueuing || isGenerating}
-                      disabled={!isUserContent || !loggedIn}
+                      disabled={!isUserContent && loggedIn}
                     />
                     <Tippy theme="fakeyou" content="Download video">
                       <div>
