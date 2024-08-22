@@ -12,6 +12,7 @@ import {
   Container,
   Label,
   Panel,
+  SessionFetchingSpinner,
 } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -49,6 +50,7 @@ import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentT
 import SourceEntityInput from "./SourceEntityInput";
 import MotionEntityInput from "./MotionEntityInput";
 import OutputThumbnailImage from "./OutputThumbnailImage";
+import LoginBlock from "components/common/LoginBlock";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -73,7 +75,7 @@ export default function LivePortrait({
 }: LivePortraitProps) {
   useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
-  const { loggedIn, loggedInOrModal } = useSession();
+  const { loggedIn, loggedInOrModal, sessionFetched } = useSession();
   const { open, close } = useModal();
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(0);
@@ -697,6 +699,19 @@ export default function LivePortrait({
       console.error("No video source available for download");
     }
   };
+
+  if (!sessionFetched) {
+    return <SessionFetchingSpinner />;
+  }
+
+  if (!loggedIn) {
+    return (
+      <LoginBlock
+        title="You need to be logged in to use Live Portrait"
+        redirect="/ai-live-portrait"
+      />
+    );
+  }
 
   return (
     <>
