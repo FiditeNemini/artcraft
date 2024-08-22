@@ -51,6 +51,7 @@ import SourceEntityInput from "./SourceEntityInput";
 import MotionEntityInput from "./MotionEntityInput";
 import OutputThumbnailImage from "./OutputThumbnailImage";
 import { useHistory } from "react-router-dom";
+import { JobState } from "@storyteller/components/src/jobs/JobStates";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -64,6 +65,12 @@ interface GeneratedVideo {
   videoSrc: string;
   jobToken: string;
   createdAt: Date;
+}
+
+interface CurrentlyGenerating {
+  sourceIndex: number;
+  motionIndex: number;
+  jobState?: JobState;
 }
 
 interface JobProgress {
@@ -109,11 +116,10 @@ export default function LivePortrait({
   const [generatedVideos, setGeneratedVideos] = useState<GeneratedVideo[]>([]);
   const [jobProcessedTokens, setJobProcessedTokens] = useState<string[]>([]);
   const [currentlyGeneratingList, setCurrentlyGeneratingList] = useState<
-    { sourceIndex: number; motionIndex: number }[]
+    CurrentlyGenerating[]
   >([]);
   const [jobProgress, setJobProgress] = useState<JobProgress>({});
   const [currentCombinationKey, setCurrentCombinationKey] = useState("");
-
   const getCombinationKey = (sourceIndex: number, motionIndex: number) =>
     `s${sourceIndex}_m${motionIndex}`;
 
@@ -179,6 +185,36 @@ export default function LivePortrait({
     }
   };
 
+  const handleJobStateChange = useCallback(
+    (jobToken: string, jobState: JobState) => {
+      const currentCombinationKey = getCombinationKey(
+        selectedSourceIndex,
+        selectedMotionIndex
+      );
+
+      if (jobState === JobState.COMPLETE_FAILURE) {
+        setCurrentlyGeneratingList(prevList =>
+          prevList.filter(
+            gen =>
+              !(
+                gen.sourceIndex === selectedSourceIndex &&
+                gen.motionIndex === selectedMotionIndex
+              )
+          )
+        );
+
+        setJobProgress(prevProgress => {
+          const updatedProgress = { ...prevProgress };
+          delete updatedProgress[currentCombinationKey];
+          return updatedProgress;
+        });
+
+        setIsGenerating(false);
+      }
+    },
+    [selectedSourceIndex, selectedMotionIndex]
+  );
+
   const handleJobProgress = (progress: number | null) => {
     setJobProgress(prevProgress => ({
       ...prevProgress,
@@ -219,6 +255,12 @@ export default function LivePortrait({
 
     setIsEnqueuing(true);
 
+    const combinationKey = getCombinationKey(
+      selectedSourceIndex,
+      selectedMotionIndex
+    );
+    setCurrentCombinationKey(combinationKey);
+
     EnqueueFaceMirror("", {
       creator_set_visibility: visibility,
       face_driver_media_file_token: motionTokens[selectedMotionIndex],
@@ -256,7 +298,11 @@ export default function LivePortrait({
         gen.motionIndex === selectedMotionIndex
     );
 
-    const currentProgress = jobProgress[currentCombinationKey] || null;
+    const currentProgress =
+      jobProgress[
+        getCombinationKey(selectedSourceIndex, selectedMotionIndex)
+      ] || null;
+
     const latestVideoSrc = getLatestVideoForCombination(
       selectedSourceIndex,
       selectedMotionIndex
@@ -511,6 +557,8 @@ export default function LivePortrait({
         response
       );
       setIsGenerating(false);
+      setGeneratedVideoSrc("");
+      setIsEnqueuing(false);
     }
   };
 
@@ -526,10 +574,6 @@ export default function LivePortrait({
       );
       const latestVideo =
         sortedVideos.length > 0 ? sortedVideos[0].videoSrc : null;
-
-      // Debugging output
-      console.log("Matching videos:", matchingVideos);
-      console.log("Latest video:", latestVideo);
 
       return latestVideo;
     },
@@ -947,6 +991,7 @@ export default function LivePortrait({
                       }
                       onJobClick={handleJobClick}
                       onJobProgress={handleJobProgress}
+                      onJobStateChange={handleJobStateChange}
                     />
                   </div>
                 </div>

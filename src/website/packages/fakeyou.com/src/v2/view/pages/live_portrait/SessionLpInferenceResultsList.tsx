@@ -26,6 +26,7 @@ interface SessionLpInferenceResultsListProps {
   addMotionToken: (token: string) => void;
   onJobClick: (job: InferenceJob) => void;
   onJobProgress: (progress: number | null) => void;
+  onJobStateChange: (jobToken: string, jobState: JobState) => void;
 }
 
 export default function SessionLpInferenceResultsList({
@@ -35,6 +36,7 @@ export default function SessionLpInferenceResultsList({
   addSourceToken,
   onJobClick,
   onJobProgress,
+  onJobStateChange,
 }: SessionLpInferenceResultsListProps) {
   const { inferenceJobsByCategory } = useInferenceJobs();
   const hasInitialized = useRef(false);
@@ -85,23 +87,37 @@ export default function SessionLpInferenceResultsList({
     livePortraitJobs.forEach((job: InferenceJob) => {
       const currentProgress = job.progressPercentage;
 
-      if (job.jobState === JobState.STARTED && currentProgress !== null) {
-        if (lastProgressRef.current[job.jobToken] !== currentProgress) {
-          onJobProgress(currentProgress);
-          lastProgressRef.current[job.jobToken] = currentProgress;
-        }
+      // Early return if nothing has changed
+      if (
+        (job.jobState === JobState.STARTED && currentProgress === null) ||
+        (job.jobState !== JobState.STARTED &&
+          job.jobState !== JobState.COMPLETE_SUCCESS &&
+          job.jobState !== JobState.COMPLETE_FAILURE)
+      ) {
+        return;
       }
 
+      // Progress handling for STARTED jobs
+      if (job.jobState === JobState.STARTED) {
+        if (lastProgressRef.current[job.jobToken] !== currentProgress) {
+          lastProgressRef.current[job.jobToken] = currentProgress;
+          onJobProgress(currentProgress);
+        }
+        return;
+      }
+
+      // Handling COMPLETE_SUCCESS or COMPLETE_FAILURE states
       if (
         (job.jobState === JobState.COMPLETE_SUCCESS ||
           job.jobState === JobState.COMPLETE_FAILURE) &&
         lastProgressRef.current[job.jobToken] !== null
       ) {
-        onJobProgress(null);
         lastProgressRef.current[job.jobToken] = null;
+        onJobProgress(null);
+        onJobStateChange(job.jobToken, job.jobState);
       }
     });
-  }, [livePortraitJobs, onJobProgress]);
+  }, [livePortraitJobs, onJobProgress, onJobStateChange]);
 
   const [mediaSrc, setMediaSrc] = useState<{ [key: string]: string }>({});
 
