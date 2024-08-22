@@ -51,7 +51,6 @@ import SourceEntityInput from "./SourceEntityInput";
 import MotionEntityInput from "./MotionEntityInput";
 import OutputThumbnailImage from "./OutputThumbnailImage";
 import { useHistory } from "react-router-dom";
-import { isMobile } from "react-device-detect";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -717,7 +716,7 @@ export default function LivePortrait({
         </div>
       ) : (
         <div className="lp-signup-cta text-center">
-          <FontAwesomeIcon icon={faLock} className="fs-2 mb-4" />
+          <FontAwesomeIcon icon={faLock} className="fs-3 mb-3" />
           <h4 className="mb-1 fw-bold">
             You need to be logged in to use Live Portrait
           </h4>
@@ -760,9 +759,10 @@ export default function LivePortrait({
             face video to an image or video.
           </p>
 
-          {!loggedIn && isMobile && (
+          {!loggedIn && (
             <div style={{ marginBottom: "2.5rem" }}>{signupCTA}</div>
           )}
+
           <div>
             <div className="row gx-0 gy-4">
               <div
@@ -912,8 +912,6 @@ export default function LivePortrait({
                   </div>
                 </div>
               </div>
-
-              {!loggedIn && <>{signupCTA}</>}
 
               {loggedIn && (
                 <div className="mt-5 pt-3 order-3">
