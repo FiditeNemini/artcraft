@@ -18,7 +18,5 @@ powerstream
 story_teller
 storytell
 storyteller
-test
 vocode
 vocodes
-voxelcam
