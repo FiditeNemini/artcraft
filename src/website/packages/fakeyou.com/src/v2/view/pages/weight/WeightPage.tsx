@@ -44,6 +44,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { ActionButton, ActionButtonProps } from "components/common";
 import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
+import { AITools } from "components/marketing";
 
 interface WeightProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -505,7 +506,6 @@ export default function WeightPage({
             </div>
           </div>
         </Panel>
-
         <div className="row g-4">
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             {weight &&
@@ -655,6 +655,14 @@ export default function WeightPage({
           </Panel>
         </Container>
       </div>
+
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+          <AITools />
+        </Panel>
+      </Container>
+
       <Modal
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatDistance } from "date-fns";
 import { Comment } from "@storyteller/components/src/api/comments/ListComments";
 import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
 import { useSession } from "hooks";
+import { Button } from "components/common";
+import { faChevronDown } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   entityType: string;
@@ -25,10 +27,15 @@ function CommentList(props: Props) {
   var reversedComments = props.comments.slice();
 
   const now = new Date();
+  const [visibleCount, setVisibleCount] = useState(5);
+
+  const showMoreComments = () => {
+    setVisibleCount(prevCount => prevCount + 10);
+  };
 
   let rows: Array<JSX.Element> = [];
 
-  reversedComments.forEach(comment => {
+  reversedComments.slice(0, visibleCount).forEach(comment => {
     const createTime = new Date(comment.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
       addSuffix: true,
@@ -64,7 +71,7 @@ function CommentList(props: Props) {
     rows.push(
       <tr key={comment.token}>
         <td className="px-0">
-          <div className="d-flex gap-3 py-3">
+          <div className="d-flex gap-3 py-2">
             <Gravatar
               email_hash={gravatarHash || ""}
               username={username || ""}
@@ -104,9 +111,23 @@ function CommentList(props: Props) {
   });
 
   return (
-    <table className="table mb-0">
-      <tbody>{rows}</tbody>
-    </table>
+    <>
+      <table className="table mb-0">
+        <tbody>{rows}</tbody>
+      </table>
+      {visibleCount < reversedComments.length && (
+        <div className="text-center mt-2 d-flex justify-content-center">
+          <Button
+            variant="secondary"
+            small={true}
+            onClick={showMoreComments}
+            label="Show More Comments"
+            iconFlip={true}
+            icon={faChevronDown}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

@@ -67,6 +67,7 @@ $topbar-height: 66px;
   padding-left: 340px;
   padding-top: $topbar-height;
   // transition: all 0.2s ease;
+  min-height: 100vh;
 
   &.no-page-padding-top {
     padding-top: 0;
