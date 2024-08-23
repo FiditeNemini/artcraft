@@ -80,6 +80,10 @@ CREATE TABLE media_files (
 
   -- ========== METADATA ==========
 
+  -- If the file is a user upload (not including studio renders).
+  -- Users can see these, but we may want to filter them out of most views.
+  is_user_upload BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- If the file is generated as an intermediate step that we won't share.
   -- Eg. cover image uploads, 3D engine renders, etc.
   is_intermediate_system_file BOOLEAN NOT NULL DEFAULT FALSE,
@@ -192,6 +196,10 @@ CREATE TABLE media_files (
   -- and produces different lengths output depending on the choice of algorithm.
   checksum_sha2 CHAR(64) NOT NULL,
 
+  -- Whether the image or video has a visible watermark.
+  -- If so, we may not need to add a watermark downstream in further processing steps.
+  has_watermark BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== UPLOAD, TRANSCODING, AND TRUNCATION DETAILS ==========
 
   -- The hash for the bucket directory that contains the original upload
@@ -295,6 +303,7 @@ CREATE TABLE media_files (
   KEY fk_maybe_origin_model_token (maybe_origin_model_token),
   KEY fk_maybe_origin_model_type_and_token (maybe_origin_model_type, maybe_origin_model_token),
   KEY index_maybe_batch_token (maybe_batch_token),
+  KEY index_is_user_upload (is_user_upload),
   KEY index_is_intermediate_system_file (is_intermediate_system_file),
   KEY index_maybe_scene_source_media_file_token (maybe_scene_source_media_file_token),
   KEY index_nsfw_status (nsfw_status),
