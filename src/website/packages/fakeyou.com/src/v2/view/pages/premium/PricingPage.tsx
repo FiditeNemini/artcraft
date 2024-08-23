@@ -158,9 +158,15 @@ function PricingPage(props: Props) {
           {/* <p className="fs-5">
           By purchasing FakeYou premium, you help us build more!
         </p> */}
-          <div className="alert alert-warning mt-4 alert-pricing mb-2">
-            <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
-            By purchasing FakeYou premium, you help us build more!
+          <div className="alert alert-warning mt-4 alert-pricing mb-2 d-flex flex-column">
+            <div>
+              <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
+              By purchasing FakeYou premium, you help us build more!
+            </div>
+          </div>
+          <div className="fs-7 pt-2 opacity-75">
+            Our features are free to use, but premium users get even faster and
+            better quality outputs.
           </div>
         </Panel>
 
