@@ -29,6 +29,26 @@
     "UNKNOWN": "Sintesi vocale da testo sconosciuta",
     "heading": "Lavori di sintesi vocale"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "Tentativo di lavoro non riuscito",
+    "COMPLETE_FAILURE": "Lavoro non riuscito.",
+    "COMPLETE_SUCCESS": "Lavoro completato",
+    "DEAD": "Lavoro morto",
+    "PENDING": "Lavoro in sospeso ",
+    "STARTED": "Lavoro in corso",
+    "UNKNOWN": "Stato lavoro sconosciuto",
+    "heading": "Lavori"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Tentativo del flusso di lavoro video non riuscito",
+    "COMPLETE_FAILURE": "Flusso di lavoro video non riuscito.",
+    "COMPLETE_SUCCESS": "Flusso di lavoro video completato",
+    "DEAD": "Videow Flusso di lavoro morto",
+    "PENDING": "Flusso di lavoro video in sospeso ",
+    "STARTED": "Flusso di lavoro video in corso",
+    "UNKNOWN": "Stato del flusso di lavoro video sconosciuto",
+    "heading": "Lavori di flusso di lavoro video"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "Tentativo di conversione vocale non riuscito",
     "COMPLETE_FAILURE": "Conversione vocale non riuscita",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "Tentativo di animazione del volto non riuscito",
     "COMPLETE_FAILURE": "Animazione del volto non riuscita.",
     "COMPLETE_SUCCESS": "Animazione del volto completata",
+    "DEAD": "Animazione del volto morto",
     "PENDING": "Animazione del volto in attesa",
     "STARTED": "Animazione del volto in corso",
     "UNKNOWN": "Stato dell'animazione sconosciuto",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "Tentativo di animazione del volto non riuscito",
     "COMPLETE_FAILURE": "Animazione del volto non riuscita.",
     "COMPLETE_SUCCESS": "Animazione del volto completata",
+    "DEAD": "Il progettista vocale è morto",
     "PENDING": "Voice Designer in attesa",
     "STARTED": "Designer vocale in corso",
     "UNKNOWN": "Stato del Voice Designer sconosciuto",

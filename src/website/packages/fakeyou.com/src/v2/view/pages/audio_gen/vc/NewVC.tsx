@@ -8,7 +8,7 @@ import {
   Label,
   Panel,
 } from "components/common";
-import { useDebounce, useInferenceJobs, useModal } from "hooks";
+import { useDebounce, useInferenceJobs, useLocalize, useModal } from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
@@ -68,6 +68,8 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isRecordingAudio, setIsRecordingAudio] = useState(false);
   usePrefixedDocumentTitle("AI Voice Conversion");
+
+  const { t } = useLocalize("NewVC");
 
   const searchChange =
     (setUpdate = true) =>
@@ -189,14 +191,12 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
       <Container type="panel" className="mt-3 mt-lg-5">
         <Panel padding={true}>
           <form onSubmit={handleConvert}>
-            <h1 className="fw-bold fs-1 mb-0">Voice to Voice</h1>
-            <p className="mb-4 opacity-75 fw-medium">
-              Transform one person's voice into another’s.
-            </p>
+            <h1 className="fw-bold fs-1 mb-0">{t("title.vc")}</h1>
+            <p className="mb-4 opacity-75 fw-medium">{t("subtitle.vc")}</p>
 
             <div className="d-flex flex-column gap-3">
               <div className="fy-featured-voices-section d-none d-lg-block">
-                <h5 className="fw-bold">Featured Voices</h5>
+                <h5 className="fw-bold">{t("title.featuredVoices")}</h5>
                 <div className="row g-3">
                   {featuredVoiceTokens.map(token => (
                     <FeaturedVoice
@@ -209,12 +209,12 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
               </div>
 
               <div>
-                <Label label="Search for a Voice" />
+                <Label label={t("label.search")} />
                 <div className="position-relative">
                   <Input
                     autoFocus={isMobile ? false : selectedVoice ? false : true}
                     icon={faSearch}
-                    placeholder={"Search from 8500+ voices"}
+                    placeholder={t("input.searchPlaceholder")}
                     onChange={searchChange()}
                     value={search}
                   />
@@ -246,7 +246,9 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                     <div className="flex-grow-1">
                       <Label
                         label={`${
-                          selectedVoice ? "Selected Voice" : "Select a Voice"
+                          selectedVoice
+                            ? t("label.selected")
+                            : t("label.select")
                         }`}
                       />
                     </div>
@@ -274,7 +276,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
               <div className="row">
                 <div className="d-flex flex-column gap-3 col-12 col-lg-6">
                   <div>
-                    <Label label="Audio Input" />
+                    <Label label={t("label.audioInput")} />
                     <div className="d-flex flex-column gap-3">
                       {!hasUploadedFile && (
                         <div>
@@ -292,7 +294,9 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                       {!hasUploadedFile && !hasRecordedFile && (
                         <div className="d-flex gap-3 align-items-center">
                           <hr className="w-100" />
-                          <span className="opacity-75 fw-medium">OR</span>
+                          <span className="opacity-75 fw-medium">
+                            {t("divider.or")}
+                          </span>
                           <hr className="w-100" />
                         </div>
                       )}
@@ -313,7 +317,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
 
                   {(hasUploadedFile || hasRecordedFile) && (
                     <div>
-                      <Label label="Pitch Control" />
+                      <Label label={t("label.pitchControl")} />
                       <div className="d-flex flex-column gap-3">
                         <VCPitchEstimateMethodComponent
                           pitchMethod={maybeF0MethodOverride}
@@ -327,7 +331,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                           onPitchChange={handlePitchChange}
                         />
                         <Checkbox
-                          label="Auto F0 (off for singing, on for speech)"
+                          label={t("label.autoF0")}
                           className="mb-0 fs-7"
                           onChange={handleAutoF0Change}
                           checked={autoConvertF0}
@@ -339,7 +343,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                   <div className="d-flex justify-content-end">
                     <Button
                       icon={faWaveformLines}
-                      label="Convert"
+                      label={t("button.convert")}
                       type="submit"
                       disabled={!selectedVoice || !mediaUploadToken}
                       isLoading={isGenerating}
@@ -348,7 +352,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                 </div>
                 <div className="col-12 col-lg-6">
                   <div className="d-flex flex-column">
-                    <Label label="Output" />
+                    <Label label={t("label.output")} />
                     <div className="d-flex flex-column session-vc-section">
                       <SessionVoiceConversionResultsList
                         sessionSubscriptionsWrapper={

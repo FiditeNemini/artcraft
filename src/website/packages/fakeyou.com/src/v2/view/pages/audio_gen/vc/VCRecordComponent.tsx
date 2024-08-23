@@ -23,7 +23,7 @@ interface Props {
 }
 
 export default function VCRecordComponent(props: Props) {
-  const { t } = useLocalize("RecordComponent");
+  const { t } = useLocalize("NewVC");
   const [uploadLoading, setUploadLoading] = useState(false);
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
@@ -103,7 +103,7 @@ export default function VCRecordComponent(props: Props) {
             >
               <span className="visually-hidden">Recording...</span>
             </div>
-            Stop recording
+            {t("button.stopRecord")}
           </div>
         </button>
       ) : (
@@ -113,8 +113,8 @@ export default function VCRecordComponent(props: Props) {
           variant="secondary"
           label={
             props.hasRecordedFile
-              ? "Re-record your voice"
-              : "Record your own voice"
+              ? t("button.rerecord")
+              : t("button.startRecord")
           }
           onClick={handleStartRecording}
           className="py-3"
@@ -137,19 +137,19 @@ export default function VCRecordComponent(props: Props) {
               {isUploadDisabled ? (
                 <>
                   <FontAwesomeIcon icon={faCheck} className="me-2" />
-                  {t("recordButtonUploaded")}
+                  {t("button.recordUploaded")}
                 </>
               ) : (
                 <>
                   <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                  {t("recordButtonUploadAudio")}
+                  {t("button.recordUpload")}
                 </>
               )}
               {uploadLoading && <LoadingIcon />}
             </button>
             <button className="btn btn-destructive w-100" onClick={handleClear}>
               <FontAwesomeIcon icon={faTrash} className="me-2" />
-              {t("recordButtonClear")}
+              {t("button.recordClear")}
             </button>
           </div>
         </>

@@ -13,6 +13,7 @@ import { isMobile } from "react-device-detect";
 import { WeightType } from "@storyteller/components/src/api/_common/enums";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { useLocalize } from "hooks";
 
 interface VoicePickerPreviewProps {
   selectedVoice: any;
@@ -36,6 +37,8 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
   );
   const { label: weightType, color: weightTagColor } = weightTypeInfo;
 
+  const { t } = useLocalize("NewTTS");
+
   return (
     <div className="fy-weight-picker-preview" onClick={openModal}>
       <WeightCoverImage
@@ -47,7 +50,7 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
       />
       <div className="d-flex flex-column justify-content-center flex-grow-1">
         <h2 className="mb-1 fw-semibold d-flex gap-2 align-items-center fs-5 fy-weight-picker-preview-text">
-          <div>{selectedVoice?.title || "No Voice Selected"}</div>
+          <div>{selectedVoice?.title || t("button.labelNoVoice")}</div>
           {selectedVoice?.weight_type && (
             <>
               <CardBadge
@@ -107,18 +110,22 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
                 className="fw-medium"
                 onClick={e => e.stopPropagation()}
               >
-                View voice details
+                {t("link.viewDetails")}
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
               </Link>
             </div>
           </span>
         ) : (
-          <span className="fs-7 opacity-75">Click here to select a voice</span>
+          <span className="fs-7 opacity-75">
+            {t("button.labelClickToSelect")}
+          </span>
         )}
       </div>
       <div className="d-flex gap-2 align-items-center">
         <span className="fw-medium opacity-75 pe-1 d-none d-lg-block">
-          {selectedVoice ? "Change voice" : "Select voice"}
+          {selectedVoice
+            ? t("button.labelChangeVoice")
+            : t("button.labelSelectVoice")}
         </span>
         <FontAwesomeIcon icon={faChevronRight} className="fs-5 me-1" />
       </div>

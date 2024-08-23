@@ -29,6 +29,26 @@
     "UNKNOWN": "Texto para fala desconhecido",
     "heading": "Trabalhos de conversão de texto em fala"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "Falha na tentativa de trabalho",
+    "COMPLETE_FAILURE": "Falha no trabalho.",
+    "COMPLETE_SUCCESS": "Trabalho concluído",
+    "DEAD": "Trabalho morto",
+    "PENDING": "Trabalho pendente ",
+    "STARTED": "Trabalho em andamento",
+    "UNKNOWN": "Status do trabalho desconhecido",
+    "heading": "Empregos"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Falha na tentativa de fluxo de trabalho de vídeo",
+    "COMPLETE_FAILURE": "Falha no fluxo de trabalho de vídeo.",
+    "COMPLETE_SUCCESS": "Fluxo de trabalho de vídeo concluído",
+    "DEAD": "Fluxo de trabalho de vídeo morto",
+    "PENDING": "Fluxo de trabalho de vídeo pendente ",
+    "STARTED": "Fluxo de trabalho de vídeo em andamento",
+    "UNKNOWN": "Status do fluxo de trabalho de vídeo desconhecido",
+    "heading": "Trabalhos de fluxo de trabalho de vídeo"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "Tentativa de conversão de voz malsucedida",
     "COMPLETE_FAILURE": "Falha na conversão de voz",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "Falha na tentativa de animação facial",
     "COMPLETE_FAILURE": "Falha na animação facial.",
     "COMPLETE_SUCCESS": "Animação facial completa",
+    "DEAD": "Animação facial morta",
     "PENDING": "Animação facial pendente",
     "STARTED": "Animação facial em andamento",
     "UNKNOWN": "Status da animação desconhecido",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "Falha na tentativa de animação facial",
     "COMPLETE_FAILURE": "Falha na animação facial.",
     "COMPLETE_SUCCESS": "Animação facial completa",
+    "DEAD": "Designer de voz morto",
     "PENDING": "Designer de voz pendente",
     "STARTED": "Designer de voz em andamento",
     "UNKNOWN": "Status do Voice Designer desconhecido",

@@ -29,6 +29,26 @@
     "UNKNOWN": "Text-to-Speech unbekannt",
     "heading": "Text-to-Speech-Jobs"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "Jobversuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Auftrag fehlgeschlagen.",
+    "COMPLETE_SUCCESS": "Auftrag abgeschlossen",
+    "DEAD": "Job tot",
+    "PENDING": "Ausstehender Auftrag ",
+    "STARTED": "Auftrag läuft",
+    "UNKNOWN": "Jobstatus unbekannt",
+    "heading": "Jobs"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Video-Workflow-Versuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Video-Workflow fehlgeschlagen.",
+    "COMPLETE_SUCCESS": "Video-Workflow abgeschlossen",
+    "DEAD": "Videow-Workflow tot",
+    "PENDING": "Ausstehender Video-Workflow ",
+    "STARTED": "Video-Workflow läuft",
+    "UNKNOWN": "Video-Workflow-Status unbekannt",
+    "heading": "Video-Workflow-Jobs"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "Sprachkonvertierungsversuch fehlgeschlagen",
     "COMPLETE_FAILURE": "Sprachkonvertierung fehlgeschlagen",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "Gesichtsanimationsversuch fehlgeschlagen",
     "COMPLETE_FAILURE": "Gesichtsanimation fehlgeschlagen.",
     "COMPLETE_SUCCESS": "Gesichtsanimation abgeschlossen",
+    "DEAD": "Gesichtsanimation tot",
     "PENDING": "Ausstehende Gesichtsanimation",
     "STARTED": "Gesichtsanimation läuft",
     "UNKNOWN": "Animationsstatus unbekannt",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "Gesichtsanimationsversuch fehlgeschlagen",
     "COMPLETE_FAILURE": "Gesichtsanimation fehlgeschlagen.",
     "COMPLETE_SUCCESS": "Gesichtsanimation abgeschlossen",
+    "DEAD": "Voice Designer tot",
     "PENDING": "Voice Designer Ausstehend",
     "STARTED": "Voice Designer in Bearbeitung",
     "UNKNOWN": "Voice Designer-Status unbekannt",

@@ -18,11 +18,12 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { useInferenceJobs, useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 import { Button } from "components/common";
 import {
   faArrowDownToLine,
   faArrowRight,
+  faStars,
 } from "@fortawesome/pro-solid-svg-icons";
 import LoadingSpinner from "components/common/LoadingSpinner";
 
@@ -37,6 +38,8 @@ const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 function SessionTtsInferenceResultList(props: Props) {
   const { inferenceJobsByCategory } = useInferenceJobs();
   const { t } = useLocalize("SessionTtsInferenceResultList");
+  const { t: t2 } = useLocalize("NewTTS");
+  const { loggedIn, loggedInOrModal } = useSession();
 
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
@@ -230,8 +233,8 @@ function SessionTtsInferenceResultList(props: Props) {
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
         <FontAwesomeIcon icon={faHeadphonesSimple} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">{t("resultsBlankText")}</h5>
-        <p>{t("resultsBlankSubText")}</p>
+        <h5 className="fw-semibold">{t2("sessionResults.emptyTitle")}</h5>
+        <p>{t2("sessionResults.emptySubtitle")}</p>
       </div>
     </div>
   );
@@ -247,23 +250,45 @@ function SessionTtsInferenceResultList(props: Props) {
     results.length !== 0 &&
     !props.sessionSubscriptionsWrapper.hasPaidFeatures()
   ) {
-    upgradeNotice = (
-      <div className="d-flex flex-column gap-3 sticky-top zi-2">
-        <div className="alert alert-warning alert-cta mb-0">
-          <FontAwesomeIcon icon={faClock} className="me-2" />
-          {t("resultsUpgradeNotice")}{" "}
-          <Link
-            to={WebUrl.pricingPageWithReferer("nowait")}
-            onClick={() => {
-              Analytics.ttsTooSlowUpgradePremium();
-            }}
-            className="alert-link fw-semibold"
-          >
-            {t("resultsUpgradeLinkText")}
-          </Link>
+    if (loggedIn) {
+      upgradeNotice = (
+        <div className="d-flex flex-column gap-3 sticky-top zi-2">
+          <div className="alert alert-primary alert-cta mb-0">
+            <FontAwesomeIcon icon={faStars} className="me-2" />
+            {t2("sessionResults.alertNoPlan")}{" "}
+            <Link
+              to={WebUrl.pricingPageWithReferer("nowait")}
+              onClick={() => {
+                Analytics.ttsTooSlowUpgradePremium();
+              }}
+              className="alert-link fw-semibold"
+            >
+              {t2("sessionResults.alertNoPlanLink")}
+            </Link>
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      upgradeNotice = (
+        <div className="d-flex flex-column gap-3 sticky-top zi-2">
+          <div className="alert alert-warning alert-cta mb-0 d-flex align-items-center">
+            <FontAwesomeIcon icon={faClock} className="me-2" />
+            {t2("sessionResults.alertNonUser")}{" "}
+            <Button
+              onClick={() =>
+                !loggedInOrModal({
+                  loginMessage: t2("modal.title.login"),
+                  signupMessage: t2("modal.title.signUp"),
+                })
+              }
+              variant="link"
+              className="alert-link fw-semibold ms-1"
+              label={t2("sessionResults.alertNonUserLink")}
+            />
+          </div>
+        </div>
+      );
+    }
   }
 
   return (

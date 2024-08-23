@@ -4,7 +4,6 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faHeadphonesSimple } from "@fortawesome/free-solid-svg-icons";
-
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
@@ -18,11 +17,12 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { useInferenceJobs, useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 import { Button } from "components/common";
 import {
   faArrowDownToLine,
   faArrowRight,
+  faStars,
 } from "@fortawesome/pro-solid-svg-icons";
 import LoadingSpinner from "components/common/LoadingSpinner";
 
@@ -36,6 +36,7 @@ const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 function SessionVoiceConversionResultsList(props: Props) {
   const { t } = useLocalize("SessionVoiceConversionResultsList");
+  const { t: t2 } = useLocalize("NewVC");
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
@@ -43,7 +44,7 @@ function SessionVoiceConversionResultsList(props: Props) {
       cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
       refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
     });
-
+  const { loggedInOrModal, loggedIn } = useSession();
   const { inferenceJobsByCategory } = useInferenceJobs();
 
   useEffect(() => {
@@ -220,8 +221,8 @@ function SessionVoiceConversionResultsList(props: Props) {
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
         <FontAwesomeIcon icon={faHeadphonesSimple} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">{t("resultsBlankText")}</h5>
-        <p>{t("resultsBlankSubText")}</p>
+        <h5 className="fw-semibold">{t2("sessionResults.emptyTitle")}</h5>
+        <p>{t2("sessionResults.emptySubtitle")}</p>
       </div>
     </div>
   );
@@ -237,23 +238,45 @@ function SessionVoiceConversionResultsList(props: Props) {
     results.length !== 0 &&
     !props.sessionSubscriptionsWrapper.hasPaidFeatures()
   ) {
-    upgradeNotice = (
-      <div className="d-flex flex-column gap-3 sticky-top zi-2">
-        <div className="alert alert-warning alert-cta mb-0">
-          <FontAwesomeIcon icon={faClock} className="me-2" />
-          {t("resultsUpgradeNotice")}{" "}
-          <Link
-            to={WebUrl.pricingPageWithReferer("nowait")}
-            onClick={() => {
-              Analytics.ttsTooSlowUpgradePremium();
-            }}
-            className="alert-link fw-semibold"
-          >
-            {t("resultsUpgradeLinkText")}
-          </Link>
+    if (loggedIn) {
+      upgradeNotice = (
+        <div className="d-flex flex-column gap-3 sticky-top zi-2">
+          <div className="alert alert-primary alert-cta mb-0">
+            <FontAwesomeIcon icon={faStars} className="me-2" />
+            {t2("sessionResults.alertNoPlan")}{" "}
+            <Link
+              to={WebUrl.pricingPageWithReferer("nowait")}
+              onClick={() => {
+                Analytics.ttsTooSlowUpgradePremium();
+              }}
+              className="alert-link fw-semibold"
+            >
+              {t2("sessionResults.alertNoPlanLink")}
+            </Link>
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      upgradeNotice = (
+        <div className="d-flex flex-column gap-3 sticky-top zi-2">
+          <div className="alert alert-warning alert-cta mb-0 d-flex align-items-center">
+            <FontAwesomeIcon icon={faClock} className="me-2" />
+            {t2("sessionResults.alertNonUser")}{" "}
+            <Button
+              onClick={() =>
+                !loggedInOrModal({
+                  loginMessage: t2("modal.title.login"),
+                  signupMessage: t2("modal.title.signUp"),
+                })
+              }
+              variant="link"
+              className="alert-link fw-semibold ms-1"
+              label={t2("sessionResults.alertNonUserLink")}
+            />
+          </div>
+        </div>
+      );
+    }
   }
 
   return (

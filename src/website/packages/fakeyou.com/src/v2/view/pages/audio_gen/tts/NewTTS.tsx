@@ -8,7 +8,7 @@ import {
   Panel,
   TextArea,
 } from "components/common";
-import { useDebounce, useInferenceJobs, useModal } from "hooks";
+import { useDebounce, useInferenceJobs, useLocalize, useModal } from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDeleteLeft,
@@ -49,6 +49,8 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
   };
   const [isGenerating, setIsGenerating] = useState(false);
   usePrefixedDocumentTitle("FakeYou. Deep Fake Text to Speech.");
+
+  const { t } = useLocalize("NewTTS");
 
   const searchChange =
     (setUpdate = true) =>
@@ -145,14 +147,12 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
       <Container type="panel" className="mt-3 mt-lg-5">
         <Panel padding={true}>
           <form onSubmit={handleSpeak}>
-            <h1 className="fw-bold fs-1 mb-0">Text to Speech</h1>
-            <p className="mb-4 opacity-75 fw-medium">
-              Make your favorite characters speak!
-            </p>
+            <h1 className="fw-bold fs-1 mb-0">{t("title.tts")}</h1>
+            <p className="mb-4 opacity-75 fw-medium">{t("subtitle.tts")}</p>
 
             <div className="d-flex flex-column gap-3">
               <div className="fy-featured-voices-section d-none d-lg-block">
-                <h5 className="fw-bold">Featured Voices</h5>
+                <h5 className="fw-bold">{t("title.featuredVoices")}</h5>
                 <div className="row g-3">
                   {featuredVoiceTokens.map(token => (
                     <FeaturedVoice
@@ -165,12 +165,12 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
               </div>
 
               <div>
-                <Label label="Search for a Voice" />
+                <Label label={t("label.search")} />
                 <div className="position-relative">
                   <Input
                     autoFocus={isMobile ? false : selectedVoice ? false : true}
                     icon={faSearch}
-                    placeholder={"Search from 3500+ voices"}
+                    placeholder={t("input.searchPlaceholder")}
                     onChange={searchChange()}
                     value={search}
                   />
@@ -202,7 +202,9 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
                     <div className="flex-grow-1">
                       <Label
                         label={`${
-                          selectedVoice ? "Selected Voice" : "Select a Voice"
+                          selectedVoice
+                            ? t("label.selected")
+                            : t("label.select")
                         }`}
                       />
                     </div>
@@ -231,26 +233,26 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
                 <div className="d-flex flex-column gap-3 col-12 col-lg-6">
                   <TextArea
                     autoFocus={selectedVoice ? true : false}
-                    label="Enter Text"
+                    label={t("label.enterText")}
                     onChange={textChange}
                     value={text}
                     rows={isMobile ? 5 : 13}
-                    placeholder={`Enter the text you want ${
-                      selectedVoice ? selectedVoice.title : "your character"
-                    } to say...`}
+                    placeholder={t("input.textPlaceholder", {
+                      character: selectedVoice ? selectedVoice.title : "",
+                    })}
                     resize={false}
                   />
                   <div className="d-flex justify-content-end gap-2">
                     <Button
                       icon={faDeleteLeft}
-                      label="Clear"
+                      label={t("button.clear")}
                       disabled={!text}
                       variant="secondary"
                       onClick={() => setText("")}
                     />
                     <Button
                       icon={faWaveformLines}
-                      label="Speak"
+                      label={t("button.speak")}
                       type="submit"
                       disabled={!selectedVoice || !text}
                       isLoading={isGenerating}
@@ -259,7 +261,7 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
                 </div>
                 <div className="col-12 col-lg-6">
                   <div className="d-flex flex-column">
-                    <Label label="Output" />
+                    <Label label={t("label.output")} />
                     <div className="d-flex flex-column session-tts-section">
                       <SessionTtsInferenceResultList
                         sessionSubscriptionsWrapper={

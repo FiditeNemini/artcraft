@@ -29,6 +29,26 @@
     "UNKNOWN": "Chuyển văn bản thành giọng nói không xác định",
     "heading": "Công việc chuyển văn bản thành giọng nói"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "Nỗ lực làm việc không thành công",
+    "COMPLETE_FAILURE": "Công việc thất bại.",
+    "COMPLETE_SUCCESS": "Hoàn thành công việc",
+    "DEAD": "Việc chết",
+    "PENDING": "Công việc đang chờ xử lý ",
+    "STARTED": "Công việc đang tiến hành",
+    "UNKNOWN": "Tình trạng công việc không xác định",
+    "heading": "Việc làm"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Quy trình làm việc video không thành công",
+    "COMPLETE_FAILURE": "Quy trình làm việc video không thành công.",
+    "COMPLETE_SUCCESS": "Quy trình làm việc video đã hoàn tất",
+    "DEAD": "Videow Quy trình làm việc đã chết",
+    "PENDING": "Luồng công việc video đang chờ xử lý ",
+    "STARTED": "Quy trình làm việc video đang được tiến hành",
+    "UNKNOWN": "Trạng thái quy trình làm việc video không xác định",
+    "heading": "Công việc trong quy trình làm việc video"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "Cố gắng chuyển đổi giọng nói không thành công",
     "COMPLETE_FAILURE": "Chuyển đổi giọng nói không thành công",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "Nỗ lực hoạt hình khuôn mặt không thành công",
     "COMPLETE_FAILURE": "Hoạt ảnh khuôn mặt không thành công.",
     "COMPLETE_SUCCESS": "Hoạt hình khuôn mặt hoàn chỉnh",
+    "DEAD": "Khuôn mặt hoạt hình chết",
     "PENDING": "Hoạt ảnh khuôn mặt đang chờ xử lý",
     "STARTED": "Đang tiến hành hoạt ảnh khuôn mặt",
     "UNKNOWN": "Trạng thái hoạt ảnh không xác định",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "Nỗ lực hoạt hình khuôn mặt không thành công",
     "COMPLETE_FAILURE": "Hoạt ảnh khuôn mặt không thành công.",
     "COMPLETE_SUCCESS": "Hoạt hình khuôn mặt hoàn chỉnh",
+    "DEAD": "Nhà thiết kế giọng nói đã chết",
     "PENDING": "Trình thiết kế giọng nói đang chờ xử lý",
     "STARTED": "Đang thiết kế giọng nói",
     "UNKNOWN": "Trạng thái thiết kế giọng nói Không xác định",

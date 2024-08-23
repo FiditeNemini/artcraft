@@ -29,6 +29,26 @@
     "UNKNOWN": "文字转语音未知",
     "heading": "文字转语音工作"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "作业尝试失败",
+    "COMPLETE_FAILURE": "作业失败。",
+    "COMPLETE_SUCCESS": "工作完成",
+    "DEAD": "工作死亡",
+    "PENDING": "待处理的工作 ",
+    "STARTED": "工作进行中",
+    "UNKNOWN": "工作状态未知",
+    "heading": "工作机会"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "视频工作流程尝试失败",
+    "COMPLETE_FAILURE": "视频工作流程失败。",
+    "COMPLETE_SUCCESS": "视频工作流程完成",
+    "DEAD": "Videow工作流程死了",
+    "PENDING": "待处理视频工作流程 ",
+    "STARTED": "视频工作流程正在进行中",
+    "UNKNOWN": "视频工作流程状态未知",
+    "heading": "视频工作流程工作"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "语音转换尝试失败",
     "COMPLETE_FAILURE": "语音转换失败",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "脸部动画尝试失败",
     "COMPLETE_FAILURE": "脸部动画失败。",
     "COMPLETE_SUCCESS": "脸部动画完成",
+    "DEAD": "脸部动画死亡",
     "PENDING": "待处理的脸部动画",
     "STARTED": "脸部动画正在进行中",
     "UNKNOWN": "动画状态未知",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "面部动画尝试失败",
     "COMPLETE_FAILURE": "脸部动画失败。",
     "COMPLETE_SUCCESS": "脸部动画完成",
+    "DEAD": "声音设计师去世",
     "PENDING": "语音设计师待定",
     "STARTED": "语音设计正在进行中",
     "UNKNOWN": "语音设计师状态未知",

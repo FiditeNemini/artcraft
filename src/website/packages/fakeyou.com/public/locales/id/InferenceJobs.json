@@ -29,6 +29,26 @@
     "UNKNOWN": "Teks ke Ucapan Tidak Diketahui",
     "heading": "Pekerjaan Teks ke Ucapan"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "Percobaan Pekerjaan Gagal",
+    "COMPLETE_FAILURE": "Pekerjaan Gagal.",
+    "COMPLETE_SUCCESS": "Pekerjaan Selesai",
+    "DEAD": "Pekerjaan Mati",
+    "PENDING": "Pekerjaan yang Tertunda ",
+    "STARTED": "Pekerjaan Sedang Berlangsung",
+    "UNKNOWN": "Status Pekerjaan Tidak Diketahui",
+    "heading": "Pekerjaan"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Upaya Alur Kerja Video Gagal",
+    "COMPLETE_FAILURE": "Alur Kerja Video Gagal.",
+    "COMPLETE_SUCCESS": "Alur Kerja Video Selesai",
+    "DEAD": "Video Alur Kerja Mati",
+    "PENDING": "Alur Kerja Video yang Tertunda ",
+    "STARTED": "Alur Kerja Video Sedang Berlangsung",
+    "UNKNOWN": "Status Alur Kerja Video Tidak Diketahui",
+    "heading": "Pekerjaan Alur Kerja Video"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "Upaya Konversi Suara Tidak Berhasil",
     "COMPLETE_FAILURE": "Konversi Suara Gagal",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",
     "COMPLETE_FAILURE": "Animasi Wajah Gagal.",
     "COMPLETE_SUCCESS": "Animasi Wajah Lengkap",
+    "DEAD": "Animasi Wajah Mati",
     "PENDING": "Animasi Wajah Tertunda",
     "STARTED": "Animasi Wajah Sedang Berlangsung",
     "UNKNOWN": "Status Animasi Tidak Diketahui",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",
     "COMPLETE_FAILURE": "Animasi Wajah Gagal.",
     "COMPLETE_SUCCESS": "Animasi Wajah Lengkap",
+    "DEAD": "Desainer Suara Mati",
     "PENDING": "Desainer Suara Tertunda",
     "STARTED": "Perancang Suara Sedang Berlangsung",
     "UNKNOWN": "Status Perancang Suara Tidak Diketahui",

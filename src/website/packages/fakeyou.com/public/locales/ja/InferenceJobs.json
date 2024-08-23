@@ -29,6 +29,26 @@
     "UNKNOWN": "テキスト読み上げ機能不明",
     "heading": "テキスト読み上げジョブ"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "ジョブの試行が失敗しました",
+    "COMPLETE_FAILURE": "ジョブが失敗しました。",
+    "COMPLETE_SUCCESS": "ジョブが完了しました",
+    "DEAD": "ジョブデッド",
+    "PENDING": "保留中のジョブ ",
+    "STARTED": "進行中のジョブ",
+    "UNKNOWN": "ジョブステータスが不明",
+    "heading": "求人"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "ビデオワークフローの試行が失敗しました",
+    "COMPLETE_FAILURE": "ビデオワークフローが失敗しました。",
+    "COMPLETE_SUCCESS": "ビデオワークフローの完了",
+    "DEAD": "ビデオワークフローが死んでいる",
+    "PENDING": "保留中のビデオワークフロー ",
+    "STARTED": "進行中のビデオワークフロー",
+    "UNKNOWN": "ビデオワークフローのステータスが不明",
+    "heading": "ビデオワークフロージョブ"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "音声変換の試行は失敗しました",
     "COMPLETE_FAILURE": "音声変換に失敗しました",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",
     "COMPLETE_FAILURE": "顔のアニメーションが失敗しました。",
     "COMPLETE_SUCCESS": "顔のアニメーションが完了しました",
+    "DEAD": "顔のアニメーションが死んでいる",
     "PENDING": "保留中の顔のアニメーション",
     "STARTED": "顔のアニメーションが進行中",
     "UNKNOWN": "アニメーションステータス不明",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",
     "COMPLETE_FAILURE": "顔のアニメーションが失敗しました。",
     "COMPLETE_SUCCESS": "顔のアニメーションが完了しました",
+    "DEAD": "ボイスデザイナー死亡",
     "PENDING": "ボイスデザイナー保留中",
     "STARTED": "ボイスデザイナー進行中",
     "UNKNOWN": "ボイスデザイナーのステータスは不明",

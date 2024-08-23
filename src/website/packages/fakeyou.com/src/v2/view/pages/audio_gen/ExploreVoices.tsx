@@ -1,5 +1,5 @@
 import { ListFeaturedWeights, Weight } from "@storyteller/components/src/api";
-import { useListContent } from "hooks";
+import { useListContent, useLocalize } from "hooks";
 import React, { useRef, useState } from "react";
 import { MasonryGrid, WeightsCards } from "components/common";
 import prepFilter from "resources/prepFilter";
@@ -16,6 +16,8 @@ const ExploreVoices = ({
   const [list, listSet] = useState<Weight[]>([]);
   const [showMasonryGrid, setShowMasonryGrid] = useState(false);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const { t } = useLocalize("NewTTS");
 
   const weights = useListContent({
     urlUpdate: false,
@@ -46,7 +48,9 @@ const ExploreVoices = ({
             </div>
           ) : (
             <div className="overflow-hidden h-100">
-              <h4 className="fw-bold pt-1 pb-2">Featured Community Voices</h4>
+              <h4 className="fw-bold pt-1 pb-2">
+                {t("modal.title.featuredVoices")}
+              </h4>
               <div
                 style={{
                   overflowX: "hidden",

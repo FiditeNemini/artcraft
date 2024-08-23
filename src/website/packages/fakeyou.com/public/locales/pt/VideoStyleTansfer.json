@@ -12,7 +12,7 @@
   },
   "image": {
     "label": {
-      "preview": "Visualização de um quadro após aplicar o Style Transfer"
+      "preview": "Visualização de um quadro após aplicar a transferência de estilo"
     }
   },
   "input": {
@@ -40,7 +40,7 @@
   "video": {
     "instruction": "Escolha um vídeo, depois escolha um modelo de estilo e deixe StoryTeller.ai fazer acontecer",
     "label": {
-      "original": "Vídeo Original"
+      "original": "Vídeo original"
     }
   }
 }

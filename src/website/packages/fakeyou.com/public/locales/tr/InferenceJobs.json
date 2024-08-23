@@ -29,6 +29,26 @@
     "UNKNOWN": "Metinden Konuşmaya Bilinmeyen",
     "heading": "Metinden Konuşmaya İşler"
   },
+  "Unknown": {
+    "ATTEMPT_FAILED": "İş Denemesi Başarısız",
+    "COMPLETE_FAILURE": "İş Başarısız.",
+    "COMPLETE_SUCCESS": "İş Tamamlandı",
+    "DEAD": "İş Öldü",
+    "PENDING": "Bekleyen İş ",
+    "STARTED": "İş Devam Ediyor",
+    "UNKNOWN": "İş Durumu Bilinmiyor",
+    "heading": "İşler"
+  },
+  "VideoWorkflow": {
+    "ATTEMPT_FAILED": "Video İş Akışı Denemesi Başarısız Oldu",
+    "COMPLETE_FAILURE": "Video İş Akışı Başarısız Oldu.",
+    "COMPLETE_SUCCESS": "Video İş Akışı Tamamlandı",
+    "DEAD": "Videow İş Akışı Öldü",
+    "PENDING": "Bekleyen Video İş Akışı ",
+    "STARTED": "Video İş Akışı Devam Ediyor",
+    "UNKNOWN": "Video İş Akışı Durumu Bilinmiyor",
+    "heading": "Video İş Akışı İşleri"
+  },
   "VoiceConversion": {
     "ATTEMPT_FAILED": "Ses Dönüştürme Denemesi Başarısız",
     "COMPLETE_FAILURE": "Ses Dönüştürme Başarısız",
@@ -73,6 +93,7 @@
     "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
     "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
     "COMPLETE_SUCCESS": "Yüz Animasyonu Tamamlandı",
+    "DEAD": "Yüz Animasyonu Öldü",
     "PENDING": "Bekleyen Yüz Animasyonu",
     "STARTED": "Yüz Animasyonu Devam Ediyor",
     "UNKNOWN": "Animasyon Durumu Bilinmiyor",
@@ -91,6 +112,7 @@
     "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
     "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
     "COMPLETE_SUCCESS": "Yüz Animasyonu Tamamlandı",
+    "DEAD": "Ses Tasarımcısı Öldü",
     "PENDING": "Ses Tasarımcısı Beklemede",
     "STARTED": "Ses Tasarımcısı Devam Ediyor",
     "UNKNOWN": "Ses Tasarımcısı Durumu Bilinmiyor",
