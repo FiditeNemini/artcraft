@@ -730,16 +730,16 @@ function WaitlistHeroButton(props: WaitlistHeroButtonProps) {
 }
 
 //const firstTitle = "Control Your Movie";
-const firstTitle = "Tell Your Story";
+const firstTitle = "Controllable AI Animation";
 //"Effortlessly create your movie in any style you want with AI.";
-const firstSubtext = "Effortlessly create in any style you want with AI.";
+const firstSubtext = "We're the first completely-digital AI Film Studio";
 const secondTitle = "Your AI 3D Creation Engine";
 const secondSubtext =
-  "Turn your creative ideas into stunning visuals, by simply building a 3D scene and generate.";
-const thirdTitle = "Filmmaking Made Easy";
-const thirdSubtext = "Just a few simple steps to creating your movie.";
-const fourthTitle = "Human in the Loop";
-const fourthSubtext = "Giving you full control of your creation process.";
+  "Build the worlds you want instead of prompting and relying on serendipity.";
+const thirdTitle = "A Film Studio in Your Hands";
+const thirdSubtext = "Build Worlds and Make Films With Just Your Computer";
+const fourthTitle = "Artist in the Loop";
+const fourthSubtext = "AI is a tool in the creative toolkit.";
 
 const features = [
   {
