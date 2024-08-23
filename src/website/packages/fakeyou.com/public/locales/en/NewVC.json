@@ -23,6 +23,12 @@
     "select": "Select a Voice",
     "selected": "Selected Voice"
   },
+  "modal": {
+    "title": {
+      "login": "Login for queue priority",
+      "signUp": "Sign up for queue priority"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "Premium users get longer audio and other benefits.",
     "alertNoPlanLink": "Upgrade now",

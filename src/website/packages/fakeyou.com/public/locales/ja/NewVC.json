@@ -23,6 +23,12 @@
     "select": "ボイスを選択する",
     "selected": "選択したボイス"
   },
+  "modal": {
+    "title": {
+      "login": "キュー優先度のログイン",
+      "signUp": "キューの優先順位にサインアップする"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "プレミアム ユーザーは、より長い音声やその他の特典を利用できます。",
     "alertNoPlanLink": "今すぐアップグレードしてください",

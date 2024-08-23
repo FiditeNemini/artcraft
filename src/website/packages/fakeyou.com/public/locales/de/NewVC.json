@@ -23,6 +23,12 @@
     "select": "Wählen Sie eine Stimme aus",
     "selected": "Ausgewählte Stimme"
   },
+  "modal": {
+    "title": {
+      "login": "Melden Sie sich für die Warteschlangenpriorität an",
+      "signUp": "Melden Sie sich für die Warteschlangenpriorität an"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "Premium-Benutzer profitieren von längerem Audio und anderen Vorteilen.",
     "alertNoPlanLink": "Jetzt upgraden",

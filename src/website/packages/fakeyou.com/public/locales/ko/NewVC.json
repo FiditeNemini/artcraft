@@ -23,6 +23,12 @@
     "select": "음색 선택",
     "selected": "선택한 음색"
   },
+  "modal": {
+    "title": {
+      "login": "대기열 우선순위에 로그인",
+      "signUp": "대기열 우선순위 등록"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "프리미엄 사용자는 더 긴 오디오 및 기타 혜택을 누릴 수 있습니다.",
     "alertNoPlanLink": "지금 업그레이드",

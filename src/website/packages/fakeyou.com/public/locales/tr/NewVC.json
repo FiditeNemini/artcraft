@@ -23,6 +23,12 @@
     "select": "Bir Ses Seçin",
     "selected": "Seçilen Ses"
   },
+  "modal": {
+    "title": {
+      "login": "Sıra önceliği için giriş yapın",
+      "signUp": "Sıra önceliği için kaydolun"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "Premium kullanıcılar daha uzun ses ve diğer avantajlardan yararlanır.",
     "alertNoPlanLink": "Şimdi yükseltin",

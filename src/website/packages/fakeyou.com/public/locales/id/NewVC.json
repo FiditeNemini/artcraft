@@ -23,6 +23,12 @@
     "select": "Pilih Suara",
     "selected": "Suara yang Dipilih"
   },
+  "modal": {
+    "title": {
+      "login": "Login untuk prioritas antrian",
+      "signUp": "Mendaftar untuk prioritas antrian"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "Pengguna premium mendapatkan audio yang lebih panjang dan manfaat lainnya.",
     "alertNoPlanLink": "Tingkatkan sekarang",

@@ -23,6 +23,12 @@
     "select": "Chọn một giọng nói",
     "selected": "Giọng nói đã chọn"
   },
+  "modal": {
+    "title": {
+      "login": "Đăng nhập để ưu tiên hàng đợi",
+      "signUp": "Đăng ký ưu tiên xếp hàng"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "Người dùng trả phí sẽ nhận được âm thanh dài hơn và các lợi ích khác.",
     "alertNoPlanLink": "Nâng cấp ngay bây giờ",

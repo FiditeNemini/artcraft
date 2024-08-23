@@ -23,6 +23,12 @@
     "select": "Seleccione una voz",
     "selected": "Voz seleccionada"
   },
+  "modal": {
+    "title": {
+      "login": "Iniciar sesión para prioridad de cola",
+      "signUp": "Regístrese para tener prioridad en la cola"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "Los usuarios Premium obtienen audio más largo y otros beneficios.",
     "alertNoPlanLink": "Actualiza ahora",

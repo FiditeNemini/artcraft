@@ -23,6 +23,12 @@
     "select": "选择音色",
     "selected": "选定的声音"
   },
+  "modal": {
+    "title": {
+      "login": "登录以获取队列优先级",
+      "signUp": "注册队列优先级"
+    }
+  },
   "sessionResults": {
     "alertNoPlan": "高级用户可以获得更长的音频和其他好处。",
     "alertNoPlanLink": "立即升级",
