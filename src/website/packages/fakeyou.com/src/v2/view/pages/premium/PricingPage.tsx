@@ -17,9 +17,9 @@ import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { Container, Panel } from "components/common";
+import { Badge, Container, Panel } from "components/common";
 import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { faStar } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -91,7 +91,8 @@ function PricingPage(props: Props) {
 
   let proButtonText = "Buy Pro";
   let proButtonDisabled = false;
-  let proBorderCss = "rounded panel padding h-100";
+  let proBorderCss =
+    "rounded panel padding h-100  pricing-border position-relative";
 
   let eliteButtonText = "Buy Elite";
   let eliteButtonDisabled = false;
@@ -146,12 +147,12 @@ function PricingPage(props: Props) {
 
   // Highlight the mid-tier plan if nothing is subscribed
   if (!userHasPaidPremium) {
-    proBorderCss = "rounded panel padding h-100  pricing-border";
+    proBorderCss = "rounded panel padding h-100 pricing-border";
   }
 
   return (
     <>
-      <Container type="panel">
+      <Container type="panel" className="mt-lg-3">
         <Panel clear={true} className="text-center my-5">
           <h1 className=" fw-bold">Pricing</h1>
           {/* <p className="fs-5">
@@ -221,7 +222,7 @@ function PricingPage(props: Props) {
               */}
 
             {/* Plus Tier */}
-            <div className="col-12 col-sm-6 col-lg-4">
+            <div className="col-12 col-sm-6 col-lg-4 pt-lg-5">
               <div className="rounded panel padding h-100">
                 <h2 className="text-center my-2 fw-bold mb-4">
                   {FYP.plus.tier}
@@ -325,6 +326,17 @@ function PricingPage(props: Props) {
             {/* Pro Tier */}
             <div className="col-12 col-sm-6 col-lg-4">
               <div className={proBorderCss}>
+                <div
+                  className="d-flex justify-content-center mb-2 position-absolute"
+                  style={{ top: "20px", right: "20px" }}
+                >
+                  <Badge
+                    label="Most Popular"
+                    color="ultramarine"
+                    icon={faStar}
+                  />
+                </div>
+
                 <h2 className="text-center my-2 fw-bold mb-4">
                   {FYP.pro.tier}
                 </h2>
@@ -475,7 +487,7 @@ function PricingPage(props: Props) {
             </div>
 
             {/* Elite Tier */}
-            <div className="col-12 col-sm-6 col-lg-4">
+            <div className="col-12 col-sm-6 col-lg-4 pt-lg-5">
               <div className="rounded panel padding h-100">
                 <h2 className="text-center my-2 fw-bold mb-4">
                   {FYP.elite.tier}
@@ -753,7 +765,7 @@ function PricingPage(props: Props) {
 
       <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
         <MentionsSection />
-        <StorytellerStudioCTA />
+        {/* <StorytellerStudioCTA /> */}
       </Container>
     </>
   );

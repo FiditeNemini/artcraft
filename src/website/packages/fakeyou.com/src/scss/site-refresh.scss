@@ -686,7 +686,7 @@ styles with important tags:
 
   .pricing-border {
     box-sizing: border-box;
-    box-shadow: inset 0px 0px 0px 3px $primary;
+    box-shadow: inset 0px 0px 0px 3px $primary !important;
   }
 
   ul.pricing-list {
