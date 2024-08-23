@@ -13,6 +13,8 @@
   "ctaButtonVc": "Voice to Voice",
   "ctaText": "Transform your messages and speaking voice into your favorite character's voice with just a few clicks.",
   "ctaTitle": "Generate Your Audio",
+  "experimentalTitle": "Try TTS: Speak as your favorite characters",
+  "experimentalDescription": "Use FakeYou's deepfake technology to generate audio of your favorite characters saying anything you want.",
   "heroButtonPricing": "View Pricing",
   "heroButtonProfile": "View my Profile",
   "heroButtonSignUp": "Sign Up",

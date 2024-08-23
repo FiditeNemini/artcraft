@@ -4,19 +4,19 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container } from "components/common";
-import { AIFaceMirrorCTA } from "components/marketing";
+// import { AIFaceMirrorCTA } from "components/marketing";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import { useDomainConfig } from "context/DomainConfigContext";
 import "./LandingPage.scss";
-import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
+// import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import {
   WebsiteConfig,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import MentionsSection from "components/common/MentionsSection";
-import VstSectionV3 from "./components/VstSectionV3";
+// import VstSectionV3 from "./components/VstSectionV3";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -58,28 +58,32 @@ function LandingPage(props: Props) {
       {domain.website === Website.FakeYou && (
         <>
           <Container type="panel">
+            <Dashboard
+              {...{ experimental: true }}
+              sessionWrapper={props.sessionWrapper}
+            />
+
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
               <FakeYouLandingHeader
+                {...{ experimental: true }}
                 sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
               />
             )}
 
-            <div className="mt-5">
+            {/*         <div className="mt-5">
               <VstSectionV3 />
             </div>
 
             <div className="mt-5">
               <AIFaceMirrorCTA />
-            </div>
+            </div>*/}
 
-            <Dashboard sessionWrapper={props.sessionWrapper} />
-
-            {!isLoggedIn && (
+            {/*            {!isLoggedIn && (
               <>
                 <FakeYouLandingBody />
               </>
-            )}
+            )}*/}
           </Container>
           {!isLoggedIn && (
             <Container type="panel">

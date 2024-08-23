@@ -7,16 +7,22 @@ import LandingDemo from "./LandingDemo/FakeYouLandingDemo";
 import { Button, Panel } from "components/common";
 
 interface FakeYouLandingHeaderProps {
+  experimental?: boolean;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 export default function FakeYouLandingHeader({
+  experimental,
   sessionSubscriptionsWrapper,
 }: FakeYouLandingHeaderProps) {
   const { t } = useLocalize("LandingPage");
 
   return (
-    <div className="d-flex flex-column fy-header">
+    <div
+      {...{
+        className: `d-flex flex-column${experimental ? "" : " fy-header"}`,
+      }}
+    >
       {/* <Panel clear={true}>
         <Alert
           id="text-to-image-alert"
@@ -33,16 +39,21 @@ export default function FakeYouLandingHeader({
         <div className="row g-5">
           <div className="col-12 col-lg-6 order-lg-2">
             <LandingDemo
+              showHanashi={false}
               sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
             />
           </div>
           <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center pt-3 pt-lg-0">
             <Panel clear={true}>
-              <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-                {t("heroTitle")}
-              </h1>
+              {experimental ? (
+                <h2>{t("experimentalTitle")}</h2>
+              ) : (
+                <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
+                  {t("heroTitle")}
+                </h1>
+              )}
               <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-                {t("heroText")}
+                {t(experimental ? "experimentalDescription" : "heroText")}
               </p>
               <div className="d-flex justify-content-center justify-content-lg-start">
                 <Button

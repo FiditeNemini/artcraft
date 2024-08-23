@@ -13,12 +13,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 interface DashboardProps {
+  experimental?: boolean;
   sessionWrapper: SessionWrapper;
 }
 
-export default function Dashboard(props: DashboardProps) {
+export default function Dashboard({
+  experimental,
+  sessionWrapper,
+}: DashboardProps) {
   const { t } = useLocalize("LandingPage");
-  const isLoggedIn = props.sessionWrapper.isLoggedIn();
+  const isLoggedIn = sessionWrapper.isLoggedIn();
 
   let uploadModelSection = <></>;
 
@@ -65,8 +69,21 @@ export default function Dashboard(props: DashboardProps) {
   }
 
   return (
-    <Panel clear={true} className="section">
-      <h1 className="fw-bold mb-4">{t("productsTitle")}</h1>
+    <Panel
+      {...{
+        className: experimental ? "" : "section",
+      }}
+      clear={true}
+    >
+      <h1
+        {...{
+          className: `fw-bold mb-4${experimental ? " mt-4" : ""}`,
+        }}
+      >
+        {experimental
+          ? "Explore our collection of AI tools"
+          : t("productsTitle")}
+      </h1>
 
       <AITools />
 
