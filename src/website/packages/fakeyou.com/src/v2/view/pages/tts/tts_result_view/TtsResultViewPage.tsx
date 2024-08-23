@@ -436,26 +436,22 @@ function TtsResultViewPage(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className=" fw-bold mb-2">{headingTitle || "Loading ..."}</h1>
+      <div className="fy-tts-results-header container py-5">
+        <h1 className=" fw-bold mb-2">{headingTitle || "Loading ..."}</h1>
 
-          <p className="mb-3 result-text pt-2">
-            <TextExpander
-              text={ttsInferenceResult?.raw_inference_text || ""}
-              cutLength={240}
-            />
-          </p>
-        </div>
+        <p className="mb-3 result-text pt-2">
+          <TextExpander
+            text={ttsInferenceResult?.raw_inference_text || ""}
+            cutLength={240}
+          />
+        </p>
       </div>
 
       <div className="container-panel pt-3 pb-5">
         <div className="fy-tts-results-player panel p-3 p-lg-4">
           {subtitle}
           <div className="py-6">
-            {ttsInferenceResult ? (
-              <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
-            ) : null}
+            <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
             {downloadButton}
           </div>
         </div>

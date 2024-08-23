@@ -157,6 +157,7 @@ function FooterNav(props: Props) {
                     src={domain.logo}
                     alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
                     height="34"
+                    width="146"
                   />
                 </Link>
                 <div className="d-flex gap-3 mt-1">

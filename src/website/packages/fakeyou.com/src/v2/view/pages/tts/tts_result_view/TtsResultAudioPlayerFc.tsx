@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { useEffect, useState } from "react";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -15,43 +15,44 @@ enum PlaybackSpeed {
   DOUBLE,
 }
 
-interface Props {
-  ttsResult: TtsResult;
+interface TTSResultsPlayerProps {
+  ttsResult?: TtsResult;
 }
 
-function TtsResultAudioPlayerFc(props: Props) {
+function TtsResultAudioPlayerFc({ ttsResult }: TTSResultsPlayerProps) {
+  const containerRef = useRef(null);
   let [isPlaying, setIsPlaying] = useState(false);
   let [isRepeating, setIsRepeating] = useState(false);
   let [playbackSpeed, setPlaybackSpeed] = useState(PlaybackSpeed.NORMAL);
   let [waveSurfer, setWaveSurfer] = useState<WaveSurfer | null>(null);
 
   useEffect(() => {
-    const wavesurferInstance = WaveSurfer.create({
-      container: "#waveform", // Previousy I used 'this.ref.current' and React.createRef()
-      height: 200,
+    if (containerRef && !waveSurfer) {
+      const wavesurferInstance = WaveSurfer.create({
+        container: containerRef?.current || "",
+        height: 200,
 
-      responsive: true,
-      waveColor: "#cbcbcb",
-      progressColor: "#fc8481",
-      cursorColor: "#fc6b68",
-      cursorWidth: 2,
-      normalize: false,
-    });
+        responsive: true,
+        waveColor: "#cbcbcb",
+        progressColor: "#fc8481",
+        cursorColor: "#fc6b68",
+        cursorWidth: 2,
+        normalize: false,
+      });
 
-    setWaveSurfer(wavesurferInstance);
-  }, []);
-
-  useEffect(() => {
-    const audioLink = new BucketConfig().getGcsUrl(
-      props.ttsResult?.public_bucket_wav_audio_path
-    );
-    if (waveSurfer) {
-      waveSurfer.load(audioLink);
+      setWaveSurfer(wavesurferInstance);
     }
-  }, [waveSurfer, props.ttsResult]);
+  }, [waveSurfer]);
 
   useEffect(() => {
     if (waveSurfer) {
+      if (ttsResult) {
+        const audioLink = new BucketConfig().getGcsUrl(
+          ttsResult?.public_bucket_wav_audio_path
+        );
+        waveSurfer.load(audioLink);
+      }
+
       waveSurfer.unAll(); // NB: Otherwise we keep reinstalling the hooks and cause chaos
       waveSurfer.on("pause", () => {
         setIsPlaying(waveSurfer!.isPlaying());
@@ -65,7 +66,7 @@ function TtsResultAudioPlayerFc(props: Props) {
         }
       });
     }
-  }, [waveSurfer, isRepeating]);
+  }, [waveSurfer, ttsResult, isRepeating]);
 
   const togglePlayPause = () => {
     if (waveSurfer) {
@@ -131,7 +132,7 @@ function TtsResultAudioPlayerFc(props: Props) {
 
   return (
     <div>
-      <div id="waveform"></div>
+      <div id="waveform" {...{ ref: containerRef }}></div>
       <div className="d-flex gap-4 flex-column justify-content-center align-items-center mt-4">
         <div className="d-flex gap-2">
           <button className="btn btn-primary" onClick={() => togglePlayPause()}>
