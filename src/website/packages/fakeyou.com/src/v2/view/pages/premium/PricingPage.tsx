@@ -337,7 +337,7 @@ function PricingPage(props: Props) {
                   style={{ top: "20px", right: "20px" }}
                 >
                   <Badge
-                    label="Most Popular"
+                    label="Recommended"
                     color="ultramarine"
                     icon={faStar}
                   />

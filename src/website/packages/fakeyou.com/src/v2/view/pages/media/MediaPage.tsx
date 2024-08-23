@@ -49,6 +49,8 @@ import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { faCube, faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
+import { AITools } from "components/marketing";
+import { useSession } from "hooks";
 
 export default function MediaPage({
   animationType,
@@ -73,6 +75,9 @@ export default function MediaPage({
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [activeSlide, setActiveSlide] = useState({ url: "", token: "" });
   const viewerCanMakeFeatured = canBanUsers() || false;
+  const { loggedIn, loggedInOrModal } = useSession();
+  const [showAlert, setShowAlert] = useState(false);
+  const [isLoadingDL, setIsLoadingDL] = useState(false);
 
   // Inside MediaPage.tsx
 
@@ -571,6 +576,26 @@ export default function MediaPage({
     }
   };
 
+  const handleDownloadClick = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+
+    if (!loggedIn) {
+      setIsLoadingDL(true);
+      setShowAlert(true);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsLoadingDL(false);
+    }
+
+    const link = document.createElement("a");
+    link.href = downloadLink;
+    link.download = downloadLink.split("/").pop() || "download";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
       <Container type="panel" className="mb-5">
@@ -718,10 +743,9 @@ export default function MediaPage({
                     icon={faArrowDownToLine}
                     label="Download"
                     className="flex-grow-1"
-                    href={downloadLink}
-                    download={downloadLink}
                     variant="secondary"
-                    target="_blank"
+                    onClick={handleDownloadClick}
+                    isLoading={isLoadingDL}
                   />
                 )}
                 {mediaFile?.media_type === MediaFileType.Audio && (
@@ -730,14 +754,32 @@ export default function MediaPage({
                       icon={faArrowDownToLine}
                       square={true}
                       variant="secondary"
-                      href={downloadLink}
-                      download={downloadLink}
+                      onClick={handleDownloadClick}
                       tooltip="Download"
-                      target="_blank"
+                      isLoading={isLoadingDL}
                     />
                   </div>
                 )}
               </div>
+
+              {showAlert && !loggedIn && (
+                <div className="alert alert-warning alert-cta mb-0 d-flex align-items-center">
+                  <span className="fw-medium">
+                    Signed in users can keep their generation history.
+                  </span>
+                  <Button
+                    onClick={() =>
+                      !loggedInOrModal({
+                        loginMessage: "Login to keep your generations",
+                        signupMessage: "Sign up to keep your generations",
+                      })
+                    }
+                    variant="link"
+                    className="alert-link fw-semibold ms-1"
+                    label="Sign up now"
+                  />
+                </div>
+              )}
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">
@@ -772,7 +814,6 @@ export default function MediaPage({
                   </div>
                 </div>
               </Panel>
-
               {mediaFile?.maybe_model_weight_info && (
                 <Panel className="rounded">
                   <div className="d-flex flex-column gap-2 p-3">
@@ -812,7 +853,6 @@ export default function MediaPage({
                   </div>
                 </Panel>
               )}
-
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
                   {!!mediaDetails && (
@@ -826,7 +866,6 @@ export default function MediaPage({
 
                 {modMediaDetails}
               </Accordion>
-
               <Panel className="p-3 rounded">
                 <div className="d-flex flex-column gap-3">
                   <div>
@@ -875,7 +914,6 @@ export default function MediaPage({
                   </div>
                 </div>
               </Panel>
-
               {canEdit && (
                 <>
                   <div className="d-flex gap-2">
@@ -941,6 +979,13 @@ export default function MediaPage({
           </Panel>
         </Container>
       </div>
+
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+          <AITools />
+        </Panel>
+      </Container>
     </>
   );
 }
