@@ -19,7 +19,7 @@ import {
   EnqueueVSTResponse,
 } from "@storyteller/components/src/api/workflows/EnqueueVST";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { STYLE_OPTIONS, STYLES_BY_KEY } from "common/StyleOptions";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
@@ -27,10 +27,12 @@ import useStyleStore from "hooks/useStyleStore";
 import StyleSelectionList from "./StyleSelection/StyleSelectionList";
 import { isMobile } from "react-device-detect";
 import { AITools } from "components/marketing";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock } from "@fortawesome/pro-solid-svg-icons";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { loggedInOrModal, sessionFetched } = useSession();
+  const { loggedIn, loggedInOrModal, sessionFetched } = useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -45,6 +47,8 @@ export default function StyleVideo() {
   const { setSelectedStyles, setCurrentImages, selectedStyleValues } =
     useStyleStore();
   const { open, modalOpen } = useModal();
+  const history = useHistory();
+  const [enableSignUpBlock] = useState(false);
 
   const openStyleSelection = () =>
     open({
@@ -205,6 +209,37 @@ export default function StyleVideo() {
     </div>
   );
 
+  const signupCTA = (
+    <>
+      {!sessionFetched ? null : (
+        <div className="lp-signup-cta text-center h-100">
+          <FontAwesomeIcon icon={faLock} className="fs-3 mb-3" />
+          <h4 className="mb-1 fw-bold">
+            You need to be logged in to use Video Style Transfer
+          </h4>
+          <p className="mb-4 opacity-75">
+            Please login or sign up to upload a video.
+          </p>
+          <div className="d-flex gap-2">
+            <Button
+              label="Login"
+              variant="action"
+              onClick={() => {
+                history.push("/login?redirect=/style-video");
+              }}
+            />
+            <Button
+              label="Sign up now"
+              onClick={() => {
+                history.push("/signup?redirect=/style-video");
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+
   if (!sessionFetched) {
     return <SessionFetchingSpinner />;
   }
@@ -234,32 +269,45 @@ export default function StyleVideo() {
                   minHeight: "400px",
                 }}
               >
-                <EntityInput
-                  {...{
-                    accept: ["video"],
-                    aspectRatio: "landscape",
-                    name: "mediaToken",
-                    className: "h-100",
-                    value: mediaToken,
-                    onPromptUpdate,
-                    onChange: ({ target }: { target: any }) => {
-                      mediaTokenSet(target.value);
-                    },
-                    type: "media",
-                  }}
-                />
+                {enableSignUpBlock && !loggedIn ? (
+                  signupCTA
+                ) : (
+                  <EntityInput
+                    {...{
+                      accept: ["video"],
+                      aspectRatio: "landscape",
+                      name: "mediaToken",
+                      className: "h-100",
+                      value: mediaToken,
+                      onPromptUpdate,
+                      onChange: ({ target }: { target: any }) => {
+                        mediaTokenSet(target.value);
+                      },
+                      type: "media",
+                    }}
+                  />
+                )}
               </div>
 
               <div className="d-none d-lg-flex justify-content-center w-100 mt-3">
-                <Button
-                  {...{
-                    disabled: !mediaToken,
-                    label: "Generate Styled Video",
-                    onClick,
-                    variant: "primary",
-                    className: "px-5 mt-2",
-                  }}
-                />
+                {enableSignUpBlock && !loggedIn ? (
+                  <Button
+                    label="Sign up now to Generate Styled Video"
+                    onClick={() => {
+                      history.push("/signup?redirect=/style-video");
+                    }}
+                  />
+                ) : (
+                  <Button
+                    {...{
+                      disabled: !mediaToken,
+                      label: "Generate Styled Video",
+                      onClick,
+                      variant: "primary",
+                      className: "px-5 mt-2",
+                    }}
+                  />
+                )}
               </div>
             </Panel>
           </div>
@@ -439,15 +487,24 @@ export default function StyleVideo() {
         className="d-flex d-lg-none justify-content-center w-100 mt-5 position-fixed bottom-0 p-3 bg-panel"
         style={{ zIndex: 3 }}
       >
-        <Button
-          {...{
-            disabled: !mediaToken,
-            label: "Generate Styled Video",
-            onClick,
-            variant: "primary",
-            className: "px-5 w-100",
-          }}
-        />
+        {enableSignUpBlock && !loggedIn ? (
+          <Button
+            label="Sign up now to Generate Styled Video"
+            onClick={() => {
+              history.push("/signup?redirect=/style-video");
+            }}
+          />
+        ) : (
+          <Button
+            {...{
+              disabled: !mediaToken,
+              label: "Generate Styled Video",
+              onClick,
+              variant: "primary",
+              className: "px-5 mt-2",
+            }}
+          />
+        )}
       </div>
 
       <Container type="panel" className="pt-5 mt-5">
