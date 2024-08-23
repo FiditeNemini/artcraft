@@ -307,6 +307,8 @@ CREATE TABLE media_files (
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_user_deleted_at (user_deleted_at),
-  KEY index_mod_deleted_at (mod_deleted_at)
+  KEY index_mod_deleted_at (mod_deleted_at),
+  KEY index_media_files_created_at (created_at),
+  KEY index_media_files_updated_at (updated_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

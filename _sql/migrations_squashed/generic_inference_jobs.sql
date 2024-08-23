@@ -287,6 +287,7 @@ CREATE TABLE generic_inference_jobs (
   KEY index_priority_level (priority_level),
   KEY index_is_debug_request (is_debug_request),
   KEY index_maybe_routing_tag (maybe_routing_tag),
-  KEY index_status (status)
+  KEY index_status (status),
+  KEY index_generic_inference_jobs_created_at (created_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
