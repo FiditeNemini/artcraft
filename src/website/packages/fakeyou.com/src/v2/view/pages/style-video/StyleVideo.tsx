@@ -12,6 +12,7 @@ import {
   Label,
   DropdownOptions,
   SessionFetchingSpinner,
+  LoginBlock,
 } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -242,6 +243,15 @@ export default function StyleVideo() {
 
   if (!sessionFetched) {
     return <SessionFetchingSpinner />;
+  }
+
+  if (!loggedIn) {
+    return (
+      <LoginBlock
+        title="You need to be logged in to use Video Style Transfer"
+        redirect="/style-video"
+      />
+    );
   }
 
   return (
