@@ -89,6 +89,7 @@
 # Old paths - Live Portrait
 /acting-face*          /ai-live-portrait     301
 /ai-face-mirror*       /ai-live-portrait     301
+/live-portrait*        /ai-live-portrait     301
 /mirror-motion*        /ai-live-portrait     301
 /motion-mirror*        /ai-live-portrait     301
 
