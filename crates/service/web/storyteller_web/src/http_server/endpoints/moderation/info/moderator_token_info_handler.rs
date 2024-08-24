@@ -26,7 +26,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
-use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
+use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::state::server_state::ServerState;
 

@@ -26,7 +26,7 @@ use tokens::tokens::prompts::PromptToken;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::get::get_media_file_handler::GetMediaFileError;
-use crate::http_server::web_utils::require_user_session::require_user_session;
+use crate::http_server::web_utils::user_session::require_user_session::require_user_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 

@@ -35,8 +35,8 @@ use crate::http_server::session::lookup::user_session_feature_flags::UserSession
 use crate::http_server::endpoints::beta_keys::list_beta_keys_handler::ListBetaKeysError;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::EnqueueTTSRequestError;
-use crate::http_server::web_utils::require_moderator::RequireModeratorError;
-use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
+use crate::http_server::web_utils::user_session::require_moderator::RequireModeratorError;
+use crate::http_server::web_utils::user_session::require_user_session::{require_user_session, RequireUserSessionError};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::try_delete_session_cache::try_delete_session_cache;
 use crate::state::server_state::ServerState;

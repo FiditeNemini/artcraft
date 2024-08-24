@@ -32,7 +32,7 @@ use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::http_server::endpoints::media_files::get::get_media_file_handler::GetMediaFilePathInfo;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
-use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
+use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 

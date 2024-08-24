@@ -26,8 +26,8 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::CreateBetaKeysError;
 use crate::http_server::endpoints::events::list_events::ListEventsError;
-use crate::http_server::web_utils::require_moderator::{require_moderator, RequireModeratorError};
-use crate::http_server::web_utils::require_user_session::{require_user_session, RequireUserSessionError};
+use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError};
+use crate::http_server::web_utils::user_session::require_user_session::{require_user_session, RequireUserSessionError};
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 
