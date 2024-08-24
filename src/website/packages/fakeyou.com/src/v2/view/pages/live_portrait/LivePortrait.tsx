@@ -87,6 +87,7 @@ const PRECOMPUTED_DRIVER_TOKENS : string[] = [
     "m_z278r5b1r2279xqkxszxjkqhc1dg2g", // Awkward Smile
     "m_dv9pcmmwdpgyevyxsyxcahkhd2c839", // Dance Monkey
     "m_53j0kfaesw4jem4713tttk6142sd0y", // Split
+    "m_ar300kqxy3ez8znq9p40y2qejfhsc2", // Slight Smile
 ];
 
 export default function LivePortrait({
@@ -141,15 +142,18 @@ export default function LivePortrait({
       // Source 1: Mona Lisa
       { src: "/videos/live-portrait/1_1.mp4" }, // Smile
       { src: "/videos/live-portrait/1_2.mp4" }, // Dance Monkey
-      { src: "/videos/live-portrait/1_2.mp4" }, // TODO: FIX ME
+      { src: "https://storage.googleapis.com/vocodes-public/media/9/w/s/v/x/9wsvx4fyaraf2prgq1zgpsrq0f1phfs1/storyteller_9wsvx4fyaraf2prgq1zgpsrq0f1phfs1.mp4" }, // Split (Mona Lisa)
+      { src: "https://storage.googleapis.com/vocodes-public/media/w/4/8/k/7/w48k741jsfgnv82vbmhc3meycf77sx1r/storyteller_w48k741jsfgnv82vbmhc3meycf77sx1r.mp4" }, // Slight Smile (Mona Lisa)
       // Source 2: Wednesday
       { src: "/videos/live-portrait/2_1.mp4" }, // Smile
       { src: "/videos/live-portrait/2_2.mp4" }, // Dance Monkey
       { src: "/videos/live-portrait/2_2.mp4" }, // TODO: FIX ME
+      { src: "/videos/live-portrait/2_2.mp4" }, // TODO: FIX ME
       // Source 3: Shiba
-      { src: "https://storage.googleapis.com/vocodes-public/media/y/5/k/p/t/y5kptzew0t63pq12y83v0cstv8mkzvk0/storyteller_y5kptzew0t63pq12y83v0cstv8mkzvk0.mp4" }, // Smile
-      { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // Dance Monkey
-      { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // TODO: FIX ME
+      { src: "https://storage.googleapis.com/vocodes-public/media/y/5/k/p/t/y5kptzew0t63pq12y83v0cstv8mkzvk0/storyteller_y5kptzew0t63pq12y83v0cstv8mkzvk0.mp4" }, // Smile (Shiba)
+      { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // Dance Monkey (Shiba)
+      { src: "https://storage.googleapis.com/vocodes-public/media/v/d/n/f/x/vdnfxzzxer8ghjb76s1yf0htx1e59fpr/storyteller_vdnfxzzxer8ghjb76s1yf0htx1e59fpr.mp4" }, // Split (Shiba)
+      { src: "https://storage.googleapis.com/vocodes-public/media/j/w/5/c/m/jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx/storyteller_jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx.mp4" }, // Slight Smile (Shiba)
     ],
     []
   );
