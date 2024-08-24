@@ -147,8 +147,8 @@ export default function LivePortrait({
       // Source 2: Wednesday
       { src: "/videos/live-portrait/2_1.mp4" }, // Smile
       { src: "/videos/live-portrait/2_2.mp4" }, // Dance Monkey
-      { src: "/videos/live-portrait/2_2.mp4" }, // TODO: FIX ME
-      { src: "/videos/live-portrait/2_2.mp4" }, // TODO: FIX ME
+      { src: "https://storage.googleapis.com/vocodes-public/media/v/6/7/3/b/v673bmm04f8vk0815d00fnm37qd53n7n/storyteller_v673bmm04f8vk0815d00fnm37qd53n7n.mp4" }, // Split (Wednesday)
+      { src: "https://storage.googleapis.com/vocodes-public/media/m/5/w/k/0/m5wk0ev4wf7wrqmhgxb334ja21mz6p3j/storyteller_m5wk0ev4wf7wrqmhgxb334ja21mz6p3j.mp4" }, // Slight Smile (Wednesday)
       // Source 3: Shiba
       { src: "https://storage.googleapis.com/vocodes-public/media/y/5/k/p/t/y5kptzew0t63pq12y83v0cstv8mkzvk0/storyteller_y5kptzew0t63pq12y83v0cstv8mkzvk0.mp4" }, // Smile (Shiba)
       { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // Dance Monkey (Shiba)
