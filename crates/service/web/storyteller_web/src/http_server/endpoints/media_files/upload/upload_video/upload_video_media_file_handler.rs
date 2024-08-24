@@ -44,7 +44,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 #[deprecated]
 #[utoipa::path(
   post,
-  tag = "Media Files (Deprecated)",
+  tag = "Media Files [Deprecated]",
   path = "/v1/media_files/upload/video",
   responses(
     (status = 200, description = "Success Update", body = UploadVideoMediaSuccessResponse),

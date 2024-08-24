@@ -37,7 +37,7 @@ pub struct UploadEngineAssetMediaSuccessResponse {
 #[deprecated]
 #[utoipa::path(
   post,
-  tag = "Media Files (Deprecated)",
+  tag = "Media Files [Deprecated]",
   path = "/v1/media_files/upload/engine_asset",
   responses(
     (status = 200, description = "Success Update", body = UploadEngineAssetMediaSuccessResponse),

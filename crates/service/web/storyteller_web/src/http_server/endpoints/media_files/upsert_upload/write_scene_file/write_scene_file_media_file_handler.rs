@@ -43,7 +43,7 @@ pub struct WriteSceneFileMediaSuccessResponse {
 #[deprecated]
 #[utoipa::path(
   post,
-  tag = "Media Files (Deprecated)",
+  tag = "Media Files [Deprecated]",
   path = "/v1/media_files/write/scene_file",
   responses(
     (status = 200, description = "Success Update", body = WriteSceneFileMediaSuccessResponse),
