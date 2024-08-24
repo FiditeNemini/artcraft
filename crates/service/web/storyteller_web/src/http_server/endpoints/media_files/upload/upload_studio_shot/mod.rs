@@ -1,0 +1,1 @@
+pub mod upload_studio_shot_media_file_handler;

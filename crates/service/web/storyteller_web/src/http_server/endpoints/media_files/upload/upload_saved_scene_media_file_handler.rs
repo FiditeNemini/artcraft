@@ -8,7 +8,7 @@ use actix_multipart::form::tempfile::TempFile;
 use actix_multipart::form::text::Text;
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
 use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
@@ -99,7 +99,7 @@ pub async fn upload_saved_scene_media_file_handler(
   server_state: web::Data<Arc<ServerState>>,
   MultipartForm(mut form): MultipartForm<UploadSavedSceneMediaFileForm>,
   path: Path<UploadSavedSceneMediaFilePathInfo>,
-) -> Result<HttpResponse, MediaFileUploadError> {
+) -> Result<Json<UploadSavedSceneMediaFileSuccessResponse>, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
@@ -271,15 +271,8 @@ pub async fn upload_saved_scene_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  let response = UploadSavedSceneMediaFileSuccessResponse {
+  Ok(Json(UploadSavedSceneMediaFileSuccessResponse {
     success: true,
     media_file_token: path.token.clone(),
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| MediaFileUploadError::ServerError)?;
-
-  return Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body));
+  }))
 }

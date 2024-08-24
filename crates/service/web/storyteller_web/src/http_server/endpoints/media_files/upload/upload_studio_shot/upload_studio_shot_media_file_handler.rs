@@ -39,10 +39,10 @@ use crate::http_server::validations::validate_idempotency_token_format::validate
 
 /// Form-multipart request fields.
 ///
-/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadPmxFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
+/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadStudioShotFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
-pub struct UploadPmxFileForm {
+pub struct UploadStudioShotFileForm {
   /// UUID for request idempotency
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = String, format = Binary)]
@@ -83,20 +83,18 @@ pub struct UploadPmxFileForm {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct UploadPmxSuccessResponse {
+pub struct UploadStudioShotSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
 
-/// Upload a pmx zip file.
-/// 
-/// Be careful to set the correct `engine_category` and `maybe_animation_type` (if needed) fields!
+/// Upload a studio render in a zip file.
 #[utoipa::path(
   post,
   tag = "Media Files (Upload)",
   path = "/v1/media_files/upload/pmx",
   responses(
-    (status = 200, description = "Success Update", body = UploadPmxSuccessResponse),
+    (status = 200, description = "Success Update", body = UploadStudioShotSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileUploadError),
     (status = 401, description = "Not authorized", body = MediaFileUploadError),
     (status = 429, description = "Too many requests", body = MediaFileUploadError),
@@ -104,16 +102,16 @@ pub struct UploadPmxSuccessResponse {
   ),
   params(
     (
-      "request" = UploadPmxFileForm,
-      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadPmxFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
+      "request" = UploadStudioShotFileForm,
+      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadStudioShotFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
     ),
   )
 )]
-pub async fn upload_pmx_media_file_handler(
+pub async fn upload_studio_shot_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
-  MultipartForm(mut form): MultipartForm<UploadPmxFileForm>,
-) -> Result<Json<UploadPmxSuccessResponse>, MediaFileUploadError> {
+  MultipartForm(mut form): MultipartForm<UploadStudioShotFileForm>,
+) -> Result<Json<UploadStudioShotSuccessResponse>, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
@@ -295,7 +293,7 @@ pub async fn upload_pmx_media_file_handler(
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  Ok(Json(UploadPmxSuccessResponse {
+  Ok(Json(UploadStudioShotSuccessResponse {
     success: true,
     media_file_token: token,
   }))

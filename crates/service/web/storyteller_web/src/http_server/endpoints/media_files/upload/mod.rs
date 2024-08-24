@@ -9,4 +9,5 @@ pub mod upload_new_video_media_file_handler;
 pub mod upload_pmx;
 pub mod upload_saved_scene_media_file_handler;
 pub mod upload_scene_snapshot_media_file_handler;
+pub mod upload_studio_shot;
 pub mod upload_video;

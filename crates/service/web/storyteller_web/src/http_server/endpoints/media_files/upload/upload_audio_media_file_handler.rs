@@ -8,6 +8,7 @@ use actix_multipart::form::tempfile::TempFile;
 use actix_multipart::form::text::Text;
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::web::Json;
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
 use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
@@ -110,7 +111,7 @@ pub async fn upload_audio_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   MultipartForm(mut form): MultipartForm<UploadAudioMediaFileForm>,
-) -> Result<HttpResponse, MediaFileUploadError> {
+) -> Result<Json<UploadAudioMediaFileSuccessResponse>, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
@@ -349,15 +350,8 @@ pub async fn upload_audio_media_file_handler(
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  let response = UploadAudioMediaFileSuccessResponse {
+  Ok(Json(UploadAudioMediaFileSuccessResponse {
     success: true,
     media_file_token: token,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| MediaFileUploadError::ServerError)?;
-
-  return Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body));
+  }))
 }
