@@ -77,6 +77,18 @@ interface JobProgress {
   [key: string]: number | null;
 }
 
+const PRECOMPUTED_SOURCE_TOKENS : string[] = [
+    "m_2xrse9799wvy8hkv8tbxqxct8089t7", // Mona Lisa
+    "m_pt99cdgcanv1m8yejdr3yzxyv5jmps", // Wednesday
+    "m_780cd9zhc5tznwcc2d8tnrqgs5dwh7", // Shiba
+];
+
+const PRECOMPUTED_DRIVER_TOKENS : string[] = [
+    "m_z278r5b1r2279xqkxszxjkqhc1dg2g", // Awkward Smile
+    "m_dv9pcmmwdpgyevyxsyxcahkhd2c839", // Dance Monkey
+    "m_53j0kfaesw4jem4713tttk6142sd0y", // Split
+];
+
 export default function LivePortrait({
   sessionSubscriptionsWrapper,
 }: LivePortraitProps) {
@@ -98,12 +110,10 @@ export default function LivePortrait({
   const hasPremium = sessionSubscriptionsWrapper.hasPaidFeatures();
   const [generatedVideoSrc, setGeneratedVideoSrc] = useState("");
   const [sourceTokens, setSourceTokens] = useState<string[]>([
-    "m_2xrse9799wvy8hkv8tbxqxct8089t7",
-    // "m_pt99cdgcanv1m8yejdr3yzxyv5jmps",
+    ...PRECOMPUTED_SOURCE_TOKENS
   ]);
   const [motionTokens, setMotionTokens] = useState<string[]>([
-    "m_z278r5b1r2279xqkxszxjkqhc1dg2g",
-    "m_dv9pcmmwdpgyevyxsyxcahkhd2c839",
+    ...PRECOMPUTED_DRIVER_TOKENS
   ]);
   const numberOfInitialSourceTokensRef = useRef(sourceTokens.length);
   const numberOfInitialSourceTokens = numberOfInitialSourceTokensRef.current;
@@ -128,18 +138,18 @@ export default function LivePortrait({
 
   const precomputedVideos = useMemo(
     () => [
-      {
-        src: "/videos/live-portrait/1_1.mp4",
-      },
-      {
-        src: "/videos/live-portrait/1_2.mp4",
-      },
-      // {
-      //   src: "/videos/live-portrait/2_1.mp4",
-      // },
-      // {
-      //   src: "/videos/live-portrait/2_2.mp4",
-      // },
+      // Source 1: Mona Lisa
+      { src: "/videos/live-portrait/1_1.mp4" }, // Smile
+      { src: "/videos/live-portrait/1_2.mp4" }, // Dance Monkey
+      { src: "/videos/live-portrait/1_2.mp4" }, // TODO: FIX ME
+      // Source 2: Wednesday
+      { src: "/videos/live-portrait/2_1.mp4" }, // Smile
+      { src: "/videos/live-portrait/2_2.mp4" }, // Dance Monkey
+      { src: "/videos/live-portrait/2_2.mp4" }, // TODO: FIX ME
+      // Source 3: Shiba
+      { src: "https://storage.googleapis.com/vocodes-public/media/y/5/k/p/t/y5kptzew0t63pq12y83v0cstv8mkzvk0/storyteller_y5kptzew0t63pq12y83v0cstv8mkzvk0.mp4" }, // Smile
+      { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // Dance Monkey
+      { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // TODO: FIX ME
     ],
     []
   );
@@ -309,6 +319,7 @@ export default function LivePortrait({
     );
 
     const precomputedVideoSrc = getPrecomputedVideoSrc();
+    console.log('precomputed video src', precomputedVideoSrc)
 
     // Show generated or precomputed video if available
     if (latestVideoSrc && !isCurrentlyGenerating) {
@@ -404,7 +415,7 @@ export default function LivePortrait({
   };
 
   const getPrecomputedVideoSrc = useCallback(() => {
-    const index = selectedSourceIndex * 4 + selectedMotionIndex;
+    const index = selectedSourceIndex * PRECOMPUTED_DRIVER_TOKENS.length + selectedMotionIndex;
     if (index >= 0 && index < precomputedVideos.length) {
       return precomputedVideos[index].src;
     }
