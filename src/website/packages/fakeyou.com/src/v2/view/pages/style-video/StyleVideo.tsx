@@ -30,10 +30,12 @@ import { isMobile } from "react-device-detect";
 import { AITools } from "components/marketing";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/pro-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-  const { loggedIn, loggedInOrModal, sessionFetched } = useSession();
+  const { loggedIn, loggedInOrModal, sessionFetched, sessionSubscriptions } =
+    useSession();
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [IPAToken, IPATokenSet] = useState("");
   const [prompt, promptSet] = useState("");
@@ -50,6 +52,9 @@ export default function StyleVideo() {
   const { open, modalOpen } = useModal();
   const history = useHistory();
   const [enableSignUpBlock] = useState(false);
+  const proOrElite =
+    sessionSubscriptions?.hasActiveProSubscription() ||
+    sessionSubscriptions?.hasActiveEliteSubscription();
 
   const openStyleSelection = () =>
     open({
@@ -109,8 +114,8 @@ export default function StyleVideo() {
 
   const lengthOptions = [
     { label: "3 seconds", value: 3000 },
-    { label: "5 seconds", value: 5000 },
-    { label: "7 seconds", value: 7000 },
+    { disabled: !proOrElite, label: "5 seconds", value: 5000 },
+    { disabled: !proOrElite, label: "7 seconds", value: 7000 },
   ];
 
   const onPromptUpdate = (prompt: Prompt | null) => {
@@ -476,7 +481,7 @@ export default function StyleVideo() {
                 <div className="mt-3">
                   <SegmentButtons
                     {...{
-                      className: "fy-style-video-length",
+                      className: "fy-style-video-length mb-1",
                       label: "Video Duration",
                       onChange: ({ target }: { target: any }) => {
                         lengthSet(target.value);
@@ -486,6 +491,14 @@ export default function StyleVideo() {
                       highlight: true,
                     }}
                   />
+                  <Link
+                    {...{
+                      className: "fs-7 lh-1",
+                      to: "/pricing",
+                    }}
+                  >
+                    Subscribe to Pro or Elite for 5 or 7 second videos
+                  </Link>
                 </div>
               </div>
             </Panel>

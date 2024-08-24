@@ -27,7 +27,7 @@ interface SessionContextType {
   querySession?: any;
   querySubscriptions?: any;
   sessionFetched: boolean;
-  sessionSubscriptions?: any;
+  sessionSubscriptions?: SessionSubscriptionsWrapper;
   sessionWrapper: SessionWrapper;
   studioAccessCheck: (x: any) => any;
   styleVideoAccessCheck: (x: any) => any;

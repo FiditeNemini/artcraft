@@ -4,21 +4,31 @@ import "./SegmentButtons.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, fa0 } from "@fortawesome/pro-solid-svg-icons";
 
-interface Props {
-  label?: string;
+type SegmentButtonsValue = string | number;
+
+export interface SegmentButtonsOptions {
+  disabled?: boolean;
+  label: string;
+  icon?: IconDefinition | undefined;
   subLabel?: string;
+  value: SegmentButtonsValue;
+}
+
+interface SegmentButtonsProps {
+  className?: string;
+  label?: string;
   name?: string;
   onChange?: any;
-  options?: any;
-  value?: string | number;
+  options?: SegmentButtonsOptions[];
+  value?: SegmentButtonsValue;
   icon?: IconDefinition | undefined;
   disabled?: boolean;
   highlight?: boolean;
 }
 
 export default function SegmentButtons({
+  className,
   label,
-  subLabel,
   name,
   icon,
   onChange,
@@ -26,41 +36,55 @@ export default function SegmentButtons({
   value: inValue = "",
   disabled = false,
   highlight = false,
-}: Props) {
+}: SegmentButtonsProps) {
   // const onClick = ({ target }: any) => onChange();
   return (
     <div>
       {label && <Label {...{ label, disabled: disabled }} />}
-      <ul {...{ className: "fy-segment-buttons mb-0" }}>
+      <ul
+        {...{
+          className: `fy-segment-buttons mb-0${
+            className ? " " + className : ""
+          }`,
+        }}
+      >
         {options.map(
           (
-            { label = "", value = "", icon = fa0, subLabel = "" },
+            {
+              disabled: disabledOpt,
+              label = "",
+              value = "",
+              icon = fa0,
+              subLabel = "",
+            },
             key: number
-          ) => (
-            <li
-              {...{
-                className: `${
-                  value === inValue
-                    ? `fy-selected-segment ${
-                        highlight && "fy-highlighted-segment"
-                      }`.trim()
-                    : ""
-                } ${disabled ? "fy-disabled-segment" : ""}`.trim(),
-                key,
-                onClick: ({ target }: any) =>
-                  onChange({ target: { name, type: "option", value } }),
-              }}
-            >
-              {icon === fa0 ? null : (
-                <FontAwesomeIcon
-                  icon={icon}
-                  className="fy-segment-button-icon"
-                />
-              )}
-              {label}
-              {subLabel && <p>{subLabel}</p>}
-            </li>
-          )
+          ) => {
+            const segmentClass = `${
+              value === inValue
+                ? `fy-selected-segment${highlight && " fy-highlighted-segment"}`
+                : ""
+            }${disabled || disabledOpt ? " fy-disabled-segment" : ""}`;
+
+            return (
+              <li
+                {...{
+                  className: segmentClass,
+                  key,
+                  onClick: ({ target }: any) =>
+                    onChange({ target: { name, type: "option", value } }),
+                }}
+              >
+                {icon === fa0 ? null : (
+                  <FontAwesomeIcon
+                    icon={icon}
+                    className="fy-segment-button-icon"
+                  />
+                )}
+                {label}
+                {subLabel && <p>{subLabel}</p>}
+              </li>
+            );
+          }
         )}
       </ul>
     </div>
