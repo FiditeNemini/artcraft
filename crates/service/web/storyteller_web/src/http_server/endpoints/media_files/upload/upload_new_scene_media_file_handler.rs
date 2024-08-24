@@ -77,7 +77,7 @@ pub struct UploadNewSceneMediaFileSuccessResponse {
 /// same scene.
 #[utoipa::path(
   post,
-  tag = "Media Files",
+  tag = "Media Files (Upload)",
   path = "/v1/media_files/upload/new_scene",
   responses(
     (status = 200, description = "Success Update", body = UploadNewSceneMediaFileSuccessResponse),

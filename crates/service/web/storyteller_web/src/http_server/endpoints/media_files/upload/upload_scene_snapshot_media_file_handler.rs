@@ -76,7 +76,7 @@ pub struct UploadSceneSnapshotMediaFileSuccessResponse {
 /// Do not replace the user's current scene with this snapshot token!
 #[utoipa::path(
   post,
-  tag = "Media Files",
+  tag = "Media Files (Upload)",
   path = "/v1/media_files/upload/scene_snapshot",
   responses(
     (status = 200, description = "Success Update", body = UploadSceneSnapshotMediaFileSuccessResponse),

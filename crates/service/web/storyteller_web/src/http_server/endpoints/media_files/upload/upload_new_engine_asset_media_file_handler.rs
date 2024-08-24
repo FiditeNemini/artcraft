@@ -92,7 +92,7 @@ pub struct UploadNewEngineAssetSuccessResponse {
 /// Be careful to set the correct `engine_category` and `maybe_animation_type` (if needed) fields!
 #[utoipa::path(
   post,
-  tag = "Media Files",
+  tag = "Media Files (Upload)",
   path = "/v1/media_files/upload/new_engine_asset",
   responses(
     (status = 200, description = "Success Update", body = UploadNewEngineAssetSuccessResponse),

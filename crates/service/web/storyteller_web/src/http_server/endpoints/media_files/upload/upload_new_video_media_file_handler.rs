@@ -104,7 +104,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 /// This endpoint is for uploading video files.
 #[utoipa::path(
   post,
-  tag = "Media Files",
+  tag = "Media Files (Upload)",
   path = "/v1/media_files/upload/new_video",
   responses(
     (status = 200, description = "Success Update", body = UploadNewVideoMediaFileSuccessResponse),

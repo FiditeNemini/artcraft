@@ -77,7 +77,7 @@ pub struct UploadSavedSceneMediaFileSuccessResponse {
 /// instead as it won't overwrite an existing scene and will return a brand new media token.
 #[utoipa::path(
   post,
-  tag = "Media Files",
+  tag = "Media Files (Upload)",
   path = "/v1/media_files/upload/saved_scene/{token}",
   responses(
     (status = 200, description = "Success Update", body = UploadSavedSceneMediaFileSuccessResponse),
