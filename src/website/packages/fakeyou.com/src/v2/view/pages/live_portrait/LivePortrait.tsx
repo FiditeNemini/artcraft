@@ -81,6 +81,7 @@ const PRECOMPUTED_SOURCE_TOKENS : string[] = [
     "m_2xrse9799wvy8hkv8tbxqxct8089t7", // Mona Lisa
     "m_pt99cdgcanv1m8yejdr3yzxyv5jmps", // Wednesday
     "m_780cd9zhc5tznwcc2d8tnrqgs5dwh7", // Shiba
+    "m_mfstb9ac7x657eyb0pbw6ybmfxh25s", // Link
 ];
 
 const PRECOMPUTED_DRIVER_TOKENS : string[] = [
@@ -154,6 +155,11 @@ export default function LivePortrait({
       { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // Dance Monkey (Shiba)
       { src: "https://storage.googleapis.com/vocodes-public/media/v/d/n/f/x/vdnfxzzxer8ghjb76s1yf0htx1e59fpr/storyteller_vdnfxzzxer8ghjb76s1yf0htx1e59fpr.mp4" }, // Split (Shiba)
       { src: "https://storage.googleapis.com/vocodes-public/media/j/w/5/c/m/jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx/storyteller_jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx.mp4" }, // Slight Smile (Shiba)
+      // Source 4: Link
+      { src: "https://storage.googleapis.com/vocodes-public/media/3/v/m/0/t/3vm0t89v1jaaft8rrr23gtv22r3fnqr9/storyteller_3vm0t89v1jaaft8rrr23gtv22r3fnqr9.mp4" }, // Smile (Link)
+      { src: "https://storage.googleapis.com/vocodes-public/media/m/a/8/e/7/ma8e7s6zgggcbywbp08kqk4gzgjfe7pw/storyteller_ma8e7s6zgggcbywbp08kqk4gzgjfe7pw.mp4" }, // Dance Monkey (Link)
+      { src: "https://storage.googleapis.com/vocodes-public/media/s/m/9/c/6/sm9c6gewq4cfcebc0j79bama8bn2ht7m/storyteller_sm9c6gewq4cfcebc0j79bama8bn2ht7m.mp4" }, // Split (Link)
+      { src: "https://storage.googleapis.com/vocodes-public/media/3/v/b/7/3/3vb736v1rmpefynr7xamdajf2vt99bam/storyteller_3vb736v1rmpefynr7xamdajf2vt99bam.mp4" }, // Slight Smile (Link)
     ],
     []
   );
