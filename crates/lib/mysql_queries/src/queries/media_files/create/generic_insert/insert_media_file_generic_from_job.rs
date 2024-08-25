@@ -8,7 +8,6 @@ use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginM
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
-use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -21,53 +20,66 @@ use crate::queries::media_files::create::generic_insert::insert_media_file_gener
 
 pub struct InsertFromJobArgs<'a> {
     pub pool: &'a MySqlPool,
+
+    // Job record provides some information: creator details, IP address, etc.
     pub job: &'a AvailableInferenceJob,
 
+    // Important database indices
     pub media_class: MediaFileClass,
     pub media_type: MediaFileType,
+    // TODO: is_intermediate_system_file, is_user_upload
 
-    // Origin and categorization
+    // Product and other origination information
     pub origin_category: MediaFileOriginCategory,
     pub origin_product_category: MediaFileOriginProductCategory,
     pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
     pub maybe_origin_model_token: Option<&'a ModelWeightToken>,
     pub maybe_origin_filename: Option<String>,
 
-    // If batch generated, this is the batch token.
-    pub maybe_batch_token: Option<&'a BatchGenerationToken>,
-
+    // Media info
     pub maybe_mime_type: Option<&'a str>,
-    
     pub file_size_bytes: u64,
     pub maybe_duration_millis: Option<u64>,
     pub maybe_audio_encoding: Option<&'a str>,
     pub maybe_video_encoding: Option<&'a str>,
     pub maybe_frame_width: Option<u32>,
     pub maybe_frame_height: Option<u32>,
-    pub maybe_prompt_token: Option<&'a PromptToken>,
     pub checksum_sha2: &'a str,
 
+    // User text information
     pub maybe_title: Option<&'a str>,
     pub maybe_text_transcript: Option<&'a str>,
+
+    // If generated from a scene, this is the scene media file token.
+    pub maybe_scene_source_media_file_token: Option<&'a MediaFileToken>,
+
+    // If additional prompt details are stored, this is the prompt token.
+    pub maybe_prompt_token: Option<&'a PromptToken>,
+
+    // If batch generated, this is the batch token.
+    pub maybe_batch_token: Option<&'a BatchGenerationToken>,
 
     // Storage details
     pub public_bucket_directory_hash: &'a str,
     pub maybe_public_bucket_prefix: Option<&'a str>,
     pub maybe_public_bucket_extension: Option<&'a str>,
 
+    // Counters
     pub maybe_creator_file_synthetic_id_category: IdCategory,
     pub maybe_creator_category_synthetic_id_category: IdCategory,
 
-    /// Extra polymorphic data stored in `extra_file_modification_info`
+    /// Extra polymorphic data stored in `extra_file_modification_info` column.
     /// This differs on a per media type basis and can depend on the product
     /// that generates the media file.
     pub maybe_extra_media_info: Option<&'a MediaFileExtraInfo>,
 
-    // Modification and generation info
-    pub maybe_mod_user_token: Option<&'a UserToken>,
+    // Worker generation info
     pub is_generated_on_prem: bool,
     pub generated_by_worker: Option<&'a str>,
     pub generated_by_cluster: Option<&'a str>,
+
+    // Moderation details (deprecated)
+    pub maybe_mod_user_token: Option<&'a UserToken>,
 }
 
 pub async fn insert_media_file_generic_from_job(
@@ -100,6 +112,7 @@ pub async fn insert_media_file_generic_from_job(
         maybe_prompt_token: args.maybe_prompt_token,
         maybe_public_bucket_extension: args.maybe_public_bucket_extension,
         maybe_public_bucket_prefix: args.maybe_public_bucket_prefix,
+        maybe_scene_source_media_file_token: args.maybe_scene_source_media_file_token,
         maybe_text_transcript: args.maybe_text_transcript,
         maybe_title: args.maybe_title,
         maybe_video_encoding: args.maybe_video_encoding,

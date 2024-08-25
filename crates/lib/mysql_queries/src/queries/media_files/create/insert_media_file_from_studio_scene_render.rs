@@ -24,6 +24,9 @@ pub struct InsertStudioSceneRenderArgs<'a> {
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
 
+  // If generated from a scene, this is the scene media file token.
+  pub maybe_scene_source_media_file_token: Option<&'a MediaFileToken>,
+
   // Probably mp4, but could change.
   pub media_type: MediaFileType,
   pub maybe_mime_type: Option<&'a str>,
@@ -69,6 +72,9 @@ pub async fn insert_media_file_from_studio_scene_render(
 
     // Dynamic bits (file data)
     maybe_title: args.maybe_title,
+
+    // Dynamic bits (foreign keys)
+    maybe_scene_source_media_file_token: args.maybe_scene_source_media_file_token,
 
     // Dynamic bits (bucket storage)
     public_bucket_directory_hash: args.public_bucket_directory_hash,

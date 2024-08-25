@@ -88,6 +88,7 @@ pub async fn insert_media_file_from_gptsovits(
     maybe_prompt_token: None,
     maybe_extra_media_info: None,
     maybe_mod_user_token: None,
+    maybe_scene_source_media_file_token: None,
   }).await?;
 
   Ok(new_media_token)
