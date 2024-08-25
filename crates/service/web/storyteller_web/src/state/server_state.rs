@@ -32,6 +32,7 @@ use crate::http_server::endpoints::voice_conversion::models::list_voice_conversi
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::session::session_checker::SessionChecker;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
+use crate::http_server::web_utils::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
@@ -95,6 +96,8 @@ pub struct ServerState {
   pub static_api_token_set: StaticApiTokenSet,
 
   pub caches: InMemoryCaches,
+
+  pub temp_dir_creator: ScopedTempDirCreator,
 }
 
 #[derive(Clone)]

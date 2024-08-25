@@ -33,9 +33,11 @@ use crate::http_server::endpoints::media_files::upload::upload_engine_asset::dra
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::extract_frames_from_zip::{extract_frames_from_zip, ExtractFramesError};
 use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::web_utils::user_session::require_user_session_using_connection::require_user_session_using_connection;
 
 /// Form-multipart request fields.
 ///
@@ -54,12 +56,6 @@ pub struct UploadStudioShotFileForm {
   #[schema(value_type = Vec<u8>, format = Binary)]
   file: TempFile,
 
-  /// The category of engine asset: character, animation, etc.
-  /// See the documentation on `MediaFileEngineCategory`.
-  #[multipart(limit = "2 KiB")]
-  #[schema(value_type = String, format = Binary)]
-  engine_category: Text<MediaFileEngineCategory>,
-
   /// Optional: Title (name) of the scene
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
@@ -69,12 +65,6 @@ pub struct UploadStudioShotFileForm {
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
   maybe_visibility: Option<Text<Visibility>>,
-
-  /// Optional: the type of animation (if this is a character or animation)
-  /// See the documentation on `MediaFileAnimationType`.
-  #[multipart(limit = "2 KiB")]
-  #[schema(value_type = Option<String>, format = Binary)]
-  maybe_animation_type: Option<Text<MediaFileAnimationType>>,
 
   /// Optional: The duration, for files that are animations.
   #[multipart(limit = "2 KiB")]
@@ -92,7 +82,7 @@ pub struct UploadStudioShotSuccessResponse {
 #[utoipa::path(
   post,
   tag = "Media Files (Upload)",
-  path = "/v1/media_files/upload/pmx",
+  path = "/v1/media_files/upload/studio_shot",
   responses(
     (status = 200, description = "Success Update", body = UploadStudioShotSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileUploadError),
@@ -124,28 +114,17 @@ pub async fn upload_studio_shot_media_file_handler(
   // ==================== READ SESSION ==================== //
 
   // NB: We require a moderator to upload PMX files.
-  let user_session = require_moderator(&http_request, &server_state, UseDatabase::FromPool(&mut mysql_connection))
+  let user_session = require_user_session_using_connection(&http_request, &server_state.session_checker, &mut mysql_connection)
       .await
-      .map_err(|err| match err {
-        RequireModeratorError::ServerError => MediaFileUploadError::ServerError,
-        RequireModeratorError::NotAuthorized => MediaFileUploadError::NotAuthorized,
+      .map_err(|e| {
+        error!("User session error: {:?}", e);
+        MediaFileUploadError::NotAuthorized
       })?;
 
   let maybe_avt_token = server_state
       .avt_cookie_manager
       .get_avt_token_from_request(&http_request);
 
-//  // ==================== READ SESSION ==================== //
-//
-//  let maybe_user_session = server_state
-//      .session_checker
-//      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
-//      .await
-//      .map_err(|e| {
-//        error!("Session checker error: {:?}", e);
-//        MediaFileUploadError::ServerError
-//      })?;
-//
 //  // ==================== BANNED USERS ==================== //
 //
 //  if let Some(ref user) = maybe_user_session {
@@ -183,18 +162,6 @@ pub async fn upload_studio_shot_media_file_handler(
 
   // ==================== UPLOAD METADATA ==================== //
 
-  let engine_category = form.engine_category.0;
-
-  let maybe_duration_millis = form.maybe_duration_millis
-      .map(|duration| duration.0);
-
-  let mut maybe_animation_type = form.maybe_animation_type
-      .map(|t| t.0);
-
-  if engine_category == MediaFileEngineCategory::Expression {
-    // NB: Expressions are exclusively ArKit for now (and probably well into the future).
-    maybe_animation_type = Some(MediaFileAnimationType::ArKit);
-  }
 
   let maybe_title = form.maybe_title
       .map(|title| title.trim().to_string())
@@ -202,12 +169,9 @@ pub async fn upload_studio_shot_media_file_handler(
 
   let creator_set_visibility = form.maybe_visibility
       .map(|visibility| visibility.0)
-      .or_else(|| {
-        //maybe_user_session
-        //    .as_ref()
-        //    .map(|user_session| user_session.preferred_tts_result_visibility)
-        Some(user_session.preferred_tts_result_visibility)
-      })
+      //.or_else(|| {
+      //  Some(user_session.preferred_tts_result_visibility)
+      //})
       .unwrap_or(Visibility::default());
 
   // ==================== USER DATA ==================== //
@@ -228,13 +192,6 @@ pub async fn upload_studio_shot_media_file_handler(
       .and_then(|filename| filename.extension())
       .and_then(|ext| ext.to_str());
 
-  let mut file_bytes = Vec::new();
-  form.file.file.read_to_end(&mut file_bytes)
-      .map_err(|e| {
-        error!("Problem reading file: {:?}", e);
-        MediaFileUploadError::ServerError
-      })?;
-
   match maybe_file_extension {
     Some("zip") => {},
     _ => {
@@ -243,55 +200,78 @@ pub async fn upload_studio_shot_media_file_handler(
     }
   }
 
-  // ==================== UPLOAD AND SAVE ==================== //
-
-  const PREFIX : Option<&str> = Some("upload_");
-  const SUFFIX : Option<&str> = Some(".pmx");
-
-  let pmx_details = extract_and_upload_pmx_files(&file_bytes, &server_state.public_bucket_client, PREFIX, SUFFIX)
-      .await
-      .map_err(|err| {
-        warn!("Extract and upload pmx error: {:?}", err);
-        match err {
-          PmxError::InvalidArchive => MediaFileUploadError::ServerErrorVerbose("invalid archive file".to_string()),
-          PmxError::TooManyFiles => MediaFileUploadError::ServerErrorVerbose("too many files".to_string()),
-          PmxError::NoPmxFile => MediaFileUploadError::ServerErrorVerbose("no pmx files".to_string()),
-          PmxError::UploadError => MediaFileUploadError::ServerErrorVerbose("upload error".to_string()),
-          PmxError::FileError => MediaFileUploadError::ServerErrorVerbose("file error".to_string()),
-          PmxError::ExtractionError => MediaFileUploadError::ServerErrorVerbose("zip extraction error".to_string()),
-        }
-      })?;
-
-  // TODO(bt, 2024-02-22): This should be a transaction.
-  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: Some(MediaFileClass::Dimensional),
-    media_file_type: MediaFileType::Pmx,
-    maybe_creator_user_token: Some(&user_session.get_strongly_typed_user_token()),
-    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
-    creator_ip_address: &ip_address,
-    creator_set_visibility,
-    upload_type: UploadType::Filesystem,
-    maybe_engine_category: Some(engine_category),
-    maybe_animation_type,
-    maybe_mime_type: Some("application/octet-stream"),
-    file_size_bytes: pmx_details.file_size_bytes,
-    maybe_duration_millis,
-    sha256_checksum: &pmx_details.sha256_checksum,
-    maybe_scene_source_media_file_token: None,
-    is_intermediate_system_file: false,
-    maybe_title: maybe_title.as_deref(),
-    public_bucket_directory_hash: pmx_details.pmx_public_upload_path.get_object_hash(),
-    maybe_public_bucket_prefix: PREFIX,
-    maybe_public_bucket_extension: SUFFIX,
-    pool: &server_state.mysql_pool,
-  })
-      .await
-      .map_err(|err| {
-        warn!("New file creation DB error: {:?}", err);
+  let mut file_bytes = Vec::new();
+  form.file.file.read_to_end(&mut file_bytes)
+      .map_err(|e| {
+        error!("Problem reading file: {:?}", e);
         MediaFileUploadError::ServerError
       })?;
 
-  info!("new media file id: {} token: {:?}", record_id, &token);
+  // ==================== EXTRACT ==================== //
+
+  // TODO(bt,2024-08-25): Should include entropy so concurrent requests don't overwrite
+  let frame_temp_dir = server_state.temp_dir_creator.new_tempdir("frames")
+      .map_err(|err| {
+        error!("Problem creating temp dir: {:?}", err);
+        MediaFileUploadError::ServerError
+      })?;
+
+  extract_frames_from_zip(&file_bytes, frame_temp_dir)
+      .map_err(|err| {
+        warn!("Extract frames error: {:?}", err);
+        match err {
+          ExtractFramesError::InvalidArchive => MediaFileUploadError::ServerErrorVerbose("invalid archive file".to_string()),
+          ExtractFramesError::NoImageFiles => MediaFileUploadError::ServerErrorVerbose("no image files".to_string()),
+          ExtractFramesError::TooFewImageFiles => MediaFileUploadError::ServerErrorVerbose("too few image files".to_string()),
+          ExtractFramesError::TooManyFiles => MediaFileUploadError::ServerErrorVerbose("too many files".to_string()),
+          ExtractFramesError::ExtractionError => MediaFileUploadError::ServerErrorVerbose("zip extraction error".to_string()),
+          ExtractFramesError::UploadError => MediaFileUploadError::ServerErrorVerbose("upload error".to_string()),
+          ExtractFramesError::FileError => MediaFileUploadError::ServerErrorVerbose("file error".to_string()),
+        }
+      })?;
+
+  // ==================== FFMPEG ==================== //
+
+
+
+  // ==================== UPLOAD AND SAVE ==================== //
+
+  // TODO DELETE ME
+  let token = MediaFileToken::new("test_token".to_string());
+
+//  const PREFIX : Option<&str> = Some("upload_");
+//  const SUFFIX : Option<&str> = Some(".pmx");
+//
+//  // TODO(bt, 2024-02-22): This should be a transaction.
+//  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
+//    maybe_media_class: Some(MediaFileClass::Dimensional),
+//    media_file_type: MediaFileType::Pmx,
+//    maybe_creator_user_token: Some(&user_session.get_strongly_typed_user_token()),
+//    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
+//    creator_ip_address: &ip_address,
+//    creator_set_visibility,
+//    upload_type: UploadType::Filesystem,
+//    maybe_engine_category: Some(engine_category),
+//    maybe_animation_type,
+//    maybe_mime_type: Some("application/octet-stream"),
+//    file_size_bytes: pmx_details.file_size_bytes,
+//    maybe_duration_millis,
+//    sha256_checksum: &pmx_details.sha256_checksum,
+//    maybe_scene_source_media_file_token: None,
+//    is_intermediate_system_file: false,
+//    maybe_title: maybe_title.as_deref(),
+//    public_bucket_directory_hash: pmx_details.pmx_public_upload_path.get_object_hash(),
+//    maybe_public_bucket_prefix: PREFIX,
+//    maybe_public_bucket_extension: SUFFIX,
+//    pool: &server_state.mysql_pool,
+//  })
+//      .await
+//      .map_err(|err| {
+//        warn!("New file creation DB error: {:?}", err);
+//        MediaFileUploadError::ServerError
+//      })?;
+//
+//  info!("new media file id: {} token: {:?}", record_id, &token);
 
   Ok(Json(UploadStudioShotSuccessResponse {
     success: true,

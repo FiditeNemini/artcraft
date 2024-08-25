@@ -6862,6 +6862,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "symphonia",
+ "tempdir",
  "thumbnail_generator",
  "time",
  "tokens",

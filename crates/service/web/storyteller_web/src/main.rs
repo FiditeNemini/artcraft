@@ -82,6 +82,7 @@ use crate::http_server::routes::add_routes::add_routes;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::session::session_checker::SessionChecker;
 use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
+use crate::http_server::web_utils::scoped_temp_dir_creator::ScopedTempDirCreator;
 use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
@@ -461,6 +462,7 @@ async fn main() -> AnyhowResult<()> {
       user_tokens: user_token_troll_bans,
       ip_addresses: ip_address_troll_bans,
     },
+    temp_dir_creator: ScopedTempDirCreator::for_directory(easyenv::get_env_pathbuf_or_default("TEMP_DIR", "/tmp")),
   };
 
   serve(server_state)
