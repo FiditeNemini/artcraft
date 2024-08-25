@@ -11,6 +11,7 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
@@ -50,6 +51,8 @@ pub struct AvailableInferenceJob {
   /// Same user token, but a `UserToken`.
   pub maybe_creator_user_token_typed: Option<UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<String>,
+  /// Same anonymous visitor token, but a `AnonymousVisitorTrackingToken`.
+  pub maybe_creator_anonymous_visitor_token_typed: Option<AnonymousVisitorTrackingToken>,
   pub creator_ip_address: String,
   pub creator_set_visibility: Visibility,
 
@@ -111,8 +114,12 @@ pub async fn list_available_generic_inference_jobs(
   let job_records : Vec<AvailableInferenceJob> = job_records.into_iter()
       .map(|record : AvailableInferenceJobRawInternal| {
         let maybe_creator_user_token_typed = record.maybe_creator_user_token
-            .as_ref()
+            .as_deref()
             .map(|s| UserToken::new_from_str(s));
+
+        let maybe_creator_anonymous_visitor_token_typed= record.maybe_creator_anonymous_visitor_token
+            .as_deref()
+            .map(|s| AnonymousVisitorTrackingToken::new_from_str(s));
 
         Ok(AvailableInferenceJob {
           id: GenericInferenceJobId(record.id),
@@ -123,6 +130,7 @@ pub async fn list_available_generic_inference_jobs(
           maybe_creator_user_token_typed,
           maybe_download_url: record.maybe_download_url,
           maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
+          maybe_creator_anonymous_visitor_token_typed,
           maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token
               .map(|s| MediaFileToken::new_from_str(&s)),
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)

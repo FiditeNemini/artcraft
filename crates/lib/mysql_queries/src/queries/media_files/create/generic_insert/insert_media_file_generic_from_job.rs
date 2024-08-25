@@ -1,4 +1,3 @@
-use anyhow::anyhow;
 use sqlx;
 use sqlx::MySqlPool;
 
@@ -9,6 +8,7 @@ use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginM
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -17,9 +17,8 @@ use tokens::tokens::users::UserToken;
 
 use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
+use crate::queries::media_files::create::generic_insert::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 
-// thought about this it seems like this can be a bit more geneneric instead of having this we can ...
 pub struct InsertFromJobArgs<'a> {
     pub pool: &'a MySqlPool,
     pub job: &'a AvailableInferenceJob,
@@ -75,146 +74,40 @@ pub async fn insert_media_file_generic_from_job(
     args: InsertFromJobArgs<'_>
 ) -> AnyhowResult<(MediaFileToken, u64)>
 {
-    let result_token = MediaFileToken::generate();
-
-    let extra_file_modification_info = args
-        .maybe_extra_media_info.map(|extra| extra.to_json_string())
-        .transpose()?;
-
-    let mut maybe_creator_file_synthetic_id : Option<u64> = None;
-    let mut maybe_creator_category_synthetic_id : Option<u64> = None;
-
-    let is_batch_generated = args.maybe_batch_token.is_some();
-
-    let mut transaction = args.pool.begin().await?;
-    
-    if let Some(creator_user_token) = args.job.maybe_creator_user_token.as_deref() {
-        let user_token = UserToken::new_from_str(creator_user_token);
-        
-        let next_media_file_id = transactional_increment_generic_synthetic_id(
-            &user_token,
-            args.maybe_creator_file_synthetic_id_category,
-            &mut transaction
-        ).await?;
-
-        let category_id = transactional_increment_generic_synthetic_id(
-            &user_token,
-            args.maybe_creator_category_synthetic_id_category,
-            &mut transaction
-        ).await?;
-
-        maybe_creator_file_synthetic_id = Some(next_media_file_id);
-        maybe_creator_category_synthetic_id = Some(category_id);
-    }
-
-    let query_result = sqlx::query!(
-        r#"
-        INSERT INTO media_files
-        SET
-            token = ?,
-
-            media_class = ?,
-            media_type = ?,
-
-            origin_category = ?, 
-            origin_product_category = ?, 
-            maybe_origin_model_type = ?, 
-            maybe_origin_model_token = ?, 
-            maybe_origin_filename = ?,
-
-            is_batch_generated = ?,
-            maybe_batch_token = ?,
-
-            maybe_mime_type = ?,
-            file_size_bytes = ?,
-            maybe_duration_millis = ?,
-            maybe_audio_encoding = ?, 
-            maybe_video_encoding = ?, 
-            maybe_frame_width = ?, 
-            maybe_frame_height = ?,
-            maybe_prompt_token = ?,
-            checksum_sha2 = ?,
-
-            maybe_title = ?,
-            maybe_text_transcript = ?,
-
-            public_bucket_directory_hash = ?, 
-            maybe_public_bucket_prefix = ?, 
-            maybe_public_bucket_extension = ?, 
-
-            maybe_creator_user_token = ?, 
-            maybe_creator_anonymous_visitor_token = ?, 
-
-            creator_ip_address = ?, 
-            creator_set_visibility = ?, 
-
-            maybe_creator_file_synthetic_id = ?, 
-            maybe_creator_category_synthetic_id = ?,
-
-            extra_file_modification_info = ?,
-
-            maybe_mod_user_token = ?, 
-            is_generated_on_prem = ?, 
-            generated_by_worker = ?, 
-            generated_by_cluster = ?
-        "#,
-        result_token,
-
-        args.media_class.to_str(),
-        args.media_type.to_str(),
-
-        args.origin_category.to_str(),
-        args.origin_product_category.to_str(),
-        args.maybe_origin_model_type.map(|e| e.to_str()),
-        args.maybe_origin_model_token.map(|e| e.to_string()),
-        args.maybe_origin_filename,
-
-        is_batch_generated,
-        args.maybe_batch_token.map(|e| e.as_str()),
-
-        args.maybe_mime_type,
-        args.file_size_bytes, 
-        args.maybe_duration_millis,
-        args.maybe_audio_encoding,
-        args.maybe_video_encoding,
-        args.maybe_frame_width, 
-        args.maybe_frame_height,
-        args.maybe_prompt_token.map(|e| e.as_str()),
-        args.checksum_sha2,
-
-        args.maybe_title,
-        args.maybe_text_transcript,
-
-        args.public_bucket_directory_hash,
-        args.maybe_public_bucket_prefix,
-        args.maybe_public_bucket_extension,
-
-        args.job.maybe_creator_user_token.as_deref(),
-        args.job.maybe_creator_anonymous_visitor_token.as_deref(),
-
-        args.job.creator_ip_address,
-        args.job.creator_set_visibility.to_str(),
-
-        maybe_creator_file_synthetic_id,
-        maybe_creator_category_synthetic_id,
-
-        extra_file_modification_info,
-
-        args.maybe_mod_user_token,
-        args.is_generated_on_prem,
-        args.generated_by_worker,
-        args.generated_by_cluster
-    ).execute(&mut *transaction).await;
-
-    let record_id = match query_result {
-        Ok(res) => res.last_insert_id(),
-        Err(err) => {
-            // TODO: handle better
-            //transaction.rollback().await?;
-            return Err(anyhow!("Mysql error: {:?}", err));
-        }
-    };
-
-    transaction.commit().await?;
-    Ok((result_token, record_id))
+    insert_media_file_generic(InsertArgs {
+        checksum_sha2: args.checksum_sha2,
+        creator_ip_address: &args.job.creator_ip_address,
+        creator_set_visibility: args.job.creator_set_visibility,
+        file_size_bytes: args.file_size_bytes,
+        generated_by_cluster: args.generated_by_cluster,
+        generated_by_worker: args.generated_by_worker,
+        is_generated_on_prem: args.is_generated_on_prem,
+        maybe_audio_encoding: args.maybe_audio_encoding,
+        maybe_batch_token: args.maybe_batch_token,
+        maybe_creator_anonymous_visitor_token: args.job.maybe_creator_anonymous_visitor_token_typed.as_ref(),
+        maybe_creator_category_synthetic_id_category: args.maybe_creator_category_synthetic_id_category,
+        maybe_creator_file_synthetic_id_category: args.maybe_creator_file_synthetic_id_category,
+        maybe_creator_user_token: args.job.maybe_creator_user_token_typed.as_ref(),
+        maybe_duration_millis: args.maybe_duration_millis,
+        maybe_extra_media_info: args.maybe_extra_media_info,
+        maybe_frame_height: args.maybe_frame_height,
+        maybe_frame_width: args.maybe_frame_width,
+        maybe_mime_type: args.maybe_mime_type,
+        maybe_mod_user_token: args.maybe_mod_user_token,
+        maybe_origin_filename: args.maybe_origin_filename,
+        maybe_origin_model_token: args.maybe_origin_model_token,
+        maybe_origin_model_type: args.maybe_origin_model_type,
+        maybe_prompt_token: args.maybe_prompt_token,
+        maybe_public_bucket_extension: args.maybe_public_bucket_extension,
+        maybe_public_bucket_prefix: args.maybe_public_bucket_prefix,
+        maybe_text_transcript: args.maybe_text_transcript,
+        maybe_title: args.maybe_title,
+        maybe_video_encoding: args.maybe_video_encoding,
+        media_class: args.media_class,
+        media_type: args.media_type,
+        origin_category: args.origin_category,
+        origin_product_category: args.origin_product_category,
+        pool: &args.pool,
+        public_bucket_directory_hash: args.public_bucket_directory_hash,
+    }).await
 }

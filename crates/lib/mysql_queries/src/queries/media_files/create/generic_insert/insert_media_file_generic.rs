@@ -20,7 +20,6 @@ use tokens::tokens::users::UserToken;
 use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
-// thought about this it seems like this can be a bit more geneneric instead of having this we can ...
 pub struct InsertArgs<'a> {
     pub pool: &'a MySqlPool,
 
