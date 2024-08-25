@@ -11,7 +11,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use crate::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
+use crate::queries::media_files::create::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
 
 pub struct InsertGptSoVitsArgs<'a> {
   pub pool: &'a MySqlPool,
@@ -42,7 +42,7 @@ pub async fn insert_media_file_from_gptsovits(
   args: InsertGptSoVitsArgs<'_>
 ) -> AnyhowResult<MediaFileToken>
 {
-  let (new_media_token, _id) = insert_media_file_generic(InsertArgs {
+  let (new_media_token, _id) = insert_media_file_generic_from_job(InsertFromJobArgs {
     pool: &args.pool,
     job: &args.job,
 

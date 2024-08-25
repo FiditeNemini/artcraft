@@ -20,7 +20,7 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
+use mysql_queries::queries::media_files::create::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
 use mysql_queries::queries::media_files::get::get_media_file_for_inference::MediaFileForInference;
 use subprocess_common::command_runner::command_runner_args::{FileOrCreate, RunAsSubprocessArgs, StreamRedirection};
 
@@ -184,7 +184,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
 
   info!("Saving record (only gltf or glb, not the buffer.bin) ...");
 
-  let (inference_result_token, id) = insert_media_file_generic(InsertArgs {
+  let (inference_result_token, id) = insert_media_file_generic_from_job(InsertFromJobArgs {
     pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
     media_class: MediaFileClass::Dimensional,

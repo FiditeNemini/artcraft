@@ -8,9 +8,7 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
-use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -18,16 +16,13 @@ use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
 use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 // thought about this it seems like this can be a bit more geneneric instead of having this we can ...
-pub struct InsertArgs<'a> {
+pub struct InsertFromJobArgs<'a> {
     pub pool: &'a MySqlPool,
-
-    pub maybe_creator_user_token: Option<&'a UserToken>,
-    pub maybe_creator_anonymous_visitor_token: Option<&'a AnonymousVisitorTrackingToken>,
-    pub creator_ip_address: &'a str,
-    pub creator_set_visibility: Visibility,
+    pub job: &'a AvailableInferenceJob,
 
     pub media_class: MediaFileClass,
     pub media_type: MediaFileType,
@@ -76,8 +71,8 @@ pub struct InsertArgs<'a> {
     pub generated_by_cluster: Option<&'a str>,
 }
 
-pub async fn insert_media_file_generic(
-    args: InsertArgs<'_>
+pub async fn insert_media_file_generic_from_job(
+    args: InsertFromJobArgs<'_>
 ) -> AnyhowResult<(MediaFileToken, u64)>
 {
     let result_token = MediaFileToken::generate();
@@ -93,15 +88,17 @@ pub async fn insert_media_file_generic(
 
     let mut transaction = args.pool.begin().await?;
     
-    if let Some(user_token) = args.maybe_creator_user_token.as_deref() {
+    if let Some(creator_user_token) = args.job.maybe_creator_user_token.as_deref() {
+        let user_token = UserToken::new_from_str(creator_user_token);
+        
         let next_media_file_id = transactional_increment_generic_synthetic_id(
-            user_token,
+            &user_token,
             args.maybe_creator_file_synthetic_id_category,
             &mut transaction
         ).await?;
 
         let category_id = transactional_increment_generic_synthetic_id(
-            user_token,
+            &user_token,
             args.maybe_creator_category_synthetic_id_category,
             &mut transaction
         ).await?;
@@ -169,11 +166,11 @@ pub async fn insert_media_file_generic(
         args.origin_category.to_str(),
         args.origin_product_category.to_str(),
         args.maybe_origin_model_type.map(|e| e.to_str()),
-        args.maybe_origin_model_token.map(|t| t.to_string()),
+        args.maybe_origin_model_token.map(|e| e.to_string()),
         args.maybe_origin_filename,
 
         is_batch_generated,
-        args.maybe_batch_token.map(|t| t.as_str()),
+        args.maybe_batch_token.map(|e| e.as_str()),
 
         args.maybe_mime_type,
         args.file_size_bytes, 
@@ -182,7 +179,7 @@ pub async fn insert_media_file_generic(
         args.maybe_video_encoding,
         args.maybe_frame_width, 
         args.maybe_frame_height,
-        args.maybe_prompt_token.map(|t| t.as_str()),
+        args.maybe_prompt_token.map(|e| e.as_str()),
         args.checksum_sha2,
 
         args.maybe_title,
@@ -192,11 +189,11 @@ pub async fn insert_media_file_generic(
         args.maybe_public_bucket_prefix,
         args.maybe_public_bucket_extension,
 
-        args.maybe_creator_user_token.map(|t| t.as_str()),
-        args.maybe_creator_anonymous_visitor_token.map(|t| t.as_str()),
+        args.job.maybe_creator_user_token.as_deref(),
+        args.job.maybe_creator_anonymous_visitor_token.as_deref(),
 
-        args.creator_ip_address,
-        args.creator_set_visibility.to_str(),
+        args.job.creator_ip_address,
+        args.job.creator_set_visibility.to_str(),
 
         maybe_creator_file_synthetic_id,
         maybe_creator_category_synthetic_id,

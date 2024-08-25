@@ -7,20 +7,22 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::users::UserToken;
 
-use crate::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
-use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
-use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use crate::queries::media_files::create::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
+use crate::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 
-pub struct InsertLivePortraitArgs<'a> {
+pub struct InsertStudioSceneRenderArgs<'a> {
   pub pool: &'a MySqlPool,
-  pub job: &'a AvailableInferenceJob,
 
-  // Live portrait specific info
-  pub live_portrait_video_info: &'a LivePortraitVideoExtraInfo,
+  // User
+  pub maybe_creator_user_token: Option<&'a UserToken>,
+  pub maybe_creator_anonymous_visitor_token: Option<&'a AnonymousVisitorTrackingToken>,
+  pub creator_ip_address: &'a str,
+  pub creator_set_visibility: Visibility,
 
   // Probably mp4, but could change.
   pub media_type: MediaFileType,
@@ -39,24 +41,20 @@ pub struct InsertLivePortraitArgs<'a> {
   pub public_bucket_directory_hash: &'a str,
   pub maybe_public_bucket_prefix: Option<&'a str>,
   pub maybe_public_bucket_extension: Option<&'a str>,
-
-  pub is_on_prem: bool,
-  pub worker_hostname: &'a str,
-  pub worker_cluster: &'a str,
 }
 
-pub async fn insert_media_file_from_live_portrait(
-  args: InsertLivePortraitArgs<'_>
+pub async fn insert_media_file_from_studio_scene_render(
+  args: InsertStudioSceneRenderArgs<'_>
 ) -> AnyhowResult<MediaFileToken>
 {
-  let extra_media_info = MediaFileExtraInfo::L(args.live_portrait_video_info.clone());
-
-  let (new_media_token, _id) = insert_media_file_generic_from_job(InsertFromJobArgs {
+  let (new_media_token, _id) = insert_media_file_generic(InsertArgs {
     pool: &args.pool,
-    job: &args.job,
 
-    // Dynamic bits (live portrait specific)
-    maybe_extra_media_info: Some(&extra_media_info),
+    // Dynamic bits (user)
+    maybe_creator_user_token: args.maybe_creator_user_token,
+    maybe_creator_anonymous_visitor_token: args.maybe_creator_anonymous_visitor_token,
+    creator_ip_address: args.creator_ip_address,
+    creator_set_visibility: args.creator_set_visibility,
 
     // Dynamic bits (file type and details)
     media_type: args.media_type,
@@ -77,22 +75,25 @@ pub async fn insert_media_file_from_live_portrait(
     maybe_public_bucket_prefix: args.maybe_public_bucket_prefix,
     maybe_public_bucket_extension: args.maybe_public_bucket_extension,
 
-    // Dynamic bits (worker details)
-    is_generated_on_prem: args.is_on_prem,
-    generated_by_worker: Some(args.worker_hostname),
-    generated_by_cluster: Some(args.worker_cluster),
+    // Static bits (media class)
+    media_class: MediaFileClass::Video,
 
     // Static bits (lookup)
-    media_class: MediaFileClass::Video,
-    origin_category: MediaFileOriginCategory::Inference,
-    origin_product_category: MediaFileOriginProductCategory::FaceMirror, // NB: Live Portrait
-    maybe_origin_model_type: Some(MediaFileOriginModelType::LivePortrait),
+    origin_category: MediaFileOriginCategory::StorytellerStudio,
+    origin_product_category: MediaFileOriginProductCategory::StorytellerStudio,
+    maybe_origin_model_type: Some(MediaFileOriginModelType::StorytellerStudio),
 
     // Static bits (counters)
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
-    maybe_creator_category_synthetic_id_category: IdCategory::LivePortraitResult,
+    maybe_creator_category_synthetic_id_category: IdCategory::StudioRender,
+
+    // Static bits (we don't use a worker)
+    is_generated_on_prem: false,
+    generated_by_worker: None,
+    generated_by_cluster: None,
 
     // Static bits (unused misc)
+    maybe_extra_media_info: None,
     maybe_origin_model_token: None,
     maybe_text_transcript: None,
     maybe_origin_filename: None,

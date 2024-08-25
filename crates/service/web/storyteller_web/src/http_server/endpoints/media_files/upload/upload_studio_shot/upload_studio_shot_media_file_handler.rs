@@ -26,6 +26,7 @@ use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
+use mysql_queries::queries::media_files::create::insert_media_file_from_studio_scene_render::{insert_media_file_from_studio_scene_render, InsertStudioSceneRenderArgs};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
@@ -266,22 +267,29 @@ pub async fn upload_studio_shot_media_file_handler(
   // ==================== SAVE RECORD ==================== //
 
   // TODO(bt, 2024-02-22): This should be a transaction.
-  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: Some(MediaFileClass::Video),
-    media_file_type: MediaFileType::Mp4,
+  let token= insert_media_file_from_studio_scene_render(InsertStudioSceneRenderArgs {
+    media_type: MediaFileType::Mp4,
     maybe_creator_user_token: Some(&user_session.user_token_typed),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
-    upload_type: UploadType::StorytellerEngine,
-    maybe_engine_category: None,
-    maybe_animation_type: None,
     maybe_mime_type: Some("video/mp4"),
     file_size_bytes: 0, // TODO
+    maybe_audio_encoding: None, // TODO
+    maybe_video_encoding: None, // TODO
+    //maybe_scene_source_media_file_token: None, // TODO
+    //is_intermediate_system_file: false, // TODO
+    // TODO: Frame rate.
+    maybe_frame_width: video_file_details
+        .dimensions
+        .as_ref()
+        .map(|dim| dim.width as u32),
+    maybe_frame_height: video_file_details
+        .dimensions
+        .as_ref()
+        .map(|dim| dim.height as u32),
     maybe_duration_millis: video_file_details.duration.map(|duration| duration.millis as u64),
     sha256_checksum: &hash,
-    maybe_scene_source_media_file_token: None,
-    is_intermediate_system_file: false, // TODO
     maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: bucket_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
@@ -294,7 +302,7 @@ pub async fn upload_studio_shot_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  info!("new media file id: {} token: {:?}", record_id, &token);
+  info!("new media file token: {:?}", &token);
 
   Ok(Json(UploadStudioShotSuccessResponse {
     success: true,

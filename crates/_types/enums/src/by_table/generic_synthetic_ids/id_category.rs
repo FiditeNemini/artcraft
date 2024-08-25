@@ -29,6 +29,10 @@ pub enum IdCategory {
   #[serde(rename = "live_portrait")]
   LivePortraitResult,
 
+  /// Studio Renders
+  #[serde(rename = "studio_render")]
+  StudioRender,
+
   /// Results from mocap
   #[serde(rename = "mocap")]
   MocapResult,
@@ -84,6 +88,7 @@ impl IdCategory {
       Self::ZeroShotTtsResult => "zs_tts_result",
       Self::VideoFilterResult => "video_filter",
       Self::LivePortraitResult => "live_portrait",
+      Self::StudioRender => "studio_render",
       Self::ModelWeights => "model_weights",
       Self::FileUpload => "file_upload",
       Self::MocapResult => "mocap",
@@ -102,6 +107,7 @@ impl IdCategory {
       "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
       "video_filter" => Ok(Self::VideoFilterResult),
       "live_portrait" => Ok(Self::LivePortraitResult),
+      "studio_render" => Ok(Self::StudioRender),
       "model_weights" => Ok(Self::ModelWeights),
       "file_upload" => Ok(Self::FileUpload),
       "mocap" => Ok(Self::MocapResult),
@@ -118,6 +124,7 @@ impl IdCategory {
       Self::LipsyncAnimationResult,
       Self::VideoFilterResult,
       Self::LivePortraitResult,
+      Self::StudioRender,
       Self::TtsResult,
       Self::VoiceConversionResult,
       Self::ZeroShotTtsResult,
@@ -145,6 +152,7 @@ mod tests {
     assert_serialization(IdCategory::LipsyncAnimationResult, "lipsync_animation");
     assert_serialization(IdCategory::VideoFilterResult, "video_filter");
     assert_serialization(IdCategory::LivePortraitResult, "live_portrait");
+    assert_serialization(IdCategory::StudioRender, "studio_render");
     assert_serialization(IdCategory::TtsResult, "tts_result");
     assert_serialization(IdCategory::VoiceConversionResult, "voice_conversion");
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
@@ -162,6 +170,7 @@ mod tests {
       assert_eq!(IdCategory::LipsyncAnimationResult.to_str(), "lipsync_animation");
       assert_eq!(IdCategory::VideoFilterResult.to_str(), "video_filter");
       assert_eq!(IdCategory::LivePortraitResult.to_str(), "live_portrait");
+      assert_eq!(IdCategory::StudioRender.to_str(), "studio_render");
       assert_eq!(IdCategory::TtsResult.to_str(), "tts_result");
       assert_eq!(IdCategory::VoiceConversionResult.to_str(), "voice_conversion");
       assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
@@ -179,6 +188,7 @@ mod tests {
       assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimationResult);
       assert_eq!(IdCategory::from_str("video_filter").unwrap(), IdCategory::VideoFilterResult);
       assert_eq!(IdCategory::from_str("live_portrait").unwrap(), IdCategory::LivePortraitResult);
+      assert_eq!(IdCategory::from_str("studio_render").unwrap(), IdCategory::StudioRender);
       assert_eq!(IdCategory::from_str("tts_result").unwrap(), IdCategory::TtsResult);
       assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversionResult);
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
@@ -194,11 +204,12 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 13);
+      assert_eq!(variants.len(), 14);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VideoFilterResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::LivePortraitResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::StudioRender));
       assert_eq!(variants.pop_first(), Some(IdCategory::MocapResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::WorkflowResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::TtsResult));
