@@ -21,7 +21,7 @@ pub struct OutputFile {
   pub duration: Option<VideoDuration>,
 }
 
-pub fn ffmpeg_frames_to_mp4(frame_input_directory: &Path, frame_type: FrameType, frame_rate: u16) -> AnyhowResult<OutputFile> {
+pub fn ffmpeg_frames_to_mp4(frame_input_directory: &Path, frame_type: FrameType, frame_rate: u8) -> AnyhowResult<OutputFile> {
   let glob_pattern = match frame_type {
     FrameType::Png => format!("{}/*.png", path_to_string(frame_input_directory)),
     FrameType::Jpg => format!("{}/*.jpg", path_to_string(frame_input_directory)),

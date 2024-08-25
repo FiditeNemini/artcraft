@@ -19,6 +19,7 @@ use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
+use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -37,10 +38,12 @@ use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_f
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::extract_frames_from_zip::{extract_frames_from_zip, ExtractFramesError};
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::ffmpeg_frames_to_mp4::{ffmpeg_frames_to_mp4, FrameType};
-use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
-use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::user_session::require_user_session_using_connection::require_user_session_using_connection;
+use crate::state::server_state::ServerState;
+
+const DEFAULT_FPS : u8 = 12;
 
 /// Form-multipart request fields.
 ///
@@ -59,6 +62,17 @@ pub struct UploadStudioShotFileForm {
   #[schema(value_type = Vec<u8>, format = Binary)]
   file: TempFile,
 
+  /// Optional: The frame rate in fps.
+  /// If not provided, it will default to 12 fps.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<u64>, format = Binary)]
+  maybe_frame_rate_fps: Option<Text<u8>>,
+
+  /// Optional: If an engine scene was used to generate this video, provide it here to create a link.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<MediaFileToken>, format = Binary)]
+  maybe_scene_source_media_file_token: Option<Text<MediaFileToken>>,
+
   /// Optional: Title (name) of the scene
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
@@ -68,11 +82,6 @@ pub struct UploadStudioShotFileForm {
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
   maybe_visibility: Option<Text<Visibility>>,
-
-  /// Optional: The duration, for files that are animations.
-  #[multipart(limit = "2 KiB")]
-  #[schema(value_type = Option<u64>, format = Binary)]
-  maybe_duration_millis: Option<Text<u64>>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -235,9 +244,19 @@ pub async fn upload_studio_shot_media_file_handler(
 
   // ==================== FFMPEG ==================== //
 
-  let video_file_details = ffmpeg_frames_to_mp4(frame_temp_dir.path(), FrameType::Png, 30)
+  let frame_rate = form.maybe_frame_rate_fps
+      .map(|fps| *fps)
+      .unwrap_or(DEFAULT_FPS);
+
+  let video_file_details = ffmpeg_frames_to_mp4(frame_temp_dir.path(), FrameType::Png, frame_rate)
       .map_err(|err| {
         warn!("FFMPEG error: {:?}", err);
+        MediaFileUploadError::ServerError
+      })?;
+
+  let file_size_bytes = file_size(&video_file_details.path)
+      .map_err(|err| {
+        error!("Problem getting file size: {:?}", err);
         MediaFileUploadError::ServerError
       })?;
 
@@ -274,7 +293,7 @@ pub async fn upload_studio_shot_media_file_handler(
     creator_ip_address: &ip_address,
     creator_set_visibility,
     maybe_mime_type: Some("video/mp4"),
-    file_size_bytes: 0, // TODO
+    file_size_bytes,
     maybe_audio_encoding: None, // TODO
     maybe_video_encoding: None, // TODO
     //maybe_scene_source_media_file_token: None, // TODO
