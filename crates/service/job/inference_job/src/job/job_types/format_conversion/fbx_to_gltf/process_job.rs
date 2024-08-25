@@ -217,6 +217,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
     maybe_text_transcript: None,
     maybe_title: None,
     maybe_scene_source_media_file_token: None,
+    is_intermediate_system_file: false,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

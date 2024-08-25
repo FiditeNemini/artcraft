@@ -100,6 +100,7 @@ pub async fn insert_media_file_from_live_portrait(
     maybe_prompt_token: None,
     maybe_mod_user_token: None,
     maybe_scene_source_media_file_token: None,
+    is_intermediate_system_file: false,
   }).await?;
 
   Ok(new_media_token)

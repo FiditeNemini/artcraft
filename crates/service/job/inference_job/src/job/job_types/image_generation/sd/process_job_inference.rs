@@ -287,6 +287,7 @@ pub async fn process_job_inference(
       generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
       maybe_title: None,
       maybe_scene_source_media_file_token: None,
+      is_intermediate_system_file: false,
     }).await?;
 
     if maybe_first_media_file_token.is_none() {

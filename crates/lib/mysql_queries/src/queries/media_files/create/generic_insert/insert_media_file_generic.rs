@@ -32,7 +32,8 @@ pub struct InsertArgs<'a> {
     // Important database indices
     pub media_class: MediaFileClass,
     pub media_type: MediaFileType,
-    // TODO: is_intermediate_system_file, is_user_upload
+    pub is_intermediate_system_file: bool,
+    // TODO: is_user_upload
 
     // Product and other origination information
     pub origin_category: MediaFileOriginCategory,
@@ -130,6 +131,8 @@ pub async fn insert_media_file_generic(
             media_class = ?,
             media_type = ?,
 
+            is_intermediate_system_file = ?,
+
             origin_category = ?, 
             origin_product_category = ?, 
             maybe_origin_model_type = ?, 
@@ -178,6 +181,8 @@ pub async fn insert_media_file_generic(
 
         args.media_class.to_str(),
         args.media_type.to_str(),
+
+        args.is_intermediate_system_file,
 
         args.origin_category.to_str(),
         args.origin_product_category.to_str(),

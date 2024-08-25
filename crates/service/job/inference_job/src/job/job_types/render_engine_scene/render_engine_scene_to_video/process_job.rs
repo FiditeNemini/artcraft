@@ -286,6 +286,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     maybe_title: None,
     maybe_text_transcript: None,
     maybe_scene_source_media_file_token: None, // TODO: The scene token should be available, but we might not revisit this job
+    is_intermediate_system_file: false,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

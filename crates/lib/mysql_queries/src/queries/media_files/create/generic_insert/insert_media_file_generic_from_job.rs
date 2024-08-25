@@ -27,7 +27,8 @@ pub struct InsertFromJobArgs<'a> {
     // Important database indices
     pub media_class: MediaFileClass,
     pub media_type: MediaFileType,
-    // TODO: is_intermediate_system_file, is_user_upload
+    pub is_intermediate_system_file: bool,
+    // TODO: is_user_upload
 
     // Product and other origination information
     pub origin_category: MediaFileOriginCategory,
@@ -94,6 +95,7 @@ pub async fn insert_media_file_generic_from_job(
         generated_by_cluster: args.generated_by_cluster,
         generated_by_worker: args.generated_by_worker,
         is_generated_on_prem: args.is_generated_on_prem,
+        is_intermediate_system_file: args.is_intermediate_system_file,
         maybe_audio_encoding: args.maybe_audio_encoding,
         maybe_batch_token: args.maybe_batch_token,
         maybe_creator_anonymous_visitor_token: args.job.maybe_creator_anonymous_visitor_token_typed.as_ref(),

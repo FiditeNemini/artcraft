@@ -87,7 +87,8 @@ pub async fn insert_media_file_from_studio_scene_render(
     // Static bits (lookup)
     origin_category: MediaFileOriginCategory::StorytellerStudio,
     origin_product_category: MediaFileOriginProductCategory::StorytellerStudio,
-    maybe_origin_model_type: Some(MediaFileOriginModelType::StorytellerStudio),
+    maybe_origin_model_type: None,
+    is_intermediate_system_file: true,
 
     // Static bits (counters)
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
