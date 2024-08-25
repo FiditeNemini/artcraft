@@ -89,6 +89,7 @@ use crate::http_server::endpoints::media_files::upload::upload_audio_media_file_
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
@@ -175,6 +176,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::list_media_files_by_batch_token_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler,
+    crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::upload_studio_shot_media_file_handler,
     crate::http_server::endpoints::media_files::list::list_pinned_media_files_handler::list_pinned_media_files_handler,
     crate::http_server::endpoints::media_files::search::search_featured_media_files_handler::search_featured_media_files_handler,
     crate::http_server::endpoints::media_files::search::search_session_media_files_handler::search_session_media_files_handler,
@@ -315,6 +317,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ChangeMediaFileAnimationTypeRequest,
     ChangeMediaFileEngineCategoryError,
     ChangeMediaFileEngineCategoryRequest,
+    UploadStudioShotFileForm,
+    UploadStudioShotSuccessResponse,
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityRequest,
     CreateBetaKeysError,
