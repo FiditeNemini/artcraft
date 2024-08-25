@@ -14,7 +14,7 @@ use filesys::file_deletion::safe_delete_file::safe_delete_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::create::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
+use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
 use thumbnail_generator::task_client::thumbnail_task::{ThumbnailTaskBuilder, ThumbnailTaskInputMimeType};
 use tokens::tokens::users::UserToken;
 

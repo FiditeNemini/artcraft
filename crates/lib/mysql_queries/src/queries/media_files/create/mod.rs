@@ -1,14 +1,5 @@
-pub mod insert_media_file_from_cli_tool;
-pub mod insert_media_file_from_comfy_ui;
-pub mod insert_media_file_from_face_animation;
-pub mod insert_media_file_from_file_upload;
+pub mod generic_insert;
 pub mod insert_media_file_from_gptsovits;
 pub mod insert_media_file_from_live_portrait;
-pub mod insert_media_file_from_mocapnet;
-pub mod insert_media_file_from_rerender;
 pub mod insert_media_file_from_studio_scene_render;
-pub mod insert_media_file_from_tacotron2;
-pub mod insert_media_file_from_voice_conversion;
-pub mod insert_media_file_from_zero_shot_tts;
-pub mod insert_media_file_generic;
-pub mod insert_media_file_generic_from_job;
+pub mod specialized_insert;

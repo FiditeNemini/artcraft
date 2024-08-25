@@ -13,7 +13,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use crate::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
 use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use crate::queries::media_files::create::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
+use crate::queries::media_files::create::generic_insert::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
 
 pub struct InsertLivePortraitArgs<'a> {
   pub pool: &'a MySqlPool,

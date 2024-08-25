@@ -13,7 +13,7 @@ use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
-use mysql_queries::queries::media_files::create::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
+use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::media_files::MediaFileToken;

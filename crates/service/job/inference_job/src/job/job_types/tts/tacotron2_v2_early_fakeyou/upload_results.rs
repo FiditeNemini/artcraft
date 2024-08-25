@@ -13,7 +13,7 @@ use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::create::insert_media_file_from_tacotron2::{insert_media_file_from_tacotron2, InsertMediaFileArgs};
+use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_tacotron2::{insert_media_file_from_tacotron2, InsertMediaFileArgs};
 use mysql_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
 use mysql_queries::queries::tts::tts_results::insert_tts_result::JobType;
 

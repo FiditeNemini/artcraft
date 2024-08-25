@@ -13,7 +13,7 @@ use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
-use crate::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
+use crate::queries::media_files::create::generic_insert::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 
 pub struct InsertStudioSceneRenderArgs<'a> {
   pub pool: &'a MySqlPool,

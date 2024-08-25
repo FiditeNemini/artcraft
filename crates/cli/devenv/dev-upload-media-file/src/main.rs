@@ -11,7 +11,7 @@ use enums::common::visibility::Visibility;
 use errors::{AnyhowResult, bail};
 use filesys::file_read_bytes::file_read_bytes;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mysql_queries::queries::media_files::create::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
+use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
 
 use crate::cli_args::parse_cli_args;
 

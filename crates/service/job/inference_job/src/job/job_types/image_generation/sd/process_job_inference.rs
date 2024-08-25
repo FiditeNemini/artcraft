@@ -19,7 +19,7 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use filesys::path_to_string::path_to_string;
 use mysql_queries::payloads::media_file_extra_info::inner_payloads::stable_diffusion_extra_info::StableDiffusionExtraInfo;
 use mysql_queries::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
-use mysql_queries::queries::media_files::create::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
+use mysql_queries::queries::media_files::create::generic_insert::insert_media_file_generic_from_job::{insert_media_file_generic_from_job, InsertFromJobArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use tokens::tokens::batch_generations::BatchGenerationToken;
