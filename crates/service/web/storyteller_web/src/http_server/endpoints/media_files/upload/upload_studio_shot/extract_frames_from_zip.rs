@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::{BufReader, Cursor, Read};
 use std::path::{Path, PathBuf};
 
-use log::{error, info, warn};
+use log::{debug, error, info, warn};
 use once_cell::sync::Lazy;
 use zip::ZipArchive;
 
@@ -48,10 +48,10 @@ pub fn extract_frames_from_zip<P: AsRef<Path>>(
   let entries = get_relevant_zip_entries(&mut archive)?;
 
   for entry in entries.iter() {
-    info!("Entry: {:?}", entry);
+    debug!("Entry: {:?}", entry);
 
     if !entry.is_frame {
-      info!("Skipping entry (not a frame): {:?}", entry);
+      debug!("Skipping entry (not a frame): {:?}", entry);
       continue;
     }
 
@@ -73,6 +73,8 @@ pub fn extract_frames_from_zip<P: AsRef<Path>>(
     };
 
     let output_path = frame_temp_dir.as_ref().join(filesystem_name);
+
+    info!("Creating: {:?}", output_path);
 
     let mut output_file = std::fs::File::create(&output_path)
         .map_err(|err| {
@@ -103,7 +105,7 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
   let mut entries = Vec::new();
 
   for i in 0..(archive.len()) {
-    info!("Reading file {}...", i);
+    debug!("Reading file {}...", i);
 
     let mut file = archive.by_index(i)
         .map_err(|err| {
@@ -114,8 +116,8 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
     let filename = file.name();
     let filename_lowercase = filename.to_lowercase();
 
-    info!("File {} is {:?} - is file = {}", i, filename, file.is_file());
-    info!("Enclosed name: {:?}", file.enclosed_name());
+    debug!("File {} is {:?} - is file = {}", i, filename, file.is_file());
+    debug!("Enclosed name: {:?}", file.enclosed_name());
 
     if file.is_dir() {
       continue;
@@ -147,7 +149,7 @@ fn get_relevant_zip_entries(archive: &mut ZipArchive<BufReader<Cursor<&[u8]>>>) 
   }
 
   for entry in entries.iter() {
-    info!("Entry: {:?}", entry);
+    debug!("Entry: {:?}", entry);
   }
 
   Ok(entries)

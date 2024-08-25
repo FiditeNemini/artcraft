@@ -20,6 +20,7 @@ use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCat
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
@@ -34,6 +35,7 @@ use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileU
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::extract_frames_from_zip::{extract_frames_from_zip, ExtractFramesError};
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::ffmpeg_frames_to_mp4::{ffmpeg_frames_to_mp4, FrameType};
 use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::state::server_state::ServerState;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
@@ -216,7 +218,7 @@ pub async fn upload_studio_shot_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  extract_frames_from_zip(&file_bytes, frame_temp_dir)
+  extract_frames_from_zip(&file_bytes, frame_temp_dir.path())
       .map_err(|err| {
         warn!("Extract frames error: {:?}", err);
         match err {
@@ -232,46 +234,67 @@ pub async fn upload_studio_shot_media_file_handler(
 
   // ==================== FFMPEG ==================== //
 
+  let video_file_details = ffmpeg_frames_to_mp4(frame_temp_dir.path(), FrameType::Png, 30)
+      .map_err(|err| {
+        warn!("FFMPEG error: {:?}", err);
+        MediaFileUploadError::ServerError
+      })?;
 
+  let hash = sha256_hash_file(&video_file_details.path)
+      .map_err(|io_error| {
+        error!("Problem hashing bytes: {:?}", io_error);
+        MediaFileUploadError::ServerError
+      })?;
 
-  // ==================== UPLOAD AND SAVE ==================== //
+  // ==================== UPLOAD ==================== //
 
-  // TODO DELETE ME
-  let token = MediaFileToken::new("test_token".to_string());
+  const PREFIX : Option<&str> = Some("upload_");
+  const SUFFIX : Option<&str> = Some(".mp4");
 
-//  const PREFIX : Option<&str> = Some("upload_");
-//  const SUFFIX : Option<&str> = Some(".pmx");
-//
-//  // TODO(bt, 2024-02-22): This should be a transaction.
-//  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-//    maybe_media_class: Some(MediaFileClass::Dimensional),
-//    media_file_type: MediaFileType::Pmx,
-//    maybe_creator_user_token: Some(&user_session.get_strongly_typed_user_token()),
-//    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
-//    creator_ip_address: &ip_address,
-//    creator_set_visibility,
-//    upload_type: UploadType::Filesystem,
-//    maybe_engine_category: Some(engine_category),
-//    maybe_animation_type,
-//    maybe_mime_type: Some("application/octet-stream"),
-//    file_size_bytes: pmx_details.file_size_bytes,
-//    maybe_duration_millis,
-//    sha256_checksum: &pmx_details.sha256_checksum,
-//    maybe_scene_source_media_file_token: None,
-//    is_intermediate_system_file: false,
-//    maybe_title: maybe_title.as_deref(),
-//    public_bucket_directory_hash: pmx_details.pmx_public_upload_path.get_object_hash(),
-//    maybe_public_bucket_prefix: PREFIX,
-//    maybe_public_bucket_extension: SUFFIX,
-//    pool: &server_state.mysql_pool,
-//  })
-//      .await
-//      .map_err(|err| {
-//        warn!("New file creation DB error: {:?}", err);
-//        MediaFileUploadError::ServerError
-//      })?;
-//
-//  info!("new media file id: {} token: {:?}", record_id, &token);
+  let bucket_path = MediaFileBucketPath::generate_new(PREFIX, SUFFIX);
+
+  server_state.public_bucket_client.upload_filename_with_content_type(
+    bucket_path.get_full_object_path_str(),
+    &video_file_details.path,
+    "video/mp4")
+      .await
+      .map_err(|e| {
+        error!("Upload video to bucket error: {:?}", e);
+        MediaFileUploadError::ServerError
+      })?;
+
+  // ==================== SAVE RECORD ==================== //
+
+  // TODO(bt, 2024-02-22): This should be a transaction.
+  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
+    maybe_media_class: Some(MediaFileClass::Video),
+    media_file_type: MediaFileType::Mp4,
+    maybe_creator_user_token: Some(&user_session.user_token_typed),
+    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
+    creator_ip_address: &ip_address,
+    creator_set_visibility,
+    upload_type: UploadType::StorytellerEngine,
+    maybe_engine_category: None,
+    maybe_animation_type: None,
+    maybe_mime_type: Some("video/mp4"),
+    file_size_bytes: 0, // TODO
+    maybe_duration_millis: video_file_details.duration.map(|duration| duration.millis as u64),
+    sha256_checksum: &hash,
+    maybe_scene_source_media_file_token: None,
+    is_intermediate_system_file: false, // TODO
+    maybe_title: maybe_title.as_deref(),
+    public_bucket_directory_hash: bucket_path.get_object_hash(),
+    maybe_public_bucket_prefix: PREFIX,
+    maybe_public_bucket_extension: SUFFIX,
+    pool: &server_state.mysql_pool,
+  })
+      .await
+      .map_err(|err| {
+        warn!("New file creation DB error: {:?}", err);
+        MediaFileUploadError::ServerError
+      })?;
+
+  info!("new media file id: {} token: {:?}", record_id, &token);
 
   Ok(Json(UploadStudioShotSuccessResponse {
     success: true,
