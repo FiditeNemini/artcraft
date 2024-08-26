@@ -4,7 +4,7 @@ use actix_web::http::Uri;
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 
-use http_server_common::request::get_request_host::get_request_host;
+use actix_helpers::extractors::get_request_host::get_request_host;
 use reusable_types::server_environment::ServerEnvironment;
 
 /// Multi-environment configuration for 3rd party redirects, eg. Stripe checkout flow and
@@ -39,7 +39,7 @@ impl ThirdPartyUrlRedirector {
                 .to_string())
         }
 
-        let redirect_hostname = match (self.environment, request_hostname.as_str()) {
+        let redirect_hostname = match (self.environment, request_hostname) {
             (ServerEnvironment::Production, "api.fakeyou.com") => "fakeyou.com",
             (ServerEnvironment::Production, "api.storyteller.io") => "storyteller.io",
             (ServerEnvironment::Production, "api.storyteller.ai") => "storyteller.ai",

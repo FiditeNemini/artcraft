@@ -18,7 +18,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
-http_server_common = { path = "../deprecated/http_server_common" }
+actix_helpers = { path = "../actix_helpers" }
 reusable_types = { path = "../../_types/reusable_types" }
 
 # Workspace hack (faster compile times)

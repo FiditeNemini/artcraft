@@ -7899,8 +7899,8 @@ name = "url_config"
 version = "0.0.1"
 dependencies = [
  "actix-web",
+ "actix_helpers",
  "anyhow",
- "http_server_common",
  "my-workspace-hack",
  "reusable_types",
 ]

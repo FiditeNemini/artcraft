@@ -6,7 +6,7 @@ use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
 use actix_web::web::Query;
 
-use http_server_common::request::get_request_host::get_request_host;
+use actix_helpers::extractors::get_request_host::get_request_host;
 
 use crate::http_server::endpoints::investor_demo::default_redirect::{DEFAULT_INVESTOR_REDIRECT, redirect_is_allowed};
 use crate::http_server::endpoints::investor_demo::demo_cookie::STORYTELLER_DEMO_COOKIE_NAME;
@@ -37,7 +37,7 @@ pub async fn enable_demo_mode_handler(
   };
 
   let maybe_host = get_request_host(&http_request);
-  let maybe_cookie_domain = match maybe_host.as_deref() {
+  let maybe_cookie_domain = match maybe_host {
     Some("jungle.horse") | Some("api.jungle.horse") => Some(".jungle.horse"),
     Some("fakeyou.com") | Some("api.fakeyou.com") => Some(".fakeyou.com"),
     Some("storyteller.io") | Some("api.storyteller.io") => Some(".storyteller.io"),
