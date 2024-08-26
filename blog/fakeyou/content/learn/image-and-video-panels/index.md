@@ -1,6 +1,6 @@
 +++
 title = "Image and Video Panels"
-slug = "image-and-video-panels-guide"
+slug = "image-and-video-panels"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/image-and-video-panels-guide/panelscover.png"
+cover_image = "/learn/image-and-video-panels/panelscover.png"
 +++
 
 # Image and Video Panels

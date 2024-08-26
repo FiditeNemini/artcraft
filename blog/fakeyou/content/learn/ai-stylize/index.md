@@ -1,6 +1,6 @@
 +++
 title = "AI Stylize Guide"
-slug = "ai-stylize-guide"
+slug = "ai-stylize"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/ai-stylize-guide/aistylize.png"
+cover_image = "/learn/ai-stylize/aistylize.png"
 +++
 
 # AI Stylize

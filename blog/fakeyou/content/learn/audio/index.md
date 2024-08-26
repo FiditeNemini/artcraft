@@ -1,6 +1,6 @@
 +++
 title = "Audio and Audio Generation Guide"
-slug = "audio-guide"
+slug = "audio"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "learn/audio-guide/uploadaudio.png"
+cover_image = "/learn/audio/audiocover.png"
 +++
 
 # Audio and Audio Generation Guide

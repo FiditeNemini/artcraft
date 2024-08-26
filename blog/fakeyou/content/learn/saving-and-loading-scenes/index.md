@@ -1,6 +1,6 @@
 +++
 title = "Saving and Loading Scenes"
-slug = "saving-loading-scenes-guide"
+slug = "saving-loading-scenes"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/saving-loading-scenes-guide/scenescover.png"
+cover_image = "/learn/saving-loading-scenes/scenescover.png"
 +++
 
 # Saving and Loading Scenes

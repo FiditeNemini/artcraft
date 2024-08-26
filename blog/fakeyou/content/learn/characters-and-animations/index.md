@@ -1,6 +1,6 @@
 +++
 title = "Character and Animation Guide"
-slug = "character-and-animation-guide"
+slug = "character-and-animation"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/character-and-animation-guide/charcover.png"
+cover_image = "/learn/character-and-animation/charcover.png"
 +++
 
 # Characters & Animations
