@@ -9,4 +9,5 @@ pub mod encrypted_sort_id;
 pub mod enroll_in_studio;
 pub mod placeholder_images;
 pub mod read_toml_file_to_struct;
+pub mod title_to_url_slug;
 pub mod troll_user_bans;
