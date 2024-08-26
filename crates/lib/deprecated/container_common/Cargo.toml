@@ -16,6 +16,8 @@ path = "src/lib.rs"
 normal = ["my-workspace-hack"]
 
 [dependencies]
+# Internal
+errors = { path = "../../errors" }
 
 # External
 anyhow = "1.0.86"

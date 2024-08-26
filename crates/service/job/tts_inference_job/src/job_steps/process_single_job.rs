@@ -12,7 +12,7 @@ use anyhow::anyhow;
 use log::{error, info, warn};
 use tempdir::TempDir;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
 use filesys::file_deletion::safe_delete_file::safe_delete_file;

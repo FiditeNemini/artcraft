@@ -18,6 +18,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
+errors = { path = "../../errors" }
 container_common = { path = "../../deprecated/container_common" }
 subprocess_common = { path = "../../subprocess_common" }
 

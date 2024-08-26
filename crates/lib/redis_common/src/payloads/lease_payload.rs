@@ -1,8 +1,8 @@
 use anyhow::anyhow;
 
-use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use container_common::token::random_crockford_token::random_crockford_token;
+use errors::AnyhowResult;
 
 // TODO: Rename, document
 

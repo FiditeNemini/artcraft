@@ -4,8 +4,8 @@ use anyhow::anyhow;
 use log::info;
 use tempdir::TempDir;
 
-use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_crockford_token::random_crockford_token;
+use errors::AnyhowResult;
 use subprocess_common::docker_options::DockerOptions;
 
 /// This is a Python script that uses the `gdown` package to download from Google Drive.

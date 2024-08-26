@@ -4,7 +4,7 @@ use std::path::Path;
 
 use serde::de::DeserializeOwned;
 
-use crate::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 /// Read a TOML file into a struct.
 pub fn read_toml_file_to_struct<D, P>(filename: P) -> AnyhowResult<D>

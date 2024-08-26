@@ -1,7 +1,7 @@
 use url::Url;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 pub fn bucket_url_from_media_path(
   bucket_path: &MediaFileBucketPath,

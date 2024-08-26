@@ -1454,6 +1454,7 @@ name = "container_common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "errors",
  "my-workspace-hack",
  "once_cell",
  "rand 0.8.5",
@@ -2863,6 +2864,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "container_common",
+ "errors",
  "log",
  "my-workspace-hack",
  "subprocess_common",
@@ -5530,6 +5532,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "container_common",
+ "errors",
  "my-workspace-hack",
  "serde",
  "serde_derive",
@@ -7757,6 +7760,7 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
+ "errors",
  "filesys",
  "google_drive_common",
  "hashing",
@@ -7788,6 +7792,7 @@ dependencies = [
  "container_common",
  "dotenv",
  "easyenv",
+ "errors",
  "filesys",
  "hashing",
  "hostname 0.4.0",
@@ -8081,6 +8086,7 @@ dependencies = [
  "container_common",
  "dotenv",
  "easyenv",
+ "errors",
  "filesys",
  "google_drive_common",
  "hashing",
@@ -8111,6 +8117,7 @@ dependencies = [
  "container_common",
  "dotenv",
  "easyenv",
+ "errors",
  "filesys",
  "google_drive_common",
  "hostname 0.4.0",

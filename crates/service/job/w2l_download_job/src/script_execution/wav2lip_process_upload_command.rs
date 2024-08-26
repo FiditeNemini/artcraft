@@ -5,7 +5,7 @@ use std::fmt::Formatter;
 use log::{info, warn};
 use subprocess::{ExitStatus, Popen, PopenConfig};
 
-use crate::AnyhowResult;
+use errors::AnyhowResult;
 
 /// The python script uses this exit code when face detection fails.
 const FACE_DETECT_FAILURE_CODE : u32 = 5;

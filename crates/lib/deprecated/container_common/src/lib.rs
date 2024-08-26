@@ -1,4 +1,3 @@
-pub mod anyhow_result;
 pub mod files;
 pub mod i18n;
 pub mod numerics;

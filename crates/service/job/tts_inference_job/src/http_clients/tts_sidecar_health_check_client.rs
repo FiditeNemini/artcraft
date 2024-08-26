@@ -3,7 +3,7 @@ use std::str::FromStr;
 use log::info;
 use reqwest::{Client, Url};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 // TODO(bt): As more microservices adopt a common health check protocol,
 // it may make sense to make this a common library.

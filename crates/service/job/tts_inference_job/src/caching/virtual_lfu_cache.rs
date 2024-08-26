@@ -4,7 +4,7 @@ use std::sync::{Arc, RwLock};
 use anyhow::anyhow;
 use lfu::LFUCache;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 /// This stands in front of the python HTTP sidecar and controls which
 /// models get to remain in memory. The Python sidecar keeps multiple

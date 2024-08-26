@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use log::info;
 use subprocess::{Popen, PopenConfig};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::docker_options::DockerOptions;
 

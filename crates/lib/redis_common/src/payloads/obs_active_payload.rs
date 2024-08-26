@@ -1,6 +1,7 @@
-use container_common::anyhow_result::AnyhowResult;
 
 // TODO: Rename, document
+
+use errors::AnyhowResult;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ObsActivePayload {

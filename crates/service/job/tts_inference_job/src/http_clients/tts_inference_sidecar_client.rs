@@ -4,7 +4,7 @@ use anyhow::anyhow;
 use log::info;
 use reqwest::Client;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 
 pub struct TtsInferenceSidecarClient {

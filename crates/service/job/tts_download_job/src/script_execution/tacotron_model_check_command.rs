@@ -4,7 +4,7 @@ use std::path::Path;
 use log::info;
 use subprocess::{Popen, PopenConfig, Redirection};
 
-use crate::AnyhowResult;
+use errors::AnyhowResult;
 
 /// This command is used to check tacotron for being a real model
 #[derive(Clone)]
