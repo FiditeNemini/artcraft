@@ -1,9 +1,7 @@
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 
-use anyhow::anyhow;
-
-use errors::AnyhowResult;
+use errors::{anyhow, AnyhowResult};
 
 /// Sometimes I need to kill a thread from somewhere else. This is a mechanism
 /// that enables it. This utility can be combined with logic that will kill a

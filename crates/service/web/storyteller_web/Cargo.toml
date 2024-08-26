@@ -35,7 +35,6 @@ cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 collections = { path = "../../../lib/data/collections" }
 composite_identifiers = { path = "../../../_types/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
-container_common = { path = "../../../lib/deprecated/container_common" }
 cookies = { path = "../../../lib/cookies" }
 crockford = { path = "../../../lib/data/crockford" }
 datetimes = { path = "../../../lib/data/datetimes" }
@@ -186,4 +185,5 @@ diesel = { version = "2.2.1", features = ["mysql"] }
 [dev-dependencies]
 speculoos = "0.11.0" # Fluent assertions
 strum = { version = "0.26", features = ["derive"] }
+tempfile = "3.10.1" # For testing
 

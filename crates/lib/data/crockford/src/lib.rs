@@ -18,9 +18,10 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-pub use crockford_entropy::crockford_entropy_lower;
 // Re-export
+pub use crockford_entropy::crockford_entropy_lower;
 pub use crockford_entropy::crockford_entropy_upper;
+pub use random_crockford_token::random_crockford_token;
 
 /// Crockford characters (uppercase)
 const CROCKFORD_UPPERCASE_CHARSET: &[u8] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";
@@ -29,4 +30,4 @@ const CROCKFORD_UPPERCASE_CHARSET: &[u8] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 const CROCKFORD_LOWERCASE_CHARSET: &[u8] = b"0123456789abcdefghjkmnpqrstvwxyz";
 
 mod crockford_entropy;
-
+mod random_crockford_token;

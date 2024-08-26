@@ -21,7 +21,6 @@ normal = ["my-workspace-hack"]
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
-container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
 errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use log::{error, info};
 
-use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
+use crate::util::read_toml_file_to_struct::read_toml_file_to_struct;
 
 /// Config to pass to handlers
 pub struct StaticApiTokenSet {

@@ -4,7 +4,7 @@ use anyhow::anyhow;
 use log::info;
 use tempdir::TempDir;
 
-use container_common::token::random_crockford_token::random_crockford_token;
+use crockford::random_crockford_token;
 use errors::AnyhowResult;
 use subprocess_common::docker_options::DockerOptions;
 

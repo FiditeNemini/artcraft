@@ -22,4 +22,5 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod async_thread_kill_signal;
 pub mod relaxed_atomic_bool;

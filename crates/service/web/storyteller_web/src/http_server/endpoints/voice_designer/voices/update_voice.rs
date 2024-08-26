@@ -14,6 +14,7 @@ use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_toke
 use mysql_queries::queries::voice_designer::voices::update_voice::{update_voice, UpdateVoiceArgs};
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
+use crate::configs::supported_languages_for_models::get_canonicalized_language_tag_for_model;
 use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
@@ -141,7 +142,7 @@ pub async fn update_voice_handler(
 
   if let Some(tag) = request.ietf_language_tag.as_deref() {
     // eg. en, en-US, es-419, ja-JP, etc.
-    let maybe_full_canonical_tag = container_common::i18n::supported_languages_for_models::get_canonicalized_language_tag_for_model(tag);
+    let maybe_full_canonical_tag = get_canonicalized_language_tag_for_model(tag);
 
     // eg. en, es, ja, etc.
     let maybe_primary_language_subtag = maybe_full_canonical_tag

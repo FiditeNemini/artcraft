@@ -16,6 +16,7 @@ use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_b
 use mysql_queries::queries::voice_designer::datasets::update_dataset::{update_dataset, UpdateDatasetArgs};
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
+use crate::configs::supported_languages_for_models::get_canonicalized_language_tag_for_model;
 use crate::state::server_state::ServerState;
 
 #[derive(Deserialize)]
@@ -143,7 +144,7 @@ pub async fn update_dataset_handler(
 
   if let Some(tag) = request.ietf_language_tag.as_deref() {
     // eg. en, en-US, es-419, ja-JP, etc.
-    let maybe_full_canonical_tag = container_common::i18n::supported_languages_for_models::get_canonicalized_language_tag_for_model(tag);
+    let maybe_full_canonical_tag = get_canonicalized_language_tag_for_model(tag);
 
     // eg. en, es, ja, etc.
     let maybe_primary_language_subtag = maybe_full_canonical_tag

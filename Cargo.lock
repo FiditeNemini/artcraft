@@ -1389,6 +1389,7 @@ dependencies = [
 name = "concurrency"
 version = "0.0.1"
 dependencies = [
+ "errors",
  "my-workspace-hack",
 ]
 
@@ -1448,21 +1449,6 @@ name = "constant_time_eq"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7144d30dcf0fafbce74250a3963025d8d52177934239851c917d29f1df280c2"
-
-[[package]]
-name = "container_common"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "errors",
- "my-workspace-hack",
- "once_cell",
- "rand 0.8.5",
- "serde",
- "tempfile",
- "toml 0.8.14",
- "uuid",
-]
 
 [[package]]
 name = "convert_case"
@@ -2127,7 +2113,6 @@ dependencies = [
  "cloud_storage",
  "concurrency",
  "config",
- "container_common",
  "crockford",
  "dotenv",
  "easyenv",
@@ -2863,7 +2848,7 @@ name = "google_drive_common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "container_common",
+ "crockford",
  "errors",
  "log",
  "my-workspace-hack",
@@ -5531,7 +5516,7 @@ name = "redis_common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "container_common",
+ "crockford",
  "errors",
  "my-workspace-hack",
  "serde",
@@ -6801,7 +6786,6 @@ dependencies = [
  "collections",
  "composite_identifiers",
  "config",
- "container_common",
  "cookies",
  "crockford",
  "datetimes",
@@ -6866,6 +6850,7 @@ dependencies = [
  "strum_macros",
  "symphonia",
  "tempdir",
+ "tempfile",
  "thumbnail_generator",
  "time",
  "tokens",
@@ -7756,7 +7741,6 @@ dependencies = [
  "chrono",
  "cloud_storage",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "enums",
@@ -7789,7 +7773,6 @@ dependencies = [
  "cloud_storage",
  "collections",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "errors",
@@ -8083,7 +8066,6 @@ dependencies = [
  "chrono",
  "cloud_storage",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "errors",
@@ -8114,7 +8096,6 @@ dependencies = [
  "chrono",
  "cloud_storage",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "errors",

@@ -18,8 +18,8 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
+crockford = { path = "../../data/crockford" }
 errors = { path = "../../errors" }
-container_common = { path = "../../deprecated/container_common" }
 subprocess_common = { path = "../../subprocess_common" }
 
 # Workspace hack (faster compile times)

@@ -1,4 +1,4 @@
-use crate::token::random_crockford_token::random_crockford_token;
+use crockford::random_crockford_token;
 
 /// Thread string identifiers
 /// Used for leases, logging, etc.
@@ -29,7 +29,7 @@ impl ThreadId {
 
 #[cfg(test)]
 mod tests {
-  use crate::thread::thread_id::ThreadId;
+  use crate::payloads::thread_id::ThreadId;
 
   #[test]
   fn equals() {

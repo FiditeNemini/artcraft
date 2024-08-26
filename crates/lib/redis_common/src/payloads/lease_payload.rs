@@ -1,8 +1,9 @@
 use anyhow::anyhow;
 
-use container_common::thread::thread_id::ThreadId;
-use container_common::token::random_crockford_token::random_crockford_token;
+use crockford::random_crockford_token;
 use errors::AnyhowResult;
+
+use crate::payloads::thread_id::ThreadId;
 
 // TODO: Rename, document
 
@@ -53,9 +54,8 @@ impl LeasePayload {
 
 #[cfg(test)]
 mod tests {
-  use container_common::thread::thread_id::ThreadId;
-
   use crate::payloads::lease_payload::LeasePayload;
+  use crate::payloads::thread_id::ThreadId;
 
   #[test]
   fn equals() {

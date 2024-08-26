@@ -114,7 +114,7 @@ pub fn is_valid_language_for_models(language_tag: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use crate::i18n::supported_languages_for_models::{get_canonicalized_language_tag_for_model, is_valid_language_for_models};
+  use crate::configs::supported_languages_for_models::{get_canonicalized_language_tag_for_model, is_valid_language_for_models};
 
   #[test]
   fn get_canonical_language_for_model_success() {
