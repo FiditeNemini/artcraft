@@ -1,6 +1,6 @@
 +++
 title = "Prompt Emphasis Guide"
-slug = "prompt-emphasis-guide"
+slug = "prompt-emphasis"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/prompt-emphasis-guide/emphasiscover.png"
+cover_image = "/learn/prompt-emphasis/emphasiscover.png"
 +++
 
 # Prompt Emphasis

@@ -1,6 +1,6 @@
 +++
 title = "Negative Prompting Guide"
-slug = "negative-prompting-guide"
+slug = "negative-prompting"
 date = "2024-08-08"
 template= "blog_template/page.html" 
 authors = ["Heart Ribbon"]
@@ -9,7 +9,7 @@ authors = ["Heart Ribbon"]
 categories = ["tutorial"]
 
 [extra]
-cover_image = "/learn/negative-prompting-guide/negativecover.png"
+cover_image = "/learn/negative-prompting/negativecover.png"
 +++
 
 # Negative Prompting Guide
