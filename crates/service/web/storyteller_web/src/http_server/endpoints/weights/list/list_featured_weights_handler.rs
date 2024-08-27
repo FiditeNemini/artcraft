@@ -27,6 +27,7 @@ use crate::http_server::endpoints::media_files::list::list_media_files_handler::
 use crate::http_server::endpoints::weights::helpers::get_scoped_weights_categories::get_scoped_weights_categories;
 use crate::http_server::endpoints::weights::helpers::get_scoped_weights_types::get_scoped_weights_types;
 use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListFeaturedWeightsQueryParams {
@@ -69,6 +70,9 @@ pub struct FeaturedModelWeightForList {
   pub weight_category: WeightsCategory,
 
   pub title: String,
+
+  /// Optional SEO-friendly URL slug for the model weight.
+  pub maybe_url_slug: Option<String>,
 
   pub creator: Option<UserDetailsLight>,
 
@@ -238,6 +242,7 @@ pub async fn list_featured_weights_handler(
 
           FeaturedModelWeightForList {
             weight_token: w.token,
+            maybe_url_slug: title_to_url_slug(&w.title),
             title: w.title,
             weight_type: PublicWeightsType::from_enum(w.weights_type),
             weight_category: w.weights_category,

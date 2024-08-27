@@ -21,6 +21,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Serialize, Clone, ToSchema)]
 pub struct GetWeightResponse {
@@ -41,6 +42,9 @@ pub struct GetWeightResponse {
 
     file_size_bytes: i64,
     file_checksum_sha2: String,
+
+    /// Optional SEO-friendly URL slug for the model weight.
+    maybe_url_slug: Option<String>,
 
     /// Information about the cover image.
     cover_image: WeightsCoverImageDetails,
@@ -187,6 +191,7 @@ pub async fn get_weight_handler(
     let response = GetWeightResponse {
         success: true,
         weight_token: weight.token,
+        maybe_url_slug: title_to_url_slug(&weight.title),
         title: weight.title,
         weight_type: PublicWeightsType::from_enum(weight.weights_type),
         weight_category: weight.weights_category,

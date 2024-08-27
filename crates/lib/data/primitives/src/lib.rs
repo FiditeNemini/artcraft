@@ -23,4 +23,5 @@ pub mod lazy_any_option_true;
 pub mod str_to_bool;
 pub mod traits;
 pub mod trim_or_empty;
+pub mod truncate_str;
 pub mod try_str_to_num;

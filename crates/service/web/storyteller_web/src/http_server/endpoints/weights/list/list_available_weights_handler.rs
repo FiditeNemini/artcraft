@@ -23,6 +23,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Deserialize,ToSchema)]
 pub struct ListAvailableWeightsQuery {
@@ -55,6 +56,9 @@ pub struct ModelWeightForList {
     //  Hopefully we don't break the frontend by omitting these.
     //pub description_markdown: String,
     //pub description_rendered_html: String,
+
+    /// Optional SEO-friendly URL slug for the model weight.
+    pub maybe_url_slug: Option<String>,
 
     /// Cover images are small descriptive images that can be set for any model.
     /// If a cover image is set, this is the path to the asset.
@@ -231,6 +235,7 @@ pub async fn list_available_weights_handler(
 
                 ModelWeightForList {
                     weight_token: weight.token,
+                    maybe_url_slug: title_to_url_slug(&weight.title),
                     title: weight.title,
                     weight_type: weight.weights_type,
                     weight_category: weight.weights_category,

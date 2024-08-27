@@ -1,6 +1,9 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
 
+use primitives::truncate_str::truncate_str;
+
+const MAX_LENGTH : usize = 100;
 const PARENS_AND_BRACKETS_REGEX: Lazy<Regex> = Lazy::new(|| {
   Regex::new(concat!(
     r"[\(\[]", // Start delimiter: ( or [
@@ -77,13 +80,19 @@ pub fn title_to_url_slug(title: &str) -> Option<String> {
 
   let title = UNSAFE_CONTROL_CODE_REGEX.replace_all(title.trim(), "");
   let title = SPACE_AND_DASH_COLLAPSE_REGEX.replace_all(title.trim(), "-");
-  let title = ENDING_NOISE_REGEX.replace_all(title.trim(), "");
+  let mut title = ENDING_NOISE_REGEX.replace_all(title.trim(), "");
 
   if title.is_empty() {
     return None;
-  } else {
-    Some(title.to_string())
   }
+
+  let title = if title.len() > MAX_LENGTH {
+    truncate_str(&title, MAX_LENGTH).to_string()
+  } else {
+    title.to_string()
+  };
+
+  Some(title)
 }
 
 #[cfg(test)]
@@ -121,6 +130,13 @@ mod tests {
       i += 1;
     }
     assert_eq!(1, 2);
+  }
+
+  #[test]
+  fn timing_test() {
+    for _ in 0..1000 {
+      assert_expected("this-shouldn-t-take-too-long", "This shouldn't take too long...");
+    }
   }
 
   #[test]

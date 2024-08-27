@@ -22,6 +22,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Serialize, Clone, ToSchema)]
 pub struct Weight {
@@ -31,6 +32,9 @@ pub struct Weight {
   weight_category: String,
   creator: UserDetailsLight,
   creator_set_visibility: Visibility,
+
+  /// Optional SEO-friendly URL slug for the model weight.
+  maybe_url_slug: Option<String>,
 
   // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
   //  Hopefully we don't break the frontend by omitting these.
@@ -207,6 +211,7 @@ pub async fn list_weights_by_user_handler(
 
     Weight {
       weight_token: weight.token,
+      maybe_url_slug: title_to_url_slug(&weight.title),
       title: weight.title,
       weight_type: weight.weights_type.to_string(),
       weight_category: weight.weights_category.to_string(),

@@ -7,10 +7,10 @@ use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
 
+use actix_web::{HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
-use actix_web::{web, HttpResponse};
 use chrono::{DateTime, Utc};
 use log::error;
 use utoipa::ToSchema;
@@ -28,6 +28,7 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Deserialize, ToSchema)]
 pub struct SearchModelWeightsRequest {
@@ -47,6 +48,9 @@ pub struct ModelWeightSearchResult {
   pub creator_set_visibility: Visibility,
 
   pub title: String,
+
+  /// Optional SEO-friendly URL slug for the model weight.
+  pub maybe_url_slug: Option<String>,
 
   pub creator: UserDetailsLight,
 
@@ -158,6 +162,7 @@ pub async fn search_model_weights_impl(
           weight_token: result.token,
           weight_type: PublicWeightsType::from_enum(result.weights_type),
           weight_category: result.weights_category,
+          maybe_url_slug: title_to_url_slug(&result.title),
           title: result.title,
           creator: UserDetailsLight::from_db_fields(
             &result.creator_user_token,

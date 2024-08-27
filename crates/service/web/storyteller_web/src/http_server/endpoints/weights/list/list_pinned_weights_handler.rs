@@ -18,6 +18,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Serialize, ToSchema)]
 pub struct ListPinnedWeightsSuccessResponse {
@@ -33,6 +34,9 @@ pub struct PinnedModelWeightForList {
   pub weight_category: WeightsCategory,
 
   pub title: String,
+
+  /// Optional SEO-friendly URL slug for the model weight.
+  pub maybe_url_slug: Option<String>,
 
   pub creator: UserDetailsLight,
 
@@ -153,6 +157,7 @@ pub async fn list_pinned_weights_handler(
 
           PinnedModelWeightForList {
             weight_token: w.token,
+            maybe_url_slug: title_to_url_slug(&w.title),
             title: w.title,
             weight_type: PublicWeightsType::from_enum(w.weights_type),
             weight_category: w.weights_category,
