@@ -8,8 +8,10 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::model_weights::get::get_weight_for_legacy_tts_info::{get_weight_for_legacy_tts_info_with_connection, ModelWeightForLegacyTtsInfo};
+use mysql_queries::queries::model_weights::get::get_weight_for_legacy_tts_info_with_legacy_tts_token::get_weight_for_legacy_tts_info_with_legacy_tts_token_with_connection;
 use mysql_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
 use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::tts_models::TtsModelToken;
 
 /// Get TTS model
 /// This is for the tts model info page
@@ -21,13 +23,26 @@ pub async fn get_tts_model_info_migration(
 ) -> AnyhowResult<Option<TtsModelInfoMigrationWrapper>> {
   // NB: This is temporary migration code as we switch from the `tts_models` table to the `model_weights` table.
   if use_weights_table {
-    let token = ModelWeightToken::new_from_str(token);
 
-    let maybe_model = get_weight_for_legacy_tts_info_with_connection(
-      &token,
-      can_see_deleted,
-      mysql_connection
-    ).await?;
+    let maybe_model;
+
+    if token.starts_with(TtsModelToken::token_prefix()) {
+      let token = TtsModelToken::new_from_str(token);
+
+      maybe_model = get_weight_for_legacy_tts_info_with_legacy_tts_token_with_connection(
+        &token,
+        can_see_deleted,
+        mysql_connection
+      ).await?;
+    } else {
+      let token = ModelWeightToken::new_from_str(token);
+
+      maybe_model = get_weight_for_legacy_tts_info_with_connection(
+        &token,
+        can_see_deleted,
+        mysql_connection
+      ).await?;
+    }
 
     Ok(maybe_model.map(|model| TtsModelInfoMigrationWrapper::ModelWeight(model)))
 
