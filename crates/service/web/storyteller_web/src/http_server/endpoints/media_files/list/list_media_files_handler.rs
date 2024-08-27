@@ -49,16 +49,21 @@ pub struct ListMediaFilesQueryParams {
   /// Usage:
   ///   - `?filter_media_classes=audio`
   ///   - `?filter_media_classes=image,video`
+  ///   - `?filter_media_classes=dimensional`
   ///   - etc.
   pub filter_media_classes: Option<String>,
 
   /// NB: This can be one (or more comma-separated values) from `MediaFileType`,
   /// which are mimetype-like / format-like categories of media files: glb, gltf,
-  /// scene_json, etc.
+  /// scene_json, jpg, png, mp4, wav, etc.
   ///
   /// Usage:
   ///   - `?filter_media_type=scene_json`
-  ///   - `?filter_media_type=glb,gltf`
+  ///   - `?filter_media_type=glb,gltf,fbx`
+  ///   - `?filter_media_type=pmd,vmd,pmx`
+  ///   - `?filter_media_type=jpg,png,gif`
+  ///   - `?filter_media_type=wav,mp3`
+  ///   - `?filter_media_type=mp4`
   ///   - etc.
   pub filter_media_type: Option<String>,
 

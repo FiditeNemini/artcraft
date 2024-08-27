@@ -25,16 +25,19 @@ CREATE TABLE media_files (
 
   -- ========== FOREIGN KEY TO ORIGIN ==========
 
-  -- Broad category for where the file came from:
+  -- There is an index on this column.
+  -- Broad "category" for where the file came from:
   --   * 'inference' for inference output
   --   * 'processed' for processed file (eg. mp3 encoding, stem splitting, etc.)
   --   * 'upload' for direct user upload (from the filesystem)
   --   * 'device_api' for direct user uploads recorded using Browser/Device APIs.
   --   * 'studio' for storyteller studio jobs
+  --   * 'story_engine' (DEPRECATED)
   origin_category VARCHAR(16) NOT NULL,
 
   -- TODO(bt,2024-01-12): Rename to origin_product.
   -- Product area where the media file originated.
+  -- *UNFORTUNATELY*, there is *NO* index on this column.
   -- This is not the *model* that created the thing, this is the *product*.
   -- (The underlying models can change over time.)
   --
@@ -54,11 +57,28 @@ CREATE TABLE media_files (
   --   * 'zs_voice' for uploads or outputs for zero shot voice products
   --   * 'mocap' for files uploaded or processed by motion capture
   --   * 'image_gen' for image generation
+  --   * 'video_filter' (DEPRECATED)
+  --   * 'workflow' (DEPRECATED)
   origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- For inference that can be tied back to a model, the type of model.
+  -- There are multiple indices on this column!
   -- DO NOT EXPOSE THIS TO USERS VIA THE API, as we may leak secrets in doing so.
+  -- Possible values:
+  --   * 'live_portrait', which doesn't have a value for maybe_origin_model_token (!!!)
+  --   * 'rvc_v2'
   --   * 'sad_talker', which doesn't have a value for maybe_origin_model_token (!!!)
+  --   * 'so_vits_svc'
+  --   * 'tacotron2'
+  --   * 'mocap_net'
+  --   * 'styletts2'
+  --   * 'stable_diffusion_1_5'
+  --   * 'gpt_sovits', which is obfuscated in the API
+  --   * 'studio', which does not have a value for maybe_origin_model_token (!!!)
+  --   * 'vst', which does not have a value for maybe_origin_model_token (!!!)
+  --   * 'comfy_ui' (DEPRECATED)
+  --   * 'vall_e_x' (DEPRECATED)
+  --   * 'rerender' (DEPRECATED)
   --   * (more tome come)
   maybe_origin_model_type VARCHAR(32) DEFAULT NULL,
 
