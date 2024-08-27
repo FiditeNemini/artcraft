@@ -8,50 +8,6 @@
 {% set pages = section.pages %}<!---->
 {% endif %}<!---->
 
-<div class="mb-10">
-  <a href="/" class="no-underline !text-panel hover:opacity-100">
-    <div class="group grid grid-cols-5 overflow-hidden rounded-lg">
-      <div
-        class="col-span-full h-52 bg-panel/20 sm:h-96 lg:col-span-3 overflow-hidden"
-      >
-        {% if featuredImage %}
-        <img
-          alt="Featured image"
-          src="{{ featuredImage }}"
-          class="h-full w-full object-cover transition-all duration-[400ms] group-hover:scale-110"
-        />
-        {% else %}
-        <div
-          class="flex h-full w-full items-center justify-center object-cover transition-all duration-[400ms] group-hover:scale-110"
-        >
-          Featured Post Image Here
-        </div>
-        {% endif %}
-      </div>
-      <div
-        class="col-span-full flex flex-col justify-center bg-panel/5 p-4 text-center lg:col-span-2 lg:p-6 lg:text-start"
-      >
-        <p
-          class="text-md font-bold uppercase opacity-70 transition-all hover:text-link hover:opacity-80 my-0"
-        >
-          Category
-        </p>
-        <h2
-          class="text-xl transition-all group-hover:text-link md:text-[28px] mt-2 md:mt-3 mb-0 lg:mb-6"
-        >
-          Title of Featured Post
-        </h2>
-        <p
-          class="text-md hidden w-fit items-center gap-1.5 font-semibold opacity-70 lg:flex my-0"
-        >
-          Read More
-          <i class="fa fa-chevron-right me-2 text-xs"></i>
-        </p>
-      </div>
-    </div>
-  </a>
-</div>
-
 <div class="grid grid-cols-2 gap-5 md:grid-cols-3 md:gap-6">
   {% for page in pages %}
   <section
