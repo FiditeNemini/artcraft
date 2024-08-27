@@ -23,7 +23,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
-use crate::helpers::boolean_converters::i64_to_bool;
+use crate::helpers::boolean_converters::{i64_to_bool, i8_to_bool};
 use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
@@ -65,6 +65,9 @@ pub struct MediaFile {
   pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
 
   pub creator_set_visibility: Visibility,
+
+  pub is_user_upload: bool,
+  pub is_intermediate_system_file: bool,
 
   pub maybe_prompt_token: Option<PromptToken>,
   pub maybe_prompt_args: Option<PromptInnerPayload>,
@@ -154,6 +157,9 @@ pub struct MediaFileRaw {
   pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
 
   pub creator_set_visibility: Visibility,
+
+  pub is_user_upload: i8,
+  pub is_intermediate_system_file: i8,
 
   pub maybe_prompt_token: Option<PromptToken>,
   pub maybe_other_prompt_args: Option<String>,
@@ -245,6 +251,8 @@ pub async fn get_media_file(
     maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
     maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
     creator_set_visibility: record.creator_set_visibility,
+    is_user_upload: i8_to_bool(record.is_user_upload),
+    is_intermediate_system_file: i8_to_bool(record.is_intermediate_system_file),
     maybe_prompt_token: record.maybe_prompt_token,
     maybe_prompt_args,
     maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
@@ -323,6 +331,9 @@ SELECT
     media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+
+    m.is_user_upload,
+    m.is_intermediate_system_file,
 
     model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,
     model_weights.title as maybe_model_weights_title,
@@ -430,6 +441,9 @@ SELECT
     media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+
+    m.is_user_upload,
+    m.is_intermediate_system_file,
 
     model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,
     model_weights.title as maybe_model_weights_title,

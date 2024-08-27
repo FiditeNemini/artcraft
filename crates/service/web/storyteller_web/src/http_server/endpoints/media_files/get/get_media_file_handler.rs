@@ -114,6 +114,14 @@ pub struct MediaFileInfo {
 
   pub creator_set_visibility: Visibility,
 
+  /// The file was uploaded by the user.
+  /// This does not include files generated on the client side, like studio renders.
+  pub is_user_upload: bool,
+
+  /// The file was created by the system.
+  /// This includes files generated on the client side, like studio renders.
+  pub is_intermediate_system_file: bool,
+
   /// The name or title of the media file (optional)
   pub maybe_title: Option<String>,
 
@@ -413,6 +421,8 @@ async fn modern_media_file_lookup(
         result.maybe_creator_gravatar_hash,
       ),
       creator_set_visibility: result.creator_set_visibility,
+      is_user_upload: result.is_user_upload,
+      is_intermediate_system_file: result.is_intermediate_system_file,
       maybe_prompt_token: result.maybe_prompt_token,
       maybe_original_filename: result.maybe_origin_filename,
       maybe_duration_millis: result.maybe_duration_millis,
@@ -516,6 +526,8 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       used_face_detailer: false,
       used_upscaler: false,
       creator_set_visibility: result.creator_set_visibility,
+      is_user_upload: false,
+      is_intermediate_system_file: false,
       maybe_title: None,
       maybe_text_transcript: Some(result.raw_inference_text),
       maybe_original_filename: None,
