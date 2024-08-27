@@ -38,17 +38,17 @@ function UploadSamples({
 
   const sampleClick =
     () =>
-    ({ target }: { target: any }) => {
-      let sampleToken =
-        samples[target.name.split(",")[0].split(":")[1]].sample_token;
-      deletingSet([...deleting, sampleToken]); // add to deleting list
-      DeleteSample(sampleToken, { as_mod: false, set_delete: true }).then(
-        res => {
-          listFetchedSet(false);
-          deletingSet(deleting.filter((item: any) => item === sampleToken)); // remove from deleting list
-        }
-      );
-    };
+      ({ target }: { target: any }) => {
+        let sampleToken =
+          samples[target.name.split(",")[0].split(":")[1]].sample_token;
+        deletingSet([...deleting, sampleToken]); // add to deleting list
+        DeleteSample(sampleToken, { as_mod: false, set_delete: true }).then(
+          res => {
+            listFetchedSet(false);
+            deletingSet(deleting.filter((item: any) => item === sampleToken)); // remove from deleting list
+          }
+        );
+      };
 
   const actionSamples = [
     // these spread operators combine the inProgress and sample arrays
@@ -66,9 +66,8 @@ function UploadSamples({
             onClick: sampleClick(),
           },
         ],
-        name: `Sample from ${
-          date ? moment(date).format("MMMM Do YYYY, h:mm a") : ""
-        }`,
+        name: `Sample from ${date ? moment(date).format("MMMM Do YYYY, h:mm a") : ""
+          }`,
       };
     }),
   ];
@@ -100,6 +99,13 @@ function UploadSamples({
             )
           );
           listFetchedSet(false); // refetches sample list
+        } else {
+          // @ts-ignore
+          window.dataLayer.push({
+            "event": "upload_failure",
+            "page": "/voice-designer/create",
+            "user_id": "$user_id"
+          });
         }
       });
     }

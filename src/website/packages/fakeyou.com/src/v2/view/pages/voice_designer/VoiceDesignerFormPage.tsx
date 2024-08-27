@@ -163,6 +163,13 @@ function VoiceDesignerFormPage({
           );
 
           history.push("/voice-designer");
+        } else {
+          // @ts-ignore
+          window.dataLayer.push({
+            "event": "enqueue_failure",
+            "page": "/voice-conversion",
+            "user_id": "$user_id"
+          });
         }
       });
   };

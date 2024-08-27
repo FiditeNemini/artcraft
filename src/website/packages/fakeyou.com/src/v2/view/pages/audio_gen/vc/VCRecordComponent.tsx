@@ -75,6 +75,13 @@ export default function VCRecordComponent(props: Props) {
       props.setMediaUploadToken(result.upload_token);
       props.setFormIsCleared(false);
       setIsUploadDisabled(true);
+    } else {
+      // @ts-ignore
+      window.dataLayer.push({
+        "event": "upload_failure",
+        "page": "/voice-conversion",
+        "user_id": "$user_id"
+      });
     }
 
     setUploadLoading(false);

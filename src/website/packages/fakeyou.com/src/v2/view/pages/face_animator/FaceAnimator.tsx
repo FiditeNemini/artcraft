@@ -161,6 +161,12 @@ export default function FaceAnimator({
         }
       })
       .catch(e => {
+        // @ts-ignore
+        window.dataLayer.push({
+          "event": "upload_failure",
+          "page": "/face-enqueue_failure",
+          "user_id": "$user_id"
+        });
         return { success: false }; // we can do more user facing error handling
       });
 

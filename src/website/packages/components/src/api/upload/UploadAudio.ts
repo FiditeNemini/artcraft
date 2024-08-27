@@ -25,10 +25,9 @@ export function UploadAudioIsError(response: UploadAudioResponse): response is U
   return response?.success === false;
 }
 
-export async function UploadAudio(request: UploadAudioRequest) : Promise<UploadAudioResponse> 
-{
+export async function UploadAudio(request: UploadAudioRequest): Promise<UploadAudioResponse> {
   const endpoint = new ApiConfig().uploadAudio();
-  
+
   const formData = new FormData();
 
   formData.append('uuid_idempotency_token', request.uuid_idempotency_token);
@@ -46,15 +45,21 @@ export async function UploadAudio(request: UploadAudioRequest) : Promise<UploadA
     },
     body: formData,
   })
-  .then(res => res.json())
-  .then(res => {
-    if (res && 'success' in res) {
-      return res;
-    } else {
-      return { success : false };
-    }
-  })
-  .catch(e => {
-    return { success : false };
-  });
+    .then(res => res.json())
+    .then(res => {
+      if (res && 'success' in res) {
+        return res;
+      } else {
+        // @ts-ignore
+        window.dataLayer.push({
+          'event': 'upload_failure',
+          'page': '/face-animator',
+          'user_id': '$user_id'
+        });
+        return { success: false };
+      }
+    })
+    .catch(e => {
+      return { success: false };
+    });
 }

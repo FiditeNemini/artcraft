@@ -25,10 +25,9 @@ export function UploadImageIsError(response: UploadImageResponse): response is U
   return response?.success === false;
 }
 
-export async function UploadImage(request: UploadImageRequest) : Promise<UploadImageResponse> 
-{
+export async function UploadImage(request: UploadImageRequest): Promise<UploadImageResponse> {
   const endpoint = new ApiConfig().uploadImage();
-  
+
   const formData = new FormData();
 
   formData.append('uuid_idempotency_token', request.uuid_idempotency_token);
@@ -46,15 +45,21 @@ export async function UploadImage(request: UploadImageRequest) : Promise<UploadI
     },
     body: formData,
   })
-  .then(res => res.json())
-  .then(res => {
-    if (res && 'success' in res) {
-      return res;
-    } else {
-      return { success : false };
-    }
-  })
-  .catch(e => {
-    return { success : false };
-  });
+    .then(res => res.json())
+    .then(res => {
+      if (res && 'success' in res) {
+        return res;
+      } else {
+        // @ts-ignore
+        window.dataLayer.push({
+          'event': 'upload_failure',
+          'page': '/face-animator',
+          'user_id': '$user_id'
+        });
+        return { success: false };
+      }
+    })
+    .catch(e => {
+      return { success: false };
+    });
 }

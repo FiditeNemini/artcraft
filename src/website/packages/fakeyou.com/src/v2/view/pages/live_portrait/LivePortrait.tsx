@@ -77,18 +77,18 @@ interface JobProgress {
   [key: string]: number | null;
 }
 
-const PRECOMPUTED_SOURCE_TOKENS : string[] = [
-    "m_2xrse9799wvy8hkv8tbxqxct8089t7", // Mona Lisa
-    "m_pt99cdgcanv1m8yejdr3yzxyv5jmps", // Wednesday
-    "m_780cd9zhc5tznwcc2d8tnrqgs5dwh7", // Shiba
-    "m_mfstb9ac7x657eyb0pbw6ybmfxh25s", // Link
+const PRECOMPUTED_SOURCE_TOKENS: string[] = [
+  "m_2xrse9799wvy8hkv8tbxqxct8089t7", // Mona Lisa
+  "m_pt99cdgcanv1m8yejdr3yzxyv5jmps", // Wednesday
+  "m_780cd9zhc5tznwcc2d8tnrqgs5dwh7", // Shiba
+  "m_mfstb9ac7x657eyb0pbw6ybmfxh25s", // Link
 ];
 
-const PRECOMPUTED_DRIVER_TOKENS : string[] = [
-    "m_z278r5b1r2279xqkxszxjkqhc1dg2g", // Awkward Smile
-    "m_dv9pcmmwdpgyevyxsyxcahkhd2c839", // Dance Monkey
-    "m_53j0kfaesw4jem4713tttk6142sd0y", // Split
-    "m_ar300kqxy3ez8znq9p40y2qejfhsc2", // Slight Smile
+const PRECOMPUTED_DRIVER_TOKENS: string[] = [
+  "m_z278r5b1r2279xqkxszxjkqhc1dg2g", // Awkward Smile
+  "m_dv9pcmmwdpgyevyxsyxcahkhd2c839", // Dance Monkey
+  "m_53j0kfaesw4jem4713tttk6142sd0y", // Split
+  "m_ar300kqxy3ez8znq9p40y2qejfhsc2", // Slight Smile
 ];
 
 export default function LivePortrait({
@@ -296,6 +296,12 @@ export default function LivePortrait({
           false
         );
       } else {
+        // @ts-ignore
+        window.dataLayer.push({
+          "event": "enqueue_failure",
+          "page": "/live-portrait",
+          "user_id": "$user_id"
+        });
         console.error("Failed to enqueue job", res);
         setIsGenerating(false);
         // Remove the combination from currentlyGeneratingList if fail
@@ -320,7 +326,7 @@ export default function LivePortrait({
 
     const currentProgress =
       jobProgress[
-        getCombinationKey(selectedSourceIndex, selectedMotionIndex)
+      getCombinationKey(selectedSourceIndex, selectedMotionIndex)
       ] || null;
 
     const latestVideoSrc = getLatestVideoForCombination(
@@ -830,7 +836,7 @@ export default function LivePortrait({
             <div className="row gx-0 gy-4">
               <div
                 className="col-12 col-lg-3 d-flex gap-3 flex-column"
-                // style={{ paddingTop: "4.2%" }}
+              // style={{ paddingTop: "4.2%" }}
               >
                 <ThumbnailMediaPicker
                   mediaTokens={sourceTokens}
@@ -860,7 +866,7 @@ export default function LivePortrait({
 
               <div
                 className="col-12 col-lg-3 d-flex gap-3 flex-column"
-                // style={{ paddingTop: "4.2%" }}
+              // style={{ paddingTop: "4.2%" }}
               >
                 <ThumbnailMediaPicker
                   mediaTokens={motionTokens}
@@ -935,7 +941,7 @@ export default function LivePortrait({
                         loggedIn
                           ? enqueueClick
                           : () =>
-                              history.push("/signup?redirect=/ai-live-portrait")
+                            history.push("/signup?redirect=/ai-live-portrait")
                       }
                       className="flex-grow-1"
                       // disabled={!isUserContent}

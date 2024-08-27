@@ -25,6 +25,7 @@ export default function SourceEntityInput({
       <EntityInput
         accept={["image", "video"]}
         className="w-100"
+        GApage="/live-portrait"
         onChange={onChange}
         type="media"
         showMediaBrowserFilters={false}

@@ -103,6 +103,12 @@ export default function StyleVideo() {
               true
             );
           } else {
+            // @ts-ignore
+            window.dataLayer.push({
+              "event": "enqueue_failure",
+              "page": "/style-video",
+              "user_id": "$user_id"
+            });
             console.log("Failed to enqueue job", res);
           }
         } catch (error) {
@@ -293,6 +299,7 @@ export default function StyleVideo() {
                       aspectRatio: "landscape",
                       name: "mediaToken",
                       className: "h-100",
+                      GApage: "/style-video",
                       value: mediaToken,
                       onPromptUpdate,
                       onChange: ({ target }: { target: any }) => {
@@ -464,6 +471,7 @@ export default function StyleVideo() {
                           accept: ["image"],
                           aspectRatio: "square",
                           className: "w-100",
+                          GApage: "/style-video",
                           label: "Additional Style Reference Image (Optional)",
                           name: "IPAToken",
                           value: IPAToken,

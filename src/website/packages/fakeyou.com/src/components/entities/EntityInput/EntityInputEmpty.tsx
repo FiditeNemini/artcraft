@@ -43,6 +43,7 @@ interface EmptySlideProps extends SlideProps {
 
 export default function EntityInputEmpty({
   accept,
+  GApage,
   inputProps,
   queryUser,
   selectToken,
@@ -57,12 +58,12 @@ export default function EntityInputEmpty({
   const isMedia = inputMode === EntityInputMode.media;
   const fileTypes = isMedia
     ? accepted
-        .map((mediaCategory, i) => {
-          return mediaCategory
-            ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory))
-            : [];
-        })
-        .flat()
+      .map((mediaCategory, i) => {
+        return mediaCategory
+          ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory))
+          : [];
+      })
+      .flat()
     : [];
 
   const props: MediaBrowserProps = {
@@ -82,7 +83,10 @@ export default function EntityInputEmpty({
     open({
       component: CameraCapture,
       padding: false,
-      props: { selectToken },
+      props: {
+        GApage,
+        selectToken
+      },
       width: "square",
     });
 
@@ -95,9 +99,8 @@ export default function EntityInputEmpty({
     return faFile;
   };
 
-  const supported = `${
-    fileTypes.length ? fileTypes.join(", ") : fileTypes[0]
-  } files supported`;
+  const supported = `${fileTypes.length ? fileTypes.join(", ") : fileTypes[0]
+    } files supported`;
 
   return (
     <>

@@ -16,11 +16,13 @@ import CapturePreview from "./CapturePreview";
 import "./CameraCapture.scss";
 
 interface CameraCaptureProps extends ModalUtilities {
+  GApage?: string;
   selectToken: (token: string) => void;
 }
 
 export default function CameraCapture({
   handleClose,
+  GApage,
   selectToken,
 }: CameraCaptureProps) {
   const webcamRef = useRef<Webcam>(null);
@@ -95,6 +97,7 @@ export default function CameraCapture({
     error: uploaderError,
     uploadProgress,
   } = useMediaUploader({
+    GApage,
     onSuccess: (res: UploaderResponse) => {
       handleClose();
       selectToken(res.media_file_token);

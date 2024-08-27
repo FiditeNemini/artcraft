@@ -73,10 +73,10 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
 
   const searchChange =
     (setUpdate = true) =>
-    ({ target }: { target: any }) => {
-      if (setUpdate) updatedSet(true);
-      searchSet(target.value);
-    };
+      ({ target }: { target: any }) => {
+        if (setUpdate) updatedSet(true);
+        searchSet(target.value);
+      };
 
   const handleResultSelect = (data: any) => {
     setSelectedVoice(data);
@@ -177,6 +177,12 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
         );
         setIsGenerating(false);
       } else {
+        // @ts-ignore
+        window.dataLayer.push({
+          "event": "enqueue_failure",
+          "page": "/voice-conversion",
+          "user_id": "$user_id"
+        });
         console.error("Error queuing VC:", "failed to enqueue");
         setIsGenerating(false);
       }
@@ -245,11 +251,10 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                   <div className="d-flex gap-2 align-items-center w-100">
                     <div className="flex-grow-1">
                       <Label
-                        label={`${
-                          selectedVoice
-                            ? t("label.selected")
-                            : t("label.select")
-                        }`}
+                        label={`${selectedVoice
+                          ? t("label.selected")
+                          : t("label.select")
+                          }`}
                       />
                     </div>
 

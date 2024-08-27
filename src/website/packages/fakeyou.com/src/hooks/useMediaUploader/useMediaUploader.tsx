@@ -17,12 +17,13 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 
 interface Props {
   autoUpload?: boolean;
+  GApage?: string;
   onSuccess?: (res: UploaderResponse) => any;
 }
 
-const n = () => {};
+const n = () => { };
 
-export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
+export default function useMediaUploader({ autoUpload, GApage, onSuccess = n }: Props) {
   const [status, statusSet] = useState(FetchStatus.ready);
   const [mediaClass, mediaClassSet] = useState<MediaFileClass>(
     MediaFileClass.Unknown
@@ -35,10 +36,10 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
   const { file, clear, inputProps } = useFile({
     ...(autoUpload
       ? {
-          onChange: (inputFile: File) => {
-            if (inputFile) createUpload(inputFile, clear);
-          },
-        }
+        onChange: (inputFile: File) => {
+          if (inputFile) createUpload(inputFile, clear);
+        },
+      }
       : {}),
   });
 
@@ -80,6 +81,12 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
           todo();
         } else {
           statusSet(FetchStatus.error);
+          // @ts-ignore
+          window.dataLayer.push({
+            "event": "upload_failure",
+            "page": GApage || "/",
+            "user_id": "$user_id"
+          });
         }
       });
     }

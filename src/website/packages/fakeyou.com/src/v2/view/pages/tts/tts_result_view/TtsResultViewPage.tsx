@@ -74,15 +74,13 @@ function TtsResultViewPage(props: Props) {
   const documentTitle =
     ttsInferenceResult?.tts_model_title === undefined
       ? undefined
-      : `Deep Fake ${
-          ttsInferenceResult.tts_model_title
-        } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
+      : `Deep Fake ${ttsInferenceResult.tts_model_title
+      } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
   usePrefixedDocumentTitle(documentTitle);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(token)}`;
-  const shareTitle = `I just used FakeYou to generate speech as ${
-    ttsInferenceResult?.tts_model_title || "one of my favorite characters"
-  }!`;
+  const shareTitle = `I just used FakeYou to generate speech as ${ttsInferenceResult?.tts_model_title || "one of my favorite characters"
+    }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);

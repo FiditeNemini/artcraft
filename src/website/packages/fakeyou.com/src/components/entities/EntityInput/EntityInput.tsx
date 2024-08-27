@@ -43,6 +43,7 @@ interface EntityInputProps {
   className?: string;
   cropProps?: CropProps;
   debug?: string;
+  GApage?: string;
   label?: string;
   name?: string;
   onChange?: any;
@@ -56,6 +57,7 @@ interface EntityInputProps {
 export interface SlideProps {
   clear: () => void;
   cropProps?: CropProps;
+  GApage?: string;
   isNarrow: boolean;
   media?: MediaFile;
   resetUploader: () => void;
@@ -217,6 +219,7 @@ export default function EntityInput({
   className,
   cropProps,
   debug,
+  GApage,
   label,
   name = "",
   onChange,
@@ -266,6 +269,7 @@ export default function EntityInput({
     reset: resetUploader,
   } = useMediaUploader({
     autoUpload: true,
+    GApage,
     onSuccess: (res: UploaderResponse) => {
       reload();
       selectToken(res.media_file_token);
@@ -319,9 +323,8 @@ export default function EntityInput({
       <Label {...{ label }} />
       <div
         {...{
-          className: `fy-entity-input ${className ? " " + className : ""}${
-            isNarrow ? " fy-entity-input-narrow" : " fy-entity-input-wide"
-          }`,
+          className: `fy-entity-input ${className ? " " + className : ""}${isNarrow ? " fy-entity-input-narrow" : " fy-entity-input-wide"
+            }`,
           ref: outerRef,
         }}
       >
@@ -360,6 +363,7 @@ export default function EntityInput({
               {...{
                 accept,
                 className: "fy-entity-input-empty",
+                GApage,
                 inputProps,
                 onSelect,
                 queryUser,
