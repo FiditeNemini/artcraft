@@ -22,6 +22,7 @@ import {
   faLock,
   faPlus,
   faSparkles,
+  faStars,
 } from "@fortawesome/pro-solid-svg-icons";
 import "./LivePortrait.scss";
 import ThumbnailMediaPicker from "./ThumbnailMediaPicker";
@@ -112,10 +113,10 @@ export default function LivePortrait({
   const hasPremium = sessionSubscriptionsWrapper.hasPaidFeatures();
   const [generatedVideoSrc, setGeneratedVideoSrc] = useState("");
   const [sourceTokens, setSourceTokens] = useState<string[]>([
-    ...PRECOMPUTED_SOURCE_TOKENS
+    ...PRECOMPUTED_SOURCE_TOKENS,
   ]);
   const [motionTokens, setMotionTokens] = useState<string[]>([
-    ...PRECOMPUTED_DRIVER_TOKENS
+    ...PRECOMPUTED_DRIVER_TOKENS,
   ]);
   const numberOfInitialSourceTokensRef = useRef(sourceTokens.length);
   const numberOfInitialSourceTokens = numberOfInitialSourceTokensRef.current;
@@ -143,23 +144,47 @@ export default function LivePortrait({
       // Source 1: Mona Lisa
       { src: "/videos/live-portrait/1_1.mp4" }, // Smile
       { src: "/videos/live-portrait/1_2.mp4" }, // Dance Monkey
-      { src: "https://storage.googleapis.com/vocodes-public/media/9/w/s/v/x/9wsvx4fyaraf2prgq1zgpsrq0f1phfs1/storyteller_9wsvx4fyaraf2prgq1zgpsrq0f1phfs1.mp4" }, // Split (Mona Lisa)
-      { src: "https://storage.googleapis.com/vocodes-public/media/w/4/8/k/7/w48k741jsfgnv82vbmhc3meycf77sx1r/storyteller_w48k741jsfgnv82vbmhc3meycf77sx1r.mp4" }, // Slight Smile (Mona Lisa)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/9/w/s/v/x/9wsvx4fyaraf2prgq1zgpsrq0f1phfs1/storyteller_9wsvx4fyaraf2prgq1zgpsrq0f1phfs1.mp4",
+      }, // Split (Mona Lisa)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/w/4/8/k/7/w48k741jsfgnv82vbmhc3meycf77sx1r/storyteller_w48k741jsfgnv82vbmhc3meycf77sx1r.mp4",
+      }, // Slight Smile (Mona Lisa)
       // Source 2: Wednesday
       { src: "/videos/live-portrait/2_1.mp4" }, // Smile
       { src: "/videos/live-portrait/2_2.mp4" }, // Dance Monkey
-      { src: "https://storage.googleapis.com/vocodes-public/media/v/6/7/3/b/v673bmm04f8vk0815d00fnm37qd53n7n/storyteller_v673bmm04f8vk0815d00fnm37qd53n7n.mp4" }, // Split (Wednesday)
-      { src: "https://storage.googleapis.com/vocodes-public/media/m/5/w/k/0/m5wk0ev4wf7wrqmhgxb334ja21mz6p3j/storyteller_m5wk0ev4wf7wrqmhgxb334ja21mz6p3j.mp4" }, // Slight Smile (Wednesday)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/v/6/7/3/b/v673bmm04f8vk0815d00fnm37qd53n7n/storyteller_v673bmm04f8vk0815d00fnm37qd53n7n.mp4",
+      }, // Split (Wednesday)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/m/5/w/k/0/m5wk0ev4wf7wrqmhgxb334ja21mz6p3j/storyteller_m5wk0ev4wf7wrqmhgxb334ja21mz6p3j.mp4",
+      }, // Slight Smile (Wednesday)
       // Source 3: Shiba
-      { src: "https://storage.googleapis.com/vocodes-public/media/y/5/k/p/t/y5kptzew0t63pq12y83v0cstv8mkzvk0/storyteller_y5kptzew0t63pq12y83v0cstv8mkzvk0.mp4" }, // Smile (Shiba)
-      { src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4" }, // Dance Monkey (Shiba)
-      { src: "https://storage.googleapis.com/vocodes-public/media/v/d/n/f/x/vdnfxzzxer8ghjb76s1yf0htx1e59fpr/storyteller_vdnfxzzxer8ghjb76s1yf0htx1e59fpr.mp4" }, // Split (Shiba)
-      { src: "https://storage.googleapis.com/vocodes-public/media/j/w/5/c/m/jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx/storyteller_jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx.mp4" }, // Slight Smile (Shiba)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/y/5/k/p/t/y5kptzew0t63pq12y83v0cstv8mkzvk0/storyteller_y5kptzew0t63pq12y83v0cstv8mkzvk0.mp4",
+      }, // Smile (Shiba)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/2/f/m/v/m/2fmvmwv65zehbyyzs1bd9mth02b8jsqr/storyteller_2fmvmwv65zehbyyzs1bd9mth02b8jsqr.mp4",
+      }, // Dance Monkey (Shiba)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/v/d/n/f/x/vdnfxzzxer8ghjb76s1yf0htx1e59fpr/storyteller_vdnfxzzxer8ghjb76s1yf0htx1e59fpr.mp4",
+      }, // Split (Shiba)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/j/w/5/c/m/jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx/storyteller_jw5cmgsdwpr0d7ekdvjnf5rac5w08nbx.mp4",
+      }, // Slight Smile (Shiba)
       // Source 4: Link
-      { src: "https://storage.googleapis.com/vocodes-public/media/3/v/m/0/t/3vm0t89v1jaaft8rrr23gtv22r3fnqr9/storyteller_3vm0t89v1jaaft8rrr23gtv22r3fnqr9.mp4" }, // Smile (Link)
-      { src: "https://storage.googleapis.com/vocodes-public/media/m/a/8/e/7/ma8e7s6zgggcbywbp08kqk4gzgjfe7pw/storyteller_ma8e7s6zgggcbywbp08kqk4gzgjfe7pw.mp4" }, // Dance Monkey (Link)
-      { src: "https://storage.googleapis.com/vocodes-public/media/s/m/9/c/6/sm9c6gewq4cfcebc0j79bama8bn2ht7m/storyteller_sm9c6gewq4cfcebc0j79bama8bn2ht7m.mp4" }, // Split (Link)
-      { src: "https://storage.googleapis.com/vocodes-public/media/3/v/b/7/3/3vb736v1rmpefynr7xamdajf2vt99bam/storyteller_3vb736v1rmpefynr7xamdajf2vt99bam.mp4" }, // Slight Smile (Link)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/3/v/m/0/t/3vm0t89v1jaaft8rrr23gtv22r3fnqr9/storyteller_3vm0t89v1jaaft8rrr23gtv22r3fnqr9.mp4",
+      }, // Smile (Link)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/m/a/8/e/7/ma8e7s6zgggcbywbp08kqk4gzgjfe7pw/storyteller_ma8e7s6zgggcbywbp08kqk4gzgjfe7pw.mp4",
+      }, // Dance Monkey (Link)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/s/m/9/c/6/sm9c6gewq4cfcebc0j79bama8bn2ht7m/storyteller_sm9c6gewq4cfcebc0j79bama8bn2ht7m.mp4",
+      }, // Split (Link)
+      {
+        src: "https://storage.googleapis.com/vocodes-public/media/3/v/b/7/3/3vb736v1rmpefynr7xamdajf2vt99bam/storyteller_3vb736v1rmpefynr7xamdajf2vt99bam.mp4",
+      }, // Slight Smile (Link)
     ],
     []
   );
@@ -298,9 +323,9 @@ export default function LivePortrait({
       } else {
         // @ts-ignore
         window.dataLayer.push({
-          "event": "enqueue_failure",
-          "page": "/live-portrait",
-          "user_id": "$user_id"
+          event: "enqueue_failure",
+          page: "/live-portrait",
+          user_id: "$user_id",
         });
         console.error("Failed to enqueue job", res);
         setIsGenerating(false);
@@ -326,7 +351,7 @@ export default function LivePortrait({
 
     const currentProgress =
       jobProgress[
-      getCombinationKey(selectedSourceIndex, selectedMotionIndex)
+        getCombinationKey(selectedSourceIndex, selectedMotionIndex)
       ] || null;
 
     const latestVideoSrc = getLatestVideoForCombination(
@@ -335,7 +360,6 @@ export default function LivePortrait({
     );
 
     const precomputedVideoSrc = getPrecomputedVideoSrc();
-    console.log('precomputed video src', precomputedVideoSrc)
 
     // Show generated or precomputed video if available
     if (latestVideoSrc && !isCurrentlyGenerating) {
@@ -431,7 +455,9 @@ export default function LivePortrait({
   };
 
   const getPrecomputedVideoSrc = useCallback(() => {
-    const index = selectedSourceIndex * PRECOMPUTED_DRIVER_TOKENS.length + selectedMotionIndex;
+    const index =
+      selectedSourceIndex * PRECOMPUTED_DRIVER_TOKENS.length +
+      selectedMotionIndex;
     if (index >= 0 && index < precomputedVideos.length) {
       return precomputedVideos[index].src;
     }
@@ -836,7 +862,7 @@ export default function LivePortrait({
             <div className="row gx-0 gy-4">
               <div
                 className="col-12 col-lg-3 d-flex gap-3 flex-column"
-              // style={{ paddingTop: "4.2%" }}
+                // style={{ paddingTop: "4.2%" }}
               >
                 <ThumbnailMediaPicker
                   mediaTokens={sourceTokens}
@@ -866,7 +892,7 @@ export default function LivePortrait({
 
               <div
                 className="col-12 col-lg-3 d-flex gap-3 flex-column"
-              // style={{ paddingTop: "4.2%" }}
+                // style={{ paddingTop: "4.2%" }}
               >
                 <ThumbnailMediaPicker
                   mediaTokens={motionTokens}
@@ -941,7 +967,7 @@ export default function LivePortrait({
                         loggedIn
                           ? enqueueClick
                           : () =>
-                            history.push("/signup?redirect=/ai-live-portrait")
+                              history.push("/signup?redirect=/ai-live-portrait")
                       }
                       className="flex-grow-1"
                       // disabled={!isUserContent}
@@ -961,19 +987,19 @@ export default function LivePortrait({
                     </Tippy>
                   </div>
 
-                  <div className="d-flex gap-3">
-                    <Checkbox
-                      disabled={!hasPremium}
-                      label={"Make Private"}
-                      onChange={() => {
-                        setVisibility(prevVisibility =>
-                          prevVisibility === "private" ? "public" : "private"
-                        );
-                      }}
-                      checked={visibility === "private"}
-                    />
+                  <div className="d-flex flex-column gap-2">
+                    <div className="d-flex gap-3">
+                      <Checkbox
+                        disabled={!hasPremium}
+                        label={"Make Private"}
+                        onChange={() => {
+                          setVisibility(prevVisibility =>
+                            prevVisibility === "private" ? "public" : "private"
+                          );
+                        }}
+                        checked={visibility === "private"}
+                      />
 
-                    <div className="d-flex">
                       <Checkbox
                         disabled={!hasPremium}
                         label={"Remove Watermark"}
@@ -984,13 +1010,18 @@ export default function LivePortrait({
                         }}
                         checked={removeWatermark}
                       />
-                      {/* <div {...{ className: "fy-ai-face-mirror-premium-label" }}>
-                    Watermark
-                    {!hasPremium ? (
-                      <Link {...{ to: "pricing" }}> subscribe to remove</Link>
-                    ) : null}
-                  </div> */}
                     </div>
+
+                    {!hasPremium && (
+                      <div className="d-flex">
+                        <Button
+                          variant="link"
+                          label="Upgrade to Premium to use features above"
+                          icon={faStars}
+                          to="/pricing"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
