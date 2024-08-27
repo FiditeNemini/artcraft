@@ -96,6 +96,7 @@ pub async fn insert_media_file_generic_from_job(
         generated_by_worker: args.generated_by_worker,
         is_generated_on_prem: args.is_generated_on_prem,
         is_intermediate_system_file: args.is_intermediate_system_file,
+        is_user_upload: false, // NB: Jobs typically won't be user uploads. Maybe this becomes a param in the future(?)
         maybe_audio_encoding: args.maybe_audio_encoding,
         maybe_batch_token: args.maybe_batch_token,
         maybe_creator_anonymous_visitor_token: args.job.maybe_creator_anonymous_visitor_token_typed.as_ref(),

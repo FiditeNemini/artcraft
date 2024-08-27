@@ -88,6 +88,10 @@ pub async fn insert_media_file_from_studio_scene_render(
     origin_category: MediaFileOriginCategory::StorytellerStudio,
     origin_product_category: MediaFileOriginProductCategory::StorytellerStudio,
     maybe_origin_model_type: None,
+
+    // NB: All client uploads should be marked as such, even if it makes the frontend product
+    // weird (i.e. users won't think of these as uploads)
+    is_user_upload: true,
     is_intermediate_system_file: true,
 
     // Static bits (counters)

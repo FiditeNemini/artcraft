@@ -296,7 +296,6 @@ pub async fn upload_studio_shot_media_file_handler(
     file_size_bytes,
     maybe_audio_encoding: None, // TODO
     maybe_video_encoding: None, // TODO
-    //is_intermediate_system_file: false, // TODO
     // TODO: Frame rate.
     maybe_scene_source_media_file_token: form.maybe_scene_source_media_file_token
         .as_ref()
