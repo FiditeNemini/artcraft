@@ -19,13 +19,14 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use migration::text_to_speech::get_tts_model_info_migration::get_tts_model_info_migration;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use redis_common::redis_cache_keys::RedisCacheKeys;
+use tokens::tokens::model_weights::ModelWeightToken;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use crate::http_server::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::http_server::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 use crate::state::server_state::ServerState;
-
+use crate::util::title_to_url_slug::title_to_url_slug;
 // =============== Request ===============
 
 /// For the URL PathInfo
@@ -95,6 +96,15 @@ pub struct TtsModelInfo {
 
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
+
+  /// We've migrated tts_models records (prefixed with TM:) to model_weights records (prefixed with weight_)
+  /// This is the new token for old TTS records, assuming the user called the legacy API with a legacy token.
+  /// If this endpoint is called with a new model_weight token, we simply return the canonical token here.
+  pub maybe_migration_new_model_weights_token: Option<ModelWeightToken>,
+
+  /// Optional SEO-friendly URL slug for the model weight.
+  /// This is so we can tell Google the canonical new URL for the model.
+  pub maybe_url_slug: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -309,6 +319,7 @@ pub async fn get_tts_model_handler(
       creator_gravatar_hash: model.creator_gravatar_hash().to_string(),
       creator_default_avatar_index: default_avatar_from_username(&model.creator_username().to_string()),
       creator_default_avatar_color_index: default_avatar_color_from_username(&model.creator_username().to_string()),
+      maybe_url_slug: title_to_url_slug(model.title()),
       title: model.title().to_string(),
       description_markdown: model.description_markdown().to_string(),
       description_rendered_html: model.description_rendered_html().to_string(),
@@ -325,6 +336,8 @@ pub async fn get_tts_model_handler(
       creator_set_visibility: model.creator_set_visibility(),
       is_locked_from_use: model.is_locked_from_use(),
       is_locked_from_user_modification: model.is_locked_from_user_modification(),
+      maybe_migration_new_model_weights_token: model.maybe_migration_new_model_weights_token()
+          .map(|t| t.clone()),
       created_at: *model.created_at(),
       updated_at: *model.updated_at(),
       maybe_moderator_fields: None,

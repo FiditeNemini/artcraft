@@ -75,6 +75,13 @@ impl TtsModelInfoMigrationWrapper {
     }
   }
 
+  pub fn maybe_migration_new_model_weights_token(&self) -> Option<&ModelWeightToken> {
+    match self {
+      Self::LegacyTts(ref model) => model.maybe_migration_new_model_weights_token.as_ref(),
+      Self::ModelWeight(ref model) => Some(&model.token),
+    }
+  }
+
   pub fn title(&self) -> &str {
     match self {
       Self::LegacyTts(ref model) => &model.title,

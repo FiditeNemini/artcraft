@@ -12,7 +12,7 @@ use sqlx::pool::PoolConnection;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-
+use tokens::tokens::model_weights::ModelWeightToken;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -56,6 +56,8 @@ pub struct TtsModelRecord {
 
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
+
+  pub maybe_migration_new_model_weights_token: Option<ModelWeightToken>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -173,6 +175,9 @@ pub async fn get_tts_model_by_token_using_connection(
         .unwrap_or(Visibility::Public),
     is_locked_from_use: i8_to_bool(model.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(model.is_locked_from_user_modification),
+    maybe_migration_new_model_weights_token: model.maybe_migration_new_model_weights_token
+        .as_deref()
+        .map(|token| ModelWeightToken::new_from_str(token)),
     created_at: model.created_at,
     updated_at: model.updated_at,
     maybe_moderator_fields: Some(TtsModelModeratorFields {
@@ -232,6 +237,8 @@ SELECT
 
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
+
+    tts.maybe_migration_new_model_weights_token,
 
     tts.maybe_custom_vocoder_token,
     vocoder.title as maybe_custom_vocoder_title,
@@ -309,6 +316,8 @@ SELECT
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
 
+    tts.maybe_migration_new_model_weights_token,
+
     tts.maybe_custom_vocoder_token,
     vocoder.title as maybe_custom_vocoder_title,
     vocoder_user.token as maybe_custom_vocoder_creator_user_token,
@@ -381,6 +390,8 @@ struct InternalTtsModelRecordRaw {
 
   pub is_locked_from_use: i8,
   pub is_locked_from_user_modification: i8,
+
+  pub maybe_migration_new_model_weights_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
