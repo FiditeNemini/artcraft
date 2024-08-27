@@ -241,6 +241,7 @@ pub async fn upload_scene_snapshot_media_file_handler(
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     maybe_scene_source_media_file_token: maybe_scene_source_media_file_token.as_ref(),
+    // NB: is_user_upload = TRUE
     is_intermediate_system_file: true, // NB: This is a snapshot, so we shouldn't show it off in lists.
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,

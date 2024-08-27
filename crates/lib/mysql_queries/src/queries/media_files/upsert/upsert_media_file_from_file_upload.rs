@@ -134,6 +134,8 @@ SET
   maybe_creator_file_synthetic_id = ?,
   maybe_creator_category_synthetic_id = ?,
 
+  is_user_upload = TRUE,
+
   maybe_origin_model_type = NULL,
   maybe_origin_model_token = NULL
 
@@ -166,6 +168,8 @@ ON DUPLICATE KEY UPDATE
 
   maybe_creator_file_synthetic_id = ?,
   maybe_creator_category_synthetic_id = ?,
+  
+  is_user_upload = TRUE,
 
   maybe_origin_model_type = NULL,
   maybe_origin_model_token = NULL

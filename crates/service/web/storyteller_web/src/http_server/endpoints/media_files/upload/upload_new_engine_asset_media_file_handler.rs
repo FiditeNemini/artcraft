@@ -221,7 +221,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
     maybe_duration_millis: file_info.maybe_duration_millis,
     sha256_checksum: &file_info.sha256_checksum,
     maybe_scene_source_media_file_token: None,
-    is_intermediate_system_file: false,
+    is_intermediate_system_file: false, // NB: is_user_upload = TRUE
     maybe_title: file_info.maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
