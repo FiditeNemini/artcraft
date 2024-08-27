@@ -10,6 +10,7 @@ use errors::AnyhowResult;
 pub enum VocoderType {
   /// Current state of the art vocoder
   #[serde(rename = "hifigan-superres")]
+  #[sqlx(rename = "hifigan-superres")]
   HifiGanSuperResolution,
 
   /// Older WaveGlow vocoder

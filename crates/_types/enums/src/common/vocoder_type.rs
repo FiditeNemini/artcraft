@@ -6,11 +6,16 @@ pub enum VocoderType {
   #[sqlx(rename = "hifigan")]
   HifiGan,
 
+  #[serde(rename = "hifigan-superres")]
+  #[sqlx(rename = "hifigan-superres")]
+  HifiGanSuperResolution,
+
   /// NB: Note - this is hifigan for SoftVC (our internal codename is "rocketvc").
   /// Some work will need to be done to unify this with other hifigan types.
   #[serde(rename = "hifigan_rocket_vc")]
   #[sqlx(rename = "hifigan_rocket_vc")]
   HifiGanRocketVc,
+
 }
 
 /// NB: Legacy API for older code.
@@ -18,6 +23,7 @@ impl VocoderType {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::HifiGan=> "hifigan",
+      Self::HifiGanSuperResolution => "hifigan-superres",
       Self::HifiGanRocketVc => "hifigan_rocket_vc",
     }
   }
@@ -25,6 +31,7 @@ impl VocoderType {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "hifigan" => Ok(Self::HifiGan),
+      "hifigan-superres" => Ok(Self::HifiGanSuperResolution),
       "hifigan_rocket_vc" => Ok(Self::HifiGanRocketVc),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -39,18 +46,21 @@ mod tests {
   #[test]
   fn test_serialization() {
     assert_serialization(VocoderType::HifiGan, "hifigan");
+    assert_serialization(VocoderType::HifiGanSuperResolution, "hifigan-superres");
     assert_serialization(VocoderType::HifiGanRocketVc, "hifigan_rocket_vc");
   }
 
   #[test]
   fn to_str() {
     assert_eq!(VocoderType::HifiGan.to_str(), "hifigan");
+    assert_eq!(VocoderType::HifiGanSuperResolution.to_str(), "hifigan-superres");
     assert_eq!(VocoderType::HifiGanRocketVc.to_str(), "hifigan_rocket_vc");
   }
 
   #[test]
   fn from_str() {
     assert_eq!(VocoderType::from_str("hifigan").unwrap(), VocoderType::HifiGan);
+    assert_eq!(VocoderType::from_str("hifigan-superres").unwrap(), VocoderType::HifiGanSuperResolution);
     assert_eq!(VocoderType::from_str("hifigan_rocket_vc").unwrap(), VocoderType::HifiGanRocketVc);
   }
 }
