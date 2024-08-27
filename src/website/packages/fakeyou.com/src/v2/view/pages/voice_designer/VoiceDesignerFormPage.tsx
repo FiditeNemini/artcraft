@@ -167,7 +167,7 @@ function VoiceDesignerFormPage({
           // @ts-ignore
           window.dataLayer.push({
             "event": "enqueue_failure",
-            "page": "/voice-conversion",
+            "page": "/voice-designer/create",
             "user_id": "$user_id"
           });
         }
