@@ -5,7 +5,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use actix_web_lab::extract::Query;
 use chrono::{DateTime, Utc};
 use futures_old_for_limiter::future::result;
@@ -250,8 +250,8 @@ impl fmt::Display for BatchGetMediaFilesError {
 pub async fn batch_get_media_files_handler(
   http_request: HttpRequest,
   query: Query<BatchGetMediaFilesQueryParams>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, BatchGetMediaFilesError>
-{
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<BatchGetMediaFilesSuccessResponse>, BatchGetMediaFilesError> {
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -392,15 +392,8 @@ pub async fn batch_get_media_files_handler(
       })
       .collect();
 
-  let response = BatchGetMediaFilesSuccessResponse {
+  Ok(Json(BatchGetMediaFilesSuccessResponse {
     success: true,
     media_files,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| BatchGetMediaFilesError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }

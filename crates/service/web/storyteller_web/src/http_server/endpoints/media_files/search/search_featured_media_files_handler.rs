@@ -3,7 +3,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Query;
+use actix_web::web::{Json, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
@@ -190,7 +190,7 @@ pub async fn search_featured_media_files_handler(
     http_request: HttpRequest,
     query: Query<SearchFeaturedMediaFilesQueryParams>,
     server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, SearchFeaturedMediaFilesError>
+) -> Result<Json<SearchFeaturedMediaFilesSuccessResponse>, SearchFeaturedMediaFilesError>
 {
   let mut maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
   let mut maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
@@ -273,15 +273,8 @@ pub async fn search_featured_media_files_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = SearchFeaturedMediaFilesSuccessResponse {
+  Ok(Json(SearchFeaturedMediaFilesSuccessResponse {
     success: true,
     results,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| SearchFeaturedMediaFilesError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }

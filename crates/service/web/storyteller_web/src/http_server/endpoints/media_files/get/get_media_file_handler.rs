@@ -4,7 +4,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::{StatusCode, Uri};
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use chrono::{DateTime, Utc};
 use log::warn;
 use url::Url;
@@ -245,8 +245,8 @@ impl fmt::Display for GetMediaFileError {
 pub async fn get_media_file_handler(
   http_request: HttpRequest,
   path: Path<GetMediaFilePathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetMediaFileError>
-{
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<GetMediaFileSuccessResponse>, GetMediaFileError> {
   let media_file_token = path.into_inner().token;
 
   let maybe_user_session = server_state
@@ -280,12 +280,7 @@ pub async fn get_media_file_handler(
     modern_media_file_lookup(&media_file_token, show_deleted_results, &server_state).await?
   };
 
-  let body = serde_json::to_string(&response)
-    .map_err(|e| GetMediaFileError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+  Ok(Json(response))
 }
 
 async fn modern_media_file_lookup(

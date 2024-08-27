@@ -3,7 +3,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Query;
+use actix_web::web::{Json, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use url::Url;
@@ -197,7 +197,7 @@ pub async fn search_session_media_files_handler(
     http_request: HttpRequest,
     query: Query<SearchMediaFilesQueryParams>,
     server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, SearchMediaFilesError>
+) -> Result<Json<SearchMediaFilesSuccessResponse>, SearchMediaFilesError>
 {
   // NB(bt,2024-07-01): This isn't great. Though we HMAC our cookies, this could
   // result in bad situations where we don't invalidate sessions, etc. We're only
@@ -303,15 +303,8 @@ pub async fn search_session_media_files_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = SearchMediaFilesSuccessResponse {
+  Ok(Json(SearchMediaFilesSuccessResponse {
     success: true,
     results,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| SearchMediaFilesError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }
