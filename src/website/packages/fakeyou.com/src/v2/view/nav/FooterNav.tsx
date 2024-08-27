@@ -12,7 +12,7 @@ import {
   faTiktok,
   faRedditAlien,
 } from "@fortawesome/free-brands-svg-icons";
-import {  } from "@storyteller/components/src/constants/ThirdPartyLinks";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import {
   GetServerInfo,
   GetServerInfoIsOk,
