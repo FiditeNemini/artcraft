@@ -97,7 +97,14 @@ export default function CameraCapture({
     error: uploaderError,
     uploadProgress,
   } = useMediaUploader({
-    GApage,
+    onError: () => {
+      // @ts-ignore
+      window.dataLayer.push({
+        "event": "upload_failure_webcam",
+        "page": GApage || "/",
+        "user_id": "$user_id"
+      });
+    },
     onSuccess: (res: UploaderResponse) => {
       handleClose();
       selectToken(res.media_file_token);

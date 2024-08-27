@@ -269,7 +269,14 @@ export default function EntityInput({
     reset: resetUploader,
   } = useMediaUploader({
     autoUpload: true,
-    GApage,
+    onError: () => {
+      // @ts-ignore
+      window.dataLayer.push({
+        "event": "upload_failure",
+        "page": GApage || "/",
+        "user_id": "$user_id"
+      });
+    },
     onSuccess: (res: UploaderResponse) => {
       reload();
       selectToken(res.media_file_token);
