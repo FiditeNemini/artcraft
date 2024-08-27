@@ -97,7 +97,6 @@ pub struct ListFeaturedMediaFilesArgs<'a> {
   pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
   pub maybe_filter_media_classes: Option<&'a HashSet<MediaFileClass>>,
   pub maybe_filter_engine_categories: Option<&'a HashSet<MediaFileEngineCategory>>,
-  pub include_user_uploads: bool,
   pub maybe_offset: Option<usize>,
   pub cursor_is_reversed: bool,
   pub sort_ascending: bool,
@@ -111,7 +110,6 @@ pub async fn list_featured_media_files(args: ListFeaturedMediaFilesArgs<'_>) -> 
     args.maybe_filter_media_types,
     args.maybe_filter_media_classes,
     args.maybe_filter_engine_categories,
-    args.include_user_uploads,
     args.limit,
     args.maybe_offset,
     args.cursor_is_reversed,
@@ -187,7 +185,6 @@ fn query_builder<'a>(
   maybe_filter_media_types: Option<&HashSet<MediaFileType>>,
   maybe_filter_media_classes: Option<&HashSet<MediaFileClass>>,
   maybe_filter_engine_categories: Option<&HashSet<MediaFileEngineCategory>>,
-  include_user_uploads: bool,
   limit: usize,
   maybe_offset: Option<usize>,
   cursor_is_reversed: bool,
@@ -341,16 +338,6 @@ LEFT OUTER JOIN prompts
 
       separated.push_unseparated(") ");
     }
-  }
-
-  if !include_user_uploads {
-    if !first_predicate_added {
-      query_builder.push(" WHERE ");
-      first_predicate_added = true;
-    } else {
-      query_builder.push(" AND ");
-    }
-    query_builder.push(" NOT m.is_user_upload ");
   }
 
   // TODO: Argument to control `is_intermediate_system_file`

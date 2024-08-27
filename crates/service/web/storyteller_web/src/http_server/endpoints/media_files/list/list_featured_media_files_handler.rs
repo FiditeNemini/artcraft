@@ -68,10 +68,6 @@ pub struct ListFeaturedMediaFilesQueryParams {
   ///   - `?filter_engine_categories=animation,character,object`
   ///   - etc.
   pub filter_engine_categories: Option<String>,
-
-  /// Include user uploaded files in the results.
-  /// By default, we do not return them unless this flag is set to true.
-  pub include_user_uploads: Option<bool>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -366,7 +362,6 @@ async fn database_lookup(
     maybe_filter_media_types: maybe_filter_media_types.as_ref(),
     maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
     maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
-    include_user_uploads: query.include_user_uploads.unwrap_or(false),
     mysql_pool: &server_state.mysql_pool,
   }).await.map_err(|err| {
     error!("DB error: {:?}", err);
