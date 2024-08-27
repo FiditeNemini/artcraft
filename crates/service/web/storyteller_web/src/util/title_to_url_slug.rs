@@ -2,7 +2,6 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 
 const PARENS_AND_BRACKETS_REGEX: Lazy<Regex> = Lazy::new(|| {
-  //Regex::new(r"\([^\\()]*\)").unwrap()
   Regex::new(concat!(
     r"[\(\[]", // Start delimiter: ( or [
     r"[^\\()\\[\\]]*", // In-between content
@@ -13,11 +12,12 @@ const PARENS_AND_BRACKETS_REGEX: Lazy<Regex> = Lazy::new(|| {
 const INVALID_CHARACTER_REGEX: Lazy<Regex> = Lazy::new(|| {
   Regex::new(r"\s+").unwrap()
 });
-const SPACE_REGEX : Lazy<Regex> = Lazy::new(|| {
-  Regex::new(r"\s+").unwrap()
+const SPACE_AND_DASH_COLLAPSE_REGEX: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"[\s\-]+").unwrap()
 });
 
-const ENDING_NOISE: Lazy<Regex> = Lazy::new(|| {
+const ENDING_NOISE_REGEX: Lazy<Regex> = Lazy::new(|| {
+  // Any non-word characters at the end of the string
   Regex::new(r"[^\w]+$").unwrap()
 });
 
@@ -29,12 +29,16 @@ const VERSION_REGEX: Lazy<Regex> = Lazy::new(|| {
   Regex::new(r"(?i)(v)(er(si[oó]n)?)?\s*\d+\.?\d*").unwrap()
 });
 
+const UNSAFE_CONTROL_CODE_REGEX: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"[\u0000-\u001F\u007F-\u009F]").unwrap()
+});
+
 
 /// Convert a model title to a URL slug.
 pub fn title_to_url_slug(title: &str) -> Option<String> {
   let title = title.trim().to_lowercase();
-  let title = PARENS_AND_BRACKETS_REGEX.replace_all(&title, "").to_string();
-  let title = VERSION_REGEX.replace_all(title.trim(), "").to_string();
+  let title = PARENS_AND_BRACKETS_REGEX.replace_all(&title, "");
+  let title = VERSION_REGEX.replace_all(title.trim(), "");
 
   // Dangerous and otherwise bad characters
   // https://perishablepress.com/stop-using-unsafe-characters-in-urls/
@@ -71,14 +75,14 @@ pub fn title_to_url_slug(title: &str) -> Option<String> {
     '~',
   ][..], " ");
 
-  let title = SPACE_REGEX.replace_all(title.trim(), "-").to_string();
-
-  let title = ENDING_NOISE.replace_all(title.trim(), "").to_string();
+  let title = UNSAFE_CONTROL_CODE_REGEX.replace_all(title.trim(), "");
+  let title = SPACE_AND_DASH_COLLAPSE_REGEX.replace_all(title.trim(), "-");
+  let title = ENDING_NOISE_REGEX.replace_all(title.trim(), "");
 
   if title.is_empty() {
     return None;
   } else {
-    Some(title)
+    Some(title.to_string())
   }
 }
 
@@ -104,7 +108,7 @@ mod tests {
     let mut i = 0;
     for line in lines.flatten() {
       if i > 1000 {
-        break;
+        //break;
       }
       let title = line.as_str();
       let slug = title_to_url_slug(title);
@@ -146,8 +150,16 @@ mod tests {
     assert_none(r"  // { , } , | , \ , ^ , ~ , [ , ] , `");
     assert_none(r" \ < > % { } | \ ^ `");
     assert_none(r" / ? # [ ] @ ! $ & ' ( ) * + , ; = \ ");
+    assert_none("\u{0000}");
+    assert_none("\u{001F}");
     assert_expected("at-t-natural-voices-rosa", "AT&T natural voices rosa");
     assert_expected("jaden-judai-yuki", "Jaden/Judai Yuki (JPN, V2)");
+  }
+
+  #[test]
+  pub fn remove_url_titles() {
+    // This is an actual title:
+    assert_expected("https-huggingface-co-jkhgf-slwooly-resolve-main-elizabethafton-zip", "https://huggingface.co/jkhgf/SLWooly/resolve/main/ElizabethAfton.zip");
   }
 
   #[test]
@@ -176,6 +188,13 @@ mod tests {
   }
 
   #[test]
+  fn remove_duplicate_dashes() {
+    // Normally these would generate multiple dashes (---) but we collapse them to one
+    assert_expected("tails-sonic-boom", "Tails - Sonic Boom");
+    assert_expected("drums-type-beat-by-regalhyperus", "Drums (from We Are Number One) - Type Beat by regalhyperus");
+  }
+
+  #[test]
   fn removes_periods() {
     assert_expected("vegeta", "Vegeta. (IMITADORES.) (Dragon Ball, Latin American Spanish.)");
   }
@@ -196,6 +215,9 @@ mod tests {
     assert_expected("shaquille-o-neal", "Shaquille O'Neal");
     assert_expected("tobey-maguire", "Tobey Maguire [Spider_Man]");
     assert_expected("vocal-planet-old-man-blues", "Vocal planet, old man blues");
+    assert_expected("roxanne-wolf", "Roxanne Wolf (Five Nights at Freddy's: Security Breach, Marta Svetek)");
+    assert_expected("hollyhock-manheim-mannheim-guerrero-robinson-zilberschlag-hsung-fonzerelli-mcquack", "Hollyhock Manheim-Mannheim-Guerrero-Robinson-Zilberschlag-Hsung-Fonzerelli-McQuack");
+
   }
 
   //#[test]
@@ -223,11 +245,25 @@ mod tests {
     assert_expected("black-cat-ps4", "Black Cat [PS4");
   }
 
-  //#[test]
-  //pub fn international_titles() {
-  //  assert_expected("", "ماريو-[فندق-ماريو"); // NB: Character printing direction
-  //  assert_expected("", "İnek Şaban (Kemal Sunal)");
-  //  assert_expected("", "REİS SEDAT PEKER");
-  //  assert_expected("", "고세구 (노래) / gosegu (singing)");
-  //}
+  #[test]
+  pub fn international_titles() {
+    assert_expected("charlie-voz-expresiva-de-narración", "Charlie. Voz expresiva de narración. (11Labs, Castillian Spanish.)");
+    assert_expected("doraemon-versión-en-español", "Doraemon. (Catalán 2005) VERSIÓN EN ESPAÑOL. (Doraemon, El Gato Cósmico, Castillian Spanish.)");
+    assert_expected("gwen-stacy-spider-gwen-español-latino", "Gwen Stacy/Spider Gwen (El Spiderverso) Español Latino");
+    assert_expected("locutor-pokémon-stadium-64", "Locutor Pokémon Stadium 64. (Pokémon, Castillian Spanish.)");
+    assert_expected("los-pingüinos-me-la-van-a-mascar-español-latino", "Los Pingüinos Me La Van A Mascar (Meme De Internet) Español Latino");
+    assert_expected("narrador-películas-antiguas-españolas-1960", "Narrador Películas Antiguas Españolas 1960. (Castillian Spanish.)");
+    assert_expected("натурал-альбертович", "Натурал Альбертович");
+    //"trained-by-𝒜𝓁𝑒𝓍-𝑀𝑒𝒽𝒾𝒸𝟣01aqua-hoshino-no-remove"    <- "Trained by:𝒜𝓁𝑒𝓍 𝑀𝑒𝒽𝒾𝒸𝟣01Aqua Hoshino (Oshi no Ko) no remove("
+    //  assert_expected("", "ماريو-[فندق-ماريو"); // NB: Character printing direction
+    //  assert_expected("", "İnek Şaban (Kemal Sunal)");
+    //  assert_expected("", "REİS SEDAT PEKER");
+    //  assert_expected("", "고세구 (노래) / gosegu (singing)");
+    // "camarón-de-la-isla"    <- "Camarón de la Isla. (Dataset de 1 hora y 10 minutos.)"
+    // "recep-i\u{307}vedik"    <- "Recep İvedik (Şahan Gökbakar)"
+    // "i\u{307}nek-şaban"    <- "İnek Şaban (Kemal Sunal)"
+    //"rei\u{307}s-sedat-peker"    <- "REİS SEDAT PEKER"
+    //"고세구-gosegu"    <- "고세구 (노래) / gosegu (singing)"
+    //"trunks-del-futuro-360-epochs-5k-stepts-entrenado-en-colaboración-por-matius"    <- "Trunks del Futuro. (Español Latino.) \"360 Epochs. 5k Stepts.\"  ENTRENADO EN COLABORACIÓN POR @Matius"
+  }
 }
