@@ -8,6 +8,7 @@ export interface Weight {
   weight_type: WeightType;
   weight_category: WeightCategory;
   title: string;
+  maybe_url_slug: string;
   public_bucket_path: string;
   creator_set_visibility: string;
   created_at: Date;

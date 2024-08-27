@@ -44,6 +44,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { ActionButton, ActionButtonProps } from "components/common";
 import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
+import { useCanonicalLink } from "@storyteller/components/src/hooks/UseCanonicalLink";
 import { AITools } from "components/marketing";
 
 interface WeightProps {
@@ -85,6 +86,11 @@ export default function WeightPage({
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const isModerator = canBanUsers() || false;
+
+  // This is important for Google SEO! Be very careful!
+  // Tell Google to only index the canonical version of the URL.
+  const canonicalUrl = (!!weight?.weight_token && !!weight?.maybe_url_slug) ? `/weight/${weight.weight_token}/${weight.maybe_url_slug}` : undefined;
+  useCanonicalLink(canonicalUrl);
 
   let pageTitle;
 
