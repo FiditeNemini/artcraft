@@ -46,6 +46,7 @@ pub struct MediaFileForElasticsearchRecord {
   pub is_batch_generated: bool,
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
+  pub is_user_upload: bool,
   pub is_intermediate_system_file: bool,
 
   pub maybe_title: Option<String>,
@@ -161,6 +162,7 @@ pub async fn list_media_files_for_elastic_search_backfill_using_cursor(
           maybe_origin_filename: record.maybe_origin_filename,
           is_batch_generated: i8_to_bool(record.is_batch_generated),
           maybe_batch_token: record.maybe_batch_token,
+          is_user_upload: i8_to_bool(record.is_user_upload),
           is_intermediate_system_file: i8_to_bool(record.is_intermediate_system_file),
           maybe_title: record.maybe_title,
           maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token,
@@ -224,6 +226,7 @@ SELECT
     m.is_batch_generated,
     m.maybe_batch_token,
 
+    m.is_user_upload,
     m.is_intermediate_system_file,
 
     m.maybe_title,
@@ -373,6 +376,7 @@ struct RawRecord {
   pub is_batch_generated: i8,
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
+  pub is_user_upload: i8,
   pub is_intermediate_system_file: i8,
 
   pub maybe_title: Option<String>,
@@ -459,6 +463,7 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       is_batch_generated: row.try_get("is_batch_generated")?,
       maybe_batch_token: BatchGenerationToken::try_from_mysql_row_nullable(row, "maybe_batch_token")?,
 
+      is_user_upload: row.try_get("is_user_upload")?,
       is_intermediate_system_file: row.try_get("is_intermediate_system_file")?,
 
       maybe_title: row.try_get("maybe_title")?,

@@ -64,6 +64,12 @@ pub struct MediaFileDocument {
   /// Whether the file is featured.
   pub is_featured: bool,
 
+  /// NB: Optional as of 2024-08-27, but will become mandatory.
+  pub is_user_upload: Option<bool>,
+
+  /// NB: Optional as of 2024-08-27, but will become mandatory.
+  pub is_intermediate_system_file: Option<bool>,
+
   /// When we read the record from the database
   pub database_read_time: DateTime<Utc>,
 

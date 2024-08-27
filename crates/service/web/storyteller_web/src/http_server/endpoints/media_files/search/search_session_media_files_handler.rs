@@ -123,6 +123,14 @@ pub struct SearchMediaFileListItem {
   // Whether the media file is featured.
   pub is_featured: bool,
 
+  /// The file was uploaded by the user.
+  /// This does not include files generated on the client side, like studio renders.
+  pub is_user_upload: bool,
+
+  /// The file was created by the system.
+  /// This includes files generated on the client side, like studio renders.
+  pub is_intermediate_system_file: bool,
+
   /// The name or title of the media file (optional)
   pub maybe_title: Option<String>,
 
@@ -279,6 +287,8 @@ pub async fn search_session_media_files_handler(
           //    bookmark_count: result.maybe_bookmark_count.unwrap_or(0),
           //  },
           is_featured: result.is_featured,
+          is_user_upload: result.is_user_upload.unwrap_or(false),
+          is_intermediate_system_file: result.is_intermediate_system_file.unwrap_or(false),
           creator_set_visibility: result.creator_set_visibility,
           maybe_title: result.maybe_title,
           //  maybe_text_transcript: result.maybe_text_transcript,

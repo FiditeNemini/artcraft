@@ -46,6 +46,16 @@
         "index": true
       },
 
+      "is_user_upload" : {
+        "type": "boolean",
+        "index": true
+      },
+
+      "is_intermediate_system_file" : {
+        "type": "boolean",
+        "index": true
+      },
+
       "is_deleted" : {
         "type": "boolean",
         "index": true

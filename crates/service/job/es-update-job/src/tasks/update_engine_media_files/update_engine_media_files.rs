@@ -151,6 +151,9 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Medi
 
     is_featured: record.is_featured,
 
+    is_user_upload: Some(record.is_user_upload),
+    is_intermediate_system_file: Some(record.is_intermediate_system_file),
+
     created_at: record.created_at,
     updated_at: record.updated_at,
     user_deleted_at: record.user_deleted_at,
