@@ -19,6 +19,7 @@ export interface ActionButtonProps {
   toggle: (entityToken: string, entityType: string) => any;
   toolTipOff?: string;
   toolTipOn?: string;
+  visible?: boolean;
 }
 
 export default function ActionButton({
@@ -34,6 +35,7 @@ export default function ActionButton({
   toggle,
   toolTipOff,
   toolTipOn,
+  visible
 }: ActionButtonProps) {
   const { events, status } = useAnimationStatus();
   const onClick = () => {
@@ -52,13 +54,13 @@ export default function ActionButton({
         placement: "bottom",
         theme: "fakeyou",
         trigger: "mouseenter",
+        visible,
       }}
     >
       <button
         {...{
-          className: `fy-action-button ${actionType}-action-button ${
-            isToggled ? "action-button-toggled" : ""
-          }`,
+          className: `fy-action-button ${actionType}-action-button ${isToggled ? "action-button-toggled" : ""
+            }`,
           disabled: busy,
           onClick,
         }}

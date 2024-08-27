@@ -3,10 +3,11 @@ import { SetRating } from "@storyteller/components/src/api/user_ratings/SetRatin
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faHeart } from "@fortawesome/pro-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
-import useBatchContent, {
+import {
+  useBatchContent,
   BatchInputProps,
-  MakePropsParams,
-} from "hooks/useBatchContent";
+  MakeBatchPropsParams,
+} from "hooks";
 
 export interface RatingsProps extends BatchInputProps {
   actionType: "like";
@@ -17,7 +18,7 @@ export interface RatingsProps extends BatchInputProps {
   labelOn: string | number;
 }
 
-export type MakeRatingsProps = (x: MakePropsParams) => RatingsProps;
+export type MakeRatingsProps = (x: MakeBatchPropsParams) => RatingsProps;
 
 export default function useRatings() {
   const fetch = (entity_token: string, entity_type: string, lib: any) => {
@@ -59,8 +60,8 @@ export default function useRatings() {
     ) => {
       let result = res.results
         ? res.results.find((item: any, i: number) => {
-            return (item.details || item)[tokenType] === entity_token;
-          })
+          return (item.details || item)[tokenType] === entity_token;
+        })
         : res;
 
       let { positive_rating_count } = (result.details || result).stats;
@@ -76,7 +77,7 @@ export default function useRatings() {
   const makeProps: MakeRatingsProps = ({
     entityToken,
     entityType,
-  }: MakePropsParams) => {
+  }: MakeBatchPropsParams) => {
     const likeCount = ratings.library[entityToken]?.positive_rating_count || 0;
     return {
       ...ratings.makeProps({ entityToken, entityType }),

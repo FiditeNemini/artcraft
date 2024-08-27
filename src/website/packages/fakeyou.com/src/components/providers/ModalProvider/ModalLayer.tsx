@@ -3,7 +3,7 @@ import { a, easings, useTransition } from "@react-spring/web";
 import { ModalWidth } from "hooks";
 import "./ModalLayer.scss";
 
-interface Props {
+interface ModalLayerProps {
   content?: React.ElementType | null;
   contentProps?: any;
   close: () => void;
@@ -13,6 +13,7 @@ interface Props {
   modalOpen: boolean;
   onModalCloseEnd: (x: any) => void;
   padding?: boolean;
+  scroll?: boolean;
   width?: ModalWidth;
 }
 
@@ -25,8 +26,9 @@ export default function ModalLayer({
   modalOpen,
   onModalCloseEnd,
   padding = true,
+  scroll,
   width = "wide",
-}: Props) {
+}: ModalLayerProps) {
   const mainClassName = "fy-modal-layer";
   const tintTransition = useTransition(modalOpen, {
     config: {
@@ -39,7 +41,7 @@ export default function ModalLayer({
     onRest: onModalCloseEnd,
   });
 
-  if (debug) console.log(`🐛 ModalLayer debug at ${debug}`, modalOpen);
+  if (debug) { console.log(`🐛 ModalLayer debug at ${debug}`, modalOpen); }
 
   return tintTransition(
     (tintStyle, modalIsOpen) =>
@@ -61,9 +63,9 @@ export default function ModalLayer({
         >
           <div
             {...{
-              className: `fy-modal-body-${width}${
-                padding ? "" : " fy-modal-no-padding"
-              }`,
+              className: `fy-modal-body-${width}${padding ? "" : " fy-modal-no-padding"
+                }${scroll ? " fy-modal-scrollable" : ""
+                }`,
             }}
           >
             {Content && (

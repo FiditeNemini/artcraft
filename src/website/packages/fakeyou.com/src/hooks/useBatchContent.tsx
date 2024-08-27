@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { useSession } from "hooks";
 
-interface Props {
+interface UseBatchContentProps {
   checker: any;
   debug?: string;
   fetcher: any;
@@ -26,20 +26,18 @@ interface Gather {
 
 type BatchToggle = (entity_token: string, entity_type: string) => boolean;
 
-export interface MakePropsParams {
+export interface MakeBatchPropsParams {
   entityToken: string;
   entityType: string;
 }
 
-export interface BatchInputProps {
-  busy: boolean;
-  entityToken: string;
-  entityType: string;
+export interface BatchInputProps extends MakeBatchPropsParams {
+  busy?: boolean;
   isToggled: boolean;
   toggle: BatchToggle;
 }
 
-export type MakeBatchProps = (x: MakePropsParams) => BatchInputProps;
+export type MakeBatchProps = (x: MakeBatchPropsParams) => BatchInputProps;
 
 export default function useBatchContent({
   checker,
@@ -47,15 +45,16 @@ export default function useBatchContent({
   fetcher,
   modLibrary = (current: any, res: any, entity_token: string) => current,
   onPass,
-  onFail = { fetch: () => new Promise(() => {}) },
+  onFail = { fetch: () => new Promise(() => { }) },
   resultsKey,
   toggleCheck,
-}: Props) {
+}: UseBatchContentProps) {
   const session = useSession();
   const [library, librarySet] = useState<Library>({});
   const [busyList, busyListSet] = useState<Library>({});
   const [status, statusSet] = useState(FetchStatus.ready);
   const [tokenType, tokenTypeSet] = useState("");
+  const [modalOpen, modalOpenSet] = useState(false);
 
   const dlog = (...dbg: any) => (debug ? console.log(...dbg) : {});
 
@@ -109,7 +108,10 @@ export default function useBatchContent({
     });
 
   const toggle: BatchToggle = (entity_token, entity_type) => {
-    if (session.loggedInOrModal({})) {
+    if (session.loggedInOrModal({}, {
+      onModalClose: () => { modalOpenSet(false); },
+      onModalOpen: () => { modalOpenSet(true); },
+    })) {
       let inLibrary = library[entity_token];
       statusSet(FetchStatus.in_progress);
       busyAdd(entity_token);
@@ -150,12 +152,13 @@ export default function useBatchContent({
 
   const toggled = (entity_token = "") => toggleCheck(library[entity_token]);
 
-  const makeProps = ({ entityToken, entityType }: MakePropsParams) => ({
+  const makeProps = ({ entityToken, entityType }: MakeBatchPropsParams) => ({
     busy: busyList[entityToken],
     entityToken,
     entityType,
     isToggled: toggled(entityToken),
     toggle,
+    ...modalOpen ? { visible: false } : {}
   });
 
   return {

@@ -13,12 +13,17 @@ export interface AccountModalMessages {
   signupMessage?: string;
 }
 
+export interface AccountModalEvents {
+  onModalClose?: () => void;
+  onModalOpen?: () => void;
+}
+
 interface SessionContextType {
   canAccessStudio: () => boolean;
   canEditTtsModel: (creatorUserToken: string) => boolean;
   canEditMediaFile: (creatorUserToken?: string) => boolean;
   canBanUsers: () => boolean;
-  loggedInOrModal: (acctMsgs: AccountModalMessages) => boolean;
+  loggedInOrModal: (acctMsgs: AccountModalMessages, cfg?: AccountModalEvents) => boolean;
   loggedIn: boolean;
   modal: {
     close: () => void;
@@ -61,8 +66,8 @@ export const SessionContext = createContext<SessionContextType>({
   studioAccessCheck: () => null,
   styleVideoAccessCheck: () => null,
   modal: {
-    close: () => {},
-    open: () => {},
+    close: () => { },
+    open: () => { },
   },
   userTokenMatch: () => false,
   sessionWrapper: SessionWrapper.emptySession(),
@@ -85,14 +90,16 @@ export default function SessionProvider({
   const { close, killModal, modalOpen, modalState, onModalCloseEnd, open } =
     useModalState({});
 
-  const loggedInOrModal = (accountModalMessages: AccountModalMessages) => {
+  const loggedInOrModal = (accountModalMessages: AccountModalMessages, events?: AccountModalEvents) => {
     if (user) {
       return true;
     } else {
       open({
         component: AccountModal,
+        scroll: true,
         width: "small",
         props: { ...accountModalMessages },
+        ...events
       });
       return false;
     }
@@ -157,6 +164,7 @@ export default function SessionProvider({
           lockTint: modalState?.lockTint,
           modalOpen,
           onModalCloseEnd,
+          scroll: modalState?.scroll,
           width: modalState?.width,
         }}
       />

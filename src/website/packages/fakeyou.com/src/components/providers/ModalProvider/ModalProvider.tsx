@@ -15,11 +15,12 @@ export interface ModalContextShared {
 }
 
 export const ModalContext = createContext<ModalContextShared>({
-  close: () => {},
-  open: () => {},
+  close: () => { },
+  open: () => { },
   modalOpen: false,
   modalState: null,
 });
+
 
 // how this works
 //
@@ -51,6 +52,7 @@ export default function ModalProvider({ children }: ModalProviderProps) {
           modalOpen,
           onModalCloseEnd,
           padding: modalState?.padding,
+          scroll: modalState?.scroll,
           width: modalState?.width,
         }}
       />

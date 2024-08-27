@@ -7,7 +7,10 @@ export interface ModalConfig {
   component: React.ElementType;
   lockTint?: boolean;
   padding?: boolean;
+  onModalClose?: () => void;
+  onModalOpen?: () => void;
   props?: any;
+  scroll?: boolean;
   width?: ModalWidth;
 }
 
@@ -28,12 +31,18 @@ export default function useModalState({ debug = "" }) {
     if (debug) {
       console.log(`🚪 useModalState open() at ${debug}`, { cfg });
     }
+    if (cfg.onModalOpen) {
+      cfg.onModalOpen();
+    }
     modalStateSet(cfg);
   };
 
   const close = () => {
     if (debug) {
       console.log(`🔥 useModalState close() at ${debug}`);
+    }
+    if (modalState?.onModalClose) {
+      modalState.onModalClose();
     }
     killModalSet(true);
     modalOpenSet(false);

@@ -4,11 +4,11 @@ import { DeleteBookmark } from "@storyteller/components/src/api/bookmarks/Delete
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faBookmark } from "@fortawesome/pro-solid-svg-icons";
 import { faBookmark as faBookmarkOutline } from "@fortawesome/pro-regular-svg-icons";
-
-import useBatchContent, {
+import {
+  useBatchContent,
   BatchInputProps,
-  MakePropsParams,
-} from "hooks/useBatchContent";
+  MakeBatchPropsParams,
+} from "hooks";
 
 export interface BookmarksProps extends BatchInputProps {
   actionType: "bookmark";
@@ -18,21 +18,21 @@ export interface BookmarksProps extends BatchInputProps {
   labelOn: string | number;
 }
 
-export type MakeBookmarksProps = (x: MakePropsParams) => BookmarksProps;
+export type MakeBookmarksProps = (x: MakeBatchPropsParams) => BookmarksProps;
 
 export default function useBookmarks() {
   const toggleList =
     (toBookmark: boolean) =>
-    (res: any, entity_token: string, entity_type: string, lib: any) => {
-      return {
-        ...lib,
-        [entity_token]: {
-          entity_type,
-          is_bookmarked: toBookmark,
-          maybe_bookmark_token: toBookmark ? res.user_bookmark_token : null,
-        },
+      (res: any, entity_token: string, entity_type: string, lib: any) => {
+        return {
+          ...lib,
+          [entity_token]: {
+            entity_type,
+            is_bookmarked: toBookmark,
+            maybe_bookmark_token: toBookmark ? res.user_bookmark_token : null,
+          },
+        };
       };
-    };
 
   const bookmarks = useBatchContent({
     debug: "bookmarks",
@@ -60,7 +60,7 @@ export default function useBookmarks() {
   const makeProps: MakeBookmarksProps = ({
     entityToken,
     entityType,
-  }: MakePropsParams) => {
+  }: MakeBatchPropsParams) => {
     return {
       ...bookmarks.makeProps({ entityToken, entityType }),
       actionType: "bookmark",

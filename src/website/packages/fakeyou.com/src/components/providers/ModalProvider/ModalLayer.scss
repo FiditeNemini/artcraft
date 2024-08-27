@@ -39,11 +39,6 @@
     height: fit-content;
   }
 
-  .fy-modal-body-square {
-    // width: 75vh;
-    // height: 75vh;
-  }
-
   .fy-modal-body-wide,
   .fy-modal-body-narrow,
   .fy-modal-body-small,
@@ -82,5 +77,9 @@
 
   .fy-modal-no-padding {
     padding: 0;
+  }
+
+  .fy-modal-scrollable {
+    overflow-y: scroll;
   }
 }

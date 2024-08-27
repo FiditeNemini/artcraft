@@ -2,7 +2,7 @@ import useAnimationStatus, {
   AnimationEvents,
   AnimationStatus,
 } from "./useAnimationStatus";
-import useBatchContent from "./useBatchContent";
+import useBatchContent, { BatchInputProps, MakeBatchPropsParams } from "./useBatchContent";
 import useBookmarks, { MakeBookmarksProps } from "./useBookmarks";
 import useChanger from "./useChanger";
 import useCoverImgUpload from "./useCoverImgUpload";
@@ -76,7 +76,9 @@ export {
 
 export type {
   AnimationEvents,
+  BatchInputProps,
   MakeBookmarksProps,
+  MakeBatchPropsParams,
   MakeRatingsProps,
   ModalConfig,
   ModalWidth,
