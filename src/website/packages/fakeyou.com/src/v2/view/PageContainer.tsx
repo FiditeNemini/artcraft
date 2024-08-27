@@ -132,6 +132,8 @@ import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
 import { StudioMobileCheckPage } from "./pages/landing/storyteller/PostlaunchLanding/StudioMobileCheckPage";
 import { UploadNewTtsModelPage } from "./pages/upload/UploadNewTtsModelPage";
 import LivePortrait from "./pages/live_portrait/LivePortrait";
+import { BetaLipSyncForm } from "./pages/beta_lipsync/BetaLipSyncForm";
+import { BetaLipSyncPage } from "./pages/beta_lipsync/BetaLipSyncPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -952,6 +954,18 @@ class PageContainer extends React.Component<
                       }
                     />
                   </Route> */}
+
+                <Route path="/beta/lip-sync/form">
+                  <BetaLipSyncForm />
+                </Route>
+
+                <Route path="/beta/lip-sync">
+                  <BetaLipSyncPage />
+                </Route>
+
+                <Route path="/beta/lip-sync/form">
+                  <BetaLipSyncForm />
+                </Route>
 
                 <Route path="/studio-mobile-check">
                   <StudioMobileCheckPage />

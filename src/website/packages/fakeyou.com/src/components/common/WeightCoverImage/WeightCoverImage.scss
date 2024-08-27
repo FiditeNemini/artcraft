@@ -7,6 +7,15 @@
   margin-right: 12px;
   position: relative;
   background-color: #57577d;
+  transition: all 0.2s;
+
+  &.cover-img-hoverable {
+    &:hover {
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid $primary;
+    }
+  }
 
   img,
   .cover-img-edit {

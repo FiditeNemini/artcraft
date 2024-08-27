@@ -74,6 +74,9 @@ export default function TopNav({
   const isOnVcPage =
     window.location.pathname.includes("/voice-conversion") ||
     window.location.pathname.includes("/dev-vc");
+  const isOnBetaLipSyncForm = window.location.pathname.includes(
+    "/beta/lip-sync/form"
+  );
 
   const { open } = useModal();
   const openModal = () =>
@@ -217,7 +220,8 @@ export default function TopNav({
         isOnCreatorOnboardingPage ||
         isOnLoginPage ||
         isOnSignUpPage ||
-        isOnWelcomePage
+        isOnWelcomePage ||
+        isOnBetaLipSyncForm
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
@@ -233,6 +237,7 @@ export default function TopNav({
     isOnLoginPage,
     isOnSignUpPage,
     isOnWelcomePage,
+    isOnBetaLipSyncForm,
   ]);
 
   if (
@@ -273,7 +278,8 @@ export default function TopNav({
     isOnCreatorOnboardingPage ||
     isOnSignUpPage ||
     isOnLoginPage ||
-    isOnWelcomePage
+    isOnWelcomePage ||
+    isOnBetaLipSyncForm
   ) {
     return null;
   }

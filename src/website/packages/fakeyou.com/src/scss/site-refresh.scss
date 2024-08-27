@@ -14,8 +14,8 @@ styles with important tags:
 @mixin panel-no-border-color {
   background-color: $panel;
   border: 1px solid;
-  border-left: none;
-  border-right: none;
+  // border-left: none;
+  // border-right: none;
   border-radius: 0px;
   box-shadow:
     0 0 0 1px rgba(0 0 0 / 16%),
@@ -1143,6 +1143,7 @@ styles with important tags:
   .tippy-box[data-theme~="fakeyou"] {
     background-color: lighten($secondary, 5%);
     color: $white;
+    border-radius: 0.4rem;
   }
 
   .tippy-box[data-theme~="range-slider"] {

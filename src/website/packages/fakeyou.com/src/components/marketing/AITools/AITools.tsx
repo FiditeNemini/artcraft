@@ -95,7 +95,8 @@ export default function AITools() {
     currentPath.includes("/voice-conversion") ||
     currentPath.includes("/tts") ||
     currentPath.includes("/live-portrait") ||
-    currentPath.includes("/dev-lp")
+    currentPath.includes("/dev-lp") ||
+    currentPath.includes("/beta/lip-sync")
   ) {
     items.push({
       externalLink: "https://discord.gg/fakeyou",
@@ -112,6 +113,16 @@ export default function AITools() {
 
   if (currentPath.includes("/voice-conversion")) {
     items = items.filter(item => item.to !== "/voice-conversion");
+  }
+
+  if (currentPath.includes("/beta/lip-sync")) {
+    items = items.filter(
+      item =>
+        item.to !== "/tts" &&
+        item.to !== "/voice-conversion" &&
+        item.to !== "/voice-designer" &&
+        item.to !== "/face-animator"
+    );
   }
 
   if (currentPath.includes("/tts")) {

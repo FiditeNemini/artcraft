@@ -12,6 +12,7 @@ interface WeightCoverImageProps {
   to?: string;
   width?: number;
   coverIndex?: number;
+  marginRight?: number;
 }
 
 export default function WeightCoverImage({
@@ -22,12 +23,14 @@ export default function WeightCoverImage({
   to,
   width = 100,
   coverIndex,
+  marginRight,
 }: WeightCoverImageProps) {
   const containerStyle = {
     height: `${height}px`,
     width: `${width}px`,
     minWidth: `${width}px`,
     backgroundColor: src ? "#F3F4F6" : "",
+    marginRight: `${marginRight}px`,
   };
 
   let image = `/images/default-covers/${coverIndex || 0}.webp`;
@@ -38,8 +41,9 @@ export default function WeightCoverImage({
   return (
     <div
       {...{
-        className: "cover-img",
+        className: `cover-img ${onClick ? "cover-img-hoverable" : ""}`,
         style: containerStyle,
+        onClick,
       }}
     >
       <img src={image} alt={alt || "Model Weight Cover"} />

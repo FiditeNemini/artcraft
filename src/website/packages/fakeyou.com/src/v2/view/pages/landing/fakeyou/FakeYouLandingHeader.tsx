@@ -20,7 +20,9 @@ export default function FakeYouLandingHeader({
   return (
     <div
       {...{
-        className: `d-flex flex-column${experimental ? "" : " fy-header"}`,
+        className: `d-flex flex-column ${
+          experimental ? "" : " fy-header"
+        } mt-5`,
       }}
     >
       {/* <Panel clear={true}>
@@ -46,7 +48,9 @@ export default function FakeYouLandingHeader({
           <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center pt-3 pt-lg-0">
             <Panel clear={true}>
               {experimental ? (
-                <h2>{t("experimentalTitle")}</h2>
+                <h2 className="fw-bold text-center text-lg-start">
+                  {t("experimentalTitle")}
+                </h2>
               ) : (
                 <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
                   {t("heroTitle")}

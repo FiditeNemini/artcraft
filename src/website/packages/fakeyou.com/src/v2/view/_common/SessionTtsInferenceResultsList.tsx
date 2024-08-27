@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,13 +19,17 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { useInferenceJobs, useLocalize, useSession } from "hooks";
-import { Button } from "components/common";
+import { Button, WeightCoverImage } from "components/common";
 import {
   faArrowDownToLine,
   faArrowRight,
+  faFaceViewfinder,
   faStars,
 } from "@fortawesome/pro-solid-svg-icons";
 import LoadingSpinner from "components/common/LoadingSpinner";
+import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
+import Tippy from "@tippyjs/react";
+import { isMobile } from "react-device-detect";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -40,7 +44,6 @@ function SessionTtsInferenceResultList(props: Props) {
   const { t } = useLocalize("SessionTtsInferenceResultList");
   const { t: t2 } = useLocalize("NewTTS");
   const { loggedIn, loggedInOrModal } = useSession();
-
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
@@ -48,6 +51,21 @@ function SessionTtsInferenceResultList(props: Props) {
       cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
       refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
     });
+
+  const [mediaSrc, setMediaSrc] = useState<{ [key: string]: string }>({});
+  const history = useHistory();
+
+  const fetchMedia = async (token: string) => {
+    try {
+      const response = await GetWeight(token, {});
+      console.log("GetWeight response:", response);
+      const publicBucketPath =
+        response.cover_image.maybe_cover_image_public_bucket_path || "";
+      setMediaSrc(prev => ({ ...prev, [token]: publicBucketPath }));
+    } catch (error) {
+      console.error("Error fetching media:", error);
+    }
+  };
 
   useEffect(() => {
     const fetch = async () => {
@@ -70,6 +88,20 @@ function SessionTtsInferenceResultList(props: Props) {
     fetch();
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
+
+  useEffect(() => {
+    inferenceJobsByCategory
+      .get(FrontendInferenceJobType.TextToSpeech)
+      ?.forEach((job: InferenceJob) => {
+        if (job.maybeModelToken) {
+          fetchMedia(job.maybeModelToken);
+        }
+      });
+  }, [inferenceJobsByCategory]);
+
+  const handleLipSyncClick = () => {
+    history.push("/beta/lip-sync");
+  };
 
   let results: Array<JSX.Element> = [];
 
@@ -178,21 +210,62 @@ function SessionTtsInferenceResultList(props: Props) {
             <div>
               <div className="panel panel-results p-3 gap-3 d-flex flex-column">
                 <div>
-                  <div className="d-flex align-items-center gap-1 mb-2">
-                    <h6 className="mb-0 fw-semibold flex-grow-1">
-                      {job.maybeModelTitle}
-                    </h6>
-                    <Button
-                      iconFlip={true}
-                      variant="link"
-                      label="More details"
-                      className="fs-7"
-                      icon={faArrowRight}
-                      to={ttsPermalink}
-                    />
+                  <div className="d-flex gap-1 mb-2">
+                    {job.maybeModelToken ? (
+                      <Tippy
+                        content={
+                          <span className="fs-7">Use audio with Lip Sync</span>
+                        }
+                        theme="fakeyou"
+                      >
+                        <div>
+                          <WeightCoverImage
+                            src={
+                              mediaSrc[job.maybeModelToken]
+                                ? new BucketConfig().getGcsUrl(
+                                    mediaSrc[job.maybeModelToken]
+                                  )
+                                : ""
+                            }
+                            height={48}
+                            width={48}
+                            marginRight={7}
+                            onClick={handleLipSyncClick}
+                          />
+                        </div>
+                      </Tippy>
+                    ) : (
+                      <LoadingSpinner />
+                    )}
+                    <div className="d-flex flex-column justify-content-center flex-grow-1">
+                      <h6 className="mb-0 fw-semibold">
+                        {job.maybeModelTitle}
+                      </h6>
+                      <div className="d-flex mt-1">
+                        <Button
+                          iconFlip={true}
+                          variant="link"
+                          label="Use audio with Lip Sync"
+                          className="fs-7"
+                          icon={faFaceViewfinder}
+                          onClick={handleLipSyncClick}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Button
+                        iconFlip={true}
+                        variant="link"
+                        label="More details"
+                        className="fs-7"
+                        icon={isMobile ? undefined : faArrowRight}
+                        to={ttsPermalink}
+                      />
+                    </div>
                   </div>
 
-                  <p className="fs-7">{job.maybeRawInferenceText}</p>
+                  <p className="fs-7 pt-1">{job.maybeRawInferenceText}</p>
                 </div>
 
                 <div className="d-flex gap-3 align-items-center">

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ModerationIcon } from "../_icons/ModerationIcon";
 import { WebUrl } from "../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,6 +33,7 @@ function FooterNav(props: Props) {
   const [serverInfo, setServerInfo] = useState<
     GetServerInfoSuccessResponse | undefined
   >(undefined);
+  const location = useLocation();
 
   const getServerInfo = useCallback(async () => {
     const response = await GetServerInfo();
@@ -135,13 +136,19 @@ function FooterNav(props: Props) {
     },
   ];
 
-  const isOnCreatorOnboardingPage = window.location.pathname.includes(
+  const isOnCreatorOnboardingPage = location.pathname.includes(
     "/creator-onboarding"
   );
-  const isOnLoginPage = window.location.pathname.includes("/login");
-  const isOnSignUpPage = window.location.pathname.includes("/signup");
+  const isOnLoginPage = location.pathname.includes("/login");
+  const isOnSignUpPage = location.pathname.includes("/signup");
+  const isOnBetaLipSyncForm = location.pathname.includes("/beta/lip-sync/form");
 
-  if (isOnCreatorOnboardingPage || isOnLoginPage || isOnSignUpPage) {
+  if (
+    isOnCreatorOnboardingPage ||
+    isOnLoginPage ||
+    isOnSignUpPage ||
+    isOnBetaLipSyncForm
+  ) {
     return null;
   }
 
