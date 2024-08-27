@@ -388,7 +388,7 @@ class PageContainer extends React.Component<
                 </Route>
 
                 <Route
-                  path="/weight/:weight_token"
+                  path="/weight/:weight_token/:maybe_url_slug?"
                   render={props => (
                     <WeightPage
                       key={props.match.params.weight_token}

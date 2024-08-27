@@ -26,6 +26,7 @@ export default function useWeightFetch({
   const [status, statusSet] = useState(FetchStatus.ready);
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const [title, titleSet] = useState("");
+  const [maybeUrlSlug, maybeUrlSlugSet] = useState(undefined);
   const [visibility, visibilitySet] = useState("public");
   const [descriptionMD, descriptionMDSet] = useState("");
   const isLoading =
@@ -86,10 +87,12 @@ export default function useWeightFetch({
               creator_set_visibility,
               description_markdown,
               title: resTitle,
+              maybe_url_slug: resMaybeUrlSlug,
             } = res;
 
             statusSet(FetchStatus.success);
             titleSet(resTitle);
+            maybeUrlSlugSet(resMaybeUrlSlug);
             descriptionMDSet(description_markdown);
             visibilitySet(creator_set_visibility);
             onSuccess(res);
@@ -114,6 +117,7 @@ export default function useWeightFetch({
     remove,
     status,
     title,
+    maybeUrlSlug,
     update,
     visibility,
     writeStatus,

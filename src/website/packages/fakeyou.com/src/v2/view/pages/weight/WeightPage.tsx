@@ -55,7 +55,8 @@ export default function WeightPage({
 }: WeightProps) {
   const { canEditTtsModel, canBanUsers, user } = useSession();
   const { search } = useLocation();
-  const { weight_token } = useParams<{ weight_token: string }>();
+  const { weight_token, maybe_url_slug } = useParams<{ weight_token: string, maybe_url_slug?: string}>();
+
   const source = search ? new URLSearchParams(search).get("source") : "";
   const history = useHistory();
   const bookmarks = useBookmarks();
@@ -68,6 +69,12 @@ export default function WeightPage({
     onSuccess: (res: any) => {
       bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading
       ratings.gather({ res, key: "weight_token" });
+
+      if (!!res.maybe_url_slug && !!res.weight_token && res.maybe_url_slug !== maybe_url_slug) {
+        // Redirect to the canonical URL, which includes the SEO-friendly "URL slug".
+        const canonicalUrl = `/weight/${res.weight_token}/${res.maybe_url_slug}`;
+        window.history.replaceState({}, "", canonicalUrl)
+      }
     },
     token: weight_token,
   });
