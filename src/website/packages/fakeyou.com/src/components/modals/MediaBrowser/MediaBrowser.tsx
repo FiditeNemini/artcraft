@@ -5,7 +5,7 @@ import {
   EntityInputMode,
   EntityFilterOptions,
 } from "components/entities/EntityTypes";
-import { ModalUtilities, Pagination, TempSelect } from "components/common";
+import { Checkbox, ModalUtilities, Pagination, TempSelect as Select } from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
@@ -27,7 +27,7 @@ import prepFilter from "resources/prepFilter";
 import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
 
-const n = () => {};
+const n = () => { };
 
 export interface MediaBrowserProps {
   accept?: AcceptTypes[];
@@ -43,7 +43,7 @@ export interface MediaBrowserProps {
   searchFilter?: string;
 }
 
-interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps {}
+interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps { }
 
 export default function MediaBrowser({
   accept,
@@ -65,6 +65,9 @@ export default function MediaBrowser({
   const [list, listSet] = useState<MediaFile | Weight[]>([]);
   const [localSearch, localSearchSet] = useState(search);
   const [searchUpdated, searchUpdatedSet] = useState(false);
+  const [showUserUploads, showUserUploadsSet] = useState(true);
+
+
   const fetcher = [
     GetBookmarksByUser,
     GetMediaByUser,
@@ -75,6 +78,7 @@ export default function MediaBrowser({
   const entities = useListContent({
     // debug: "media browser",
     addQueries: {
+      include_user_uploads: showUserUploads,
       ...(localSearch ? {} : { page_size: 24 }),
       ...prepFilter(
         filterType,
@@ -98,11 +102,11 @@ export default function MediaBrowser({
     },
     ...(localSearch
       ? {
-          request: {
-            search_term: localSearch,
-            weight_category: searchFilter ? searchFilter : "text_to_speech",
-          },
-        }
+        request: {
+          search_term: localSearch,
+          weight_category: searchFilter ? searchFilter : "text_to_speech",
+        },
+      }
       : {}),
     requestList: true,
     ...(localSearch ? { resultsKey: "weights" } : {}),
@@ -158,9 +162,9 @@ export default function MediaBrowser({
 
   const filterOptions = accept
     ? accept.map((value: string) => ({
-        value,
-        label: value,
-      }))
+      value,
+      label: value,
+    }))
     : EntityFilterOptions(inputMode);
 
   return (
@@ -175,7 +179,17 @@ export default function MediaBrowser({
       >
         {showFilters && (
           <>
-            <TempSelect
+            <Checkbox {...{
+              className: "mb-0",
+              checked: showUserUploads,
+              label: "Show my uploads",
+              onChange: ({ target }: any) => {
+                entities.reFetch();
+                showUserUploadsSet(target.checked)
+              },
+              variant: "secondary"
+            }} />
+            <Select
               {...{
                 icon: faArrowDownWideShort,
                 options: sortOptions,
@@ -185,7 +199,7 @@ export default function MediaBrowser({
               }}
             />
             {(!accept || (accept && accept.length)) && (
-              <TempSelect
+              <Select
                 {...{
                   icon: faFilter,
                   options: filterOptions,
