@@ -183,7 +183,10 @@ actix = "0.13.5"
 diesel = { version = "2.2.1", features = ["mysql"] }
 
 [dev-dependencies]
+# Testing/Dev Deps: Internal
+testing = { path = "../../../lib/testing" }
+
+# Testing/Dev Deps: External
 speculoos = "0.11.0" # Fluent assertions
 strum = { version = "0.26", features = ["derive"] }
 tempfile = "3.10.1" # For testing
-

@@ -6851,6 +6851,7 @@ dependencies = [
  "symphonia",
  "tempdir",
  "tempfile",
+ "testing",
  "thumbnail_generator",
  "time",
  "tokens",

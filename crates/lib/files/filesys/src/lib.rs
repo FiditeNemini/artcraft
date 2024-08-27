@@ -30,4 +30,5 @@ pub mod file_size;
 pub mod filename_concat;
 pub mod is_filesystem_full_error;
 pub mod path_to_string;
+pub mod read_lines_iterator;
 pub mod rename_across_devices;
