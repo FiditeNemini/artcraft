@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,\n    tts.text_pipeline_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.use_default_mel_multiply_factor,\n    tts.maybe_custom_mel_multiply_factor,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.ietf_language_tag,\n    tts.ietf_primary_language_subtag,\n\n    tts.is_front_page_featured,\n    tts.is_twitch_featured,\n\n    tts.maybe_suggested_unique_bot_command,\n\n    tts.user_ratings_positive_count,\n    tts.user_ratings_negative_count,\n    tts.user_ratings_total_count,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder_user.token as maybe_custom_vocoder_creator_user_token,\n    vocoder_user.username as maybe_custom_vocoder_creator_username,\n    vocoder_user.display_name as maybe_custom_vocoder_creator_display_name,\n    vocoder_user.email_gravatar_hash as maybe_custom_vocoder_creator_gravatar_hash,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\nLEFT OUTER JOIN users AS vocoder_user\n    ON vocoder_user.token = vocoder.creator_user_token\n\nWHERE\n    tts.token = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
+  "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,\n    tts.text_pipeline_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.use_default_mel_multiply_factor,\n    tts.maybe_custom_mel_multiply_factor,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.ietf_language_tag,\n    tts.ietf_primary_language_subtag,\n\n    tts.is_front_page_featured,\n    tts.is_twitch_featured,\n\n    tts.maybe_suggested_unique_bot_command,\n\n    tts.user_ratings_positive_count,\n    tts.user_ratings_negative_count,\n    tts.user_ratings_total_count,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.maybe_migration_new_model_weights_token,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder_user.token as maybe_custom_vocoder_creator_user_token,\n    vocoder_user.username as maybe_custom_vocoder_creator_username,\n    vocoder_user.display_name as maybe_custom_vocoder_creator_display_name,\n    vocoder_user.email_gravatar_hash as maybe_custom_vocoder_creator_gravatar_hash,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\nLEFT OUTER JOIN users AS vocoder_user\n    ON vocoder_user.token = vocoder.creator_user_token\n\nWHERE\n    tts.token = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -265,6 +265,16 @@
       },
       {
         "ordinal": 26,
+        "name": "maybe_migration_new_model_weights_token",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY | BINARY",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 27,
         "name": "maybe_custom_vocoder_token",
         "type_info": {
           "type": "VarString",
@@ -274,7 +284,7 @@
         }
       },
       {
-        "ordinal": 27,
+        "ordinal": 28,
         "name": "maybe_custom_vocoder_title",
         "type_info": {
           "type": "VarString",
@@ -284,7 +294,7 @@
         }
       },
       {
-        "ordinal": 28,
+        "ordinal": 29,
         "name": "maybe_custom_vocoder_creator_user_token",
         "type_info": {
           "type": "VarString",
@@ -294,7 +304,7 @@
         }
       },
       {
-        "ordinal": 29,
+        "ordinal": 30,
         "name": "maybe_custom_vocoder_creator_username",
         "type_info": {
           "type": "VarString",
@@ -304,7 +314,7 @@
         }
       },
       {
-        "ordinal": 30,
+        "ordinal": 31,
         "name": "maybe_custom_vocoder_creator_display_name",
         "type_info": {
           "type": "VarString",
@@ -314,7 +324,7 @@
         }
       },
       {
-        "ordinal": 31,
+        "ordinal": 32,
         "name": "maybe_custom_vocoder_creator_gravatar_hash",
         "type_info": {
           "type": "String",
@@ -324,7 +334,7 @@
         }
       },
       {
-        "ordinal": 32,
+        "ordinal": 33,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -334,7 +344,7 @@
         }
       },
       {
-        "ordinal": 33,
+        "ordinal": 34,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -344,7 +354,7 @@
         }
       },
       {
-        "ordinal": 34,
+        "ordinal": 35,
         "name": "creator_ip_address_creation",
         "type_info": {
           "type": "VarString",
@@ -354,7 +364,7 @@
         }
       },
       {
-        "ordinal": 35,
+        "ordinal": 36,
         "name": "creator_ip_address_last_update",
         "type_info": {
           "type": "VarString",
@@ -364,7 +374,7 @@
         }
       },
       {
-        "ordinal": 36,
+        "ordinal": 37,
         "name": "mod_deleted_at",
         "type_info": {
           "type": "Timestamp",
@@ -374,7 +384,7 @@
         }
       },
       {
-        "ordinal": 37,
+        "ordinal": 38,
         "name": "user_deleted_at",
         "type_info": {
           "type": "Timestamp",
@@ -420,6 +430,7 @@
       true,
       true,
       true,
+      true,
       false,
       false,
       false,
@@ -428,5 +439,5 @@
       true
     ]
   },
-  "hash": "0049a4b3dd3770564c3a466ade7479f0a11508bd4a48b2344b28ff0a20e0b9ca"
+  "hash": "295ac99103e49c817d545d5a7b8a819a839885245c60f8ce2c13a73155917942"
 }

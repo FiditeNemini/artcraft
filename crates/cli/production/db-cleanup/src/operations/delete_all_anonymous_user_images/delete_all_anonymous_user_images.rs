@@ -33,6 +33,7 @@ pub async fn delete_all_anonymous_user_images(_args: &Args, mysql: &Pool<MySql>)
       view_as: ViewAs::Moderator,
       mysql_pool: &mysql,
       maybe_filter_engine_categories: None,
+      include_user_uploads: true,
     }).await?;
 
     if media_files.records.is_empty() {
