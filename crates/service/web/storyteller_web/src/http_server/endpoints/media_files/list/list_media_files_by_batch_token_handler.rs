@@ -3,7 +3,7 @@ use std::sync::Arc;
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::{Path, Query};
+use actix_web::web::{Json, Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
@@ -43,6 +43,8 @@ pub struct ListMediaFilesByBatchQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
+
+  #[deprecated(note="This field has no meaning for this endpoint. Not sure why it was added.")]
   pub filter_media_type: Option<MediaFileType>,
 }
 
@@ -104,6 +106,14 @@ pub struct MediaFilesByBatchListItem {
   pub cover_image: MediaFileCoverImageDetails,
 
   pub creator_set_visibility: Visibility,
+
+  /// The file was uploaded by the user.
+  /// This does not include files generated on the client side, like studio renders.
+  pub is_user_upload: bool,
+
+  /// The file was created by the system.
+  /// This includes files generated on the client side, like studio renders.
+  pub is_intermediate_system_file: bool,
 
   /// The name or title of the media file (optional)
   pub maybe_title: Option<String>,
@@ -174,7 +184,7 @@ pub async fn list_media_files_by_batch_token_handler(
   path: Path<ListMediaFilesByBatchPathInfo>,
   query: Query<ListMediaFilesByBatchQueryParams>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ListMediaFilesByBatchError>
+) -> Result<Json<ListMediaFilesByBatchSuccessResponse>, ListMediaFilesByBatchError>
 {
   let maybe_user_session = server_state
       .session_checker
@@ -267,6 +277,8 @@ pub async fn list_media_files_by_batch_token_handler(
           public_bucket_url: bucket_url_string_from_media_path(&public_bucket_path),
           cover_image: MediaFileCoverImageDetails::from_token(&record.token),
           creator_set_visibility: record.creator_set_visibility,
+          is_user_upload: record.is_user_upload,
+          is_intermediate_system_file: record.is_intermediate_system_file,
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
           maybe_style_name: record.maybe_prompt_args
@@ -284,19 +296,12 @@ pub async fn list_media_files_by_batch_token_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = ListMediaFilesByBatchSuccessResponse {
+  Ok(Json(ListMediaFilesByBatchSuccessResponse {
     success: true,
     results,
     pagination: PaginationPage{
       current: results_page.current_page,
       total_page_count: results_page.total_page_count,
     }
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| ListMediaFilesByBatchError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  }))
 }

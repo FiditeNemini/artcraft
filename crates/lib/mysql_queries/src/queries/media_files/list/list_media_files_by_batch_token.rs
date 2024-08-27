@@ -16,6 +16,7 @@ use errors::AnyhowResult;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct MediaFileListPage {
@@ -50,6 +51,9 @@ pub struct MediaFileListItem {
   pub maybe_public_bucket_extension: Option<String>,
 
   pub creator_set_visibility: Visibility,
+
+  pub is_user_upload: bool,
+  pub is_intermediate_system_file: bool,
 
   pub maybe_title: Option<String>,
 
@@ -126,6 +130,8 @@ pub async fn list_media_files_by_batch_token(args: ListMediaFileByBatchArgs<'_>)
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
           creator_set_visibility: record.creator_set_visibility,
+          is_user_upload: i8_to_bool(record.is_user_upload),
+          is_intermediate_system_file: i8_to_bool(record.is_intermediate_system_file),
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
           maybe_prompt_args: record.maybe_other_prompt_args
@@ -177,6 +183,9 @@ fn select_result_fields() -> String {
     m.maybe_public_bucket_extension,
 
     m.creator_set_visibility,
+
+    m.is_user_upload,
+    m.is_intermediate_system_file,
 
     m.maybe_title,
     m.maybe_text_transcript,
@@ -285,6 +294,9 @@ struct MediaFileListItemInternal {
 
   creator_set_visibility: Visibility,
 
+  is_user_upload: i8,
+  is_intermediate_system_file: i8,
+
   maybe_title: Option<String>,
 
   /// Text transcripts for TTS, etc.
@@ -330,6 +342,8 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      is_user_upload: row.try_get("is_user_upload")?,
+      is_intermediate_system_file: row.try_get("is_intermediate_system_file")?,
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,

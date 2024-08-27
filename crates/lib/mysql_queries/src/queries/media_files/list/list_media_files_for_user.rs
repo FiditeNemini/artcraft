@@ -17,6 +17,7 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct MediaFileListPage {
@@ -52,6 +53,9 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  pub is_user_upload: bool,
+  pub is_intermediate_system_file: bool,
+
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
   pub maybe_file_cover_image_public_bucket_extension: Option<String>,
@@ -78,6 +82,7 @@ pub struct ListMediaFileForUserArgs<'a> {
   pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
   pub maybe_filter_media_classes: Option<&'a HashSet<MediaFileClass>>,
   pub maybe_filter_engine_categories: Option<&'a HashSet<MediaFileEngineCategory>>,
+  pub include_user_uploads: bool,
   pub page_size: usize,
   pub page_index: usize,
   pub sort_ascending: bool,
@@ -92,6 +97,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     args.maybe_filter_media_types,
     args.maybe_filter_media_classes,
     args.maybe_filter_engine_categories,
+    args.include_user_uploads,
     args.username,
     false,
     0,
@@ -110,6 +116,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     args.maybe_filter_media_types,
     args.maybe_filter_media_classes,
     args.maybe_filter_engine_categories,
+    args.include_user_uploads,
     args.username,
     true,
     args.page_index,
@@ -140,6 +147,8 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
           creator_set_visibility: record.creator_set_visibility,
+          is_user_upload: i8_to_bool(record.is_user_upload),
+          is_intermediate_system_file: i8_to_bool(record.is_intermediate_system_file),
           maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
           maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
           maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
@@ -195,6 +204,9 @@ fn select_result_fields() -> String {
 
     m.creator_set_visibility,
 
+    m.is_user_upload,
+    m.is_intermediate_system_file,
+
     media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
     media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
     media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
@@ -225,6 +237,7 @@ fn query_builder<'a>(
   maybe_filter_media_types: Option<&HashSet<MediaFileType>>,
   maybe_filter_media_classes: Option<&HashSet<MediaFileClass>>,
   maybe_filter_engine_categories: Option<&HashSet<MediaFileEngineCategory>>,
+  include_user_uploads: bool,
   username: &'a str,
   enforce_limits: bool,
   page_index: usize,
@@ -264,9 +277,6 @@ LEFT OUTER JOIN prompts
   //  query_builder.push(" AND m.media_type = ");
   //  query_builder.push_bind(media_type.to_str());
   //}
-
-  // TODO: Argument to control
-  query_builder.push(" AND NOT m.is_intermediate_system_file ");
 
   if let Some(media_types) = maybe_filter_media_types {
     // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
@@ -315,6 +325,13 @@ LEFT OUTER JOIN prompts
       separated.push_unseparated(") ");
     }
   }
+
+  if !include_user_uploads {
+    query_builder.push(" AND NOT m.is_user_upload ");
+  }
+
+  // TODO: Argument to control
+  query_builder.push(" AND NOT m.is_intermediate_system_file ");
 
   match view_as {
     ViewAs::Author | ViewAs::Moderator => {
@@ -372,6 +389,9 @@ struct MediaFileListItemInternal {
 
   creator_set_visibility: Visibility,
 
+  is_user_upload: i8,
+  is_intermediate_system_file: i8,
+
   maybe_file_cover_image_public_bucket_hash: Option<String>,
   maybe_file_cover_image_public_bucket_prefix: Option<String>,
   maybe_file_cover_image_public_bucket_extension: Option<String>,
@@ -421,6 +441,8 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      is_user_upload: row.try_get("is_user_upload")?,
+      is_intermediate_system_file: row.try_get("is_intermediate_system_file")?,
       maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
       maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
       maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,

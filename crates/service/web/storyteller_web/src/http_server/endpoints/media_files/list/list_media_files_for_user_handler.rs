@@ -72,6 +72,10 @@ pub struct ListMediaFilesForUserQueryParams {
   ///   - `?filter_engine_categories=animation,character,object`
   ///   - etc.
   pub filter_engine_categories: Option<String>,
+
+  /// Include user uploaded files in the results.
+  /// By default, we do not return them unless this flag is set to true.
+  pub include_user_uploads: Option<bool>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -132,6 +136,14 @@ pub struct MediaFileForUserListItem {
   pub cover_image: MediaFileCoverImageDetails,
 
   pub creator_set_visibility: Visibility,
+
+  /// The file was uploaded by the user.
+  /// This does not include files generated on the client side, like studio renders.
+  pub is_user_upload: bool,
+
+  /// The file was created by the system.
+  /// This includes files generated on the client side, like studio renders.
+  pub is_intermediate_system_file: bool,
 
   /// The name or title of the media file (optional)
   pub maybe_title: Option<String>,
@@ -254,6 +266,7 @@ pub async fn list_media_files_for_user_handler(
     maybe_filter_media_types: maybe_filter_media_types.as_ref(),
     maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
     maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
+    include_user_uploads: query.include_user_uploads.unwrap_or(false),
     page_size,
     page_index,
     sort_ascending,
@@ -326,6 +339,8 @@ pub async fn list_media_files_for_user_handler(
             record.maybe_file_cover_image_public_bucket_extension.as_deref(),
           ),
           creator_set_visibility: record.creator_set_visibility,
+          is_user_upload: record.is_user_upload,
+          is_intermediate_system_file: record.is_intermediate_system_file,
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
           maybe_style_name: record.maybe_prompt_args

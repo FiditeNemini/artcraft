@@ -18,6 +18,7 @@ use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
+use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct MediaFileListPage {
@@ -67,6 +68,9 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  pub is_user_upload: bool,
+  pub is_intermediate_system_file: bool,
+
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
   pub maybe_file_cover_image_public_bucket_extension: Option<String>,
@@ -90,6 +94,7 @@ pub struct ListMediaFilesArgs<'a> {
   pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
   pub maybe_filter_media_classes: Option<&'a HashSet<MediaFileClass>>,
   pub maybe_filter_engine_categories: Option<&'a HashSet<MediaFileEngineCategory>>,
+  pub include_user_uploads: bool,
   pub maybe_offset: Option<usize>,
   pub cursor_is_reversed: bool,
   pub sort_ascending: bool,
@@ -103,6 +108,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
     args.maybe_filter_media_types,
     args.maybe_filter_media_classes,
     args.maybe_filter_engine_categories,
+    args.include_user_uploads,
     args.limit,
     args.maybe_offset,
     args.cursor_is_reversed,
@@ -150,6 +156,8 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
               .flatten(),
           maybe_duration_millis: record.maybe_duration_millis.map(|d| d as u64),
           creator_set_visibility: record.creator_set_visibility,
+          is_user_upload: i8_to_bool(record.is_user_upload),
+          is_intermediate_system_file: i8_to_bool(record.is_intermediate_system_file),
           maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
           maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
           maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
@@ -176,6 +184,7 @@ fn query_builder<'a>(
   maybe_filter_media_types: Option<&HashSet<MediaFileType>>,
   maybe_filter_media_classes: Option<&HashSet<MediaFileClass>>,
   maybe_filter_engine_categories: Option<&HashSet<MediaFileEngineCategory>>,
+  include_user_uploads: bool,
   limit: usize,
   maybe_offset: Option<usize>,
   cursor_is_reversed: bool,
@@ -220,6 +229,9 @@ SELECT
   entity_stats.bookmark_count as maybe_bookmark_count,
 
   m.creator_set_visibility,
+
+  m.is_user_upload,
+  m.is_intermediate_system_file,
 
   media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
   media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
@@ -323,6 +335,27 @@ LEFT OUTER JOIN prompts
     }
   }
 
+  if !include_user_uploads {
+    if !first_predicate_added {
+      query_builder.push(" WHERE ");
+      first_predicate_added = true;
+    } else {
+      query_builder.push(" AND ");
+    }
+    query_builder.push(" NOT m.is_user_upload ");
+  }
+
+  // TODO: Argument to control `is_intermediate_system_file`
+  {
+    if !first_predicate_added {
+      query_builder.push(" WHERE ");
+      first_predicate_added = true;
+    } else {
+      query_builder.push(" AND ");
+    }
+    query_builder.push(" NOT m.is_intermediate_system_file ");
+  }
+
   match view_as {
     ViewAs::Moderator | ViewAs::Author => {
       if !first_predicate_added {
@@ -378,9 +411,6 @@ LEFT OUTER JOIN prompts
     query_builder.push_bind(offset as i64);
   }
 
-  // TODO: Argument to control
-  query_builder.push(" AND NOT m.is_intermediate_system_file ");
-
   query_builder.push(" GROUP BY m.id ");
 
   if sort_ascending {
@@ -420,6 +450,9 @@ struct MediaFileListItemInternal {
   maybe_creator_gravatar_hash: Option<String>,
 
   creator_set_visibility: Visibility,
+
+  is_user_upload: i8,
+  is_intermediate_system_file: i8,
 
   maybe_file_cover_image_public_bucket_hash: Option<String>,
   maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -478,6 +511,8 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
       maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      is_user_upload: row.try_get("is_user_upload")?,
+      is_intermediate_system_file: row.try_get("is_intermediate_system_file")?,
       maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
       maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
       maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,

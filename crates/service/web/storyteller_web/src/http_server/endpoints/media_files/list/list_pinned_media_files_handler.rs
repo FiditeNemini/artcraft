@@ -85,6 +85,14 @@ pub struct PinnedMediaFile {
 
   pub maybe_creator: Option<UserDetailsLight>,
 
+  /// The file was uploaded by the user.
+  /// This does not include files generated on the client side, like studio renders.
+  pub is_user_upload: bool,
+
+  /// The file was created by the system.
+  /// This includes files generated on the client side, like studio renders.
+  pub is_intermediate_system_file: bool,
+
   /// The name or title of the media file (optional)
   pub maybe_title: Option<String>,
 
@@ -227,6 +235,8 @@ pub async fn list_pinned_media_files_handler(
               m.maybe_creator_display_name,
               m.maybe_creator_email_gravatar_hash
             ),
+            is_user_upload: m.is_user_upload,
+            is_intermediate_system_file: m.is_intermediate_system_file,
             maybe_title: m.maybe_title,
             maybe_text_transcript: m.maybe_text_transcript,
             maybe_style_name: m.maybe_prompt_args
