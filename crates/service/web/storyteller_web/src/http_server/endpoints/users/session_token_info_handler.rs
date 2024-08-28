@@ -25,6 +25,7 @@ pub struct SessionTokenInfoSuccessResponse {
   /// A signed session that can be sent as a header, bypassing cookies.
   /// This is useful for API clients that don't support cookies or Google
   /// browsers killing cross-domain cookies.
+  /// Send this as the "Session:" header.
   pub maybe_signed_session: Option<String>,
 }
 
@@ -59,6 +60,10 @@ impl fmt::Display for SessionTokenInfoError {
   }
 }
 
+/// Hack to bypass CORS. !!!!!!!!!!!DO NOT USE THIS!!!!!!!!!!!!!!
+///
+/// Seriously do not use this unless you okay it with Brandon, Kasisnu, or Michael.
+/// This is poison and is a huge security vuln.
 #[utoipa::path(
   get,
   tag = "Users",

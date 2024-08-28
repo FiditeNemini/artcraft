@@ -119,6 +119,7 @@ use crate::http_server::endpoints::users::get_profile_handler::*;
 use crate::http_server::endpoints::users::login_handler::*;
 use crate::http_server::endpoints::users::logout_handler::*;
 use crate::http_server::endpoints::users::session_info_handler::*;
+use crate::http_server::endpoints::users::session_token_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::*;
@@ -210,6 +211,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::users::get_profile_handler::get_profile_handler,
     crate::http_server::endpoints::users::login_handler::login_handler,
     crate::http_server::endpoints::users::logout_handler::logout_handler,
+    crate::http_server::endpoints::users::session_token_info_handler::session_token_info_handler,
     crate::http_server::endpoints::users::session_info_handler::session_info_handler,
     crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
@@ -324,6 +326,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     CreateBetaKeysError,
     CreateBetaKeysRequest,
     CreateBetaKeysSuccessResponse,
+    SessionTokenInfoSuccessResponse,
+    SessionTokenInfoError,
     CreateCheckoutSessionError,
     CreateCheckoutSessionRequest,
     CreateCheckoutSessionSuccessResponse,
