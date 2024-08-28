@@ -32,14 +32,15 @@ export const BetaVideoCompositorPage = () => {
                   muted
                   loop
                   className="object-fit-cover w-100 h-100"
+                  style={{ objectPosition: "top" }}
                 >
-                  <source src="/videos/ai-tools/vcomp_video.mp4" />
+                  <source src="/videos/ai-tools/vcomp_video_2.mp4" />
                 </video>
               </div>
             </div>
             <div className="d-flex flex-column align-items-center py-4">
               <h2 className="fw-bold mb-2 text-center">
-                We're currently building Video Compositor!
+                We're currently building 2D Video Compositor!
               </h2>
               <p className="opacity-75 text-center">
                 Simply add images and videos onto a canvas to create a new

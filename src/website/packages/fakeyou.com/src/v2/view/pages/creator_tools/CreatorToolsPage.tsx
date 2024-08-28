@@ -93,7 +93,7 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
       imgAlt: "Lipsync",
     },
     {
-      to: "/beta/video-compositor",
+      to: "/beta/2d-video-compositor",
       title: "2D Video Compositor",
       text: "Compose videos and images with AI",
       videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
@@ -102,7 +102,7 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
       videoPosition: "top",
     },
     {
-      to: "/beta/video-compositor",
+      to: "/beta/3d-video-compositor",
       title: "3D Video Compositor",
       text: "Compose videos and images with AI",
       videoSrc: "/videos/ai-tools/vcomp_video.mp4",
