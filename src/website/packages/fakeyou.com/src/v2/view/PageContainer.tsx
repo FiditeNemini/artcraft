@@ -132,9 +132,13 @@ import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
 import { StudioMobileCheckPage } from "./pages/landing/storyteller/PostlaunchLanding/StudioMobileCheckPage";
 import { UploadNewTtsModelPage } from "./pages/upload/UploadNewTtsModelPage";
 import LivePortrait from "./pages/live_portrait/LivePortrait";
-import { BetaLipSyncForm } from "./pages/beta_lipsync/BetaLipSyncForm";
-import { BetaLipSyncPage } from "./pages/beta_lipsync/BetaLipSyncPage";
+import { BetaLipSyncForm } from "./pages/beta_products/BetaLipSyncForm";
+import { BetaLipSyncPage } from "./pages/beta_products/BetaLipSyncPage";
 import { ToolsTestPage } from "./pages/tools_test/ToolsTestPage";
+import { BetaVideoCompositorForm } from "./pages/beta_products/BetaVideoCompositorForm";
+import { BetaVideoCompositorPage } from "./pages/beta_products/BetaVideoCompositorPage";
+import { BetaWebcamActingForm } from "./pages/beta_products/BetaWebcamActingForm";
+import { BetaWebcamActingPage } from "./pages/beta_products/BetaWebcamActingPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -955,6 +959,22 @@ class PageContainer extends React.Component<
                       }
                     />
                   </Route> */}
+
+                <Route path="/beta/webcam-acting/form">
+                  <BetaWebcamActingForm />
+                </Route>
+
+                <Route path="/beta/webcam-acting">
+                  <BetaWebcamActingPage />
+                </Route>
+
+                <Route path="/beta/video-compositor/form">
+                  <BetaVideoCompositorForm />
+                </Route>
+
+                <Route path="/beta/video-compositor">
+                  <BetaVideoCompositorPage />
+                </Route>
 
                 <Route path="/beta/lip-sync/form">
                   <BetaLipSyncForm />

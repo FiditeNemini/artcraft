@@ -62,6 +62,31 @@ export default function AITools() {
       imgAlt: "Lipsync",
     },
     {
+      to: "/beta/video-compositor",
+      title: "2D Video Compositor",
+      text: "Compose videos and images with AI",
+      videoSrc: "/videos/ai-tools/vcomp_video.mp4",
+      videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+      imgAlt: "Video Compositor",
+    },
+    {
+      to: "/beta/video-compositor",
+      title: "3D Video Compositor",
+      text: "Compose videos and images with AI",
+      videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
+      videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
+      imgAlt: "Video Compositor",
+      videoPosition: "top",
+    },
+    {
+      to: "/beta/webcam-acting",
+      title: "Webcam Acting",
+      text: "Act as your character through your camera",
+      videoSrc: "/videos/ai-tools/ca_video.mp4",
+      videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
+      imgAlt: "Video Compositor",
+    },
+    {
       to: "/tts",
       title: t("productTtsTitle"),
       text: t("productTtsText"),
@@ -97,7 +122,7 @@ export default function AITools() {
     currentPath.includes("/tts") ||
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp") ||
-    currentPath.includes("/beta/lip-sync")
+    currentPath.includes("/beta/")
   ) {
     items.push({
       externalLink: "https://discord.gg/fakeyou",
@@ -113,7 +138,7 @@ export default function AITools() {
     items.push(
       {
         to: "/",
-        title: "Video Compositor",
+        title: "2D Video Compositor",
         text: "Compose videos and images with AI",
         videoSrc: "/videos/ai-tools/vcomp_video.mp4",
         videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
@@ -121,7 +146,7 @@ export default function AITools() {
       },
       {
         to: "/",
-        title: "Video Compositor",
+        title: "3D Video Compositor",
         text: "Compose videos and images with AI",
         videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
         videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
@@ -137,6 +162,12 @@ export default function AITools() {
         imgAlt: "Video Compositor",
       }
     );
+    items = items.filter(
+      item =>
+        item.to !== "/tts" &&
+        item.to !== "/voice-conversion" &&
+        item.to !== "/voice-designer"
+    );
   }
 
   if (currentPath.includes("/tts")) {
@@ -147,13 +178,15 @@ export default function AITools() {
     items = items.filter(item => item.to !== "/voice-conversion");
   }
 
-  if (currentPath.includes("/beta/lip-sync")) {
+  if (currentPath.includes("/beta/")) {
     items = items.filter(
       item =>
         item.to !== "/tts" &&
         item.to !== "/voice-conversion" &&
         item.to !== "/voice-designer" &&
-        item.to !== "/face-animator"
+        item.to !== "/face-animator" &&
+        item.to !== "/beta/video-compositor" &&
+        item.to !== "/beta/webcam-acting"
     );
   }
 
