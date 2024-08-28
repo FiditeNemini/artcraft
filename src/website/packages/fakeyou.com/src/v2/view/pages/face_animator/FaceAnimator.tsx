@@ -23,13 +23,13 @@ import FaceAnimatorSubViews from "./sub_views";
 import FaceAnimatorTitle from "./FaceAnimatorTitle";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
-import { VideoBasic } from "components/common";
+import { Container, Panel, VideoBasic } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
 import "./FaceAnimator.scss";
 import PremiumLock from "components/PremiumLock";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { AITools } from "components/marketing";
 
 export default function FaceAnimator({
   sessionSubscriptionsWrapper,
@@ -163,9 +163,9 @@ export default function FaceAnimator({
       .catch(e => {
         // @ts-ignore
         window.dataLayer.push({
-          "event": "upload_failure",
-          "page": "/face-enqueue_failure",
-          "user_id": "$user_id"
+          event: "upload_failure",
+          page: "/face-enqueue_failure",
+          user_id: "$user_id",
         });
         return { success: false }; // we can do more user facing error handling
       });
@@ -219,62 +219,71 @@ export default function FaceAnimator({
   };
 
   return (
-    <div {...{ className: "face-animator-container container-panel pt-4" }}>
-      <FaceAnimatorTitle {...headerProps} />
-      <PremiumLock
-        requiredPlan="any"
-        sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-        large={true}
-        showCtaButton={true}
-      >
-        <div {...{ className: "panel face-animator-main" }}>
-          {transitions((style, i) => {
-            const Page = FaceAnimatorSubViews[page];
-            return Page ? (
-              <Page
-                {...{
-                  audioProps,
-                  imageProps,
-                  frameDimensions,
-                  frameDimensionsChange,
-                  disableFaceEnhancement,
-                  disableFaceEnhancementChange,
-                  enqueueInferenceJob,
-                  preferPresetAudio,
-                  preferPresetAudioSet,
-                  presetAudio,
-                  still,
-                  stillChange,
-                  sessionSubscriptionsWrapper,
-                  index,
-                  t,
-                  toggle: { audio: readyMedia(1), image: readyMedia(0) },
-                  style,
-                  removeWatermark,
-                  removeWatermarkChange,
-                }}
-              />
-            ) : null;
-          })}
-        </div>
-      </PremiumLock>
-      <InferenceJobsList
-        {...{
-          failures,
-          onSelect: () => Analytics.voiceConversionClickDownload(),
-          jobType: FrontendInferenceJobType.FaceAnimation,
-        }}
-      />
-      <div className="face-animator-mobile-sample">
-        <VideoBasic
-          title="Face Animator Sample"
-          src="/videos/face-animator-instruction-en.mp4"
+    <>
+      <div {...{ className: "face-animator-container container-panel pt-4" }}>
+        <FaceAnimatorTitle {...headerProps} />
+        <PremiumLock
+          requiredPlan="any"
+          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+          large={true}
+          showCtaButton={true}
+        >
+          <div {...{ className: "panel face-animator-main" }}>
+            {transitions((style, i) => {
+              const Page = FaceAnimatorSubViews[page];
+              return Page ? (
+                <Page
+                  {...{
+                    audioProps,
+                    imageProps,
+                    frameDimensions,
+                    frameDimensionsChange,
+                    disableFaceEnhancement,
+                    disableFaceEnhancementChange,
+                    enqueueInferenceJob,
+                    preferPresetAudio,
+                    preferPresetAudioSet,
+                    presetAudio,
+                    still,
+                    stillChange,
+                    sessionSubscriptionsWrapper,
+                    index,
+                    t,
+                    toggle: { audio: readyMedia(1), image: readyMedia(0) },
+                    style,
+                    removeWatermark,
+                    removeWatermarkChange,
+                  }}
+                />
+              ) : null;
+            })}
+          </div>
+        </PremiumLock>
+        <InferenceJobsList
+          {...{
+            failures,
+            onSelect: () => Analytics.voiceConversionClickDownload(),
+            jobType: FrontendInferenceJobType.FaceAnimation,
+          }}
         />
+        <div className="face-animator-mobile-sample">
+          <VideoBasic
+            title="Face Animator Sample"
+            src="/videos/face-animator-instruction-en.mp4"
+          />
+        </div>
+
+        {/* <div className="py-5">
+        <StorytellerStudioCTA title="Try Storyteller Studio" />
+      </div> */}
       </div>
 
-      <div className="py-5">
-        <StorytellerStudioCTA title="Try Storyteller Studio" />
-      </div>
-    </div>
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try other AI video tools</h2>
+          <AITools />
+        </Panel>
+      </Container>
+    </>
   );
 }

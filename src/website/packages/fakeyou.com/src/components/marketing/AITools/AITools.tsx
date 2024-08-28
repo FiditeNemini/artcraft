@@ -122,7 +122,8 @@ export default function AITools() {
     currentPath.includes("/tts") ||
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp") ||
-    currentPath.includes("/beta/")
+    currentPath.includes("/beta/") ||
+    currentPath.includes("/face-animator")
   ) {
     items.push({
       externalLink: "https://discord.gg/fakeyou",
@@ -200,7 +201,11 @@ export default function AITools() {
   }
 
   if (currentPath.includes("/style-video")) {
-    items = [items[1], items[2], items[6]];
+    items = [items[1], items[2], items[9]];
+  }
+
+  if (currentPath.includes("/face-animator")) {
+    items = [items[0], items[1], items[9]];
   }
 
   if (
@@ -209,7 +214,7 @@ export default function AITools() {
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp")
   ) {
-    items = [items[0], items[2], items[6]];
+    items = [items[0], items[2], items[9]];
   }
 
   return <AIToolsRow {...{ items }} />;
