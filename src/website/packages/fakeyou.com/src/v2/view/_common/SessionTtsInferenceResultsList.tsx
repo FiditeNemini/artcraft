@@ -203,10 +203,6 @@ function SessionTtsInferenceResultList(props: Props) {
 
         results.push(
           <div key={job.jobToken}>
-            {/*<div className="message-header">
-              <p>{job.title}</p>
-              <button className="delete" aria-label="delete"></button>
-            </div>*/}
             <div>
               <div className="panel panel-results p-3 gap-3 d-flex flex-column">
                 <div>
@@ -227,8 +223,8 @@ function SessionTtsInferenceResultList(props: Props) {
                                   )
                                 : ""
                             }
-                            height={48}
-                            width={48}
+                            height={36}
+                            width={36}
                             marginRight={7}
                             onClick={handleLipSyncClick}
                           />
@@ -241,16 +237,6 @@ function SessionTtsInferenceResultList(props: Props) {
                       <h6 className="mb-0 fw-semibold">
                         {job.maybeModelTitle}
                       </h6>
-                      <div className="d-flex mt-1">
-                        <Button
-                          iconFlip={true}
-                          variant="link"
-                          label="Use audio with Lip Sync"
-                          className="fs-7"
-                          icon={faFaceViewfinder}
-                          onClick={handleLipSyncClick}
-                        />
-                      </div>
                     </div>
 
                     <div>
@@ -283,18 +269,17 @@ function SessionTtsInferenceResultList(props: Props) {
                   />
                 </div>
 
-                {/* <div className="mt-2">
-                  <Link
-                    to={ttsPermalink}
-                    onClick={() => {
-                      Analytics.ttsClickResultLink();
-                    }}
-                    className="fw-semibold"
-                  >
-                    <FontAwesomeIcon icon={faLink} className="me-2" />
-                    {t("resultsAudioShareDownload")}
-                  </Link>
-                </div> */}
+                <div className="d-flex mt-2">
+                  <Button
+                    iconFlip={true}
+                    variant="primary"
+                    label="Use this audio with Lip Sync"
+                    className="fs-7"
+                    icon={faFaceViewfinder}
+                    onClick={handleLipSyncClick}
+                    small={true}
+                  />
+                </div>
               </div>
             </div>
           </div>
