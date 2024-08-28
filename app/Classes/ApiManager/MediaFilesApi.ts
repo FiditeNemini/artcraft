@@ -194,6 +194,7 @@ export class MediaFilesApi extends ApiManager {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list/user/${userName}`;
     const queryWithStrings = {
       ...query,
+      include_user_uploads: true,
       filter_media_classes: query.filter_media_classes
         ? query.filter_media_classes.join(",")
         : undefined,
