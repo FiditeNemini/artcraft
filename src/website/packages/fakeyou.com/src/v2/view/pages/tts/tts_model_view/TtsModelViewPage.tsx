@@ -65,8 +65,6 @@ import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { useInferenceJobs } from "hooks";
-import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { AITools } from "components/marketing";
 import { useSession } from "hooks";
@@ -871,12 +869,6 @@ function TtsModelViewPage(props: Props) {
           <SessionTtsInferenceResultList
             sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
           />
-        </div>
-        <>
-          <MentionsSection />
-        </>
-        <div className="py-5">
-          <StorytellerStudioCTA />
         </div>
       </div>
     );
