@@ -185,7 +185,8 @@ export default function AITools() {
         item.to !== "/voice-conversion" &&
         item.to !== "/voice-designer" &&
         item.to !== "/face-animator" &&
-        item.to !== "/beta/video-compositor" &&
+        item.to !== "/beta/2d-video-compositor" &&
+        item.to !== "/beta/3d-video-compositor" &&
         item.to !== "/beta/webcam-acting"
     );
   }
