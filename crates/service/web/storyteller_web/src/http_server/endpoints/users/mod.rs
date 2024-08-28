@@ -6,3 +6,4 @@ pub mod logout_handler;
 pub mod password_reset_redeem_handler;
 pub mod password_reset_request_handler;
 pub mod session_info_handler;
+pub mod session_token_info_handler;

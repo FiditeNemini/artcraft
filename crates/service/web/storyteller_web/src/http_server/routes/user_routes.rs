@@ -14,6 +14,7 @@ use crate::http_server::endpoints::users::logout_handler::logout_handler;
 use crate::http_server::endpoints::users::password_reset_redeem_handler::password_reset_redeem_handler;
 use crate::http_server::endpoints::users::password_reset_request_handler::password_reset_request_handler;
 use crate::http_server::endpoints::users::session_info_handler::session_info_handler;
+use crate::http_server::endpoints::users::session_token_info_handler::session_token_info_handler;
 use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
 use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 
@@ -72,6 +73,11 @@ pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
           web::resource("/v1/session")
               .route(web::get().to(session_info_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/v1/session_token")
+            .route(web::get().to(session_token_info_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
         web::resource("/v1/password_reset/request")

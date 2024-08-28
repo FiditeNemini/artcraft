@@ -80,15 +80,7 @@ impl HttpUserSessionManager {
     request: &HttpRequest
   ) -> AnyhowResult<Option<HttpUserSessionPayload>>
   {
-    let mut signed_session_payload= request.cookie(SESSION_COOKIE_NAME)
-        .map(|cookie| cookie.value().to_string());
-
-    if signed_session_payload.is_none() {
-      signed_session_payload = request.headers().get(SESSION_HEADER_NAME)
-          .map(|header| header.to_str())
-          .transpose()?
-          .map(|payload| payload.to_string());
-    }
+    let signed_session_payload = self.session_payload_from_request(request)?;
 
     let signed_session_payload = match signed_session_payload {
       Some(payload) => payload,
@@ -102,6 +94,41 @@ impl HttpUserSessionManager {
       },
       Ok(payload) => Ok(Some(payload)),
     }
+  }
+
+  // NB: THIS IS ONLY FOR A QUICK HACK FOR FREAKING CORS UGH
+  // THIS IS A HUGE STUPID SECURITY VULN. DAMNIT GOOGLE DAMNIT CORS.
+  pub fn check_and_return_session_token_decodes(&self, request: &HttpRequest) -> AnyhowResult<Option<String>> {
+    let signed_session_payload = self.session_payload_from_request(request)?;
+
+    let signed_session_payload = match signed_session_payload {
+      Some(payload) => payload,
+      None => return Ok(None),
+    };
+
+    match self.payload_signer.decode(&signed_session_payload) {
+      Err(e) => {
+        warn!("Session cookie decode error: {:?}", e);
+        return Err(anyhow!("Could not decode session cookie: {:?}", e));
+      },
+      Ok(_payload) => {}, // Good! We'll just discard this.
+    }
+
+    Ok(Some(signed_session_payload))
+  }
+
+  fn session_payload_from_request(&self, request: &HttpRequest) -> AnyhowResult<Option<String>> {
+    let mut signed_session_payload= request.cookie(SESSION_COOKIE_NAME)
+        .map(|cookie| cookie.value().to_string());
+
+    if signed_session_payload.is_none() {
+      signed_session_payload = request.headers().get(SESSION_HEADER_NAME)
+          .map(|header| header.to_str())
+          .transpose()?
+          .map(|payload| payload.to_string());
+    }
+
+    Ok(signed_session_payload)
   }
 }
 
