@@ -62,21 +62,21 @@ export default function AITools() {
       imgAlt: "Lipsync",
     },
     {
-      to: "/beta/video-compositor",
+      to: "/beta/2d-video-compositor",
       title: "2D Video Compositor",
-      text: "Compose videos and images with AI",
-      videoSrc: "/videos/ai-tools/vcomp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
-      imgAlt: "Video Compositor",
-    },
-    {
-      to: "/beta/video-compositor",
-      title: "3D Video Compositor",
       text: "Compose videos and images with AI",
       videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
       videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
       imgAlt: "Video Compositor",
       videoPosition: "top",
+    },
+    {
+      to: "/beta/3d-video-compositor",
+      title: "3D Video Compositor",
+      text: "Compose videos and images with AI",
+      videoSrc: "/videos/ai-tools/vcomp_video.mp4",
+      videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+      imgAlt: "Video Compositor",
     },
     {
       to: "/beta/webcam-acting",
@@ -134,41 +134,41 @@ export default function AITools() {
   }
 
   // Test Page
-  if (currentPath.includes("/dev/tools")) {
-    items.push(
-      {
-        to: "/",
-        title: "2D Video Compositor",
-        text: "Compose videos and images with AI",
-        videoSrc: "/videos/ai-tools/vcomp_video.mp4",
-        videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
-        imgAlt: "Video Compositor",
-      },
-      {
-        to: "/",
-        title: "3D Video Compositor",
-        text: "Compose videos and images with AI",
-        videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
-        videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
-        imgAlt: "Video Compositor",
-        videoPosition: "top",
-      },
-      {
-        to: "/",
-        title: "Webcam Acting",
-        text: "Act as your character through your camera",
-        videoSrc: "/videos/ai-tools/ca_video.mp4",
-        videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
-        imgAlt: "Video Compositor",
-      }
-    );
-    items = items.filter(
-      item =>
-        item.to !== "/tts" &&
-        item.to !== "/voice-conversion" &&
-        item.to !== "/voice-designer"
-    );
-  }
+  // if (currentPath.includes("/dev/tools")) {
+  //   items.push(
+  //     {
+  //       to: "/",
+  //       title: "2D Video Compositor",
+  //       text: "Compose videos and images with AI",
+  //       videoSrc: "/videos/ai-tools/vcomp_video.mp4",
+  //       videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+  //       imgAlt: "Video Compositor",
+  //     },
+  //     {
+  //       to: "/",
+  //       title: "3D Video Compositor",
+  //       text: "Compose videos and images with AI",
+  //       videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
+  //       videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
+  //       imgAlt: "Video Compositor",
+  //       videoPosition: "top",
+  //     },
+  //     {
+  //       to: "/",
+  //       title: "Webcam Acting",
+  //       text: "Act as your character through your camera",
+  //       videoSrc: "/videos/ai-tools/ca_video.mp4",
+  //       videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
+  //       imgAlt: "Video Compositor",
+  //     }
+  //   );
+  //   items = items.filter(
+  //     item =>
+  //       item.to !== "/tts" &&
+  //       item.to !== "/voice-conversion" &&
+  //       item.to !== "/voice-designer"
+  //   );
+  // }
 
   if (currentPath.includes("/tts")) {
     items = items.filter(item => item.to !== "/tts");

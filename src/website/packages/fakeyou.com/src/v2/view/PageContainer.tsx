@@ -139,6 +139,8 @@ import { BetaVideoCompositorForm } from "./pages/beta_products/BetaVideoComposit
 import { BetaVideoCompositorPage } from "./pages/beta_products/BetaVideoCompositorPage";
 import { BetaWebcamActingForm } from "./pages/beta_products/BetaWebcamActingForm";
 import { BetaWebcamActingPage } from "./pages/beta_products/BetaWebcamActingPage";
+import { Beta3DVideoCompositorForm } from "./pages/beta_products/Beta3DVideoCompositorForm";
+import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoCompositorPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -968,11 +970,19 @@ class PageContainer extends React.Component<
                   <BetaWebcamActingPage />
                 </Route>
 
-                <Route path="/beta/video-compositor/form">
+                <Route path="/beta/3d-video-compositor/form">
+                  <Beta3DVideoCompositorForm />
+                </Route>
+
+                <Route path="/beta/3d-video-compositor">
+                  <Beta3DVideoCompositorPage />
+                </Route>
+
+                <Route path="/beta/2d-video-compositor/form">
                   <BetaVideoCompositorForm />
                 </Route>
 
-                <Route path="/beta/video-compositor">
+                <Route path="/beta/2d-video-compositor">
                   <BetaVideoCompositorPage />
                 </Route>
 

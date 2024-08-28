@@ -4,13 +4,13 @@ import { useLocation } from "react-router-dom";
 import { useDomainConfig } from "context/DomainConfigContext";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
-export const BetaVideoCompositorForm = () => {
+export const Beta3DVideoCompositorForm = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
   const domain = useDomainConfig();
 
-  const formId = "aoQgj41v";
+  const formId = "GIivcXuf";
 
   const fullFormUrl = `${formId}?${
     domain.titlePart === "FakeYou"
@@ -18,7 +18,7 @@ export const BetaVideoCompositorForm = () => {
       : "typeform-source=storyteller.ai"
   }&email=${encodeURIComponent(email || "")}`;
 
-  usePrefixedDocumentTitle("Beta 2D Video Compositor");
+  usePrefixedDocumentTitle("Beta 3D Video Compositor");
 
   return (
     <div

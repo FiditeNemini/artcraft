@@ -5,8 +5,8 @@ import { AITools } from "components/marketing";
 import React from "react";
 // import { Widget } from "@typeform/embed-react";
 
-export const BetaVideoCompositorPage = () => {
-  usePrefixedDocumentTitle("Beta 2D Video Compositor");
+export const Beta3DVideoCompositorPage = () => {
+  usePrefixedDocumentTitle("Beta 3D Video Compositor");
   return (
     <>
       <div className="d-flex flex-column align-items-center">
@@ -33,7 +33,7 @@ export const BetaVideoCompositorPage = () => {
                   loop
                   className="object-fit-cover w-100 h-100"
                 >
-                  <source src="/videos/ai-tools/vcomp_video.mp4" />
+                  <source src="/videos/ai-tools/vcomp_video_2.mp4" />
                 </video>
               </div>
             </div>
@@ -51,7 +51,7 @@ export const BetaVideoCompositorPage = () => {
                 <Button
                   label="Join the waitlist"
                   className="mt-4"
-                  to="/beta/2d-video-compositor/form"
+                  to="/beta/3d-video-compositor/form"
                   variant="primary"
                   icon={faArrowRight}
                   iconFlip={true}
