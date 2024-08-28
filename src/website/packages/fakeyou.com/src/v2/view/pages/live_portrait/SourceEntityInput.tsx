@@ -23,12 +23,13 @@ export default function SourceEntityInput({
         Please upload an image or video with a clear face or it may not work.
       </p>
       <EntityInput
-        accept={["image", "video"]}
+        accept={["video", "image"]}
         className="w-100"
+        name="mediaToken"
         GApage="/live-portrait"
         onChange={onChange}
         type="media"
-        showMediaBrowserFilters={false}
+        showMediaBrowserFilters={true}
       />
     </div>
   );
