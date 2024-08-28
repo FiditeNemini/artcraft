@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import MediaCards from "components/common/Card/MediaCards";
-import { Button, TempSelect } from "components/common";
+import { Button, Checkbox, TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -22,7 +22,7 @@ export default function MediaTab() {
   const ratings = useRatings();
   const toTopBtnRef = useRef<HTMLDivElement | null>(null);
   const onScreen = useOnScreen(toTopBtnRef, "0px");
-
+  const [showUserUploads, showUserUploadsSet] = useState(true);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [mediaType, mediaTypeSet] = useState(
     urlQueries.get("filter_media_type") || "all"
@@ -31,6 +31,7 @@ export default function MediaTab() {
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
     addQueries: {
+      include_user_uploads: showUserUploads,
       page_size: urlQueries.get("page_size") || "24",
       //...prepFilter(weightType, "maybe_scoped_weight_type"),
       ...prepFilter(
@@ -90,6 +91,16 @@ export default function MediaTab() {
               value: mediaType,
             }}
           />
+          <Checkbox {...{
+            className: "mb-0",
+            checked: showUserUploads,
+            label: "Include uploads",
+            onChange: ({ target }: any) => {
+              media.reset();
+              showUserUploadsSet(target.checked)
+            },
+            variant: "secondary"
+          }} />
         </div>
         {media.urlCursor ? (
           <div>

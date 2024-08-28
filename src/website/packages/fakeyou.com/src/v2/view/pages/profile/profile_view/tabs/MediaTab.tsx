@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import MediaCards from "components/common/Card/MediaCards";
-import { TempSelect } from "components/common";
+import { Checkbox, TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -24,6 +24,7 @@ export default function MediaTab({ username }: { username: string }) {
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  const [showUserUploads, showUserUploadsSet] = useState(true);
   const [mediaType, mediaTypeSet] = useState(
     urlQueries.get("filter_media_classes") || "unknown"
   );
@@ -31,6 +32,7 @@ export default function MediaTab({ username }: { username: string }) {
 
   const media = useListContent({
     addQueries: {
+      include_user_uploads: showUserUploads,
       page_size: urlQueries.get("page_size") || "24",
       ...prepFilter(mediaType, "filter_media_classes"),
     },
@@ -90,6 +92,16 @@ export default function MediaTab({ username }: { username: string }) {
               value: mediaType,
             }}
           />
+          <Checkbox {...{
+            className: "mb-0",
+            checked: showUserUploads,
+            label: "Include uploads",
+            onChange: ({ target }: any) => {
+              media.reFetch();
+              showUserUploadsSet(target.checked)
+            },
+            variant: "secondary"
+          }} />
         </div>
         <Pagination {...paginationProps} />
       </div>
