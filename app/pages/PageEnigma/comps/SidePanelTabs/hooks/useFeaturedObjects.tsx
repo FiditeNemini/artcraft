@@ -82,7 +82,7 @@ export const useFeaturedObjects = (props: useFeaturedObjectsProps) => {
       firstFetch.current = FetchStatus.IN_PROGRESS;
       fetchFeaturedObjects();
     }
-  }, [featuredFetchStatus, fetchFeaturedObjects]);
+  }, [fetchFeaturedObjects]);
 
   return {
     featuredObjects,

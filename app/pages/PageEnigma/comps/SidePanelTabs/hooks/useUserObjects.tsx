@@ -13,6 +13,8 @@ interface useUserObjectsProps {
 
 export const useUserObjects = (props: useUserObjectsProps) => {
   const failedFetches = useRef<number>(0);
+  const firstFetch = useRef<FetchStatus>(FetchStatus.READY);
+
   const [
     {
       mediaItems: userObjects,
@@ -56,6 +58,9 @@ export const useUserObjects = (props: useUserObjectsProps) => {
       } else {
         failedFetches.current = 0;
       }
+      if (firstFetch.current !== FetchStatus.SUCCESS && result.mediaItems) {
+        firstFetch.current = FetchStatus.SUCCESS;
+      }
 
       setUserFetch((curr) => ({
         status: result.status,
@@ -70,10 +75,14 @@ export const useUserObjects = (props: useUserObjectsProps) => {
   );
 
   useEffect(() => {
-    if (!userObjects && failedFetches.current <= MAX_FAILED_FETCHES) {
+    if (
+      (firstFetch.current === FetchStatus.READY ||
+        firstFetch.current === FetchStatus.ERROR) &&
+      failedFetches.current <= MAX_FAILED_FETCHES
+    ) {
       fetchUserObjects();
     }
-  }, [userObjects, fetchUserObjects]);
+  }, [fetchUserObjects]);
 
   return {
     userObjects,
