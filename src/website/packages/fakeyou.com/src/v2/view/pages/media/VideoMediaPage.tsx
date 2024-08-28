@@ -187,17 +187,15 @@ export default function DevMediaPage({
                             }}
                           />
                         )}
-                        {canAccessStudio() && (
-                          <Button
-                            {...{
-                              icon: faArrowRightArrowLeft,
-                              label: "Prompt Again",
-                              small: isMobile && true,
-                              to: `/style-video/${mediaFile?.token || ""}`,
-                              variant: "secondary",
-                            }}
-                          />
-                        )}
+                        <Button
+                          {...{
+                            icon: faArrowRightArrowLeft,
+                            label: "Remix Style",
+                            small: isMobile && true,
+                            to: `/style-video/${mediaFile?.token || ""}`,
+                            variant: "secondary",
+                          }}
+                        />
                         {canAccessStudio() &&
                           mediaFile?.maybe_scene_source_media_file_token && (
                             <Button

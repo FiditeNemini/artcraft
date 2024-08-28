@@ -20,6 +20,7 @@ interface AIToolsItemProps {
   videoSrc?: string;
   videoPosterSrc?: string;
   externalLink?: string;
+  videoPosition?: "top" | "center";
 }
 
 export function AIToolsItem({
@@ -32,6 +33,7 @@ export function AIToolsItem({
   videoSrc,
   videoPosterSrc,
   externalLink,
+  videoPosition = "center",
 }: AIToolsItemProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPoster, setShowPoster] = useState(true);
@@ -158,6 +160,7 @@ export function AIToolsItem({
               style={{
                 borderTopLeftRadius: "0.5rem",
                 borderTopRightRadius: "0.5rem",
+                objectPosition: videoPosition,
               }}
               onEnded={handleVideoEnded}
             >

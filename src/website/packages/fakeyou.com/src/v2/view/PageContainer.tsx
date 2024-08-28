@@ -134,6 +134,7 @@ import { UploadNewTtsModelPage } from "./pages/upload/UploadNewTtsModelPage";
 import LivePortrait from "./pages/live_portrait/LivePortrait";
 import { BetaLipSyncForm } from "./pages/beta_lipsync/BetaLipSyncForm";
 import { BetaLipSyncPage } from "./pages/beta_lipsync/BetaLipSyncPage";
+import { ToolsTestPage } from "./pages/tools_test/ToolsTestPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -999,6 +1000,11 @@ class PageContainer extends React.Component<
 
                 <Route path="/beta-key/list">
                   <BetaKeysListPage />
+                </Route>
+
+                {/* test page for tools */}
+                <Route path="/dev/tools">
+                  <ToolsTestPage />
                 </Route>
 
                 <Route path="/tools">

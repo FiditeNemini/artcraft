@@ -35,6 +35,7 @@
 /contribute*           /website/index.html   200
 /creator-onboarding*   /website/index.html   200
 /dashboard*            /website/index.html   200
+/dev*                  /website/index.html   200
 /dev-media-input       /website/index.html   200
 /edit-cover-image*     /website/index.html   200
 /engine-compositor*    /website/index.html   200

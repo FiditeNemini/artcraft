@@ -23,6 +23,7 @@ export default function AITools() {
       icon: any;
       label: string;
     };
+    videoPosition?: "top" | "center";
   };
 
   let items: Item[] = [
@@ -105,6 +106,37 @@ export default function AITools() {
       imgSrc: "/images/landing/select-discord.webp",
       imgAlt: "Discord Link",
     });
+  }
+
+  // Test Page
+  if (currentPath.includes("/dev/tools")) {
+    items.push(
+      {
+        to: "/",
+        title: "Video Compositor",
+        text: "Compose videos and images with AI",
+        videoSrc: "/videos/ai-tools/vcomp_video.mp4",
+        videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+        imgAlt: "Video Compositor",
+      },
+      {
+        to: "/",
+        title: "Video Compositor",
+        text: "Compose videos and images with AI",
+        videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
+        videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
+        imgAlt: "Video Compositor",
+        videoPosition: "top",
+      },
+      {
+        to: "/",
+        title: "Webcam Acting",
+        text: "Act as your character through your camera",
+        videoSrc: "/videos/ai-tools/ca_video.mp4",
+        videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
+        imgAlt: "Video Compositor",
+      }
+    );
   }
 
   if (currentPath.includes("/tts")) {
