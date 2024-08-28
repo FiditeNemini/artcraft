@@ -9,11 +9,7 @@ use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use videos::ffprobe_get_info::{ffprobe_get_info, VideoDimensions, VideoDuration};
 
-#[derive(Copy,Clone,Debug)]
-pub enum FrameType {
-  Png,
-  Jpg,
-}
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::frame_type::FrameType;
 
 pub struct OutputFile {
   pub path: PathBuf,

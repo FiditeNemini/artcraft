@@ -26,8 +26,8 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
-use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use mysql_queries::queries::media_files::create::insert_media_file_from_studio_scene_render::{insert_media_file_from_studio_scene_render, InsertStudioSceneRenderArgs};
+use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
@@ -37,7 +37,7 @@ use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileU
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::extract_frames_from_zip::{extract_frames_from_zip, ExtractFramesError};
-use crate::http_server::endpoints::media_files::upload::upload_studio_shot::ffmpeg_frames_to_mp4::{ffmpeg_frames_to_mp4, FrameType};
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::ffmpeg_frames_to_mp4::ffmpeg_frames_to_mp4;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::user_session::require_user_session_using_connection::require_user_session_using_connection;
@@ -228,7 +228,7 @@ pub async fn upload_studio_shot_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  extract_frames_from_zip(&file_bytes, frame_temp_dir.path())
+  let frame_type = extract_frames_from_zip(&file_bytes, frame_temp_dir.path())
       .map_err(|err| {
         warn!("Extract frames error: {:?}", err);
         match err {
@@ -248,7 +248,7 @@ pub async fn upload_studio_shot_media_file_handler(
       .map(|fps| *fps)
       .unwrap_or(DEFAULT_FPS);
 
-  let video_file_details = ffmpeg_frames_to_mp4(frame_temp_dir.path(), FrameType::Png, frame_rate)
+  let video_file_details = ffmpeg_frames_to_mp4(frame_temp_dir.path(), frame_type, frame_rate)
       .map_err(|err| {
         warn!("FFMPEG error: {:?}", err);
         MediaFileUploadError::ServerError

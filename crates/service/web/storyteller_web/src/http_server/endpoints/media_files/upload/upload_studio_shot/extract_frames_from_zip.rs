@@ -8,6 +8,7 @@ use zip::ZipArchive;
 
 use filesys::path_to_string::path_to_string;
 
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::frame_type::FrameType;
 use crate::http_server::web_utils::open_zip_archive::{open_zip_archive, OpenZipError};
 
 static ALLOWED_FRAME_EXTENSIONS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
@@ -33,7 +34,7 @@ pub enum ExtractFramesError {
 pub fn extract_frames_from_zip<P: AsRef<Path>>(
   zip_container_file_bytes: &[u8],
   frame_temp_dir: P,
-) -> Result<(), ExtractFramesError> {
+) -> Result<FrameType, ExtractFramesError> {
 
   info!("Opening archive...");
 
@@ -46,6 +47,8 @@ pub fn extract_frames_from_zip<P: AsRef<Path>>(
   info!("Reading archive contents...");
 
   let entries = get_relevant_zip_entries(&mut archive)?;
+
+  let mut maybe_frame_type = None;
 
   for entry in entries.iter() {
     debug!("Entry: {:?}", entry);
@@ -87,9 +90,18 @@ pub fn extract_frames_from_zip<P: AsRef<Path>>(
           error!("Problem copying file bytes {:?} : {:?}", output_path, err);
           ExtractFramesError::ExtractionError
         })?;
+
+    // Lazy heuristic to determine the frame type.
+    if maybe_frame_type.is_none()  {
+      maybe_frame_type = Some(match filesystem_name {
+        name if name.ends_with(".png") => FrameType::Png,
+        name if name.ends_with(".jpg") => FrameType::Jpg,
+        _ => FrameType::Jpg,
+      });
+    }
   }
 
-  Ok(())
+  Ok(maybe_frame_type.unwrap_or(FrameType::Jpg))
 }
 
 #[derive(Debug, Clone)]
