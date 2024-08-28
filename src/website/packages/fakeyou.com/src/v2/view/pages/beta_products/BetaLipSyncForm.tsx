@@ -2,6 +2,7 @@ import React from "react";
 import { Widget } from "@typeform/embed-react";
 import { useLocation } from "react-router-dom";
 import { useDomainConfig } from "context/DomainConfigContext";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export const BetaLipSyncForm = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ export const BetaLipSyncForm = () => {
       : "typeform-source=storyteller.ai"
   }&email=${encodeURIComponent(email || "")}`;
 
+  usePrefixedDocumentTitle("Beta Lip Sync");
   return (
     <div
       style={{

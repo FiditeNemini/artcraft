@@ -1,10 +1,12 @@
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel } from "components/common";
 import { AITools } from "components/marketing";
 import React from "react";
 // import { Widget } from "@typeform/embed-react";
 
 export const BetaWebcamActingPage = () => {
+  usePrefixedDocumentTitle("Beta Webcam Acting");
   return (
     <>
       <div className="d-flex flex-column align-items-center">

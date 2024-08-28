@@ -27,7 +27,24 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
 
   usePrefixedDocumentTitle("Creator Tools");
 
-  const videoProducts = [
+  type Item = {
+    to?: string;
+    externalLink?: string;
+    title: string;
+    text: string;
+    imgSrc?: string;
+    imgAlt: string;
+    videoSrc?: string;
+    videoPosterSrc?: string;
+    badgeContent?: {
+      type: string;
+      icon: any;
+      label: string;
+    };
+    videoPosition?: "top" | "center";
+  };
+
+  const videoProducts: Item[] = [
     // {
     //   to: "/text-to-image",
     //   title: t("productImageGenTitle"),
@@ -67,7 +84,6 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
         label: "NEW",
       },
     },
-
     {
       to: "/face-animator",
       title: t("productLipsyncTitle"),
@@ -75,6 +91,31 @@ export default function CreatorToolsPage(props: CreatorToolsPageProps) {
       videoSrc: "/videos/ai-tools/ls_video.mp4",
       videoPosterSrc: "/images/ai-tools/ls_video_poster.jpg",
       imgAlt: "Lipsync",
+    },
+    {
+      to: "/beta/video-compositor",
+      title: "2D Video Compositor",
+      text: "Compose videos and images with AI",
+      videoSrc: "/videos/ai-tools/vcomp_video.mp4",
+      videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+      imgAlt: "Video Compositor",
+    },
+    {
+      to: "/beta/video-compositor",
+      title: "3D Video Compositor",
+      text: "Compose videos and images with AI",
+      videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
+      videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
+      imgAlt: "Video Compositor",
+      videoPosition: "top",
+    },
+    {
+      to: "/beta/webcam-acting",
+      title: "Webcam Acting",
+      text: "Act as your character through your camera",
+      videoSrc: "/videos/ai-tools/ca_video.mp4",
+      videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
+      imgAlt: "Video Compositor",
     },
   ];
 

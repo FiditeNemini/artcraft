@@ -2,6 +2,7 @@ import React from "react";
 import { Widget } from "@typeform/embed-react";
 import { useLocation } from "react-router-dom";
 import { useDomainConfig } from "context/DomainConfigContext";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export const BetaVideoCompositorForm = () => {
   const location = useLocation();
@@ -16,6 +17,8 @@ export const BetaVideoCompositorForm = () => {
       ? "typeform-source=fakeyou.com"
       : "typeform-source=storyteller.ai"
   }&email=${encodeURIComponent(email || "")}`;
+
+  usePrefixedDocumentTitle("Beta Video Compositor");
 
   return (
     <div
