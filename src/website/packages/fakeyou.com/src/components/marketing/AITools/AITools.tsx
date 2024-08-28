@@ -73,7 +73,7 @@ export default function AITools() {
     {
       to: "/beta/3d-video-compositor",
       title: "3D Video Compositor",
-      text: "Compose videos and images with AI",
+      text: "Build videos with AI 3D engine",
       videoSrc: "/videos/ai-tools/vcomp_video.mp4",
       videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
       imgAlt: "Video Compositor",
