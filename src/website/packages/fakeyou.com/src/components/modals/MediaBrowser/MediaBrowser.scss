@@ -1,5 +1,7 @@
 @import "scss/colours.scss";
 @import "scss/site-refresh.scss";
+@import "scss/_breakpoint.scss";
+@import "scss/breakpoints.scss";
 
 .fy-media-browser-tools {
   display: flex;
@@ -15,13 +17,26 @@
   .fy-temp-select {
     margin-bottom: 0;
   }
+
+  @include breakpoint($under768) {
+    flex-wrap: wrap;
+
+    .fy-media-browser-tools {
+      order: 3;
+    }
+
+    svg {
+      order: 2;
+    }
+  }
 }
 
 .fy-media-browser-header {
   h3 {
     margin-bottom: 0;
   }
-  > * {
+
+  >* {
     margin-bottom: 1rem;
   }
 
