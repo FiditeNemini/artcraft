@@ -361,6 +361,10 @@ export default function LivePortrait({
 
     const precomputedVideoSrc = getPrecomputedVideoSrc();
 
+    const isUserUploadedContent =
+      selectedSourceIndex >= numberOfInitialSourceTokens ||
+      selectedMotionIndex >= numberOfInitialMotionTokens;
+
     // Show generated or precomputed video if available
     if (latestVideoSrc && !isCurrentlyGenerating) {
       return (
@@ -406,7 +410,7 @@ export default function LivePortrait({
           />
         </div>
       );
-    } else if (precomputedVideoSrc && !isUserUploaded) {
+    } else if (precomputedVideoSrc && !isUserUploadedContent) {
       return (
         <video
           loop
