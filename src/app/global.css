@@ -29,10 +29,10 @@
     @apply text-sm font-light;
   }
   a {
-    @apply font-light text-primary-500 hover:text-primary-300;
+    @apply font-light text-primary-400 hover:text-primary-200;
   }
   a:visited {
-    @apply text-primary-700 hover:text-primary-500;
+    @apply text-primary-600 hover:text-primary-400;
   }
 
   input {

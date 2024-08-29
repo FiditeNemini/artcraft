@@ -15,7 +15,6 @@ export const Loader = ({
         className={twMerge(
           // default styles
           "flex flex-col items-center gap-2",
-
           // base transition properties
           "transition-opacity ease-in-out",
           // Shared closed styles

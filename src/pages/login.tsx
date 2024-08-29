@@ -47,11 +47,11 @@ export const Login = () => {
   });
 
   return (
-    <div className="fixed w-full">
-      <div className="mx-auto my-6 w-10/12 max-w-2xl">
-        <h1>Login to Storyteller</h1>
+    <div className="fixed flex h-full w-full flex-col items-center justify-center">
+      <div className="mx-auto my-6 flex w-10/12 max-w-2xl gap-4">
+        <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
       </div>
-      <div className="border-ui-border bg-ui-panel relative mx-auto my-6 w-10/12 max-w-2xl overflow-hidden rounded-lg border p-6">
+      <div className="border-ui-border bg-ui-panel relative mx-auto w-10/12 max-w-2xl overflow-hidden rounded-lg border p-6">
         <form
           ref={formRef}
           onSubmit={handleOnSumbit}
