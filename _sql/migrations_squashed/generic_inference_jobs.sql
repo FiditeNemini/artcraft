@@ -91,6 +91,10 @@ CREATE TABLE generic_inference_jobs (
   -- And furthermore, not all download URLs have a cover image.
   maybe_cover_image_media_file_token VARCHAR(32) DEFAULT NULL,
 
+  -- A migration flag we can control from the backend API service which will tell
+  -- the worker where to store the results. If false, GCP. If true, AWS.
+  store_in_aws BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== SUCCESS CASE ==========
 
   -- The type of the object will vary based on the type of the upload,
