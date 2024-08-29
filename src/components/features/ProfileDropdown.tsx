@@ -13,12 +13,12 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { Gravatar } from "./Gravatar";
+import { Gravatar } from "../ui/Gravatar";
 import { twMerge } from "tailwind-merge";
 
 import { authentication, logout } from "~/signals";
 
-export default function ProfileDropdown() {
+export function ProfileDropdown() {
   useSignals();
   const { userInfo } = authentication;
 

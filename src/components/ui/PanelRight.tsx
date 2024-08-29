@@ -3,7 +3,6 @@ import { faChevronLeft, faChevronRight } from "@fortawesome/pro-thin-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import { Transition } from "@headlessui/react";
-import ProfileDropdown from "./ProfileDropdown";
 
 export const PanelRight = ({
   className,
@@ -47,14 +46,6 @@ export const PanelRight = ({
           )}
           {...props}
         >
-          <div className="flex items-center gap-4">
-            <div className="w-1/2">
-              <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
-            </div>
-            <span className="grow" />
-            <ProfileDropdown />
-          </div>
-          <hr className="border-ui-divider my-2" />
           {children}
 
           <button
