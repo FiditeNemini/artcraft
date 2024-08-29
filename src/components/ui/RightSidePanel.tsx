@@ -23,7 +23,7 @@ export const RightSidePanel = ({
           onClick={() => {
             setIsOpen(true);
           }}
-          className={twMerge(buttonClasses, "fixed right-0 top-0 w-6")}
+          className={twMerge(buttonClasses, "fixed right-0 top-1 w-6")}
         >
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -31,7 +31,7 @@ export const RightSidePanel = ({
       <Transition show={isOpen}>
         <div
           className={twMerge(
-            "bg-ui-panel border-ui-border relative h-full border transition ease-in-out",
+            "bg-ui-panel border-ui-border relative h-full border p-2 transition ease-in-out",
             colClasses,
             // Shared closed styles
             "data-[closed]:opacity-0",
@@ -55,7 +55,7 @@ export const RightSidePanel = ({
             onClick={() => {
               setIsOpen(false);
             }}
-            className={twMerge(buttonClasses, "absolute -left-6 top-0")}
+            className={twMerge(buttonClasses, "absolute -left-6 top-1")}
           >
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
