@@ -5,15 +5,12 @@ import { twMerge } from "tailwind-merge";
 import { Transition } from "@headlessui/react";
 import ProfileDropdown from "./ProfileDropdown";
 
-export interface LeftSidePanelProps extends HTMLAttributes<HTMLDivElement> {}
-
-export const RightSidePanel = ({
+export const PanelRight = ({
   className,
   children,
   ...props
-}: LeftSidePanelProps) => {
+}: HTMLAttributes<HTMLDivElement>) => {
   const [isOpen, setIsOpen] = useState(true);
-  const colClasses = `col-start-10 col-span-3`;
   const buttonClasses =
     "w-6 bg-ui-panel border-ui-border border-l border-t border-b rounded-l-md py-4";
   return (
@@ -23,7 +20,7 @@ export const RightSidePanel = ({
           onClick={() => {
             setIsOpen(true);
           }}
-          className={twMerge(buttonClasses, "fixed right-0 top-1 w-6")}
+          className={twMerge(buttonClasses, "fixed right-0 top-1")}
         >
           <FontAwesomeIcon icon={faChevronLeft} />
         </button>
@@ -31,8 +28,8 @@ export const RightSidePanel = ({
       <Transition show={isOpen}>
         <div
           className={twMerge(
-            "bg-ui-panel border-ui-border relative h-full border p-2 transition ease-in-out",
-            colClasses,
+            "bg-ui-panel border-ui-border relative border p-2 transition ease-in-out",
+            "col-span-3 col-start-10 row-span-12 row-start-1",
             // Shared closed styles
             "data-[closed]:opacity-0",
             // Entering styles

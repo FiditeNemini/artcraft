@@ -1,5 +1,6 @@
 export * from "./Button";
 export * from "./Input";
-export * from "./RightSidePanel";
 export * from "./Loader";
+export * from "./PanelBottom";
+export * from "./PanelRight";
 export * from "./Spinner";
