@@ -1,4 +1,4 @@
-import { authentication } from "./authentication";
+import { signals } from "./signals";
 import { UsersApi } from "@ApiManager/UsersApi";
 import { BillingApi } from "@ApiManager/BillingApi";
 
@@ -8,7 +8,7 @@ import {
   updateUserInfo,
   setLogoutStates,
 } from "./utilities";
-import { AUTH_STATUS } from "~/enums/Authentication";
+import { AUTH_STATUS } from "./enums";
 
 export const logout = async (
   failureCallback?: (errorMessage: string) => void,
@@ -83,7 +83,7 @@ export const signUp = async ({
 
 export const persistLogin = async () => {
   //Only run First Load, return if not
-  if (authentication.status.value !== AUTH_STATUS.INIT) {
+  if (signals.status.value !== AUTH_STATUS.INIT) {
     return;
   }
   getUserInfoAndSubcriptions();

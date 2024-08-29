@@ -2,18 +2,22 @@ import { ComponentType, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 import { Spinner } from "~/components/ui";
-import { authentication, persistLogin } from "~/signals";
-import { AUTH_STATUS } from "~/enums/Authentication";
+import { authentication } from "~/signals";
 
 export const withProtectionRoute = <P extends object>(
   Component: ComponentType<P>,
 ) =>
   function ProtectionRoute(rest: P) {
+    const {
+      signals: { status, userInfo },
+      fetchers: { persistLogin },
+      enums: { AUTH_STATUS },
+    } = authentication;
+
     useSignalEffect(() => {
       persistLogin();
     });
 
-    const { status, userInfo } = authentication;
     //render according to auth status
     if (
       status.value === AUTH_STATUS.INIT ||

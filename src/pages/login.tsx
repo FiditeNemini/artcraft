@@ -3,26 +3,43 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 
 import { faKey, faUser } from "@fortawesome/pro-thin-svg-icons";
-
-import { AUTH_STATUS } from "~/enums/Authentication";
-import {
-  authentication,
-  login,
-  // logout
-} from "~/signals";
-
 import { Button, Input, Loader } from "~/components/ui";
+import { authentication } from "~/signals";
 
 export const Login = () => {
+  const {
+    signals: { status: authStatus },
+    fetchers: { login },
+    enums: { AUTH_STATUS },
+  } = authentication;
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   const formRef = useRef<HTMLFormElement | null>(null);
-  const { status: authStatus } = authentication;
+
   const authLoaderMessage = getAuthLoaderMessage();
   const shouldShowLoader = checkShouldShowLoader();
-
   // const showNoAccessModal = authStatus.value === AUTH_STATUS.NO_ACCESS;
+  function checkShouldShowLoader() {
+    return (
+      authStatus.value === AUTH_STATUS.LOGGING ||
+      authStatus.value === AUTH_STATUS.LOGGED_IN
+    );
+  }
+  function getAuthLoaderMessage() {
+    if (authStatus.value === AUTH_STATUS.LOGGED_IN) {
+      return "Authenticated, Redirecting...";
+    }
+    if (authStatus.value === AUTH_STATUS.GET_USER_INFO) {
+      return "Getting User Info...";
+    }
+    return "Getting Session...";
+  }
+  // const handleClose = () => {
+  //   if (authentication.status.value !== AUTH_STATUS.LOGGED_OUT) {
+  //     logout();
+  //   }
+  // };
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -51,7 +68,7 @@ export const Login = () => {
       <div className="mx-auto my-6 flex w-10/12 max-w-2xl gap-4">
         <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
       </div>
-      <div className="border-ui-border bg-ui-panel relative mx-auto w-10/12 max-w-2xl overflow-hidden rounded-lg border p-6">
+      <div className="relative mx-auto w-10/12 max-w-2xl overflow-hidden rounded-lg border border-ui-border bg-ui-panel p-6">
         <form
           ref={formRef}
           onSubmit={handleOnSumbit}
@@ -111,26 +128,4 @@ export const Login = () => {
       </div>
     </div>
   );
-};
-
-// const handleClose = () => {
-//   if (authentication.status.value !== AUTH_STATUS.LOGGED_OUT) {
-//     logout();
-//   }
-// };
-
-const checkShouldShowLoader = () => {
-  return (
-    authentication.status.value === AUTH_STATUS.LOGGING ||
-    authentication.status.value === AUTH_STATUS.LOGGED_IN
-  );
-};
-const getAuthLoaderMessage = () => {
-  if (authentication.status.value === AUTH_STATUS.LOGGED_IN) {
-    return "Authenticated, Redirecting...";
-  }
-  if (authentication.status.value === AUTH_STATUS.GET_USER_INFO) {
-    return "Getting User Info...";
-  }
-  return "Getting Session...";
 };

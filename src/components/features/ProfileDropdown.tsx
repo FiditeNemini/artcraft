@@ -16,11 +16,14 @@ import {
 import { Gravatar } from "../ui/Gravatar";
 import { twMerge } from "tailwind-merge";
 
-import { authentication, logout } from "~/signals";
+import { authentication } from "~/signals";
 
 export function ProfileDropdown() {
   useSignals();
-  const { userInfo } = authentication;
+  const {
+    signals: { userInfo },
+    fetchers: { logout },
+  } = authentication;
 
   if (!userInfo.value) {
     return null;

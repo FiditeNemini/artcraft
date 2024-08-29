@@ -1,11 +1,16 @@
 import { useCallback } from "react";
 import { withProtectionRoute } from "~/components/hoc";
-import { authentication, logout } from "~/signals";
+import { authentication } from "~/signals";
 import { PanelRight, PanelBottom } from "~/components/ui";
 import { ProfileDropdown, KonaContainer } from "~/components/features";
 import { KonvaApp } from "~/KonvaApp";
 
 export const Main = withProtectionRoute(() => {
+  const {
+    signals: { userInfo },
+    fetchers: { logout },
+  } = authentication;
+
   const konaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
     if (node !== null) {
       KonvaApp(node);
@@ -27,9 +32,7 @@ export const Main = withProtectionRoute(() => {
           <ProfileDropdown />
         </div>
         <hr className="my-2 border-ui-divider" />
-        <p>
-          you are logged in as {authentication.userInfo.value?.display_name}
-        </p>
+        <p>you are logged in as {userInfo.value?.display_name}</p>
         <button onClick={() => logout()}>Logout</button>
       </PanelRight>
       <PanelBottom>

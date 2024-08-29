@@ -5,7 +5,7 @@ import { ActiveSubscriptions } from "@ApiManager/models/Billing";
 import { LoyaltyProgram } from "@ApiManager/enums/Billing";
 import { USER_FEATURE_FLAGS } from "@ApiManager/enums/UserFeatures";
 
-import { AUTH_STATUS } from "~/enums/Authentication";
+import { AUTH_STATUS } from "./enums";
 
 const status = signal<AUTH_STATUS>(AUTH_STATUS.INIT);
 const userInfo = signal<UserInfo | undefined>(undefined);
@@ -43,7 +43,7 @@ const hasPremium = computed(() => {
   return false;
 });
 
-export const authentication = {
+export const signals = {
   status,
   userInfo,
   activeSubs,

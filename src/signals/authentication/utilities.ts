@@ -1,14 +1,11 @@
-import { AUTH_STATUS } from "~/enums/Authentication";
+import { AUTH_STATUS } from "./enums";
 import { UserInfo } from "~/Classes/ApiManager/models/Users";
 import { ActiveSubscriptions } from "@ApiManager/models/Billing";
 
-import {
-  authentication,
-  // flushAllBackgroundLoadedMedia
-} from "~/signals";
+import { signals } from "./signals";
 
 export const updateAuthStatus = (newStatus: AUTH_STATUS) => {
-  authentication.status.value = newStatus;
+  signals.status.value = newStatus;
 };
 
 export const updateUserInfo = (
@@ -17,20 +14,20 @@ export const updateUserInfo = (
 ) => {
   if (newInfo && !flush) {
     //case of updating UserInfo partly
-    authentication.userInfo.value = {
-      ...authentication.userInfo.value,
+    signals.userInfo.value = {
+      ...signals.userInfo.value,
       ...newInfo,
     };
   } else {
     //case of setting a new User
     //case of deleting userInfo
-    authentication.userInfo.value = newInfo;
+    signals.userInfo.value = newInfo;
   }
 };
 export const updateActiveSubscriptions = (
   activeSubs: ActiveSubscriptions | undefined,
 ) => {
-  authentication.activeSubs.value = activeSubs;
+  signals.activeSubs.value = activeSubs;
 };
 
 // this function is not exposed, only the logout function is
