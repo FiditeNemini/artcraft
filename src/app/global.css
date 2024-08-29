@@ -4,10 +4,7 @@
 
 @layer base {
   :root {
-    @apply bg-ui-background text-white;
-  }
-  html {
-    @apply font-sans;
+    @apply bg-ui-background font-sans text-white;
   }
   h1 {
     @apply text-3xl font-medium md:text-5xl;
@@ -21,10 +18,10 @@
   h4 {
     @apply text-lg font-medium;
   }
-  h5 {
+  h5,
+  label {
     @apply text-base;
   }
-
   h6 {
     @apply text-sm;
   }

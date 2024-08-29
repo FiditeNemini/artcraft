@@ -11,10 +11,7 @@ import {
   // logout
 } from "~/signals";
 
-import {
-  Input,
-  // Spinner,
-} from "~/components/ui";
+import { Input, Loader } from "~/components/ui";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -22,8 +19,8 @@ export const Login = () => {
 
   const formRef = useRef<HTMLFormElement | null>(null);
   const { status: authStatus } = authentication;
-  // const authLoaderMessage = getAuthLoaderMessage();
-  // const shouldShowLoader = checkShouldShowLoader();
+  const authLoaderMessage = getAuthLoaderMessage();
+  const shouldShowLoader = checkShouldShowLoader();
 
   // const showNoAccessModal = authStatus.value === AUTH_STATUS.NO_ACCESS;
 
@@ -92,12 +89,10 @@ export const Login = () => {
 
           <button className="h-11 w-full text-sm">Login</button>
         </form>
-        {/* <LoadingDots
-          className="absolute left-0 top-0 h-full w-full"
-          isShowing={shouldShowLoader}
-          message={authLoaderMessage}
-          type="bricks"
-        />
+
+        <Loader isShowing={shouldShowLoader} message={authLoaderMessage} />
+
+        {/*
         <ConfirmationModal
           text="We're in a closed beta and you'll need a beta key to use this app."
           title="Unauthorized"
@@ -124,18 +119,18 @@ export const Login = () => {
 //   }
 // };
 
-// const checkShouldShowLoader = () => {
-//   return (
-//     authentication.status.value === AUTH_STATUS.LOGGING ||
-//     authentication.status.value === AUTH_STATUS.LOGGED_IN
-//   );
-// };
-// const getAuthLoaderMessage = () => {
-//   if (authentication.status.value === AUTH_STATUS.LOGGED_IN) {
-//     return "Authenticated, Redirecting...";
-//   }
-//   if (authentication.status.value === AUTH_STATUS.GET_USER_INFO) {
-//     return "Getting User Info...";
-//   }
-//   return "Getting Session...";
-// };
+const checkShouldShowLoader = () => {
+  return (
+    authentication.status.value === AUTH_STATUS.LOGGING ||
+    authentication.status.value === AUTH_STATUS.LOGGED_IN
+  );
+};
+const getAuthLoaderMessage = () => {
+  if (authentication.status.value === AUTH_STATUS.LOGGED_IN) {
+    return "Authenticated, Redirecting...";
+  }
+  if (authentication.status.value === AUTH_STATUS.GET_USER_INFO) {
+    return "Getting User Info...";
+  }
+  return "Getting Session...";
+};

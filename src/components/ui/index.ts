@@ -1,2 +1,3 @@
-export * from "./Spinne";
+export * from "./Spinner";
 export * from "./Input";
+export * from "./Loader";
