@@ -12,8 +12,7 @@ export const RightSidePanel = ({
   ...props
 }: LeftSidePanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
-  const colSpan = 3;
-  const colClasses = `col-start-${12 - colSpan + 1} col-span-${colSpan}`;
+  const colClasses = `col-start-10 col-span-3`;
   const buttonClasses =
     "w-6 bg-ui-panel border-ui-border border-l border-t border-b rounded-l-md py-4";
   return (
