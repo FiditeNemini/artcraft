@@ -1,7 +1,8 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { Pagination } from "~/pages/PageEnigma/models";
+import { Pagination } from "./models/Pagination";
+import { ZsDataset } from "./models/Dataset";
+
 import { authentication } from "~/signals";
-import { ZsDataset } from "~/models/Dataset";
 
 interface VoiceDesignerParams {
   text: string;

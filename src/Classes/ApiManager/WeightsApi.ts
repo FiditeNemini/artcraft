@@ -1,13 +1,14 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { authentication } from "~/signals";
-import { Weight } from "~/models";
-import { Pagination, PaginationInfinite } from "~/pages/PageEnigma/models";
+import { Weight } from "./models/Weight";
+import { Pagination, PaginationInfinite } from "./models/Pagination";
 import {
   FilterEngineCategories,
   FilterMediaClasses,
   FilterMediaType,
-  Visibility,
-} from "~/enums";
+} from "./enums/QueryFilters";
+import { Visibility } from "./enums/Visibility";
+
+import { authentication } from "~/signals";
 
 export enum ScopedWeightType {
   HIFIGAN_TT2 = "hifigan_tt2",

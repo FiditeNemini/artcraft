@@ -1,5 +1,6 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { FilterEngineCategories, Visibility } from "~/enums";
+import { FilterEngineCategories } from "./enums/QueryFilters";
+import { Visibility } from "./enums/Visibility";
 
 export class MediaUploadApi extends ApiManager {
   private async Upload({

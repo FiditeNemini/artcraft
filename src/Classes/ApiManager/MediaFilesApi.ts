@@ -1,9 +1,6 @@
-import {
-  MediaFile,
-  MediaInfo,
-  Pagination,
-  PaginationInfinite,
-} from "~/pages/PageEnigma/models";
+import { MediaFile } from "./models/MediaFile";
+import { MediaInfo } from "./models/MediaInfo";
+import { Pagination, PaginationInfinite } from "./models/Pagination";
 import { ApiManager, ApiResponse } from "./ApiManager";
 import { authentication } from "~/signals";
 import type { Property } from "csstype";
@@ -13,7 +10,7 @@ import {
   FilterEngineCategories,
   FilterMediaClasses,
   FilterMediaType,
-} from "~/enums";
+} from "./enums/QueryFilters";
 
 interface ListMediaQuery {
   sort_ascending?: boolean;

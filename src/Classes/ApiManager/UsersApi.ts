@@ -1,5 +1,5 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { UserInfo } from "~/models";
+import { UserInfo } from "./models/Users";
 
 export class UsersApi extends ApiManager {
   public GetSession(): Promise<

@@ -1,7 +1,6 @@
 import { StrictMode, useRef } from "react";
 import { createRoot } from "react-dom/client";
 
-import environmentVariables from "~/Classes/EnvironmentVariables";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 
@@ -14,16 +13,6 @@ const App = () => {
     console.log(`App rerendered ${AppRerenderCount.current} times`);
   } else {
     console.warn(`App rerendered ${AppRerenderCount.current} times`);
-  }
-
-  if (Object.keys(environmentVariables.values).length === 0) {
-    environmentVariables.initialize({
-      BASE_API: import.meta.env.VITE_BASE_API,
-      GOOGLE_API: import.meta.env.VITE_GOOGLE_API,
-      FUNNEL_API: import.meta.env.VITE_FUNNEL_API,
-      CDN_API: import.meta.env.VITE_CDN_API,
-      GRAVATAR_API: import.meta.env.VITE_GRAVATAR_API,
-    });
   }
 
   return <RouterProvider router={router} />;

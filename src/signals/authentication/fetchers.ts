@@ -1,6 +1,6 @@
 import { authentication } from "./authentication";
-import { UsersApi } from "~/Classes/ApiManager/UsersApi";
-import { BillingApi } from "~/Classes/ApiManager/BillingApi";
+import { UsersApi } from "@ApiManager/UsersApi";
+import { BillingApi } from "@ApiManager/BillingApi";
 
 import {
   updateActiveSubscriptions,
@@ -8,7 +8,7 @@ import {
   updateUserInfo,
   setLogoutStates,
 } from "./utilities";
-import { AUTH_STATUS } from "~/enums";
+import { AUTH_STATUS } from "~/enums/Authentication";
 
 export const logout = async (
   failureCallback?: (errorMessage: string) => void,

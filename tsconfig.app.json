@@ -20,7 +20,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@ApiManager/*": ["./src/Classes/ApiManager/*"]
     }
   },
   "include": ["src"]

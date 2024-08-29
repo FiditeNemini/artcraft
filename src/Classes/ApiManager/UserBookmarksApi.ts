@@ -1,10 +1,10 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
 import {
-  Pagination,
   UserBookmarkBatch,
   UserBookmarkByEntity,
   UserBookmarkByUser,
-} from "~/pages/PageEnigma/models";
+} from "./models/UserBookmark";
+import { Pagination } from "./models/Pagination";
 import { authentication } from "~/signals";
 
 export enum ScopedEntityTypes {

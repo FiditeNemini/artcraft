@@ -1,17 +1,17 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { Job, JobState } from "~/models";
+import { Job } from "./models/Job";
 
 export class JobsApi extends ApiManager {
   public GetJobByToken({
     token,
   }: {
     token: string;
-  }): Promise<ApiResponse<JobState>> {
+  }): Promise<ApiResponse<Job>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/jobs/job/${token}`;
 
     return this.get<{
       success: boolean;
-      state: JobState;
+      state: Job;
     }>({ endpoint })
       .then((response) => ({
         success: response.success,
@@ -22,12 +22,12 @@ export class JobsApi extends ApiManager {
       });
   }
 
-  public ListJobs(): Promise<ApiResponse<JobState[]>> {
+  public ListJobs(): Promise<ApiResponse<Job[]>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/jobs/batch`;
 
     return this.get<{
       success: boolean;
-      job_states: JobState[];
+      job_states: Job[];
     }>({ endpoint })
       .then((response) => ({
         success: response.success,

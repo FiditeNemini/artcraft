@@ -1,6 +1,6 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { GenerateTtsAudioErrorType } from "~/pages/PageEnigma/enums";
-import { Visibility } from "~/enums";
+import { GenerateTtsAudioErrorType } from "./enums/Tts";
+import { Visibility } from "./enums/Visibility";
 
 export interface GenerateTtsAudioRequest {
   creator_set_visibility?: Visibility;

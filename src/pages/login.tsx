@@ -4,8 +4,12 @@ import { useSignalEffect } from "@preact/signals-react/runtime";
 
 import { faKey, faUser } from "@fortawesome/pro-thin-svg-icons";
 
-import { AUTH_STATUS } from "~/enums";
-import { authentication, login, logout } from "~/signals";
+import { AUTH_STATUS } from "~/enums/Authentication";
+import {
+  authentication,
+  login,
+  // logout
+} from "~/signals";
 
 import {
   Input,

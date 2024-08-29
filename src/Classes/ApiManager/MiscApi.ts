@@ -1,5 +1,5 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { StatusAlert } from "~/models/StatusAlert";
+import { StatusAlert } from "./models/StatusAlert";
 
 export class MiscApi extends ApiManager {
   public GetStatusAlertCheck(): Promise<ApiResponse<StatusAlert>> {

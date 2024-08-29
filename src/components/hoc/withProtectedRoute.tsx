@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 import { Spinner } from "~/components/ui";
 import { authentication, persistLogin } from "~/signals";
-import { AUTH_STATUS } from "~/enums";
+import { AUTH_STATUS } from "~/enums/Authentication";
 
 export const withProtectionRoute = <P extends object>(
   Component: ComponentType<P>,

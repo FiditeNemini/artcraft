@@ -1,4 +1,4 @@
-import environmentVariables from "../EnvironmentVariables";
+import { API_TARGETS } from "./enums/Api";
 
 type NonNullableObject<T extends object> = NonNullable<T>;
 
@@ -14,11 +14,11 @@ export class ApiManager {
 
   constructor() {
     this.ApiTargets = {
-      BaseApi: environmentVariables.values.BASE_API as string,
-      GoggleApi: environmentVariables.values.GOOGLE_API as string,
-      FunnelApi: environmentVariables.values.FUNNEL_API as string,
-      CdnApi: environmentVariables.values.CDN_API as string,
-      GravatarApi: environmentVariables.values.GRAVATAR_API as string,
+      BaseApi: API_TARGETS.BASE_API,
+      GoggleApi: API_TARGETS.GOOGLE_API,
+      FunnelApi: API_TARGETS.FUNNEL_API,
+      CdnApi: API_TARGETS.CDN_API,
+      GravatarApi: API_TARGETS.GRAVATAR_API,
     };
   }
 

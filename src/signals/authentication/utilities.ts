@@ -1,5 +1,7 @@
-import { AUTH_STATUS } from "~/enums";
-import { UserInfo, ActiveSubscriptions } from "~/models";
+import { AUTH_STATUS } from "~/enums/Authentication";
+import { UserInfo } from "~/Classes/ApiManager/models/Users";
+import { ActiveSubscriptions } from "@ApiManager/models/Billing";
+
 import {
   authentication,
   // flushAllBackgroundLoadedMedia
