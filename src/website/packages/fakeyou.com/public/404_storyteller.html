@@ -2,7 +2,113 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="static-404.css">
+    <style type="text/css">
+      :root {
+        --primary: #e66462;
+        --primary-light: #ea7a78;
+      }
+      html, body {
+        background-color: #1a1a27;
+        color: #fff;
+        font-family: "Source Sans 3";
+        font-weight: 400;
+        font-style: normal;
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: .5rem;
+        line-height: 1em;
+      }
+
+      .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 0 2rem;
+        font-weight: 400;
+      }
+
+      .item-header h2 {
+        margin: 0;
+        line-height: 1em;
+        height: 1em;
+      }
+
+      .subtitle {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .tools-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.5rem;
+      }
+      .tools-grid-item {
+        display: flex;
+        flex-direction: column;
+        background-color: #242433;
+        border: 2px solid rgba(255, 255, 255, .04);
+        border-radius: .5rem;
+        box-sizing: border-box;
+        height: 330px;
+        padding: 2rem 1.5rem 0;
+        text-decoration: none;
+        color: #fff;
+        transition: .2s all;
+        overflow: hidden;
+      }
+
+      .tools-grid-item:hover {
+        border-color: var(--primary);
+      }
+
+      .arrow-button {
+        display: inline-block;
+        background-color: var(--primary);
+        border-radius: .5rem;
+        height: 2.5rem;
+        width: 2.5rem;
+        transition: .2s all;
+      }
+
+      .tools-grid-item:hover .arrow-button {
+        background-color: var(--primary-light);
+      }
+
+      .arrow-button line, .arrow-button polyline {
+        stroke: #fff;
+        stroke-width: 2.5px;
+        stroke-linecap: round;
+        fill: none;
+        transition: .2s all;
+      }
+
+      .tools-grid-item:hover line, .tools-grid-item:hover polyline {
+        transform: translateX(3px);
+      }
+
+      .hanashi-banner {
+        transition: .2s all ease-in-out;
+      }
+
+      .tools-grid-item:hover .hanashi-banner {
+        transform: scale(1.1);
+      }
+
+      .banner-art {
+        width: 100%;
+        height: 100%;
+        border-radius: .5rem .5rem 0 0;
+        overflow: hidden;
+      }
+
+      .banner-art img {
+        width: 100%;
+        height: auto;
+      }
+    </style>
     <link
       rel="apple-touch-icon"
       sizes="180x180"
