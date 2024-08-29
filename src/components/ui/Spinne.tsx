@@ -1,5 +1,5 @@
-import { faSpinnerThird } from "@fortawesome/pro-thin-svg-icons";
 import { twMerge } from "tailwind-merge";
+import { faSpinnerThird } from "@fortawesome/pro-thin-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Spinner = ({ className }: { className?: string }) => {

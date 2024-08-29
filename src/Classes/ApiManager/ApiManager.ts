@@ -154,10 +154,6 @@ export class ApiManager {
 
     return this.fetchMultipartFormData<T>(endpoint, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
       body: formData,
     });
   }
