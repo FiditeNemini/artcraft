@@ -41,8 +41,6 @@ import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import "./TtsResult.scss";
 
 interface Props {
@@ -554,12 +552,6 @@ function TtsResultViewPage(props: Props) {
             />
           </div>
         </div>
-      </div>
-      <>
-        <MentionsSection />
-      </>
-      <div className="py-5">
-        <StorytellerStudioCTA />
       </div>
     </div>
   );
