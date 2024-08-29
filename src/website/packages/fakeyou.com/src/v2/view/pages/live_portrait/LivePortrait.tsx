@@ -406,7 +406,7 @@ export default function LivePortrait({
           />
         </div>
       );
-    } else if (precomputedVideoSrc) {
+    } else if (precomputedVideoSrc && !isUserUploaded) {
       return (
         <video
           loop
