@@ -38,6 +38,7 @@ use tokens::tokens::user_bookmarks::*;
 use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
 
+use crate::http_server::common_requests::auto_product_category::AutoProductCategory;
 use crate::http_server::common_requests::media_file_token_path_info::MediaFileTokenPathInfo;
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileCoverImageDetails;
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
@@ -89,7 +90,6 @@ use crate::http_server::endpoints::media_files::upload::upload_audio_media_file_
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
-use crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
@@ -97,6 +97,7 @@ use crate::http_server::endpoints::media_files::upload::upload_new_video_media_f
 use crate::http_server::endpoints::media_files::upload::upload_pmx::upload_pmx_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_scene_snapshot_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
@@ -129,8 +130,6 @@ use crate::http_server::endpoints::weights::list::list_available_weights_handler
 use crate::http_server::endpoints::weights::list::list_featured_weights_handler::*;
 use crate::http_server::endpoints::weights::list::list_pinned_weights_handler::*;
 use crate::http_server::endpoints::weights::list::list_weights_by_user_handler::*;
-use crate::http_server::endpoints::weights::search::search_model_weights_http_get_handler::*;
-use crate::http_server::endpoints::weights::search::search_model_weights_http_post_handler::*;
 use crate::http_server::endpoints::weights::search::search_model_weights_impl::*;
 use crate::http_server::endpoints::weights::update::set_model_weight_cover_image_handler::*;
 use crate::http_server::endpoints::weights::update::update_weight_handler::*;
@@ -266,6 +265,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     UserFeatureFlag,
     WeightsCategory,
     WeightsType,
+
+    // Other common enums
+    AutoProductCategory,
 
     // Common path info
     MediaFileTokenPathInfo,

@@ -97,6 +97,7 @@ pub struct ListFeaturedMediaFilesArgs<'a> {
   pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
   pub maybe_filter_media_classes: Option<&'a HashSet<MediaFileClass>>,
   pub maybe_filter_engine_categories: Option<&'a HashSet<MediaFileEngineCategory>>,
+  pub maybe_filter_product_categories: Option<&'a HashSet<MediaFileOriginProductCategory>>,
   pub maybe_offset: Option<usize>,
   pub cursor_is_reversed: bool,
   pub sort_ascending: bool,
@@ -110,6 +111,7 @@ pub async fn list_featured_media_files(args: ListFeaturedMediaFilesArgs<'_>) -> 
     args.maybe_filter_media_types,
     args.maybe_filter_media_classes,
     args.maybe_filter_engine_categories,
+    args.maybe_filter_product_categories,
     args.limit,
     args.maybe_offset,
     args.cursor_is_reversed,
@@ -185,6 +187,7 @@ fn query_builder<'a>(
   maybe_filter_media_types: Option<&HashSet<MediaFileType>>,
   maybe_filter_media_classes: Option<&HashSet<MediaFileClass>>,
   maybe_filter_engine_categories: Option<&HashSet<MediaFileEngineCategory>>,
+  maybe_filter_product_categories: Option<&HashSet<MediaFileOriginProductCategory>>,
   limit: usize,
   maybe_offset: Option<usize>,
   cursor_is_reversed: bool,
@@ -334,6 +337,28 @@ LEFT OUTER JOIN prompts
 
       for engine_category in engine_categories.iter() {
         separated.push_bind(engine_category.to_str());
+      }
+
+      separated.push_unseparated(") ");
+    }
+  }
+
+  if let Some(product_categories) = maybe_filter_product_categories {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !product_categories.is_empty() {
+      if !first_predicate_added {
+        query_builder.push(" WHERE ");
+        first_predicate_added = true;
+      } else {
+        query_builder.push(" AND ");
+      }
+      query_builder.push(" m.origin_product_category IN ( ");
+
+      let mut separated = query_builder.separated(", ");
+
+      for product_category in product_categories.iter() {
+        separated.push_bind(product_category.to_str());
       }
 
       separated.push_unseparated(") ");

@@ -31,6 +31,7 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
+use crate::http_server::endpoints::media_files::helpers::get_scoped_product_categories::get_scoped_product_categories;
 use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
@@ -73,6 +74,19 @@ pub struct ListFeaturedMediaFilesQueryParams {
   ///   - `?filter_engine_categories=animation,character,object`
   ///   - etc.
   pub filter_engine_categories: Option<String>,
+
+  /// NB: This can be one (or more comma-separated values) from `AutoProductCategory`.
+  /// AutoProductCategory is not a db enum directly and can expand to multiple categories for some values.
+  ///
+  /// Usage:
+  ///   - `?filter_products=voice`
+  ///   - `?filter_products=tts,voice_conversion,zs_voice`
+  ///   - `?filter_products=live_portrait`
+  ///   - `?filter_products=lipsync`
+  ///   - `?filter_products=vst`
+  ///   - `?filter_products=studio`
+  ///   - etc.
+  pub filter_products: Option<String>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -353,6 +367,7 @@ async fn database_lookup(
   let maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
   let maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
   let maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
+  let maybe_filter_product_categories = get_scoped_product_categories(query.filter_engine_categories.as_deref());
 
   // NB: No reason to show deleted or non-public featured items to mods or authors.
   //  That's just confusing and wastes an extra query.
@@ -367,6 +382,7 @@ async fn database_lookup(
     maybe_filter_media_types: maybe_filter_media_types.as_ref(),
     maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
     maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
+    maybe_filter_product_categories: maybe_filter_product_categories.as_ref(),
     mysql_pool: &server_state.mysql_pool,
   }).await.map_err(|err| {
     error!("DB error: {:?}", err);
