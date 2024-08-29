@@ -18,7 +18,6 @@ export default {
       // common colors
       white: colors.white,
       black: colors.black,
-      gray: colors.slate, //use slate instead of gray
       red: colors.red,
       oragne: colors.orange,
       yellow: colors.yellow,
@@ -27,6 +26,13 @@ export default {
       indigo: colors.indigo,
       purple: colors.purple,
 
+      // utility colors
+      error: colors.red[500],
+      warning: colors.yellow[500],
+      success: colors.green[500],
+      info: colors.sky[500],
+
+      // brand colors
       primary: {
         //sunglo
         DEFAULT: "#e66462", //=500
@@ -71,6 +77,19 @@ export default {
         800: "#1f616b",
         900: "#1e505b",
         950: "#0e353e",
+      },
+
+      ui: {
+        900: "#1a1a27",
+        background: "#1a1a27",
+        700: "#242433",
+        panel: "#242433",
+        500: "#393948",
+        border: "#393948",
+        300: "#515168",
+        divider: "#515168",
+        100: "#676781",
+        button: "#676781",
       },
     },
   },
