@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html{
+    @apply font-sans;
+  }
+  h1 {
+    @apply text-3xl font-medium md:text-5xl;
+  }
+  h2 {
+    @apply text-2xl font-medium md:text-4xl;
+  }
+  h3 {
+    @apply text-xl font-medium md:text-3xl;
+  }
+  h4 {
+    @apply text-lg font-medium;
+  }
+  /* h5 { } */
+  h6 {
+    @apply text-sm;
+  }
+  p {
+    @apply text-sm font-light;
+  }
+  a {
+    @apply font-light hover:text-primary-400;
+  }
+  a:visited {
+    @apply hover:text-primary-700;
+  }
+  input {
+    @apply px-2 py-1 border-0 outline-none -outline-offset-2 focus:outline-primary-400 focus:ring-0 ;
+  }
+}
