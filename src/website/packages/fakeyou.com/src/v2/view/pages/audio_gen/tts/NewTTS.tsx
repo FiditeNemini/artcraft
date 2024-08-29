@@ -107,11 +107,11 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
   };
 
   const featuredVoiceTokens = [
-    "weight_31ewdsvev9bttgb4eg7zy7mj5",
-    "weight_b8rncypy7gw6nb0wthnwe2kk4",
-    "weight_3k28fws0v6r1ke3p0w0vw48gm",
+    "weight_qdtx8h0mvn945md9tm2zaq422",
+    "weight_f9wz0b1amfxhj1fnxxwtwn3rq",
     "weight_0f762jdzgsy1dhpb86qxy4ssm",
-    "weight_tq6pwerrbr4mvbjmtyhbsqe6t",
+    "weight_7jk8mgwkzsycqrxmfw5q4245y",
+    "weight_3k28fws0v6r1ke3p0w0vw48gm",
     "weight_2qbzp2nmrbbsxrxq7m53y4zan",
     "weight_msq6440ch8hj862nz5y255n8j",
     "weight_6jvgbqkzschw55qdg7exnx7zx",
