@@ -17,11 +17,19 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== INFERENCE DETAILS ==========
 
+  -- There is an index on this column.
   -- The new enum for the type of job, which will eventually replace `inference_category` and `maybe_model_type`.
   -- This isn't fully supported yet in the inference-job, but we'll start populating it and adding logic around it.
   -- We'll start this out as nullable, then migrate the old rows with a default column value.
   job_type VARCHAR(32) DEFAULT NULL,
 
+  -- There is an index on this column.
+  -- This is a user-facing and analytics-facing column that describes what product area the job
+  -- is attributed to. For example, this will help us separate "video style transfer" from
+  -- "storyteller studio" and also separate "live portrait" from "webcam live portrait".
+  product_category VARCHAR(32) DEFAULT NULL,
+
+  -- There is an index on this column.
   -- NB: This is becoming a problematic field and is becoming conflated with `maybe_model_type`.
   -- We're using this to handle job dispatching, but the latter is being used to load container
   -- dependencies at startup (even if it isn't a real model type or a polymorphic foreign key).
@@ -33,6 +41,7 @@ CREATE TABLE generic_inference_jobs (
   --  * voice_conversion
   inference_category VARCHAR(32) NOT NULL,
 
+  -- There is an index on this column.
   -- NB: See notes on inference_category. This is becoming a problematic field. We're using
   -- this to load the container spin-up arguments and dependencies, but the former is being
   -- used to dispatch the job. `inference_category` is the one that should probably go away,
@@ -47,9 +56,9 @@ CREATE TABLE generic_inference_jobs (
   --    * so_vits_svc
   --    * tacotron2
   --    * vits
-  --
   maybe_model_type VARCHAR(32) DEFAULT NULL,
 
+  -- There is an index on this column.
   -- Potential part of the composite foreign key to the primary model being used, if any.
   -- This will normally live in `maybe_inference_args`, but in this case, it's useful for
   -- running easy database analytical queries.
@@ -275,6 +284,7 @@ CREATE TABLE generic_inference_jobs (
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
   KEY index_job_type (job_type),
+  KEY index_product_category (product_category),
   KEY index_inference_category (inference_category),
   KEY index_maybe_model_type_and_maybe_model_token (maybe_model_type, maybe_model_token),
   KEY index_maybe_model_type (maybe_model_type),

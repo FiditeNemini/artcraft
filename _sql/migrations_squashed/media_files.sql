@@ -242,6 +242,10 @@ CREATE TABLE media_files (
   -- `[{maybe_public_bucket_prefix}]{public_bucket_directory_hash}[{maybe_public_bucket_extension}]`
   maybe_public_bucket_extension VARCHAR(16) DEFAULT NULL,
 
+  -- This is a migration flag that denotes whether this media file is stored in AWS.
+  -- If not, it's stored in GCP.
+  is_in_aws BOOLEAN NOT NULL DEFAULT false,
+
   -- NB: Removed, since this can be derived.
   -- The directory this media is uploaded to will be exclusive for this file.
   -- Only this given record will live in this bucket, but the directory may include
@@ -332,6 +336,7 @@ CREATE TABLE media_files (
   KEY index_maybe_engine_category (maybe_engine_category),
   KEY fk_maybe_prompt_token (maybe_prompt_token),
   KEY index_checksum_sha2 (checksum_sha2),
+  KEY index_is_in_aws (is_in_aws),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),

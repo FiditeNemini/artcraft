@@ -126,6 +126,9 @@ CREATE TABLE model_weights (
   -- `[{maybe_public_bucket_prefix}]{public_bucket_hash}[{maybe_public_bucket_extension}]`
   maybe_public_bucket_extension VARCHAR(16) DEFAULT NULL,
 
+  -- This is a migration flag that denotes whether this model weight is stored in AWS.
+  -- If not, it's stored in GCP.
+  is_in_aws BOOLEAN NOT NULL DEFAULT false,
 
   -- ========== MODERATION DETAILS ==========
 
@@ -172,6 +175,7 @@ CREATE TABLE model_weights (
   KEY fk_creator_user_token (creator_user_token),
   KEY index_creator_set_visibility (creator_set_visibility),
   KEY fk_maybe_cover_media_file_token (maybe_cover_image_media_file_token),
+  KEY index_is_in_aws (is_in_aws),
   KEY index_updated_at (updated_at),
   KEY index_user_deleted_at (user_deleted_at),
   KEY index_mod_deleted_at (user_deleted_at)
