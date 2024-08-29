@@ -3,6 +3,7 @@ import { faChevronLeft, faChevronRight } from "@fortawesome/pro-thin-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import { Transition } from "@headlessui/react";
+import ProfileDropdown from "./ProfileDropdown";
 
 export interface LeftSidePanelProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -44,10 +45,13 @@ export const RightSidePanel = ({
           )}
           {...props}
         >
-          <div className="flex p-2">
-            <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
+          <div className="flex gap-4">
+            <div className="grow">
+              <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
+            </div>
+            <ProfileDropdown />
           </div>
-          <hr className="border-ui-divider" />
+          <hr className="border-ui-divider my-2" />
           {children}
 
           <button
