@@ -36,9 +36,9 @@ CREATE TABLE media_files (
   origin_category VARCHAR(16) NOT NULL,
 
   -- TODO(bt,2024-01-12): Rename to origin_product.
+  -- There is an index on this column.
   -- Product area where the media file originated.
-  -- *UNFORTUNATELY*, there is *NO* index on this column.
-  -- This is not the *model* that created the thing, this is the *product*.
+  -- This is not the _model_ that created the thing, this is the _product_.
   -- (The underlying models can change over time.)
   --
   -- This value indicates what product originally created the media file. (Not the ML model or
@@ -323,6 +323,7 @@ CREATE TABLE media_files (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   KEY index_origin_category (origin_category),
+  KEY index_origin_product_category (origin_product_category),
   KEY index_maybe_origin_model_type (maybe_origin_model_type),
   KEY fk_maybe_origin_model_token (maybe_origin_model_token),
   KEY fk_maybe_origin_model_type_and_token (maybe_origin_model_type, maybe_origin_model_token),
