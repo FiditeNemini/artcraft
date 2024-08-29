@@ -6,6 +6,11 @@
   :root {
     @apply bg-ui-background font-sans text-white;
   }
+  .pegboard {
+    background-image: radial-gradient(#676781 1px, transparent 0);
+    background-size: 36px 36px;
+    @apply bg-center;
+  }
   h1 {
     @apply text-3xl font-medium md:text-5xl;
   }

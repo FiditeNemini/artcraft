@@ -4,7 +4,7 @@ import { PanelRight, PanelBottom } from "~/components/ui";
 
 export const Main = withProtectionRoute(() => {
   return (
-    <div className="fixed grid h-full w-full grid-cols-12 grid-rows-12">
+    <div className="pegboard fixed grid h-full w-full grid-cols-12 grid-rows-12">
       <PanelRight>
         <p>
           you are logged in as {authentication.userInfo.value?.display_name}

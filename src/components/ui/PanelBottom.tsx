@@ -11,8 +11,16 @@ export const PanelBottom = ({
 }: HTMLAttributes<HTMLDivElement>) => {
   const [isOpen, setIsOpen] = useState(true);
 
-  const buttonClasses =
-    "w-12 h-6 bg-ui-panel border-ui-border border-l border-t border-r rounded-t-md px-4 flex items-center justify-center";
+  const gridClasses = twMerge(
+    "row-span-3 row-start-10",
+    "col-span-12 col-start-1",
+  );
+  const buttonClasses = twMerge(
+    "w-12 h-6 bg-ui-panel",
+    "border-ui-border border-l border-t border-r rounded-t-md",
+    "px-4 flex items-center justify-center",
+  );
+
   return (
     <>
       {!isOpen && (
@@ -28,8 +36,10 @@ export const PanelBottom = ({
       <Transition show={isOpen}>
         <div
           className={twMerge(
+            gridClasses,
+            //base styles
             "bg-ui-panel border-ui-border relative border p-2 transition ease-in-out",
-            "col-span-12 col-start-1 row-span-3 row-start-10",
+
             // Shared closed styles
             "data-[closed]:opacity-0",
             // Entering styles
