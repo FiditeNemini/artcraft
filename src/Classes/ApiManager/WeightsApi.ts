@@ -8,8 +8,6 @@ import {
 } from "./enums/QueryFilters";
 import { Visibility } from "./enums/Visibility";
 
-import { authentication } from "~/signals";
-
 export enum ScopedWeightType {
   HIFIGAN_TT2 = "hifigan_tt2",
   RVC_V2 = "rvc_v2",
@@ -30,7 +28,6 @@ export enum ScopedWeightCategory {
 }
 
 interface WeightsRequest {
-  username?: string;
   pageSize?: number;
   weightType?: ScopedWeightType[];
   weightCategory?: ScopedWeightCategory[];
@@ -40,6 +37,7 @@ interface WeightsRequest {
 }
 
 export interface ListWeightsByUserRequest extends WeightsRequest {
+  username: string;
   pageIndex?: number;
   sortAscending?: boolean;
 }
@@ -96,7 +94,7 @@ export class WeightsApi extends ApiManager {
     username,
     ...params
   }: ListWeightsByUserRequest): Promise<ApiResponse<Weight[], Pagination>> {
-    const user = username ?? authentication.userInfo.value?.username;
+    const user = username;
     const endpoint = `${this.ApiTargets.BaseApi}/v1/weights/by_user/${user}`;
 
     const query = this.parseQueryValues(params);

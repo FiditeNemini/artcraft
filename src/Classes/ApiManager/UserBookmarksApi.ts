@@ -5,7 +5,6 @@ import {
   UserBookmarkByUser,
 } from "./models/UserBookmark";
 import { Pagination } from "./models/Pagination";
-import { authentication } from "~/signals";
 
 export enum ScopedEntityTypes {
   USER = "user",
@@ -40,7 +39,7 @@ export enum ScopedMediaFileType {
 }
 
 interface ListUserBookmarksByUserRequest {
-  username?: string;
+  username: string;
   sort_ascending?: boolean;
   page_size?: number;
   page_index?: number;
@@ -145,7 +144,7 @@ export class UserBookmarksApi extends ApiManager {
   }: ListUserBookmarksByUserRequest): Promise<
     ApiResponse<UserBookmarkByUser[], Pagination>
   > {
-    const user = username ?? authentication.userInfo.value?.username;
+    const user = username;
     const endpoint = `${this.ApiTargets.BaseApi}/v1/user_bookmarks/list/${user}`;
 
     const query = {

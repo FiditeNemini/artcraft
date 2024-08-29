@@ -1,10 +1,7 @@
 import { MediaFile } from "./models/MediaFile";
-import { MediaInfo } from "./models/MediaInfo";
 import { Pagination, PaginationInfinite } from "./models/Pagination";
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { authentication } from "~/signals";
-import type { Property } from "csstype";
-type Visibility = Property.Visibility;
+import { Visibility } from "./enums/Visibility";
 
 import {
   FilterEngineCategories,
@@ -23,6 +20,7 @@ interface ListMediaQuery {
 }
 
 interface ListUserMediaQuery {
+  username: string;
   sort_ascending?: boolean;
   page_size?: number;
   page_index?: number;
@@ -118,7 +116,7 @@ export class MediaFilesApi extends ApiManager {
 
   public async ListMediaFiles(
     query: ListMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], PaginationInfinite>> {
+  ): Promise<ApiResponse<MediaFile[], PaginationInfinite>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list`;
     const queryWithStrings = {
       ...query,
@@ -134,7 +132,7 @@ export class MediaFilesApi extends ApiManager {
     };
     return await this.get<{
       success: boolean;
-      results: MediaInfo[];
+      results: MediaFile[];
       pagination?: PaginationInfinite;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({
@@ -152,7 +150,7 @@ export class MediaFilesApi extends ApiManager {
 
   public async ListFeaturedMediaFiles(
     query: ListMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], PaginationInfinite>> {
+  ): Promise<ApiResponse<MediaFile[], PaginationInfinite>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list_featured`;
     const queryWithStrings = {
       ...query,
@@ -168,7 +166,7 @@ export class MediaFilesApi extends ApiManager {
     };
     return await this.get<{
       success: boolean;
-      results: MediaInfo[];
+      results: MediaFile[];
       pagination: PaginationInfinite;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({
@@ -186,8 +184,8 @@ export class MediaFilesApi extends ApiManager {
 
   public async ListUserMediaFiles(
     query: ListUserMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
-    const userName = authentication.userInfo.value?.username;
+  ): Promise<ApiResponse<MediaFile[], Pagination>> {
+    const userName = query.username;
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/list/user/${userName}`;
     const queryWithStrings = {
       ...query,
@@ -204,7 +202,7 @@ export class MediaFilesApi extends ApiManager {
     };
     return await this.get<{
       success: boolean;
-      results: MediaInfo[];
+      results: MediaFile[];
       pagination?: Pagination;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({
@@ -222,7 +220,7 @@ export class MediaFilesApi extends ApiManager {
 
   public async SearchFeaturedMediaFiles(
     query: SearchFeaturedMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
+  ): Promise<ApiResponse<MediaFile[], Pagination>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/search_featured`;
     const queryWithStrings = {
       search_term: query.search_term,
@@ -238,7 +236,7 @@ export class MediaFilesApi extends ApiManager {
     };
     return await this.get<{
       success: boolean;
-      results: MediaInfo[];
+      results: MediaFile[];
       pagination: Pagination;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({
@@ -254,7 +252,7 @@ export class MediaFilesApi extends ApiManager {
 
   public async SearchUserMediaFiles(
     query: SearchFeaturedMediaQuery,
-  ): Promise<ApiResponse<MediaInfo[], Pagination>> {
+  ): Promise<ApiResponse<MediaFile[], Pagination>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/search_session`;
     const queryWithStrings = {
       search_term: query.search_term,
@@ -270,7 +268,7 @@ export class MediaFilesApi extends ApiManager {
     };
     return await this.get<{
       success: boolean;
-      results: MediaInfo[];
+      results: MediaFile[];
       pagination: Pagination;
     }>({ endpoint, query: queryWithStrings })
       .then((response) => ({

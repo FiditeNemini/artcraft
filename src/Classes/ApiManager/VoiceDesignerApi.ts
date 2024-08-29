@@ -2,8 +2,6 @@ import { ApiManager, ApiResponse } from "./ApiManager";
 import { Pagination } from "./models/Pagination";
 import { ZsDataset } from "./models/Dataset";
 
-import { authentication } from "~/signals";
-
 interface VoiceDesignerParams {
   text: string;
   uuidIdempotencyToken: string;
@@ -58,9 +56,9 @@ export class VoiceDesignerApi extends ApiManager {
   public ListDatasetsByUser({
     username,
   }: {
-    username?: string;
+    username: string;
   }): Promise<ApiResponse<ZsDataset[]>> {
-    const user = username ?? authentication.userInfo.value?.username;
+    const user = username;
     const endpoint = `${this.ApiTargets.BaseApi}/v1/voice_designer/user/${user}/list`;
 
     return this.get<{
