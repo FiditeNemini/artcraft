@@ -11,7 +11,7 @@ import {
   // logout
 } from "~/signals";
 
-import { Input, Loader } from "~/components/ui";
+import { Button, Input, Loader } from "~/components/ui";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -87,7 +87,7 @@ export const Login = () => {
             </div>
           </div>
 
-          <button className="h-11 w-full text-sm">Login</button>
+          <Button>Login</Button>
         </form>
 
         <Loader isShowing={shouldShowLoader} message={authLoaderMessage} />
