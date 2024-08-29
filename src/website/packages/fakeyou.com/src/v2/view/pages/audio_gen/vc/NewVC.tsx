@@ -8,7 +8,13 @@ import {
   Label,
   Panel,
 } from "components/common";
-import { useDebounce, useInferenceJobs, useLocalize, useModal } from "hooks";
+import {
+  useDebounce,
+  useInferenceJobs,
+  useLocalize,
+  useModal,
+  useSession,
+} from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
@@ -36,6 +42,7 @@ import VCUploadComponent from "./VCUploadComponent";
 import VCPitchShiftComponent from "./VCPitchShiftComponent";
 import VCPitchEstimateMethodComponent from "./VCPitchEstimateMethodComponent";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
+import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -44,6 +51,7 @@ interface Props {
 export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
   const { enqueueInferenceJob } = useInferenceJobs();
   const { modalState, open, close } = useModal();
+  const { loggedIn, loggedInOrModal } = useSession();
   const [search, searchSet] = useState("");
   const [updated, updatedSet] = useState(false);
   const {
@@ -73,10 +81,10 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
 
   const searchChange =
     (setUpdate = true) =>
-      ({ target }: { target: any }) => {
-        if (setUpdate) updatedSet(true);
-        searchSet(target.value);
-      };
+    ({ target }: { target: any }) => {
+      if (setUpdate) updatedSet(true);
+      searchSet(target.value);
+    };
 
   const handleResultSelect = (data: any) => {
     setSelectedVoice(data);
@@ -144,6 +152,23 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
   const handleConvert = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
+    const generationCountKey = "generationCountVC";
+    const promptShownKey = "promptShownVC";
+    const ttl = 2 * 60 * 1000; // 2 minutes in milliseconds
+    let generationCount = parseInt(
+      getLocalStorageItem(generationCountKey) || "0"
+    );
+    const promptShown = getLocalStorageItem(promptShownKey);
+
+    // Show sign up prompt after 2 generations, and dont show again until local storage expires
+    if (!loggedIn && generationCount >= 2 && !promptShown) {
+      loggedInOrModal({
+        loginMessage: "Login to keep your generated audio history",
+        signupMessage: "Sign up to keep your generated audio history",
+      });
+      setLocalStorageItem(promptShownKey, "true", ttl);
+    }
+
     if (!selectedVoice || !mediaUploadToken) return;
 
     setIsGenerating(true);
@@ -179,9 +204,9 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
       } else {
         // @ts-ignore
         window.dataLayer.push({
-          "event": "enqueue_failure",
-          "page": "/voice-conversion",
-          "user_id": "$user_id"
+          event: "enqueue_failure",
+          page: "/voice-conversion",
+          user_id: "$user_id",
         });
         console.error("Error queuing VC:", "failed to enqueue");
         setIsGenerating(false);
@@ -190,6 +215,9 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
       console.error("Unexpected error:", error);
       setIsGenerating(false);
     }
+
+    generationCount += 1;
+    setLocalStorageItem(generationCountKey, generationCount.toString(), ttl);
   };
 
   return (
@@ -251,10 +279,11 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                   <div className="d-flex gap-2 align-items-center w-100">
                     <div className="flex-grow-1">
                       <Label
-                        label={`${selectedVoice
-                          ? t("label.selected")
-                          : t("label.select")
-                          }`}
+                        label={`${
+                          selectedVoice
+                            ? t("label.selected")
+                            : t("label.select")
+                        }`}
                       />
                     </div>
 
