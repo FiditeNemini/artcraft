@@ -45,10 +45,11 @@ export const RightSidePanel = ({
           )}
           {...props}
         >
-          <div className="flex gap-4">
-            <div className="grow">
+          <div className="flex items-center gap-4">
+            <div className="w-1/2">
               <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
             </div>
+            <span className="grow" />
             <ProfileDropdown />
           </div>
           <hr className="border-ui-divider my-2" />
