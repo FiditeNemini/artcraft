@@ -27,9 +27,21 @@ const FAKEYOU_PRICES = {
     //     "Up to 2 mins realtime",
     //   ],
     // },
-    w2l: {
-      title: "Wav2Lip",
-      features: ["Up to 12 seconds video"],
+    // w2l: {
+    //   title: "Wav2Lip",
+    //   features: ["Up to 12 seconds video"],
+    // },
+    lipsync: {
+      title: "Lipsync",
+      features: ["Access to Lipsync video generation"],
+    },
+    live_portrait: {
+      title: "Live Portrait",
+      features: ["Access to Live Portrait"],
+    },
+    style_transfer: {
+      title: "Video Style Transfer",
+      features: ["Access to Style Transfer", "3 second video generation"],
     },
   },
 
@@ -65,9 +77,21 @@ const FAKEYOU_PRICES = {
     //     "Up to 7 mins realtime",
     //   ],
     // },
-    w2l: {
-      title: "Wav2Lip",
-      features: ["Up to 1 minute video"],
+    // w2l: {
+    //   title: "Wav2Lip",
+    //   features: ["Up to 1 minute video"],
+    // },
+    lipsync: {
+      title: "Lipsync",
+      features: ["Access to Lipsync video generation"],
+    },
+    live_portrait: {
+      title: "Live Portrait",
+      features: ["Access to Live Portrait"],
+    },
+    style_transfer: {
+      title: "Video Style Transfer",
+      features: ["Access to Style Transfer", "3 second video generation"],
     },
   },
 
@@ -115,9 +139,31 @@ const FAKEYOU_PRICES = {
     //     "Up to 15 mins realtime",
     //   ],
     // },
-    w2l: {
-      title: "Wav2Lip",
-      features: ["Up to 2 minutes video"],
+    // w2l: {
+    //   title: "Wav2Lip",
+    //   features: ["Up to 2 minutes video"],
+    // },
+    lipsync: {
+      title: "Lipsync",
+      features: ["Access to Lipsync video generation"],
+    },
+    live_portrait: {
+      title: "Live Portrait",
+      features: [
+        "Access to Live Portrait",
+        "Private videos",
+        "Watermark removal",
+      ],
+    },
+    style_transfer: {
+      title: "Video Style Transfer",
+      features: [
+        "Access to Style Transfer",
+        "7 second video generation",
+        "Private videos",
+        "Watermark removal",
+        "Faster/Higher quality renders",
+      ],
     },
     storyteller: {
       title: "High-Fidelity, Controllable Video Generation",
@@ -180,9 +226,31 @@ const FAKEYOU_PRICES = {
     //     "Unlimited realtime",
     //   ],
     // },
-    w2l: {
-      title: "Wav2Lip",
-      features: ["Up to 2 minutes video"],
+    // w2l: {
+    //   title: "Wav2Lip",
+    //   features: ["Up to 2 minutes video"],
+    // },
+    lipsync: {
+      title: "Lipsync",
+      features: ["Access to Lipsync video generation"],
+    },
+    live_portrait: {
+      title: "Live Portrait",
+      features: [
+        "Access to Live Portrait",
+        "Private videos",
+        "Watermark removal",
+      ],
+    },
+    style_transfer: {
+      title: "Video Style Transfer",
+      features: [
+        "Access to Style Transfer",
+        "7 second video generation",
+        "Private videos",
+        "Watermark removal",
+        "Faster/Higher quality renders",
+      ],
     },
     api: {
       title: "API Access",

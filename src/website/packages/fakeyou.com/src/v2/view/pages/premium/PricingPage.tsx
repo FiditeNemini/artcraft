@@ -284,21 +284,9 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
-                  {/*
-                <li className="fw-semibold">{FYP.plus.vcapp.title}</li>
-                {FYP.plus.vcapp.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}*/}
-                  <li className="fw-semibold">{FYP.plus.w2l.title}</li>
-                  {FYP.plus.w2l.features.map((e: any) => {
+
+                  <li className="fw-semibold">{FYP.plus.lipsync.title}</li>
+                  {FYP.plus.lipsync.features.map((e: any) => {
                     return (
                       <li key={e}>
                         <FontAwesomeIcon
@@ -309,18 +297,36 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
-                  {/* <li className="fw-semibold">{FYP.plus.support.title}</li>
-                {FYP.plus.support.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faHeart}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })} */}
+
+                  <li className="fw-semibold">
+                    {FYP.plus.style_transfer.title}
+                  </li>
+                  {FYP.plus.style_transfer.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
+
+                  <li className="fw-semibold">
+                    {FYP.plus.live_portrait.title}
+                  </li>
+                  {FYP.plus.live_portrait.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
                 </ul>
                 <hr className="my-4" />
                 <h6 className="text-center fw-normal opacity-50">
@@ -398,32 +404,9 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
-                  {/*<li className="fw-semibold">{FYP.pro.vcweb.title}</li>
-                {FYP.pro.vcweb.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.pro.vcapp.title}</li>
-                {FYP.pro.vcapp.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}*/}
-                  <li className="fw-semibold">{FYP.pro.w2l.title}</li>
-                  {FYP.pro.w2l.features.map((e: any) => {
+
+                  <li className="fw-semibold">{FYP.pro.lipsync.title}</li>
+                  {FYP.pro.lipsync.features.map((e: any) => {
                     return (
                       <li key={e}>
                         <FontAwesomeIcon
@@ -434,6 +417,35 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
+
+                  <li className="fw-semibold">
+                    {FYP.pro.style_transfer.title}
+                  </li>
+                  {FYP.pro.style_transfer.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
+
+                  <li className="fw-semibold">{FYP.pro.live_portrait.title}</li>
+                  {FYP.pro.live_portrait.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
+
                   <li className="fw-semibold">{FYP.pro.storyteller.title}</li>
                   {FYP.pro.storyteller.features.map((e: any) => {
                     return (
@@ -446,44 +458,6 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
-
-                  {/* <li className="fw-semibold">{FYP.pro.channels.title}</li>
-                {FYP.pro.channels.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })} */}
-
-                  {/*<li className="fw-semibold">{FYP.pro.api.title}</li>
-                {FYP.pro.api.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}*/}
-                  {/* <li className="fw-semibold">{FYP.pro.support.title}</li>
-                {FYP.pro.support.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faHeart}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })} */}
                 </ul>
                 <hr className="my-4" />
                 <h6 className="text-center fw-normal opacity-50">
@@ -553,32 +527,9 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
-                  {/*<li className="fw-semibold">{FYP.elite.vcweb.title}</li>
-                {FYP.elite.vcweb.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.elite.vcapp.title}</li>
-                {FYP.elite.vcapp.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}*/}
-                  <li className="fw-semibold">{FYP.elite.w2l.title}</li>
-                  {FYP.elite.w2l.features.map((e: any) => {
+
+                  <li className="fw-semibold">{FYP.elite.lipsync.title}</li>
+                  {FYP.elite.lipsync.features.map((e: any) => {
                     return (
                       <li key={e}>
                         <FontAwesomeIcon
@@ -590,31 +541,36 @@ function PricingPage(props: Props) {
                     );
                   })}
 
-                  {/* <li className="fw-semibold">{FYP.elite.channels.title}</li>
-                {FYP.elite.channels.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })} */}
+                  <li className="fw-semibold">
+                    {FYP.elite.style_transfer.title}
+                  </li>
+                  {FYP.elite.style_transfer.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
 
-                  {/*<li className="fw-semibold">{FYP.elite.api.title}</li>
-                {FYP.elite.api.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}*/}
+                  <li className="fw-semibold">
+                    {FYP.elite.live_portrait.title}
+                  </li>
+                  {FYP.elite.live_portrait.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
+
                   <li className="fw-semibold">{FYP.elite.commercial.title}</li>
                   {FYP.elite.commercial.features.map((e: any) => {
                     return (
@@ -639,18 +595,6 @@ function PricingPage(props: Props) {
                       </li>
                     );
                   })}
-                  {/* <li className="fw-semibold">{FYP.elite.support.title}</li>
-                {FYP.elite.support.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faHeart}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })} */}
                 </ul>
                 <hr className="my-4" />
                 <h6 className="text-center fw-normal opacity-50">
