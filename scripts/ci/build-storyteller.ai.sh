@@ -58,7 +58,8 @@ echo "Moving website artifacts..."
 # NB: storyteller is part of the "fakeyou.com" build
 mv src/website/packages/fakeyou.com/build/* storyteller.ai/website/
 
-echo "Copying redirects configuration to Netlify build dir..."
+echo "Copying redirects and headers configurations to Netlify build dir..."
+cp src/netlify_configs/storyteller.ai/_headers storyteller.ai/
 cp src/netlify_configs/storyteller.ai/_redirects storyteller.ai/
 cp src/netlify_configs/storyteller.ai/netlify.toml storyteller.ai/
 cp src/netlify_configs/storyteller.ai/netlify.toml ./
