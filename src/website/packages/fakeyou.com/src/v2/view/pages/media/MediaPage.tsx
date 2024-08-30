@@ -590,6 +590,7 @@ export default function MediaPage({
 
     const link = document.createElement("a");
     link.href = downloadLink;
+    link.target = "_blank";
     link.download = downloadLink.split("/").pop() || "download";
     document.body.appendChild(link);
     link.click();
