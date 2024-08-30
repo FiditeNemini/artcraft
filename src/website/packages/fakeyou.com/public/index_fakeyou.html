@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="%PUBLIC_URL%/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="%PUBLIC_URL%/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="%PUBLIC_URL%/favicon-16x16.png"
+    />
+
+    <!-- Preload important images on index so they don't load late. -->
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/fakeyou/FakeYou-Logo.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/mascot/kitsune_pose2.webp"
+    />
+    <!-- Preload images on other pages. -->
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/mascot/kitsune_pose7.webp"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/mascot/kitsune_pose3.webp"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1c1c25" />
+    <meta name="description" content="FakeYou Celebrity AI Voice and AI Video Generator" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!-- Google Tag Manager -->
+    <!-- This *eventually* replaces gtag.js :/ -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-K62TJT9N");
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Google tag (gtag.js) -->
+    <!-- This replaces old universal analytics. -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-525G5MXFJG"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-525G5MXFJG");
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5350229982172647"
+    crossorigin="anonymous"></script>
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>FakeYou Celebrity AI Voice and Video Generator</title>
+
+    <!-- Twitter, Discord, etc. -->
+    <meta
+      property="og:title"
+      content="FakeYou Celebrity AI Voice and Video Generator"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fakeyou.com" />
+    <meta property="og:image" content="%PUBLIC_URL%/apple-touch-icon.png" />
+    <meta
+      property="og:description"
+      content="FakeYou lets you generate voices and videos using AI technology"
+    />
+
+    <!-- Include this to make the og:image larger -->
+    <meta name="twitter:card" content="summary_large_image" />
+
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-K62TJT9N"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

@@ -3,6 +3,9 @@
 
 set -euxo pipefail
 
+# Control certain build switches between FakeYou.com and Storyteller.ai
+export WEBSITE="fakeyou" 
+
 function replace_commit_ref {
   # Add the GIT SHA to the build
   # This must be done before everything else, or it will get cached with the build.
