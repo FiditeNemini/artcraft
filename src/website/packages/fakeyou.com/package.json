@@ -5,7 +5,7 @@
   "dependencies": {
     "@colormap/core": "0.1.0-3",
     "@colormap/presets": "0.1.0-4",
-    "@craco/craco": "^6.4.3",
+    "@craco/craco": "^7.1.0",
     "@fortawesome/fontawesome-common-types": "^6.2.1",
     "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/free-brands-svg-icons": "^6.2.1",
