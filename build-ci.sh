@@ -52,6 +52,7 @@ find . -type f -exec sed -i "s${d}%BUILD_GRAVATAR_VIDEO%${d}${GRAVATAR_API}${d}g
 find . -type f -exec sed -i "s${d}%DEPLOY_PRIME_URL%${d}${DEPLOY_PRIME_URL}${d}g" {} +
 find . -type f -exec sed -i "s${d}%DEPLOY_CONTEXT%${d}${DEPLOY_CONTEXT}${d}g" {} +
 find . -type f -exec sed -i "s${d}%CONTEXT%${d}${CONTEXT}${d}g" {} +
+find . -type f -exec sed -i "s${d}%UPLOAD_API_VIDEO%${d}${UPLOAD_API_VIDEO}${d}g" {} +
 
 # Replace Posthog env variables in the code
 find . -type f -exec sed -i "s${d}%REACT_APP_PUBLIC_POSTHOG_KEY%${d}${REACT_APP_PUBLIC_POSTHOG_KEY}${d}g" {} +
