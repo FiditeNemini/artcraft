@@ -9,8 +9,8 @@
   },
   "scripts": {
     "test-fakeyou": "lerna exec --scope @storyteller/fakeyou.com -- yarn test --watchAll=false",
-    "build-fakeyou": "lerna exec --scope @storyteller/fakeyou.com -- yarn build",
-    "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
+    "build-fakeyou": "lerna exec --scope @storyteller/fakeyou.com --loglevel verbose -- yarn build --verbose",
+    "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou.com --loglevel verbose -- yarn start --verbose",
     "start-fakeyou-80": "PORT=80 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
     "start-fakeyou-w": "lerna exec --scope @storyteller/fakeyou.com -- yarn start-w",
     "start-fakeyou-ws": "lerna exec --scope @storyteller/fakeyou.com -- yarn start-ws",
@@ -49,5 +49,5 @@
       "pre-commit": "pretty-quick --staged"
     }
   },
-  "packageManager": "yarn@3.3.1"
+  "packageManager": "yarn@4.4.1"
 }
