@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
@@ -30,6 +30,7 @@ export default function SearchBar({
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const isOnSearchPage = location.pathname.startsWith("/search");
+  const previousSearchTerm = useRef<string>(searchTerm);
 
   const maybeSearch = useCallback(
     async (value: string) => {
@@ -63,7 +64,13 @@ export default function SearchBar({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedDoSearch = useCallback(
     debounce(searchTerm => {
-      doSearch(searchTerm);
+      if (
+        searchTerm.trim() !== "" &&
+        searchTerm !== previousSearchTerm.current
+      ) {
+        doSearch(searchTerm);
+        previousSearchTerm.current = searchTerm;
+      }
     }, 250),
     [doSearch]
   );
@@ -100,6 +107,7 @@ export default function SearchBar({
   const handleSearchButtonClick = useCallback(() => {
     if (searchTerm !== "") {
       history.push(`/search/weights?query=${encodeURIComponent(searchTerm)}`);
+      previousSearchTerm.current = searchTerm;
     }
   }, [searchTerm, history]);
 
