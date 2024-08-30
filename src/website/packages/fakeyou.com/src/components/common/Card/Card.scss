@@ -2,7 +2,7 @@
 
 .card {
   background-color: $panel-inner;
-  border: 1px solid $panel-inner-border;
+  border: 2px solid $panel-inner-border;
   border-radius: 0.5rem;
   overflow: hidden;
   transition: 0.2s;
@@ -97,11 +97,30 @@
     text-shadow: 0 0 4px rgba(#000, 0.75);
   }
 
+  .card-featured-badge {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 0;
+    left: 0;
+    font-size: 13px;
+    font-weight: 600;
+    background-color: $primary;
+    border-radius: 0 0 6px 0;
+    padding: 2px 8px 2px 4px;
+    box-shadow: 0 0 12px rgba(#000, 0.3);
+
+    svg {
+      font-size: 11px;
+      margin-bottom: 1px;
+    }
+  }
+
   &.card-clickable {
     &:hover {
       background-color: lighten($panel-inner, 2%);
       cursor: pointer;
-      border: 1px solid lighten($panel-inner-border, 15%);
+      border: 2px solid lighten($panel-inner-border, 15%);
     }
 
     &:hover > .card-img {
@@ -118,13 +137,22 @@
 
     &.card-hover-border-red {
       &:hover {
-        border: 1px solid $primary;
+        border: 2px solid $primary;
       }
     }
 
     &.bottom-text-hover {
       background-color: lighten($panel-inner, 2%);
-      border: 1px solid $primary;
+      border: 2px solid $primary;
+    }
+  }
+
+  &.card-featured {
+    border: 2px solid $primary;
+
+    &:hover {
+      cursor: pointer;
+      border: 2px solid lighten($primary, 6%);
     }
   }
 

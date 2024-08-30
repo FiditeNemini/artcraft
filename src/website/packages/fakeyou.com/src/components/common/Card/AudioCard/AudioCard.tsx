@@ -5,8 +5,7 @@ import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CardFooter } from "components/entities";
 import Badge from "components/common/Badge";
-import { faArrowRight, faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
-import Button from "components/common/Button";
+import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -183,16 +182,6 @@ export default function AudioCard({
                         {data?.stats?.positive_rating_count}
                       </span>
                     </div>
-                    {inSelectModal ? null : (
-                      <Button
-                        icon={faArrowRight}
-                        iconFlip={true}
-                        variant="link"
-                        label="Use"
-                        className="fs-7"
-                        onClick={handleSelectModalResultSelect}
-                      />
-                    )}
                   </div>
                 </div>
               </div>
@@ -217,6 +206,8 @@ export default function AudioCard({
                 makeBookmarksProps: bookmarks?.makeProps,
                 makeRatingsProps: ratings?.makeProps,
                 showCreator: true,
+                inSelectModal,
+                showUseButton: true,
               }}
             />
           )}

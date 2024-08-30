@@ -45,7 +45,7 @@ export default function Card({
           //     }
           //   : {}),
           height: height || "auto",
-          borderWidth: borderWidth || "1px",
+          borderWidth: borderWidth || "2px",
           borderStyle: "solid",
           aspectRatio: aspectRatio || "auto",
         }}

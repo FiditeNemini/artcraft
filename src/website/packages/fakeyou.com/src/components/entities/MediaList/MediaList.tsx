@@ -13,6 +13,7 @@ import { EntityType } from "components/entities/EntityTypes";
 interface MediaCardsProps {
   props: any;
   type: string;
+  featured?: boolean;
 }
 
 interface Props {
@@ -22,23 +23,27 @@ interface Props {
   emptyContent?: React.ReactNode;
 }
 
-const Cards = ({ props, type }: MediaCardsProps) => {
+const Cards = ({ props, type, featured }: MediaCardsProps) => {
   switch (type) {
     case "audio":
-      return <CardWrapper {...{ ...props, card: AudioCard, padding: true }} />;
+      return (
+        <CardWrapper
+          {...{ ...props, card: AudioCard, padding: true, featured }}
+        />
+      );
     case "gif":
     case "image":
     case "jpg":
       return (
         <CardWrapper
-          {...{ ...props, card: OverlayCard, preview: ImagePreview }}
+          {...{ ...props, card: OverlayCard, preview: ImagePreview, featured }}
         />
       );
     case "mp4":
     case "video":
       return (
         <CardWrapper
-          {...{ ...props, card: OverlayCard, preview: VideoPreview }}
+          {...{ ...props, card: OverlayCard, preview: VideoPreview, featured }}
         />
       );
     case "bvh":
@@ -47,16 +52,24 @@ const Cards = ({ props, type }: MediaCardsProps) => {
     case "scene_ron":
       return (
         <CardWrapper
-          {...{ ...props, card: OverlayCard, preview: MocapPreview }}
+          {...{ ...props, card: OverlayCard, preview: MocapPreview, featured }}
         />
       );
     case "rvc_v2":
     case "so_vits_svc":
-      return <CardWrapper {...{ ...props, card: WeightCard, padding: true }} />;
+      return (
+        <CardWrapper
+          {...{ ...props, card: WeightCard, padding: true, featured }}
+        />
+      );
     case "tt2":
     case "tacotron2.5":
     case "gpt_so_vits":
-      return <CardWrapper {...{ ...props, card: WeightCard, padding: true }} />;
+      return (
+        <CardWrapper
+          {...{ ...props, card: WeightCard, padding: true, featured }}
+        />
+      );
     default:
       return <div>Unsupported type</div>;
   }
@@ -94,7 +107,13 @@ export default function MediaList({
               key,
             }}
           >
-            <Cards {...{ type: data.media_type || data.weight_type, props }} />
+            <Cards
+              {...{
+                type: data.media_type || data.weight_type,
+                props,
+                featured: data.is_featured,
+              }}
+            />
             {
               // [ null,
               //   <MediaCards {...{ type: data.media_type, props }} />,

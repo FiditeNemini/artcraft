@@ -15,8 +15,10 @@ interface CardFooterProps {
   makeRatingsProps?: MakeRatingsProps; // this is MakeBatchProps extended to include likeCount
   showCreator?: boolean;
   showDivider?: boolean;
+  showUseButton?: boolean;
   creatorLink?: boolean;
   showGravatar?: boolean;
+  inSelectModal?: boolean;
 }
 
 export default function CardFooter({
@@ -27,8 +29,10 @@ export default function CardFooter({
   makeRatingsProps,
   showCreator,
   showDivider = true,
+  showUseButton = false,
   creatorLink,
   showGravatar,
+  inSelectModal,
 }: CardFooterProps) {
   const {
     default_avatar,
@@ -65,6 +69,14 @@ export default function CardFooter({
               <BookmarkButton
                 {...makeBookmarksProps({ entityToken, entityType })}
               />
+            )}
+            {!inSelectModal && showUseButton && (
+              <div
+                className="fs-7 fw-medium fy-select-voice d-flex align-items-center justify-content-center rounded"
+                style={{ top: "14px", right: "14px" }}
+              >
+                Use
+              </div>
             )}
           </div>
         ) : null}
