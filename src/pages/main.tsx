@@ -4,6 +4,7 @@ import { authentication } from "~/signals";
 import { PanelRight, PanelBottom } from "~/components/ui";
 import { ProfileDropdown, KonaContainer } from "~/components/features";
 import { KonvaApp } from "~/KonvaApp";
+import { twMerge } from "tailwind-merge";
 
 export const Main = withProtectionRoute(() => {
   const {
@@ -23,7 +24,13 @@ export const Main = withProtectionRoute(() => {
         ref={konaContainerCallbackRef}
         className="col-span-12 col-start-1 row-span-12 row-start-1"
       />
-      <div className="col-span-3 col-start-10 row-span-1 row-start-1">
+      <div
+        className={twMerge(
+          "col-span-8 col-start-5 row-span-1 row-start-1",
+          "md:col-span-6 md:col-start-7",
+          "lg:col-span-3 lg:col-start-10",
+        )}
+      >
         <div className="flex items-center justify-end gap-4 pr-4 pt-2">
           <div className="w-1/2">
             <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
