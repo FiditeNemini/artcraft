@@ -1,16 +1,32 @@
-import { useCallback } from "react";
-import { withProtectionRoute } from "~/components/hoc";
-import { authentication } from "~/signals";
-import { PanelRight, PanelBottom } from "~/components/ui";
-import { ProfileDropdown, KonaContainer } from "~/components/features";
-import { KonvaApp } from "~/KonvaApp";
+import { useCallback, useRef } from "react";
 import { twMerge } from "tailwind-merge";
+// import { useSignals } from "@preact/signals-react/runtime";
+import { withProtectionRoute } from "~/components/hoc";
+// import { authentication } from "~/signals";
+
+import {
+  //PanelRight,
+  PanelBottom,
+} from "~/components/ui";
+import { ProfileDropdown, KonaContainer } from "~/components/features";
+
+import { KonvaApp } from "~/KonvaApp";
+
+import { BottomMenu } from "./BottomMenu";
 
 export const Main = withProtectionRoute(() => {
-  const {
-    signals: { userInfo },
-    fetchers: { logout },
-  } = authentication;
+  // useSignals();
+  const MainPageRerenderCount = useRef(0);
+  MainPageRerenderCount.current++;
+  if (MainPageRerenderCount.current === 1) {
+    console.log(`Main page rerendered ${MainPageRerenderCount.current} times`);
+  } else {
+    console.warn(`Main page rerendered ${MainPageRerenderCount.current} times`);
+  }
+  // const {
+  //   signals: { userInfo },
+  //   fetchers: { logout },
+  // } = authentication;
 
   const konaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
     if (node !== null) {
@@ -51,9 +67,7 @@ export const Main = withProtectionRoute(() => {
         <button onClick={() => logout()}>Logout</button>
       </PanelRight> */}
       <PanelBottom>
-        <div className="flex h-full items-center justify-center">
-          <p>If you need to put buttons somewhere, this could be the spot.</p>
-        </div>
+        <BottomMenu />
       </PanelBottom>
     </div>
   );
