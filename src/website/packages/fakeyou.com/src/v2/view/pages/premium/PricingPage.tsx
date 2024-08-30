@@ -228,7 +228,7 @@ function PricingPage(props: Props) {
               */}
 
             {/* Plus Tier */}
-            <div className="col-12 col-sm-6 col-lg-4 pt-lg-5">
+            <div className="col-12 col-md-6 col-lg-4 pt-lg-5 order-2 order-md-1">
               <div className="rounded panel padding h-100">
                 <h2 className="text-center my-2 fw-bold mb-4">
                   {FYP.plus.tier}
@@ -336,7 +336,7 @@ function PricingPage(props: Props) {
             </div>
 
             {/* Pro Tier */}
-            <div className="col-12 col-sm-6 col-lg-4">
+            <div className="col-12 col-md-6 col-lg-4 order-1 order-md-2">
               <div className={proBorderCss}>
                 <div
                   className="d-flex justify-content-center mb-2 position-absolute"
@@ -467,7 +467,7 @@ function PricingPage(props: Props) {
             </div>
 
             {/* Elite Tier */}
-            <div className="col-12 col-sm-6 col-lg-4 pt-lg-5">
+            <div className="col-12 col-md-6 col-lg-4 pt-lg-5 order-3 order-md-3">
               <div className="rounded panel padding h-100">
                 <h2 className="text-center my-2 fw-bold mb-4">
                   {FYP.elite.tier}
