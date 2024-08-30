@@ -449,6 +449,7 @@ pub async fn enqueue_video_style_transfer_handler(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
         job_type: InferenceJobType::ComfyUi,
+        maybe_product_category: None, // TODO: This endpoint is deprecated. Is anyone calling it?
         inference_category: InferenceCategory::Workflow,
         maybe_model_type: Some(InferenceModelType::ComfyUi), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference

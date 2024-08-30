@@ -170,6 +170,7 @@ pub async fn enqueue_gptsovits_model_download_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: InferenceJobType::GptSovits,
+    maybe_product_category: None, // Do not count downloads as product usage (or perhaps they should be their own)
     inference_category: InferenceCategory::DeprecatedField,
     maybe_model_type: None,
     maybe_model_token: None,

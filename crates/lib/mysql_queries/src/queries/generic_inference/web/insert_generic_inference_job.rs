@@ -4,6 +4,7 @@ use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -22,6 +23,8 @@ pub struct InsertGenericInferenceArgs<'a> {
   // used entirely inconsistently for job dispatching (especially "inference category"). This should always be 1:1 with
   // a concrete job type.
   pub job_type: InferenceJobType,
+
+  pub maybe_product_category: Option<InferenceJobProductCategory>,
 
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<InferenceModelType>,
@@ -89,6 +92,8 @@ SET
 
   job_type = ?,
 
+  product_category = ?,
+
   inference_category = ?,
   maybe_model_type = ?,
   maybe_model_token = ?,
@@ -122,6 +127,8 @@ SET
         args.uuid_idempotency_token,
 
         args.job_type.to_str(),
+
+        args.maybe_product_category.map(|c| c.to_str()),
 
         args.inference_category.to_str(),
 

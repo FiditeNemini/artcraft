@@ -18,6 +18,7 @@ use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -357,9 +358,16 @@ pub async fn enqueue_voice_conversion_inference_handler(
     }
   };
 
+  let maybe_product_category = match model_inference_info.job_model_type {
+    InferenceModelType::RvcV2 => Some(InferenceJobProductCategory::VcRvc2),
+    InferenceModelType::SoVitsSvc => Some(InferenceJobProductCategory::VcSvc),
+    _ => None,
+  };
+
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type,
+    maybe_product_category,
     inference_category: InferenceCategory::VoiceConversion,
     maybe_model_type: Some(model_inference_info.job_model_type),
     maybe_model_token: Some(&model_token),

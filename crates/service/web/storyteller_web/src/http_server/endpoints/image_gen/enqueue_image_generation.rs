@@ -412,6 +412,7 @@ pub async fn enqueue_image_generation_request(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
         job_type: InferenceJobType::StableDiffusion,
+        maybe_product_category: None, // This is not a product anymore
         inference_category: InferenceCategory::ImageGeneration,
         maybe_model_type: Some(InferenceModelType::StableDiffusion), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference

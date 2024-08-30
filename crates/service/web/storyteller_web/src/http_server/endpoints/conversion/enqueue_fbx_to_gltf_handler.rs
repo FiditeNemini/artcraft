@@ -192,6 +192,7 @@ pub async fn enqueue_fbx_to_gltf_handler(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
         job_type: InferenceJobType::ConvertFbxToGltf,
+        maybe_product_category: None, // This is not a product
         inference_category: InferenceCategory::FormatConversion,
         maybe_model_type: Some(InferenceModelType::ConvertFbxToGltf),
         maybe_model_token: None,

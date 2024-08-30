@@ -205,6 +205,7 @@ pub async fn enqueue_mocapnet_handler(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
         job_type: InferenceJobType::MocapNet,
+        maybe_product_category: None, // This is not a product anymore
         inference_category: InferenceCategory::Mocap,
         maybe_model_type: Some(InferenceModelType::MocapNet), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference

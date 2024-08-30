@@ -11,6 +11,7 @@ use actix_web::http::StatusCode;
 use log::{info, warn};
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -298,6 +299,7 @@ pub async fn enqueue_face_animation_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: InferenceJobType::SadTalker,
+    maybe_product_category: Some(InferenceJobProductCategory::LipsyncSadTalker),
     inference_category: InferenceCategory::LipsyncAnimation,
     maybe_model_type: Some(InferenceModelType::SadTalker), // NB: Model is static during inference
     maybe_model_token: None, // NB: Model is static during inference

@@ -17,6 +17,7 @@ use rand::seq::SliceRandom;
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -420,9 +421,16 @@ pub async fn enqueue_infer_tts_handler(
     _ => None, // NB: Shouldn't occur
   };
 
+  let maybe_product_category = match tts_model.job_type() {
+    InferenceJobType::Tacotron2 => Some(InferenceJobProductCategory::TtsTacotron2),
+    InferenceJobType::GptSovits => Some(InferenceJobProductCategory::TtsGptSoVits),
+    _ => None,
+  };
+
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: tts_model.job_type(),
+    maybe_product_category,
     inference_category: InferenceCategory::TextToSpeech,
     maybe_model_type,
     maybe_model_token: Some(request.tts_model_token.as_str()),

@@ -250,6 +250,7 @@ pub async fn enqueue_render_engine_scene_to_video_handler(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
         job_type: InferenceJobType::BevyToWorkflow,
+        maybe_product_category: None, // This is not a product anymore
         inference_category: InferenceCategory::ConvertBvhToWorkflow,
         maybe_model_type: Some(InferenceModelType::BvhToWorkflow),
         maybe_model_token: None,

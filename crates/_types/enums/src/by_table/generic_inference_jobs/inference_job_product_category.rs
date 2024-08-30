@@ -16,6 +16,12 @@ use strum::EnumIter;
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum InferenceJobProductCategory {
+  /// Lipsync: Face Fusion
+  LipsyncFaceFusion,
+
+  /// Lipsync: SadTalker
+  LipsyncSadTalker,
+
   /// Live Portrait (normal interface)
   LivePortrait,
 
@@ -52,6 +58,8 @@ impl_mysql_enum_coders!(InferenceJobProductCategory);
 impl InferenceJobProductCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::LipsyncFaceFusion => "lipsync_face_fusion",
+      Self::LipsyncSadTalker => "lipsync_sad_talker",
       Self::LivePortrait => "live_portrait",
       Self::LivePortraitWebcam => "live_portrait_webcam",
       Self::Studio => "studio",
@@ -66,6 +74,8 @@ impl InferenceJobProductCategory {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "lipsync_face_fusion" => Ok(Self::LipsyncFaceFusion),
+      "lipsync_sad_talker" => Ok(Self::LipsyncSadTalker),
       "live_portrait" => Ok(Self::LivePortrait),
       "live_portrait_webcam" => Ok(Self::LivePortraitWebcam),
       "studio" => Ok(Self::Studio),
@@ -83,6 +93,8 @@ impl InferenceJobProductCategory {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::LipsyncFaceFusion,
+      Self::LipsyncSadTalker,
       Self::LivePortrait,
       Self::LivePortraitWebcam,
       Self::Studio,
@@ -106,6 +118,8 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceJobProductCategory::LipsyncFaceFusion, "lipsync_face_fusion");
+      assert_serialization(InferenceJobProductCategory::LipsyncSadTalker, "lipsync_sad_talker");
       assert_serialization(InferenceJobProductCategory::LivePortrait, "live_portrait");
       assert_serialization(InferenceJobProductCategory::LivePortraitWebcam, "live_portrait_webcam");
       assert_serialization(InferenceJobProductCategory::Studio, "studio");
@@ -119,6 +133,8 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceJobProductCategory::LipsyncFaceFusion.to_str(), "lipsync_face_fusion");
+      assert_eq!(InferenceJobProductCategory::LipsyncSadTalker.to_str(), "lipsync_sad_talker");
       assert_eq!(InferenceJobProductCategory::LivePortrait.to_str(), "live_portrait");
       assert_eq!(InferenceJobProductCategory::LivePortraitWebcam.to_str(), "live_portrait_webcam");
       assert_eq!(InferenceJobProductCategory::Studio.to_str(), "studio");
@@ -132,6 +148,8 @@ mod tests {
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceJobProductCategory::from_str("lipsync_face_fusion").unwrap(), InferenceJobProductCategory::LipsyncFaceFusion);
+      assert_eq!(InferenceJobProductCategory::from_str("lipsync_sad_talker").unwrap(), InferenceJobProductCategory::LipsyncSadTalker);
       assert_eq!(InferenceJobProductCategory::from_str("live_portrait").unwrap(), InferenceJobProductCategory::LivePortrait);
       assert_eq!(InferenceJobProductCategory::from_str("live_portrait_webcam").unwrap(), InferenceJobProductCategory::LivePortraitWebcam);
       assert_eq!(InferenceJobProductCategory::from_str("studio").unwrap(), InferenceJobProductCategory::Studio);
@@ -147,7 +165,9 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobProductCategory::all_variants();
-      assert_eq!(variants.len(), 9);
+      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncFaceFusion));
+      assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncSadTalker));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LivePortrait));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LivePortraitWebcam));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::Studio));

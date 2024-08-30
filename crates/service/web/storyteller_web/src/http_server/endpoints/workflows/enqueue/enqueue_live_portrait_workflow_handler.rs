@@ -13,6 +13,7 @@ use log::{error, info, warn};
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -257,6 +258,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: InferenceJobType::LivePortrait,
+    maybe_product_category: Some(InferenceJobProductCategory::LivePortrait),
     inference_category: InferenceCategory::LivePortrait,
     maybe_model_type: None,
     maybe_model_token: None,
