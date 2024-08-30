@@ -16,6 +16,9 @@ use strum::EnumIter;
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum InferenceJobProductCategory {
+  /// Download: GptSoVits
+  DownloadGptSoVits,
+
   /// Lipsync: Face Fusion
   LipsyncFaceFusion,
 
@@ -58,6 +61,7 @@ impl_mysql_enum_coders!(InferenceJobProductCategory);
 impl InferenceJobProductCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::DownloadGptSoVits => "download_gpt_so_vits",
       Self::LipsyncFaceFusion => "lipsync_face_fusion",
       Self::LipsyncSadTalker => "lipsync_sad_talker",
       Self::LivePortrait => "live_portrait",
@@ -74,6 +78,7 @@ impl InferenceJobProductCategory {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "download_gpt_so_vits" => Ok(Self::DownloadGptSoVits),
       "lipsync_face_fusion" => Ok(Self::LipsyncFaceFusion),
       "lipsync_sad_talker" => Ok(Self::LipsyncSadTalker),
       "live_portrait" => Ok(Self::LivePortrait),
@@ -93,6 +98,7 @@ impl InferenceJobProductCategory {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::DownloadGptSoVits,
       Self::LipsyncFaceFusion,
       Self::LipsyncSadTalker,
       Self::LivePortrait,
@@ -118,6 +124,7 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceJobProductCategory::DownloadGptSoVits, "download_gpt_so_vits");
       assert_serialization(InferenceJobProductCategory::LipsyncFaceFusion, "lipsync_face_fusion");
       assert_serialization(InferenceJobProductCategory::LipsyncSadTalker, "lipsync_sad_talker");
       assert_serialization(InferenceJobProductCategory::LivePortrait, "live_portrait");
@@ -133,6 +140,7 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceJobProductCategory::DownloadGptSoVits.to_str(), "download_gpt_so_vits");
       assert_eq!(InferenceJobProductCategory::LipsyncFaceFusion.to_str(), "lipsync_face_fusion");
       assert_eq!(InferenceJobProductCategory::LipsyncSadTalker.to_str(), "lipsync_sad_talker");
       assert_eq!(InferenceJobProductCategory::LivePortrait.to_str(), "live_portrait");
@@ -148,6 +156,7 @@ mod tests {
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceJobProductCategory::from_str("download_gpt_so_vits").unwrap(), InferenceJobProductCategory::DownloadGptSoVits);
       assert_eq!(InferenceJobProductCategory::from_str("lipsync_face_fusion").unwrap(), InferenceJobProductCategory::LipsyncFaceFusion);
       assert_eq!(InferenceJobProductCategory::from_str("lipsync_sad_talker").unwrap(), InferenceJobProductCategory::LipsyncSadTalker);
       assert_eq!(InferenceJobProductCategory::from_str("live_portrait").unwrap(), InferenceJobProductCategory::LivePortrait);
@@ -165,7 +174,8 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobProductCategory::all_variants();
-      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.len(), 12);
+      assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::DownloadGptSoVits));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncFaceFusion));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncSadTalker));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LivePortrait));
