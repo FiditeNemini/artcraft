@@ -1,0 +1,106 @@
+--- Analyze records
+SELECT
+  job_type,
+  product_category,
+  inference_category,
+  maybe_model_type,
+  created_at
+FROM generic_inference_jobs
+WHERE product_category IS NULL
+AND created_at >= '2024-08-25'
+AND job_type NOT IN ('comfy_ui', 'stable_diffusion')
+ORDER BY ID DESC
+LIMIT 10;
+
+AND job_type NOT IN ('stable_diffusion', 'so_vits_svc', 'comfy_ui')
+
+--- Update tacotron2 jobs
+UPDATE generic_inference_jobs
+SET product_category = 'tts_tacotron2'
+WHERE job_type = 'tacotron2'
+AND inference_category = 'text_to_speech'
+AND maybe_model_type = 'tacotron2'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 1000;
+
+
+--- Update tacotron2 jobs
+UPDATE generic_inference_jobs
+SET product_category = 'tts_tacotron2'
+WHERE job_type = 'tacotron2'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 1000;
+
+--- Update GptSoVits (#1)
+UPDATE generic_inference_jobs
+SET product_category = 'tts_gpt_so_vits'
+WHERE job_type = 'gpt_sovits'
+AND inference_category = 'text_to_speech'
+AND maybe_model_type IS NULL
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 100000;
+
+
+--- Update GptSoVits (#2: we changed the inference_category)
+UPDATE generic_inference_jobs
+SET product_category = 'tts_gpt_so_vits'
+WHERE job_type = 'gpt_sovits'
+AND inference_category = 'deprecated_field'
+AND maybe_model_type IS NULL
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 100000;
+
+
+--- Update RVCv2 VC jobs
+UPDATE generic_inference_jobs
+SET product_category = 'vc_rvc2'
+WHERE job_type = 'rvc_v2'
+AND inference_category = 'voice_conversion'
+AND maybe_model_type = 'rvc_v2'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 100000;
+
+
+--- Update SVC VC jobs
+UPDATE generic_inference_jobs
+SET product_category = 'vc_svc'
+WHERE job_type = 'so_vits_svc'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 10000;
+
+
+--- Update StyleTTS2 jobs
+UPDATE generic_inference_jobs
+SET product_category = 'tts_style_tts2'
+WHERE job_type = 'styletts2'
+AND inference_category = 'text_to_speech'
+AND maybe_model_type = 'styletts2'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 1000;
+
+
+--- Update Live Portrait jobs
+UPDATE generic_inference_jobs
+SET product_category = 'live_portrait'
+WHERE job_type = 'live_portrait'
+AND inference_category = 'live_portrait'
+AND maybe_model_type IS NULL
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 10000;
+
+--- Update SadTalker jobs
+UPDATE generic_inference_jobs
+SET product_category = 'lipsync_sad_talker'
+WHERE maybe_model_type = 'sad_talker'
+AND inference_category = 'lipsync_animation'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 100;
