@@ -9,7 +9,7 @@ import { generateUUID } from "three/src/math/MathUtils.js";
 import { LoadingPlaceHolderManager } from "./placeholder_manager";
 import { MMDAnimationHelper, Water } from "three/examples/jsm/Addons.js";
 import { MediaFileType } from "../enums";
-import {ChromaKeyMaterial} from './chromakey'
+import { ChromaKeyMaterial } from "./chromakey";
 
 class Scene {
   name: string;
@@ -152,14 +152,20 @@ class Scene {
         //await videoElement.play();
         this.video_planes.push(videoElement);
 
-
         texture = new THREE.VideoTexture(videoElement);
 
         texture.colorSpace = THREE.SRGBColorSpace;
-        const image_material = new ChromaKeyMaterial(texture, 0x00ff00, 1920, 1080, 0.159, 0.082, 0.0);
+        const image_material = new ChromaKeyMaterial(
+          texture,
+          0x00ff00,
+          1920,
+          1080,
+          0.159,
+          0.082,
+          0.0,
+        );
         obj = new THREE.Mesh(geometry, image_material);
         obj.userData["media_id"] = name;
-
       } else {
         const loader = new THREE.TextureLoader();
         texture = loader.load(image_token);
@@ -371,6 +377,7 @@ class Scene {
     }
   }
 
+  // TODO: REPLACE
   async getMediaURL(media_id: string) {
     //This is for prod when we have the proper info on the url.
     const api_base_url = environmentVariables.values.BASE_API;
@@ -426,7 +433,7 @@ class Scene {
   }
 
   setVisible(object_uuid: string, visible: boolean) {
-    let object = this.get_object_by_uuid(object_uuid);
+    const object = this.get_object_by_uuid(object_uuid);
     if (object) {
       object.visible = visible;
       object.userData["visible"] = object.visible;
@@ -596,7 +603,7 @@ class Scene {
       child.userData["specular"] = 0.5;
       child.userData["locked"] = false;
       child.userData["media_file_type"] = MediaFileType.GLB;
-      
+
       child.layers.enable(0);
       child.layers.enable(1);
       if (load_version <= 1.0) {
@@ -678,13 +685,12 @@ class Scene {
     media_url: string,
     progress: (event: ProgressEvent) => void,
   ): Promise<THREE.SkinnedMesh> {
-
     // TODO: When converted to ts remove this and make ammo await instead.
     await this.delay_mmd(100);
 
-    console.log('Load MMD')
-    const scriptModule = document.createElement('script');
-    scriptModule.type = 'module';
+    console.log("Load MMD");
+    const scriptModule = document.createElement("script");
+    scriptModule.type = "module";
 
     scriptModule.textContent = `
       Ammo().then(function (AmmoLib) {
@@ -699,7 +705,8 @@ class Scene {
     return new Promise((resolve, reject) => {
       const mmdLoader = new MMDLoader();
       mmdLoader.loadWithAnimation(
-        media_url, ["/resources/pose/Lumine Idle cycle.vmd"],
+        media_url,
+        ["/resources/pose/Lumine Idle cycle.vmd"],
         (mmd) => {
           this.helper.add(mmd.mesh, {
             animation: mmd.animation,

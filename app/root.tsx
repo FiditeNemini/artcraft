@@ -57,6 +57,7 @@ export const links: LinksFunction = () => [
   },
 ];
 
+// .env part 2 add to this
 export async function loader() {
   const env = {
     // @ts-expect-error ProvessEnv is correct
@@ -83,6 +84,10 @@ export async function loader() {
     CONTEXT: process.env.CONTEXT || "%CONTEXT%",
     // @ts-expect-error ProvessEnv is correct
     DEPLOY_CONTEXT: process.env.DEPLOY_CONTEXT || "%DEPLOY_CONTEXT%",
+
+    // .env part 3
+    // @ts-expect-error ProvessEnv is correct
+    UPLOAD_API_VIDEO: process.env.UPLOAD_API_VIDEO || "%UPLOAD_API_VIDEO%",
   } as Record<string, string | boolean>;
   return { ENV: env };
 }

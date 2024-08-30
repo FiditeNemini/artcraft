@@ -36,6 +36,7 @@ import {
   loadingBarIsShowing,
   signalScene,
 } from "~/signals";
+
 import { outlinerState, updateObjectPanel } from "../signals";
 import { IGenerationOptions } from "../models/generationOptions";
 import { toEngineActions } from "../Queue/toEngineActions";
@@ -45,10 +46,11 @@ import { SceneManager } from "./scene_manager_api";
 import { CustomOutlinePass } from "./CustomOutlinePass.js";
 import FindSurfaces from "./FindSurfaces.js";
 import {
-  EngineFrameBuffers,
-  VideoAudioPreProcessor,
-} from "./video_audio_preprocessor";
-import { forEach } from "lodash";
+  ImageFormat,
+  //VideoAudioPreProcessor,
+} from "./VideoProcessor/video_audio_preprocessor";
+import { BufferType, EngineFrameBuffers } from "./VideoProcessor/engine_buffer";
+
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export type EditorInitializeConfig = {
@@ -93,7 +95,7 @@ class Editor {
   cameraViewControls: FreeCam | undefined;
   orbitControls: OrbitControls | undefined;
   locked: boolean;
-  frame_buffer: string[][] = []; // Contains a single frame with 4 channels or a signle frame with 1 channel color | depth | outline | normal.
+
   render_timer: number;
   fps_number: number;
   cap_fps: number;
@@ -174,50 +176,29 @@ class Editor {
   surfaceFinder: FindSurfaces | undefined;
 
   // New Rendering Pipeline Engine Work
-  videoAudioPreProcessor: VideoAudioPreProcessor;
-  colorRenderQueue: Array<Promise<string> | null>;
-  depthRenderQueue: Array<Promise<string> | null>;
-  normalRenderQueue: Array<Promise<string> | null>;
-  outlineRenderQueue: Array<Promise<string> | null>;
+  //videoAudioPreProcessor: VideoAudioPreProcessor | undefined;
+
   engineFrameBuffers: EngineFrameBuffers;
   renderIndex: number;
   // this should be set in the future to extend the lenght of the track for rendering engine
   globalSetTrackLengthSeconds: number;
 
+  // this is to prevent recording processing from happening twice there is an update loop bug at its core.
+  processingRecording: boolean;
+
+  // this is to catch and ensure that caching doesn't break the app.
+  // this happens because we can error out during the video generation process and things will cache despite that failing.
+  processingHasFailed: boolean;
   stats: Stats;
 
   constructor() {
+    this.processingHasFailed = false;
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
-
+    this.can_initialize = true;
+    this.processingRecording = false;
     this.stats = new Stats();
-
-
-    // New Rendering Pipeline Engine Work
-    this.globalSetTrackLengthSeconds = 7;
-    this.cap_fps = 60;
-    const frames = this.globalSetTrackLengthSeconds * this.cap_fps;
-
-    this.videoAudioPreProcessor = new VideoAudioPreProcessor();
-    this.videoAudioPreProcessor.initialize();
-
-    // number of frames max in a scene
-    this.colorRenderQueue = new Array(frames).fill(null);
-    this.depthRenderQueue = new Array(frames).fill(null);
-    this.normalRenderQueue = new Array(frames).fill(null);
-    this.outlineRenderQueue = new Array(frames).fill(null);
-    this.renderIndex = 0;
-
-    this.engineFrameBuffers = {
-      colorFrames: new Array(frames).fill(null),
-      normalFrames: new Array(frames).fill(null),
-      outlineFrames: new Array(frames).fill(null),
-      depthFrames: new Array(frames).fill(null),
-    };
-
-    // New Rendering Pipeline Engine Work
-
     // TODO: REMOVE LATER WITH BETTER FIX FOR IMPORTING AMMOJS
     document.body.appendChild(
       Object.assign(document.createElement("script"), {
@@ -225,8 +206,6 @@ class Editor {
       }),
     );
 
-    this.can_initialize = false;
-    this.can_initialize = true;
     const newElement = document.createElement("div");
     newElement.id = "created-one-element";
     document.body.appendChild(newElement);
@@ -322,6 +301,24 @@ class Editor {
     this.globalIpAdapterImage = undefined; // used to display when loading in the app. and to serialize to an image token
     // TODO REMOVE
     this.outliner_feature_flag = true;
+
+    // New Rendering Pipeline Engine Work
+    this.globalSetTrackLengthSeconds = 7;
+
+    // set image type at this stage
+
+    const imageFormat = ImageFormat.JPEG;
+
+    this.renderIndex = 0;
+    this.engineFrameBuffers = new EngineFrameBuffers(
+      this.getRenderDimensions().width,
+      this.getRenderDimensions().height,
+    );
+    if (this.engineFrameBuffers.frameWorkerManager) {
+      this.engineFrameBuffers.frameWorkerManager.type = imageFormat;
+    }
+
+    // New Rendering Pipeline Engine Work
   }
   getRenderDimensions() {
     switch (this.render_camera_aspect_ratio) {
@@ -413,6 +410,7 @@ class Editor {
       data: this.render_camera_aspect_ratio,
     });
   }
+
   initialize({
     sceneToken,
     editorCanvasEl,
@@ -425,6 +423,9 @@ class Editor {
     }
 
     this.can_initialize = false;
+
+    // This is to prevent recording processing from happening twice there is an update loop bug at its core.
+    this.processingRecording = false;
 
     // Gets the canvas.
     this.canvReference = editorCanvasEl;
@@ -473,16 +474,10 @@ class Editor {
 
     this.renderer.shadowMap.enabled = true;
     this.clock = new THREE.Clock();
+
     // Resizes the renderer.
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    //document.body.appendChild(this.renderer.domElement)
-
-    // window.addEventListener("resize", this.onWindowResize.bind(this));
-    // this.renderer.domElement.addEventListener(
-    //   "resize",
-    //   this.onWindowResize.bind(this),
-    // );
 
     this._configurePostProcessing();
     // Controls and movement.
@@ -575,7 +570,7 @@ class Editor {
       this.getAssetType.bind(this),
       this.setSelected.bind(this),
       this.isMovable.bind(this),
-      this.enable_stats.bind(this)
+      this.enable_stats.bind(this),
     );
 
     if (this.outliner_feature_flag) {
@@ -638,7 +633,7 @@ class Editor {
   }
 
   public enable_stats() {
-    document.body.appendChild(this.stats.dom)
+    document.body.appendChild(this.stats.dom);
   }
 
   public async newScene(sceneTitleInput: string) {
@@ -810,16 +805,22 @@ class Editor {
       this.activeScene.scene,
       this.render_camera,
     );
+
     this.render_composer = new EffectComposer(this.rawRenderer, renderTarget);
+
     this.surfaceFinder = new FindSurfaces();
+
     this.rawRenderPass = new RenderPass(
       this.activeScene.scene,
       this.render_camera,
     );
+
     this.render_composer.addPass(this.rawRenderPass);
+
     this.render_composer.addPass(this.customOutlinerPass);
 
     this.renderOutputPass = new OutputPass();
+
     this.render_composer.addPass(this.renderOutputPass);
 
     this.setColorMap();
@@ -883,7 +884,6 @@ class Editor {
     this.composer.addPass(this.outlinePass);
 
     this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
-
     this.saoPass.params.saoBias = 4.1;
     this.saoPass.params.saoIntensity = 1.0;
     this.saoPass.params.saoScale = 32.0;
@@ -955,11 +955,15 @@ class Editor {
               : 1000;
 
         this.rawRenderer.setSize(width, height);
+
+        // ensure that during a resize or change in perspective this will processes correct.
+        this.engineFrameBuffers.setRenderSurfaceSize(width, height);
+
         this.render_camera.aspect = width / height;
       }
 
       this.render_timer += this.clock.getDelta();
-      this.frames += 1;
+
       this.playback_location++;
 
       this.utils.removeTransformControls(true);
@@ -967,53 +971,29 @@ class Editor {
       if (this.timeline.is_playing) {
         this.setColorMap();
         this.render_composer?.render();
+        if (this.canvReference) {
+          console.time("Color Frame RenderTime");
 
-        // TODO we can fix this, we need to create a bunch of off screen canvas elements
-        // then in parallel have them be peeled off of there
-        const renderTask = this.videoAudioPreProcessor.retrieveFrame(
-          this.rawRenderer,
-        );
-        // await for now race condition with frame retrival on the buffer.
-        this.engineFrameBuffers.colorFrames[this.renderIndex] =
-          await renderTask;
+          // reset this flag to ensure that a failure isn't cached
+          this.processingHasFailed = false;
+          // can't render without this.
 
-        if (this.engine_preprocessing) {
-          // Normals
-          this.setNormalMap();
-          this.render_composer?.render();
+          if (!this.render_camera) {
+            return;
+          }
 
-          const normalRenderTask = this.videoAudioPreProcessor.retrieveFrame(
+          this.engineFrameBuffers.enqueueWork(
             this.rawRenderer,
+            this.activeScene.scene,
+            this.render_camera,
           );
-          this.engineFrameBuffers.normalFrames[this.renderIndex] =
-            await normalRenderTask;
-
-          //this.normalRenderQueue[this.renderIndex] = normalRenderTask;
-
-          // Depth
-          this.setRenderDepth();
-          this.render_composer?.render();
-          const depthRenderTask = this.videoAudioPreProcessor.retrieveFrame(
-            this.rawRenderer,
-          );
-          this.engineFrameBuffers.depthFrames[this.renderIndex] =
-            await depthRenderTask;
-          // this.depthRenderQueue[this.renderIndex] = depthRenderTask;
-
-          // Outline
-          this.setOutlineRender();
-          this.render_composer?.render();
-          const outlineRenderTask = this.videoAudioPreProcessor.retrieveFrame(
-            this.rawRenderer,
-          );
-          this.engineFrameBuffers.outlineFrames[this.renderIndex] =
-            await outlineRenderTask;
-
-          //this.outlineRenderQueue[this.renderIndex] = outlineRenderTask;
 
           this.renderIndex += 1;
+          console.log(`Frames Counted: ${this.renderIndex}`);
+
+          console.timeEnd("Color Frame RenderTime");
         } else {
-          this.renderIndex += 1;
+          console.log("We lost the canvas reference.");
         }
 
         this.render_timer += this.clock.getDelta();
@@ -1021,38 +1001,35 @@ class Editor {
       if (!this.timeline.is_playing) {
         this.playback_location = 0;
         try {
-          this.renderIndex = 0;
-          // collect all frames here
-          console.time("RenderQueueTime");
-          //const colors = await Promise.all(this.colorRenderQueue);
-          console.timeEnd("RenderQueueTime");
-          // console.log(`Number of Frames: ${colors.length}`);
-
-          // We are doing it sync now.
-          // this.engineFrameBuffers.colorFrames = colors;
-          this.colorRenderQueue.fill(null);
-
-          if (this.engine_preprocessing) {
-            console.time("EnginePreProcessingTime");
-            //const normals = await Promise.all(this.normalRenderQueue);
-            //this.engineFrameBuffers.normalFrames = normals;
-            //this.normalRenderQueue.fill(null);
-
-            //const depth = await Promise.all(this.depthRenderQueue);
-            //this.engineFrameBuffers.depthFrames = depth;
-            //this.depthRenderQueue.fill(null);
-
-            //const outlines = await Promise.all(this.outlineRenderQueue);
-            //this.engineFrameBuffers.outlineFrames = outlines;
-            //this.outlineRenderQueue.fill(null);
-            console.timeEnd("EnginePreProcessingTime");
+          if (this.processingRecording) {
+            console.log(
+              "processingRecording is already happening this shouldn't have happened",
+            );
+            return;
           }
+          this.processingRecording = true;
+          // collect all frames here, there is some kind of race condition that is happening
+          // TODO BUG with the main loop,that sends multiple zip requests.
+          console.log(`COLLECTING COLOR FRAMES COUNTED: ${this.renderIndex}`);
+          await this.engineFrameBuffers.collectColorFrames(this.renderIndex);
 
+          await this.engineFrameBuffers.logBufferInfo(BufferType.COLOR);
+          this.renderIndex = 0;
+          console.time("Stop Playback And Upload Video Time");
           await this.stopPlaybackAndUploadVideo();
+          console.timeEnd("Stop Playback And Upload Video Time");
+
+          this.processingRecording = false;
+          console.log("Processing has ended");
         } catch (error) {
-          console.log(error);
+          // don't use cache in this case.
+          this.processingHasFailed = true;
+          this.engineFrameBuffers.clearBuffer(BufferType.COLOR);
+          console.log(`Video Generation: ${error}`);
         }
-      }
+      } // End Timeline Playing
+
+      // BRB ^)^
     }
   }
 
@@ -1240,14 +1217,12 @@ class Editor {
   async generateVideo() {
     // cannot run this function reliably without ensuring state below doesn't blow everything up.
     if (await this.checkAndUseCache()) {
-      console.log("Checking Cache");
+      console.log("Generating Video: Checking Cache");
       await this.videoGeneration.handleCachedEnqueue();
       return;
     }
 
     // some state changes below
-
-    console.log("Generating Video", this.frame_buffer);
 
     this.timeline.is_playing = false;
     this.timeline.scrubber_frame_position = 0;
@@ -1266,7 +1241,6 @@ class Editor {
     console.log("Running without Cache");
 
     this.togglePlayback();
-    this.frame_buffer = [];
     this.render_timer = 0;
     this.activeScene.renderMode(this.rendering);
     this.timeline.scrubber_frame_position = 0;
@@ -1283,7 +1257,10 @@ class Editor {
   // This sadly doesn't cover camera framing style changes,
   // Reasoning is that there is no defined interface to get changes like that.
   async checkAndUseCache(): Promise<boolean> {
-    if (await this.useCachedMediaTokens()) {
+    if (
+      (await this.useCachedMediaTokens()) &&
+      this.processingHasFailed == false
+    ) {
       console.log("Using Cache");
       return true;
     } else {
@@ -1425,6 +1402,7 @@ class Editor {
 
   setupResizeObserver() {
     this.containerMayReset();
+
     if (!this.container) {
       return;
     }

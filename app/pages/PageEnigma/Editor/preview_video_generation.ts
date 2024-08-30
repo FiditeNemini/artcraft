@@ -1,16 +1,12 @@
 import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
 
 import {
-  StandardResponse,
   ProcessStatus,
   StreamingProgressResponse,
   VideoAudioPreProcessor,
-  EngineFrameBuffers,
-  AudioBuffer,
-} from "./video_audio_preprocessor";
+} from "./VideoProcessor/video_audio_preprocessor";
 
 class PreviewVideoGeneration {
-  conditionedFrameBuffer: EngineFrameBuffers;
   mediaUploadAPI: MediaUploadApi;
   videoAPI: VideoApi;
   videoAndAudioPreProcessor: VideoAudioPreProcessor;
@@ -21,12 +17,6 @@ class PreviewVideoGeneration {
     onProgress: (response: StreamingProgressResponse<ProcessStatus>) => void,
   ) {
     this.onProgress = onProgress;
-    this.conditionedFrameBuffer = {
-      colorFrames: [],
-      normalFrames: [],
-      outlineFrames: [],
-      depthFrames: [],
-    };
     this.videoAndAudioPreProcessor = new VideoAudioPreProcessor(onProgress);
     this.mediaUploadAPI = new MediaUploadApi();
     this.videoAPI = new VideoApi();
@@ -45,14 +35,7 @@ class PreviewVideoGeneration {
     // start polling for percentage change and convert and remap to remainint %
   }
 
-  async clearFrameBuffers() {
-    this.conditionedFrameBuffer = {
-      colorFrames: [],
-      normalFrames: [],
-      outlineFrames: [],
-      depthFrames: [],
-    };
-  }
+  async clearFrameBuffers() {}
 }
 
 export { PreviewVideoGeneration };

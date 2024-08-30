@@ -13,12 +13,14 @@ export class ApiManager {
   ApiTargets: Record<string, string> = {};
 
   constructor() {
+    // look at the .env file
     this.ApiTargets = {
       BaseApi: environmentVariables.values.BASE_API as string,
       GoggleApi: environmentVariables.values.GOOGLE_API as string,
       FunnelApi: environmentVariables.values.FUNNEL_API as string,
       CdnApi: environmentVariables.values.CDN_API as string,
       GravatarApi: environmentVariables.values.GRAVATAR_API as string,
+      uploadApi: environmentVariables.values.UPLOAD_API_VIDEO as string,
     };
   }
 
@@ -152,6 +154,7 @@ export class ApiManager {
       formData.append("file", blob);
     }
 
+    console.log(`HELLO${formData}`);
     return this.fetchMultipartFormData<T>(endpoint, {
       method: "POST",
       headers: {

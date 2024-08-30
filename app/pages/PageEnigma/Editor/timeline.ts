@@ -240,7 +240,7 @@ export class TimeLine {
           await this.editorEngine.generateVideo();
           this.debounce_generate_video = false;
         }
-        console.log("Finished! Generate Video");
+        console.log("Generate Video Press Event");
         break;
       }
       case toEngineActions.CHANGE_CAMERA_ASPECT_RATIO: {
@@ -755,9 +755,11 @@ export class TimeLine {
       // Caps to 10fps so that the buffering issue is solved and it plays i am not sure how to fix this.
       // TODO: Fix buffering and make 30 fps.
       const fixedPoint = 1;
-      
+
       let pb = parseFloat(
-        (this.scrubber_frame_position / this.editorEngine.cap_fps).toFixed(fixedPoint),
+        (this.scrubber_frame_position / this.editorEngine.cap_fps).toFixed(
+          fixedPoint,
+        ),
       );
       pb = parseFloat((pb % video_plane.duration).toFixed(fixedPoint));
       if (video_plane.currentTime !== pb) {
@@ -846,9 +848,6 @@ export class TimeLine {
         }
       }
     }
-
-
-    //this.scene.helper.update(0.1);
 
     if (
       this.scrubber_frame_position >= this.timeline_limit &&

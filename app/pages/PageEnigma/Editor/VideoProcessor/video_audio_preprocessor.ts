@@ -1,8 +1,7 @@
 import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
 import { BucketConfig } from "~/api/BucketConfig";
-import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
-import { ClipUI } from "../datastructures/clips/clip_ui";
-import * as THREE from "three";
+// import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+import { ClipUI } from "../../datastructures/clips/clip_ui";
 
 export interface VideoPreProcessorError {
   message: string;
@@ -26,13 +25,6 @@ interface VideoPreProcessorOutputProperties {
   timelineTrackLengthSeconds: number;
 }
 
-export interface EngineFrameBuffers {
-  colorFrames: (string | null)[];
-  normalFrames: (string | null)[];
-  outlineFrames: (string | null)[];
-  depthFrames: (string | null)[];
-}
-
 export interface AudioBuffer {
   buffer: AudioClipInfo[];
 }
@@ -51,104 +43,66 @@ export enum ImageFormat {
 
 // 44099.10498046875 for the image buffer loop and memory pressure.
 export class VideoAudioPreProcessor {
-  ffmpeg: FFmpeg;
+  // ffmpeg: FFmpeg;
   properties: VideoPreProcessorOutputProperties;
   onProgress: (response: StreamingProgressResponse<ProcessStatus>) => void;
   mediaFilesApi: MediaFilesApi;
+
   bucketConfig: BucketConfig;
 
   constructor(
     onProgress: (response: StreamingProgressResponse<ProcessStatus>) => void,
     properties: VideoPreProcessorOutputProperties = {
       frameRate: 60,
-      imageFormat: ImageFormat.JPEG,
+      imageFormat: ImageFormat.PNG,
       timelineTrackLengthSeconds: 7,
     },
   ) {
-    this.ffmpeg = createFFmpeg({ log: false });
+    // this.ffmpeg = createFFmpeg({ log: true, logger: (p) => console.log(p) });
     this.properties = properties;
     this.onProgress = onProgress;
     this.mediaFilesApi = new MediaFilesApi();
+
     this.bucketConfig = new BucketConfig();
   }
 
   // You have to call this early on because it can take a while to load from the CDN.
   async initialize() {
-    if (this.ffmpeg.isLoaded() == false) {
-      await this.ffmpeg.load();
-      console.log("Loaded FFMPEG");
-    } else {
-      console.log("Error Failed to Load FFMPEG");
-    }
+    // if (this.ffmpeg.isLoaded() == false) {
+    //   await this.ffmpeg.load();
+    //   console.log("Video Generation: Loaded FFMPEG");
+    // } else {
+    //   console.log("Video Generation: Already Loaded");
+    // }
   }
 
   // This retrieves by creating dom elements
-  async retrieveFrame(rawRenderer: THREE.WebGLRenderer): Promise<string> {
-    return new Promise((resolve, reject) => {
-      rawRenderer.domElement.toBlob(
-        (blob) => {
-          if (blob) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const imgData = reader.result as string;
-              resolve(imgData);
-            };
-            reader.onerror = () => {
-              reject({
-                message: "Failed to Retrieve Frame and Serialize it.",
-                code: 100,
-              });
-            };
-            reader.readAsDataURL(blob);
-          }
-        },
-        this.properties.imageFormat,
-        1.0,
-      );
-    });
+
+  async removeInMemoryWavs(): Promise<void> {
+    try {
+      // const fileNames = this.ffmpeg.FS("readdir", "/");
+      // const extension = ".wav";
+      // for (const fileName of fileNames) {
+      //   if (fileName.endsWith(extension)) {
+      //     await this.ffmpeg.FS("unlink", fileName);
+      //   }
+      // }
+    } catch (error) {
+      const processError: VideoPreProcessorError = {
+        message: "Failed to delete files from FFmpeg memory store:",
+        code: 101,
+      };
+
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error(errorMessage);
+
+      throw processError;
+    }
   }
-  // parallel version
-  // async retrieveFrame(rawRenderer: THREE.WebGLRenderer): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     // Create an offscreen canvas
-  //     const offscreenCanvas = document.createElement("canvas");
-  //     offscreenCanvas.width = rawRenderer.domElement.width;
-  //     offscreenCanvas.height = rawRenderer.domElement.height;
-  //     const ctx = offscreenCanvas.getContext("2d");
-
-  //     if (!ctx) {
-  //       reject("Failed to get 2D context");
-  //       return;
-  //     }
-
-  //     // Draw the renderer's canvas content onto the offscreen canvas
-  //     ctx.drawImage(rawRenderer.domElement, 0, 0);
-
-  //     // Convert the offscreen canvas to a Blob
-  //     offscreenCanvas.toBlob(
-  //       (blob) => {
-  //         if (blob) {
-  //           const reader = new FileReader();
-  //           reader.onloadend = () => {
-  //             const imgData = reader.result as string;
-  //             resolve(imgData);
-  //           };
-  //           reader.onerror = () => {
-  //             reject("Failed to Retrieve Frame");
-  //           };
-  //           reader.readAsDataURL(blob);
-  //         } else {
-  //           reject("Failed to convert canvas to Blob");
-  //         }
-  //       },
-  //       "image/jpeg",
-  //       1.0,
-  //     );
-  //   });
-  // }
   async removeInMemoryImages(): Promise<void> {
     try {
-      const fileNames = this.ffmpeg.FS("readdir", "/");
+      // const fileNames = this.ffmpeg.FS("readdir", "/");
       const imageFormat = this.properties.imageFormat;
       let extension = "";
       if (imageFormat == ImageFormat.JPEG) {
@@ -157,11 +111,11 @@ export class VideoAudioPreProcessor {
         extension = ".png";
       }
 
-      for (const fileName of fileNames) {
-        if (fileName.endsWith(extension)) {
-          await this.ffmpeg.FS("unlink", fileName);
-        }
-      }
+      // for (const fileName of fileNames) {
+      //   if (fileName.endsWith(extension)) {
+      //     await this.ffmpeg.FS("unlink", fileName);
+      //   }
+      // }
     } catch (error) {
       const processError: VideoPreProcessorError = {
         message: "Failed to delete files from FFmpeg memory store:",
@@ -269,12 +223,12 @@ export class VideoAudioPreProcessor {
       });
 
       if (response.success && response.data) {
-        this.bucketConfig.isLocalDev = false; // TODO REMOVE
-        const imageUrl = this.bucketConfig.getGcsUrl(
+        this.bucketConfig.isLocalDev = false;
+        const mediaUrl = this.bucketConfig.getGcsUrl(
           response.data.public_bucket_path,
         );
 
-        return imageUrl;
+        return mediaUrl;
       } else {
         const processError: VideoPreProcessorError = {
           message: "Failed to get MediaUrlFrom Token",
@@ -363,86 +317,119 @@ export class VideoAudioPreProcessor {
   ): Promise<Blob | void> {
     const outputName = `${audioOutputFileName}`;
 
-    // Create the samples in memory
-    for (let i = 0; i < audioBuffer.buffer.length; i++) {
-      const buffer: AudioClipInfo = audioBuffer.buffer[i];
-      const urlPath = await this.getMediaUrlFromToken(buffer.media_id);
-      const audio = await fetchFile(urlPath);
+    try {
+      // Create the samples in memory
+      for (let i = 0; i < audioBuffer.buffer.length; i++) {
+        const buffer: AudioClipInfo = audioBuffer.buffer[i];
+        const urlPath = await this.getMediaUrlFromToken(buffer.media_id);
+        const audio = await fetchFile(urlPath);
+        console.log(urlPath);
+        console.log(audio);
 
-      if (audio.length === 0) {
-        console.log("audio is 0");
+        if (audio.length === 0) {
+          console.log("audio is 0");
 
-        const processError: VideoPreProcessorError = {
-          message: `Audio length is 0 for ${urlPath}`,
-          code: 103,
-        };
-        throw processError;
+          const processError: VideoPreProcessorError = {
+            message: `Audio length is 0 for ${urlPath}`,
+            code: 103,
+          };
+          throw processError;
+        }
+
+        await this.ffmpeg.FS("writeFile", `tmp${i}.wav`, audio);
       }
+      console.log("Write the Audio");
 
-      await this.ffmpeg.FS("writeFile", `tmp${i}.wav`, audio);
-    }
-    console.log("Write the Audio");
+      // Construct the FFmpeg command to mix the WAV files
+      const inputArgs = [];
+      const filterComplexArgs = [];
 
-    // Construct the FFmpeg command to mix the WAV files
-    const inputArgs = [];
-    const filterComplexArgs = [];
-
-    // Add the silent audio file and account for it below. i + 1
-    inputArgs.push(
-      "-f",
-      "lavfi",
-      "-t",
-      "7",
-      "-i",
-      "anullsrc=r=44100:cl=stereo",
-    );
-
-    // Add the existing audio clips
-    for (let i = 0; i < audioBuffer.buffer.length; i++) {
-      const endTime = audioBuffer.buffer[i].length / this.properties.frameRate; // allows trimming from the right
-
-      const offset = audioBuffer.buffer[i].offset / this.properties.frameRate; // where it will end up on the track.
-
-      const startTime =
-        audioBuffer.buffer[i].offset / this.properties.frameRate; // allows trimming from the left eventually
-      const end = endTime - startTime;
-
-      inputArgs.push("-i", `tmp${i}.wav`);
-      // trim the audio to the end time then offset
-      filterComplexArgs.push(
-        `[${i + 1}:a]atrim=start=${0}:end=${end},adelay=${offset * 1000}|${offset * 1000}[a${i}];`,
+      // Add the silent audio file and account for it below. i + 1
+      inputArgs.push(
+        "-f",
+        "lavfi",
+        "-t",
+        "7",
+        "-i",
+        "anullsrc=r=44100:cl=stereo",
       );
 
-      console.log("Write Audio and Offset Position");
+      // Add the existing audio clips
+      for (let i = 0; i < audioBuffer.buffer.length; i++) {
+        const endTime =
+          audioBuffer.buffer[i].length / this.properties.frameRate; // allows trimming from the right
+
+        const offset = audioBuffer.buffer[i].offset / this.properties.frameRate; // where it will end up on the track.
+
+        const startTime =
+          audioBuffer.buffer[i].offset / this.properties.frameRate; // allows trimming from the left eventually
+        const end = endTime - startTime;
+
+        inputArgs.push("-i", `tmp${i}.wav`);
+        // trim the audio to the end time then offset
+        filterComplexArgs.push(
+          `[${i + 1}:a]atrim=start=${0}:end=${end},adelay=${offset * 1000}|${offset * 1000}[a${i}];`,
+        );
+
+        console.log("Write Audio and Offset Position");
+      }
+
+      // Add the silent audio track to the filter complex arguments
+      filterComplexArgs.push("[0:a]");
+
+      // Add the existing audio tracks to the filter complex arguments
+      for (let i = 0; i < audioBuffer.buffer.length; i++) {
+        filterComplexArgs.push(`[a${i}]`);
+      }
+
+      // Mix the silent audio track with the existing audio tracks
+      filterComplexArgs.push(`amix=inputs=${audioBuffer.buffer.length + 1}[a]`);
+
+      // Run the FFmpeg command to mix the WAV files
+      await this.ffmpeg.run(
+        ...inputArgs,
+        "-filter_complex",
+        filterComplexArgs.join(""),
+        "-map",
+        "[a]",
+        `${outputName}.wav`,
+      );
+
+      this.debugListFiles();
+
+      if (includeBlob) {
+        const blob = await this.outputWavFromMemory(`${outputName}`);
+        return blob;
+      } else {
+        return;
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
+  }
 
-    // Add the silent audio track to the filter complex arguments
-    filterComplexArgs.push("[0:a]");
+  // Testing function
+  public downloadImageBlob(blob: Blob, filename: string) {
+    // Create a URL for the blob
+    const url = URL.createObjectURL(blob);
 
-    // Add the existing audio tracks to the filter complex arguments
-    for (let i = 0; i < audioBuffer.buffer.length; i++) {
-      filterComplexArgs.push(`[a${i}]`);
-    }
+    // Create a temporary anchor element
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
 
-    // Mix the silent audio track with the existing audio tracks
-    filterComplexArgs.push(`amix=inputs=${audioBuffer.buffer.length + 1}[a]`);
+    // Append the anchor to the document body
+    document.body.appendChild(a);
 
-    // Run the FFmpeg command to mix the WAV files
-    await this.ffmpeg.run(
-      ...inputArgs,
-      "-filter_complex",
-      filterComplexArgs.join(""),
-      "-map",
-      "[a]",
-      `${outputName}.wav`,
-    );
+    // Trigger a click event on the anchor
+    a.click();
 
-    if (includeBlob) {
-      const blob = await this.outputWavFromMemory(`${outputName}`);
-      return blob;
-    } else {
-      return;
-    }
+    // Remove the anchor from the document
+    document.body.removeChild(a);
+
+    // Revoke the object URL to free up memory
+    URL.revokeObjectURL(url);
   }
 
   async processVideoWithBuffer(
@@ -460,8 +447,9 @@ export class VideoAudioPreProcessor {
       } else {
         extension = ".png";
       }
-      // console.log("Image Files");
-      // console.log(`Buffer Lenght ${buffer.length}`);
+      console.log(`Image Files of extension ${extension}`);
+      console.log(`Buffer Length ${buffer.length}`);
+
       for (let index = 0; index < buffer.length; index++) {
         const element = buffer[index];
         if (element === null) {
@@ -469,6 +457,7 @@ export class VideoAudioPreProcessor {
         }
         // this can fail so catch any errors.
         const image = await fetchFile(element);
+
         await this.ffmpeg.FS(
           "writeFile",
           `${imagePrefix}_image${index}${extension}`,
@@ -529,6 +518,18 @@ export class VideoAudioPreProcessor {
     return blob;
   }
 
+  // Grab the file from in memory fs and provide it as a blob
+  async outputImageFromMemory(
+    fileName: string,
+    imageExtension: ImageFormat = ImageFormat.JPEG,
+  ): Promise<Blob> {
+    // Upload individual videos or single color video
+    const output = this.ffmpeg.FS("readFile", `${fileName}`);
+    // Create a Blob from the output file for downloading
+    const blob = new Blob([output.buffer], { type: `${imageExtension}` });
+    return blob;
+  }
+
   async outputWavFromMemory(fileName: string): Promise<Blob> {
     // Upload individual videos or single color video
     const output = this.ffmpeg.FS("readFile", `${fileName}.wav`);
@@ -542,8 +543,6 @@ export class VideoAudioPreProcessor {
     // List all files in the in-memory filesystem
     const files = this.ffmpeg.FS("readdir", "/");
     await this.deleteFilesFromFFmpegMemoryStore(files);
-    // This is undefined probably never want to call this really lol
-    // this.ffmpeg.exit();
   }
 
   async debugListFiles() {

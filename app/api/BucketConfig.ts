@@ -11,6 +11,7 @@ class BucketConfig {
   }
 
   // TODO: Prevent callers with undefined/null paths
+  // TODO pipeline works make more robust....
   getGcsUrl(bucketRelativePath: string | undefined | null): string {
     const bucket = this.getBucket();
     let path = bucketRelativePath;

@@ -7,7 +7,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "staging-build": "remix vite:build",
-    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint playground/* .",
     "start": "netlify serve",
     "typecheck": "tsc",
     "update:icons": "npm update @awesome.me/kit-fde2be5eb0",
@@ -19,9 +19,6 @@
   },
   "dependencies": {
     "@awesome.me/kit-fde2be5eb0": "^1.0.7",
-    "@ffmpeg/core": "0.11.0",
-    "@ffmpeg/ffmpeg": "0.11.6",
-    "@ffmpeg/util": "0.12.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/pro-solid-svg-icons": "^6.5.1",
@@ -38,6 +35,7 @@
     "@remix-run/serve": "^2.8.1",
     "@tweenjs/tween.js": "^18.6.4",
     "@types/lodash": "^4.17.6",
+    "@zip.js/zip.js": "^2.7.51",
     "ammo.js": "^0.0.10",
     "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
     "common": "file:common",
@@ -105,7 +103,7 @@
     "terser": "^5.30.3",
     "ts-jest": "^29.1.4",
     "typescript": "^5.1.6",
-    "vite": "^5.0.0",
+    "vite": "^5.4.0",
     "vite-tsconfig-paths": "^4.2.1"
   },
   "engines": {
@@ -113,7 +111,7 @@
   },
   "version": "",
   "lint-staged": {
-    "*.js": "eslint --cache --fix",
+    "*.js": "eslint --cache --fix --ignore-pattern 'playground/**'",
     "*.{js,css,md}": "prettier --write"
   }
 }
