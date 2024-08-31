@@ -153,6 +153,14 @@ AND created_at <= '2024-08-30'
 LIMIT 100000;
 
 
+-- Update GptSoVits Download Jobs
+UPDATE generic_inference_jobs
+SET product_category = 'download_gpt_so_vits'
+WHERE job_type = 'gpt_sovits'
+AND maybe_download_url IS NOT NULL
+LIMIT 10000;
+
+
 --- TODO: Not working
 --- Update RVCv2 VC jobs
 UPDATE generic_inference_jobs

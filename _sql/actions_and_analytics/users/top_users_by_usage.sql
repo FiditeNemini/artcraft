@@ -3,6 +3,23 @@
 -- noinspection SqlResolveForFile
 
 SELECT
+    m.maybe_creator_user_token as user_token,
+    u.username,
+    count(*) as usage_count,
+    u.created_at
+FROM media_files as m
+JOIN users as u
+ON u.token = m.maybe_creator_user_token
+WHERE m.maybe_creator_user_token IS NOT NULL
+AND m.created_at > NOW() - INTERVAL 31 DAY
+GROUP BY m.maybe_creator_user_token
+ORDER BY usage_count DESC
+LIMIT 50000;
+
+
+----- Older queries -----
+
+SELECT
     u.username as username,
     j.token as token
 FROM users AS u
@@ -11,18 +28,6 @@ ON u.token = j.maybe_creator_user_token
   AND j.created_at > NOW() - INTERVAL 31 DAY
 
 
-SELECT
-    t.maybe_creator_user_token as user_token,
-    u.username,
-    count(*) as usage_count,
-    u.created_at
-FROM tts_results as t
-JOIN users as u
-ON u.token = t.maybe_creator_user_token
-WHERE t.maybe_creator_user_token IS NOT NULL
-GROUP BY t.maybe_creator_user_token
-ORDER BY usage_count DESC
-LIMIT 50000;
 
 
 SELECT
