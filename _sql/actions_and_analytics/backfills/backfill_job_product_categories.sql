@@ -8,8 +8,7 @@ SELECT
 FROM generic_inference_jobs
 WHERE product_category IS NULL
 AND created_at >= '2024-07-31'
-ORDER BY ID DESC
-LIMIT 10;
+ORDER BY ID DESC;
 
 -- AND job_type NOT IN ('stable_diffusion', 'so_vits_svc', 'comfy_ui')
 
@@ -17,7 +16,7 @@ LIMIT 10;
 UPDATE generic_inference_jobs
 SET product_category = 'studio'
 WHERE job_type = 'comfy_ui'
-AND product_category IS NULL
+AND product_category IN ('vst', 'studio', NULL)
 AND token IN (
     SELECT
       job.token
@@ -33,7 +32,7 @@ AND token IN (
           JSON_UNQUOTE(JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in')) as input_token
         FROM generic_inference_jobs
         WHERE job_type = 'comfy_ui'
-        AND product_category IS NULL
+        AND product_category IN ('vst', 'studio', NULL)
         AND created_at >= '2024-05-01'
         ORDER BY ID DESC
     ) as job
@@ -41,6 +40,63 @@ AND token IN (
     WHERE m.created_at >= '2024-05-01'
     AND   m.maybe_scene_source_media_file_token IS NOT NULL
 );
+
+-- Update VST jobs (distinguished from studio jobs)
+UPDATE generic_inference_jobs
+SET product_category = 'vst'
+WHERE job_type = 'comfy_ui'
+AND product_category IN ('vst', 'studio', NULL)
+AND token IN (
+    SELECT
+      job.token
+    FROM media_files as m
+    JOIN (
+        SELECT
+          token,
+          job_type,
+          product_category,
+          inference_category,
+          maybe_model_type,
+          created_at,
+          JSON_UNQUOTE(JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in')) as input_token
+        FROM generic_inference_jobs
+        WHERE job_type = 'comfy_ui'
+        AND product_category IN ('vst', 'studio', NULL)
+        AND created_at >= '2024-03-01'
+        ORDER BY ID DESC
+    ) as job
+    ON m.token = job.input_token
+    WHERE m.created_at >= '2024-03-01'
+    AND   m.maybe_scene_source_media_file_token IS NULL
+);
+
+-- Update final remaining VST jobs (distinguished from studio jobs)
+UPDATE generic_inference_jobs
+SET product_category = 'vst'
+WHERE job_type = 'comfy_ui'
+AND product_category IS NULL
+AND token NOT IN (
+    SELECT
+      job.token
+    FROM media_files as m
+    JOIN (
+        SELECT
+          token,
+          job_type,
+          product_category,
+          inference_category,
+          maybe_model_type,
+          created_at,
+          JSON_UNQUOTE(JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in')) as input_token
+        FROM generic_inference_jobs
+        WHERE job_type = 'comfy_ui'
+        AND product_category IN ('vst', 'studio', NULL)
+        AND created_at >= '2024-03-01'
+    ) as job
+    ON m.token = job.input_token
+    WHERE m.created_at >= '2024-03-01'
+);
+
 
 
 -- Distinguish between VST and Studio
@@ -50,13 +106,14 @@ SELECT
   inference_category,
   maybe_model_type,
   created_at,
+  maybe_inference_args,
   JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in') as input_token
 FROM generic_inference_jobs
 WHERE job_type = 'comfy_ui'
 AND product_category IS NULL
 AND created_at >= '2024-07-31'
 ORDER BY ID DESC
-LIMIT 10;
+LIMIT 359;
 
 
 
@@ -160,7 +217,7 @@ AND product_category IS NULL
 AND created_at >= '2024-07-25'
 LIMIT 100;
 
---- Update SadTalker jobs
+--- Update "stable diffusion" jobs (how are people still enqueueing these?)
 UPDATE generic_inference_jobs
 SET product_category = 'stable_diffusion'
 WHERE job_type = 'stable_diffusion'
@@ -168,5 +225,5 @@ AND inference_category = 'image_generation'
 AND maybe_model_type = 'stable_diffusion'
 AND product_category IS NULL
 AND created_at >= '2024-07-25'
-AND created_at <= '2024-08-15'
+AND created_at <= '2024-09-30'
 LIMIT 100;
