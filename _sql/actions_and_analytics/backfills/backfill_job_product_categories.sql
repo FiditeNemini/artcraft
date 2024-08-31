@@ -11,30 +11,39 @@ AND created_at >= '2024-07-31'
 ORDER BY ID DESC
 LIMIT 10;
 
--- Distinguish between VST and Studio
-SELECT
-  m.token,
-  m.maybe_scene_source_media_file_token
-FROM media_files as m
-JOIN (
-SELECT
-  job_type,
-  product_category,
-  inference_category,
-  maybe_model_type,
-  created_at,
-  JSON_UNQUOTE(JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in')) as input_token
-FROM generic_inference_jobs
+-- AND job_type NOT IN ('stable_diffusion', 'so_vits_svc', 'comfy_ui')
+
+-- Update studio jobs (distinguished from VST jobs)
+UPDATE generic_inference_jobs
+SET product_category = 'studio'
 WHERE job_type = 'comfy_ui'
 AND product_category IS NULL
-AND created_at >= '2024-07-31'
-ORDER BY ID DESC) as x
-ON m.token = x.input_token
-WHERE m.created_at >= '2024-07-30'
-AND   m.maybe_scene_source_media_file_token IS NOT NULL
-LIMIT 500;
+AND token IN (
+    SELECT
+      job.token
+    FROM media_files as m
+    JOIN (
+        SELECT
+          token,
+          job_type,
+          product_category,
+          inference_category,
+          maybe_model_type,
+          created_at,
+          JSON_UNQUOTE(JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in')) as input_token
+        FROM generic_inference_jobs
+        WHERE job_type = 'comfy_ui'
+        AND product_category IS NULL
+        AND created_at >= '2024-05-01'
+        ORDER BY ID DESC
+    ) as job
+    ON m.token = job.input_token
+    WHERE m.created_at >= '2024-05-01'
+    AND   m.maybe_scene_source_media_file_token IS NOT NULL
+);
 
 
+-- Distinguish between VST and Studio
 SELECT
   job_type,
   product_category,
@@ -50,16 +59,6 @@ ORDER BY ID DESC
 LIMIT 10;
 
 
-SELECT *
-FROM generic_inference_jobs
-WHERE product_category IS NULL
-AND created_at >= '2024-07-31'
-ORDER BY ID DESC
-LIMIT 10;
-
-
-
-AND job_type NOT IN ('stable_diffusion', 'so_vits_svc', 'comfy_ui')
 
 --- Update tacotron2 jobs
 UPDATE generic_inference_jobs
