@@ -7,10 +7,57 @@ SELECT
   created_at
 FROM generic_inference_jobs
 WHERE product_category IS NULL
-AND created_at >= '2024-08-25'
-AND job_type NOT IN ('comfy_ui', 'stable_diffusion')
+AND created_at >= '2024-07-31'
 ORDER BY ID DESC
 LIMIT 10;
+
+-- Distinguish between VST and Studio
+SELECT
+  m.token,
+  m.maybe_scene_source_media_file_token
+FROM media_files as m
+JOIN (
+SELECT
+  job_type,
+  product_category,
+  inference_category,
+  maybe_model_type,
+  created_at,
+  JSON_UNQUOTE(JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in')) as input_token
+FROM generic_inference_jobs
+WHERE job_type = 'comfy_ui'
+AND product_category IS NULL
+AND created_at >= '2024-07-31'
+ORDER BY ID DESC) as x
+ON m.token = x.input_token
+WHERE m.created_at >= '2024-07-30'
+AND   m.maybe_scene_source_media_file_token IS NOT NULL
+LIMIT 500;
+
+
+SELECT
+  job_type,
+  product_category,
+  inference_category,
+  maybe_model_type,
+  created_at,
+  JSON_EXTRACT(maybe_inference_args, '$.args.Cu.in') as input_token
+FROM generic_inference_jobs
+WHERE job_type = 'comfy_ui'
+AND product_category IS NULL
+AND created_at >= '2024-07-31'
+ORDER BY ID DESC
+LIMIT 10;
+
+
+SELECT *
+FROM generic_inference_jobs
+WHERE product_category IS NULL
+AND created_at >= '2024-07-31'
+ORDER BY ID DESC
+LIMIT 10;
+
+
 
 AND job_type NOT IN ('stable_diffusion', 'so_vits_svc', 'comfy_ui')
 
@@ -21,17 +68,10 @@ WHERE job_type = 'tacotron2'
 AND inference_category = 'text_to_speech'
 AND maybe_model_type = 'tacotron2'
 AND product_category IS NULL
-AND created_at >= '2024-07-25'
-LIMIT 1000;
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-08-30'
+LIMIT 100000;
 
-
---- Update tacotron2 jobs
-UPDATE generic_inference_jobs
-SET product_category = 'tts_tacotron2'
-WHERE job_type = 'tacotron2'
-AND product_category IS NULL
-AND created_at >= '2024-07-25'
-LIMIT 1000;
 
 --- Update GptSoVits (#1)
 UPDATE generic_inference_jobs
@@ -40,7 +80,8 @@ WHERE job_type = 'gpt_sovits'
 AND inference_category = 'text_to_speech'
 AND maybe_model_type IS NULL
 AND product_category IS NULL
-AND created_at >= '2024-07-25'
+AND created_at >= '2024-08-14'
+AND created_at <= '2024-08-30'
 LIMIT 100000;
 
 
@@ -51,10 +92,12 @@ WHERE job_type = 'gpt_sovits'
 AND inference_category = 'deprecated_field'
 AND maybe_model_type IS NULL
 AND product_category IS NULL
-AND created_at >= '2024-07-25'
+AND created_at >= '2024-07-15'
+AND created_at <= '2024-08-30'
 LIMIT 100000;
 
 
+--- TODO: Not working
 --- Update RVCv2 VC jobs
 UPDATE generic_inference_jobs
 SET product_category = 'vc_rvc2'
@@ -62,7 +105,8 @@ WHERE job_type = 'rvc_v2'
 AND inference_category = 'voice_conversion'
 AND maybe_model_type = 'rvc_v2'
 AND product_category IS NULL
-AND created_at >= '2024-07-25'
+AND created_at >= '2024-07-31'
+AND created_at <= '2024-08-30'
 LIMIT 100000;
 
 
@@ -72,6 +116,7 @@ SET product_category = 'vc_svc'
 WHERE job_type = 'so_vits_svc'
 AND product_category IS NULL
 AND created_at >= '2024-07-25'
+AND created_at <= '2024-08-30'
 LIMIT 10000;
 
 
@@ -82,15 +127,26 @@ WHERE job_type = 'styletts2'
 AND inference_category = 'text_to_speech'
 AND maybe_model_type = 'styletts2'
 AND product_category IS NULL
-AND created_at >= '2024-07-25'
+AND created_at >= '2024-08-15'
+AND created_at <= '2024-08-30'
 LIMIT 1000;
 
 
---- Update Live Portrait jobs
+--- Update Live Portrait jobs (#1)
 UPDATE generic_inference_jobs
 SET product_category = 'live_portrait'
 WHERE job_type = 'live_portrait'
 AND inference_category = 'live_portrait'
+AND maybe_model_type IS NULL
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+LIMIT 10000;
+
+--- Update Live Portrait jobs (#2)
+UPDATE generic_inference_jobs
+SET product_category = 'live_portrait'
+WHERE job_type = 'live_portrait'
+AND inference_category = 'deprecated_field'
 AND maybe_model_type IS NULL
 AND product_category IS NULL
 AND created_at >= '2024-07-25'
@@ -103,4 +159,15 @@ WHERE maybe_model_type = 'sad_talker'
 AND inference_category = 'lipsync_animation'
 AND product_category IS NULL
 AND created_at >= '2024-07-25'
+LIMIT 100;
+
+--- Update SadTalker jobs
+UPDATE generic_inference_jobs
+SET product_category = 'stable_diffusion'
+WHERE job_type = 'stable_diffusion'
+AND inference_category = 'image_generation'
+AND maybe_model_type = 'stable_diffusion'
+AND product_category IS NULL
+AND created_at >= '2024-07-25'
+AND created_at <= '2024-08-15'
 LIMIT 100;

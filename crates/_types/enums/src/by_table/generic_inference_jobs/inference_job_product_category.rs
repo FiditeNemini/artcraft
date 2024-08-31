@@ -31,6 +31,9 @@ pub enum InferenceJobProductCategory {
   /// Live Portrait (webcam interface)
   LivePortraitWebcam,
 
+  /// Stable Diffusion (deprecated)
+  StableDiffusion,
+
   /// Storyteller Studio
   Studio,
   
@@ -66,6 +69,7 @@ impl InferenceJobProductCategory {
       Self::LipsyncSadTalker => "lipsync_sad_talker",
       Self::LivePortrait => "live_portrait",
       Self::LivePortraitWebcam => "live_portrait_webcam",
+      Self::StableDiffusion => "stable_diffusion",
       Self::Studio => "studio",
       Self::TtsGptSoVits => "tts_gpt_so_vits",
       Self::TtsStyleTts2 => "tts_style_tts2",
@@ -83,6 +87,7 @@ impl InferenceJobProductCategory {
       "lipsync_sad_talker" => Ok(Self::LipsyncSadTalker),
       "live_portrait" => Ok(Self::LivePortrait),
       "live_portrait_webcam" => Ok(Self::LivePortraitWebcam),
+      "stable_diffusion" => Ok(Self::StableDiffusion),
       "studio" => Ok(Self::Studio),
       "tts_gpt_so_vits" => Ok(Self::TtsGptSoVits),
       "tts_style_tts2" => Ok(Self::TtsStyleTts2),
@@ -103,6 +108,7 @@ impl InferenceJobProductCategory {
       Self::LipsyncSadTalker,
       Self::LivePortrait,
       Self::LivePortraitWebcam,
+      Self::StableDiffusion,
       Self::Studio,
       Self::TtsGptSoVits,
       Self::TtsStyleTts2,
@@ -129,6 +135,7 @@ mod tests {
       assert_serialization(InferenceJobProductCategory::LipsyncSadTalker, "lipsync_sad_talker");
       assert_serialization(InferenceJobProductCategory::LivePortrait, "live_portrait");
       assert_serialization(InferenceJobProductCategory::LivePortraitWebcam, "live_portrait_webcam");
+      assert_serialization(InferenceJobProductCategory::StableDiffusion, "stable_diffusion");
       assert_serialization(InferenceJobProductCategory::Studio, "studio");
       assert_serialization(InferenceJobProductCategory::TtsGptSoVits, "tts_gpt_so_vits");
       assert_serialization(InferenceJobProductCategory::TtsStyleTts2, "tts_style_tts2");
@@ -145,6 +152,7 @@ mod tests {
       assert_eq!(InferenceJobProductCategory::LipsyncSadTalker.to_str(), "lipsync_sad_talker");
       assert_eq!(InferenceJobProductCategory::LivePortrait.to_str(), "live_portrait");
       assert_eq!(InferenceJobProductCategory::LivePortraitWebcam.to_str(), "live_portrait_webcam");
+      assert_eq!(InferenceJobProductCategory::StableDiffusion.to_str(), "stable_diffusion");
       assert_eq!(InferenceJobProductCategory::Studio.to_str(), "studio");
       assert_eq!(InferenceJobProductCategory::TtsGptSoVits.to_str(), "tts_gpt_so_vits");
       assert_eq!(InferenceJobProductCategory::TtsStyleTts2.to_str(), "tts_style_tts2");
@@ -161,6 +169,7 @@ mod tests {
       assert_eq!(InferenceJobProductCategory::from_str("lipsync_sad_talker").unwrap(), InferenceJobProductCategory::LipsyncSadTalker);
       assert_eq!(InferenceJobProductCategory::from_str("live_portrait").unwrap(), InferenceJobProductCategory::LivePortrait);
       assert_eq!(InferenceJobProductCategory::from_str("live_portrait_webcam").unwrap(), InferenceJobProductCategory::LivePortraitWebcam);
+      assert_eq!(InferenceJobProductCategory::from_str("stable_diffusion").unwrap(), InferenceJobProductCategory::StableDiffusion);
       assert_eq!(InferenceJobProductCategory::from_str("studio").unwrap(), InferenceJobProductCategory::Studio);
       assert_eq!(InferenceJobProductCategory::from_str("tts_gpt_so_vits").unwrap(), InferenceJobProductCategory::TtsGptSoVits);
       assert_eq!(InferenceJobProductCategory::from_str("tts_style_tts2").unwrap(), InferenceJobProductCategory::TtsStyleTts2);
@@ -174,12 +183,13 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobProductCategory::all_variants();
-      assert_eq!(variants.len(), 12);
+      assert_eq!(variants.len(), 13);
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::DownloadGptSoVits));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncFaceFusion));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncSadTalker));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LivePortrait));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LivePortraitWebcam));
+      assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::StableDiffusion));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::Studio));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::TtsGptSoVits));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::TtsStyleTts2));
