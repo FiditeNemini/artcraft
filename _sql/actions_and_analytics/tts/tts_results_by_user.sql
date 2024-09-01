@@ -1,5 +1,6 @@
 
--- Select most used tts models by user
+-- This is a useful query!
+-- Count the most-used tts models by user.
 -- This query has old token support!
 SELECT
    mw.token,
@@ -16,7 +17,7 @@ JOIN (
       on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
     join users as u
       on f.maybe_creator_user_token = u.token
-    where u.username = lower('dzth')
+    where u.username = lower('thebigo')
 ) as x
 on mw.token = x.token
 group by mw.token, mw.title
@@ -24,6 +25,7 @@ order by use_count desc
 
 
 -- See a sample of tts results by user
+-- This can be useful to distinguish "AI Shows" from AI abusers
 -- This includes old token support
 select
   f.token,
@@ -41,7 +43,7 @@ left outer join model_weights as w_migrated
   on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
 join users as u
   on f.maybe_creator_user_token = u.token
-where u.username = lower('dzth')
+where u.username = lower()
 order by f.id desc
 limit 100
 

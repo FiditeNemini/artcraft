@@ -14,7 +14,7 @@ WHERE m.maybe_creator_user_token IS NOT NULL
 AND m.created_at > NOW() - INTERVAL 31 DAY
 GROUP BY m.maybe_creator_user_token
 ORDER BY usage_count DESC
-LIMIT 50000;
+LIMIT 50;
 
 
 ----- Older queries -----
