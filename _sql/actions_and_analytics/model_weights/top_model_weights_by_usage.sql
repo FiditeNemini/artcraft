@@ -2,6 +2,8 @@
 -- Find top model weights by usage.
 -- Remove "AI Streamers" and top users
 -- This supports old-format TTS tokens.
+-- This is a very expensive query that takes forever to run:
+-- 1000 rows in set (7 hours 6 min 8.98 sec)
 SELECT
   mw.token,
   mw.weights_type,
@@ -92,11 +94,12 @@ limit 1000;
 
 
 
--------- Backup query: -------
+-------- Only media_files version of the query -------
 
 -- Find top model weights by usage.
 -- Remove "AI Streamers" and top users
 -- This supports old-format TTS tokens.
+-- This only queries the media_files table and runs in just 8 minutes.
 SELECT
   mw.token,
   mw.weights_type,
