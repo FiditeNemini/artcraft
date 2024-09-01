@@ -17,7 +17,7 @@ JOIN (
       on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
     join users as u
       on f.maybe_creator_user_token = u.token
-    where u.username = lower('thebigo')
+    where u.username = lower('peepostream')
 ) as x
 on mw.token = x.token
 group by mw.token, mw.title
@@ -43,7 +43,7 @@ left outer join model_weights as w_migrated
   on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
 join users as u
   on f.maybe_creator_user_token = u.token
-where u.username = lower()
+where u.username = lower('powerchat')
 order by f.id desc
 limit 100
 
