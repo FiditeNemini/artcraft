@@ -12,6 +12,101 @@ SELECT
   count(*) as use_count
 FROM model_weights as mw
 JOIN (
+  -- First subquery: media_files records that reference model_weights or migrated model_weights
+  select
+    coalesce(w.token, w_migrated.token) as token
+  from media_files as f
+  left outer join model_weights as w
+     on f.maybe_origin_model_token = w.token
+  left outer join model_weights as w_migrated
+    on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
+  where
+    f.maybe_creator_user_token NOT IN (
+      "U:03HG1NRMDT7A6", "U:0BJT98T611SZC", "U:0T2NJR5VJRT8Z", "U:19WD4DHDR8XDH", "U:1S4G4YY0EW2X6", "U:211ZHWM8J1F8B",
+      "U:246RSQQGZE7F7", "U:2H5SED9TD85AW", "U:2RAPWS9K5HEYZ", "U:2TEZS9T6AK6CY", "U:36910S9YX5M7S", "U:3MQB45NCHSNH9",
+      "U:3S8S9X3H9B6SA", "U:3T08BX8GFDGJ2", "U:4MFYA09TH7SD1", "U:4Z8DK9T7K4170", "U:5P0BDXD18ST8C", "U:5W2X30KK6KNAP",
+      "U:5WTDZVMX23WC1", "U:5Z4ZMBVZT8FYP", "U:6JJJRNN0B17CP", "U:6SCFF1NBHARQA", "U:70C2DNQ8NAPE2", "U:7HV0JNV82F85J",
+      "U:7N1GDKHSSSZNJ", "U:7WAD25W85TYHM", "U:89XRNEWENPCGX", "U:8D706H5C7E5MF", "U:9QH9CFSXE5EY8", "U:9T28V6PKPB7EM",
+      "U:A9HWW4VAE6XJ5", "U:AF0K4PMS37JWN", "U:BY6920DKHNDBT", "U:DG228ZACF1NAN", "U:DX55CFAPANPK3", "U:E4TSGYT5DX19C",
+      "U:ESVW6NHE6GHP8", "U:EW15EA1XNGFVB", "U:F1DXEJZ7HS137", "U:FVFZ0TN0Y0N4F", "U:FYNFQA4D40PH4", "U:GJJKBHK15C9W0",
+      "U:GSQGDX7HCQ9DK", "U:H2KWH2QPNHDRB", "U:JV591Y7HGVKMR", "U:KEXZ6BBGH75AX", "U:MBNYW84PRT7BB", "U:N0VXP0H0E36WT",
+      "U:NBNCMS81965ZS", "U:NFV8FYBZHZPP4", "U:P6W06DB29G9SZ", "U:PM36EZDVKCMW3", "U:QJ9PGBCJR2101", "U:QPEXYBZJ5TB9K",
+      "U:QYGQSZ0232EXP", "U:R2MATFEE7223X", "U:RAE3M212X65W6", "U:RBH6ZHBDDVH3Q", "U:SVZRVJSP04JAE", "U:SYW8H845YZJBW",
+      "U:T3EE4GCA5Q4ZJ", "U:T7T6XH9540GVV", "U:TBM1Z40A46NXZ", "U:V7VA6DS24T2VE", "U:VVFERXHKNT4KN", "U:VW9XKV9NWV6WS",
+      "U:WA1Q15SB6Q1VJ", "U:WG9S2GHDW8MA0", "U:WHB70A279YBPJ", "U:WHXJK1RSYM5WD", "U:WJJT9AHJHGJS5", "U:WPF17KR1HB4YV",
+      "U:XACATP3C7NG5D", "U:XWA2SDNQBYMXD", "U:Y2Q8Q7C537G88", "U:YASA2RC19EHGY", "U:YX31ZJ517T40G", "U:Z477H1KNSY3B5",
+      "user_23jmwykxjjrm4", "user_2xes0wjhfmybb", "user_4c2qcpbq6twv7", "user_5eq7hj7vnmqqc", "user_73k9zn3jxvcxs",
+      "user_7yjk723jtfmj6", "user_8h8ffwmgphmq9", "user_9rjpehtnpd6tb", "user_a7nef57s5ypgm", "user_as01gf1gfc8ny",
+      "user_at41z2z9zafdz", "user_aw7m4d07fjzrv", "user_bkypxftv69675", "user_bz76arxrmr0vj", "user_cewjs06e36hfq",
+      "user_dppfbvwjq2963", "user_e9fwd2xfn2ajv", "user_gv0a0vec80540", "user_hdav69agkm2mw", "user_kqfdj8rdhkpnv",
+      "user_mhzm8s7q9jt6h", "user_q7dj0hj3xy31g", "user_qcnpkvw9fnhyr", "user_vb7mch05njgnp", "user_vmdq5nq7bfckh",
+      "user_wb4592qst8t48", "user_wm3tzh0v91gnv", "user_x990jyt3ne4br", "user_xy3snt46r1edn", "user_y1b4ag72ezh65",
+      "user_y5q4s4he1snq9", "user_zgw9q4tz6506t"
+    )
+    and (w.token IS NOT NULL OR w_migrated.token IS NOT NULL)
+
+  UNION ALL
+
+  -- Second subquery: tts_results that reference tts_models (which we have migrated to model_weights)
+  select
+    w_migrated_2.token as token
+  from tts_results as tr
+  left outer join model_weights as w_migrated_2
+     on tr.model_token = w_migrated_2.maybe_migration_old_model_token
+  where
+    tr.maybe_creator_user_token NOT IN (
+      "U:03HG1NRMDT7A6", "U:0BJT98T611SZC", "U:0T2NJR5VJRT8Z", "U:19WD4DHDR8XDH", "U:1S4G4YY0EW2X6", "U:211ZHWM8J1F8B",
+      "U:246RSQQGZE7F7", "U:2H5SED9TD85AW", "U:2RAPWS9K5HEYZ", "U:2TEZS9T6AK6CY", "U:36910S9YX5M7S", "U:3MQB45NCHSNH9",
+      "U:3S8S9X3H9B6SA", "U:3T08BX8GFDGJ2", "U:4MFYA09TH7SD1", "U:4Z8DK9T7K4170", "U:5P0BDXD18ST8C", "U:5W2X30KK6KNAP",
+      "U:5WTDZVMX23WC1", "U:5Z4ZMBVZT8FYP", "U:6JJJRNN0B17CP", "U:6SCFF1NBHARQA", "U:70C2DNQ8NAPE2", "U:7HV0JNV82F85J",
+      "U:7N1GDKHSSSZNJ", "U:7WAD25W85TYHM", "U:89XRNEWENPCGX", "U:8D706H5C7E5MF", "U:9QH9CFSXE5EY8", "U:9T28V6PKPB7EM",
+      "U:A9HWW4VAE6XJ5", "U:AF0K4PMS37JWN", "U:BY6920DKHNDBT", "U:DG228ZACF1NAN", "U:DX55CFAPANPK3", "U:E4TSGYT5DX19C",
+      "U:ESVW6NHE6GHP8", "U:EW15EA1XNGFVB", "U:F1DXEJZ7HS137", "U:FVFZ0TN0Y0N4F", "U:FYNFQA4D40PH4", "U:GJJKBHK15C9W0",
+      "U:GSQGDX7HCQ9DK", "U:H2KWH2QPNHDRB", "U:JV591Y7HGVKMR", "U:KEXZ6BBGH75AX", "U:MBNYW84PRT7BB", "U:N0VXP0H0E36WT",
+      "U:NBNCMS81965ZS", "U:NFV8FYBZHZPP4", "U:P6W06DB29G9SZ", "U:PM36EZDVKCMW3", "U:QJ9PGBCJR2101", "U:QPEXYBZJ5TB9K",
+      "U:QYGQSZ0232EXP", "U:R2MATFEE7223X", "U:RAE3M212X65W6", "U:RBH6ZHBDDVH3Q", "U:SVZRVJSP04JAE", "U:SYW8H845YZJBW",
+      "U:T3EE4GCA5Q4ZJ", "U:T7T6XH9540GVV", "U:TBM1Z40A46NXZ", "U:V7VA6DS24T2VE", "U:VVFERXHKNT4KN", "U:VW9XKV9NWV6WS",
+      "U:WA1Q15SB6Q1VJ", "U:WG9S2GHDW8MA0", "U:WHB70A279YBPJ", "U:WHXJK1RSYM5WD", "U:WJJT9AHJHGJS5", "U:WPF17KR1HB4YV",
+      "U:XACATP3C7NG5D", "U:XWA2SDNQBYMXD", "U:Y2Q8Q7C537G88", "U:YASA2RC19EHGY", "U:YX31ZJ517T40G", "U:Z477H1KNSY3B5",
+      "user_23jmwykxjjrm4", "user_2xes0wjhfmybb", "user_4c2qcpbq6twv7", "user_5eq7hj7vnmqqc", "user_73k9zn3jxvcxs",
+      "user_7yjk723jtfmj6", "user_8h8ffwmgphmq9", "user_9rjpehtnpd6tb", "user_a7nef57s5ypgm", "user_as01gf1gfc8ny",
+      "user_at41z2z9zafdz", "user_aw7m4d07fjzrv", "user_bkypxftv69675", "user_bz76arxrmr0vj", "user_cewjs06e36hfq",
+      "user_dppfbvwjq2963", "user_e9fwd2xfn2ajv", "user_gv0a0vec80540", "user_hdav69agkm2mw", "user_kqfdj8rdhkpnv",
+      "user_mhzm8s7q9jt6h", "user_q7dj0hj3xy31g", "user_qcnpkvw9fnhyr", "user_vb7mch05njgnp", "user_vmdq5nq7bfckh",
+      "user_wb4592qst8t48", "user_wm3tzh0v91gnv", "user_x990jyt3ne4br", "user_xy3snt46r1edn", "user_y1b4ag72ezh65",
+      "user_y5q4s4he1snq9", "user_zgw9q4tz6506t"
+    )
+) as x
+on mw.token = x.token
+group by
+  mw.token,
+  mw.weights_type,
+  mw.title,
+  mw.created_at,
+  mw.user_deleted_at,
+  mw.mod_deleted_at
+order by use_count desc
+limit 1000;
+
+
+
+
+
+-------- Backup query: -------
+
+-- Find top model weights by usage.
+-- Remove "AI Streamers" and top users
+-- This supports old-format TTS tokens.
+SELECT
+  mw.token,
+  mw.weights_type,
+  mw.title,
+  mw.created_at,
+  mw.user_deleted_at,
+  mw.mod_deleted_at,
+  count(*) as use_count
+FROM model_weights as mw
+JOIN (
   select
     coalesce(w.token, w_migrated.token) as token
   from media_files as f
@@ -20,116 +115,26 @@ JOIN (
   left outer join model_weights as w_migrated
     on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
   and f.maybe_creator_user_token NOT IN (
-      "U:03HG1NRMDT7A6",
-      "U:0BJT98T611SZC",
-      "U:0T2NJR5VJRT8Z",
-      "U:19WD4DHDR8XDH",
-      "U:1S4G4YY0EW2X6",
-      "U:211ZHWM8J1F8B",
-      "U:246RSQQGZE7F7",
-      "U:2H5SED9TD85AW",
-      "U:2RAPWS9K5HEYZ",
-      "U:2TEZS9T6AK6CY",
-      "U:36910S9YX5M7S",
-      "U:3MQB45NCHSNH9",
-      "U:3S8S9X3H9B6SA",
-      "U:3T08BX8GFDGJ2",
-      "U:4MFYA09TH7SD1",
-      "U:4Z8DK9T7K4170",
-      "U:5P0BDXD18ST8C",
-      "U:5W2X30KK6KNAP",
-      "U:5WTDZVMX23WC1",
-      "U:5Z4ZMBVZT8FYP",
-      "U:6JJJRNN0B17CP",
-      "U:6SCFF1NBHARQA",
-      "U:70C2DNQ8NAPE2",
-      "U:7HV0JNV82F85J",
-      "U:7N1GDKHSSSZNJ",
-      "U:7WAD25W85TYHM",
-      "U:89XRNEWENPCGX",
-      "U:8D706H5C7E5MF",
-      "U:9QH9CFSXE5EY8",
-      "U:9T28V6PKPB7EM",
-      "U:A9HWW4VAE6XJ5",
-      "U:AF0K4PMS37JWN",
-      "U:BY6920DKHNDBT",
-      "U:DG228ZACF1NAN",
-      "U:DX55CFAPANPK3",
-      "U:E4TSGYT5DX19C",
-      "U:ESVW6NHE6GHP8",
-      "U:EW15EA1XNGFVB",
-      "U:F1DXEJZ7HS137",
-      "U:FVFZ0TN0Y0N4F",
-      "U:FYNFQA4D40PH4",
-      "U:GJJKBHK15C9W0",
-      "U:GSQGDX7HCQ9DK",
-      "U:H2KWH2QPNHDRB",
-      "U:JV591Y7HGVKMR",
-      "U:KEXZ6BBGH75AX",
-      "U:MBNYW84PRT7BB",
-      "U:N0VXP0H0E36WT",
-      "U:NBNCMS81965ZS",
-      "U:NFV8FYBZHZPP4",
-      "U:P6W06DB29G9SZ",
-      "U:PM36EZDVKCMW3",
-      "U:QJ9PGBCJR2101",
-      "U:QPEXYBZJ5TB9K",
-      "U:QYGQSZ0232EXP",
-      "U:R2MATFEE7223X",
-      "U:RAE3M212X65W6",
-      "U:RBH6ZHBDDVH3Q",
-      "U:SVZRVJSP04JAE",
-      "U:SYW8H845YZJBW",
-      "U:T3EE4GCA5Q4ZJ",
-      "U:T7T6XH9540GVV",
-      "U:TBM1Z40A46NXZ",
-      "U:V7VA6DS24T2VE",
-      "U:VVFERXHKNT4KN",
-      "U:VW9XKV9NWV6WS",
-      "U:WA1Q15SB6Q1VJ",
-      "U:WG9S2GHDW8MA0",
-      "U:WHB70A279YBPJ",
-      "U:WHXJK1RSYM5WD",
-      "U:WJJT9AHJHGJS5",
-      "U:WPF17KR1HB4YV",
-      "U:XACATP3C7NG5D",
-      "U:XWA2SDNQBYMXD",
-      "U:Y2Q8Q7C537G88",
-      "U:YASA2RC19EHGY",
-      "U:YX31ZJ517T40G",
-      "U:Z477H1KNSY3B5",
-      "user_23jmwykxjjrm4",
-      "user_2xes0wjhfmybb",
-      "user_4c2qcpbq6twv7",
-      "user_5eq7hj7vnmqqc",
-      "user_73k9zn3jxvcxs",
-      "user_7yjk723jtfmj6",
-      "user_8h8ffwmgphmq9",
-      "user_9rjpehtnpd6tb",
-      "user_a7nef57s5ypgm",
-      "user_as01gf1gfc8ny",
-      "user_at41z2z9zafdz",
-      "user_aw7m4d07fjzrv",
-      "user_bkypxftv69675",
-      "user_bz76arxrmr0vj",
-      "user_cewjs06e36hfq",
-      "user_dppfbvwjq2963",
-      "user_e9fwd2xfn2ajv",
-      "user_gv0a0vec80540",
-      "user_hdav69agkm2mw",
-      "user_kqfdj8rdhkpnv",
-      "user_mhzm8s7q9jt6h",
-      "user_q7dj0hj3xy31g",
-      "user_qcnpkvw9fnhyr",
-      "user_vb7mch05njgnp",
-      "user_vmdq5nq7bfckh",
-      "user_wb4592qst8t48",
-      "user_wm3tzh0v91gnv",
-      "user_x990jyt3ne4br",
-      "user_xy3snt46r1edn",
-      "user_y1b4ag72ezh65",
-      "user_y5q4s4he1snq9",
-      "user_zgw9q4tz6506t"
+      "U:03HG1NRMDT7A6", "U:0BJT98T611SZC", "U:0T2NJR5VJRT8Z", "U:19WD4DHDR8XDH", "U:1S4G4YY0EW2X6", "U:211ZHWM8J1F8B",
+      "U:246RSQQGZE7F7", "U:2H5SED9TD85AW", "U:2RAPWS9K5HEYZ", "U:2TEZS9T6AK6CY", "U:36910S9YX5M7S", "U:3MQB45NCHSNH9",
+      "U:3S8S9X3H9B6SA", "U:3T08BX8GFDGJ2", "U:4MFYA09TH7SD1", "U:4Z8DK9T7K4170", "U:5P0BDXD18ST8C", "U:5W2X30KK6KNAP",
+      "U:5WTDZVMX23WC1", "U:5Z4ZMBVZT8FYP", "U:6JJJRNN0B17CP", "U:6SCFF1NBHARQA", "U:70C2DNQ8NAPE2", "U:7HV0JNV82F85J",
+      "U:7N1GDKHSSSZNJ", "U:7WAD25W85TYHM", "U:89XRNEWENPCGX", "U:8D706H5C7E5MF", "U:9QH9CFSXE5EY8", "U:9T28V6PKPB7EM",
+      "U:A9HWW4VAE6XJ5", "U:AF0K4PMS37JWN", "U:BY6920DKHNDBT", "U:DG228ZACF1NAN", "U:DX55CFAPANPK3", "U:E4TSGYT5DX19C",
+      "U:ESVW6NHE6GHP8", "U:EW15EA1XNGFVB", "U:F1DXEJZ7HS137", "U:FVFZ0TN0Y0N4F", "U:FYNFQA4D40PH4", "U:GJJKBHK15C9W0",
+      "U:GSQGDX7HCQ9DK", "U:H2KWH2QPNHDRB", "U:JV591Y7HGVKMR", "U:KEXZ6BBGH75AX", "U:MBNYW84PRT7BB", "U:N0VXP0H0E36WT",
+      "U:NBNCMS81965ZS", "U:NFV8FYBZHZPP4", "U:P6W06DB29G9SZ", "U:PM36EZDVKCMW3", "U:QJ9PGBCJR2101", "U:QPEXYBZJ5TB9K",
+      "U:QYGQSZ0232EXP", "U:R2MATFEE7223X", "U:RAE3M212X65W6", "U:RBH6ZHBDDVH3Q", "U:SVZRVJSP04JAE", "U:SYW8H845YZJBW",
+      "U:T3EE4GCA5Q4ZJ", "U:T7T6XH9540GVV", "U:TBM1Z40A46NXZ", "U:V7VA6DS24T2VE", "U:VVFERXHKNT4KN", "U:VW9XKV9NWV6WS",
+      "U:WA1Q15SB6Q1VJ", "U:WG9S2GHDW8MA0", "U:WHB70A279YBPJ", "U:WHXJK1RSYM5WD", "U:WJJT9AHJHGJS5", "U:WPF17KR1HB4YV",
+      "U:XACATP3C7NG5D", "U:XWA2SDNQBYMXD", "U:Y2Q8Q7C537G88", "U:YASA2RC19EHGY", "U:YX31ZJ517T40G", "U:Z477H1KNSY3B5",
+      "user_23jmwykxjjrm4", "user_2xes0wjhfmybb", "user_4c2qcpbq6twv7", "user_5eq7hj7vnmqqc", "user_73k9zn3jxvcxs",
+      "user_7yjk723jtfmj6", "user_8h8ffwmgphmq9", "user_9rjpehtnpd6tb", "user_a7nef57s5ypgm", "user_as01gf1gfc8ny",
+      "user_at41z2z9zafdz", "user_aw7m4d07fjzrv", "user_bkypxftv69675", "user_bz76arxrmr0vj", "user_cewjs06e36hfq",
+      "user_dppfbvwjq2963", "user_e9fwd2xfn2ajv", "user_gv0a0vec80540", "user_hdav69agkm2mw", "user_kqfdj8rdhkpnv",
+      "user_mhzm8s7q9jt6h", "user_q7dj0hj3xy31g", "user_qcnpkvw9fnhyr", "user_vb7mch05njgnp", "user_vmdq5nq7bfckh",
+      "user_wb4592qst8t48", "user_wm3tzh0v91gnv", "user_x990jyt3ne4br", "user_xy3snt46r1edn", "user_y1b4ag72ezh65",
+      "user_y5q4s4he1snq9", "user_zgw9q4tz6506t"
   )
 ) as x
 on mw.token = x.token
@@ -142,8 +147,6 @@ group by
   mw.mod_deleted_at
 order by use_count desc
 limit 100;
-
-
 
 
 +----------------------------------+--------------+----------------------------------------------------------------------------------------------------------------+---------------------+---------------------+----------------+-----------+
@@ -250,10 +253,10 @@ mysql> select count(*) from tts_results;
 +-----------+
 1 row in set (8 min 47.22 sec)
 
-mysql> select count(*) from media_files; -- Sept 1st, 2024
+mysql> select count(*) from media_files;
 +----------+
 | count(*) |
 +----------+
-| 40057845 |   -- 40,057,845
+| 40057845 |   -- 40,057,845 (sept 1st, 2024)
 +----------+
 1 row in set (36.59 sec)
