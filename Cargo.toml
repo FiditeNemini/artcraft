@@ -15,6 +15,7 @@ members = [
   "crates/cli/devenv/dev-database-seed",
   "crates/cli/devenv/dev-upload-media-file",
   "crates/cli/devenv/scrape-test",
+  "crates/cli/production/db-backfill",
   "crates/cli/production/db-backup",
   "crates/cli/production/db-cleanup",
   "crates/cli/production/elasticsearch-cli",

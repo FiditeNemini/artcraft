@@ -1808,6 +1808,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "db-backfill"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "clap",
+ "dotenv",
+ "easyenv",
+ "enums",
+ "errors",
+ "log",
+ "my-workspace-hack",
+ "mysql_queries",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "tokens",
+ "tokio",
+]
+
+[[package]]
 name = "db-backup"
 version = "0.0.1"
 dependencies = [
