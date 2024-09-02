@@ -1,7 +1,7 @@
 export function setLocalStorageItem(
   key: string,
   value: string,
-  ttl: number
+  ttl: number = 2 * 24 * 60 * 60 * 1000 // 2 days by default expiry date
 ): void {
   const now = new Date();
   const item = {

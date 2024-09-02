@@ -4,6 +4,7 @@ import {
   ModalProvider,
   NotificationProvider,
   SessionProvider,
+  SignUpQuestionnaireProvider,
 } from "components/providers";
 import ServerStatusChecker from "./ServerStatusChecker";
 
@@ -33,7 +34,11 @@ export default function CoreServicesProvider({
       <InferenceJobsProvider>
         <NotificationProvider>
           <ServerStatusChecker />
-          <ModalProvider>{children}</ModalProvider>
+          <ModalProvider>
+            <SignUpQuestionnaireProvider>
+              {children}
+            </SignUpQuestionnaireProvider>
+          </ModalProvider>
         </NotificationProvider>
       </InferenceJobsProvider>
     </SessionProvider>

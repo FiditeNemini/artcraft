@@ -261,8 +261,14 @@ function SignupPage(props: Props) {
     return false;
   };
 
-  const redirectLink = queryParams.get("redirect");
+  let redirectLink = queryParams.get("redirect");
   const redirectSignUpLink = "/welcome";
+
+  if (redirectLink) {
+    const url = new URL(redirectLink);
+    url.searchParams.set("from", "signup");
+    redirectLink = url.toString();
+  }
 
   const afterSignupRedirect = async () => {
     const maybeInternalPlanKey = parsedQueryString["sub"] as string | undefined;
