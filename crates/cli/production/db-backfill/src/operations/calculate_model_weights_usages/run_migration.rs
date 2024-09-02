@@ -43,21 +43,34 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
   //  }
   //}
 
-  let model_chunks = split_vec(models, 8);
+  const THREAD_COUNT : usize = 8;
+  let chunk_size = models.len() / THREAD_COUNT;
+  
+  let model_chunks = split_vec(models, chunk_size);
   let mut join_handles = Vec::with_capacity(model_chunks.len());
 
-  for model_chunk in model_chunks {
+  for (h, model_chunk) in model_chunks.into_iter().enumerate() {
     let mysql_pool = mysql.clone();
     let args_copy = args.clone();
 
     let join = tokio::task::spawn(async move {
-      let mut connection = mysql_pool.acquire().await.expect("failure");
+      let mut connection = match mysql_pool.acquire().await {
+        Ok(cnx) => cnx,
+        Err(err) => {
+          error!("ERROR ACQUIRING FIRST MYSQL POOL CONNECTION FOR THREAD {}: {:?}", (h+1), err);
+          return;
+        }
+      };
 
       for (i, model) in model_chunk.iter().enumerate() {
         let dates = get_all_dates(&args_copy, model)
             .unwrap_or_else(|_err| Vec::new());
         for (j, date) in dates.iter().enumerate() {
-          info!("Model: {}/{} Date: {}/{}", i + 1, model_chunk.len(), j + 1, dates.len());
+          info!("Thread: {}/{} Model: {}/{} Date: {}/{}",
+            h + 1, THREAD_COUNT,
+            i + 1, model_chunk.len(),
+            j + 1, dates.len()
+          );
           backfill_on_date_with_retry(&mut mysql_pool.clone(), &mut connection, model, *date).await;
         }
       }
@@ -85,11 +98,11 @@ async fn backfill_on_date_with_retry(
       error!("Error backfilling token: {} for date: {:?} - {:?}", model.token.as_str(), date, err);
       tokio::time::sleep(Duration::from_secs(15)).await;
 
-      info!("Re-acquire connection...");
+      error!("Re-acquire connection...");
       loop {
         match mysql.acquire().await {
           Err(err) => {
-            error!("Error re-acquiring connection: {:?}", err);
+            error!("ERROR RE-ACQUIRING CONNECTION: {:?}", err);
             tokio::time::sleep(Duration::from_secs(15)).await;
           }
           Ok(cnx) => {

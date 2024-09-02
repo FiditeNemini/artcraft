@@ -41,7 +41,7 @@ async fn get_mysql(env_var_name: &str) -> AnyhowResult<Pool<MySql>> {
     info!("Connecting to MySQL {env_var_name}...");
 
     let pool = MySqlPoolOptions::new()
-        .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 3)?)
+        .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 20)?)
         .connect(&easyenv::get_env_string_required(env_var_name)?)
         .await?;
 
