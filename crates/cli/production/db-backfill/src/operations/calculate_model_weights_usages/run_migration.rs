@@ -37,10 +37,11 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
 
   let mut connection = mysql.acquire().await?;
 
-  for model in models.iter() {
+  for (i, model) in models.iter().enumerate() {
     let dates = get_all_dates(&args, model)?;
-    for date in dates.into_iter() {
-      backfill_on_date_with_retry(&mut mysql.clone(), &mut connection, model, date).await;
+    for (j, date) in dates.iter().enumerate() {
+      info!("Model: {}/{} Date: {}/{}", i + 1, models.len(), j + 1, dates.len());
+      backfill_on_date_with_retry(&mut mysql.clone(), &mut connection, model, *date).await;
     }
   }
 
