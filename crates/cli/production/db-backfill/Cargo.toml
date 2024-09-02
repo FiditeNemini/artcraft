@@ -20,6 +20,7 @@ normal = ["my-workspace-hack"]
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # Internal
+datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }

@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use chrono::NaiveDate;
+use log::info;
 use sqlx::{Executor, MySql};
 
 use errors::AnyhowResult;
@@ -12,6 +13,12 @@ where E: 'e + Executor<'c, Database = MySql>
   pub model_token: &'e ModelWeightToken,
   pub date: NaiveDate,
   pub usage_count: u64,
+
+  /// We should only need a sparse matrix for our histogram.
+  /// There will be a lot of "0" usage count "holes", and we should skip creating
+  /// records for them. This is just an extra explicit check to make sure we don't
+  /// insert unless we really want to do so.
+  pub insert_on_zero: bool,
 
   pub mysql_executor: E,
 
@@ -25,6 +32,10 @@ pub async fn upsert_model_weight_usage_count_for_date<'e, 'c : 'e, E>(
 ) -> AnyhowResult<()>
 where E: 'e + Executor<'c, Database = MySql>
 {
+  if !args.insert_on_zero && args.usage_count == 0 {
+    info!("Skipping insert for zero usage count");
+    return Ok(());
+  }
 
   let query = sqlx::query!(
         r#"
