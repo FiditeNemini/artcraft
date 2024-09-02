@@ -43,7 +43,7 @@ left outer join model_weights as w_migrated
   on f.maybe_origin_model_token = w_migrated.maybe_migration_old_model_token
 join users as u
   on f.maybe_creator_user_token = u.token
-where u.username = lower('powerchat')
+where u.username = lower('peepostream')
 order by f.id desc
 limit 100
 
