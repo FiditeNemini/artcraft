@@ -19,6 +19,15 @@
     "UNKNOWN": "图像生成状态未知",
     "heading": "图像生成工作"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "实时肖像尝试失败",
+    "COMPLETE_FAILURE": "实时肖像失败",
+    "COMPLETE_SUCCESS": "实时肖像完成",
+    "DEAD": "活人肖像死",
+    "PENDING": "待处理的实时肖像",
+    "STARTED": "实时肖像正在进行中",
+    "UNKNOWN": "实时肖像状态未知"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "文本转语音尝试失败",
     "COMPLETE_FAILURE": "文本转语音失败",

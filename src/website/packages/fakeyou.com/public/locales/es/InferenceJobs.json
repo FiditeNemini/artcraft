@@ -19,6 +19,15 @@
     "UNKNOWN": "Estado de generación de imagen desconocido",
     "heading": "Empleos de ImageGeneration"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Intento de retrato en vivo fallido",
+    "COMPLETE_FAILURE": "Retrato en vivo fallido",
+    "COMPLETE_SUCCESS": "Retrato en vivo completo",
+    "DEAD": "retrato vivo muerto",
+    "PENDING": "Retrato en vivo pendiente",
+    "STARTED": "Retrato en vivo en progreso",
+    "UNKNOWN": "Estado de Live Portrait desconocido"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Intento de texto a voz fallido",
     "COMPLETE_FAILURE": "Error de texto a voz",

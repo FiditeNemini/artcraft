@@ -19,6 +19,15 @@
     "UNKNOWN": "Status de geração de imagem desconhecido",
     "heading": "Trabalhos de geração de imagens"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Tentativa de retrato ao vivo malsucedida",
+    "COMPLETE_FAILURE": "Falha no retrato ao vivo",
+    "COMPLETE_SUCCESS": "Retrato ao vivo completo",
+    "DEAD": "Retrato ao vivo morto",
+    "PENDING": "Retrato ao vivo pendente",
+    "STARTED": "Retrato ao vivo em andamento",
+    "UNKNOWN": "Status do retrato ao vivo desconhecido"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Tentativa de conversão de texto em fala malsucedida",
     "COMPLETE_FAILURE": "Falha na conversão de texto em fala",

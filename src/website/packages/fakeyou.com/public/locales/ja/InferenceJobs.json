@@ -19,6 +19,15 @@
     "UNKNOWN": "イメージ生成ステータスが不明",
     "heading": "画像生成ジョブ"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "ライブポートレートの試行が失敗しました",
+    "COMPLETE_FAILURE": "ライブポートレートが失敗しました",
+    "COMPLETE_SUCCESS": "ライブポートレート完成",
+    "DEAD": "ライブポートレートデッド",
+    "PENDING": "保留中のライブポートレート",
+    "STARTED": "ライブポートレート進行中",
+    "UNKNOWN": "ライブポートレートステータス不明"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "テキスト読み上げの試行が失敗しました",
     "COMPLETE_FAILURE": "テキスト読み上げに失敗しました",

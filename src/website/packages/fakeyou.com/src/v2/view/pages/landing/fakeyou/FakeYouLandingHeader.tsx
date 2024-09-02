@@ -53,7 +53,7 @@ export default function FakeYouLandingHeader({
                 </h2>
               ) : (
                 <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-                  {t("heroTitle")}
+                  {t("experimentalDescription")}
                 </h1>
               )}
               <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">

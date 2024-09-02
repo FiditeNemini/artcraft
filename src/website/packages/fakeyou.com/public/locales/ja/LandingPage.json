@@ -13,6 +13,8 @@
   "ctaButtonVc": "声から声へ",
   "ctaText": "数回クリックするだけで、メッセージや話し声をお気に入りのキャラクターの声に変換できます。",
   "ctaTitle": "オーディオを生成する",
+  "experimentalDescription": "FakeYou のディープフェイク技術を使用して、お気に入りのキャラクターが言いたいことを言う音声を生成します。",
+  "experimentalTitle": "TTS を試してみましょう: お気に入りのキャラクターとして話しましょう",
   "heroButtonPricing": "価格を見る",
   "heroButtonProfile": "私のプロフィールを見る",
   "heroButtonSignUp": "サインアップ",

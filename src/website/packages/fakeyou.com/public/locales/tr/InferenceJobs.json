@@ -19,6 +19,15 @@
     "UNKNOWN": "Görüntü Oluşturma Durumu Bilinmiyor",
     "heading": "ImageGeneration İşleri"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Canlı Portre Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Canlı Portre Başarısız",
+    "COMPLETE_SUCCESS": "Canlı Portre Tamamlandı",
+    "DEAD": "Canlı Portre Ölü",
+    "PENDING": "Canlı Portre Bekleniyor",
+    "STARTED": "Canlı Portre Devam Ediyor",
+    "UNKNOWN": "Canlı Portre Durumu Bilinmiyor"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Metinden Konuşmaya Girişim Başarısız",
     "COMPLETE_FAILURE": "Metni Konuşmaya Dönüştürme Başarısız",

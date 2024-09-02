@@ -19,6 +19,15 @@
     "UNKNOWN": "Status Pembuatan Gambar Tidak Diketahui",
     "heading": "Pekerjaan ImageGeneration"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Upaya Potret Langsung Tidak Berhasil",
+    "COMPLETE_FAILURE": "Potret Langsung Gagal",
+    "COMPLETE_SUCCESS": "Potret Langsung Selesai",
+    "DEAD": "Potret Hidup Mati",
+    "PENDING": "Potret Langsung Tertunda",
+    "STARTED": "Potret Langsung Sedang Berlangsung",
+    "UNKNOWN": "Status Potret Langsung Tidak Diketahui"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Upaya Text to Speech Gagal",
     "COMPLETE_FAILURE": "Teks ke Ucapan Gagal",

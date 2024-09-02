@@ -19,6 +19,15 @@
     "UNKNOWN": "Statut de génération d'image inconnu",
     "heading": "Emplois ImageGeneration"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Tentative de portrait en direct infructueuse",
+    "COMPLETE_FAILURE": "Échec du portrait en direct",
+    "COMPLETE_SUCCESS": "Portrait en direct terminé",
+    "DEAD": "Portrait en direct mort",
+    "PENDING": "Portrait en direct en attente",
+    "STARTED": "Portrait en direct en cours",
+    "UNKNOWN": "Statut du portrait en direct inconnu"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Tentative de synthèse vocale infructueuse",
     "COMPLETE_FAILURE": "Échec de la synthèse vocale",

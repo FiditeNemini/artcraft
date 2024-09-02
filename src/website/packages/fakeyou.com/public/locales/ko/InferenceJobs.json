@@ -19,6 +19,15 @@
     "UNKNOWN": "이미지 생성 상태를 알 수 없음",
     "heading": "이미지 생성 작업"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "라이브 인물 사진 시도가 실패했습니다.",
+    "COMPLETE_FAILURE": "라이브 초상화 실패",
+    "COMPLETE_SUCCESS": "라이브 초상화 완성",
+    "DEAD": "라이브 초상화 죽은",
+    "PENDING": "보류 중인 라이브 초상화",
+    "STARTED": "라이브 인물 사진 진행 중",
+    "UNKNOWN": "실시간 인물 사진 상태 알 수 없음"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "텍스트 음성 변환 시도가 실패했습니다.",
     "COMPLETE_FAILURE": "텍스트 음성 변환 실패",

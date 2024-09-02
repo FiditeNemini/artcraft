@@ -13,6 +13,8 @@
   "ctaButtonVc": "Sesten Sese",
   "ctaText": "Sadece birkaç tıklamayla mesajlarınızı ve konuşma sesinizi en sevdiğiniz karakterin sesine dönüştürün.",
   "ctaTitle": "Sesinizi Oluşturun",
+  "experimentalDescription": "Favori karakterlerinizin istediğiniz herhangi bir şeyi söylemesinin sesini oluşturmak için FakeYou'nun deepfake teknolojisini kullanın.",
+  "experimentalTitle": "TTS'yi deneyin: Favori karakterleriniz gibi konuşun",
   "heroButtonPricing": "Fiyatlandırmayı Görüntüle",
   "heroButtonProfile": "Profilimi görüntüle",
   "heroButtonSignUp": "Üye olmak",

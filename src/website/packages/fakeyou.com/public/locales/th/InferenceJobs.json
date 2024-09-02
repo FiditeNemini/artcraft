@@ -19,6 +19,15 @@
     "UNKNOWN": "ไม่ทราบสถานะการสร้างอิมเมจ",
     "heading": "งานการสร้างภาพ"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "ความพยายามในการถ่ายภาพบุคคลแบบสดไม่สำเร็จ",
+    "COMPLETE_FAILURE": "Live Portrait ล้มเหลว",
+    "COMPLETE_SUCCESS": "Live Portrait เสร็จสมบูรณ์",
+    "DEAD": "ภาพบุคคลสดตาย",
+    "PENDING": "รอดำเนินการภาพสด",
+    "STARTED": "กำลังดำเนินการถ่ายภาพบุคคลแบบสด",
+    "UNKNOWN": "ไม่ทราบสถานะภาพบุคคลสด"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "ความพยายามในการอ่านออกเสียงข้อความไม่สำเร็จ",
     "COMPLETE_FAILURE": "ข้อความเป็นคำพูดล้มเหลว",

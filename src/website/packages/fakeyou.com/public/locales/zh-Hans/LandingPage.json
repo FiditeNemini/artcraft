@@ -13,6 +13,8 @@
   "ctaButtonVc": "语音到语音",
   "ctaText": "只需点击几下，即可将您的消息和说话声音转换为您最喜欢的角色的声音。",
   "ctaTitle": "生成您的音频",
+  "experimentalDescription": "使用 FakeYou 的 Deepfake 技术生成您最喜欢的角色的音频，说出您想说的任何内容。",
+  "experimentalTitle": "尝试 TTS：用您最喜欢的角色说话",
   "heroButtonPricing": "查看定价",
   "heroButtonProfile": "查看我的个人资料",
   "heroButtonSignUp": "报名",

@@ -10,7 +10,7 @@
     "heading": "Face Animator Jobs"
   },
   "ImageGeneration": {
-    "ATTEMPT_FAILED": "Image Generation Atempt Unsuccessful",
+    "ATTEMPT_FAILED": "Image Generation Attempt Unsuccessful",
     "COMPLETE_FAILURE": "Image Generation Failed",
     "COMPLETE_SUCCESS": "Image Generation Complete",
     "DEAD": "Image Generation Dead",
@@ -19,8 +19,17 @@
     "UNKNOWN": "Image Generation Status Unknown",
     "heading": "ImageGeneration Jobs"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Live Portrait Attempt Unsuccessful",
+    "COMPLETE_FAILURE": "Live Portrait Failed",
+    "COMPLETE_SUCCESS": "Live Portrait Complete",
+    "DEAD": "Live Portrait Dead",
+    "PENDING": "Pending Live Portrait",
+    "STARTED": "Live Portrait In Progress",
+    "UNKNOWN": "Live Portrait Status Unknown"
+  },
   "TextToSpeech": {
-    "ATTEMPT_FAILED": "Text to Speech Atempt Unsuccessful",
+    "ATTEMPT_FAILED": "Text to Speech Attempt Unsuccessful",
     "COMPLETE_FAILURE": "Text to Speech Failed",
     "COMPLETE_SUCCESS": "Text to Speech Complete",
     "DEAD": "Text to Speech Dead",
@@ -40,7 +49,7 @@
     "heading": "Jobs"
   },
   "VideoWorkflow": {
-    "ATTEMPT_FAILED": "Video Workflow Atempt Failed",
+    "ATTEMPT_FAILED": "Video Workflow Attempt Failed",
     "COMPLETE_FAILURE": "Video Workflow Failed.",
     "COMPLETE_SUCCESS": "Video Workflow Complete",
     "DEAD": "Videow Workflow Dead",
@@ -50,7 +59,7 @@
     "heading": "Video Workflow Jobs"
   },
   "VoiceConversion": {
-    "ATTEMPT_FAILED": "Voice Conversion Atempt Unsuccessful",
+    "ATTEMPT_FAILED": "Voice Conversion Attempt Unsuccessful",
     "COMPLETE_FAILURE": "Voice Conversion Failed",
     "COMPLETE_SUCCESS": "Voice Conversion Complete",
     "DEAD": "Voice Conversion Dead",
@@ -60,7 +69,7 @@
     "heading": "Voice Conversion Jobs"
   },
   "VoiceDesignerCreateVoice": {
-    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "ATTEMPT_FAILED": "Face Animation Attempt Failed",
     "COMPLETE_FAILURE": "Face Animation Failed.",
     "COMPLETE_SUCCESS": "Face Animation Complete",
     "DEAD": "Voice Designer Dead",
@@ -70,7 +79,7 @@
     "heading": "Voice Designer Jobs"
   },
   "VoiceDesignerTts": {
-    "ATTEMPT_FAILED": "Text to Speech Atempt Unsuccessful",
+    "ATTEMPT_FAILED": "Text to Speech Attempt Unsuccessful",
     "COMPLETE_FAILURE": "Text to Speech Failed",
     "COMPLETE_SUCCESS": "Text to Speech Complete",
     "DEAD": "Text to Speech Dead",
@@ -90,7 +99,7 @@
     "noJobsTitle": "No jobs in queue"
   },
   "face_animator": {
-    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "ATTEMPT_FAILED": "Face Animation Attempt Failed",
     "COMPLETE_FAILURE": "Face Animation Failed.",
     "COMPLETE_SUCCESS": "Face Animation Complete",
     "DEAD": "Face Animation Dead",
@@ -109,7 +118,7 @@
     "UNKNOWN": "Please wait or try again"
   },
   "voice_designer": {
-    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "ATTEMPT_FAILED": "Face Animation Attempt Failed",
     "COMPLETE_FAILURE": "Face Animation Failed.",
     "COMPLETE_SUCCESS": "Face Animation Complete",
     "DEAD": "Voice Designer Dead",

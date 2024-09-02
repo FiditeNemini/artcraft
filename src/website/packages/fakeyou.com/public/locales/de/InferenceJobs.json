@@ -19,6 +19,15 @@
     "UNKNOWN": "Bildgenerierungsstatus unbekannt",
     "heading": "ImageGeneration-Jobs"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Live-Portrait-Versuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Live-Portrait fehlgeschlagen",
+    "COMPLETE_SUCCESS": "Live-Portrait abgeschlossen",
+    "DEAD": "Live-Portrait Dead",
+    "PENDING": "Ausstehendes Live-Portrait",
+    "STARTED": "Live-Portrait in Bearbeitung",
+    "UNKNOWN": "Live-Portrait-Status unbekannt"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Text-to-Speech-Versuch fehlgeschlagen",
     "COMPLETE_FAILURE": "Text-to-Speech fehlgeschlagen",

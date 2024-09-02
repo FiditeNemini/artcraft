@@ -19,6 +19,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDeleteLeft,
   faSearch,
+  faSparkles,
   faWaveformLines,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -254,6 +255,13 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
                       />
                     )}
                   </div> */}
+                    <Button
+                      label={t("link.exploreNewVoices")}
+                      variant="link"
+                      className="mb-2"
+                      icon={faSparkles}
+                      to="/explore/weights?page_size=24&weight_category=text_to_speech"
+                    />
                   </div>
                 </div>
 

@@ -19,6 +19,15 @@
     "UNKNOWN": "Trạng thái tạo hình ảnh không xác định",
     "heading": "Công việc của ImageGeneration"
   },
+  "LivePortrait": {
+    "ATTEMPT_FAILED": "Nỗ lực chụp chân dung trực tiếp không thành công",
+    "COMPLETE_FAILURE": "Chân dung trực tiếp không thành công",
+    "COMPLETE_SUCCESS": "Chân dung trực tiếp hoàn chỉnh",
+    "DEAD": "Chân dung sống Chết",
+    "PENDING": "Chân dung trực tiếp đang chờ xử lý",
+    "STARTED": "Đang tiến hành chụp chân dung trực tiếp",
+    "UNKNOWN": "Trạng thái chân dung trực tiếp không xác định"
+  },
   "TextToSpeech": {
     "ATTEMPT_FAILED": "Cố gắng chuyển văn bản thành giọng nói không thành công",
     "COMPLETE_FAILURE": "Chuyển văn bản thành giọng nói không thành công",
