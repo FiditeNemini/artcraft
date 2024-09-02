@@ -18,7 +18,7 @@ const SignUpQuestionnaireForm = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setModalHeaderOpacity(1);
-    }, 3000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
