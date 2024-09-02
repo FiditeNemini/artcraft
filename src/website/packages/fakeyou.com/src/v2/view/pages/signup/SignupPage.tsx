@@ -264,17 +264,6 @@ function SignupPage(props: Props) {
   let redirectLink = queryParams.get("redirect");
   const redirectSignUpLink = "/welcome";
 
-  if (redirectLink) {
-    try {
-      const url = new URL(redirectLink);
-      url.searchParams.set("from", "signup");
-      redirectLink = url.toString();
-    } catch (error) {
-      console.error("Invalid redirect URL:", redirectLink);
-      redirectLink = null;
-    }
-  }
-
   const afterSignupRedirect = async () => {
     const maybeInternalPlanKey = parsedQueryString["sub"] as string | undefined;
 
@@ -284,7 +273,12 @@ function SignupPage(props: Props) {
       }
     }
 
-    let redirectUrl = redirectLink || WebUrl.pricingPageWithReferer("signup");
+    let redirectUrl = redirectLink
+      ? redirectLink.includes("?")
+        ? redirectLink + "&from=signup"
+        : redirectLink + "?from=signup"
+      : WebUrl.pricingPageWithReferer("signup");
+
     if (domain.titlePart === "Storyteller AI") {
       redirectUrl = redirectSignUpLink;
       if (redirectUrl === redirectSignUpLink) {
