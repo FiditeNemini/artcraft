@@ -35,15 +35,37 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
 
   info!("Model token count: {:?}", models.len());
 
-  let mut connection = mysql.acquire().await?;
+  //for (i, model) in models.iter().enumerate() {
+  //  let dates = get_all_dates(&args, model)?;
+  //  for (j, date) in dates.iter().enumerate() {
+  //    info!("Model: {}/{} Date: {}/{}", i + 1, models.len(), j + 1, dates.len());
+  //    backfill_on_date_with_retry(&mut mysql.clone(), &mut connection, model, *date).await;
+  //  }
+  //}
 
-  for (i, model) in models.iter().enumerate() {
-    let dates = get_all_dates(&args, model)?;
-    for (j, date) in dates.iter().enumerate() {
-      info!("Model: {}/{} Date: {}/{}", i + 1, models.len(), j + 1, dates.len());
-      backfill_on_date_with_retry(&mut mysql.clone(), &mut connection, model, *date).await;
-    }
+  let model_chunks = split_vec(models, 8);
+  let mut join_handles = Vec::with_capacity(model_chunks.len());
+
+  for model_chunk in model_chunks {
+    let mysql_pool = mysql.clone();
+    let args_copy = args.clone();
+
+    let join = tokio::task::spawn(async move {
+      let mut connection = mysql_pool.acquire().await.expect("failure");
+
+      for (i, model) in model_chunk.iter().enumerate() {
+        let dates = get_all_dates(&args_copy, model)
+            .unwrap_or_else(|_err| Vec::new());
+        for (j, date) in dates.iter().enumerate() {
+          info!("Model: {}/{} Date: {}/{}", i + 1, model_chunk.len(), j + 1, dates.len());
+          backfill_on_date_with_retry(&mut mysql_pool.clone(), &mut connection, model, *date).await;
+        }
+      }
+    });
+    join_handles.push(join);
   }
+
+  let _r = futures::future::join_all(join_handles).await;
 
   Ok(())
 }
@@ -142,4 +164,18 @@ async fn backfill_token(mysql: &mut PoolConnection<MySql>, model_token: &ModelWe
   }).await?;
 
   Ok(())
+}
+
+fn split_vec<T>(v: Vec<T>, chunk_size: usize) -> Vec<Vec<T>> {
+  use std::collections::VecDeque;
+
+  let mut v: VecDeque<T> = v.into(); // avoids reallocating when possible
+
+  let mut acc = Vec::new();
+  while v.len() > chunk_size {
+    acc.push(v.drain(0..chunk_size).collect());
+    v.shrink_to_fit();
+  }
+  acc.push(v.into());
+  acc
 }
