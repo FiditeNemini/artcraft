@@ -4,7 +4,7 @@ use std::time::Duration;
 use anyhow::anyhow;
 use chrono::{DateTime, NaiveDate, Utc};
 use log::{error, info};
-use sqlx::{MySql, Pool};
+use sqlx::{Error, MySql, Pool};
 use sqlx::pool::PoolConnection;
 use tokio::time::Instant;
 
@@ -40,24 +40,53 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
   for model in models.iter() {
     let dates = get_all_dates(&args, model)?;
     for date in dates.into_iter() {
-      let start = Instant::now();
-      match backfill_token(&mut connection, &model.token, date).await {
-        Ok(_) => {
-          let end = Instant::now();
-          if end.duration_since(start).as_millis() > 1600 {
-            info!("Slow backfills. Slowing down queries...");
-            tokio::time::sleep(Duration::from_secs(2)).await;
-          }
-        }
-        Err(err) => {
-          error!("Error backfilling token: {:?} for date: {:?} - {:?}", model.token, date, err);
-          tokio::time::sleep(Duration::from_secs(15)).await;
-        }
-      }
+      backfill_on_date_with_retry(&mut mysql.clone(), &mut connection, model, date).await;
     }
   }
 
   Ok(())
+}
+
+async fn backfill_on_date_with_retry(
+  mysql: &mut Pool<MySql>,
+  connection: &mut PoolConnection<MySql>,
+  model: &ModelInfo,
+  date: NaiveDate,
+) {
+  let mut duration = Duration::from_secs(60);
+
+  loop {
+    let start = Instant::now();
+
+    if let Err(err) = backfill_token(connection, &model.token, date).await {
+      error!("Error backfilling token: {} for date: {:?} - {:?}", model.token.as_str(), date, err);
+      tokio::time::sleep(Duration::from_secs(15)).await;
+
+      info!("Re-acquire connection...");
+      loop {
+        match mysql.acquire().await {
+          Err(err) => {
+            error!("Error re-acquiring connection: {:?}", err);
+            tokio::time::sleep(Duration::from_secs(15)).await;
+          }
+          Ok(cnx) => {
+            *connection = cnx;
+            break;
+          }
+        }
+      }
+      continue; // retry
+    }
+
+    duration = Instant::now().duration_since(start);
+    break;
+  }
+
+  // Success, but add some backoff if we're stressing the database.
+  if duration.as_millis() > 1600 {
+    info!("Slow backfills. Slowing down queries...");
+    tokio::time::sleep(Duration::from_secs(2)).await;
+  }
 }
 
 pub struct ModelInfo {
@@ -90,7 +119,7 @@ fn get_all_dates(args: &SubArgs, model: &ModelInfo) -> AnyhowResult<Vec<NaiveDat
 // the model_weights table started to become populated (first record 2023-04-26 16:58:09).
 // This means we might be missing inference generations.
 async fn backfill_token(mysql: &mut PoolConnection<MySql>, model_token: &ModelWeightToken, date: NaiveDate) -> AnyhowResult<()> {
-  info!("Backfilling token: {:?} for date: {:?}", model_token, date);
+  info!("Backfilling token: {} for date: {:?}", model_token.as_str(), date);
 
   let count = count_model_use_using_media_files_on_date(
     &mut **mysql, &model_token, date).await?;
