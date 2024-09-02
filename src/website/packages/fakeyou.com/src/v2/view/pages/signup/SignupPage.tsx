@@ -265,9 +265,14 @@ function SignupPage(props: Props) {
   const redirectSignUpLink = "/welcome";
 
   if (redirectLink) {
-    const url = new URL(redirectLink);
-    url.searchParams.set("from", "signup");
-    redirectLink = url.toString();
+    try {
+      const url = new URL(redirectLink);
+      url.searchParams.set("from", "signup");
+      redirectLink = url.toString();
+    } catch (error) {
+      console.error("Invalid redirect URL:", redirectLink);
+      redirectLink = null;
+    }
   }
 
   const afterSignupRedirect = async () => {
