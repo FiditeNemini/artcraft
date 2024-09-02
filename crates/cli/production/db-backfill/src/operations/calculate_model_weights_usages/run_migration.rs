@@ -1,7 +1,13 @@
+use std::thread;
+use std::time::Duration;
+
 use anyhow::anyhow;
 use chrono::{DateTime, NaiveDate, Utc};
-use log::info;
+use log::{error, info};
 use sqlx::{MySql, Pool};
+use sqlx::pool::PoolConnection;
+use tokio::time::Instant;
+
 use datetimes::CHRONO_DATETIME_UNIX_EPOCH;
 use datetimes::generate_dates_inclusive::generate_dates_inclusive;
 use errors::AnyhowResult;
@@ -29,10 +35,25 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
 
   info!("Model token count: {:?}", models.len());
 
+  let mut connection = mysql.acquire().await?;
+
   for model in models.iter() {
     let dates = get_all_dates(&args, model)?;
     for date in dates.into_iter() {
-      backfill_token(&mysql, &model.token, date).await?;
+      let start = Instant::now();
+      match backfill_token(&mut connection, &model.token, date).await {
+        Ok(_) => {
+          let end = Instant::now();
+          if end.duration_since(start).as_millis() > 1600 {
+            info!("Slow backfills. Slowing down queries...");
+            tokio::time::sleep(Duration::from_secs(2)).await;
+          }
+        }
+        Err(err) => {
+          error!("Error backfilling token: {:?} for date: {:?} - {:?}", model.token, date, err);
+          tokio::time::sleep(Duration::from_secs(15)).await;
+        }
+      }
     }
   }
 
@@ -56,19 +77,23 @@ async fn get_all_model_weight_tokens(mysql: Pool<MySql>) -> AnyhowResult<Vec<Mod
 }
 
 fn get_all_dates(args: &SubArgs, model: &ModelInfo) -> AnyhowResult<Vec<NaiveDate>> {
-  let start_date = model.maybe_created_date
-      .or_else(|| args.start_date)
+  let start_date = args.start_date
+      .or_else(|| model.maybe_created_date)
       .ok_or_else(|| anyhow!("no start date given"))?;
   let end_date = args.end_date
       .unwrap_or_else(|| Utc::today().naive_utc());
   Ok(generate_dates_inclusive(start_date, end_date))
 }
 
-async fn backfill_token(mysql: &Pool<MySql>, model_token: &ModelWeightToken, date: NaiveDate) -> AnyhowResult<()> {
+// NB: This methodology might be inaccurate
+// We wrote to the media_files table (first record 2023-09-15 12:43:36) months after
+// the model_weights table started to become populated (first record 2023-04-26 16:58:09).
+// This means we might be missing inference generations.
+async fn backfill_token(mysql: &mut PoolConnection<MySql>, model_token: &ModelWeightToken, date: NaiveDate) -> AnyhowResult<()> {
   info!("Backfilling token: {:?} for date: {:?}", model_token, date);
 
   let count = count_model_use_using_media_files_on_date(
-    mysql, &model_token, date).await?;
+    &mut **mysql, &model_token, date).await?;
 
   if count.record_count == 0 {
     info!("Count: {:?} (skipping)", count.record_count);
@@ -82,7 +107,7 @@ async fn backfill_token(mysql: &Pool<MySql>, model_token: &ModelWeightToken, dat
     date,
     usage_count: count.record_count,
     insert_on_zero: false,
-    mysql_executor: mysql,
+    mysql_executor: &mut **mysql,
     phantom: Default::default(),
   }).await?;
 
