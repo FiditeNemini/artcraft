@@ -13,10 +13,9 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
   info!("args: {:?}", args);
 
   let model_token = args.model_token
-      .map(|token| MediaFileToken::new_from_str(&token))
       .ok_or_else(|| anyhow!("no token provided"))?;
 
-  let date = NaiveDate::from_ymd_opt(2024, 9, 1)
+  let date = args.start_date
       .ok_or_else(|| anyhow!("invalid start date"))?;
 
   let count = count_model_use_using_media_files_on_date(&mysql, &model_token, date).await?;
