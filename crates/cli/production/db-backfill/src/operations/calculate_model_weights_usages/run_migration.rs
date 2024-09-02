@@ -1,11 +1,13 @@
 use anyhow::anyhow;
-use chrono::NaiveDate;
+use chrono::{DateTime, NaiveDate, Utc};
 use log::info;
 use sqlx::{MySql, Pool};
 use datetimes::CHRONO_DATETIME_UNIX_EPOCH;
+use datetimes::generate_dates_inclusive::generate_dates_inclusive;
 use errors::AnyhowResult;
 use mysql_queries::queries::model_weight_usage_counts::upsert_model_weight_usage_count_for_date::{Args, upsert_model_weight_usage_count_for_date};
 use mysql_queries::queries::model_weights::count::count_model_use_using_media_files_on_date::count_model_use_using_media_files_on_date;
+use mysql_queries::queries::model_weights::list::list_all_model_weight_tokens_for_backfill::list_all_model_weight_tokens_for_backfill;
 use mysql_queries::queries::model_weights::list::list_model_weight_tokens_updated_since::list_model_weight_tokens_updated_since;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -17,31 +19,52 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
 
   info!("Backfill args: {:?}", args);
 
-  let model_tokens = match args.model_token.as_ref() {
-    Some(model_token) => vec![model_token.clone()],
+  let models = match args.model_token.as_ref() {
+    Some(model_token) => vec![ModelInfo {
+      token: model_token.clone(),
+      maybe_created_date: None,
+    }],
     None => get_all_model_weight_tokens(mysql.clone()).await?,
   };
 
-  for token in model_tokens.iter() {
-    backfill_token(&mysql, &args, &token).await?;
+  info!("Model token count: {:?}", models.len());
+
+  for model in models.iter() {
+    let dates = get_all_dates(&args, model)?;
+    for date in dates.into_iter() {
+      backfill_token(&mysql, &model.token, date).await?;
+    }
   }
 
-  info!("Model token count: {:?}", model_tokens.len());
   Ok(())
 }
 
-async fn get_all_model_weight_tokens(mysql: Pool<MySql>) -> AnyhowResult<Vec<ModelWeightToken>> {
+pub struct ModelInfo {
+  pub token: ModelWeightToken,
+  pub maybe_created_date: Option<NaiveDate>,
+}
+
+async fn get_all_model_weight_tokens(mysql: Pool<MySql>) -> AnyhowResult<Vec<ModelInfo>> {
   let epoch = *CHRONO_DATETIME_UNIX_EPOCH;
-  let results = list_model_weight_tokens_updated_since(&mysql, &epoch).await?;
+  let results = list_all_model_weight_tokens_for_backfill(&mysql, &epoch).await?;
   Ok(results.into_iter()
-      .map(|result| result.token)
+      .map(|result| ModelInfo {
+        token: result.token,
+        maybe_created_date: Some(result.created_at.date_naive()),
+      })
       .collect())
 }
 
-async fn backfill_token(mysql: &Pool<MySql>, args: &SubArgs, model_token: &ModelWeightToken) -> AnyhowResult<()> {
-  let date = args.start_date
-      .ok_or_else(|| anyhow!("invalid start date"))?;
+fn get_all_dates(args: &SubArgs, model: &ModelInfo) -> AnyhowResult<Vec<NaiveDate>> {
+  let start_date = model.maybe_created_date
+      .or_else(|| args.start_date)
+      .ok_or_else(|| anyhow!("no start date given"))?;
+  let end_date = args.end_date
+      .unwrap_or_else(|| Utc::today().naive_utc());
+  Ok(generate_dates_inclusive(start_date, end_date))
+}
 
+async fn backfill_token(mysql: &Pool<MySql>, model_token: &ModelWeightToken, date: NaiveDate) -> AnyhowResult<()> {
   info!("Backfilling token: {:?} for date: {:?}", model_token, date);
 
   let count = count_model_use_using_media_files_on_date(
