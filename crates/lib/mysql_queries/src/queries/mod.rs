@@ -18,6 +18,7 @@ pub mod ip_bans;
 pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;
+pub mod model_weight_usage_counts;
 pub mod model_weights;
 pub mod prompts;
 pub mod public_event_feed;
