@@ -1,32 +1,23 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { twMerge } from "tailwind-merge";
-// import { useSignals } from "@preact/signals-react/runtime";
 import { withProtectionRoute } from "~/components/hoc";
-// import { authentication } from "~/signals";
+import { useRenderCounter } from "~/hooks/useRenderCounter";
 
+// Components
 import {
-  //PanelRight,
-  PanelBottom,
-} from "~/components/ui";
-import { ProfileDropdown, KonaContainer } from "~/components/features";
+  ProfileDropdown,
+  KonaContainer,
+  ToolbarMain,
+} from "~/components/features";
 
+// The KonvaApp is the root of the Konva stage
+// and only entry point for anything Konva
 import { KonvaApp } from "~/KonvaApp";
 
-import { BottomMenu } from "./BottomMenu";
-
 export const Main = withProtectionRoute(() => {
-  // useSignals();
-  const MainPageRerenderCount = useRef(0);
-  MainPageRerenderCount.current++;
-  if (MainPageRerenderCount.current === 1) {
-    console.log(`Main page rerendered ${MainPageRerenderCount.current} times`);
-  } else {
-    console.warn(`Main page rerendered ${MainPageRerenderCount.current} times`);
-  }
-  // const {
-  //   signals: { userInfo },
-  //   fetchers: { logout },
-  // } = authentication;
+  // This is a hook that will log the number of times the component has rerendered
+  // Let's make sure we only log once
+  useRenderCounter("Pages/Main");
 
   const konaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
     if (node !== null) {
@@ -54,21 +45,7 @@ export const Main = withProtectionRoute(() => {
           <ProfileDropdown />
         </div>
       </div>
-      {/* <PanelRight>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2">
-            <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
-          </div>
-          <span className="grow" />
-          <ProfileDropdown />
-        </div>
-        <hr className="my-2 border-ui-divider" />
-        <p>you are logged in as {userInfo.value?.display_name}</p>
-        <button onClick={() => logout()}>Logout</button>
-      </PanelRight> */}
-      <PanelBottom>
-        <BottomMenu />
-      </PanelBottom>
+      <ToolbarMain />
     </div>
   );
 });

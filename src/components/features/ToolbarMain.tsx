@@ -1,6 +1,6 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import { layout } from "~/signals";
-export const BottomMenu = () => {
+export const ToolbarMain = () => {
   useSignals();
   const {
     signals: { isMobile, windowWidth, windowHeight },
