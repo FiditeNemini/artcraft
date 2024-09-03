@@ -57,3 +57,8 @@ mod error;
 mod init;
 mod logging;
 pub (crate) mod types;
+
+/// Re-export of env_logger
+pub mod env_logger {
+  pub use env_logger::Builder;
+}

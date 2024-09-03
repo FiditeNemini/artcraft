@@ -20,6 +20,11 @@ use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::operations::calculate_model_weights_usages::sub_args::{parse_cli_sub_args, SubArgs};
 
+/// DO NOT USE THIS MIGRATION
+/// IT IS SLOW AND INEFFICIENT
+/// It does some nifty multithreaded and retry things, but the queries
+/// themselves are super sparse and running the entire backfill will
+/// take forever.
 pub async fn run_migration_old(mysql: Pool<MySql>) -> AnyhowResult<()> {
   let args = parse_cli_sub_args()?;
 
