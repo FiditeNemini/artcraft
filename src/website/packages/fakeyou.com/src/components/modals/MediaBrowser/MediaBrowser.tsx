@@ -5,7 +5,12 @@ import {
   EntityInputMode,
   EntityFilterOptions,
 } from "components/entities/EntityTypes";
-import { Checkbox, ModalUtilities, Pagination, TempSelect as Select } from "components/common";
+import {
+  Checkbox,
+  ModalUtilities,
+  Pagination,
+  TempSelect as Select,
+} from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
@@ -27,7 +32,7 @@ import prepFilter from "resources/prepFilter";
 import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
 
-const n = () => { };
+const n = () => {};
 
 export interface MediaBrowserProps {
   accept?: AcceptTypes[];
@@ -43,7 +48,7 @@ export interface MediaBrowserProps {
   searchFilter?: string;
 }
 
-interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps { }
+interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps {}
 
 export default function MediaBrowser({
   accept,
@@ -66,7 +71,6 @@ export default function MediaBrowser({
   const [localSearch, localSearchSet] = useState(search);
   const [searchUpdated, searchUpdatedSet] = useState(false);
   const [showUserUploads, showUserUploadsSet] = useState(true);
-
 
   const fetcher = [
     GetBookmarksByUser,
@@ -102,11 +106,11 @@ export default function MediaBrowser({
     },
     ...(localSearch
       ? {
-        request: {
-          search_term: localSearch,
-          weight_category: searchFilter ? searchFilter : "text_to_speech",
-        },
-      }
+          request: {
+            search_term: localSearch,
+            weight_category: searchFilter ? searchFilter : "text_to_speech",
+          },
+        }
       : {}),
     requestList: true,
     ...(localSearch ? { resultsKey: "weights" } : {}),
@@ -162,9 +166,9 @@ export default function MediaBrowser({
 
   const filterOptions = accept
     ? accept.map((value: string) => ({
-      value,
-      label: value,
-    }))
+        value,
+        label: value,
+      }))
     : EntityFilterOptions(inputMode);
 
   return (
@@ -177,41 +181,47 @@ export default function MediaBrowser({
           title,
         }}
       >
-        {showFilters && (
+        {showFilters || showPagination ? (
           <>
-            <Checkbox {...{
-              className: "mb-0",
-              checked: showUserUploads,
-              label: "Show my uploads",
-              onChange: ({ target }: any) => {
-                entities.reFetch();
-                showUserUploadsSet(target.checked)
-              },
-              variant: "secondary"
-            }} />
-            <Select
-              {...{
-                icon: faArrowDownWideShort,
-                options: sortOptions,
-                name: "sort",
-                onChange: entities.onChange,
-                value: entities.sort,
-              }}
-            />
-            {(!accept || (accept && accept.length)) && (
-              <Select
-                {...{
-                  icon: faFilter,
-                  options: filterOptions,
-                  name: "filterType",
-                  onChange: entities.onChange,
-                  value: filterType,
-                }}
-              />
+            {showFilters && (
+              <>
+                <Checkbox
+                  {...{
+                    className: "mb-0",
+                    checked: showUserUploads,
+                    label: "Show my uploads",
+                    onChange: ({ target }: any) => {
+                      entities.reFetch();
+                      showUserUploadsSet(target.checked);
+                    },
+                    variant: "secondary",
+                  }}
+                />
+                <Select
+                  {...{
+                    icon: faArrowDownWideShort,
+                    options: sortOptions,
+                    name: "sort",
+                    onChange: entities.onChange,
+                    value: entities.sort,
+                  }}
+                />
+                {(!accept || (accept && accept.length)) && (
+                  <Select
+                    {...{
+                      icon: faFilter,
+                      options: filterOptions,
+                      name: "filterType",
+                      onChange: entities.onChange,
+                      value: filterType,
+                    }}
+                  />
+                )}
+              </>
             )}
+            {showPagination && <Pagination {...paginationProps} />}
           </>
-        )}
-        {showPagination && <Pagination {...paginationProps} />}
+        ) : null}
       </ModalHeader>
       <AudioPlayerProvider>
         {entities.isLoading ? (

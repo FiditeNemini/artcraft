@@ -39,7 +39,13 @@ export default function ModalHeader({
 
   return (
     <header {...{ className: "fy-media-browser-header" }}>
-      <div {...{ className: "fy-media-browser-tools" }}>
+      <div
+        {...{
+          className: `fy-media-browser-tools ${
+            children !== null ? "" : "flex-nowrap"
+          }`.trim(),
+        }}
+      >
         {search !== undefined ? (
           <div className="position-relative w-100">
             <Input
