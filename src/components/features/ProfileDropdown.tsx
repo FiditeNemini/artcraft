@@ -69,43 +69,36 @@ export function ProfileDropdown() {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems
-          static
-          className="absolute right-[-5px] mt-2.5 w-36 overflow-hidden rounded-lg bg-secondary shadow-lg focus:outline-none"
-        >
-          <MenuItem key={0}>
-            {({ active }) => (
-              <a
-                className={twMerge(
-                  "duration-50 bg-action/60 group flex w-full items-center gap-2 px-3 py-[10px] text-start text-sm font-medium text-white transition-all",
-                  active && "bg-action-500/80",
-                )}
-                href={profileUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <FontAwesomeIcon icon={faUser} />
-                My Profile
-              </a>
-            )}
-          </MenuItem>
-          {options.map((option, index) => (
-            <MenuItem key={index + 1}>
-              {({ active }) => (
-                <button
-                  className={twMerge(
-                    "duration-50 bg-action/60 group flex w-full items-center gap-2 px-3 py-[10px] text-start text-sm font-medium text-white transition-all",
-                    active && "bg-action-500/80",
-                  )}
-                  onClick={() => option.onClick()}
+        <div className="absolute -right-2 mt-2.5 w-fit rounded-xl border border-ui-border bg-ui-panel shadow-lg">
+          <MenuItems static className="flex flex-col py-2 focus:outline-none">
+            <MenuItem key={0}>
+              {() => (
+                <a
+                  className="duration-50 group flex w-full items-center gap-2 text-nowrap px-4 py-2 text-start text-sm font-medium transition-all"
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  <FontAwesomeIcon icon={option.icon} />
-                  {option.label}
-                </button>
+                  <FontAwesomeIcon icon={faUser} />
+                  My Profile
+                </a>
               )}
             </MenuItem>
-          ))}
-        </MenuItems>
+            {options.map((option, index) => (
+              <MenuItem key={index + 1}>
+                {() => (
+                  <button
+                    className="duration-50 group flex w-full items-center gap-2 px-4 py-2 text-start text-sm font-medium transition-all"
+                    onClick={() => option.onClick()}
+                  >
+                    <FontAwesomeIcon icon={option.icon} />
+                    {option.label}
+                  </button>
+                )}
+              </MenuItem>
+            ))}
+          </MenuItems>
+        </div>
       </Transition>
     </Menu>
   );
