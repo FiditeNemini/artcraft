@@ -2,8 +2,12 @@ import useAnimationStatus, {
   AnimationEvents,
   AnimationStatus,
 } from "./useAnimationStatus";
-import useBatchContent, { BatchInputProps, MakeBatchPropsParams } from "./useBatchContent";
+import useBatchContent, {
+  BatchInputProps,
+  MakeBatchPropsParams,
+} from "./useBatchContent";
 import useBookmarks, { MakeBookmarksProps } from "./useBookmarks";
+import useCameraState, { CameraState } from "./useCameraState";
 import useChanger from "./useChanger";
 import useCoverImgUpload from "./useCoverImgUpload";
 import useDebounce from "./useDebounce";
@@ -41,6 +45,7 @@ export {
   useAnimationStatus,
   useBatchContent,
   useBookmarks,
+  useCameraState,
   useChanger,
   useCoverImgUpload,
   useDebounce,
@@ -77,6 +82,7 @@ export {
 export type {
   AnimationEvents,
   BatchInputProps,
+  CameraState,
   MakeBookmarksProps,
   MakeBatchPropsParams,
   MakeRatingsProps,

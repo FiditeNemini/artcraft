@@ -1,6 +1,7 @@
 import React from "react";
 import { SlideProps } from "./EntityInput";
 import {
+  useCameraState,
   // useMediaUploader,
   useModal,
   useSession,
@@ -53,17 +54,19 @@ export default function EntityInputEmpty({
 }: EmptySlideProps) {
   const { open } = useModal();
   const { user } = useSession();
+  const camera = useCameraState();
+
   const accepted = Array.isArray(accept) ? accept : [accept];
   const inputMode = EntityInputMode[type];
   const isMedia = inputMode === EntityInputMode.media;
   const fileTypes = isMedia
     ? accepted
-      .map((mediaCategory, i) => {
-        return mediaCategory
-          ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory))
-          : [];
-      })
-      .flat()
+        .map((mediaCategory, i) => {
+          return mediaCategory
+            ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory))
+            : [];
+        })
+        .flat()
     : [];
 
   const props: MediaBrowserProps = {
@@ -84,8 +87,9 @@ export default function EntityInputEmpty({
       component: CameraCapture,
       padding: false,
       props: {
+        camera,
         GApage,
-        selectToken
+        selectToken,
       },
       width: "square",
     });
@@ -99,8 +103,9 @@ export default function EntityInputEmpty({
     return faFile;
   };
 
-  const supported = `${fileTypes.length ? fileTypes.join(", ") : fileTypes[0]
-    } files supported`;
+  const supported = `${
+    fileTypes.length ? fileTypes.join(", ") : fileTypes[0]
+  } files supported`;
 
   return (
     <>

@@ -79,7 +79,7 @@ export default function AITools() {
       imgAlt: "Video Compositor",
     },
     {
-      to: "/beta/webcam-acting",
+      to: "/webcam-acting",
       title: "Webcam Acting",
       text: "Act as your character through your camera",
       videoSrc: "/videos/ai-tools/ca_video.mp4",
