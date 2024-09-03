@@ -2,6 +2,11 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+-- Get pending job count
+select count(*)
+from generic_inference_jobs
+where status = 'pending';
+
 -- Kill *ALL* pending / outstanding jobs of any type
 update generic_inference_jobs
 set status = 'dead'

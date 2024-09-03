@@ -45,7 +45,7 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
 
   const THREAD_COUNT : usize = 8;
   let chunk_size = models.len() / THREAD_COUNT;
-  
+
   let model_chunks = split_vec(models, chunk_size);
   let mut join_handles = Vec::with_capacity(model_chunks.len());
 
