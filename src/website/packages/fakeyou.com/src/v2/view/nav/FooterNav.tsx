@@ -141,13 +141,14 @@ function FooterNav(props: Props) {
   );
   const isOnLoginPage = location.pathname.includes("/login");
   const isOnSignUpPage = location.pathname.includes("/signup");
-  const isOnBetaLipSyncForm = location.pathname.includes("/beta/lip-sync/form");
+  const isOnBetaForm =
+    location.pathname.includes("/beta") && location.pathname.includes("/form");
 
   if (
     isOnCreatorOnboardingPage ||
     isOnLoginPage ||
     isOnSignUpPage ||
-    isOnBetaLipSyncForm
+    isOnBetaForm
   ) {
     return null;
   }

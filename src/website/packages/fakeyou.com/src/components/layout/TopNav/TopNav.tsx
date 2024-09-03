@@ -74,9 +74,9 @@ export default function TopNav({
   const isOnVcPage =
     window.location.pathname.includes("/voice-conversion") ||
     window.location.pathname.includes("/dev-vc");
-  const isOnBetaLipSyncForm = window.location.pathname.includes(
-    "/beta/lip-sync/form"
-  );
+  const isOnBetaForm =
+    window.location.pathname.includes("/beta") &&
+    window.location.pathname.includes("/form");
 
   const { open } = useModal();
   const openModal = () =>
@@ -221,7 +221,7 @@ export default function TopNav({
         isOnLoginPage ||
         isOnSignUpPage ||
         isOnWelcomePage ||
-        isOnBetaLipSyncForm
+        isOnBetaForm
       ) {
         pageContentWrapper.style.padding = "0px";
       } else {
@@ -237,7 +237,7 @@ export default function TopNav({
     isOnLoginPage,
     isOnSignUpPage,
     isOnWelcomePage,
-    isOnBetaLipSyncForm,
+    isOnBetaForm,
   ]);
 
   if (
@@ -279,7 +279,7 @@ export default function TopNav({
     isOnSignUpPage ||
     isOnLoginPage ||
     isOnWelcomePage ||
-    isOnBetaLipSyncForm
+    isOnBetaForm
   ) {
     return null;
   }
