@@ -18,7 +18,7 @@ export default {
 
       // common colors
       white: colors.white,
-      gray: storytellerColors.gunpowder,
+      gray: colors.zinc,
       black: colors.black,
       red: colors.red,
       oragne: colors.orange,
@@ -40,11 +40,9 @@ export default {
       tertiary: storytellerColors.aquamarineBlue,
 
       ui: {
-        background: storytellerColors.gunpowder[100],
-        panel: storytellerColors.gunpowder[100],
-        border: storytellerColors.gunpowder[300],
-        divider: storytellerColors.gunpowder[300],
-        button: storytellerColors.gunpowder[500],
+        background: colors.zinc[100],
+        panel: colors.white,
+        border: colors.zinc[200],
       },
     },
   },
