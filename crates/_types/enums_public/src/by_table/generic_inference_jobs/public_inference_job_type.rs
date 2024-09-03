@@ -13,11 +13,16 @@ use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobTyp
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default, ToSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum PublicInferenceJobType {
-  // Renamed enum variants 
+
+  // ======= Renamed enum variants  ======
 
   /// Instead of `InferenceJobType::LivePortrait` ("live_portrait")
+  /// This is not necessary anymore since we call the product "live portrait" in production
   ActingFace,
-  
+
+  /// Instead of `InferenceJobType::FaceFusion` ("face_fusion")
+  Lipsync,
+
   /// Storyteller Studio and Video Style Transfer Jobs (which we may want to split).
   /// These run in Comfy.
   /// TODO(bt,2024-07-15): We may segregate these two job types in the future
@@ -25,7 +30,7 @@ pub enum PublicInferenceJobType {
 
   GptSovits,
 
-  // Everything else is the same
+  // ======= Everything else is the same =======
 
   /// Jobs that run ComfyUI workflows
   /// This is actually just for Video Style Transfer and Storyteller Studio.
@@ -85,6 +90,7 @@ impl PublicInferenceJobType {
     match inference_job_type {
       // Renamed variants
       InferenceJobType::LivePortrait => Self::ActingFace,
+      InferenceJobType::FaceFusion => Self::Lipsync,
       // Conserved variants
       InferenceJobType::VideoRender => Self::VideoRender,
       InferenceJobType::GptSovits => Self::GptSovits,
@@ -107,6 +113,7 @@ impl PublicInferenceJobType {
     match self {
       // Renamed variants
       Self::ActingFace => InferenceJobType::LivePortrait,
+      Self::Lipsync => InferenceJobType::FaceFusion,
       // Conserved variants
       Self::VideoRender => InferenceJobType::VideoRender,
       Self::GptSovits => InferenceJobType::GptSovits,
@@ -134,9 +141,10 @@ mod tests {
 
   use super::*;
 
-  fn override_enums() -> &'static [PublicInferenceJobType; 1] {
+  fn override_enums() -> &'static [PublicInferenceJobType; 2] {
     &[
       PublicInferenceJobType::ActingFace,
+      PublicInferenceJobType::Lipsync,
     ]
   }
 
@@ -153,6 +161,17 @@ mod tests {
       assert_eq!(PublicInferenceJobType::from_enum(InferenceJobType::LivePortrait), PublicInferenceJobType::ActingFace);
       assert_eq!(to_json(&PublicInferenceJobType::from_enum(InferenceJobType::LivePortrait)), "acting_face");
     }
+
+    #[test]
+    fn lipsync() {
+      // Public --> Internal
+      assert_eq!(PublicInferenceJobType::Lipsync.to_enum(), InferenceJobType::FaceFusion);
+      assert_eq!(to_json(&PublicInferenceJobType::Lipsync.to_enum()), "face_fusion");
+
+      // Internal --> Public
+      assert_eq!(PublicInferenceJobType::from_enum(InferenceJobType::FaceFusion), PublicInferenceJobType::Lipsync);
+      assert_eq!(to_json(&PublicInferenceJobType::from_enum(InferenceJobType::FaceFusion)), "lipsync");
+    }
   }
 
   mod mechanical_checks {
@@ -163,8 +182,10 @@ mod tests {
       let mut tested_count = 0;
 
       for public_variant in PublicInferenceJobType::iter() {
-        if public_variant == PublicInferenceJobType::ActingFace {
-          continue; // Can't compare.
+        match public_variant {
+          PublicInferenceJobType::ActingFace |
+          PublicInferenceJobType::Lipsync => continue, // Can't compare
+          _ => {}
         }
 
         // Round trip
@@ -188,8 +209,10 @@ mod tests {
       let mut tested_count = 0;
 
       for internal_variant in InferenceJobType::all_variants() {
-        if internal_variant == InferenceJobType::LivePortrait {
-          continue; // Can't compare.
+        match internal_variant {
+          InferenceJobType::LivePortrait |
+          InferenceJobType::FaceFusion => continue, // Can't compare
+          _ => {}
         }
 
         // Round trip

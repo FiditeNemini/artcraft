@@ -25,6 +25,10 @@ pub enum PublicMediaFileModelType {
   #[serde(rename = "face_animator")]
   FaceAnimator,
 
+  /// Instead of `MediaFileOriginModelType::FaceFusion` ("face_fusion")
+  #[serde(rename = "lipsync")]
+  Lipsync,
+
   /// Instead of `MediaFileOriginModelType::StyleTTS2` ("styletts2")
   #[serde(rename = "voice_designer")]
   VoiceDesigner,
@@ -75,6 +79,7 @@ impl PublicMediaFileModelType {
   pub fn from_enum(model_type: MediaFileOriginModelType) -> Self {
     match model_type {
       // Renamed variants
+      MediaFileOriginModelType::FaceFusion => Self::Lipsync,
       MediaFileOriginModelType::LivePortrait => Self::FaceMirror,
       MediaFileOriginModelType::SadTalker => Self::FaceAnimator,
       MediaFileOriginModelType::StyleTTS2 => Self::VoiceDesigner,
@@ -98,6 +103,7 @@ impl PublicMediaFileModelType {
       // Renamed variants
       Self::FaceMirror => MediaFileOriginModelType::LivePortrait,
       Self::FaceAnimator => MediaFileOriginModelType::SadTalker,
+      Self::Lipsync => MediaFileOriginModelType::FaceFusion,
       Self::VoiceDesigner => MediaFileOriginModelType::StyleTTS2,
       // Conserved variants
       Self::RvcV2 => MediaFileOriginModelType::RvcV2,
@@ -123,16 +129,28 @@ mod tests {
 
   use super::*;
 
-  fn override_enums() -> &'static [PublicMediaFileModelType; 3] {
+  fn override_enums() -> &'static [PublicMediaFileModelType; 4] {
     &[
       PublicMediaFileModelType::FaceMirror,
       PublicMediaFileModelType::FaceAnimator,
+      PublicMediaFileModelType::Lipsync,
       PublicMediaFileModelType::VoiceDesigner,
     ]
   }
 
   mod override_values {
     use super::*;
+
+    #[test]
+    fn face_fusion() {
+      // Public --> Internal
+      assert_eq!(PublicMediaFileModelType::Lipsync.to_enum(), MediaFileOriginModelType::FaceFusion);
+      assert_eq!(to_json(&PublicMediaFileModelType::Lipsync.to_enum()), "face_fusion");
+
+      // Internal --> Public
+      assert_eq!(PublicMediaFileModelType::from_enum(MediaFileOriginModelType::FaceFusion), PublicMediaFileModelType::Lipsync);
+      assert_eq!(to_json(&PublicMediaFileModelType::from_enum(MediaFileOriginModelType::FaceFusion)), "lipsync");
+    }
 
     #[test]
     fn live_portrait() {
@@ -181,6 +199,7 @@ mod tests {
         match public_variant {
           PublicMediaFileModelType::FaceMirror |
           PublicMediaFileModelType::FaceAnimator |
+          PublicMediaFileModelType::Lipsync |
           PublicMediaFileModelType::VoiceDesigner => continue, // Can't compare.
           _ => {}
         }
@@ -207,6 +226,7 @@ mod tests {
 
       for internal_variant in MediaFileOriginModelType::all_variants() {
         match internal_variant {
+          MediaFileOriginModelType::FaceFusion |
           MediaFileOriginModelType::LivePortrait |
           MediaFileOriginModelType::SadTalker |
           MediaFileOriginModelType::StyleTTS2 => continue, // Can't compare.
