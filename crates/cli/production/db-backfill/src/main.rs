@@ -26,13 +26,12 @@ async fn main() -> AnyhowResult<()> {
 
     let mysql = get_mysql("MYSQL_PRODUCTION_URL").await?;
 
+    info!("dispatching command: {:?}", command);
+
     match command.sub_command {
         Command::CalculateModelWeightsUsages => run_migration(mysql).await?,
         Command::CalculateTtsResultsUsages => {}
     }
-    info!("command: {:?}", command);
-
-    info!("TODO...");
 
     Ok(())
 }
