@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    @apply bg-ui-background font-sans text-white;
+    @apply bg-ui-background font-sans text-black;
   }
   .pegboard {
-    background-image: radial-gradient(#676781 1px, transparent 0);
+    background-image: radial-gradient(#8188b0 1px, transparent 0);
     background-size: 36px 36px;
     @apply bg-center;
   }
