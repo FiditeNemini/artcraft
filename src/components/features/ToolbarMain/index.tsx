@@ -24,7 +24,7 @@ export const ToolbarMain = () => {
   // } = layout;
   return (
     <div className="col-span-12 col-start-1 row-span-1 row-start-12 justify-center">
-      <div className="m-auto flex w-fit items-center divide-x divide-ui-border rounded-2xl border border-ui-border bg-ui-panel p-2">
+      <div className="m-auto flex w-fit items-center divide-x divide-ui-border rounded-2xl border border-ui-border bg-ui-panel p-2 shadow-xl">
         {/* <p>
           Layout is {windowWidth.value} x {windowHeight.value},{" "}
           <b>{isMobile.value ? "Mobile" : "Not Mobile"}</b>
