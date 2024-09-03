@@ -10,7 +10,7 @@ export const BetaLipSyncForm = () => {
   const email = queryParams.get("email");
   const domain = useDomainConfig();
 
-  const formId = "ETlmLSEx";
+  const formId = "ETlmLSEx?typeform-welcome=0";
 
   const fullFormUrl = `${formId}?${
     domain.titlePart === "FakeYou"

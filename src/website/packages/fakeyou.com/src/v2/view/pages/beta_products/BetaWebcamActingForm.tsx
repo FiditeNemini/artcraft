@@ -10,7 +10,7 @@ export const BetaWebcamActingForm = () => {
   const email = queryParams.get("email");
   const domain = useDomainConfig();
 
-  const formId = "ZGXvD5os";
+  const formId = "ZGXvD5os?typeform-welcome=0";
 
   const fullFormUrl = `${formId}?${
     domain.titlePart === "FakeYou"

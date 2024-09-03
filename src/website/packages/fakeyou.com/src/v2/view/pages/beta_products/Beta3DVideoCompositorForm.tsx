@@ -10,7 +10,7 @@ export const Beta3DVideoCompositorForm = () => {
   const email = queryParams.get("email");
   const domain = useDomainConfig();
 
-  const formId = "GIivcXuf";
+  const formId = "GIivcXuf?typeform-welcome=0";
 
   const fullFormUrl = `${formId}?${
     domain.titlePart === "FakeYou"
