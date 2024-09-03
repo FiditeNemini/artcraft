@@ -20,8 +20,8 @@ pub struct Args {
 // #[derive(Debug, Deserialize, Copy, Clone)]
 #[derive(ValueEnum, Clone, Copy, Debug)]
 pub enum Command {
+  CalculateLegacyTtsResultsUsages,
   CalculateModelWeightsUsages,
-  CalculateTtsResultsUsages,
 }
 
 pub fn parse_cli_args() -> AnyhowResult<Args> {

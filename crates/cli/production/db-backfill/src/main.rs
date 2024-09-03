@@ -10,6 +10,7 @@ use easyenv::init_all_with_default_logging;
 use errors::AnyhowResult;
 
 use crate::args::{Command, parse_cli_args};
+use crate::operations::calculate_legacy_tts_results_usages::calculate_legacy_tts_results_usages::calculate_legacy_tts_result_usages;
 use crate::operations::calculate_model_weights_usages::run_migration::run_migration;
 
 pub mod args;
@@ -46,7 +47,7 @@ async fn main() -> AnyhowResult<()> {
 
   match command.sub_command {
     Command::CalculateModelWeightsUsages => run_migration(mysql).await?,
-    Command::CalculateTtsResultsUsages => {}
+    Command::CalculateLegacyTtsResultsUsages => calculate_legacy_tts_result_usages(mysql).await?,
   }
 
   Ok(())
