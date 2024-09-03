@@ -20,6 +20,7 @@ pub enum InferenceJobProductCategory {
   DownloadGptSoVits,
 
   /// Lipsync: Face Fusion
+  #[deprecated(note = "Use `VidFaceFusion` instead")]
   LipsyncFaceFusion,
 
   /// Lipsync: SadTalker

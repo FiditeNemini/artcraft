@@ -62,6 +62,10 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(alias = "live_portrait")]
   LivePortrait,
 
+  #[serde(rename = "ff")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "face_fusion")]
+  FaceFusion,
+
   #[serde(rename = "fc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "format_conversion")]
   FormatConversion,

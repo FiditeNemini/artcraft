@@ -16,7 +16,7 @@ use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::inner_payloads::live_portrait_payload::{CropDimensions, LivePortraitPayload};
+use mysql_queries::payloads::generic_inference_args::inner_payloads::face_fusion_payload::{CropDimensions, FaceFusionPayload};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
@@ -38,22 +38,18 @@ use crate::state::server_state::ServerState;
 use crate::util::cleaners::empty_media_file_token_to_null::empty_media_file_token_to_null;
 
 #[derive(Deserialize, ToSchema)]
-pub struct EnqueueLivePortraitWorkflowRequest {
+pub struct EnqueueFaceFusionWorkflowRequest {
   /// Entropy for request de-duplication (required)
   uuid_idempotency_token: String,
 
-  /// Source media token
-  /// This can be an image or a video media file token
-  /// This is what constitutes the "portrait" or the overall final video.
-  /// This video or image must contain a face.
-  source_media_file_token: MediaFileToken,
+  /// Audio media token
+  /// This is the audio to lipsync against.
+  audio_media_file_token: MediaFileToken,
 
-  /// Driving media token
-  /// This must be a video media file token.
-  /// This drives the animation of the face, but the actor will disappear
-  /// and their facial expressions will be transferred to the source.
+  /// Image or video media token
+  /// This is the image or video that will be lipsynced to the audio
   /// This video must contain a face.
-  face_driver_media_file_token: MediaFileToken,
+  image_or_video_media_file_token: MediaFileToken,
 
   /// Remove watermark from the output
   /// Only for premium accounts
@@ -63,12 +59,12 @@ pub struct EnqueueLivePortraitWorkflowRequest {
   creator_set_visibility: Option<Visibility>,
 
   /// Optional crop dimensions from the top left corner.
-  maybe_crop: Option<EnqueueLivePortraitCropDimensions>,
+  maybe_crop: Option<EnqueueFaceFusionCropDimensions>,
 }
 
 // Top left corner, height  + width  of crop area
 #[derive(Deserialize, ToSchema)]
-pub struct EnqueueLivePortraitCropDimensions {
+pub struct EnqueueFaceFusionCropDimensions {
   /// X coordinate of the top left corner of the cropped area
   x: u32,
   /// Y coordinate of the top left corner of the cropped area
@@ -80,35 +76,35 @@ pub struct EnqueueLivePortraitCropDimensions {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct EnqueueLivePortraitWorkflowSuccessResponse {
+pub struct EnqueueFaceFusionWorkflowSuccessResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }
 
 #[derive(Debug, ToSchema)]
-pub enum EnqueueLivePortraitWorkflowError {
+pub enum EnqueueFaceFusionWorkflowError {
   BadInput(String),
   NotAuthorized,
   ServerError,
   RateLimited,
 }
 
-impl ResponseError for EnqueueLivePortraitWorkflowError {
+impl ResponseError for EnqueueFaceFusionWorkflowError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      EnqueueLivePortraitWorkflowError::BadInput(_) => StatusCode::BAD_REQUEST,
-      EnqueueLivePortraitWorkflowError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EnqueueLivePortraitWorkflowError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      EnqueueLivePortraitWorkflowError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      EnqueueFaceFusionWorkflowError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EnqueueFaceFusionWorkflowError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      EnqueueFaceFusionWorkflowError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EnqueueFaceFusionWorkflowError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      EnqueueLivePortraitWorkflowError::BadInput(reason) => reason.to_string(),
-      EnqueueLivePortraitWorkflowError::NotAuthorized => "unauthorized".to_string(),
-      EnqueueLivePortraitWorkflowError::ServerError => "server error".to_string(),
-      EnqueueLivePortraitWorkflowError::RateLimited => "rate limited".to_string(),
+      EnqueueFaceFusionWorkflowError::BadInput(reason) => reason.to_string(),
+      EnqueueFaceFusionWorkflowError::NotAuthorized => "unauthorized".to_string(),
+      EnqueueFaceFusionWorkflowError::ServerError => "server error".to_string(),
+      EnqueueFaceFusionWorkflowError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -116,32 +112,33 @@ impl ResponseError for EnqueueLivePortraitWorkflowError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl std::fmt::Display for EnqueueLivePortraitWorkflowError {
+impl std::fmt::Display for EnqueueFaceFusionWorkflowError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-/// Enqueue "face mirror" (Live Portrait) video workflows.
+/// Enqueue "lipsync" (Face Fusion) video workflows.
 ///
 /// We've renamed this as to not give away what we're doing to users.
 #[utoipa::path(
   post,
   tag = "Workflows",
-  path = "/v1/workflows/enqueue_face_mirror",
+  path = "/v1/workflows/enqueue_lipsync",
   responses(
-    (status = 200, description = "Success", body = EnqueueLivePortraitWorkflowSuccessResponse),
-    (status = 400, description = "Bad input", body = EnqueueLivePortraitWorkflowError),
-    (status = 401, description = "Not authorized", body = EnqueueLivePortraitWorkflowError),
-    (status = 429, description = "Rate limited", body = EnqueueLivePortraitWorkflowError),
-    (status = 500, description = "Server error", body = EnqueueLivePortraitWorkflowError)
+    (status = 200, description = "Success", body = EnqueueFaceFusionWorkflowSuccessResponse),
+    (status = 400, description = "Bad input", body = EnqueueFaceFusionWorkflowError),
+    (status = 401, description = "Not authorized", body = EnqueueFaceFusionWorkflowError),
+    (status = 429, description = "Rate limited", body = EnqueueFaceFusionWorkflowError),
+    (status = 500, description = "Server error", body = EnqueueFaceFusionWorkflowError)
   ),
-  params(("request" = EnqueueLivePortraitWorkflowRequest, description = "Payload for request"))
+  params(("request" = EnqueueFaceFusionWorkflowRequest, description = "Payload for request"))
 )]
-pub async fn enqueue_live_portrait_workflow_handler(
+pub async fn enqueue_face_fusion_workflow_handler(
   http_request: HttpRequest,
-  request: Json<EnqueueLivePortraitWorkflowRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<Json<EnqueueLivePortraitWorkflowSuccessResponse>, EnqueueLivePortraitWorkflowError>
+  request: Json<EnqueueFaceFusionWorkflowRequest>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<EnqueueFaceFusionWorkflowSuccessResponse>, EnqueueFaceFusionWorkflowError>
 {
   // ==================== DB ==================== //
 
@@ -150,7 +147,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        EnqueueLivePortraitWorkflowError::ServerError
+        EnqueueFaceFusionWorkflowError::ServerError
       })?;
 
   // ==================== USER SESSION ==================== //
@@ -164,8 +161,8 @@ pub async fn enqueue_live_portrait_workflow_handler(
     &mut mysql_connection)
       .await
       .map_err(|err| match err {
-        RequireUserSessionError::ServerError => EnqueueLivePortraitWorkflowError::ServerError,
-        RequireUserSessionError::NotAuthorized => EnqueueLivePortraitWorkflowError::NotAuthorized,
+        RequireUserSessionError::ServerError => EnqueueFaceFusionWorkflowError::ServerError,
+        RequireUserSessionError::NotAuthorized => EnqueueFaceFusionWorkflowError::NotAuthorized,
       })?;
 
   // ==================== PAID PLAN + PRIORITY ==================== //
@@ -187,20 +184,20 @@ pub async fn enqueue_live_portrait_workflow_handler(
   // ==================== RATE LIMIT ==================== //
 
   if let Err(_err) = server_state.redis_rate_limiters.logged_in.rate_limit_request(&http_request) {
-    return Err(EnqueueLivePortraitWorkflowError::RateLimited);
+    return Err(EnqueueFaceFusionWorkflowError::RateLimited);
   }
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
-    return Err(EnqueueLivePortraitWorkflowError::BadInput(reason));
+    return Err(EnqueueFaceFusionWorkflowError::BadInput(reason));
   }
 
   insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        EnqueueLivePortraitWorkflowError::BadInput("invalid idempotency token".to_string())
+        EnqueueFaceFusionWorkflowError::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== HANDLE REQUEST ==================== //
@@ -239,12 +236,11 @@ pub async fn enqueue_live_portrait_workflow_handler(
     watermark_type = None;
   }
 
-  let payload = LivePortraitPayload {
-    portrait_media_file_token: empty_media_file_token_to_null(Some(&request.source_media_file_token)),
-    driver_media_file_token: empty_media_file_token_to_null(Some(&request.face_driver_media_file_token)),
+  let payload = FaceFusionPayload {
+    audio_media_file_token: empty_media_file_token_to_null(Some(&request.audio_media_file_token)),
+    image_or_video_media_file_token: empty_media_file_token_to_null(Some(&request.image_or_video_media_file_token)),
     crop: maybe_crop,
     watermark_type,
-    remove_watermark: None,
     sleep_millis: None,
   };
 
@@ -252,9 +248,9 @@ pub async fn enqueue_live_portrait_workflow_handler(
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    job_type: InferenceJobType::LivePortrait,
-    maybe_product_category: Some(InferenceJobProductCategory::LivePortrait),
-    inference_category: InferenceCategory::LivePortrait,
+    job_type: InferenceJobType::FaceFusion,
+    maybe_product_category: Some(InferenceJobProductCategory::VidFaceFusion),
+    inference_category: InferenceCategory::DeprecatedField,
     maybe_model_type: None,
     maybe_model_token: None,
     maybe_input_source_token: None,
@@ -264,8 +260,8 @@ pub async fn enqueue_live_portrait_workflow_handler(
     maybe_raw_inference_text: None,
     maybe_max_duration_seconds: None,
     maybe_inference_args: Some(GenericInferenceArgs {
-      inference_category: Some(InferenceCategoryAbbreviated::LivePortrait),
-      args: Some(PolymorphicInferenceArgs::Lp(payload)),
+      inference_category: Some(InferenceCategoryAbbreviated::FaceFusion),
+      args: Some(PolymorphicInferenceArgs::Ff(payload)),
     }),
     maybe_creator_user_token: Some(&user_session.user_token_typed),
     maybe_avt_token: maybe_avt_token.as_ref(),
@@ -283,13 +279,13 @@ pub async fn enqueue_live_portrait_workflow_handler(
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
       if err.had_duplicate_idempotency_token() {
-        return Err(EnqueueLivePortraitWorkflowError::BadInput("Duplicate idempotency token".to_string()));
+        return Err(EnqueueFaceFusionWorkflowError::BadInput("Duplicate idempotency token".to_string()));
       }
-      return Err(EnqueueLivePortraitWorkflowError::ServerError);
+      return Err(EnqueueFaceFusionWorkflowError::ServerError);
     }
   };
 
-  Ok(Json(EnqueueLivePortraitWorkflowSuccessResponse {
+  Ok(Json(EnqueueFaceFusionWorkflowSuccessResponse {
     success: true,
     inference_job_token: job_token,
   }))

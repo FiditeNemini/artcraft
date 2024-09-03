@@ -3,6 +3,7 @@ use actix_service::ServiceFactory;
 use actix_web::{App, Error, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 
+use crate::http_server::endpoints::workflows::enqueue::enqueue_face_fusion_workflow_handler::enqueue_face_fusion_workflow_handler;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_live_portrait_workflow_handler::enqueue_live_portrait_workflow_handler;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_studio_workflow_handler::enqueue_studio_workflow_handler;
 use crate::http_server::endpoints::workflows::enqueue::enqueue_video_style_transfer_workflow_handler::enqueue_video_style_transfer_workflow_handler;
@@ -28,6 +29,10 @@ where
       )
       .service(web::resource("/enqueue_face_mirror")
           .route(web::post().to(enqueue_live_portrait_workflow_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/enqueue_lipsync")
+          .route(web::post().to(enqueue_face_fusion_workflow_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/enqueue_studio")
