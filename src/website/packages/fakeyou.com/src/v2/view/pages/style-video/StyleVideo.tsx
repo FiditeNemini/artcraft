@@ -20,7 +20,7 @@ import {
   EnqueueVSTResponse,
 } from "@storyteller/components/src/api/workflows/EnqueueVST";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
-import { useHistory, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { STYLE_OPTIONS, STYLES_BY_KEY } from "common/StyleOptions";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { StyleSelectionButton } from "./StyleSelection/StyleSelectionButton";
@@ -30,7 +30,7 @@ import { isMobile } from "react-device-detect";
 import { AITools } from "components/marketing";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/pro-solid-svg-icons";
-import { Link } from "react-router-dom";
+import PremiumLock from "components/PremiumLock";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -52,9 +52,6 @@ export default function StyleVideo() {
   const { open, modalOpen } = useModal();
   const history = useHistory();
   const [enableSignUpBlock] = useState(false);
-  const proOrElite =
-    sessionSubscriptions?.hasActiveProSubscription() ||
-    sessionSubscriptions?.hasActiveEliteSubscription();
 
   const openStyleSelection = () =>
     open({
@@ -105,9 +102,9 @@ export default function StyleVideo() {
           } else {
             // @ts-ignore
             window.dataLayer.push({
-              "event": "enqueue_failure",
-              "page": "/style-video",
-              "user_id": "$user_id"
+              event: "enqueue_failure",
+              page: "/style-video",
+              user_id: "$user_id",
             });
             console.log("Failed to enqueue job", res);
           }
@@ -120,9 +117,13 @@ export default function StyleVideo() {
 
   const lengthOptions = [
     { label: "3 seconds", value: 3000 },
-    { disabled: !proOrElite, label: "5 seconds", value: 5000 },
-    { disabled: !proOrElite, label: "7 seconds", value: 7000 },
+    { label: "5 seconds", value: 5000 },
+    { label: "7 seconds", value: 7000 },
   ];
+
+  const proOrElite =
+    sessionSubscriptions?.hasActiveProSubscription() ||
+    sessionSubscriptions?.hasActiveEliteSubscription();
 
   const onPromptUpdate = (prompt: Prompt | null) => {
     promptSet(prompt?.maybe_positive_prompt || "");
@@ -487,26 +488,37 @@ export default function StyleVideo() {
                 </div>
 
                 <div className="mt-3">
-                  <SegmentButtons
-                    {...{
-                      className: "fy-style-video-length mb-1",
-                      label: "Video Duration",
-                      onChange: ({ target }: { target: any }) => {
-                        lengthSet(target.value);
-                      },
-                      options: lengthOptions,
-                      value: length,
-                      highlight: true,
-                    }}
-                  />
-                  <Link
-                    {...{
-                      className: "fs-7 lh-1",
-                      to: "/pricing",
-                    }}
-                  >
-                    Subscribe to Pro or Elite for 5 or 7 second videos
-                  </Link>
+                  {sessionSubscriptions && (
+                    <PremiumLock
+                      sessionSubscriptionsWrapper={sessionSubscriptions}
+                      requiredPlan="pro"
+                      lockPosition="top"
+                    >
+                      <SegmentButtons
+                        {...{
+                          className: "fy-style-video-length",
+                          label: "Video Duration",
+                          onChange: ({ target }: { target: any }) => {
+                            lengthSet(target.value);
+                          },
+                          options: lengthOptions,
+                          value: length,
+                          highlight: true,
+                        }}
+                      />
+                    </PremiumLock>
+                  )}
+
+                  {!proOrElite && (
+                    <Link
+                      {...{
+                        className: "d-flex fs-7 lh-1 pt-3",
+                        to: "/pricing",
+                      }}
+                    >
+                      Subscribe to Pro or Elite for 5 or 7 second videos
+                    </Link>
+                  )}
                 </div>
               </div>
             </Panel>

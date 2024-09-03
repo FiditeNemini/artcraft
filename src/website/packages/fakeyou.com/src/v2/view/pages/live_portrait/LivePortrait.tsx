@@ -22,7 +22,6 @@ import {
   faLock,
   faPlus,
   faSparkles,
-  faStars,
 } from "@fortawesome/pro-solid-svg-icons";
 import "./LivePortrait.scss";
 import ThumbnailMediaPicker from "./ThumbnailMediaPicker";
@@ -53,6 +52,7 @@ import MotionEntityInput from "./MotionEntityInput";
 import OutputThumbnailImage from "./OutputThumbnailImage";
 import { useHistory } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
+import PremiumLock from "components/PremiumLock";
 
 interface LivePortraitProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -110,7 +110,6 @@ export default function LivePortrait({
     x: 0,
     y: 0,
   });
-  const hasPremium = sessionSubscriptionsWrapper.hasPaidFeatures();
   const [generatedVideoSrc, setGeneratedVideoSrc] = useState("");
   const [sourceTokens, setSourceTokens] = useState<string[]>([
     ...PRECOMPUTED_SOURCE_TOKENS,
@@ -992,31 +991,40 @@ export default function LivePortrait({
                   </div>
 
                   <div className="d-flex flex-column gap-2">
-                    <div className="d-flex gap-3">
-                      <Checkbox
-                        disabled={!hasPremium}
-                        label={"Make Private"}
-                        onChange={() => {
-                          setVisibility(prevVisibility =>
-                            prevVisibility === "private" ? "public" : "private"
-                          );
-                        }}
-                        checked={visibility === "private"}
-                      />
+                    <PremiumLock
+                      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                      lockPosition="top"
+                      requiredPlan="pro"
+                      plural={true}
+                    >
+                      <div className="d-flex gap-3">
+                        <Checkbox
+                          label={"Make Private"}
+                          onChange={() => {
+                            setVisibility(prevVisibility =>
+                              prevVisibility === "private"
+                                ? "public"
+                                : "private"
+                            );
+                          }}
+                          checked={visibility === "private"}
+                          className="mb-0"
+                        />
 
-                      <Checkbox
-                        disabled={!hasPremium}
-                        label={"Remove Watermark"}
-                        onChange={() => {
-                          setRemoveWatermark(
-                            prevRemoveWatermark => !prevRemoveWatermark
-                          );
-                        }}
-                        checked={removeWatermark}
-                      />
-                    </div>
+                        <Checkbox
+                          label={"Remove Watermark"}
+                          onChange={() => {
+                            setRemoveWatermark(
+                              prevRemoveWatermark => !prevRemoveWatermark
+                            );
+                          }}
+                          checked={removeWatermark}
+                          className="mb-0"
+                        />
+                      </div>
+                    </PremiumLock>
 
-                    {!hasPremium && (
+                    {/* {!hasPremium && ( 
                       <div className="d-flex">
                         <Button
                           variant="link"
@@ -1025,7 +1033,7 @@ export default function LivePortrait({
                           to="/pricing"
                         />
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>

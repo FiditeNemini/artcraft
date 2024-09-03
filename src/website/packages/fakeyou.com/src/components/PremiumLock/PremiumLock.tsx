@@ -13,6 +13,8 @@ interface PremiumLockProps {
   session?: any;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   showCtaButton?: boolean;
+  lockPosition?: "top" | "center";
+  plural?: boolean;
 }
 
 export default function PremiumLock({
@@ -21,6 +23,8 @@ export default function PremiumLock({
   sessionSubscriptionsWrapper,
   showCtaButton = false,
   large = false,
+  lockPosition = "center",
+  plural = false,
 }: PremiumLockProps) {
   const hasAccess = () => {
     switch (requiredPlan) {
@@ -50,40 +54,92 @@ export default function PremiumLock({
         children
       ) : (
         <Panel className="fy-premium-lock rounded px-3 py-4">
-          {children}
-          <div className="overlay">
-            <div className="d-flex flex-column align-items-center gap-2 text-center">
-              <FontAwesomeIcon
-                icon={faLock}
-                className={`me-2 ${large ? "fs-4" : "fs-5"}`}
-              />
-              {requiredPlan === "any" ? (
-                <span className={`${large ? "lead fw-medium" : ""}`}>
-                  This feature requires a{" "}
-                  <Link
-                    to="/pricing"
-                    className={`${large ? "lead fw-medium" : ""}`}
-                  >
-                    subscription plan.
-                  </Link>
-                </span>
-              ) : (
-                <span>
-                  This feature requires a{" "}
-                  <Link to="/pricing">{requiredPlan} subscription</Link>
-                </span>
-              )}
-
-              {showCtaButton && (
-                <Button
-                  variant="primary"
-                  label="Upgrade your account"
-                  icon={faUp}
-                  to="/pricing"
-                  className="mt-2"
+          {lockPosition === "center" && children}
+          {lockPosition === "top" && (
+            <div className="mt-5 mb-0">{children}</div>
+          )}
+          <div
+            className={`overlay ${
+              lockPosition === "top"
+                ? "align-items-start justify-content-start pt-3"
+                : ""
+            }`}
+          >
+            {lockPosition === "center" ? (
+              <div className="d-flex flex-column align-items-center gap-2 text-center">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className={`me-2 ${large ? "fs-4" : "fs-5"}`}
                 />
-              )}
-            </div>
+                {requiredPlan === "any" ? (
+                  <span className={`${large ? "lead fw-medium" : ""}`}>
+                    {plural
+                      ? "These features require a"
+                      : "This feature requires a"}{" "}
+                    <Link
+                      to="/pricing"
+                      className={`${large ? "lead fw-medium" : ""}`}
+                    >
+                      subscription plan
+                    </Link>
+                  </span>
+                ) : (
+                  <span>
+                    {plural
+                      ? "These features require a"
+                      : "This feature requires a"}{" "}
+                    <Link to="/pricing">{requiredPlan} plan</Link>
+                  </span>
+                )}
+
+                {showCtaButton && (
+                  <Button
+                    variant="primary"
+                    label="Upgrade your account"
+                    icon={faUp}
+                    to="/pricing"
+                    className="mt-2"
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="d-flex align-items-center gap-2 text-start justify-content-center">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className={`me-1 ${large ? "fs-4" : "fs-7"}`}
+                />
+                {requiredPlan === "any" ? (
+                  <span className={`${large ? "lead fw-medium" : ""}`}>
+                    {plural
+                      ? "These features require a"
+                      : "This feature requires a"}{" "}
+                    <Link
+                      to="/pricing"
+                      className={`${large ? "lead fw-medium" : ""}`}
+                    >
+                      subscription plan
+                    </Link>
+                  </span>
+                ) : (
+                  <span>
+                    <Link className="fw-medium" to="/pricing">
+                      Upgrade to {requiredPlan}
+                    </Link>{" "}
+                    {plural ? "to use these features" : "to use this feature"}
+                  </span>
+                )}
+
+                {showCtaButton && (
+                  <Button
+                    variant="primary"
+                    label="Upgrade your account"
+                    icon={faUp}
+                    to="/pricing"
+                    className="mt-2"
+                  />
+                )}
+              </div>
+            )}
           </div>
         </Panel>
       )}

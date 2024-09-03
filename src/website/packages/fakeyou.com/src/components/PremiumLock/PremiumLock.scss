@@ -5,27 +5,26 @@
   background-color: $panel-inner;
   pointer-events: none;
   overflow: hidden;
-  box-shadow: none !important;
+  border-radius: 0.5rem;
+  padding: 1rem;
 
   .overlay {
     position: absolute;
-    z-index: 5;
+    z-index: 10;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba($panel, 0.8);
+    background-color: rgba($panel-inner, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: rgba($white, 0.8);
-    font-size: 16px;
+    color: rgba($white, 0.9);
+    font-size: 15px;
+    font-weight: 500;
     pointer-events: all;
-    border: 1px solid rgba($primary, 0.4);
+    border: 2px solid rgba($primary, 0.4);
     border-radius: 0.5rem;
-
-    span {
-      text-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-    }
+    padding-left: 1rem;
   }
 }
