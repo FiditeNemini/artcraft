@@ -27,6 +27,10 @@ pub enum MediaFileOriginProductCategory {
   #[serde(rename = "face_animator")]
   FaceAnimator,
 
+  /// Media files created by Face Fusion (lipsync)
+  #[serde(rename = "face_fusion")]
+  FaceFusion,
+
   /// Media files created by Face Mirror (currently powered by Live Portrait)
   #[serde(rename = "face_mirror")]
   FaceMirror,
@@ -80,6 +84,7 @@ impl MediaFileOriginProductCategory {
     match self {
       Self::Unknown => "unknown",
       Self::FaceAnimator => "face_animator",
+      Self::FaceFusion => "face_fusion",
       Self::FaceMirror => "face_mirror",
       Self::VideoStyleTransfer => "vst",
       Self::StorytellerStudio => "studio",
@@ -97,6 +102,7 @@ impl MediaFileOriginProductCategory {
     match value {
       "unknown" => Ok(Self::Unknown),
       "face_animator" => Ok(Self::FaceAnimator),
+      "face_fusion" => Ok(Self::FaceFusion),
       "face_mirror" => Ok(Self::FaceMirror),
       "vst" => Ok(Self::VideoStyleTransfer),
       "studio" => Ok(Self::StorytellerStudio),
@@ -117,6 +123,7 @@ impl MediaFileOriginProductCategory {
     BTreeSet::from([
       Self::Unknown,
       Self::FaceAnimator,
+      Self::FaceFusion,
       Self::FaceMirror,
       Self::VideoStyleTransfer,
       Self::StorytellerStudio,
@@ -143,6 +150,7 @@ mod tests {
     fn test_serialization() {
       assert_serialization(MediaFileOriginProductCategory::Unknown, "unknown");
       assert_serialization(MediaFileOriginProductCategory::FaceAnimator, "face_animator");
+      assert_serialization(MediaFileOriginProductCategory::FaceFusion, "face_fusion");
       assert_serialization(MediaFileOriginProductCategory::FaceMirror, "face_mirror");
       assert_serialization(MediaFileOriginProductCategory::VideoStyleTransfer, "vst");
       assert_serialization(MediaFileOriginProductCategory::StorytellerStudio, "studio");
@@ -159,6 +167,7 @@ mod tests {
     fn to_str() {
       assert_eq!(MediaFileOriginProductCategory::Unknown.to_str(), "unknown");
       assert_eq!(MediaFileOriginProductCategory::FaceAnimator.to_str(), "face_animator");
+      assert_eq!(MediaFileOriginProductCategory::FaceFusion.to_str(), "face_fusion");
       assert_eq!(MediaFileOriginProductCategory::FaceMirror.to_str(), "face_mirror");
       assert_eq!(MediaFileOriginProductCategory::VideoStyleTransfer.to_str(), "vst");
       assert_eq!(MediaFileOriginProductCategory::StorytellerStudio.to_str(), "studio");
@@ -175,6 +184,7 @@ mod tests {
     fn from_str() {
       assert_eq!(MediaFileOriginProductCategory::from_str("unknown").unwrap(), MediaFileOriginProductCategory::Unknown);
       assert_eq!(MediaFileOriginProductCategory::from_str("face_animator").unwrap(), MediaFileOriginProductCategory::FaceAnimator);
+      assert_eq!(MediaFileOriginProductCategory::from_str("face_fusion").unwrap(), MediaFileOriginProductCategory::FaceFusion);
       assert_eq!(MediaFileOriginProductCategory::from_str("face_mirror").unwrap(), MediaFileOriginProductCategory::FaceMirror);
       assert_eq!(MediaFileOriginProductCategory::from_str("vst").unwrap(), MediaFileOriginProductCategory::VideoStyleTransfer);
       assert_eq!(MediaFileOriginProductCategory::from_str("studio").unwrap(), MediaFileOriginProductCategory::StorytellerStudio);
@@ -190,9 +200,10 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginProductCategory::all_variants();
-      assert_eq!(variants.len(), 12);
+      assert_eq!(variants.len(), 13);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Unknown));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::FaceAnimator));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::FaceFusion));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::FaceMirror));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::VideoStyleTransfer));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::StorytellerStudio));

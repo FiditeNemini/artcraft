@@ -24,6 +24,10 @@ pub enum InferenceJobType {
   /// These run in Comfy.
   LivePortrait,
 
+  /// Face Fusion Jobs.
+  /// These run in Comfy.
+  FaceFusion,
+
   /// Voice jobs that use GPT-Sovits
   GptSovits,
 
@@ -88,6 +92,7 @@ impl InferenceJobType {
     match self {
       Self::VideoRender => "video_render",
       Self::LivePortrait => "live_portrait",
+      Self::FaceFusion => "face_fusion",
       Self::GptSovits => "gpt_sovits",
       Self::ComfyUi => "comfy_ui",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
@@ -108,6 +113,7 @@ impl InferenceJobType {
     match value {
       "video_render" => Ok(Self::VideoRender),
       "live_portrait" => Ok(Self::LivePortrait),
+      "face_fusion" => Ok(Self::FaceFusion),
       "gpt_sovits" => Ok(Self::GptSovits),
       "comfy_ui" => Ok(Self::ComfyUi),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
@@ -131,6 +137,7 @@ impl InferenceJobType {
     BTreeSet::from([
       Self::VideoRender,
       Self::LivePortrait,
+      Self::FaceFusion,
       Self::GptSovits,
       Self::ComfyUi,
       Self::ConvertFbxToGltf,
@@ -165,6 +172,7 @@ mod tests {
     fn test_serialization() {
       assert_serialization(InferenceJobType::VideoRender, "video_render");
       assert_serialization(InferenceJobType::LivePortrait, "live_portrait");
+      assert_serialization(InferenceJobType::FaceFusion, "face_fusion");
       assert_serialization(InferenceJobType::GptSovits, "gpt_sovits");
       assert_serialization(InferenceJobType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceJobType::ConvertFbxToGltf, "convert_fbx_gltf");
@@ -184,6 +192,7 @@ mod tests {
     fn to_str() {
       assert_eq!(InferenceJobType::VideoRender.to_str(), "video_render");
       assert_eq!(InferenceJobType::LivePortrait.to_str(), "live_portrait");
+      assert_eq!(InferenceJobType::FaceFusion.to_str(), "face_fusion");
       assert_eq!(InferenceJobType::GptSovits.to_str(), "gpt_sovits");
       assert_eq!(InferenceJobType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceJobType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
@@ -203,6 +212,7 @@ mod tests {
     fn from_str() {
       assert_eq!(InferenceJobType::from_str("video_render").unwrap(), InferenceJobType::VideoRender);
       assert_eq!(InferenceJobType::from_str("live_portrait").unwrap(), InferenceJobType::LivePortrait);
+      assert_eq!(InferenceJobType::from_str("face_fusion").unwrap(), InferenceJobType::FaceFusion);
       assert_eq!(InferenceJobType::from_str("gpt_sovits").unwrap(), InferenceJobType::GptSovits);
       assert_eq!(InferenceJobType::from_str("comfy_ui").unwrap(), InferenceJobType::ComfyUi);
       assert_eq!(InferenceJobType::from_str("convert_fbx_gltf").unwrap(), InferenceJobType::ConvertFbxToGltf);
@@ -222,9 +232,10 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobType::all_variants();
-      assert_eq!(variants.len(), 15);
+      assert_eq!(variants.len(), 16);
       assert_eq!(variants.pop_first(), Some(InferenceJobType::VideoRender));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::LivePortrait));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::FaceFusion));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::GptSovits));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ConvertFbxToGltf));

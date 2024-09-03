@@ -1,5 +1,6 @@
 use errors::AnyhowResult;
 
+use crate::payloads::generic_inference_args::inner_payloads::face_fusion_payload::FaceFusionPayload;
 use crate::payloads::generic_inference_args::inner_payloads::gptsovits_payload::GptSovitsPayload;
 use crate::payloads::generic_inference_args::inner_payloads::image_generation_payload::StableDiffusionArgs;
 use crate::payloads::generic_inference_args::inner_payloads::lipsync_payload::LipsyncArgs;
@@ -136,6 +137,9 @@ pub enum PolymorphicInferenceArgs {
 
   /// ComfyUI (Short name to save space when serializing.)
   Lp(LivePortraitPayload),
+
+  /// Face Fusion
+  Ff(FaceFusionPayload),
 
   /// Render engine scene to video args
   Es(RenderEngineSceneToVideoArgs),

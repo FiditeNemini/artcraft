@@ -10,9 +10,9 @@ use buckets::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePat
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
-use filesys::file_size::file_size;
 use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
 use filesys::file_deletion::safe_delete_file::safe_delete_file;
+use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use migration::voice_conversion::query_vc_model_for_migration::VcModel;
@@ -251,31 +251,15 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   let maybe_override_f0_method = maybe_args
       .map(|args| match args {
-        PolymorphicInferenceArgs::Tts { .. } => None,
-        PolymorphicInferenceArgs::La(_) => None,
         PolymorphicInferenceArgs::Vc { override_f0_method, .. } => *override_f0_method,
-        PolymorphicInferenceArgs::Rr(_) => None,
-        PolymorphicInferenceArgs::Ig(_) => None,
-        PolymorphicInferenceArgs::Mc(_) => None,
-        PolymorphicInferenceArgs::Cu(_) => None,
-        PolymorphicInferenceArgs::Es(_) => None,
-        PolymorphicInferenceArgs::Lp(_) => None,
-        PolymorphicInferenceArgs::Gs(_) => None,
+        _ => None,
       })
       .flatten();
 
   let maybe_f0_up_key = maybe_args
       .map(|args| match args {
-        PolymorphicInferenceArgs::Tts { .. } => None,
-        PolymorphicInferenceArgs::La(_) => None,
         PolymorphicInferenceArgs::Vc { transpose, .. } => *transpose,
-        PolymorphicInferenceArgs::Rr(_) => None,
-        PolymorphicInferenceArgs::Ig(_) => None,
-        PolymorphicInferenceArgs::Mc(_) => None,
-        PolymorphicInferenceArgs::Cu(_) => None,
-        PolymorphicInferenceArgs::Es(_) => None,
-        PolymorphicInferenceArgs::Lp(_) => None,
-        PolymorphicInferenceArgs::Gs(_) => None,
+        _ => None,
       })
       .flatten();
 

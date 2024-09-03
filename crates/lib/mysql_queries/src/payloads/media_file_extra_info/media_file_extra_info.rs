@@ -2,12 +2,18 @@ use anyhow::bail;
 
 use errors::AnyhowResult;
 
+use crate::payloads::media_file_extra_info::inner_payloads::face_fusion_video_extra_info::FaceFusionVideoExtraInfo;
 use crate::payloads::media_file_extra_info::inner_payloads::live_portrait_video_extra_info::LivePortraitVideoExtraInfo;
 use crate::payloads::media_file_extra_info::inner_payloads::stable_diffusion_extra_info::StableDiffusionExtraInfo;
 
 /// For things that don't fit in the schema
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum MediaFileExtraInfo {
+  /// Face Fusion Video
+  /// NB: Enum variant is short to conserve DB space.
+  /// NB: DO NOT CHANGE. It could break live jobs.
+  F(FaceFusionVideoExtraInfo),
+
   /// Live Portrait Video
   /// NB: Enum variant is short to conserve DB space.
   /// NB: DO NOT CHANGE. It could break live jobs.

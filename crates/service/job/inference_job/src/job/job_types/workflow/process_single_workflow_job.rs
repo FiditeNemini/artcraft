@@ -3,6 +3,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
 use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::process_live_portrait_job;
 use crate::job::job_types::workflow::upload_workflow::process_upload_workflow_job::process_upload_workflow_job;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
@@ -18,6 +19,10 @@ pub async fn process_single_workflow_job(
   match job.job_type {
     InferenceJobType::LivePortrait => {
       let job_success_result = process_live_portrait_job(job_dependencies, job).await?;
+      return Ok(job_success_result);
+    }
+    InferenceJobType::FaceFusion => {
+      let job_success_result = process_face_fusion_job(job_dependencies, job).await?;
       return Ok(job_success_result);
     }
     _ => {} // Fall through

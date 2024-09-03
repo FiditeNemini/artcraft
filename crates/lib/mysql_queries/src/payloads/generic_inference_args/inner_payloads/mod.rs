@@ -1,3 +1,4 @@
+pub mod face_fusion_payload;
 pub mod gptsovits_payload;
 pub mod image_generation_payload;
 pub mod lipsync_payload;

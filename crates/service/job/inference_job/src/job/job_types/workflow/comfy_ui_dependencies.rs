@@ -5,7 +5,7 @@ use reqwest::StatusCode;
 use tokio::process::Command;
 use tokio::time::sleep;
 
-use easyenv::{get_env_pathbuf_required, get_env_string_optional};
+use easyenv::get_env_string_optional;
 use errors::AnyhowResult;
 
 use crate::job::job_types::workflow::comfy_ui_inference_command::ComfyInferenceCommand;
