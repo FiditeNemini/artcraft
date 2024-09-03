@@ -8,6 +8,7 @@ import { faStar } from "@fortawesome/pro-solid-svg-icons";
 interface Props {
   canHover?: boolean;
   card: React.ElementType;
+
   data: any;
   onClick?: (e: any) => any;
   padding?: boolean;
@@ -25,7 +26,7 @@ export default function CardWrapper({
   padding,
   source = "",
   type,
-  featured = true,
+  featured,
   ...rest
 }: Props) {
   const linkUrl = getCardUrl(data, source, type);
