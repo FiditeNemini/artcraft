@@ -132,6 +132,7 @@ import SignUpSuccessPage from "./pages/beta_key/SignUpSuccessPage";
 import { StudioMobileCheckPage } from "./pages/landing/storyteller/PostlaunchLanding/StudioMobileCheckPage";
 import { UploadNewTtsModelPage } from "./pages/upload/UploadNewTtsModelPage";
 import LivePortrait from "./pages/live_portrait/LivePortrait";
+import CameraLivePortrait from "./pages/live_portrait/CameraLivePortrait";
 import { BetaLipSyncForm } from "./pages/beta_products/BetaLipSyncForm";
 import { BetaLipSyncPage } from "./pages/beta_products/BetaLipSyncPage";
 import { ToolsTestPage } from "./pages/tools_test/ToolsTestPage";
@@ -760,6 +761,10 @@ class PageContainer extends React.Component<
                       this.props.sessionSubscriptionsWrapper
                     }
                   />
+                </Route>
+
+                <Route exact path="/webcam-acting">
+                  <CameraLivePortrait />
                 </Route>
 
                 {/* Route for initial voice creation */}

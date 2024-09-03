@@ -7,6 +7,7 @@ import BasicTabs from "./BasicTabs";
 import BookmarkButton from "./BookmarkButton";
 import Button from "./Button";
 import ButtonRevertToDefault from "./ButtonRevertToDefault";
+import CameraInput, { CameraInputEvent } from "./CameraInput";
 import Checkbox from "./Checkbox";
 import { MediaCards, SkeletonCard, WeightsCards } from "./Card";
 import Container from "./Container";
@@ -21,6 +22,7 @@ import FileLabel from "./FileLabel";
 import ImageInput from "./ImageInput";
 import Input from "./Input";
 import InputSeed from "./InputSeed";
+import InputDescription from "./InputDescription";
 import JobsClearButton from "./JobsClearButton";
 import JobQueueTicker from "./JobQueueTicker";
 import Label from "./Label";
@@ -35,6 +37,10 @@ import NumberSliderV2 from "./NumberSliderV2";
 import Pagination from "./Pagination";
 import Panel from "./Panel";
 import Radio from "./Radio";
+import RecordToggle, {
+  RecordToggleEvent,
+  RecordToggleProps,
+} from "./RecordToggle";
 import Scene3D from "./Scene3D/Scene3D";
 import Searcher from "./Searcher";
 import SegmentButtons from "./SegmentButtons";
@@ -72,6 +78,7 @@ export {
   BasicTabs,
   BookmarkButton,
   Button,
+  CameraInput,
   //Cards
   DeviceNotSupported,
   DropdownOptions,
@@ -90,6 +97,7 @@ export {
   FileLabel,
   ImageInput,
   Input,
+  InputDescription,
   InputSeed,
   JobsClearButton,
   JobQueueTicker,
@@ -106,6 +114,7 @@ export {
   Pagination,
   Panel,
   Radio,
+  RecordToggle,
   Scene3D,
   SegmentButtons,
   Searcher,
@@ -137,7 +146,10 @@ export {
 
 export type {
   ActionButtonProps,
+  CameraInputEvent,
   ModalUtilities,
+  RecordToggleEvent,
+  RecordToggleProps,
   SelectModalData,
   Socials,
   ZoomSliderOnChangeEvent,

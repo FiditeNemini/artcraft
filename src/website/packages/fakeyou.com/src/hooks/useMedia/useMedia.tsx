@@ -9,6 +9,7 @@ import {
 } from "@storyteller/components/src/api/prompts/GetPrompts";
 import { DeleteMedia } from "@storyteller/components/src/api/media_files/DeleteMedia";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 export default function useMedia({
   debug = "",
@@ -40,6 +41,12 @@ export default function useMedia({
   const busy =
     status === FetchStatus.in_progress ||
     writeStatus === FetchStatus.in_progress;
+
+  // const bucketConfig = new BucketConfig();
+
+  const bucketUrl = media?.public_bucket_path
+    ? new BucketConfig().getGcsUrl(media.public_bucket_path)
+    : "";
 
   useEffect(() => {
     // this condidition handles all media file fetches
@@ -80,6 +87,7 @@ export default function useMedia({
 
   return {
     busy,
+    bucketUrl,
     media,
     mediaFile: media,
     mediaSet,
