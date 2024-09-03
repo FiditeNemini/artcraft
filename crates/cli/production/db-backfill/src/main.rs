@@ -15,8 +15,8 @@ use crate::operations::calculate_model_weights_usages::run_migration::run_migrat
 pub mod args;
 pub mod operations;
 
-//#[tokio::main]
-#[tokio::main(flavor = "multi_thread", worker_threads = 16)]
+//#[tokio::main(flavor = "multi_thread", worker_threads = 16)]
+#[tokio::main]
 async fn main() -> AnyhowResult<()> {
   println!("db-backfill: run backfill or migration operations");
 

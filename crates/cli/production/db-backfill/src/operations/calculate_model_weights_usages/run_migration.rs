@@ -18,6 +18,7 @@ use mysql_queries::queries::model_weights::list::list_all_model_weight_tokens_fo
 use mysql_queries::queries::model_weights::list::list_model_weight_tokens_updated_since::list_model_weight_tokens_updated_since;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+
 use crate::operations::calculate_model_weights_usages::run_migration_old::ModelInfo;
 use crate::operations::calculate_model_weights_usages::sub_args::{parse_cli_sub_args, SubArgs};
 
@@ -47,7 +48,8 @@ pub async fn run_migration(mysql: Pool<MySql>) -> AnyhowResult<()> {
       if usage.record_count == 0 {
         continue;
       }
-      info!("Date: {} Token: {} Uses: {} (query duration sec: {})", date, usage.token.as_str(), usage.record_count, start.elapsed().as_secs());
+
+      info!("Date: {} Token: {} Uses: {} (batch elapsed: {} seconds)", date, usage.token.as_str(), usage.record_count, start.elapsed().as_secs());
 
       upsert_model_weight_usage_count_for_date(Args {
         model_token: &usage.token,
