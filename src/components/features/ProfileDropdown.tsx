@@ -1,20 +1,13 @@
-import { Fragment } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCaretDown,
+  faChevronDown,
   faRightFromBracket,
   faUser,
 } from "@fortawesome/pro-thin-svg-icons";
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from "@headlessui/react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Gravatar } from "../ui/Gravatar";
-import { twMerge } from "tailwind-merge";
 
 import { authentication } from "~/signals";
 
@@ -48,8 +41,10 @@ export function ProfileDropdown() {
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        as="div"
-        className="group flex size-12 cursor-pointer items-center gap-1.5 transition-opacity duration-150 hover:opacity-90"
+        className={twMerge(
+          "flex size-12 cursor-pointer items-center gap-1.5",
+          "data-[hover]:opacity-70",
+        )}
       >
         <Gravatar
           size={34}
@@ -58,48 +53,47 @@ export function ProfileDropdown() {
           avatarIndex={avatarIndex}
           backgroundIndex={backgroundColorIndex}
         />
-        <FontAwesomeIcon icon={faCaretDown} />
+
+        <FontAwesomeIcon icon={faChevronDown} />
       </MenuButton>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
+      <MenuItems
+        anchor="bottom end"
+        transition
+        className={twMerge(
+          "rounded-lg border border-ui-border bg-ui-panel",
+          "flex w-fit flex-col py-2 focus:outline-none",
+          "transition duration-150 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
+        )}
       >
-        <div className="absolute -right-2 mt-2.5 w-fit rounded-xl border border-ui-border bg-ui-panel shadow-lg">
-          <MenuItems static className="flex flex-col py-2 focus:outline-none">
-            <MenuItem key={0}>
-              {() => (
-                <a
-                  className="duration-50 group flex w-full items-center gap-2 text-nowrap px-4 py-2 text-start text-sm font-medium transition-all"
-                  href={profileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <FontAwesomeIcon icon={faUser} />
-                  My Profile
-                </a>
-              )}
-            </MenuItem>
-            {options.map((option, index) => (
-              <MenuItem key={index + 1}>
-                {() => (
-                  <button
-                    className="duration-50 group flex w-full items-center gap-2 px-4 py-2 text-start text-sm font-medium transition-all"
-                    onClick={() => option.onClick()}
-                  >
-                    <FontAwesomeIcon icon={option.icon} />
-                    {option.label}
-                  </button>
-                )}
-              </MenuItem>
-            ))}
-          </MenuItems>
-        </div>
-      </Transition>
+        <MenuItem
+          key={0}
+          as="a"
+          href={profileUrl}
+          target="_blank"
+          rel="noreferrer"
+          className={twMerge(
+            "flex w-full items-center gap-2 text-nowrap px-4 py-2 text-start text-sm font-medium",
+            "data-[focus]:bg-gray-200 transition-all duration-150 data-[focus]:text-primary-500",
+          )}
+        >
+          <FontAwesomeIcon icon={faUser} />
+          <span>My Profile</span>
+        </MenuItem>
+        {options.map((option, index) => (
+          <MenuItem
+            as="button"
+            key={index + 1}
+            className={twMerge(
+              "flex w-full items-center gap-2 px-4 py-2 text-start text-sm font-medium",
+              "data-[focus]:bg-gray-200 transition-all duration-150 group-hover:bg-ui-border",
+            )}
+            onClick={option.onClick}
+          >
+            <FontAwesomeIcon icon={option.icon} />
+            <span>{option.label}</span>
+          </MenuItem>
+        ))}
+      </MenuItems>
     </Menu>
   );
 }
