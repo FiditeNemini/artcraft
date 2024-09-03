@@ -20,6 +20,7 @@ import {
 import { ToolbarButtons } from "./ToolbarButtons";
 import { twMerge } from "tailwind-merge";
 
+import { UploadImage } from "../UploadImage";
 // import { layout } from "~/signals";
 
 export const ToolbarMain = () => {
@@ -28,6 +29,8 @@ export const ToolbarMain = () => {
   //   signals: { isMobile, windowWidth, windowHeight },
   // } = layout;
   const [isUploadSubmenuOpen, setIsUploadSubmenuOpen] = useState(false);
+  const [isUploadImageOpen, setIsUploadImageOpen] = useState(false);
+
   const panelClasses =
     "rounded-2xl border border-ui-border bg-ui-panel p-2 shadow-xl";
   return (
@@ -63,7 +66,10 @@ export const ToolbarMain = () => {
                   panelClasses,
                 )}
               >
-                <ToolbarButtons icon={faImage} />
+                <ToolbarButtons
+                  icon={faImage}
+                  onClick={() => setIsUploadImageOpen(true)}
+                />
                 <ToolbarButtons icon={faFilm} />
               </div>
             )}
@@ -83,6 +89,11 @@ export const ToolbarMain = () => {
           <ToolbarButtons icon={faDownload} />
         </div>
       </div>
+
+      <UploadImage
+        isOpen={isUploadImageOpen}
+        closeCallback={() => setIsUploadImageOpen(false)}
+      />
     </div>
   );
 };

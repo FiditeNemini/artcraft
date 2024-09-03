@@ -2,12 +2,7 @@ import React from "react";
 import { twMerge } from "tailwind-merge";
 import { IconDefinition } from "@fortawesome/pro-thin-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-const kebabCase = (str: string) =>
-  str
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/[\s_]+/g, "-")
-    .toLowerCase();
+import { kebabCase } from "~/utilities";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   inputClassName?: string;
