@@ -8,6 +8,7 @@ export class Engine {
 
   private offScreenCanvas: OffscreenCanvas;
 
+  // signal reference
   constructor(canvasReference: HTMLDivElement) {
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({

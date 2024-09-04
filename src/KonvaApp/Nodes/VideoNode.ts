@@ -150,7 +150,7 @@ export class VideoNode extends NetworkedNodeContext {
 
   async animate() {
     this.updateImage(this.imageSources[this.imageIndex]);
-    const imageIndex = (this.imageIndex + 1) % this.imageSources.length;
+    this.imageIndex = (this.imageIndex + 1) % this.imageSources.length;
     setTimeout(this.animate.bind(this), 1000); // Update every second
   }
 
