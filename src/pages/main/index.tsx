@@ -18,8 +18,7 @@ export const Main = withProtectionRoute(() => {
   // This is a hook that will log the number of times the component has rerendered
   // Let's make sure we only log once
   useRenderCounter("Pages/Main");
-
-  const konaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
+  const konvaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
     if (node !== null) {
       KonvaApp(node);
     }
@@ -28,7 +27,7 @@ export const Main = withProtectionRoute(() => {
   return (
     <div className="fixed grid h-full w-full grid-cols-12 grid-rows-12">
       <KonvaContainer
-        ref={konaContainerCallbackRef}
+        ref={konvaContainerCallbackRef}
         className="col-span-12 col-start-1 row-span-12 row-start-1"
       />
       <div
