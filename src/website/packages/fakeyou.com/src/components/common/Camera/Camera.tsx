@@ -28,10 +28,7 @@ export default function Camera({
         videoConstraints: {
           width: 512,
           height: 512,
-          facingMode:
-            cameraPosition === "user"
-              ? cameraPosition
-              : { exact: cameraPosition },
+          facingMode: cameraPosition,
         },
       }}
     />
