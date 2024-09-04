@@ -38,6 +38,7 @@ export interface MediaSubViewProps {
   animationType: AnimationOptions;
   animationTypeChange: (event: { target: { value: AnimationType } }) => void;
   bookmarkButtonProps: ActionButtonProps;
+  bucketUrl: string;
   canAccessStudio: () => boolean;
   canBanUsers: () => boolean;
   canEdit: boolean;
@@ -68,7 +69,7 @@ export default function MediaPageSwitch() {
   const [engineCategory, engineCategorySet] =
     useState<EngineCategoryOptions>(null);
 
-  const { mediaFile, prompt, remove, status } = useMedia({
+  const { bucketUrl, mediaFile, prompt, remove, status } = useMedia({
     mediaToken: urlToken,
     onSuccess: (res: any) => {
       isFeaturedSet(res.is_featured);
@@ -180,6 +181,7 @@ export default function MediaPageSwitch() {
   const subViewProps: MediaSubViewProps = {
     animationType,
     animationTypeChange,
+    bucketUrl,
     bookmarkButtonProps,
     canAccessStudio,
     canBanUsers,

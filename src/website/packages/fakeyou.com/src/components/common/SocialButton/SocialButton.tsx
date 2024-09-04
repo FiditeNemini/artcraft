@@ -21,7 +21,8 @@ export type Socials =
   | "download";
 
 interface SocialButtonProps {
-  downloadLink?: string;
+  bucketUrl?: string;
+  GApage?: string;
   hideLabel?: boolean;
   social: Socials;
   shareUrl?: string;
@@ -29,7 +30,8 @@ interface SocialButtonProps {
 }
 
 export default function SocialButton({
-  downloadLink,
+  bucketUrl,
+  GApage,
   hideLabel,
   social,
   shareUrl,
@@ -67,7 +69,7 @@ export default function SocialButton({
           text
         )}&body=${encodeURIComponent(url)}`;
       case "download":
-        return downloadLink;
+        return bucketUrl;
       default:
         return "#";
     }
@@ -79,7 +81,19 @@ export default function SocialButton({
         className: "social-button",
         href: getShareLink(social, shareUrl || "", shareText),
         target: "_blank",
-        ...(social === "download" ? { download: true } : {}),
+        ...(social === "download"
+          ? {
+              download: true,
+              onClick: () => {
+                // @ts-ignore
+                window.dataLayer.push({
+                  event: "media_file_download",
+                  page: GApage || "/",
+                  user_id: "$user_id",
+                });
+              },
+            }
+          : {}),
       }}
     >
       <div

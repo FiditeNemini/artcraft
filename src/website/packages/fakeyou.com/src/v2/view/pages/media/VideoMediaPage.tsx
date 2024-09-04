@@ -19,7 +19,6 @@ import {
   RenameMediaResponse,
 } from "@storyteller/components/src/api/media_files/RenameMedia";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import PromptViewer from "./PromptViewer";
 import { MediaSubViewProps } from "./MediaPageSwitch";
 import { a, useTransition } from "@react-spring/web";
@@ -41,8 +40,9 @@ export enum EditingTitleState {
   saving,
 }
 
-export default function DevMediaPage({
+export default function VideoMediaPage({
   bookmarkButtonProps,
+  bucketUrl,
   canAccessStudio,
   canEdit,
   featureButtonProps,
@@ -58,7 +58,6 @@ export default function DevMediaPage({
   const [editingTitle, editingTitleSet] = useState(EditingTitleState.closed);
   const { events, status: animationStatus } = useAnimationStatus();
   const titlePaused = animationStatus === AnimationStatus.paused;
-  const bucketConfig = new BucketConfig();
 
   const transitions = useTransition(
     editingTitle,
@@ -124,8 +123,6 @@ export default function DevMediaPage({
     "email",
     "download",
   ];
-
-  let downloadLink = bucketConfig.getGcsUrl(mediaFile?.public_bucket_path);
 
   const sharePath = `/media/${mediaFile?.token || ""}`;
 
@@ -320,7 +317,8 @@ export default function DevMediaPage({
                 {shareLinks.map((social, i) => (
                   <SocialButton
                     {...{
-                      downloadLink,
+                      bucketUrl,
+                      GApage: "/media",
                       hideLabel: true,
                       social,
                       shareUrl,
