@@ -40,7 +40,6 @@ export class Engine {
 
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved
-
     this.setupStage();
   }
 
