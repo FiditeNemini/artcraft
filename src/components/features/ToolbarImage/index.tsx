@@ -13,7 +13,7 @@ import {
 import { ToolbarButtons } from "~/components/features/ToolbarButtons";
 import { paperWrapperStyles } from "~/components/styles";
 
-export const ContextualImageToolbar = ({
+export const ToolbarImage = ({
   position,
 }: {
   position: {
