@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import Webcam from "react-webcam";
 import { a, TransitionFn, useTransition } from "@react-spring/web";
 import { useCameraState, useMedia, useModal } from "hooks";
 import { CameraCapture } from "components/modals";
-import { Button, RecordToggle } from "components/common";
+import { Camera, Button, RecordToggle } from "components/common";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCameraSlash } from "@fortawesome/pro-solid-svg-icons";
 import "./CameraInput.scss";
 
 export interface CameraInputEvent {
@@ -27,6 +28,7 @@ export default function CameraInput({
   const camera = useCameraState(true);
   const [token, tokenSet] = useState("");
   const { bucketUrl } = useMedia({ mediaToken: token });
+  const cameraSupported = MediaRecorder.isTypeSupported("video/mp4");
 
   const cameraClick = () =>
     open({
@@ -62,7 +64,14 @@ export default function CameraInput({
   };
 
   return (
-    <div {...{ className: "fy-camera-input", onClick: cameraClick }}>
+    <div
+      {...{
+        className: `fy-camera-input${
+          cameraSupported ? "" : " fy-camera-input-unsuported"
+        }`,
+        ...(cameraSupported ? { onClick: cameraClick } : {}),
+      }}
+    >
       {transitions((style: any, hasToken: boolean) =>
         hasToken ? (
           <a.div
@@ -93,35 +102,35 @@ export default function CameraInput({
               style,
             }}
           >
-            <Webcam
-              audio
-              {...{
-                muted: true,
-                // onUserMedia: () => cameraStartedSet(true),
-                ref: camera.ref,
-                videoConstraints: {
-                  width: 512,
-                  height: 512,
-                  facingMode: "user",
-                  // facingMode:
-                  //   cameraPosition === "user"
-                  //     ? cameraPosition
-                  //     : { exact: cameraPosition },
-                },
-              }}
-            />
-            <div
-              {...{
-                className: "fy-camera-input-toggle-container",
-              }}
-            >
-              <RecordToggle
-                {...{
-                  className: "fy-camera-input-toggle",
-                  value: false,
-                }}
-              />
-            </div>
+            {MediaRecorder.isTypeSupported("video/mp4") ? (
+              <>
+                <Camera
+                  {...{
+                    cameraPosition: "user",
+                    muted: true,
+                    cameraRef: camera.ref,
+                  }}
+                />
+                <div
+                  {...{
+                    className: "fy-camera-input-toggle-container",
+                  }}
+                >
+                  <RecordToggle
+                    {...{
+                      className: "fy-camera-input-toggle",
+                      value: false,
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div {...{ className: "fy-webcam-not-supported" }}>
+                <FontAwesomeIcon {...{ icon: faCameraSlash }} />
+                Sorry, we currently do not support webcam recording in your
+                browser.
+              </div>
+            )}
           </a.div>
         )
       )}

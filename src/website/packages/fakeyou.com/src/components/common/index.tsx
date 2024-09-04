@@ -7,6 +7,7 @@ import BasicTabs from "./BasicTabs";
 import BookmarkButton from "./BookmarkButton";
 import Button from "./Button";
 import ButtonRevertToDefault from "./ButtonRevertToDefault";
+import Camera from "./Camera";
 import CameraInput, { CameraInputEvent } from "./CameraInput";
 import Checkbox from "./Checkbox";
 import { MediaCards, SkeletonCard, WeightsCards } from "./Card";
@@ -78,6 +79,7 @@ export {
   BasicTabs,
   BookmarkButton,
   Button,
+  Camera,
   CameraInput,
   //Cards
   DeviceNotSupported,

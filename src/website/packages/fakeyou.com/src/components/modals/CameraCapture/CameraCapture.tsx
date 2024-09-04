@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Webcam from "react-webcam";
 import { a, TransitionFn, useTransition } from "@react-spring/web";
 import { WorkIndicator } from "components/svg";
 import { CameraState, useCameraState, useMediaUploader } from "hooks";
 import { UploaderResponse } from "components/entities/EntityTypes";
 import {
+  Camera,
   Button,
   ModalUtilities,
   RecordToggle,
@@ -102,21 +102,13 @@ export default function CameraCapture({
       {transitions((style: any, i: number) => {
         return [
           <a.div {...{ className: "fy-camera-capture-slide", style }}>
-            <Webcam
-              audio
+            <Camera
               {...{
-                muted: true,
+                // muted: true,
                 className: "fy-camera-capture-display",
                 onUserMedia: () => camera.startedSet(true),
-                ref: camera.ref,
-                videoConstraints: {
-                  width: 512,
-                  height: 512,
-                  facingMode:
-                    cameraPosition === "user"
-                      ? cameraPosition
-                      : { exact: cameraPosition },
-                },
+                cameraPosition,
+                cameraRef: camera.ref,
               }}
             />
             {camera.started ? (

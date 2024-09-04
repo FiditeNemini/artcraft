@@ -12,6 +12,10 @@
 	overflow: hidden;
 	cursor: pointer;
 
+	&.fy-camera-input-unsuported {
+		cursor: not-allowed;
+	}
+
 	.fy-camera-input-preview {
 		// background: red;
 		position: absolute;
