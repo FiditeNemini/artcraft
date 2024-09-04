@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
-import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowRight,
+  // faArrowDownToLine,
+} from "@fortawesome/pro-solid-svg-icons";
 import Badge from "components/common/Badge";
 import Button from "components/common/Button";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -70,6 +73,10 @@ export default function VideoCard({
   const bucketImageUrl = publicBucketPath
     ? bucketConfig.getGcsUrl(publicBucketPath + "-thumb.jpg")
     : null;
+
+  // const bucketUrl = publicBucketPath
+  //   ? new BucketConfig().getGcsUrl(publicBucketPath)
+  //   : "";
 
   const checkGifExists = async (url: string) => {
     try {
@@ -183,6 +190,13 @@ export default function VideoCard({
               <div className="d-flex flex-grow-1 gap-2">
                 <Badge label="Video" color="purple" overlay={true} />
                 <Badge label={productCategory} color="gray" overlay={true} />
+                {/*      <Badge
+                  className="fy-card-download-badge"
+                  icon={faArrowDownToLine}
+                  color="primary"
+                  overlay={true}
+                  to={bucketUrl}
+                />*/}
               </div>
               {inSelectModal && (
                 <Button
