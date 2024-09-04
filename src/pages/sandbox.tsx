@@ -10,6 +10,14 @@ export const Sandbox = () => {
         isShowing={true}
         message="Loading..."
       />
+
+      <LoadingBar
+        progress={50}
+        position={{ x: 300, y: 200 }}
+        status={LoadingBarStatus.LOADING}
+        isShowing={true}
+        message="Loading..."
+      />
     </div>
   );
 };

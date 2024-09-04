@@ -37,7 +37,7 @@ export const LoadingBar = ({
           // default styles
           "flex flex-col items-center gap-2",
           // position styles
-          position && `fixed left-${position.x} top-${position.y}`,
+          position && `fixed w-96`,
           // base transition properties
           "transition-opacity ease-in-out",
           // Shared closed styles
@@ -47,6 +47,10 @@ export const LoadingBar = ({
           // Leaving styles
           "data-[leave]:duration-300",
         )}
+        style={{
+          left: position?.x,
+          top: position?.y,
+        }}
       >
         <div className="flex w-full items-center gap-2">
           <div className="bg-gray-200 h-2.5 flex-grow rounded-full">
