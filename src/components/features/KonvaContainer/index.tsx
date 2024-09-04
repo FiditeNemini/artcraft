@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 import { ContextualToolbarImage } from "./ContextualToolbarImage";
+import { ContextualLoadingBar } from "./ContextualLoadingBar";
 
 export const KonvaContainer = forwardRef<
   HTMLDivElement,
@@ -16,6 +17,7 @@ export const KonvaContainer = forwardRef<
     <>
       <div ref={ref} className={classes} {...props} />
       <ContextualToolbarImage />
+      <ContextualLoadingBar />
     </>
   );
 });
