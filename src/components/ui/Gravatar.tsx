@@ -69,7 +69,7 @@ function Gravatar(props: Props) {
   return (
     <div
       className={twMerge(
-        "relative aspect-square overflow-hidden rounded-full border-2 border-white",
+        "relative aspect-square overflow-hidden rounded-full border-2 border-ui-border",
         props.className,
       )}
     >

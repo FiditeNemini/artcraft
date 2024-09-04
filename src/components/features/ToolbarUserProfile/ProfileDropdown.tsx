@@ -48,7 +48,7 @@ export function ProfileDropdown() {
     <Menu as="div" className="relative">
       <MenuButton
         className={twMerge(
-          "flex size-12 cursor-pointer items-center gap-1.5",
+          "flex size-16 cursor-pointer items-center gap-1.5",
           "data-[hover]:opacity-70",
         )}
       >

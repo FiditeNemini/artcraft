@@ -25,3 +25,5 @@ export const FileUploader = ({ fileTypes, title, file, setFile }: Props) => {
     </div>
   );
 };
+
+export { IMAGEP_FILE_TYPE } from "./enums";
