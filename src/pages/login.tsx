@@ -7,6 +7,9 @@ import { faKey, faUser } from "@fortawesome/pro-thin-svg-icons";
 import { Button, Input, LoadingSpinner } from "~/components/ui";
 import { authentication } from "~/signals";
 
+import { paperWrapperStyles } from "~/components/styles";
+import { twMerge } from "tailwind-merge";
+
 export const Login = () => {
   useSignals();
   const {
@@ -70,11 +73,19 @@ export const Login = () => {
       <div className="mx-auto my-6 flex w-10/12 max-w-2xl gap-4">
         <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
       </div>
-      <div className="relative mx-auto w-10/12 max-w-2xl overflow-hidden rounded-lg border border-ui-border bg-ui-panel p-6">
+      <div
+        className={twMerge(
+          paperWrapperStyles,
+          "relative mx-auto w-10/12 max-w-2xl p-6",
+        )}
+      >
         <form
           ref={formRef}
           onSubmit={handleOnSumbit}
-          className="flex flex-col gap-4"
+          className={twMerge(
+            "flex flex-col gap-4",
+            shouldShowLoader && "opacity-0",
+          )}
         >
           <Input
             label="Username or Email"
@@ -108,11 +119,14 @@ export const Login = () => {
 
           <Button>Login</Button>
         </form>
-
-        <LoadingSpinner
-          isShowing={shouldShowLoader}
-          message={authLoaderMessage}
-        />
+        {shouldShowLoader && (
+          <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+            <LoadingSpinner
+              isShowing={shouldShowLoader}
+              message={authLoaderMessage}
+            />
+          </div>
+        )}
 
         {/*
         <ConfirmationModal

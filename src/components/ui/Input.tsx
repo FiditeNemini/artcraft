@@ -32,7 +32,11 @@ export const Input = React.forwardRef(
   ) => {
     return (
       <div className={twMerge("flex flex-col", className)}>
-        {label && <label htmlFor={id ? id : kebabCase(label)}>{label}</label>}
+        {label && (
+          <label htmlFor={id ? id : kebabCase(label)} className="pb-2">
+            {label}
+          </label>
+        )}
 
         <div className="relative w-full">
           {icon && (
@@ -45,7 +49,7 @@ export const Input = React.forwardRef(
             ref={ref}
             id={id ? id : label ? kebabCase(label) : undefined}
             className={twMerge(
-              "h-10 w-full rounded-lg bg-secondary px-3 py-2.5 outline-none",
+              "h-10 w-full rounded-lg px-3 py-2.5 outline-ui-border",
               // on focus
               "outline-offset-0 transition-all duration-150 ease-in-out focus:outline-primary",
               icon && "pl-10",
