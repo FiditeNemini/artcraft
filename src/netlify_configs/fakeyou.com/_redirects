@@ -70,7 +70,6 @@
 /tts*                  /website/index.html   200
 /tts_configs*          /website/index.html   200
 /upload*               /website/index.html   200
-/video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
 /voice-designer*       /website/index.html   200
 /waitlist-next-steps*  /website/index.html   200
@@ -94,6 +93,9 @@
 /live-portrait*        /ai-live-portrait     301
 /mirror-motion*        /ai-live-portrait     301
 /motion-mirror*        /ai-live-portrait     301
+
+# Old paths - Video Style Transfer
+/video-style*          /style-video          301
 
 # Old paths - Face Animator
 /face-animation*       /face-animator        301
