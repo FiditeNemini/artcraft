@@ -17,7 +17,7 @@ import {
   faSquareDashed,
 } from "@fortawesome/pro-thin-svg-icons";
 
-import { ToolbarButtons } from "./ToolbarButtons";
+import { ToolbarButtons } from "../ToolbarButtons";
 import { twMerge } from "tailwind-merge";
 
 import { UploadImage } from "../UploadImage";
@@ -82,14 +82,14 @@ export const ToolbarMain = () => {
               </div>
             )}
           </div>
+          <ToolbarButtons icon={faCameraRotate} />
         </div>
-        <div className="flex items-center gap-2 px-2">
+        {/* <div className="flex items-center gap-2 px-2">
           <ToolbarButtons icon={faMinus} />
           <span>100%</span>
           <ToolbarButtons icon={faPlus} />
           <ToolbarButtons icon={faHand} />
-          <ToolbarButtons icon={faCameraRotate} />
-        </div>
+        </div> */}
         <div className="flex items-center gap-2 px-2">
           <ToolbarButtons icon={faArrowRotateLeft} />
           <ToolbarButtons icon={faArrowRotateRight} />

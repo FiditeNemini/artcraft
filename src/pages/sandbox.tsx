@@ -1,5 +1,7 @@
 import { LoadingBar, LoadingBarStatus } from "~/components/ui";
 
+import { ContextualImageToolbar } from "~/components/ContextualToolbars";
+
 export const Sandbox = () => {
   return (
     <div>
@@ -18,6 +20,8 @@ export const Sandbox = () => {
         isShowing={true}
         message="Loading..."
       />
+
+      <ContextualImageToolbar position={{ x: 300, y: 600 }} />
     </div>
   );
 };
