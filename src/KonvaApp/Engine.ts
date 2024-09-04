@@ -8,6 +8,7 @@ export class Engine {
 
   private offScreenCanvas: OffscreenCanvas;
 
+  // signal reference
   constructor(canvasReference: HTMLDivElement) {
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
@@ -40,7 +41,6 @@ export class Engine {
 
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved
-
     this.setupStage();
   }
 
