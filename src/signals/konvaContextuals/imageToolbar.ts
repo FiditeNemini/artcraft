@@ -1,14 +1,7 @@
 import { signal } from "@preact/signals-core";
+import { ContextualUi } from "./type";
 
-export type ContextualToolbar = {
-  position: {
-    x: number;
-    y: number;
-  };
-  isShowing: boolean;
-};
-
-const imageToolbarSignal = signal<ContextualToolbar>({
+const imageToolbarSignal = signal<ContextualUi>({
   position: {
     x: 0,
     y: 0,
@@ -18,7 +11,7 @@ const imageToolbarSignal = signal<ContextualToolbar>({
 
 export const imageToolbar = {
   signal: imageToolbarSignal,
-  setPosition(position: ContextualToolbar["position"]) {
+  setPosition(position: ContextualUi["position"]) {
     imageToolbarSignal.value = {
       position,
       isShowing: true,
