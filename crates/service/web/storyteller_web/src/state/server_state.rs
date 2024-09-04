@@ -28,7 +28,7 @@ use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo
 use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::ListFeaturedMediaFilesQueryParams;
 use crate::http_server::endpoints::stats::result_transformer::CacheableQueueStats;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
-use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
+use crate::http_server::endpoints::voice_conversion::list_voice_conversion_models_handler::VoiceConversionModel;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::session::session_checker::SessionChecker;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;

@@ -1,2 +1,2 @@
-pub mod inference;
-pub mod models;
+pub mod enqueue_voice_conversion_inference_handler;
+pub mod list_voice_conversion_models_handler;
