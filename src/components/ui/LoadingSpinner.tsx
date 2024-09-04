@@ -2,7 +2,7 @@ import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 import { Spinner } from "./Spinner";
 
-export const Loader = ({
+export const LoadingSpinner = ({
   isShowing,
   message,
 }: {

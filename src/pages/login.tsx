@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 
 import { faKey, faUser } from "@fortawesome/pro-thin-svg-icons";
-import { Button, Input, Loader } from "~/components/ui";
+import { Button, Input, LoadingSpinner } from "~/components/ui";
 import { authentication } from "~/signals";
 
 export const Login = () => {
@@ -109,7 +109,10 @@ export const Login = () => {
           <Button>Login</Button>
         </form>
 
-        <Loader isShowing={shouldShowLoader} message={authLoaderMessage} />
+        <LoadingSpinner
+          isShowing={shouldShowLoader}
+          message={authLoaderMessage}
+        />
 
         {/*
         <ConfirmationModal
