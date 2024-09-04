@@ -5,8 +5,8 @@ import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 // Components
 import {
-  ProfileDropdown,
-  KonaContainer,
+  ToolbarUserProfile,
+  KonvaContainer,
   ToolbarMain,
 } from "~/components/features";
 
@@ -27,23 +27,18 @@ export const Main = withProtectionRoute(() => {
 
   return (
     <div className="fixed grid h-full w-full grid-cols-12 grid-rows-12">
-      <KonaContainer
+      <KonvaContainer
         ref={konaContainerCallbackRef}
         className="col-span-12 col-start-1 row-span-12 row-start-1"
       />
       <div
         className={twMerge(
-          "col-span-8 col-start-5 row-span-1 row-start-1",
+          "col-span-8 col-start-5 row-span-1 row-start-1 flex justify-end",
           "md:col-span-6 md:col-start-7",
           "lg:col-span-3 lg:col-start-10",
         )}
       >
-        <div className="flex items-center justify-end gap-4 pr-4 pt-2">
-          <div className="w-1/2">
-            <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
-          </div>
-          <ProfileDropdown />
-        </div>
+        <ToolbarUserProfile />
       </div>
       <ToolbarMain />
     </div>

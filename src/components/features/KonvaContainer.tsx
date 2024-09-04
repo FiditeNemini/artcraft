@@ -1,7 +1,7 @@
 import { forwardRef, HTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 
-export const KonaContainer = forwardRef<
+export const KonvaContainer = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {

@@ -7,9 +7,15 @@ import {
   faUser,
 } from "@fortawesome/pro-thin-svg-icons";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Gravatar } from "../ui/Gravatar";
+import { Gravatar } from "../../ui/Gravatar";
 
 import { authentication } from "~/signals";
+
+// style constants
+import {
+  paperWrapperStyles,
+  transitionTimingStyles,
+} from "~/components/styles";
 
 export function ProfileDropdown() {
   useSignals();
@@ -60,9 +66,10 @@ export function ProfileDropdown() {
         anchor="bottom end"
         transition
         className={twMerge(
-          "rounded-lg border border-ui-border bg-ui-panel",
-          "flex w-fit flex-col py-2 focus:outline-none",
-          "transition duration-150 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
+          paperWrapperStyles,
+          "mt-4 flex w-fit flex-col px-0 focus:outline-none",
+          transitionTimingStyles,
+          "data-[closed]:scale-95 data-[closed]:opacity-0",
         )}
       >
         <MenuItem
@@ -73,7 +80,7 @@ export function ProfileDropdown() {
           rel="noreferrer"
           className={twMerge(
             "flex w-full items-center gap-2 text-nowrap px-4 py-2 text-start text-sm font-medium",
-            "data-[focus]:bg-gray-200 transition-all duration-150 data-[focus]:text-primary-500",
+            "data-[focus]:bg-gray-200 data-[focus]:text-primary-600",
           )}
         >
           <FontAwesomeIcon icon={faUser} />
@@ -85,7 +92,7 @@ export function ProfileDropdown() {
             key={index + 1}
             className={twMerge(
               "flex w-full items-center gap-2 px-4 py-2 text-start text-sm font-medium",
-              "data-[focus]:bg-gray-200 transition-all duration-150 group-hover:bg-ui-border",
+              "data-[focus]:bg-gray-200",
             )}
             onClick={option.onClick}
           >

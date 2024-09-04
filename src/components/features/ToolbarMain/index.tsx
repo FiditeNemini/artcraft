@@ -1,4 +1,4 @@
-// import { useSignals } from "@preact/signals-react/runtime";
+import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import { useState } from "react";
 import {
   faArrowRotateLeft,
@@ -21,30 +21,38 @@ import { ToolbarButtons } from "./ToolbarButtons";
 import { twMerge } from "tailwind-merge";
 
 import { UploadImage } from "../UploadImage";
-// import { layout } from "~/signals";
+
+// style constants
+import { paperWrapperStyles } from "~/components/styles";
+
+// for testing
+import { layout } from "~/signals";
 
 export const ToolbarMain = () => {
-  // useSignals();
-  // const {
-  //   signals: { isMobile, windowWidth, windowHeight },
-  // } = layout;
+  //// for testing
+  useSignals();
+  const {
+    signals: { isMobile },
+  } = layout;
+  useSignalEffect(() => {
+    console.info(
+      "orientation Changed",
+      `Oriendtation Change detected, current orientation: ${isMobile.value ? "mobile" : "desktop"}`,
+    );
+  });
+  /// end for testing
+
   const [isUploadSubmenuOpen, setIsUploadSubmenuOpen] = useState(false);
   const [isUploadImageOpen, setIsUploadImageOpen] = useState(false);
 
-  const panelClasses =
-    "rounded-2xl border border-ui-border bg-ui-panel p-2 shadow-xl";
   return (
     <div className="col-span-12 col-start-1 row-span-1 row-start-12 justify-center">
       <div
         className={twMerge(
           "m-auto flex w-fit items-center divide-x divide-ui-border",
-          panelClasses,
+          paperWrapperStyles,
         )}
       >
-        {/* <p>
-          Layout is {windowWidth.value} x {windowHeight.value},{" "}
-          <b>{isMobile.value ? "Mobile" : "Not Mobile"}</b>
-        </p> */}
         <div className="flex items-center gap-2 px-2">
           <ToolbarButtons icon={faBars} />
           <ToolbarButtons
@@ -63,7 +71,7 @@ export const ToolbarMain = () => {
               <div
                 className={twMerge(
                   "absolute -left-2 bottom-11 z-10",
-                  panelClasses,
+                  paperWrapperStyles,
                 )}
               >
                 <ToolbarButtons

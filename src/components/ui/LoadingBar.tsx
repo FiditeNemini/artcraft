@@ -14,7 +14,8 @@ export enum LoadingBarStatus {
 
 export const LoadingBar = ({
   progress = 0,
-  status = LoadingBarStatus.SUCCESS,
+  position,
+  status,
   onRetry,
   isShowing,
   message,
@@ -22,6 +23,10 @@ export const LoadingBar = ({
   progress: number;
   status: LoadingBarStatus;
   isShowing: boolean;
+  position?: {
+    x: number;
+    y: number;
+  };
   message?: string;
   onRetry?: () => void;
 }) => {
@@ -31,6 +36,8 @@ export const LoadingBar = ({
         className={twMerge(
           // default styles
           "flex flex-col items-center gap-2",
+          // position styles
+          position && `fixed left-${position.x} top-${position.y}`,
           // base transition properties
           "transition-opacity ease-in-out",
           // Shared closed styles
