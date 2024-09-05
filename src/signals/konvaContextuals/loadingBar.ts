@@ -19,6 +19,7 @@ export const loadingBar = {
   update(props: Omit<ContextualLoadingBarProps, "isShowing">) {
     loadingBarSignal.value = {
       ...loadingBarSignal.value,
+      isShowing: true,
       ...props,
     };
   },
@@ -26,6 +27,12 @@ export const loadingBar = {
     loadingBarSignal.value = {
       ...loadingBarSignal.value,
       message,
+    };
+  },
+  updateWidth(width: number) {
+    loadingBarSignal.value = {
+      ...loadingBarSignal.value,
+      width,
     };
   },
   updatePosition(position: { x: number; y: number }) {

@@ -1,5 +1,4 @@
-import { LoadingBarStatus } from "~/components/ui";
-export { LoadingBarStatus };
+import { LoadingBarProps } from "~/components/ui";
 
 export interface ContextualUi {
   position: {
@@ -9,9 +8,6 @@ export interface ContextualUi {
   isShowing: boolean;
 }
 
-export interface ContextualLoadingBarProps extends ContextualUi {
-  progress: number;
-  status: LoadingBarStatus;
-  message?: string;
-  onRetry?: () => void;
-}
+export interface ContextualLoadingBarProps
+  extends ContextualUi,
+    Omit<LoadingBarProps, "position"> {}
