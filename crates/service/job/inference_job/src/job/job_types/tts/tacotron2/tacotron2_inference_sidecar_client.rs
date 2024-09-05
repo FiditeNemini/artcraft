@@ -8,7 +8,7 @@ use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
+use crate::job::job_types::tts::tacotron2::vocoder_option::VocoderForInferenceOption;
 
 /// This is used to talk to the TT2 Python HTTP sidecar (rather than shelling out over bash).
 /// This keeps models loaded in memory and results in faster inference time.

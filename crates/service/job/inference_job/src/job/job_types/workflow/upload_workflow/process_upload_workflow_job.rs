@@ -22,6 +22,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::state::job_dependencies::JobDependencies;
 
+#[deprecated(note = "bt(2024-09-02): this looks like a way for users to upload garbage to the website and looks as if we no longer use it anymore")]
 pub async fn process_upload_workflow_job(deps: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError>{
    let mysql_pool = &deps.db.mysql_pool;
 

@@ -18,7 +18,7 @@ use mysql_queries::queries::tts::tts_results::insert_tts_result::insert_tts_resu
 use mysql_queries::queries::tts::tts_results::insert_tts_result::JobType;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::FileMetadata;
+use crate::job::job_types::tts::tacotron2::process_job::FileMetadata;
 use crate::state::job_dependencies::JobDependencies;
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";

@@ -4,7 +4,7 @@ use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReport
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
+use crate::job::job_types::tts::tacotron2::tacotron2_dependencies::Tacotron2Dependencies;
 use crate::state::job_dependencies::JobDependencies;
 use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 

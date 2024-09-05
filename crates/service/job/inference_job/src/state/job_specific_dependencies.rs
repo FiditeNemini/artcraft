@@ -9,7 +9,7 @@ use crate::job::job_types::lipsync::sad_talker::sad_talker_dependencies::SadTalk
 use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
 use crate::job::job_types::render_engine_scene::render_engine_scene_to_video::dependencies::RenderEngineSceneToVideoDependencies;
 use crate::job::job_types::tts::styletts2::styletts2_dependencies::StyleTTS2Dependencies;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
+use crate::job::job_types::tts::tacotron2::tacotron2_dependencies::Tacotron2Dependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_dependencies::VallExDependencies;
 use crate::job::job_types::tts::vits::vits_dependencies::VitsDependencies;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;

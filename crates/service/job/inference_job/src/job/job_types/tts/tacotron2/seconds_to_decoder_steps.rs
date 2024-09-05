@@ -24,7 +24,7 @@ pub fn seconds_to_decoder_steps(max_duration_seconds: i32) -> u32 {
 
 #[cfg(test)]
 mod tests {
-  use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
+  use crate::job::job_types::tts::tacotron2::seconds_to_decoder_steps::seconds_to_decoder_steps;
 
   #[test]
   fn test_max_decoder_steps_zero() {

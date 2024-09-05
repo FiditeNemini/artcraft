@@ -8,9 +8,9 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::{styletts2, tacotron2_v2_early_fakeyou, vits};
+use crate::job::job_types::tts::{styletts2, tacotron2, vits};
 use crate::job::job_types::tts::styletts2::process_job::StyleTTS2ProcessJobArgs;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
+use crate::job::job_types::tts::tacotron2::process_job::ProcessJobArgs;
 use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 use crate::job::job_types::tts::vits::process_job::VitsProcessJobArgs;
 use crate::state::job_dependencies::JobDependencies;
@@ -110,7 +110,7 @@ async fn dispatch_fine_tuned_weights_model(
       }).await
     }
     TtsModelType::Tacotron2 => {
-      let result = tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
+      let result = tacotron2::process_job::process_job(ProcessJobArgs {
           job_dependencies,
           job,
           tts_model: &tts_model,

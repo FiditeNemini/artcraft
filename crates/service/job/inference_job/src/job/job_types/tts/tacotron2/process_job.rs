@@ -21,12 +21,12 @@ use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::download_static_dependencies::download_static_dependencies;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_trap::maybe_block_on_sidecar_health_check;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::upload_results::{upload_results, UploadResultArgs};
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
+use crate::job::job_types::tts::tacotron2::download_static_dependencies::download_static_dependencies;
+use crate::job::job_types::tts::tacotron2::health_check_trap::maybe_block_on_sidecar_health_check;
+use crate::job::job_types::tts::tacotron2::seconds_to_decoder_steps::seconds_to_decoder_steps;
+use crate::job::job_types::tts::tacotron2::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
+use crate::job::job_types::tts::tacotron2::upload_results::{upload_results, UploadResultArgs};
+use crate::job::job_types::tts::tacotron2::vocoder_option::VocoderForInferenceOption;
 use crate::state::job_dependencies::JobDependencies;
 use crate::util::downloaders::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 

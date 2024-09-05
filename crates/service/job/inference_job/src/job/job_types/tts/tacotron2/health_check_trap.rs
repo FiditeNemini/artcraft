@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use log::{error, info};
 
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_sidecar_health_check_client::{HealthState, Tacotron2SidecarHealthCheckClient};
+use crate::job::job_types::tts::tacotron2::tacotron2_sidecar_health_check_client::{HealthState, Tacotron2SidecarHealthCheckClient};
 
 // Health check timeouts
 const HEALTH_CHECK_START_TIMEOUT_MILLIS : u64 = 250;

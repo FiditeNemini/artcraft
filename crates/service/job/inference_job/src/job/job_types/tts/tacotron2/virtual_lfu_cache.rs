@@ -107,7 +107,7 @@ impl SyncVirtualLfuCache {
 
 #[cfg(test)]
 pub mod tests {
-  use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::virtual_lfu_cache::VirtualLfuCache;
+  use crate::job::job_types::tts::tacotron2::virtual_lfu_cache::VirtualLfuCache;
 
   #[test]
   fn large_capacity_does_not_shed() {
