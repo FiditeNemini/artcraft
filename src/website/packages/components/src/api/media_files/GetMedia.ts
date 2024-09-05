@@ -46,7 +46,7 @@ export interface MediaFile {
   maybe_moderator_fields?: MediaFileModeratorFields;
   created_at: Date;
   updated_at: Date;
-  maybe_text_transcript: string | undefined;
+  maybe_text_transcript?: string | undefined;
 }
 
 export interface MediaFileModeratorFields {
