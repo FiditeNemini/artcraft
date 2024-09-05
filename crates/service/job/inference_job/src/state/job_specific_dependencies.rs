@@ -78,17 +78,23 @@ impl JobSpecificDependencies {
       maybe_rvc_v2_dependencies = Some(RvcV2Dependencies::setup()?);
     }
 
-    if scoped_model_type_execution.can_run_job(InferenceModelType::SadTalker) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::SadTalker)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::SadTalker)
+    {
       print_with_space("Setting SadTalker dependencies...");
       maybe_sad_talker_dependencies = Some(SadTalkerDependencies::setup()?);
     }
 
-    if scoped_model_type_execution.can_run_job(InferenceModelType::SoVitsSvc) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::SoVitsSvc)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::SoVitsSvc)
+    {
       print_with_space("Setting SVC dependencies...");
       maybe_svc_dependencies = Some(SvcDependencies::setup()?);
     }
 
-    if scoped_model_type_execution.can_run_job(InferenceModelType::Tacotron2) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::Tacotron2)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::Tacotron2)
+    {
       print_with_space("Setting Tacotron2 dependencies...");
       maybe_tacotron2_dependencies = Some(Tacotron2Dependencies::setup()?);
     }
@@ -98,7 +104,9 @@ impl JobSpecificDependencies {
       maybe_vall_e_x_dependencies = Some(VallExDependencies::setup()?);
     }
 
-    if scoped_model_type_execution.can_run_job(InferenceModelType::StyleTTS2) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::StyleTTS2)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::StyleTTS2)
+    {
       print_with_space("Setting StyleTTS2 dependencies...");
       maybe_styletts2_dependencies = Some(StyleTTS2Dependencies::setup()?);
     }
