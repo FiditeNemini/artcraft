@@ -26,7 +26,9 @@ pub struct InsertGenericInferenceArgs<'a> {
 
   pub maybe_product_category: Option<InferenceJobProductCategory>,
 
+  // TODO(bt,2024-09-05): We really need to kill this, but the frontend depends on it.
   pub inference_category: InferenceCategory,
+
   pub maybe_model_type: Option<InferenceModelType>,
   pub maybe_model_token: Option<&'a str>,
 

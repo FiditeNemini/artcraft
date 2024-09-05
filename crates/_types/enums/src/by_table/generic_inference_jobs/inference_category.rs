@@ -18,10 +18,11 @@ use utoipa::ToSchema;
 pub enum InferenceCategory {
   /// Deprecate this field !!!
   /// We should drain all jobs from using this database field, then remove it.
+  #[deprecated(note = "NB(bt,2024-09-05): The frontend still needs this")]
   #[serde(rename = "deprecated_field")]
   DeprecatedField,
 
-  /// Facial lipsync animation (eg. SadTalker, Wav2Lip)
+  /// Facial lipsync animation (eg. SadTalker, Wav2Lip, FaceFusion)
   #[serde(rename = "lipsync_animation")]
   #[default]
   LipsyncAnimation,
