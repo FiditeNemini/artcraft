@@ -1,3 +1,4 @@
+import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 import { LoadingBarProps } from "~/components/ui";
 
 export interface ContextualUi {
@@ -6,6 +7,14 @@ export interface ContextualUi {
     y: number;
   };
   isShowing: boolean;
+}
+export interface ContextualImageToolbarProps extends ContextualUi {
+  disabled: boolean;
+  buttonStates: {
+    [key in ToolbarImageButtonNames]: {
+      disabled: boolean;
+    };
+  };
 }
 
 export interface ContextualLoadingBarProps

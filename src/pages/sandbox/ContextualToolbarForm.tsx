@@ -1,16 +1,23 @@
 import { useState } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
 
 import { Input, Button } from "~/components/ui";
 import { imageToolbar } from "~/signals";
 
+import { ToolbarImageButtonData } from "~/components/features/ToolbarImage/data";
+
 export const ContextualToolbarForm = () => {
+  useSignals();
+  const { disabled: allDisabled, buttonStates } = imageToolbar.signal.value;
+
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
 
   return (
     <div className="flex flex-col gap-2">
+      <label className="font-bold">Image Toolbar Props</label>
       <div className="flex items-center gap-2">
-        <label>Image Toolbar Position</label>
+        <label>X:</label>
         <Input
           className="w-20"
           type="text"
@@ -20,6 +27,7 @@ export const ContextualToolbarForm = () => {
             setX(parseInt(e.target.value) || 0);
           }}
         />
+        <label>Y:</label>
         <Input
           className="w-20"
           type="text"
@@ -40,6 +48,37 @@ export const ContextualToolbarForm = () => {
           Set Position
         </Button>
         <Button onClick={() => imageToolbar.hide()}>Hide</Button>
+        <Button
+          onClick={() => {
+            const exec = allDisabled
+              ? imageToolbar.enable
+              : imageToolbar.disable;
+            exec();
+          }}
+        >
+          {allDisabled ? "Enable" : "Disable"}
+        </Button>
+      </div>
+      <div className="flex gap-2">
+        {Object.values(ToolbarImageButtonData).map((button) => (
+          <Button
+            key={button.name}
+            icon={button.icon}
+            variant={
+              buttonStates[button.name].disabled ? "secondary" : "primary"
+            }
+            onClick={() =>
+              imageToolbar.changeButtonState(
+                button.name,
+                !buttonStates[button.name].disabled,
+              )
+            }
+          >
+            <span className="w-12">
+              {buttonStates[button.name].disabled ? "Enable" : "Disable"}
+            </span>
+          </Button>
+        ))}
       </div>
     </div>
   );
