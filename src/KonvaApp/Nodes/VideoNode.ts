@@ -2,7 +2,9 @@ import Konva from "konva";
 import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { v4 as uuidv4 } from "uuid";
-import { storytellerColors } from "./tailwind.stcolors";
+
+import { imageToolbar } from "~/signals";
+import { loadingBar } from "~/signals";
 
 export class VideoNode extends NetworkedNodeContext {
   public videoURL: string;
@@ -21,6 +23,7 @@ export class VideoNode extends NetworkedNodeContext {
   // Use Context Menu Item
   private duration: number = 0;
   private imageIndex: number = 0;
+
   private imageSources: [] = [
     "https://images-ng.pixai.art/images/orig/7ef23baa-2fc8-4e2f-8299-4f9241920090",
     "https://images-ng.pixai.art/images/orig/98196e9f-b968-4fe1-97ec-083ffd77c263",
@@ -70,7 +73,7 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.videoComponent.onloadstart = (event: Event) => {
       console.log("OnLoadStart");
-      this.startLoading();
+      this.startLoading(); // call the loading bar here... use the loading image.
     };
 
     this.videoComponent.onloadeddata = (event: Event) => {
@@ -107,6 +110,18 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.node.on("dragstart", () => {
       console.log("Drag Start");
+      this.updateContextMenuPosition();
+
+      if (this.didFinishLoading == false) {
+        this.updateLoadingBarPosition();
+      }
+    });
+
+    this.node.on("dragmove", () => {
+      this.updateContextMenuPosition();
+      if (this.didFinishLoading == false) {
+        this.updateLoadingBarPosition();
+      }
     });
 
     this.node.on("mouseover", () => {
@@ -123,19 +138,24 @@ export class VideoNode extends NetworkedNodeContext {
     });
 
     this.node.on("dragend", () => {
-      console.log("Drag End");
+      this.updateContextMenuPosition();
+      if (this.didFinishLoading == false) {
+        this.updateLoadingBarPosition();
+      }
     });
 
     this.node.on("mousedown", () => {
-      if (this.didFinishLoading && this.shouldPlay === true) {
-        this.shouldPlay = false;
-        this.videoComponent.play();
+      imageToolbar.show();
+      this.updateContextMenuPosition();
+      if (this.didFinishLoading == false) {
+        this.updateLoadingBarPosition();
       } else {
-        this.shouldPlay = true;
-        this.videoComponent.pause();
-
-        console.log("Pausing");
+        loadingBar.hide();
       }
+    });
+
+    this.node.on("mouseup", () => {
+      this.play();
     });
   }
 
@@ -144,14 +164,122 @@ export class VideoNode extends NetworkedNodeContext {
     newImage.src = newImageSrc;
     newImage.onload = () => {
       this.node.image(newImage);
-      this.videoLayer.draw();
+      this.node.draw();
     };
   }
 
-  async animate() {
-    this.updateImage(this.imageSources[this.imageIndex]);
-    this.imageIndex = (this.imageIndex + 1) % this.imageSources.length;
-    setTimeout(this.animate.bind(this), 1000); // Update every second
+  updateContextMenuPosition() {
+    imageToolbar.setPosition({
+      x: this.node.getPosition().x + this.node.getSize().width / 4,
+      y: this.node.getPosition().y - 150,
+    });
+  }
+
+  updateLoadingBarPosition() {
+    loadingBar.updatePosition({
+      x: this.node.getPosition().x + this.node.getSize().width / 4,
+      y: this.node.getPosition().y - 60,
+    });
+  }
+
+  private async createVideoElement(newURL: string) {
+    // try catch here with a retry button.
+    const videoComponent = document.createElement("video");
+    // Update to use image.
+    videoComponent.src = newURL;
+    // assign video to start process.
+    this.videoComponent = videoComponent;
+    console.log(newURL);
+
+    videoComponent.onseeked = (event: Event) => {
+      //console.log("Seeked");
+      // reimplement using the function
+    };
+
+    videoComponent.onloadedmetadata = (event: Event) => {
+      console.log("Loaded Metadata");
+
+      // it might have length here which we will need to trim down to 7 seconds.
+      console.log(`Video Duration: ${videoComponent.duration}`);
+      this.duration = videoComponent.duration;
+    };
+
+    videoComponent.onloadstart = (event: Event) => {
+      this.didFinishLoading = false;
+      console.log("OnLoadStart");
+    };
+
+    videoComponent.onloadeddata = (event: Event) => {
+      try {
+        console.log("LoadedData");
+
+        this.node.image(videoComponent);
+        this.node.draw();
+        this.videoComponent.loop = true;
+        this.videoComponent.currentTime = 0; // ensure it shows up on screen
+
+        console.log("Can Play");
+
+        this.didFinishLoading = true;
+        this.shouldPlay = true; // means its play state
+
+        // remove loading ui
+        loadingBar.updateProgress(100);
+        loadingBar.hide();
+
+        // Might have to auto click? on first load this doesn't work in general how about after ?
+        this.videoComponent.play(); //sometimes race condition with the
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  }
+
+  private play() {
+    console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
+    if (this.didFinishLoading && this.shouldPlay === true) {
+      console.log("Playing");
+      this.shouldPlay = false;
+      this.videoComponent.play();
+    } else {
+      this.shouldPlay = true;
+      this.videoComponent.pause();
+
+      console.log("Pausing");
+    }
+  }
+  async simulatedLoading() {
+    // need to block playing while loading
+    this.didFinishLoading = false;
+
+    console.log(this.imageIndex);
+
+    if (this.imageIndex == 0) {
+      loadingBar.show();
+    }
+
+    await this.updateImage(this.imageSources[this.imageIndex]);
+    this.imageIndex = this.imageIndex + 1;
+
+    this.updateLoadingBarPosition();
+
+    loadingBar.updateMessage("Generating");
+
+    if (this.imageIndex == this.imageSources.length - 1) {
+      // show final video
+      console.log("Final Video Element");
+      await this.createVideoElement(
+        this.imageSources[this.imageSources.length - 1],
+      );
+      console.log("Done Video Element");
+    }
+
+    if (this.imageIndex < this.imageSources.length - 1) {
+      loadingBar.updateProgress(
+        (this.imageIndex / this.imageSources.length) * 100,
+      );
+      setTimeout(this.simulatedLoading.bind(this), 500); // Update every second
+    }
   }
 
   // use sub milisecond for frames.

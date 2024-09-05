@@ -1,5 +1,6 @@
 import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
+import { imageToolbar, loadingBar } from "~/signals";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
@@ -41,6 +42,9 @@ export class Engine {
 
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved
+
+    imageToolbar.hide();
+    loadingBar.hide();
     this.setupStage();
   }
 
@@ -59,11 +63,10 @@ export class Engine {
         const timeDiff = frame.timeDiff;
         const frameRate = frame.frameRate;
         textNode.setText(
-          `FrameTime:${timeDiff.toFixed(0)}ms\n FrameRate:${frameRate.toFixed(0)} FPS`,
+          `FrameTime:${timeDiff.toFixed(0)} ms\nFrameRate:${frameRate.toFixed(0)} fps`,
         );
       }
     }, this.videoLayer);
-
     anim.start();
 
     // Adding nodes here
@@ -71,10 +74,11 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      50,
-      50,
+      300,
+      300,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
+    videoNode.simulatedLoading();
 
     this.videoLayer.add(textNode);
   }
