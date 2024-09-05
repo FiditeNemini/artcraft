@@ -14,11 +14,13 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use mysql_queries::payloads::generic_inference_args::common::watermark_type::WatermarkType;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::inner_payloads::live_portrait_payload::{CropDimensions, LivePortraitPayload};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use primitives::optional_false_to_none::optional_false_to_none;
 use primitives::traits::trim_or_emptyable::TrimOrEmptyable;
 use primitives::try_str_to_num::try_str_to_num;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -58,6 +60,10 @@ pub struct EnqueueLivePortraitWorkflowRequest {
   /// Remove watermark from the output
   /// Only for premium accounts
   remove_watermark: Option<bool>,
+
+  /// Remove watermark from the output
+  /// Only for premium accounts
+  used_webcam: Option<bool>,
 
   /// Optional visibility setting override.
   creator_set_visibility: Option<Visibility>,
@@ -239,6 +245,14 @@ pub async fn enqueue_live_portrait_workflow_handler(
     watermark_type = None;
   }
 
+  let used_webcam = request.used_webcam.unwrap_or(false);
+
+  let product_category = if used_webcam {
+    InferenceJobProductCategory::LivePortraitWebcam
+  } else {
+    InferenceJobProductCategory::LivePortrait
+  };
+
   let payload = LivePortraitPayload {
     portrait_media_file_token: empty_media_file_token_to_null(Some(&request.source_media_file_token)),
     driver_media_file_token: empty_media_file_token_to_null(Some(&request.face_driver_media_file_token)),
@@ -246,6 +260,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
     watermark_type,
     remove_watermark: None,
     sleep_millis: None,
+    used_webcam: optional_false_to_none(request.used_webcam),
   };
 
   info!("Creating ComfyUI job record...");
@@ -253,7 +268,7 @@ pub async fn enqueue_live_portrait_workflow_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: InferenceJobType::LivePortrait,
-    maybe_product_category: Some(InferenceJobProductCategory::LivePortrait),
+    maybe_product_category: Some(product_category),
     inference_category: InferenceCategory::LivePortrait,
     maybe_model_type: None,
     maybe_model_token: None,

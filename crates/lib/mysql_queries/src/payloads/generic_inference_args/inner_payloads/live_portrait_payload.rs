@@ -26,6 +26,11 @@ pub struct LivePortraitPayload {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub watermark_type: Option<WatermarkType>,
 
+  /// Flag to indicate the webcam mode was used
+  #[serde(rename = "wc")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub used_webcam: Option<bool>,
+
   /// This is a debugging flag.
   #[serde(rename = "sp")]
   #[serde(skip_serializing_if = "Option::is_none")]
