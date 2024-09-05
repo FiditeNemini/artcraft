@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { Input, Button } from "~/components/ui";
-import { imageToolbar } from "~/signals";
+import { uiAccess } from "~/signals";
 
 import { ToolbarImageButtonData } from "~/components/features/ToolbarImage/data";
 
 export const ContextualToolbarForm = () => {
   useSignals();
+  const imageToolbar = uiAccess.imageToolbar;
+
   const { disabled: allDisabled, buttonStates } = imageToolbar.signal.value;
 
   const [x, setX] = useState(0);

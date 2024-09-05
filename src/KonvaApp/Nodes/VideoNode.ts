@@ -3,8 +3,9 @@ import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { v4 as uuidv4 } from "uuid";
 
-import { imageToolbar } from "~/signals";
-import { loadingBar } from "~/signals";
+import { uiAccess } from "~/signals";
+const imageToolbar = uiAccess.imageToolbar;
+const loadingBar = uiAccess.loadingBar;
 
 export class VideoNode extends NetworkedNodeContext {
   public videoURL: string;
@@ -44,6 +45,7 @@ export class VideoNode extends NetworkedNodeContext {
     videoURL: string,
   ) {
     super();
+
     this.shouldPlay = true; // start
     this.offScreenCanvas = offScreenCanvas;
     this.uuid = uuid;

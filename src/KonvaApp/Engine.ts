@@ -1,6 +1,8 @@
 import Konva from "konva";
+import { effect } from "@preact/signals-core";
 import { VideoNode } from "./Nodes/VideoNode";
-import { imageToolbar, loadingBar } from "~/signals";
+import { uiAccess } from "~/signals";
+import { uiEvents } from "~/signals";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
@@ -32,6 +34,13 @@ export class Engine {
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
     const context = this.offScreenCanvas.getContext("2d");
+
+    effect(() => {
+      const image = uiEvents.getStagedImage();
+      if (image) {
+        this.addImage(image);
+      }
+    });
   }
 
   private applyChanges() {
@@ -43,8 +52,8 @@ export class Engine {
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved
 
-    imageToolbar.hide();
-    loadingBar.hide();
+    uiAccess.imageToolbar.hide();
+    uiAccess.loadingBar.hide();
     this.setupStage();
   }
 
@@ -81,6 +90,25 @@ export class Engine {
     videoNode.simulatedLoading();
 
     this.videoLayer.add(textNode);
+  }
+
+  public addImage(imageFile: File) {
+    // main API:
+    const imageObj = new Image();
+    const videoLayer = this.videoLayer;
+    imageObj.onload = () => {
+      const konvaImage = new Konva.Image({
+        x: 50,
+        y: 50,
+        image: imageObj,
+        width: 106,
+        height: 118,
+      });
+
+      // add the shape to the layer
+      videoLayer.add(konvaImage);
+    };
+    imageObj.src = URL.createObjectURL(imageFile);
   }
 }
 

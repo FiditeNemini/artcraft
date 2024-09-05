@@ -3,13 +3,13 @@ import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
 import { ToolbarImage } from "../ToolbarImage";
-import { imageToolbar } from "~/signals/konvaContextuals";
+import { uiAccess } from "~/signals/uiAccess";
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualToolbarImage = () => {
   useSignals();
 
-  const { isShowing, ...rest } = imageToolbar.signal.value;
+  const { isShowing, ...rest } = uiAccess.imageToolbar.signal.value;
 
   return (
     <Transition show={isShowing}>

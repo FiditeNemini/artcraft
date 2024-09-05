@@ -2,14 +2,13 @@ import { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { faChevronDown } from "@fortawesome/pro-thin-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  loadingBar,
-  ContextualLoadingBarProps,
-} from "~/signals/konvaContextuals";
+import { uiAccess, uiAccessType } from "~/signals/uiAccess";
 
 import { Input, Button, LoadingBarStatus } from "~/components/ui";
-type LoadingBarPropsType = Omit<ContextualLoadingBarProps, "isShowing">;
+
 export const ContextualLoadingBarForm = () => {
+  const loadingBar = uiAccess.loadingBar;
+  type LoadingBarPropsType = Omit<uiAccessType["loadingBar"], "isShowing">;
   const [loadingBarProps, setLoadingBarProps] = useState<LoadingBarPropsType>({
     status: LoadingBarStatus.IDLE,
     progress: 0,
