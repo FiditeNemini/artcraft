@@ -27,11 +27,13 @@ import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
 interface GenerateTtsProps {
   weightToken?: string | null;
   onResultToken?: (token: string | null) => void;
+  onAudioDelete?: () => void;
 }
 
 export const GenerateTts = ({
   weightToken,
   onResultToken,
+  onAudioDelete,
 }: GenerateTtsProps) => {
   const [textBuffer, setTextBuffer] = useState("");
   const [maybeTtsError, setMaybeTtsError] = useState<
@@ -93,7 +95,7 @@ export const GenerateTts = ({
   };
 
   useEffect(() => {
-    if (!jobToken) return;
+    if (!jobToken || currentAudioUrl === null) return;
 
     const fetch = async () => {
       const job = inferenceJobs.find(
@@ -131,6 +133,23 @@ export const GenerateTts = ({
     fetch();
   }, [currentAudioUrl, jobToken, inferenceJobs, onResultToken]);
 
+  const handleClearAudio = () => {
+    setJobToken(null);
+    setCurrentAudioUrl(null);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("audio");
+    window.history.replaceState({}, "", url.toString());
+
+    if (onResultToken) {
+      onResultToken(null);
+    }
+
+    if (onAudioDelete) {
+      onAudioDelete();
+    }
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const maybeResultToken = urlParams.get("audio");
@@ -148,10 +167,12 @@ export const GenerateTts = ({
             const audioLink = new BucketConfig().getGcsUrl(
               response.media_file.public_bucket_path
             );
-            setCurrentAudioUrl(audioLink);
-            setTranscript(response.media_file.maybe_text_transcript || "");
-            if (onResultToken) {
-              onResultToken(response.media_file.token);
+            if (audioLink && currentAudioUrl === null) {
+              setCurrentAudioUrl(audioLink);
+              setTranscript(response.media_file.maybe_text_transcript || "");
+              if (onResultToken) {
+                onResultToken(response.media_file.token);
+              }
             }
           } else {
             console.error(
@@ -166,22 +187,10 @@ export const GenerateTts = ({
 
       fetchMedia();
     }
-  }, [onResultToken]);
+  }, [currentAudioUrl, onResultToken]);
 
   const handleAudioFinish = () => {
     setIsPlaying(false);
-  };
-
-  const handleClearAudio = () => {
-    setCurrentAudioUrl(null);
-    setJobToken(null);
-    const url = new URL(window.location.href);
-    url.searchParams.delete("audio");
-    window.history.replaceState({}, "", url.toString());
-
-    if (onResultToken) {
-      onResultToken(null);
-    }
   };
 
   let maybeError = <></>;
