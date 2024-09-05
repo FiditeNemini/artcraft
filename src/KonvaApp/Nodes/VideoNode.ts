@@ -152,17 +152,10 @@ export class VideoNode extends NetworkedNodeContext {
       } else {
         loadingBar.hide();
       }
-      console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
-      if (this.didFinishLoading && this.shouldPlay === true) {
-        console.log("Playing");
-        this.shouldPlay = false;
-        this.videoComponent.play();
-      } else {
-        this.shouldPlay = true;
-        this.videoComponent.pause();
+    });
 
-        console.log("Pausing");
-      }
+    this.node.on("mouseup", () => {
+      this.play();
     });
   }
 
@@ -215,6 +208,7 @@ export class VideoNode extends NetworkedNodeContext {
 
       this.node.image(videoComponent);
       this.node.draw();
+      this.videoComponent.loop = true;
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
 
       console.log("Can Play");
@@ -225,10 +219,12 @@ export class VideoNode extends NetworkedNodeContext {
       // remove loading ui
       loadingBar.updateProgress(100);
       loadingBar.hide();
+
+      this.videoComponent.play();
     };
 
     videoComponent.onseeked = (event: Event) => {
-      console.log("Seeked");
+      //console.log("Seeked");
       // reimplement using the function
     };
 
@@ -237,12 +233,25 @@ export class VideoNode extends NetworkedNodeContext {
   }
   // odd reasoning you have to refresh to prevent multiple instances of things being created. causing laggyness
   // Loading animation when having a sequence of images.
+  play() {
+    console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
+    if (this.didFinishLoading && this.shouldPlay === true) {
+      console.log("Playing");
+      this.shouldPlay = false;
+      this.videoComponent.play();
+    } else {
+      this.shouldPlay = true;
+      this.videoComponent.pause();
 
+      console.log("Pausing");
+    }
+  }
   async simulatedLoading() {
     // need to block playing while loading
     this.didFinishLoading = false;
 
     console.log(this.imageIndex);
+
     if (this.imageIndex == 0) {
       loadingBar.show();
     }

@@ -67,7 +67,6 @@ export class Engine {
         );
       }
     }, this.videoLayer);
-
     anim.start();
 
     // Adding nodes here
