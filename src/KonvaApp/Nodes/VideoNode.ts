@@ -146,7 +146,7 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.node.on("mousedown", () => {
       imageToolbar.show();
-
+      this.updateContextMenuPosition();
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       } else {
@@ -185,10 +185,16 @@ export class VideoNode extends NetworkedNodeContext {
   private async createVideoElement(newURL: string) {
     // try catch here with a retry button.
     const videoComponent = document.createElement("video");
-
     // Update to use image.
     videoComponent.src = newURL;
+    // assign video to start process.
+    this.videoComponent = videoComponent;
     console.log(newURL);
+
+    videoComponent.onseeked = (event: Event) => {
+      //console.log("Seeked");
+      // reimplement using the function
+    };
 
     videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
@@ -204,36 +210,32 @@ export class VideoNode extends NetworkedNodeContext {
     };
 
     videoComponent.onloadeddata = (event: Event) => {
-      console.log("LoadedData");
+      try {
+        console.log("LoadedData");
 
-      this.node.image(videoComponent);
-      this.node.draw();
-      this.videoComponent.loop = true;
-      this.videoComponent.currentTime = 0; // ensure it shows up on screen
+        this.node.image(videoComponent);
+        this.node.draw();
+        this.videoComponent.loop = true;
+        this.videoComponent.currentTime = 0; // ensure it shows up on screen
 
-      console.log("Can Play");
+        console.log("Can Play");
 
-      this.didFinishLoading = true;
-      this.shouldPlay = true; // means its initial state
+        this.didFinishLoading = true;
+        this.shouldPlay = true; // means its play state
 
-      // remove loading ui
-      loadingBar.updateProgress(100);
-      loadingBar.hide();
+        // remove loading ui
+        loadingBar.updateProgress(100);
+        loadingBar.hide();
 
-      this.videoComponent.play();
+        // Might have to auto click? on first load this doesn't work in general how about after ?
+        this.videoComponent.play(); //sometimes race condition with the
+      } catch (error) {
+        console.log(error);
+      }
     };
-
-    videoComponent.onseeked = (event: Event) => {
-      //console.log("Seeked");
-      // reimplement using the function
-    };
-
-    // assign video to start process.
-    this.videoComponent = videoComponent;
   }
-  // odd reasoning you have to refresh to prevent multiple instances of things being created. causing laggyness
-  // Loading animation when having a sequence of images.
-  play() {
+
+  private play() {
     console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
     if (this.didFinishLoading && this.shouldPlay === true) {
       console.log("Playing");
@@ -263,13 +265,6 @@ export class VideoNode extends NetworkedNodeContext {
 
     loadingBar.updateMessage("Generating");
 
-    if (this.imageIndex < this.imageSources.length - 1) {
-      loadingBar.updateProgress(
-        (this.imageIndex / this.imageSources.length) * 100,
-      );
-      setTimeout(this.simulatedLoading.bind(this), 100); // Update every second
-    }
-
     if (this.imageIndex == this.imageSources.length - 1) {
       // show final video
       console.log("Final Video Element");
@@ -277,6 +272,13 @@ export class VideoNode extends NetworkedNodeContext {
         this.imageSources[this.imageSources.length - 1],
       );
       console.log("Done Video Element");
+    }
+
+    if (this.imageIndex < this.imageSources.length - 1) {
+      loadingBar.updateProgress(
+        (this.imageIndex / this.imageSources.length) * 100,
+      );
+      setTimeout(this.simulatedLoading.bind(this), 500); // Update every second
     }
   }
 

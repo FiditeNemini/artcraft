@@ -74,8 +74,8 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      100,
-      100,
+      300,
+      300,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
     videoNode.simulatedLoading();
