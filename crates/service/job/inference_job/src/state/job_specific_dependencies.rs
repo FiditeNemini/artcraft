@@ -71,7 +71,9 @@ impl JobSpecificDependencies {
       maybe_gpt_sovits_dependencies = Some(GptSovitsDependencies::setup()?);
     }
 
-    if scoped_model_type_execution.can_run_job(InferenceModelType::RvcV2) {
+    if scoped_model_type_execution.can_run_job(InferenceModelType::RvcV2)
+        || scoped_job_type_execution.can_run_job(InferenceJobType::RvcV2)
+    {
       print_with_space("Setting RVCv2 dependencies...");
       maybe_rvc_v2_dependencies = Some(RvcV2Dependencies::setup()?);
     }
