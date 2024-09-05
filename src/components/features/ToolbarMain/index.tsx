@@ -9,11 +9,11 @@ import {
   faFilePlus,
   faFilm,
   faFloppyDisk,
-  faHand,
+  // faHand,
   faImage,
   faLocationArrow,
-  faPlus,
-  faMinus,
+  // faPlus,
+  // faMinus,
   faSquareDashed,
 } from "@fortawesome/pro-thin-svg-icons";
 

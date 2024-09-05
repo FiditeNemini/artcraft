@@ -1,5 +1,4 @@
 import Konva from "konva";
-import { effect } from "@preact/signals-core";
 import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
@@ -35,11 +34,8 @@ export class Engine {
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
     const context = this.offScreenCanvas.getContext("2d");
 
-    effect(() => {
-      const image = uiEvents.getStagedImage();
-      if (image) {
-        this.addImage(image);
-      }
+    uiEvents.onGetStagedImage((image) => {
+      this.addImage(image);
     });
   }
 
