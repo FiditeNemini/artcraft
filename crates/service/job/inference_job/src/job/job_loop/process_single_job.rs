@@ -254,9 +254,10 @@ async fn do_process_single_job(
 
 fn can_use_new_dispatch(job: &AvailableInferenceJob) -> bool {
   match job.job_type {
-    InferenceJobType::VideoRender => true,
-    InferenceJobType::LivePortrait => true,
     InferenceJobType::GptSovits => true,
+    InferenceJobType::LivePortrait => true,
+    InferenceJobType::RvcV2 => true,
+    InferenceJobType::VideoRender => true,
     _ => false,
   }
 }
@@ -279,6 +280,7 @@ async fn new_dispatch(
     InferenceJobType::RvcV2 => {
       dispatch_rvc_v2_job(job_dependencies, job).await?
     },
+    // NB: Make sure to add the job to `can_use_new_dispatch`.
     _ => {
       return Err(ProcessSingleJobError::InvalidJob(
         anyhow!("invalid job type for dispatch: {:?}", job.job_type)))
