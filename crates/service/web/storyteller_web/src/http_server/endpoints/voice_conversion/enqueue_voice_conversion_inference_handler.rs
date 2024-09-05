@@ -281,25 +281,6 @@ pub async fn enqueue_voice_conversion_inference_handler(
         "input token is not a media_upload or media_file token".to_string()));
     };
 
-  // NB: This is better, but we'd need to change the API and migrate callers.
-  // let (input_token, input_token_type) =
-  //     match (&request.source_media_upload_token, &request.source_media_file_token) {
-  //       (Some(media_upload), None) => {
-  //         (media_upload.to_string(), InferenceInputSourceTokenType::MediaUpload)
-  //       },
-  //       (None, Some(media_file)) => {
-  //         (media_file.to_string(), InferenceInputSourceTokenType::MediaFile)
-  //       },
-  //       (Some(_media_upload), Some(_media_file)) => {
-  //         return Err(EnqueueVoiceConversionInferenceError::BadInput(
-  //           "both source_media_upload_token and source_media_file_token provided".to_string()));
-  //       },
-  //       (None, None) => {
-  //         return Err(EnqueueVoiceConversionInferenceError::BadInput(
-  //           "neither source_media_upload_token nor source_media_file_token provided".to_string()));
-  //       },
-  //     };
-
   // ==================== CHECK AND ENQUEUE VOICE CONVERSION ==================== //
 
   let mut redis = server_state.redis_pool

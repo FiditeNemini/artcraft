@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use log::{error, info, warn};
+use log::{error, info};
 
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
 use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModelType};
@@ -17,7 +17,8 @@ use crate::job::job_types::vc::rvc_v2::process_rvc_job::RvcV2ProcessJobArgs;
 use crate::job::job_types::vc::so_vits_svc::process_job::SoVitsSvcProcessJobArgs;
 use crate::state::job_dependencies::JobDependencies;
 
-pub async fn process_single_vc_job(
+/// This is meant to take over from the `process_single_vc_job` function for a short bit
+pub async fn process_rvc_job_old_entrypoint_adapter(
   job_dependencies: &JobDependencies,
   job: &AvailableInferenceJob
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -40,22 +41,6 @@ pub async fn process_single_vc_job(
     None => return Err(ProcessSingleJobError::Other(anyhow!("model weights not found: {:?}", model_token))),
     Some(model) => model,
   };
-
-  // TODO: Look for model files on filesystem
-
-  // TODO: Attempt to grab job lock
-
-  //let maybe_media_upload_token = job.maybe_inference_args
-  //    .as_ref()
-  //    .map(|args| args.args.as_ref())
-  //    .flatten()
-  //    .map(|args| {
-  //      match args {
-  //        PolymorphicInferenceArgs::TextToSpeechInferenceArgs { .. } => None,
-  //        PolymorphicInferenceArgs::VoiceConversionInferenceArgs { maybe_media_token } => maybe_media_token.clone(),
-  //      }
-  //    })
-  //    .flatten();
 
   let media_token = job.maybe_input_source_token
       .as_deref()
@@ -117,7 +102,6 @@ pub async fn process_single_vc_job(
 
   let job_success_result = match model.get_model_type() {
     VcModelType::RvcV2 => {
-      warn!("OLD/LEGACY RVC code path. We should instead dispatch on the basis of job_type. See `dispatch_rvc_v2_job` and migrate to that code path.");
       rvc_v2::process_rvc_job::process_rvc_job(RvcV2ProcessJobArgs {
         job_dependencies,
         job,
@@ -125,17 +109,10 @@ pub async fn process_single_vc_job(
         inference_media: &inference_media,
       }).await?
     }
-    VcModelType::SoVitsSvc => {
-      so_vits_svc::process_job::process_job(SoVitsSvcProcessJobArgs {
-        job_dependencies,
-        job,
-        vc_model: &model,
-        inference_media: &inference_media,
-      }).await?
-    }
-    VcModelType::SoftVc => return Err(ProcessSingleJobError::NotYetImplemented),
-    VcModelType::Invalid => return Err(ProcessSingleJobError::InvalidJob(anyhow!("invalid vc model type: {:?}", model.get_model_type()))),
+    _ => return Err(ProcessSingleJobError::InvalidJob(anyhow!("only RVC models should be dispatched this way"))),
   };
 
   Ok(job_success_result)
 }
+
+

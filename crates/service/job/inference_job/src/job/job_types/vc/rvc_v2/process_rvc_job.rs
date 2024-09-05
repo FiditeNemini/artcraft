@@ -42,7 +42,7 @@ pub struct RvcV2ProcessJobArgs<'a> {
   pub inference_media: &'a MediaForInference,
 }
 
-pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_rvc_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let job = args.job;
   let vc_model = args.vc_model;
 
