@@ -150,6 +150,9 @@ export const GenerateTts = ({
             );
             setCurrentAudioUrl(audioLink);
             setTranscript(response.media_file.maybe_text_transcript || "");
+            if (onResultToken) {
+              onResultToken(response.media_file.token);
+            }
           } else {
             console.error(
               "Failed to retrieve media or media has no public bucket path",
@@ -163,7 +166,7 @@ export const GenerateTts = ({
 
       fetchMedia();
     }
-  }, []);
+  }, [onResultToken]);
 
   const handleAudioFinish = () => {
     setIsPlaying(false);
