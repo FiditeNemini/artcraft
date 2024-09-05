@@ -1,5 +1,5 @@
 import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -45,9 +45,24 @@ export const ToolbarMain = () => {
   const [isUploadSubmenuOpen, setIsUploadSubmenuOpen] = useState(false);
   const [isUploadImageOpen, setIsUploadImageOpen] = useState(false);
 
+  const toolbarCallbackRef = useCallback((node: HTMLDivElement) => {
+    function handleClickOutside(e: MouseEvent) {
+      if (!node.contains(e.target as Node)) {
+        setIsUploadSubmenuOpen(false);
+      }
+    }
+    if (node) {
+      window.addEventListener("click", handleClickOutside);
+    }
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="col-span-12 col-start-1 row-span-1 row-start-12 justify-center">
       <div
+        ref={toolbarCallbackRef}
         className={twMerge(
           "m-auto flex w-fit items-center divide-x divide-ui-border",
           paperWrapperStyles,
