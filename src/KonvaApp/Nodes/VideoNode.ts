@@ -152,11 +152,11 @@ export class VideoNode extends NetworkedNodeContext {
       } else {
         loadingBar.hide();
       }
-
+      console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
       if (this.didFinishLoading && this.shouldPlay === true) {
+        console.log("Playing");
         this.shouldPlay = false;
         this.videoComponent.play();
-        console.log("Playing");
       } else {
         this.shouldPlay = true;
         this.videoComponent.pause();
@@ -237,6 +237,7 @@ export class VideoNode extends NetworkedNodeContext {
   }
   // odd reasoning you have to refresh to prevent multiple instances of things being created. causing laggyness
   // Loading animation when having a sequence of images.
+
   async simulatedLoading() {
     // need to block playing while loading
     this.didFinishLoading = false;
@@ -245,17 +246,19 @@ export class VideoNode extends NetworkedNodeContext {
     if (this.imageIndex == 0) {
       loadingBar.show();
     }
+
     await this.updateImage(this.imageSources[this.imageIndex]);
     this.imageIndex = this.imageIndex + 1;
+
     this.updateLoadingBarPosition();
 
     loadingBar.updateMessage("Generating");
 
-    if (this.imageIndex < this.imageSources.length) {
+    if (this.imageIndex < this.imageSources.length - 1) {
       loadingBar.updateProgress(
         (this.imageIndex / this.imageSources.length) * 100,
       );
-      setTimeout(this.simulatedLoading.bind(this), 250); // Update every second
+      setTimeout(this.simulatedLoading.bind(this), 100); // Update every second
     }
 
     if (this.imageIndex == this.imageSources.length - 1) {
