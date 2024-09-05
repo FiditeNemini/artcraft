@@ -247,6 +247,7 @@ export default function LivePortrait() {
       },
       remove_watermark: removeWatermark,
       source_media_file_token: sourceTokens[selectedSourceIndex],
+      used_webcam: true,
       uuid_idempotency_token: uuidv4(),
     }).then((res: EnqueueFaceMirrorResponse) => {
       if (res.success && res.inference_job_token) {

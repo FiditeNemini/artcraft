@@ -14,6 +14,7 @@ export interface EnqueueFaceMirrorRequest {
   maybe_crop: MediaFileCropArea;
   remove_watermark: boolean;
   source_media_file_token: string;
+  used_webcam?: boolean;
   uuid_idempotency_token: string;
 }
 
