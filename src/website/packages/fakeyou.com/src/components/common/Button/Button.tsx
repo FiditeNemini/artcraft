@@ -10,6 +10,7 @@ export default function Button({
   buttonRef,
   label,
   icon,
+  onClick,
   small,
   variant: variantProps = "primary",
   to,
@@ -74,6 +75,7 @@ export default function Button({
       square ? (small ? "button-square-small" : "button-square") : ""
     } button-${variant} ${full ? "w-100" : ""}`,
     disabled: disabled || isLoading,
+    onClick,
   };
 
   delete rest.className;
@@ -95,18 +97,14 @@ export default function Button({
   );
 
   const WrappedButton = to ? (
-    <Link to={to} {...commonProps}>
-      {ButtonContent}
-    </Link>
+    <Link {...{ ...commonProps, to }}>{ButtonContent}</Link>
   ) : href ? (
     <a
-      href={href}
-      target={target}
       rel="noopener noreferrer"
       download={
         download ? (typeof download === "string" ? download : true) : undefined
       }
-      {...commonProps}
+      {...{ ...commonProps, href, target }}
     >
       {ButtonContent}
     </a>

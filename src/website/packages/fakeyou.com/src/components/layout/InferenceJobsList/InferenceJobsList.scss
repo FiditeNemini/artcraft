@@ -55,10 +55,11 @@ $primary-transparent: rgba($primary, 0.75);
 
 .fy-inference-jobs-list-grid {
   display: grid;
-  grid-template-columns: 2.25rem fit-content(100px) minmax(0, 1fr) minmax(
+  grid-template-columns: min-content fit-content(100px) minmax(0, 1fr) minmax(
       min-content,
       1fr
     );
+  // grid-template-rows: 4rem;
   gap: 1rem 0;
 
   .work-indicator {
@@ -75,13 +76,19 @@ $primary-transparent: rgba($primary, 0.75);
 
   .fy-inference-job-hover-on,
   .fy-inference-job-hover-off {
-    padding: 0.5rem;
+    padding: 0.75rem;
 
     // &:first-of-type { }
   }
 
   .fy-inference-job-success {
     cursor: pointer;
+
+    button {
+      height: 2.25rem;
+      width: 2.25rem;
+      margin: auto 0 auto 1rem;
+    }
 
     &.fy-inference-job-hover-on {
       background-color: $panel-inner;
@@ -90,8 +97,8 @@ $primary-transparent: rgba($primary, 0.75);
 
   .fy-inference-job-indicator {
     border-radius: 0.5rem 0 0 0.5rem;
-    margin-left: -0.5rem;
-    padding-right: 0;
+    // margin-left: -0.5rem;
+    // padding-right: 0;
 
     .fy-inference-job-indicator-container {
       // background-color: red;
@@ -162,7 +169,7 @@ $primary-transparent: rgba($primary, 0.75);
   }
 
   .fy-inference-job-action-frame {
-    margin-right: -0.5rem;
+    // margin-right: -0.5rem;
     position: relative;
     padding: 0;
     // width: fit-content;
@@ -175,12 +182,8 @@ $primary-transparent: rgba($primary, 0.75);
       cursor: pointer;
       margin: auto;
       white-space: nowrap;
-      // padding-left: .75rem;
-      // display: flex;
-      // align-items: center;
       border-radius: 0.5rem;
-      // line-height: 1em;
-      margin: auto 0 auto auto;
+      margin: auto 0 auto 1rem;
     }
 
     .job-status-complete-success {
@@ -220,6 +223,33 @@ $primary-transparent: rgba($primary, 0.75);
       padding: 0.625rem 1rem;
       line-height: 1em;
       // height: 2.25rem;
+    }
+  }
+
+  .fy-inference-job-preview {
+    // background-color: red;
+    // grid-column-start: 1;
+    // grid-column-end: five;
+
+    .fy-inference-job-preview-thumb {
+      // background-color: blue;
+      // margin: 3rem 0;
+      height: 3.25rem;
+      width: fit-content;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      position: relative;
+
+      .fy-inference-job-preview-static,
+      .fy-inference-job-preview-gif {
+        position: absolute;
+        border-radius: 0.5rem;
+        width: auto;
+        height: 100%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
     }
   }
 }

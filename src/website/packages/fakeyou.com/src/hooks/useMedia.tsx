@@ -11,6 +11,14 @@ import { DeleteMedia } from "@storyteller/components/src/api/media_files/DeleteM
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
+type ThumbFn = (width?: number, quality?: number) => string;
+
+export interface MediaURLs {
+  file: string;
+  gif: ThumbFn;
+  thumb: ThumbFn;
+}
+
 export default function useMedia({
   debug = "",
   mediaToken = "",
@@ -42,11 +50,19 @@ export default function useMedia({
     status === FetchStatus.in_progress ||
     writeStatus === FetchStatus.in_progress;
 
-  // const bucketConfig = new BucketConfig();
+  const bucketConfig = new BucketConfig();
 
-  const bucketUrl = media?.public_bucket_path
-    ? new BucketConfig().getGcsUrl(media.public_bucket_path)
-    : "";
+  const publicBucketPath = media?.public_bucket_path || "";
+
+  const bucketUrl = bucketConfig.getGcsUrl(publicBucketPath);
+
+  const urls = {
+    file: bucketConfig.getGcsUrl(publicBucketPath),
+    gif: (width = 360, quality = 20) =>
+      bucketConfig.getCdnUrl(publicBucketPath + "-thumb.gif", width, quality),
+    thumb: (width = 600, quality = 100) =>
+      bucketConfig.getCdnUrl(publicBucketPath + "-thumb.jpg", width, quality),
+  };
 
   useEffect(() => {
     // this condidition handles all media file fetches
@@ -96,6 +112,7 @@ export default function useMedia({
     reload,
     status,
     statusSet,
+    urls,
     writeStatus,
   };
 }

@@ -12,7 +12,7 @@ import useChanger from "./useChanger";
 import useCoverImgUpload from "./useCoverImgUpload";
 import useDebounce from "./useDebounce";
 import useFile from "./useFile";
-import useHover from "./useHover";
+import useHover, { HoverValues } from "./useHover";
 import useId from "./useId";
 import useIdempotency from "./useIdempotency";
 import useInferenceJobs from "./useInferenceJobs";
@@ -22,7 +22,7 @@ import useJobStatus from "./useJobStatus";
 import useLazyLists from "./useLazyLists";
 import useListContent from "./useListContent";
 import useLocalize from "./useLocalize";
-import useMedia from "./useMedia";
+import useMedia, { MediaURLs } from "./useMedia";
 import useMediaUploader from "./useMediaUploader";
 import useModal from "./useModal";
 import useModalState, { ModalConfig, ModalWidth } from "./useModalState";
@@ -83,9 +83,11 @@ export type {
   AnimationEvents,
   BatchInputProps,
   CameraState,
+  HoverValues,
   MakeBookmarksProps,
   MakeBatchPropsParams,
   MakeRatingsProps,
+  MediaURLs,
   ModalConfig,
   ModalWidth,
 };

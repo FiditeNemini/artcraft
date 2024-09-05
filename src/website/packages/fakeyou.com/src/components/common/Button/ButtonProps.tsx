@@ -5,6 +5,7 @@ export default interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   buttonRef?: any;
   label?: string | null;
+  onClick?: (e: any) => any;
   icon?: IconDefinition;
   small?: boolean;
   variant?: string;

@@ -5,17 +5,21 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import {
   CancelJob,
   CancelJobResponse,
 } from "@storyteller/components/src/api/jobs/CancelJob";
-import { useHover, useSlides } from "hooks";
+import { MediaURLs, useHover, useMedia, useSlides } from "hooks";
 import {
   JobState,
   jobStateCanChange,
 } from "@storyteller/components/src/jobs/JobStates";
+import { Button } from "components/common";
 import { useHistory } from "react-router-dom";
 import { STYLES_BY_KEY } from "common/StyleOptions";
+import JobResultPreview from "./JobResultPreview";
+import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
 
 interface JobListItem extends InferenceJob {
   failures: (fail: string) => string;
@@ -28,18 +32,56 @@ interface JobListItem extends InferenceJob {
 
 const BaseAction = ({
   canStop = false,
+  hover = false,
+  mediaFile,
+  maybeResultToken = "",
   success = false,
   toggleSlide = () => {},
+  urls,
+}: {
+  canStop: boolean;
+  hover: boolean;
+  mediaFile: MediaFile;
+  maybeResultToken: string;
+  success: boolean;
+  toggleSlide: () => void;
+  urls: MediaURLs;
 }) =>
   canStop || success ? (
-    <svg
-      {...{
-        className: `fy-inference-job-action${success ? "-success" : ""}`,
-        ...(success ? {} : { onClick: toggleSlide }),
-      }}
-    >
-      <ArrowX {...{ checked: success }} />
-    </svg>
+    <>
+      <JobResultPreview
+        {...{
+          hover,
+          mediaFile,
+          mediaToken: maybeResultToken,
+          show: success,
+          urls,
+        }}
+      />
+      {success && (
+        <Button
+          {...{
+            href: urls.file,
+            icon: faArrowDownToLine,
+            onClick: (e: any) => {
+              e.stopPropagation();
+            },
+            square: true,
+            small: true,
+            target: "_blank",
+            variant: "secondary",
+          }}
+        />
+      )}
+      <svg
+        {...{
+          className: `fy-inference-job-action${success ? "-success" : ""}`,
+          ...(success ? {} : { onClick: toggleSlide }),
+        }}
+      >
+        <ArrowX {...{ checked: success }} />
+      </svg>
+    </>
   ) : (
     <></>
   );
@@ -164,12 +206,22 @@ export default function JobItem({
     }
   };
 
+  const { mediaFile, urls } = useMedia({ mediaToken: maybeResultToken || "" });
+
   const slides = useSlides({
     index,
     slides: [
       {
         component: BaseAction,
-        props: { success, toggleSlide, canStop: canStop() },
+        props: {
+          canStop: canStop(),
+          hover,
+          maybeResultToken,
+          mediaFile,
+          success,
+          toggleSlide,
+          urls,
+        },
       },
       { component: StopConfirm, props: { stopClick, toggleSlide } },
     ],
@@ -229,11 +281,6 @@ export default function JobItem({
       <div {...{ ...outerProps(`fy-inference-job-action-frame`), ...hoverSet }}>
         {slides}
       </div>
-      {
-        // <div {...{ className: "fy-inference-job-previews" }}>
-        //   {  }
-        // </div>
-      }
     </>
   );
 }
