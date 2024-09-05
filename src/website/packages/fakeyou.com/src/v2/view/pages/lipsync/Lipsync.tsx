@@ -242,10 +242,10 @@ export default function LivePortrait({
 
     EnqueueLipsync("", {
       creator_set_visibility: visibility,
-      audio_media_file_token: "",
+      audio_media_file_token: audioToken || "",
       maybe_crop: cropArea,
       remove_watermark: removeWatermark,
-      image_or_video_media_file_token: "",
+      image_or_video_media_file_token: sourceTokens[selectedSourceIndex],
       uuid_idempotency_token: uuidv4(),
     }).then((res: EnqueueLipsyncResponse) => {
       if (res.success && res.inference_job_token) {
