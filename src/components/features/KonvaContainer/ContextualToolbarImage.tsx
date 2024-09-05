@@ -7,7 +7,7 @@ import { imageToolbar } from "~/signals/konvaContextuals";
 import { transitionTimingStyles } from "~/components/styles";
 export const ContextualToolbarImage = () => {
   useSignals();
-  console.log("ContextualToolbarImage");
+  //console.log("ContextualToolbarImage");
 
   const { position, isShowing } = imageToolbar.signal.value;
 

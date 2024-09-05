@@ -5,7 +5,7 @@ import { loadingBar } from "~/signals/konvaContextuals";
 
 export const ContextualLoadingBar = () => {
   useSignals();
-  console.log("ContextualLoadingBar");
+  //console.log("ContextualLoadingBar");
   const props = loadingBar.signal.value;
 
   return <LoadingBar {...props} />;
