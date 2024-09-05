@@ -7,6 +7,7 @@ interface TextAreaProps
   textArea?: boolean;
   required?: boolean;
   resize?: boolean;
+  className?: string;
 }
 
 export default function TextArea({
@@ -14,17 +15,20 @@ export default function TextArea({
   textArea,
   required,
   resize = true,
+  className,
   ...rest
 }: TextAreaProps) {
   return (
-    <div className="fy-textarea">
+    <div className="fy-textarea flex-grow-1 position-relative">
       {label && (
         <label className={`sub-title ${required ? "required" : ""}`.trim()}>
           {label}
         </label>
       )}
       <textarea
-        className={`form-control ${resize ? "" : "no-resize"}`.trim()}
+        className={`form-control ${
+          resize ? "" : "no-resize"
+        } ${className}`.trim()}
         {...rest}
       />
     </div>

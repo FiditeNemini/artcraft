@@ -19,6 +19,7 @@ export enum FrontendInferenceJobType {
   VideoWorkflow, // workflow ?
   VideoStyleTransfer, // video_filter
   LivePortrait, // live_portrait
+  Lipsync, // lip_sync
 }
 
 export enum AllInferenceJobs {

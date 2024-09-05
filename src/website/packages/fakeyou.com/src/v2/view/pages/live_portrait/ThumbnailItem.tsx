@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 interface ThumbnailItemProps {
   index: number;
   selectedIndex: number;
-  handleThumbnailClick: (index: number) => void;
+  handleThumbnailClick?: (index: number) => void;
   poster?: string;
   mediaType?: string;
 }
@@ -48,7 +48,7 @@ const ThumbnailItem: React.FC<ThumbnailItemProps> = ({
     <div className="col-3" key={index}>
       <div
         className={`lp-thumbnail ${index === selectedIndex ? "active" : ""}`}
-        onClick={() => handleThumbnailClick(index)}
+        onClick={() => handleThumbnailClick && handleThumbnailClick(index)}
       >
         {poster ? (
           mediaType === "image" ? (

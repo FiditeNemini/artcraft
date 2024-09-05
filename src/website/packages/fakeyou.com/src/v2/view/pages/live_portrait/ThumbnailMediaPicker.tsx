@@ -21,7 +21,7 @@ import { useSession } from "hooks";
 interface ThumbnailMediaPickerProps {
   mediaTokens: string[];
   selectedIndex: number;
-  handleThumbnailClick: (index: number) => void;
+  handleThumbnailClick?: (index: number) => void;
   title?: string;
   description?: string;
   badgeLabel?: string;
@@ -39,6 +39,10 @@ interface ThumbnailMediaPickerProps {
   onSelectedMediaChange?: (media: any) => void;
   uploadFocusPoint?: boolean;
   uploadButtonText?: string;
+  showThumbnails?: boolean;
+  showUploadButton?: boolean;
+  showStep?: boolean;
+  stepAlwaysOnTop?: boolean;
 }
 
 interface MediaData {
@@ -62,6 +66,10 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     onSelectedMediaChange,
     uploadFocusPoint,
     uploadButtonText = "Upload your own media",
+    showThumbnails = true,
+    showUploadButton = true,
+    showStep = true,
+    stepAlwaysOnTop = false,
   }) => {
     const [isCropping, setIsCropping] = useState(false);
     const [mediaData, setMediaData] = useState<{ [key: string]: any }>({});
@@ -146,8 +154,10 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     );
 
     return (
-      <div className="d-flex gap-3 flex-column">
-        <div className="lp-media order-4 order-lg-1">
+      <div className="d-flex gap-3 flex-column w-100 h-100">
+        <div
+          className={`lp-media order-4 ${stepAlwaysOnTop ? "" : "order-lg-1"}`}
+        >
           <div className="lp-tag">
             <div>
               {!isCropping ? (
@@ -232,59 +242,67 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
           )}
         </div>
 
-        <div className="order-1 order-lg-2">
-          <div className="d-flex gap-2 align-items-center mb-1">
-            {stepNumber && <div className="lp-step">{stepNumber}</div>}
-            <h2 className="fs-5 mb-0 fw-semibold">{title}</h2>
-          </div>
-
-          <p className="fw-medium fs-7 opacity-75">{description}</p>
-        </div>
-
-        <div className="row g-2 order-2 order-lg-3 position-relative">
-          {paginatedMediaTokens.map((token, index) => {
-            const media = mediaData[token];
-            const mediaLink = media?.public_bucket_path
-              ? new BucketConfig().getGcsUrl(media.public_bucket_path)
-              : null;
-
-            return (
-              <ThumbnailItem
-                key={index}
-                index={index + currentPage * itemsPerPage}
-                selectedIndex={selectedIndex}
-                handleThumbnailClick={handleThumbnailClick}
-                poster={mediaLink || ""}
-                mediaType={media?.media_type}
-              />
-            );
-          })}
-
-          {mediaTokens.length > itemsPerPage && (
-            <div className="thumbnail-pagination">
-              <FontAwesomeIcon
-                icon={faChevronLeft}
-                onClick={handlePreviousPage}
-                className="thumbnail-pagination-icon left-arrow"
-              />
-              <FontAwesomeIcon
-                icon={faChevronRight}
-                onClick={handleNextPage}
-                className="thumbnail-pagination-icon right-arrow"
-              />
+        {showStep && (
+          <div
+            className={`order-1 ${stepAlwaysOnTop ? "" : "order-lg-2"}`.trim()}
+          >
+            <div className="d-flex gap-2 align-items-center mb-1">
+              {stepNumber && <div className="lp-step">{stepNumber}</div>}
+              <h2 className="fs-5 mb-0 fw-semibold">{title}</h2>
             </div>
-          )}
-        </div>
 
-        <Button
-          icon={faUpload}
-          label={uploadButtonText}
-          variant="action"
-          className="order-3 order-lg-4"
-          onClick={onUploadClick}
-          focusPoint={uploadFocusPoint}
-          disabled={!loggedIn}
-        />
+            <p className="fw-medium fs-7 opacity-75">{description}</p>
+          </div>
+        )}
+
+        {showThumbnails && (
+          <div className="row g-2 order-2 order-lg-3 position-relative">
+            {paginatedMediaTokens.map((token, index) => {
+              const media = mediaData[token];
+              const mediaLink = media?.public_bucket_path
+                ? new BucketConfig().getGcsUrl(media.public_bucket_path)
+                : null;
+
+              return (
+                <ThumbnailItem
+                  key={index}
+                  index={index + currentPage * itemsPerPage}
+                  selectedIndex={selectedIndex}
+                  handleThumbnailClick={handleThumbnailClick}
+                  poster={mediaLink || ""}
+                  mediaType={media?.media_type}
+                />
+              );
+            })}
+
+            {mediaTokens.length > itemsPerPage && (
+              <div className="thumbnail-pagination">
+                <FontAwesomeIcon
+                  icon={faChevronLeft}
+                  onClick={handlePreviousPage}
+                  className="thumbnail-pagination-icon left-arrow"
+                />
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  onClick={handleNextPage}
+                  className="thumbnail-pagination-icon right-arrow"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {showUploadButton && (
+          <Button
+            icon={faUpload}
+            label={uploadButtonText}
+            variant="action"
+            className="order-3 order-lg-4"
+            onClick={onUploadClick}
+            focusPoint={uploadFocusPoint}
+            disabled={!loggedIn}
+          />
+        )}
       </div>
     );
   }

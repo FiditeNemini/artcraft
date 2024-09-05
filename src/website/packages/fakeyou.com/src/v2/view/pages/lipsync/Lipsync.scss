@@ -1,0 +1,28 @@
+@import "scss/colours.scss";
+
+.ls-remove-audio-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: $action;
+  border: 2.5px solid;
+  border-color: $action;
+  transition: 0.2s;
+  color: $white !important;
+  &:hover {
+    background-color: lighten($action, 5%);
+    border-color: lighten($action, 5%);
+    color: $white !important;
+  }
+  border-radius: 0.5rem;
+}
+
+.ls-section-between {
+  padding-top: 16%;
+
+  @media (max-width: 992px) {
+    padding-top: 0;
+  }
+}

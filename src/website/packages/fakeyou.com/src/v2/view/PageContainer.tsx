@@ -142,6 +142,7 @@ import { BetaWebcamActingForm } from "./pages/beta_products/BetaWebcamActingForm
 import { BetaWebcamActingPage } from "./pages/beta_products/BetaWebcamActingPage";
 import { Beta3DVideoCompositorForm } from "./pages/beta_products/Beta3DVideoCompositorForm";
 import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoCompositorPage";
+import Lipsync from "./pages/lipsync/Lipsync";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -757,6 +758,14 @@ class PageContainer extends React.Component<
                 {/* NEW LIVE PORTRAIT PAGE */}
                 <Route exact path="/ai-live-portrait">
                   <LivePortrait
+                    sessionSubscriptionsWrapper={
+                      this.props.sessionSubscriptionsWrapper
+                    }
+                  />
+                </Route>
+
+                <Route exact path="/dev/lipsync">
+                  <Lipsync
                     sessionSubscriptionsWrapper={
                       this.props.sessionSubscriptionsWrapper
                     }
