@@ -376,6 +376,7 @@ async fn modern_media_file_lookup(
           .to_string(),
       cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
         &result.token,
+        media_domain,
         result.maybe_file_cover_image_public_bucket_hash.as_deref(),
         result.maybe_file_cover_image_public_bucket_prefix.as_deref(),
         result.maybe_file_cover_image_public_bucket_extension.as_deref(),

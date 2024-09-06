@@ -270,6 +270,7 @@ pub async fn search_session_media_files_handler(
           public_bucket_url: bucket_url_string_from_media_path(&public_bucket_path),
           cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
             &result.token,
+            media_domain,
             result.maybe_cover_image_public_bucket_hash.as_deref(),
             result.maybe_cover_image_public_bucket_prefix.as_deref(),
             result.maybe_cover_image_public_bucket_extension.as_deref(),
