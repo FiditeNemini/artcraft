@@ -50,6 +50,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::simple_response::SimpleResponse;
 use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::common_responses::weights_cover_image_details::*;
+use crate::http_server::common_responses::media_links::*;
 use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
 use crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::*;
@@ -282,12 +283,14 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileSocialMetaLight,
     MediaFileWriteError,
     MediaFileWriteError,
+    MediaLinks,
     PaginationCursors,
     PaginationPage,
     SimpleEntityStats,
     SimpleGenericJsonSuccess,
     SimpleResponse,
     UserDetailsLight,
+    VideoPreviews,
     Visibility,
 
     // Common cover image types
