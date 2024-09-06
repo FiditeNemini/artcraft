@@ -376,7 +376,7 @@ async fn database_lookup(
   let maybe_filter_media_types = get_scoped_media_types(query.filter_media_type.as_deref());
   let maybe_filter_media_classes  = get_scoped_media_classes(query.filter_media_classes.as_deref());
   let maybe_filter_engine_categories = get_scoped_engine_categories(query.filter_engine_categories.as_deref());
-  let maybe_filter_product_categories = get_scoped_product_categories(query.filter_engine_categories.as_deref());
+  let maybe_filter_product_categories = get_scoped_product_categories(query.filter_products.as_deref());
 
   // NB: No reason to show deleted or non-public featured items to mods or authors.
   //  That's just confusing and wastes an extra query.
