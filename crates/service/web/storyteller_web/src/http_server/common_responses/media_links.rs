@@ -46,6 +46,7 @@ pub struct MediaLinks {
   pub cdn_url: Url,
 
   /// Template to construct thumbnail URLs.
+  /// Replace the string `{WIDTH}` with the desired width.
   /// Only relevant for image media files. (Video media files instead have
   /// video previews, which, in turn, have their own thumbnail templates.)
   pub maybe_thumbnail_template: Option<String>,
@@ -62,8 +63,10 @@ pub struct VideoPreviews {
   /// An animated gif preview of the video.
   pub animated: Url,
   /// A template used to construct the still thumbnail URL.
+  /// Replace the string `{WIDTH}` with the desired width.
   pub still_thumbnail_template: String,
   /// A template used to construct the animated thumbnail URL.
+  /// Replace the string `{WIDTH}` with the desired width.
   pub animated_thumbnail_template: String,
 }
 
