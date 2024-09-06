@@ -29,9 +29,11 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
+use crate::http_server::common_responses::media_links::{MediaDomain, MediaLinks};
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_str_path::bucket_url_from_str_path;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -88,11 +90,15 @@ pub struct MediaFileInfo {
   pub maybe_scene_source_media_file_token: Option<MediaFileToken>,
 
   /// (DEPRECATED) URL path to the media file
-  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub public_bucket_path: String,
 
-  /// Full URL to the media file
+  /// (DEPRECATED) Full URL to the media file
+  #[deprecated(note="This points to the bucket. Use media_links instead to leverage the CDN.")]
   pub public_bucket_url: Url,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -270,14 +276,26 @@ pub async fn get_media_file_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
+  let media_domain = get_media_domain(&http_request);
+
   // NB(bt,2023-11-27): We're moving TT2 results over to the `media_files` table, originally from
   // the `tts_results_table`. We're emulating media files (for viewing) to support API clients
   // (eg. the AI streamer shows).
   let response = if media_file_token.0.starts_with("TR:") {
     // NB: This is the exceptional case, where we emulate results in the `tts_results` table as media files
-    emulate_media_file_with_legacy_tts_result_lookup(&media_file_token, show_deleted_results, &server_state).await?
+    emulate_media_file_with_legacy_tts_result_lookup(
+      &media_file_token,
+      show_deleted_results,
+      &server_state,
+      media_domain
+    ).await?
   } else {
-    modern_media_file_lookup(&media_file_token, show_deleted_results, &server_state).await?
+    modern_media_file_lookup(
+      &media_file_token,
+      show_deleted_results,
+      &server_state,
+      media_domain
+    ).await?
   };
 
   Ok(Json(response))
@@ -287,6 +305,7 @@ async fn modern_media_file_lookup(
   media_file_token: &MediaFileToken,
   show_deleted_results: bool,
   server_state: &ServerState,
+  media_domain: MediaDomain,
 ) -> Result<GetMediaFileSuccessResponse, GetMediaFileError> {
 
   let is_mod = show_deleted_results;
@@ -305,19 +324,6 @@ async fn modern_media_file_lookup(
     Ok(None) => return Err(GetMediaFileError::NotFound),
     Ok(Some(result)) => result,
   };
-
-  //if let Some(moderator_fields) = result.maybe_moderator_fields.as_ref() {
-  //  // NB: The moderator fields will always be present before removal
-  //  // We don't want non-mods seeing stuff made by banned users.
-  //  if (moderator_fields.model_creator_is_banned || moderator_fields.result_creator_is_banned_if_user)
-  //      && !is_moderator{
-  //    return Err(GetMediaFileError::NotFound);
-  //  }
-  //}
-
-  //if !is_moderator {
-  //  result.maybe_moderator_fields = None;
-  //}
 
   let public_bucket_path = MediaFileBucketPath::from_object_hash(
     &result.public_bucket_directory_hash,
@@ -359,6 +365,7 @@ async fn modern_media_file_lookup(
       maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
       maybe_scene_source_media_file_token: result.maybe_scene_source_media_file_token,
+      media_links: MediaLinks::from_media_path(media_domain, &public_bucket_path),
       public_bucket_url: bucket_url_from_media_path(&public_bucket_path)
           .map_err(|err| {
             warn!("error creating URL: {:?}", err);
@@ -444,6 +451,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
   media_file_token: &MediaFileToken,
   show_deleted_results: bool,
   server_state: &ServerState,
+  media_domain: MediaDomain,
 ) -> Result<GetMediaFileSuccessResponse, GetMediaFileError> {
 
   let result = select_tts_result_by_token(
@@ -493,6 +501,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_engine_extension: None,
       maybe_batch_token: None,
       maybe_scene_source_media_file_token: None,
+      media_links: MediaLinks::from_rooted_path(media_domain, &public_bucket_path),
       public_bucket_url: bucket_url_from_str_path(&public_bucket_path)
           .map_err(|err| {
             warn!("error creating URL: {:?}", err);

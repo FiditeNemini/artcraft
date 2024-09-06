@@ -24,9 +24,11 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
+use crate::http_server::common_responses::media_links::MediaLinks;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
@@ -125,12 +127,15 @@ pub struct MediaFileListItem {
   pub origin: MediaFileOriginDetails,
 
   /// (DEPRECATED) URL path to the media file
-  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub public_bucket_path: String,
 
-  // NB: Should be of type URL, but making infallible for faster port
-  /// Full URL to the media file
+  /// (DEPRECATED) Full URL to the media file
+  #[deprecated(note="This points to the bucket. Use media_links instead to leverage the CDN.")]
   pub public_bucket_url: String,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -315,6 +320,8 @@ pub async fn list_media_files_handler(
     None
   };
 
+  let media_domain = get_media_domain(&http_request);
+
   let results = results_page.records.into_iter()
       .map(|record| {
         let public_bucket_path = MediaFileBucketPath::from_object_hash(
@@ -339,6 +346,7 @@ pub async fn list_media_files_handler(
           maybe_origin_model_type: record.maybe_origin_model_type
               .map(|m| PublicMediaFileModelType::from_enum(m)),
           maybe_origin_model_token: record.maybe_origin_model_token,
+          media_links: MediaLinks::from_media_path(media_domain, &public_bucket_path),
           public_bucket_path: public_bucket_path
               .get_full_object_path_str()
               .to_string(),

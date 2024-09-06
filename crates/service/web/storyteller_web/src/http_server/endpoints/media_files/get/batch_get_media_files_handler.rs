@@ -32,9 +32,11 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
+use crate::http_server::common_responses::media_links::MediaLinks;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_str_path::bucket_url_from_str_path;
 use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
@@ -99,12 +101,15 @@ pub struct BatchMediaFileInfo {
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
   /// (DEPRECATED) URL path to the media file
-  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub public_bucket_path: String,
 
-  // NB: Should be of type URL, but making infallible for faster port
-  /// Full URL to the media file
+  /// (DEPRECATED) Full URL to the media file
+  #[deprecated(note="This points to the bucket. Use media_links instead to leverage the CDN.")]
   pub public_bucket_url: String,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -293,6 +298,8 @@ pub async fn batch_get_media_files_handler(
     }
   };
 
+  let media_domain = get_media_domain(&http_request);
+
   let media_files = media_files.into_iter()
       .map(|result| {
         let public_bucket_path = MediaFileBucketPath::from_object_hash(
@@ -331,6 +338,7 @@ pub async fn batch_get_media_files_handler(
           maybe_media_subtype: result.maybe_media_subtype,
           maybe_engine_extension,
           maybe_batch_token: result.maybe_batch_token,
+          media_links: MediaLinks::from_media_path(media_domain, &public_bucket_path),
           public_bucket_path: public_bucket_path
               .get_full_object_path_str()
               .to_string(),

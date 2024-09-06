@@ -23,10 +23,12 @@ use tokens::tokens::users::UserToken;
 
 use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
+use crate::http_server::common_responses::media_links::MediaLinks;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::BatchGetMediaFilesError;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categories::get_scoped_engine_categories;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
@@ -101,12 +103,15 @@ pub struct SearchMediaFileListItem {
   pub maybe_animation_type: Option<MediaFileAnimationType>,
 
   /// (DEPRECATED) URL path to the media file
-  #[deprecated(note="This field doesn't point to the full URL. Use public_bucket_url instead.")]
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub public_bucket_path: String,
 
-  // NB: Should be of type URL, but making infallible for faster port
-  /// Full URL to the media file
+  /// (DEPRECATED) Full URL to the media file
+  #[deprecated(note="This points to the bucket. Use media_links instead to leverage the CDN.")]
   pub public_bucket_url: String,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   /// Information about the cover image. Many media files do not require a cover image,
   /// e.g. image files, video files with thumbnails, audio files, etc.
@@ -244,6 +249,8 @@ pub async fn search_session_media_files_handler(
     }
   };
 
+  let media_domain = get_media_domain(&http_request);
+
   let results = results.into_iter()
       .map(|result| {
         let public_bucket_path = MediaFileBucketPath::from_object_hash(
@@ -256,16 +263,7 @@ pub async fn search_session_media_files_handler(
           media_type: result.media_type,
           maybe_engine_category: result.maybe_engine_category,
           maybe_animation_type: result.maybe_animation_type,
-          //  origin: MediaFileOriginDetails::from_db_fields_str(
-          //    result.origin_category,
-          //    result.origin_product_category,
-          //    result.maybe_origin_model_type,
-          //    result.maybe_origin_model_token.as_deref(),
-          //    result.maybe_origin_model_title.as_deref()),
-          //  origin_category: result.origin_category,
-          //  origin_product_category: result.origin_product_category,
-          //  maybe_origin_model_type: result.maybe_origin_model_type,
-          //  maybe_origin_model_token: result.maybe_origin_model_token,
+          media_links: MediaLinks::from_media_path(media_domain, &public_bucket_path),
           public_bucket_path: public_bucket_path
               .get_full_object_path_str()
               .to_string(),
