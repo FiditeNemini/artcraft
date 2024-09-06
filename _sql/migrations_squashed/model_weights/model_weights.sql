@@ -130,6 +130,9 @@ CREATE TABLE model_weights (
   -- If not, it's stored in GCP.
   is_in_aws BOOLEAN NOT NULL DEFAULT false,
 
+  -- This is a migration flag that denotes that weight is not stored in GCP.
+  is_not_in_gcp BOOLEAN NOT NULL DEFAULT false,
+
   -- ========== MODERATION DETAILS ==========
 
   -- Mods may have to approve of vc models for them to show up in a public index.
@@ -142,6 +145,13 @@ CREATE TABLE model_weights (
   -- Extremely popular models may be locked from deletion or modification by users.
   -- is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- ========== MIGRATION DETAILS ==========
+
+  -- A cache of the total number of times the model has been used.
+  -- We calculate this from `media_files` and legacy `tts_results` counts in another
+  -- process and periodically update this figure. This is not a source of truth, nor
+  -- should it be considered accurate, up to date, or monotonically increasing.
+  cached_usage_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
 
   -- ========== MIGRATION DETAILS ==========
 

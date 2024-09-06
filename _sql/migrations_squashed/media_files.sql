@@ -246,6 +246,9 @@ CREATE TABLE media_files (
   -- If not, it's stored in GCP.
   is_in_aws BOOLEAN NOT NULL DEFAULT false,
 
+  -- This is a migration flag that denotes that weight is not stored in GCP.
+  is_not_in_gcp BOOLEAN NOT NULL DEFAULT false,
+
   -- NB: Removed, since this can be derived.
   -- The directory this media is uploaded to will be exclusive for this file.
   -- Only this given record will live in this bucket, but the directory may include
