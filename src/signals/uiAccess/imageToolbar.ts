@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import { signal } from "@preact/signals-core";
 import { ContextualImageToolbarProps } from "./type";
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
@@ -10,15 +11,24 @@ const imageToolbarSignal = signal<ContextualImageToolbarProps>({
   isShowing: false,
   disabled: false,
   buttonStates: initButtonStates(),
+  buttonCallbacks: initButtonCallbacks(),
 });
 
 export const imageToolbar = {
   signal: imageToolbarSignal,
+  setup(props: ContextualImageToolbarProps) {
+    imageToolbarSignal.value = props;
+  },
+  update(props: Partial<ContextualImageToolbarProps>) {
+    imageToolbarSignal.value = {
+      ...imageToolbarSignal.value,
+      ...props,
+    };
+  },
   setPosition(position: ContextualImageToolbarProps["position"]) {
     imageToolbarSignal.value = {
       ...imageToolbarSignal.value,
       position,
-      isShowing: true,
     };
   },
   show() {
@@ -54,6 +64,18 @@ export const imageToolbar = {
       },
     };
   },
+  changeButtonCallback(
+    buttonName: ToolbarImageButtonNames,
+    callback: () => void,
+  ) {
+    imageToolbarSignal.value = {
+      ...imageToolbarSignal.value,
+      buttonCallbacks: {
+        ...imageToolbarSignal.value.buttonCallbacks,
+        [buttonName]: callback,
+      },
+    };
+  },
 };
 
 function initButtonStates() {
@@ -64,4 +86,14 @@ function initButtonStates() {
     };
   });
   return ret as ContextualImageToolbarProps["buttonStates"];
+}
+
+function initButtonCallbacks() {
+  const ret: {
+    [key: string]: MouseEventHandler<HTMLButtonElement> | undefined;
+  } = {};
+  Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
+    ret[buttonName] = undefined;
+  });
+  return ret as ContextualImageToolbarProps["buttonCallbacks"];
 }

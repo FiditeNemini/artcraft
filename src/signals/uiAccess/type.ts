@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 import { LoadingBarProps } from "~/components/ui";
 
@@ -14,6 +15,11 @@ export interface ContextualImageToolbarProps extends ContextualUi {
     [key in ToolbarImageButtonNames]: {
       disabled: boolean;
     };
+  };
+  buttonCallbacks: {
+    [key in ToolbarImageButtonNames]:
+      | MouseEventHandler<HTMLButtonElement>
+      | undefined;
   };
 }
 

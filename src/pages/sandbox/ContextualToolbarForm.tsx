@@ -10,7 +10,12 @@ export const ContextualToolbarForm = () => {
   useSignals();
   const imageToolbar = uiAccess.imageToolbar;
 
-  const { disabled: allDisabled, buttonStates } = imageToolbar.signal.value;
+  const {
+    isShowing,
+    disabled: allDisabled,
+    buttonStates,
+    buttonCallbacks,
+  } = imageToolbar.signal.value;
 
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
@@ -49,7 +54,13 @@ export const ContextualToolbarForm = () => {
         >
           Set Position
         </Button>
-        <Button onClick={() => imageToolbar.hide()}>Hide</Button>
+        <Button disabled={isShowing} onClick={() => imageToolbar.show()}>
+          Show
+        </Button>
+
+        <Button disabled={!isShowing} onClick={() => imageToolbar.hide()}>
+          Hide
+        </Button>
         <Button
           onClick={() => {
             const exec = allDisabled
@@ -79,6 +90,23 @@ export const ContextualToolbarForm = () => {
             <span className="w-12">
               {buttonStates[button.name].disabled ? "Enable" : "Disable"}
             </span>
+          </Button>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        {Object.values(ToolbarImageButtonData).map((button) => (
+          <Button
+            key={button.name}
+            icon={button.icon}
+            variant="primary"
+            disabled={buttonCallbacks[button.name] !== undefined}
+            onClick={() =>
+              imageToolbar.changeButtonCallback(button.name, () => {
+                console.log("clicked");
+              })
+            }
+          >
+            <span className="w-12">Bind</span>
           </Button>
         ))}
       </div>

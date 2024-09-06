@@ -14,16 +14,16 @@ export const Sandbox = () => {
 
   return (
     <div className="p-2">
-      <ContextualToolbarImage />
-      <ContextualLoadingBar />
-      <ErrorDialog />
-
       <div className="flex flex-col gap-8">
         <h1>Sandbox</h1>
         <ContextualToolbarForm />
         <ContextualLoadingBarForm />
         <ErrorDialogForm />
       </div>
+
+      <ContextualToolbarImage />
+      <ContextualLoadingBar />
+      <ErrorDialog />
     </div>
   );
 };

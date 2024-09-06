@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -12,6 +13,7 @@ export const ToolbarImage = ({
   position,
   disabled,
   buttonStates,
+  buttonCallbacks,
 }: {
   position: {
     x: number;
@@ -23,8 +25,12 @@ export const ToolbarImage = ({
       disabled: boolean;
     };
   };
+  buttonCallbacks?: {
+    [key in ToolbarImageButtonNames]:
+      | MouseEventHandler<HTMLButtonElement>
+      | undefined;
+  };
 }) => {
-  console.log(buttonStates);
   return (
     <div
       className={twMerge(
@@ -45,11 +51,16 @@ export const ToolbarImage = ({
           buttonStates && buttonStates[buttonDatum.name]
             ? { disabled: buttonStates[buttonDatum.name].disabled }
             : undefined;
+        const buttonCallback =
+          buttonCallbacks && buttonCallbacks[buttonDatum.name]
+            ? buttonCallbacks[buttonDatum.name]
+            : undefined;
         return (
           <ToolbarButtons
             icon={buttonDatum.icon}
             key={idx}
             buttonProps={buttonProps}
+            onClick={buttonCallback}
           />
         );
       })}

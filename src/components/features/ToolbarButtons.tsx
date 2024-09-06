@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes, MouseEventHandler } from "react";
 import { twMerge } from "tailwind-merge";
 import {
   FontAwesomeIcon,
@@ -13,7 +13,7 @@ export const ToolbarButtons = ({
   iconProps,
 }: {
   icon: IconDefinition;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>;
   iconProps?: Omit<FontAwesomeIconProps, "icon">;
 }) => {
