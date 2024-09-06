@@ -37,6 +37,7 @@ mod tests {
       crop: None,
       remove_watermark: None,
       watermark_type: None,
+      used_webcam: None,
       sleep_millis: None,
     });
 
