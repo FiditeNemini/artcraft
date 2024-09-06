@@ -28,7 +28,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
-import Tippy from "@tippyjs/react";
+// import Tippy from "@tippyjs/react";
 import { isMobile } from "react-device-detect";
 import { LipsyncTokenMap } from "../pages/lipsync/LipsyncTokens";
 
@@ -209,28 +209,28 @@ function SessionTtsInferenceResultList(props: Props) {
                 <div>
                   <div className="d-flex gap-1 mb-2">
                     {job.maybeModelToken ? (
-                      <Tippy
-                        content={
-                          <span className="fs-7">Use audio with Lip Sync</span>
-                        }
-                        theme="fakeyou"
-                      >
-                        <div>
-                          <WeightCoverImage
-                            src={
-                              mediaSrc[job.maybeModelToken]
-                                ? new BucketConfig().getGcsUrl(
-                                    mediaSrc[job.maybeModelToken]
-                                  )
-                                : ""
-                            }
-                            height={36}
-                            width={36}
-                            marginRight={7}
-                          />
-                        </div>
-                      </Tippy>
+                      // <Tippy
+                      //   content={
+                      //     <span className="fs-7">Use audio with Lip Sync</span>
+                      //   }
+                      //   theme="fakeyou"
+                      // >
+                      <div>
+                        <WeightCoverImage
+                          src={
+                            mediaSrc[job.maybeModelToken]
+                              ? new BucketConfig().getGcsUrl(
+                                  mediaSrc[job.maybeModelToken]
+                                )
+                              : ""
+                          }
+                          height={36}
+                          width={36}
+                          marginRight={7}
+                        />
+                      </div>
                     ) : (
+                      // </Tippy>
                       <LoadingSpinner />
                     )}
                     <div className="d-flex flex-column justify-content-center flex-grow-1">
