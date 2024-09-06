@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,13 +23,14 @@ import { Button, WeightCoverImage } from "components/common";
 import {
   faArrowDownToLine,
   faArrowRight,
-  faFaceViewfinder,
+  faLips,
   faStars,
 } from "@fortawesome/pro-solid-svg-icons";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import Tippy from "@tippyjs/react";
 import { isMobile } from "react-device-detect";
+import { LipsyncTokenMap } from "../pages/lipsync/LipsyncTokens";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -53,7 +54,7 @@ function SessionTtsInferenceResultList(props: Props) {
     });
 
   const [mediaSrc, setMediaSrc] = useState<{ [key: string]: string }>({});
-  const history = useHistory();
+  // const history = useHistory();
 
   const fetchMedia = async (token: string) => {
     try {
@@ -99,9 +100,9 @@ function SessionTtsInferenceResultList(props: Props) {
       });
   }, [inferenceJobsByCategory]);
 
-  const handleLipSyncClick = () => {
-    history.push("/beta/lip-sync");
-  };
+  // const handleLipSyncClick = () => {
+  //   history.push("/beta/lip-sync");
+  // };
 
   let results: Array<JSX.Element> = [];
 
@@ -226,7 +227,6 @@ function SessionTtsInferenceResultList(props: Props) {
                             height={36}
                             width={36}
                             marginRight={7}
-                            onClick={handleLipSyncClick}
                           />
                         </div>
                       </Tippy>
@@ -269,17 +269,18 @@ function SessionTtsInferenceResultList(props: Props) {
                   />
                 </div>
 
-                <div className="d-flex mt-2">
-                  <Button
-                    iconFlip={true}
-                    variant="primary"
-                    label="Use this audio with Lip Sync"
-                    className="fs-7"
-                    icon={faFaceViewfinder}
-                    onClick={handleLipSyncClick}
-                    small={true}
-                  />
-                </div>
+                {job.maybeModelToken && LipsyncTokenMap[job.maybeModelToken] ? (
+                  <div className="d-flex mt-2">
+                    <Button
+                      variant="primary"
+                      label="Lip sync with this audio!"
+                      className="fs-7"
+                      icon={faLips}
+                      to={`/ai-lip-sync?voice=${job.maybeModelToken}&audio=${job.maybeResultToken}`}
+                      small={true}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

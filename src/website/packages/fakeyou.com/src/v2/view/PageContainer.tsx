@@ -764,7 +764,7 @@ class PageContainer extends React.Component<
                   />
                 </Route>
 
-                <Route exact path="/dev/lipsync">
+                <Route exact path="/ai-lip-sync">
                   <Lipsync
                     sessionSubscriptionsWrapper={
                       this.props.sessionSubscriptionsWrapper

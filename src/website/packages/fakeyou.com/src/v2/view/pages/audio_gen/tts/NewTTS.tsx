@@ -113,7 +113,7 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
     "weight_0f762jdzgsy1dhpb86qxy4ssm",
     "weight_7jk8mgwkzsycqrxmfw5q4245y",
     "weight_3k28fws0v6r1ke3p0w0vw48gm",
-    "weight_2qbzp2nmrbbsxrxq7m53y4zan",
+    "weight_dqcy6bxq1n79z5ahwpy01bvje",
     "weight_msq6440ch8hj862nz5y255n8j",
     "weight_6jvgbqkzschw55qdg7exnx7zx",
   ];

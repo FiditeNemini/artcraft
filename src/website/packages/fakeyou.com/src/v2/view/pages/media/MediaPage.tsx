@@ -18,6 +18,7 @@ import {
   faFileCircleXmark,
   faArrowRightArrowLeft,
   faFilm,
+  faLips,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -51,6 +52,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
 import { AITools } from "components/marketing";
 import { useSession } from "hooks";
+import { LipsyncTokenMap } from "../lipsync/LipsyncTokens";
 
 export default function MediaPage({
   animationType,
@@ -655,17 +657,29 @@ export default function MediaPage({
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
-                {mediaFile?.media_type === MediaFileType.Audio ? (
+                {mediaFile?.media_type === MediaFileType.Audio &&
+                mediaFile?.maybe_model_weight_info.weight_token &&
+                LipsyncTokenMap[
+                  mediaFile?.maybe_model_weight_info.weight_token
+                ] ? (
+                  <Button
+                    variant="primary"
+                    label="Lip sync with this audio!"
+                    className="flex-grow-1"
+                    icon={faLips}
+                    to={`/ai-lip-sync?voice=${mediaFile?.maybe_model_weight_info.weight_token}&audio=${mediaFile?.token}`}
+                  />
+                ) : (
                   <Button
                     {...{
                       icon: faFaceViewfinder,
                       label: "Use audio in Face Animator",
-                      to: `/face-animator/${mediaFile.token}`,
+                      to: `/face-animator/${mediaFile?.token}`,
                       variant: "primary",
                       className: "flex-grow-1",
                     }}
                   />
-                ) : null}
+                )}
                 {canAccessStudio() &&
                 mediaFile?.media_type === MediaFileType.Video ? (
                   <Button

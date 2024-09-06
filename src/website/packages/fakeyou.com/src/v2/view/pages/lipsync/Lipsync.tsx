@@ -283,18 +283,18 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
     }
   };
 
-  const handleDownloadClick = () => {
-    if (generatedVideoSrc) {
-      const link = document.createElement("a");
-      link.href = generatedVideoSrc;
-      link.download = "output_video.mp4";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      console.error("No video source available for download");
-    }
-  };
+  // const handleDownloadClick = () => {
+  //   if (generatedVideoSrc) {
+  //     const link = document.createElement("a");
+  //     link.href = generatedVideoSrc;
+  //     link.download = "output_video.mp4";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } else {
+  //     console.error("No video source available for download");
+  //   }
+  // };
 
   const handleAudioDelete = () => {
     setAudioToken(null);
@@ -481,7 +481,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                       onClick={
                         loggedIn
                           ? enqueueClick
-                          : () => history.push("/signup?redirect=/lipsync")
+                          : () => history.push("/signup?redirect=/ai-lip-sync")
                       }
                       className="flex-grow-1"
                       // disabled={!isUserContent}
@@ -501,7 +501,9 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                           square={true}
                           icon={faArrowDownToLine}
                           variant="action"
-                          onClick={handleDownloadClick}
+                          download="output_video.mp4"
+                          href={generatedVideoSrc}
+                          target="_blank"
                           disabled={!loggedIn || !generatedVideoSrc}
                         />
                       </div>
