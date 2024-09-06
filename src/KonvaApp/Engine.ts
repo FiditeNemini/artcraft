@@ -81,7 +81,29 @@ export class Engine {
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
 
-    this.renderEngine.addNodes(videoNode);
+    const node2 = new VideoNode(
+      "",
+      this.offScreenCanvas,
+      this.videoLayer,
+      700,
+      700,
+      "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+    );
+
+    const frame = new Konva.Rect({
+      x: 50,
+      y: 50,
+      width: 720,
+      height: 1080,
+      fill: "white",
+      stroke: "black",
+      strokeWidth: 1,
+      draggable: true,
+    });
+    frame.moveToTop();
+    this.videoLayer.add(frame);
+
+    //this.renderEngine.addNodes(videoNode);
 
     // Call this when
     //await this.renderEngine.startProcessing();

@@ -1,13 +1,10 @@
-import { faL } from "@fortawesome/pro-thin-svg-icons";
 import { VideoNode } from "./Nodes/VideoNode";
-
 export class RenderEngine {
   private videoNodes: VideoNode[];
   private offScreenCanvas: OffscreenCanvas;
   private context: OffscreenCanvasRenderingContext2D | null;
   private isProcessing: boolean;
 
-  private frameLength: number;
   private frames: ImageBitmap[];
   constructor(offScreenCanvas: OffscreenCanvas) {
     this.videoNodes = [];
@@ -110,11 +107,6 @@ export class RenderEngine {
             );
             console.log("Pushing");
             this.frames.push(this.offScreenCanvas.transferToImageBitmap());
-            //   this.offScreenCanvas.convertToBlob().then((blob) => {
-            //     // Save or process the blob as needed
-            //     console.log("Frame saved as blob:", blob);
-            //     this.blobToFile(blob);
-            //   });
           }
         } // end of if
       } // end of for.
