@@ -21,12 +21,19 @@ import { ToolbarButtons } from "../ToolbarButtons";
 import { twMerge } from "tailwind-merge";
 
 import { UploadImage } from "../UploadImage";
+import { UploadVideo } from "../UploadVideo";
 
 // style constants
 import { paperWrapperStyles } from "~/components/styles";
 
 // for testing
 import { layout } from "~/signals";
+
+const initialState = {
+  isUploadSubmenuOpen: false,
+  isUploadVideoOpen: false,
+  isUploadImageOpen: false,
+};
 
 export const ToolbarMain = () => {
   //// for testing
@@ -41,14 +48,12 @@ export const ToolbarMain = () => {
     );
   });
   /// end for testing
-
-  const [isUploadSubmenuOpen, setIsUploadSubmenuOpen] = useState(false);
-  const [isUploadImageOpen, setIsUploadImageOpen] = useState(false);
+  const [state, setState] = useState(initialState);
 
   const toolbarCallbackRef = useCallback((node: HTMLDivElement) => {
     function handleClickOutside(e: MouseEvent) {
       if (!node.contains(e.target as Node)) {
-        setIsUploadSubmenuOpen(false);
+        setState(initialState);
       }
     }
     if (node) {
@@ -79,10 +84,10 @@ export const ToolbarMain = () => {
             <ToolbarButtons
               icon={faFilePlus}
               onClick={() => {
-                setIsUploadSubmenuOpen(true);
+                setState({ ...state, isUploadSubmenuOpen: true });
               }}
             />
-            {isUploadSubmenuOpen && (
+            {state.isUploadSubmenuOpen && (
               <div
                 className={twMerge(
                   "absolute -left-2 bottom-11 z-10",
@@ -91,9 +96,24 @@ export const ToolbarMain = () => {
               >
                 <ToolbarButtons
                   icon={faImage}
-                  onClick={() => setIsUploadImageOpen(true)}
+                  onClick={() =>
+                    setState({
+                      ...state,
+                      isUploadImageOpen: true,
+                      isUploadVideoOpen: false,
+                    })
+                  }
                 />
-                <ToolbarButtons icon={faFilm} />
+                <ToolbarButtons
+                  icon={faFilm}
+                  onClick={() =>
+                    setState({
+                      ...state,
+                      isUploadVideoOpen: true,
+                      isUploadImageOpen: false,
+                    })
+                  }
+                />
               </div>
             )}
           </div>
@@ -114,8 +134,12 @@ export const ToolbarMain = () => {
       </div>
 
       <UploadImage
-        isOpen={isUploadImageOpen}
-        closeCallback={() => setIsUploadImageOpen(false)}
+        isOpen={state.isUploadImageOpen ?? false}
+        closeCallback={() => setState({ ...state, isUploadImageOpen: false })}
+      />
+      <UploadVideo
+        isOpen={state.isUploadVideoOpen ?? false}
+        closeCallback={() => setState({ ...state, isUploadVideoOpen: false })}
       />
     </div>
   );

@@ -37,6 +37,9 @@ export class Engine {
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
     });
+    uiEvents.onGetStagedVideo((video) => {
+      this.addVideo(video);
+    });
   }
 
   private applyChanges() {
@@ -105,6 +108,10 @@ export class Engine {
       videoLayer.add(konvaImage);
     };
     imageObj.src = URL.createObjectURL(imageFile);
+  }
+  public addVideo(videoFile: File) {
+    // Adding nodes here
+    console.log("addVideo", videoFile);
   }
 }
 
