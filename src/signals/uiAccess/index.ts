@@ -11,9 +11,12 @@ type uiAccessType = {
 
 export type { uiAccessType };
 
+import { errorDialogue } from "./errorDialogue";
 import { imageToolbar } from "./imageToolbar";
 import { loadingBar } from "./loadingBar";
+
 export const uiAccess = {
+  errorDialogue,
   imageToolbar,
   loadingBar,
 };
