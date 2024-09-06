@@ -23,6 +23,10 @@ export const ContextualToolbarForm = () => {
   return (
     <div className="flex flex-col gap-2">
       <label className="font-bold">Image Toolbar Props</label>
+      <p className="-mt-2 pb-1">
+        toolbar setup is assumed, in real implementation you may want to start
+        with the setup function instead
+      </p>
       <div className="flex items-center gap-2">
         <label>X:</label>
         <Input
@@ -102,7 +106,7 @@ export const ContextualToolbarForm = () => {
             disabled={buttonCallbacks[button.name] !== undefined}
             onClick={() =>
               imageToolbar.changeButtonCallback(button.name, () => {
-                console.log("clicked");
+                console.log(`${button.name} clicked`);
               })
             }
           >
