@@ -18,15 +18,16 @@ interface SessionLpInferenceResultsListProps {
   onJobTokens: (
     maybeResultToken: string,
     jobToken: string,
-    createdAt: Date,
-    progressPercentage: number | null
+    createdAt: Date
   ) => void;
   onJobClick?: (job: InferenceJob) => void;
+  onJobProgress?: (progressPercentage: number | null) => void;
 }
 
 export default function SessionLpInferenceResultsList({
   onJobTokens,
   onJobClick,
+  onJobProgress,
 }: SessionLpInferenceResultsListProps) {
   const { inferenceJobsByCategory } = useInferenceJobs();
   const hasInitialized = useRef(false);
@@ -51,12 +52,7 @@ export default function SessionLpInferenceResultsList({
           job.jobToken !== lastProcessedJobToken.current
         ) {
           lastProcessedJobToken.current = job.jobToken;
-          onJobTokens(
-            job.maybeResultToken,
-            job.jobToken,
-            job.createdAt,
-            job.progressPercentage
-          );
+          onJobTokens(job.maybeResultToken, job.jobToken, job.createdAt);
         }
       });
     }
@@ -80,6 +76,9 @@ export default function SessionLpInferenceResultsList({
       if (job.jobState === JobState.STARTED) {
         if (lastProgressRef.current[job.jobToken] !== currentProgress) {
           lastProgressRef.current[job.jobToken] = currentProgress;
+          if (onJobProgress) {
+            onJobProgress(currentProgress);
+          }
         }
         return;
       }
@@ -93,7 +92,7 @@ export default function SessionLpInferenceResultsList({
         lastProgressRef.current[job.jobToken] = null;
       }
     });
-  }, [lipsyncJobs]);
+  }, [lipsyncJobs, onJobProgress]);
 
   const [mediaSrc, setMediaSrc] = useState<{ [key: string]: string }>({});
 

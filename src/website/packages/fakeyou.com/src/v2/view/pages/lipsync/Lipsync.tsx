@@ -125,6 +125,8 @@ export default function LivePortrait({
     });
   };
 
+  console.log(jobPercentage);
+
   const renderVideoOrPlaceholder = () => {
     if (generatedVideoSrc && !isGenerating && audioToken) {
       return (
@@ -157,13 +159,11 @@ export default function LivePortrait({
               <div className="d-flex flex-column align-items-center gap-3 justify-content-center">
                 <LoadingSpinner padding={false} />
                 {jobPercentage !== null
-                  ? `Generating video...`
+                  ? `Generating video... ${jobPercentage}%`
                   : "Generating video..."}
               </div>
             </h4>
-            <p className="fs-6 opacity-75">
-              This should take about a minute...
-            </p>
+            <p className="fs-6 opacity-75">This should take about a minute.</p>
           </div>
           <OutputThumbnailImage
             src={selectedSourceMediaLink || ""}
@@ -230,16 +230,16 @@ export default function LivePortrait({
     ? new BucketConfig().getGcsUrl(selectedSourceMedia.public_bucket_path)
     : null;
 
+  const handleJobProgress = (progressPercentage: number | null) => {
+    console.log("Job Progress:", progressPercentage);
+    setJobPercentage(progressPercentage);
+  };
+
   const handleJobTokens = async (
     maybeResultToken: string,
     jobToken: string,
-    createdAt: Date,
-    progressPercentage: number | null
+    createdAt: Date
   ) => {
-    if (progressPercentage) {
-      setJobPercentage(progressPercentage);
-    }
-
     if (!maybeResultToken) {
       return;
     }
@@ -263,6 +263,7 @@ export default function LivePortrait({
       if (jobToken === lastEnqueuedJobToken) {
         setGeneratedVideoSrc(mediaLink);
         setIsGenerating(false);
+        setJobPercentage(null);
       }
 
       setJobProcessedTokens(prevTokens => [...prevTokens, jobToken]);
@@ -274,6 +275,7 @@ export default function LivePortrait({
       setIsGenerating(false);
       setGeneratedVideoSrc("");
       setIsEnqueuing(false);
+      setJobPercentage(null);
     }
   };
 
@@ -549,6 +551,7 @@ export default function LivePortrait({
                     <SessionLsInferenceResultsList
                       sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                       onJobTokens={handleJobTokens}
+                      onJobProgress={handleJobProgress}
                     />
                   </div>
                 </div>

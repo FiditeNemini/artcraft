@@ -95,7 +95,7 @@ export const GenerateTts = ({
   };
 
   useEffect(() => {
-    if (!jobToken || currentAudioUrl === null) return;
+    if (!jobToken) return;
 
     const fetch = async () => {
       const job = inferenceJobs.find(
