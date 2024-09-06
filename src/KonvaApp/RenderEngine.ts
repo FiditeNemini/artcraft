@@ -67,7 +67,7 @@ export class RenderEngine {
 
     // find the longest video
     const numberOfFrames = this.findLongestVideoLength();
-    this.processFrame();
+    await this.processFrame();
   }
 
   public stopProcessing() {
@@ -82,7 +82,9 @@ export class RenderEngine {
   private async processFrame() {
     if (!this.isProcessing) return;
 
-    this.videoNodes.forEach((videoNode: VideoNode) => {
+    for (let j = 0; j < this.videoNodes.length; j++) {
+      const videoNode = this.videoNodes[j];
+
       videoNode.stop();
       const numberOfFrames = videoNode.getNumberFrames();
 
@@ -94,31 +96,31 @@ export class RenderEngine {
         console.log(videoNode.duration);
 
         if (frameTime < videoNode.duration) {
-          videoNode.seek(frameTime, () => {
-            this.offScreenCanvas.width = videoNode.node.getSize().width;
-            this.offScreenCanvas.height = videoNode.node.getSize().height;
+          await videoNode.seek(frameTime);
+          this.offScreenCanvas.width = videoNode.node.getSize().width;
+          this.offScreenCanvas.height = videoNode.node.getSize().height;
 
-            if (this.context) {
-              this.context.drawImage(
-                videoNode.videoComponent,
-                0,
-                0,
-                this.offScreenCanvas.width,
-                this.offScreenCanvas.height,
-              );
-              this.frames.push(this.offScreenCanvas.transferToImageBitmap());
-              //   this.offScreenCanvas.convertToBlob().then((blob) => {
-              //     // Save or process the blob as needed
-              //     console.log("Frame saved as blob:", blob);
-              //     this.blobToFile(blob);
-              //   });
-            }
-          }); // end of seek
+          if (this.context) {
+            this.context.drawImage(
+              videoNode.videoComponent,
+              0,
+              0,
+              this.offScreenCanvas.width,
+              this.offScreenCanvas.height,
+            );
+            console.log("Pushing");
+            this.frames.push(this.offScreenCanvas.transferToImageBitmap());
+            //   this.offScreenCanvas.convertToBlob().then((blob) => {
+            //     // Save or process the blob as needed
+            //     console.log("Frame saved as blob:", blob);
+            //     this.blobToFile(blob);
+            //   });
+          }
         } // end of if
       } // end of for.
-    });
+    }
 
-    console.log(frames);
+    console.log(this.frames);
   }
 
   private blobToFile(blob: Blob) {

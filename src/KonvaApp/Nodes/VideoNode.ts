@@ -48,7 +48,7 @@ export class VideoNode extends NetworkedNodeContext {
     "https://images-ng.pixai.art/images/orig/56dcbb5f-7a31-4328-b4ea-1312df6e77a0",
     "https://videos.pixai.art/f7df019d-79a2-4ed2-bb99-775c941f7ec6",
   ];
-  private frameDidFinishSeeking: (() => void) | undefined;
+  private frameDidFinishSeeking: Promise<void>;
   constructor(
     uuid: string = uuidv4(),
     offScreenCanvas: OffscreenCanvas,
@@ -76,7 +76,7 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.videoComponent = document.createElement("video");
 
-    this.frameDidFinishSeeking = undefined;
+    this.frameDidFinishSeeking = new Promise<void>(() => {});
 
     this.videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
@@ -93,7 +93,7 @@ export class VideoNode extends NetworkedNodeContext {
       // reimplement using the function
       // ensure that this doesn't race.
       if (this.frameDidFinishSeeking) {
-        this.frameDidFinishSeeking();
+        this.frameDidFinishSeeking.then(() => {});
       }
     };
 
@@ -315,10 +315,10 @@ export class VideoNode extends NetworkedNodeContext {
   }
 
   // use sub milisecond for frames.
-  seek(second: number, doneSeeking: () => void) {
+  async seek(second: number) {
     // prevent interaction
 
-    console.log(`${this.didFinishLoading}`);
+    //console.log(`${this.didFinishLoading}`);
     if (this.didFinishLoading === false) {
       console.log("Didn't finish loading so cannot seek");
       return;
@@ -330,14 +330,22 @@ export class VideoNode extends NetworkedNodeContext {
         return;
       }
       console.log("Setting");
-      this.frameDidFinishSeeking = doneSeeking; // should trigger the next frame.
+
       this.videoComponent.currentTime = second;
-      this.videoComponent.seeking;
+
+      this.frameDidFinishSeeking = new Promise<void>((resolve, reject) => {
+        this.videoComponent.onseeked = (event: Event) => {
+          console.log("Seeked Finished");
+          // reimplement using the function
+          // ensure that this doesn't race.
+
+          resolve();
+        };
+      });
+
+      await this.frameDidFinishSeeking;
     } else {
       console.log("Video Not Seekable");
     }
   }
-
-  // grab frames
-  async render() {}
 }

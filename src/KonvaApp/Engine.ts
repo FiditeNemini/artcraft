@@ -50,7 +50,7 @@ export class Engine {
     this.setupStage();
   }
 
-  public setupStage() {
+  public async setupStage() {
     var textNode = new Konva.Text({
       x: 0,
       y: 0,
@@ -84,7 +84,7 @@ export class Engine {
     this.renderEngine.addNodes(videoNode);
 
     // Call this when
-    this.renderEngine.startProcessing();
+    //await this.renderEngine.startProcessing();
 
     //videoNode.simulatedLoading();
 
