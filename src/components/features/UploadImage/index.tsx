@@ -46,7 +46,17 @@ export const UploadImage = ({
               setAssetFile(file);
             }}
           />
-
+          {assetFile && (
+            <div className="relative flex items-center justify-center rounded-xl bg-ui-border">
+              <label className="absolute left-0 top-0 rounded-br-xl rounded-tl-xl border border-ui-border bg-white p-2 shadow-md">
+                Preview
+              </label>
+              <img
+                src={URL.createObjectURL(assetFile)}
+                className="border border-dashed border-white"
+              />
+            </div>
+          )}
           <div className="flex w-full justify-end gap-4 pt-4">
             <Button onClick={handleClose} variant="secondary">
               Cancel
