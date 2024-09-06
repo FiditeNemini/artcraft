@@ -47,7 +47,7 @@ import { GenerateTts } from "./GenerateTts";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import { LipsyncTokenMap } from "./LipsyncTokens";
 
-interface LivePortraitProps {
+interface LipsyncProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
@@ -55,9 +55,7 @@ const PRECOMPUTED_SOURCE_TOKENS: string[] = [
   "m_2xrse9799wvy8hkv8tbxqxct8089t7", // Mona Lisa
 ];
 
-export default function LivePortrait({
-  sessionSubscriptionsWrapper,
-}: LivePortraitProps) {
+export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   useDocumentTitle("Lip Sync AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
   const { loggedIn, sessionFetched } = useSession();
@@ -90,6 +88,7 @@ export default function LivePortrait({
   const [jobPercentage, setJobPercentage] = useState<number | null>(null);
   const location = useLocation();
   const history = useHistory();
+  const sourceVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleAudioResultToken = (token: string | null) => {
     setAudioToken(token);
@@ -264,6 +263,11 @@ export default function LivePortrait({
         setGeneratedVideoSrc(mediaLink);
         setIsGenerating(false);
         setJobPercentage(null);
+
+        // Pause the source video if it's playing
+        if (sourceVideoRef.current && !sourceVideoRef.current.paused) {
+          sourceVideoRef.current.pause();
+        }
       }
 
       setJobProcessedTokens(prevTokens => [...prevTokens, jobToken]);
@@ -408,6 +412,7 @@ export default function LivePortrait({
             <div className="row gx-0 gy-4">
               <div className="col-12 col-lg-3 d-flex gap-3 flex-column align-items-center pt-lg-5">
                 <ThumbnailMediaPicker
+                  videoRef={sourceVideoRef}
                   mediaTokens={sourceTokens}
                   selectedIndex={selectedSourceIndex}
                   title="Source Image/Video"
@@ -483,14 +488,21 @@ export default function LivePortrait({
                       isLoading={isEnqueuing || isGenerating}
                       disabled={!loggedIn || !audioToken}
                     />
-                    <Tippy theme="fakeyou" content="Download video">
+                    <Tippy
+                      theme="fakeyou"
+                      content={
+                        generatedVideoSrc
+                          ? "Download video"
+                          : "Animate first to download"
+                      }
+                    >
                       <div>
                         <Button
                           square={true}
                           icon={faArrowDownToLine}
                           variant="action"
                           onClick={handleDownloadClick}
-                          disabled={!loggedIn}
+                          disabled={!loggedIn || !generatedVideoSrc}
                         />
                       </div>
                     </Tippy>

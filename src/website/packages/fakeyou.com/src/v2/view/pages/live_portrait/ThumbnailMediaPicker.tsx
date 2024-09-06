@@ -43,6 +43,7 @@ interface ThumbnailMediaPickerProps {
   showUploadButton?: boolean;
   showStep?: boolean;
   stepAlwaysOnTop?: boolean;
+  videoRef?: React.RefObject<HTMLVideoElement>;
 }
 
 interface MediaData {
@@ -70,6 +71,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     showUploadButton = true,
     showStep = true,
     stepAlwaysOnTop = false,
+    videoRef,
   }) => {
     const [isCropping, setIsCropping] = useState(false);
     const [mediaData, setMediaData] = useState<{ [key: string]: any }>({});
@@ -221,6 +223,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                     ) : (
                       <video
                         key={selectedIndex}
+                        ref={videoRef}
                         autoPlay={true}
                         muted
                         loop={true}
