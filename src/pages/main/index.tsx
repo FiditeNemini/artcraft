@@ -8,6 +8,7 @@ import {
   ToolbarUserProfile,
   KonvaContainer,
   ToolbarMain,
+  ErrorDialog,
 } from "~/components/features";
 
 // The KonvaApp is the root of the Konva stage
@@ -38,6 +39,7 @@ export const Main = withProtectionRoute(() => {
         )}
       >
         <ToolbarUserProfile />
+        <ErrorDialog />
       </div>
       <ToolbarMain />
     </div>

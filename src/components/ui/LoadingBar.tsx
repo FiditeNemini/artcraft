@@ -2,13 +2,7 @@ import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheck,
-  faArrowRotateLeft,
-  faStop,
-} from "@fortawesome/pro-thin-svg-icons";
-
-import { Spinner } from "./Spinner";
+import { faArrowRotateLeft } from "@fortawesome/pro-thin-svg-icons";
 
 export enum LoadingBarStatus {
   IDLE = "idle",
@@ -16,7 +10,8 @@ export enum LoadingBarStatus {
   SUCCESS = "success",
   ERROR = "error",
 }
-export type LoadingBarProps = {
+export interface LoadingBarProps {
+  width?: number;
   progress: number;
   status: LoadingBarStatus;
   isShowing: boolean;
@@ -26,9 +21,10 @@ export type LoadingBarProps = {
   };
   message?: string;
   onRetry?: () => void;
-};
+}
 
 export const LoadingBar = ({
+  width,
   progress = 0,
   position,
   status,
@@ -41,9 +37,10 @@ export const LoadingBar = ({
       <div
         className={twMerge(
           // default styles
-          "flex w-full gap-2",
+          "flex w-full flex-col gap-2",
           // position styles
-          position && `fixed w-96`,
+          position && `fixed`,
+          position && !width && `w-96`,
           // base transition properties
           "transition-opacity ease-in-out",
           // Shared closed styles
@@ -56,31 +53,28 @@ export const LoadingBar = ({
         style={{
           left: position?.x,
           top: position?.y,
+          width: width ? `${width}px` : undefined,
         }}
       >
-        <div className="relative flex-grow">
-          <div className="h-2.5 w-full rounded-full bg-gray-200">
-            <div
-              className="h-2.5 rounded-full bg-primary-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          {message && (
-            <label className="mt-2 block w-full text-center">{message}</label>
-          )}
+        <div className="h-2.5 w-full rounded-full bg-gray-200">
+          <div
+            className={twMerge(
+              "h-2.5 rounded-full bg-primary-500",
+              status === LoadingBarStatus.LOADING && "animate-pulse",
+            )}
+            style={{ width: `${progress}%` }}
+          />
         </div>
-        <div className="-mt-1.5">
-          {status === LoadingBarStatus.IDLE && (
-            <FontAwesomeIcon icon={faStop} />
-          )}
-          {status === LoadingBarStatus.LOADING && (
-            <Spinner className="size-5" />
-          )}
-          {status === LoadingBarStatus.SUCCESS && (
-            <FontAwesomeIcon icon={faCheck} />
-          )}
+
+        <div className="flex grow items-center justify-center gap-2">
+          {message && <label>{message}</label>}
+
           {status === LoadingBarStatus.ERROR && (
-            <button onClick={onRetry}>
+            <button
+              onClick={onRetry}
+              className="flex items-center gap-2 hover:text-primary"
+            >
+              <label className="cursor-pointer">Retry</label>
               <FontAwesomeIcon icon={faArrowRotateLeft} />
             </button>
           )}

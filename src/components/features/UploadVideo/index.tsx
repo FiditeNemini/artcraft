@@ -2,13 +2,13 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
-import { FileUploader, IMAGE_FILE_TYPE } from "../FileUploader";
+import { FileUploader, VIDEO_FILE_TYPE } from "../FileUploader";
 import { Button } from "~/components/ui";
 
 import { paperWrapperStyles } from "~/components/styles";
-import { addImageToEngine } from "~/signals/uiEvents";
+import { addVideoToEngine } from "~/signals/uiEvents";
 
-export const UploadImage = ({
+export const UploadVideo = ({
   isOpen,
   closeCallback,
 }: {
@@ -24,7 +24,7 @@ export const UploadImage = ({
 
   function handleEnter() {
     if (assetFile) {
-      addImageToEngine(assetFile);
+      addVideoToEngine(assetFile);
     }
     handleClose();
   }
@@ -37,10 +37,10 @@ export const UploadImage = ({
             "w-full max-w-xl space-y-4 p-8",
           )}
         >
-          <DialogTitle className="font-bold">Upload Image</DialogTitle>
+          <DialogTitle className="font-bold">Upload Video</DialogTitle>
           <FileUploader
             title=""
-            fileTypes={Object.values(IMAGE_FILE_TYPE)}
+            fileTypes={Object.values(VIDEO_FILE_TYPE)}
             file={assetFile}
             setFile={(file: File | null) => {
               setAssetFile(file);
@@ -51,8 +51,9 @@ export const UploadImage = ({
               <label className="absolute left-0 top-0 rounded-br-xl rounded-tl-xl border border-ui-border bg-white p-2 shadow-md">
                 Preview
               </label>
-              <img
+              <video
                 src={URL.createObjectURL(assetFile)}
+                controls
                 className="border border-dashed border-white"
               />
             </div>

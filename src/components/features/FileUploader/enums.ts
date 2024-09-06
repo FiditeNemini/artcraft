@@ -1,4 +1,4 @@
-export enum IMAGEP_FILE_TYPE {
+export enum IMAGE_FILE_TYPE {
   PNG = "png",
   JPG = "jpg",
   JPEG = "jpeg",

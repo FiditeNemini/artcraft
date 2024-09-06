@@ -1,12 +1,20 @@
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { LoadingBar } from "~/components/ui";
-import { loadingBar } from "~/signals/konvaContextuals";
+import { uiAccess } from "~/signals/uiAccess";
+
+// import { useSignalRenderCounter } from "~/hooks/useSignalRenderCounter";
 
 export const ContextualLoadingBar = () => {
   useSignals();
-  //console.log("ContextualLoadingBar");
-  const props = loadingBar.signal.value;
+
+  // TODO: Testing the signal render efficiency
+  // useSignalRenderCounter<typeof loadingBar.signal.value>(
+  //   "ContextualLoadingBar",
+  //   loadingBar.signal,
+  // );
+
+  const props = uiAccess.loadingBar.signal.value;
 
   return <LoadingBar {...props} />;
 };
