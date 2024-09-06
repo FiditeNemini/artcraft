@@ -1,12 +1,13 @@
 import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
 import { imageToolbar, loadingBar } from "~/signals";
+import { RenderEngine } from "./RenderEngine";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
   private videoLayer: Konva.Layer;
-
+  private renderEngine: RenderEngine;
   private offScreenCanvas: OffscreenCanvas;
 
   // signal reference
@@ -32,6 +33,8 @@ export class Engine {
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
     const context = this.offScreenCanvas.getContext("2d");
+
+    this.renderEngine = new RenderEngine(this.offScreenCanvas);
   }
 
   private applyChanges() {
@@ -42,7 +45,6 @@ export class Engine {
 
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved
-
     imageToolbar.hide();
     loadingBar.hide();
     this.setupStage();
@@ -78,7 +80,13 @@ export class Engine {
       300,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
-    videoNode.simulatedLoading();
+
+    this.renderEngine.addNodes(videoNode);
+
+    // Call this when
+    this.renderEngine.startProcessing();
+
+    //videoNode.simulatedLoading();
 
     this.videoLayer.add(textNode);
   }
