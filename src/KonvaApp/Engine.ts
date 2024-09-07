@@ -2,7 +2,8 @@ import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
-
+import { RenderEngine } from "./RenderEngine";
+import { layer } from "@fortawesome/fontawesome-svg-core";
 export class Engine {
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
@@ -40,6 +41,10 @@ export class Engine {
     uiEvents.onGetStagedVideo((video) => {
       this.addVideo(video);
     });
+  }
+
+  sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private applyChanges() {
@@ -82,7 +87,7 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      300,
+      1200,
       300,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
@@ -91,23 +96,68 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      700,
+      1600,
       700,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
 
-    const frame = new Konva.Rect({
-      x: 50,
-      y: 50,
-      width: 720,
-      height: 1080,
+    var positionX = window.innerWidth / 2 - 720 / 2;
+    var positionY = window.innerHeight / 2 - 1080 / 2;
+
+    var width = 720;
+    var height = 1080;
+
+    const activeFrame = new Konva.Rect({
+      x: positionX,
+      y: positionY,
+      width: width,
+      height: height,
       fill: "white",
       stroke: "black",
       strokeWidth: 1,
-      draggable: true,
+      draggable: false,
     });
-    frame.moveToTop();
-    this.videoLayer.add(frame);
+
+    const activeFrame2 = new Konva.Rect({
+      x: positionX,
+      y: positionY,
+      width: 100,
+      height: 100,
+      fill: "green",
+      stroke: "black",
+      strokeWidth: 1,
+      draggable: false,
+    });
+
+    this.videoLayer.add(activeFrame);
+    this.videoLayer.add(activeFrame2);
+    activeFrame2.moveToTop();
+    activeFrame.moveToBottom();
+    this.videoLayer.draw();
+
+    //
+    await this.sleep(5000);
+    const canvas = await this.renderPortionOfLayer(
+      this.videoLayer,
+      positionX,
+      positionY,
+      width,
+      height,
+    );
+    this.videoLayer.draw();
+    canvas.toBlob((blob) => {
+      if (blob) {
+        // Do something with the blob, e.g., upload it or save it
+        console.log("Blob created:", blob);
+        // Example: Create a download link for the blob
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "canvas-output.png";
+        link.click();
+      } else {
+        console.error("Failed to create blob");
+      }
+    }, "image/png");
 
     //this.renderEngine.addNodes(videoNode);
 
@@ -117,6 +167,22 @@ export class Engine {
     //videoNode.simulatedLoading();
 
     this.videoLayer.add(textNode);
+  }
+
+  async renderPortionOfLayer(
+    layer: Konva.Layer,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ) {
+    const canvas = layer.toCanvas({
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+    });
+    return canvas;
   }
 
   public addImage(imageFile: File) {

@@ -340,11 +340,10 @@ export class VideoNode extends NetworkedNodeContext {
           console.log("Seeked Finished");
           // reimplement using the function
           // ensure that this doesn't race.
-
           resolve();
         };
       });
-
+      // wait for this to finish
       await this.frameDidFinishSeeking;
     } else {
       console.log("Video Not Seekable");
