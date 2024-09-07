@@ -10,10 +10,10 @@ import {
   faFilm,
   faFloppyDisk,
   // faHand,
+  faHatWizard,
   faImage,
   faLocationArrow,
-  faArrowTurnLeft,
-  faArrowTurnRight,
+
   // faPlus,
   // faMinus,
   faSquareDashed,
@@ -120,13 +120,8 @@ export const ToolbarMain = () => {
             )}
           </div>
           <ToolbarButtons icon={faCameraRotate} />
+          <ToolbarButtons icon={faHatWizard} />
         </div>
-        {/* <div className="flex items-center gap-2 px-2">
-          <ToolbarButtons icon={faMinus} />
-          <span>100%</span>
-          <ToolbarButtons icon={faPlus} />
-          <ToolbarButtons icon={faHand} />
-        </div> */}
         <div className="flex items-center gap-2 px-2">
           <ToolbarButtons icon={faArrowRotateLeft} />
           <ToolbarButtons icon={faArrowRotateRight} />

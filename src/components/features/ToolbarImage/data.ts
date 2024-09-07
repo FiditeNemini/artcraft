@@ -4,10 +4,8 @@ import {
   faArrowsRotate,
   faArrowsUpDownLeftRight,
   faArrowDownFromLine,
-  // faEraser,
-  // faPaintbrush,
+  faHatWitch,
   faTrashCan,
-  // faWandMagicSparkles,
 } from "@fortawesome/pro-thin-svg-icons";
 
 export const ToolbarImageButtonData = [
@@ -20,6 +18,10 @@ export const ToolbarImageButtonData = [
     icon: faArrowsRotate,
   },
   {
+    name: ToolbarImageButtonNames.AI_STYLIZE,
+    icon: faHatWitch,
+  },
+  {
     name: ToolbarImageButtonNames.MOVE_LAYER_UP,
     icon: faArrowUpFromLine,
   },
@@ -27,18 +29,6 @@ export const ToolbarImageButtonData = [
     name: ToolbarImageButtonNames.MOVE_LAYER_DOWN,
     icon: faArrowDownFromLine,
   },
-  // {
-  //   name: ToolbarImageButtonNames.ERASE,
-  //   icon: faEraser,
-  // },
-  // {
-  //   name: ToolbarImageButtonNames.PAINT,
-  //   icon: faPaintbrush,
-  // },
-  // {
-  //   name: ToolbarImageButtonNames.MAGIC,
-  //   icon: faWandMagicSparkles,
-  // },
   {
     name: ToolbarImageButtonNames.DELETE,
     icon: faTrashCan,

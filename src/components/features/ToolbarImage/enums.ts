@@ -1,9 +1,7 @@
 export enum ToolbarImageButtonNames {
   MOVE = "MOVE",
   ROTATE = "ROTATE",
-  ERASE = "ERASE",
-  PAINT = "PAINT",
-  MAGIC = "MAGIC",
+  AI_STYLIZE = "AI_STYLIZE",
   DELETE = "DELETE",
   MOVE_LAYER_UP = "MOVE_LAYER_UP",
   MOVE_LAYER_DOWN = "MOVE_LAYER_DOWN",
