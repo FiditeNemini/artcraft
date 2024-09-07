@@ -124,7 +124,7 @@ export class RenderEngine {
 
     this.videoNodes.forEach((item: VideoNode) => {});
 
-    // find the longest video node;
+    // find the longest video node
     const numberOfFrames = this.findLongestVideoLength();
 
     await this.render(numberOfFrames);
@@ -166,16 +166,16 @@ export class RenderEngine {
           this.offScreenCanvas.width = videoNode.node.getSize().width;
           this.offScreenCanvas.height = videoNode.node.getSize().height;
 
-          if (this.context) {
-            this.context.drawImage(
+          if (this.videoDrawContext) {
+            this.videoDrawContext.drawImage(
               videoNode.videoComponent,
               0,
               0,
               this.offScreenCanvas.width,
               this.offScreenCanvas.height,
             );
-
-            this.frames.push(this.offScreenCanvas.transferToImageBitmap());
+            // TODO bridge this.
+            //this.frames.push(this.videoDrawCanvas.toBlob());
           }
         } // end of if
       } // end of for.

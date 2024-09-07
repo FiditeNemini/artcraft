@@ -97,7 +97,7 @@ export class Engine {
     // Testing render engine
     this.renderEngine.addNodes(videoNode);
 
-    await this.renderEngine.render();
+    await this.renderEngine.startProcessing();
 
     // Call this when test video nodes
     //await this.renderEngine.startProcessing();

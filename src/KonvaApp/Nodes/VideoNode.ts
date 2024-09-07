@@ -35,6 +35,8 @@ export class VideoNode extends NetworkedNodeContext {
     this.isProcessing = true;
   }
 
+  private finishedLoadingOnStart: Promise<void>;
+
   getNumberFrames(): number {
     return this.fps * this.duration;
   }
@@ -79,6 +81,8 @@ export class VideoNode extends NetworkedNodeContext {
     this.videoComponent = document.createElement("video");
 
     this.frameDidFinishSeeking = new Promise<void>(() => {});
+
+    this.finishedLoadingOnStart = new Promise<void>(() => {});
 
     this.videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
