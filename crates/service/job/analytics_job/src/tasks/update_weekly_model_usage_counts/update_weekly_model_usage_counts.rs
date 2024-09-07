@@ -1,0 +1,76 @@
+use std::time::Duration;
+
+use chrono::{Days, NaiveDate, Utc};
+use log::{error, info};
+
+use datetimes::generate_dates_inclusive::generate_dates_inclusive;
+use errors::AnyhowResult;
+use mysql_queries::queries::model_weight_usage_counts::upsert_model_weight_usage_count_for_date::{Args, upsert_model_weight_usage_count_for_date};
+use mysql_queries::queries::model_weights::count::count_all_model_usages_on_date::count_all_model_usages_on_date;
+
+use crate::job_state::JobState;
+
+pub async fn update_weekly_model_usage_counts(job_state: JobState) -> AnyhowResult<()> {
+  loop {
+    info!("update weekly model usage counts");
+
+    match calculate_old_model_analytics(&job_state).await {
+      Ok(_) => {
+        tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis)).await;
+      }
+      Err(e) => {
+        error!("error: {:?}", e);
+        tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_error_wait_millis)).await;
+      }
+    }
+  }
+}
+
+pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult<()> {
+  let mut connection = job_state.mysql_pool.acquire().await?;
+
+  let dates = get_dates();
+
+  for date in dates {
+    info!("Finding usages for date: {:?}", date);
+
+    let usages = count_all_model_usages_on_date(&mut *connection, date).await?;
+
+    info!("Records found: {}", usages.counts.len());
+
+    for usage in usages.counts {
+      if usage.record_count == 0 {
+        continue;
+      }
+
+      info!("Date: {} Token: {} Uses: {}", date, usage.token.as_str(), usage.record_count);
+
+      upsert_model_weight_usage_count_for_date(Args {
+        model_token: &usage.token,
+        date,
+        usage_count: usage.record_count,
+        insert_on_zero: false,
+        mysql_executor: &mut *connection,
+        phantom: Default::default(),
+      }).await?;
+    }
+
+    tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis)).await;
+  }
+
+  Ok(())
+}
+
+fn get_dates() -> Vec<NaiveDate> {
+  let today = Utc::now().date_naive();
+
+  let start_date = today
+      .checked_sub_days(Days::new(2))
+      .unwrap_or(today);
+
+  let end_date = today
+      .checked_add_days(Days::new(2))
+      .unwrap_or(today);
+
+  generate_dates_inclusive(start_date, end_date)
+}

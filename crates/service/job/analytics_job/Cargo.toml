@@ -19,6 +19,7 @@ normal = ["my-workspace-hack"]
 
 # Internal
 config = { path = "../../../lib/deprecated/config" }
+datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
