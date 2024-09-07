@@ -473,6 +473,7 @@ dependencies = [
  "easyenv",
  "enums",
  "errors",
+ "futures 0.3.29",
  "hostname 0.4.0",
  "log",
  "my-workspace-hack",

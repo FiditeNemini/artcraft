@@ -17,6 +17,7 @@
 //#![forbid(warnings)]
 
 use log::info;
+use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -24,11 +25,10 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
 use crate::job_state::{JobState, SleepConfigs};
-use crate::main_loop::main_loop;
+use crate::tasks::calculate_old_model_analytics::calculate_old_model_analytics_loop::calculate_old_model_analytics_loop;
 
 pub mod job_state;
 pub mod tasks;
-pub mod main_loop;
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
@@ -46,17 +46,7 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Hostname: {}", &server_hostname);
 
-  let db_connection_string =
-      easyenv::get_env_string_or_default(
-        "MYSQL_URL",
-        DEFAULT_MYSQL_CONNECTION_STRING);
-
-  info!("Connecting to database...");
-
-  let mysql_pool = MySqlPoolOptions::new()
-      .max_connections(5)
-      .connect(&db_connection_string)
-      .await?;
+  let mysql_pool = get_mysql_pool().await?;
 
   let job_state = JobState {
     mysql_pool,
@@ -68,7 +58,32 @@ async fn main() -> AnyhowResult<()> {
     },
   };
 
-  let _r = main_loop(job_state).await;
+  let job_state_1 = job_state.clone();
+
+  let handle_1 = tokio::task::spawn(async move {
+    let _r = calculate_old_model_analytics_loop(job_state_1).await;
+  });
+
+  futures::future::join_all([
+    handle_1,
+  ]).await;
+
 
   Ok(())
+}
+
+async fn get_mysql_pool() -> AnyhowResult<Pool<MySql>> {
+  info!("Connecting to MySQL database...");
+
+  let db_connection_string =
+      easyenv::get_env_string_or_default(
+        "MYSQL_URL",
+        DEFAULT_MYSQL_CONNECTION_STRING);
+
+  let mysql_pool = MySqlPoolOptions::new()
+      .max_connections(5)
+      .connect(&db_connection_string)
+      .await?;
+
+  Ok(mysql_pool)
 }

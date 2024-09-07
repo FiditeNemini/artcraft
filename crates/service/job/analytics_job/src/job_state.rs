@@ -1,5 +1,6 @@
 use sqlx::MySqlPool;
 
+#[derive(Clone)]
 pub struct JobState {
   pub mysql_pool: MySqlPool,
 
@@ -7,6 +8,7 @@ pub struct JobState {
 }
 
 /// Use sleep to not overload the database.
+#[derive(Clone)]
 pub struct SleepConfigs {
   // How long to wait between individual "jobs".
   pub between_job_wait_millis: u64,

@@ -7,7 +7,7 @@ use errors::AnyhowResult;
 use crate::job_state::JobState;
 use crate::tasks::calculate_old_model_analytics::calculate_old_model_analytics::calculate_old_model_analytics;
 
-pub async fn main_loop(job_state: JobState) -> AnyhowResult<()> {
+pub async fn calculate_old_model_analytics_loop(job_state: JobState) -> AnyhowResult<()> {
   loop {
     info!("Begin analytics job batch.");
 
