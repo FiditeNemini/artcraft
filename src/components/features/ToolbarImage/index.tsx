@@ -2,7 +2,7 @@ import { MouseEventHandler } from "react";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faImage } from "@fortawesome/pro-thin-svg-icons";
+import { faImage } from "@fortawesome/pro-solid-svg-icons";
 
 import { ToolbarButtons } from "~/components/features/ToolbarButtons";
 import { paperWrapperStyles } from "~/components/styles";

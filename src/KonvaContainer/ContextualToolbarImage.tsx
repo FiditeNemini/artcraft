@@ -2,8 +2,9 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
-import { ToolbarImage } from "../ToolbarImage";
+import { ToolbarImage } from "~/components/features/ToolbarImage";
 import { uiAccess } from "~/signals/uiAccess";
+
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualToolbarImage = () => {

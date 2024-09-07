@@ -3,7 +3,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 
-import { faKey, faUser } from "@fortawesome/pro-thin-svg-icons";
+import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
 import { Button, Input, LoadingSpinner } from "~/components/ui";
 import { authentication } from "~/signals";
 

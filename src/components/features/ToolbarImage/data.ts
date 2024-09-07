@@ -6,7 +6,7 @@ import {
   faArrowDownFromLine,
   faHatWitch,
   faTrashCan,
-} from "@fortawesome/pro-thin-svg-icons";
+} from "@fortawesome/pro-solid-svg-icons";
 
 export const ToolbarImageButtonData = [
   {

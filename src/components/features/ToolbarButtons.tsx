@@ -4,7 +4,7 @@ import {
   FontAwesomeIcon,
   FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
-import { IconDefinition } from "@fortawesome/pro-thin-svg-icons";
+import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 
 export const ToolbarButtons = ({
   icon,

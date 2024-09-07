@@ -1,5 +1,5 @@
-import { ContextualToolbarImage } from "~/components/features/KonvaContainer/ContextualToolbarImage";
-import { ContextualLoadingBar } from "~/components/features/KonvaContainer/ContextualLoadingBar";
+import { ContextualToolbarImage } from "~/KonvaContainer/ContextualToolbarImage";
+import { ContextualLoadingBar } from "~/KonvaContainer/ContextualLoadingBar";
 
 import { ErrorDialog } from "~/components/features";
 

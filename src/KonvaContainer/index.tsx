@@ -5,6 +5,7 @@ import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 import { ContextualToolbarImage } from "./ContextualToolbarImage";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
+import { ToolbarMain, ErrorDialog } from "~/components/features";
 
 export const KonvaContainer = forwardRef<
   HTMLDivElement,
@@ -16,8 +17,10 @@ export const KonvaContainer = forwardRef<
   return (
     <>
       <div ref={ref} className={classes} {...props} />
+      <ToolbarMain />
       <ContextualToolbarImage />
       <ContextualLoadingBar />
+      <ErrorDialog />
     </>
   );
 });

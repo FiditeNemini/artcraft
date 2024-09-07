@@ -1,5 +1,5 @@
 import { HTMLAttributes, useState } from "react";
-import { faChevronDown, faChevronUp } from "@fortawesome/pro-thin-svg-icons";
+import { faChevronDown, faChevronUp } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import { Transition } from "@headlessui/react";

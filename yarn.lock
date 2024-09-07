@@ -470,10 +470,10 @@
   dependencies:
     "@fortawesome/fontawesome-common-types" "6.6.0"
 
-"@fortawesome/pro-thin-svg-icons@^6.6.0":
+"@fortawesome/pro-solid-svg-icons@^6.6.0":
   version "6.6.0"
-  resolved "https://npm.fontawesome.com/@fortawesome/pro-thin-svg-icons/-/6.6.0/pro-thin-svg-icons-6.6.0.tgz"
-  integrity sha512-Kp378bhM7e9q0dzIt4hJ/Zgy+1AISQFHyXPT5QVZXQjyovYLy2g8pC+nNOyOwekPCjUNnHPBZVOIhi/Noa7ovg==
+  resolved "https://npm.fontawesome.com/@fortawesome/pro-solid-svg-icons/-/6.6.0/pro-solid-svg-icons-6.6.0.tgz#e4f99d9b674288c3d1ccbec27b37e008bd190ca1"
+  integrity sha512-IwYuyO+i681arIxOjPUoqRwoHeTqeg6i2s5rY2WbZ1R7PnwavOd1+aPHCJlfU2k8l5LZ+u3hAKlVqu+emQFlZg==
   dependencies:
     "@fortawesome/fontawesome-common-types" "6.6.0"
 

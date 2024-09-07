@@ -3,16 +3,14 @@ import { twMerge } from "tailwind-merge";
 import { withProtectionRoute } from "~/components/hoc";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
-// Components
-import {
-  ToolbarUserProfile,
-  KonvaContainer,
-  ToolbarMain,
-  ErrorDialog,
-} from "~/components/features";
+// Components of the page
+import { ToolbarUserProfile, ErrorDialog } from "~/components/features";
+
+// Components of the Konva App are all in the KonvaContainer
+import { KonvaContainer } from "~/KonvaContainer";
 
 // The KonvaApp is the root of the Konva stage
-// and only entry point for anything Konva
+// and only entry point for anything in Konva JS
 import { KonvaApp } from "~/KonvaApp";
 
 export const Main = withProtectionRoute(() => {
@@ -41,7 +39,6 @@ export const Main = withProtectionRoute(() => {
         <ToolbarUserProfile />
         <ErrorDialog />
       </div>
-      <ToolbarMain />
     </div>
   );
 });

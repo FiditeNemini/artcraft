@@ -5,7 +5,7 @@ import {
   faChevronDown,
   faRightFromBracket,
   faUser,
-} from "@fortawesome/pro-thin-svg-icons";
+} from "@fortawesome/pro-solid-svg-icons";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Gravatar } from "../../ui/Gravatar";
 

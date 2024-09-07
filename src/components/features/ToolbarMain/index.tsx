@@ -17,7 +17,7 @@ import {
   // faPlus,
   // faMinus,
   faSquareDashed,
-} from "@fortawesome/pro-thin-svg-icons";
+} from "@fortawesome/pro-solid-svg-icons";
 
 import { ToolbarButtons } from "../ToolbarButtons";
 import { twMerge } from "tailwind-merge";

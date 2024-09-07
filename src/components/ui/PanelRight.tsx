@@ -1,5 +1,8 @@
 import { HTMLAttributes, useState } from "react";
-import { faChevronLeft, faChevronRight } from "@fortawesome/pro-thin-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import { Transition } from "@headlessui/react";
@@ -33,7 +36,7 @@ export const PanelRight = ({
           className={twMerge(
             gridClasses,
             // base styles
-            "bg-ui-panel border-ui-border relative border p-2 transition ease-in-out",
+            "relative border border-ui-border bg-ui-panel p-2 transition ease-in-out",
             // Shared closed styles
             "data-[closed]:opacity-0",
             // Entering styles

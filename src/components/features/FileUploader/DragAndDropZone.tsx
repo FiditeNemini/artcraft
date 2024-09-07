@@ -4,7 +4,7 @@ import {
   faFileArrowUp,
   faFileImage,
   faFileVideo,
-} from "@fortawesome/pro-thin-svg-icons";
+} from "@fortawesome/pro-solid-svg-icons";
 import { getFileName } from "~/utilities";
 
 import { VIDEO_FILE_TYPE } from "./enums";

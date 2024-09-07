@@ -2,7 +2,7 @@ import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft } from "@fortawesome/pro-thin-svg-icons";
+import { faArrowRotateLeft } from "@fortawesome/pro-solid-svg-icons";
 
 export enum LoadingBarStatus {
   IDLE = "idle",

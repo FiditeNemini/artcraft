@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { faChevronDown } from "@fortawesome/pro-thin-svg-icons";
+import { faChevronDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { uiAccess, uiAccessType } from "~/signals/uiAccess";
 
