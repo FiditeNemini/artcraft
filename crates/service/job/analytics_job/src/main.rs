@@ -25,8 +25,8 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
 use crate::job_state::{JobState, SleepConfigs};
-use crate::tasks::calculate_old_model_analytics::calculate_old_model_analytics_loop::calculate_old_model_analytics_loop;
 use crate::tasks::update_model_usage_counts_table::update_model_usage_counts_table::update_model_usage_counts_table;
+use crate::tasks::update_model_weights_cached_usage_field::update_model_weights_cached_usage_field::update_model_weights_cached_usage_field;
 
 pub mod job_state;
 pub mod tasks;
@@ -62,13 +62,13 @@ async fn main() -> AnyhowResult<()> {
   let job_state_1 = job_state.clone();
 
   let handle_1 = tokio::task::spawn(async move {
-    let _r = calculate_old_model_analytics_loop(job_state_1).await;
+    let _r = update_model_usage_counts_table(job_state_1).await;
   });
 
   let job_state_2 = job_state.clone();
 
   let handle_2 = tokio::task::spawn(async move {
-    let _r = update_model_usage_counts_table(job_state_2).await;
+    let _r = update_model_weights_cached_usage_field(job_state_2).await;
   });
 
   futures::future::join_all([

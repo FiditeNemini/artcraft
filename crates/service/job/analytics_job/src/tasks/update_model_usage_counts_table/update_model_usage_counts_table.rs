@@ -29,12 +29,12 @@ pub async fn update_model_usage_counts_table(job_state: JobState) -> AnyhowResul
 }
 
 async fn connect_and_calculate_loop(job_state: &JobState) -> AnyhowResult<()> {
+  // NB: Don't re-establish this connection unless something goes wrong.
   let mut connection = job_state.mysql_pool.acquire().await?;
   loop {
     calculate_with_connection(&mut connection, job_state).await?;
   }
 }
-
 
 async fn calculate_with_connection(
   connection: &mut PoolConnection<MySql>,
