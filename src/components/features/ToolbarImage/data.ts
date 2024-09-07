@@ -1,11 +1,13 @@
 import { ToolbarImageButtonNames } from "./enums";
 import {
+  faArrowUpFromLine,
   faArrowsRotate,
   faArrowsUpDownLeftRight,
-  faEraser,
-  faPaintbrush,
+  faArrowDownFromLine,
+  // faEraser,
+  // faPaintbrush,
   faTrashCan,
-  faWandMagicSparkles,
+  // faWandMagicSparkles,
 } from "@fortawesome/pro-thin-svg-icons";
 
 export const ToolbarImageButtonData = [
@@ -18,17 +20,25 @@ export const ToolbarImageButtonData = [
     icon: faArrowsRotate,
   },
   {
-    name: ToolbarImageButtonNames.ERASE,
-    icon: faEraser,
+    name: ToolbarImageButtonNames.MOVE_LAYER_UP,
+    icon: faArrowUpFromLine,
   },
   {
-    name: ToolbarImageButtonNames.PAINT,
-    icon: faPaintbrush,
+    name: ToolbarImageButtonNames.MOVE_LAYER_DOWN,
+    icon: faArrowDownFromLine,
   },
-  {
-    name: ToolbarImageButtonNames.MAGIC,
-    icon: faWandMagicSparkles,
-  },
+  // {
+  //   name: ToolbarImageButtonNames.ERASE,
+  //   icon: faEraser,
+  // },
+  // {
+  //   name: ToolbarImageButtonNames.PAINT,
+  //   icon: faPaintbrush,
+  // },
+  // {
+  //   name: ToolbarImageButtonNames.MAGIC,
+  //   icon: faWandMagicSparkles,
+  // },
   {
     name: ToolbarImageButtonNames.DELETE,
     icon: faTrashCan,

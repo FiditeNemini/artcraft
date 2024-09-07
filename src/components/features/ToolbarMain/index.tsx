@@ -12,6 +12,8 @@ import {
   // faHand,
   faImage,
   faLocationArrow,
+  faArrowTurnLeft,
+  faArrowTurnRight,
   // faPlus,
   // faMinus,
   faSquareDashed,
