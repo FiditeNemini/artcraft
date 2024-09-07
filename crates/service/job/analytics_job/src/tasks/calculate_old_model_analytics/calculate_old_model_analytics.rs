@@ -28,7 +28,7 @@ pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult
 
   let tokens = query_all_model_tokens(&mut mysql_connection).await?;
 
-  std::thread::sleep(Duration::from_millis(100));
+  tokio::time::sleep(Duration::from_millis(100)).await;
 
   for token in tokens.tokens {
     info!("Running analytics for TTS model {}", token.token);
@@ -38,7 +38,7 @@ pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult
       &mut mysql_connection,
       &token.token).await;
 
-    std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_job_wait_millis));
+    tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_wait_millis)).await;
   }
 
   Ok(())
@@ -80,7 +80,7 @@ async fn query_single_model_statistics(
     }).await?;
   }
 
-  std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_query_wait_millis));
+  tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_query_wait_millis)).await;
 
   {
     let three_days_in_minutes = 60 * 24 * 3;
@@ -100,7 +100,7 @@ async fn query_single_model_statistics(
     }).await?;
   }
 
-  std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_query_wait_millis));
+  tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_query_wait_millis)).await;
 
   {
     let result = count_tts_model_uses_total(
