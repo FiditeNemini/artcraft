@@ -27,7 +27,7 @@ use crate::job_state::{JobState, SleepConfigs};
 use crate::main_loop::main_loop;
 
 pub mod job_state;
-pub mod jobs;
+pub mod tasks;
 pub mod main_loop;
 
 #[tokio::main]

@@ -20,7 +20,7 @@ use crate::job_state::JobState;
 //  Jobs can store state, batch progress, and not starve one another.
 //  It'll be easier to interleave jobs.
 
-pub async fn calculate_model_analytics(job_state: &JobState) -> AnyhowResult<()> {
+pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult<()> {
   // TODO(bt, 2023-01-16): It's conceivable the pool connection dies mid-workload and we starve
   //  our tokens. An ideal fix would be a self-healing pool connection, but for now we'll use
   //  ugly hacks.
