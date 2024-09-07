@@ -24,6 +24,7 @@ elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
+primitives = { path = "../../../lib/data/primitives" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
 tokens = { path = "../../../_types/tokens" }
 

@@ -46,6 +46,7 @@ pub struct ModelWeightForElasticsearchRecord {
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
+  pub cached_usage_count: u64,
 
   // TTS extensions
   pub maybe_tts_ietf_language_tag: Option<String>,
@@ -113,6 +114,7 @@ pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
           maybe_ratings_positive_count: model.maybe_ratings_positive_count,
           maybe_ratings_negative_count: model.maybe_ratings_negative_count,
           maybe_bookmark_count: model.maybe_bookmark_count,
+          cached_usage_count: model.cached_usage_count,
           creator_set_visibility: model.creator_set_visibility,
           created_at: model.created_at,
           updated_at: model.updated_at,
@@ -162,6 +164,8 @@ SELECT
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
     entity_stats.bookmark_count as maybe_bookmark_count,
+
+    w.cached_usage_count,
 
     extension_tts.ietf_language_tag as maybe_tts_ietf_language_tag,
     extension_tts.ietf_primary_language_subtag as maybe_tts_ietf_primary_language_subtag,
@@ -247,6 +251,7 @@ struct RawRecord {
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
+  pub cached_usage_count: u64,
 
   // TTS extensions
   pub maybe_tts_ietf_language_tag: Option<String>,
@@ -308,6 +313,8 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
       maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
       maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
+
+      cached_usage_count: row.try_get("cached_usage_count")?,
 
       maybe_tts_ietf_language_tag: row.try_get("maybe_tts_ietf_language_tag")?,
       maybe_tts_ietf_primary_language_subtag: row.try_get("maybe_tts_ietf_primary_language_subtag")?,

@@ -29,6 +29,11 @@
       "ratings_negative_count" : { "type" : "unsigned_long" },
       "bookmark_count" : { "type" : "unsigned_long" },
 
+      "cached_usage_count" : {
+        "type": "integer",
+        "index": true
+      },
+
       "maybe_ietf_language_tag" : { "type" : "keyword" },
       "maybe_ietf_primary_language_subtag" : { "type" : "keyword" },
 

@@ -23,6 +23,7 @@ composite_identifiers = { path = "../../_types/composite_identifiers" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../errors" }
 idempotency = { path = "../idempotency" }
+primitives = { path = "../data/primitives" }
 reusable_types = { path = "../../_types/reusable_types" }
 tokens = { path = "../../_types/tokens" }
 

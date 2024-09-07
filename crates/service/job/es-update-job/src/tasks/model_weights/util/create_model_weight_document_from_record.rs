@@ -8,6 +8,7 @@ use elasticsearch_schema::traits::document::Document;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use errors::AnyhowResult;
 use mysql_queries::queries::model_weights::batch_get::batch_get_model_weights_for_elastic_search_backfill::ModelWeightForElasticsearchRecord;
+use primitives::numerics::u64_to_i32_saturating::u64_to_i32_saturating;
 
 pub async fn create_model_weight_document_from_record(
   elasticsearch: &Elasticsearch,
@@ -44,6 +45,8 @@ pub async fn create_model_weight_document_from_record(
     ratings_positive_count: record.maybe_ratings_positive_count.unwrap_or(0),
     ratings_negative_count: record.maybe_ratings_negative_count.unwrap_or(0),
     bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
+
+    cached_usage_count: Some(u64_to_i32_saturating(record.cached_usage_count)),
 
     maybe_ietf_language_tag: match record.weights_category {
       WeightsCategory::TextToSpeech => record.maybe_tts_ietf_language_tag,

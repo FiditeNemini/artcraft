@@ -49,13 +49,17 @@ pub struct ModelWeightDocument {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  // TODO(bt,2024-08-08): This should be migrated to non-nullable soon. Turn this into a strict `bool` and drop the Option<T>
+  // TODO(bt, 2024-08-08): This should be migrated to non-nullable soon. Turn this into a strict `bool` and drop the Option<T>
   pub is_featured: Option<bool>,
 
   // Statistics
   pub ratings_positive_count: u32,
   pub ratings_negative_count: u32,
   pub bookmark_count: u32,
+
+  // Stored as "integer" type
+  // TODO(bt, 2024-09-07): This should be migrated to non-nullable soon. Turn this into a strict `i32` and drop the Option<T>
+  pub cached_usage_count: Option<i32>,
 
   // Fields only used for TTS models and voice conversion models.
   pub maybe_ietf_language_tag: Option<String>,

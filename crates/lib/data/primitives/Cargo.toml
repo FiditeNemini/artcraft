@@ -19,6 +19,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 # NB: This is designed to be a central crate with few dependencies.
 # Consider the dependencies here wisely.
+# This is used in MySQL, etc., so dependencies are ill-advised.
 
 # Internal
 #errors = { path = "../../errors" }
