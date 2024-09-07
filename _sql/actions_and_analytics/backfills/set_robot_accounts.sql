@@ -30,7 +30,7 @@ WHERE username IN (
 -- Ripping off our API (???):
 -- We won't filter these from organic analysis because their usage is likely organic even if they're hijacking us
 -- devproject2023 - lots of different voices used, in different languages
--- leon_says: lots of different voices used, in different languages
+-- leon_says: 101soundboards again, lots of different voices used, in different languages
 -- thebigo - not API hacker, but not paying us, using us at volume, making bad content??
 -- yigithan - lots of different voices used, in different languages
 
@@ -40,7 +40,7 @@ WHERE username IN (
 | user_token         | username        | usage_count | created_at          |
 +--------------------+-----------------+-------------+---------------------+
 | user_aw7m4d07fjzrv | robertmctague   |      286029 | 2024-03-18 21:51:42 | -- Strange. Bimodal character set, auto-censor, bitcoin
-| U:03HG1NRMDT7A6    | leon_says       |      209682 | 2023-09-13 16:27:40 | -- Ripping off our API (???)
+| U:03HG1NRMDT7A6    | leon_says       |      209682 | 2023-09-13 16:27:40 | -- 101soundboards - ripping off our API again
 | U:Z477H1KNSY3B5    | dzth            |      145174 | 2023-07-31 15:53:50 |  AI SpongeBob
 | user_vb7mch05njgnp | idkman01        |       77741 | 2024-06-29 03:33:34 |  AI Sonic + a little AI SpongeBob
 | U:8D706H5C7E5MF    | yigithan        |       41965 | 2023-05-03 07:35:43 | -- Ripping off our API (???)
