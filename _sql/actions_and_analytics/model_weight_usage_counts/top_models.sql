@@ -6,7 +6,7 @@
 | usage_count | int(10) unsigned | NO   | MUL | 0       |                |
 +-------------+------------------+------+-----+---------+----------------+
 
-
+--- Top models after date
 select
   w.token,
   substring(w.title, 1, 100) as title,
@@ -17,5 +17,6 @@ join model_weights as w
 where on_date >= '2024-09-01'
 group by w.token
 order by usage_count desc
-limit 5
+limit 50;
+
 

@@ -49,8 +49,9 @@ async fn calculate_with_connection(
 
     info!("Records found: {}", usages.counts.len());
 
-    let mut skipped_sparse_updates = 0;
-    let mut skipped_noop_updates = 0;
+    let mut skipped_sparse_updates : u32 = 0;
+    let mut skipped_noop_updates : u32 = 0;
+    let mut update_count : u32 = 0;
 
     for usage in usages.counts {
       if usage.latest_usage_count == 0 {
@@ -72,10 +73,13 @@ async fn calculate_with_connection(
         mysql_executor: &mut **connection,
         phantom: Default::default(),
       }).await?;
+
+      update_count += 1;
     }
 
     info!("Skipped sparse updates: {}", skipped_sparse_updates);
     info!("Skipped no-op updates: {}", skipped_noop_updates);
+    info!("Updated records: {}", update_count);
 
     tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis)).await;
   }

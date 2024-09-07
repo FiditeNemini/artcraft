@@ -45,12 +45,11 @@ async fn calculate_with_connection(
 
   info!("Records found: {}", backfill_tokens.len());
 
-  let mut skipped_sparse_updates = 0;
-  let mut skipped_noop_updates = 0;
+  let mut skipped_sparse_updates : u32 = 0;
+  let mut skipped_noop_updates : u32 = 0;
+  let mut update_count : u32 = 0;
 
   for backfill_token in backfill_tokens {
-    info!("Updating cached usages for model: {:?}", backfill_token.token);
-
     let usage_count = sum_model_weight_usage_count_for_models(
       &backfill_token.token,
       &mut **connection,
@@ -72,7 +71,7 @@ async fn calculate_with_connection(
       continue;
     }
 
-    info!("Token: {} Uses: {}", backfill_token.token, usage_count);
+    info!("Total all-time uses for model {} : {}", backfill_token.token, usage_count);
 
     update_model_weight_cached_usage_count(Args {
       model_weight_token: &backfill_token.token,
@@ -80,10 +79,13 @@ async fn calculate_with_connection(
       mysql_executor: &mut **connection,
       phantom: Default::default(),
     }).await?;
+
+    update_count += 1;
   }
 
   info!("Skipped sparse updates: {}", skipped_sparse_updates);
   info!("Skipped no-op updates: {}", skipped_noop_updates);
+  info!("Updated records: {}", update_count);
 
   tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis)).await;
 
