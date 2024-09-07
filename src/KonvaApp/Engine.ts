@@ -133,32 +133,34 @@ export class Engine {
     this.videoLayer.add(activeFrame2);
     activeFrame2.moveToTop();
     activeFrame.moveToBottom();
-    this.videoLayer.draw();
 
-    //
     await this.sleep(5000);
-    const canvas = await this.renderPortionOfLayer(
-      this.videoLayer,
-      positionX,
-      positionY,
-      width,
-      height,
-    );
-    this.videoLayer.draw();
-    canvas.toBlob((blob) => {
-      if (blob) {
-        // Do something with the blob, e.g., upload it or save it
-        console.log("Blob created:", blob);
-        // Example: Create a download link for the blob
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "canvas-output.png";
-        link.click();
-      } else {
-        console.error("Failed to create blob");
-      }
-    }, "image/png");
 
+    for (let i = 0; i < 10; i++) {
+      const canvas = await this.renderPortionOfLayer(
+        this.videoLayer,
+        positionX,
+        positionY,
+        width,
+        height,
+      );
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          // Do something with the blob, e.g., upload it or save it
+          console.log("Blob created:", blob);
+          // Example: Create a download link for the blob
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "canvas-output.png";
+          link.click();
+        } else {
+          console.error("Failed to create blob");
+        }
+      }, "image/png");
+
+      await this.sleep(2000);
+    }
     //this.renderEngine.addNodes(videoNode);
 
     // Call this when
