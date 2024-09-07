@@ -460,7 +460,7 @@ export default function TopNav({
                   src={domain.logo}
                   alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
                   height="36"
-                  width="156"
+                  width={domain.titlePart === "FakeYou" ? "155" : "222"}
                   className="mb-1 d-none d-lg-block"
                 />
                 <img
