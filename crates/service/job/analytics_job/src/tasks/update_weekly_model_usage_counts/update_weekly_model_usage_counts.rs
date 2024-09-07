@@ -38,22 +38,33 @@ pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult
 
     info!("Records found: {}", usages.counts.len());
 
+    let mut skipped_sparse_updates = 0;
+    let mut skipped_noop_updates = 0;
+
     for usage in usages.counts {
-      if usage.record_count == 0 {
+      if usage.latest_usage_count == 0 {
+        skipped_sparse_updates += 1;
+        continue;
+      }
+      if usage.latest_usage_count == usage.maybe_previously_cached_model_use_count.unwrap_or(0) {
+        skipped_noop_updates += 1;
         continue;
       }
 
-      info!("Date: {} Token: {} Uses: {}", date, usage.token.as_str(), usage.record_count);
+      info!("Date: {} Token: {} Uses: {}", date, usage.token.as_str(), usage.latest_usage_count);
 
       upsert_model_weight_usage_count_for_date(Args {
         model_token: &usage.token,
         date,
-        usage_count: usage.record_count,
+        usage_count: usage.latest_usage_count,
         insert_on_zero: false,
         mysql_executor: &mut *connection,
         phantom: Default::default(),
       }).await?;
     }
+
+    info!("Skipped sparse updates: {}", skipped_sparse_updates);
+    info!("Skipped no-op updates: {}", skipped_noop_updates);
 
     tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis)).await;
   }
