@@ -13,7 +13,8 @@ export class VideoNode extends NetworkedNodeContext {
 
   public node: Konva.Image;
 
-  private didFinishLoading: boolean;
+  // do not modify internal
+  public didFinishLoading: boolean;
   private videoLayer: Layer;
 
   public uuid: string;
@@ -22,10 +23,25 @@ export class VideoNode extends NetworkedNodeContext {
   private shouldPlay: boolean = true;
 
   // Use Context Menu Item
-  private duration: number = 0;
+  public duration: number = 0;
   private imageIndex: number = 0;
 
-  private imageSources: [] = [
+  public fps: number = 24;
+
+  // This locks interaction when the render engine is rendering
+  private isProcessing: boolean = false;
+
+  async setProcessing() {
+    this.isProcessing = true;
+  }
+
+  private finishedLoadingOnStart: Promise<void>;
+
+  getNumberFrames(): number {
+    return this.fps * this.duration;
+  }
+
+  private imageSources: string[] = [
     "https://images-ng.pixai.art/images/orig/7ef23baa-2fc8-4e2f-8299-4f9241920090",
     "https://images-ng.pixai.art/images/orig/98196e9f-b968-4fe1-97ec-083ffd77c263",
     "https://images-ng.pixai.art/images/orig/a05a49dd-6764-4bfe-902f-1dfad67e49c9",
@@ -35,7 +51,7 @@ export class VideoNode extends NetworkedNodeContext {
     "https://images-ng.pixai.art/images/orig/56dcbb5f-7a31-4328-b4ea-1312df6e77a0",
     "https://videos.pixai.art/f7df019d-79a2-4ed2-bb99-775c941f7ec6",
   ];
-
+  private frameDidFinishSeeking: Promise<void>;
   constructor(
     uuid: string = uuidv4(),
     offScreenCanvas: OffscreenCanvas,
@@ -61,7 +77,12 @@ export class VideoNode extends NetworkedNodeContext {
     this.didFinishLoading = false;
 
     this.videoURL = videoURL;
+
     this.videoComponent = document.createElement("video");
+
+    this.frameDidFinishSeeking = new Promise<void>(() => {});
+
+    this.finishedLoadingOnStart = new Promise<void>(() => {});
 
     this.videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
@@ -73,29 +94,19 @@ export class VideoNode extends NetworkedNodeContext {
       this.duration = this.videoComponent.duration;
     };
 
-    this.videoComponent.onloadstart = (event: Event) => {
-      console.log("OnLoadStart");
-      this.startLoading(); // call the loading bar here... use the loading image.
-    };
-
-    this.videoComponent.onloadeddata = (event: Event) => {
-      console.log("LoadedData");
-    };
-
-    this.videoComponent.onload = (event: Event) => {
-      console.log("OnLoaded");
-    };
-
     this.videoComponent.onseeked = (event: Event) => {
-      console.log("Seeked");
+      console.log("Seeked Finished");
+      // reimplement using the function
+      // ensure that this doesn't race.
+      if (this.frameDidFinishSeeking) {
+        this.frameDidFinishSeeking.then(() => {});
+      }
     };
 
-    // assign listeners to manage state
-    this.videoComponent.oncanplay = (event: Event) => {
+    this.videoComponent.oncanplaythrough = (event: Event) => {
       this.didFinishLoading = true;
-      // remove loading ui
-
-      this.endLoading();
+      // Might have to auto click? on first load this doesn't work in general how about after ?
+      this.videoComponent.play(); //sometimes race condition with the
     };
 
     // assign video to start process.
@@ -120,7 +131,14 @@ export class VideoNode extends NetworkedNodeContext {
     });
 
     this.node.on("dragmove", () => {
+      // shouldn't be able to move if processing.
+
       this.updateContextMenuPosition();
+
+      if (this.isProcessing) {
+        return;
+      }
+
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       }
@@ -129,7 +147,7 @@ export class VideoNode extends NetworkedNodeContext {
     this.node.on("mouseover", () => {
       console.log("MouseOver");
       this.node.stroke("salmon");
-      this.node.strokeWidth(5);
+      this.node.strokeWidth(12);
       this.node.draw();
     });
 
@@ -149,6 +167,7 @@ export class VideoNode extends NetworkedNodeContext {
     this.node.on("mousedown", () => {
       imageToolbar.show();
       this.updateContextMenuPosition();
+
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       } else {
@@ -157,8 +176,18 @@ export class VideoNode extends NetworkedNodeContext {
     });
 
     this.node.on("mouseup", () => {
+      if (this.didFinishLoading == false) {
+        return;
+      }
       this.play();
     });
+  }
+
+  stop() {
+    if (this.shouldPlay == false) {
+      this.shouldPlay = true;
+      this.videoComponent.pause();
+    }
   }
 
   async updateImage(newImageSrc: string) {
@@ -194,7 +223,7 @@ export class VideoNode extends NetworkedNodeContext {
     console.log(newURL);
 
     videoComponent.onseeked = (event: Event) => {
-      //console.log("Seeked");
+      console.log("Seeked Finished");
       // reimplement using the function
     };
 
@@ -220,34 +249,41 @@ export class VideoNode extends NetworkedNodeContext {
         this.videoComponent.loop = true;
         this.videoComponent.currentTime = 0; // ensure it shows up on screen
 
-        console.log("Can Play");
-
-        this.didFinishLoading = true;
         this.shouldPlay = true; // means its play state
-
-        // remove loading ui
-        loadingBar.updateProgress(100);
-        loadingBar.hide();
-
-        // Might have to auto click? on first load this doesn't work in general how about after ?
-        this.videoComponent.play(); //sometimes race condition with the
       } catch (error) {
         console.log(error);
       }
     };
+
+    videoComponent.oncanplaythrough = (event: Event) => {
+      // remove loading ui
+      loadingBar.updateProgress(100);
+      loadingBar.hide();
+      this.didFinishLoading = true;
+      // Might have to auto click? on first load this doesn't work in general how about after ?
+      this.play(); //sometimes race condition with the
+    };
   }
 
   private play() {
-    console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
-    if (this.didFinishLoading && this.shouldPlay === true) {
-      console.log("Playing");
-      this.shouldPlay = false;
-      this.videoComponent.play();
-    } else {
-      this.shouldPlay = true;
-      this.videoComponent.pause();
+    try {
+      if (this.didFinishLoading === false || this.isProcessing) {
+        return;
+      }
 
-      console.log("Pausing");
+      console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
+      if (this.didFinishLoading && this.shouldPlay === true) {
+        console.log("Playing");
+        this.shouldPlay = false;
+        this.videoComponent.play();
+      } else {
+        this.shouldPlay = true;
+        this.videoComponent.pause();
+
+        console.log("Pausing");
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
   async simulatedLoading() {
@@ -286,13 +322,33 @@ export class VideoNode extends NetworkedNodeContext {
 
   // use sub milisecond for frames.
   async seek(second: number) {
+    // prevent interaction
+
+    //console.log(`${this.didFinishLoading}`);
+    if (this.didFinishLoading === false) {
+      console.log("Didn't finish loading so cannot seek");
+      return;
+    }
+
     if (this.videoComponent.seekable) {
       if (!this.videoComponent) {
         console.log("Didn't setup Video Component?");
         return;
       }
+      console.log("Setting");
 
       this.videoComponent.currentTime = second;
+
+      this.frameDidFinishSeeking = new Promise<void>((resolve, reject) => {
+        this.videoComponent.onseeked = (event: Event) => {
+          console.log("Seeked Finished");
+          // reimplement using the function
+          // ensure that this doesn't race.
+          resolve();
+        };
+      });
+      // wait for this to finish
+      await this.frameDidFinishSeeking;
     } else {
       console.log("Video Not Seekable");
     }

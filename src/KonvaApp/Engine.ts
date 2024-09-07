@@ -2,12 +2,13 @@ import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
+import { RenderEngine } from "./RenderEngine";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
   private videoLayer: Konva.Layer;
-
+  private renderEngine: RenderEngine;
   private offScreenCanvas: OffscreenCanvas;
 
   // signal reference
@@ -18,6 +19,9 @@ export class Engine {
       width: window.innerWidth,
       height: window.innerHeight,
     });
+    const videoLayer = new Konva.Layer();
+    this.videoLayer = videoLayer;
+    this.stage.add(videoLayer);
 
     // Listen to changes in container size
     const resizeObserver = new ResizeObserver(() => {
@@ -27,12 +31,10 @@ export class Engine {
     resizeObserver.observe(this.canvasReference);
     this.applyChanges();
 
-    const videoLayer = new Konva.Layer();
-    this.videoLayer = videoLayer;
-    this.stage.add(videoLayer);
+    // core layer for all the work done.
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
-    const context = this.offScreenCanvas.getContext("2d");
+    this.renderEngine = new RenderEngine(this.videoLayer, this.offScreenCanvas);
 
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
@@ -42,6 +44,10 @@ export class Engine {
     });
   }
 
+  sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   private applyChanges() {
     this.stage.width(this.canvasReference.offsetWidth);
     this.stage.height(this.canvasReference.offsetHeight);
@@ -49,14 +55,14 @@ export class Engine {
   }
 
   public initializeStage(sceneToken: string) {
-    // load canvas that was originaly saved
+    // load canvas that was originaly saved TODO Save manager for resharing.
 
     uiAccess.imageToolbar.hide();
     uiAccess.loadingBar.hide();
     this.setupStage();
   }
 
-  public setupStage() {
+  public async setupStage() {
     var textNode = new Konva.Text({
       x: 0,
       y: 0,
@@ -82,11 +88,22 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      300,
+      1200,
       300,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
-    videoNode.simulatedLoading();
+
+    // CODE TO TEST RENDER ENGINE
+    // Testing render engine
+    this.renderEngine.addNodes(videoNode);
+
+    await this.renderEngine.startProcessing();
+
+    // Call this when test video nodes
+    //await this.renderEngine.startProcessing();
+
+    //videoNode.simulatedLoading();
+    // TODO support Text nodes
 
     this.videoLayer.add(textNode);
   }
@@ -114,37 +131,3 @@ export class Engine {
     console.log("addVideo", videoFile);
   }
 }
-
-// do nothing, animation just need to update the layer
-// try {
-//   if (!context) {
-//     console.log("Context is dead.");
-//     return;
-//   }
-//   offScreenCanvas.width = videoNode.getWidth();
-//   offScreenCanvas.height = videoNode.getHeight();
-//   context.drawImage(
-//     video,
-//     0,
-//     0,
-//     videoNode.getWidth(),
-//     videoNode.getHeight(),
-//   );
-//   console.log("draw");
-//   const blob = await offScreenCanvas.convertToBlob({
-//     quality: 1.0,
-//     type: "image/jpeg",
-//   });
-//   console.log("blob");
-//   const link = document.createElement("a");
-//   link.href = URL.createObjectURL(blob);
-//   link.download = "canvas-output.jpg";
-//   // Trigger the download
-//   link.click();
-//   // Clean up the URL object
-//   URL.revokeObjectURL(link.href);
-//   console.log("hello");
-// } catch (error) {
-//   console.log(error);
-// }
-// anim.stop();
