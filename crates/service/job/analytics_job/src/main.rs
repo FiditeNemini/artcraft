@@ -26,7 +26,7 @@ use errors::AnyhowResult;
 
 use crate::job_state::{JobState, SleepConfigs};
 use crate::tasks::calculate_old_model_analytics::calculate_old_model_analytics_loop::calculate_old_model_analytics_loop;
-use crate::tasks::update_weekly_model_usage_counts::update_weekly_model_usage_counts::update_weekly_model_usage_counts;
+use crate::tasks::update_model_usage_counts_table::update_model_usage_counts_table::update_model_usage_counts_table;
 
 pub mod job_state;
 pub mod tasks;
@@ -68,7 +68,7 @@ async fn main() -> AnyhowResult<()> {
   let job_state_2 = job_state.clone();
 
   let handle_2 = tokio::task::spawn(async move {
-    let _r = update_weekly_model_usage_counts(job_state_2).await;
+    let _r = update_model_usage_counts_table(job_state_2).await;
   });
 
   futures::future::join_all([

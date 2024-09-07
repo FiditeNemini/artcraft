@@ -2,6 +2,8 @@ use std::time::Duration;
 
 use chrono::{Days, NaiveDate, Utc};
 use log::{error, info};
+use sqlx::MySql;
+use sqlx::pool::PoolConnection;
 
 use datetimes::generate_dates_inclusive::generate_dates_inclusive;
 use errors::AnyhowResult;
@@ -10,11 +12,11 @@ use mysql_queries::queries::model_weights::count::count_all_model_usages_on_date
 
 use crate::job_state::JobState;
 
-pub async fn update_weekly_model_usage_counts(job_state: JobState) -> AnyhowResult<()> {
+pub async fn update_model_usage_counts_table(job_state: JobState) -> AnyhowResult<()> {
   loop {
-    info!("update weekly model usage counts");
+    info!("update model usage counts table");
 
-    match calculate_old_model_analytics(&job_state).await {
+    match connect_and_calculate_loop(&job_state).await {
       Ok(_) => {
         tokio::time::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis)).await;
       }
@@ -26,15 +28,24 @@ pub async fn update_weekly_model_usage_counts(job_state: JobState) -> AnyhowResu
   }
 }
 
-pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult<()> {
+async fn connect_and_calculate_loop(job_state: &JobState) -> AnyhowResult<()> {
   let mut connection = job_state.mysql_pool.acquire().await?;
+  loop {
+    calculate_with_connection(&mut connection, job_state).await?;
+  }
+}
 
+
+async fn calculate_with_connection(
+  connection: &mut PoolConnection<MySql>,
+  job_state: &JobState
+) -> AnyhowResult<()> {
   let dates = get_dates();
 
   for date in dates {
     info!("Finding usages for date: {:?}", date);
 
-    let usages = count_all_model_usages_on_date(&mut *connection, date).await?;
+    let usages = count_all_model_usages_on_date(&mut **connection, date).await?;
 
     info!("Records found: {}", usages.counts.len());
 
@@ -58,7 +69,7 @@ pub async fn calculate_old_model_analytics(job_state: &JobState) -> AnyhowResult
         date,
         usage_count: usage.latest_usage_count,
         insert_on_zero: false,
-        mysql_executor: &mut *connection,
+        mysql_executor: &mut **connection,
         phantom: Default::default(),
       }).await?;
     }

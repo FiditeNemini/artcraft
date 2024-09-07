@@ -43,6 +43,9 @@ pub async fn count_all_model_usages_on_date<'e, 'c, E>(
   //        See https://stackoverflow.com/a/14769096
   //        Basically it requires an interval of timestamps:
   //        (f.created_at >= CURDATE() AND f.created_at < CURDATE() + INTERVAL 1 DAY)
+  //
+  // NB(3): We also join against model_weight_usage_counts to get the previously
+  //        cached count. We should rewrite that value if there's a mismatch.
   let query = sqlx::query_as!(
       RawResult,
         r#"
