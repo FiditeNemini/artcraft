@@ -6,7 +6,7 @@ import { FileUploader, IMAGE_FILE_TYPE } from "../FileUploader";
 import { Button } from "~/components/ui";
 
 import { paperWrapperStyles } from "~/components/styles";
-import { addImageToEngine } from "~/signals/uiEvents";
+import { dispatchUiEvents } from "~/signals/uiEvents/";
 
 export const UploadImage = ({
   isOpen,
@@ -24,7 +24,7 @@ export const UploadImage = ({
 
   function handleEnter() {
     if (assetFile) {
-      addImageToEngine(assetFile);
+      dispatchUiEvents.addImageToEngine(assetFile);
     }
     handleClose();
   }

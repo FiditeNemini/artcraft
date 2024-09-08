@@ -6,33 +6,41 @@ import {
 } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 
-export const ToolbarButtons = ({
+export interface ToolbarButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  active?: boolean;
+}
+
+export const ToolbarButton = ({
   icon,
   onClick,
-  buttonProps = { className: "" },
+  buttonProps = {},
   iconProps,
 }: {
   icon: IconDefinition;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+  buttonProps?: ToolbarButtonProps;
   iconProps?: Omit<FontAwesomeIconProps, "icon">;
 }) => {
   const {
     className: customButtonClassNames,
     disabled,
+    active,
+    onClick: customOnClick,
     ...restButtonProps
   } = buttonProps;
   const mergedButtonClasses = twMerge(
     "size-10 rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
     disabled && "pointer-events-none text-secondary-300",
+    active && "pointer-events-none text-primary ",
     customButtonClassNames,
   );
   return (
     <button
       className={mergedButtonClasses}
-      onClick={onClick}
       disabled={disabled}
       {...restButtonProps}
+      onClick={onClick ? onClick : customOnClick}
     >
       <FontAwesomeIcon icon={icon} {...iconProps} />
     </button>

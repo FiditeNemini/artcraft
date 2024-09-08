@@ -6,7 +6,7 @@ import { FileUploader, VIDEO_FILE_TYPE } from "../FileUploader";
 import { Button } from "~/components/ui";
 
 import { paperWrapperStyles } from "~/components/styles";
-import { addVideoToEngine } from "~/signals/uiEvents";
+import { dispatchUiEvents } from "~/signals/uiEvents";
 
 export const UploadVideo = ({
   isOpen,
@@ -24,7 +24,7 @@ export const UploadVideo = ({
 
   function handleEnter() {
     if (assetFile) {
-      addVideoToEngine(assetFile);
+      dispatchUiEvents.addVideoToEngine(assetFile);
     }
     handleClose();
   }

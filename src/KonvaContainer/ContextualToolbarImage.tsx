@@ -1,23 +1,45 @@
+import { MouseEventHandler } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
 import { ToolbarImage } from "~/components/features/ToolbarImage";
 import { uiAccess } from "~/signals/uiAccess";
+import { dispatchUiEvents } from "~/signals/uiEvents";
 
+import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualToolbarImage = () => {
   useSignals();
 
-  const { isShowing, ...rest } = uiAccess.imageToolbar.signal.value;
-
+  const { isShowing, position, ...rest } = uiAccess.imageToolbar.signal.value;
+  const buttonsProps = Object.values(ToolbarImageButtonNames).reduce(
+    (acc, buttonName) => {
+      acc[buttonName] = {
+        onClick: dispatchUiEvents.imageToolbar[buttonName],
+      };
+      return acc;
+    },
+    {} as {
+      [key in ToolbarImageButtonNames]: {
+        onClick: MouseEventHandler<HTMLButtonElement>;
+      };
+    },
+  );
   return (
     <Transition show={isShowing}>
       <div
-        className={twMerge(transitionTimingStyles, "data-[closed]:opacity-0")}
+        className={twMerge(
+          transitionTimingStyles,
+          "fixed data-[closed]:opacity-0",
+        )}
+        style={{
+          top: position.y,
+          left: position.x,
+        }}
       >
-        <ToolbarImage {...rest} />
+        <ToolbarImage {...rest} buttonsProps={buttonsProps} />
       </div>
     </Transition>
   );

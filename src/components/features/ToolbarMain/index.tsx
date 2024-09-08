@@ -9,17 +9,13 @@ import {
   faFilePlus,
   faFilm,
   faFloppyDisk,
-  // faHand,
   faHatWizard,
   faImage,
   faLocationArrow,
-
-  // faPlus,
-  // faMinus,
   faSquareDashed,
 } from "@fortawesome/pro-solid-svg-icons";
 
-import { ToolbarButtons } from "../ToolbarButtons";
+import { ToolbarButton } from "../ToolbarButton";
 import { twMerge } from "tailwind-merge";
 
 import { UploadImage } from "../UploadImage";
@@ -76,14 +72,14 @@ export const ToolbarMain = () => {
         )}
       >
         <div className="flex items-center gap-2 px-2">
-          <ToolbarButtons icon={faBars} />
-          <ToolbarButtons
+          <ToolbarButton icon={faBars} />
+          <ToolbarButton
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}
           />
-          <ToolbarButtons icon={faSquareDashed} />
+          <ToolbarButton icon={faSquareDashed} />
           <div className="relative">
-            <ToolbarButtons
+            <ToolbarButton
               icon={faFilePlus}
               onClick={() => {
                 setState({ ...state, isUploadSubmenuOpen: true });
@@ -96,7 +92,7 @@ export const ToolbarMain = () => {
                   paperWrapperStyles,
                 )}
               >
-                <ToolbarButtons
+                <ToolbarButton
                   icon={faImage}
                   onClick={() =>
                     setState({
@@ -106,7 +102,7 @@ export const ToolbarMain = () => {
                     })
                   }
                 />
-                <ToolbarButtons
+                <ToolbarButton
                   icon={faFilm}
                   onClick={() =>
                     setState({
@@ -119,14 +115,14 @@ export const ToolbarMain = () => {
               </div>
             )}
           </div>
-          <ToolbarButtons icon={faCameraRotate} />
-          <ToolbarButtons icon={faHatWizard} />
+          <ToolbarButton icon={faCameraRotate} />
+          <ToolbarButton icon={faHatWizard} />
         </div>
         <div className="flex items-center gap-2 px-2">
-          <ToolbarButtons icon={faArrowRotateLeft} />
-          <ToolbarButtons icon={faArrowRotateRight} />
-          <ToolbarButtons icon={faFloppyDisk} />
-          <ToolbarButtons icon={faDownload} />
+          <ToolbarButton icon={faArrowRotateLeft} />
+          <ToolbarButton icon={faArrowRotateRight} />
+          <ToolbarButton icon={faFloppyDisk} />
+          <ToolbarButton icon={faDownload} />
         </div>
       </div>
 
