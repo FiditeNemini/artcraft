@@ -1,5 +1,4 @@
 import { MouseEventHandler } from "react";
-import { useSignals } from "@preact/signals-react/runtime";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
@@ -11,8 +10,6 @@ import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enum
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualToolbarImage = () => {
-  useSignals();
-
   const { isShowing, position, ...rest } = uiAccess.imageToolbar.signal.value;
   const buttonsProps = Object.values(ToolbarImageButtonNames).reduce(
     (acc, buttonName) => {

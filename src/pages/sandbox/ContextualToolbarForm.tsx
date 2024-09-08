@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useSignals } from "@preact/signals-react/runtime";
 
 import { Input, Button } from "~/components/ui";
 import { uiAccess } from "~/signals";
@@ -9,7 +8,6 @@ import { ToolbarImageButtonData } from "~/components/features/ToolbarImage/data"
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
 export const ContextualToolbarForm = () => {
-  useSignals();
   const imageToolbar = uiAccess.imageToolbar;
 
   const {

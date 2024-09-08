@@ -40,7 +40,6 @@ export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
 export const dispatchers = Object.values(ToolbarImageButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      // console.log("dispatch", buttonName);
       events[buttonName].value = e;
     };
     return acc;

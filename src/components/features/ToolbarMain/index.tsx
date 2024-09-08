@@ -1,4 +1,4 @@
-import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
+import { useSignalEffect } from "@preact/signals-react/runtime";
 import { useCallback, useState } from "react";
 import {
   faArrowRotateLeft,
@@ -35,7 +35,6 @@ const initialState = {
 
 export const ToolbarMain = () => {
   //// for testing
-  useSignals();
   const {
     signals: { isMobile },
   } = layout;
@@ -57,9 +56,6 @@ export const ToolbarMain = () => {
     if (node) {
       window.addEventListener("click", handleClickOutside);
     }
-    return () => {
-      window.removeEventListener("click", handleClickOutside);
-    };
   }, []);
 
   return (

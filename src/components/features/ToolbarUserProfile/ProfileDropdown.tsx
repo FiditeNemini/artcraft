@@ -1,4 +1,3 @@
-import { useSignals } from "@preact/signals-react/runtime";
 import { twMerge } from "tailwind-merge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,7 +17,6 @@ import {
 } from "~/components/styles";
 
 export function ProfileDropdown() {
-  useSignals();
   const {
     signals: { userInfo },
     fetchers: { logout },

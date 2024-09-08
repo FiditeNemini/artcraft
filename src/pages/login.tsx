@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { useSignals } from "@preact/signals-react/runtime";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 
@@ -11,7 +10,6 @@ import { paperWrapperStyles } from "~/components/styles";
 import { twMerge } from "tailwind-merge";
 
 export const Login = () => {
-  useSignals();
   const {
     signals: { status: authStatus },
     fetchers: { login },

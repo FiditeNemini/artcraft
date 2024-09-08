@@ -1,4 +1,3 @@
-import { useSignals } from "@preact/signals-react/runtime";
 import { twMerge } from "tailwind-merge";
 import { uiAccess } from "~/signals/uiAccess";
 import { paperWrapperStyles } from "~/components/styles";
@@ -11,7 +10,6 @@ import {
 import { Button } from "~/components/ui";
 
 export const ErrorDialog = () => {
-  useSignals();
   const props = uiAccess.errorDialogue.signal.value;
   const { isShowing, title, message } = props;
 
