@@ -17,6 +17,6 @@ join model_weights as w
 where on_date >= '2024-09-01'
 group by w.token
 order by usage_count desc
-limit 50;
+limit 150;
 
 

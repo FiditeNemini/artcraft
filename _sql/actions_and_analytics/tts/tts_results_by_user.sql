@@ -1,7 +1,7 @@
 
--- This is a useful query!
--- Count the most-used tts models by user.
--- This query has old token support!
+-- Count the most-used tts models for a given user
+-- This is a useful query to distinguish "AI Streamers" from API abusers
+-- This query has old TTS model token support!
 SELECT
    mw.token,
    mw.title,
@@ -25,8 +25,8 @@ order by use_count desc
 
 
 -- See a sample of tts results by user
--- This can be useful to distinguish "AI Shows" from AI abusers
--- This includes old token support
+-- This is a useful query to distinguish "AI Streamers" from API abusers
+-- This includes old TTS model token support
 select
   f.token,
   f.origin_product_category,
