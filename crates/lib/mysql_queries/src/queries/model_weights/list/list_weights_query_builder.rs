@@ -296,7 +296,7 @@ impl ListWeightsQueryBuilder {
             entity_stats.ratings_positive_count as maybe_ratings_positive_count,
             entity_stats.ratings_negative_count as maybe_ratings_negative_count,
             entity_stats.bookmark_count as maybe_bookmark_count,
-            mw.cached_usage_count
+            model_weights.cached_usage_count
         FROM model_weights
         JOIN users
             ON users.token = model_weights.creator_user_token
