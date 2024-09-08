@@ -1,7 +1,7 @@
 import { ComponentType, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
-import { Spinner } from "~/components/ui";
+import { LoadingSpinner } from "~/components/ui";
 import { authentication } from "~/signals";
 
 export const withProtectionRoute = <P extends object>(
@@ -26,7 +26,7 @@ export const withProtectionRoute = <P extends object>(
     ) {
       return (
         <div className="fixed flex h-full w-full flex-col items-center justify-center">
-          <Spinner />
+          <LoadingSpinner isShowing={true} message="Loading..." />
         </div>
       );
     }
@@ -57,7 +57,7 @@ const RedirectToLogin = () => {
   }, [navigate, pathname]);
   return (
     <div className="fixed flex h-full w-full flex-col items-center justify-center">
-      <Spinner />
+      <LoadingSpinner isShowing={true} message="Loading...." />
     </div>
   );
 };

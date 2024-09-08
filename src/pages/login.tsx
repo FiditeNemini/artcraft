@@ -22,11 +22,11 @@ export const Login = () => {
 
   const authLoaderMessage = getAuthLoaderMessage();
   const shouldShowLoader = checkShouldShowLoader();
-  // const showNoAccessModal = authStatus.value === AUTH_STATUS.NO_ACCESS;
   function checkShouldShowLoader() {
     return (
       authStatus.value === AUTH_STATUS.LOGGING ||
-      authStatus.value === AUTH_STATUS.LOGGED_IN
+      authStatus.value === AUTH_STATUS.LOGGED_IN ||
+      authStatus.value === AUTH_STATUS.GET_USER_INFO
     );
   }
   function getAuthLoaderMessage() {
@@ -38,11 +38,6 @@ export const Login = () => {
     }
     return "Getting Session...";
   }
-  // const handleClose = () => {
-  //   if (authentication.status.value !== AUTH_STATUS.LOGGED_OUT) {
-  //     logout();
-  //   }
-  // };
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -119,29 +114,9 @@ export const Login = () => {
         </form>
         {shouldShowLoader && (
           <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-            <LoadingSpinner
-              isShowing={shouldShowLoader}
-              message={authLoaderMessage}
-            />
+            <LoadingSpinner isShowing={true} message={authLoaderMessage} />
           </div>
         )}
-
-        {/*
-        <ConfirmationModal
-          text="We're in a closed beta and you'll need a beta key to use this app."
-          title="Unauthorized"
-          open={showNoAccessModal}
-          onClose={handleClose}
-          cancelText="Close"
-          onCancel={handleClose}
-          okText="Get Beta Key"
-          onOk={() => {
-            handleClose();
-            if (window) {
-              window.open("https://storyteller.ai/beta-key/redeem", "_blank");
-            }
-          }} 
-        />*/}
       </div>
     </div>
   );

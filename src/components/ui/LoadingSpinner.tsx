@@ -25,7 +25,7 @@ export const LoadingSpinner = ({
           "data-[leave]:duration-300",
         )}
       >
-        <Spinner className="size-20" />
+        <Spinner className="size-10" />
         {message && <label>{message}</label>}
       </div>
     </Transition>
