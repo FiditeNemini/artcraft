@@ -80,8 +80,8 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.videoComponent = document.createElement("video");
 
+    // Wrapping events
     this.frameDidFinishSeeking = new Promise<void>(() => {});
-
     this.finishedLoadingOnStart = new Promise<void>(() => {});
 
     this.videoComponent.onloadedmetadata = (event: Event) => {
@@ -94,20 +94,14 @@ export class VideoNode extends NetworkedNodeContext {
       this.duration = this.videoComponent.duration;
     };
 
-    this.videoComponent.onseeked = (event: Event) => {
-      console.log("Seeked Finished");
-      // reimplement using the function
-      // ensure that this doesn't race.
-      if (this.frameDidFinishSeeking) {
-        this.frameDidFinishSeeking.then(() => {});
-      }
-    };
-
-    this.videoComponent.oncanplaythrough = (event: Event) => {
-      this.didFinishLoading = true;
-      // Might have to auto click? on first load this doesn't work in general how about after ?
-      this.videoComponent.play(); //sometimes race condition with the
-    };
+    this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
+      this.videoComponent.oncanplaythrough = (event: Event) => {
+        this.didFinishLoading = true;
+        // Might have to auto click? on first load this doesn't work in general how about after ?
+        this.videoComponent.play(); //sometimes race condition with the
+        resolve();
+      };
+    });
 
     // assign video to start process.
     this.videoComponent.src = this.videoURL;
@@ -324,7 +318,6 @@ export class VideoNode extends NetworkedNodeContext {
   async seek(second: number) {
     // prevent interaction
 
-    //console.log(`${this.didFinishLoading}`);
     if (this.didFinishLoading === false) {
       console.log("Didn't finish loading so cannot seek");
       return;
@@ -335,7 +328,7 @@ export class VideoNode extends NetworkedNodeContext {
         console.log("Didn't setup Video Component?");
         return;
       }
-      console.log("Setting");
+      console.log(`Seeking to Position ${second}`);
 
       this.videoComponent.currentTime = second;
 
@@ -347,7 +340,7 @@ export class VideoNode extends NetworkedNodeContext {
           resolve();
         };
       });
-      // wait for this to finish
+      // await
       await this.frameDidFinishSeeking;
     } else {
       console.log("Video Not Seekable");

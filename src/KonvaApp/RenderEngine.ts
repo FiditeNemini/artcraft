@@ -1,7 +1,7 @@
-import { layer } from "@fortawesome/fontawesome-svg-core";
 import { VideoNode } from "./Nodes/VideoNode";
 import Konva from "konva";
-import { CanvasHTMLAttributes } from "react";
+
+// https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 export class RenderEngine {
   private videoNodes: VideoNode[];
   private offScreenCanvas: OffscreenCanvas;
@@ -12,50 +12,59 @@ export class RenderEngine {
 
   // capturing composite within window
   private videoLayer: Konva.Layer;
-  private videoDrawCanvas: HTMLCanvasElement;
-  private videoDrawContext: CanvasRenderingContext2D | null;
+
+  private height: number;
+  private width: number;
+  private positionX: number;
+  private positionY: number;
+
   constructor(videoLayer: Konva.Layer, offScreenCanvas: OffscreenCanvas) {
     this.videoNodes = [];
-    this.offScreenCanvas = offScreenCanvas;
-    this.context = this.offScreenCanvas.getContext("2d");
-    this.isProcessing = false;
-    this.frames = [];
 
-    // Rendering surface resolution
+    this.isProcessing = false;
+
+    // TODO make this dynamic
+
+    this.width = 720;
+    this.height = 1280;
+    this.positionX = window.innerWidth / 2 - 720 / 2;
+    this.positionY = window.innerHeight / 2 - 1080 / 2;
+
+    this.offScreenCanvas = offScreenCanvas;
+    this.offScreenCanvas.width = this.width;
+    this.offScreenCanvas.height = this.height;
+    this.context = this.offScreenCanvas.getContext("2d");
+
+    this.frames = [];
 
     this.videoLayer = videoLayer;
 
-    var positionX = window.innerWidth / 2 - 720 / 2;
-    var positionY = window.innerHeight / 2 - 1080 / 2;
-    // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
-    var width = 720;
-    var height = 1280;
-
     const captureCanvas = new Konva.Rect({
-      x: positionX,
-      y: positionY,
-      width: width,
-      height: height,
+      x: this.positionX,
+      y: this.positionY,
+      width: this.width,
+      height: this.height,
       fill: "white",
       stroke: "black",
       strokeWidth: 1,
       draggable: false,
     });
+
+    // DEBUG ONLY
+    // const rectangle = new Konva.Rect({
+    //   x: this.positionX,
+    //   y: this.positionY,
+    //   width: 100,
+    //   height: 100,
+    //   fill: "green",
+    //   stroke: "black",
+    //   strokeWidth: 1,
+    //   draggable: false,
+    // });
+    //this.videoLayer.add(rectangle);
     this.videoLayer.add(captureCanvas);
     // set furest back
-    captureCanvas.setZIndex(-10);
-
-    // get the render position on the layer
-    this.videoDrawCanvas = this.renderPortionOfLayer(
-      this.videoLayer,
-      positionX,
-      positionY,
-      width,
-      height,
-    );
-
-    // sadly exists as a NOT AS a offscreen rendering context. ? maybe bitmaprenderer ?
-    this.videoDrawContext = this.videoDrawCanvas.getContext("2d");
+    captureCanvas.setZIndex(0);
   }
 
   // This function uses a portion of the video layer to capture just the capture canvas.
@@ -146,39 +155,61 @@ export class RenderEngine {
   // find longest video
   // then seek through each node 1 step.
   // stop ignore stepping if the duration is less.
-  private async render(numberOfFrames: number) {
+  private async render(largestNumberOfFrames: number) {
     if (!this.isProcessing) return;
-    for (let j = 0; j < numberOfFrames; j++) {
-      const videoNode = this.videoNodes[j];
 
+    // Stop all nodes first
+    console.log(`LargestNumberOfFrames:${largestNumberOfFrames}`);
+
+    for (let k = 0; k < this.videoNodes.length; k++) {
+      const videoNode = this.videoNodes[k];
+      if (videoNode.didFinishLoading === false) {
+        throw Error("Videos Did Not Finish Loading Please Try Again.");
+      }
       videoNode.stop();
-      const numberOfFrames = videoNode.getNumberFrames();
+    }
 
-      for (let i = 0; i <= numberOfFrames; i++) {
-        const frameTime = this.calculateFrameTime(i, videoNode.fps);
+    for (let j = 0; j < largestNumberOfFrames; j++) {
+      for (let i = 0; i < this.videoNodes.length; i++) {
+        const currentVideoNode = this.videoNodes[i];
+        const frameTime = this.calculateFrameTime(j, currentVideoNode.fps);
 
-        console.log(i);
-        console.log(frameTime);
-        console.log(videoNode.duration);
+        if (frameTime < currentVideoNode.duration) {
+          console.log(`CurrentFrame:${j}`);
+          console.log(`frameTime:${frameTime}`);
+          console.log(`duration:${currentVideoNode.duration}`);
 
-        if (frameTime < videoNode.duration) {
-          await videoNode.seek(frameTime);
-          this.offScreenCanvas.width = videoNode.node.getSize().width;
-          this.offScreenCanvas.height = videoNode.node.getSize().height;
+          await currentVideoNode.seek(frameTime);
+          this.videoLayer.draw();
 
-          if (this.videoDrawContext) {
-            this.videoDrawContext.drawImage(
-              videoNode.videoComponent,
+          // SCOPES the capture for the context
+          // Correct size for the mobile canvas.
+          this.offScreenCanvas.width = this.width;
+          this.offScreenCanvas.height = this.height;
+
+          if (this.context) {
+            // This crops it starting at position X / Y where the mobile canvas is
+            // Then picks the height and width range
+            // then we draw it at 0,0,width and height of the canvas
+            this.context.drawImage(
+              this.videoLayer.canvas._canvas,
+              this.positionX,
+              this.positionY,
+              this.width,
+              this.height,
               0,
               0,
-              this.offScreenCanvas.width,
-              this.offScreenCanvas.height,
+              this.width,
+              this.height,
             );
-            // TODO bridge this.
-            //this.frames.push(this.videoDrawCanvas.toBlob());
-          }
-        } // end of if
-      } // end of for.
+            const blob = await this.offScreenCanvas.convertToBlob({
+              quality: 1.0,
+              type: "image/jpeg",
+            });
+            this.blobToFile(blob);
+          } // end of if context
+        } // End frame time
+      } // end of for each frame
     }
   }
 
