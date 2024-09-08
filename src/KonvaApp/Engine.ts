@@ -92,8 +92,8 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      1200,
-      300,
+      1550,
+      450,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
 
@@ -101,10 +101,12 @@ export class Engine {
     // Testing render engine
     this.renderEngine.addNodes(videoNode);
 
+
     // await this.renderEngine.startProcessing();
 
+
     // Call this when test video nodes
-    //await this.renderEngine.startProcessing();
+   // await this.renderEngine.startProcessing();
 
     //videoNode.simulatedLoading();
     // TODO support Text nodes
