@@ -16,6 +16,7 @@ use enums_public::by_table::model_weights::public_weights_types::PublicWeightsTy
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use mysql_queries::queries::model_weights::list::list_featured_weights::{list_featured_weights, ListFeaturedWeightsArgs};
 use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;
+use primitives::numerics::u64_to_u32_saturating::u64_to_u32_saturating;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
@@ -86,6 +87,10 @@ pub struct FeaturedModelWeightForList {
 
   /// Statistics about the weights
   pub stats: SimpleEntityStats,
+
+  /// Number of times the model has been used.
+  /// (This isn't in SimpleEntityStats since that also applies to media files, etc.)
+  pub usage_count: u32,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -258,6 +263,7 @@ pub async fn list_featured_weights_handler(
               positive_rating_count: w.maybe_ratings_positive_count.unwrap_or(0),
               bookmark_count: w.maybe_bookmark_count.unwrap_or(0),
             },
+            usage_count: u64_to_u32_saturating(w.cached_usage_count),
             created_at: w.created_at,
             updated_at: w.updated_at,
           }

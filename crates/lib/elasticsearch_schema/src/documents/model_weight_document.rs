@@ -57,7 +57,7 @@ pub struct ModelWeightDocument {
   pub ratings_negative_count: u32,
   pub bookmark_count: u32,
 
-  // Stored as "integer" type
+  // Stored as ES "integer" type - the documents seem to imply this is better for searching than unsigned_long, but I'm not sure.
   // TODO(bt, 2024-09-07): This should be migrated to non-nullable soon. Turn this into a strict `i32` and drop the Option<T>
   pub cached_usage_count: Option<i32>,
 

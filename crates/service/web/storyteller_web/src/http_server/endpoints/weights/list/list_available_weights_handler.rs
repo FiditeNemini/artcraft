@@ -16,6 +16,7 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
+use primitives::numerics::u64_to_u32_saturating::u64_to_u32_saturating;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
@@ -85,6 +86,10 @@ pub struct ModelWeightForList {
 
     /// Statistics about the weights
     pub stats: SimpleEntityStats,
+
+    /// Number of times the model has been used.
+    /// (This isn't in SimpleEntityStats since that also applies to media files, etc.)
+    pub usage_count: u32,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -262,6 +267,7 @@ pub async fn list_available_weights_handler(
                         positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
                         bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
                     },
+                    usage_count: u64_to_u32_saturating(weight.cached_usage_count),
 
                     created_at: weight.created_at,
                     updated_at: weight.updated_at,

@@ -21,6 +21,7 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
+use primitives::numerics::i32_to_u32_zero_clamped::i32_to_u32_zero_clamped;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
@@ -63,7 +64,12 @@ pub struct ModelWeightSearchResult {
   // Whether the model weight is featured.
   pub is_featured: bool,
 
+  /// Statistics about the weights
   pub stats: SimpleEntityStats,
+
+  /// Number of times the model has been used.
+  /// (This isn't in SimpleEntityStats since that also applies to media files, etc.)
+  pub usage_count: u32,
 
   pub maybe_ietf_language_tag: Option<String>,
   pub maybe_ietf_primary_language_subtag: Option<String>,
@@ -177,6 +183,7 @@ pub async fn search_model_weights_impl(
             positive_rating_count: result.ratings_positive_count,
             bookmark_count: result.bookmark_count,
           },
+          usage_count: i32_to_u32_zero_clamped(result.cached_usage_count.unwrap_or(0)),
           maybe_ietf_language_tag: result.maybe_ietf_language_tag,
           maybe_ietf_primary_language_subtag: result.maybe_ietf_primary_language_subtag,
           creator_set_visibility: result.creator_set_visibility,

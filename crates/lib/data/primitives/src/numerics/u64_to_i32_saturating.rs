@@ -1,4 +1,3 @@
-
 const MAX_I32 : u64 = i32::MAX as u64;
 
 /// Convert a u64 to a positive i32, saturating to i32::MAX if the u64 overflows the container.

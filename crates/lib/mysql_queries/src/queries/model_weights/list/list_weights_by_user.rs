@@ -59,6 +59,7 @@ pub struct WeightsJoinUserRecord {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+    pub cached_usage_count: u64,
 
     pub version: i32,
     
@@ -166,6 +167,8 @@ fn select_result_fields() -> String {
         entity_stats.ratings_positive_count as maybe_ratings_positive_count,
         entity_stats.ratings_negative_count as maybe_ratings_negative_count,
         entity_stats.bookmark_count as maybe_bookmark_count,
+
+        mw.cached_usage_count,
 
         mw.version,
         mw.created_at,
@@ -275,6 +278,7 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
                 maybe_ratings_positive_count: weight.maybe_ratings_positive_count,
                 maybe_ratings_negative_count: weight.maybe_ratings_negative_count,
                 maybe_bookmark_count: weight.maybe_bookmark_count,
+                cached_usage_count: weight.cached_usage_count,
 
                 version: weight.version,
                 created_at: weight.created_at,
@@ -328,6 +332,7 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+    pub cached_usage_count: u64,
 
     pub version: i32,
     
@@ -370,6 +375,7 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
             maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
             maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
             maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
+            cached_usage_count: row.try_get("cached_usage_count")?,
             version: row.try_get("version")?,
             created_at: row.try_get("created_at")?,
             updated_at: row.try_get("updated_at")?,

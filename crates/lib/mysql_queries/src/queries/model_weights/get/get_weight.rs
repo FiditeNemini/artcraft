@@ -50,6 +50,7 @@ pub struct RetrievedModelWeight {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+    pub cached_usage_count: u64,
 
     pub is_featured: bool,
 
@@ -121,6 +122,7 @@ pub async fn get_weights_by_token_with_connection(
             maybe_ratings_positive_count: record.maybe_ratings_positive_count,
             maybe_ratings_negative_count: record.maybe_ratings_negative_count,
             maybe_bookmark_count: record.maybe_bookmark_count,
+            cached_usage_count: record.cached_usage_count,
             is_featured: i64_to_bool(record.is_featured),
             version: record.version,
             created_at: record.created_at,
@@ -171,6 +173,7 @@ async fn select_include_deleted(
         entity_stats.ratings_positive_count as maybe_ratings_positive_count,
         entity_stats.ratings_negative_count as maybe_ratings_negative_count,
         entity_stats.bookmark_count as maybe_bookmark_count,
+        wt.cached_usage_count,
 
         featured_items.entity_token IS NOT NULL AS is_featured,
 
@@ -204,8 +207,6 @@ async fn select_without_deleted(
     weight_token: &ModelWeightToken,
     mysql_connection: &mut PoolConnection<MySql>
 ) -> Result<RawWeight, sqlx::Error> {
-    //as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
-    //as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`
     sqlx
         ::query_as!(
             RawWeight,
@@ -241,6 +242,7 @@ async fn select_without_deleted(
         entity_stats.ratings_positive_count as maybe_ratings_positive_count,
         entity_stats.ratings_negative_count as maybe_ratings_negative_count,
         entity_stats.bookmark_count as maybe_bookmark_count,
+        wt.cached_usage_count,
 
         featured_items.entity_token IS NOT NULL AS is_featured,
 
@@ -305,6 +307,7 @@ pub struct RawWeight {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+    pub cached_usage_count: u64,
 
     pub is_featured: i64,
 

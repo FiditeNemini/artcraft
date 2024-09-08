@@ -67,6 +67,7 @@ pub struct WeightJoinUser {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+    pub cached_usage_count: u64,
 
     pub version: i32,
 
@@ -241,6 +242,7 @@ impl ListWeightsQueryBuilder {
                     maybe_ratings_positive_count: record.maybe_ratings_positive_count,
                     maybe_ratings_negative_count: record.maybe_ratings_negative_count,
                     maybe_bookmark_count: record.maybe_bookmark_count,
+                    cached_usage_count: record.cached_usage_count,
                     version: record.version,
                     created_at: record.created_at,
                     updated_at: record.updated_at,
@@ -293,7 +295,8 @@ impl ListWeightsQueryBuilder {
             users.email_gravatar_hash AS creator_email_gravatar_hash,
             entity_stats.ratings_positive_count as maybe_ratings_positive_count,
             entity_stats.ratings_negative_count as maybe_ratings_negative_count,
-            entity_stats.bookmark_count as maybe_bookmark_count
+            entity_stats.bookmark_count as maybe_bookmark_count,
+            mw.cached_usage_count
         FROM model_weights
         JOIN users
             ON users.token = model_weights.creator_user_token
@@ -452,6 +455,7 @@ struct RawWeightJoinUser {
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+    pub cached_usage_count: u64,
 
     pub version: i32,
 

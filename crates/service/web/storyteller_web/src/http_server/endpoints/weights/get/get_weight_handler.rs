@@ -15,6 +15,7 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use primitives::numerics::u64_to_u32_saturating::u64_to_u32_saturating;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
@@ -26,8 +27,11 @@ use crate::util::title_to_url_slug::title_to_url_slug;
 #[derive(Serialize, Clone, ToSchema)]
 pub struct GetWeightResponse {
     success: bool,
+
     weight_token: ModelWeightToken,
+
     title: String,
+
     weight_type: PublicWeightsType,
     weight_category: WeightsCategory,
 
@@ -59,6 +63,10 @@ pub struct GetWeightResponse {
 
     /// Statistics about the weights
     stats: SimpleEntityStats,
+
+    /// Number of times the model has been used.
+    /// (This isn't in SimpleEntityStats since that also applies to media files, etc.)
+    usage_count: u32,
 
     version: i32,
     created_at: DateTime<Utc>,
@@ -209,6 +217,7 @@ pub async fn get_weight_handler(
             positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
             bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
         },
+        usage_count: u64_to_u32_saturating(weight.cached_usage_count),
         version: weight.version,
         created_at: weight.created_at,
         updated_at: weight.updated_at,
