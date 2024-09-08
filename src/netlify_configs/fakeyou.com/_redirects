@@ -94,6 +94,7 @@
 /live-portrait*        /ai-live-portrait     301
 /mirror-motion*        /ai-live-portrait     301
 /motion-mirror*        /ai-live-portrait     301
+/beta/webcam-acting    /webcam-acting        301
 
 # Old paths - Video Style Transfer
 /video-style*          /style-video          301
