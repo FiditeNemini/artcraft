@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n        wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n        wt.title,\n        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n        wt.maybe_description_markdown,\n        wt.maybe_description_rendered_html,\n\n        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n        users.username as creator_username,\n        users.display_name as creator_display_name,\n        users.email_gravatar_hash AS creator_gravatar_hash,\n\n        wt.creator_ip_address,\n        wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n        wt.original_download_url,\n        wt.original_filename,\n        wt.file_size_bytes,\n        wt.file_checksum_sha2,\n\n        wt.public_bucket_hash,\n        wt.maybe_public_bucket_prefix,\n        wt.maybe_public_bucket_extension,\n\n        cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,\n        cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,\n        cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,\n\n        entity_stats.ratings_positive_count as maybe_ratings_positive_count,\n        entity_stats.ratings_negative_count as maybe_ratings_negative_count,\n        entity_stats.bookmark_count as maybe_bookmark_count,\n\n        featured_items.entity_token IS NOT NULL AS is_featured,\n\n        wt.version,\n        wt.created_at,\n        wt.updated_at,\n        wt.user_deleted_at,\n        wt.mod_deleted_at\n\n        FROM model_weights as wt\n        JOIN users\n            ON users.token = wt.creator_user_token\n        LEFT OUTER JOIN media_files as cover_image\n            ON cover_image.token = wt.maybe_cover_image_media_file_token\n        LEFT OUTER JOIN entity_stats\n            ON entity_stats.entity_type = \"model_weight\"\n            AND entity_stats.entity_token = wt.token\n        LEFT OUTER JOIN featured_items\n            ON featured_items.entity_type = \"model_weight\"\n            AND featured_items.entity_token = wt.token\n            AND featured_items.deleted_at IS NULL\n        WHERE\n            wt.token = ?\n            ",
+  "query": "\n        SELECT\n        wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n        wt.title,\n        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n        wt.maybe_description_markdown,\n        wt.maybe_description_rendered_html,\n        wt.creator_ip_address,\n        wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n        users.username as creator_username,\n        users.display_name as creator_display_name,\n        users.email_gravatar_hash AS creator_gravatar_hash,\n\n        wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n        wt.original_download_url,\n        wt.original_filename,\n        wt.file_size_bytes,\n        wt.file_checksum_sha2,\n        wt.public_bucket_hash,\n        wt.maybe_public_bucket_prefix,\n        wt.maybe_public_bucket_extension,\n\n        cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,\n        cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,\n        cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,\n\n        entity_stats.ratings_positive_count as maybe_ratings_positive_count,\n        entity_stats.ratings_negative_count as maybe_ratings_negative_count,\n        entity_stats.bookmark_count as maybe_bookmark_count,\n        wt.cached_usage_count,\n\n        featured_items.entity_token IS NOT NULL AS is_featured,\n\n        wt.version,\n        wt.created_at,\n        wt.updated_at,\n        wt.user_deleted_at,\n        wt.mod_deleted_at\n\n        FROM model_weights as wt\n        JOIN users\n            ON users.token = wt.creator_user_token\n        LEFT OUTER JOIN media_files as cover_image\n            ON cover_image.token = wt.maybe_cover_image_media_file_token\n        LEFT OUTER JOIN entity_stats\n            ON entity_stats.entity_type = \"model_weight\"\n            AND entity_stats.entity_token = wt.token\n        LEFT OUTER JOIN featured_items\n            ON featured_items.entity_type = \"model_weight\"\n            AND featured_items.entity_token = wt.token\n            AND featured_items.deleted_at IS NULL\n        WHERE\n            wt.token = ?\n            AND wt.user_deleted_at IS NULL\n            AND wt.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -65,46 +65,6 @@
       },
       {
         "ordinal": 6,
-        "name": "creator_user_token: tokens::tokens::users::UserToken",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 128
-        }
-      },
-      {
-        "ordinal": 7,
-        "name": "creator_username",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 80
-        }
-      },
-      {
-        "ordinal": 8,
-        "name": "creator_display_name",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 80
-        }
-      },
-      {
-        "ordinal": 9,
-        "name": "creator_gravatar_hash",
-        "type_info": {
-          "type": "String",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 128
-        }
-      },
-      {
-        "ordinal": 10,
         "name": "creator_ip_address",
         "type_info": {
           "type": "VarString",
@@ -114,13 +74,53 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 7,
         "name": "creator_set_visibility: enums::common::visibility::Visibility",
         "type_info": {
           "type": "String",
           "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | ENUM",
           "char_set": 224,
           "max_size": 28
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "creator_user_token: tokens::tokens::users::UserToken",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "creator_username",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 80
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "creator_display_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 80
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "creator_gravatar_hash",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
         }
       },
       {
@@ -265,6 +265,16 @@
       },
       {
         "ordinal": 26,
+        "name": "cached_usage_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | UNSIGNED",
+          "char_set": 63,
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 27,
         "name": "is_featured",
         "type_info": {
           "type": "LongLong",
@@ -274,7 +284,7 @@
         }
       },
       {
-        "ordinal": 27,
+        "ordinal": 28,
         "name": "version",
         "type_info": {
           "type": "Long",
@@ -284,7 +294,7 @@
         }
       },
       {
-        "ordinal": 28,
+        "ordinal": 29,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -294,7 +304,7 @@
         }
       },
       {
-        "ordinal": 29,
+        "ordinal": 30,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -304,7 +314,7 @@
         }
       },
       {
-        "ordinal": 30,
+        "ordinal": 31,
         "name": "user_deleted_at",
         "type_info": {
           "type": "Timestamp",
@@ -314,7 +324,7 @@
         }
       },
       {
-        "ordinal": 31,
+        "ordinal": 32,
         "name": "mod_deleted_at",
         "type_info": {
           "type": "Timestamp",
@@ -358,9 +368,10 @@
       false,
       false,
       false,
+      false,
       true,
       true
     ]
   },
-  "hash": "d7a9edd3c52ab2a01f53a55c94967b2a0751df34b5a52d45717a63976d3611b8"
+  "hash": "1053294a21439ddb41fdd1053547b3f5c50457f6ba9450e5167a1db5caf896d1"
 }
