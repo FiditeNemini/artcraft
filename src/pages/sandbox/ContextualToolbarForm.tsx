@@ -3,8 +3,10 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 import { Input, Button } from "~/components/ui";
 import { uiAccess } from "~/signals";
+import { uiEvents } from "~/signals";
 
 import { ToolbarImageButtonData } from "~/components/features/ToolbarImage/data";
+import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
 export const ContextualToolbarForm = () => {
   useSignals();
@@ -14,7 +16,6 @@ export const ContextualToolbarForm = () => {
     isShowing,
     disabled: allDisabled,
     buttonStates,
-    buttonCallbacks,
   } = imageToolbar.signal.value;
 
   const [x, setX] = useState(0);
@@ -76,7 +77,7 @@ export const ContextualToolbarForm = () => {
           {allDisabled ? "Enable" : "Disable"}
         </Button>
       </div>
-      <div className="flex gap-2">
+      <div className="grid max-w-2xl grid-cols-6 gap-2">
         {Object.values(ToolbarImageButtonData).map((button) => (
           <Button
             key={button.name}
@@ -85,10 +86,9 @@ export const ContextualToolbarForm = () => {
               buttonStates[button.name].disabled ? "secondary" : "primary"
             }
             onClick={() =>
-              imageToolbar.changeButtonState(
-                button.name,
-                !buttonStates[button.name].disabled,
-              )
+              imageToolbar.changeButtonState(button.name, {
+                disabled: !buttonStates[button.name].disabled,
+              })
             }
           >
             <span className="w-12">
@@ -96,24 +96,42 @@ export const ContextualToolbarForm = () => {
             </span>
           </Button>
         ))}
-      </div>
-      <div className="flex gap-2">
         {Object.values(ToolbarImageButtonData).map((button) => (
           <Button
             key={button.name}
             icon={button.icon}
-            variant="primary"
-            disabled={buttonCallbacks[button.name] !== undefined}
+            variant={buttonStates[button.name].active ? "primary" : "secondary"}
             onClick={() =>
-              imageToolbar.changeButtonCallback(button.name, () => {
-                console.log(`${button.name} clicked`);
+              imageToolbar.changeButtonState(button.name, {
+                active: !buttonStates[button.name].active,
               })
             }
           >
-            <span className="w-12">Bind</span>
+            <span className="w-12">
+              {buttonStates[button.name].active ? "Unactive" : "Active"}
+            </span>
           </Button>
         ))}
       </div>
+      <LittleThing />
+    </div>
+  );
+};
+
+export const LittleThing = () => {
+  Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
+    uiEvents.imageToolbar[buttonName].onClick((e) => {
+      console.log(buttonName, e);
+    });
+  });
+
+  return (
+    <div>
+      <p>See Log for Button Click Events</p>
+      <p className="text-xs">
+        Wil: I fucked up the rerender on this page but the test on the engine
+        wont fire multiple times, so no need to worry for now.
+      </p>
     </div>
   );
 };

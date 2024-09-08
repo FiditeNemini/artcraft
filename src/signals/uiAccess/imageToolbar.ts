@@ -1,4 +1,3 @@
-import { MouseEventHandler } from "react";
 import { signal } from "@preact/signals-core";
 import { ContextualImageToolbarProps } from "./type";
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
@@ -11,7 +10,6 @@ const imageToolbarSignal = signal<ContextualImageToolbarProps>({
   isShowing: false,
   disabled: false,
   buttonStates: initButtonStates(),
-  buttonCallbacks: initButtonCallbacks(),
 });
 
 export const imageToolbar = {
@@ -55,45 +53,30 @@ export const imageToolbar = {
       disabled: true,
     };
   },
-  changeButtonState(buttonName: ToolbarImageButtonNames, disabled: boolean) {
+  changeButtonState(
+    buttonName: ToolbarImageButtonNames,
+    { disabled, active }: { disabled?: boolean; active?: boolean },
+  ) {
     imageToolbarSignal.value = {
       ...imageToolbarSignal.value,
       buttonStates: {
         ...imageToolbarSignal.value.buttonStates,
-        [buttonName]: { disabled },
-      },
-    };
-  },
-  changeButtonCallback(
-    buttonName: ToolbarImageButtonNames,
-    callback: () => void,
-  ) {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
-      buttonCallbacks: {
-        ...imageToolbarSignal.value.buttonCallbacks,
-        [buttonName]: callback,
+        [buttonName]: {
+          disabled: active ? false : (disabled ?? false),
+          active: active ?? false,
+        },
       },
     };
   },
 };
 
 function initButtonStates() {
-  const ret: { [key: string]: { disabled: boolean } } = {};
+  const ret: { [key: string]: { disabled: boolean; active: boolean } } = {};
   Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
     ret[buttonName] = {
       disabled: false,
+      active: false,
     };
   });
   return ret as ContextualImageToolbarProps["buttonStates"];
-}
-
-function initButtonCallbacks() {
-  const ret: {
-    [key: string]: MouseEventHandler<HTMLButtonElement> | undefined;
-  } = {};
-  Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
-    ret[buttonName] = undefined;
-  });
-  return ret as ContextualImageToolbarProps["buttonCallbacks"];
 }

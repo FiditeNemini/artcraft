@@ -1,22 +1,29 @@
 import { MouseEventHandler } from "react";
-import { signal, effect } from "@preact/signals-core";
+import { signal, effect, Signal } from "@preact/signals-core";
 
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
-const events = signal<{
-  [key in ToolbarImageButtonNames]?: React.MouseEvent<
-    HTMLButtonElement,
-    MouseEvent
-  >;
-}>();
+const events = Object.values(ToolbarImageButtonNames).reduce(
+  (acc, buttonName) => {
+    acc[buttonName] = signal<
+      React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+    >();
+    return acc;
+  },
+  {} as {
+    [key in ToolbarImageButtonNames]: Signal<
+      (React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined) | undefined
+    >;
+  },
+);
 
 export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = {
       onClick: (callback: MouseEventHandler<HTMLButtonElement>) => {
         effect(() => {
-          if (events.value?.[buttonName]) {
-            callback(events.value?.[buttonName]);
+          if (events[buttonName].value) {
+            callback(events[buttonName].value);
           }
         });
       },
@@ -33,10 +40,8 @@ export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
 export const dispatchers = Object.values(ToolbarImageButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      events.value = {
-        ...events.value,
-        [buttonName]: e,
-      };
+      // console.log("dispatch", buttonName);
+      events[buttonName].value = e;
     };
     return acc;
   },

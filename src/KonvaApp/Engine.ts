@@ -42,6 +42,10 @@ export class Engine {
     uiEvents.onGetStagedVideo((video) => {
       this.addVideo(video);
     });
+    // TODO: You may listen to all the image toolbar events here
+    uiEvents.imageToolbar.MOVE.onClick(() => {
+      console.log("move");
+    });
   }
 
   sleep(ms: number): Promise<void> {
@@ -97,7 +101,7 @@ export class Engine {
     // Testing render engine
     this.renderEngine.addNodes(videoNode);
 
-    await this.renderEngine.startProcessing();
+    // await this.renderEngine.startProcessing();
 
     // Call this when test video nodes
     //await this.renderEngine.startProcessing();

@@ -18,12 +18,18 @@ export const ContextualToolbarImage = () => {
     (acc, buttonName) => {
       acc[buttonName] = {
         onClick: dispatchUiEvents.imageToolbar[buttonName],
+        disabled:
+          uiAccess.imageToolbar.signal.value.buttonStates[buttonName].disabled,
+        active:
+          uiAccess.imageToolbar.signal.value.buttonStates[buttonName].active,
       };
       return acc;
     },
     {} as {
       [key in ToolbarImageButtonNames]: {
         onClick: MouseEventHandler<HTMLButtonElement>;
+        disabled: boolean;
+        active: boolean;
       };
     },
   );
