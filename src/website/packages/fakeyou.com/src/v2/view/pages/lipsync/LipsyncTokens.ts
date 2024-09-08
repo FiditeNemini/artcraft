@@ -28,4 +28,7 @@ export const LipsyncTokenMap: { [key: string]: string } = {
   weight_abe03ym9bztnzvx462kkc3fak: "m_7ap2qssd4y5ew51dkx4awnng2key32", // Wednesday Addams (Jenna Ortega) "Merlina"
   weight_cspd7e4wpjnrv1ygsa19b0gff: "m_7ap2qssd4y5ew51dkx4awnng2key32", // Wednesday Addams (Jenna Ortega)
   weight_jvdn28ebg186b63hyk6z5kpv7: "m_7ap2qssd4y5ew51dkx4awnng2key32", // Wednesday Addams (Jenna Ortega)
+  // Waldemaro Martínez
+  weight_kwmxssf6k6ha92h3b55mh3w9q: "m_gb27fgnr2n9nh19efmskenckptvjjt", // Waldemaro Martínez (top model)
+  weight_kfc9kqm18k4jc3q2j3acdzj1a: "m_gb27fgnr2n9nh19efmskenckptvjjt", // Waldemaro Martínez (top model)
 };
