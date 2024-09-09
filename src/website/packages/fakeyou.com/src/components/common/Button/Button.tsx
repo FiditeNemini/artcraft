@@ -45,6 +45,9 @@ export default function Button({
   if (variant === "discord") {
     variant = "discord";
   }
+  if (variant === "rainbow") {
+    variant = "rainbow";
+  }
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
   let IconComponent = icon ? (
     <FontAwesomeIcon

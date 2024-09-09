@@ -272,7 +272,7 @@ function SessionTtsInferenceResultList(props: Props) {
                 {job.maybeModelToken && LipsyncTokenMap[job.maybeModelToken] ? (
                   <div className="d-flex mt-2">
                     <Button
-                      variant="primary"
+                      variant="rainbow"
                       label="Lip sync with this audio!"
                       className="fs-7"
                       icon={faLips}
