@@ -8,7 +8,7 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import { WeightType } from "@storyteller/components/src/api/_common/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
+import { faThumbsUp, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import Stat from "components/common/Stat/Stat";
 
 interface Props {
@@ -96,12 +96,11 @@ export default function WeightCard({
                   small={true}
                   color={weightTagColor || ""}
                 />
-                <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50">
-                  <Stat
-                    count={data?.usage_count}
-                    />
-                </span>
-                <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50">
+                <div className="opacity-50">
+                  <Stat count={data?.usage_count} icon={faWaveformLines} />
+                </div>
+
+                <span className="d-flex align-items-center gap-1 fs-7 opacity-50">
                   <FontAwesomeIcon icon={faThumbsUp} />
                   {data?.stats?.positive_rating_count}
                 </span>

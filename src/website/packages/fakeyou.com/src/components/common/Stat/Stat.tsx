@@ -2,12 +2,12 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
-const MILLION : number = 1000000;
-const THOUSAND : number = 1000;
+const MILLION: number = 1000000;
+const THOUSAND: number = 1000;
 
 interface Props {
-  count: number,
-  icon?: IconProp,
+  count: number;
+  icon?: IconProp;
 }
 
 export default function Stat(props: Props) {
@@ -19,13 +19,14 @@ export default function Stat(props: Props) {
   }
 
   return (
-    <span>
-      {friendlyCount} {icon}
+    <span className="d-flex align-items-center gap-1 fs-7">
+      {icon}
+      {friendlyCount}
     </span>
-  )
+  );
 }
 
-function toHumanNumber(count: number) : string {
+function toHumanNumber(count: number): string {
   if (count > MILLION) {
     let digits = (count / MILLION).toFixed(2);
     return `${digits}m`;

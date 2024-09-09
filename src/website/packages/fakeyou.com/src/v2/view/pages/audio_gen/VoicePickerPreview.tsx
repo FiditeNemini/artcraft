@@ -5,6 +5,7 @@ import {
   faArrowRight,
   faChevronRight,
   faThumbsUp,
+  faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import CardBadge from "components/entities/CardBadge";
@@ -14,6 +15,7 @@ import { WeightType } from "@storyteller/components/src/api/_common/enums";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useLocalize } from "hooks";
+import Stat from "components/common/Stat/Stat";
 
 interface VoicePickerPreviewProps {
   selectedVoice: any;
@@ -61,6 +63,12 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
                 small={true}
                 color={weightTagColor || ""}
               />
+              <div className="opacity-75">
+                <Stat
+                  count={selectedVoice?.usage_count}
+                  icon={faWaveformLines}
+                />
+              </div>
               <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-75">
                 <FontAwesomeIcon icon={faThumbsUp} />
                 {selectedVoice?.stats?.positive_rating_count}

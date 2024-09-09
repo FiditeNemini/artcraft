@@ -5,7 +5,7 @@ import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CardFooter } from "components/entities";
 import Badge from "components/common/Badge";
-import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
+import { faThumbsUp, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -178,12 +178,13 @@ export default function AudioCard({
                         label={weightBadgeLabel}
                         color={weightBadgeColor}
                       />
-                      <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50 text-white">
-                        <Stat 
+                      <div className="opacity-50">
+                        <Stat
                           count={data?.usage_count}
-                          />
-                      </span>
-                      <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50 text-white">
+                          icon={faWaveformLines}
+                        />
+                      </div>
+                      <span className="d-flex align-items-center gap-1 fs-7 opacity-50 text-white">
                         <FontAwesomeIcon icon={faThumbsUp} />
                         {data?.stats?.positive_rating_count}
                       </span>
