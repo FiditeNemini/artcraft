@@ -10,12 +10,16 @@ use crate::http_server::endpoints::inference_job::utils::estimates::comfy_workfl
 use crate::http_server::endpoints::inference_job::utils::estimates::percent::percent;
 
 // TODO: These numbers are made up. We should measure the average job durations.
-const LIPSYNC_JOB_AVERAGE_SECONDS : u64 = 60 * 3;
 const TTS_JOB_AVERAGE_SECONDS : u64 = 7;
 const VC_JOB_AVERAGE_SECONDS : u64 = 90;
 
 const LIVE_PORTRAIT_JOB_AVERAGE_SECONDS : u64 = 90;
-const VID_FACE_FUSION_AVERAGE_SECONDS : u64 = 30;
+
+/// Lipsync with face fusion
+const VID_FACE_FUSION_AVERAGE_SECONDS : u64 = 45;
+
+/// Lipsync with SadTalker (super old and slow)
+const LIPSYNC_JOB_AVERAGE_SECONDS : u64 = 60 * 3;
 
 pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option<&PolymorphicInferenceArgs>) -> u8 {
   match job.status {
