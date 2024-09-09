@@ -12,7 +12,6 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import getCardUrl from "../getCardUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Stat from "components/common/Stat/Stat";
-import { faVolumeHigh } from "@fortawesome/pro-duotone-svg-icons";
 // import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
