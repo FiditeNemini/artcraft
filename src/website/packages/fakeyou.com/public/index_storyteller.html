@@ -52,42 +52,24 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- This tag appears not to be associated with Google Analytics/Ads account. Disabling for now -V -->
-    <!-- Google Tag Manager -->
-    <!-- This *eventually* replaces gtag.js :/ -->
-    <!--     <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-K62TJT9N");
-    </script> -->
-    <!-- End Google Tag Manager -->
-
     <!-- Google tag (gtag.js) -->
-    <!-- This replaces old universal analytics. -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-525G5MXFJG"
-    ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K7MJ8LMJ7S"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-525G5MXFJG");
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-K7MJ8LMJ7S');
     </script>
+
+    <!--
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5350229982172647"
       crossorigin="anonymous"
     ></script>
+    -->
+
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -116,16 +98,6 @@
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
-    <!-- Google Tag Manager (noscript) -->
-    <!--     <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-K62TJT9N"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript> -->
-    <!-- End Google Tag Manager (noscript) -->
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
