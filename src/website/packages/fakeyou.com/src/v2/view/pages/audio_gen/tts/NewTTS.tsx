@@ -37,10 +37,10 @@ import { v4 as uuidv4 } from "uuid";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { isMobile } from "react-device-detect";
 import { useTtsStore } from "hooks";
-import ExploreTts from "../ExploreVoices";
 import { AITools } from "components/marketing";
 import VoicePickerPreview from "../VoicePickerPreview";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
+import ExploreVoices from "../ExploreVoices";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -79,7 +79,7 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
     onSearchChange: searchChange(false),
     search,
     emptyContent: (
-      <ExploreTts
+      <ExploreVoices
         onResultSelect={handleResultSelect}
         filterCategory="text_to_speech"
       />

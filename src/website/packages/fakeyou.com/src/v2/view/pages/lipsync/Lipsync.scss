@@ -26,3 +26,35 @@
     padding-top: 0;
   }
 }
+
+.ls-voice-picker-preview {
+  color: $white;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba($action, 0.8);
+  border: 2px solid lighten($action, 12%);
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  .cover-img {
+    margin-right: 16px;
+  }
+
+  .fy-weight-picker-preview-text {
+    font-size: 20px !important;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+      font-size: 16px !important;
+    }
+  }
+
+  &:hover {
+    background-color: rgba($action, 1);
+    border: 2px solid $primary;
+  }
+}

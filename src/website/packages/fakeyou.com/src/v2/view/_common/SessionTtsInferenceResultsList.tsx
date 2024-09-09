@@ -34,6 +34,11 @@ import { LipsyncTokenMap } from "../pages/lipsync/LipsyncTokens";
 
 interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  mode?: "tts" | "lipsync";
+  onResultClick?: (
+    maybeModelToken: string | undefined,
+    maybeResultToken: string | undefined | null
+  ) => void;
 }
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
@@ -203,42 +208,54 @@ function SessionTtsInferenceResultList(props: Props) {
         let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
 
         results.push(
-          <div key={job.jobToken}>
-            <div>
-              <div className="panel panel-results p-3 gap-3 d-flex flex-column">
-                <div>
-                  <div className="d-flex gap-1 mb-2">
-                    {job.maybeModelToken ? (
-                      // <Tippy
-                      //   content={
-                      //     <span className="fs-7">Use audio with Lip Sync</span>
-                      //   }
-                      //   theme="fakeyou"
-                      // >
-                      <div>
-                        <WeightCoverImage
-                          src={
-                            mediaSrc[job.maybeModelToken]
-                              ? new BucketConfig().getGcsUrl(
-                                  mediaSrc[job.maybeModelToken]
-                                )
-                              : ""
-                          }
-                          height={36}
-                          width={36}
-                          marginRight={7}
-                        />
-                      </div>
-                    ) : (
-                      // </Tippy>
-                      <LoadingSpinner />
-                    )}
-                    <div className="d-flex flex-column justify-content-center flex-grow-1">
-                      <h6 className="mb-0 fw-semibold">
-                        {job.maybeModelTitle}
-                      </h6>
+          <div
+            key={job.jobToken}
+            onClick={() =>
+              props.onResultClick?.(job.maybeModelToken, job.maybeResultToken)
+            }
+          >
+            <div
+              className={`panel panel-results p-3 gap-3 d-flex flex-column ${
+                props.mode === "lipsync" ? "lipsync-tts-results" : ""
+              }`.trim()}
+            >
+              <div>
+                <div className="d-flex gap-1 mb-2">
+                  {job.maybeModelToken ? (
+                    // <Tippy
+                    //   content={
+                    //     <span className="fs-7">Use audio with Lip Sync</span>
+                    //   }
+                    //   theme="fakeyou"
+                    // >
+                    <div>
+                      <WeightCoverImage
+                        src={
+                          mediaSrc[job.maybeModelToken]
+                            ? new BucketConfig().getGcsUrl(
+                                mediaSrc[job.maybeModelToken]
+                              )
+                            : ""
+                        }
+                        height={36}
+                        width={36}
+                        marginRight={7}
+                      />
                     </div>
+                  ) : (
+                    // </Tippy>
+                    <LoadingSpinner />
+                  )}
 
+                  <div className="d-flex flex-column justify-content-center flex-grow-1">
+                    <h6 className="mb-0 fw-semibold">{job.maybeModelTitle}</h6>
+                  </div>
+
+                  {props.mode === "lipsync" ? (
+                    <div>
+                      <div className="fs-7 fw-medium fy-select-voice">Use</div>
+                    </div>
+                  ) : (
                     <div>
                       <Button
                         iconFlip={true}
@@ -249,44 +266,52 @@ function SessionTtsInferenceResultList(props: Props) {
                         to={ttsPermalink}
                       />
                     </div>
-                  </div>
-
-                  <p className="fs-7 pt-1">{job.maybeRawInferenceText}</p>
+                  )}
                 </div>
 
-                <div className="d-flex gap-3 align-items-center">
-                  {wavesurfers}
-                  <Button
-                    variant="action"
-                    small={true}
-                    square={true}
-                    icon={faArrowDownToLine}
-                    fontLarge={true}
-                    to={ttsPermalink}
-                    onClick={() => {
-                      Analytics.ttsClickResultLink();
-                    }}
-                  />
-                </div>
-
-                {job.maybeModelToken && LipsyncTokenMap[job.maybeModelToken] ? (
-                  <div className="d-flex mt-2">
+                <p className="fs-7 pt-1">{job.maybeRawInferenceText}</p>
+              </div>
+              {props.mode === "lipsync" ? null : (
+                <>
+                  <div className="d-flex gap-3 align-items-center">
+                    {wavesurfers}
                     <Button
-                      variant="rainbow"
-                      label="Lip sync with this audio!"
-                      className="fs-7"
-                      icon={faLips}
-                      to={`/ai-lip-sync?voice=${job.maybeModelToken}&audio=${job.maybeResultToken}`}
+                      variant="action"
                       small={true}
+                      square={true}
+                      icon={faArrowDownToLine}
+                      fontLarge={true}
+                      to={ttsPermalink}
+                      onClick={() => {
+                        Analytics.ttsClickResultLink();
+                      }}
                     />
                   </div>
-                ) : null}
-              </div>
+
+                  {job.maybeModelToken &&
+                  LipsyncTokenMap[job.maybeModelToken] ? (
+                    <div className="d-flex mt-2">
+                      <Button
+                        variant="rainbow"
+                        label="Lip sync with this audio!"
+                        className="fs-7"
+                        icon={faLips}
+                        to={`/ai-lip-sync?voice=${job.maybeModelToken}&audio=${job.maybeResultToken}`}
+                        small={true}
+                      />
+                    </div>
+                  ) : null}
+                </>
+              )}
             </div>
           </div>
         );
       }
     });
+
+  if (props.mode === "lipsync") {
+    results = results.slice(0, 5);
+  }
 
   let noResultsSection = (
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">

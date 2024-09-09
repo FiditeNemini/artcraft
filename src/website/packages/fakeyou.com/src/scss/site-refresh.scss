@@ -443,6 +443,17 @@ styles with important tags:
       border-radius: 0.5rem;
       background-color: lighten($panel, 4%);
       box-shadow: none !important;
+      transition: all 0.15s;
+
+      &.lipsync-tts-results {
+        border-width: 2px;
+
+        &:hover {
+          background-color: lighten($panel-inner, 2%);
+          cursor: pointer;
+          border: 2px solid lighten($panel-inner-border, 15%) !important;
+        }
+      }
     }
 
     .panel-title {

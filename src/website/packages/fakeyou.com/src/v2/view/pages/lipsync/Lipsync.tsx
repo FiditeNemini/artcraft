@@ -14,7 +14,6 @@ import {
   faEquals,
   faLips,
   faLock,
-  faMicrophone,
   faPlus,
   faSparkles,
   faWaveformLines,
@@ -44,8 +43,8 @@ import OutputThumbnailImage from "../live_portrait/OutputThumbnailImage";
 import SessionLsInferenceResultsList from "./SessionLsInferenceResultsList";
 import ThumbnailMediaPicker from "../live_portrait/ThumbnailMediaPicker";
 import { GenerateTts } from "./GenerateTts";
-import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import { LipsyncTokenMap } from "./LipsyncTokens";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 
 interface LipsyncProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -74,7 +73,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
     x: 0,
     y: 0,
   });
-  const [voiceModelTitle, setVoiceModelTitle] = useState<string | null>(null);
   const [generatedVideoSrc, setGeneratedVideoSrc] = useState("");
   const [sourceTokens, setSourceTokens] = useState<string[]>([
     ...PRECOMPUTED_SOURCE_TOKENS,
@@ -123,8 +121,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
       setIsEnqueuing(false);
     });
   };
-
-  console.log(jobPercentage);
 
   const renderVideoOrPlaceholder = () => {
     if (generatedVideoSrc && !isGenerating && audioToken) {
@@ -230,7 +226,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
     : null;
 
   const handleJobProgress = (progressPercentage: number | null) => {
-    console.log("Job Progress:", progressPercentage);
     setJobPercentage(progressPercentage);
   };
 
@@ -308,12 +303,13 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     setVoiceToken(queryParams.get("voice"));
+  }, [location.search]);
 
+  useEffect(() => {
     if (voiceToken) {
       const precomputedSourceToken = LipsyncTokenMap[voiceToken];
 
       if (precomputedSourceToken) {
-        // Set the precomputed source token as the media
         setSourceTokens(prevTokens => {
           const tokenIndex = prevTokens.indexOf(precomputedSourceToken);
           if (tokenIndex !== -1) {
@@ -326,24 +322,8 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
           }
         });
       }
-
-      GetWeight(voiceToken, {})
-        .then(response => {
-          if (response && response.success) {
-            const title = response.title || null;
-            setVoiceModelTitle(title);
-          } else {
-            console.error(
-              "Failed to retrieve media or media has no title",
-              response
-            );
-          }
-        })
-        .catch(error => {
-          console.error("Error fetching media:", error);
-        });
     }
-  }, [location.search, numberOfInitialSourceTokens, voiceToken]);
+  }, [voiceToken, numberOfInitialSourceTokens]);
 
   const signupCTA = (
     <>
@@ -385,13 +365,16 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
             Lip Sync
           </h1>
 
-          <h2 className="fs-5 opacity-75 fw-semibold pb-2">
+          <h2
+            className="fs-5 opacity-75 fw-semibold pb-2"
+            style={{ marginBottom: "3rem" }}
+          >
             Make your characters really speak with lip sync and text to speech
           </h2>
 
-          {voiceModelTitle ? (
+          {/* {voiceModelTitle ? (
             <Panel
-              style={{ marginBottom: "2.5rem" }}
+              style={{ marginBottom: "3rem" }}
               className="panel-inner p-3 rounded"
             >
               <div className="d-flex align-items-center gap-2">
@@ -401,28 +384,36 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                 </h3>
               </div>
             </Panel>
-          ) : null}
+          ) : null} */}
           {/* <hr style={{ marginBottom: "2.5rem" }} /> */}
 
-          {!loggedIn && (
-            <div style={{ marginBottom: "2.5rem" }}>{signupCTA}</div>
-          )}
+          {!loggedIn && <div style={{ marginBottom: "3rem" }}>{signupCTA}</div>}
 
           <div>
             <div className="row gx-0 gy-4">
-              <div className="col-12 col-lg-3 d-flex gap-3 flex-column align-items-center pt-lg-5">
-                <ThumbnailMediaPicker
-                  videoRef={sourceVideoRef}
-                  mediaTokens={sourceTokens}
-                  selectedIndex={selectedSourceIndex}
-                  title="Source Image/Video"
-                  description="This is what your final video will look like."
-                  badgeLabel="Source Media"
-                  stepNumber={1}
-                  onSelectedMediaChange={handleSelectedMediaChange}
-                  showUploadButton={false}
-                  showThumbnails={false}
-                  stepAlwaysOnTop={true}
+              <div className="col-12 col-lg-3 d-flex gap-3 flex-column align-items-center">
+                <div className="w-100">
+                  <ThumbnailMediaPicker
+                    videoRef={sourceVideoRef}
+                    mediaTokens={sourceTokens}
+                    selectedIndex={selectedSourceIndex}
+                    title="Source Image/Video"
+                    description="This is what your final video will look like."
+                    badgeLabel="Source Media"
+                    stepNumber={1}
+                    onSelectedMediaChange={handleSelectedMediaChange}
+                    showUploadButton={false}
+                    showThumbnails={false}
+                    stepAlwaysOnTop={true}
+                  />
+                </div>
+                <Button
+                  className="w-100 d-none d-lg-flex"
+                  icon={faDiscord}
+                  label="Suggest more images on Discord"
+                  variant="secondary"
+                  href="https://discord.gg/fakeyou"
+                  target="_blank"
                 />
               </div>
 
@@ -433,11 +424,12 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                 />
               </div>
 
-              <div className="col-12 col-lg-3 d-flex gap-3 flex-column pt-lg-5">
+              <div className="col-12 col-lg-3 d-flex gap-3 flex-column">
                 <GenerateTts
                   weightToken={voiceToken}
                   onResultToken={handleAudioResultToken}
                   onAudioDelete={handleAudioDelete}
+                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                 />
               </div>
 
@@ -453,6 +445,19 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
               </div>
 
               <div className="col-12 col-lg-4 d-flex gap-3 flex-column">
+                <div>
+                  <div className="d-flex gap-2 align-items-center mb-1">
+                    <div className="lp-step">3</div>
+                    <h2 className="fs-5 mb-0 fw-semibold">
+                      Final Video Output
+                    </h2>
+                  </div>
+
+                  <p className="fw-medium fs-7 opacity-75">
+                    Your completed lip-synced video.
+                  </p>
+                </div>
+
                 <div className="lp-media">
                   {renderVideoOrPlaceholder()}
 

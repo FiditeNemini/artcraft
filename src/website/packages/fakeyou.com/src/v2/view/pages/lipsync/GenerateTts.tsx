@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
+  faChevronRight,
+  faHistory,
   faPause,
   faPlay,
   faSquareQuote,
+  faTrashAlt,
   faWaveformLines,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -18,23 +21,40 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { Button, Panel, TextArea } from "components/common";
-import { useInferenceJobs } from "hooks";
+import {
+  Button,
+  Label,
+  Panel,
+  TextArea,
+  WeightCoverImage,
+} from "components/common";
+import { useDebounce, useInferenceJobs, useModal } from "hooks";
 import LipsyncAudioPlayer from "./LipsyncAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { useHistory } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import LoadingSpinner from "components/common/LoadingSpinner";
+import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
+import { MediaBrowser } from "components/modals";
+import ExploreVoices from "../audio_gen/ExploreVoices";
 
 interface GenerateTtsProps {
   weightToken?: string | null;
   onResultToken?: (token: string | null) => void;
   onAudioDelete?: () => void;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 export const GenerateTts = ({
   weightToken,
   onResultToken,
   onAudioDelete,
+  sessionSubscriptionsWrapper,
 }: GenerateTtsProps) => {
+  const { modalState, open, close } = useModal();
   const [textBuffer, setTextBuffer] = useState("");
   const [maybeTtsError, setMaybeTtsError] = useState<
     GenerateTtsAudioErrorType | undefined
@@ -43,24 +63,31 @@ export const GenerateTts = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [jobToken, setJobToken] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
-  const [voiceToken, setVoiceToken] = useState(
-    weightToken || "weight_hz7g8f1j4psrsw2sv67e4y61q"
-  );
+  const [voiceToken, setVoiceToken] = useState(weightToken);
   const [progress, setProgress] = useState(0);
-
   const { enqueueInferenceJob, inferenceJobs } = useInferenceJobs();
-
+  const history = useHistory();
   const [transcript, setTranscript] = useState<string | null>(null);
-
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
     setTextBuffer(textValue);
   };
+  const location = useLocation();
+  const [loadingSelectedAudioResult, setLoadingSelectedAudioResult] =
+    useState(false);
+  const [voiceTitle, setVoiceTitle] = useState<string | null>(null);
+  const [voiceCoverImage, setVoiceCoverImage] = useState<string | null>(null);
+  const [search, searchSet] = useState("");
+  const [updated, updatedSet] = useState(false);
 
   const handleEnqueueTts = async (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
 
     if (!textBuffer) {
+      return false;
+    }
+
+    if (!voiceToken) {
       return false;
     }
 
@@ -187,7 +214,7 @@ export const GenerateTts = ({
 
       fetchMedia();
     }
-  }, [currentAudioUrl, onResultToken]);
+  }, [location.search, currentAudioUrl, onResultToken]);
 
   const handleAudioFinish = () => {
     setIsPlaying(false);
@@ -234,6 +261,123 @@ export const GenerateTts = ({
     }
   }, [weightToken]);
 
+  useEffect(() => {
+    if (voiceToken) {
+      GetWeight(voiceToken, {})
+        .then(response => {
+          if (response && response.success) {
+            const title = response.title || null;
+            const cover_image =
+              response.cover_image.maybe_cover_image_public_bucket_path || null;
+            setVoiceTitle(title);
+            if (cover_image) {
+              setVoiceCoverImage(
+                new BucketConfig().getCdnUrl(cover_image, 36, 100)
+              );
+            }
+          } else {
+            console.error(
+              "Failed to retrieve media or media has no title",
+              response
+            );
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching media:", error);
+        });
+    }
+  }, [voiceToken]);
+
+  const handleResultClick = async (
+    modelToken: string | undefined,
+    resultToken: string | undefined | null
+  ) => {
+    if (modelToken && resultToken) {
+      handleClearAudio();
+      setLoadingSelectedAudioResult(true);
+      const newUrl = `/ai-lip-sync?voice=${modelToken}&audio=${resultToken}`;
+      history.push(newUrl);
+
+      try {
+        const response = await GetMedia(resultToken, {});
+        if (
+          response &&
+          response.media_file &&
+          response.media_file.public_bucket_path &&
+          response.media_file.maybe_text_transcript
+        ) {
+          const audioLink = new BucketConfig().getGcsUrl(
+            response.media_file.public_bucket_path
+          );
+          setCurrentAudioUrl(audioLink);
+          setTranscript(response.media_file.maybe_text_transcript || "");
+          if (onResultToken) {
+            onResultToken(response.media_file.token);
+          }
+          setLoadingSelectedAudioResult(false);
+        } else {
+          console.error(
+            "Failed to retrieve media or media has no public bucket path",
+            response
+          );
+          setLoadingSelectedAudioResult(false);
+        }
+      } catch (error) {
+        console.error("Error fetching media:", error);
+        setLoadingSelectedAudioResult(false);
+      }
+    }
+  };
+
+  const searchChange =
+    (setUpdate = true) =>
+    ({ target }: { target: any }) => {
+      if (setUpdate) updatedSet(true);
+      searchSet(target.value);
+    };
+
+  const handleVoiceSelect = async (data: any) => {
+    if (data.weight_token) {
+      const newUrl = `/ai-lip-sync?voice=${data.weight_token}`;
+      history.push(newUrl);
+      close();
+    }
+  };
+
+  const mediaBrowserProps = {
+    onSelect: (weight: any) => setVoiceToken(weight.weight_token),
+    inputMode: 3,
+    onSearchChange: searchChange(false),
+    search,
+    emptyContent: (
+      <ExploreVoices
+        onResultSelect={handleVoiceSelect}
+        filterCategory="text_to_speech"
+      />
+    ),
+    showFilters: false,
+    showPagination: false,
+    searchFilter: "text_to_speech",
+  };
+
+  useDebounce({
+    blocked: !(updated && !modalState && search),
+    onTimeout: () => {
+      updatedSet(false);
+      open({
+        component: MediaBrowser,
+        props: mediaBrowserProps,
+      });
+    },
+  });
+
+  const handleOpenVoiceSelection = () => {
+    open({
+      component: MediaBrowser,
+      props: mediaBrowserProps,
+    });
+  };
+
   return (
     <>
       <div>
@@ -249,10 +393,17 @@ export const GenerateTts = ({
 
       <div className="ratio ratio-1x1">
         <div className="d-flex flex-column h-100">
-          {currentAudioUrl ? (
+          {loadingSelectedAudioResult ? (
             <Panel
               padding={true}
-              className="panel-inner h-100 position-relative"
+              className="panel-inner h-100 position-relative rounded d-flex align-items-center justify-content-center"
+            >
+              <LoadingSpinner padding={false} />
+            </Panel>
+          ) : currentAudioUrl ? (
+            <Panel
+              padding={true}
+              className="panel-inner h-100 position-relative rounded"
             >
               <div className="d-flex flex-column justify-content-center h-100">
                 <div className="d-flex gap-3 align-items-center justify-content-center">
@@ -265,6 +416,7 @@ export const GenerateTts = ({
                   />
                   <div className="w-100">
                     <LipsyncAudioPlayer
+                      key={currentAudioUrl}
                       filename={currentAudioUrl || ""}
                       play={isPlaying}
                       onFinish={handleAudioFinish}
@@ -290,33 +442,79 @@ export const GenerateTts = ({
             </Panel>
           ) : (
             <>
+              <button
+                className="ls-voice-picker-preview mb-3"
+                onClick={handleOpenVoiceSelection}
+              >
+                <div className="d-flex align-items-center flex-grow-1">
+                  <div className="d-flex">
+                    <WeightCoverImage
+                      src={voiceCoverImage || ""}
+                      height={36}
+                      width={36}
+                      marginRight={8}
+                    />
+                  </div>
+                  <span className="text-truncate" style={{ maxWidth: "300px" }}>
+                    {voiceTitle || "No voice selected"}
+                  </span>
+                </div>
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
               <TextArea
                 placeholder={"Type what you want your character to say..."}
                 value={textBuffer}
                 onChange={handleChangeText}
-                rows={4}
+                rows={6}
                 resize={false}
-                className="h-100"
                 autoFocus={true}
                 disabled={isAudioLoading}
+                className="h-100"
               />
               {maybeError}
-              <Button
-                label={
-                  isAudioLoading
-                    ? `Generating Audio... ${
-                        progress !== 0 ? progress + "%" : ""
-                      }`
-                    : "Generate audio"
-                }
-                variant="action"
-                icon={faWaveformLines}
-                onClick={handleEnqueueTts}
-                disabled={textBuffer.length === 0}
-                isLoading={isAudioLoading}
-              />
             </>
           )}
+        </div>
+      </div>
+
+      {currentAudioUrl !== null || loadingSelectedAudioResult ? (
+        <Button
+          label="Clear current audio"
+          variant="secondary"
+          icon={faTrashAlt}
+          onClick={handleClearAudio}
+          isLoading={isAudioLoading}
+        />
+      ) : (
+        <Button
+          label={
+            isAudioLoading
+              ? `Generating Audio... ${progress !== 0 ? progress + "%" : ""}`
+              : "Generate audio"
+          }
+          variant={"action"}
+          icon={faWaveformLines}
+          onClick={handleEnqueueTts}
+          disabled={textBuffer.length === 0}
+          isLoading={isAudioLoading}
+        />
+      )}
+
+      <div className="mt-3 d-none d-lg-block mb-2">
+        <Label
+          label={
+            <div className="d-flex gap-2 align-items-center fw-semibold">
+              <FontAwesomeIcon icon={faHistory} />
+              Previous TTS Results
+            </div>
+          }
+        />
+        <div style={{ height: "280px", overflow: "auto" }}>
+          <SessionTtsInferenceResultList
+            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+            mode="lipsync"
+            onResultClick={handleResultClick}
+          />
         </div>
       </div>
     </>
