@@ -2,6 +2,11 @@
 // Lipsync buttons on TTS results will only show if that voice token is in this map
 
 export const LipsyncTokenMap: { [key: string]: string } = {
+  // Cristiano Ronaldo
+  weight_t7a4br08b76btnnwkb32tsh7q: "m_n55cyxxbqhshbzb8btq5zs6h0amfaq", // Ronaldo (most popular)
+  weight_ren3ng1bvpktsvg58gcrv2s52: "m_n55cyxxbqhshbzb8btq5zs6h0amfaq", // Ronaldo
+  weight_9y01j5jxnfqmygtz2g2scenac: "m_n55cyxxbqhshbzb8btq5zs6h0amfaq", // Ronaldo
+  weight_xkpvgmzj85pmrah3nt3jf3edb: "m_n55cyxxbqhshbzb8btq5zs6h0amfaq", // Ronaldo
   // Donald Trump
   weight_ppqs5038bvkm6wc29w0xfebzy: "m_vrqwr74atwg9btfcbzx6d7ehzbjmsd", // Donald Trump (most popular)
   weight_x6r5w2tsxgcrrsgweva6dkrqj: "m_vrqwr74atwg9btfcbzx6d7ehzbjmsd", // Donald Trump
