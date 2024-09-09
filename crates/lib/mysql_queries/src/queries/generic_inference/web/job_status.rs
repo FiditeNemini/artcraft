@@ -43,7 +43,7 @@ pub struct GenericInferenceJobStatus {
 /// (We may want to present it in the "pending" UI.)
 #[derive(Debug, Default, Serialize)]
 pub struct RequestDetails {
-  pub product_category: InferenceJobProductCategory,
+  pub maybe_product_category: Option<InferenceJobProductCategory>,
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
   pub maybe_model_token: Option<String>,

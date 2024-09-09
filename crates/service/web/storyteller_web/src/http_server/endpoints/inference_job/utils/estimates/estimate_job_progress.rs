@@ -70,8 +70,9 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option
     InferenceCategory::DeprecatedField => 0, // TODO(bt,2024-07-16): Read job type instead.
   };
 
-  match job.request_details.product_category {
-    InferenceJobProductCategory::VidFaceFusion => {
+  // For some products/models that didn't get matched above
+  match job.request_details.maybe_product_category {
+    Some(InferenceJobProductCategory::VidFaceFusion) => {
       progress = percent(duration_seconds, VID_FACE_FUSION_AVERAGE_SECONDS);
     }
     _ => {}, // Intentional Fallthrough
