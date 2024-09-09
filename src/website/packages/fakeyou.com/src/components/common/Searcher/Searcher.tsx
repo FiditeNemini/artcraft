@@ -14,6 +14,7 @@ import useSearcherStore from "hooks/useSearcherStore";
 import prepFilter from "resources/prepFilter";
 import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights";
 import InfiniteScroll from "react-infinite-scroll-component";
+
 interface SearcherProps {
   type?: "page" | "modal";
   dataType?: "media" | "weights";

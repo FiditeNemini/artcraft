@@ -11,6 +11,8 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import getCardUrl from "../getCardUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Stat from "components/common/Stat/Stat";
+import { faVolumeHigh } from "@fortawesome/pro-duotone-svg-icons";
 // import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
@@ -177,6 +179,11 @@ export default function AudioCard({
                         label={weightBadgeLabel}
                         color={weightBadgeColor}
                       />
+                      <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50 text-white">
+                        <Stat 
+                          count={data?.usage_count}
+                          />
+                      </span>
                       <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-50 text-white">
                         <FontAwesomeIcon icon={faThumbsUp} />
                         {data?.stats?.positive_rating_count}

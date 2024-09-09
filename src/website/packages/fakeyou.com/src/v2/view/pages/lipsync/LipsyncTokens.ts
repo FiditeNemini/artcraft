@@ -30,6 +30,7 @@ export const LipsyncTokenMap: { [key: string]: string } = {
   // Rick Sanchez (live portrait video is poor quality)
   weight_0f762jdzgsy1dhpb86qxy4ssm: "m_3b2yhzq4na7yg724k9tm4dn0513c36", // Rick Sanchez
   weight_qfz806d82b0qmxfn3vzgmtyme: "m_3b2yhzq4na7yg724k9tm4dn0513c36", // Rick Sanchez
+  weight_n99qccqtbb4fe3yj16dsfgfv4: "m_3b2yhzq4na7yg724k9tm4dn0513c36", // Rick Sanchez
   // Walter White (live portrait video looks funny)
   weight_0bsxzrwp6p77t67s8dcn607wf: "m_ft3y3vjyg2shssrqq0p51qh143pm0n", // Walter White (most popular)
   weight_x6vgpe83p2g9pxehhaq4e8823: "m_ft3y3vjyg2shssrqq0p51qh143pm0n", // Walter White

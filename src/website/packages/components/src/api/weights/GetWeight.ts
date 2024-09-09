@@ -31,6 +31,7 @@ export interface Weight {
     bookmark_count: number;
     positive_rating_count: number;
   };
+  usage_count: number;
 }
 
 export interface GetWeightRequest {}
