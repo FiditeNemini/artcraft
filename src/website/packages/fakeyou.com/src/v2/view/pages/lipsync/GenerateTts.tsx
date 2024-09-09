@@ -28,7 +28,7 @@ import {
   TextArea,
   WeightCoverImage,
 } from "components/common";
-import { useDebounce, useInferenceJobs, useModal } from "hooks";
+import { useDebounce, useInferenceJobs, useLocalize, useModal } from "hooks";
 import LipsyncAudioPlayer from "./LipsyncAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
@@ -79,6 +79,7 @@ export const GenerateTts = ({
   const [voiceCoverImage, setVoiceCoverImage] = useState<string | null>(null);
   const [search, searchSet] = useState("");
   const [updated, updatedSet] = useState(false);
+  const { t } = useLocalize("NewLipsync");
 
   const handleEnqueueTts = async (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
@@ -274,6 +275,8 @@ export const GenerateTts = ({
               setVoiceCoverImage(
                 new BucketConfig().getCdnUrl(cover_image, 36, 100)
               );
+            } else {
+              setVoiceCoverImage("");
             }
           } else {
             console.error(
@@ -292,7 +295,7 @@ export const GenerateTts = ({
     modelToken: string | undefined,
     resultToken: string | undefined | null
   ) => {
-    if (modelToken && resultToken) {
+    if (modelToken && resultToken && isAudioLoading === false) {
       handleClearAudio();
       setLoadingSelectedAudioResult(true);
       const newUrl = `/ai-lip-sync?voice=${modelToken}&audio=${resultToken}`;
@@ -383,12 +386,10 @@ export const GenerateTts = ({
       <div>
         <div className="d-flex gap-2 align-items-center mb-1">
           <div className="lp-step">2</div>
-          <h2 className="fs-5 mb-0 fw-semibold">Generate Audio</h2>
+          <h2 className="fs-5 mb-0 fw-semibold">{t("step.two.title")}</h2>
         </div>
 
-        <p className="fw-medium fs-7 opacity-75">
-          What do you want your character to say?
-        </p>
+        <p className="fw-medium fs-7 opacity-75">{t("step.two.subtitle")}</p>
       </div>
 
       <div className="ratio ratio-1x1">
@@ -462,7 +463,7 @@ export const GenerateTts = ({
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
               <TextArea
-                placeholder={"Type what you want your character to say..."}
+                placeholder={t("input.textPlaceholder")}
                 value={textBuffer}
                 onChange={handleChangeText}
                 rows={6}
@@ -479,7 +480,7 @@ export const GenerateTts = ({
 
       {currentAudioUrl !== null || loadingSelectedAudioResult ? (
         <Button
-          label="Clear current audio"
+          label={t("button.clearAudio")}
           variant="secondary"
           icon={faTrashAlt}
           onClick={handleClearAudio}
@@ -489,8 +490,10 @@ export const GenerateTts = ({
         <Button
           label={
             isAudioLoading
-              ? `Generating Audio... ${progress !== 0 ? progress + "%" : ""}`
-              : "Generate audio"
+              ? `${t("button.generating")} ${
+                  progress !== 0 ? progress + "%" : ""
+                }`
+              : t("button.generateAudio")
           }
           variant={"action"}
           icon={faWaveformLines}
@@ -505,7 +508,7 @@ export const GenerateTts = ({
           label={
             <div className="d-flex gap-2 align-items-center fw-semibold">
               <FontAwesomeIcon icon={faHistory} />
-              Previous TTS Results
+              {t("label.previousTtsResults")}
             </div>
           }
         />

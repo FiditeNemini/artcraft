@@ -28,7 +28,7 @@ import {
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs, useSession } from "hooks";
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
@@ -87,6 +87,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   const location = useLocation();
   const history = useHistory();
   const sourceVideoRef = useRef<HTMLVideoElement | null>(null);
+  const { t, language } = useLocalize("NewLipsync");
 
   const handleAudioResultToken = (token: string | null) => {
     setAudioToken(token);
@@ -182,23 +183,38 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
           >
             {audioToken ? (
               <h4 className="fw-medium">
-                Click{" "}
-                <b>
-                  <FontAwesomeIcon icon={faSparkles} className="me-2 fs-6" />
-                  Animate
-                </b>{" "}
-                to start generating
+                {language === "en" ? (
+                  <>
+                    Click{" "}
+                    <b>
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        className="me-2 fs-6"
+                      />
+                      Animate
+                    </b>{" "}
+                    to start generating
+                  </>
+                ) : (
+                  <>{t("instruction.animate")}</>
+                )}
               </h4>
             ) : (
               <h4 className="fw-medium">
-                <b>
-                  <FontAwesomeIcon
-                    icon={faWaveformLines}
-                    className="me-2 fs-6"
-                  />
-                  Generate Audio
-                </b>{" "}
-                then click animate
+                {language === "en" ? (
+                  <>
+                    <b>
+                      <FontAwesomeIcon
+                        icon={faWaveformLines}
+                        className="me-2 fs-6"
+                      />
+                      Generate Audio
+                    </b>{" "}
+                    then click animate
+                  </>
+                ) : (
+                  <>{t("instruction.generateAudio")}</>
+                )}
               </h4>
             )}
           </div>
@@ -362,14 +378,14 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
         <Panel padding={true}>
           <h1 className="fw-bold fs-1">
             <FontAwesomeIcon icon={faLips} className="me-3 fs-2" />
-            Lip Sync
+            {t("title.lipsync")}
           </h1>
 
           <h2
             className="fs-5 opacity-75 fw-semibold pb-2"
             style={{ marginBottom: "3rem" }}
           >
-            Make your characters really speak with lip sync and text to speech
+            {t("subtitle.lipsync")}
           </h2>
 
           {/* {voiceModelTitle ? (
@@ -397,9 +413,9 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                     videoRef={sourceVideoRef}
                     mediaTokens={sourceTokens}
                     selectedIndex={selectedSourceIndex}
-                    title="Source Image/Video"
-                    description="This is what your final video will look like."
-                    badgeLabel="Source Media"
+                    title={t("step.one.title")}
+                    description={t("step.one.subtitle")}
+                    badgeLabel={t("badge.sourceMedia")}
                     stepNumber={1}
                     onSelectedMediaChange={handleSelectedMediaChange}
                     showUploadButton={false}
@@ -410,7 +426,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                 <Button
                   className="w-100 d-none d-lg-flex"
                   icon={faDiscord}
-                  label="Suggest more images on Discord"
+                  label={t("button.suggestImages")}
                   variant="secondary"
                   href="https://discord.gg/fakeyou"
                   target="_blank"
@@ -449,12 +465,12 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                   <div className="d-flex gap-2 align-items-center mb-1">
                     <div className="lp-step">3</div>
                     <h2 className="fs-5 mb-0 fw-semibold">
-                      Final Video Output
+                      {t("step.three.title")}
                     </h2>
                   </div>
 
                   <p className="fw-medium fs-7 opacity-75">
-                    Your completed lip-synced video.
+                    {t("step.three.subtitle")}
                   </p>
                 </div>
 
@@ -464,7 +480,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                   <div className="lp-tag">
                     <div className="d-flex gap-2 w-100">
                       <Badge
-                        label="Output Video"
+                        label={t("badge.outputVideo")}
                         color="ultramarine"
                         overlay={true}
                       />
@@ -478,10 +494,10 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                       icon={faSparkles}
                       label={
                         !loggedIn
-                          ? "Sign Up and Animate"
+                          ? t("button.signUpAndAnimate")
                           : generatedVideoSrc
-                            ? "Re-animate"
-                            : "Animate"
+                            ? t("button.reanimate")
+                            : t("button.animate")
                       }
                       onClick={
                         loggedIn
@@ -497,8 +513,8 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                       theme="fakeyou"
                       content={
                         generatedVideoSrc
-                          ? "Download video"
-                          : "Animate first to download"
+                          ? t("tooltip.downloadVideo")
+                          : t("tooltip.downloadNoOutput")
                       }
                     >
                       <div>
@@ -524,7 +540,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                     >
                       <div className="d-flex gap-3">
                         <Checkbox
-                          label={"Make Private"}
+                          label={t("check.makePrivate")}
                           onChange={() => {
                             setVisibility(prevVisibility =>
                               prevVisibility === "private"
@@ -537,7 +553,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                         />
 
                         <Checkbox
-                          label={"Remove Watermark"}
+                          label={t("check.removeWatermark")}
                           onChange={() => {
                             setRemoveWatermark(
                               prevRemoveWatermark => !prevRemoveWatermark

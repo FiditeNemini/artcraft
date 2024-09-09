@@ -293,7 +293,7 @@ function SessionTtsInferenceResultList(props: Props) {
                     <div className="d-flex mt-2">
                       <Button
                         variant="rainbow"
-                        label="Lip sync with this audio!"
+                        label={t2("sessionResults.lipsync")}
                         className="fs-7"
                         icon={faLips}
                         to={`/ai-lip-sync?voice=${job.maybeModelToken}&audio=${job.maybeResultToken}`}
