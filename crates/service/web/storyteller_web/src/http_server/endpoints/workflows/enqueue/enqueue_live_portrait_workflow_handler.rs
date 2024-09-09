@@ -248,9 +248,9 @@ pub async fn enqueue_live_portrait_workflow_handler(
   let used_webcam = request.used_webcam.unwrap_or(false);
 
   let product_category = if used_webcam {
-    InferenceJobProductCategory::LivePortraitWebcam
+    InferenceJobProductCategory::VidLivePortraitWebcam
   } else {
-    InferenceJobProductCategory::LivePortrait
+    InferenceJobProductCategory::VidLivePortrait
   };
 
   let payload = LivePortraitPayload {

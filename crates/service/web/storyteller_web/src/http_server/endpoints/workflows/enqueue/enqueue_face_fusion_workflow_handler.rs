@@ -249,7 +249,7 @@ pub async fn enqueue_face_fusion_workflow_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     job_type: InferenceJobType::FaceFusion,
-    maybe_product_category: Some(InferenceJobProductCategory::VidFaceFusion),
+    maybe_product_category: Some(InferenceJobProductCategory::VidLipsyncFaceFusion),
     inference_category: InferenceCategory::LipsyncAnimation,
     maybe_model_type: None,
     maybe_model_token: None,
