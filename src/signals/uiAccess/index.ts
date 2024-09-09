@@ -1,22 +1,21 @@
-import {
-  // ContextualUi,
-  ContextualLoadingBarProps,
-  ContextualImageToolbarProps,
-} from "./type";
+import { ContextualLoadingBarProps } from "./type";
 
 type uiAccessType = {
-  imageToolbar: ContextualImageToolbarProps;
   loadingBar: ContextualLoadingBarProps;
 };
 
 export type { uiAccessType };
 
 import { errorDialogue } from "./errorDialogue";
-import { imageToolbar } from "./imageToolbar";
+import { toolbarImage as imageToolbar } from "./toolbarImage";
+import { toolbarVideo } from "./toolbarVideo";
+import { toolbarMain } from "./toolbarMain";
 import { loadingBar } from "./loadingBar";
 
 export const uiAccess = {
   errorDialogue,
   imageToolbar,
   loadingBar,
+  toolbarVideo,
+  toolbarMain,
 };

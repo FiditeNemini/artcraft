@@ -1,8 +1,18 @@
 import { signal } from "@preact/signals-core";
-import { ContextualImageToolbarProps } from "./type";
+import { ContextualUi } from "./type";
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
-const imageToolbarSignal = signal<ContextualImageToolbarProps>({
+interface ContextualImageToolbarProps extends ContextualUi {
+  disabled: boolean;
+  buttonStates: {
+    [key in ToolbarImageButtonNames]: {
+      disabled: boolean;
+      active: boolean;
+    };
+  };
+}
+
+const toolbarImageSignal = signal<ContextualImageToolbarProps>({
   position: {
     x: 0,
     y: 0,
@@ -12,44 +22,44 @@ const imageToolbarSignal = signal<ContextualImageToolbarProps>({
   buttonStates: initButtonStates(),
 });
 
-export const imageToolbar = {
-  signal: imageToolbarSignal,
+export const toolbarImage = {
+  signal: toolbarImageSignal,
   setup(props: ContextualImageToolbarProps) {
-    imageToolbarSignal.value = props;
+    toolbarImageSignal.value = props;
   },
   update(props: Partial<ContextualImageToolbarProps>) {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       ...props,
     };
   },
   setPosition(position: ContextualImageToolbarProps["position"]) {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       position,
     };
   },
   show() {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       isShowing: true,
     };
   },
   hide() {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       isShowing: false,
     };
   },
   enable() {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       disabled: false,
     };
   },
   disable() {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       disabled: true,
     };
   },
@@ -57,10 +67,10 @@ export const imageToolbar = {
     buttonName: ToolbarImageButtonNames,
     { disabled, active }: { disabled?: boolean; active?: boolean },
   ) {
-    imageToolbarSignal.value = {
-      ...imageToolbarSignal.value,
+    toolbarImageSignal.value = {
+      ...toolbarImageSignal.value,
       buttonStates: {
-        ...imageToolbarSignal.value.buttonStates,
+        ...toolbarImageSignal.value.buttonStates,
         [buttonName]: {
           disabled: active ? false : (disabled ?? false),
           active: active ?? false,

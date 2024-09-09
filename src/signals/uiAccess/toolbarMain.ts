@@ -1,5 +1,6 @@
 import { signal } from "@preact/signals-core";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+
 interface ToolbarMainSignalInterface {
   disabled: boolean;
   buttonStates: {
