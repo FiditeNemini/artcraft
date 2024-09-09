@@ -43,7 +43,7 @@ export const GenerateTts = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [jobToken, setJobToken] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
-  const [voiceToken] = useState(
+  const [voiceToken, setVoiceToken] = useState(
     weightToken || "weight_hz7g8f1j4psrsw2sv67e4y61q"
   );
   const [progress, setProgress] = useState(0);
@@ -227,6 +227,12 @@ export const GenerateTts = ({
       );
     }
   }
+
+  useEffect(() => {
+    if (weightToken) {
+      setVoiceToken(weightToken);
+    }
+  }, [weightToken]);
 
   return (
     <>
