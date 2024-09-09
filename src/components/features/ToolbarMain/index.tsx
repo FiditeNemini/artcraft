@@ -1,5 +1,5 @@
+import { MouseEventHandler, useCallback, useState } from "react";
 import { useSignalEffect } from "@preact/signals-react/runtime";
-import { useCallback, useState } from "react";
 import {
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -27,13 +27,27 @@ import { paperWrapperStyles } from "~/components/styles";
 // for testing
 import { layout } from "~/signals";
 
+import { ToolbarMainButtonNames } from "./enum";
+
 const initialState = {
   isUploadSubmenuOpen: false,
   isUploadVideoOpen: false,
   isUploadImageOpen: false,
 };
 
-export const ToolbarMain = () => {
+export const ToolbarMain = ({
+  disabled = false,
+  buttonProps,
+}: {
+  disabled?: boolean;
+  buttonProps: {
+    [key in ToolbarMainButtonNames]: {
+      disabled?: boolean;
+      active?: boolean;
+      onClick?: MouseEventHandler<HTMLButtonElement>;
+    };
+  };
+}) => {
   //// for testing
   const {
     signals: { isMobile },
@@ -65,15 +79,21 @@ export const ToolbarMain = () => {
         className={twMerge(
           "m-auto flex w-fit items-center divide-x divide-ui-border",
           paperWrapperStyles,
+          disabled &&
+            "pointer-events-none cursor-default bg-ui-border shadow-md",
         )}
       >
         <div className="flex items-center gap-2 px-2">
-          <ToolbarButton icon={faBars} />
+          <ToolbarButton icon={faBars} buttonProps={buttonProps.MENU} />
           <ToolbarButton
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}
+            buttonProps={buttonProps.SELECT_ONE}
           />
-          <ToolbarButton icon={faSquareDashed} />
+          <ToolbarButton
+            icon={faSquareDashed}
+            buttonProps={buttonProps.SELECT_AREA}
+          />
           <div className="relative">
             <ToolbarButton
               icon={faFilePlus}
@@ -111,14 +131,26 @@ export const ToolbarMain = () => {
               </div>
             )}
           </div>
-          <ToolbarButton icon={faCameraRotate} />
-          <ToolbarButton icon={faHatWizard} />
+          <ToolbarButton
+            icon={faCameraRotate}
+            buttonProps={buttonProps.CHANGE_CAMERA_ORIENTATION}
+          />
+          <ToolbarButton
+            icon={faHatWizard}
+            buttonProps={buttonProps.AI_STYLIZE}
+          />
         </div>
         <div className="flex items-center gap-2 px-2">
-          <ToolbarButton icon={faArrowRotateLeft} />
-          <ToolbarButton icon={faArrowRotateRight} />
-          <ToolbarButton icon={faFloppyDisk} />
-          <ToolbarButton icon={faDownload} />
+          <ToolbarButton
+            icon={faArrowRotateLeft}
+            buttonProps={buttonProps.UNDO}
+          />
+          <ToolbarButton
+            icon={faArrowRotateRight}
+            buttonProps={buttonProps.REDO}
+          />
+          <ToolbarButton icon={faFloppyDisk} buttonProps={buttonProps.SAVE} />
+          <ToolbarButton icon={faDownload} buttonProps={buttonProps.DOWNLOAD} />
         </div>
       </div>
 

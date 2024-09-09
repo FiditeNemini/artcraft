@@ -46,6 +46,10 @@ export class Engine {
     uiEvents.imageToolbar.MOVE.onClick(() => {
       console.log("move");
     });
+
+    uiEvents.toolbarMain.SELECT_ONE.onClick(() => {
+      console.log("select one is clicked");
+    });
   }
 
   sleep(ms: number): Promise<void> {
@@ -101,12 +105,10 @@ export class Engine {
     // Testing render engine
     this.renderEngine.addNodes(videoNode);
 
-
     // await this.renderEngine.startProcessing();
 
-
     // Call this when test video nodes
-   // await this.renderEngine.startProcessing();
+    // await this.renderEngine.startProcessing();
 
     //videoNode.simulatedLoading();
     // TODO support Text nodes
