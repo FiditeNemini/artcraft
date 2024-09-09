@@ -313,9 +313,10 @@ pub async fn process_face_fusion_job(
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
+  let model_title = audio.media_file.maybe_model_weights_title.as_deref();
   let audio_title = audio.media_file.maybe_title.as_deref();
   let image_or_video_title = image_or_video.media_file.maybe_title.as_deref();
-  let result_video_title = face_fusion_title(audio_title, image_or_video_title);
+  let result_video_title = face_fusion_title(model_title, audio_title, image_or_video_title);
 
   // ==================== UPLOAD AND SAVE ==================== //
 
