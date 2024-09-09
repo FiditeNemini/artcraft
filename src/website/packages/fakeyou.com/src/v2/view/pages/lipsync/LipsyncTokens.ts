@@ -10,6 +10,13 @@ export const LipsyncTokenMap: { [key: string]: string } = {
   weight_jazc270pdr3qe0yer61a5cvh5: "m_vrqwr74atwg9btfcbzx6d7ehzbjmsd", // Donald Trump
   weight_q24qbmxgrv2s6yka8nwdmw1aq: "m_vrqwr74atwg9btfcbzx6d7ehzbjmsd", // Donald Trump
   weight_ekwz4cqek5rrdez73rgy843ft: "m_vrqwr74atwg9btfcbzx6d7ehzbjmsd", // Donald Trump
+  // Goku (live portrait video is poor quality)
+  weight_txvtzmcd7jw0rg192284r1g3w: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Son Goku. (IMITADOR Remasterizado.) (Latin American Spanish.)
+  weight_hday2q4qgcybvn4ngvzjd5mpc: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Son Goku Abriged.
+  weight_jm7reg55vqn4b5v2cdn9d8w4v: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Son Goku Abriged.
+  weight_wn689844yyr08jny6jyyvkwcp: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Goku Italian
+  weight_657xnk20pcpr8asar6sgpctqh: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Goku
+  weight_gce486k6m08ew6070emm6rgpd: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Goku
   // Mariano Closs
   weight_hz7g8f1j4psrsw2sv67e4y61q: "m_zx1fyp6t7n8b46swz087xkapa7s2vs", // Mariano Closs (most popular)
   weight_42axnmna7stqy9h16j5nqef6k: "m_zx1fyp6t7n8b46swz087xkapa7s2vs", // Mariano Closs
