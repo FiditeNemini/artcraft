@@ -8,6 +8,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
@@ -136,6 +137,7 @@ SELECT
     jobs.maybe_creator_anonymous_visitor_token as maybe_creator_anonymous_visitor_token,
     jobs.creator_ip_address,
 
+    jobs.product_category,
     jobs.inference_category as inference_category,
     jobs.maybe_model_type,
     jobs.maybe_model_token,
@@ -283,6 +285,7 @@ fn raw_records_to_public_result(records: Vec<RawGenericInferenceJobStatus>) -> V
           maybe_first_started_at: record.maybe_first_started_at,
           maybe_frontend_failure_category: record.maybe_frontend_failure_category,
           request_details: RequestDetails {
+            product_category: record.product_category,
             inference_category: record.inference_category,
             maybe_model_type: record.maybe_model_type,
             maybe_model_token: record.maybe_model_token,
@@ -317,6 +320,7 @@ struct RawGenericInferenceJobStatus {
   pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
   pub creator_ip_address: String,
 
+  pub product_category: InferenceJobProductCategory,
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
@@ -373,6 +377,7 @@ impl FromRow<'_, MySqlRow> for RawGenericInferenceJobStatus {
       maybe_creator_user_token: UserToken::try_from_mysql_row_nullable(row, "maybe_creator_user_token")?,
       maybe_creator_anonymous_visitor_token: AnonymousVisitorTrackingToken::try_from_mysql_row_nullable(row, "maybe_creator_anonymous_visitor_token")?,
       creator_ip_address: row.try_get("creator_ip_address")?,
+      product_category: row.try_get("product_category")?,
       inference_category: InferenceCategory::try_from_mysql_row(row, "inference_category")?,
       maybe_model_type: row.try_get("maybe_model_type")?,
       maybe_model_token: row.try_get("maybe_model_token")?,

@@ -13,10 +13,11 @@ use strum::EnumIter;
 ///
 /// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum InferenceJobProductCategory {
   /// Download: GptSoVits
+  #[default]
   DownloadGptSoVits,
 
   /// Lipsync: Face Fusion

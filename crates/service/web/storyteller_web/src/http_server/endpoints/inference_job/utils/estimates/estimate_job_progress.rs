@@ -1,6 +1,7 @@
 use std::cmp::min;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::common::job_status_plus::JobStatusPlus;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
@@ -14,6 +15,7 @@ const TTS_JOB_AVERAGE_SECONDS : u64 = 7;
 const VC_JOB_AVERAGE_SECONDS : u64 = 90;
 
 const LIVE_PORTRAIT_JOB_AVERAGE_SECONDS : u64 = 90;
+const VID_FACE_FUSION_AVERAGE_SECONDS : u64 = 30;
 
 pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option<&PolymorphicInferenceArgs>) -> u8 {
   match job.status {
@@ -49,7 +51,7 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option
   //  This might also take parameters: the job arguments, text length,
   //  video length (currently unavailable - we'll need to put that in the
   //  job metadata), etc.
-  let progress = match job.request_details.inference_category {
+  let mut progress = match job.request_details.inference_category {
     // TODO: Better estimates for each of these job types.
     InferenceCategory::LipsyncAnimation => percent(duration_seconds, LIPSYNC_JOB_AVERAGE_SECONDS),
     InferenceCategory::TextToSpeech => percent(duration_seconds, TTS_JOB_AVERAGE_SECONDS),
@@ -67,6 +69,13 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option
     InferenceCategory::ConvertBvhToWorkflow => 0,
     InferenceCategory::DeprecatedField => 0, // TODO(bt,2024-07-16): Read job type instead.
   };
+
+  match job.request_details.product_category {
+    InferenceJobProductCategory::VidFaceFusion => {
+      progress = percent(duration_seconds, VID_FACE_FUSION_AVERAGE_SECONDS);
+    }
+    _ => {}, // Intentional Fallthrough
+  }
 
   // We shouldn't show 100% if the job isn't complete.
   min(progress, 95)

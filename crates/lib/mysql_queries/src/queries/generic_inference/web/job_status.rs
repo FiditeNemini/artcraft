@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
@@ -42,6 +43,7 @@ pub struct GenericInferenceJobStatus {
 /// (We may want to present it in the "pending" UI.)
 #[derive(Debug, Default, Serialize)]
 pub struct RequestDetails {
+  pub product_category: InferenceJobProductCategory,
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
   pub maybe_model_token: Option<String>,

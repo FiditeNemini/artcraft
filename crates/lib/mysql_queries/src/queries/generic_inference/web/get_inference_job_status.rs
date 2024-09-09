@@ -6,6 +6,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
@@ -49,6 +50,7 @@ SELECT
     jobs.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
     jobs.creator_ip_address,
 
+    jobs.product_category as `product_category: enums::by_table::generic_inference_jobs::inference_job_product_category::InferenceJobProductCategory`,
     jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,
     jobs.maybe_model_type,
     jobs.maybe_model_token,
@@ -213,6 +215,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
     maybe_first_started_at: record.maybe_first_started_at,
     maybe_frontend_failure_category: record.maybe_frontend_failure_category,
     request_details: RequestDetails {
+      product_category: record.product_category,
       inference_category: record.inference_category,
       maybe_model_type: record.maybe_model_type,
       maybe_model_token: record.maybe_model_token,
@@ -245,6 +248,7 @@ struct RawGenericInferenceJobStatus {
   pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
   pub creator_ip_address: String,
 
+  pub product_category: InferenceJobProductCategory,
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
