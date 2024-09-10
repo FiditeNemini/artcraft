@@ -12,6 +12,9 @@ import { EngineType } from "~/KonvaApp";
 // and only entry point for anything in Konva JS
 import { KonvaApp } from "~/KonvaApp";
 
+import { Button } from "~/components/ui";
+import { uiAccess } from "~/signals";
+
 export const KonvaRootComponent = ({ className }: { className: string }) => {
   // This is a hook that will log the number of times the component has rerendered
   // Let's make sure we only log once
@@ -27,6 +30,17 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
 
   return (
     <>
+      <Button
+        onClick={() => {
+          uiAccess.errorDialogue.show({
+            title: "Test Error",
+            message: "This is a test error",
+          });
+        }}
+      >
+        Error Dialogue Test
+      </Button>
+
       <KonvaCanvasContainer
         ref={konvaContainerCallbackRef}
         className={className}
