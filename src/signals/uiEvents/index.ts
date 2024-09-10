@@ -14,15 +14,21 @@ import {
   dispatchers as toolbarMainDispatchers,
   eventsHandlers as toolbarMainEvents,
 } from "./toolbarMain";
+import {
+  dispatcher as buttonTestDispatcher,
+  eventsHandler as buttonTestEvent,
+} from "./buttonTest";
 
 export const uiEvents = {
   ...addMediaEvents,
+  buttonTest: buttonTestEvent,
   imageToolbar: imageToolbarEvents,
   toolbarMain: toolbarMainEvents,
   toolbarVideo: videoToolbarEvents,
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
+  buttonTest: buttonTestDispatcher,
   imageToolbar: imageToolbarDispatchers,
   toolbarMain: toolbarMainDispatchers,
   toolbarVideo: videoToolbarDispatchers,

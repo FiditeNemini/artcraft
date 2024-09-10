@@ -1,4 +1,4 @@
-import { signal } from "@preact/signals-core";
+import { signal } from "@preact/signals-react";
 import { ContextualUi } from "./type";
 import { ToolbarVideoButtonNames } from "~/components/features/ToolbarVideo/enums";
 

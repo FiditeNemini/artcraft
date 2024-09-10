@@ -1,4 +1,4 @@
-import { signal } from "@preact/signals-core";
+import { signal } from "@preact/signals-react";
 import { ContextualLoadingBarProps } from "./type";
 import { LoadingBarStatus } from "~/components/ui/LoadingBar";
 

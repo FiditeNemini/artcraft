@@ -118,8 +118,11 @@ export const ContextualToolbarForm = () => {
 
 export const LittleThing = () => {
   Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
-    uiEvents.imageToolbar[buttonName].onClick((e) => {
-      console.log(buttonName, e);
+    uiEvents.imageToolbar[buttonName].onClick(() => {
+      console.log(buttonName);
+      uiAccess.imageToolbar.changeButtonState(buttonName, {
+        disabled: true,
+      });
     });
   });
 

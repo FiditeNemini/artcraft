@@ -1,4 +1,4 @@
-import { computed, signal } from "@preact/signals-core";
+import { computed, signal } from "@preact/signals-react";
 
 import { UserInfo } from "@ApiManager/models/Users";
 import { ActiveSubscriptions } from "@ApiManager/models/Billing";

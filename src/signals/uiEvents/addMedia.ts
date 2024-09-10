@@ -1,5 +1,4 @@
-import { signal } from "@preact/signals-core";
-import { effect } from "@preact/signals-react";
+import { signal, effect } from "@preact/signals-react";
 
 const stagedImage = signal<File | null>(null);
 

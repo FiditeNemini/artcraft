@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { signal, effect, Signal } from "@preact/signals-core";
+import { signal, effect, Signal } from "@preact/signals-react";
 
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
@@ -24,6 +24,14 @@ export const eventsHandlers = Object.values(ToolbarMainButtonNames).reduce(
         effect(() => {
           if (events[buttonName].value) {
             callback(events[buttonName].value);
+            return () => {
+              //console.log("Toolbar Main effect event handler cleanup");
+              events[buttonName].value = undefined;
+            };
+            return () => {
+              //console.log("Toolbar Image effect event handler cleanup");
+              events[buttonName].value = undefined;
+            };
           }
         });
       },

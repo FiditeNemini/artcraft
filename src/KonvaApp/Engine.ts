@@ -3,6 +3,7 @@ import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
 import { RenderEngine } from "./RenderEngine";
+import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
@@ -49,6 +50,28 @@ export class Engine {
 
     uiEvents.toolbarMain.SELECT_ONE.onClick(() => {
       console.log("select one is clicked");
+    });
+
+    uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
+      uiAccess.toolbarMain.changeButtonState(
+        ToolbarMainButtonNames.AI_STYLIZE,
+        { disabled: true },
+      );
+      const sleepytstart = new Date();
+      console.log(
+        "SLEEP",
+        `${sleepytstart.getMinutes()}:${sleepytstart.getSeconds()}`,
+      );
+      await this.sleep(5000);
+      const sleeptend = new Date();
+      console.log(
+        "DONE",
+        `${sleeptend.getMinutes()}:${sleeptend.getSeconds()}`,
+      );
+      uiAccess.toolbarMain.changeButtonState(
+        ToolbarMainButtonNames.AI_STYLIZE,
+        { disabled: false },
+      );
     });
   }
 

@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { signal, effect, Signal } from "@preact/signals-core";
+import { signal, effect, Signal } from "@preact/signals-react";
 
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
@@ -20,10 +20,14 @@ const events = Object.values(ToolbarImageButtonNames).reduce(
 export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = {
-      onClick: (callback: MouseEventHandler<HTMLButtonElement>) => {
+      onClick: (callback: () => void) => {
         effect(() => {
           if (events[buttonName].value) {
-            callback(events[buttonName].value);
+            callback();
+            return () => {
+              //console.log("Toolbar Image effect event handler cleanup");
+              events[buttonName].value = undefined;
+            };
           }
         });
       },
@@ -32,7 +36,7 @@ export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
   },
   {} as {
     [key in ToolbarImageButtonNames]: {
-      onClick: (callback: MouseEventHandler<HTMLButtonElement>) => void;
+      onClick: (callback: () => void) => void;
     };
   },
 );

@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import { signal, effect, Signal } from "@preact/signals-core";
+import { signal, effect, Signal } from "@preact/signals-react";
 
 import { ToolbarVideoButtonNames } from "~/components/features/ToolbarVideo/enums";
 
@@ -24,6 +24,10 @@ export const eventsHandlers = Object.values(ToolbarVideoButtonNames).reduce(
         effect(() => {
           if (events[buttonName].value) {
             callback(events[buttonName].value);
+            return () => {
+              //console.log("Toolbar Video effect event handler cleanup");
+              events[buttonName].value = undefined;
+            };
           }
         });
       },

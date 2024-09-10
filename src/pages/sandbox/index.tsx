@@ -9,6 +9,8 @@ import { ContextualToolbarForm } from "./ContextualToolbarForm";
 import { ContextualLoadingBarForm } from "./ContextualLoadingBarForm";
 import { ErrorDialogForm } from "./ErrorDialogForm";
 
+import { ButtonTestTester } from "./ButtonTestTester";
+
 export const Sandbox = () => {
   useRenderCounter("Sandbox");
 
@@ -16,6 +18,7 @@ export const Sandbox = () => {
     <div className="p-2">
       <div className="flex flex-col gap-8">
         <h1>Sandbox</h1>
+        <ButtonTestTester />
         <ContextualToolbarForm />
         <ContextualLoadingBarForm />
         <ErrorDialogForm />

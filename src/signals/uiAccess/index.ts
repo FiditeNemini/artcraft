@@ -6,13 +6,16 @@ type uiAccessType = {
 
 export type { uiAccessType };
 
+import { buttonTest } from "./buttonTest";
+
 import { errorDialogue } from "./errorDialogue";
+import { loadingBar } from "./loadingBar";
 import { toolbarImage as imageToolbar } from "./toolbarImage";
 import { toolbarVideo } from "./toolbarVideo";
 import { toolbarMain } from "./toolbarMain";
-import { loadingBar } from "./loadingBar";
 
 export const uiAccess = {
+  buttonTest,
   errorDialogue,
   imageToolbar,
   loadingBar,
