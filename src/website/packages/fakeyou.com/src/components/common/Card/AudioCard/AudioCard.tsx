@@ -10,6 +10,8 @@ import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import getCardUrl from "../getCardUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Stat from "components/common/Stat/Stat";
+import WeightCoverImage from "components/common/WeightCoverImage";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import {
   // MediaFile,
   MediaLinks,
@@ -45,6 +47,14 @@ export default function AudioCard({
 }: AudioCardProps) {
   const { mainURL } = MediaLinks(data.media_links);
   const linkUrl = getCardUrl(data, source, type);
+
+  const coverImage = data.maybe_cover_image_public_bucket_path
+    ? new BucketConfig().getCdnUrl(
+        data.maybe_cover_image_public_bucket_path,
+        110,
+        100
+      )
+    : "";
 
   const handleSelectModalResultSelect = () => {
     if (inSelectModal) {
@@ -113,6 +123,14 @@ export default function AudioCard({
       {type === "weights" && (
         <>
           <div className="d-flex">
+            {showCover && (
+              <WeightCoverImage
+                src={coverImage}
+                height={100}
+                width={100}
+                coverIndex={data?.cover_image?.default_cover?.image_index}
+              />
+            )}
             <div className="flex-grow-1">
               <div className="d-flex align-items-center">
                 <div className="flex-grow-1">
