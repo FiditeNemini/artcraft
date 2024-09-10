@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Login } from "~/pages/login";
-import { Main } from "~/pages/main";
-import { Sandbox } from "~/pages/sandbox";
+import { Login } from "~/app/pages/login";
+import { Main } from "~/app/pages/main";
+import { Sandbox } from "~/app/pages/sandbox";
 
 export const router = createBrowserRouter([
   {

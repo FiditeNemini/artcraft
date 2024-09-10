@@ -1,4 +1,4 @@
-import { StrictMode, useRef, useEffect } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
 import { RouterProvider } from "react-router-dom";
@@ -7,15 +7,10 @@ import { router } from "./router";
 import { layout } from "~/signals/";
 
 import "./global.css";
-
+import { useRenderCounter } from "~/hooks/useRenderCounter";
 const App = () => {
-  const AppRerenderCount = useRef(0);
-  AppRerenderCount.current++;
-  if (AppRerenderCount.current === 1) {
-    console.log(`App rerendered ${AppRerenderCount.current} times`);
-  } else {
-    console.warn(`App rerendered ${AppRerenderCount.current} times`);
-  }
+  const useStrictMode = false;
+  useRenderCounter("App");
 
   useEffect(() => {
     const { windowWidth, windowHeight } = layout.signals;
@@ -30,11 +25,15 @@ const App = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  if (useStrictMode) {
+    return (
+      <StrictMode>
+        <RouterProvider router={router} />
+      </StrictMode>
+    );
+  }
   return <RouterProvider router={router} />;
 };
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+createRoot(document.getElementById("root")!).render(<App />);
