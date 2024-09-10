@@ -22,6 +22,8 @@ export const LipsyncTokenMap: { [key: string]: string } = {
   weight_wn689844yyr08jny6jyyvkwcp: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Goku Italian
   weight_657xnk20pcpr8asar6sgpctqh: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Goku
   weight_gce486k6m08ew6070emm6rgpd: "m_e1grhfep0c0zf7m3ta7k2j256b99gw", // Goku
+  // Kamala Harris
+  weight_th73g8zcdrj8znt5zm1fhe1s0: "m_xt17chsq6hrv3tqxebmd0sssspe12a", // Kamala Harris
   // Mariano Closs
   weight_hz7g8f1j4psrsw2sv67e4y61q: "m_zx1fyp6t7n8b46swz087xkapa7s2vs", // Mariano Closs (most popular)
   weight_42axnmna7stqy9h16j5nqef6k: "m_zx1fyp6t7n8b46swz087xkapa7s2vs", // Mariano Closs
