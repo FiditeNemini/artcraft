@@ -89,10 +89,12 @@ export const ToolbarMain = ({
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}
             buttonProps={buttonProps.SELECT_ONE}
+            tooltip="Select"
           />
           <ToolbarButton
             icon={faSquareDashed}
             buttonProps={buttonProps.SELECT_AREA}
+            tooltip="Select Area"
           />
           <div className="relative">
             <ToolbarButton
@@ -104,7 +106,7 @@ export const ToolbarMain = ({
             {state.isUploadSubmenuOpen && (
               <div
                 className={twMerge(
-                  "absolute -left-2 bottom-11 z-10",
+                  "absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2",
                   paperWrapperStyles,
                 )}
               >
@@ -117,7 +119,9 @@ export const ToolbarMain = ({
                       isUploadVideoOpen: false,
                     })
                   }
-                />
+                >
+                  Add Image
+                </ToolbarButton>
                 <ToolbarButton
                   icon={faFilm}
                   onClick={() =>
@@ -127,30 +131,44 @@ export const ToolbarMain = ({
                       isUploadImageOpen: false,
                     })
                   }
-                />
+                >
+                  Add Video
+                </ToolbarButton>
               </div>
             )}
           </div>
           <ToolbarButton
             icon={faCameraRotate}
             buttonProps={buttonProps.CHANGE_CAMERA_ORIENTATION}
+            tooltip="Change Orientation"
           />
           <ToolbarButton
             icon={faHatWizard}
             buttonProps={buttonProps.AI_STYLIZE}
+            tooltip="AI Stylize"
           />
         </div>
         <div className="flex items-center gap-2 px-2">
           <ToolbarButton
             icon={faArrowRotateLeft}
             buttonProps={buttonProps.UNDO}
+            tooltip="Undo"
           />
           <ToolbarButton
             icon={faArrowRotateRight}
             buttonProps={buttonProps.REDO}
+            tooltip="Redo"
           />
-          <ToolbarButton icon={faFloppyDisk} buttonProps={buttonProps.SAVE} />
-          <ToolbarButton icon={faDownload} buttonProps={buttonProps.DOWNLOAD} />
+          <ToolbarButton
+            icon={faFloppyDisk}
+            buttonProps={buttonProps.SAVE}
+            tooltip="Save"
+          />
+          <ToolbarButton
+            icon={faDownload}
+            buttonProps={buttonProps.DOWNLOAD}
+            tooltip="Download"
+          />
         </div>
       </div>
 
