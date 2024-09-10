@@ -35,6 +35,7 @@ export const ToolbarImage = ({ disabled, buttonsProps }: ToolbarImageProps) => {
         return (
           <ToolbarButton
             icon={buttonDatum.icon}
+            tooltip={buttonDatum.tooltip}
             key={idx}
             buttonProps={buttonProps}
           />

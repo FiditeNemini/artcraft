@@ -5,3 +5,4 @@ export * from "./LoadingSpinner";
 export * from "./PanelBottom";
 export * from "./PanelRight";
 export * from "./Spinner";
+export * from "./Tooltip";

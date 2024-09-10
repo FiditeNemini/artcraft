@@ -6,6 +6,8 @@ import {
 } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 
+import { Tooltip } from "~/components/ui";
+
 export interface ToolbarButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
@@ -13,11 +15,13 @@ export interface ToolbarButtonProps
 
 export const ToolbarButton = ({
   icon,
+  tooltip,
   onClick,
   buttonProps = {},
   iconProps,
 }: {
   icon: IconDefinition;
+  tooltip?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   buttonProps?: ToolbarButtonProps;
   iconProps?: Omit<FontAwesomeIconProps, "icon">;
@@ -35,7 +39,8 @@ export const ToolbarButton = ({
     active && "pointer-events-none text-primary ",
     customButtonClassNames,
   );
-  return (
+
+  const Button = (
     <button
       className={mergedButtonClasses}
       disabled={disabled}
@@ -45,4 +50,8 @@ export const ToolbarButton = ({
       <FontAwesomeIcon icon={icon} {...iconProps} />
     </button>
   );
+  if (tooltip) {
+    return <Tooltip tip={tooltip}>{Button}</Tooltip>;
+  }
+  return Button;
 };
