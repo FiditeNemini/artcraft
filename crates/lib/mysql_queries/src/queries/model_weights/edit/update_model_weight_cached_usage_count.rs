@@ -25,11 +25,14 @@ pub async fn update_model_weight_cached_usage_count<'e, 'c : 'e, E>(
   args: Args<'e, 'c, E>,
 ) -> AnyhowResult<()> where E: 'e + Executor<'c, Database = MySql> {
 
+  // NB: Since this is an automation, don't trigger the updated_at trigger.
+  // Force by writing the updated_at field with the current value.
   let _query_result = sqlx::query!(
         r#"
         UPDATE model_weights
         SET
-            cached_usage_count = ?
+            cached_usage_count = ?,
+            updated_at = updated_at
         WHERE token = ?
         LIMIT 1
         "#,
