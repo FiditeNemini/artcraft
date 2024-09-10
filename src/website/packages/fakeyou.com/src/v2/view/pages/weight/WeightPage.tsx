@@ -46,6 +46,7 @@ import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_ite
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
 import { useCanonicalLink } from "@storyteller/components/src/hooks/UseCanonicalLink";
 import { AITools } from "components/marketing";
+import Stat from "components/common/Stat/Stat";
 
 interface WeightProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -508,6 +509,10 @@ export default function WeightPage({
                   </div>
                   {subtitleDivider}
                   <p>{weightCategory}</p>
+                  {subtitleDivider}
+                  <Stat
+                    count={weight.usage_count}
+                  />
                   {subtitleDivider}
                   <div className="d-flex align-items-center gap-2">
                     <ActionButton {...ratingButtonProps} />
