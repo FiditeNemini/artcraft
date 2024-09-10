@@ -97,7 +97,7 @@ describe("media files", () => {
       media_class: MediaFileClass.Unknown,
       media_links: {
         cdn_url:
-          "https://storage.googleapis.com/dev-vocodes-public/path/to/file.gltf",
+          "https://storage.googleapis.com/dev-vocodes-public/path/to/file",
         maybe_thumbnail_template: null,
         maybe_video_previews: null,
       },
