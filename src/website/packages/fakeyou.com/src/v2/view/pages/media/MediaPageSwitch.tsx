@@ -6,7 +6,7 @@ import {
   EngineCategory,
   MediaFileType,
 } from "@storyteller/components/src/api/_common/enums";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { MediaFile } from "@storyteller/components/src/api/media_files";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
 import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_items/DeleteFeaturedItem";
@@ -69,7 +69,7 @@ export default function MediaPageSwitch() {
   const [engineCategory, engineCategorySet] =
     useState<EngineCategoryOptions>(null);
 
-  const { bucketUrl, mediaFile, prompt, remove, status } = useMedia({
+  const { links, mediaFile, prompt, remove, status } = useMedia({
     mediaToken: urlToken,
     onSuccess: (res: any) => {
       isFeaturedSet(res.is_featured);
@@ -80,6 +80,7 @@ export default function MediaPageSwitch() {
       bookmarks.gather({ res, key: "token" });
     },
   });
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const canEdit = canEditMediaFile(mediaFile?.maybe_creator_user?.user_token);
@@ -181,7 +182,7 @@ export default function MediaPageSwitch() {
   const subViewProps: MediaSubViewProps = {
     animationType,
     animationTypeChange,
-    bucketUrl,
+    bucketUrl: links.mainURL,
     bookmarkButtonProps,
     canAccessStudio,
     canBanUsers,

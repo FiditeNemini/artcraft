@@ -27,7 +27,7 @@ export default function CameraInput({
   const { open } = useModal();
   const camera = useCameraState(true);
   const [token, tokenSet] = useState("");
-  const { bucketUrl } = useMedia({ mediaToken: token });
+  const { links } = useMedia({ mediaToken: token });
   const cameraSupported = MediaRecorder.isTypeSupported("video/mp4");
 
   const cameraClick = () =>
@@ -83,7 +83,7 @@ export default function CameraInput({
             <video
               controls
               {...{
-                src: bucketUrl,
+                src: links.mainURL,
               }}
             />
             <Button

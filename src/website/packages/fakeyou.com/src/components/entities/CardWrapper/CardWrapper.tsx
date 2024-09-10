@@ -4,12 +4,14 @@ import getCardUrl from "components/common/Card/getCardUrl";
 import "./CardWrapper.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
+import { useHover } from "hooks";
+import { MediaFile } from "@storyteller/components/src/api/media_files";
 
 interface Props {
   canHover?: boolean;
   card: React.ElementType;
 
-  data: any;
+  data: MediaFile;
   onClick?: (e: any) => any;
   padding?: boolean;
   preview: React.ElementType;
@@ -29,14 +31,15 @@ export default function CardWrapper({
   featured,
   ...rest
 }: Props) {
+  const [hover, hoverProps] = useHover({});
   const linkUrl = getCardUrl(data, source, type);
-  const cardProps = { data, source, type, ...rest };
+  const cardProps = { data, hover, source, type, ...rest };
   const className = `card ${padding ? "p-3" : ""} ${
     featured ? "card-featured" : ""
   } ${onClick || canHover ? "card-clickable" : ""}`.trim();
 
   return onClick ? (
-    <div {...{ className, onClick: () => onClick(data) }}>
+    <div {...{ className, onClick: () => onClick(data), ...hoverProps }}>
       <Card {...cardProps} />
       {featured && (
         <div className="card-featured-badge">
@@ -46,7 +49,7 @@ export default function CardWrapper({
       )}
     </div>
   ) : (
-    <Link {...{ className, to: linkUrl }}>
+    <Link {...{ className, to: linkUrl, ...hoverProps }}>
       <Card {...cardProps} />
     </Link>
   );

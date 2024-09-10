@@ -1,13 +1,15 @@
 import React, { useEffect, useState, memo } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import {
   faPlay,
   faPause,
   faRepeat,
   faArrowRight,
 } from "@fortawesome/pro-solid-svg-icons";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import Button from "components/common/Button";
 
 enum PlaybackSpeed {
@@ -42,14 +44,13 @@ const MediaAudioPlayer = memo(({ mediaFile }: MediaAudioPlayerProps) => {
   }, []);
 
   useEffect(() => {
-    const audioLink = new BucketConfig().getGcsUrl(
-      mediaFile.public_bucket_path
-    );
+    const { mainURL } = MediaLinks(mediaFile.media_links);
+
     if (waveSurfer) {
-      waveSurfer.load(audioLink);
+      waveSurfer.load(mainURL);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [waveSurfer, mediaFile.public_bucket_path, BucketConfig]);
+  }, [waveSurfer, mediaFile.public_bucket_path]);
 
   useEffect(() => {
     if (waveSurfer) {

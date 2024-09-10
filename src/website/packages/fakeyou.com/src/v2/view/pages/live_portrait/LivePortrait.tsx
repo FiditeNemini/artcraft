@@ -40,10 +40,12 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import SessionLpInferenceResultsList from "./SessionLpInferenceResultsList";
-import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  GetMedia,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import { useLocation } from "react-router-dom";
 import { LivePortraitDetails } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
@@ -543,9 +545,8 @@ export default function LivePortrait({
     setSelectedSourceMedia(media);
   };
 
-  const selectedSourceMediaLink = selectedSourceMedia?.public_bucket_path
-    ? new BucketConfig().getGcsUrl(selectedSourceMedia.public_bucket_path)
-    : null;
+  const selectedSourceMediaLink =
+    MediaLinks(selectedSourceMedia.media_links).mainURL || null;
 
   const handleJobTokens = async (
     maybeResultToken: string,
@@ -569,9 +570,7 @@ export default function LivePortrait({
       response.media_file &&
       response.media_file.public_bucket_path
     ) {
-      const mediaLink = new BucketConfig().getGcsUrl(
-        response.media_file.public_bucket_path
-      );
+      const { mainURL } = MediaLinks(response.media_file.media_links);
 
       const sourceIndex = sourceTokens.indexOf(
         livePortraitDetails.source_media_file_token
@@ -585,7 +584,7 @@ export default function LivePortrait({
         motionIndex,
         sourceToken: livePortraitDetails.source_media_file_token,
         motionToken: livePortraitDetails.face_driver_media_file_token,
-        videoSrc: mediaLink,
+        videoSrc: mainURL,
         jobToken,
         createdAt,
       };
@@ -602,7 +601,7 @@ export default function LivePortrait({
         selectedSourceIndex === newGeneratedVideo.sourceIndex &&
         selectedMotionIndex === newGeneratedVideo.motionIndex
       ) {
-        setGeneratedVideoSrc(mediaLink);
+        setGeneratedVideoSrc(mainURL);
         setIsGenerating(false);
       }
 

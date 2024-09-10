@@ -1,5 +1,5 @@
 import React from "react";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Scene3D from "components/common/Scene3D/Scene3D";
 import { EngineMode } from "components/common/Scene3D/EngineMode";
 
@@ -12,10 +12,10 @@ const SKYBOX = "333348"; // Looks good (lighter)
 //const SKYBOX = "3f3f55"; // too light
 
 export interface EngineMediaPanelArgs {
-  mediaFile: MediaFile,
+  mediaFile: MediaFile;
 }
 
-export function EngineMediaPanel({ mediaFile } : EngineMediaPanelArgs) {
+export function EngineMediaPanel({ mediaFile }: EngineMediaPanelArgs) {
   return (
     <Scene3D
       mode={EngineMode.Viewer}
@@ -23,6 +23,6 @@ export function EngineMediaPanel({ mediaFile } : EngineMediaPanelArgs) {
       fullScreen={false}
       className="fy-studio-frame"
       asset={mediaFile}
-      />
+    />
   );
 }

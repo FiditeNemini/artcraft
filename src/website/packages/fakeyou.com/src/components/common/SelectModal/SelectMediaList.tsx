@@ -4,7 +4,7 @@ import MasonryGrid from "../MasonryGrid/MasonryGrid";
 import { useListContent, useSession } from "hooks";
 import prepFilter from "resources/prepFilter";
 import MediaCards from "../Card/MediaCards";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";

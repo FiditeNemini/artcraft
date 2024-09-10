@@ -1,5 +1,7 @@
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import React from "react";
 
 interface MediaVideoComponentProps {
@@ -9,13 +11,11 @@ interface MediaVideoComponentProps {
 export default function MediaVideoComponent({
   mediaFile,
 }: MediaVideoComponentProps) {
-  let mediaLink = mediaFile
-    ? new BucketConfig().getGcsUrl(mediaFile.public_bucket_path)
-    : "";
+  const { mainURL } = MediaLinks(mediaFile?.media_links);
 
   return mediaFile && mediaFile.public_bucket_path ? (
     <video className="rounded" controls width="100%" height="auto">
-      <source src={mediaLink} />
+      <source src={mainURL} />
       Your browser does not support the video element.
     </video>
   ) : null;

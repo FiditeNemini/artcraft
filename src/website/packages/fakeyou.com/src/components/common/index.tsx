@@ -29,7 +29,6 @@ import JobQueueTicker from "./JobQueueTicker";
 import Label from "./Label";
 import LikeButton from "./LikeButton";
 import LoginBlock from "./LoginBlock";
-import MocapInput from "./MocapInput";
 import MasonryGrid from "./MasonryGrid/MasonryGrid";
 import Modal, { ModalUtilities } from "./Modal";
 import Notification from "./Notification";
@@ -106,7 +105,6 @@ export {
   Label,
   LikeButton,
   LoginBlock,
-  MocapInput,
   MasonryGrid,
   Modal,
   NonRouteTabs,

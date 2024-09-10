@@ -1,45 +1,54 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { Button, TempSelect } from "components/common";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
-import { faPlay, faPause, faRepeat, faArrowRight } from "@fortawesome/pro-solid-svg-icons";
-
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
+import {
+  faPlay,
+  faPause,
+  faRepeat,
+  faArrowRight,
+} from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
-  actions?: any
+  actions?: any;
   mediaFile?: MediaFile;
 }
 
 export default function TempAudioPlayer({ actions = [], mediaFile }: Props) {
   const ref = useRef(null);
-  const [finished,finishedSet] = useState(false);
-  const [initialized,initializedSet] = useState(false);
-  const [playing,playingSet] = useState(false);
-  const [repeat,repeatSet] = useState(false);
-  const [speed,speedSet] = useState(1);
+  const [finished, finishedSet] = useState(false);
+  const [initialized, initializedSet] = useState(false);
+  const [playing, playingSet] = useState(false);
+  const [repeat, repeatSet] = useState(false);
+  const [speed, speedSet] = useState(1);
   const waveSurferRef = useRef<any>({ playing: () => false });
+  const { mainURL } = MediaLinks(mediaFile?.media_links);
 
   const options = [
-    { label: "x.5", value: .5 },
+    { label: "x.5", value: 0.5 },
     { label: "x1", value: 1 },
-    { label: "x1.5", value: 1.5 }
+    { label: "x1.5", value: 1.5 },
   ];
 
-	const baseActions = [
-    { 
-      icon: playing ? faPause : faPlay ,
+  const baseActions = [
+    {
+      icon: playing ? faPause : faPlay,
       onClick: () => {
         playingSet(!waveSurferRef.current.isPlaying());
         waveSurferRef.current.playPause();
       },
-      square: true
-    },
-    { 
-      icon: repeat ? faArrowRight : faRepeat, 
-      onClick: () => { repeatSet(!repeat) },
       square: true,
-      variant: "secondary"
+    },
+    {
+      icon: repeat ? faArrowRight : faRepeat,
+      onClick: () => {
+        repeatSet(!repeat);
+      },
+      square: true,
+      variant: "secondary",
     },
     {
       options,
@@ -47,11 +56,10 @@ export default function TempAudioPlayer({ actions = [], mediaFile }: Props) {
         waveSurferRef.current.setPlaybackRate(target.value);
         speedSet(target.value);
       },
-      value: speed
+      value: speed,
     },
-    ...actions
+    ...actions,
   ];
-
 
   useEffect(() => {
     if (!initialized && ref.current && mediaFile) {
@@ -66,23 +74,37 @@ export default function TempAudioPlayer({ actions = [], mediaFile }: Props) {
         cursorWidth: 2,
         normalize: true,
       });
-      waveSurfer.load(new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path));
-      waveSurfer.on('ready', () => { waveSurferRef.current = waveSurfer });
-      waveSurfer.on('finish', () => { finishedSet(true); });
+      waveSurfer.load(mainURL);
+      waveSurfer.on("ready", () => {
+        waveSurferRef.current = waveSurfer;
+      });
+      waveSurfer.on("finish", () => {
+        finishedSet(true);
+      });
     }
 
     if (finished) {
       finishedSet(false);
-      if (!repeat) { playingSet(false); }
-      else { waveSurferRef.current.playPause(); }
+      if (!repeat) {
+        playingSet(false);
+      } else {
+        waveSurferRef.current.playPause();
+      }
     }
+  }, [finished, initialized, mainURL, mediaFile, repeat]);
 
-  },[finished,initialized,mediaFile,repeat]);
-
-  return <div {...{ className: "fy-audio-player" }}>
+  return (
+    <div {...{ className: "fy-audio-player" }}>
       <div {...{ ref }}></div>
       <div className="d-flex justify-content-center gap-2 mt-3">
-        { baseActions.map((action,key) => action.options ? <TempSelect { ...{ ...action, key } }/> : <Button { ...{ ...action, key } }/>) }
+        {baseActions.map((action, key) =>
+          action.options ? (
+            <TempSelect {...{ ...action, key }} />
+          ) : (
+            <Button {...{ ...action, key }} />
+          )
+        )}
       </div>
-    </div>;
-};
+    </div>
+  );
+}

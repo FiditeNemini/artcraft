@@ -1,7 +1,10 @@
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import React, { useEffect, useState } from "react";
 import SceneCard from "./SceneCard";
 import Marquee from "react-fast-marquee";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 
 interface ScrollingSceneCarouselProps {
   small?: boolean;
@@ -11,15 +14,6 @@ interface ScrollingSceneCarouselProps {
   className?: string;
 }
 
-interface MediaItem {
-  token: string;
-  public_bucket_path: string;
-  maybe_creator?: {
-    username: string;
-  };
-  maybe_title?: string;
-}
-
 export default function ScrollingSceneCarousel({
   small,
   showGradient = true,
@@ -27,8 +21,7 @@ export default function ScrollingSceneCarousel({
   pauseOnHover = false,
   className,
 }: ScrollingSceneCarouselProps) {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
-  const bucketConfig = new BucketConfig();
+  const [mediaItems, setMediaItems] = useState<MediaFile[]>([]);
 
   useEffect(() => {
     fetchMediaItems();
@@ -79,11 +72,11 @@ export default function ScrollingSceneCarousel({
         {firstHalf.map((item, index) => (
           <div key={index}>
             <SceneCard
-              image={bucketConfig.getCdnUrl(
-                item.public_bucket_path + "-thumb.gif",
-                360,
-                20
-              )}
+              image={
+                MediaLinks(item.media_links).videoAnimated
+                  ? MediaLinks(item?.media_links).videoAnimated!(360)
+                  : ""
+              }
               alt={`Scene ${index}`}
               title={item.maybe_title || "Scene"}
               token={item.token}
@@ -105,11 +98,11 @@ export default function ScrollingSceneCarousel({
           {secondHalf.map((item, index) => (
             <div key={index}>
               <SceneCard
-                image={bucketConfig.getCdnUrl(
-                  item.public_bucket_path + "-thumb.gif",
-                  360,
-                  20
-                )}
+                image={
+                  MediaLinks(item.media_links).videoAnimated
+                    ? MediaLinks(item?.media_links).videoAnimated!(360)
+                    : ""
+                }
                 alt={`Scene ${index}`}
                 title={item.maybe_title || "Scene"}
                 token={item.token}

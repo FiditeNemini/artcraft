@@ -1,32 +1,28 @@
 import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
-import { MediaFile as MediaFileOne } from "@storyteller/components/src/api/media_files/GetMedia";
-import { MediaFile as MediaFileTwo } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 
-// Support multiple "Media File" API response payloads.
-type MediaFile = MediaFileOne | MediaFileTwo ;
-
-export function GetMediaFileTitle(mediaFile?: MediaFile) : string {
+export function GetMediaFileTitle(mediaFile?: MediaFile): string {
   if (mediaFile === undefined) {
     return "Untitled file";
   }
 
   let mediaType = undefined;
-  
+
   switch (mediaFile?.media_type) {
     case MediaFileType.Audio:
     case MediaFileType.Video:
     case MediaFileType.Image:
-        mediaType = mediaFile?.media_type.toLocaleLowerCase();
-        break;
+      mediaType = mediaFile?.media_type.toLocaleLowerCase();
+      break;
     case MediaFileType.BVH:
     case MediaFileType.GLTF:
     case MediaFileType.GLB:
     case MediaFileType.FBX:
-        mediaType = mediaFile?.media_type.toUpperCase();
-        break;
+      mediaType = mediaFile?.media_type.toUpperCase();
+      break;
     case MediaFileType.SceneRon:
-        mediaType = "RON";
-        break;
+      mediaType = "RON";
+      break;
   }
 
   let title = "";
@@ -44,7 +40,7 @@ export function GetMediaFileTitle(mediaFile?: MediaFile) : string {
   }
 
   if (title.length < 4) {
-    const maybeSuffix = (!!mediaType) ? ` (${mediaType} file)` : "";
+    const maybeSuffix = !!mediaType ? ` (${mediaType} file)` : "";
     return `${title}${maybeSuffix}`;
   } else {
     return title;

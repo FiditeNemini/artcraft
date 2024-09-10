@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { faPlay, faPause } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
 import "./AudioPlayer.scss";
@@ -20,8 +19,6 @@ export default function AudioPlayer({ src, id }: AudioPlayerProps) {
   const isPlayerOnScreen = useOnScreen(waveformRef); //This stops the audio from playing when the player is not on screen
 
   useEffect(() => {
-    const audioLink = new BucketConfig().getGcsUrl(src);
-
     if (!waveSurferRef.current && waveformRef.current) {
       const wavesurferInstance = WaveSurfer.create({
         container: waveformRef.current,
@@ -36,7 +33,7 @@ export default function AudioPlayer({ src, id }: AudioPlayerProps) {
 
       waveSurferRef.current = wavesurferInstance;
 
-      waveSurferRef.current.load(audioLink);
+      waveSurferRef.current.load(src);
 
       waveSurferRef.current.on("pause", () => {
         setIsPlaying(false);

@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Badge, Button } from "components/common";
 import FaceCropper from "./FaceCropper";
 import ThumbnailItem from "./ThumbnailItem";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import {
   GetMedia,
   MediaFile,
-} from "@storyteller/components/src/api/media_files/GetMedia";
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import {
   faUpload,
   faChevronLeft,
@@ -116,9 +116,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     }, [selectedIndex]);
 
     const selectedMedia = mediaData[mediaTokens[selectedIndex]];
-    const mediaLink = selectedMedia?.public_bucket_path
-      ? new BucketConfig().getGcsUrl(selectedMedia.public_bucket_path)
-      : null;
+    const { mainURL } = MediaLinks(selectedMedia.media_links);
 
     useEffect(() => {
       if (onSelectedMediaChange) {
@@ -188,9 +186,9 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
 
           {cropper && cropArea ? (
             <>
-              {mediaLink ? (
+              {mainURL ? (
                 <FaceCropper
-                  videoSrc={mediaLink}
+                  videoSrc={mainURL}
                   onCropComplete={onCropComplete}
                   showGrid={isCropping ? true : false}
                   zoomWithScroll={isCropping ? true : false}
@@ -213,11 +211,11 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                 <LoadingSpinner />
               ) : (
                 <>
-                  {mediaLink ? (
+                  {mainURL ? (
                     selectedMedia?.media_type === "image" ? (
                       <img
                         key={selectedIndex}
-                        src={mediaLink}
+                        src={mainURL}
                         alt="Selected media"
                       />
                     ) : (
@@ -232,7 +230,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                         preload="auto"
                         draggable="false"
                       >
-                        <source src={mediaLink} type="video/mp4" />
+                        <source src={mainURL} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
                     )
@@ -262,9 +260,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
           <div className="row g-2 order-2 order-lg-3 position-relative">
             {paginatedMediaTokens.map((token, index) => {
               const media = mediaData[token];
-              const mediaLink = media?.public_bucket_path
-                ? new BucketConfig().getGcsUrl(media.public_bucket_path)
-                : null;
+              const { mainURL: itemMainUrl } = MediaLinks(media.media_links);
 
               return (
                 <ThumbnailItem
@@ -272,7 +268,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                   index={index + currentPage * itemsPerPage}
                   selectedIndex={selectedIndex}
                   handleThumbnailClick={handleThumbnailClick}
-                  poster={mediaLink || ""}
+                  poster={itemMainUrl || ""}
                   mediaType={media?.media_type}
                 />
               );

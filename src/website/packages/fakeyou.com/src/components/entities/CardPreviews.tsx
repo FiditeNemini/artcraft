@@ -1,31 +1,59 @@
 import React from "react";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // for now
 import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 
-export const ImagePreview = ({ data }: { data: any }) => {
-  const bucketConfig = new BucketConfig();
-  const coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 600, 100);
+export const ImagePreview = ({ data }: { data: MediaFile }) => {
+  const { mainURL, imageThumb } = MediaLinks(data.media_links);
 
-  return <img {...{ alt: data.weight_name, className: "card-img", src: coverImage }} />;
+  return (
+    <img
+      {...{
+        alt: "",
+        className: "card-img",
+        src: imageThumb ? imageThumb(600) : mainURL || "",
+      }}
+    />
+  );
 };
 
-export const VideoPreview = ({ data }: { data: any }) => {
+export const VideoPreview = ({
+  data,
+  hover,
+}: {
+  data: MediaFile;
+  hover: boolean;
+}) => {
+  const { videoAnimated, videoStill } = MediaLinks(data.media_links);
+  const { default_cover } = data?.cover_image || {};
 
-  const { default_cover, maybe_cover_image_public_bucket_path } = data?.cover_image || {};
-
-  const bucketConfig = new BucketConfig();
   //video doesnt have random cover image endpoint or thumbnails yet
-  let coverImage = `/images/default-covers/${ default_cover?.image_index || 0  }.webp`;
+  const coverImage = `/images/default-covers/${
+    default_cover?.image_index || 0
+  }.webp`;
 
-  if (maybe_cover_image_public_bucket_path) {
-    coverImage = bucketConfig.getCdnUrl(maybe_cover_image_public_bucket_path, 600, 100);
-  }
-
-  return <img {...{ alt: data.weight_name, className: "card-video", src: coverImage }} />;
+  return (
+    <img
+      {...{
+        alt: "",
+        className: "card-video",
+        src:
+          hover && videoAnimated
+            ? videoAnimated(360)
+            : videoStill
+              ? videoStill(600)
+              : coverImage,
+      }}
+    />
+  );
 };
 
-export const MocapPreview = () => <Icon {...{ className: "card-img", icon: faPersonWalking }}/>;
+export const MocapPreview = () => (
+  <Icon {...{ className: "card-img", icon: faPersonWalking }} />
+);
 
 // export const ImagePreview = previwImg("card-img");
 // export const VideoPreview = previwImg("card-video");

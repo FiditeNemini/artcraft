@@ -32,9 +32,12 @@ import { useInferenceJobs, useLocalize, useSession } from "hooks";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import LoadingSpinner from "components/common/LoadingSpinner";
-import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  GetMedia,
+  // MediaFile, please use this type where applicabale
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import { useLocation } from "react-router-dom";
 import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
 import { useHistory } from "react-router-dom";
@@ -238,7 +241,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   };
 
   const selectedSourceMediaLink = selectedSourceMedia?.public_bucket_path
-    ? new BucketConfig().getGcsUrl(selectedSourceMedia.public_bucket_path)
+    ? MediaLinks(selectedSourceMedia.media_links).mainURL
     : null;
 
   const handleJobProgress = (progressPercentage: number | null) => {
@@ -266,12 +269,10 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
       response.media_file &&
       response.media_file.public_bucket_path
     ) {
-      const mediaLink = new BucketConfig().getGcsUrl(
-        response.media_file.public_bucket_path
-      );
+      const { mainURL } = MediaLinks(response.media_file.media_links);
 
       if (jobToken === lastEnqueuedJobToken) {
-        setGeneratedVideoSrc(mediaLink);
+        setGeneratedVideoSrc(mainURL);
         setIsGenerating(false);
         setJobPercentage(null);
 
