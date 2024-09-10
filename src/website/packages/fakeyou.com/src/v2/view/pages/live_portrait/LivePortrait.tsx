@@ -546,7 +546,7 @@ export default function LivePortrait({
   };
 
   const selectedSourceMediaLink =
-    MediaLinks(selectedSourceMedia.media_links).mainURL || null;
+    MediaLinks(selectedSourceMedia?.media_links).mainURL || null;
 
   const handleJobTokens = async (
     maybeResultToken: string,

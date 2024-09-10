@@ -116,7 +116,8 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     }, [selectedIndex]);
 
     const selectedMedia = mediaData[mediaTokens[selectedIndex]];
-    const { mainURL } = MediaLinks(selectedMedia.media_links);
+
+    const { mainURL } = MediaLinks(selectedMedia?.media_links);
 
     useEffect(() => {
       if (onSelectedMediaChange) {
@@ -260,7 +261,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
           <div className="row g-2 order-2 order-lg-3 position-relative">
             {paginatedMediaTokens.map((token, index) => {
               const media = mediaData[token];
-              const { mainURL: itemMainUrl } = MediaLinks(media.media_links);
+              const { mainURL: itemMainUrl } = MediaLinks(media?.media_links);
 
               return (
                 <ThumbnailItem
