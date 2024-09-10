@@ -1,8 +1,8 @@
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
-use actix_web::{App, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
+use actix_web::{web, App, HttpResponse};
 
 use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
@@ -14,6 +14,7 @@ use crate::http_server::endpoints::api_tokens::create_api_token::create_api_toke
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
 use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
+use crate::http_server::endpoints::app_state::get_app_state_handler::get_app_state_handler;
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
 use crate::http_server::endpoints::categories::tts::assign_tts_category::assign_tts_category_handler;
@@ -193,6 +194,11 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/user_bookmarks/list/entity/{entity_type}/{entity_token}", list_user_bookmarks_for_entity_handler)
       .into_app();
 
+  // ==================== Application State ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/app_state", get_app_state_handler)
+      .into_app();
 
   // ==================== Animations ====================
 

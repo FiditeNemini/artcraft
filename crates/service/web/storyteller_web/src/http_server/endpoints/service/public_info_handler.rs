@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use crate::http_server::endpoints::app_state::components::get_server_info::get_server_info;
+use crate::state::server_state::ServerState;
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
+use actix_web::{web, HttpRequest, HttpResponse, ResponseError};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-
-use crate::state::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct PublicInfoResponse {
@@ -42,10 +42,10 @@ pub async fn get_public_info_handler(
   _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<Json<PublicInfoResponse>, PublicInfoError> {
-
+  let server_info = get_server_info(&server_state);
   Ok(Json(PublicInfoResponse {
     success: true,
-    server_build_sha: server_state.server_info.build_sha.clone(),
-    server_hostname: server_state.hostname.clone(),
+    server_build_sha: server_info.build_sha,
+    server_hostname: server_info.hostname,
   }))
 }

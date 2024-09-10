@@ -1,16 +1,14 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use log::{log, warn};
+use actix_web::web::Json;
+use actix_web::{web, HttpRequest, HttpResponse};
 
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
-use http_server_common::request::parse_accept_language::parse_accept_language;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-
+use crate::http_server::endpoints::app_state::components::get_user_locale::get_user_locale;
 use crate::state::server_state::ServerState;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
 // =============== Success Response ===============
 
@@ -51,41 +49,15 @@ impl fmt::Display for DetectLocaleError {
 
 // =============== Handler ===============
 
-pub const FORCE_LOCALE_COOKIE_HEADER_NAME : &str = "force-locale";
-
 pub async fn detect_locale_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, DetectLocaleError> {
+) -> Result<Json<DetectLocaleResponse>, DetectLocaleError> {
+  let locale = get_user_locale(&http_request);
 
-  let mut maybe_accept_language =
-      get_request_header_optional(&http_request, "accept-language");
-
-  if let Some(cookie) = http_request.cookie(FORCE_LOCALE_COOKIE_HEADER_NAME) {
-    warn!("Overriding default accept language with custom value (from cookie)");
-    maybe_accept_language = Some(cookie.value().to_string());
-
-  } else if let Some(header) = get_request_header_optional(&http_request, FORCE_LOCALE_COOKIE_HEADER_NAME) {
-    warn!("Overriding default accept language with custom value (from header)");
-    maybe_accept_language = Some(header);
-  }
-
-  let accept_language = maybe_accept_language.unwrap_or("en".to_string());
-
-  let mut response = DetectLocaleResponse::default();
-  response.success = true;
-
-  let language_tags = parse_accept_language(&accept_language);
-
-  for language_tag in language_tags.iter() {
-    response.full_language_tags.push(language_tag.to_string());
-    response.language_codes.push(language_tag.primary_language().to_string());
-  }
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| DetectLocaleError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  Ok(Json(DetectLocaleResponse {
+    success: true,
+    full_language_tags: locale.full_language_tags,
+    language_codes: locale.language_codes,
+  }))
 }

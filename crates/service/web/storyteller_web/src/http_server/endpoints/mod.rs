@@ -1,6 +1,7 @@
 pub mod analytics;
 pub mod animation;
 pub mod api_tokens;
+pub mod app_state;
 pub mod beta_keys;
 pub mod categories;
 pub mod comments;

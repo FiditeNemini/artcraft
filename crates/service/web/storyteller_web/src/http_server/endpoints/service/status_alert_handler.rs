@@ -1,14 +1,14 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
+use actix_web::{web, HttpRequest, HttpResponse, ResponseError};
 use utoipa::ToSchema;
 
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-
+use crate::http_server::endpoints::app_state::components::get_status_alert::{get_status_alert, AppStateStatusAlertCategory};
 use crate::state::server_state::ServerState;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
 /// How often the client should poll
 const REFRESH_INTERVAL: Duration = Duration::from_secs(60);
@@ -24,7 +24,7 @@ pub struct StatusAlertResponse {
 
   /// Tell the frontend client how fast to refresh their view of this list.
   /// During an attack, we may want this to go extremely slow.
-  pub refresh_interval_millis: u64,
+  pub refresh_interval_millis: u128,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -94,18 +94,19 @@ pub async fn status_alert_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<Json<StatusAlertResponse>, StatusAlertError> {
 
-  let maybe_category = server_state
-      .flags
-      .maybe_status_alert_category
-      .as_deref()
-      .map(|category| category_to_enum(&category))
-      .flatten();
+  let maybe_alert = get_status_alert(&server_state);
 
-  let maybe_message = server_state
-      .flags
-      .maybe_status_alert_custom_message
-      .as_deref()
-      .map(|message| message.trim().to_string());
+  let maybe_category = maybe_alert
+      .as_ref()
+      .map(|alert| alert.maybe_category)
+      .flatten()
+      .map(|category| match category {
+        AppStateStatusAlertCategory::DownForMaintenance => StatusAlertCategory::DownForMaintenance,
+      });
+
+  let maybe_message = maybe_alert
+      .map(|alert| alert.maybe_message)
+      .flatten();
 
   let maybe_alert = match (maybe_category, maybe_message) {
     (None, None) => None,
@@ -118,14 +119,6 @@ pub async fn status_alert_handler(
   Ok(Json(StatusAlertResponse {
     success: true,
     maybe_alert,
-    refresh_interval_millis: REFRESH_INTERVAL.as_millis() as u64,
+    refresh_interval_millis: REFRESH_INTERVAL.as_millis(),
   }))
-}
-
-fn category_to_enum(category: &str) -> Option<StatusAlertCategory> {
-  let key = category.trim();
-  match key {
-    "down_for_maintenance" => Some(StatusAlertCategory::DownForMaintenance),
-    _ => None,
-  }
 }
