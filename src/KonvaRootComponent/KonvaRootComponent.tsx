@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
@@ -6,6 +6,7 @@ import { ContextualToolbarImage } from "./ContextualToolbarImage";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
 import { ErrorDialog } from "~/components/features";
+import { EngineType } from "~/KonvaApp";
 
 // The KonvaApp is the root of the Konva stage
 // and only entry point for anything in Konva JS
@@ -16,11 +17,14 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
   // Let's make sure we only log once
   useRenderCounter("KonvaRootComponent");
 
+  const engineRef = useRef<EngineType | null>(null);
+
   const konvaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
-    if (node !== null) {
-      KonvaApp(node);
+    if (node !== null && engineRef.current === null) {
+      engineRef.current = KonvaApp(node);
     }
   }, []);
+
   return (
     <>
       <KonvaCanvasContainer
@@ -28,6 +32,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
         className={className}
         // retreive the classNames from the parent for sizing/styling
       />
+
       <SignaledToolbarMain />
       <ContextualToolbarImage />
       <ContextualLoadingBar />

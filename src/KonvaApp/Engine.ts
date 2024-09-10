@@ -95,7 +95,9 @@ export class Engine {
     uiAccess.loadingBar.hide();
     this.setupStage();
   }
-
+  public isInitialized() {
+    return this.stage !== null;
+  }
   public async setupStage() {
     var textNode = new Konva.Text({
       x: 0,
