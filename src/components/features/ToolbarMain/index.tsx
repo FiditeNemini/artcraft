@@ -102,6 +102,7 @@ export const ToolbarMain = ({
               onClick={() => {
                 setState({ ...state, isUploadSubmenuOpen: true });
               }}
+              tooltip={state.isUploadSubmenuOpen ? undefined : "Add..."}
             />
             {state.isUploadSubmenuOpen && (
               <div
