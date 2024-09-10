@@ -1,4 +1,4 @@
-import { signal, effect } from "@preact/signals-react";
+import { signal } from "@preact/signals-react";
 const buttonTestSignal = signal<{ disabled: boolean; active: boolean }>({
   disabled: false,
   active: false,
@@ -27,7 +27,3 @@ export const buttonTest = {
     };
   },
 };
-
-effect(() => {
-  console.log("buttonTestSignal", buttonTestSignal.value);
-});

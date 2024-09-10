@@ -14,6 +14,9 @@ export class Engine {
 
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
+    if (import.meta.env.DEV) {
+      console.log("Engine Constructor ran");
+    }
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
       container: this.canvasReference,
