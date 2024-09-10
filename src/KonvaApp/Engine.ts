@@ -3,6 +3,8 @@ import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
 import { RenderEngine } from "./RenderEngine";
+
+import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export class Engine {
@@ -14,9 +16,13 @@ export class Engine {
 
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
+
+    console.log("Engine Created!");
+
     if (import.meta.env.DEV) {
       console.log("Engine Constructor ran");
     }
+
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
       container: this.canvasReference,
@@ -46,6 +52,12 @@ export class Engine {
     uiEvents.onGetStagedVideo((video) => {
       this.addVideo(video);
     });
+
+    uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
+      // disable the buttons to debounce
+      await this.renderEngine.startProcessing();
+    });
+
     // TODO: You may listen to all the image toolbar events here
     uiEvents.imageToolbar.MOVE.onClick(() => {
       console.log("move");
@@ -124,14 +136,24 @@ export class Engine {
       "",
       this.offScreenCanvas,
       this.videoLayer,
-      1550,
-      450,
+      1560,
+      400,
+      "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+    );
+
+    const videoNode2 = new VideoNode(
+      "",
+      this.offScreenCanvas,
+      this.videoLayer,
+      1560,
+      1000,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     );
 
     // CODE TO TEST RENDER ENGINE
     // Testing render engine
     this.renderEngine.addNodes(videoNode);
+    this.renderEngine.addNodes(videoNode2);
 
     // await this.renderEngine.startProcessing();
 

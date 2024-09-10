@@ -70,7 +70,7 @@ export class VideoNode extends NetworkedNodeContext {
 
     // use web codecs to get the frame rate 89% support
     // assume 60fps for now.
-    this.fps = 60; // need to query this from the media
+    this.fps = 24; // need to query this from the media
 
     this.duration = -1;
 
@@ -255,7 +255,7 @@ export class VideoNode extends NetworkedNodeContext {
       loadingBar.hide();
       this.didFinishLoading = true;
       // Might have to auto click? on first load this doesn't work in general how about after ?
-      this.play(); //sometimes race condition with the
+      //this.play(); //sometimes race condition with the
     };
   }
 

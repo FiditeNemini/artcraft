@@ -100,46 +100,54 @@ export class RenderEngine {
     this.videoNodes.push(node);
   }
 
+  // Do a bunch of precondition checks and error out early on.
   public async startProcessing() {
     // Start processing and lock everything
     this.isProcessing = true;
+    try {
+      // or not loaded
 
-    // or not loaded
+      // error out if nodes are not all loaded.
 
-    // error out if nodes are not all loaded.
+      // ensure items cannot be manipulated
 
-    // ensure items cannot be manipulated
+      // todo remove when we have error handling + and ui
+      var failed = false;
+      for (let i = 0; i < this.videoNodes.length; i++) {
+        const item = this.videoNodes[i];
 
-    // todo remove when we have error handling + and ui
-    var failed = false;
-    for (let i = 0; i < this.videoNodes.length; i++) {
-      const item = this.videoNodes[i];
+        if (item.didFinishLoading == false) {
+          // error out and show error message
+          //this.startProcessing();
+          failed = true;
+          setTimeout(this.startProcessing.bind(this), 1000);
+          break;
+        }
 
-      if (item.didFinishLoading == false) {
-        // error out and show error message
-        //this.startProcessing();
-        failed = true;
-        setTimeout(this.startProcessing.bind(this), 1000);
-        break;
+        item.setProcessing();
       }
 
-      item.setProcessing();
+      // todo remove
+      if (failed) {
+        // throw error
+        return;
+      }
+
+      this.videoNodes.forEach((item: VideoNode) => {});
+
+      // find the longest video node
+      const numberOfFrames = this.findLongestVideoLength();
+      console.log(`Number Of Frames: ${numberOfFrames}`);
+
+      await this.render(numberOfFrames);
+
+      // only to test video node
+      //await this.processFrame();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.isProcessing = false;
     }
-
-    // todo remove
-    if (failed) {
-      return;
-    }
-
-    this.videoNodes.forEach((item: VideoNode) => {});
-
-    // find the longest video node
-    const numberOfFrames = this.findLongestVideoLength();
-
-    await this.render(numberOfFrames);
-
-    // only to test video node
-    //await this.processFrame();
   }
 
   public stopProcessing() {
@@ -169,46 +177,51 @@ export class RenderEngine {
       videoNode.stop();
     }
 
+    // only pick nodes that intersect with the canvas on screen bounds
+
     for (let j = 0; j < largestNumberOfFrames; j++) {
+      // Seek Video Nodes first then draw
+
+      let frameTime = undefined;
+
       for (let i = 0; i < this.videoNodes.length; i++) {
         const currentVideoNode = this.videoNodes[i];
-        const frameTime = this.calculateFrameTime(j, currentVideoNode.fps);
-
+        frameTime = this.calculateFrameTime(j, currentVideoNode.fps);
+        frameTime = parseFloat(frameTime.toFixed(2));
         if (frameTime < currentVideoNode.duration) {
           console.log(`CurrentFrame:${j}`);
-          console.log(`frameTime:${frameTime}`);
-          console.log(`duration:${currentVideoNode.duration}`);
-
+          console.log(`FrameTime:${frameTime}`);
+          console.log(`Duration:${currentVideoNode.duration}`);
           await currentVideoNode.seek(frameTime);
-          this.videoLayer.draw();
+        } // end of if context
+      } // End frame time
+      this.videoLayer.draw();
 
-          // SCOPES the capture for the context
-          // Correct size for the mobile canvas.
-          this.offScreenCanvas.width = this.width;
-          this.offScreenCanvas.height = this.height;
+      // SCOPES the capture for the context
+      // Correct size for the mobile canvas.
+      this.offScreenCanvas.width = this.width;
+      this.offScreenCanvas.height = this.height;
 
-          if (this.context) {
-            // This crops it starting at position X / Y where the mobile canvas is
-            // Then picks the height and width range
-            // then we draw it at 0,0,width and height of the canvas
-            this.context.drawImage(
-              this.videoLayer.canvas._canvas,
-              this.positionX,
-              this.positionY,
-              this.width,
-              this.height,
-              0,
-              0,
-              this.width,
-              this.height,
-            );
-            const blob = await this.offScreenCanvas.convertToBlob({
-              quality: 1.0,
-              type: "image/jpeg",
-            });
-            this.blobToFile(blob);
-          } // end of if context
-        } // End frame time
+      if (this.context) {
+        // This crops it starting at position X / Y where the mobile canvas is
+        // Then picks the height and width range
+        // then we draw it at 0,0,width and height of the canvas
+        this.context.drawImage(
+          this.videoLayer.canvas._canvas,
+          this.positionX,
+          this.positionY,
+          this.width,
+          this.height,
+          0,
+          0,
+          this.width,
+          this.height,
+        );
+        const blob = await this.offScreenCanvas.convertToBlob({
+          quality: 1.0,
+          type: "image/jpeg",
+        });
+        await this.blobToFile(blob, `${j}`);
       } // end of for each frame
     }
   }
@@ -254,11 +267,12 @@ export class RenderEngine {
     console.log(this.frames);
   }
 
-  private blobToFile(blob: Blob) {
+  private blobToFile(blob: Blob, index: string) {
     try {
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "canvas-output.jpg";
+      const formattedIndex = String(index).padStart(4, "0");
+      link.download = `${formattedIndex}.jpg`;
       // Trigger the download
       link.click();
       // Clean up the URL object
