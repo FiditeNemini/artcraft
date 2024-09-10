@@ -85,8 +85,18 @@ impl std::fmt::Display for AppStateError {
 
 // =============== Handler ===============
 
-
-/// This endpoint loads a lot of the application state for the user and avoids lots of queries to various endpoints.
+/// Load core application and  user state.
+///
+/// This endpoint loads a lot of the application state for the user and avoids lots
+/// of parallel queries to various endpoints. This should help improve Google Lighthouse
+/// and Core Web Vitals scores.
+///
+/// This single endpoint can replace the following endpoints:
+///  - `GET /detect_locale`
+///  - `GET /server_info`
+///  - `GET /v1/status_alert_check`
+///
+/// This endpoint will probably grow new functionality in the future as well.
 #[utoipa::path(
   get,
   tag = "App State",
