@@ -1,23 +1,24 @@
 import React from "react";
-import { MediaURLs } from "hooks";
-// import { MediaFileClass } from "../enums/MediaFileClass";
 import { MediaFileClass } from "@storyteller/components/src/api";
 
 import { a, TransitionFn, useTransition } from "@react-spring/web";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  MediaFile,
+  MediaLinkUtility,
+} from "@storyteller/components/src/api/media_files";
 
 interface JobResultPreviewProps {
   hover: boolean;
+  links: MediaLinkUtility;
   mediaFile: MediaFile;
   show?: boolean;
-  urls: MediaURLs;
 }
 
 export default function JobResultPreview({
   hover,
+  links,
   mediaFile,
   show,
-  urls,
 }: JobResultPreviewProps) {
   const transitions: TransitionFn<boolean, { opacity: number }> = useTransition(
     hover,
@@ -39,7 +40,7 @@ export default function JobResultPreview({
             <a.img
               {...{
                 className: "fy-inference-job-preview-static",
-                src: urls.thumb(),
+                src: links.videoStill ? links.videoStill(100) : "",
               }}
             />
             {transitions((style, isHovering) =>
@@ -47,7 +48,7 @@ export default function JobResultPreview({
                 <a.img
                   {...{
                     className: "fy-inference-job-preview-gif",
-                    src: urls.gif(),
+                    src: links.videoAnimated ? links.videoAnimated(100) : "",
                     style,
                   }}
                 />

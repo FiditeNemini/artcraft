@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import { Button, Panel } from "components/common";
 import { STYLES_BY_KEY } from "common/StyleOptions";
 import { faCopy } from "@fortawesome/pro-solid-svg-icons";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface PromptViewerProps {
   isModerator: boolean;
@@ -20,6 +22,8 @@ export default function PromptViewer({
 }: PromptViewerProps) {
   const [copyPositiveButtonText, setCopyPositiveButtonText] = useState("Copy");
   const [copyNegativeButtonText, setCopyNegativeButtonText] = useState("Copy");
+
+  const { mainURL } = MediaLinks(mediaFile?.media_links);
 
   const copyToClipboard = async (
     text: string,
@@ -45,14 +49,7 @@ export default function PromptViewer({
               </div>
               <div className="panel-inner p-2 rounded">
                 <p className="fs-7">
-                  <a
-                    href={new BucketConfig().getGcsUrl(
-                      mediaFile?.public_bucket_path.replace(
-                        ".mp4",
-                        ".no_watermark.mp4"
-                      )
-                    )}
-                  >
+                  <a href={mainURL.replace(".mp4", ".no_watermark.mp4")}>
                     Download Without Watermark
                   </a>{" "}
                   (Staff Only)

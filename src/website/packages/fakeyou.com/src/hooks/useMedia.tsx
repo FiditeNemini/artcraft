@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import {
   GetMedia,
   MediaFile,
-} from "@storyteller/components/src/api/media_files/GetMedia";
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import {
   GetPrompts,
   Prompt,
 } from "@storyteller/components/src/api/prompts/GetPrompts";
 import { DeleteMedia } from "@storyteller/components/src/api/media_files/DeleteMedia";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 type ThumbFn = (width?: number, quality?: number) => string;
 
@@ -50,19 +50,7 @@ export default function useMedia({
     status === FetchStatus.in_progress ||
     writeStatus === FetchStatus.in_progress;
 
-  const bucketConfig = new BucketConfig();
-
-  const publicBucketPath = media?.public_bucket_path || "";
-
-  const bucketUrl = bucketConfig.getGcsUrl(publicBucketPath);
-
-  const urls = {
-    file: bucketConfig.getGcsUrl(publicBucketPath),
-    gif: (width = 360, quality = 20) =>
-      bucketConfig.getCdnUrl(publicBucketPath + "-thumb.gif", width, quality),
-    thumb: (width = 600, quality = 100) =>
-      bucketConfig.getCdnUrl(publicBucketPath + "-thumb.jpg", width, quality),
-  };
+  const links = MediaLinks(media?.media_links);
 
   useEffect(() => {
     // this condidition handles all media file fetches
@@ -103,7 +91,8 @@ export default function useMedia({
 
   return {
     busy,
-    bucketUrl,
+    // bucketUrl,
+    links,
     media,
     mediaFile: media,
     mediaSet,
@@ -112,7 +101,7 @@ export default function useMedia({
     reload,
     status,
     statusSet,
-    urls,
+    // urls,
     writeStatus,
   };
 }

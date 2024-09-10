@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MediaAudioPlayer from "./MediaAudioPlayer";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
@@ -58,6 +61,7 @@ export default function MediaPage({
   animationType,
   animationTypeChange,
   bookmarkButtonProps,
+  bucketUrl,
   canAccessStudio,
   canBanUsers,
   canEdit,
@@ -89,7 +93,7 @@ export default function MediaPage({
         .then(response => {
           if (response.success) {
             const mediaItems = response.results.map(result => ({
-              url: bucketConfig.getGcsUrl(result.public_bucket_path),
+              url: MediaLinks(result.media_links).mainURL,
               token: result.token,
             }));
             setImages(mediaItems);
@@ -184,7 +188,7 @@ export default function MediaPage({
         if (mediaFile.public_bucket_path) {
           sdMediaImage = [
             {
-              url: bucketConfig.getGcsUrl(mediaFile.public_bucket_path),
+              url: bucketUrl,
               token: mediaFile?.token,
             },
           ];
@@ -266,8 +270,7 @@ export default function MediaPage({
     ? mediaTypeLabels[mediaFile?.media_type]
     : "";
 
-  let downloadLink =
-    activeSlide.url || bucketConfig.getGcsUrl(mediaFile?.public_bucket_path);
+  let downloadLink = activeSlide.url || bucketUrl;
 
   const sharePath = `/media/${activeSlide.token || mediaFile?.token || ""}`;
 

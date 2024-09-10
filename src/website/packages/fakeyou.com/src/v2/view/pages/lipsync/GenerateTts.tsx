@@ -31,7 +31,11 @@ import {
 import { useDebounce, useInferenceJobs, useLocalize, useModal } from "hooks";
 import LipsyncAudioPlayer from "./LipsyncAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  GetMedia,
+  GetMediaResponse,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { useHistory } from "react-router-dom";
@@ -185,18 +189,20 @@ export const GenerateTts = ({
     if (maybeResultToken) {
       const fetchMedia = async () => {
         try {
-          const response = await GetMedia(maybeResultToken, {});
+          const response: GetMediaResponse = await GetMedia(
+            maybeResultToken,
+            {}
+          );
           if (
             response &&
             response.media_file &&
             response.media_file.public_bucket_path &&
             response.media_file.maybe_text_transcript
           ) {
-            const audioLink = new BucketConfig().getGcsUrl(
-              response.media_file.public_bucket_path
-            );
-            if (audioLink && currentAudioUrl === null) {
-              setCurrentAudioUrl(audioLink);
+            const { mainURL } = MediaLinks(response.media_file.media_links);
+
+            if (mainURL && currentAudioUrl === null) {
+              setCurrentAudioUrl(mainURL);
               setTranscript(response.media_file.maybe_text_transcript || "");
               if (onResultToken) {
                 onResultToken(response.media_file.token);

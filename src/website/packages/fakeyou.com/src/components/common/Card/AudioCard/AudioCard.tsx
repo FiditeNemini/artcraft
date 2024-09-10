@@ -7,11 +7,13 @@ import { CardFooter } from "components/entities";
 import Badge from "components/common/Badge";
 import { faThumbsUp, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
-import WeightCoverImage from "components/common/WeightCoverImage";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import getCardUrl from "../getCardUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Stat from "components/common/Stat/Stat";
+import {
+  // MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 // import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
@@ -41,6 +43,7 @@ export default function AudioCard({
   onResultSelect,
   onResultBookmarkSelect,
 }: AudioCardProps) {
+  const { mainURL } = MediaLinks(data.media_links);
   const linkUrl = getCardUrl(data, source, type);
 
   const handleSelectModalResultSelect = () => {
@@ -61,28 +64,6 @@ export default function AudioCard({
     useWeightTypeInfo(
       data.weight_type || data.details?.maybe_weight_data?.weight_type
     );
-
-  const bucketConfig = new BucketConfig();
-  let coverImage = undefined;
-
-  if (type === "media") {
-    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
-  } else if (type === "weights") {
-    if (data?.cover_image?.maybe_cover_image_public_bucket_path) {
-      coverImage = bucketConfig.getCdnUrl(
-        data.cover_image.maybe_cover_image_public_bucket_path,
-        110,
-        100
-      );
-    }
-    if (data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path) {
-      coverImage = bucketConfig.getCdnUrl(
-        data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
-        110,
-        100
-      );
-    }
-  }
 
   const card = (
     <Card
@@ -113,13 +94,7 @@ export default function AudioCard({
               </p>
             )}
           </div>
-          <AudioPlayer
-            src={
-              data.details?.maybe_media_file_data?.public_bucket_path ||
-              data.public_bucket_path
-            }
-            id={data.token}
-          />
+          <AudioPlayer src={mainURL} id={data.token} />
           <CardFooter
             {...{
               creator:
@@ -138,15 +113,6 @@ export default function AudioCard({
       {type === "weights" && (
         <>
           <div className="d-flex">
-            {showCover && (
-              <WeightCoverImage
-                src={coverImage}
-                height={100}
-                width={100}
-                coverIndex={data?.cover_image?.default_cover?.image_index}
-              />
-            )}
-
             <div className="flex-grow-1">
               <div className="d-flex align-items-center">
                 <div className="flex-grow-1">

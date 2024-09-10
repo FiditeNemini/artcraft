@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
 import {
@@ -7,10 +7,14 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import Badge from "components/common/Badge";
 import Button from "components/common/Button";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { useHover } from "hooks";
 import { Link } from "react-router-dom";
 import getCardUrl from "../getCardUrl";
 import { STYLES_BY_KEY } from "common/StyleOptions";
+import {
+  // MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 
 interface VideoCardProps {
   bookmarks?: any;
@@ -24,16 +28,15 @@ interface VideoCardProps {
 }
 
 export default function VideoCard({
-  bookmarks,
   data,
-  ratings,
-  showCreator,
   source = "",
   type,
   inSelectModal = false,
   onResultSelect,
 }: VideoCardProps) {
   const linkUrl = getCardUrl(data, source, type);
+  const { videoAnimated, videoStill } = MediaLinks(data.media_links);
+  const [hover, hoverProps] = useHover({});
 
   const handleSelectModalResultSelect = () => {
     if (inSelectModal && onResultSelect) {
@@ -42,16 +45,7 @@ export default function VideoCard({
   };
 
   const timeAgo = useTimeAgo(data.created_at);
-  const [isHovered, setIsHovered] = useState(false);
-  const [imageSrc, setImageSrc] = useState("");
-  const [gifExists, setGifExists] = useState(false);
-  const [staticImageExists, setStaticImageExists] = useState(false);
 
-  const publicBucketPath = data.details
-    ? data.details.maybe_media_file_data.public_bucket_path
-    : data.public_bucket_path;
-
-  const bucketConfig = new BucketConfig();
   //video doesnt have random cover image endpoint or thumbnails yet
   const defaultImageUrl = `/images/default-covers/${
     data?.cover_image?.default_cover.image_index || 0
@@ -59,91 +53,8 @@ export default function VideoCard({
 
   // We are checking the existence of the bucket gif files because it seems as though we can't check the cdn file's existence without running into cors issues
   // CDN URLS
-  const staticImageUrl = publicBucketPath
-    ? bucketConfig.getCdnUrl(publicBucketPath + "-thumb.jpg", 600, 100)
-    : defaultImageUrl;
-  const gifUrl = publicBucketPath
-    ? bucketConfig.getCdnUrl(publicBucketPath + "-thumb.gif", 360, 20)
-    : null;
-
-  // BUCKET URLS
-  const bucketGifUrl = publicBucketPath
-    ? bucketConfig.getGcsUrl(publicBucketPath + "-thumb.gif")
-    : null;
-  const bucketImageUrl = publicBucketPath
-    ? bucketConfig.getGcsUrl(publicBucketPath + "-thumb.jpg")
-    : null;
-
-  // const bucketUrl = publicBucketPath
-  //   ? new BucketConfig().getGcsUrl(publicBucketPath)
-  //   : "";
-
-  const checkGifExists = async (url: string) => {
-    try {
-      const response = await fetch(url, { method: "HEAD" });
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const checkImageExists = async (url: string) => {
-    try {
-      const response = await fetch(url, { method: "HEAD" });
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  // Preload images and check if the GIF exists when the component mounts
-  useEffect(() => {
-    // Check if the static image exists
-    if (bucketImageUrl === null) return;
-    checkImageExists(bucketImageUrl).then(staticExists => {
-      setStaticImageExists(staticExists);
-      if (staticExists) {
-        setImageSrc(bucketImageUrl);
-      } else {
-        setImageSrc(defaultImageUrl);
-      }
-    });
-
-    // Check and preload the GIF if it exists
-    if (bucketGifUrl === null) return;
-    checkGifExists(bucketGifUrl).then(gifExists => {
-      setGifExists(gifExists);
-      if (gifExists) {
-        const imgGif = new Image();
-        imgGif.src = bucketGifUrl;
-      }
-    });
-  }, [bucketGifUrl, staticImageUrl, defaultImageUrl, bucketImageUrl, data]);
-
-  useEffect(() => {
-    if (isHovered && gifExists && bucketGifUrl && staticImageExists) {
-      setImageSrc(gifUrl!);
-    } else if (staticImageExists) {
-      setImageSrc(bucketImageUrl!);
-    } else {
-      setImageSrc(defaultImageUrl);
-    }
-  }, [
-    isHovered,
-    gifExists,
-    gifUrl,
-    bucketGifUrl,
-    staticImageUrl,
-    staticImageExists,
-    defaultImageUrl,
-    bucketImageUrl,
-    data,
-  ]);
-
-  useEffect(() => {
-    setImageSrc(defaultImageUrl);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  const staticImageUrl = videoStill && videoStill(600);
+  const gifUrl = videoAnimated && videoAnimated(360);
 
   const styleLabel = STYLES_BY_KEY.has(data.maybe_style_name)
     ? STYLES_BY_KEY.get(data.maybe_style_name)?.label
@@ -169,16 +80,15 @@ export default function VideoCard({
 
   const card = (
     <Card
+      {...{ ...hoverProps }}
       padding={false}
       canHover={true}
       onClick={handleSelectModalResultSelect}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {type === "media" && (
         <>
           <img
-            src={imageSrc}
+            src={gifUrl && hover ? gifUrl : staticImageUrl || defaultImageUrl}
             alt={data.weight_name}
             className="card-video"
             loading="lazy"

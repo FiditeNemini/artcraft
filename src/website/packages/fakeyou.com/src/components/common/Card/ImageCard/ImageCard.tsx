@@ -8,6 +8,10 @@ import Button from "components/common/Button";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import {
+  // MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 // import useToken from "hooks/useToken";
 import getCardUrl from "../getCardUrl";
 
@@ -38,6 +42,8 @@ export default function ImageCard({
   // const { setToken, setWeightTitle } = useToken();
   const linkUrl = getCardUrl(data, source, type);
 
+  const { imageThumb } = MediaLinks(data.media_links);
+
   const handleSelectModalResultSelect = () => {
     console.log("handleSelectModalResultSelect");
     if (inSelectModal) {
@@ -63,10 +69,10 @@ export default function ImageCard({
     );
 
   const bucketConfig = new BucketConfig();
-  let coverImage = undefined;
+  let coverImage = "";
 
-  if (type === "media") {
-    coverImage = bucketConfig.getCdnUrl(data.details?.maybe_media_file_data?.public_bucket_path || data.public_bucket_path, 600, 100);
+  if (imageThumb && type === "media") {
+    coverImage = imageThumb(600);
   } else if (type === "weights") {
     coverImage = `/images/default-covers/${
       data?.cover_image?.default_cover.image_index || 0
@@ -121,7 +127,9 @@ export default function ImageCard({
               </div>
               <CardFooter
                 {...{
-                  creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
+                  creator:
+                    data?.maybe_creator ||
+                    data.details?.maybe_media_file_data?.maybe_creator,
                   entityToken: data.details?.entity_token || data.token,
                   entityType: "media_file",
                   makeBookmarksProps: bookmarks?.makeProps,

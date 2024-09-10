@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./PrelaunchLanding.scss";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import { MainButton } from "./MainButton";
-
-interface MediaItem {
-  token: string;
-  public_bucket_path: string;
-  maybe_creator: {
-    username: string;
-  };
-}
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -18,7 +13,7 @@ interface Props {
 
 function PrelaunchLanding(props: Props) {
   const totalGrids = 63;
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaFile[]>([]);
   const [blankGrids, setBlankGrids] = useState<number[]>([15, 16, 17, 22, 23]);
   const [screenSize, setScreenSize] = useState("lg");
 
@@ -133,14 +128,8 @@ function PrelaunchLanding(props: Props) {
       }
 
       const mediaItem = mediaItems[i - 1];
-      const bucketConfig = new BucketConfig();
-      const gifUrl = mediaItem
-        ? bucketConfig.getCdnUrl(
-            mediaItem.public_bucket_path + "-thumb.gif",
-            360,
-            20
-          )
-        : "";
+      const { videoAnimated } = MediaLinks(mediaItem.media_links);
+      const gifUrl = videoAnimated ? videoAnimated(360) : "";
 
       gridItems.push(
         <div
@@ -164,7 +153,9 @@ function PrelaunchLanding(props: Props) {
               }
               src={gifUrl}
               className="w-100 h-100 object-fit-cover"
-              alt={`Video by ${mediaItem.maybe_creator.username}`}
+              alt={`Video by ${
+                mediaItem.maybe_creator_user?.username || "user"
+              }`}
             />
           ) : null}
         </div>

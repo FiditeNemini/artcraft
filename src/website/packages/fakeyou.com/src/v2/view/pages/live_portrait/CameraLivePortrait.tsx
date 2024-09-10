@@ -40,9 +40,11 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { AITools } from "components/marketing";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SessionLpInferenceResultsList from "./SessionLpInferenceResultsList";
-import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  GetMedia,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import { useLocation } from "react-router-dom";
 import { LivePortraitDetails } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle";
@@ -359,9 +361,7 @@ export default function LivePortrait() {
       response.media_file &&
       response.media_file.public_bucket_path
     ) {
-      const mediaLink = new BucketConfig().getGcsUrl(
-        response.media_file.public_bucket_path
-      );
+      const { mainURL } = MediaLinks(response.media_file.media_links);
 
       const sourceIndex = sourceTokens.indexOf(
         livePortraitDetails.source_media_file_token
@@ -375,7 +375,7 @@ export default function LivePortrait() {
         motionIndex,
         sourceToken: livePortraitDetails.source_media_file_token,
         motionToken: livePortraitDetails.face_driver_media_file_token,
-        videoSrc: mediaLink,
+        videoSrc: mainURL,
         jobToken,
         createdAt,
       };
@@ -392,7 +392,7 @@ export default function LivePortrait() {
         selectedSourceIndex === newGeneratedVideo.sourceIndex &&
         selectedMotionIndex === newGeneratedVideo.motionIndex
       ) {
-        setGeneratedVideoSrc(mediaLink);
+        setGeneratedVideoSrc(mainURL);
         setIsGenerating(false);
       }
 

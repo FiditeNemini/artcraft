@@ -5,12 +5,15 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  MediaFile,
+  MediaLinkUtility,
+} from "@storyteller/components/src/api/media_files";
 import {
   CancelJob,
   CancelJobResponse,
 } from "@storyteller/components/src/api/jobs/CancelJob";
-import { MediaURLs, useHover, useMedia, useSlides } from "hooks";
+import { useHover, useMedia, useSlides } from "hooks";
 import {
   JobState,
   jobStateCanChange,
@@ -33,35 +36,35 @@ interface JobListItem extends InferenceJob {
 const BaseAction = ({
   canStop = false,
   hover = false,
+  links,
   mediaFile,
   maybeResultToken = "",
   success = false,
   toggleSlide = () => {},
-  urls,
 }: {
   canStop: boolean;
   hover: boolean;
+  links: MediaLinkUtility;
   mediaFile: MediaFile;
   maybeResultToken: string;
   success: boolean;
   toggleSlide: () => void;
-  urls: MediaURLs;
 }) =>
   canStop || success ? (
     <>
       <JobResultPreview
         {...{
           hover,
+          links,
           mediaFile,
           mediaToken: maybeResultToken,
           show: success,
-          urls,
         }}
       />
       {success && (
         <Button
           {...{
-            href: urls.file,
+            href: links.mainURL,
             icon: faArrowDownToLine,
             onClick: (e: any) => {
               e.stopPropagation();
@@ -206,7 +209,7 @@ export default function JobItem({
     }
   };
 
-  const { mediaFile, urls } = useMedia({ mediaToken: maybeResultToken || "" });
+  const { links, mediaFile } = useMedia({ mediaToken: maybeResultToken || "" });
 
   const slides = useSlides({
     index,
@@ -216,11 +219,11 @@ export default function JobItem({
         props: {
           canStop: canStop(),
           hover,
+          links,
           maybeResultToken,
           mediaFile,
           success,
           toggleSlide,
-          urls,
         },
       },
       { component: StopConfirm, props: { stopClick, toggleSlide } },

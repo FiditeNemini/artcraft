@@ -95,6 +95,12 @@ describe("media files", () => {
       token: "MEDIA_FILE_TOKEN",
       media_type: MediaFileType.GLB,
       media_class: MediaFileClass.Unknown,
+      media_links: {
+        cdn_url:
+          "https://storage.googleapis.com/dev-vocodes-public/path/to/file",
+        maybe_thumbnail_template: null,
+        maybe_video_previews: null,
+      },
       maybe_engine_category: null,
       maybe_animation_type: null,
       maybe_media_subtype: null,

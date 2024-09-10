@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
 import useMeasure from "react-use-measure";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  MediaFile,
+  MediaLinks,
+} from "@storyteller/components/src/api/media_files";
 import Iframe from "react-iframe";
 import { Area, Point } from "react-easy-crop";
 import {
@@ -20,7 +23,6 @@ import {
 } from "components/entities/EntityTypes";
 import { WorkIndicator } from "components/svg";
 import { useMedia, useMediaUploader } from "hooks";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import EntityInputEmpty from "./EntityInputEmpty";
 import EntityInputSidePanel from "./EntityInputSidePanel";
@@ -112,14 +114,12 @@ const MediaBusy = ({ uploaderBusy, uploadProgress }: SlideProps) => {
 };
 
 const EntityInputFull = ({ clear, cropProps, isNarrow, media }: SlideProps) => {
-  const bucketConfig = new BucketConfig();
-  const mediaUrl = media?.public_bucket_path
-    ? bucketConfig.getGcsUrl(media.public_bucket_path)
-    : "";
   const mediaType = mediaCategoryfromString(media?.media_type || "");
 
   const [crop, cropSet] = useState<Point>({ x: 0, y: 0 });
   const [zoom, zoomSet] = useState(1);
+
+  const { mainURL } = MediaLinks(media?.media_links);
 
   const zoomSliderChange = ({ target }: ZoomSliderOnChangeEvent) =>
     zoomSet(target.value);
@@ -133,7 +133,7 @@ const EntityInputFull = ({ clear, cropProps, isNarrow, media }: SlideProps) => {
               crop,
               cropProps,
               cropSet,
-              image: mediaUrl,
+              image: mainURL,
               zoom,
               zoomSet,
             }}
@@ -159,7 +159,7 @@ const EntityInputFull = ({ clear, cropProps, isNarrow, media }: SlideProps) => {
               crop,
               cropProps,
               cropSet,
-              video: mediaUrl,
+              video: mainURL,
               zoom,
               zoomSet,
             }}
@@ -182,7 +182,7 @@ const EntityInputFull = ({ clear, cropProps, isNarrow, media }: SlideProps) => {
         <>
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&${media?.media_type}=${mediaUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&${media?.media_type}=${mainURL}`,
               className: "fy-entity-input-mocap-preview",
             }}
           />
@@ -272,9 +272,9 @@ export default function EntityInput({
     onError: () => {
       // @ts-ignore
       window.dataLayer.push({
-        "event": "upload_failure",
-        "page": GApage || "/",
-        "user_id": "$user_id"
+        event: "upload_failure",
+        page: GApage || "/",
+        user_id: "$user_id",
       });
     },
     onSuccess: (res: UploaderResponse) => {
@@ -330,8 +330,9 @@ export default function EntityInput({
       <Label {...{ label }} />
       <div
         {...{
-          className: `fy-entity-input ${className ? " " + className : ""}${isNarrow ? " fy-entity-input-narrow" : " fy-entity-input-wide"
-            }`,
+          className: `fy-entity-input ${className ? " " + className : ""}${
+            isNarrow ? " fy-entity-input-narrow" : " fy-entity-input-wide"
+          }`,
           ref: outerRef,
         }}
       >
