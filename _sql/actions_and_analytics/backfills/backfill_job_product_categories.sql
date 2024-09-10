@@ -235,3 +235,51 @@ AND product_category IS NULL
 AND created_at >= '2024-07-25'
 AND created_at <= '2024-09-30'
 LIMIT 100;
+
+-- Change Product Category: vst -> vid_style_transfer
+UPDATE generic_inference_jobs
+SET product_category = 'vid_style_transfer'
+WHERE product_category = 'vst'
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-09-30'
+LIMIT 10;
+
+-- Change Product Category: studio -> vid_studio
+UPDATE generic_inference_jobs
+SET product_category = 'vid_studio'
+WHERE product_category = 'studio'
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-09-30'
+LIMIT 10;
+
+-- Change Product Category: vid_face_fusion -> vid_lipsync_face_fusion
+UPDATE generic_inference_jobs
+SET product_category = 'vid_lipsync_face_fusion'
+WHERE product_category = 'vid_face_fusion'
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-09-30'
+LIMIT 10;
+
+-- Change Product Category: lipsync_sad_talker -> vid_lipsync_sad_talker
+UPDATE generic_inference_jobs
+SET product_category = 'vid_lipsync_sad_talker'
+WHERE product_category = 'lipsync_sad_talker'
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-09-30'
+LIMIT 10;
+
+-- Change Product Category: live_portrait -> vid_live_portrait
+UPDATE generic_inference_jobs
+SET product_category = 'vid_live_portrait'
+WHERE product_category = 'live_portrait'
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-09-30'
+LIMIT 10;
+
+-- Change Product Category: live_portrait_webcam -> vid_live_portrait_webcam
+UPDATE generic_inference_jobs
+SET product_category = 'vid_live_portrait_webcam'
+WHERE product_category = 'live_portrait_webcam'
+AND created_at >= '2024-07-30'
+AND created_at <= '2024-09-30'
+LIMIT 10;
