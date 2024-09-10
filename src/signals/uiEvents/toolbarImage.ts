@@ -17,17 +17,27 @@ const events = Object.values(ToolbarImageButtonNames).reduce(
   },
 );
 
+const effectsCleanups = Object.values(ToolbarImageButtonNames).reduce(
+  (acc, buttonName) => {
+    acc[buttonName] = undefined;
+    return acc;
+  },
+  {} as {
+    [key in ToolbarImageButtonNames]: (() => void) | undefined;
+  },
+);
+
 export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = {
-      onClick: (callback: () => void) => {
-        effect(() => {
+      onClick: (callback: MouseEventHandler<HTMLButtonElement>) => {
+        if (effectsCleanups[buttonName]) {
+          effectsCleanups[buttonName]();
+        }
+        effectsCleanups[buttonName] = effect(() => {
           if (events[buttonName].value) {
-            callback();
-            return () => {
-              //console.log("Toolbar Image effect event handler cleanup");
-              events[buttonName].value = undefined;
-            };
+            callback(events[buttonName].value);
+            events[buttonName].value = undefined;
           }
         });
       },
@@ -36,7 +46,7 @@ export const eventsHandlers = Object.values(ToolbarImageButtonNames).reduce(
   },
   {} as {
     [key in ToolbarImageButtonNames]: {
-      onClick: (callback: () => void) => void;
+      onClick: (callback: MouseEventHandler<HTMLButtonElement>) => void;
     };
   },
 );
