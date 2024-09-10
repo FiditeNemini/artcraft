@@ -96,7 +96,8 @@ describe("media files", () => {
       media_type: MediaFileType.GLB,
       media_class: MediaFileClass.Unknown,
       media_links: {
-        cdn_url: "",
+        cdn_url:
+          "https://storage.googleapis.com/dev-vocodes-public/path/to/file.gltf",
         maybe_thumbnail_template: null,
         maybe_video_previews: null,
       },
