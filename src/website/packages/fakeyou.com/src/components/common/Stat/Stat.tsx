@@ -11,6 +11,9 @@ interface Props {
 }
 
 export default function Stat(props: Props) {
+  if (isNaN(props.count) || props.count < 0) {
+    return null;
+  }
   let friendlyCount = toHumanNumber(props.count);
 
   let icon = <></>;
@@ -19,10 +22,14 @@ export default function Stat(props: Props) {
   }
 
   return (
-    <span className="d-flex align-items-center gap-1 fs-7">
-      {icon}
-      {friendlyCount}
-    </span>
+    <>
+      {props.count !== null ? (
+        <span className="d-flex align-items-center gap-1 fs-7">
+          {icon}
+          {friendlyCount}
+        </span>
+      ) : null}
+    </>
   );
 }
 

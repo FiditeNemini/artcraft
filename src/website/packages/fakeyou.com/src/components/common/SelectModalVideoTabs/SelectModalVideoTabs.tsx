@@ -2,7 +2,7 @@ import React, { memo, useRef, useState } from "react";
 
 import { useListContent, useSession } from "hooks";
 
-import { MediaFileType, GetMediaByUser } from "@storyteller/components/src/api";
+import { MediaFile, GetMediaByUser } from "@storyteller/components/src/api";
 
 import {
   MasonryGrid,
@@ -69,7 +69,7 @@ function VideoTabsContent({
   onSelect: (data: SelectModalData) => void;
 }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [list, listSet] = useState<MediaFileType[]>([]);
+  const [list, listSet] = useState<MediaFile[]>([]);
   const { user } = useSession();
   const media = useListContent({
     addQueries: {
@@ -119,7 +119,7 @@ function VideoTabsContent({
             if (debug) console.log("Layout complete!");
           }}
         >
-          {media.list.map((data: MediaFileType, key: number) => {
+          {media.list.map((data: MediaFile, key: number) => {
             let props = {
               data,
               showCreator: true,

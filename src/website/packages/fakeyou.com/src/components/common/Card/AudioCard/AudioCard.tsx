@@ -94,7 +94,7 @@ export default function AudioCard({
               </p>
             )}
           </div>
-          <AudioPlayer src={mainURL} id={data.token} />
+          {mainURL && <AudioPlayer src={mainURL} id={data.token} />}
           <CardFooter
             {...{
               creator:
@@ -144,12 +144,14 @@ export default function AudioCard({
                         label={weightBadgeLabel}
                         color={weightBadgeColor}
                       />
-                      <div className="opacity-50">
-                        <Stat
-                          count={data?.usage_count}
-                          icon={faWaveformLines}
-                        />
-                      </div>
+                      {data.usage_count && (
+                        <div className="opacity-50">
+                          <Stat
+                            count={data?.usage_count}
+                            icon={faWaveformLines}
+                          />
+                        </div>
+                      )}
                       <span className="d-flex align-items-center gap-1 fs-7 opacity-50 text-white">
                         <FontAwesomeIcon icon={faThumbsUp} />
                         {data?.stats?.positive_rating_count}
