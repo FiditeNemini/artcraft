@@ -4,9 +4,11 @@ import { twMerge } from "tailwind-merge";
 export const Tooltip = ({
   tip,
   children,
+  forceShow,
 }: {
   tip: string;
   children: ReactElement<any, string | JSXElementConstructor<any>>;
+  forceShow?: boolean;
 }) => {
   const clonedChildren = cloneElement(children, {
     tooltip: tip,
@@ -19,7 +21,9 @@ export const Tooltip = ({
       "after:absolute after:left-1/2 after:bottom-full after:-translate-x-1/2 after:z-40 ",
       "after:content-[attr(tooltip)] after:text-black after:text-nowrap",
       "after:rounded-xl after:border after:border-ui-border after:bg-ui-panel after:px-2 after:py-1 after:mb-2 after:shadow-xl",
-      "after:hidden before:hidden hover:after:block hover:before:block",
+      forceShow
+        ? "after:block before:block"
+        : "after:hidden before:hidden hover:after:block hover:before:block",
       "relative",
       children.props.className,
     ),

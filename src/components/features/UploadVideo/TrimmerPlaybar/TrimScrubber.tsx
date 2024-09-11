@@ -3,7 +3,12 @@ import { twMerge } from "tailwind-merge";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { buttonStyles, verticalPositionStyles } from "./utilities";
+import {
+  buttonStyles,
+  verticalPositionStyles,
+  formatSecondsToHHMMSSCS,
+} from "./utilities";
+import { Tooltip } from "~/components/ui";
 
 export const TrimScrubber = ({
   icon,
@@ -95,23 +100,32 @@ export const TrimScrubber = ({
     }
   }, [isScrubbing]);
 
+  const leftOffset = isScrubbing
+    ? `${scrubbingPosition}%`
+    : `${trimPosPercent}%`;
+  const trimmerTime = isScrubbing
+    ? `${formatSecondsToHHMMSSCS(((scrubbingPosition / 100) * totalDurationMs) / 1000)}`
+    : `${formatSecondsToHHMMSSCS(((trimPosPercent / 100) * totalDurationMs) / 1000)}`;
+
   return (
-    <div
-      ref={mountCallback}
-      className={twMerge(
-        verticalPositionStyles,
-        buttonStyles,
-        "flex h-10 w-4 items-center justify-center",
-        isScrubbing && "cursor-grabbing",
-        className,
-      )}
-      onMouseDown={handleScrubbing}
-      style={{
-        left: isScrubbing ? `${scrubbingPosition}%` : `${trimPosPercent}%`,
-      }}
-    >
-      <FontAwesomeIcon icon={icon} />
-    </div>
+    <Tooltip tip={trimmerTime} forceShow={isScrubbing}>
+      <div
+        ref={mountCallback}
+        className={twMerge(
+          verticalPositionStyles,
+          buttonStyles,
+          "flex h-10 w-4 items-center justify-center",
+          isScrubbing && "cursor-grabbing",
+          className,
+        )}
+        onMouseDown={handleScrubbing}
+        style={{
+          left: leftOffset,
+        }}
+      >
+        <FontAwesomeIcon icon={icon} />
+      </div>
+    </Tooltip>
   );
 };
 
