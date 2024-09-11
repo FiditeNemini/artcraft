@@ -31,6 +31,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
   return (
     <>
       <Button
+        className="absolute bottom-0 left-0"
         onClick={() => {
           uiAccess.errorDialogue.show({
             title: "Test Error",

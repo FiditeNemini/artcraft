@@ -1,21 +1,14 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import Cropper, { Point, Area } from "react-easy-crop";
 
 import { FileUploader, VIDEO_FILE_TYPE } from "../FileUploader";
 import { Button } from "~/components/ui";
 
 import { paperWrapperStyles } from "~/components/styles";
 import { dispatchUiEvents } from "~/signals/uiEvents";
+import { QuickTrimVideoPlayer } from "./QuickTrimVideoPlayer";
 
-function readFile(file: File) {
-  return new Promise<string | ArrayBuffer | null>((resolve) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => resolve(reader.result), false);
-    reader.readAsDataURL(file);
-  });
-}
 export const UploadVideo = ({
   isOpen,
   closeCallback,
@@ -24,15 +17,6 @@ export const UploadVideo = ({
   closeCallback: () => void;
 }) => {
   const [assetFile, setAssetFile] = useState<File | null>(null);
-  const [videoFile, setVideoFile] = useState<string | null>(null);
-
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-
-  const onCropComplete = (croppedArea: Area, croppedAreaPixels: Point) => {
-    console.log(croppedArea, croppedAreaPixels);
-  };
-
   function handleClose() {
     setAssetFile(null);
     closeCallback();
@@ -51,48 +35,22 @@ export const UploadVideo = ({
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,
-            "w-full max-w-xl space-y-4 p-8",
+            "flex w-full max-w-5xl flex-col gap-4 px-6 py-4",
           )}
         >
           <DialogTitle className="font-bold">Upload Video</DialogTitle>
-          <FileUploader
-            title=""
-            fileTypes={Object.values(VIDEO_FILE_TYPE)}
-            file={assetFile}
-            setFile={async (file: File | null) => {
-              setAssetFile(file);
-              if (file) {
-                let videoDataUrl = await readFile(file);
-                setVideoFile(videoDataUrl as string);
-              }
-            }}
-          />
-          {assetFile && videoFile && (
-            <div className="relative flex aspect-video items-center justify-center rounded-xl bg-ui-border">
-              <label className="absolute left-0 top-0 rounded-br-xl rounded-tl-xl border border-ui-border bg-white p-2 shadow-md">
-                Preview
-              </label>
-              {/* <video
-                src={URL.createObjectURL(assetFile)}
-                controls
-                className="border border-dashed border-white"
-              /> */}
-              <div className="crop-container">
-                <Cropper
-                  video={videoFile}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={4 / 3}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  // onImageLoaded={(res:any) => {
-                  //   console.log(res);
-                  // }}
-                />
-              </div>
-            </div>
-          )}
-          <div className="flex w-full justify-end gap-4 pt-4">
+          <div className="flex flex-col rounded-lg border-2 border-dashed border-ui-border">
+            <FileUploader
+              title=""
+              fileTypes={Object.values(VIDEO_FILE_TYPE)}
+              file={assetFile}
+              setFile={async (file: File | null) => {
+                setAssetFile(file);
+              }}
+            />
+            {assetFile && <QuickTrimVideoPlayer file={assetFile} />}
+          </div>
+          <div className="flex w-full justify-end gap-4">
             <Button onClick={handleClose} variant="secondary">
               Cancel
             </Button>
