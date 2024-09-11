@@ -484,7 +484,7 @@ export const GenerateTts = ({
                     />
                   </div>
                   <span className="text-truncate" style={{ maxWidth: "300px" }}>
-                    {voiceTitle || "No voice selected"}
+                    {voiceTitle || "Click here to select a voice..."}
                   </span>
                 </div>
                 <FontAwesomeIcon icon={faChevronRight} />
@@ -525,7 +525,7 @@ export const GenerateTts = ({
           variant={"action"}
           icon={faWaveformLines}
           onClick={handleEnqueueTts}
-          disabled={textBuffer.length === 0}
+          disabled={textBuffer.length === 0 || voiceToken === null}
           isLoading={isAudioLoading}
         />
       )}
