@@ -36,7 +36,7 @@ export const QuickTrimVideoPlayer = ({
           src={URL.createObjectURL(file)}
         />
       </div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center bg-gray-100">
         <VideoControls vidEl={vidEl} className="w-fit" />
         <TrimmerPlaybar
           vidEl={vidEl}

@@ -68,7 +68,9 @@ export const TrimScrubber = ({
           scrubbingPosition: calcPosition(e),
         });
       };
-      const handleMouseUp = () => {
+      const handleMouseUp = (e: MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
         setState((prev) => {
           scrubbingPositionRef.current = prev.scrubbingPosition;
           return {

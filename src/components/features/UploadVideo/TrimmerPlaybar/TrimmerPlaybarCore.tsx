@@ -36,16 +36,40 @@ export const TrimmerPlaybarCore = ({
   const { durationMs, currentTimeMs, trimStartMs, trimEndMs } = states;
 
   const setTrimStartMs = useCallback((newTrimMs: number) => {
-    setStates((prev) => ({
-      ...prev,
-      trimStartMs: newTrimMs,
-    }));
+    setStates((prev) => {
+      if (prev.trimEndMs === undefined) {
+        if (import.meta.env.DEV) {
+          console.warn("Logical Error in Trim Start Setting");
+        }
+        return prev;
+      }
+      return {
+        ...prev,
+        trimStartMs: newTrimMs,
+        trimEndMs:
+          prev.trimEndMs - newTrimMs >= MAX_TRIM_DURATION
+            ? newTrimMs + MAX_TRIM_DURATION
+            : prev.trimEndMs,
+      };
+    });
   }, []);
   const setTrimEndMs = useCallback((newTrimMs: number) => {
-    setStates((prev) => ({
-      ...prev,
-      trimEndMs: newTrimMs,
-    }));
+    setStates((prev) => {
+      if (prev.trimStartMs === undefined) {
+        if (import.meta.env.DEV) {
+          console.warn("Logical Error in Trim End Setting");
+        }
+        return prev;
+      }
+      return {
+        ...prev,
+        trimEndMs: newTrimMs,
+        trimStartMs:
+          newTrimMs - prev.trimStartMs >= MAX_TRIM_DURATION
+            ? newTrimMs - MAX_TRIM_DURATION
+            : prev.trimStartMs,
+      };
+    });
   }, []);
 
   useEffect(() => {
@@ -94,7 +118,10 @@ export const TrimmerPlaybarCore = ({
 
   return (
     <div
-      className={twMerge("relative mx-4 h-10 w-full bg-gray-200", className)}
+      className={twMerge(
+        "relative mx-4 h-10 w-full border-l border-r border-dotted border-l-ui-border border-r-ui-border",
+        className,
+      )}
     >
       <ProgressCursor
         vidEl={vidEl}
@@ -107,9 +134,7 @@ export const TrimmerPlaybarCore = ({
         className="-translate-x-full"
         trimPosMs={trimStartMs}
         maxTrimPosMs={trimEndMs}
-        minTrimPosMs={
-          trimEndMs - MAX_TRIM_DURATION > 0 ? trimEndMs - MAX_TRIM_DURATION : 0
-        }
+        minTrimPosMs={0}
         totalDurationMs={durationMs}
         onChange={setTrimStartMs}
       />
@@ -117,11 +142,7 @@ export const TrimmerPlaybarCore = ({
         // trim end scrubber
         icon={faBracketCurlyRight}
         trimPosMs={trimEndMs}
-        maxTrimPosMs={
-          trimStartMs + MAX_TRIM_DURATION <= durationMs
-            ? trimStartMs + MAX_TRIM_DURATION
-            : durationMs
-        }
+        maxTrimPosMs={durationMs}
         minTrimPosMs={trimStartMs}
         totalDurationMs={durationMs}
         onChange={setTrimEndMs}
