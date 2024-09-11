@@ -41,6 +41,7 @@ import { AITools } from "components/marketing";
 import VoicePickerPreview from "../VoicePickerPreview";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import ExploreVoices from "../ExploreVoices";
+import { featuredTtsVoiceTokens } from "./FeaturedTTSVoiceTokens";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -106,19 +107,6 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
       props: mediaBrowserProps,
     });
   };
-
-  const featuredVoiceTokens = [
-    "weight_ppqs5038bvkm6wc29w0xfebzy", // Donald Trump (GptSoVits)
-    "weight_th73g8zcdrj8znt5zm1fhe1s0", // Kamala Harris (GptSoVits)
-    "weight_qdtx8h0mvn945md9tm2zaq422", // SpongeBob SquarePants (GptSoVits)
-    //"weight_f9wz0b1amfxhj1fnxxwtwn3rq", // Zelda (Breath of the Wild) (GptSoVits)
-    "weight_0f762jdzgsy1dhpb86qxy4ssm", // Rick Sanchez (Version 2.0) (TT2)
-    "weight_7jk8mgwkzsycqrxmfw5q4245y", // Homer Simpson (GptSoVits)
-    "weight_3k28fws0v6r1ke3p0w0vw48gm", // Eric Cartman (New) (TT2)
-    "weight_dqcy6bxq1n79z5ahwpy01bvje", // Harry Potter (GptSoVits)
-    "weight_msq6440ch8hj862nz5y255n8j", // IShowSpeed (TT2)
-    //"weight_6jvgbqkzschw55qdg7exnx7zx", // Moist Cr1TiKaL (New) (TT2)
-  ];
 
   const handleSpeak = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -191,7 +179,7 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
               <div className="fy-featured-voices-section d-none d-lg-block">
                 <h5 className="fw-bold">{t("title.featuredVoices")}</h5>
                 <div className="row g-3">
-                  {featuredVoiceTokens.map(token => (
+                  {featuredTtsVoiceTokens.map(token => (
                     <FeaturedVoice
                       key={token}
                       token={token}

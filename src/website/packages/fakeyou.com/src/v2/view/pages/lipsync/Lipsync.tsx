@@ -48,6 +48,7 @@ import ThumbnailMediaPicker from "../live_portrait/ThumbnailMediaPicker";
 import { GenerateTts } from "./GenerateTts";
 import { LipsyncTokenMap } from "./LipsyncTokens";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { featuredTtsVoiceTokens } from "../audio_gen/tts/FeaturedTTSVoiceTokens";
 
 interface LipsyncProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -322,11 +323,21 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const voiceTokenFromQuery = queryParams.get("voice");
+    let voiceTokenFromQuery = queryParams.get("voice");
     const sourceTokenFromQuery = queryParams.get("source");
 
     setVoiceToken(voiceTokenFromQuery);
     setSourceTokenFromQuery(sourceTokenFromQuery);
+
+    if (!voiceTokenFromQuery) {
+      if (featuredTtsVoiceTokens.length > 0) {
+        voiceTokenFromQuery =
+          featuredTtsVoiceTokens[
+            Math.floor(Math.random() * featuredTtsVoiceTokens.length)
+          ];
+        setVoiceToken(voiceTokenFromQuery);
+      }
+    }
 
     if (sourceTokenFromQuery) {
       setSourceTokens(prevTokens => {
