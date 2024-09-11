@@ -1,11 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
-import {
-  makePositionCalculator,
-  buttonStyles,
-  verticalPositionStyles,
-} from "./utilities";
+import { buttonStyles, verticalPositionStyles } from "./utilities";
 
 export const ProgressCursor = ({
   progress,
@@ -23,27 +19,36 @@ export const ProgressCursor = ({
   });
 
   const { isScrubbing, scrubbingPosition } = state;
+  const containerRef = useRef<HTMLElement | null>(null);
+  const mountCallback = useCallback((node: HTMLDivElement) => {
+    if (node) {
+      containerRef.current = node.parentElement;
+    }
+  }, []);
 
   const handleScrubbingCurrentTime = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       e.preventDefault();
-
-      const calcPosition = makePositionCalculator(e);
+      if (containerRef.current === null) {
+        console.log("NULL");
+        return;
+      }
       const wasPlaying = !vidEl.paused;
       if (wasPlaying) {
         vidEl.pause();
       }
 
+      const containerEl = containerRef.current;
       setState({
         isScrubbing: true,
-        scrubbingPosition: calcPosition(e),
+        scrubbingPosition: calcPosition(e, containerEl),
       });
 
       const handleMouseMove = (e: MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        const newPosition = calcPosition(e);
+        const newPosition = calcPosition(e, containerEl);
         vidEl.currentTime = (newPosition / 100) * vidEl.duration;
         setState({
           isScrubbing: true,
@@ -80,6 +85,7 @@ export const ProgressCursor = ({
         }}
       />
       <div
+        ref={mountCallback}
         // current time scrubber
         className={twMerge(
           verticalPositionStyles,
@@ -92,4 +98,19 @@ export const ProgressCursor = ({
       />
     </>
   );
+};
+
+const calcPosition = (
+  e: MouseEvent | React.MouseEvent<HTMLDivElement>,
+  parentEl: HTMLElement,
+) => {
+  const parentWidth = parentEl.getBoundingClientRect().width;
+  const result = ((e.clientX - parentEl.offsetLeft) / parentWidth) * 100;
+  if (result < 0) {
+    return 0;
+  }
+  if (result > 100) {
+    return 100;
+  }
+  return result;
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
@@ -7,7 +7,7 @@ import { Button } from "~/components/ui";
 
 import { paperWrapperStyles } from "~/components/styles";
 import { dispatchUiEvents } from "~/signals/uiEvents";
-import { QuickTrimVideoPlayer } from "./QuickTrimVideoPlayer";
+import { QuickTrimVideoPlayer, TrimData } from "./QuickTrimVideoPlayer";
 
 export const UploadVideo = ({
   isOpen,
@@ -17,6 +17,8 @@ export const UploadVideo = ({
   closeCallback: () => void;
 }) => {
   const [assetFile, setAssetFile] = useState<File | null>(null);
+  const trimDataRef = useRef<TrimData | undefined>(undefined);
+
   function handleClose() {
     setAssetFile(null);
     closeCallback();
@@ -24,7 +26,7 @@ export const UploadVideo = ({
 
   function handleEnter() {
     if (assetFile) {
-      dispatchUiEvents.addVideoToEngine(assetFile);
+      dispatchUiEvents.addVideoToEngine(assetFile, trimDataRef.current);
     }
     handleClose();
   }
@@ -48,7 +50,14 @@ export const UploadVideo = ({
                 setAssetFile(file);
               }}
             />
-            {assetFile && <QuickTrimVideoPlayer file={assetFile} />}
+            {assetFile && (
+              <QuickTrimVideoPlayer
+                file={assetFile}
+                onTrimChange={(trimData) => {
+                  trimDataRef.current = trimData;
+                }}
+              />
+            )}
           </div>
           <div className="flex w-full justify-end gap-4">
             <Button onClick={handleClose} variant="secondary">

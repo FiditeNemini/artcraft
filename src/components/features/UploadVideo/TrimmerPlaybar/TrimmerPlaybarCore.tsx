@@ -4,80 +4,74 @@ import {
   faBracketCurly,
   faBracketCurlyRight,
 } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { MAX_TRIM_DURATION } from "./utilities";
 
 import { TrimmingPlaybarLoading } from "./TrimmerPlaybarLoading";
-import { MAX_TRIM_DURATION } from "./constants";
-import { buttonStyles, verticalPositionStyles } from "./utilities";
 import { ProgressCursor } from "./ProgressCursor";
+import { TrimScrubber } from "./TrimScrubber";
+import { TrimData } from "./utilities";
 
 export const TrimmerPlaybarCore = ({
   vidEl,
   className,
+  onTrimChange,
 }: {
   vidEl: HTMLVideoElement;
   className?: string;
+  onTrimChange: (trimData: TrimData) => void;
 }) => {
   const [states, setStates] = useState<{
-    duration: number | undefined;
-    currentTime: number | undefined;
+    durationMs: number | undefined;
+    currentTimeMs: number | undefined;
     trimStartMs: number | undefined;
     trimEndMs: number | undefined;
   }>({
-    duration: undefined,
-    currentTime: undefined,
+    durationMs: undefined,
+    currentTimeMs: undefined,
     trimStartMs: undefined,
     trimEndMs: undefined,
   });
 
-  const { duration, currentTime, trimStartMs, trimEndMs } = states;
+  const { durationMs, currentTimeMs, trimStartMs, trimEndMs } = states;
 
-  const setTrimStartMs = useCallback((value: number) => {
-    setStates((prev) => {
-      if (!prev.trimEndMs || value > prev.trimEndMs) {
-        return prev;
-      }
-      if (value > prev.trimEndMs) {
-        return { ...prev, trimStartMs: prev.trimEndMs - 1 };
-      }
-      if (prev.trimEndMs - value >= MAX_TRIM_DURATION) {
-        return { ...prev, trimStartMs: prev.trimEndMs - MAX_TRIM_DURATION };
-      }
-      return { ...prev, trimStartMs: value };
-    });
+  const setTrimStartMs = useCallback((newTrimMs: number) => {
+    setStates((prev) => ({
+      ...prev,
+      trimStartMs: newTrimMs,
+    }));
   }, []);
-  const setTrimEndMs = useCallback((value: number) => {
-    setStates((prev) => {
-      if (!prev.trimStartMs) {
-        return prev;
-      }
-      if (value < prev.trimStartMs) {
-        return { ...prev, trimEndMs: prev.trimStartMs + 1 };
-      }
-      if (value - prev.trimStartMs >= MAX_TRIM_DURATION) {
-        return { ...prev, trimEndMs: prev.trimStartMs + MAX_TRIM_DURATION };
-      }
-      return { ...prev, trimEndMs: value };
-    });
+  const setTrimEndMs = useCallback((newTrimMs: number) => {
+    setStates((prev) => ({
+      ...prev,
+      trimEndMs: newTrimMs,
+    }));
   }, []);
 
   useEffect(() => {
+    if (trimStartMs && trimEndMs) {
+      onTrimChange({ trimStartMs, trimEndMs });
+    }
+  }, [trimStartMs, trimEndMs]);
+
+  useEffect(() => {
     const handleLoadedmetadata = () => {
+      console.log(vidEl.duration * 1000);
       setStates((prev) => ({
         ...prev,
-        duration: vidEl.duration,
-        currentTime: vidEl.currentTime,
+        durationMs: vidEl.duration * 1000,
+        currentTimeMs: vidEl.currentTime * 1000,
         trimStartMs: 0,
         trimEndMs:
-          vidEl.duration >= MAX_TRIM_DURATION
+          vidEl.duration * 1000 >= MAX_TRIM_DURATION
             ? MAX_TRIM_DURATION
-            : vidEl.duration,
+            : vidEl.duration * 1000,
       }));
     };
     const handleTimeupdate = () => {
       setStates((prev) => ({
         ...prev,
-        currentTime: vidEl.currentTime,
+        currentTimeMs: vidEl.currentTime * 1000,
       }));
     };
 
@@ -90,39 +84,49 @@ export const TrimmerPlaybarCore = ({
     };
   }, [vidEl]);
 
-  if (!duration) {
+  if (
+    durationMs === undefined ||
+    currentTimeMs === undefined ||
+    trimEndMs === undefined ||
+    trimStartMs === undefined
+  ) {
     return <TrimmingPlaybarLoading className={className} />;
   }
+
   return (
     <div
       className={twMerge("relative mx-4 h-10 w-full bg-gray-200", className)}
     >
       <ProgressCursor
         vidEl={vidEl}
-        progress={((currentTime ?? 0) / (duration ?? 1)) * 100}
+        progress={(currentTimeMs / durationMs) * 100}
       />
-      <div
+
+      <TrimScrubber
         // trim start scrubber
-        className={twMerge(
-          verticalPositionStyles,
-          buttonStyles,
-          "flex h-10 w-4 -translate-x-full items-center justify-center",
-        )}
-        style={{ left: `${((trimStartMs ?? 0) / (duration ?? 1)) * 100}%` }}
-      >
-        <FontAwesomeIcon icon={faBracketCurly} />
-      </div>
-      <div
+        icon={faBracketCurly}
+        className="-translate-x-full"
+        trimPosMs={trimStartMs}
+        maxTrimPosMs={trimEndMs}
+        minTrimPosMs={
+          trimEndMs - MAX_TRIM_DURATION > 0 ? trimEndMs - MAX_TRIM_DURATION : 0
+        }
+        totalDurationMs={durationMs}
+        onChange={setTrimStartMs}
+      />
+      <TrimScrubber
         // trim end scrubber
-        className={twMerge(
-          verticalPositionStyles,
-          buttonStyles,
-          "flex h-10 w-4 items-center justify-center",
-        )}
-        style={{ left: `${((trimEndMs ?? 0) / (duration ?? 1)) * 100}%` }}
-      >
-        <FontAwesomeIcon icon={faBracketCurlyRight} />
-      </div>
+        icon={faBracketCurlyRight}
+        trimPosMs={trimEndMs}
+        maxTrimPosMs={
+          trimStartMs + MAX_TRIM_DURATION <= durationMs
+            ? trimStartMs + MAX_TRIM_DURATION
+            : durationMs
+        }
+        minTrimPosMs={trimStartMs}
+        totalDurationMs={durationMs}
+        onChange={setTrimEndMs}
+      />
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { signal, effect } from "@preact/signals-react";
+import { TrimData } from "~/components/features/UploadVideo/TrimmerPlaybar";
 
 const stagedImage = signal<File | null>(null);
 
@@ -14,13 +15,18 @@ const onGetStagedImage = (callback: (file: File) => void) => {
   });
 };
 
-const stagedVideo = signal<File | null>(null);
+const stagedVideo = signal<{ file: File; trimData?: TrimData } | null>(null);
 
-const addVideoToEngine = (video: File) => {
-  stagedVideo.value = video;
+const addVideoToEngine = (file: File, trimData?: TrimData) => {
+  stagedVideo.value = { file, trimData };
 };
 
-const onGetStagedVideo = (callback: (file: File) => void) => {
+const onGetStagedVideo = (
+  callback: (videoData: {
+    file: File;
+    trimData?: { trimStartMs: number; trimEndMs: number };
+  }) => void,
+) => {
   effect(() => {
     if (stagedVideo.value) {
       callback(stagedVideo.value);

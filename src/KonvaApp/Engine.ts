@@ -16,7 +16,6 @@ export class Engine {
 
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
-
     console.log("Engine Created!");
 
     if (import.meta.env.DEV) {
@@ -50,7 +49,8 @@ export class Engine {
       this.addImage(image);
     });
     uiEvents.onGetStagedVideo((video) => {
-      this.addVideo(video);
+      console.log("Engine got trim data: ", video.trimData);
+      this.addVideo(video.file);
     });
 
     uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
