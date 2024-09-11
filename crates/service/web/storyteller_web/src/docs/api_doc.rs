@@ -44,14 +44,24 @@ use crate::http_server::common_responses::media_file_cover_image_details::MediaF
 use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
 use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
+use crate::http_server::common_responses::media_links::*;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::simple_response::SimpleResponse;
 use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::common_responses::weights_cover_image_details::*;
-use crate::http_server::common_responses::media_links::*;
 use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
+use crate::http_server::endpoints::app_state::components::get_permissions::AppStateLegacyPermissionFlags;
+use crate::http_server::endpoints::app_state::components::get_permissions::AppStatePermissions;
+use crate::http_server::endpoints::app_state::components::get_premium_info::AppStatePremiumInfo;
+use crate::http_server::endpoints::app_state::components::get_premium_info::AppStateSubscriptionProductKey;
+use crate::http_server::endpoints::app_state::components::get_server_info::AppStateServerInfo;
+use crate::http_server::endpoints::app_state::components::get_status_alert::AppStateStatusAlertInfo;
+use crate::http_server::endpoints::app_state::components::get_status_alert::AppStateStatusAlertCategory;
+use crate::http_server::endpoints::app_state::components::get_user_info::AppStateUserInfo;
+use crate::http_server::endpoints::app_state::components::get_user_locale::AppStateUserLocale;
+use crate::http_server::endpoints::app_state::get_app_state_handler::*;
 use crate::http_server::endpoints::beta_keys::create_beta_keys_handler::*;
 use crate::http_server::endpoints::beta_keys::edit_beta_key_distributed_flag_handler::*;
 use crate::http_server::endpoints::beta_keys::edit_beta_key_note_handler::*;
@@ -164,6 +174,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::inference_job::delete::dismiss_finished_session_jobs_handler::dismiss_finished_session_jobs_handler,
     crate::http_server::endpoints::inference_job::delete::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::inference_job::get::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
+    crate::http_server::endpoints::app_state::get_app_state_handler::get_app_state_handler,
     crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::list::list_session_jobs_handler::list_session_jobs_handler,
     crate::http_server::endpoints::media_files::delete::delete_media_file_handler::delete_media_file_handler,
@@ -301,6 +312,17 @@ use crate::http_server::web_utils::response_success_helpers::*;
     WeightsDefaultCoverInfo,
 
     // Endpoint API types
+    AppStateError,
+    AppStateLegacyPermissionFlags,
+    AppStatePermissions,
+    AppStatePremiumInfo,
+    AppStateResponse,
+    AppStateServerInfo,
+    AppStateStatusAlertCategory,
+    AppStateStatusAlertInfo,
+    AppStateSubscriptionProductKey,
+    AppStateUserInfo,
+    AppStateUserLocale,
     BatchGetInferenceJobStatusError,
     BatchGetInferenceJobStatusQueryParams,
     BatchGetInferenceJobStatusSuccessResponse,
@@ -326,15 +348,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ChangeMediaFileAnimationTypeRequest,
     ChangeMediaFileEngineCategoryError,
     ChangeMediaFileEngineCategoryRequest,
-    UploadStudioShotFileForm,
-    UploadStudioShotSuccessResponse,
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityRequest,
     CreateBetaKeysError,
     CreateBetaKeysRequest,
     CreateBetaKeysSuccessResponse,
-    SessionTokenInfoSuccessResponse,
-    SessionTokenInfoError,
     CreateCheckoutSessionError,
     CreateCheckoutSessionRequest,
     CreateCheckoutSessionSuccessResponse,
@@ -377,6 +395,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EditUserFeatureFlagsError,
     EditUserFeatureFlagsOption,
     EditUserFeatureFlagsRequest,
+    EnqueueFaceFusionCropDimensions,
+    EnqueueFaceFusionWorkflowError,
+    EnqueueFaceFusionWorkflowRequest,
+    EnqueueFaceFusionWorkflowSuccessResponse,
     EnqueueFbxToGltfRequest,
     EnqueueFbxToGltfRequestError,
     EnqueueFbxToGltfRequestSuccessResponse,
@@ -399,10 +421,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     FakeYouPlan,
     FeaturedMediaFile,
     FeaturedModelWeightForList,
-    EnqueueFaceFusionCropDimensions,
-    EnqueueFaceFusionWorkflowError,
-    EnqueueFaceFusionWorkflowRequest,
-    EnqueueFaceFusionWorkflowSuccessResponse,
     FundamentalFrequencyMethod,
     GetInferenceJobStatusError,
     GetInferenceJobStatusPathInfo,
@@ -426,11 +444,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
+    InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     InferTtsError,
     InferTtsRequest,
     InferTtsSuccessResponse,
-    InferenceJobStatusResponsePayload,
-    InferenceJobTokenType,
     LegacyQueueDetails,
     ListActiveUserSubscriptionsError,
     ListActiveUserSubscriptionsResponse,
@@ -496,8 +514,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFileUploadError,
     MediaFilesByBatchListItem,
+    MediaFileUploadError,
     ModelWeightForList,
     ModelWeightSearchResult,
     ModernInferenceQueueStats,
@@ -526,6 +544,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SearchModelWeightsSuccessResponse,
     SessionInfoError,
     SessionInfoSuccessResponse,
+    SessionTokenInfoError,
+    SessionTokenInfoSuccessResponse,
     SessionUserInfo,
     SetMediaFileCoverImageError,
     SetMediaFileCoverImageRequest,
@@ -568,6 +588,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     UploadSavedSceneMediaFileSuccessResponse,
     UploadSceneSnapshotMediaFileForm,
     UploadSceneSnapshotMediaFileSuccessResponse,
+    UploadStudioShotFileForm,
+    UploadStudioShotSuccessResponse,
     UploadVideoMediaSuccessResponse,
     UserBookmarkDetailsForUserList,
     UserBookmarkEntityType,
