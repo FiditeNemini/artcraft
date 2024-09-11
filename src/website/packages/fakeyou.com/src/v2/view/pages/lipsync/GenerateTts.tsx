@@ -301,10 +301,21 @@ export const GenerateTts = ({
     modelToken: string | undefined,
     resultToken: string | undefined | null
   ) => {
-    if (modelToken && resultToken && isAudioLoading === false) {
+    if (modelToken && resultToken && !isAudioLoading) {
       handleClearAudio();
       setLoadingSelectedAudioResult(true);
-      const newUrl = `/ai-lip-sync?voice=${modelToken}&audio=${resultToken}`;
+      const url = new URL(window.location.href);
+      const searchParams = new URLSearchParams(url.search);
+      const sourceToken = searchParams.get("source");
+      searchParams.set("voice", modelToken);
+      searchParams.set("audio", resultToken || "");
+
+      if (sourceToken) {
+        searchParams.set("source", sourceToken);
+      }
+
+      const newUrl = `${url.pathname}?${searchParams.toString()}`;
+
       history.push(newUrl);
 
       try {
@@ -347,8 +358,18 @@ export const GenerateTts = ({
 
   const handleVoiceSelect = async (data: any) => {
     if (data.weight_token) {
-      const newUrl = `/ai-lip-sync?voice=${data.weight_token}`;
+      const url = new URL(window.location.href);
+      const searchParams = new URLSearchParams(url.search);
+      const sourceToken = searchParams.get("source");
+      searchParams.set("voice", data.weight_token);
+
+      if (sourceToken) {
+        searchParams.set("source", sourceToken);
+      }
+
+      const newUrl = `${url.pathname}?${searchParams.toString()}`;
       history.push(newUrl);
+
       close();
     }
   };
@@ -411,6 +432,7 @@ export const GenerateTts = ({
             <Panel
               padding={true}
               className="panel-inner h-100 position-relative rounded"
+              key={currentAudioUrl}
             >
               <div className="d-flex flex-column justify-content-center h-100">
                 <div className="d-flex gap-3 align-items-center justify-content-center">
@@ -423,7 +445,6 @@ export const GenerateTts = ({
                   />
                   <div className="w-100">
                     <LipsyncAudioPlayer
-                      key={currentAudioUrl}
                       filename={currentAudioUrl || ""}
                       play={isPlaying}
                       onFinish={handleAudioFinish}
@@ -433,7 +454,7 @@ export const GenerateTts = ({
                 <div className="pt-4">
                   <h6 className="fw-bold">
                     <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
-                    Audio Transcript
+                    {t("label.audioTranscript")}
                   </h6>
                   <p className="fs-7">{transcript}</p>
                 </div>

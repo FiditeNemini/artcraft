@@ -64,7 +64,6 @@ function SessionTtsInferenceResultList(props: Props) {
   const fetchMedia = async (token: string) => {
     try {
       const response = await GetWeight(token, {});
-      console.log("GetWeight response:", response);
       const publicBucketPath =
         response.cover_image.maybe_cover_image_public_bucket_path || "";
       setMediaSrc(prev => ({ ...prev, [token]: publicBucketPath }));

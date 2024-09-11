@@ -80,8 +80,11 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   const [sourceTokens, setSourceTokens] = useState<string[]>([
     ...PRECOMPUTED_SOURCE_TOKENS,
   ]);
-  const numberOfInitialSourceTokensRef = useRef(sourceTokens.length);
-  const numberOfInitialSourceTokens = numberOfInitialSourceTokensRef.current;
+  const [sourceTokenFromQuery, setSourceTokenFromQuery] = useState<
+    string | null
+  >(null);
+  // const numberOfInitialSourceTokensRef = useRef(sourceTokens.length);
+  // const numberOfInitialSourceTokens = numberOfInitialSourceTokensRef.current;
   const [isGenerating, setIsGenerating] = useState(false);
   const [jobProcessedTokens, setJobProcessedTokens] = useState<string[]>([]);
   const [voiceToken, setVoiceToken] = useState<string | null>(null);
@@ -319,13 +322,26 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    setVoiceToken(queryParams.get("voice"));
-  }, [location.search]);
+    const voiceTokenFromQuery = queryParams.get("voice");
+    const sourceTokenFromQuery = queryParams.get("source");
 
-  useEffect(() => {
-    if (voiceToken) {
-      const precomputedSourceToken = LipsyncTokenMap[voiceToken];
+    setVoiceToken(voiceTokenFromQuery);
+    setSourceTokenFromQuery(sourceTokenFromQuery);
 
+    if (sourceTokenFromQuery) {
+      setSourceTokens(prevTokens => {
+        const tokenIndex = prevTokens.indexOf(sourceTokenFromQuery);
+        if (tokenIndex !== -1) {
+          setSelectedSourceIndex(tokenIndex);
+          return prevTokens;
+        } else {
+          const updatedTokens = [...prevTokens, sourceTokenFromQuery];
+          setSelectedSourceIndex(updatedTokens.length - 1);
+          return updatedTokens;
+        }
+      });
+    } else if (voiceTokenFromQuery) {
+      const precomputedSourceToken = LipsyncTokenMap[voiceTokenFromQuery];
       if (precomputedSourceToken) {
         setSourceTokens(prevTokens => {
           const tokenIndex = prevTokens.indexOf(precomputedSourceToken);
@@ -340,7 +356,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
         });
       }
     }
-  }, [voiceToken, numberOfInitialSourceTokens]);
+  }, [location.search]);
 
   const signupCTA = (
     <>
@@ -372,6 +388,22 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
       )}
     </>
   );
+
+  const handleRemoveSourceMedia = () => {
+    if (sourceTokenFromQuery) {
+      setSourceTokenFromQuery(null);
+      setGeneratedVideoSrc("");
+      setJobProcessedTokens([]);
+      setJobPercentage(null);
+      setLastEnqueuedJobToken(null);
+      setIsGenerating(false);
+
+      const queryParams = new URLSearchParams(location.search);
+      queryParams.delete("source");
+      history.replace({ search: queryParams.toString() });
+      setSelectedSourceIndex(0);
+    }
+  };
 
   return (
     <>
@@ -422,6 +454,8 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                     showUploadButton={false}
                     showThumbnails={false}
                     stepAlwaysOnTop={true}
+                    showRemoveButton={!!sourceTokenFromQuery}
+                    onRemoveMedia={handleRemoveSourceMedia}
                   />
                 </div>
                 <Button

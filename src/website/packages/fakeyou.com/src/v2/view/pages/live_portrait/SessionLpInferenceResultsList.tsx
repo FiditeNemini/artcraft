@@ -12,7 +12,9 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowTurnUp } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowTurnUp, faLips } from "@fortawesome/pro-solid-svg-icons";
+import { Button } from "components/common";
+import { useHistory } from "react-router-dom";
 
 interface SessionLpInferenceResultsListProps {
   sessionSubscriptionsWrapper: any;
@@ -38,6 +40,8 @@ export default function SessionLpInferenceResultsList({
   onJobProgress,
   onJobStateChange,
 }: SessionLpInferenceResultsListProps) {
+  const history = useHistory();
+
   const { inferenceJobsByCategory } = useInferenceJobs();
   const hasInitialized = useRef(false);
 
@@ -151,6 +155,19 @@ export default function SessionLpInferenceResultsList({
     [JobState.CANCELED_BY_USER]: "Canceled by User",
   };
 
+  const handleLipsyncCTA = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    resultToken: string | undefined
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (resultToken) {
+      history.push(`/ai-lip-sync?source=${resultToken}`);
+    } else {
+      console.error("No result token available for this job.");
+    }
+  };
+
   const jobContent = (
     <div>
       {livePortraitJobs.length > 0 ? (
@@ -166,63 +183,86 @@ export default function SessionLpInferenceResultsList({
                 className="col-12 col-lg-3"
               >
                 <div className="lp-jobs-list">
-                  <div
-                    className="ratio ratio-1x1 overflow-hidden rounded"
-                    style={{ width: "70px" }}
-                  >
-                    <img
-                      src={
-                        job.maybeLivePortraitDetails?.source_media_file_token
-                          ? (() => {
-                              const mediaPath =
-                                mediaSrc[
-                                  job.maybeLivePortraitDetails
-                                    .source_media_file_token
-                                ] || "";
-                              const isVideo = mediaPath.endsWith(".mp4");
-                              const finalPath = isVideo
-                                ? `${mediaPath}-thumb.jpg`
-                                : mediaPath;
-                              return new BucketConfig().getGcsUrl(finalPath);
-                            })()
-                          : ""
-                      }
-                      alt="Job Thumbnail"
-                      className="object-fit-cover w-100 h-100 rounded"
-                    />
-                  </div>
-                  <div className="d-flex flex-column flex-grow-1">
-                    <div className="d-flex gap-2 align-items-center">
-                      {(job.jobState === JobState.PENDING ||
-                        job.jobState === JobState.STARTED) && (
-                        <LoadingSpinner thin={true} size={14} padding={false} />
-                      )}
-                      <span className="fw-semibold">
-                        {jobStateTextMap[job.jobState as JobState]}
-                      </span>
-                    </div>
-                    <span className="fw-normal opacity-75 fs-7">
-                      {moment(job.createdAt).fromNow()}
-                    </span>
-                    <div className="d-flex">
-                      {job.maybeResultToken ? (
-                        <Link
-                          className="fs-7 d-flex align-items-center gap-1 mt-1"
-                          to={`/media/${job.maybeResultToken}`}
-                        >
-                          More Details
-                        </Link>
-                      ) : (
-                        <div className="fs-7 opacity-50 fw-medium mt-1">
-                          {job.progressPercentage}% complete
+                  <div className="d-flex flex-column gap-2 w-100">
+                    <div className="d-flex gap-2 align-items-center w-100">
+                      <div
+                        className="ratio ratio-1x1 overflow-hidden rounded"
+                        style={{ width: "70px" }}
+                      >
+                        <img
+                          src={
+                            job.maybeLivePortraitDetails
+                              ?.source_media_file_token
+                              ? (() => {
+                                  const mediaPath =
+                                    mediaSrc[
+                                      job.maybeLivePortraitDetails
+                                        .source_media_file_token
+                                    ] || "";
+                                  const isVideo = mediaPath.endsWith(".mp4");
+                                  const finalPath = isVideo
+                                    ? `${mediaPath}-thumb.jpg`
+                                    : mediaPath;
+                                  return new BucketConfig().getGcsUrl(
+                                    finalPath
+                                  );
+                                })()
+                              : ""
+                          }
+                          alt="Job Thumbnail"
+                          className="object-fit-cover w-100 h-100 rounded"
+                        />
+                      </div>
+                      <div className="d-flex flex-column flex-grow-1">
+                        <div className="d-flex gap-2 align-items-center">
+                          {(job.jobState === JobState.PENDING ||
+                            job.jobState === JobState.STARTED) && (
+                            <LoadingSpinner
+                              thin={true}
+                              size={14}
+                              padding={false}
+                            />
+                          )}
+                          <span className="fw-semibold">
+                            {jobStateTextMap[job.jobState as JobState]}
+                          </span>
                         </div>
-                      )}
+                        <span className="fw-normal opacity-75 fs-7">
+                          {moment(job.createdAt).fromNow()}
+                        </span>
+                        <div className="d-flex">
+                          {job.maybeResultToken ? (
+                            <Link
+                              className="fs-7 d-flex align-items-center gap-1 mt-1"
+                              to={`/media/${job.maybeResultToken}`}
+                            >
+                              More Details
+                            </Link>
+                          ) : (
+                            <div className="fs-7 opacity-50 fw-medium mt-1">
+                              {job.progressPercentage}% complete
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <FontAwesomeIcon
+                        icon={faArrowTurnUp}
+                        className="pe-2 fs-5 opacity-75"
+                      />
                     </div>
+                    {job.maybeResultToken && (
+                      <Button
+                        icon={faLips}
+                        label="Use with Lip Sync"
+                        small={true}
+                        onClick={e => {
+                          if (job.maybeResultToken !== null) {
+                            handleLipsyncCTA(e, job.maybeResultToken);
+                          }
+                        }}
+                      />
+                    )}
                   </div>
-                  <FontAwesomeIcon
-                    icon={faArrowTurnUp}
-                    className="pe-2 fs-5 opacity-75"
-                  />
                 </div>
               </div>
             ))}

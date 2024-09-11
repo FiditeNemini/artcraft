@@ -12,6 +12,7 @@ import {
   faUpload,
   faChevronLeft,
   faChevronRight,
+  faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isMobile } from "react-device-detect";
@@ -44,6 +45,8 @@ interface ThumbnailMediaPickerProps {
   showStep?: boolean;
   stepAlwaysOnTop?: boolean;
   videoRef?: React.RefObject<HTMLVideoElement>;
+  showRemoveButton?: boolean;
+  onRemoveMedia?: () => void;
 }
 
 interface MediaData {
@@ -72,6 +75,8 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     showStep = true,
     stepAlwaysOnTop = false,
     videoRef,
+    showRemoveButton = false,
+    onRemoveMedia,
   }) => {
     const [isCropping, setIsCropping] = useState(false);
     const [mediaData, setMediaData] = useState<{ [key: string]: any }>({});
@@ -159,6 +164,21 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
         <div
           className={`lp-media order-4 ${stepAlwaysOnTop ? "" : "order-lg-1"}`}
         >
+          {showRemoveButton && (
+            <div
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                zIndex: 10,
+              }}
+            >
+              <button onClick={onRemoveMedia} className="ls-remove-audio-btn">
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+          )}
+
           <div className="lp-tag">
             <div>
               {!isCropping ? (
