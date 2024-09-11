@@ -1,11 +1,17 @@
 use billing_component::stripe::traits::internal_user_lookup::UserMetadata;
 use utoipa::ToSchema;
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
+use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 
 #[derive(Serialize, ToSchema)]
 pub struct AppStatePremiumInfo {
   /// If the user has premium perks. This can be the result of
   /// having *either* a loyalty perk or a paid subscription.
   pub user_has_premium: bool,
+
+  /// If the user has free premium perks.
+  /// This is from free loyalty program perks.
+  pub user_has_free_premium: bool,
 
   /// If the user has paid for a premium subscription, this will
   /// be true. Loyalty perks are not considered paid.
@@ -29,28 +35,33 @@ pub struct AppStateSubscriptionProductKey {
 }
 
 pub fn get_premium_info(
-  user_metadata: &UserMetadata,
+  user_metadata: &UserSessionExtended,
 ) -> AppStatePremiumInfo {
 
   let maybe_loyalty_program = user_metadata
+      .premium
       .maybe_loyalty_program_key
       .as_deref()
       .map(|lp| lp.to_string());
 
   let active_subscriptions = user_metadata
-      .existing_subscription_keys
+      .premium
+      .subscription_plans
       .iter()
       .map(|sub| AppStateSubscriptionProductKey {
-        namespace: sub.internal_subscription_namespace.to_string(),
-        product_slug: sub.internal_subscription_product_slug.to_string(),
+        // TODO: Is this correct? Should it be externally facing?
+        namespace: sub.subscription_namespace.to_string(),
+        product_slug: sub.subscription_product_slug.to_string(),
       })
       .collect::<Vec<_>>();
 
   let user_has_paid_premium = !active_subscriptions.is_empty();
-  let user_has_premium = user_has_paid_premium || maybe_loyalty_program.is_some();
+  let user_has_free_premium = maybe_loyalty_program.is_some();
+  let user_has_premium = user_has_paid_premium || user_has_free_premium;
 
   AppStatePremiumInfo {
     user_has_premium,
+    user_has_free_premium,
     user_has_paid_premium,
     maybe_loyalty_program,
     active_subscriptions,
