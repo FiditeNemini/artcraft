@@ -13,7 +13,6 @@ export function ButtonPlaypause({ vidEl }: { vidEl: HTMLVideoElement }) {
     PlayPauseStatus.PAUSED,
   );
   const togglePlaypause = () => {
-    console.log("togglePlaypause", playpause);
     if (playpause === PlayPauseStatus.PLAYING) {
       vidEl.pause();
     } else {

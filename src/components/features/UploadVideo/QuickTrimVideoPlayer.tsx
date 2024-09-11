@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useState } from "react";
 
 import { VideoControls } from "./VideoControls";
 import { TrimmerPlaybar } from "./TrimmerPlaybar";
@@ -13,14 +13,15 @@ export const QuickTrimVideoPlayer = ({ file }: { file: File }) => {
   //   trimStartMs: undefined,
   //   trimEndMs: undefined,
   // });
+  const [vidEl, setVidEl] = useState<HTMLVideoElement | undefined>(undefined);
 
-  const videoRef = useRef<HTMLVideoElement | undefined>(undefined);
+  // const videoRef = useRef<HTMLVideoElement | undefined>(undefined);
 
   const videoRefCallback = useCallback(
     (node: HTMLVideoElement) => {
       if (node !== null) {
         // DOM node referenced by ref has changed and exists
-        videoRef.current = node;
+        setVidEl(node);
       }
     },
     [
@@ -41,8 +42,8 @@ export const QuickTrimVideoPlayer = ({ file }: { file: File }) => {
         />
       </div>
       <div className="flex items-center justify-center">
-        <VideoControls vidEl={videoRef.current} className="w-fit" />
-        <TrimmerPlaybar vidEl={videoRef.current} className="grow" />
+        <VideoControls vidEl={vidEl} className="w-fit" />
+        <TrimmerPlaybar vidEl={vidEl} className="grow" />
       </div>
     </>
   );
