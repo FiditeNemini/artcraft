@@ -49,14 +49,13 @@ export const TrimmerPlaybarCore = ({
   }, []);
 
   useEffect(() => {
-    if (trimStartMs && trimEndMs) {
+    if (trimStartMs !== undefined && trimEndMs !== undefined) {
       onTrimChange({ trimStartMs, trimEndMs });
     }
   }, [trimStartMs, trimEndMs]);
 
   useEffect(() => {
     const handleLoadedmetadata = () => {
-      console.log(vidEl.duration * 1000);
       setStates((prev) => ({
         ...prev,
         durationMs: vidEl.duration * 1000,

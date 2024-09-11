@@ -134,7 +134,7 @@ function makeTrimPositionCalculator(
     // console.log(
     //   `(${currE.clientX} - ${parentEl.offsetLeft}) / ${parentWidth} * 100`,
     // );
-    console.log(`${result} - ${minPercent}:${maxPercent}`);
+    // console.log(`${result} - ${minPercent}:${maxPercent}`);
     if (result < minPercent) {
       return minPercent;
     }
