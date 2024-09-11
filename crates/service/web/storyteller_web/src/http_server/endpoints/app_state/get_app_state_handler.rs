@@ -31,13 +31,6 @@ const REFRESH_INTERVAL: Duration = Duration::from_secs(60);
 
 // =============== Success Response ===============
 
-// DONE:
-//   - server_info (once)
-//   - detect_locale (once)
-//   - status_alert_check (60 seconds)
-//   - active_subscriptions
-// TODO:
-//   - session
 #[derive(Serialize, ToSchema)]
 pub struct AppStateResponse {
   /// All endpoints return `success = true` on 200.
@@ -64,7 +57,10 @@ pub struct AppStateResponse {
   pub locale: AppStateUserLocale,
 
   /// Whether the user is logged in.
-  pub logged_in: bool,
+  pub is_logged_in: bool,
+
+  /// Whether the user is banned (even logged-out users can be IP banned.)
+  pub is_banned: bool,
 
   /// If the user is logged into an account with a valid session, this will
   /// contain the user's account info.
@@ -76,17 +72,6 @@ pub struct AppStateResponse {
   /// Contains details oof the user's premium subscription status.
   pub maybe_premium: Option<AppStatePremiumInfo>,
 }
-
-// /// User account information.
-// /// This is only for valid logged-in users.
-// #[derive(Serialize, ToSchema)]
-// pub struct AppStateUserAccountInfo {
-//   /// Information on the user's account
-//   pub account: String,
-//
-//   /// Details on the user's premium subscription status.
-//   pub premium: AppStatePremiumInfo,
-// }
 
 // =============== Error Response ===============
 
@@ -125,7 +110,7 @@ impl std::fmt::Display for AppStateError {
 /// This single endpoint can replace the following endpoints:
 ///  - `GET /detect_locale`
 ///  - `GET /server_info`
-///  - `GET /v1/billing/active_subscriptions` (TODO: port new logic to old endpoint)
+///  - `GET /v1/billing/active_subscriptions`
 ///  - `GET /v1/status_alert_check`
 ///  - `GET /v1/session`
 ///
@@ -174,6 +159,13 @@ pub async fn get_app_state_handler(
       .as_ref()
       .map(|session| get_premium_info(session));
 
+  let is_logged_in = maybe_user_session.is_some();
+
+  let is_banned = maybe_user_session
+      .as_ref()
+      .map(|session| session.role.is_banned)
+      .unwrap_or(false);
+
   Ok(Json(AppStateResponse {
     success: true,
     refresh_interval_millis: REFRESH_INTERVAL.as_millis(),
@@ -183,6 +175,7 @@ pub async fn get_app_state_handler(
     maybe_user_info,
     permissions,
     maybe_premium,
-    logged_in: false,
+    is_logged_in,
+    is_banned,
   }))
 }

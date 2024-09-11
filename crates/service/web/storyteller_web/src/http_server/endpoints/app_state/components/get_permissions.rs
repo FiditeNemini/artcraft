@@ -1,4 +1,4 @@
-use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
+use crate::http_server::session::lookup::user_session_extended::{UserSessionExtended, UserSessionRoleAndPermissions};
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use std::collections::BTreeSet;
 use utoipa::ToSchema;
@@ -53,7 +53,7 @@ pub fn get_permissions(
   match maybe_user {
     None => LOGGED_OUT_PERMISSIONS.clone(),
     Some(user) => AppStatePermissions {
-      is_moderator: user.role.user_role_slug == "moderator",
+      is_moderator: is_moderator(&user.role),
       feature_flags: user.feature_flags.clone_flags(),
       legacy_permission_flags: AppStateLegacyPermissionFlags {
         can_use_tts: user.role.can_use_tts,
@@ -105,3 +105,13 @@ const LOGGED_OUT_PERMISSIONS : AppStatePermissions  = AppStatePermissions {
     can_delete_users: false,
   },
 };
+
+fn is_moderator(role: &UserSessionRoleAndPermissions) -> bool {
+  match role.user_role_slug.as_str() {
+    "admin" => true,
+    "administrator" => true,
+    "mod" => true,
+    "moderator" => true,
+    _ => false,
+  }
+}
