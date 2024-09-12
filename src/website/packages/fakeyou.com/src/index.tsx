@@ -1,15 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
-import AppTranslated from "./AppTranslated";
-
-const IS_IOS: boolean = /iPad|iPhone|iPod/.test(navigator.platform || "");
-
-const enableSpectrograms = !IS_IOS;
-
-const flashVocodesNotice = new URLSearchParams(window.location.search).has(
-  "vocodes"
-);
+// import AppTranslated from "./AppTranslated";
+import { App } from "./App";
 
 const designSystemClass = "fakeyou-refresh";
 
@@ -44,10 +37,7 @@ document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppTranslated
-      enableSpectrograms={enableSpectrograms}
-      flashVocodesNotice={flashVocodesNotice}
-    />
+    <App />
   </React.StrictMode>,
   document.getElementById("root")
 );

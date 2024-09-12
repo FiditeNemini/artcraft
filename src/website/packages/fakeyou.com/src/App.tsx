@@ -8,7 +8,6 @@ import {
   DetectLocale,
   DetectLocaleIsOk,
 } from "@storyteller/components/src/api/locale/DetectLocale";
-import { Language } from "@storyteller/components/src/i18n/Language";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import PageContainer from "./v2/view/PageContainer";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
@@ -16,13 +15,10 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
-import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import deepEqual from "deep-equal";
-import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import {
   AvailableLanguageKey,
   AVAILABLE_LANGUAGE_MAP,
@@ -78,85 +74,37 @@ enum MigrationMode {
   OLD_VOCODES,
 }
 
-interface Props {
-  enableSpectrograms: boolean;
-
-  flashVocodesNotice: boolean;
-
-  allTtsCategories: TtsCategoryType[];
-  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
-
-  allTtsModels: TtsModelListItem[];
-  setAllTtsModels: (allTtsModels: TtsModelListItem[]) => void;
-
-  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
-  setComputedTtsCategoryAssignments: (
-    categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse
-  ) => void;
-
-  allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
-  allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
-  ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
-
-  dropdownCategories: TtsCategoryType[][];
-  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void;
-  selectedCategories: TtsCategoryType[];
-  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void;
-
-  maybeSelectedTtsModel?: TtsModelListItem;
-  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
-
-  selectedTtsLanguageScope: string;
-  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
-}
+interface Props {}
 
 interface State {
   // Migration Mode
-  migrationMode: MigrationMode;
+  // migrationMode: MigrationMode;
 
   // Rollout of vocodes 2.0
-  enableAlpha: boolean;
+  // enableAlpha: boolean;
 
   sessionFetched: boolean;
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
-  // Show flash notice of vocodes name change
-  isShowingVocodesNotice: boolean;
-
   // Locale + show flash notice to Spanish speakers
   //localeLanguageCodes: string[],
   //localeFullLanguageTags: string[],
-  isShowingLanguageNotice: boolean;
-  displayLanguage: Language;
-  primaryLanguageCode: string;
+  // isShowingLanguageNotice: boolean;
+  // displayLanguage: Language;
+  // primaryLanguageCode: string;
 
-  isShowingTwitchTtsNotice: boolean;
-  isShowingPleaseFollowNotice: boolean;
+  // isShowingTwitchTtsNotice: boolean;
+  // isShowingPleaseFollowNotice: boolean;
 
   // An improved notice for "new" languages asking users to help.
-  isShowingBootstrapLanguageNotice: boolean;
+  // isShowingBootstrapLanguageNotice: boolean;
 
   // Current text entered
   textBuffer: string;
 
-  voiceConversionModels: VoiceConversionModelListItem[];
+  // voiceConversionModels: VoiceConversionModelListItem[];
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
-}
-
-function newVocodes() {
-  const discord = /discord/i.test(navigator.userAgent || "");
-  const twitter = /twitter/i.test(navigator.userAgent || "");
-  const alphaCookie = document.cookie.includes("enable-alpha");
-  return discord || twitter || alphaCookie;
-}
-
-function isMacOs() {
-  // Not on macs yet
-  // https://stackoverflow.com/a/38241481
-  const platform = window.navigator.platform;
-  const macPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K", "darwin"];
-  return macPlatforms.indexOf(platform) !== -1;
 }
 
 // TODO: Port to functional component
@@ -164,39 +112,14 @@ class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const enableAlpha = newVocodes() || true;
-
-    const migrationMode = enableAlpha
-      ? MigrationMode.NEW_VOCODES
-      : MigrationMode.OLD_VOCODES;
-
-    let showTwitchNotice = !isMacOs();
-    showTwitchNotice = false; // TODO: Temporarily disabled.
-
-    let showPleaseFollowNotice = false;
-
     this.state = {
-      enableAlpha: enableAlpha,
-      migrationMode: migrationMode,
-
       sessionFetched: false,
       sessionWrapper: SessionWrapper.emptySession(),
       sessionSubscriptionsWrapper:
         SessionSubscriptionsWrapper.emptySubscriptions(),
 
-      isShowingVocodesNotice: props.flashVocodesNotice,
-
-      isShowingLanguageNotice: false,
-      displayLanguage: Language.English,
-      primaryLanguageCode: "en",
-
-      isShowingTwitchTtsNotice: showTwitchNotice,
-      isShowingPleaseFollowNotice: showPleaseFollowNotice,
-      isShowingBootstrapLanguageNotice: false,
-
       textBuffer: "",
 
-      voiceConversionModels: [],
       maybeSelectedVoiceConversionModel: undefined,
     };
   }
@@ -319,15 +242,6 @@ class App extends React.Component<Props, State> {
         }
       }
 
-      this.setState({
-        isShowingLanguageNotice: false, // TODO: Remove/consolidate
-        displayLanguage: preferredLanguage.language,
-        primaryLanguageCode: preferredLanguage.languageCode,
-        isShowingPleaseFollowNotice: preferredLanguage.showPleaseFollowNotice,
-        isShowingBootstrapLanguageNotice:
-          preferredLanguage.showBootstrapLanguageNotice,
-      });
-
       i18n.changeLanguage(preferredLanguage.languageCode);
       i18n2.changeLanguage(preferredLanguage.languageCode);
     }
@@ -351,40 +265,6 @@ class App extends React.Component<Props, State> {
       .catch(e => {
         /* Ignore. */
       });
-  };
-
-  clearVocodesNotice = () => {
-    this.setState({ isShowingVocodesNotice: false });
-  };
-
-  clearLanguageNotice = () => {
-    this.setState({ isShowingLanguageNotice: false });
-  };
-
-  clearTwitchTtsNotice = () => {
-    this.setState({ isShowingTwitchTtsNotice: false });
-  };
-
-  clearPleaseFollowNotice = () => {
-    this.setState({ isShowingPleaseFollowNotice: false });
-  };
-
-  clearBootstrapLanguageNotice = () => {
-    this.setState({ isShowingBootstrapLanguageNotice: false });
-  };
-
-  setAllVoiceConversionModels = (models: VoiceConversionModelListItem[]) => {
-    this.setState({ voiceConversionModels: models });
-  };
-
-  setMaybeSelectedVoiceConversionModel = (
-    model?: VoiceConversionModelListItem
-  ) => {
-    this.setState({ maybeSelectedVoiceConversionModel: model });
-  };
-
-  setMigrationMode = (mode: MigrationMode) => {
-    this.setState({ migrationMode: mode });
   };
 
   setTextBuffer = (textBuffer: string) => {
@@ -427,71 +307,11 @@ class App extends React.Component<Props, State> {
                       querySessionSubscriptionsAction={
                         this.querySessionSubscriptions
                       }
-                      isShowingVocodesNotice={this.state.isShowingVocodesNotice}
-                      clearVocodesNotice={this.clearVocodesNotice}
-                      isShowingLangaugeNotice={
-                        this.state.isShowingLanguageNotice
-                      }
-                      clearLanguageNotice={this.clearLanguageNotice}
-                      displayLanguage={this.state.displayLanguage}
-                      primaryLanguageCode={this.state.primaryLanguageCode}
-                      isShowingTwitchTtsNotice={
-                        this.state.isShowingTwitchTtsNotice
-                      }
-                      clearTwitchTtsNotice={this.clearTwitchTtsNotice}
-                      isShowingPleaseFollowNotice={
-                        this.state.isShowingPleaseFollowNotice
-                      }
-                      clearPleaseFollowNotice={this.clearPleaseFollowNotice}
-                      isShowingBootstrapLanguageNotice={
-                        this.state.isShowingBootstrapLanguageNotice
-                      }
-                      clearBootstrapLanguageNotice={
-                        this.clearBootstrapLanguageNotice
-                      }
                       textBuffer={this.state.textBuffer}
                       setTextBuffer={this.setTextBuffer}
                       clearTextBuffer={this.clearTextBuffer}
-                      ttsModels={this.props.allTtsModels}
-                      setTtsModels={this.props.setAllTtsModels}
-                      allTtsCategories={this.props.allTtsCategories}
-                      setAllTtsCategories={this.props.setAllTtsCategories}
-                      computedTtsCategoryAssignments={
-                        this.props.computedTtsCategoryAssignments
-                      }
-                      setComputedTtsCategoryAssignments={
-                        this.props.setComputedTtsCategoryAssignments
-                      }
-                      allTtsCategoriesByTokenMap={
-                        this.props.allTtsCategoriesByTokenMap
-                      }
-                      allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
-                      ttsModelsByCategoryToken={
-                        this.props.ttsModelsByCategoryToken
-                      }
-                      dropdownCategories={this.props.dropdownCategories}
-                      setDropdownCategories={this.props.setDropdownCategories}
-                      selectedCategories={this.props.selectedCategories}
-                      setSelectedCategories={this.props.setSelectedCategories}
-                      maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                      setMaybeSelectedTtsModel={
-                        this.props.setMaybeSelectedTtsModel
-                      }
-                      selectedTtsLanguageScope={
-                        this.props.selectedTtsLanguageScope
-                      }
-                      setSelectedTtsLanguageScope={
-                        this.props.setSelectedTtsLanguageScope
-                      }
-                      voiceConversionModels={this.state.voiceConversionModels}
-                      setVoiceConversionModels={
-                        this.setAllVoiceConversionModels
-                      }
                       maybeSelectedVoiceConversionModel={
                         this.state.maybeSelectedVoiceConversionModel
-                      }
-                      setMaybeSelectedVoiceConversionModel={
-                        this.setMaybeSelectedVoiceConversionModel
                       }
                     />
                   </Route>

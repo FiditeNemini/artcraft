@@ -40,8 +40,6 @@ import { W2lTemplateDeletePage } from "./pages/w2l/w2l_template_delete/W2lTempla
 import { W2lTemplateEditPage } from "./pages/w2l/w2l_template_edit/W2lTemplateEditPage";
 import { W2lResultDeletePage } from "./pages/w2l/w2l_result_delete/W2lResultDeletePage";
 import { W2lTemplateApprovePage } from "./pages/w2l/w2l_template_approve/W2lTemplateApprovePage";
-// import { TtsModelListPage } from "./pages/tts/tts_model_list/TtsModelListPage";
-import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { ProfileBanFc } from "./pages/profile/profile_ban/ProfileBanFc";
 import { ModerationUserListFc } from "./pages/moderation/moderation_user_list/ModerationUserList";
 import { LeaderboardPage } from "./pages/leaderboard/LeaderboardPage";
@@ -54,25 +52,18 @@ import { TtsEditCategoriesPage } from "./pages/tts/tts_edit_categories/TtsEditCa
 import { ModerationTtsCategoryListPage } from "./pages/moderation/categories/ModerationTtsCategoryListPage";
 import { ModerationTtsCategoryEditPage } from "./pages/moderation/categories/ModerationTtsCategoryEditPage";
 import { ModerationCategoryDeletePage } from "./pages/moderation/categories/ModerationCategoryDeletePage";
-import { TtsCategoryType } from "../../AppWrapper";
 import { PatronPage } from "./pages/patrons/PatronPage";
-import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
-
 import { PricingPage } from "./pages/premium/PricingPage";
 import { WelcomePage } from "./pages/welcome/WelcomePage";
 import { CheckoutSuccessPage } from "./pages/premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./pages/premium/PortalSuccessPage";
 import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
-import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
-//import { LandingPage } from "./pages/landing/LandingPage";
-// import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
-
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
@@ -80,11 +71,8 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
-// import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
 import TopNav from "components/layout/TopNav/TopNav";
-// import MediaPage from "./pages/media/MediaPage";
 import MediaPageSwitch from "./pages/media/MediaPageSwitch";
-// import DevMediaPage from "./pages/media/DevMediaPage";
 import EditCoverImage from "./pages/media/EditCoverImage";
 import MediaRenamePage from "./pages/media/MediaRenamePage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
@@ -93,18 +81,14 @@ import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesigner
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
-// import EngineCompositor from "./pages/EngineCompositor/EngineCompositor";
 import InferenceJobsPage from "./pages/inference_jobs_page/InferenceJobsPage";
-// import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
 import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
-
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
-
 import VideoWorkflowPage from "./pages/video_workflow/VideoWorkflow";
 import ScrollToTop from "./_common/ScrollToTop";
 import TextToImagePage from "./pages/text_to_image/TextToImagePage";
@@ -118,7 +102,6 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 import StyleVideo from "./pages/style-video";
-// import AIFaceMirror from "./pages/ai_face_mirror";
 import CreateBetaKeyPage from "./pages/beta_key/CreateBetaKeyPage";
 import RedeemBetaKeyPage from "./pages/beta_key/RedeemBetaKeyPage";
 import RedeemSuccessPage from "./pages/beta_key/RedeemSuccessPage";
@@ -151,62 +134,11 @@ interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   querySessionSubscriptionsAction: () => void;
 
-  isShowingVocodesNotice: boolean;
-  clearVocodesNotice: () => void;
-
-  isShowingLangaugeNotice: boolean;
-  clearLanguageNotice: () => void;
-  displayLanguage: Language;
-  primaryLanguageCode: string;
-
-  isShowingTwitchTtsNotice: boolean;
-  clearTwitchTtsNotice: () => void;
-
-  isShowingPleaseFollowNotice: boolean;
-  clearPleaseFollowNotice: () => void;
-
-  isShowingBootstrapLanguageNotice: boolean;
-  clearBootstrapLanguageNotice: () => void;
-
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
   clearTextBuffer: () => void;
 
-  ttsModels: Array<TtsModelListItem>;
-  setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void;
-
-  allTtsCategories: TtsCategoryType[];
-  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
-
-  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
-  setComputedTtsCategoryAssignments: (
-    categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse
-  ) => void;
-
-  allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
-  allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
-  ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
-
-  dropdownCategories: TtsCategoryType[][];
-  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void;
-  selectedCategories: TtsCategoryType[];
-  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void;
-
-  maybeSelectedTtsModel?: TtsModelListItem;
-  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
-
-  selectedTtsLanguageScope: string;
-  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
-
-  voiceConversionModels: Array<VoiceConversionModelListItem>;
-  setVoiceConversionModels: (
-    ttsVoices: Array<VoiceConversionModelListItem>
-  ) => void;
-
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
-  setMaybeSelectedVoiceConversionModel: (
-    maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
-  ) => void;
 }
 
 interface State {}
