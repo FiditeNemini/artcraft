@@ -104,12 +104,12 @@ use crate::http_server::endpoints::media_files::upload::upload_generic::upload_m
 use crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
-use crate::http_server::endpoints::media_files::upload::upload_new_video_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_pmx::upload_pmx_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_scene_snapshot_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::*;
-use crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_video_new::upload_new_video_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_video_old::upload_video_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::*;
@@ -199,11 +199,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::upload_image_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::upload_new_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::upload_new_scene_media_file_handler,
-    crate::http_server::endpoints::media_files::upload::upload_new_video_media_file_handler::upload_new_video_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_pmx::upload_pmx_media_file_handler::upload_pmx_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::upload_saved_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_scene_snapshot_media_file_handler::upload_scene_snapshot_media_file_handler,
-    crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
+    crate::http_server::endpoints::media_files::upload::upload_video_new::upload_new_video_media_file_handler::upload_new_video_media_file_handler,
+    crate::http_server::endpoints::media_files::upload::upload_video_old::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::write_scene_file_media_file_handler,
     crate::http_server::endpoints::model_download::enqueue_gptsovits_model_download_handler::enqueue_gptsovits_model_download_handler,
