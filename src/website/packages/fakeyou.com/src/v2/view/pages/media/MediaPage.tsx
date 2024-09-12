@@ -661,7 +661,7 @@ export default function MediaPage({
             <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
                 {mediaFile?.media_type === MediaFileType.Audio &&
-                mediaFile?.maybe_model_weight_info.weight_token &&
+                mediaFile?.maybe_model_weight_info?.weight_token &&
                 LipsyncTokenMap[
                   mediaFile?.maybe_model_weight_info.weight_token
                 ] ? (
