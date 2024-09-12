@@ -18,8 +18,8 @@ export const ArtStyleItem = ({
   defaultImg = "/resources/placeholders/style_placeholder.png",
   src = defaultImg,
   onSelected,
-  width,
-  height,
+  // width,
+  // height,
   className,
   ...imgProps
 }: ArtStyleItemProps) => {
@@ -45,12 +45,12 @@ export const ArtStyleItem = ({
           : "border-ui-border hover:border-primary-300",
         className,
       )}
-      style={{
-        minWidth: (width as number) + 4,
-        minHeight: (height as number) + 4,
-        maxWidth: (width as number) + 4,
-        maxHeight: (height as number) + 4,
-      }}
+      // style={{
+      //   minWidth: (width as number) + 4,
+      //   minHeight: (height as number) + 4,
+      //   maxWidth: (width as number) + 4,
+      //   maxHeight: (height as number) + 4,
+      // }}
       onClick={handleSelected}
     >
       <img
@@ -58,12 +58,12 @@ export const ArtStyleItem = ({
         src={imageSrc}
         {...imgProps}
         alt={label}
-        style={{
-          minWidth: width,
-          minHeight: height,
-          maxWidth: width,
-          maxHeight: height,
-        }}
+        // style={{
+        //   minWidth: width,
+        //   minHeight: height,
+        //   maxWidth: width,
+        //   maxHeight: height,
+        // }}
       />
       <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
       <h4 className="absolute bottom-0 left-1 truncate text-start text-sm drop-shadow-md">
