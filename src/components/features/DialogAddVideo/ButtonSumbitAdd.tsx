@@ -1,0 +1,76 @@
+import { useCallback } from "react";
+import { Signal } from "@preact/signals-react";
+import { v4 as uuidv4 } from "uuid";
+
+import { MediaUploadApi, MediaFilesApi } from "~/Classes/ApiManager";
+import { TrimData } from "./TrimmerPlaybar";
+import { DialogAddMediaStatuses } from "./enums";
+import { Button } from "~/components/ui";
+
+import { dispatchUiEvents } from "~/signals";
+
+export const ButtonSubmitAdd = ({
+  file,
+  trimData,
+  onStatusChanged,
+}: {
+  file: File | null;
+  trimData: Signal<TrimData | undefined>;
+  onStatusChanged: (newStatus: DialogAddMediaStatuses) => void;
+}) => {
+  const handleAdd = useCallback(async () => {
+    if (file && trimData.value) {
+      // setup payload
+      const payload = {
+        blob: file,
+        fileName: file.name,
+        uuid: uuidv4(),
+        is_intermediate_system_file: false,
+        maybe_trim_start_millis: Math.round(trimData.value.trimStartMs),
+        maybe_trim_end_millis: Math.round(trimData.value.trimEndMs),
+      };
+      console.log("Add Video Payload >> ", payload);
+
+      // upload the file
+      onStatusChanged(DialogAddMediaStatuses.FILE_UPLOADING);
+      const meaidaUpload = new MediaUploadApi();
+      const fileUploadResponse = await meaidaUpload.UploadNewVideo(payload);
+      console.log("Add Video Response >> ", fileUploadResponse);
+
+      // if upload fails
+      if (!fileUploadResponse.success || !fileUploadResponse.data) {
+        onStatusChanged(DialogAddMediaStatuses.ERROR_FILE_UPLOAD);
+        return;
+      }
+
+      // request the file record
+      onStatusChanged(DialogAddMediaStatuses.FILE_RECORD_REQUESTING);
+      const mediaFiles = new MediaFilesApi();
+      const recordRequestResponse = await mediaFiles.GetMediaFileByToken({
+        mediaFileToken: fileUploadResponse.data,
+      });
+
+      // if reqest fails
+      if (!recordRequestResponse.success || !recordRequestResponse.data) {
+        onStatusChanged(DialogAddMediaStatuses.ERROR_FILE_RECORD_REQUEST);
+        return;
+      }
+
+      // return the good result
+      onStatusChanged(DialogAddMediaStatuses.FILE_RECORD_RECEIVED);
+      console.log(recordRequestResponse);
+      dispatchUiEvents.addVideoToEngine({
+        url: recordRequestResponse.data.public_bucket_url,
+      });
+    }
+  }, [file]);
+
+  return (
+    <Button
+      onClick={handleAdd}
+      disabled={file === null || trimData === undefined}
+    >
+      Add Video
+    </Button>
+  );
+};

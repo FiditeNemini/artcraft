@@ -142,26 +142,36 @@ export class MediaUploadApi extends ApiManager {
     blob,
     fileName,
     uuid,
+    is_intermediate_system_file = true,
     maybe_title,
     maybe_visibility = Visibility.Public,
     maybe_style_name,
     maybe_scene_source_media_file_token,
+    maybe_trim_end_millis,
+    maybe_trim_start_millis,
   }: {
     blob: Blob;
     fileName: string;
     uuid: string;
+    is_intermediate_system_file?: boolean;
     maybe_title?: string;
     maybe_visibility?: Visibility;
     maybe_style_name?: string;
     maybe_scene_source_media_file_token?: string;
+    maybe_trim_end_millis?: number;
+    maybe_trim_start_millis?: number;
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/new_video`;
     const options: Record<string, string | number | undefined> = {
-      is_intermediate_system_file: "true",
+      is_intermediate_system_file: is_intermediate_system_file
+        ? "true"
+        : "false",
       maybe_title,
       maybe_visibility: maybe_visibility?.toString(),
       maybe_style_name,
       maybe_scene_source_media_file_token,
+      maybe_trim_end_millis,
+      maybe_trim_start_millis,
     };
     return this.Upload({ endpoint, blob, fileName, uuid, options });
   }

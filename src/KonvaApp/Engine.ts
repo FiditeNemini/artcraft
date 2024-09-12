@@ -54,8 +54,8 @@ export class Engine {
       this.addImage(image);
     });
     uiEvents.onGetStagedVideo((video) => {
-      console.log("Engine got trim data: ", video.trimData);
-      this.addVideo(video.file);
+      console.log("Engine got video: " + video.url);
+      // this.addVideo(video.file);
     });
 
     // TODO: You may listen to all the image toolbar events here

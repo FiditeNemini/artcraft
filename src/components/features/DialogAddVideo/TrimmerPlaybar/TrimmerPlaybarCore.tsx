@@ -14,10 +14,12 @@ import { TrimData } from "./utilities";
 
 export const TrimmerPlaybarCore = ({
   vidEl,
+  trimData,
   className,
   onTrimChange,
 }: {
   vidEl: HTMLVideoElement;
+  trimData?: TrimData;
   className?: string;
   onTrimChange: (trimData: TrimData) => void;
 }) => {
@@ -84,9 +86,10 @@ export const TrimmerPlaybarCore = ({
         ...prev,
         durationMs: vidEl.duration * 1000,
         currentTimeMs: vidEl.currentTime * 1000,
-        trimStartMs: 0,
-        trimEndMs:
-          vidEl.duration * 1000 >= MAX_TRIM_DURATION
+        trimStartMs: trimData?.trimStartMs ?? 0,
+        trimEndMs: trimData?.trimEndMs
+          ? trimData.trimEndMs
+          : vidEl.duration * 1000 >= MAX_TRIM_DURATION
             ? MAX_TRIM_DURATION
             : vidEl.duration * 1000,
       }));
@@ -102,8 +105,8 @@ export const TrimmerPlaybarCore = ({
     vidEl.addEventListener("loadedmetadata", handleLoadedmetadata);
     vidEl.addEventListener("timeupdate", handleTimeupdate);
     return () => {
-      vidEl.removeEventListener("loadedmetadata", handleLoadedmetadata);
       vidEl.removeEventListener("timeupdate", handleTimeupdate);
+      vidEl.removeEventListener("loadedmetadata", handleLoadedmetadata);
     };
   }, [vidEl]);
 

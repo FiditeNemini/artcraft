@@ -22,7 +22,7 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
         ? `${Math.floor(file.size / 1024)} KB`
         : null;
 
-  const fileName = file && getFileName(file).toUpperCase();
+  // const fileName = file && getFileName(file).toUpperCase();
   const wrapperClassName = twMerge(
     "group cursor-pointer p-3 bg-gray-100",
     !file && "aspect-video flex flex-col items-center justify-center gap-6",
@@ -54,14 +54,12 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
           <p className="font-medium">
             {file.name.slice(0, file.name.lastIndexOf("."))}
           </p>
-          <p className="flex items-center gap-2 text-sm font-normal">
-            <span className="opacity-50">
-              {`${fileName} file size: ${fileSize} `}
-            </span>
-            <u className="transition-all group-hover:text-primary">
-              Change File
-            </u>
+          <p className="flex items-center gap-2 text-sm font-normal text-gray-500">
+            {`file size: ${fileSize} `}
           </p>
+        </div>
+        <div className="rounded-md bg-primary px-4 py-2 hover:bg-primary-400">
+          <p className="font-normal text-white">Change File</p>
         </div>
       </div>
     );

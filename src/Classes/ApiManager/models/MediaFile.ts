@@ -27,6 +27,7 @@ export interface MediaFile {
   maybe_duration_millis: number | null;
   maybe_style_name: null | string;
   public_bucket_path: string;
+  public_bucket_url: string;
   cover_image: {
     maybe_cover_image_public_bucket_path: null | string;
     default_cover: {

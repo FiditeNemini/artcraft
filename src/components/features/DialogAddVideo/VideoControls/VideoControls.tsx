@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { VIDEO_STATE_STATUSES } from "./enum";
@@ -14,32 +14,43 @@ export const VideoControls = ({
   vidEl: HTMLVideoElement | undefined;
   className?: string;
 }) => {
+  const prevVidEl = useRef<HTMLVideoElement | undefined>(undefined);
   const [status, setStatus] = useState<VIDEO_STATE_STATUSES>(
     VIDEO_STATE_STATUSES.INIT,
   );
 
   useEffect(() => {
+    // helper function for removing listenders
     const handleLoadedmetadata = () => {
       if (vidEl) {
         setStatus(VIDEO_STATE_STATUSES.METADATA_LOADED);
+        prevVidEl.current = vidEl;
       }
     };
 
-    // DOM node referencs has changed and exists
-    if (vidEl) {
-      vidEl.addEventListener("loadedmetadata", handleLoadedmetadata);
-    }
+    // DOM node referencs has changed
+    setStatus(VIDEO_STATE_STATUSES.INIT);
+    // if the node exist, attach the listener and its remover
+    vidEl?.addEventListener("loadedmetadata", handleLoadedmetadata);
     return () => {
       vidEl?.removeEventListener("loadedmetadata", handleLoadedmetadata);
     };
   }, [vidEl]);
+
+  useEffect(() => {
+    prevVidEl.current = vidEl;
+  }, []);
 
   const wrapperClass = twMerge(
     "flex w-full h-10 justify-center items-center gap-2",
     className,
   );
 
-  if (status === VIDEO_STATE_STATUSES.METADATA_LOADED && vidEl) {
+  if (
+    status === VIDEO_STATE_STATUSES.METADATA_LOADED &&
+    vidEl &&
+    prevVidEl.current === vidEl
+  ) {
     return (
       <div className={wrapperClass}>
         <ButtonPlaypause vidEl={vidEl} />
