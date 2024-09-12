@@ -559,7 +559,7 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                       theme="fakeyou"
                       content={
                         generatedVideoSrc
-                          ? t("tooltip.downloadVideo")
+                          ? t("tooltip.download")
                           : t("tooltip.downloadNoOutput")
                       }
                     >

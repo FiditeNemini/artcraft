@@ -250,18 +250,19 @@ export default function SessionLpInferenceResultsList({
                         className="pe-2 fs-5 opacity-75"
                       />
                     </div>
-                    {job.maybeResultToken && (
-                      <Button
-                        icon={faLips}
-                        label="Use with Lip Sync"
-                        small={true}
-                        onClick={e => {
-                          if (job.maybeResultToken !== null) {
-                            handleLipsyncCTA(e, job.maybeResultToken);
-                          }
-                        }}
-                      />
-                    )}
+
+                    <Button
+                      icon={faLips}
+                      label="Use with Lip Sync"
+                      small={true}
+                      variant={job.maybeResultToken ? "primary" : "action"}
+                      disabled={!job.maybeResultToken}
+                      onClick={e => {
+                        if (job.maybeResultToken !== null) {
+                          handleLipsyncCTA(e, job.maybeResultToken);
+                        }
+                      }}
+                    />
                   </div>
                 </div>
               </div>

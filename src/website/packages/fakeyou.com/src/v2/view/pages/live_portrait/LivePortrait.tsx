@@ -19,6 +19,7 @@ import {
   faArrowDownToLine,
   faEquals,
   faImageUser,
+  faLips,
   faLock,
   faPlus,
   faSparkles,
@@ -129,6 +130,9 @@ export default function LivePortrait({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVideos, setGeneratedVideos] = useState<GeneratedVideo[]>([]);
   const [jobProcessedTokens, setJobProcessedTokens] = useState<string[]>([]);
+  const [resultTokens, setResultTokens] = useState<{
+    [key: string]: string | null;
+  }>({});
   const [currentlyGeneratingList, setCurrentlyGeneratingList] = useState<
     CurrentlyGenerating[]
   >([]);
@@ -579,6 +583,16 @@ export default function LivePortrait({
         livePortraitDetails.face_driver_media_file_token
       );
 
+      const sourceToken = livePortraitDetails.source_media_file_token;
+      const motionToken = livePortraitDetails.face_driver_media_file_token;
+
+      const combinationKey = `${sourceToken}_${motionToken}`;
+
+      setResultTokens(prevTokens => ({
+        ...prevTokens,
+        [combinationKey]: maybeResultToken,
+      }));
+
       const newGeneratedVideo = {
         sourceIndex,
         motionIndex,
@@ -840,6 +854,8 @@ export default function LivePortrait({
     </>
   );
 
+  const combinationKey = `${sourceTokens[selectedSourceIndex]}_${motionTokens[selectedMotionIndex]}`;
+
   return (
     <>
       <Container type="panel" className="mt-3 mt-lg-5">
@@ -951,42 +967,62 @@ export default function LivePortrait({
                 </div>
 
                 <div className="d-flex flex-column gap-4">
-                  <div className="d-flex gap-2">
-                    <Button
-                      icon={isUserContent ? faSparkles : undefined}
-                      label={
-                        !loggedIn && isUserContent
-                          ? "Sign Up and Animate"
-                          : isUserContent
-                            ? generatedVideoSrc
-                              ? "Re-animate"
-                              : "Animate"
-                            : !loggedIn
-                              ? "Sign up now to Animate"
-                              : "Upload your media to generate"
-                      }
-                      onClick={
-                        loggedIn
-                          ? enqueueClick
-                          : () =>
-                              history.push("/signup?redirect=/ai-live-portrait")
-                      }
-                      className="flex-grow-1"
-                      // disabled={!isUserContent}
-                      isLoading={isEnqueuing || isGenerating}
-                      disabled={!isUserContent && loggedIn}
-                    />
-                    <Tippy theme="fakeyou" content="Download video">
-                      <div>
-                        <Button
-                          square={true}
-                          icon={faArrowDownToLine}
-                          variant="action"
-                          onClick={handleDownloadClick}
-                          disabled={!loggedIn}
-                        />
-                      </div>
-                    </Tippy>
+                  <div className="d-flex flex-column gap-3">
+                    {generatedVideoSrc && resultTokens[combinationKey] && (
+                      <Button
+                        icon={faLips}
+                        label="Use with Lipsync"
+                        onClick={() =>
+                          history.push(
+                            `/ai-lip-sync?source=${resultTokens[combinationKey]}`
+                          )
+                        }
+                        className="flex-grow-1"
+                        variant="primary"
+                      />
+                    )}
+
+                    <div className="d-flex gap-2">
+                      <Button
+                        icon={isUserContent ? faSparkles : undefined}
+                        label={
+                          !loggedIn && isUserContent
+                            ? "Sign Up and Animate"
+                            : isUserContent
+                              ? generatedVideoSrc
+                                ? "Re-animate"
+                                : "Animate"
+                              : !loggedIn
+                                ? "Sign up now to Animate"
+                                : "Upload your media to generate"
+                        }
+                        onClick={
+                          loggedIn
+                            ? enqueueClick
+                            : () =>
+                                history.push(
+                                  "/signup?redirect=/ai-live-portrait"
+                                )
+                        }
+                        className="flex-grow-1"
+                        // disabled={!isUserContent}
+                        isLoading={isEnqueuing || isGenerating}
+                        disabled={!isUserContent && loggedIn}
+                        variant={generatedVideoSrc ? "action" : "primary"}
+                      />
+
+                      <Tippy theme="fakeyou" content="Download video">
+                        <div>
+                          <Button
+                            square={true}
+                            icon={faArrowDownToLine}
+                            variant="action"
+                            onClick={handleDownloadClick}
+                            disabled={!loggedIn}
+                          />
+                        </div>
+                      </Tippy>
+                    </div>
                   </div>
 
                   <div className="d-flex flex-column gap-2">
