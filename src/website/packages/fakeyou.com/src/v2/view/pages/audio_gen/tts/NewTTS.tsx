@@ -42,6 +42,7 @@ import VoicePickerPreview from "../VoicePickerPreview";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import ExploreVoices from "../ExploreVoices";
 import { featuredTtsVoiceTokens } from "./FeaturedTTSVoiceTokens";
+import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -311,7 +312,10 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+          <FeaturedVideos />
+        </Panel>
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try our video AI tools</h2>
           <AITools />
         </Panel>
         {/* <MentionsSection /> */}

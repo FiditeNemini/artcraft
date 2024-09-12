@@ -5,7 +5,7 @@ export interface ListFeaturedMediaFilesRequest {}
 
 export interface ListFeaturedMediaFilesResponse {
   success: boolean;
-  media_files: MediaFile[];
+  results: MediaFile[];
 }
 
 export const ListFeaturedMediaFiles = MakeRequest<
