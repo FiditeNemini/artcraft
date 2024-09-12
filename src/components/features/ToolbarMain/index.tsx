@@ -20,6 +20,7 @@ import { twMerge } from "tailwind-merge";
 
 import { DialogAddImage } from "../DialogAddImage";
 import { DialogAddVideo } from "../DialogAddVideo";
+import { DialogAiStylize } from "../DialogAiStylize";
 
 // style constants
 import { paperWrapperStyles } from "~/components/styles";
@@ -30,9 +31,10 @@ import { layout } from "~/signals";
 import { ToolbarMainButtonNames } from "./enum";
 
 const initialState = {
-  isUploadSubmenuOpen: false,
-  isUploadVideoOpen: false,
-  isUploadImageOpen: false,
+  isAddSubmenuOpen: false,
+  isAddVideoOpen: false,
+  isAddImageOpen: false,
+  isAiStylizeOpen: false,
 };
 
 export const ToolbarMain = ({
@@ -64,12 +66,40 @@ export const ToolbarMain = ({
   const toolbarCallbackRef = useCallback((node: HTMLDivElement) => {
     function handleClickOutside(e: MouseEvent) {
       if (!node.contains(e.target as Node)) {
-        setState(initialState);
+        setState((curr) => ({ ...curr, isUploadSubmenuOpen: false }));
       }
     }
     if (node) {
       window.addEventListener("click", handleClickOutside);
     }
+  }, []);
+
+  const closeAll = useCallback(() => {
+    setState(initialState);
+  }, []);
+  const openAddSubmenu = useCallback(() => {
+    setState({
+      ...initialState, //this closes all other opened things
+      isAddSubmenuOpen: true,
+    });
+  }, []);
+  const openAddImage = useCallback(() => {
+    setState({
+      ...initialState, //this closes all other opened things
+      isAddImageOpen: true,
+    });
+  }, []);
+  const openAddVideo = useCallback(() => {
+    setState({
+      ...initialState, //this closes all other opened things
+      isAddVideoOpen: true,
+    });
+  }, []);
+  const openAIStylize = useCallback(() => {
+    setState({
+      ...initialState, //this closes all other opened things
+      isAiStylizeOpen: true,
+    });
   }, []);
 
   return (
@@ -99,40 +129,20 @@ export const ToolbarMain = ({
           <div className="relative">
             <ToolbarButton
               icon={faFilePlus}
-              onClick={() => {
-                setState({ ...state, isUploadSubmenuOpen: true });
-              }}
-              tooltip={state.isUploadSubmenuOpen ? undefined : "Add..."}
+              onClick={openAddSubmenu}
+              tooltip={state.isAddSubmenuOpen ? undefined : "Add..."}
             />
-            {state.isUploadSubmenuOpen && (
+            {state.isAddSubmenuOpen && (
               <div
                 className={twMerge(
                   "absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2",
                   paperWrapperStyles,
                 )}
               >
-                <ToolbarButton
-                  icon={faImage}
-                  onClick={() =>
-                    setState({
-                      ...state,
-                      isUploadImageOpen: true,
-                      isUploadVideoOpen: false,
-                    })
-                  }
-                >
+                <ToolbarButton icon={faImage} onClick={openAddImage}>
                   Add Image
                 </ToolbarButton>
-                <ToolbarButton
-                  icon={faFilm}
-                  onClick={() =>
-                    setState({
-                      ...state,
-                      isUploadVideoOpen: true,
-                      isUploadImageOpen: false,
-                    })
-                  }
-                >
+                <ToolbarButton icon={faFilm} onClick={openAddVideo}>
                   Add Video
                 </ToolbarButton>
               </div>
@@ -146,6 +156,7 @@ export const ToolbarMain = ({
           <ToolbarButton
             icon={faHatWizard}
             buttonProps={buttonProps.AI_STYLIZE}
+            onClick={openAIStylize}
             tooltip="AI Stylize"
           />
         </div>
@@ -174,12 +185,16 @@ export const ToolbarMain = ({
       </div>
 
       <DialogAddImage
-        isOpen={state.isUploadImageOpen ?? false}
-        closeCallback={() => setState({ ...state, isUploadImageOpen: false })}
+        isOpen={state.isAddImageOpen ?? false}
+        closeCallback={closeAll}
       />
       <DialogAddVideo
-        isOpen={state.isUploadVideoOpen ?? false}
-        closeCallback={() => setState({ ...state, isUploadVideoOpen: false })}
+        isOpen={state.isAddVideoOpen ?? false}
+        closeCallback={closeAll}
+      />
+      <DialogAiStylize
+        isOpen={state.isAiStylizeOpen ?? false}
+        closeCallback={closeAll}
       />
     </div>
   );
