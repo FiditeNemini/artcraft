@@ -2,10 +2,15 @@ import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
-import { RenderEngine } from "./RenderEngine";
+import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
 
-import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+import {
+  WorkFunction,
+  ProgressData,
+  WorkQueue,
+} from "./WorkerPrimitives/GenericWorker";
+import { SharedWorkerClient } from "./WorkerPrimitives/SharedWorkerClient";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
@@ -53,11 +58,6 @@ export class Engine {
       this.addVideo(video.file);
     });
 
-    uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
-      // disable the buttons to debounce
-      await this.renderEngine.startProcessing();
-    });
-
     // TODO: You may listen to all the image toolbar events here
     uiEvents.imageToolbar.MOVE.onClick(() => {
       console.log("move");
@@ -77,12 +77,13 @@ export class Engine {
         "SLEEP",
         `${sleepytstart.getMinutes()}:${sleepytstart.getSeconds()}`,
       );
-      await this.sleep(5000);
+      await this.renderEngine.startProcessing();
       const sleeptend = new Date();
       console.log(
         "DONE",
         `${sleeptend.getMinutes()}:${sleeptend.getSeconds()}`,
       );
+
       uiAccess.toolbarMain.changeButtonState(
         ToolbarMainButtonNames.AI_STYLIZE,
         { disabled: false },
@@ -98,6 +99,61 @@ export class Engine {
     this.stage.width(this.canvasReference.offsetWidth);
     this.stage.height(this.canvasReference.offsetHeight);
     this.stage.draw(); // Redraw the canvas
+  }
+
+  // Sandbox is quickly a way to test your idea.
+  public sandbox() {
+    // How to use:
+    // const exampleWorkFunction: WorkFunction<number, number> = async (
+    //   data: number,
+    //   reportProgress: (progress: number) => void,
+    // ) => {
+    //   // Simulate some asynchronous work with progress reporting
+    //   for (let i = 0; i <= 100; i += 20) {
+    //     await new Promise((resolve) => setTimeout(resolve, 200));
+    //     reportProgress(i);
+    //   }
+    //   return data * 2;
+    // };
+
+    // const progressCallback = (progressData: ProgressData) => {
+    //   console.log(
+    //     `Job ${progressData.jobId} progress: ${progressData.progress}%`,
+    //   );
+    // };
+
+    // const workQueue = new WorkQueue<number, number>(
+    //   exampleWorkFunction,
+    //   progressCallback,
+    // );
+    // workQueue.addWork(1, 10);
+    // workQueue.addWork(2, 20);
+    // workQueue.addWork(3, 30);
+
+    // const sharedWorker = new SharedWorker(
+    //   "src\\KonvaApp\\WorkerPrimitives\\NumberSharedWorker.ts",
+    //   {
+    //     type: "module",
+    //   },
+    // );
+
+    // // Get the port for communication
+    // let port = sharedWorker.port;
+    // port.start();
+    // // Set up the message event listener
+    // port.onmessage = this.onMessage.bind(this);
+    // port.postMessage({ jobID: 1, data: 2, isDoneStreaming: false });
+
+    const value = new SharedWorkerClient<number, number, number>(
+      "src\\KonvaApp\\WorkerPrimitives\\NumberSharedWorker.ts",
+      undefined,
+    );
+    value.send({ jobID: 1, data: 1, isDoneStreaming: false });
+  }
+
+  public onMessage(event: MessageEvent) {
+    console.log("Message From Shared Worker");
+    console.log(event);
   }
 
   public initializeStage(sceneToken: string) {

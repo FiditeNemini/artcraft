@@ -1,11 +1,15 @@
-import { VideoNode } from "./Nodes/VideoNode";
+import { VideoNode } from "../Nodes/VideoNode";
 import Konva from "konva";
+
+import { RenderTask, WorkerEvent } from "./RenderTask";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 export class RenderEngine {
   private videoNodes: VideoNode[];
   private offScreenCanvas: OffscreenCanvas;
   private context: OffscreenCanvasRenderingContext2D | null;
+
+  private offscreenCanvasCache: OffscreenCanvas[] = [];
   private isProcessing: boolean;
 
   private frames: ImageBitmap[];
@@ -18,6 +22,10 @@ export class RenderEngine {
   private positionX: number;
   private positionY: number;
 
+  private canUseSharedWorker: boolean;
+  private sharedWorker: SharedWorker | undefined;
+  private port: MessagePort | undefined;
+  private maxFrames: number;
   constructor(videoLayer: Konva.Layer, offScreenCanvas: OffscreenCanvas) {
     this.videoNodes = [];
 
@@ -39,6 +47,7 @@ export class RenderEngine {
 
     this.videoLayer = videoLayer;
 
+    this.port = undefined;
     const captureCanvas = new Konva.Rect({
       x: this.positionX,
       y: this.positionY,
@@ -49,6 +58,8 @@ export class RenderEngine {
       strokeWidth: 1,
       draggable: false,
     });
+
+    this.maxFrames = 7 * 24;
 
     // DEBUG ONLY
     // const rectangle = new Konva.Rect({
@@ -63,8 +74,69 @@ export class RenderEngine {
     // });
     //this.videoLayer.add(rectangle);
     this.videoLayer.add(captureCanvas);
-    // set furest back
+    // set back
     captureCanvas.setZIndex(0);
+
+    this.sharedWorker = undefined;
+    this.canUseSharedWorker = false;
+    this.setupSharedWorker();
+  }
+
+  // Manage the worker
+  onMessage(event: MessageEvent) {
+    const message = event.data;
+    console.log("Main script received:", message);
+    // Send a response back to the worker
+    if (!this.port) {
+      return console.log("Undefined Worker");
+    }
+  }
+
+  sendMessage() {
+    if (!this.port) {
+      return console.log("Undefined Worker");
+    }
+    this.port.postMessage("Hello from Main Script");
+  }
+
+  async sendCanvasPayload(renderTask: RenderTask) {
+    if (!this.port) {
+      return console.log("Undefined Worker");
+    }
+    this.port.postMessage(renderTask);
+  }
+
+  setupSharedWorker() {
+    if (typeof SharedWorker !== "undefined") {
+      this.offscreenCanvasCache = [];
+      // canvas size should be defined here
+      for (let i = 0; i < this.maxFrames; i++) {
+        let offScreenCanvas = new OffscreenCanvas(this.width, this.height);
+        this.offscreenCanvasCache.push(offScreenCanvas);
+      }
+
+      console.log("Shared Workers are supported in this browser.");
+      // Debug chrome://inspect/#workers
+      // TODO ensure that the cors is solved for this.
+      this.sharedWorker = new SharedWorker(
+        "src\\KonvaApp\\RenderingPrimitives\\RenderSharedWorker.ts",
+        {
+          type: "module",
+        },
+      );
+
+      // Get the port for communication
+      this.port = this.sharedWorker.port;
+      this.port.start();
+      // Set up the message event listener
+      this.port.onmessage = this.onMessage.bind(this);
+
+      this.canUseSharedWorker = true;
+    } else {
+      console.log("Shared Workers are not supported in this browser.");
+      // Handle the lack of Shared Worker support (e.g., fallback to another solution)
+      this.canUseSharedWorker = false;
+    }
   }
 
   // This function uses a portion of the video layer to capture just the capture canvas.
@@ -197,16 +269,41 @@ export class RenderEngine {
       } // End frame time
       this.videoLayer.draw();
 
-      // SCOPES the capture for the context
-      // Correct size for the mobile canvas.
-      this.offScreenCanvas.width = this.width;
-      this.offScreenCanvas.height = this.height;
+      // use main thread
+      if (this.canUseSharedWorker === false) {
+        // SCOPES the capture for the context
+        // Correct size for the mobile canvas.
+        this.offScreenCanvas.width = this.width;
+        this.offScreenCanvas.height = this.height;
+        if (this.context) {
+          // This crops it starting at position X / Y where the mobile canvas is
+          // Then picks the height and width range
+          // then we draw it at 0,0,width and height of the canvas
+          this.context.drawImage(
+            this.videoLayer.canvas._canvas,
+            this.positionX,
+            this.positionY,
+            this.width,
+            this.height,
+            0,
+            0,
+            this.width,
+            this.height,
+          );
 
-      if (this.context) {
-        // This crops it starting at position X / Y where the mobile canvas is
-        // Then picks the height and width range
-        // then we draw it at 0,0,width and height of the canvas
-        this.context.drawImage(
+          const blob = await this.offScreenCanvas.convertToBlob({
+            quality: 1.0,
+            type: "image/jpeg",
+          });
+
+          await this.blobToFile(blob, `${j}`);
+        } // end of for each frame
+      } else {
+        console.log("Using Shared Worker");
+        const canvas = this.offscreenCanvasCache[j];
+        const context = canvas.getContext("2d");
+        // decode on the shared webworker.
+        context?.drawImage(
           this.videoLayer.canvas._canvas,
           this.positionX,
           this.positionY,
@@ -217,54 +314,27 @@ export class RenderEngine {
           this.width,
           this.height,
         );
-        const blob = await this.offScreenCanvas.convertToBlob({
-          quality: 1.0,
-          type: "image/jpeg",
+
+        this.sendCanvasPayload({
+          jobID: 1,
+          isDone: false,
+          event: WorkerEvent.DATA,
+          data: {
+            offscreenCanvas: canvas,
+            id: j,
+          },
         });
-        await this.blobToFile(blob, `${j}`);
-      } // end of for each frame
+
+        if (j == this.maxFrames - 1) {
+          this.sendCanvasPayload({
+            jobID: 1,
+            isDone: true,
+            event: WorkerEvent.DATA,
+            data: undefined,
+          });
+        }
+      }
     }
-  }
-
-  //DO NOT USE: This code is to test whether or not we can seek frames on each video nodes.
-  //To check the correctness of the seeking.
-  private async processFrame() {
-    if (!this.isProcessing) return;
-
-    for (let j = 0; j < this.videoNodes.length; j++) {
-      const videoNode = this.videoNodes[j];
-
-      videoNode.stop();
-      const numberOfFrames = videoNode.getNumberFrames();
-
-      for (let i = 0; i <= numberOfFrames; i++) {
-        const frameTime = this.calculateFrameTime(i, videoNode.fps);
-
-        console.log(i);
-        console.log(frameTime);
-        console.log(videoNode.duration);
-
-        if (frameTime < videoNode.duration) {
-          await videoNode.seek(frameTime);
-          this.offScreenCanvas.width = videoNode.node.getSize().width;
-          this.offScreenCanvas.height = videoNode.node.getSize().height;
-
-          if (this.context) {
-            this.context.drawImage(
-              videoNode.videoComponent,
-              0,
-              0,
-              this.offScreenCanvas.width,
-              this.offScreenCanvas.height,
-            );
-            console.log("Pushing");
-            this.frames.push(this.offScreenCanvas.transferToImageBitmap());
-          }
-        } // end of if
-      } // end of for.
-    }
-
-    console.log(this.frames);
   }
 
   private blobToFile(blob: Blob, index: string) {
@@ -283,3 +353,43 @@ export class RenderEngine {
     }
   }
 }
+
+// //DO NOT USE: This code is to test whether or not we can seek frames on each video nodes.
+// //To check the correctness of the seeking.
+// private async processFrame() {
+//   if (!this.isProcessing) return;
+
+//   for (let j = 0; j < this.videoNodes.length; j++) {
+//     const videoNode = this.videoNodes[j];
+
+//     videoNode.stop();
+//     const numberOfFrames = videoNode.getNumberFrames();
+
+//     for (let i = 0; i <= numberOfFrames; i++) {
+//       const frameTime = this.calculateFrameTime(i, videoNode.fps);
+
+//       console.log(i);
+//       console.log(frameTime);
+//       console.log(videoNode.duration);
+
+//       if (frameTime < videoNode.duration) {
+//         await videoNode.seek(frameTime);
+//         this.offScreenCanvas.width = videoNode.node.getSize().width;
+//         this.offScreenCanvas.height = videoNode.node.getSize().height;
+
+//         if (this.context) {
+//           this.context.drawImage(
+//             videoNode.videoComponent,
+//             0,
+//             0,
+//             this.offScreenCanvas.width,
+//             this.offScreenCanvas.height,
+//           );
+//           console.log("Pushing");
+//           this.frames.push(this.offScreenCanvas.transferToImageBitmap());
+//         }
+//       } // end of if
+//     } // end of for.
+//   }
+//   console.log(this.frames);
+// }
