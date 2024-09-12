@@ -70,7 +70,6 @@ import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/c
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
-import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
 //import { LandingPage } from "./pages/landing/LandingPage";
 // import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -113,6 +112,7 @@ import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
 import NewTTS from "./pages/audio_gen/tts/NewTTS";
+import NewTrumpTTS from "./pages/audio_gen/tts/NewTrumpTTS";
 import NewVC from "./pages/audio_gen/vc/NewVC";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
@@ -228,8 +228,6 @@ class PageContainer extends React.Component<
         <SearchProvider>
           <ScrollToTop />
           <div id="wrapper" className="no-padding">
-            <div id="overlay"></div>
-
             <TopNav
               sessionWrapper={this.props.sessionWrapper}
               logoutHandler={this.logout}
@@ -245,78 +243,74 @@ class PageContainer extends React.Component<
                 this.props.sessionSubscriptionsWrapper
               }
             />
+            <Switch>
+              <Route path="/comp-lib">
+                <ComponentsLibrary sessionWrapper={this.props.sessionWrapper} />
+              </Route>
+              <Route path="/firehose">
+                <FirehoseEventListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <div id="page-content-wrapper">
-              <Switch>
-                <Route path="/comp-lib">
-                  <ComponentsLibrary
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
-                <Route path="/firehose">
-                  <FirehoseEventListPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/news">
+                <NewsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route path="/news">
-                  <NewsPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              <Route path="/channels">
+                <ChannelsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route path="/channels">
-                  <ChannelsPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              <Route path="/leaderboard">
+                <LeaderboardPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/leaderboard">
-                  <LeaderboardPage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/login">
+                <LoginPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  querySessionAction={this.props.querySessionAction}
+                  querySessionSubscriptionsAction={
+                    this.props.querySessionSubscriptionsAction
+                  }
+                />
+              </Route>
 
-                <Route path="/login">
-                  <LoginPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    querySessionAction={this.props.querySessionAction}
-                    querySessionSubscriptionsAction={
-                      this.props.querySessionSubscriptionsAction
-                    }
-                  />
-                </Route>
+              <Route path="/password-reset/verify">
+                <PasswordResetVerificationPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  querySessionAction={this.props.querySessionAction}
+                  querySessionSubscriptionsAction={
+                    this.props.querySessionSubscriptionsAction
+                  }
+                />
+              </Route>
 
-                <Route path="/password-reset/verify">
-                  <PasswordResetVerificationPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    querySessionAction={this.props.querySessionAction}
-                    querySessionSubscriptionsAction={
-                      this.props.querySessionSubscriptionsAction
-                    }
-                  />
-                </Route>
+              <Route path="/password-reset">
+                <PasswordResetEmailPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/password-reset">
-                  <PasswordResetEmailPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/profile/:username/edit">
+                <ProfileEditFc sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/profile/:username/edit">
-                  <ProfileEditFc sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/profile/:username/ban">
+                <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/profile/:username/ban">
-                  <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
-                </Route>
-
-                {/* Old Profile Page */}
-                {/* <Route path="/profile/:username">
+              {/* Old Profile Page */}
+              {/* <Route path="/profile/:username">
                     <NewProfilePage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
@@ -325,332 +319,320 @@ class PageContainer extends React.Component<
                     />
                   </Route> */}
 
-                <Route path="/profile/:username">
-                  <ProfilePageV3
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              <Route path="/profile/:username">
+                <ProfilePageV3
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route path="/signup">
-                  <SignupPage
-                    querySessionCallback={() => {}}
-                    sessionWrapper={this.props.sessionWrapper}
-                    querySessionAction={this.props.querySessionAction}
-                  />
-                </Route>
+              <Route path="/signup">
+                <SignupPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                  querySessionAction={this.props.querySessionAction}
+                />
+              </Route>
 
-                <Route path="/pricing" exact={true}>
-                  <PricingPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              <Route path="/pricing" exact={true}>
+                <PricingPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route path="/checkout_success" exact={true}>
-                  <CheckoutSuccessPage
-                    querySessionCallback={() => {}}
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
-                <Route path="/checkout_cancel" exact={true}>
-                  <CheckoutCancelPage
-                    querySessionCallback={() => {}}
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
-                <Route path="/portal_success" exact={true}>
-                  <PortalSuccessPage
-                    querySessionCallback={() => {}}
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/checkout_success" exact={true}>
+                <CheckoutSuccessPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
+              <Route path="/checkout_cancel" exact={true}>
+                <CheckoutCancelPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
+              <Route path="/portal_success" exact={true}>
+                <PortalSuccessPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/media/rename/:media_file_token">
-                  <MediaRenamePage />
-                </Route>
+              <Route path="/media/rename/:media_file_token">
+                <MediaRenamePage />
+              </Route>
 
-                <Route path="/media/:token">
-                  <MediaPageSwitch />
-                </Route>
+              <Route path="/media/:token">
+                <MediaPageSwitch />
+              </Route>
 
-                {/*                <Route path="/media/:token">
+              {/*                <Route path="/media/:token">
                     <MediaPage />
                   </Route>*/}
 
-                {/*                 <Route path="/dev-media/:token">
+              {/*                 <Route path="/dev-media/:token">
                     <DevMediaPage />
                   </Route>*/}
 
-                <Route path="/edit-cover-image/:token">
-                  <EditCoverImage />
-                </Route>
+              <Route path="/edit-cover-image/:token">
+                <EditCoverImage />
+              </Route>
 
-                <Route path="/explore">
-                  <ExplorePage />
-                </Route>
+              <Route path="/explore">
+                <ExplorePage />
+              </Route>
 
-                <Route path="/weight/:weight_token/edit">
-                  <WeightEditPage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/weight/:weight_token/edit">
+                <WeightEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route
-                  path="/weight/:weight_token/:maybe_url_slug?"
-                  render={props => (
-                    <WeightPage
-                      key={props.match.params.weight_token}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  )}
+              <Route
+                path="/weight/:weight_token/:maybe_url_slug?"
+                render={props => (
+                  <WeightPage
+                    key={props.match.params.weight_token}
+                    sessionSubscriptionsWrapper={
+                      this.props.sessionSubscriptionsWrapper
+                    }
+                  />
+                )}
+              />
+
+              <Route path="/search/weights">
+                <SearchPage />
+              </Route>
+
+              <Route path="/tts/result/:token/edit">
+                <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
+
+              <Route path="/tts/result/:token/delete">
+                <TtsResultDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
                 />
+              </Route>
 
-                <Route path="/search/weights">
-                  <SearchPage />
-                </Route>
+              <Route path="/tts/result/:token">
+                <TtsResultViewPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/tts/result/:token/edit">
-                  <TtsResultEditPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/tts/:token/edit">
+                <TtsModelEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/tts/result/:token/delete">
-                  <TtsResultDeletePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/tts/:token/delete">
+                <TtsModelDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/tts/result/:token">
-                  <TtsResultViewPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/tts/:token/categories">
+                <TtsEditCategoriesPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/tts/:token/edit">
-                  <TtsModelEditPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/tts/:token">
+                <TtsModelViewPage
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  textBuffer={this.props.textBuffer}
+                  setTextBuffer={this.props.setTextBuffer}
+                  clearTextBuffer={this.props.clearTextBuffer}
+                />
+              </Route>
 
-                <Route path="/tts/:token/delete">
-                  <TtsModelDeletePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/w2l/result/:token/edit">
+                <W2lResultEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/tts/:token/categories">
-                  <TtsEditCategoriesPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/w2l/result/:token/delete">
+                <W2lResultDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/tts/:token">
-                  <TtsModelViewPage
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                    textBuffer={this.props.textBuffer}
-                    setTextBuffer={this.props.setTextBuffer}
-                    clearTextBuffer={this.props.clearTextBuffer}
-                  />
-                </Route>
+              <Route path="/w2l/result/:token">
+                <W2lResultViewPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/w2l/result/:token/edit">
-                  <W2lResultEditPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/w2l/:templateToken/edit">
+                <W2lTemplateEditPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/w2l/result/:token/delete">
-                  <W2lResultDeletePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/w2l/:templateToken/approval">
+                <W2lTemplateApprovePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/w2l/result/:token">
-                  <W2lResultViewPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/w2l/:templateToken/delete">
+                <W2lTemplateDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/w2l/:templateToken/edit">
-                  <W2lTemplateEditPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/video">
+                <W2lTemplateListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/w2l/:templateToken/approval">
-                  <W2lTemplateApprovePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/upload/tts">
+                <UploadTtsModelPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/w2l/:templateToken/delete">
-                  <W2lTemplateDeletePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/upload/tts_model">
+                <UploadNewTtsModelPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/video">
-                  <W2lTemplateListPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/upload/sd">
+                <UploadSdWeightPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/upload/tts">
-                  <UploadTtsModelPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/upload/lora">
+                <UploadLoraWeightPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/upload/tts_model">
-                  <UploadNewTtsModelPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/upload/workflow">
+                <UploadWorkflowPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/upload/sd">
-                  <UploadSdWeightPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/contribute">
+                <ContributeIndexPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/upload/lora">
-                  <UploadLoraWeightPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/user/list">
+                <ModerationUserListFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/upload/workflow">
-                  <UploadWorkflowPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/user_feature_flags/:username?">
+                <ModerationUserFeatureFlagsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/contribute">
-                  <ContributeIndexPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/ip_bans/:ipAddress">
+                <ModerationViewIpBanFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/user/list">
-                  <ModerationUserListFc
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/ip_bans">
+                <ModerationIpBanListFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/user_feature_flags/:username?">
-                  <ModerationUserFeatureFlagsPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/voice_stats">
+                <ModerationVoiceStatsFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/ip_bans/:ipAddress">
-                  <ModerationViewIpBanFc
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/job_stats">
+                <ModerationJobStatsFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/ip_bans">
-                  <ModerationIpBanListFc
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/job_control">
+                <ModerationJobControlPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
+              <Route path="/moderation/token_info">
+                <ModerationTokenInfoPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/voice_stats">
-                  <ModerationVoiceStatsFc
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/tts_category/list">
+                <ModerationTtsCategoryListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/job_stats">
-                  <ModerationJobStatsFc
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/tts_category/edit/:token">
+                <ModerationTtsCategoryEditPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/job_control">
-                  <ModerationJobControlPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
-                <Route path="/moderation/token_info">
-                  <ModerationTokenInfoPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/category/delete/:token">
+                <ModerationCategoryDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/tts_category/list">
-                  <ModerationTtsCategoryListPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation/approve/w2l_templates">
+                <ModerationPendingW2lTemplatesFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/moderation/tts_category/edit/:token">
-                  <ModerationTtsCategoryEditPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/moderation">
+                <ModerationPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/moderation/category/delete/:token">
-                  <ModerationCategoryDeletePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route exact={true} path="/clone">
+                <VoiceCloneRequestPage />
+              </Route>
 
-                <Route path="/moderation/approve/w2l_templates">
-                  <ModerationPendingW2lTemplatesFc
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/patrons">
+                <PatronPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/moderation">
-                  <ModerationPage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/product-usage">
+                <ProductUsageInfoPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route exact={true} path="/clone">
-                  <VoiceCloneRequestPage />
-                </Route>
+              <Route path="/voice-conversion/:token/delete">
+                <VcModelDeletePage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/patrons">
-                  <PatronPage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/voice-conversion/:token/edit">
+                <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/product-usage">
-                  <ProductUsageInfoPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/voice-conversion/:token">
+                <VcModelViewPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  setMaybeSelectedInferenceJob={
+                    this.props.maybeSelectedVoiceConversionModel
+                  }
+                />
+              </Route>
 
-                <Route path="/voice-conversion/:token/delete">
-                  <VcModelDeletePage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
-
-                <Route path="/voice-conversion/:token/edit">
-                  <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
-
-                <Route path="/voice-conversion/:token">
-                  <VcModelViewPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                    setMaybeSelectedInferenceJob={
-                      this.props.maybeSelectedVoiceConversionModel
-                    }
-                  />
-                </Route>
-
-                {/* <Route path="/voice-conversion">
+              {/* <Route path="/voice-conversion">
                     <VcModelListPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
@@ -669,32 +651,32 @@ class PageContainer extends React.Component<
                     />
                   </Route> */}
 
-                <Route path="/dashboard">
-                  <DashboardPage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/dashboard">
+                <DashboardPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/welcome-to-studio">
-                  <WelcomePage sessionWrapper={this.props.sessionWrapper} />
-                </Route>
+              <Route path="/welcome-to-studio">
+                <WelcomePage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/about">
-                  <AboutPage />
-                </Route>
+              <Route path="/about">
+                <AboutPage />
+              </Route>
 
-                <Route path="/face-animator/:mediaToken?">
-                  <FaceAnimator
-                    {...{
-                      sessionSubscriptionsWrapper:
-                        this.props.sessionSubscriptionsWrapper,
-                    }}
-                  />
-                </Route>
+              <Route path="/face-animator/:mediaToken?">
+                <FaceAnimator
+                  {...{
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-                <Route path="/fbx-to-gltf/:mediaToken?">
-                  <FbxToGltfPage />
-                </Route>
+              <Route path="/fbx-to-gltf/:mediaToken?">
+                <FbxToGltfPage />
+              </Route>
 
-                {/*
+              {/*
                   // <Route path="/studio/:mediaToken?">
                   //   <StorytellerStudioListPage
                   //     sessionWrapper={this.props.sessionWrapper}
@@ -705,212 +687,207 @@ class PageContainer extends React.Component<
                   // </Route>
                     */}
 
-                <Route path="/commissions">
-                  <CommunityCommissionsPage />
-                </Route>
+              <Route path="/commissions">
+                <CommunityCommissionsPage />
+              </Route>
 
-                <Route path="/terms">
-                  <TermsPage />
-                </Route>
+              <Route path="/terms">
+                <TermsPage />
+              </Route>
 
-                <Route path="/privacy">
-                  <PrivacyPage />
-                </Route>
+              <Route path="/privacy">
+                <PrivacyPage />
+              </Route>
 
-                <Route path="/guide">
-                  <GuidePage />
-                </Route>
+              <Route path="/guide">
+                <GuidePage />
+              </Route>
 
-                <Route path="/old">
-                  <VocodesPage />
-                </Route>
+              <Route path="/old">
+                <VocodesPage />
+              </Route>
 
-                <Route path="/dev-upload">
-                  <DevUpload />
-                </Route>
+              <Route path="/dev-upload">
+                <DevUpload />
+              </Route>
 
-                <Route path="/dev-upload-alt">
-                  <DevUploadAlt />
-                </Route>
+              <Route path="/dev-upload-alt">
+                <DevUploadAlt />
+              </Route>
 
-                <Route path="/dev-media-input">
-                  <DevMediaInput />
-                </Route>
+              <Route path="/dev-media-input">
+                <DevMediaInput />
+              </Route>
 
-                {/* NEW TTS PAGE */}
-                <Route exact path="/tts">
-                  <NewTTS
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              {/* NEW TTS PAGE */}
+              <Route exact path="/tts">
+                <NewTTS
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                {/* NEW VC PAGE */}
-                <Route exact path="/voice-conversion">
-                  <NewVC
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              {/* NEW VC PAGE */}
+              <Route exact path="/voice-conversion">
+                <NewVC
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                {/* NEW LIVE PORTRAIT PAGE */}
-                <Route exact path="/ai-live-portrait">
-                  <LivePortrait
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              {/* NEW LIVE PORTRAIT PAGE */}
+              <Route exact path="/ai-live-portrait">
+                <LivePortrait
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route exact path="/ai-lip-sync">
-                  <Lipsync
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              <Route exact path="/ai-lip-sync">
+                <Lipsync
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route exact path="/webcam-acting">
-                  <CameraLivePortrait />
-                </Route>
+              <Route exact path="/webcam-acting">
+                <CameraLivePortrait />
+              </Route>
 
-                {/* Route for initial voice creation */}
-                <Route exact path="/voice-designer/create">
-                  <VoiceDesignerFormPage
-                    {...{
-                      sessionWrapper: this.props.sessionWrapper,
-                      sessionSubscriptionsWrapper:
-                        this.props.sessionSubscriptionsWrapper,
-                    }}
-                  />
-                </Route>
+              {/* Route for initial voice creation */}
+              <Route exact path="/voice-designer/create">
+                <VoiceDesignerFormPage
+                  {...{
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-                {/* Route for editing the dataset details */}
-                <Route exact path="/voice-designer/dataset/:dataset_token/edit">
-                  <VoiceDesignerFormPage
-                    {...{
-                      sessionWrapper: this.props.sessionWrapper,
-                      sessionSubscriptionsWrapper:
-                        this.props.sessionSubscriptionsWrapper,
-                    }}
-                  />
-                </Route>
+              {/* Route for editing the dataset details */}
+              <Route exact path="/voice-designer/dataset/:dataset_token/edit">
+                <VoiceDesignerFormPage
+                  {...{
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-                {/* Route for handling dataset token for uploading samples */}
-                <Route
-                  exact
-                  path="/voice-designer/dataset/:dataset_token/upload"
-                >
-                  <VoiceDesignerFormPage
-                    {...{
-                      sessionWrapper: this.props.sessionWrapper,
-                      sessionSubscriptionsWrapper:
-                        this.props.sessionSubscriptionsWrapper,
-                    }}
-                  />
-                </Route>
+              {/* Route for handling dataset token for uploading samples */}
+              <Route exact path="/voice-designer/dataset/:dataset_token/upload">
+                <VoiceDesignerFormPage
+                  {...{
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-                <Route path="/voice-designer/voice/:voice_token/edit">
-                  <VoiceDesignerVoiceEditPage />
-                </Route>
+              <Route path="/voice-designer/voice/:voice_token/edit">
+                <VoiceDesignerVoiceEditPage />
+              </Route>
 
-                <Route path="/voice-designer/voice/:voice_token">
-                  <VoiceDesignerUseVoicePage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
+              <Route path="/voice-designer/voice/:voice_token">
+                <VoiceDesignerUseVoicePage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-                <Route path="/inference-jobs-list">
-                  <InferenceJobsPage />
-                </Route>
+              <Route path="/inference-jobs-list">
+                <InferenceJobsPage />
+              </Route>
 
-                <Route path="/voice-designer">
-                  <VoiceDesignerMainPage />
-                </Route>
+              <Route path="/voice-designer">
+                <VoiceDesignerMainPage />
+              </Route>
 
-                <Route path="/style-video/:mediaToken?">
-                  <StyleVideo />
-                </Route>
+              <Route path="/style-video/:mediaToken?">
+                <StyleVideo />
+              </Route>
 
-                <Route path="/generate-speech">
-                  <GenerateSpeechPage />
-                </Route>
+              <Route path="/generate-speech">
+                <GenerateSpeechPage />
+              </Route>
 
-                <Route path="/video-mocap/:mediaToken?">
-                  <VideoMocap
-                    {...{
-                      sessionWrapper: this.props.sessionWrapper,
-                    }}
-                  />
-                </Route>
+              <Route path="/video-mocap/:mediaToken?">
+                <VideoMocap
+                  {...{
+                    sessionWrapper: this.props.sessionWrapper,
+                  }}
+                />
+              </Route>
 
-                <Route path="/video-workflow">
-                  <VideoWorkflowPage
-                    {...{
-                      sessionWrapper: this.props.sessionWrapper,
-                    }}
-                  />
-                </Route>
+              <Route path="/video-workflow">
+                <VideoWorkflowPage
+                  {...{
+                    sessionWrapper: this.props.sessionWrapper,
+                  }}
+                />
+              </Route>
 
-                <Route path="/text-to-image">
-                  <TextToImagePage
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/text-to-image">
+                <TextToImagePage
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/character/donald-trump">
-                  <TrumpTtsPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                    textBuffer={this.props.textBuffer}
-                    setTextBuffer={this.props.setTextBuffer}
-                    clearTextBuffer={this.props.clearTextBuffer}
-                    ttsModels={this.props.ttsModels}
-                    setTtsModels={this.props.setTtsModels}
-                    allTtsCategories={this.props.allTtsCategories}
-                    setAllTtsCategories={this.props.setAllTtsCategories}
-                    allTtsCategoriesByTokenMap={
-                      this.props.allTtsCategoriesByTokenMap
-                    }
-                    computedTtsCategoryAssignments={
-                      this.props.computedTtsCategoryAssignments
-                    }
-                    setComputedTtsCategoryAssignments={
-                      this.props.setComputedTtsCategoryAssignments
-                    }
-                    allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
-                    ttsModelsByCategoryToken={
-                      this.props.ttsModelsByCategoryToken
-                    }
-                    dropdownCategories={this.props.dropdownCategories}
-                    setDropdownCategories={this.props.setDropdownCategories}
-                    selectedCategories={this.props.selectedCategories}
-                    setSelectedCategories={this.props.setSelectedCategories}
-                    maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                    setMaybeSelectedTtsModel={
-                      this.props.setMaybeSelectedTtsModel
-                    }
-                    selectedTtsLanguageScope={
-                      this.props.selectedTtsLanguageScope
-                    }
-                    setSelectedTtsLanguageScope={
-                      this.props.setSelectedTtsLanguageScope
-                    }
-                  />
-                </Route>
+              <Route path="/character/donald-trump">
+                <NewTrumpTTS />
+              </Route>
 
-                {/* OLD TTS PAGE */}
-                {/* <Route path="/tts" exact={true}>
+              {/*              <Route path="/character/donald-trump">
+                <TrumpTtsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  textBuffer={this.props.textBuffer}
+                  setTextBuffer={this.props.setTextBuffer}
+                  clearTextBuffer={this.props.clearTextBuffer}
+                  ttsModels={this.props.ttsModels}
+                  setTtsModels={this.props.setTtsModels}
+                  allTtsCategories={this.props.allTtsCategories}
+                  setAllTtsCategories={this.props.setAllTtsCategories}
+                  allTtsCategoriesByTokenMap={
+                    this.props.allTtsCategoriesByTokenMap
+                  }
+                  computedTtsCategoryAssignments={
+                    this.props.computedTtsCategoryAssignments
+                  }
+                  setComputedTtsCategoryAssignments={
+                    this.props.setComputedTtsCategoryAssignments
+                  }
+                  allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
+                  ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
+                  dropdownCategories={this.props.dropdownCategories}
+                  setDropdownCategories={this.props.setDropdownCategories}
+                  selectedCategories={this.props.selectedCategories}
+                  setSelectedCategories={this.props.setSelectedCategories}
+                  maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+                  selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={
+                    this.props.setSelectedTtsLanguageScope
+                  }
+                />
+              </Route>*/}
+
+              {/* OLD TTS PAGE */}
+              {/* <Route path="/tts" exact={true}>
                     <TtsModelListPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
@@ -976,92 +953,90 @@ class PageContainer extends React.Component<
                     />
                   </Route> */}
 
-                <Route path="/beta/webcam-acting/form">
-                  <BetaWebcamActingForm />
-                </Route>
+              <Route path="/beta/webcam-acting/form">
+                <BetaWebcamActingForm />
+              </Route>
 
-                <Route path="/beta/webcam-acting">
-                  <BetaWebcamActingPage />
-                </Route>
+              <Route path="/beta/webcam-acting">
+                <BetaWebcamActingPage />
+              </Route>
 
-                <Route path="/beta/3d-video-compositor/form">
-                  <Beta3DVideoCompositorForm />
-                </Route>
+              <Route path="/beta/3d-video-compositor/form">
+                <Beta3DVideoCompositorForm />
+              </Route>
 
-                <Route path="/beta/3d-video-compositor">
-                  <Beta3DVideoCompositorPage />
-                </Route>
+              <Route path="/beta/3d-video-compositor">
+                <Beta3DVideoCompositorPage />
+              </Route>
 
-                <Route path="/beta/2d-video-compositor/form">
-                  <BetaVideoCompositorForm />
-                </Route>
+              <Route path="/beta/2d-video-compositor/form">
+                <BetaVideoCompositorForm />
+              </Route>
 
-                <Route path="/beta/2d-video-compositor">
-                  <BetaVideoCompositorPage />
-                </Route>
+              <Route path="/beta/2d-video-compositor">
+                <BetaVideoCompositorPage />
+              </Route>
 
-                <Route path="/beta/lip-sync/form">
-                  <BetaLipSyncForm />
-                </Route>
+              <Route path="/beta/lip-sync/form">
+                <BetaLipSyncForm />
+              </Route>
 
-                <Route path="/beta/lip-sync">
-                  <BetaLipSyncPage />
-                </Route>
+              <Route path="/beta/lip-sync">
+                <BetaLipSyncPage />
+              </Route>
 
-                <Route path="/beta/lip-sync/form">
-                  <BetaLipSyncForm />
-                </Route>
+              <Route path="/beta/lip-sync/form">
+                <BetaLipSyncForm />
+              </Route>
 
-                <Route path="/studio-mobile-check">
-                  <StudioMobileCheckPage />
-                </Route>
+              <Route path="/studio-mobile-check">
+                <StudioMobileCheckPage />
+              </Route>
 
-                <Route path="/category/create">
-                  <CreateCategoryPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/category/create">
+                <CreateCategoryPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-                <Route path="/creator-onboarding">
-                  <CreatorTypeformPage />
-                </Route>
+              <Route path="/creator-onboarding">
+                <CreatorTypeformPage />
+              </Route>
 
-                <Route path="/welcome">
-                  <SignUpSuccessPage />
-                </Route>
+              <Route path="/welcome">
+                <SignUpSuccessPage />
+              </Route>
 
-                <Route path="/beta-key/create">
-                  <CreateBetaKeyPage />
-                </Route>
+              <Route path="/beta-key/create">
+                <CreateBetaKeyPage />
+              </Route>
 
-                <Route path="/beta-key/redeem/success">
-                  <RedeemSuccessPage />
-                </Route>
+              <Route path="/beta-key/redeem/success">
+                <RedeemSuccessPage />
+              </Route>
 
-                <Route path="/beta-key/redeem/:token?">
-                  <RedeemBetaKeyPage />
-                </Route>
+              <Route path="/beta-key/redeem/:token?">
+                <RedeemBetaKeyPage />
+              </Route>
 
-                <Route path="/beta-key/list">
-                  <BetaKeysListPage />
-                </Route>
+              <Route path="/beta-key/list">
+                <BetaKeysListPage />
+              </Route>
 
-                {/* test page for tools */}
-                <Route path="/dev/tools">
-                  <ToolsTestPage />
-                </Route>
+              {/* test page for tools */}
+              <Route path="/dev/tools">
+                <ToolsTestPage />
+              </Route>
 
-                <Route path="/tools">
-                  <CreatorToolsPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
+              <Route path="/tools">
+                <CreatorToolsPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-                <Route path="/waitlist-next-steps">
-                  <WaitlistNextStepsPage />
-                </Route>
+              <Route path="/waitlist-next-steps">
+                <WaitlistNextStepsPage />
+              </Route>
 
-                {/* <Route path="/ai-live-portrait">
+              {/* <Route path="/ai-live-portrait">
                     <AIFaceMirror
                       {...{
                         sessionSubscriptionsWrapper:
@@ -1070,7 +1045,7 @@ class PageContainer extends React.Component<
                     />
                   </Route> */}
 
-                {/*
+              {/*
                   // <Route path="/engine-compositor">
                   //   <EngineCompositor
                   //     sessionWrapper={this.props.sessionWrapper}
@@ -1078,16 +1053,15 @@ class PageContainer extends React.Component<
                   // </Route>
                     */}
 
-                <Route path="/" exact={true}>
-                  <LandingPage
-                    sessionWrapper={this.props.sessionWrapper}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
-                </Route>
-              </Switch>
-            </div>
+              <Route path="/" exact={true}>
+                <LandingPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
+            </Switch>
           </div>
         </SearchProvider>
       </DomainConfigProvider>

@@ -97,3 +97,60 @@
   display: flex;
   height: min-content;
 }
+
+.fy-trump-select {
+  // background-color: red;
+  height: 10rem;
+  margin-bottom: 1rem;
+  display: flex;
+
+  // display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+
+  button {
+    flex-grow: 1;
+    background: $secondary;
+    appearance: none;
+    color: #fff;
+    outline: none;
+    border-radius: 0.5rem;
+    border: 2px solid $secondary;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    // justify-content: center;
+    // align-items: center;
+    position: relative;
+
+    &.fy-selected-trump {
+      border-color: $primary;
+    }
+
+    img {
+      border-radius: 0.25rem;
+      width: 100%;
+      height: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      opacity: 0.45;
+      transform: translate(-50%, -50%);
+      transition: 0.25s all;
+    }
+
+    &:hover img {
+      transform: translate(-50%, -50%) scale(1.05);
+      opacity: 0.66;
+    }
+
+    b {
+      position: absolute;
+      color: rgba(#fff, 0.66);
+      font-size: 1.125rem;
+      height: 1em;
+      line-height: 1em;
+      margin: 0.5rem auto auto 0.5rem;
+    }
+  }
+}
