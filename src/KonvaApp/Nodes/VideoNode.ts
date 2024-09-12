@@ -4,7 +4,7 @@ import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { v4 as uuidv4 } from "uuid";
 
 import { uiAccess } from "~/signals";
-const imageToolbar = uiAccess.imageToolbar;
+const toolbarImage = uiAccess.toolbarImage;
 const loadingBar = uiAccess.loadingBar;
 
 export class VideoNode extends NetworkedNodeContext {
@@ -159,7 +159,7 @@ export class VideoNode extends NetworkedNodeContext {
     });
 
     this.node.on("mousedown", () => {
-      imageToolbar.show();
+      toolbarImage.show();
       this.updateContextMenuPosition();
 
       if (this.didFinishLoading == false) {
@@ -194,7 +194,7 @@ export class VideoNode extends NetworkedNodeContext {
   }
 
   updateContextMenuPosition() {
-    imageToolbar.setPosition({
+    toolbarImage.setPosition({
       x: this.node.getPosition().x + this.node.getSize().width / 4,
       y: this.node.getPosition().y - 150,
     });

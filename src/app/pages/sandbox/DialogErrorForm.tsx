@@ -3,7 +3,7 @@ import { Input, Button } from "~/components/ui";
 
 import { uiAccess } from "~/signals/uiAccess";
 
-export const ErrorDialogForm = () => {
+export const DialogErrorForm = () => {
   const [title, setTitle] = useState<string | undefined>(undefined);
   const [message, setMessage] = useState<string | undefined>(undefined);
 
@@ -35,7 +35,7 @@ export const ErrorDialogForm = () => {
         />
         <Button
           onClick={() => {
-            uiAccess.errorDialogue.show({
+            uiAccess.dialogueError.show({
               title: title,
               message: message,
             });
@@ -45,7 +45,7 @@ export const ErrorDialogForm = () => {
         </Button>
         <Button
           onClick={() => {
-            uiAccess.errorDialogue.hide();
+            uiAccess.dialogueError.hide();
           }}
         >
           Hide

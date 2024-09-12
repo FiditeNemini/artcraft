@@ -5,20 +5,20 @@ const initialState = {
   title: "",
   message: "",
 };
-const errorDialogueSignal = signal(initialState);
+const dialogErrorSignal = signal(initialState);
 
-export const errorDialogue = {
-  signal: errorDialogueSignal,
+export const dialogueError = {
+  signal: dialogErrorSignal,
 
   show({ title, message }: { title?: string; message?: string }) {
-    errorDialogueSignal.value = {
-      ...errorDialogueSignal.value,
+    dialogErrorSignal.value = {
+      ...dialogErrorSignal.value,
       title: title ?? "Error",
       message: message ?? "An unknownerror occurred",
       isShowing: true,
     };
   },
   hide() {
-    errorDialogueSignal.value = initialState;
+    dialogErrorSignal.value = initialState;
   },
 };

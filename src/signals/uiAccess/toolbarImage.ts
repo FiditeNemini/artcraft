@@ -2,7 +2,7 @@ import { signal } from "@preact/signals-react";
 import { ContextualUi } from "./type";
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
-interface ContextualImageToolbarProps extends ContextualUi {
+interface ContextualToolbarImageProps extends ContextualUi {
   disabled: boolean;
   buttonStates: {
     [key in ToolbarImageButtonNames]: {
@@ -12,7 +12,7 @@ interface ContextualImageToolbarProps extends ContextualUi {
   };
 }
 
-const toolbarImageSignal = signal<ContextualImageToolbarProps>({
+const toolbarImageSignal = signal<ContextualToolbarImageProps>({
   position: {
     x: 0,
     y: 0,
@@ -24,16 +24,16 @@ const toolbarImageSignal = signal<ContextualImageToolbarProps>({
 
 export const toolbarImage = {
   signal: toolbarImageSignal,
-  setup(props: ContextualImageToolbarProps) {
+  setup(props: ContextualToolbarImageProps) {
     toolbarImageSignal.value = props;
   },
-  update(props: Partial<ContextualImageToolbarProps>) {
+  update(props: Partial<ContextualToolbarImageProps>) {
     toolbarImageSignal.value = {
       ...toolbarImageSignal.value,
       ...props,
     };
   },
-  setPosition(position: ContextualImageToolbarProps["position"]) {
+  setPosition(position: ContextualToolbarImageProps["position"]) {
     toolbarImageSignal.value = {
       ...toolbarImageSignal.value,
       position,
@@ -88,5 +88,5 @@ function initButtonStates() {
       active: false,
     };
   });
-  return ret as ContextualImageToolbarProps["buttonStates"];
+  return ret as ContextualToolbarImageProps["buttonStates"];
 }

@@ -10,15 +10,15 @@ import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enum
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualToolbarImage = () => {
-  const { isShowing, position, ...rest } = uiAccess.imageToolbar.signal.value;
+  const { isShowing, position, ...rest } = uiAccess.toolbarImage.signal.value;
   const buttonsProps = Object.values(ToolbarImageButtonNames).reduce(
     (acc, buttonName) => {
       acc[buttonName] = {
-        onClick: dispatchUiEvents.imageToolbar[buttonName],
+        onClick: dispatchUiEvents.toolbarImage[buttonName],
         disabled:
-          uiAccess.imageToolbar.signal.value.buttonStates[buttonName].disabled,
+          uiAccess.toolbarImage.signal.value.buttonStates[buttonName].disabled,
         active:
-          uiAccess.imageToolbar.signal.value.buttonStates[buttonName].active,
+          uiAccess.toolbarImage.signal.value.buttonStates[buttonName].active,
       };
       return acc;
     },

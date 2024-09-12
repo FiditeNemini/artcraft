@@ -8,13 +8,13 @@ import { ToolbarImageButtonData } from "~/components/features/ToolbarImage/data"
 import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
 
 export const ContextualToolbarForm = () => {
-  const imageToolbar = uiAccess.imageToolbar;
+  const toolbarImage = uiAccess.toolbarImage;
 
   const {
     isShowing,
     disabled: allDisabled,
     buttonStates,
-  } = imageToolbar.signal.value;
+  } = toolbarImage.signal.value;
 
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
@@ -49,7 +49,7 @@ export const ContextualToolbarForm = () => {
         />
         <Button
           onClick={() =>
-            imageToolbar.setPosition({
+            toolbarImage.setPosition({
               x: x,
               y: y,
             })
@@ -57,18 +57,18 @@ export const ContextualToolbarForm = () => {
         >
           Set Position
         </Button>
-        <Button disabled={isShowing} onClick={() => imageToolbar.show()}>
+        <Button disabled={isShowing} onClick={() => toolbarImage.show()}>
           Show
         </Button>
 
-        <Button disabled={!isShowing} onClick={() => imageToolbar.hide()}>
+        <Button disabled={!isShowing} onClick={() => toolbarImage.hide()}>
           Hide
         </Button>
         <Button
           onClick={() => {
             const exec = allDisabled
-              ? imageToolbar.enable
-              : imageToolbar.disable;
+              ? toolbarImage.enable
+              : toolbarImage.disable;
             exec();
           }}
         >
@@ -84,7 +84,7 @@ export const ContextualToolbarForm = () => {
               buttonStates[button.name].disabled ? "secondary" : "primary"
             }
             onClick={() =>
-              imageToolbar.changeButtonState(button.name, {
+              toolbarImage.changeButtonState(button.name, {
                 disabled: !buttonStates[button.name].disabled,
               })
             }
@@ -100,7 +100,7 @@ export const ContextualToolbarForm = () => {
             icon={button.icon}
             variant={buttonStates[button.name].active ? "primary" : "secondary"}
             onClick={() =>
-              imageToolbar.changeButtonState(button.name, {
+              toolbarImage.changeButtonState(button.name, {
                 active: !buttonStates[button.name].active,
               })
             }
@@ -118,9 +118,9 @@ export const ContextualToolbarForm = () => {
 
 export const LittleThing = () => {
   Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
-    uiEvents.imageToolbar[buttonName].onClick(() => {
+    uiEvents.toolbarImage[buttonName].onClick(() => {
       console.log(buttonName);
-      uiAccess.imageToolbar.changeButtonState(buttonName, {
+      uiAccess.toolbarImage.changeButtonState(buttonName, {
         disabled: true,
       });
     });

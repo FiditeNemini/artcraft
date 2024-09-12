@@ -1,13 +1,13 @@
 import { ContextualToolbarImage } from "~/KonvaRootComponent/ContextualToolbarImage";
 import { ContextualLoadingBar } from "~/KonvaRootComponent/ContextualLoadingBar";
 
-import { DialogError } from "~/components/features";
+import { SignaledDialogError } from "~/KonvaRootComponent/SignaledComponents";
 
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 import { ContextualToolbarForm } from "./ContextualToolbarForm";
 import { ContextualLoadingBarForm } from "./ContextualLoadingBarForm";
-import { ErrorDialogForm } from "./ErrorDialogForm";
+import { DialogErrorForm } from "./DialogErrorForm";
 
 import { ButtonTestTester } from "./ButtonTestTester";
 
@@ -21,12 +21,12 @@ export const Sandbox = () => {
         <ButtonTestTester />
         <ContextualToolbarForm />
         <ContextualLoadingBarForm />
-        <ErrorDialogForm />
+        <DialogErrorForm />
       </div>
 
       <ContextualToolbarImage />
       <ContextualLoadingBar />
-      <DialogError />
+      <SignaledDialogError />
     </div>
   );
 };

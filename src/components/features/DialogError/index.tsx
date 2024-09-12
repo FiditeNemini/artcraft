@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { uiAccess } from "~/signals/uiAccess";
+
 import { paperWrapperStyles } from "~/components/styles";
 import {
   Description,
@@ -9,15 +9,19 @@ import {
 } from "@headlessui/react";
 import { Button } from "~/components/ui";
 
-export const DialogError = () => {
-  const props = uiAccess.errorDialogue.signal.value;
-  const { isShowing, title, message } = props;
-
-  function handleClose() {
-    uiAccess.errorDialogue.hide();
-  }
+export const DialogError = ({
+  isShowing,
+  title,
+  message,
+  onClose,
+}: {
+  isShowing: boolean;
+  title: string;
+  message: string;
+  onClose: () => void;
+}) => {
   return (
-    <Dialog open={isShowing} onClose={handleClose} className="relative z-50">
+    <Dialog open={isShowing} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
         <DialogPanel
           className={twMerge(
@@ -28,7 +32,7 @@ export const DialogError = () => {
           <DialogTitle className="font-bold">{title}</DialogTitle>
           <Description>{message}</Description>
           <div className="flex justify-end gap-4">
-            <Button onClick={handleClose}>Close</Button>
+            <Button onClick={onClose}>Close</Button>
           </div>
         </DialogPanel>
       </div>

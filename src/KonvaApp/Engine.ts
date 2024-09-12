@@ -59,7 +59,7 @@ export class Engine {
     });
 
     // TODO: You may listen to all the image toolbar events here
-    uiEvents.imageToolbar.MOVE.onClick(() => {
+    uiEvents.toolbarImage.MOVE.onClick(() => {
       console.log("move");
     });
 
@@ -159,7 +159,7 @@ export class Engine {
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved TODO Save manager for resharing.
 
-    uiAccess.imageToolbar.hide();
+    uiAccess.toolbarImage.hide();
     uiAccess.loadingBar.hide();
     this.setupStage();
   }

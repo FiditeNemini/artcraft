@@ -3,8 +3,8 @@ import {
   events as addMediaEvents,
 } from "./addMedia";
 import {
-  dispatchers as imageToolbarDispatchers,
-  eventsHandlers as imageToolbarEvents,
+  dispatchers as toolbarImageDispatchers,
+  eventsHandlers as toolbarImageEvents,
 } from "./toolbarImage";
 import {
   dispatchers as videoToolbarDispatchers,
@@ -22,14 +22,14 @@ import {
 export const uiEvents = {
   ...addMediaEvents,
   buttonTest: buttonTestEvent,
-  imageToolbar: imageToolbarEvents,
+  toolbarImage: toolbarImageEvents,
   toolbarMain: toolbarMainEvents,
   toolbarVideo: videoToolbarEvents,
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
   buttonTest: buttonTestDispatcher,
-  imageToolbar: imageToolbarDispatchers,
+  toolbarImage: toolbarImageDispatchers,
   toolbarMain: toolbarMainDispatchers,
   toolbarVideo: videoToolbarDispatchers,
 };

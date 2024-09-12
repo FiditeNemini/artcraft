@@ -5,7 +5,7 @@ import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
 import { ContextualToolbarImage } from "./ContextualToolbarImage";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
-import { DialogError } from "~/components/features";
+import { SignaledDialogError } from "./SignaledComponents";
 import { EngineType } from "~/KonvaApp";
 
 // The KonvaApp is the root of the Konva stage
@@ -33,7 +33,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
       <Button
         className="absolute bottom-0 left-0"
         onClick={() => {
-          uiAccess.errorDialogue.show({
+          uiAccess.dialogueError.show({
             title: "Test Error",
             message: "This is a test error",
           });
@@ -51,7 +51,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
       <SignaledToolbarMain />
       <ContextualToolbarImage />
       <ContextualLoadingBar />
-      <DialogError />
+      <SignaledDialogError />
     </>
   );
 };
