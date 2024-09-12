@@ -5,7 +5,7 @@ import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
 import { ContextualToolbarImage } from "./ContextualToolbarImage";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
-import { ErrorDialog } from "~/components/features";
+import { DialogError } from "~/components/features";
 import { EngineType } from "~/KonvaApp";
 
 // The KonvaApp is the root of the Konva stage
@@ -51,7 +51,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
       <SignaledToolbarMain />
       <ContextualToolbarImage />
       <ContextualLoadingBar />
-      <ErrorDialog />
+      <DialogError />
     </>
   );
 };

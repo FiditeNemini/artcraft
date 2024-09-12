@@ -1,5 +1,5 @@
 import { signal, effect } from "@preact/signals-react";
-import { TrimData } from "~/components/features/UploadVideo/TrimmerPlaybar";
+import { TrimData } from "~/components/features/DialogAddVideo/TrimmerPlaybar";
 
 const stagedImage = signal<File | null>(null);
 

@@ -9,7 +9,7 @@ import { paperWrapperStyles } from "~/components/styles";
 import { dispatchUiEvents } from "~/signals/uiEvents";
 import { QuickTrimVideoPlayer, TrimData } from "./QuickTrimVideoPlayer";
 
-export const UploadVideo = ({
+export const DialogAddVideo = ({
   isOpen,
   closeCallback,
 }: {

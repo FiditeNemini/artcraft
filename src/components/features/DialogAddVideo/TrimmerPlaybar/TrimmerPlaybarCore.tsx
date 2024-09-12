@@ -8,7 +8,7 @@ import {
 import { MAX_TRIM_DURATION } from "./utilities";
 
 import { TrimmingPlaybarLoading } from "./TrimmerPlaybarLoading";
-import { ProgressCursor } from "./ProgressCursor";
+import { PlayProgressCursor } from "./PlayProgressCursor";
 import { TrimScrubber } from "./TrimScrubber";
 import { TrimData } from "./utilities";
 
@@ -123,11 +123,11 @@ export const TrimmerPlaybarCore = ({
         className,
       )}
     >
-      <ProgressCursor
+      <div className="mt-3 h-4 w-full bg-secondary-300" />
+      <PlayProgressCursor
         vidEl={vidEl}
-        progress={(currentTimeMs / durationMs) * 100}
+        currentTimePercent={(currentTimeMs / durationMs) * 100}
       />
-
       <TrimScrubber
         // trim start scrubber
         icon={faBracketCurly}

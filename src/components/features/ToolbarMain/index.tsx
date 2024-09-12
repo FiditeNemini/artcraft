@@ -18,8 +18,8 @@ import {
 import { ToolbarButton } from "../ToolbarButton";
 import { twMerge } from "tailwind-merge";
 
-import { UploadImage } from "../UploadImage";
-import { UploadVideo } from "../UploadVideo";
+import { DialogAddImage } from "../DialogAddImage";
+import { DialogAddVideo } from "../DialogAddVideo";
 
 // style constants
 import { paperWrapperStyles } from "~/components/styles";
@@ -173,11 +173,11 @@ export const ToolbarMain = ({
         </div>
       </div>
 
-      <UploadImage
+      <DialogAddImage
         isOpen={state.isUploadImageOpen ?? false}
         closeCallback={() => setState({ ...state, isUploadImageOpen: false })}
       />
-      <UploadVideo
+      <DialogAddVideo
         isOpen={state.isUploadVideoOpen ?? false}
         closeCallback={() => setState({ ...state, isUploadVideoOpen: false })}
       />

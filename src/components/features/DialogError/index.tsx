@@ -9,7 +9,7 @@ import {
 } from "@headlessui/react";
 import { Button } from "~/components/ui";
 
-export const ErrorDialog = () => {
+export const DialogError = () => {
   const props = uiAccess.errorDialogue.signal.value;
   const { isShowing, title, message } = props;
 

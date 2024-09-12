@@ -3,11 +3,11 @@ import { twMerge } from "tailwind-merge";
 
 import { buttonStyles, verticalPositionStyles } from "./utilities";
 
-export const ProgressCursor = ({
-  progress,
+export const PlayProgressCursor = ({
+  currentTimePercent,
   vidEl,
 }: {
-  progress: number;
+  currentTimePercent: number;
   vidEl: HTMLVideoElement;
 }) => {
   const [state, setState] = useState<{
@@ -79,9 +79,11 @@ export const ProgressCursor = ({
     <>
       <div
         // play progress bar
-        className="mt-3 h-4 bg-primary-500"
+        className="absolute left-0 top-0 mt-3 h-4 bg-primary-500"
         style={{
-          width: isScrubbing ? `${scrubbingPosition}%` : `${progress}%`,
+          width: isScrubbing
+            ? `${scrubbingPosition}%`
+            : `${currentTimePercent}%`,
         }}
       />
       <div
@@ -94,7 +96,11 @@ export const ProgressCursor = ({
           isScrubbing && "cursor-grabbing",
         )}
         onMouseDown={handleScrubbingCurrentTime}
-        style={{ left: isScrubbing ? `${scrubbingPosition}%` : `${progress}%` }}
+        style={{
+          left: isScrubbing
+            ? `${scrubbingPosition}%`
+            : `${currentTimePercent}%`,
+        }}
       />
     </>
   );

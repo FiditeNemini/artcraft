@@ -1,7 +1,7 @@
 import { ContextualToolbarImage } from "~/KonvaRootComponent/ContextualToolbarImage";
 import { ContextualLoadingBar } from "~/KonvaRootComponent/ContextualLoadingBar";
 
-import { ErrorDialog } from "~/components/features";
+import { DialogError } from "~/components/features";
 
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
@@ -26,7 +26,7 @@ export const Sandbox = () => {
 
       <ContextualToolbarImage />
       <ContextualLoadingBar />
-      <ErrorDialog />
+      <DialogError />
     </div>
   );
 };

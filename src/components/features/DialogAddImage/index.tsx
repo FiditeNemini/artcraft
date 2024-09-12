@@ -8,7 +8,7 @@ import { Button } from "~/components/ui";
 import { paperWrapperStyles } from "~/components/styles";
 import { dispatchUiEvents } from "~/signals/uiEvents/";
 
-export const UploadImage = ({
+export const DialogAddImage = ({
   isOpen,
   closeCallback,
 }: {
