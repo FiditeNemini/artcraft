@@ -1,12 +1,16 @@
 // Example of this working.
-import { ProgressData, WorkResult } from "./GenericWorker";
+import { ProgressData, WorkResult } from "../GenericWorker";
 import {
   SharedWorkerBase,
   SharedWorkerRequest,
   ResponseType,
-} from "./SharedWorkerBase";
+} from "../SharedWorkerBase";
 
-class SharedNumberWorker extends SharedWorkerBase<number, number, number> {
+export interface ExP {}
+export interface ExI {}
+export interface ExR {}
+
+export class TemplateSharedWorker extends SharedWorkerBase<ExI, ExR, ExP> {
   constructor(port: MessagePort) {
     super(port);
     this.setup(this.workFunction.bind(this), this.progressFunction.bind(this));
@@ -14,18 +18,24 @@ class SharedNumberWorker extends SharedWorkerBase<number, number, number> {
   // Data here will be shipped off for progressive loading
   async workFunction(
     isDoneStreaming: boolean,
-    item: number,
-    reportProgress: (progress: number, data: number) => void,
-  ): Promise<[number, boolean]> {
+    item: ExI,
+    reportProgress: (progress: number, data: ExP) => void,
+  ): Promise<[ExR | undefined, boolean]> {
     console.log(`Working Item ${item}`);
 
-    for (let i = 0; i < 1000; i++) {}
-    reportProgress(item, 100);
+    const exP = {};
+    reportProgress(0, exP);
 
-    return [5, true];
+    const exR: ExR = {};
+
+    if (isDoneStreaming) {
+      return [exR, true];
+    } else {
+      return [undefined, false];
+    }
   }
 
-  progressFunction(progress: ProgressData<number>) {
+  progressFunction(progress: ProgressData<ExP>) {
     console.log(
       `Progress Function  JobID:${progress.jobID} Data:${progress.data} Progress:${progress.progress}`,
     );
@@ -38,7 +48,7 @@ class SharedNumberWorker extends SharedWorkerBase<number, number, number> {
     });
   }
 
-  reportResult(result: WorkResult<number>) {
+  reportResult(result: WorkResult<ExR>) {
     console.log(`Result: jobID:${result.jobID} result:${result.data}`);
     this.send({
       jobID: result.jobID,
@@ -47,7 +57,7 @@ class SharedNumberWorker extends SharedWorkerBase<number, number, number> {
     });
   }
 
-  async receive(request: SharedWorkerRequest<number>) {
+  async receive(request: SharedWorkerRequest<ExI>) {
     console.log("Received Request");
     console.log(request);
     this.submitWork({
@@ -61,18 +71,18 @@ class SharedNumberWorker extends SharedWorkerBase<number, number, number> {
 // This is a copy paste to create a worker now.
 self.onconnect = (e: any) => {
   const port = e.ports[0];
-  console.log("NumberSharedWorker Started");
-  let worker: SharedNumberWorker | undefined = undefined;
+  console.log("TemplateSharedWorker Started");
+  let worker: TemplateSharedWorker | undefined = undefined;
   let started = false;
 
   if (started === false) {
     started = true;
-    worker = new SharedNumberWorker(port);
+    worker = new TemplateSharedWorker(port);
     worker.start();
   }
 
   // Response For Start.
-  const workerResult = "Number Shared Worker Started";
+  const workerResult = "TemplateSharedWorker Started";
   port.postMessage(workerResult);
   port.start(); // Required when using addEventListener. Otherwise called implicitly by onmessage setter.
 };

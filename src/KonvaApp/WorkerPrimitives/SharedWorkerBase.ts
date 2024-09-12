@@ -66,7 +66,7 @@ export class SharedWorkerBase<I, R, P> {
 
   // Override
   public errorFunction(error: SharedWorkerResponse<I, R>) {
-    console.log("Please Override Function");
+    console.log("Please Override Error Function");
   }
 
   // Call to start the worker
@@ -85,7 +85,7 @@ export class SharedWorkerBase<I, R, P> {
   // Must override in SharedWorker subclass
   public async receive(request: SharedWorkerRequest<I>) {
     // override this
-    console.log("receive Override in subclass");
+    console.log("Receive Override in subclass");
   }
 
   public async receiveFromPort(event: any) {
@@ -107,6 +107,6 @@ export class SharedWorkerBase<I, R, P> {
 
   // override this for subclass;
   public reportResult(result: WorkResult<R>): void {
-    console.log("Must Override reportResult");
+    console.log("Must Override ReportResult");
   }
 }

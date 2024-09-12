@@ -4,10 +4,12 @@
 import { ResponseType, SharedWorkerResponse } from "./SharedWorkerBase";
 
 // Does work with the data and returns progress and any progress data.
+// result is undefined if still streaming
 export type WorkFunction<I, R, P> = (
+  isDoneStreaming: boolean,
   workItem: I,
   reportProgress: (progress: number, data: P) => void,
-) => Promise<[R, boolean]>;
+) => Promise<[R | undefined, boolean]>;
 
 // Work Item with Type T
 export interface WorkItem<T> {
@@ -44,7 +46,6 @@ export class WorkQueue<I, R, P> {
 
   // Streaming workers wait for a stop before they return a result used for frames.
   // if not then it produces one result for one work item off the main thread.
-  public isStreamingWorker: boolean = true;
 
   protected workFunction: WorkFunction<I, R, P> | undefined;
   protected resultFunction: (result: WorkResult<R>) => void;
@@ -86,7 +87,11 @@ export class WorkQueue<I, R, P> {
             console.log("Work Function is Null Generic Worker");
             return;
           }
-          const result = await this.workFunction(workItem.data, reportProgress);
+          const result = await this.workFunction(
+            workItem.finishedStreamingInput,
+            workItem.data,
+            reportProgress,
+          );
           // should report
           if (result[1] === true) {
             this.reportResult({ jobID: workItem.jobID, data: result[0] });
@@ -134,29 +139,3 @@ export class WorkQueue<I, R, P> {
     this.resultFunction(result);
   }
 }
-
-// How to use:
-// const exampleWorkFunction: WorkFunction<number, number> = async (
-//   data: number,
-//   reportProgress: (progress: number) => void,
-// ) => {
-//   // Simulate some asynchronous work with progress reporting
-//   for (let i = 0; i <= 100; i += 20) {
-//     await new Promise((resolve) => setTimeout(resolve, 200));
-//     reportProgress(i);
-//   }
-//   return data * 2;
-// };
-
-// const progressCallback = (progressData: ProgressData) => {
-//   console.log(`Job ${progressData.jobId} progress: ${progressData.progress}%`);
-// };
-
-// const workQueue = new WorkQueue<number, number>(
-//   exampleWorkFunction,
-//   progressCallback,
-// );
-
-// workQueue.addWork(1, 10);
-// workQueue.addWork(2, 20);
-// workQueue.addWork(3, 30);
