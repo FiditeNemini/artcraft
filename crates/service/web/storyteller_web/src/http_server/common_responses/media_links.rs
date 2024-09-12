@@ -4,6 +4,7 @@ use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
+//const FAKEYOU_CDN_STR: &str = "https://storage.googleapis.com/dev-vocodes-public";
 const FAKEYOU_CDN_STR: &str = "https://cdn.fakeyou.com";
 
 const STORYTELLER_CDN_STR: &str = "https://cdn.storyteller.ai";

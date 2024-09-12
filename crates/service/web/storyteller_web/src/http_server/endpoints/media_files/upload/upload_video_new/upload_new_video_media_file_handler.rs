@@ -148,6 +148,10 @@ pub async fn upload_new_video_media_file_handler(
   MultipartForm(mut form): MultipartForm<UploadNewVideoMediaFileForm>,
 ) -> Result<Json<UploadNewVideoMediaFileSuccessResponse>, MediaFileUploadError> {
 
+  fast_form_validations(&form)?;
+
+  // ==================== READ SESSION ==================== //
+
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
@@ -155,8 +159,6 @@ pub async fn upload_new_video_media_file_handler(
         error!("MySql pool error: {:?}", err);
         MediaFileUploadError::ServerError
       })?;
-
-  // ==================== READ SESSION ==================== //
 
   let maybe_user_session = server_state
       .session_checker
@@ -426,4 +428,25 @@ pub async fn upload_new_video_media_file_handler(
     success: true,
     media_file_token: token,
   }))
+}
+
+fn fast_form_validations(form: &UploadNewVideoMediaFileForm) -> Result<(), MediaFileUploadError> {
+  if let Some(resample_fps) = form.maybe_resample_fps.as_ref() {
+    if **resample_fps > 24 {
+      return Err(MediaFileUploadError::BadInput("Resample FPS must be 24 or lower".to_string()));
+    } else if **resample_fps == 0 {
+      return Err(MediaFileUploadError::BadInput("Resample FPS must be greater than 0".to_string()));
+    }
+  }
+
+  form.maybe_trim_start_millis.as_ref().zip(form.maybe_trim_end_millis.as_ref())
+      .map(|(start, end)| {
+        if **start >= **end {
+          return Err(MediaFileUploadError::BadInput("Trim start must be less than trim end".to_string()));
+        }
+        Ok(())
+      })
+      .transpose()?;
+
+  Ok(())
 }
