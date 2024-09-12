@@ -113,8 +113,10 @@ export const ToolbarMain = ({
             "pointer-events-none cursor-default bg-ui-border shadow-md",
         )}
       >
-        <div className="flex items-center gap-2 px-2">
+        <div className="pl-1 pr-2">
           <ToolbarButton icon={faBars} buttonProps={buttonProps.MENU} />
+        </div>
+        <div className="flex items-center gap-2 px-2">
           <ToolbarButton
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}

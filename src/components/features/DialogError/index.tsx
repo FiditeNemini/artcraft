@@ -1,6 +1,9 @@
 import { twMerge } from "tailwind-merge";
 
-import { paperWrapperStyles } from "~/components/styles";
+import {
+  dialogBackgroundStyles,
+  paperWrapperStyles,
+} from "~/components/styles";
 import {
   Description,
   Dialog,
@@ -22,7 +25,7 @@ export const DialogError = ({
 }) => {
   return (
     <Dialog open={isShowing} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+      <div className={dialogBackgroundStyles}>
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,

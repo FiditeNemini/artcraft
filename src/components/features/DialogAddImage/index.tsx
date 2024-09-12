@@ -5,7 +5,10 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { FileUploader, IMAGE_FILE_TYPE } from "../FileUploader";
 import { Button } from "~/components/ui";
 
-import { paperWrapperStyles } from "~/components/styles";
+import {
+  paperWrapperStyles,
+  dialogBackgroundStyles,
+} from "~/components/styles";
 import { dispatchUiEvents } from "~/signals/uiEvents/";
 
 export const DialogAddImage = ({
@@ -30,7 +33,7 @@ export const DialogAddImage = ({
   }
   return (
     <Dialog open={isOpen} onClose={closeCallback} className="relative z-50">
-      <div className="fixed inset-0 flex w-screen items-center justify-center">
+      <div className={dialogBackgroundStyles}>
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,

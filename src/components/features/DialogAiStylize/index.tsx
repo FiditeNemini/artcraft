@@ -4,7 +4,10 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { faWandSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button } from "~/components/ui";
-import { paperWrapperStyles } from "~/components/styles";
+import {
+  dialogBackgroundStyles,
+  paperWrapperStyles,
+} from "~/components/styles";
 
 import { ArtStyleNames } from "./enums";
 import {
@@ -59,7 +62,7 @@ export const DialogAiStylize = ({
 
   return (
     <Dialog open={isOpen} onClose={closeCallback} className="relative z-50">
-      <div className="fixed inset-0 flex w-screen items-center justify-center">
+      <div className={dialogBackgroundStyles}>
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,
