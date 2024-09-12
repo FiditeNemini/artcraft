@@ -8083,6 +8083,7 @@ dependencies = [
  "log",
  "mp4",
  "my-workspace-hack",
+ "regex",
  "testing",
 ]
 

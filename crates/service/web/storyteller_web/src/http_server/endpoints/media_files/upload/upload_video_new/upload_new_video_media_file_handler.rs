@@ -13,6 +13,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::web::Json;
 use log::{debug, error, info, warn};
 use once_cell::sync::Lazy;
+use std::time::Duration;
 use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
 use utoipa::ToSchema;
 
@@ -25,6 +26,7 @@ use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use errors::AnyhowResult;
 use filesys::directory_exists::directory_exists;
 use filesys::file_exists::file_exists;
+use filesys::file_read_bytes::file_read_bytes;
 use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -34,6 +36,8 @@ use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
+use primitives::numerics::i64_to_u64_zero_clamped::i64_to_u64_zero_clamped;
+use primitives::numerics::u64_to_i64_saturating::u64_to_i64_saturating;
 use thumbnail_generator::task_client::thumbnail_task::{ThumbnailTaskBuilder, ThumbnailTaskInputMimeType};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
@@ -41,6 +45,7 @@ use videos::ffprobe_get_info::ffprobe_get_info;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
+use crate::http_server::endpoints::media_files::upload::upload_video_new::ffmpeg_trim_and_resample::{ffmpeg_trim_and_resample, Args};
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::state::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
@@ -67,10 +72,10 @@ pub struct UploadNewVideoMediaFileForm {
   #[schema(value_type = Option<String>, format = Binary)]
   maybe_title: Option<Text<String>>,
 
-  /// Optional: Style transfer style used. See `StyleTransferName` for possible values.
-  #[multipart(limit = "2 KiB")]
-  #[schema(value_type = Option<StyleTransferName>, format = Binary)]
-  maybe_style_name: Option<Text<StyleTransferName>>,
+  // /// Optional: Style transfer style used. See `StyleTransferName` for possible values.
+  // #[multipart(limit = "2 KiB")]
+  // #[schema(value_type = Option<StyleTransferName>, format = Binary)]
+  // maybe_style_name: Option<Text<StyleTransferName>>,
 
   /// Optional: Visibility of the scene
   #[multipart(limit = "2 KiB")]
@@ -86,6 +91,22 @@ pub struct UploadNewVideoMediaFileForm {
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<bool>, format = Binary)]
   is_intermediate_system_file: Option<Text<bool>>,
+
+  /// Optional: Trim start offset in milliseconds.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<u64>, format = Binary)]
+  maybe_trim_start_millis: Option<Text<u64>>,
+
+  /// Optional: Trim end offset in milliseconds.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<u64>, format = Binary)]
+  maybe_trim_end_millis: Option<Text<u64>>,
+
+  /// Optional: Resample the video to this FPS.
+  /// Only certain values equal or under 24fps are allowed.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<u64>, format = Binary)]
+  maybe_resample_fps: Option<Text<u8>>,
 }
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
@@ -217,7 +238,7 @@ pub async fn upload_new_video_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  let mimetype = get_mimetype_for_bytes(file_bytes.as_ref())
+  let mut mimetype = get_mimetype_for_bytes(file_bytes.as_ref())
       .map(|mimetype| mimetype.to_string())
       .ok_or_else(|| {
         warn!("Could not determine mimetype for file");
@@ -234,11 +255,63 @@ pub async fn upload_new_video_media_file_handler(
     return Err(MediaFileUploadError::BadInput(format!("unpermitted mime type: {}", &filtered_mimetype)));
   }
 
+  // ==================== OPTIONAL VIDEO RESAMPLE ==================== //
+
+  let should_resample = form.maybe_resample_fps.is_some()
+      || form.maybe_trim_start_millis.is_some()
+      || form.maybe_trim_end_millis.is_some();
+
+  let mut save_tempdir_ref = None; // NB: Save from Drop
+
+  let mut final_upload_file_path = form.file.file.path().to_path_buf();
+
+  if should_resample {
+    // TODO(bt,2024-09-11): Should include entropy so concurrent requests don't overwrite
+    let frame_temp_dir = server_state.temp_dir_creator.new_tempdir("ffmpeg")
+        .map_err(|err| {
+          error!("Problem creating temp dir: {:?}", err);
+          MediaFileUploadError::ServerError
+        })?;
+
+    let video_output_path = frame_temp_dir.path().join("output.mp4");
+
+    let maybe_new_frame_rate = form.maybe_resample_fps.map(|fps| fps.0);
+    let maybe_start_offset = form.maybe_trim_start_millis.map(|millis| Duration::from_millis(millis.0));
+    let maybe_end_offset = form.maybe_trim_end_millis.map(|millis| Duration::from_millis(millis.0));
+
+    ffmpeg_trim_and_resample(Args {
+      video_input_path: form.file.file.path(),
+      video_output_path: &video_output_path,
+      maybe_new_frame_rate,
+      maybe_start_offset,
+      maybe_end_offset,
+    }).map_err(|err| {
+      error!("Problem resampling video: {:?}", err);
+      MediaFileUploadError::ServerError
+    })?;
+
+    file_bytes = file_read_bytes(&video_output_path)
+        .map_err(|e| {
+          error!("Problem reading file: {:?}", e);
+          MediaFileUploadError::ServerError
+        })?;
+
+    mimetype = get_mimetype_for_bytes(file_bytes.as_ref())
+        .map(|mimetype| mimetype.to_string())
+        .ok_or_else(|| {
+          warn!("Could not determine mimetype for file");
+          MediaFileUploadError::BadInput("Could not determine mimetype for file".to_string())
+        })?;
+
+    final_upload_file_path = video_output_path;
+    save_tempdir_ref = Some(frame_temp_dir); // NB: Keep from going out of scope
+  }
+
   // ==================== OTHER FILE METADATA ==================== //
 
   let mut maybe_duration_millis = None;
 
-  match ffprobe_get_info(form.file.file.path()) {
+  match ffprobe_get_info(&final_upload_file_path) {
     Ok(video_info) => {
       maybe_duration_millis = video_info.duration
           .map(|duration| duration.millis as u64);

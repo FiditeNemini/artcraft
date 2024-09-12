@@ -30,6 +30,7 @@ log = "0.4.20"
 # TODO(bt,2024-08-08): We might drop `mp4` crate because it crashes on reading
 #  some videos with the message "avcc not found"
 mp4 = "0.14.0"
+regex = "1.10.5"
 
 [dev-dependencies]
 testing = { path = "../../testing" }
