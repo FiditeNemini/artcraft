@@ -23,9 +23,10 @@ use mysql_queries::queries::generic_inference::web::job_status::GenericInference
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
-
+use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
 use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
 use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_lipsync_details::extract_lipsync_details;
 use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
 use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
 use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::BatchGetMediaFilesQueryParams;
@@ -90,6 +91,10 @@ pub struct BatchRequestDetailsResponse {
 
   /// OPTIONAL. For Live Portrait jobs, this is additional information on the request.
   pub maybe_live_portrait_details: Option<JobDetailsLivePortraitRequest>,
+
+  /// OPTIONAL. For lipsync jobs (face fusion and sad talker), this is additional
+  /// information on the request.
+  pub maybe_lipsync_details: Option<JobDetailsLipsyncRequest>,
 }
 
 /// Details about the ongoing job status
@@ -277,7 +282,11 @@ fn db_record_to_response_payload(
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
       maybe_style_name: record.request_details.maybe_style_name,
       maybe_live_portrait_details: maybe_polymorphic_args
-          .and_then(|ref args| extract_live_portrait_details(args)),
+          .as_ref()
+          .and_then(|args| extract_live_portrait_details(args)),
+      maybe_lipsync_details: maybe_polymorphic_args
+          .as_ref()
+          .and_then(|args| extract_lipsync_details(args)),
     },
     status: BatchStatusDetailsResponse {
       status: record.status,
