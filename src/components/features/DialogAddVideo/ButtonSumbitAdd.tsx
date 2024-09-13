@@ -13,10 +13,12 @@ export const ButtonSubmitAdd = ({
   file,
   trimData,
   onStatusChanged,
+  retry,
 }: {
   file: File | null;
   trimData: Signal<TrimData | undefined>;
   onStatusChanged: (newStatus: DialogAddMediaStatuses) => void;
+  retry?: boolean;
 }) => {
   const handleAdd = useCallback(async () => {
     if (file && trimData.value) {
@@ -58,7 +60,7 @@ export const ButtonSubmitAdd = ({
 
       // return the good result
       onStatusChanged(DialogAddMediaStatuses.FILE_RECORD_RECEIVED);
-      console.log(recordRequestResponse);
+      console.log("Request Video Response >>", recordRequestResponse);
       dispatchUiEvents.addVideoToEngine({
         url: recordRequestResponse.data.public_bucket_url,
       });
@@ -70,7 +72,7 @@ export const ButtonSubmitAdd = ({
       onClick={handleAdd}
       disabled={file === null || trimData === undefined}
     >
-      Add Video
+      {retry ? "Retry Add" : "Add Video"}
     </Button>
   );
 };

@@ -51,7 +51,9 @@ export class Engine {
       console.log("Engine got video: " + video.url);
       // this.addVideo(video.file);
     });
-
+    uiEvents.onRequestAiStylize((data) => {
+      console.log("Engine heard AI Stylize request: ", data);
+    });
     // TODO: You may listen to all the image toolbar events here
     uiEvents.toolbarImage.MOVE.onClick(() => {
       console.log("move");
