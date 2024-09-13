@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { signal } from "@preact/signals-react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -33,36 +33,38 @@ export const DialogAddVideo = ({
     file: File | null;
     dialogStatus: DialogAddMediaStatuses;
   }>(initialState);
-  const trimData = signal<TrimData | undefined>(undefined);
+  const trimDataRef = useRef(signal<TrimData | undefined>(undefined));
+  const trimData = trimDataRef.current;
 
   const handleClose = useCallback(() => {
     closeCallback();
-  }, [closeCallback]);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      //this reset the modal on close
+      setStates(initialState);
+    }
+  }, [isOpen]);
 
   const changeDialogStatus = useCallback(
     (newStatus: DialogAddMediaStatuses) => {
       setStates((curr) => ({ ...curr, dialogStatus: newStatus }));
       if (newStatus === DialogAddMediaStatuses.FILE_RECORD_RECEIVED) {
         setTimeout(handleClose, 1000);
-        setTimeout(() => setStates(initialState), 1100);
       }
     },
-    [handleClose],
+    [],
   );
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={closeCallback}
-      unmount={true}
-      className="relative z-50"
-    >
+    <Dialog open={isOpen} onClose={closeCallback} className="relative z-50">
       <div className={dialogBackgroundStyles}>
         <DialogPanel className="w-full max-w-5xl">
           <div
             className={twMerge(
               paperWrapperStyles,
-              "flex w-full max-w-5xl flex-col gap-4 px-6 py-4",
+              "flex w-full max-w-5xl flex-col justify-between gap-4 px-6 pb-6 pt-4",
             )}
             style={{ height: "calc(100vh - 200px)" }}
           >
@@ -80,20 +82,43 @@ export const DialogAddVideo = ({
                   }}
                 />
                 <span className="grow" />
-                <div className="flex w-full justify-end gap-4">
-                  <Button onClick={handleClose} variant="secondary">
-                    Cancel
-                  </Button>
-
-                  <ButtonSubmitAdd
-                    file={file}
-                    trimData={trimData}
-                    onStatusChanged={changeDialogStatus}
-                  />
-                </div>
               </>
             )}
-            <LoadingScreens currStatus={dialogStatus} />
+            <LoadingScreens
+              currStatus={dialogStatus}
+              retryButton={
+                <ButtonSubmitAdd
+                  file={file}
+                  trimData={trimData}
+                  onStatusChanged={changeDialogStatus}
+                  retry
+                />
+              }
+            />
+
+            <div className="flex w-full justify-center gap-4">
+              <Button onClick={handleClose} variant="secondary">
+                Cancel
+              </Button>
+              {dialogStatus === DialogAddMediaStatuses.STAGING_FILE && (
+                <ButtonSubmitAdd
+                  file={file}
+                  trimData={trimData}
+                  onStatusChanged={changeDialogStatus}
+                />
+              )}
+              {(dialogStatus === DialogAddMediaStatuses.ERROR_FILE_UPLOAD ||
+                dialogStatus ===
+                  DialogAddMediaStatuses.ERROR_FILE_RECORD_REQUEST) && (
+                <Button
+                  onClick={() => {
+                    setStates(initialState);
+                  }}
+                >
+                  Add Another Video
+                </Button>
+              )}
+            </div>
           </div>
         </DialogPanel>
       </div>
