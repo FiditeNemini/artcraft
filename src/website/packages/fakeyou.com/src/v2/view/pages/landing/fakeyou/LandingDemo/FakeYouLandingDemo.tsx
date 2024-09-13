@@ -223,7 +223,7 @@ export default function LandingDemo({
         />
       )}
 
-      <Panel padding={true}>
+      <Panel padding={true} className="rounded">
         <form className="d-flex flex-column">
           <div>
             <div className="d-flex">

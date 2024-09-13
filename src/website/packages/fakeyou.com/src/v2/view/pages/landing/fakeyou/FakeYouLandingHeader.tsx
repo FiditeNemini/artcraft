@@ -38,7 +38,7 @@ export default function FakeYouLandingHeader({
       </Panel> */}
 
       <div className="my-lg-5 py-lg-5 pt-3 pb-5">
-        <div className="row g-5">
+        <div className="row g-5 m-0">
           <div className="col-12 col-lg-6 order-lg-2">
             <LandingDemo
               showHanashi={false}

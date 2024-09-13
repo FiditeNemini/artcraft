@@ -211,7 +211,7 @@ export default function TopNav({
   const topBarWrapper = document.getElementById("topbar-wrapper");
 
   useEffect(() => {
-    const pageContentWrapper = document.getElementById("page-content-wrapper");
+    const pageContentWrapper = document.getElementById("wrapper");
 
     if (pageContentWrapper) {
       if (
