@@ -15,6 +15,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
+import { InjectScript } from "common/InjectScript";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -24,7 +25,6 @@ interface Props {
 
 function LoginPage(props: Props) {
   let history = useHistory();
-  PosthogClient.recordPageview();
   const domain = useDomainConfig();
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -32,6 +32,9 @@ function LoginPage(props: Props) {
   let location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const redirectUrl = queryParams.get("redirect") || "/";
+
+  PosthogClient.recordPageview();
+  InjectScript.addGoogleAuthLogin();
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push("/");
