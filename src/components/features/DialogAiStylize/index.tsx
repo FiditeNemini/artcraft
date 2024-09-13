@@ -17,6 +17,7 @@ import {
 
 import { Prompts } from "./Prompts";
 import { ArtStyleSelector } from "./ArtStyleSelector";
+import { dispatchUiEvents } from "~/signals";
 
 export const DialogAiStylize = ({
   isOpen,
@@ -40,10 +41,12 @@ export const DialogAiStylize = ({
     closeCallback();
   }
 
-  function handleEnter() {
-    // if (data) {
-    //   dispatchUiEvents;
-    // }
+  function handleGenerate() {
+    dispatchUiEvents.requestAiStylize({
+      artstyle: selectedArtStyle,
+      positivePrompt: positivePrompt,
+      negativePrompt: negativePrompt,
+    });
     handleClose();
   }
   const onSelectedArtStyle = useCallback((newArtstyle: ArtStyleNames) => {
@@ -95,7 +98,7 @@ export const DialogAiStylize = ({
             <Button
               className="hover:animate-pulse"
               icon={faWandSparkles}
-              onClick={handleEnter}
+              onClick={handleGenerate}
             >
               Generate
             </Button>

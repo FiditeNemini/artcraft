@@ -18,9 +18,11 @@ import {
   dispatcher as buttonTestDispatcher,
   eventsHandler as buttonTestEvent,
 } from "./buttonTest";
+import { requestAiStylize, onRequestAiStylize } from "./aiStylize";
 
 export const uiEvents = {
   ...addMediaEvents,
+  onRequestAiStylize,
   buttonTest: buttonTestEvent,
   toolbarImage: toolbarImageEvents,
   toolbarMain: toolbarMainEvents,
@@ -28,6 +30,7 @@ export const uiEvents = {
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
+  requestAiStylize,
   buttonTest: buttonTestDispatcher,
   toolbarImage: toolbarImageDispatchers,
   toolbarMain: toolbarMainDispatchers,
