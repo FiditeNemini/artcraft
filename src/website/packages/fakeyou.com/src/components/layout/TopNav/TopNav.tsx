@@ -379,7 +379,10 @@ export default function TopNav({
         label="My Profile"
         small
         variant="secondary"
-        onClick={() => history.push(url)}
+        onClick={() => {
+          history.push(url);
+          handleNavLinkClick();
+        }}
         className="d-block d-lg-none"
       />
     );
