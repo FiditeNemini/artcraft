@@ -1737,6 +1737,14 @@ styles with important tags:
   }
 }
 
+.container-panel {
+  overflow: hidden;
+}
+
+.container-panel-full {
+  overflow: hidden;
+}
+
 select {
   border-color: $input-dark !important;
   background-color: $input-dark !important;
@@ -1916,6 +1924,7 @@ textarea {
       margin-left: auto;
       max-width: 1600px;
       border-radius: 0.5rem;
+      overflow: hidden;
     }
 
     .container-panel-full {
@@ -1925,6 +1934,7 @@ textarea {
       margin-right: auto;
       margin-left: auto;
       border-radius: 0.5rem;
+      overflow: hidden;
     }
 
     .panel {

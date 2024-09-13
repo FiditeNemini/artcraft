@@ -4,10 +4,11 @@
 
 #wrapper {
   padding-left: 0;
-  -webkit-transition: all 0.2s ease;
-  -moz-transition: all 0.2s ease;
-  -o-transition: all 0.2s ease;
-  transition: all 0.2s ease;
+  min-height: 100vh;
+  // -webkit-transition: all 0.2s ease;
+  // -moz-transition: all 0.2s ease;
+  // -o-transition: all 0.2s ease;
+  // transition: all 0.2s ease;
 }
 
 $topbar-height: 66px;
@@ -20,10 +21,10 @@ $topbar-height: 66px;
   height: calc(100% - $topbar-height);
   margin-left: -260px;
   overflow-x: hidden;
-  -webkit-transition: all 0.2s ease;
-  -moz-transition: all 0.2s ease;
-  -o-transition: all 0.2s ease;
-  transition: all 0.2s ease;
+  // -webkit-transition: all 0.2s ease;
+  // -moz-transition: all 0.2s ease;
+  // -o-transition: all 0.2s ease;
+  // transition: all 0.2s ease;
   margin-top: $topbar-height;
   display: grid;
   grid-template-rows: 1fr auto;

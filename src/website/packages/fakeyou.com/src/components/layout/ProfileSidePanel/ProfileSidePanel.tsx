@@ -62,7 +62,7 @@ export default function ProfileSidePanel({
   }`.trim();
 
   useEffect(() => {
-    const contentWrapper = document.getElementById("page-content-wrapper");
+    const contentWrapper = document.getElementById("wrapper");
 
     if (shouldShowSidebar && isOnProfilePage) {
       contentWrapper?.classList.remove("no-padding");
