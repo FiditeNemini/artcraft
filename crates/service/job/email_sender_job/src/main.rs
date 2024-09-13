@@ -47,18 +47,6 @@ pub mod http_server;
 pub mod job;
 pub mod job_dependencies;
 
-// Buckets (shared config)
-const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &str = "SECRET_KEY";
-const ENV_REGION_NAME : &str = "REGION_NAME";
-
-// Bucket names
-const ENV_PRIVATE_BUCKET_NAME : &str = "PRIVATE_BUCKET_NAME";
-const ENV_PUBLIC_BUCKET_NAME : &str = "PUBLIC_BUCKET_NAME";
-
-// HTTP sidecar
-const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
-
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
 
