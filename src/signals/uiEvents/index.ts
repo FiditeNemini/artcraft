@@ -18,11 +18,16 @@ import {
   dispatcher as buttonTestDispatcher,
   eventsHandler as buttonTestEvent,
 } from "./buttonTest";
+import {
+  dispatcher as buttonRetryDispatcher,
+  eventsHandler as buttonRetryEvent,
+} from "./buttonRetry";
 import { requestAiStylize, onRequestAiStylize } from "./aiStylize";
 
 export const uiEvents = {
   ...addMediaEvents,
   onRequestAiStylize,
+  buttonRetry: buttonRetryEvent,
   buttonTest: buttonTestEvent,
   toolbarImage: toolbarImageEvents,
   toolbarMain: toolbarMainEvents,
@@ -31,6 +36,7 @@ export const uiEvents = {
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
   requestAiStylize,
+  buttonRetry: buttonRetryDispatcher,
   buttonTest: buttonTestDispatcher,
   toolbarImage: toolbarImageDispatchers,
   toolbarMain: toolbarMainDispatchers,

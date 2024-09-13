@@ -2,6 +2,7 @@ import { useCallback, useRef } from "react";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
+import { ContextualButtonRetry } from "./ContextualButtonRetry";
 import { ContextualToolbarImage } from "./ContextualToolbarImage";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
@@ -41,15 +42,14 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
       >
         Error Dialogue Test
       </Button>
-
       <KonvaCanvasContainer
         ref={konvaContainerCallbackRef}
         className={className}
         // retreive the classNames from the parent for sizing/styling
       />
-
       <SignaledToolbarMain />
       <ContextualToolbarImage />
+      <ContextualButtonRetry />
       <ContextualLoadingBar />
       <SignaledDialogError />
     </>

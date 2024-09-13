@@ -11,3 +11,7 @@ export interface ContextualUi {
 export interface ContextualLoadingBarProps
   extends ContextualUi,
     Omit<LoadingBarProps, "position"> {}
+
+export interface ContextualButtonRetryProps extends ContextualUi {
+  disabled: boolean;
+}
