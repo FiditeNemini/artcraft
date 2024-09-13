@@ -16,7 +16,10 @@
     "output": "산출",
     "search": "음성 검색",
     "select": "음색 선택",
-    "selected": "선택한 음색"
+    "selected": "선택한 음색",
+    "trumpAngry": "화난",
+    "trumpCasual": "평상복",
+    "trumpSarcastic": "냉소적인"
   },
   "link": {
     "exploreNewVoices": "최신 목소리 탐색",

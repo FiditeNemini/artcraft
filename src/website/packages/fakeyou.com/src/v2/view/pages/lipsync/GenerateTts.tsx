@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   faChevronRight,
@@ -50,20 +50,27 @@ interface GenerateTtsProps {
   onResultToken?: (token: string | null) => void;
   onAudioDelete?: () => void;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  loadingSelectedAudioResult: boolean;
+  setLoadingSelectedAudioResult: React.Dispatch<React.SetStateAction<boolean>>;
+  currentAudioUrl: string | null;
+  setCurrentAudioUrl: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export const GenerateTts = ({
+export const GenerateTts = memo(function GenerateTts({
   weightToken,
   onResultToken,
   onAudioDelete,
   sessionSubscriptionsWrapper,
-}: GenerateTtsProps) => {
+  loadingSelectedAudioResult,
+  setLoadingSelectedAudioResult,
+  currentAudioUrl,
+  setCurrentAudioUrl,
+}: GenerateTtsProps) {
   const { modalState, open, close } = useModal();
   const [textBuffer, setTextBuffer] = useState("");
   const [maybeTtsError, setMaybeTtsError] = useState<
     GenerateTtsAudioErrorType | undefined
   >(undefined);
-  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [jobToken, setJobToken] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
@@ -77,8 +84,6 @@ export const GenerateTts = ({
     setTextBuffer(textValue);
   };
   const location = useLocation();
-  const [loadingSelectedAudioResult, setLoadingSelectedAudioResult] =
-    useState(false);
   const [voiceTitle, setVoiceTitle] = useState<string | null>(null);
   const [voiceCoverImage, setVoiceCoverImage] = useState<string | null>(null);
   const [search, searchSet] = useState("");
@@ -163,15 +168,21 @@ export const GenerateTts = ({
     };
 
     fetch();
-  }, [currentAudioUrl, jobToken, inferenceJobs, onResultToken]);
+  }, [
+    currentAudioUrl,
+    jobToken,
+    inferenceJobs,
+    onResultToken,
+    setCurrentAudioUrl,
+  ]);
 
-  const handleClearAudio = () => {
+  const handleClearAudio = useCallback(() => {
     setJobToken(null);
     setCurrentAudioUrl(null);
 
-    const url = new URL(window.location.href);
-    url.searchParams.delete("audio");
-    window.history.replaceState({}, "", url.toString());
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.delete("audio");
+    history.push({ search: queryParams.toString() });
 
     if (onResultToken) {
       onResultToken(null);
@@ -180,7 +191,13 @@ export const GenerateTts = ({
     if (onAudioDelete) {
       onAudioDelete();
     }
-  };
+  }, [
+    setCurrentAudioUrl,
+    location.search,
+    history,
+    onResultToken,
+    onAudioDelete,
+  ]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -221,11 +238,11 @@ export const GenerateTts = ({
 
       fetchMedia();
     }
-  }, [location.search, currentAudioUrl, onResultToken]);
+  }, [location.search, currentAudioUrl, onResultToken, setCurrentAudioUrl]);
 
-  const handleAudioFinish = () => {
+  const handleAudioFinish = useCallback(() => {
     setIsPlaying(false);
-  };
+  }, []);
 
   let maybeError = <></>;
   if (!!maybeTtsError) {
@@ -432,7 +449,7 @@ export const GenerateTts = ({
             <Panel
               padding={true}
               className="panel-inner h-100 position-relative rounded"
-              key={currentAudioUrl}
+              key={`${currentAudioUrl}-${Date.now()}`}
             >
               <div className="d-flex flex-column justify-content-center h-100">
                 <div className="d-flex gap-3 align-items-center justify-content-center">
@@ -530,7 +547,7 @@ export const GenerateTts = ({
         />
       )}
 
-      <div className="mt-3 d-none d-lg-block mb-2">
+      <div className="mt-3 d-none d-lg-flex flex-column mb-2 h-100">
         <Label
           label={
             <div className="d-flex gap-2 align-items-center fw-semibold">
@@ -539,7 +556,17 @@ export const GenerateTts = ({
             </div>
           }
         />
-        <div style={{ height: "280px", overflow: "auto" }}>
+        <div
+          style={{
+            height: "100%",
+            maxHeight:
+              sessionSubscriptionsWrapper.hasActiveProSubscription() ||
+              sessionSubscriptionsWrapper.hasActiveEliteSubscription()
+                ? "460px"
+                : "520px",
+            overflow: "auto",
+          }}
+        >
           <SessionTtsInferenceResultList
             sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
             mode="lipsync"
@@ -549,4 +576,4 @@ export const GenerateTts = ({
       </div>
     </>
   );
-};
+});

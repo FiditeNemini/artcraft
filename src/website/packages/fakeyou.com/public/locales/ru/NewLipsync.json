@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "Аудио расшифровка",
+    "latestLipsyncOutputs": "Новейшие выходы Lip Sync",
     "previousTtsResults": "Предыдущие результаты TTS"
   },
   "step": {

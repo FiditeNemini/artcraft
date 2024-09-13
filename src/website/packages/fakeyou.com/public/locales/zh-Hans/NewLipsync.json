@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "音频记录",
+    "latestLipsyncOutputs": "最新唇形同步输出",
     "previousTtsResults": "以前的 TTS 结果"
   },
   "step": {

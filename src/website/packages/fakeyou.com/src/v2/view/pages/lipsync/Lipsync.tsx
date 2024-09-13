@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Badge,
   Button,
@@ -12,6 +12,7 @@ import {
   faArrowDown,
   faArrowDownToLine,
   faEquals,
+  faHistory,
   faLips,
   faLock,
   faPlus,
@@ -29,7 +30,10 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { v4 as uuidv4 } from "uuid";
 import { useInferenceJobs, useLocalize, useSession } from "hooks";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
 import LoadingSpinner from "components/common/LoadingSpinner";
@@ -54,8 +58,9 @@ interface LipsyncProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
+// Initial source if no source or matching voice that has a source is provided
 const PRECOMPUTED_SOURCE_TOKENS: string[] = [
-  "m_2xrse9799wvy8hkv8tbxqxct8089t7", // Mona Lisa
+  "m_7ap2qssd4y5ew51dkx4awnng2key32", // Wednesday Addams
 ];
 
 export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
@@ -94,11 +99,17 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   const location = useLocation();
   const history = useHistory();
   const sourceVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [loadingSelectedAudioResult, setLoadingSelectedAudioResult] =
+    useState(false);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
   const { t, language } = useLocalize("NewLipsync");
 
-  const handleAudioResultToken = (token: string | null) => {
-    setAudioToken(token);
-  };
+  const handleAudioResultToken = useCallback(
+    (token: string | null) => {
+      setAudioToken(token);
+    },
+    [setAudioToken]
+  );
 
   const enqueueClick = () => {
     // Clear the generated video when reanimating
@@ -134,9 +145,9 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
     if (generatedVideoSrc && !isGenerating && audioToken) {
       return (
         <video
-          loop
+          // loop
           autoPlay
-          muted
+          // muted
           playsInline
           controls={true}
           preload="auto"
@@ -312,14 +323,21 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
   //   }
   // };
 
-  const handleAudioDelete = () => {
+  const handleAudioDelete = useCallback(() => {
     setAudioToken(null);
     setGeneratedVideoSrc("");
     setJobProcessedTokens([]);
     setJobPercentage(null);
     setLastEnqueuedJobToken(null);
     setIsGenerating(false);
-  };
+  }, [
+    setAudioToken,
+    setGeneratedVideoSrc,
+    setJobProcessedTokens,
+    setJobPercentage,
+    setLastEnqueuedJobToken,
+    setIsGenerating,
+  ]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -411,9 +429,64 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
 
       const queryParams = new URLSearchParams(location.search);
       queryParams.delete("source");
-      history.replace({ search: queryParams.toString() });
+      history.push({ search: queryParams.toString() });
       setSelectedSourceIndex(0);
     }
+  };
+
+  const handleJobClick = async (job: InferenceJob) => {
+    const lipsyncDetails = job.maybeLipsyncDetails;
+    const jobResult = job.maybeResultToken;
+
+    if (!lipsyncDetails) {
+      return;
+    }
+
+    if (currentAudioUrl) {
+      setLoadingSelectedAudioResult(true);
+      setCurrentAudioUrl(null);
+    }
+
+    const { audio_source_token, image_or_video_source_token } = lipsyncDetails;
+
+    const queryParams = new URLSearchParams(location.search);
+    if (audio_source_token) {
+      queryParams.set("audio", audio_source_token);
+    }
+    if (image_or_video_source_token) {
+      queryParams.set("source", image_or_video_source_token);
+    }
+    history.push({ search: queryParams.toString() });
+
+    if (jobResult) {
+      const response = await GetMedia(jobResult, {});
+
+      if (
+        response &&
+        response.media_file &&
+        response.media_file.public_bucket_path
+      ) {
+        const { mainURL } = MediaLinks(response.media_file.media_links);
+
+        setGeneratedVideoSrc(mainURL);
+        setIsGenerating(false);
+        setIsEnqueuing(false);
+        setJobPercentage(null);
+      } else {
+        console.error(
+          "Failed to retrieve media or media has no public bucket path",
+          response
+        );
+        setIsGenerating(false);
+        setGeneratedVideoSrc("");
+        setIsEnqueuing(false);
+        setJobPercentage(null);
+      }
+    } else {
+      setIsGenerating(true);
+    }
+
+    setLoadingSelectedAudioResult(false);
   };
 
   return (
@@ -492,6 +565,10 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                   onResultToken={handleAudioResultToken}
                   onAudioDelete={handleAudioDelete}
                   sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                  loadingSelectedAudioResult={loadingSelectedAudioResult}
+                  setLoadingSelectedAudioResult={setLoadingSelectedAudioResult}
+                  currentAudioUrl={currentAudioUrl}
+                  setCurrentAudioUrl={setCurrentAudioUrl}
                 />
               </div>
 
@@ -577,6 +654,27 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                     </Tippy>
                   </div>
 
+                  <div>
+                    <Label
+                      label={
+                        <div className="d-flex gap-2 align-items-center fw-semibold">
+                          <FontAwesomeIcon icon={faHistory} />
+                          {t("label.latestLipsyncOutputs")}
+                        </div>
+                      }
+                    />
+                    <div>
+                      <SessionLsInferenceResultsList
+                        sessionSubscriptionsWrapper={
+                          sessionSubscriptionsWrapper
+                        }
+                        onJobTokens={handleJobTokens}
+                        onJobProgress={handleJobProgress}
+                        onJobClick={handleJobClick}
+                      />
+                    </div>
+                  </div>
+
                   <div className="d-flex flex-column gap-2 mb-4">
                     <PremiumLock
                       sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
@@ -624,19 +722,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                   </div>
                 </div>
               </div>
-
-              {loggedIn && (
-                <div className="mt-5 pt-3 order-3 d-none">
-                  <Label label="Latest Outputs" />
-                  <div>
-                    <SessionLsInferenceResultsList
-                      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                      onJobTokens={handleJobTokens}
-                      onJobProgress={handleJobProgress}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </Panel>

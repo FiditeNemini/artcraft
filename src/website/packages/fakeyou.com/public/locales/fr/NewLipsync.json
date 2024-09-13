@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "Transcription audio",
+    "latestLipsyncOutputs": "Dernières sorties Lip Sync",
     "previousTtsResults": "Résultats TTS précédents"
   },
   "step": {

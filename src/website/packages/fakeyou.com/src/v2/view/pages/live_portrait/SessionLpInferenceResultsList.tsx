@@ -182,7 +182,7 @@ export default function SessionLpInferenceResultsList({
                 }}
                 className="col-12 col-lg-3"
               >
-                <div className="lp-jobs-list">
+                <div className="ls-jobs-list">
                   <div className="d-flex flex-column gap-2 w-100">
                     <div className="d-flex gap-2 align-items-center w-100">
                       <div

@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "오디오 대본",
+    "latestLipsyncOutputs": "최신 립싱크 출력",
     "previousTtsResults": "이전 TTS 결과"
   },
   "step": {

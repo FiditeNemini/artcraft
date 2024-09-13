@@ -7,7 +7,7 @@ interface Props {
   onFinish?: () => void;
 }
 
-export default function LipsyncAudioPlayer(props: Props) {
+function LipsyncAudioPlayer(props: Props) {
   const [position, setPosition] = useState(0);
 
   const handleFinish = useCallback(() => {
@@ -19,7 +19,6 @@ export default function LipsyncAudioPlayer(props: Props) {
   return (
     <div className="flex-grow-1 h-100 overflow-hidden w-100">
       <Wavesurfer
-        key={props.filename}
         onFinish={handleFinish}
         pos={position}
         src={props.filename || ""}
@@ -34,3 +33,5 @@ export default function LipsyncAudioPlayer(props: Props) {
     </div>
   );
 }
+
+export default React.memo(LipsyncAudioPlayer);

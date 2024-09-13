@@ -16,7 +16,10 @@
     "output": "đầu ra",
     "search": "Tìm kiếm giọng nói",
     "select": "Chọn một giọng nói",
-    "selected": "Giọng nói đã chọn"
+    "selected": "Giọng nói đã chọn",
+    "trumpAngry": "Tức giận",
+    "trumpCasual": "Bình thường",
+    "trumpSarcastic": "mỉa mai"
   },
   "link": {
     "exploreNewVoices": "Khám phá những giọng nói mới nhất",

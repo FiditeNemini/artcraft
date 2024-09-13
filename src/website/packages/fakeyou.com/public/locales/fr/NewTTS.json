@@ -16,7 +16,10 @@
     "output": "Sortir",
     "search": "Rechercher une voix",
     "select": "Sélectionnez une voix",
-    "selected": "Voix sélectionnée"
+    "selected": "Voix sélectionnée",
+    "trumpAngry": "En colère",
+    "trumpCasual": "Occasionnel",
+    "trumpSarcastic": "Sarcastique"
   },
   "link": {
     "exploreNewVoices": "Explorez les voix les plus récentes",

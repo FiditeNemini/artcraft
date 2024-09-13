@@ -16,7 +16,10 @@
     "output": "出力",
     "search": "声を探す",
     "select": "ボイスを選択する",
-    "selected": "選択したボイス"
+    "selected": "選択したボイス",
+    "trumpAngry": "怒り",
+    "trumpCasual": "カジュアル",
+    "trumpSarcastic": "皮肉な"
   },
   "link": {
     "exploreNewVoices": "最新の音声を探索する",

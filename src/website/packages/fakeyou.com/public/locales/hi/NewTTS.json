@@ -16,7 +16,10 @@
     "output": "उत्पादन",
     "search": "एक आवाज खोजें",
     "select": "एक आवाज चुनें",
-    "selected": "चयनित आवाज"
+    "selected": "चयनित आवाज",
+    "trumpAngry": "गुस्सा",
+    "trumpCasual": "अनौपचारिक",
+    "trumpSarcastic": "व्यंग्यात्मक"
   },
   "link": {
     "exploreNewVoices": "नवीनतम आवाज़ों का अन्वेषण करें",

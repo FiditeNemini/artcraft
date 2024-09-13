@@ -43,6 +43,7 @@ import VCPitchShiftComponent from "./VCPitchShiftComponent";
 import VCPitchEstimateMethodComponent from "./VCPitchEstimateMethodComponent";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
+import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
 interface Props {
   sessionSubscriptionsWrapper: any;
@@ -403,6 +404,9 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
       </Container>
 
       <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <FeaturedVideos />
+        </Panel>
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />

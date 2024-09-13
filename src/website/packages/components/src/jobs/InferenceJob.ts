@@ -1,4 +1,5 @@
 import {
+  LipsyncDetails,
   LivePortraitDetails,
   ModelInferenceJobStatus,
 } from "../api/model_inference/GetModelInferenceJobStatus";
@@ -48,6 +49,7 @@ export class InferenceJob {
   maybeModelTitle?: string;
   maybeRawInferenceText?: string;
   maybeLivePortraitDetails?: LivePortraitDetails;
+  maybeLipsyncDetails?: LipsyncDetails;
   maybeStyleName?: string;
 
   // Result
@@ -73,6 +75,7 @@ export class InferenceJob {
     maybeModelTitle: string | undefined = undefined,
     maybeRawInferenceText: string | undefined = undefined,
     maybeLivePortraitDetails: LivePortraitDetails | undefined = undefined,
+    maybeLipsyncDetails: LipsyncDetails | undefined = undefined,
     maybeStyleName: string | undefined = undefined,
     // Result
     maybeResultEntityType: string | undefined | null = null,
@@ -101,6 +104,8 @@ export class InferenceJob {
     this.maybeRawInferenceText = maybeRawInferenceText;
 
     this.maybeLivePortraitDetails = maybeLivePortraitDetails;
+
+    this.maybeLipsyncDetails = maybeLipsyncDetails;
 
     if (!!maybeResultEntityType) {
       this.maybeStyleName = maybeStyleName;
@@ -137,6 +142,7 @@ export class InferenceJob {
       response.request.maybe_model_title,
       response.request.maybe_raw_inference_text,
       response.request.maybe_live_portrait_details,
+      response.request.maybe_lipsync_details,
       response.request.maybe_style_name,
       response.maybe_result?.entity_type,
       response.maybe_result?.entity_token,

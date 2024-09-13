@@ -16,7 +16,10 @@
     "output": "输出",
     "search": "寻找声音",
     "select": "选择音色",
-    "selected": "选定的声音"
+    "selected": "选定的声音",
+    "trumpAngry": "生气的",
+    "trumpCasual": "随意的",
+    "trumpSarcastic": "讽刺的"
   },
   "link": {
     "exploreNewVoices": "探索最新声音",

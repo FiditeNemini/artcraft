@@ -16,7 +16,10 @@
     "output": "เอาท์พุต",
     "search": "ค้นหาเสียง",
     "select": "เลือกเสียง",
-    "selected": "เสียงที่เลือก"
+    "selected": "เสียงที่เลือก",
+    "trumpAngry": "โกรธ",
+    "trumpCasual": "ไม่เป็นทางการ",
+    "trumpSarcastic": "ประชดประชัน"
   },
   "link": {
     "exploreNewVoices": "สำรวจเสียงใหม่ล่าสุด",

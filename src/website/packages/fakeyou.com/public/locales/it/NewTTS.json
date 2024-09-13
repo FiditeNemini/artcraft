@@ -16,7 +16,10 @@
     "output": "Produzione",
     "search": "Cerca una voce",
     "select": "Seleziona una voce",
-    "selected": "Voce selezionata"
+    "selected": "Voce selezionata",
+    "trumpAngry": "Arrabbiato",
+    "trumpCasual": "Casuale",
+    "trumpSarcastic": "Sarcastico"
   },
   "link": {
     "exploreNewVoices": "Esplora le voci più recenti",

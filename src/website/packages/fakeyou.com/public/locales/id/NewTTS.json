@@ -16,7 +16,10 @@
     "output": "Keluaran",
     "search": "Cari Suara",
     "select": "Pilih Suara",
-    "selected": "Suara yang Dipilih"
+    "selected": "Suara yang Dipilih",
+    "trumpAngry": "Marah",
+    "trumpCasual": "Kasual",
+    "trumpSarcastic": "Sarkastik"
   },
   "link": {
     "exploreNewVoices": "Jelajahi Suara Terbaru",

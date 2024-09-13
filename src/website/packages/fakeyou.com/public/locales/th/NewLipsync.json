@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "การถอดเสียง",
+    "latestLipsyncOutputs": "เอาต์พุตลิปซิงค์ล่าสุด",
     "previousTtsResults": "ผลลัพธ์ TTS ก่อนหน้า"
   },
   "step": {

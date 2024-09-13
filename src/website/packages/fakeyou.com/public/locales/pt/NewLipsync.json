@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "Transcrição de áudio",
+    "latestLipsyncOutputs": "Últimas saídas de sincronização labial",
     "previousTtsResults": "Resultados anteriores do TTS"
   },
   "step": {

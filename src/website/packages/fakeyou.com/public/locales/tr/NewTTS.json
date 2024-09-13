@@ -16,7 +16,10 @@
     "output": "Çıkış",
     "search": "Ses Ara",
     "select": "Bir Ses Seçin",
-    "selected": "Seçilen Ses"
+    "selected": "Seçilen Ses",
+    "trumpAngry": "Sinirli",
+    "trumpCasual": "Gündelik",
+    "trumpSarcastic": "Alaycı"
   },
   "link": {
     "exploreNewVoices": "En Yeni Sesleri Keşfedin",

@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "Ses Metni",
+    "latestLipsyncOutputs": "En Son Dudak Senkronizasyon Çıkışları",
     "previousTtsResults": "Önceki TTS Sonuçları"
   },
   "step": {

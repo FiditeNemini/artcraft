@@ -17,9 +17,9 @@
     "search": "Search for a Voice",
     "select": "Select a Voice",
     "selected": "Selected Voice",
-    "trumpAngry": "angry",
-    "trumpCasual": "casual",
-    "trumpSarcastic": "sarcastic"
+    "trumpAngry": "Angry",
+    "trumpCasual": "Casual",
+    "trumpSarcastic": "Sarcastic"
   },
   "link": {
     "exploreNewVoices": "Explore Newest Voices",

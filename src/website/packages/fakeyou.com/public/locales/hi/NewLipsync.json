@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "ऑडियो प्रतिलेख",
+    "latestLipsyncOutputs": "नवीनतम लिप सिंक आउटपुट",
     "previousTtsResults": "पिछला टीटीएस परिणाम"
   },
   "step": {

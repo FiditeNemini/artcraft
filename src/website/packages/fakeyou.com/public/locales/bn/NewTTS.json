@@ -16,7 +16,10 @@
     "output": "আউটপুট",
     "search": "একটি ভয়েস অনুসন্ধান করুন",
     "select": "একটি ভয়েস নির্বাচন করুন",
-    "selected": "নির্বাচিত ভয়েস"
+    "selected": "নির্বাচিত ভয়েস",
+    "trumpAngry": "রাগ",
+    "trumpCasual": "নৈমিত্তিক",
+    "trumpSarcastic": "ব্যঙ্গাত্মক"
   },
   "link": {
     "exploreNewVoices": "নতুন ভয়েস অন্বেষণ করুন",

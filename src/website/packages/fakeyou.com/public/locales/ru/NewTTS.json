@@ -16,7 +16,10 @@
     "output": "Выход",
     "search": "Поиск голоса",
     "select": "Выберите голос",
-    "selected": "Выбранный голос"
+    "selected": "Выбранный голос",
+    "trumpAngry": "Злой",
+    "trumpCasual": "Повседневный",
+    "trumpSarcastic": "Саркастический"
   },
   "link": {
     "exploreNewVoices": "Изучите новейшие голоса",

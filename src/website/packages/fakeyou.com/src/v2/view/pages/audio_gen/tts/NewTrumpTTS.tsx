@@ -23,6 +23,7 @@ import { AITools } from "components/marketing";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import TrumpSelect, { TrumpOption } from "./TrumpSelect";
+import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
 export default function NewTTS() {
   const { enqueueInferenceJob } = useInferenceJobs();
@@ -169,6 +170,9 @@ export default function NewTTS() {
       </Container>
 
       <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <FeaturedVideos />
+        </Panel>
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />

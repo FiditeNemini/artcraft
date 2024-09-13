@@ -27,6 +27,7 @@ export interface RequestDetails {
   maybe_raw_inference_text?: string;
 
   maybe_live_portrait_details?: LivePortraitDetails;
+  maybe_lipsync_details?: LipsyncDetails;
 
   maybe_style_name?: string;
 }
@@ -49,6 +50,11 @@ export interface ResultDetails {
 export type LivePortraitDetails = {
   source_media_file_token: string;
   face_driver_media_file_token: string;
+};
+
+export type LipsyncDetails = {
+  audio_source_token: string;
+  image_or_video_source_token: string;
 };
 
 export interface GetModelInferenceJobStatusErrorResponse {

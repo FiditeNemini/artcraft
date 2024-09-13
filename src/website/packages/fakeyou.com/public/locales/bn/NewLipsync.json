@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "অডিও ট্রান্সক্রিপ্ট",
+    "latestLipsyncOutputs": "সর্বশেষ লিপ সিঙ্ক আউটপুট",
     "previousTtsResults": "পূর্ববর্তী TTS ফলাফল"
   },
   "step": {

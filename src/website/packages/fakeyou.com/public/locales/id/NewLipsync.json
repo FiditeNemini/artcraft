@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "Transkrip Audio",
+    "latestLipsyncOutputs": "Keluaran Lip Sync Terbaru",
     "previousTtsResults": "Hasil TTS Sebelumnya"
   },
   "step": {

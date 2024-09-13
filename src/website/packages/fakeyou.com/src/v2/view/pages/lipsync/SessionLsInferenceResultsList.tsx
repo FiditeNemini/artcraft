@@ -5,7 +5,6 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { useInferenceJobs } from "hooks";
 import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import moment from "moment";
 import { Link } from "react-router-dom";
@@ -100,7 +99,8 @@ export default function SessionLpInferenceResultsList({
     const fetchMedia = async (token: string) => {
       try {
         const response = await GetMedia(token, {});
-        const publicBucketPath = response.media_file?.public_bucket_path || "";
+        const publicBucketPath =
+          response.media_file?.media_links?.cdn_url || "";
         setMediaSrc(prev => ({ ...prev, [token]: publicBucketPath }));
       } catch (error) {
         console.error("Error fetching media:", error);
@@ -108,7 +108,7 @@ export default function SessionLpInferenceResultsList({
     };
 
     lipsyncJobs.forEach((job: InferenceJob) => {
-      const token = job.maybeLivePortraitDetails?.source_media_file_token;
+      const token = job.maybeLipsyncDetails?.image_or_video_source_token;
       if (token && !mediaSrc[token]) {
         fetchMedia(token);
       }
@@ -127,36 +127,41 @@ export default function SessionLpInferenceResultsList({
   };
 
   const jobContent = (
-    <div>
+    <div
+      style={{
+        maxHeight: "260px",
+        overflowY: "auto",
+        overflowX: "hidden",
+      }}
+    >
       {lipsyncJobs.length > 0 ? (
         <div className="row g-3">
-          {lipsyncJobs.slice(0, 4).map((job: InferenceJob, key: number) => (
+          {lipsyncJobs.slice(0, 6).map((job: InferenceJob, key: number) => (
             <div
               key={key}
               onClick={() => {
                 onJobClick && onJobClick(job);
               }}
-              className="col-12 col-lg-3"
             >
               <div className="lp-jobs-list">
                 <div
                   className="ratio ratio-1x1 overflow-hidden rounded"
-                  style={{ width: "70px" }}
+                  style={{ width: "44px" }}
                 >
                   <img
                     src={
-                      job.maybeLivePortraitDetails?.source_media_file_token
+                      job.maybeLipsyncDetails?.image_or_video_source_token
                         ? (() => {
                             const mediaPath =
                               mediaSrc[
-                                job.maybeLivePortraitDetails
-                                  .source_media_file_token
+                                job.maybeLipsyncDetails
+                                  .image_or_video_source_token
                               ] || "";
                             const isVideo = mediaPath.endsWith(".mp4");
                             const finalPath = isVideo
                               ? `${mediaPath}-thumb.jpg`
                               : mediaPath;
-                            return new BucketConfig().getGcsUrl(finalPath);
+                            return finalPath;
                           })()
                         : ""
                     }
@@ -174,10 +179,11 @@ export default function SessionLpInferenceResultsList({
                       {jobStateTextMap[job.jobState as JobState]}
                     </span>
                   </div>
-                  <span className="fw-normal opacity-75 fs-7">
-                    {moment(job.createdAt).fromNow()}
-                  </span>
-                  <div className="d-flex">
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="fw-normal opacity-75 fs-7">
+                      {moment(job.createdAt).fromNow()}
+                    </span>
+                    <span className="opacity-50">•</span>
                     {job.maybeResultToken ? (
                       <Link
                         className="fs-7 d-flex align-items-center gap-1 mt-1"
@@ -203,7 +209,7 @@ export default function SessionLpInferenceResultsList({
       ) : (
         <div
           className="lp-jobs-list no-hover d-flex align-items-center justify-content-center"
-          style={{ height: "94px" }}
+          style={{ minHeight: "73px" }}
         >
           <span className="fw-medium opacity-75">
             Your latest lip sync generations will appear here.

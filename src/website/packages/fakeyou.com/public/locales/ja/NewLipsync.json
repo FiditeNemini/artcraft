@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "音声トランスクリプト",
+    "latestLipsyncOutputs": "最新のリップシンク出力",
     "previousTtsResults": "以前の TTS 結果"
   },
   "step": {

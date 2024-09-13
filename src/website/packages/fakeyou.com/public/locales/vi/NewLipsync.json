@@ -25,6 +25,7 @@
   },
   "label": {
     "audioTranscript": "Bản ghi âm",
+    "latestLipsyncOutputs": "Đầu ra Lip Sync mới nhất",
     "previousTtsResults": "Kết quả TTS trước đó"
   },
   "step": {

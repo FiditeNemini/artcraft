@@ -47,6 +47,7 @@ import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_ite
 import { useCanonicalLink } from "@storyteller/components/src/hooks/UseCanonicalLink";
 import { AITools } from "components/marketing";
 import Stat from "components/common/Stat/Stat";
+import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
 interface WeightProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -57,7 +58,10 @@ export default function WeightPage({
 }: WeightProps) {
   const { canEditTtsModel, canBanUsers, user } = useSession();
   const { search } = useLocation();
-  const { weight_token, maybe_url_slug } = useParams<{ weight_token: string, maybe_url_slug?: string}>();
+  const { weight_token, maybe_url_slug } = useParams<{
+    weight_token: string;
+    maybe_url_slug?: string;
+  }>();
 
   const source = search ? new URLSearchParams(search).get("source") : "";
   const history = useHistory();
@@ -72,10 +76,14 @@ export default function WeightPage({
       bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading
       ratings.gather({ res, key: "weight_token" });
 
-      if (!!res.maybe_url_slug && !!res.weight_token && res.maybe_url_slug !== maybe_url_slug) {
+      if (
+        !!res.maybe_url_slug &&
+        !!res.weight_token &&
+        res.maybe_url_slug !== maybe_url_slug
+      ) {
         // Redirect to the canonical URL, which includes the SEO-friendly "URL slug".
         const canonicalUrl = `/weight/${res.weight_token}/${res.maybe_url_slug}`;
-        window.history.replaceState({}, "", canonicalUrl)
+        window.history.replaceState({}, "", canonicalUrl);
       }
     },
     token: weight_token,
@@ -90,7 +98,10 @@ export default function WeightPage({
 
   // This is important for Google SEO! Be very careful!
   // Tell Google to only index the canonical version of the URL.
-  const canonicalUrl = (!!weight?.weight_token && !!weight?.maybe_url_slug) ? `/weight/${weight.weight_token}/${weight.maybe_url_slug}` : undefined;
+  const canonicalUrl =
+    !!weight?.weight_token && !!weight?.maybe_url_slug
+      ? `/weight/${weight.weight_token}/${weight.maybe_url_slug}`
+      : undefined;
   useCanonicalLink(canonicalUrl);
 
   let pageTitle;
@@ -510,9 +521,7 @@ export default function WeightPage({
                   {subtitleDivider}
                   <p>{weightCategory}</p>
                   {subtitleDivider}
-                  <Stat
-                    count={weight.usage_count}
-                  />
+                  <Stat count={weight.usage_count} />
                   {subtitleDivider}
                   <div className="d-flex align-items-center gap-2">
                     <ActionButton {...ratingButtonProps} />
@@ -675,6 +684,9 @@ export default function WeightPage({
       </div>
 
       <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <FeaturedVideos />
+        </Panel>
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
