@@ -1,7 +1,18 @@
 import { VideoNode } from "../Nodes/VideoNode";
 import Konva from "konva";
+import { RenderTask } from "./RenderTask";
 
-import { RenderTask, WorkerEvent } from "./RenderTask";
+import { DiffusionSharedWorkerClient } from "../SharedWorkers/Diffusion/DiffusionSharedWorkerClient";
+import {
+  SharedWorkerRequest,
+  SharedWorkerResponse,
+} from "../WorkerPrimitives/SharedWorkerBase";
+import {
+  DiffusionSharedWorkerProgressData,
+  DiffusionSharedWorkerResponseData,
+  DiffusionSharedWorker,
+  DiffusionSharedWorkerItemData,
+} from "../SharedWorkers/Diffusion/DiffusionSharedWorker";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 export class RenderEngine {
@@ -9,7 +20,6 @@ export class RenderEngine {
   private offScreenCanvas: OffscreenCanvas;
   private context: OffscreenCanvasRenderingContext2D | null;
 
-  private offscreenCanvasCache: OffscreenCanvas[] = [];
   private isProcessing: boolean;
 
   private frames: ImageBitmap[];
@@ -23,15 +33,23 @@ export class RenderEngine {
   private positionY: number;
 
   private canUseSharedWorker: boolean;
-  private sharedWorker: SharedWorker | undefined;
+
   private port: MessagePort | undefined;
   private maxFrames: number;
+
+  private diffusionWorker:
+    | DiffusionSharedWorkerClient<
+        DiffusionSharedWorkerItemData,
+        DiffusionSharedWorkerResponseData,
+        DiffusionSharedWorkerProgressData
+      >
+    | undefined;
+
   constructor(videoLayer: Konva.Layer, offScreenCanvas: OffscreenCanvas) {
     this.videoNodes = [];
-
     this.isProcessing = false;
 
-    // TODO make this dynamic
+    // TODO: Make this dynamic and update this on change of canvas.
 
     this.width = 720;
     this.height = 1280;
@@ -61,42 +79,29 @@ export class RenderEngine {
 
     this.maxFrames = 7 * 24;
 
-    // DEBUG ONLY
-    // const rectangle = new Konva.Rect({
-    //   x: this.positionX,
-    //   y: this.positionY,
-    //   width: 100,
-    //   height: 100,
-    //   fill: "green",
-    //   stroke: "black",
-    //   strokeWidth: 1,
-    //   draggable: false,
-    // });
-    //this.videoLayer.add(rectangle);
     this.videoLayer.add(captureCanvas);
-    // set back
+    // send back
     captureCanvas.setZIndex(0);
 
-    this.sharedWorker = undefined;
     this.canUseSharedWorker = false;
     this.setupSharedWorker();
+
+    //this.debug();
   }
 
-  // Manage the worker
-  onMessage(event: MessageEvent) {
-    const message = event.data;
-    console.log("Main script received:", message);
-    // Send a response back to the worker
-    if (!this.port) {
-      return console.log("Undefined Worker");
-    }
-  }
-
-  sendMessage() {
-    if (!this.port) {
-      return console.log("Undefined Worker");
-    }
-    this.port.postMessage("Hello from Main Script");
+  debug() {
+    // DEBUG ONLY
+    const rectangle = new Konva.Rect({
+      x: this.positionX,
+      y: this.positionY,
+      width: 100,
+      height: 100,
+      fill: "green",
+      stroke: "black",
+      strokeWidth: 1,
+      draggable: false,
+    });
+    this.videoLayer.add(rectangle);
   }
 
   async sendCanvasPayload(renderTask: RenderTask) {
@@ -106,30 +111,23 @@ export class RenderEngine {
     this.port.postMessage(renderTask);
   }
 
+  onMessageReceived(
+    response: SharedWorkerResponse<
+      DiffusionSharedWorkerResponseData,
+      DiffusionSharedWorkerProgressData
+    >,
+  ) {
+    console.log(response);
+  }
+
   setupSharedWorker() {
     if (typeof SharedWorker !== "undefined") {
-      this.offscreenCanvasCache = [];
-      // canvas size should be defined here
-      for (let i = 0; i < this.maxFrames; i++) {
-        let offScreenCanvas = new OffscreenCanvas(this.width, this.height);
-        this.offscreenCanvasCache.push(offScreenCanvas);
-      }
-
       console.log("Shared Workers are supported in this browser.");
       // Debug chrome://inspect/#workers
-      // TODO ensure that the cors is solved for this.
-      this.sharedWorker = new SharedWorker(
-        "src\\KonvaApp\\RenderingPrimitives\\RenderSharedWorker.ts",
-        {
-          type: "module",
-        },
+      this.diffusionWorker = new DiffusionSharedWorkerClient(
+        "src\\KonvaApp\\SharedWorkers\\Diffusion\\DiffusionSharedWorker.ts",
+        this.onMessageReceived.bind(this),
       );
-
-      // Get the port for communication
-      this.port = this.sharedWorker.port;
-      this.port.start();
-      // Set up the message event listener
-      this.port.onmessage = this.onMessage.bind(this);
 
       this.canUseSharedWorker = true;
     } else {
@@ -253,7 +251,6 @@ export class RenderEngine {
 
     for (let j = 0; j < largestNumberOfFrames; j++) {
       // Seek Video Nodes first then draw
-
       let frameTime = undefined;
 
       for (let i = 0; i < this.videoNodes.length; i++) {
@@ -300,10 +297,19 @@ export class RenderEngine {
         } // end of for each frame
       } else {
         console.log("Using Shared Worker");
-        const canvas = this.offscreenCanvasCache[j];
-        const context = canvas.getContext("2d");
+
         // decode on the shared webworker.
-        context?.drawImage(
+        if (!this.context) {
+          console.log("Context Didn't Initialize");
+          return;
+        }
+
+        if (!this.diffusionWorker) {
+          console.log("Didnt Initialize Diffusion");
+          return;
+        }
+
+        this.context.drawImage(
           this.videoLayer.canvas._canvas,
           this.positionX,
           this.positionY,
@@ -315,24 +321,26 @@ export class RenderEngine {
           this.height,
         );
 
-        this.sendCanvasPayload({
-          jobID: 1,
-          isDone: false,
-          event: WorkerEvent.DATA,
-          data: {
-            offscreenCanvas: canvas,
-            id: j,
-          },
-        });
+        const data: DiffusionSharedWorkerItemData = {
+          height: this.height,
+          width: this.width,
+          imageBitmap: this.offScreenCanvas.transferToImageBitmap(),
+          frame: j,
+          totalFrames: this.maxFrames,
+        };
+
+        let isDoneStreaming = false;
 
         if (j == this.maxFrames - 1) {
-          this.sendCanvasPayload({
-            jobID: 1,
-            isDone: true,
-            event: WorkerEvent.DATA,
-            data: undefined,
-          });
+          isDoneStreaming = true;
         }
+
+        const container: SharedWorkerRequest<DiffusionSharedWorkerItemData> = {
+          data: data,
+          isDoneStreaming: isDoneStreaming,
+          jobID: 1,
+        };
+        this.diffusionWorker.send(container);
       }
     }
   }

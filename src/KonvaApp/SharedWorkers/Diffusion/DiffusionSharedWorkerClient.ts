@@ -1,5 +1,8 @@
-import { SharedWorkerRequest, SharedWorkerResponse } from "./SharedWorkerBase";
-import { ResponseType } from "./SharedWorkerBase";
+import {
+  SharedWorkerRequest,
+  SharedWorkerResponse,
+} from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
+import { ResponseType } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 
 import {
   DiffusionSharedWorkerItemData,
@@ -29,7 +32,7 @@ export class DiffusionSharedWorkerClient<
       >,
     ) => void,
   ) {
-    // exampl
+    // example
     // "src\\KonvaApp\\WorkerPrimitives\\NumberSharedWorker.ts"
     this.sharedWorker = new SharedWorker(workerPath, {
       type: "module",
@@ -47,13 +50,13 @@ export class DiffusionSharedWorkerClient<
       DiffusionSharedWorkerItemData
     >;
     if (data.responseType === ResponseType.error) {
-      console.log(`TemplateSharedWorkerClient Error:${data}`);
+      console.log(`DiffusionSharedWorkerClient Error:${data}`);
     } else if (data.responseType === ResponseType.progress) {
-      console.log(`TemplateSharedWorkerClient Progress:${data}`);
+      console.log(`DiffusionSharedWorkerClient Progress:${data}`);
     } else if (data.responseType === ResponseType.result) {
-      console.log(`TemplateSharedWorkerClient Result:${data}`);
+      console.log(`DiffusionSharedWorkerClient Result:${data}`);
     } else {
-      console.log("TemplateSharedWorkerClient Message Unknown");
+      console.log(`DiffusionSharedWorkerClient Message Unknown ${data}`);
     }
     console.log(`TemplateSharedWorker Response: ${JSON.stringify(event.data)}`);
   }
