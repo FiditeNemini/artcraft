@@ -76,28 +76,34 @@ export class Engine {
         { disabled: false },
       );
     });
-    uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
-      uiAccess.toolbarMain.changeButtonState(
-        ToolbarMainButtonNames.AI_STYLIZE,
-        { disabled: true },
-      );
-      const sleepytstart = new Date();
+    uiEvents.toolbarMain.loadingBarRetry.onClick((e) => {
       console.log(
-        "SLEEP",
-        `${sleepytstart.getMinutes()}:${sleepytstart.getSeconds()}`,
-      );
-
-      const sleeptend = new Date();
-      console.log(
-        "DONE",
-        `${sleeptend.getMinutes()}:${sleeptend.getSeconds()}`,
-      );
-
-      uiAccess.toolbarMain.changeButtonState(
-        ToolbarMainButtonNames.AI_STYLIZE,
-        { disabled: false },
+        "toolbarMain > loadingBar > retry : onClick heard in Engine",
+        e,
       );
     });
+    // uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
+    //   uiAccess.toolbarMain.changeButtonState(
+    //     ToolbarMainButtonNames.AI_STYLIZE,
+    //     { disabled: true },
+    //   );
+    //   const sleepytstart = new Date();
+    //   console.log(
+    //     "SLEEP",
+    //     `${sleepytstart.getMinutes()}:${sleepytstart.getSeconds()}`,
+    //   );
+
+    //   const sleeptend = new Date();
+    //   console.log(
+    //     "DONE",
+    //     `${sleeptend.getMinutes()}:${sleeptend.getSeconds()}`,
+    //   );
+
+    //   uiAccess.toolbarMain.changeButtonState(
+    //     ToolbarMainButtonNames.AI_STYLIZE,
+    //     { disabled: false },
+    //   );
+    // });
   }
 
   sleep(ms: number): Promise<void> {

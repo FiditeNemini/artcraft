@@ -16,6 +16,10 @@ const events = Object.values(ToolbarMainButtonNames).reduce(
     >;
   },
 );
+const loadingBarRetryEvent = signal<
+  React.MouseEvent<HTMLButtonElement> | undefined
+>();
+
 const effectsCleanups = Object.values(ToolbarMainButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = undefined;
@@ -26,7 +30,7 @@ const effectsCleanups = Object.values(ToolbarMainButtonNames).reduce(
   },
 );
 
-export const eventsHandlers = Object.values(ToolbarMainButtonNames).reduce(
+const buttonEventsHandlers = Object.values(ToolbarMainButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = {
       onClick: (callback: MouseEventHandler<HTMLButtonElement>) => {
@@ -49,8 +53,25 @@ export const eventsHandlers = Object.values(ToolbarMainButtonNames).reduce(
     };
   },
 );
-
-export const dispatchers = Object.values(ToolbarMainButtonNames).reduce(
+let loadingBarRetryEffectCleanup: (() => void) | undefined = undefined;
+const loadingBarRetryEventHandler = {
+  onClick: (callback: MouseEventHandler<HTMLButtonElement>) => {
+    if (loadingBarRetryEffectCleanup) {
+      loadingBarRetryEffectCleanup();
+    }
+    loadingBarRetryEffectCleanup = effect(() => {
+      if (loadingBarRetryEvent.value) {
+        callback(loadingBarRetryEvent.value);
+        loadingBarRetryEvent.value = undefined;
+      }
+    });
+  },
+};
+export const eventsHandlers = {
+  ...buttonEventsHandlers,
+  loadingBarRetry: loadingBarRetryEventHandler,
+};
+const buttonDispatchers = Object.values(ToolbarMainButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       events[buttonName].value = e;
@@ -61,3 +82,11 @@ export const dispatchers = Object.values(ToolbarMainButtonNames).reduce(
     [key in ToolbarMainButtonNames]: MouseEventHandler<HTMLButtonElement>;
   },
 );
+const loadingBarRetryDispatch = (e: React.MouseEvent<HTMLButtonElement>) => {
+  console.log("toolbarMain > loadingBar > retry : onClick dispatched", e);
+  loadingBarRetryEvent.value = e;
+};
+export const dispatchers = {
+  ...buttonDispatchers,
+  loadingBarRetry: loadingBarRetryDispatch,
+};

@@ -103,7 +103,7 @@ export const ToolbarMain = ({
   }, []);
 
   return (
-    <div className="col-span-12 col-start-1 row-span-1 row-start-12 justify-center">
+    <>
       <div
         ref={toolbarCallbackRef}
         className={twMerge(
@@ -198,6 +198,6 @@ export const ToolbarMain = ({
         isOpen={state.isAiStylizeOpen ?? false}
         closeCallback={closeAll}
       />
-    </div>
+    </>
   );
 };

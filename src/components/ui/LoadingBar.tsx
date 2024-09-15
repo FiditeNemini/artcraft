@@ -1,8 +1,10 @@
+import { MouseEventHandler } from "react";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRotateLeft } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowRightRotate } from "@fortawesome/pro-solid-svg-icons";
+
+import { Button } from "./Button";
 
 export enum LoadingBarStatus {
   IDLE = "idle",
@@ -12,6 +14,7 @@ export enum LoadingBarStatus {
 }
 export interface LoadingBarProps {
   width?: number;
+  colReverse?: boolean;
   progress: number;
   status: LoadingBarStatus;
   isShowing: boolean;
@@ -20,10 +23,11 @@ export interface LoadingBarProps {
     y: number;
   };
   message?: string;
-  onRetry?: () => void;
+  onRetry?: MouseEventHandler<HTMLButtonElement>;
 }
 
 export const LoadingBar = ({
+  colReverse,
   width,
   progress = 0,
   position,
@@ -41,6 +45,7 @@ export const LoadingBar = ({
           // position styles
           position && `fixed`,
           position && !width && `w-96`,
+          colReverse && "flex-col-reverse",
           // base transition properties
           "transition-opacity ease-in-out",
           // Shared closed styles
@@ -70,13 +75,13 @@ export const LoadingBar = ({
           {message && <label>{message}</label>}
 
           {status === LoadingBarStatus.ERROR && (
-            <button
+            <Button
+              icon={faArrowRightRotate}
               onClick={onRetry}
               className="flex items-center gap-2 hover:text-primary"
             >
               <label className="cursor-pointer">Retry</label>
-              <FontAwesomeIcon icon={faArrowRotateLeft} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
