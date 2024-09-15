@@ -1,10 +1,14 @@
+use crate::http_server::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
+use crate::http_server::cookies::anonymous_visitor_tracking::avt_cookie_payload::AvtCookiePayload;
 use crate::http_server::endpoints::app_state::components::get_permissions::{get_permissions, AppStatePermissions};
 use crate::http_server::endpoints::app_state::components::get_premium_info::{get_premium_info, AppStatePremiumInfo};
 use crate::http_server::endpoints::app_state::components::get_server_info::{get_server_info, AppStateServerInfo};
 use crate::http_server::endpoints::app_state::components::get_status_alert::{get_status_alert, AppStateStatusAlertInfo};
 use crate::http_server::endpoints::app_state::components::get_user_info::{get_user_info, AppStateUserInfo};
 use crate::http_server::endpoints::app_state::components::get_user_locale::{get_user_locale, AppStateUserLocale};
+use crate::http_server::endpoints::users::session_info_handler::SessionInfoError;
 use crate::state::server_state::ServerState;
+use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest, HttpResponse, ResponseError};
@@ -12,9 +16,10 @@ use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use billing_component::users::http_endpoints::list_active_user_subscriptions_handler::ListActiveUserSubscriptionsError;
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
+use errors::AnyhowResult;
 use hostname::get;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{error, info};
+use log::{error, info, warn};
 use mysql_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
 use mysql_queries::queries::users::user_ratings::get_user_rating::{get_user_rating, Args};
 use std::sync::Arc;
@@ -127,7 +132,7 @@ impl std::fmt::Display for AppStateError {
 pub async fn get_app_state_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<Json<AppStateResponse>, AppStateError>
+) -> Result<HttpResponse, AppStateError>
 {
   let mut mysql_connection = server_state.mysql_pool.acquire()
       .await
@@ -166,7 +171,7 @@ pub async fn get_app_state_handler(
       .map(|session| session.role.is_banned)
       .unwrap_or(false);
 
-  Ok(Json(AppStateResponse {
+  let response = AppStateResponse {
     success: true,
     refresh_interval_millis: REFRESH_INTERVAL.as_millis(),
     server_info,
@@ -177,5 +182,43 @@ pub async fn get_app_state_handler(
     maybe_premium,
     is_logged_in,
     is_banned,
-  }))
+  };
+
+  maybe_respond_with_avt_cookie(
+    &http_request,
+    &server_state.avt_cookie_manager,
+    response
+  )
+}
+
+fn maybe_respond_with_avt_cookie(
+  http_request: &HttpRequest,
+  avt_manager: &AvtCookieManager,
+  response: AppStateResponse,
+) -> Result<HttpResponse, AppStateError> {
+
+  let maybe_avt_cookie = match avt_manager.decode_cookie_payload_from_request(&http_request) {
+    Ok(Some(_avt_cookie)) => None, // User already has AVT cookie. Don't replace it.
+    _ => {
+      let cookie = avt_manager.make_new_cookie()
+          .map_err(|e| {
+            warn!("avt cookie creation error: {:?}", e);
+            AppStateError::ServerError
+          })?;
+      Some(cookie)
+    }
+  };
+
+  let mut response_builder = HttpResponse::Ok();
+
+  if let Some(cookie) = maybe_avt_cookie {
+    response_builder.cookie(cookie);
+  }
+
+  let body = serde_json::to_string(&response)
+      .map_err(|_e| AppStateError::ServerError)?;
+
+  Ok(response_builder
+      .content_type("application/json")
+      .body(body))
 }
