@@ -48,6 +48,8 @@ pub fn extract_frames_from_zip<P: AsRef<Path>>(
 
   let entries = get_relevant_zip_entries(&mut archive)?;
 
+  info!("Relevant zip file entry count: {:?}", entries.len());
+
   let mut maybe_frame_type = None;
 
   for entry in entries.iter() {

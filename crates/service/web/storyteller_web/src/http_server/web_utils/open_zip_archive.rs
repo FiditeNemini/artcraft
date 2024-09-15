@@ -1,6 +1,6 @@
 use std::io::{BufReader, Cursor};
 
-use log::{error, warn};
+use log::{error, info, warn};
 use zip::ZipArchive;
 
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
@@ -34,8 +34,11 @@ pub fn open_zip_archive(
         OpenZipError::InvalidArchive
       })?;
 
+  info!("Archive opened. Entry count: {}", archive.len());
+
   if let Some(max_file_count) = maybe_max_file_count {
     if archive.len() > max_file_count {
+      warn!("Too many files in archive: {}", archive.len());
       return Err(OpenZipError::TooManyFiles);
     }
   }
