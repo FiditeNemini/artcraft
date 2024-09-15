@@ -22,6 +22,7 @@ use enums::common::visibility::Visibility;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
@@ -38,6 +39,7 @@ use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_f
 use crate::http_server::endpoints::media_files::upload::upload_pmx::extract_and_upload_pmx_files::{extract_and_upload_pmx_files, PmxError};
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::extract_frames_from_zip::{extract_frames_from_zip, ExtractFramesError};
 use crate::http_server::endpoints::media_files::upload::upload_studio_shot::ffmpeg_frames_to_mp4::ffmpeg_frames_to_mp4;
+use crate::http_server::headers::has_debug_header::has_debug_header;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError, UseDatabase};
 use crate::http_server::web_utils::user_session::require_user_session_using_connection::require_user_session_using_connection;
@@ -282,6 +284,25 @@ pub async fn upload_studio_shot_media_file_handler(
         error!("Upload video to bucket error: {:?}", e);
         MediaFileUploadError::ServerError
       })?;
+
+  if has_debug_header(&http_request) {
+    warn!("Debug header detected. Uploading original zip file for analysis.");
+
+    let zip_bucket_path_hash = bucket_path.get_object_hash();
+
+    let zip_bucket_path = MediaFileBucketPath::from_object_hash(zip_bucket_path_hash, PREFIX, Some(".zip"));
+
+    let result = server_state.public_bucket_client.upload_filename_with_content_type(
+      zip_bucket_path.get_full_object_path_str(),
+      form.file.file.path(),
+      "application/zip"
+    ).await;
+
+    // NB: Fail open
+    if let Err(err) = result {
+      error!("Upload zip to bucket error: {:?}", err);
+    }
+  }
 
   // ==================== SAVE RECORD ==================== //
 
