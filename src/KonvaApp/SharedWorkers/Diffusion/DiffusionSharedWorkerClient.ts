@@ -32,8 +32,6 @@ export class DiffusionSharedWorkerClient<
       >,
     ) => void,
   ) {
-    // example
-    // "src\\KonvaApp\\WorkerPrimitives\\NumberSharedWorker.ts"
     this.sharedWorker = new SharedWorker(workerPath, {
       type: "module",
     });
@@ -45,25 +43,33 @@ export class DiffusionSharedWorkerClient<
 
   async onMessage(event: MessageEvent) {
     // returns progress and returns result need to check error tomorrow then were good to go.
-    const data = event.data as SharedWorkerResponse<
-      DiffusionSharedWorkerResponseData,
-      DiffusionSharedWorkerItemData
-    >;
-    if (data.responseType === ResponseType.error) {
-      console.log(`DiffusionSharedWorkerClient Error:${data}`);
-    } else if (data.responseType === ResponseType.progress) {
-      console.log(`DiffusionSharedWorkerClient Progress:${data}`);
-    } else if (data.responseType === ResponseType.result) {
-      console.log(`DiffusionSharedWorkerClient Result:${data}`);
+    console.log(`incoming`);
+    console.log(event);
+    if (event.data.responseType === ResponseType.error) {
+      console.log(`DiffusionSharedWorkerClient Error`);
+      console.log(event.data);
+    } else if (event.data.responseType === ResponseType.progress) {
+      console.log(`DiffusionSharedWorkerClient Progress`);
+      console.log(event.data);
+    } else if (event.data.responseType === ResponseType.result) {
+      console.log(`DiffusionSharedWorkerClient Result`);
+      console.log(event.data);
     } else {
-      console.log(`DiffusionSharedWorkerClient Message Unknown ${data}`);
+      console.log(`DiffusionSharedWorkerClient Message Unknown`);
+      console.log(event.data);
     }
-    console.log(`TemplateSharedWorker Response: ${JSON.stringify(event.data)}`);
   }
 
-  async send(
-    sharedWorkerRequest: SharedWorkerRequest<DiffusionSharedWorkerItemData>,
+  async sendData(
+    jobID: number,
+    data: DiffusionSharedWorkerItemData,
+    isDoneStreaming: boolean,
   ) {
-    this.port.postMessage(sharedWorkerRequest);
+    const payload: SharedWorkerRequest<DiffusionSharedWorkerItemData> = {
+      jobID: jobID,
+      data: data,
+      isDoneStreaming: isDoneStreaming,
+    };
+    this.port.postMessage(payload);
   }
 }

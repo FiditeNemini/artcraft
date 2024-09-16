@@ -4,14 +4,17 @@ import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { v4 as uuidv4 } from "uuid";
 
 import { uiAccess } from "~/signals";
-const toolbarImage = uiAccess.toolbarImage;
+import { SelectionManager } from "../SelectionManager";
+const toolbarVideo = uiAccess.toolbarImage;
 const loadingBar = uiAccess.loadingBar;
 
 export class VideoNode extends NetworkedNodeContext {
+  public selectionManagerRef: SelectionManager;
+
   public videoURL: string;
   public videoComponent: HTMLVideoElement;
 
-  public node: Konva.Image;
+  public kNode: Konva.Image;
 
   // do not modify internal
   public didFinishLoading: boolean;
@@ -37,8 +40,26 @@ export class VideoNode extends NetworkedNodeContext {
 
   private finishedLoadingOnStart: Promise<void>;
 
+  public delete() {
+    // Do any other clean up and delete the konva node.
+    if (this.kNode) {
+      this.kNode.destroy();
+    }
+  }
+
   getNumberFrames(): number {
     return this.fps * this.duration;
+  }
+
+  public highlight() {
+    this.kNode.stroke("salmon");
+    this.kNode.strokeWidth(12);
+    this.kNode.draw();
+  }
+  public unHighLight() {
+    this.kNode.stroke(null);
+    this.kNode.strokeWidth(0);
+    this.kNode.draw();
   }
 
   private imageSources: string[] = [
@@ -59,9 +80,10 @@ export class VideoNode extends NetworkedNodeContext {
     x: number,
     y: number,
     videoURL: string,
+    selectionManagerRef: SelectionManager,
   ) {
     super();
-
+    this.selectionManagerRef = selectionManagerRef;
     this.shouldPlay = true; // start
     this.offScreenCanvas = offScreenCanvas;
     this.uuid = uuid;
@@ -86,8 +108,8 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
-      this.node.width(this.videoComponent.videoWidth);
-      this.node.height(this.videoComponent.videoHeight);
+      this.kNode.width(this.videoComponent.videoWidth);
+      this.kNode.height(this.videoComponent.videoHeight);
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
       // it might have length here which we will need to trim down to 7 seconds.
       console.log(`Video Duration: ${this.videoComponent.duration}`);
@@ -106,29 +128,32 @@ export class VideoNode extends NetworkedNodeContext {
     // assign video to start process.
     this.videoComponent.src = this.videoURL;
 
-    this.node = new Konva.Image({
+    this.kNode = new Konva.Image({
       image: this.videoComponent,
       x: x,
       y: y,
       draggable: true,
     });
 
-    this.videoLayer.add(this.node);
+    this.videoLayer.add(this.kNode);
 
-    this.node.on("dragstart", () => {
-      console.log("Drag Start");
+    this.kNode.on("dragstart", (e) => {
       this.updateContextMenuPosition();
-
+      // Multiselect
+      const isMultiSelect = e.evt.shiftKey;
+      this.selectionManagerRef.startDrag(this);
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       }
     });
 
-    this.node.on("dragmove", () => {
+    this.kNode.on("dragmove", (e) => {
       // shouldn't be able to move if processing.
 
       this.updateContextMenuPosition();
-
+      // Multiselect
+      const isMultiSelect = e.evt.shiftKey;
+      this.selectionManagerRef.dragging(this);
       if (this.isProcessing) {
         return;
       }
@@ -138,28 +163,32 @@ export class VideoNode extends NetworkedNodeContext {
       }
     });
 
-    this.node.on("mouseover", () => {
-      console.log("MouseOver");
-      this.node.stroke("salmon");
-      this.node.strokeWidth(12);
-      this.node.draw();
+    this.kNode.on("dragend", (e) => {
+      this.selectionManagerRef.draggingStopped(this);
     });
 
-    this.node.on("mouseout", () => {
-      this.node.stroke(null);
-      this.node.strokeWidth(0);
-      this.node.draw();
+    this.kNode.on("mouseover", () => {
+      //this.highlight();
     });
 
-    this.node.on("dragend", () => {
+    this.kNode.on("mouseout", () => {
+      // this.unHighLight();
+    });
+
+    this.kNode.on("dragend", () => {
       this.updateContextMenuPosition();
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       }
     });
 
-    this.node.on("mousedown", () => {
-      toolbarImage.show();
+    this.kNode.on("mousedown", (e) => {
+      toolbarVideo.show();
+
+      // selection on click doesn't do a good job.
+      const isMultiSelect = e.evt.shiftKey;
+      this.selectionManagerRef.selectNode(this, isMultiSelect);
+
       this.updateContextMenuPosition();
 
       if (this.didFinishLoading == false) {
@@ -169,7 +198,7 @@ export class VideoNode extends NetworkedNodeContext {
       }
     });
 
-    this.node.on("mouseup", () => {
+    this.kNode.on("mouseup", () => {
       if (this.didFinishLoading == false) {
         return;
       }
@@ -188,23 +217,35 @@ export class VideoNode extends NetworkedNodeContext {
     const newImage = new Image();
     newImage.src = newImageSrc;
     newImage.onload = () => {
-      this.node.image(newImage);
-      this.node.draw();
+      this.kNode.image(newImage);
+      this.kNode.draw();
     };
   }
 
   updateContextMenuPosition() {
-    toolbarImage.setPosition({
-      x: this.node.getPosition().x + this.node.getSize().width / 4,
-      y: this.node.getPosition().y - 150,
+    toolbarVideo.setPosition({
+      x: this.kNode.getPosition().x + this.kNode.getSize().width / 4,
+      y: this.kNode.getPosition().y - 150,
     });
   }
 
   updateLoadingBarPosition() {
     loadingBar.updatePosition({
-      x: this.node.getPosition().x + this.node.getSize().width / 4,
-      y: this.node.getPosition().y - 60,
+      x: this.kNode.getPosition().x + this.kNode.getSize().width / 4,
+      y: this.kNode.getPosition().y - 60,
     });
+  }
+
+  public bringToFront() {
+    this.kNode.moveUp();
+  }
+
+  public sendBack() {
+    // prevent canvas being in front.
+    if (this.kNode.zIndex() === 1) {
+      return;
+    }
+    this.kNode.moveDown();
   }
 
   private async createVideoElement(newURL: string) {
@@ -238,8 +279,8 @@ export class VideoNode extends NetworkedNodeContext {
       try {
         console.log("LoadedData");
 
-        this.node.image(videoComponent);
-        this.node.draw();
+        this.kNode.image(videoComponent);
+        this.kNode.draw();
         this.videoComponent.loop = true;
         this.videoComponent.currentTime = 0; // ensure it shows up on screen
 
@@ -265,19 +306,19 @@ export class VideoNode extends NetworkedNodeContext {
         return;
       }
 
-      console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
+      //console.log(`${this.didFinishLoading} ${this.shouldPlay}`);
       if (this.didFinishLoading && this.shouldPlay === true) {
-        console.log("Playing");
+        //console.log("Playing");
         this.shouldPlay = false;
         this.videoComponent.play();
       } else {
         this.shouldPlay = true;
         this.videoComponent.pause();
 
-        console.log("Pausing");
+        //console.log("Pausing");
       }
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
   }
   async simulatedLoading() {
@@ -328,13 +369,13 @@ export class VideoNode extends NetworkedNodeContext {
         console.log("Didn't setup Video Component?");
         return;
       }
-      console.log(`Seeking to Position ${second}`);
+      //console.log(`Seeking to Position ${second}`);
 
       this.videoComponent.currentTime = second;
 
       this.frameDidFinishSeeking = new Promise<void>((resolve, reject) => {
         this.videoComponent.onseeked = (event: Event) => {
-          console.log("Seeked Finished");
+          //console.log("Seeked Finished");
           // reimplement using the function
           // ensure that this doesn't race.
           resolve();

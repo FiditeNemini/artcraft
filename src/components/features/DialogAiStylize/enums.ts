@@ -33,3 +33,9 @@ export enum ArtStyleNames {
   RealisticMatrix = "realistic_matrix",
   RealisticCyberpunk = "realistic_cyberpunk",
 }
+
+export enum Visibility {
+  Public = "public",
+  Hidden = "hidden",
+  Private = "private",
+}

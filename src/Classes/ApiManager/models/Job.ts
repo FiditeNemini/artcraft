@@ -32,5 +32,6 @@ export interface JobStatusResponse {
   maybe_failure_category: string;
   maybe_first_started_at: string;
   requires_keepalive: boolean;
+  progress_percentage: number;
   status: JobStatus;
 }

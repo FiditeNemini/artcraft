@@ -5,6 +5,8 @@ import { uiEvents } from "~/signals";
 import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
 
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+import { SelectionManager } from "./SelectionManager";
+import { toolbarImage } from "~/signals/uiAccess/toolbarImage";
 
 export class Engine {
   private canvasReference: HTMLDivElement;
@@ -12,6 +14,8 @@ export class Engine {
   private videoLayer: Konva.Layer;
   private renderEngine: RenderEngine;
   private offScreenCanvas: OffscreenCanvas;
+
+  private selectionManager: SelectionManager;
 
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
@@ -21,12 +25,15 @@ export class Engine {
       console.log("Engine Constructor ran");
     }
 
+    this.selectionManager = new SelectionManager();
+
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
       container: this.canvasReference,
       width: window.innerWidth,
       height: window.innerHeight,
     });
+
     const videoLayer = new Konva.Layer();
     this.videoLayer = videoLayer;
     this.stage.add(videoLayer);
@@ -44,13 +51,45 @@ export class Engine {
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
     this.renderEngine = new RenderEngine(this.videoLayer, this.offScreenCanvas);
 
+    this.stage.on("mousedown", (e) => {
+      if (e.target === this.stage) {
+        this.selectionManager.clearSelection();
+      }
+    });
+
+    uiEvents.toolbarImage.DELETE.onClick(() => {
+      const nodes = this.selectionManager.getSelectedNodes();
+      toolbarImage.hide();
+
+      nodes.forEach((node) => {
+        this.selectionManager.deselectNode(node);
+        node.delete();
+      });
+    });
+
+    uiEvents.toolbarImage.MOVE_LAYER_DOWN.onClick(() => {
+      const nodes = this.selectionManager.getSelectedNodes();
+      nodes.forEach((node) => {
+        node.sendBack();
+      });
+    });
+
+    uiEvents.toolbarImage.MOVE_LAYER_UP.onClick(() => {
+      const nodes = this.selectionManager.getSelectedNodes();
+      nodes.forEach((node) => {
+        node.bringToFront();
+      });
+    });
+
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
     });
+
     uiEvents.onGetStagedVideo((video) => {
       console.log("Engine got video: " + video.url);
       // this.addVideo(video.file);
     });
+
     uiEvents.onRequestAiStylize((data) => {
       console.log("Engine heard AI Stylize request: ", data);
     });
@@ -62,6 +101,7 @@ export class Engine {
     uiEvents.toolbarMain.SELECT_ONE.onClick(() => {
       console.log("select one is clicked");
     });
+
     uiEvents.toolbarMain.SAVE.onClick(async (event) => {
       uiAccess.toolbarMain.changeButtonState(
         ToolbarMainButtonNames.AI_STYLIZE,
@@ -76,6 +116,7 @@ export class Engine {
         { disabled: false },
       );
     });
+
     uiEvents.toolbarMain.loadingBarRetry.onClick((e) => {
       console.log(
         "toolbarMain > loadingBar > retry : onClick heard in Engine",
@@ -111,8 +152,14 @@ export class Engine {
   }
 
   private applyChanges() {
+    if (this.renderEngine) {
+      // won't update the first time.
+      this.renderEngine.updateCaptureCanvas(undefined, undefined);
+    }
+
     this.stage.width(this.canvasReference.offsetWidth);
     this.stage.height(this.canvasReference.offsetHeight);
+
     this.stage.draw(); // Redraw the canvas
   }
 
@@ -163,6 +210,7 @@ export class Engine {
       1560,
       400,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+      this.selectionManager,
     );
 
     const videoNode2 = new VideoNode(
@@ -172,6 +220,7 @@ export class Engine {
       1560,
       1000,
       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+      this.selectionManager,
     );
 
     // CODE TO TEST RENDER ENGINE
@@ -212,4 +261,6 @@ export class Engine {
     // Adding nodes here
     console.log("addVideo", videoFile);
   }
+
+  public applyUIListners() {}
 }

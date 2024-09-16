@@ -22,22 +22,6 @@ export class JobsApi extends ApiManager {
       });
   }
 
-  public ListJobs(): Promise<ApiResponse<Job[]>> {
-    const endpoint = `${this.ApiTargets.BaseApi}/v1/jobs/batch`;
-
-    return this.get<{
-      success: boolean;
-      job_states: Job[];
-    }>({ endpoint })
-      .then((response) => ({
-        success: response.success,
-        data: response.job_states,
-      }))
-      .catch((err) => {
-        return { success: false, errorMessage: err.message };
-      });
-  }
-
   public ListRecentJobs(): Promise<ApiResponse<Job[]>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/jobs/session`;
 

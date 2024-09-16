@@ -13,8 +13,10 @@ import {
   DiffusionSharedWorker,
   DiffusionSharedWorkerItemData,
 } from "../SharedWorkers/Diffusion/DiffusionSharedWorker";
+import { Vector } from "@techstark/opencv-js";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
+
 export class RenderEngine {
   private videoNodes: VideoNode[];
   private offScreenCanvas: OffscreenCanvas;
@@ -35,7 +37,9 @@ export class RenderEngine {
   private canUseSharedWorker: boolean;
 
   private port: MessagePort | undefined;
-  private maxFrames: number;
+  private upperMaxFrames: number;
+
+  private captureCanvas: Konva.Rect;
 
   private diffusionWorker:
     | DiffusionSharedWorkerClient<
@@ -45,6 +49,52 @@ export class RenderEngine {
       >
     | undefined;
 
+  async updateCaptureCanvas(
+    width: number | undefined,
+    height: number | undefined,
+  ) {
+    if (!this.captureCanvas) {
+      return;
+    }
+    if (width) {
+      this.width = width;
+    }
+    if (height) {
+      this.height = height;
+    }
+    // Ensures that all the nodes stag in the same place should
+    // there be a window resize.
+    // recompute the position
+    const oldPositionX = this.positionX;
+    const oldPositionY = this.positionY;
+
+    // recompute the position
+    this.positionX = window.innerWidth / 2 - this.width / 2;
+    this.positionY = window.innerHeight / 2 - this.height / 2;
+
+    this.captureCanvas.setPosition({ x: this.positionX, y: this.positionY });
+    this.captureCanvas.size({ width: this.width, height: this.height });
+
+    // this is the change.
+    const deltaX = this.positionX - oldPositionX;
+    const deltaY = this.positionY - oldPositionY;
+
+    var children = this.videoLayer.getChildren();
+    for (let i = 0; i < children.length; i++) {
+      let node = children[i];
+
+      // skip the capture canvas update.
+      if (node.name() === "CaptureCanvas") {
+        continue;
+      }
+      const pos = node.getPosition();
+      node.setPosition({
+        x: pos.x + deltaX,
+        y: pos.y + deltaY,
+      });
+    }
+    this.videoLayer.batchDraw();
+  }
   constructor(videoLayer: Konva.Layer, offScreenCanvas: OffscreenCanvas) {
     this.videoNodes = [];
     this.isProcessing = false;
@@ -53,8 +103,8 @@ export class RenderEngine {
 
     this.width = 720;
     this.height = 1280;
-    this.positionX = window.innerWidth / 2 - 720 / 2;
-    this.positionY = window.innerHeight / 2 - 1080 / 2;
+    this.positionX = window.innerWidth / 2 - this.width / 2;
+    this.positionY = window.innerHeight / 2 - this.height / 2;
 
     this.offScreenCanvas = offScreenCanvas;
     this.offScreenCanvas.width = this.width;
@@ -66,7 +116,7 @@ export class RenderEngine {
     this.videoLayer = videoLayer;
 
     this.port = undefined;
-    const captureCanvas = new Konva.Rect({
+    this.captureCanvas = new Konva.Rect({
       x: this.positionX,
       y: this.positionY,
       width: this.width,
@@ -76,12 +126,13 @@ export class RenderEngine {
       strokeWidth: 1,
       draggable: false,
     });
+    this.captureCanvas.addName("CaptureCanvas");
 
-    this.maxFrames = 7 * 24;
+    this.upperMaxFrames = 7 * 24;
 
-    this.videoLayer.add(captureCanvas);
+    this.videoLayer.add(this.captureCanvas);
     // send back
-    captureCanvas.setZIndex(0);
+    this.captureCanvas.setZIndex(0);
 
     this.canUseSharedWorker = false;
     this.setupSharedWorker();
@@ -206,7 +257,8 @@ export class RenderEngine {
       this.videoNodes.forEach((item: VideoNode) => {});
 
       // find the longest video node
-      const numberOfFrames = this.findLongestVideoLength();
+      let numberOfFrames = this.findLongestVideoLength();
+      numberOfFrames = Math.min(numberOfFrames, this.upperMaxFrames);
       console.log(`Number Of Frames: ${numberOfFrames}`);
 
       await this.render(numberOfFrames);
@@ -229,10 +281,11 @@ export class RenderEngine {
     return frameNumber / frameRate;
   }
 
-  // TODO render loop should be.
-  // find longest video
-  // then seek through each node 1 step.
-  // stop ignore stepping if the duration is less.
+  /** 
+  find longest video
+  then seek through each node 1 step.
+  stop ignore stepping if the duration is less.
+  **/
   private async render(largestNumberOfFrames: number) {
     if (!this.isProcessing) return;
 
@@ -258,9 +311,9 @@ export class RenderEngine {
         frameTime = this.calculateFrameTime(j, currentVideoNode.fps);
         frameTime = parseFloat(frameTime.toFixed(2));
         if (frameTime < currentVideoNode.duration) {
-          console.log(`CurrentFrame:${j}`);
-          console.log(`FrameTime:${frameTime}`);
-          console.log(`Duration:${currentVideoNode.duration}`);
+          // console.log(`CurrentFrame:${j}`);
+          // console.log(`FrameTime:${frameTime}`);
+          // console.log(`Duration:${currentVideoNode.duration}`);
           await currentVideoNode.seek(frameTime);
         } // end of if context
       } // End frame time
@@ -287,17 +340,16 @@ export class RenderEngine {
             this.width,
             this.height,
           );
+          // TODO write the non webworker version
 
-          const blob = await this.offScreenCanvas.convertToBlob({
-            quality: 1.0,
-            type: "image/jpeg",
-          });
+          // const blob = await this.offScreenCanvas.convertToBlob({
+          //   quality: 1.0,
+          //   type: "image/jpeg",
+          // });
 
-          await this.blobToFile(blob, `${j}`);
+          //await this.blobToFile(blob, `${j}`);
         } // end of for each frame
       } else {
-        console.log("Using Shared Worker");
-
         // decode on the shared webworker.
         if (!this.context) {
           console.log("Context Didn't Initialize");
@@ -305,7 +357,7 @@ export class RenderEngine {
         }
 
         if (!this.diffusionWorker) {
-          console.log("Didnt Initialize Diffusion");
+          console.log("Didn't Initialize Diffusion");
           return;
         }
 
@@ -321,83 +373,33 @@ export class RenderEngine {
           this.height,
         );
 
+        // Test remove later.
+        // const largestNumberOfFrames = 4;
+
         const data: DiffusionSharedWorkerItemData = {
           height: this.height,
           width: this.width,
           imageBitmap: this.offScreenCanvas.transferToImageBitmap(),
           frame: j,
-          totalFrames: this.maxFrames,
+          totalFrames: largestNumberOfFrames,
         };
 
         let isDoneStreaming = false;
 
-        if (j == this.maxFrames - 1) {
+        console.log(`Processing Frame:${j} out of ${largestNumberOfFrames}`);
+
+        if (j == largestNumberOfFrames - 1) {
           isDoneStreaming = true;
         }
 
-        const container: SharedWorkerRequest<DiffusionSharedWorkerItemData> = {
-          data: data,
-          isDoneStreaming: isDoneStreaming,
-          jobID: 1,
-        };
-        this.diffusionWorker.send(container);
+        this.diffusionWorker.sendData(1, data, isDoneStreaming);
+
+        // DEBUG TO SHORT CUT WAITING
+        if (isDoneStreaming) {
+          console.log("Done streaming");
+          break;
+        }
       }
     }
   }
-
-  private blobToFile(blob: Blob, index: string) {
-    try {
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      const formattedIndex = String(index).padStart(4, "0");
-      link.download = `${formattedIndex}.jpg`;
-      // Trigger the download
-      link.click();
-      // Clean up the URL object
-      URL.revokeObjectURL(link.href);
-      console.log("Done");
-    } catch (error) {
-      console.log(error);
-    }
-  }
 }
-
-// //DO NOT USE: This code is to test whether or not we can seek frames on each video nodes.
-// //To check the correctness of the seeking.
-// private async processFrame() {
-//   if (!this.isProcessing) return;
-
-//   for (let j = 0; j < this.videoNodes.length; j++) {
-//     const videoNode = this.videoNodes[j];
-
-//     videoNode.stop();
-//     const numberOfFrames = videoNode.getNumberFrames();
-
-//     for (let i = 0; i <= numberOfFrames; i++) {
-//       const frameTime = this.calculateFrameTime(i, videoNode.fps);
-
-//       console.log(i);
-//       console.log(frameTime);
-//       console.log(videoNode.duration);
-
-//       if (frameTime < videoNode.duration) {
-//         await videoNode.seek(frameTime);
-//         this.offScreenCanvas.width = videoNode.node.getSize().width;
-//         this.offScreenCanvas.height = videoNode.node.getSize().height;
-
-//         if (this.context) {
-//           this.context.drawImage(
-//             videoNode.videoComponent,
-//             0,
-//             0,
-//             this.offScreenCanvas.width,
-//             this.offScreenCanvas.height,
-//           );
-//           console.log("Pushing");
-//           this.frames.push(this.offScreenCanvas.transferToImageBitmap());
-//         }
-//       } // end of if
-//     } // end of for.
-//   }
-//   console.log(this.frames);
-// }

@@ -96,7 +96,7 @@ export class WorkQueue<I, R, P> {
           if (result[1] === true) {
             this.reportResult({ jobID: workItem.jobID, data: result[0] });
           } else {
-            console.log("Work Function is not done producing result");
+            //console.log("Work Function is not done producing result");
           }
         } catch (error) {
           // catches errors from the worker and sends it back as an error

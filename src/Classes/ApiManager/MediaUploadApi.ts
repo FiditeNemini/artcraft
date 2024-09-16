@@ -3,6 +3,8 @@ import { FilterEngineCategories } from "./enums/QueryFilters";
 import { Visibility } from "./enums/Visibility";
 
 export class MediaUploadApi extends ApiManager {
+  private sessionToken: string = undefined;
+
   private async Upload({
     endpoint,
     uuid,
@@ -244,5 +246,104 @@ export class MediaUploadApi extends ApiManager {
 
     const fileName = `${maybe_title}-${uuid}`;
     return this.Upload({ endpoint, blob, fileName, uuid, options }); // token comes back and send it VST
+  }
+
+  // TODO clean this up...
+  private async getSessionTokenForUploadStudioShot() {
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/session_token`;
+    return await this.get<{
+      maybe_signed_session: string;
+    }>({ endpoint })
+      .then((response) => {
+        return {
+          success: true,
+          data: response["maybe_signed_session"],
+        };
+      })
+      .catch((err) => {
+        return {
+          success: false,
+          errorMessage: err.message,
+        };
+      });
+  }
+
+  public async UploadStudioShot({
+    maybe_title,
+    uuid_idempotency_token,
+    blob,
+    fileName,
+    maybe_visibility,
+  }: {
+    maybe_title?: string;
+    uuid_idempotency_token: string;
+    blob: Blob | null;
+    fileName: string;
+    maybe_visibility?: Visibility;
+  }): Promise<ApiResponse<string>> {
+    // This function is a bit special it requires that
+    const endpoint = `https://upload.storyteller.ai/v1/media_files/upload/studio_shot`;
+
+    if (!this.sessionToken) {
+      console.log("Session Token");
+      const response = await this.getSessionTokenForUploadStudioShot();
+      if (response.success && response.data) {
+        this.sessionToken = response.data;
+        console.log(`Token ${this.sessionToken}`);
+      } else {
+        return {
+          success: false,
+          errorMessage: "Could not obtain session tokens.",
+        };
+      }
+    } else {
+      console.log(`Session Token: ${this.sessionToken}`);
+    }
+
+    const options: Record<string, string | number | undefined> = {
+      maybe_title,
+      maybe_frame_rate_fps: 24,
+      maybe_visibility: maybe_visibility?.toString(),
+    };
+
+    const formRecord = Object.entries(options).reduce(
+      (allOptions, [key, value]) => {
+        if (value === undefined) {
+          return allOptions;
+        }
+        return { ...allOptions, [key]: value.toString() };
+      },
+      {} as Record<string, string>,
+    );
+
+    const formData = new FormData();
+    formData.append("uuid_idempotency_token", uuid_idempotency_token);
+    Object.entries(formRecord).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    if (blob && fileName) {
+      formData.append("file", blob, fileName);
+    } else if (blob) {
+      formData.append("file", blob);
+    }
+
+    console.log(formData);
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Session: this.sessionToken,
+      },
+      credentials: "include",
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log(result);
+    if (result.success && result.media_file_token) {
+      return { success: true, data: result.media_file_token };
+    } else {
+      return { success: false, errorMessage: "Failed to Get Media Token" };
+    }
   }
 }
