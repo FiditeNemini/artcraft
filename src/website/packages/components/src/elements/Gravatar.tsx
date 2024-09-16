@@ -43,6 +43,7 @@ function Gravatar(props: Props) {
       width={props.size}
       style={{ backgroundColor: getBackgroundColor(props.backgroundIndex) }}
       onClick={props.onClick}
+      crossOrigin="anonymous"
     />
   );
 }
