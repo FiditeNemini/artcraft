@@ -14,8 +14,12 @@ import { isMobile } from "react-device-detect";
 import { WeightType } from "@storyteller/components/src/api/_common/enums";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { useLocalize } from "hooks";
+import { useLocalize, useRatings, useSession, useWeightFetch } from "hooks";
 import Stat from "components/common/Stat/Stat";
+import { ActionButton, ActionButtonProps } from "components/common";
+import { faThumbsUp as faThumbsUpOutline } from "@fortawesome/pro-regular-svg-icons";
+import { FetchStatus } from "@storyteller/components/src/api";
+import LoadingSpinner from "components/common/LoadingSpinner";
 
 interface VoicePickerPreviewProps {
   selectedVoice: any;
@@ -38,6 +42,34 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
     selectedVoice?.weight_type || WeightType.NONE
   );
   const { label: weightType, color: weightTagColor } = weightTypeInfo;
+  const { loggedIn } = useSession();
+
+  const ratings = useRatings();
+
+  const fetchedWeight = useWeightFetch({
+    onSuccess: (res: any) => {
+      ratings.gather({ res, key: "weight_token" });
+    },
+    token: selectedVoice?.weight_token,
+    refetch: true,
+  });
+
+  const { data: weight, status } = fetchedWeight;
+
+  const ratingButtonProps: ActionButtonProps = {
+    ...ratings.makeProps({
+      entityToken: weight?.weight_token || "",
+      entityType: "model_weight",
+    }),
+    toolTipOff: "Like this voice",
+    toolTipOn: "Unlike this voice",
+    iconOn: faThumbsUp,
+    iconOff: faThumbsUpOutline,
+    color: "action",
+    toolTipPlacement: "top",
+    toolTipDisable: isMobile,
+    style: { minHeight: "1.75rem", fontSize: "14px" },
+  };
 
   const { t } = useLocalize("NewTTS");
 
@@ -51,7 +83,7 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
         }}
       />
       <div className="d-flex flex-column justify-content-center flex-grow-1">
-        <h2 className="mb-1 fw-semibold d-flex gap-2 align-items-center fs-5 fy-weight-picker-preview-text">
+        <h2 className="mb-1 fw-semibold d-flex gap-2 align-items-center fs-5 fy-weight-picker-preview-text flex-wrap">
           <div>{selectedVoice?.title || t("button.labelNoVoice")}</div>
           {selectedVoice?.weight_type && (
             <>
@@ -69,10 +101,28 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
                   icon={faWaveformLines}
                 />
               </div>
-              <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-75">
-                <FontAwesomeIcon icon={faThumbsUp} />
-                {selectedVoice?.stats?.positive_rating_count}
-              </span>
+
+              {loggedIn ? (
+                <>
+                  {status === FetchStatus.success ? (
+                    <div onClick={e => e.stopPropagation()}>
+                      <ActionButton {...ratingButtonProps} />
+                    </div>
+                  ) : (
+                    <div
+                      className="d-flex align-items-center"
+                      style={{ minHeight: "1.75rem" }}
+                    >
+                      <LoadingSpinner thin={true} size={20} padding={false} />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <span className="d-none d-lg-flex align-items-center gap-1 fs-7 opacity-75">
+                  <FontAwesomeIcon icon={faThumbsUp} />
+                  {selectedVoice?.stats?.positive_rating_count}
+                </span>
+              )}
             </>
           )}
         </h2>
@@ -106,10 +156,12 @@ const VoicePickerPreview: React.FC<VoicePickerPreviewProps> = ({
                 small={true}
                 color={weightTagColor || ""}
               />
-              <span className="ms-2 d-flex d-lg-none align-items-center gap-1 fs-7 opacity-75">
-                <FontAwesomeIcon icon={faThumbsUp} />
-                {selectedVoice?.stats?.positive_rating_count}
-              </span>
+              {!loggedIn && (
+                <span className="ms-2 d-flex d-lg-none align-items-center gap-1 fs-7 opacity-75">
+                  <FontAwesomeIcon icon={faThumbsUp} />
+                  {selectedVoice?.stats?.positive_rating_count}
+                </span>
+              )}
             </div>
             <div className="d-flex gap-1 align-items-center">
               <span className="d-none d-lg-block px-1 opacity-50">|</span>

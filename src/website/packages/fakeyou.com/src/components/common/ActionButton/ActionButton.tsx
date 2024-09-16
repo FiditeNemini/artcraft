@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import Tippy from "@tippyjs/react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
@@ -19,7 +19,10 @@ export interface ActionButtonProps {
   toggle: (entityToken: string, entityType: string) => any;
   toolTipOff?: string;
   toolTipOn?: string;
-  visible?: boolean;
+  color?: "default" | "action";
+  toolTipPlacement?: "top" | "bottom";
+  toolTipDisable?: boolean;
+  style?: CSSProperties;
 }
 
 export default function ActionButton({
@@ -35,7 +38,10 @@ export default function ActionButton({
   toggle,
   toolTipOff,
   toolTipOn,
-  visible
+  toolTipPlacement = "bottom",
+  toolTipDisable = true,
+  color = "default",
+  style,
 }: ActionButtonProps) {
   const { events, status } = useAnimationStatus();
   const onClick = () => {
@@ -51,18 +57,22 @@ export default function ActionButton({
         delay: [500, 0],
         hideOnClick: false,
         offset: [0, 12],
-        placement: "bottom",
+        placement: toolTipPlacement,
         theme: "fakeyou",
         trigger: "mouseenter",
-        visible,
+        disabled: toolTipDisable,
       }}
     >
       <button
         {...{
-          className: `fy-action-button ${actionType}-action-button ${isToggled ? "action-button-toggled" : ""
-            }`,
+          className: `fy-action-button ${
+            color === "action" ? "color-action" : ""
+          } ${actionType}-action-button ${
+            isToggled ? "action-button-toggled" : ""
+          }`.trim(),
           disabled: busy,
           onClick,
+          style,
         }}
       >
         <Icon

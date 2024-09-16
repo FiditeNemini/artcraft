@@ -13,6 +13,7 @@ interface Props {
   onSuccess?: (res: Weight) => any;
   onRemove?: (x: any) => void;
   token: string;
+  refetch?: boolean;
 }
 
 const n = (x?: any) => {};
@@ -21,6 +22,7 @@ export default function useWeightFetch({
   onRemove = n,
   onSuccess = n,
   token,
+  refetch = false,
 }: Props) {
   const [data, setData] = useState<Weight | undefined | null>(null);
   const [status, statusSet] = useState(FetchStatus.ready);
@@ -76,6 +78,18 @@ export default function useWeightFetch({
       onRemove(res);
     });
   };
+
+  useEffect(() => {
+    if (token && refetch) {
+      // Reset state when token changes to ensure a refetch
+      setData(null);
+      statusSet(FetchStatus.ready);
+      titleSet("");
+      maybeUrlSlugSet(undefined);
+      descriptionMDSet("");
+      visibilitySet("public");
+    }
+  }, [token, refetch]);
 
   useEffect(() => {
     if (token && !data && status === FetchStatus.ready) {
