@@ -2,16 +2,28 @@ use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Json, Path};
+use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
 use actix_web_lab::extract::Query;
 use chrono::{DateTime, Utc};
 use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 use utoipa::{IntoParams, ToSchema};
 
+use crate::http_server::common_responses::media_links::{MediaDomain, MediaLinks};
+use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
+use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
+use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_lipsync_details::extract_lipsync_details;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
+use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::BatchGetMediaFilesQueryParams;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
+use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::state::server_state::ServerState;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
@@ -23,16 +35,6 @@ use mysql_queries::queries::generic_inference::web::job_status::GenericInference
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
-use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
-use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
-use crate::http_server::endpoints::inference_job::utils::extractors::extract_lipsync_details::extract_lipsync_details;
-use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
-use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
-use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::BatchGetMediaFilesQueryParams;
-use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::state::server_state::ServerState;
 
 /// For certain jobs or job classes (eg. non-premium), we kill the jobs if the user hasn't
 /// maintained a keepalive. This prevents wasted work when users who are unlikely to return
@@ -133,8 +135,12 @@ pub struct BatchResultDetailsResponse {
   pub entity_type: String,
   pub entity_token: String,
 
-  /// NB: This is only for audio- or video- type results.
+  /// (DEPRECATED) URL path to the media file
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub maybe_public_bucket_media_path: Option<String>,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
@@ -199,7 +205,8 @@ pub async fn batch_get_inference_job_status_handler(
       .collect::<Vec<_>>();
 
   if tokens.is_empty() {
-    return Ok(records_to_response(Vec::new()));
+    // NB: MediaDomain doesn't matter since it's an empty list.
+    return Ok(records_to_response(Vec::new(), MediaDomain::Storyteller));
   }
 
   // NB: Since this is publicly exposed, we don't query sensitive data.
@@ -243,17 +250,20 @@ pub async fn batch_get_inference_job_status_handler(
     };
   }
 
-  Ok(records_to_response(records))
+  let media_domain = get_media_domain(&http_request);
+
+  Ok(records_to_response(records, media_domain))
 }
 
-fn records_to_response(records: Vec<GenericInferenceJobStatus>)
-  -> Json<BatchGetInferenceJobStatusSuccessResponse>
-{
+fn records_to_response(
+  records: Vec<GenericInferenceJobStatus>,
+  media_domain: MediaDomain,
+) -> Json<BatchGetInferenceJobStatusSuccessResponse> {
   Json(BatchGetInferenceJobStatusSuccessResponse {
     success: true,
     job_states: records.into_iter()
         .map(|record| {
-          db_record_to_response_payload(record, None)
+          db_record_to_response_payload(record, None, media_domain)
         })
         .collect::<Vec<_>>(),
   })
@@ -262,6 +272,7 @@ fn records_to_response(records: Vec<GenericInferenceJobStatus>)
 fn db_record_to_response_payload(
   record: GenericInferenceJobStatus,
   maybe_extra_status_description: Option<String>,
+  media_domain: MediaDomain,
 ) -> BatchInferenceJobStatusResponsePayload {
   let inference_category = record.request_details.inference_category;
 
@@ -397,6 +408,7 @@ fn db_record_to_response_payload(
       BatchResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,
+        media_links: MediaLinks::from_rooted_path(media_domain, &public_bucket_media_path),
         maybe_public_bucket_media_path: Some(public_bucket_media_path),
         maybe_successfully_completed_at: result_details.maybe_successfully_completed_at,
       }

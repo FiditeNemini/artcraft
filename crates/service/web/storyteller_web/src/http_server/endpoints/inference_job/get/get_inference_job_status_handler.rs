@@ -1,15 +1,26 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Json, Path};
+use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 use utoipa::ToSchema;
 
+use crate::http_server::common_responses::media_links::{MediaDomain, MediaLinks};
+use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
+use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
+use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_lipsync_details::extract_lipsync_details;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
+use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
+use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::state::server_state::ServerState;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
@@ -20,15 +31,6 @@ use mysql_queries::queries::generic_inference::web::get_inference_job_status::ge
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
-use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
-use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
-use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
-use crate::http_server::endpoints::inference_job::utils::extractors::extract_lipsync_details::extract_lipsync_details;
-use crate::http_server::endpoints::inference_job::utils::extractors::extract_live_portrait_details::extract_live_portrait_details;
-use crate::http_server::endpoints::inference_job::utils::extractors::extract_polymorphic_inference_args::extract_polymorphic_inference_args;
-use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::state::server_state::ServerState;
 
 /// For certain jobs or job classes (eg. non-premium), we kill the jobs if the user hasn't
 /// maintained a keepalive. This prevents wasted work when users who are unlikely to return
@@ -121,8 +123,12 @@ pub struct ResultDetailsResponse {
   pub entity_type: String,
   pub entity_token: String,
 
-  /// NB: This is only for audio- or video- type results.
+  /// (DEPRECATED) URL path to the media file
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub maybe_public_bucket_media_path: Option<String>,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
@@ -240,8 +246,13 @@ pub async fn get_inference_job_status_handler(
     };
   }
 
+  let media_domain = get_media_domain(&http_request);
+
   let record_for_response = record_to_payload(
-    record, maybe_extra_status_description);
+    record,
+    maybe_extra_status_description,
+    media_domain,
+  );
 
   Ok(Json(GetInferenceJobStatusSuccessResponse {
     success: true,
@@ -252,6 +263,7 @@ pub async fn get_inference_job_status_handler(
 fn record_to_payload(
   record: GenericInferenceJobStatus,
   maybe_extra_status_description: Option<String>,
+  media_domain: MediaDomain,
 ) -> InferenceJobStatusResponsePayload {
   let inference_category = record.request_details.inference_category;
 
@@ -387,6 +399,7 @@ fn record_to_payload(
       ResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,
+        media_links: MediaLinks::from_rooted_path(media_domain, &public_bucket_media_path),
         maybe_public_bucket_media_path: Some(public_bucket_media_path),
         maybe_successfully_completed_at: result_details.maybe_successfully_completed_at,
       }
@@ -398,10 +411,11 @@ fn record_to_payload(
 
 #[cfg(test)]
 mod tests {
+  use crate::http_server::common_responses::media_links::MediaDomain;
+  use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::record_to_payload;
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use mysql_queries::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
-
-  use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::record_to_payload;
+  use url::Url;
 
   #[test]
   fn text_to_speech_as_media_file() {
@@ -424,11 +438,16 @@ mod tests {
     };
 
     let payload =
-        record_to_payload(status, None);
+        record_to_payload(status, None, MediaDomain::Storyteller);
 
     assert!(payload.maybe_result.is_some());
 
     let result = payload.maybe_result.expect("should have result");
+
+    assert_eq!(
+      Url::parse("https://cdn.storyteller.ai/media/t/p/k/8/4/tpk848b5s5zwhnwrph75jhyfyja3j42v/fakeyou_tpk848b5s5zwhnwrph75jhyfyja3j42v.wav").unwrap(),
+      result.media_links.cdn_url
+    );
 
     assert_eq!(
       Some("/media/t/p/k/8/4/tpk848b5s5zwhnwrph75jhyfyja3j42v/fakeyou_tpk848b5s5zwhnwrph75jhyfyja3j42v.wav"),
@@ -458,11 +477,16 @@ mod tests {
     };
 
     let payload =
-        record_to_payload(status, None);
+        record_to_payload(status, None, MediaDomain::FakeYou);
 
     assert!(payload.maybe_result.is_some());
 
     let result = payload.maybe_result.expect("should have result");
+
+    assert_eq!(
+      Url::parse("https://cdn.fakeyou.com/tts_inference_output/9/9/7/vocodes_997e710c-d733-406c-9b6e-5e1d0c471816.wav").unwrap(),
+      result.media_links.cdn_url
+    );
 
     assert_eq!(
       Some("/tts_inference_output/9/9/7/vocodes_997e710c-d733-406c-9b6e-5e1d0c471816.wav"),

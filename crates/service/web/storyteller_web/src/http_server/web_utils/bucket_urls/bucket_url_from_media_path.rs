@@ -3,6 +3,7 @@ use url::Url;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use errors::AnyhowResult;
 
+#[deprecated(note = "This is tied to GCP and is legacy.")]
 pub fn bucket_url_from_media_path(
   bucket_path: &MediaFileBucketPath,
 ) -> AnyhowResult<Url> {
