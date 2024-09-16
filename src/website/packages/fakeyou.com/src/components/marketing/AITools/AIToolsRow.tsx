@@ -133,7 +133,7 @@ export function AIToolsItem({
           >
             {videoPosterSrc && (
               <div
-                className={`h-100 w-100 ${
+                className={`h-100 w-100 object-fit-cover ${
                   showPoster ? "opacity-100" : "opacity-0"
                 }`}
                 style={{
@@ -145,7 +145,11 @@ export function AIToolsItem({
                 }}
               >
                 <img
-                  src={videoPosterSrc}
+                  {...{
+                    fetchPriority: "high",
+                    src: `${videoPosterSrc}_1x.webp`,
+                    srcSet: `${videoPosterSrc}_1x.webp, ${videoPosterSrc}_2x.webp 2x, ${videoPosterSrc}_3x.webp 3x`,
+                  }}
                   className="h-100 w-100 object-fit-cover"
                   alt={imgAlt}
                 />
