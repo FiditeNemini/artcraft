@@ -12,11 +12,14 @@ interface Props {
 }
 
 function Gravatar(props: Props) {
+  const domain = window.location.hostname.includes("fakeyou.com")
+    ? "fakeyou.com"
+    : "storyteller.ai";
   // TODO: staging domain + local dev support
   let defaultImageUrl =
     props.avatarIndex === undefined
-      ? "https://fakeyou.com/images/avatars/default-pfp.png"
-      : `https://fakeyou.com/images/avatars/2000x2000/${props.avatarIndex}.webp`;
+      ? `https://${domain}/images/avatars/default-pfp.png`
+      : `https://${domain}/images/avatars/2000x2000/${props.avatarIndex}.webp`;
 
   // NB: Gravatar suggests URI encoding these:
   // https://en.gravatar.com/site/implement/images/
