@@ -97,7 +97,7 @@ pub fn title_to_url_slug(title: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-  use filesys::read_lines_iterator::read_lines_iterator;
+  use filesys::file_lines::iterate_file_lines::iterate_file_lines;
   use testing::test_file_path::test_file_path;
 
   use crate::util::title_to_url_slug::title_to_url_slug;
@@ -113,7 +113,7 @@ mod tests {
   //#[test]
   fn many_files() {
     let path = test_file_path("model_weights_titles.txt").unwrap();
-    let lines = read_lines_iterator(&path).unwrap();
+    let lines = iterate_file_lines(&path).unwrap();
     let mut i = 0;
     for line in lines.flatten() {
       if i > 1000 {

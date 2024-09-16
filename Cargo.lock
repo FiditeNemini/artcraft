@@ -2590,6 +2590,7 @@ dependencies = [
  "errors",
  "log",
  "my-workspace-hack",
+ "testing",
  "walkdir",
 ]
 

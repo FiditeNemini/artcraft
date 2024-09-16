@@ -17,17 +17,16 @@ path = "src/lib.rs"
 normal = ["my-workspace-hack"]
 
 [dependencies]
-# Internal
-errors = { path = "../../errors" }
-
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# Internal (keep this to a minimum!)
+errors = { path = "../../errors" }
 
 # External
 # KEEP THIS TO A MINIMUM OR NIL.
 log = "0.4.20"
 walkdir = "2.4.0"
 
-
 [dev-dependencies]
-# None yet
+testing = { path = "../../testing" }
