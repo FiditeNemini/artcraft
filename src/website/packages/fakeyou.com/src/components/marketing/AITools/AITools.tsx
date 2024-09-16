@@ -32,7 +32,7 @@ export default function AITools() {
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
       videoSrc: "/videos/ai-tools/vst_video.mp4",
-      videoPosterSrc: "/images/ai-tools/vst_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/vst",
       imgAlt: "Video Style Transfer",
       badgeContent: {
         type: "new",
@@ -45,7 +45,7 @@ export default function AITools() {
       title: t("productLivePortraitTitle"),
       text: t("productLivePortraitText"),
       videoSrc: "/videos/ai-tools/lp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/lp_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/live_portrait",
       imgAlt: "Live Portrait",
       badgeContent: {
         type: "new",
@@ -58,7 +58,7 @@ export default function AITools() {
       title: t("productLipsyncTitle"),
       text: t("productLipsyncText"),
       videoSrc: "/videos/ai-tools/ls_video.mp4",
-      videoPosterSrc: "/images/ai-tools/ls_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/lipsync",
       imgAlt: "Lipsync",
     },
     {
@@ -66,7 +66,7 @@ export default function AITools() {
       title: "2D Video Compositor",
       text: "Compose videos and images with AI",
       videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
-      videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
+      videoPosterSrc: "/images/ai-tools/2d_vid_com",
       imgAlt: "Video Compositor",
       videoPosition: "top",
     },
@@ -75,7 +75,7 @@ export default function AITools() {
       title: "3D Video Compositor",
       text: "Build videos with AI 3D engine",
       videoSrc: "/videos/ai-tools/vcomp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/3d_vid_com",
       imgAlt: "Video Compositor",
     },
     {
@@ -83,7 +83,7 @@ export default function AITools() {
       title: "Webcam Acting",
       text: "Act as your character through your camera",
       videoSrc: "/videos/ai-tools/ca_video.mp4",
-      videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/webcam_acting",
       imgAlt: "Video Compositor",
     },
     {
