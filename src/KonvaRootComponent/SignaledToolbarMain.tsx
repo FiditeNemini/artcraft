@@ -1,10 +1,12 @@
 import { MouseEventHandler } from "react";
 
-import { ToolbarMain } from "~/components/features";
 import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { dispatchers } from "~/signals/uiEvents/toolbarMain";
-import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+
+import { ToolbarMain } from "~/components/features";
 import { LoadingBar } from "~/components/ui";
+
+import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export const SignaledToolbarMain = () => {
   const loadingBar = toolbarMain.loadingBar.signal.value;
