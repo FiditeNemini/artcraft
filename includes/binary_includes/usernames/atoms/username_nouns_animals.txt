@@ -1,141 +1,36 @@
 -- From: https://github.com/jneidel/animal-names
 -- https://github.com/jneidel/animal-names/blob/master/animals-common.txt
+-- This has been trimmed to remove potentially negative, offensive, uncool, or otherwise bad choices
 
-albatross
 alligator
 alpaca
-anteater
-antelope
-armadillo
-baboon
 badger
-bald eagle
-bat
-bear
-beaver
-bird
-bison
-black bear
-boa
-boa constrictor
-boar
-buffalo
-butterfly
-camel
-capybara
 cat
 cheetah
-chimpanzee
-chipmunk
 cobra
-cow
 coyote
-crab
-crane
 crocodile
-crow
-deer
-dog
-dolphin
-dove
-dragonfly
-duck
+dragon
 eagle
-echidna
-elephant
-elk
-emu
 falcon
-ferret
-fish
-flamingo
-flicker
 fox
-gazelle
 gecko
 giraffe
-gnu
-goat
-goose
-gorilla
-grizzly bear
-groundhog
-gull
-harbor seal
 hawk
 hedgehog
-hen
-hippopotamus
-honey badger
-hyena
-iguana
-insect
-jackal
 jaguar
 kangaroo
-killer whale
 koala
-komodo dragon
-lemming
-lemur
 leopard
 lion
-lizard
 llama
-lynx
-magpie
-manatee
-mockingbird
-mongoose
-monkey
-moose
-mouse
-opossum
-orca
-ostrich
-otter
-owl
-ox
-peacock
-pelican
 penguin
-pigeon
-platypus
-porcupine
-possum
 puma
-python
 rabbit
 raccoon
-rat
-rattlesnake
-rhinoceros
-salmon
-sea lion
-seal
 shark
-sheep
-skunk
-sloth
-snake
-sparrow
-spider
-squirrel
-starfish
-swan
-tapir
-tarantula
 tiger
-tortoise
-turkey
-turtle
-viper
-vulture
-wagtail
 wallaby
-whale
 wolf
 wombat
-woodpecker
-yak
 zebra
