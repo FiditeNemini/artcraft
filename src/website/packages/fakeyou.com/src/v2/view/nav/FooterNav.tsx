@@ -164,8 +164,8 @@ function FooterNav(props: Props) {
                   <img
                     src={domain.logo}
                     alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
-                    height="34"
-                    width="146"
+                    height="36"
+                    width={domain.titlePart === "FakeYou" ? "155" : "222"}
                   />
                 </Link>
                 <div className="d-flex gap-3 mt-1">
