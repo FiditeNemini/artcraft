@@ -1,6 +1,9 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
 
+/// Username may be up to this many characters, but not more.
+pub const USERNAME_MAX_LENGTH: usize = 16;
+
 pub fn validate_username(username: &str) -> Result<(), String> {
   static USERNAME_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[A-Za-z0-9_\-]{3,16}$").expect("should be valid regex")
@@ -10,7 +13,7 @@ pub fn validate_username(username: &str) -> Result<(), String> {
     return Err("username is too short".to_string());
   }
 
-  if username.len() > 16 {
+  if username.len() > USERNAME_MAX_LENGTH {
     return Err("username is too long".to_string());
   }
 

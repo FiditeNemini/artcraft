@@ -19,6 +19,7 @@
 #![allow(non_snake_case)]
 
 pub mod bool_to_str;
+pub mod iterators;
 pub mod lazy_any_option_true;
 pub mod numerics;
 pub mod optional_false_to_none;

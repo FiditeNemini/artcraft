@@ -5136,6 +5136,7 @@ name = "primitives"
 version = "0.0.1"
 dependencies = [
  "my-workspace-hack",
+ "testing",
 ]
 
 [[package]]
