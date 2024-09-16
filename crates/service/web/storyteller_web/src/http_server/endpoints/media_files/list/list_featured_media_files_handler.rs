@@ -1,12 +1,14 @@
 use std::sync::Arc;
-
+use std::time::Instant;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Query;
+use actix_web_lab::__reexports::tracing::info;
 use chrono::{DateTime, Utc};
 use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
+use time::ext::InstantExt;
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -19,6 +21,7 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use enums_public::by_table::media_files::public_media_file_model_type::PublicMediaFileModelType;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::batch_get_media_files_by_tokens;
 use mysql_queries::queries::media_files::list::list_featured_media_files::{FeaturedMediaFileListPage, list_featured_media_files, ListFeaturedMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
@@ -34,9 +37,13 @@ use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categ
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_product_categories::get_scoped_product_categories;
+use crate::http_server::headers::has_debug_header::has_debug_header;
 use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;
+
+// Cloudflare Ray ID HTTP header name
+const CLOUDFLARE_RAY_HEADER: &str = "cf-ray";
 
 #[derive(Deserialize, ToSchema, IntoParams, Hash, Clone, PartialEq, Eq)]
 pub struct ListFeaturedMediaFilesQueryParams {
@@ -221,6 +228,10 @@ pub async fn list_featured_media_files_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListFeaturedMediaFilesError> {
 
+  let cache_start = Instant::now();
+
+  let maybe_cloudflare_header = get_request_header_optional(&http_request, CLOUDFLARE_RAY_HEADER);
+
   let maybe_cached_results  = server_state
       .caches
       .ephemeral
@@ -229,11 +240,16 @@ pub async fn list_featured_media_files_handler(
       .ok()
       .flatten();
 
+  let cache_duration = Instant::now().signed_duration_since(cache_start);
+
+  info!("ListFeaturedMediaFiles: cache read: {:?}, cloudflare ray id: {:?}",
+    cache_duration, maybe_cloudflare_header);
+
   let mut is_from_cache = maybe_cached_results.is_some();
 
   let results_page = match maybe_cached_results {
     Some(cached_results) => cached_results,
-    None => database_lookup(&query, &server_state).await?,
+    None => database_lookup(&query, &server_state, maybe_cloudflare_header.as_deref()).await?,
   };
 
   let cursor_next = if let Some(id) = results_page.last_id {
@@ -354,6 +370,7 @@ pub async fn list_featured_media_files_handler(
 async fn database_lookup(
   query: &ListFeaturedMediaFilesQueryParams,
   server_state: &ServerState,
+  maybe_cloudflare_header: Option<&str>,
 ) -> Result<FeaturedMediaFileListPage, ListFeaturedMediaFilesError> {
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
@@ -382,6 +399,8 @@ async fn database_lookup(
   //  That's just confusing and wastes an extra query.
   const VIEW_AS: ViewAs = ViewAs::AnotherUser;
 
+  let query_start = Instant::now();
+
   let results = list_featured_media_files(ListFeaturedMediaFilesArgs {
     limit,
     maybe_offset: cursor,
@@ -398,12 +417,21 @@ async fn database_lookup(
     ListFeaturedMediaFilesError::ServerError
   })?;
 
+  let query_duration = Instant::now().signed_duration_since(query_start);
+
+  let cache_store_start = Instant::now();
+
   // NB: Fail open.
   let _result = server_state
       .caches
       .ephemeral
       .featured_media_files_sieve
       .store_copy(&query, &results);
+
+  let cache_store_duration = Instant::now().signed_duration_since(cache_store_start);
+
+  info!("ListFeaturedMediaFiles: query: {:?}, cache store: {:?}, results len: {:?}, cloudflare ray id: {:?}",
+    query_duration, cache_store_duration, results.records.len(), maybe_cloudflare_header);
 
   Ok(results)
 }
