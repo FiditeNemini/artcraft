@@ -117,9 +117,11 @@ const ENV_GC_ENABLED_PUBLIC_BUCKET_NAME : &str = "GC_ENABLED_PUBLIC_BUCKET_NAME"
 // Various bucket roots
 const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &str = "AUDIO_UPLOADS_BUCKET_ROOT";
 
+// Report cloudflare trace ID header (CF-Ray) in logs
 // "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 const LOG_FORMAT : &str =
-  "[%{HOSTNAME}e] IP=[%{X-Forwarded-For}i] \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+  "[%{HOSTNAME}e] IP=[%{X-Forwarded-For}i] %{CF-Ray}i \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+// "[%{HOSTNAME}e] IP=[%{X-Forwarded-For}i] \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
