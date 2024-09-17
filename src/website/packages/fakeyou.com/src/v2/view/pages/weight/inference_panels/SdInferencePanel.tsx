@@ -250,11 +250,11 @@ function SdInferencePanel({
       return false;
     }
 
-    if (sessionSubscriptions?.hasPaidFeatures()) {
+    if (!sessionSubscriptions?.hasPaidFeatures()) {
       return false;
     }
 
-    if (sessionSubscriptions?.hasActiveProSubscription()) {
+    if (!sessionSubscriptions?.hasActiveProSubscription()) {
       batchCountSet(1);
     }
 

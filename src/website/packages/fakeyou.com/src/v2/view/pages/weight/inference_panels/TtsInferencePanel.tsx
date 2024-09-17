@@ -125,7 +125,7 @@ export default function TtsInferencePanel({
   }
 
   let audioLimitAlert = <></>;
-  if (isAudioLimitAlertVisible && sessionSubscriptions?.hasPaidFeatures()) {
+  if (isAudioLimitAlertVisible && !sessionSubscriptions?.hasPaidFeatures()) {
     audioLimitAlert = (
       <>
         <div className="alert alert-warning fs-7 mb-0">
