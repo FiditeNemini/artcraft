@@ -42,7 +42,7 @@ export const VideoControls = ({
   }, []);
 
   const wrapperClass = twMerge(
-    "flex w-full h-10 justify-center items-center gap-2",
+    "flex w-full h-10 justify-center items-center gap-2 pl-2",
     className,
   );
 

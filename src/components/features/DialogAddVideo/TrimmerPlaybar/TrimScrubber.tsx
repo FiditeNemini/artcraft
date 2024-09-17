@@ -114,7 +114,7 @@ export const TrimScrubber = ({
         className={twMerge(
           verticalPositionStyles,
           buttonStyles,
-          "flex h-10 w-4 items-center justify-center",
+          "flex h-10 w-4 items-center justify-center shadow-md",
           isScrubbing && "cursor-grabbing",
           className,
         )}

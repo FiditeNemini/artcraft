@@ -16,6 +16,9 @@ import { DialogAddMediaStatuses } from "./enums";
 import { LoadingScreens } from "./LoadingScreens";
 // import { useRenderCounter } from "~/hooks/useRenderCounter";
 
+import { ApiResponse } from "~/Classes/ApiManager/ApiManager";
+import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
+
 const initialState = {
   file: null,
   dialogStatus: DialogAddMediaStatuses.STAGING_FILE,
@@ -23,9 +26,11 @@ const initialState = {
 export const DialogAddVideo = ({
   isOpen,
   closeCallback,
+  onUploadedVideo,
 }: {
   isOpen: boolean;
   closeCallback: () => void;
+  onUploadedVideo: (response: ApiResponse<MediaFile>) => void;
 }) => {
   // useRenderCounter("DialogAddVideo");
 
@@ -44,6 +49,10 @@ export const DialogAddVideo = ({
     if (!isOpen) {
       //this reset the modal on close
       setStates(initialState);
+      trimData.value = {
+        trimStartMs: 0,
+        trimEndMs: 0,
+      };
     }
   }, [isOpen]);
 
@@ -91,6 +100,7 @@ export const DialogAddVideo = ({
                   file={file}
                   trimData={trimData}
                   onStatusChanged={changeDialogStatus}
+                  onUploadedVideo={onUploadedVideo}
                   retry
                 />
               }
@@ -105,6 +115,7 @@ export const DialogAddVideo = ({
                   file={file}
                   trimData={trimData}
                   onStatusChanged={changeDialogStatus}
+                  onUploadedVideo={onUploadedVideo}
                 />
               )}
               {(dialogStatus === DialogAddMediaStatuses.ERROR_FILE_UPLOAD ||

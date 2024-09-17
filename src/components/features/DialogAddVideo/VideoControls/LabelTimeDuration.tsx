@@ -33,16 +33,15 @@ export function LabelTimeDuration({ vidEl }: { vidEl: HTMLVideoElement }) {
 
   return (
     <div className="flex items-center gap-1">
-      <p className="w-12">{`${formatSecondsToHHMMSSCS(currentTime)}`}</p>
+      <p className="w-8">{`${formatSecondsToHHMMSS(currentTime)}`}</p>
       <span>/</span>
-      <p className="w-12">{`${formatSecondsToHHMMSSCS(duration)}`}</p>
+      <p className="w-8">{`${formatSecondsToHHMMSS(duration)}`}</p>
     </div>
   );
 }
-function formatSecondsToHHMMSSCS(seconds: number) {
+function formatSecondsToHHMMSS(seconds: number) {
   //example of the ISO String: 1970-01-01T00:01:40.774Z
   const isoString = new Date(Math.round(seconds * 1000)).toISOString();
-  if (seconds > 3600)
-    return isoString.substring(11, 19) + "." + isoString.substring(20, 22);
-  else return isoString.substring(14, 19) + "." + isoString.substring(20, 22);
+  if (seconds > 3600) return isoString.substring(11, 19);
+  else return isoString.substring(14, 19);
 }

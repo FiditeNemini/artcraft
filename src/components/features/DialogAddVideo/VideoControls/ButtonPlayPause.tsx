@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { faPlay, faPause, faStop } from "@fortawesome/pro-solid-svg-icons";
+import { faPlay, faPause } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button } from "~/components/ui";
 enum PlayPauseStatus {
@@ -23,10 +23,8 @@ export function ButtonPlaypause({ vidEl }: { vidEl: HTMLVideoElement }) {
   const getIcon = () => {
     if (playpause === PlayPauseStatus.PLAYING) {
       return faPause;
-    } else if (playpause === PlayPauseStatus.PAUSED) {
-      return faPlay;
     } else {
-      return faStop;
+      return faPlay;
     }
   };
 

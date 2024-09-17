@@ -7,17 +7,20 @@ import { TrimData } from "./TrimmerPlaybar";
 import { DialogAddMediaStatuses } from "./enums";
 import { Button } from "~/components/ui";
 
-import { dispatchUiEvents } from "~/signals";
+import { ApiResponse } from "~/Classes/ApiManager/ApiManager";
+import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
 
 export const ButtonSubmitAdd = ({
   file,
   trimData,
   onStatusChanged,
+  onUploadedVideo,
   retry,
 }: {
   file: File | null;
   trimData: Signal<TrimData | undefined>;
   onStatusChanged: (newStatus: DialogAddMediaStatuses) => void;
+  onUploadedVideo: (response: ApiResponse<MediaFile>) => void;
   retry?: boolean;
 }) => {
   const handleAdd = useCallback(async () => {
@@ -61,9 +64,7 @@ export const ButtonSubmitAdd = ({
       // return the good result
       onStatusChanged(DialogAddMediaStatuses.FILE_RECORD_RECEIVED);
       console.log("Request Video Response >>", recordRequestResponse);
-      dispatchUiEvents.addVideoToEngine({
-        url: recordRequestResponse.data.public_bucket_url,
-      });
+      onUploadedVideo(recordRequestResponse);
     }
   }, [file]);
 

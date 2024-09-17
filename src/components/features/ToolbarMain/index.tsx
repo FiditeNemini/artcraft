@@ -1,4 +1,6 @@
-import { MouseEventHandler, useCallback, useState } from "react";
+import { Fragment, MouseEventHandler } from "react";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+
 import { useSignalEffect } from "@preact/signals-react/runtime";
 import {
   faArrowRotateLeft,
@@ -14,13 +16,10 @@ import {
   faLocationArrow,
   faSquareDashed,
 } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { ToolbarButton } from "../ToolbarButton";
 import { twMerge } from "tailwind-merge";
-
-import { DialogAddImage } from "../DialogAddImage";
-import { DialogAddVideo } from "../DialogAddVideo";
-import { DialogAiStylize } from "../DialogAiStylize";
 
 // style constants
 import { paperWrapperStyles } from "~/components/styles";
@@ -30,16 +29,12 @@ import { layout } from "~/signals";
 
 import { ToolbarMainButtonNames } from "./enum";
 
-const initialState = {
-  isAddSubmenuOpen: false,
-  isAddVideoOpen: false,
-  isAddImageOpen: false,
-  isAiStylizeOpen: false,
-};
-
 export const ToolbarMain = ({
   disabled = false,
   buttonProps,
+  openAddImage,
+  openAddVideo,
+  openAIStylize,
 }: {
   disabled?: boolean;
   buttonProps: {
@@ -49,6 +44,9 @@ export const ToolbarMain = ({
       onClick?: MouseEventHandler<HTMLButtonElement>;
     };
   };
+  openAddImage: () => void;
+  openAddVideo: () => void;
+  openAIStylize: () => void;
 }) => {
   //// for testing
   const {
@@ -61,51 +59,10 @@ export const ToolbarMain = ({
     );
   });
   /// end for testing
-  const [state, setState] = useState(initialState);
-
-  const toolbarCallbackRef = useCallback((node: HTMLDivElement) => {
-    function handleClickOutside(e: MouseEvent) {
-      if (!node.contains(e.target as Node)) {
-        setState((curr) => ({ ...curr, isUploadSubmenuOpen: false }));
-      }
-    }
-    if (node) {
-      window.addEventListener("click", handleClickOutside);
-    }
-  }, []);
-
-  const closeAll = useCallback(() => {
-    setState(initialState);
-  }, []);
-  const openAddSubmenu = useCallback(() => {
-    setState({
-      ...initialState, //this closes all other opened things
-      isAddSubmenuOpen: true,
-    });
-  }, []);
-  const openAddImage = useCallback(() => {
-    setState({
-      ...initialState, //this closes all other opened things
-      isAddImageOpen: true,
-    });
-  }, []);
-  const openAddVideo = useCallback(() => {
-    setState({
-      ...initialState, //this closes all other opened things
-      isAddVideoOpen: true,
-    });
-  }, []);
-  const openAIStylize = useCallback(() => {
-    setState({
-      ...initialState, //this closes all other opened things
-      isAiStylizeOpen: true,
-    });
-  }, []);
 
   return (
     <>
       <div
-        ref={toolbarCallbackRef}
         className={twMerge(
           "m-auto flex w-fit items-center divide-x divide-ui-border",
           paperWrapperStyles,
@@ -128,28 +85,43 @@ export const ToolbarMain = ({
             buttonProps={buttonProps.SELECT_AREA}
             tooltip="Select Area"
           />
-          <div className="relative">
-            <ToolbarButton
-              icon={faFilePlus}
-              onClick={openAddSubmenu}
-              tooltip={state.isAddSubmenuOpen ? undefined : "Add..."}
-            />
-            {state.isAddSubmenuOpen && (
-              <div
+          <Popover className="relative">
+            <PopoverButton as={Fragment}>
+              <button
+                data-tooltip="Add..."
                 className={twMerge(
-                  "absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2",
-                  paperWrapperStyles,
+                  "size-10 rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
+                  "before:absolute before:h-0 before:w-0",
+                  "before:bottom-full before:left-1/2 before:z-50 before:mb-[1px] before:-translate-x-1/2",
+                  "before:border-l-8 before:border-l-transparent",
+                  "before:border-r-8 before:border-r-transparent",
+                  "before:border-t-8 before:border-t-white",
+                  "after:absolute after:bottom-full after:left-1/2 after:z-40 after:-translate-x-1/2",
+                  "after:text-nowrap after:text-black after:content-[attr(data-tooltip)]",
+                  "after:mb-2 after:rounded-xl after:border after:border-ui-border after:bg-ui-panel after:px-2 after:py-1 after:shadow-xl",
+                  "before:hidden after:hidden hover:before:block hover:after:block",
+                  "relative",
                 )}
               >
-                <ToolbarButton icon={faImage} onClick={openAddImage}>
-                  Add Image
-                </ToolbarButton>
-                <ToolbarButton icon={faFilm} onClick={openAddVideo}>
-                  Add Video
-                </ToolbarButton>
-              </div>
-            )}
-          </div>
+                <FontAwesomeIcon icon={faFilePlus} />
+              </button>
+            </PopoverButton>
+            <PopoverPanel
+              anchor="bottom"
+              className={twMerge(
+                // "absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2",
+                "flex flex-col [--anchor-gap:16px]",
+                paperWrapperStyles,
+              )}
+            >
+              <ToolbarButton icon={faImage} onClick={openAddImage}>
+                Add Image
+              </ToolbarButton>
+              <ToolbarButton icon={faFilm} onClick={openAddVideo}>
+                Add Video
+              </ToolbarButton>
+            </PopoverPanel>
+          </Popover>
           <ToolbarButton
             icon={faCameraRotate}
             buttonProps={buttonProps.CHANGE_CAMERA_ORIENTATION}
@@ -185,19 +157,6 @@ export const ToolbarMain = ({
           />
         </div>
       </div>
-
-      <DialogAddImage
-        isOpen={state.isAddImageOpen ?? false}
-        closeCallback={closeAll}
-      />
-      <DialogAddVideo
-        isOpen={state.isAddVideoOpen ?? false}
-        closeCallback={closeAll}
-      />
-      <DialogAiStylize
-        isOpen={state.isAiStylizeOpen ?? false}
-        closeCallback={closeAll}
-      />
     </>
   );
 };
