@@ -107,8 +107,15 @@ export const DialogAddVideo = ({
             />
 
             <div className="flex w-full justify-center gap-4">
-              <Button onClick={handleClose} variant="secondary">
-                Cancel
+              <Button
+                onClick={handleClose}
+                variant="secondary"
+                disabled={
+                  dialogStatus === DialogAddMediaStatuses.FILE_UPLOADING ||
+                  dialogStatus === DialogAddMediaStatuses.FILE_RECORD_REQUESTING
+                }
+              >
+                Close
               </Button>
               {dialogStatus === DialogAddMediaStatuses.STAGING_FILE && (
                 <ButtonSubmitAdd

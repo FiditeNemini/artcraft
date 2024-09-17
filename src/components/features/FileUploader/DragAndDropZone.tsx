@@ -25,7 +25,7 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
   // const fileName = file && getFileName(file).toUpperCase();
   const wrapperClassName = twMerge(
     "group cursor-pointer p-3 bg-gray-100",
-    !file && "aspect-video flex flex-col items-center justify-center gap-6",
+    !file && "flex flex-col items-center justify-center gap-6",
     file && "flex items-center gap-3.5",
     // "rounded-lg border-2 border-dashed border-ui-border",
   );
