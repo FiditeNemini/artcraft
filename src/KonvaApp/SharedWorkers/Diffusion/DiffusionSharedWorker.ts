@@ -88,6 +88,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
     this.zipFileWriter = new BlobWriter(this.imageType);
     this.zipWriter = new ZipWriter(this.zipFileWriter);
     this.totalFrames = 0;
+    this.blobs = [];
   }
   // Data here will be shipped off for progressive loading
   async workFunction(
