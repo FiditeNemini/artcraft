@@ -17,17 +17,17 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-use std::sync::Arc;
 use std::sync::atomic::AtomicUsize;
+use std::sync::Arc;
 use std::time::Duration;
 
 use actix::Actor;
 use actix_multipart::form::MultipartFormConfig;
-use actix_web::{App, HttpServer, middleware, web};
 use actix_web::middleware::{DefaultHeaders, Logger};
+use actix_web::{middleware, web, App, HttpServer};
 use anyhow::anyhow;
-use elasticsearch::Elasticsearch;
 use elasticsearch::http::transport::Transport;
+use elasticsearch::Elasticsearch;
 use futures::Future;
 use log::info;
 use r2d2_redis::r2d2;
@@ -74,6 +74,7 @@ use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurge
 use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInternalSubscriptionProductLookupImpl;
 use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
 use crate::configs::app_startup::redis_rate_limiters::configure_redis_rate_limiters;
+use crate::configs::connect_to_database::connect_to_database;
 use crate::configs::static_api_tokens::StaticApiTokenSet;
 use crate::http_server::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use crate::http_server::endpoints::workflows::enqueue::progress_tracker_server;
@@ -145,15 +146,7 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Connecting to database...");
 
-  let db_connection_string =
-    easyenv::get_env_string_or_default(
-      "MYSQL_URL",
-      DEFAULT_MYSQL_CONNECTION_STRING);
-
-  let pool = MySqlPoolOptions::new()
-    .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 5)?)
-    .connect(&db_connection_string)
-    .await?;
+  let pool = connect_to_database().await?;
 
   let firehose_publisher = FirehosePublisher {
     mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
@@ -174,7 +167,6 @@ async fn main() -> AnyhowResult<()> {
     redis_pool.clone(),
     easyenv::get_env_num("REDIS_CACHE_TTL_SECONDS", 60)?,
   );
-
 
   info!("Connecting to elasticsearch...");
 

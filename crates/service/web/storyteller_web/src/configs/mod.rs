@@ -1,4 +1,5 @@
 pub mod app_startup;
+pub mod connect_to_database;
 pub mod plans;
 pub mod reserved_names;
 pub mod static_api_tokens;
