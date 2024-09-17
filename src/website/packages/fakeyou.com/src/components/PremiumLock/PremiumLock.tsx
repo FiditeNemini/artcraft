@@ -2,16 +2,15 @@ import { Button, Panel } from "components/common";
 import { Link } from "react-router-dom";
 import React from "react";
 import "./PremiumLock.scss";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUp } from "@fortawesome/pro-solid-svg-icons";
+import { useSession } from "hooks";
 
 interface PremiumLockProps {
   requiredPlan?: "any" | "plus" | "pro" | "elite";
   large?: boolean;
   children: React.ReactNode;
   session?: any;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   showCtaButton?: boolean;
   lockPosition?: "top" | "center";
   plural?: boolean;
@@ -20,31 +19,31 @@ interface PremiumLockProps {
 export default function PremiumLock({
   requiredPlan = "plus",
   children,
-  sessionSubscriptionsWrapper,
   showCtaButton = false,
   large = false,
   lockPosition = "center",
   plural = false,
 }: PremiumLockProps) {
+  const { sessionSubscriptions } = useSession();
   const hasAccess = () => {
     switch (requiredPlan) {
       case "any":
-        return sessionSubscriptionsWrapper.hasPaidFeatures();
+        return sessionSubscriptions?.hasPaidFeatures();
       case "plus":
         return (
-          sessionSubscriptionsWrapper.hasActivePlusSubscription() ||
-          sessionSubscriptionsWrapper.hasActiveProSubscription() ||
-          sessionSubscriptionsWrapper.hasActiveEliteSubscription()
+          sessionSubscriptions?.hasActivePlusSubscription() ||
+          sessionSubscriptions?.hasActiveProSubscription() ||
+          sessionSubscriptions?.hasActiveEliteSubscription()
         );
       case "pro":
         return (
-          sessionSubscriptionsWrapper.hasActiveProSubscription() ||
-          sessionSubscriptionsWrapper.hasActiveEliteSubscription()
+          sessionSubscriptions?.hasActiveProSubscription() ||
+          sessionSubscriptions?.hasActiveEliteSubscription()
         );
       case "elite":
-        return sessionSubscriptionsWrapper.hasActiveEliteSubscription();
+        return sessionSubscriptions?.hasActiveEliteSubscription();
       default:
-        return sessionSubscriptionsWrapper.hasPaidFeatures();
+        return sessionSubscriptions?.hasPaidFeatures();
     }
   };
 

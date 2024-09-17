@@ -1,18 +1,10 @@
 import React from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { Link } from "react-router-dom";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-function ChannelsPage(props: Props) {
+function ChannelsPage() {
   usePrefixedDocumentTitle("Channels");
   PosthogClient.recordPageview();
 

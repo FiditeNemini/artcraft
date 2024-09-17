@@ -28,7 +28,6 @@ export default function FaceAnimatorInput({
   t,
   removeWatermark,
   removeWatermarkChange,
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper,
 }: FaceAnimatorSlide) {
   return (
     <animated.div {...{ className: "lipsync-editor row", style }}>

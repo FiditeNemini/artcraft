@@ -227,11 +227,7 @@ export default function VoiceDesignerUseVoicePage(
                 Session TTS Results
               </h4>
               <div className="d-flex flex-column gap-3 session-tts-section">
-                <SessionVoiceDesignerInferenceResultsList
-                  sessionSubscriptionsWrapper={
-                    props.sessionSubscriptionsWrapper
-                  }
-                />
+                <SessionVoiceDesignerInferenceResultsList />
               </div>
             </div>
           </div>

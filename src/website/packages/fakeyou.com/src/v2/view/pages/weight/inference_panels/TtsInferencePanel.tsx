@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { faDeleteLeft } from "@fortawesome/pro-solid-svg-icons";
 import Panel from "components/common/Panel/Panel";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
 // import InferenceJobsList from "components/layout/InferenceJobsList";
@@ -19,19 +18,18 @@ import {
 import { Analytics } from "common/Analytics";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 
 interface TtsInferencePanelProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   voiceToken: string;
   // enqueueTtsJob: (jobToken: string) => void;
 }
 
 export default function TtsInferencePanel({
-  sessionSubscriptionsWrapper,
   voiceToken,
 }: TtsInferencePanelProps) {
   const { enqueueInferenceJob, inferenceJobsByCategory } = useInferenceJobs();
+  const { sessionSubscriptions } = useSession();
   const ttsJobs = inferenceJobsByCategory.get(
     FrontendInferenceJobType.TextToSpeech
   );
@@ -127,10 +125,7 @@ export default function TtsInferencePanel({
   }
 
   let audioLimitAlert = <></>;
-  if (
-    isAudioLimitAlertVisible &&
-    !sessionSubscriptionsWrapper.hasPaidFeatures()
-  ) {
+  if (isAudioLimitAlertVisible && sessionSubscriptions?.hasPaidFeatures()) {
     audioLimitAlert = (
       <>
         <div className="alert alert-warning fs-7 mb-0">
@@ -194,9 +189,7 @@ export default function TtsInferencePanel({
           <Accordion>
             <Accordion.Item title="Session TTS Results" defaultOpen={true}>
               <div className="p-3">
-                <SessionTtsInferenceResultList
-                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                />
+                <SessionTtsInferenceResultList />
               </div>
             </Accordion.Item>
           </Accordion>

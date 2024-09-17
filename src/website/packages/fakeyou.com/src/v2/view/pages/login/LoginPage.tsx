@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import {
   CreateSession,
@@ -16,9 +15,9 @@ import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 import { InjectScript } from "common/InjectScript";
+import { useSession } from "hooks";
 
 interface Props {
-  sessionWrapper: SessionWrapper;
   querySessionAction: () => void;
   querySessionSubscriptionsAction: () => void;
 }
@@ -26,6 +25,7 @@ interface Props {
 function LoginPage(props: Props) {
   let history = useHistory();
   const domain = useDomainConfig();
+  const { sessionWrapper } = useSession();
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,7 +36,7 @@ function LoginPage(props: Props) {
   PosthogClient.recordPageview();
   InjectScript.addGoogleAuthLogin();
 
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     history.push("/");
   }
 

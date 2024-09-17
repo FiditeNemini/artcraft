@@ -866,9 +866,7 @@ function TtsModelViewPage(props: Props) {
             <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
             Session TTS Results
           </h4>
-          <SessionTtsInferenceResultList
-            sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-          />
+          <SessionTtsInferenceResultList />
         </div>
       </div>
     );

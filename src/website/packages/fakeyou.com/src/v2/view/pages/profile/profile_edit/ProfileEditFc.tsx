@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { Link, useHistory } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { useParams } from "react-router-dom";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
@@ -19,14 +18,11 @@ import {
   faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../../../_common/BackLink";
+import { useSession } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
-
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
 
 interface ProfileResponsePayload {
   success: boolean;
@@ -59,13 +55,15 @@ interface UserPayload {
   preferred_w2l_result_visibility: string;
 }
 
-function ProfileEditFc(props: Props) {
+function ProfileEditFc() {
   const { username } = useParams() as { username: string };
   PosthogClient.recordPageview();
 
   const userProfilePage = `/profile/${username}`;
 
   const history = useHistory();
+
+  const { sessionWrapper } = useSession();
 
   // From endpoint
   const [userData, setUserData] = useState<UserPayload | undefined>(undefined);
@@ -95,8 +93,8 @@ function ProfileEditFc(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const profileResponse: ProfileResponsePayload = res;
 
         if (profileResponse === undefined || !profileResponse.success) {
@@ -122,7 +120,7 @@ function ProfileEditFc(props: Props) {
             DEFAULT_VISIBILITY
         );
       })
-      .catch((e) => {
+      .catch(e => {
         //this.props.onSpeakErrorCallback();
       });
   }, [username]); // NB: Empty array dependency sets to run ONLY on mount
@@ -197,13 +195,13 @@ function ProfileEditFc(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
           history.push(userProfilePage);
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };
@@ -213,7 +211,7 @@ function ProfileEditFc(props: Props) {
     return <span />;
   }
 
-  if (!!userData && !props.sessionWrapper.canEditUserProfile(username)) {
+  if (!!userData && sessionWrapper.canEditUserProfile(username)) {
     // Loading and we don't have access.
     history.push(userProfilePage);
   }

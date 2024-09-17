@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -59,11 +58,7 @@ interface TargetUserInfo {
   default_avatar_color_index: number;
 }
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function FirehoseEventListPage(props: Props) {
+function FirehoseEventListPage() {
   const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
     []
   );
@@ -80,8 +75,8 @@ function FirehoseEventListPage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const firehoseResponse: FirehoseEventListResponsePayload = res;
         if (!firehoseResponse.success) {
           return;
@@ -89,7 +84,7 @@ function FirehoseEventListPage(props: Props) {
 
         setFirehoseEvents(firehoseResponse.events);
       })
-      .catch((e) => {
+      .catch(e => {
         // ignored
       });
   };
@@ -114,7 +109,7 @@ function FirehoseEventListPage(props: Props) {
 
   let eventItems: Array<JSX.Element> = [];
 
-  firehoseEvents.slice(0, 16).forEach((event) => {
+  firehoseEvents.slice(0, 16).forEach(event => {
     let inner = <span />;
     let userLink = <span>Anonymous user</span>;
     let gravatar = (

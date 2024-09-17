@@ -161,7 +161,6 @@ class PageContainer extends React.Component<
           <ScrollToTop />
           <div id="wrapper" className="no-padding">
             <TopNav
-              sessionWrapper={this.props.sessionWrapper}
               logoutHandler={this.logout}
               querySessionCallback={this.props.querySessionAction}
               querySessionSubscriptionsCallback={
@@ -169,47 +168,29 @@ class PageContainer extends React.Component<
               }
             />
 
-            <ProfileSidePanel
-              sessionWrapper={this.props.sessionWrapper}
-              sessionSubscriptionsWrapper={
-                this.props.sessionSubscriptionsWrapper
-              }
-            />
+            <ProfileSidePanel />
             <Switch>
               <Route path="/comp-lib">
                 <ComponentsLibrary sessionWrapper={this.props.sessionWrapper} />
               </Route>
               <Route path="/firehose">
-                <FirehoseEventListPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <FirehoseEventListPage />
               </Route>
 
               <Route path="/news">
-                <NewsPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <NewsPage />
               </Route>
 
               <Route path="/channels">
-                <ChannelsPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <ChannelsPage />
               </Route>
 
               <Route path="/leaderboard">
-                <LeaderboardPage sessionWrapper={this.props.sessionWrapper} />
+                <LeaderboardPage />
               </Route>
 
               <Route path="/login">
                 <LoginPage
-                  sessionWrapper={this.props.sessionWrapper}
                   querySessionAction={this.props.querySessionAction}
                   querySessionSubscriptionsAction={
                     this.props.querySessionSubscriptionsAction
@@ -219,7 +200,6 @@ class PageContainer extends React.Component<
 
               <Route path="/password-reset/verify">
                 <PasswordResetVerificationPage
-                  sessionWrapper={this.props.sessionWrapper}
                   querySessionAction={this.props.querySessionAction}
                   querySessionSubscriptionsAction={
                     this.props.querySessionSubscriptionsAction
@@ -228,72 +208,42 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/password-reset">
-                <PasswordResetEmailPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <PasswordResetEmailPage />
               </Route>
 
               <Route path="/profile/:username/edit">
-                <ProfileEditFc sessionWrapper={this.props.sessionWrapper} />
+                <ProfileEditFc />
               </Route>
 
               <Route path="/profile/:username/ban">
                 <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
               </Route>
 
-              {/* Old Profile Page */}
-              {/* <Route path="/profile/:username">
-                    <NewProfilePage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  </Route> */}
-
               <Route path="/profile/:username">
-                <ProfilePageV3
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <ProfilePageV3 />
               </Route>
 
               <Route path="/signup">
                 <SignupPage
                   querySessionCallback={() => {}}
-                  sessionWrapper={this.props.sessionWrapper}
                   querySessionAction={this.props.querySessionAction}
                 />
               </Route>
 
               <Route path="/pricing" exact={true}>
-                <PricingPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <PricingPage />
               </Route>
 
               <Route path="/checkout_success" exact={true}>
-                <CheckoutSuccessPage
-                  querySessionCallback={() => {}}
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <CheckoutSuccessPage />
               </Route>
+
               <Route path="/checkout_cancel" exact={true}>
-                <CheckoutCancelPage
-                  querySessionCallback={() => {}}
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <CheckoutCancelPage />
               </Route>
+
               <Route path="/portal_success" exact={true}>
-                <PortalSuccessPage
-                  querySessionCallback={() => {}}
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <PortalSuccessPage />
               </Route>
 
               <Route path="/media/rename/:media_file_token">
@@ -303,14 +253,6 @@ class PageContainer extends React.Component<
               <Route path="/media/:token">
                 <MediaPageSwitch />
               </Route>
-
-              {/*                <Route path="/media/:token">
-                    <MediaPage />
-                  </Route>*/}
-
-              {/*                 <Route path="/dev-media/:token">
-                    <DevMediaPage />
-                  </Route>*/}
 
               <Route path="/edit-cover-image/:token">
                 <EditCoverImage />
@@ -327,12 +269,7 @@ class PageContainer extends React.Component<
               <Route
                 path="/weight/:weight_token/:maybe_url_slug?"
                 render={props => (
-                  <WeightPage
-                    key={props.match.params.weight_token}
-                    sessionSubscriptionsWrapper={
-                      this.props.sessionSubscriptionsWrapper
-                    }
-                  />
+                  <WeightPage key={props.match.params.weight_token} />
                 )}
               />
 
@@ -555,33 +492,11 @@ class PageContainer extends React.Component<
               <Route path="/voice-conversion/:token">
                 <VcModelViewPage
                   sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
                   setMaybeSelectedInferenceJob={
                     this.props.maybeSelectedVoiceConversionModel
                   }
                 />
               </Route>
-
-              {/* <Route path="/voice-conversion">
-                    <VcModelListPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                      voiceConversionModels={this.props.voiceConversionModels}
-                      setVoiceConversionModels={
-                        this.props.setVoiceConversionModels
-                      }
-                      maybeSelectedVoiceConversionModel={
-                        this.props.maybeSelectedVoiceConversionModel
-                      }
-                      setMaybeSelectedVoiceConversionModel={
-                        this.props.setMaybeSelectedVoiceConversionModel
-                      }
-                    />
-                  </Route> */}
 
               <Route path="/dashboard">
                 <DashboardPage sessionWrapper={this.props.sessionWrapper} />
@@ -596,28 +511,12 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/face-animator/:mediaToken?">
-                <FaceAnimator
-                  {...{
-                    sessionSubscriptionsWrapper:
-                      this.props.sessionSubscriptionsWrapper,
-                  }}
-                />
+                <FaceAnimator />
               </Route>
 
               <Route path="/fbx-to-gltf/:mediaToken?">
                 <FbxToGltfPage />
               </Route>
-
-              {/*
-                  // <Route path="/studio/:mediaToken?">
-                  //   <StorytellerStudioListPage
-                  //     sessionWrapper={this.props.sessionWrapper}
-                  //     sessionSubscriptionsWrapper={
-                  //       this.props.sessionSubscriptionsWrapper
-                  //     }
-                  //   />
-                  // </Route>
-                    */}
 
               <Route path="/commissions">
                 <CommunityCommissionsPage />
@@ -653,20 +552,12 @@ class PageContainer extends React.Component<
 
               {/* NEW TTS PAGE */}
               <Route exact path="/tts">
-                <NewTTS
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <NewTTS />
               </Route>
 
               {/* NEW VC PAGE */}
               <Route exact path="/voice-conversion">
-                <NewVC
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <NewVC />
               </Route>
 
               {/* NEW LIVE PORTRAIT PAGE */}
@@ -781,110 +672,6 @@ class PageContainer extends React.Component<
                 <NewTrumpTTS />
               </Route>
 
-              {/*              <Route path="/character/donald-trump">
-                <TrumpTtsPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                  textBuffer={this.props.textBuffer}
-                  setTextBuffer={this.props.setTextBuffer}
-                  clearTextBuffer={this.props.clearTextBuffer}
-                  ttsModels={this.props.ttsModels}
-                  setTtsModels={this.props.setTtsModels}
-                  allTtsCategories={this.props.allTtsCategories}
-                  setAllTtsCategories={this.props.setAllTtsCategories}
-                  allTtsCategoriesByTokenMap={
-                    this.props.allTtsCategoriesByTokenMap
-                  }
-                  computedTtsCategoryAssignments={
-                    this.props.computedTtsCategoryAssignments
-                  }
-                  setComputedTtsCategoryAssignments={
-                    this.props.setComputedTtsCategoryAssignments
-                  }
-                  allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
-                  dropdownCategories={this.props.dropdownCategories}
-                  setDropdownCategories={this.props.setDropdownCategories}
-                  selectedCategories={this.props.selectedCategories}
-                  setSelectedCategories={this.props.setSelectedCategories}
-                  maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
-                  selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
-                  setSelectedTtsLanguageScope={
-                    this.props.setSelectedTtsLanguageScope
-                  }
-                />
-              </Route>*/}
-
-              {/* OLD TTS PAGE */}
-              {/* <Route path="/tts" exact={true}>
-                    <TtsModelListPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                      isShowingVocodesNotice={this.props.isShowingVocodesNotice}
-                      clearVocodesNotice={this.props.clearVocodesNotice}
-                      isShowingLanguageNotice={
-                        this.props.isShowingLangaugeNotice
-                      }
-                      clearLanguageNotice={this.props.clearLanguageNotice}
-                      displayLanguage={this.props.displayLanguage}
-                      isShowingTwitchTtsNotice={
-                        this.props.isShowingTwitchTtsNotice
-                      }
-                      clearTwitchTtsNotice={this.props.clearTwitchTtsNotice}
-                      isShowingPleaseFollowNotice={
-                        this.props.isShowingPleaseFollowNotice
-                      }
-                      clearPleaseFollowNotice={
-                        this.props.clearPleaseFollowNotice
-                      }
-                      isShowingBootstrapLanguageNotice={
-                        this.props.isShowingBootstrapLanguageNotice
-                      }
-                      clearBootstrapLanguageNotice={
-                        this.props.clearBootstrapLanguageNotice
-                      }
-                      textBuffer={this.props.textBuffer}
-                      setTextBuffer={this.props.setTextBuffer}
-                      clearTextBuffer={this.props.clearTextBuffer}
-                      ttsModels={this.props.ttsModels}
-                      setTtsModels={this.props.setTtsModels}
-                      allTtsCategories={this.props.allTtsCategories}
-                      setAllTtsCategories={this.props.setAllTtsCategories}
-                      allTtsCategoriesByTokenMap={
-                        this.props.allTtsCategoriesByTokenMap
-                      }
-                      computedTtsCategoryAssignments={
-                        this.props.computedTtsCategoryAssignments
-                      }
-                      setComputedTtsCategoryAssignments={
-                        this.props.setComputedTtsCategoryAssignments
-                      }
-                      allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
-                      ttsModelsByCategoryToken={
-                        this.props.ttsModelsByCategoryToken
-                      }
-                      dropdownCategories={this.props.dropdownCategories}
-                      setDropdownCategories={this.props.setDropdownCategories}
-                      selectedCategories={this.props.selectedCategories}
-                      setSelectedCategories={this.props.setSelectedCategories}
-                      maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                      setMaybeSelectedTtsModel={
-                        this.props.setMaybeSelectedTtsModel
-                      }
-                      selectedTtsLanguageScope={
-                        this.props.selectedTtsLanguageScope
-                      }
-                      setSelectedTtsLanguageScope={
-                        this.props.setSelectedTtsLanguageScope
-                      }
-                    />
-                  </Route> */}
-
               <Route path="/beta/webcam-acting/form">
                 <BetaWebcamActingForm />
               </Route>
@@ -967,23 +754,6 @@ class PageContainer extends React.Component<
               <Route path="/waitlist-next-steps">
                 <WaitlistNextStepsPage />
               </Route>
-
-              {/* <Route path="/ai-live-portrait">
-                    <AIFaceMirror
-                      {...{
-                        sessionSubscriptionsWrapper:
-                          this.props.sessionSubscriptionsWrapper,
-                      }}
-                    />
-                  </Route> */}
-
-              {/*
-                  // <Route path="/engine-compositor">
-                  //   <EngineCompositor
-                  //     sessionWrapper={this.props.sessionWrapper}
-                  //   />
-                  // </Route>
-                    */}
 
               <Route path="/" exact={true}>
                 <LandingPage

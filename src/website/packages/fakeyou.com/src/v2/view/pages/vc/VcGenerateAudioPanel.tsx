@@ -8,7 +8,6 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import UploadComponent from "./vc_model_list/components/UploadComponent";
 import {
   EnqueueVoiceConversion,
@@ -31,7 +30,6 @@ import { useInferenceJobs } from "hooks";
 
 interface VcGenerateAudioPanelProps {
   sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   voiceConversionModels: Array<VoiceConversionModelListItem>;
   setVoiceConversionModels: (
@@ -386,9 +384,7 @@ export default function VcGenerateAudioPanel(props: VcGenerateAudioPanelProps) {
               Session V2V Results
             </h4>
             <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
-              <SessionVoiceConversionResultsList
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-              />
+              <SessionVoiceConversionResultsList />
             </div>
           </div>
         </div>

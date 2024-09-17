@@ -1027,7 +1027,6 @@ export default function LivePortrait({
 
                   <div className="d-flex flex-column gap-2">
                     <PremiumLock
-                      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                       lockPosition="top"
                       requiredPlan="pro"
                       plural={true}

@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Redirect, useLocation } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { useParams } from "react-router-dom";
 import {
   GetUserByUsername,
@@ -33,12 +31,7 @@ import VideosTab from "./tabs/VideosTab";
 import AudiosTab from "./tabs/AudiosTab";
 import UserProfileInfo from "components/layout/ProfileSidePanel/UserProfileInfo";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-function ProfilePageV3(this: any, props: Props) {
+function ProfilePageV3() {
   const { username }: { username: string } = useParams();
   const { pathname } = useLocation();
   PosthogClient.recordPageview();
@@ -148,10 +141,7 @@ function ProfilePageV3(this: any, props: Props) {
         <div className="flex-grow-1">
           <Panel clear={true} className="d-lg-none mb-4">
             <div className="profile-sidebar-panel py-3">
-              <UserProfileInfo
-                sessionWrapper={props.sessionWrapper}
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-              />
+              <UserProfileInfo />
             </div>
           </Panel>
 

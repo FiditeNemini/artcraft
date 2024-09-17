@@ -38,7 +38,6 @@ import { AITools } from "components/marketing";
 
 interface Props {
   sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   voiceConversionModels: Array<VoiceConversionModelListItem>;
   setVoiceConversionModels: (
@@ -501,11 +500,7 @@ function VcModelListPage(props: Props) {
                       {t("vcResultsTitle")}
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
-                      <SessionVoiceConversionResultsList
-                        sessionSubscriptionsWrapper={
-                          props.sessionSubscriptionsWrapper
-                        }
-                      />
+                      <SessionVoiceConversionResultsList />
                     </div>
                   </div>
                 </div>

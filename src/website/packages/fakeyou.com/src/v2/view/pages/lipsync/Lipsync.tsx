@@ -677,7 +677,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
 
                   <div className="d-flex flex-column gap-2 mb-4">
                     <PremiumLock
-                      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                       lockPosition="top"
                       requiredPlan="pro"
                       plural={true}

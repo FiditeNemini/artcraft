@@ -591,11 +591,7 @@ function TtsModelListPage(props: Props) {
                       {t("ttsResultsTitle")}
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
-                      <SessionTtsInferenceResultList
-                        sessionSubscriptionsWrapper={
-                          props.sessionSubscriptionsWrapper
-                        }
-                      />
+                      <SessionTtsInferenceResultList />
                     </div>
                   </div>
                 </div>

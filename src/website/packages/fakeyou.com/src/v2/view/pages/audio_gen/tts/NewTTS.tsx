@@ -44,11 +44,7 @@ import ExploreVoices from "../ExploreVoices";
 import { featuredTtsVoiceTokens } from "./FeaturedTTSVoiceTokens";
 import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
-interface Props {
-  sessionSubscriptionsWrapper: any;
-}
-
-export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
+export default function NewTTS() {
   const { enqueueInferenceJob } = useInferenceJobs();
   const { modalState, open, close } = useModal();
   const { loggedIn, loggedInOrModal } = useSession();
@@ -296,11 +292,7 @@ export default function NewTTS({ sessionSubscriptionsWrapper }: Props) {
                   <div className="d-flex flex-column">
                     <Label label={t("label.output")} />
                     <div className="d-flex flex-column session-tts-section">
-                      <SessionTtsInferenceResultList
-                        sessionSubscriptionsWrapper={
-                          sessionSubscriptionsWrapper
-                        }
-                      />
+                      <SessionTtsInferenceResultList />
                     </div>
                   </div>
                 </div>

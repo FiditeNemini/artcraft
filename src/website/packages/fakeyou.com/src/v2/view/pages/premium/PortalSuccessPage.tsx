@@ -1,15 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  querySessionCallback: () => void;
-}
-
-function PortalSuccessPage(props: Props) {
+function PortalSuccessPage() {
   PosthogClient.recordPageview();
 
   return (

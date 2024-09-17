@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useHistory } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import Container from "components/common/Container";
@@ -9,11 +8,12 @@ import { Button } from "components/common";
 import Panel from "components/common/Panel";
 import { faLock } from "@fortawesome/pro-solid-svg-icons";
 import {
-  RedeemResetPassword, RedeemResetPasswordIsSuccess,
+  RedeemResetPassword,
+  RedeemResetPasswordIsSuccess,
 } from "@storyteller/components/src/api/user/RedeemResetPassword";
+import { useSession } from "hooks";
 
 interface Props {
-  sessionWrapper: SessionWrapper;
   querySessionAction: () => void;
   querySessionSubscriptionsAction: () => void;
 }
@@ -23,28 +23,42 @@ const ERR_CODE_NOT_SET = "password reset code is not set";
 const ERR_CODE_TOO_SHORT = "password reset code is too short";
 const ERR_PASSWORD_TOO_SHORT = "new password is too short";
 const ERR_PASSWORD_DOES_NOT_MATCH = "new password does not match";
-const ERR_BACKEND = "There was an issue resetting your password. Perhaps your code expired?";
+const ERR_BACKEND =
+  "There was an issue resetting your password. Perhaps your code expired?";
 
 function PasswordResetVerificationPage(props: Props) {
-  let history = useHistory();
+  const history = useHistory();
+  const { sessionWrapper } = useSession();
 
   usePrefixedDocumentTitle("Password Reset Verification");
 
   const [resetToken, setResetToken] = useState(getCodeFromUrl() || "");
-  const [resetTokenLooksValid, setResetTokenLooksValid] = useState(!!!getResetCodeErrors(getCodeFromUrl()));
-  const [resetTokenInvalidReason, setResetTokenInvalidReason] = useState(getResetCodeErrors(getCodeFromUrl()));
+  const [resetTokenLooksValid, setResetTokenLooksValid] = useState(
+    !!!getResetCodeErrors(getCodeFromUrl())
+  );
+  const [resetTokenInvalidReason, setResetTokenInvalidReason] = useState(
+    getResetCodeErrors(getCodeFromUrl())
+  );
 
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordIsValid, setNewPasswordIsValid] = useState(false);
-  const [newPasswordInvalidReason, setNewPasswordInvalidReason] = useState<string|undefined>(ERR_PASSWORD_TOO_SHORT);
+  const [newPasswordInvalidReason, setNewPasswordInvalidReason] = useState<
+    string | undefined
+  >(ERR_PASSWORD_TOO_SHORT);
 
   const [newPasswordConfirmation, setNewPasswordConfirmation] = useState("");
-  const [newPasswordConfirmationIsValid, setNewPasswordConfirmationIsValid] = useState(false);
-  const [newPasswordConfirmationInvalidReason, setNewPasswordConfirmationInvalidReason] = useState<string|undefined>(ERR_PASSWORD_TOO_SHORT);
+  const [newPasswordConfirmationIsValid, setNewPasswordConfirmationIsValid] =
+    useState(false);
+  const [
+    newPasswordConfirmationInvalidReason,
+    setNewPasswordConfirmationInvalidReason,
+  ] = useState<string | undefined>(ERR_PASSWORD_TOO_SHORT);
 
-  const [backendError, setBackendError] = useState<string|undefined>(undefined);
+  const [backendError, setBackendError] = useState<string | undefined>(
+    undefined
+  );
 
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     history.push("/");
   }
 
@@ -54,7 +68,7 @@ function PasswordResetVerificationPage(props: Props) {
     setResetToken(token);
     setResetTokenLooksValid(!!!errors);
     setResetTokenInvalidReason(errors);
-  }
+  };
 
   const handleChangePassword = (ev: React.FormEvent<HTMLInputElement>) => {
     const value = (ev.target as HTMLInputElement).value;
@@ -69,18 +83,20 @@ function PasswordResetVerificationPage(props: Props) {
 
     setNewPassword(value);
     setNewPasswordIsValid(isValid);
-    setNewPasswordInvalidReason(invalidReason)
+    setNewPasswordInvalidReason(invalidReason);
 
     if (value !== newPasswordConfirmation) {
       setNewPasswordConfirmationIsValid(false);
-      setNewPasswordConfirmationInvalidReason(ERR_PASSWORD_DOES_NOT_MATCH)
+      setNewPasswordConfirmationInvalidReason(ERR_PASSWORD_DOES_NOT_MATCH);
     } else if (newPasswordConfirmation.length > 4) {
       setNewPasswordConfirmationIsValid(true);
-      setNewPasswordConfirmationInvalidReason(undefined)
+      setNewPasswordConfirmationInvalidReason(undefined);
     }
-  }
+  };
 
-  const handleChangePasswordConfirmation = (ev: React.FormEvent<HTMLInputElement>) => {
+  const handleChangePasswordConfirmation = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
     const value = (ev.target as HTMLInputElement).value;
 
     let isValid = true;
@@ -89,20 +105,19 @@ function PasswordResetVerificationPage(props: Props) {
     if (value !== newPassword) {
       isValid = false;
       invalidReason = ERR_PASSWORD_DOES_NOT_MATCH;
-    }
-    else if (value.length < 5) {
+    } else if (value.length < 5) {
       isValid = false;
       invalidReason = ERR_PASSWORD_TOO_SHORT;
     }
 
     setNewPasswordConfirmation(value);
     setNewPasswordConfirmationIsValid(isValid);
-    setNewPasswordConfirmationInvalidReason(invalidReason)
-  }
+    setNewPasswordConfirmationInvalidReason(invalidReason);
+  };
 
   const handleSubmit = async (
     ev: React.FormEvent<HTMLButtonElement>
-  ) : Promise<boolean> => {
+  ): Promise<boolean> => {
     ev.preventDefault();
 
     const password = newPassword.trim();
@@ -130,11 +145,20 @@ function PasswordResetVerificationPage(props: Props) {
     return false;
   };
 
-  const canSubmit = resetTokenLooksValid && newPasswordIsValid && newPasswordConfirmationIsValid;
+  const canSubmit =
+    resetTokenLooksValid &&
+    newPasswordIsValid &&
+    newPasswordConfirmationIsValid;
 
-  let resetTokenHelpClasses = resetTokenLooksValid ? "" : "form-control is-danger";
-  let newPasswordHelpClasses = newPasswordIsValid ? "" : "form-control is-danger";
-  let newPasswordConfirmationHelpClasses = newPasswordConfirmationIsValid ? "" : "form-control is-danger";
+  let resetTokenHelpClasses = resetTokenLooksValid
+    ? ""
+    : "form-control is-danger";
+  let newPasswordHelpClasses = newPasswordIsValid
+    ? ""
+    : "form-control is-danger";
+  let newPasswordConfirmationHelpClasses = newPasswordConfirmationIsValid
+    ? ""
+    : "form-control is-danger";
   let backendErrorClasses = !!!backendError ? "" : "form-control is-danger";
 
   return (
@@ -148,7 +172,6 @@ function PasswordResetVerificationPage(props: Props) {
       <Panel padding={true}>
         <form>
           <div className="d-flex flex-column gap-4">
-
             <Input
               label="Verification Code"
               icon={faLock}
@@ -157,9 +180,7 @@ function PasswordResetVerificationPage(props: Props) {
               onChange={handleChangeResetToken}
             />
 
-            <p className={resetTokenHelpClasses}>
-              {resetTokenInvalidReason}
-            </p>
+            <p className={resetTokenHelpClasses}>{resetTokenInvalidReason}</p>
 
             <Input
               type="password"
@@ -170,9 +191,7 @@ function PasswordResetVerificationPage(props: Props) {
               onChange={handleChangePassword}
             />
 
-            <p className={newPasswordHelpClasses}>
-              {newPasswordInvalidReason}
-            </p>
+            <p className={newPasswordHelpClasses}>{newPasswordInvalidReason}</p>
 
             <Input
               type="password"
@@ -187,9 +206,7 @@ function PasswordResetVerificationPage(props: Props) {
               {newPasswordConfirmationInvalidReason}
             </p>
 
-            <p className={backendErrorClasses}>
-              {backendError}
-            </p>
+            <p className={backendErrorClasses}>{backendError}</p>
 
             <Button
               label="Change Password"
@@ -204,22 +221,22 @@ function PasswordResetVerificationPage(props: Props) {
 }
 
 // Pre-load the code from a URL query string, eg https://fakeyou.com/password-reset/validate?code=codeGoesHere
-function getCodeFromUrl() : string | null {
+function getCodeFromUrl(): string | null {
   const urlParams = new URLSearchParams(window.location.search);
-  const tokenUnsafe = urlParams.get('token');
-  const tokenSafe = tokenUnsafe === null ? null : tokenUnsafe.replace(/[^A-Za-z0-9]/g, '');
+  const tokenUnsafe = urlParams.get("token");
+  const tokenSafe =
+    tokenUnsafe === null ? null : tokenUnsafe.replace(/[^A-Za-z0-9]/g, "");
   return tokenSafe;
 }
 
 // Handle error state at initialization
-function getResetCodeErrors(code: string | null) : string | undefined {
+function getResetCodeErrors(code: string | null): string | undefined {
   if (!code) {
     return ERR_CODE_NOT_SET;
   }
   if (code.length < 10) {
     return ERR_CODE_TOO_SHORT;
-  };
+  }
 }
-
 
 export { PasswordResetVerificationPage };

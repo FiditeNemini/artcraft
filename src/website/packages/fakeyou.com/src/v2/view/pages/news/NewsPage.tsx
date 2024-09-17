@@ -1,8 +1,4 @@
 import React, { useEffect } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { TwitchPlayer, TwitchChat } from "react-twitch-embed";
 import { Link } from "react-router-dom";
@@ -11,11 +7,7 @@ import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
+import { useSession } from "hooks";
 
 //interface StreamInfo {
 //  broadcaster_name: string;
@@ -41,7 +33,8 @@ interface Props {
 
 const TWITCH_CHANNEL = "FakeYouLabs";
 
-function NewsPage(props: Props) {
+function NewsPage() {
+  const { sessionSubscriptions } = useSession();
   usePrefixedDocumentTitle("AI News");
   PosthogClient.recordPageview();
 
@@ -93,7 +86,7 @@ function NewsPage(props: Props) {
 
   let subscriberPart = <></>;
   let subscribeButton = <></>;
-  if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+  if (sessionSubscriptions?.hasPaidFeatures()) {
     subscriberPart = (
       <p>
         If you'd like an ad-free experience,{" "}

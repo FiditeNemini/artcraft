@@ -45,11 +45,7 @@ import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceC
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
-interface Props {
-  sessionSubscriptionsWrapper: any;
-}
-
-export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
+export default function NewVC() {
   const { enqueueInferenceJob } = useInferenceJobs();
   const { modalState, open, close } = useModal();
   const { loggedIn, loggedInOrModal } = useSession();
@@ -389,11 +385,7 @@ export default function NewVC({ sessionSubscriptionsWrapper }: Props) {
                   <div className="d-flex flex-column">
                     <Label label={t("label.output")} />
                     <div className="d-flex flex-column session-vc-section">
-                      <SessionVoiceConversionResultsList
-                        sessionSubscriptionsWrapper={
-                          sessionSubscriptionsWrapper
-                        }
-                      />
+                      <SessionVoiceConversionResultsList />
                     </div>
                   </div>
                 </div>

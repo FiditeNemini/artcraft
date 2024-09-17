@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { faRightLeft } from "@fortawesome/pro-solid-svg-icons";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Button } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
@@ -23,12 +22,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useInferenceJobs } from "hooks";
 
 interface VcInferencePanelProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   voiceToken: string;
 }
 
 export default function VcInferencePanel({
-  sessionSubscriptionsWrapper,
   voiceToken,
 }: VcInferencePanelProps) {
   const [convertLoading, setConvertLoading] = useState(false);
@@ -284,9 +281,7 @@ export default function VcInferencePanel({
           <Accordion>
             <Accordion.Item title="Session V2V Results" defaultOpen={true}>
               <div className="p-3">
-                <SessionVoiceConversionResultsList
-                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                />
+                <SessionVoiceConversionResultsList />
               </div>
             </Accordion.Item>
           </Accordion>

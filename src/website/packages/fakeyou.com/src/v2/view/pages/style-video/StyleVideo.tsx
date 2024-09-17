@@ -489,11 +489,7 @@ export default function StyleVideo() {
 
                 <div className="mt-3">
                   {sessionSubscriptions && (
-                    <PremiumLock
-                      sessionSubscriptionsWrapper={sessionSubscriptions}
-                      requiredPlan="pro"
-                      lockPosition="top"
-                    >
+                    <PremiumLock requiredPlan="pro" lockPosition="top">
                       <SegmentButtons
                         {...{
                           className: "fy-style-video-length",

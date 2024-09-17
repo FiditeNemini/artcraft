@@ -19,8 +19,6 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { format } from "date-fns";
 import { Button } from "components/common";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { WebUrl } from "common/WebUrl";
 import {
   faDiscord,
@@ -29,13 +27,10 @@ import {
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import Tippy from "@tippyjs/react";
+import { useSession } from "hooks";
 
-interface UserProfileInfoProps {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-export default function UserProfileInfo(props: UserProfileInfoProps) {
+export default function UserProfileInfo() {
+  const { sessionSubscriptions, sessionWrapper } = useSession();
   const location = useLocation();
   const pathSegments = location.pathname.split("/");
   const username = pathSegments[2];
@@ -102,9 +97,9 @@ export default function UserProfileInfo(props: UserProfileInfoProps) {
 
   let upgradeButton = undefined;
 
-  if (props.sessionWrapper.isLoggedIn()) {
-    if (props.sessionWrapper.userTokenMatches(userData.user_token)) {
-      if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+  if (sessionWrapper.isLoggedIn()) {
+    if (sessionWrapper.userTokenMatches(userData.user_token)) {
+      if (sessionSubscriptions?.hasPaidFeatures()) {
         const upgradeLinkUrl = WebUrl.pricingPage();
 
         upgradeButton = (
@@ -121,7 +116,7 @@ export default function UserProfileInfo(props: UserProfileInfoProps) {
     }
   }
 
-  if (props.sessionWrapper.canBanUsers()) {
+  if (sessionWrapper.canBanUsers()) {
     const currentlyBanned = userData.maybe_moderator_fields?.is_banned;
     const banLinkUrl = WebUrl.userProfileBanPage(userData.username);
     const buttonLabel = currentlyBanned ? "Unban" : "Ban";
@@ -140,13 +135,11 @@ export default function UserProfileInfo(props: UserProfileInfoProps) {
     );
   }
 
-  if (props.sessionWrapper.canEditUserProfile(userData.username)) {
+  if (sessionWrapper.canEditUserProfile(userData.username)) {
     const editLinkUrl = WebUrl.userProfileEditPage(userData.username);
 
     // Mods shouldn't edit preferences.
-    const buttonLabel = props.sessionWrapper.userTokenMatches(
-      userData.user_token
-    )
+    const buttonLabel = sessionWrapper.userTokenMatches(userData.user_token)
       ? "Edit Profile & Preferences"
       : "Edit Profile";
 
@@ -328,7 +321,7 @@ export default function UserProfileInfo(props: UserProfileInfoProps) {
           <div className="mb-3 d-flex gap-4 gap-lg-3 profile-social-icons justify-content-center justify-content-lg-start">
             {profileRows}
           </div>
-          {props.sessionWrapper.isLoggedIn() && (
+          {sessionWrapper.isLoggedIn() && (
             <div className="gap-2 d-flex flex-column w-100">
               {editProfileButton}
               {banUserButton}
@@ -361,7 +354,7 @@ export default function UserProfileInfo(props: UserProfileInfoProps) {
           {profileRows}
         </div>
 
-        {props.sessionWrapper.isLoggedIn() && (
+        {sessionWrapper.isLoggedIn() && (
           <div className="gap-2 d-flex w-100">
             {editProfileButton}
             {banUserButton}

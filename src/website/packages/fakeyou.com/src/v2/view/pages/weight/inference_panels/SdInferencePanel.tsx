@@ -26,15 +26,14 @@ import {
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PremiumLock from "components/PremiumLock";
 import { useInferenceJobs } from "hooks";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
+import { useSession } from "hooks";
 
 interface SdInferencePanelProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   weight_token?: string;
   isStandalone?: boolean;
   weightPageType?: "lora" | "sd";
@@ -42,10 +41,10 @@ interface SdInferencePanelProps {
 
 function SdInferencePanel({
   weight_token,
-  sessionSubscriptionsWrapper,
   isStandalone = false,
   weightPageType = "sd",
 }: SdInferencePanelProps) {
+  const { sessionSubscriptions } = useSession();
   const { enqueueInferenceJob, inferenceJobs } = useInferenceJobs();
   const [loraToken, setLoraToken] = useState<string | null>(null);
   const [sdToken, setSdToken] = useState<string | null>(null);
@@ -251,11 +250,11 @@ function SdInferencePanel({
       return false;
     }
 
-    if (!sessionSubscriptionsWrapper.hasPaidFeatures()) {
+    if (sessionSubscriptions?.hasPaidFeatures()) {
       return false;
     }
 
-    if (!sessionSubscriptionsWrapper.hasActiveProSubscription()) {
+    if (sessionSubscriptions?.hasActiveProSubscription()) {
       batchCountSet(1);
     }
 
@@ -306,12 +305,7 @@ function SdInferencePanel({
   };
 
   return (
-    <PremiumLock
-      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-      requiredPlan="any"
-      showCtaButton={true}
-      large={true}
-    >
+    <PremiumLock requiredPlan="any" showCtaButton={true} large={true}>
       <div>
         <SplitPanel dividerHeader={true}>
           <SplitPanel.Header padding={true}>
@@ -375,10 +369,7 @@ function SdInferencePanel({
               />
               <div>
                 <Label label="Number of Generations" />
-                <PremiumLock
-                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                  requiredPlan="pro"
-                >
+                <PremiumLock requiredPlan="pro">
                   <SegmentButtons
                     {...{
                       name: "batchCount",

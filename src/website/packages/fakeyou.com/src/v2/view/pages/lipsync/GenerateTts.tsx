@@ -568,7 +568,6 @@ export const GenerateTts = memo(function GenerateTts({
           }}
         >
           <SessionTtsInferenceResultList
-            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
             mode="lipsync"
             onResultClick={handleResultClick}
           />

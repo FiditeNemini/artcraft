@@ -4,7 +4,6 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faHeadphonesSimple } from "@fortawesome/free-solid-svg-icons";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
 import { WebUrl } from "../../../common/WebUrl";
@@ -26,15 +25,11 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import LoadingSpinner from "components/common/LoadingSpinner";
 
-interface Props {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-function SessionVoiceConversionResultsList(props: Props) {
+function SessionVoiceConversionResultsList() {
   const { t } = useLocalize("SessionVoiceConversionResultsList");
   const { t: t2 } = useLocalize("NewVC");
   const [pendingTtsJobs, setPendingTtsJobs] =
@@ -44,7 +39,7 @@ function SessionVoiceConversionResultsList(props: Props) {
       cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
       refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
     });
-  const { loggedInOrModal, loggedIn } = useSession();
+  const { loggedInOrModal, loggedIn, sessionSubscriptions } = useSession();
   const { inferenceJobsByCategory } = useInferenceJobs();
 
   useEffect(() => {
@@ -234,10 +229,7 @@ function SessionVoiceConversionResultsList(props: Props) {
   let upgradeNotice = <></>;
 
   // Ask non-premium users to upgrade
-  if (
-    results.length !== 0 &&
-    !props.sessionSubscriptionsWrapper.hasPaidFeatures()
-  ) {
+  if (results.length !== 0 && sessionSubscriptions?.hasPaidFeatures()) {
     if (loggedIn) {
       upgradeNotice = (
         <div className="d-flex flex-column gap-3 sticky-top zi-2">

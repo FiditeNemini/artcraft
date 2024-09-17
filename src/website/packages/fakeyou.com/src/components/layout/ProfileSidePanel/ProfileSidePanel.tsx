@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import "./ProfileSidePanel.scss";
 import UserProfileInfo from "./UserProfileInfo";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 
-interface ProfileSidePanelProps {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-export default function ProfileSidePanel({
-  sessionWrapper,
-  sessionSubscriptionsWrapper,
-}: ProfileSidePanelProps) {
+export default function ProfileSidePanel() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -76,10 +66,7 @@ export default function ProfileSidePanel({
       <div id="profile-sidebar-wrapper" className={sidebarClassName}>
         <div className="py-3 ps-3 h-100">
           <div className="profile-sidebar-panel">
-            <UserProfileInfo
-              sessionWrapper={sessionWrapper}
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            />
+            <UserProfileInfo />
           </div>
         </div>
       </div>

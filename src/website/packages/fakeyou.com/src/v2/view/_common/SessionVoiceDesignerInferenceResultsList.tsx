@@ -8,8 +8,6 @@ import {
   faLink,
   faHeadphonesSimple,
 } from "@fortawesome/free-solid-svg-icons";
-
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
 import { WebUrl } from "../../../common/WebUrl";
@@ -22,18 +20,15 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { useInferenceJobs, useLocalize } from "hooks";
-
-interface Props {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-function SessionVoiceDesignerInferenceResultsList(props: Props) {
+function SessionVoiceDesignerInferenceResultsList() {
   const { t } = useLocalize("SessionTtsInferenceResultList");
+  const { sessionSubscriptions } = useSession();
   const { inferenceJobsByCategory } = useInferenceJobs();
 
   const [pendingTtsJobs, setPendingTtsJobs] =
@@ -193,10 +188,7 @@ function SessionVoiceDesignerInferenceResultsList(props: Props) {
   let upgradeNotice = <></>;
 
   // Ask non-premium users to upgrade
-  if (
-    results.length !== 0 &&
-    !props.sessionSubscriptionsWrapper.hasPaidFeatures()
-  ) {
+  if (results.length !== 0 && sessionSubscriptions?.hasPaidFeatures()) {
     upgradeNotice = (
       <div className="d-flex flex-column gap-3 sticky-top zi-2">
         <div className="alert alert-warning alert-cta mb-0">

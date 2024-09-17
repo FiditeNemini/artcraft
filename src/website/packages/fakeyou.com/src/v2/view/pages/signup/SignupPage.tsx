@@ -9,7 +9,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 import { Analytics } from "../../../../common/Analytics";
 import queryString from "query-string";
@@ -20,6 +19,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
+import { useSession } from "hooks";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -28,7 +28,6 @@ enum FieldTriState {
 }
 
 interface Props {
-  sessionWrapper: SessionWrapper;
   querySessionCallback: () => void;
   querySessionAction: () => void;
 }
@@ -37,6 +36,7 @@ function SignupPage(props: Props) {
   let history = useHistory();
   const domain = useDomainConfig();
   let location = useLocation();
+  const { sessionWrapper } = useSession();
   const queryParams = new URLSearchParams(location.search);
 
   const parsedQueryString = queryString.parse(window.location.search);
@@ -300,7 +300,7 @@ function SignupPage(props: Props) {
 
   usePrefixedDocumentTitle("Create an account");
 
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     return (
       <div className="container py-5">
         <div className="py-5">

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { WebUrl } from "common/WebUrl";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
   GetLeaderboard,
@@ -16,11 +15,7 @@ import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2"
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function LeaderboardPage(props: Props) {
+function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>(
     undefined
   );
@@ -68,7 +63,7 @@ function LeaderboardPage(props: Props) {
   let ttsRows: Array<JSX.Element> = [];
 
   if (ttsLeaderboard) {
-    ttsLeaderboard.forEach((ttsEntry) => {
+    ttsLeaderboard.forEach(ttsEntry => {
       ttsRows.push(
         <tr>
           <td className="lb-name">
@@ -95,7 +90,7 @@ function LeaderboardPage(props: Props) {
   let w2lRows: Array<JSX.Element> = [];
 
   if (w2lLeaderboard) {
-    w2lLeaderboard.forEach((w2lEntry) => {
+    w2lLeaderboard.forEach(w2lEntry => {
       w2lRows.push(
         <tr>
           <td className="lb-name">

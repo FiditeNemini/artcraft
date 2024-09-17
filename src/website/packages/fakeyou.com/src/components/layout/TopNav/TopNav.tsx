@@ -24,7 +24,6 @@ import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useHistory } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useLocalize, useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
@@ -38,17 +37,16 @@ import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 import { WebUrl } from "common/WebUrl";
 
 interface TopNavProps {
-  sessionWrapper: SessionWrapper;
   logoutHandler: () => void;
   querySessionCallback: () => void;
   querySessionSubscriptionsCallback: () => void;
 }
 
 export default function TopNav({
-  sessionWrapper,
   querySessionCallback,
   querySessionSubscriptionsCallback,
 }: TopNavProps) {
+  const { sessionWrapper, user } = useSession();
   const domain = useDomainConfig();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
@@ -157,8 +155,6 @@ export default function TopNav({
   };
 
   let profileDropdown = <></>;
-
-  const { user } = useSession();
 
   if (sessionWrapper.isLoggedIn()) {
     let displayName = user.display_name;

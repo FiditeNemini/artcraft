@@ -2,8 +2,6 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useHistory } from "react-router-dom";
 import { faCheck, faHeart } from "@fortawesome/free-solid-svg-icons";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FAKEYOU_PRICES as FYP } from "../../../../data/PriceTiers";
 import {
   CreateStripePortalRedirect,
@@ -20,14 +18,11 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Badge, Container, Panel } from "components/common";
 import MentionsSection from "components/common/MentionsSection";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-function PricingPage(props: Props) {
-  let history = useHistory();
+function PricingPage() {
+  const history = useHistory();
+  const { sessionSubscriptions, sessionWrapper } = useSession();
   PosthogClient.recordPageview();
 
   const beginStripePortalFlow = async (): Promise<boolean> => {
@@ -59,7 +54,7 @@ function PricingPage(props: Props) {
         break;
     }
 
-    if (!props.sessionWrapper.isLoggedIn()) {
+    if (sessionWrapper.isLoggedIn()) {
       // TODO: This needs to bring the user back to purchase flow.
       Analytics.premiumBounceToSignup();
 
@@ -67,7 +62,7 @@ function PricingPage(props: Props) {
       history.push(signupUrl);
 
       return false;
-    } else if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+    } else if (sessionSubscriptions?.hasPaidFeatures()) {
       Analytics.premiumForwardToStripePortal();
       return await beginStripePortalFlow(); // NB: This redirects the user to Stripe
     } else {
@@ -83,8 +78,7 @@ function PricingPage(props: Props) {
     ? "production"
     : "development";
 
-  const userHasPaidPremium =
-    props.sessionSubscriptionsWrapper.hasPaidFeatures();
+  const userHasPaidPremium = sessionSubscriptions?.hasPaidFeatures();
 
   let plusButtonText = "Buy Plus";
   let plusButtonDisabled = false;
@@ -102,14 +96,14 @@ function PricingPage(props: Props) {
   if (userHasPaidPremium) {
     let unsubscribeKey = FYP.plus.internal_plan_key[planKey]; // NB: Default to something (I don't think this matters to Stripe.)
 
-    if (props.sessionSubscriptionsWrapper.hasActivePlusSubscription()) {
+    if (sessionSubscriptions?.hasActivePlusSubscription()) {
       plusButtonText = "Subscribed";
       plusButtonDisabled = true;
     } else {
       plusButtonText = "Switch to Plus";
     }
 
-    if (props.sessionSubscriptionsWrapper.hasActiveProSubscription()) {
+    if (sessionSubscriptions?.hasActiveProSubscription()) {
       unsubscribeKey = FYP.pro.internal_plan_key[planKey];
       proButtonText = "Subscribed";
       proButtonDisabled = true;
@@ -117,7 +111,7 @@ function PricingPage(props: Props) {
       proButtonText = "Switch to Pro";
     }
 
-    if (props.sessionSubscriptionsWrapper.hasActiveEliteSubscription()) {
+    if (sessionSubscriptions?.hasActiveEliteSubscription()) {
       unsubscribeKey = FYP.elite.internal_plan_key[planKey];
       eliteButtonText = "Subscribed";
       eliteButtonDisabled = true;

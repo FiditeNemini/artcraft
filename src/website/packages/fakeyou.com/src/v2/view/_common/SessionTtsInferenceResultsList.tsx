@@ -5,7 +5,6 @@ import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faHeadphonesSimple } from "@fortawesome/free-solid-svg-icons";
 
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
 import { WebUrl } from "../../../common/WebUrl";
@@ -33,7 +32,6 @@ import { isMobile } from "react-device-detect";
 import { LipsyncTokenMap } from "../pages/lipsync/LipsyncTokens";
 
 interface Props {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   mode?: "tts" | "lipsync";
   onResultClick?: (
     maybeModelToken: string | undefined,
@@ -49,7 +47,7 @@ function SessionTtsInferenceResultList(props: Props) {
   const { inferenceJobsByCategory } = useInferenceJobs();
   const { t } = useLocalize("SessionTtsInferenceResultList");
   const { t: t2 } = useLocalize("NewTTS");
-  const { loggedIn, loggedInOrModal } = useSession();
+  const { loggedIn, loggedInOrModal, sessionSubscriptions } = useSession();
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
@@ -329,10 +327,7 @@ function SessionTtsInferenceResultList(props: Props) {
   let upgradeNotice = <></>;
 
   // Ask non-premium users to upgrade
-  if (
-    results.length !== 0 &&
-    !props.sessionSubscriptionsWrapper.hasPaidFeatures()
-  ) {
+  if (results.length !== 0 && sessionSubscriptions?.hasPaidFeatures()) {
     if (loggedIn) {
       upgradeNotice = (
         <div className="d-flex flex-column gap-3 sticky-top zi-2">

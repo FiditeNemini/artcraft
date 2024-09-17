@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { faDeleteLeft } from "@fortawesome/pro-solid-svg-icons";
 import Panel from "components/common/Panel/Panel";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
@@ -14,12 +13,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useInferenceJobs } from "hooks";
 
 interface VdInferencePanelProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   voiceToken: string;
 }
 
 export default function VdInferencePanel({
-  sessionSubscriptionsWrapper,
   voiceToken,
 }: VdInferencePanelProps) {
   const [textBuffer, setTextBuffer] = useState("");
@@ -100,9 +97,7 @@ export default function VdInferencePanel({
           <Accordion>
             <Accordion.Item title="Session TTS Results" defaultOpen={true}>
               <div className="p-3">
-                <SessionVoiceDesignerInferenceResultsList
-                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                />
+                <SessionVoiceDesignerInferenceResultsList />
               </div>
             </Accordion.Item>
           </Accordion>

@@ -22,7 +22,6 @@ import {
 import FaceAnimatorSubViews from "./sub_views";
 import FaceAnimatorTitle from "./FaceAnimatorTitle";
 import InferenceJobsList from "components/layout/InferenceJobsList";
-import { FaceAnimatorCore } from "./FaceAnimatorTypes";
 import { Container, Panel, VideoBasic } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
@@ -31,10 +30,7 @@ import "./FaceAnimator.scss";
 import PremiumLock from "components/PremiumLock";
 import { AITools } from "components/marketing";
 
-export default function FaceAnimator({
-  sessionSubscriptionsWrapper,
-  ...rest
-}: FaceAnimatorCore) {
+export default function FaceAnimator() {
   const { mediaToken } = useParams<{ mediaToken: string }>();
   const { media: presetAudio } = useMedia({ mediaToken });
   const { t } = useLocalize("Lipsync");
@@ -222,12 +218,7 @@ export default function FaceAnimator({
     <>
       <div {...{ className: "face-animator-container container-panel pt-4" }}>
         <FaceAnimatorTitle {...headerProps} />
-        <PremiumLock
-          requiredPlan="any"
-          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-          large={true}
-          showCtaButton={true}
-        >
+        <PremiumLock requiredPlan="any" large={true} showCtaButton={true}>
           <div {...{ className: "panel face-animator-main" }}>
             {transitions((style, i) => {
               const Page = FaceAnimatorSubViews[page];
@@ -246,7 +237,6 @@ export default function FaceAnimator({
                     presetAudio,
                     still,
                     stillChange,
-                    sessionSubscriptionsWrapper,
                     index,
                     t,
                     toggle: { audio: readyMedia(1), image: readyMedia(0) },

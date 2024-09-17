@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import Container from "components/common/Container";
@@ -14,11 +13,7 @@ import {
 } from "@storyteller/components/src/api/user/RequestResetPassword";
 import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function PasswordResetEmailPage(props: Props) {
+function PasswordResetEmailPage() {
   let history = useHistory();
   const { user } = useSession();
 

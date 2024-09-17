@@ -156,9 +156,7 @@ export default function NewTTS() {
                     <Label label={t("label.output")} />
                     <div className="d-flex flex-column session-tts-section">
                       {sessionSubscriptions ? (
-                        <SessionTtsInferenceResultList
-                          sessionSubscriptionsWrapper={sessionSubscriptions}
-                        />
+                        <SessionTtsInferenceResultList />
                       ) : null}
                     </div>
                   </div>

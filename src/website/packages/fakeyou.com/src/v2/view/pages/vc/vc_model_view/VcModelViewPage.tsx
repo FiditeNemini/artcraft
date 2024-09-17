@@ -10,7 +10,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Panel from "components/common/Panel/Panel";
 import { Link } from "react-router-dom";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
@@ -23,7 +22,6 @@ import VcGenerateAudioPanel from "../VcGenerateAudioPanel";
 interface VcModelViewPageProps {
   setMaybeSelectedInferenceJob: any;
   sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 export default function VcModelViewPage(props: VcModelViewPageProps) {
@@ -107,7 +105,6 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
       />
 
       <VcGenerateAudioPanel
-        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         sessionWrapper={props.sessionWrapper}
         setVoiceConversionModels={() => {}}
         voiceConversionModels={[]}

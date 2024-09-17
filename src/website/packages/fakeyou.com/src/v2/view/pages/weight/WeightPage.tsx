@@ -25,7 +25,6 @@ import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import Badge from "components/common/Badge";
 import VdInferencePanel from "./inference_panels/VdInferencePanel";
 import VcInferencePanel from "./inference_panels/VcInferencePanel";
@@ -49,13 +48,7 @@ import { AITools } from "components/marketing";
 import Stat from "components/common/Stat/Stat";
 import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
-interface WeightProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-export default function WeightPage({
-  sessionSubscriptionsWrapper,
-}: WeightProps) {
+export default function WeightPage() {
   const { canEditTtsModel, canBanUsers, user } = useSession();
   const { search } = useLocation();
   const { weight_token, maybe_url_slug } = useParams<{
@@ -154,7 +147,6 @@ export default function WeightPage({
     case WeightType.SDXL:
       imageGenPanel = (
         <SdInferencePanel
-          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
           weight_token={weight?.weight_token}
           weightPageType="sd"
         />
@@ -163,7 +155,6 @@ export default function WeightPage({
     case WeightType.LORA:
       imageGenPanel = (
         <SdInferencePanel
-          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
           weight_token={weight?.weight_token}
           weightPageType="lora"
         />
@@ -174,27 +165,12 @@ export default function WeightPage({
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {
       case WeightCategory.TTS:
-        return (
-          <TtsInferencePanel
-            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            voiceToken={weight.weight_token}
-          />
-        );
+        return <TtsInferencePanel voiceToken={weight.weight_token} />;
       case WeightCategory.VC:
-        return (
-          <VcInferencePanel
-            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            voiceToken={weight.weight_token}
-          />
-        );
+        return <VcInferencePanel voiceToken={weight.weight_token} />;
 
       case WeightCategory.ZS:
-        return (
-          <VdInferencePanel
-            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            voiceToken={weight.weight_token}
-          />
-        );
+        return <VdInferencePanel voiceToken={weight.weight_token} />;
       case WeightCategory.SD:
         let sdCoverImage = "/images/avatars/default-pfp.png";
         if (

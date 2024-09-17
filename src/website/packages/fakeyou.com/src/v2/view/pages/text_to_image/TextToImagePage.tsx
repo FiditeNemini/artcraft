@@ -33,10 +33,7 @@ export default function TextToImagePage({
         yOffset="68%"
       />
 
-      <SdInferencePanel
-        sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-        isStandalone={true}
-      />
+      <SdInferencePanel isStandalone={true} />
     </Container>
   );
 }
