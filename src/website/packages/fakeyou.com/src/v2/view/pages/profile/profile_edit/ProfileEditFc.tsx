@@ -211,7 +211,7 @@ function ProfileEditFc() {
     return <span />;
   }
 
-  if (!!userData && sessionWrapper.canEditUserProfile(username)) {
+  if (!!userData && !sessionWrapper.canEditUserProfile(username)) {
     // Loading and we don't have access.
     history.push(userProfilePage);
   }

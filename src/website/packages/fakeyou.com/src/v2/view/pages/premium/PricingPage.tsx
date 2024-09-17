@@ -54,7 +54,7 @@ function PricingPage() {
         break;
     }
 
-    if (sessionWrapper.isLoggedIn()) {
+    if (!sessionWrapper.isLoggedIn()) {
       // TODO: This needs to bring the user back to purchase flow.
       Analytics.premiumBounceToSignup();
 

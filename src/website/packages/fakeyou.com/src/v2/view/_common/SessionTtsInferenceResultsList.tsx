@@ -327,7 +327,7 @@ function SessionTtsInferenceResultList(props: Props) {
   let upgradeNotice = <></>;
 
   // Ask non-premium users to upgrade
-  if (results.length !== 0 && sessionSubscriptions?.hasPaidFeatures()) {
+  if (results.length !== 0 && !sessionSubscriptions?.hasPaidFeatures()) {
     if (loggedIn) {
       upgradeNotice = (
         <div className="d-flex flex-column gap-3 sticky-top zi-2">

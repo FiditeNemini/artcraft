@@ -99,7 +99,7 @@ export default function UserProfileInfo() {
 
   if (sessionWrapper.isLoggedIn()) {
     if (sessionWrapper.userTokenMatches(userData.user_token)) {
-      if (sessionSubscriptions?.hasPaidFeatures()) {
+      if (!sessionSubscriptions?.hasPaidFeatures()) {
         const upgradeLinkUrl = WebUrl.pricingPage();
 
         upgradeButton = (

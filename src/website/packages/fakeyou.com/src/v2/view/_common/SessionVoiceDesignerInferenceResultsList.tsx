@@ -188,7 +188,7 @@ function SessionVoiceDesignerInferenceResultsList() {
   let upgradeNotice = <></>;
 
   // Ask non-premium users to upgrade
-  if (results.length !== 0 && sessionSubscriptions?.hasPaidFeatures()) {
+  if (results.length !== 0 && !sessionSubscriptions?.hasPaidFeatures()) {
     upgradeNotice = (
       <div className="d-flex flex-column gap-3 sticky-top zi-2">
         <div className="alert alert-warning alert-cta mb-0">

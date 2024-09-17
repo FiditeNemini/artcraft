@@ -86,7 +86,7 @@ function NewsPage() {
 
   let subscriberPart = <></>;
   let subscribeButton = <></>;
-  if (sessionSubscriptions?.hasPaidFeatures()) {
+  if (!sessionSubscriptions?.hasPaidFeatures()) {
     subscriberPart = (
       <p>
         If you'd like an ad-free experience,{" "}
