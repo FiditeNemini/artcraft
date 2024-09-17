@@ -47,16 +47,18 @@ enum UsernameFormat {
   SnakeCase,
   CamelKebabCase,
   CamelSnakeCase,
+  ScreamingSnakeCase,
 }
 
 impl Distribution<UsernameFormat> for Standard {
   fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> UsernameFormat {
-    match rng.gen_range(0..=4) {
+    match rng.gen_range(0..=5) {
       0 => UsernameFormat::CamelCase,
       1 => UsernameFormat::KebabCase,
       2 => UsernameFormat::SnakeCase,
       3 => UsernameFormat::CamelKebabCase,
-      _ => UsernameFormat::CamelSnakeCase,
+      4 => UsernameFormat::CamelSnakeCase,
+      _ => UsernameFormat::ScreamingSnakeCase,
     }
   }
 }
@@ -71,13 +73,17 @@ fn generate_candidate_username() -> Option<String> {
     UsernameFormat::SnakeCase => format!("{}_{}", adjective, noun),
     UsernameFormat::CamelKebabCase => format!("{}-{}", first_letter_uppercase(adjective), first_letter_uppercase(noun)),
     UsernameFormat::CamelSnakeCase => format!("{}_{}", first_letter_uppercase(adjective), first_letter_uppercase(noun)),
+    UsernameFormat::ScreamingSnakeCase => format!("{}_{}", adjective.to_uppercase(), noun.to_uppercase()),
   };
 
   if let Some(digit) = random_digit() {
     candidate_username = match format {
       UsernameFormat::CamelCase => format!("{}{}", candidate_username, digit),
-      UsernameFormat::KebabCase | UsernameFormat::CamelKebabCase => format!("{}-{}", candidate_username, digit),
-      UsernameFormat::SnakeCase | UsernameFormat::CamelSnakeCase => format!("{}_{}", candidate_username, digit),
+      UsernameFormat::KebabCase
+      | UsernameFormat::CamelKebabCase => format!("{}-{}", candidate_username, digit),
+      UsernameFormat::SnakeCase
+      | UsernameFormat::CamelSnakeCase
+      | UsernameFormat::ScreamingSnakeCase => format!("{}_{}", candidate_username, digit),
     };
   }
 
@@ -99,10 +105,20 @@ fn random_digit() -> Option<u32> {
 
 #[cfg(test)]
 mod tests {
+  use std::collections::HashSet;
   use crate::util::generate_random_username::generate_random_username;
 
   #[test]
   fn test_base_case_success() {
     assert!(generate_random_username().len() > 0);
+  }
+
+  #[test]
+  fn generate_lots() {
+    let mut collection = HashSet::new();
+    for _ in 0..100 {
+      collection.insert(generate_random_username());
+    }
+    assert!(collection.len() > 50); // NB: Should be an easy bar to hit
   }
 }
