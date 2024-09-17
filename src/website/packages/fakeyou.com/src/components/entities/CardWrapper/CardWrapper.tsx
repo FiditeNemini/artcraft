@@ -44,7 +44,7 @@ export default function CardWrapper({
       {featured && (
         <div className="card-featured-badge">
           <FontAwesomeIcon icon={faStar} className="me-1" />
-          Featured
+          High Quality
         </div>
       )}
     </div>
