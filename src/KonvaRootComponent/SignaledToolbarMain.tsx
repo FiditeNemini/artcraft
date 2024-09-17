@@ -99,6 +99,13 @@ export const SignaledToolbarMain = () => {
       />
       <DialogAiStylize
         isOpen={state.isAiStylizeOpen ?? false}
+        onRequestAIStylize={(data) => {
+          const { selectedArtStyle: artstyle, ...rest } = data;
+          dispatchUiEvents.aiStylize.dispatchRequest({
+            artstyle,
+            ...rest,
+          });
+        }}
         closeCallback={closeAll}
       />
     </div>

@@ -39,3 +39,8 @@ export enum Visibility {
   Hidden = "hidden",
   Private = "private",
 }
+
+export enum SubPanelNames {
+  BASIC = "basic",
+  ADVANCED = "advanced",
+}

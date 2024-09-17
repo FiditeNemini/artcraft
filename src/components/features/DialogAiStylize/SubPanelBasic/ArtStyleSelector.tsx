@@ -1,6 +1,6 @@
-import { styleList } from "./data/styeList";
+import { styleList } from "../data/styeList";
 import { ArtStyleItem } from "./ArtStyleItem";
-import { ArtStyleNames } from "./enums";
+import { ArtStyleNames } from "../enums";
 
 export const ArtStyleSelector = ({
   selectedArtStyle,
@@ -10,10 +10,7 @@ export const ArtStyleSelector = ({
   onSelectedArtStyle: (newArtStyle: ArtStyleNames) => void;
 }) => {
   return (
-    <div
-      className="flex flex-col gap-4 overflow-hidden rounded-t-lg bg-ui-panel"
-      style={{ height: "calc(100vh - 500px)" }}
-    >
+    <div className="flex h-0 flex-auto overflow-hidden">
       <div className="overflow-y-auto">
         <div className="grid grid-cols-3 gap-2">
           {styleList.map((style) => (

@@ -38,10 +38,12 @@ export const loadingBar = {
       status,
     };
   },
-  show: (props: Omit<LoadingParInterface, "isShowing">) => {
+  show: (props?: Omit<LoadingParInterface, "isShowing">) => {
+    const mergedProps = props
+      ? { ...props, ...loadingBarSignal.value }
+      : loadingBarSignal.value;
     loadingBarSignal.value = {
-      ...loadingBarSignal.value,
-      ...props,
+      ...mergedProps,
       isShowing: true,
     };
   },

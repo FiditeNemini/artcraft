@@ -53,7 +53,7 @@ export const loadingBar = {
       status,
     };
   },
-  show(props: Omit<ContextualLoadingBarProps, "isShowing">) {
+  show(props?: Omit<ContextualLoadingBarProps, "isShowing">) {
     if (loadingBarSignal.value.isShowing) {
       if (import.meta.env.DEV) {
         console.warn(
@@ -63,8 +63,11 @@ export const loadingBar = {
       }
       return;
     }
+    const mergedProps = props
+      ? { ...props, ...loadingBarSignal.value }
+      : loadingBarSignal.value;
     loadingBarSignal.value = {
-      ...props,
+      ...mergedProps,
       isShowing: true,
     };
   },
