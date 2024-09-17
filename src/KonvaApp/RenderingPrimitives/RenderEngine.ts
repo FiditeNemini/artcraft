@@ -305,11 +305,9 @@ export class RenderEngine {
       console.log(`Number Of Frames: ${numberOfFrames}`);
 
       await this.render(numberOfFrames);
-
-      // only to test video node
-      //await this.processFrame();
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       this.isProcessing = false;
 

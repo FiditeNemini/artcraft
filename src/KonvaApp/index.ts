@@ -3,11 +3,6 @@ import { Engine } from "./Engine";
 export { Engine as EngineType };
 export const KonvaApp = async (element: HTMLDivElement) => {
   const engine = new Engine(element);
-  //await engine.sandbox();
   engine.initializeStage("");
-
-  //engine.sandbox();
-  // engine.initializeStage("");
-
   return engine;
 };
