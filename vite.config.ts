@@ -37,6 +37,5 @@ export default defineConfig({
       },
     },
   ],
-
   assetsInclude: ["**/.onnx", "**/*.wasm"],
 });

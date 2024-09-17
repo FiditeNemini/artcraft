@@ -1,16 +1,17 @@
 import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
-
+import { ImageNode } from "./Nodes/ImageNode";
+type MediaNode = VideoNode | ImageNode;
 export class SelectionManager {
-  private selectedNodes: Set<VideoNode>;
-  private initialPositions: Map<VideoNode, { x: number; y: number }>;
+  private selectedNodes: Set<MediaNode>;
+  private initialPositions: Map<MediaNode, { x: number; y: number }>;
 
   constructor() {
     this.selectedNodes = new Set();
-    this.initialPositions = new Map<VideoNode, { x: number; y: number }>();
+    this.initialPositions = new Map<MediaNode, { x: number; y: number }>();
   }
 
-  public selectNode(node: VideoNode, isMultiSelect: boolean): void {
+  public selectNode(node: MediaNode, isMultiSelect: boolean): void {
     if (!isMultiSelect) {
       this.clearSelection();
     }
@@ -28,7 +29,7 @@ export class SelectionManager {
     console.log(this.selectedNodes);
   }
 
-  public deselectNode(node: VideoNode): void {
+  public deselectNode(node: MediaNode): void {
     this.selectedNodes.delete(node);
     node.kNode.getLayer()?.batchDraw();
   }
@@ -43,7 +44,7 @@ export class SelectionManager {
   }
 
   // Start State
-  public startDrag(node: VideoNode): void {
+  public startDrag(node: MediaNode | ImageNode): void {
     console.log("Starting Drag");
 
     const position = node.kNode.position();
@@ -57,7 +58,7 @@ export class SelectionManager {
   }
 
   // Drag State
-  public dragging(node: VideoNode): void {
+  public dragging(node: MediaNode): void {
     const initialPosition = this.initialPositions.get(node);
     if (!initialPosition) {
       console.log("Initial Position Undefined");
@@ -82,13 +83,13 @@ export class SelectionManager {
   }
 
   // End State
-  public draggingStopped(node: VideoNode): void {
+  public draggingStopped(node: MediaNode): void {
     console.log("Stop Dragging");
     this.initialPositions.clear();
   }
 
   // This lets us perfom operations on the selected node.
-  public getSelectedNodes(): Set<VideoNode> {
+  public getSelectedNodes(): Set<MediaNode> {
     return this.selectedNodes;
   }
 }

@@ -4,12 +4,6 @@ import {
 } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 import { ResponseType } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 
-import {
-  DiffusionSharedWorkerItemData,
-  DiffusionSharedWorkerProgressData,
-  DiffusionSharedWorkerResponseData,
-} from "./DiffusionSharedWorker";
-
 export class DiffusionSharedWorkerClient<
   DiffusionSharedWorkerItemData,
   DiffusionSharedWorkerResponseData,
@@ -32,31 +26,34 @@ export class DiffusionSharedWorkerClient<
       >,
     ) => void,
   ) {
+    this.messageReceived = messageReceived;
     this.sharedWorker = new SharedWorker(workerPath, {
       type: "module",
     });
     this.port = this.sharedWorker.port;
-    // make sure to bind this for this from the invoker
     this.port.onmessage = this.onMessage.bind(this);
     this.port.start();
   }
 
   async onMessage(event: MessageEvent) {
     // returns progress and returns result need to check error tomorrow then were good to go.
-    console.log(`incoming`);
-    console.log(event);
+    //console.log(`incoming`);
+    // console.log(event);
     if (event.data.responseType === ResponseType.error) {
-      console.log(`DiffusionSharedWorkerClient Error`);
-      console.log(event.data);
+      //console.log(`DiffusionSharedWorkerClient Error`);
+      //console.log(event.data);
+      this.messageReceived(event.data);
     } else if (event.data.responseType === ResponseType.progress) {
-      console.log(`DiffusionSharedWorkerClient Progress`);
-      console.log(event.data);
+      // console.log(`DiffusionSharedWorkerClient Progress`);
+      //console.log(event.data);
+      this.messageReceived(event.data);
     } else if (event.data.responseType === ResponseType.result) {
-      console.log(`DiffusionSharedWorkerClient Result`);
-      console.log(event.data);
+      // console.log(`DiffusionSharedWorkerClient Result`);
+      //console.log(event.data);
+      this.messageReceived(event.data);
     } else {
-      console.log(`DiffusionSharedWorkerClient Message Unknown`);
-      console.log(event.data);
+      // console.log(`DiffusionSharedWorkerClient Message Unknown?`);
+      // console.log(event.data);
     }
   }
 

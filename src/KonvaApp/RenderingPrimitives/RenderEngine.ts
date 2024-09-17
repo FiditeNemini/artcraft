@@ -2,6 +2,16 @@ import { VideoNode } from "../Nodes/VideoNode";
 import Konva from "konva";
 import { RenderTask } from "./RenderTask";
 
+// Hide these two to start. WIL
+// uiAccess.toolbarMain.loadingBar.hide();
+// uiEvents.toolbarMain.loadingBarRetry.onClick((e) => {
+//   console.log(
+//     "toolbarMain > loadingBar > retry : onClick heard in Engine",
+//     e,
+//   );
+// });
+// uiAccess.toolbarMain.loadingBar.updateProgress(100);
+
 import { DiffusionSharedWorkerClient } from "../SharedWorkers/Diffusion/DiffusionSharedWorkerClient";
 import {
   SharedWorkerRequest,
@@ -41,6 +51,15 @@ export class RenderEngine {
 
   private captureCanvas: Konva.Rect;
 
+  public videoLoadingCanvas: VideoNode | undefined;
+
+  private onRenderingSystemMessageRecieved: (
+    response: SharedWorkerResponse<
+      DiffusionSharedWorkerResponseData,
+      DiffusionSharedWorkerProgressData
+    >,
+  ) => void;
+
   private diffusionWorker:
     | DiffusionSharedWorkerClient<
         DiffusionSharedWorkerItemData,
@@ -65,6 +84,8 @@ export class RenderEngine {
     // Ensures that all the nodes stag in the same place should
     // there be a window resize.
     // recompute the position
+    // to ensure that the position of this stays
+
     const oldPositionX = this.positionX;
     const oldPositionY = this.positionY;
 
@@ -75,7 +96,23 @@ export class RenderEngine {
     this.captureCanvas.setPosition({ x: this.positionX, y: this.positionY });
     this.captureCanvas.size({ width: this.width, height: this.height });
 
-    // this is the change.
+    // Setup loader and position it accordingly
+    if (this.videoLoadingCanvas === undefined) {
+      this.videoLoadingCanvas = new VideoNode(
+        "",
+        this.videoLayer,
+        this.positionX,
+        this.positionY,
+        "wipe.mp4",
+        undefined,
+        this.width,
+        this.height,
+      );
+    }
+    this.videoLoadingCanvas.highlight();
+    this.videoLoadingCanvas.kNode.hide();
+
+    // this is the change in positions
     const deltaX = this.positionX - oldPositionX;
     const deltaY = this.positionY - oldPositionY;
 
@@ -95,10 +132,20 @@ export class RenderEngine {
     }
     this.videoLayer.batchDraw();
   }
-  constructor(videoLayer: Konva.Layer, offScreenCanvas: OffscreenCanvas) {
+  constructor(
+    videoLayer: Konva.Layer,
+    offScreenCanvas: OffscreenCanvas,
+    onRenderingSystemMessageRecieved: (
+      response: SharedWorkerResponse<
+        DiffusionSharedWorkerResponseData,
+        DiffusionSharedWorkerProgressData
+      >,
+    ) => void,
+  ) {
+    this.videoLoadingCanvas = undefined;
     this.videoNodes = [];
     this.isProcessing = false;
-
+    this.onRenderingSystemMessageRecieved = onRenderingSystemMessageRecieved;
     // TODO: Make this dynamic and update this on change of canvas.
 
     this.width = 720;
@@ -162,22 +209,13 @@ export class RenderEngine {
     this.port.postMessage(renderTask);
   }
 
-  onMessageReceived(
-    response: SharedWorkerResponse<
-      DiffusionSharedWorkerResponseData,
-      DiffusionSharedWorkerProgressData
-    >,
-  ) {
-    console.log(response);
-  }
-
   setupSharedWorker() {
     if (typeof SharedWorker !== "undefined") {
       console.log("Shared Workers are supported in this browser.");
       // Debug chrome://inspect/#workers
       this.diffusionWorker = new DiffusionSharedWorkerClient(
         "src\\KonvaApp\\SharedWorkers\\Diffusion\\DiffusionSharedWorker.ts",
-        this.onMessageReceived.bind(this),
+        this.onRenderingSystemMessageRecieved,
       );
 
       this.canUseSharedWorker = true;
@@ -221,6 +259,14 @@ export class RenderEngine {
     this.videoNodes.push(node);
   }
 
+  public removeNodes(node: VideoNode) {
+    const index = this.videoNodes.indexOf(node);
+    if (index > -1) {
+      this.videoNodes.splice(index, 1);
+      this.videoLayer.draw();
+    }
+  }
+
   // Do a bunch of precondition checks and error out early on.
   public async startProcessing() {
     // Start processing and lock everything
@@ -230,13 +276,11 @@ export class RenderEngine {
 
       // error out if nodes are not all loaded.
 
-      // ensure items cannot be manipulated
-
       // todo remove when we have error handling + and ui
       var failed = false;
       for (let i = 0; i < this.videoNodes.length; i++) {
         const item = this.videoNodes[i];
-
+        item.kNode.listening(false);
         if (item.didFinishLoading == false) {
           // error out and show error message
           //this.startProcessing();
@@ -251,7 +295,7 @@ export class RenderEngine {
       // todo remove
       if (failed) {
         // throw error
-        return;
+        throw Error("Wait For Items to Finish Processing");
       }
 
       this.videoNodes.forEach((item: VideoNode) => {});
@@ -269,6 +313,12 @@ export class RenderEngine {
       console.log(error);
     } finally {
       this.isProcessing = false;
+
+      // enable all nodes again.
+      for (let i = 0; i < this.videoNodes.length; i++) {
+        const item = this.videoNodes[i];
+        item.kNode.listening(true);
+      }
     }
   }
 
@@ -300,7 +350,7 @@ export class RenderEngine {
       videoNode.stop();
     }
 
-    // only pick nodes that intersect with the canvas on screen bounds
+    // only pick nodes that intersect with the canvas on screen bounds to freeze.
 
     for (let j = 0; j < largestNumberOfFrames; j++) {
       // Seek Video Nodes first then draw
@@ -388,13 +438,15 @@ export class RenderEngine {
 
         console.log(`Processing Frame:${j} out of ${largestNumberOfFrames}`);
 
-        if (j == largestNumberOfFrames - 1) {
+        if (j == Math.floor(largestNumberOfFrames)) {
           isDoneStreaming = true;
         }
 
+        console.log(isDoneStreaming);
+
         this.diffusionWorker.sendData(1, data, isDoneStreaming);
 
-        // DEBUG TO SHORT CUT WAITING
+        // To ensure there is no lingering frames.
         if (isDoneStreaming) {
           console.log("Done streaming");
           break;

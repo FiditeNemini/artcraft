@@ -3,11 +3,18 @@ import { VideoNode } from "./Nodes/VideoNode";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
 import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
+import { v4 as uuidv4 } from "uuid";
 
-import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 import { SelectionManager } from "./SelectionManager";
 import { toolbarImage } from "~/signals/uiAccess/toolbarImage";
+
+import { ImageNode } from "./Nodes/ImageNode";
+
+import { LoadingBarStatus } from "~/components/ui";
+import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
+
 import * as ort from "onnxruntime-web";
+
 
 export class Engine {
   private canvasReference: HTMLDivElement;
@@ -50,8 +57,77 @@ export class Engine {
     // core layer for all the work done.
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
-    this.renderEngine = new RenderEngine(this.videoLayer, this.offScreenCanvas);
+    this.renderEngine = new RenderEngine(
+      this.videoLayer,
+      this.offScreenCanvas,
+      this.onRenderingSystemReceived.bind(this),
+    );
 
+    this.setupEventSystem();
+  }
+
+  private isShowing: boolean = false;
+
+  // TODO write code to show error and retry.
+
+  onRenderingSystemReceived(
+    response: SharedWorkerResponse<
+      DiffusionSharedWorkerResponseData,
+      DiffusionSharedWorkerProgressData
+    >,
+  ) {
+    // Test URL to quickly test the code.
+    // show the loader.
+    // const response = {
+    //   data: {
+    //     status: "complete_success",
+    //     videoUrl:
+    //       "/media/j/3/c/v/j/j3cvjjdstr4fqs477d3ech8rp2c9skpy/storyteller_j3cvjjdstr4fqs477d3ech8rp2c9skpy.mp4",
+    //     progress: 0.2,
+    //   },
+    // };
+    if (!this.renderEngine.videoLoadingCanvas) {
+      console.log("Missing Video Loading Canvas");
+      return;
+    }
+    if (response.responseType === ResponseType.result) {
+      uiAccess.toolbarMain.loadingBar.hide();
+      // create video node here.
+      // choose it to be the size of the rendering output, this case its mobile. (1560, 400)
+      const media_api_base_url = "https://storage.googleapis.com/";
+      const media_url = `${media_api_base_url}vocodes-public${response.data.videoUrl}`;
+
+      const videoNode = new VideoNode(
+        uuidv4(),
+        this.videoLayer,
+        this.renderEngine.videoLoadingCanvas?.kNode.position().x,
+        this.renderEngine.videoLoadingCanvas?.kNode.position().y,
+        media_url,
+        this.selectionManager,
+        undefined,
+        undefined,
+      );
+      this.renderEngine.addNodes(videoNode);
+
+      // hide the loader
+      this.renderEngine.videoLoadingCanvas.kNode.hide();
+      uiAccess.toolbarMain.loadingBar.hide();
+    } else if (response.responseType === ResponseType.progress) {
+      // TODO wil fix this ?!?! parameter issue
+      uiAccess.toolbarMain.loadingBar.show();
+      this.renderEngine.videoLoadingCanvas.kNode.show();
+      uiAccess.toolbarMain.loadingBar.updateProgress(
+        response.data.progress * 100,
+      );
+    } else {
+      // throw error to retry
+      console.log(response);
+    }
+
+    console.log(response);
+  }
+
+  private setupEventSystem() {
     this.stage.on("mousedown", (e) => {
       if (e.target === this.stage) {
         this.selectionManager.clearSelection();
@@ -64,6 +140,7 @@ export class Engine {
 
       nodes.forEach((node) => {
         this.selectionManager.deselectNode(node);
+        this.renderEngine.removeNodes(node);
         node.delete();
       });
     });
@@ -88,7 +165,7 @@ export class Engine {
 
     uiEvents.onGetStagedVideo((video) => {
       console.log("Engine got video: " + video.url);
-      // this.addVideo(video.file);
+      this.addVideo(video.url);
     });
 
     uiEvents.onRequestAiStylize((data) => {
@@ -103,49 +180,30 @@ export class Engine {
       console.log("select one is clicked");
     });
 
+    // TODO implement.
     uiEvents.toolbarMain.SAVE.onClick(async (event) => {
-      uiAccess.toolbarMain.changeButtonState(
-        ToolbarMainButtonNames.AI_STYLIZE,
-        { disabled: true },
-      );
+      //this.onRenderingSystemReceived(undefined);
+    });
 
-      console.log("onClick");
+    uiEvents.onRequestAiStylize(async () => {
+      // uiAccess.toolbarMain.changeButtonState(
+      //   ToolbarMainButtonNames.AI_STYLIZE,
+      //   { disabled: true },
+      // );
+
+      // TODO pull the values for stlyization
+
       await this.renderEngine.startProcessing();
 
-      uiAccess.toolbarMain.changeButtonState(
-        ToolbarMainButtonNames.AI_STYLIZE,
-        { disabled: false },
-      );
+      // uiAccess.toolbarMain.changeButtonState(
+      //   ToolbarMainButtonNames.AI_STYLIZE,
+      //   { disabled: false },
+      // );
     });
 
-    uiEvents.toolbarMain.loadingBarRetry.onClick((e) => {
-      console.log(
-        "toolbarMain > loadingBar > retry : onClick heard in Engine",
-        e,
-      );
-    });
-    // uiEvents.toolbarMain.AI_STYLIZE.onClick(async (event) => {
-    //   uiAccess.toolbarMain.changeButtonState(
-    //     ToolbarMainButtonNames.AI_STYLIZE,
-    //     { disabled: true },
-    //   );
-    //   const sleepytstart = new Date();
-    //   console.log(
-    //     "SLEEP",
-    //     `${sleepytstart.getMinutes()}:${sleepytstart.getSeconds()}`,
-    //   );
-
-    //   const sleeptend = new Date();
-    //   console.log(
-    //     "DONE",
-    //     `${sleeptend.getMinutes()}:${sleeptend.getSeconds()}`,
-    //   );
-
-    //   uiAccess.toolbarMain.changeButtonState(
-    //     ToolbarMainButtonNames.AI_STYLIZE,
-    //     { disabled: false },
-    //   );
-    // });
+    // WIL please default hide this. TODO Remove
+    uiAccess.toolbarMain.loadingBar.hide();
+    uiAccess.toolbarMain.loadingBar.updateStatus(LoadingBarStatus.IDLE);
   }
 
   sleep(ms: number): Promise<void> {
@@ -258,30 +316,30 @@ export class Engine {
     anim.start();
 
     // Adding nodes here
-    const videoNode = new VideoNode(
-      "",
-      this.offScreenCanvas,
-      this.videoLayer,
-      1560,
-      400,
-      "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-      this.selectionManager,
-    );
+    // const videoNode = new VideoNode(
+    //   "",
+    //   this.offScreenCanvas,
+    //   this.videoLayer,
+    //   1560,
+    //   400,
+    //   "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+    //   this.selectionManager,
+    // );
 
-    const videoNode2 = new VideoNode(
-      "",
-      this.offScreenCanvas,
-      this.videoLayer,
-      1560,
-      1000,
-      "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-      this.selectionManager,
-    );
+    // const videoNode2 = new VideoNode(
+    //   "",
+    //   this.offScreenCanvas,
+    //   this.videoLayer,
+    //   1560,
+    //   1000,
+    //   "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+    //   this.selectionManager,
+    // );
 
     // CODE TO TEST RENDER ENGINE
     // Testing render engine
-    this.renderEngine.addNodes(videoNode);
-    this.renderEngine.addNodes(videoNode2);
+    // this.renderEngine.addNodes(videoNode);
+    // this.renderEngine.addNodes(videoNode2);
 
     // await this.renderEngine.startProcessing();
 
@@ -295,27 +353,27 @@ export class Engine {
   }
 
   public addImage(imageFile: File) {
-    // main API:
-    const imageObj = new Image();
-    const videoLayer = this.videoLayer;
-    imageObj.onload = () => {
-      const konvaImage = new Konva.Image({
-        x: 50,
-        y: 50,
-        image: imageObj,
-        width: 106,
-        height: 118,
-      });
-
-      // add the shape to the layer
-      videoLayer.add(konvaImage);
-    };
-    imageObj.src = URL.createObjectURL(imageFile);
+    const imageNode = new ImageNode(
+      uuidv4(),
+      this.videoLayer,
+      50,
+      50,
+      imageFile,
+      this.selectionManager,
+    );
   }
-  public addVideo(videoFile: File) {
+  public addVideo(url: string) {
     // Adding nodes here
-    console.log("addVideo", videoFile);
+    const videoNode = new VideoNode(
+      uuidv4(),
+      this.videoLayer,
+      1560,
+      400,
+      url,
+      this.selectionManager,
+      undefined,
+      undefined,
+    );
+    this.renderEngine.addNodes(videoNode);
   }
-
-  public applyUIListners() {}
 }

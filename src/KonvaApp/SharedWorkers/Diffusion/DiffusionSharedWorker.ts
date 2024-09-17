@@ -22,6 +22,7 @@ import { JobStatus } from "~/Classes/ApiManager/enums/Job";
 export interface DiffusionSharedWorkerProgressData {
   url: string;
   status: JobStatus;
+  progress: number;
 }
 
 export interface DiffusionSharedWorkerItemData {
@@ -92,14 +93,10 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
   async workFunction(
     isDoneStreaming: boolean,
     item: DiffusionSharedWorkerItemData,
-    reportProgress: (
-      progress: number,
-      data: DiffusionSharedWorkerProgressData,
-    ) => void,
+    reportProgress: (data: DiffusionSharedWorkerProgressData) => void,
   ): Promise<[DiffusionSharedWorkerResponseData | undefined, boolean]> {
     // make request via api with options
 
-    console.log(this);
     try {
       if (this.offscreenCanvas === undefined) {
         this.offscreenCanvas = new OffscreenCanvas(item.width, item.height);
@@ -119,6 +116,8 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       });
 
       this.blobs.push(blob);
+      console.log("Length of blob");
+      console.log(this.blobs.length);
       // progress
       const aproxSteps = item.totalFrames;
       const totalPercent = 100.0;
@@ -126,18 +125,10 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       const progressData: DiffusionSharedWorkerProgressData = {
         url: "",
         status: JobStatus.PENDING,
+        progress: (item.frame / aproxSteps / 2 / totalPercent) * 100,
       };
-
-      reportProgress(
-        (item.frame / aproxSteps / 2 / totalPercent) * 100,
-        progressData,
-      ); // once finished gives you up to 50%
-
-      /** Don't do this ? doesn't let you stream zip it.
-        const name = String(item.frame).padStart(5, "0"); // '0009'
-        console.log(name);
-        await this.zipWriter.add(`${name}.jpg`, new BlobReader(blob));
-      **/
+      console.log("Lets report progress.");
+      reportProgress(progressData); // once finished gives you up to 50%
 
       if (isDoneStreaming === false) {
         return [undefined, false];
@@ -218,57 +209,53 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
           let renderProgressData: DiffusionSharedWorkerProgressData = {
             url: "",
             status: JobStatus.DEAD,
+            progress: computedProgress / totalPercent,
           };
+
           renderProgressData.status = status;
           switch (status) {
             case JobStatus.PENDING:
-              reportProgress(
-                computedProgress / totalPercent,
-                renderProgressData,
-              ); // once finished gives you up to 50%
+              reportProgress(renderProgressData); // once finished gives you up to 50%
               break;
             case JobStatus.DEAD:
-              reportProgress(0, renderProgressData);
+              renderProgressData.progress = 0;
+              reportProgress(renderProgressData);
               break;
             case JobStatus.STARTED:
-              reportProgress(
-                computedProgress / totalPercent,
-                renderProgressData,
-              );
+              reportProgress(renderProgressData);
               break;
             case JobStatus.ATTEMPT_FAILED:
-              reportProgress(
-                computedProgress / totalPercent,
-                renderProgressData,
-              );
+              reportProgress(renderProgressData);
               break;
             case JobStatus.COMPLETE_SUCCESS:
+              renderProgressData.progress = 100;
+
               jobIsProcessing = false;
               if (!job.data.maybe_result.maybe_public_bucket_media_path) {
-                // maybe you need to convert to media url ?
                 throw Error("Server Failed To Return Result");
               }
               resultURL = job.data.maybe_result.maybe_public_bucket_media_path;
-              reportProgress(100, renderProgressData);
+              reportProgress(renderProgressData);
               break;
             case JobStatus.COMPLETE_FAILURE:
               jobIsProcessing = false;
-              reportProgress(0, renderProgressData);
+              renderProgressData.progress = 0;
+              reportProgress(renderProgressData);
               break;
             case JobStatus.DEAD:
               jobIsProcessing = false;
-              reportProgress(0, renderProgressData);
+              reportProgress(renderProgressData);
               break;
             case JobStatus.CANCCELLED_BY_SYSTEM:
               jobIsProcessing = false;
-              reportProgress(0, renderProgressData);
+              reportProgress(renderProgressData);
               break;
             case JobStatus.CANCELLED_BY_USER:
               jobIsProcessing = false;
-              reportProgress(0, renderProgressData);
+              reportProgress(renderProgressData);
               break;
           }
-          await this.sleep(1000);
+          await this.sleep(500);
         } // end while loop
       }
       if (!resultURL) {
@@ -295,7 +282,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 
   progressFunction(progress: ProgressData<DiffusionSharedWorkerProgressData>) {
     console.log(
-      `Progress Function  JobID:${progress.jobID} Data:${progress.data} Progress:${progress.progress}`,
+      `Progress Function  JobID:${progress.jobID} Data:${progress.data}`,
     );
 
     // send out to node as a worker response

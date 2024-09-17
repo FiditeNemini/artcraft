@@ -9,7 +9,7 @@ const toolbarVideo = uiAccess.toolbarImage;
 const loadingBar = uiAccess.loadingBar;
 
 export class VideoNode extends NetworkedNodeContext {
-  public selectionManagerRef: SelectionManager;
+  public selectionManagerRef: SelectionManager | undefined;
 
   public videoURL: string;
   public videoComponent: HTMLVideoElement;
@@ -21,7 +21,6 @@ export class VideoNode extends NetworkedNodeContext {
   private videoLayer: Layer;
 
   public uuid: string;
-  public offScreenCanvas: OffscreenCanvas;
 
   private shouldPlay: boolean = true;
 
@@ -75,17 +74,17 @@ export class VideoNode extends NetworkedNodeContext {
   private frameDidFinishSeeking: Promise<void>;
   constructor(
     uuid: string = uuidv4(),
-    offScreenCanvas: OffscreenCanvas,
     videoLayer: Layer,
     x: number,
     y: number,
     videoURL: string,
-    selectionManagerRef: SelectionManager,
+    selectionManagerRef: SelectionManager | undefined,
+    width: number | undefined,
+    height: number | undefined,
   ) {
     super();
     this.selectionManagerRef = selectionManagerRef;
     this.shouldPlay = true; // start
-    this.offScreenCanvas = offScreenCanvas;
     this.uuid = uuid;
     this.videoLayer = videoLayer;
     // state manage the node
@@ -106,10 +105,30 @@ export class VideoNode extends NetworkedNodeContext {
     this.frameDidFinishSeeking = new Promise<void>(() => {});
     this.finishedLoadingOnStart = new Promise<void>(() => {});
 
+    this.kNode = new Konva.Image({
+      image: this.videoComponent,
+      x: x,
+      y: y,
+      draggable: true,
+    });
+
+    if (this.selectionManagerRef === undefined) {
+      this.kNode.listening(false);
+    }
+
     this.videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
-      this.kNode.width(this.videoComponent.videoWidth);
-      this.kNode.height(this.videoComponent.videoHeight);
+      if (height) {
+        this.kNode.height(height);
+      } else {
+        this.kNode.height(this.videoComponent.videoHeight);
+      }
+      if (width) {
+        this.kNode.width(width);
+      } else {
+        this.kNode.width(this.videoComponent.videoWidth);
+      }
+
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
       // it might have length here which we will need to trim down to 7 seconds.
       console.log(`Video Duration: ${this.videoComponent.duration}`);
@@ -128,20 +147,15 @@ export class VideoNode extends NetworkedNodeContext {
     // assign video to start process.
     this.videoComponent.src = this.videoURL;
 
-    this.kNode = new Konva.Image({
-      image: this.videoComponent,
-      x: x,
-      y: y,
-      draggable: true,
-    });
-
     this.videoLayer.add(this.kNode);
 
     this.kNode.on("dragstart", (e) => {
       this.updateContextMenuPosition();
       // Multiselect
       const isMultiSelect = e.evt.shiftKey;
-      this.selectionManagerRef.startDrag(this);
+      if (this.selectionManagerRef) {
+        this.selectionManagerRef.startDrag(this);
+      }
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       }
@@ -153,7 +167,9 @@ export class VideoNode extends NetworkedNodeContext {
       this.updateContextMenuPosition();
       // Multiselect
       const isMultiSelect = e.evt.shiftKey;
-      this.selectionManagerRef.dragging(this);
+      if (this.selectionManagerRef) {
+        this.selectionManagerRef.dragging(this);
+      }
       if (this.isProcessing) {
         return;
       }
@@ -164,7 +180,9 @@ export class VideoNode extends NetworkedNodeContext {
     });
 
     this.kNode.on("dragend", (e) => {
-      this.selectionManagerRef.draggingStopped(this);
+      if (this.selectionManagerRef) {
+        this.selectionManagerRef.draggingStopped(this);
+      }
     });
 
     this.kNode.on("mouseover", () => {
@@ -187,7 +205,9 @@ export class VideoNode extends NetworkedNodeContext {
 
       // selection on click doesn't do a good job.
       const isMultiSelect = e.evt.shiftKey;
-      this.selectionManagerRef.selectNode(this, isMultiSelect);
+      if (this.selectionManagerRef) {
+        this.selectionManagerRef.selectNode(this, isMultiSelect);
+      }
 
       this.updateContextMenuPosition();
 
@@ -248,56 +268,55 @@ export class VideoNode extends NetworkedNodeContext {
     this.kNode.moveDown();
   }
 
-  private async createVideoElement(newURL: string) {
+  public async createVideoElement(newURL: string) {
     // try catch here with a retry button.
     const videoComponent = document.createElement("video");
     // Update to use image.
     videoComponent.src = newURL;
-    // assign video to start process.
-    this.videoComponent = videoComponent;
+    console.log("Video Data");
     console.log(newURL);
-
-    videoComponent.onseeked = (event: Event) => {
-      console.log("Seeked Finished");
-      // reimplement using the function
-    };
-
-    videoComponent.onloadedmetadata = (event: Event) => {
-      console.log("Loaded Metadata");
-
-      // it might have length here which we will need to trim down to 7 seconds.
-      console.log(`Video Duration: ${videoComponent.duration}`);
-      this.duration = videoComponent.duration;
-    };
-
     videoComponent.onloadstart = (event: Event) => {
       this.didFinishLoading = false;
       console.log("OnLoadStart");
     };
 
-    videoComponent.onloadeddata = (event: Event) => {
-      try {
-        console.log("LoadedData");
+    videoComponent.onloadedmetadata = (event: Event) => {
+      console.log("Loaded Metadata");
+      this.kNode.width(videoComponent.videoWidth);
+      this.kNode.height(videoComponent.videoHeight);
 
-        this.kNode.image(videoComponent);
-        this.kNode.draw();
-        this.videoComponent.loop = true;
-        this.videoComponent.currentTime = 0; // ensure it shows up on screen
+      // it might have length here which we will need to trim down to 7 seconds.
+      console.log(`Video Duration: ${videoComponent.duration}`);
+      videoComponent.currentTime = 0; // ensure it shows up on screen
 
-        this.shouldPlay = true; // means its play state
-      } catch (error) {
-        console.log(error);
-      }
+      this.duration = videoComponent.duration;
+
+      this.videoComponent = videoComponent;
     };
 
-    videoComponent.oncanplaythrough = (event: Event) => {
-      // remove loading ui
-      loadingBar.updateProgress(100);
-      loadingBar.hide();
-      this.didFinishLoading = true;
-      // Might have to auto click? on first load this doesn't work in general how about after ?
-      //this.play(); //sometimes race condition with the
-    };
+    // videoComponent.onloadeddata = (event: Event) => {
+    //   try {
+    //     console.log("LoadedData");
+
+    //     this.kNode.image(videoComponent);
+    //     this.kNode.draw();
+    //     this.videoComponent.loop = true;
+    //     this.videoComponent.currentTime = 0; // ensure it shows up on screen
+
+    //     this.shouldPlay = true; // means its play state
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
+
+    // videoComponent.oncanplaythrough = (event: Event) => {
+    //   // remove loading ui
+    //   loadingBar.updateProgress(100);
+    //   loadingBar.hide();
+    //   this.didFinishLoading = true;
+    //   // Might have to auto click? on first load this doesn't work in general how about after ?
+    //   //this.play(); //sometimes race condition with the
+    // };
   }
 
   private play() {

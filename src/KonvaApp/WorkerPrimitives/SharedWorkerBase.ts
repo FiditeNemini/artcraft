@@ -106,7 +106,7 @@ export class SharedWorkerBase<I, R, P> {
   }
 
   // override this for subclass;
-  public reportResult(result: WorkResult<R>): void {
+  public reportResult(result: WorkResult<R | undefined>): void {
     console.log("Must Override ReportResult");
   }
 }

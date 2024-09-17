@@ -8,7 +8,7 @@ import { ResponseType, SharedWorkerResponse } from "./SharedWorkerBase";
 export type WorkFunction<I, R, P> = (
   isDoneStreaming: boolean,
   workItem: I,
-  reportProgress: (progress: number, data: P) => void,
+  reportProgress: (data: P) => void,
 ) => Promise<[R | undefined, boolean]>;
 
 // Work Item with Type T
@@ -27,7 +27,7 @@ export interface WorkResult<R> {
 // Streamed Progress with or without data
 export interface ProgressData<P> {
   jobID: number;
-  progress: number;
+
   data: P | undefined;
 }
 
@@ -48,7 +48,7 @@ export class WorkQueue<I, R, P> {
   // if not then it produces one result for one work item off the main thread.
 
   protected workFunction: WorkFunction<I, R, P> | undefined;
-  protected resultFunction: (result: WorkResult<R>) => void;
+  protected resultFunction: (result: WorkResult<R | undefined>) => void;
   protected errorFunction: (error: SharedWorkerResponse<I, R>) => void;
   protected progressCallback: (
     progressData: ProgressData<P>,
@@ -57,7 +57,7 @@ export class WorkQueue<I, R, P> {
   constructor(
     workFunction: WorkFunction<I, R, P>,
     progressCallback: (progressData: ProgressData<P>) => void,
-    resultFunction: (result: WorkResult<R>) => void,
+    resultFunction: (result: WorkResult<R | undefined>) => void,
     errorFunction: (error: SharedWorkerResponse<I, R>) => void,
   ) {
     this.workFunction = workFunction;
@@ -76,10 +76,11 @@ export class WorkQueue<I, R, P> {
       if (workItem) {
         try {
           // The Data E here is used to stream back any extra images or anything.
-          const reportProgress = (progress: number, data: P) => {
+
+          // FOR SOME REASON THIS CALLS at the end of the stream.
+          const reportProgress = (data: P) => {
             this.progressCallback({
               jobID: workItem.jobID,
-              progress: progress,
               data: data, // could be url's some kind of data
             });
           };
@@ -128,7 +129,7 @@ export class WorkQueue<I, R, P> {
     this.processQueue();
   }
 
-  public reportResult(result: WorkResult<R>): void {
+  public reportResult(result: WorkResult<R | undefined>): void {
     console.log(`Job ${result.jobID} completed with result:`, result.data);
     // You can replace this with any reporting mechanism you need
     if (!this.resultFunction) {
