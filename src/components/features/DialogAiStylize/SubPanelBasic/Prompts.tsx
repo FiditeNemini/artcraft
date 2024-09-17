@@ -6,8 +6,8 @@ import { Textarea } from "~/components/ui";
 import {
   generateRandomTextPositive,
   generateRandomTextNegative,
-} from "./utilities";
-import { ArtStyleNames } from "./enums";
+} from "../utilities";
+import { ArtStyleNames } from "../enums";
 
 export const Prompts = ({
   selectedArtStyle,

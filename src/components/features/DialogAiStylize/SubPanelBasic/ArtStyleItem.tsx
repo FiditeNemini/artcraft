@@ -1,6 +1,7 @@
 import { ImgHTMLAttributes, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { ArtStyleNames } from "./enums";
+import { ArtStyleNames } from "../enums";
+import { transitionTimingStyles } from "~/components/styles";
 
 interface ArtStyleItemProps extends ImgHTMLAttributes<HTMLImageElement> {
   label: string;
@@ -18,8 +19,6 @@ export const ArtStyleItem = ({
   defaultImg = "/resources/placeholders/style_placeholder.png",
   src = defaultImg,
   onSelected,
-  // width,
-  // height,
   className,
   ...imgProps
 }: ArtStyleItemProps) => {
@@ -39,18 +38,13 @@ export const ArtStyleItem = ({
   return (
     <button
       className={twMerge(
-        "relative cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out",
+        "relative cursor-pointer overflow-hidden rounded-lg border-2 transition-colors",
+        transitionTimingStyles,
         selected
           ? "border-primary"
           : "border-ui-border hover:border-primary-300",
         className,
       )}
-      // style={{
-      //   minWidth: (width as number) + 4,
-      //   minHeight: (height as number) + 4,
-      //   maxWidth: (width as number) + 4,
-      //   maxHeight: (height as number) + 4,
-      // }}
       onClick={handleSelected}
     >
       <img
@@ -58,12 +52,6 @@ export const ArtStyleItem = ({
         src={imageSrc}
         {...imgProps}
         alt={label}
-        // style={{
-        //   minWidth: width,
-        //   minHeight: height,
-        //   maxWidth: width,
-        //   maxHeight: height,
-        // }}
       />
       <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
       <h4 className="absolute bottom-0 left-1 truncate text-start text-sm drop-shadow-md">
@@ -72,9 +60,11 @@ export const ArtStyleItem = ({
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
-        className={`absolute right-2 top-2 size-5 shadow-xl transition-opacity duration-200 ease-in-out ${
-          selected ? "opacity-100" : "opacity-0"
-        }`}
+        className={twMerge(
+          "absolute right-2 top-2 size-5 shadow-xl transition-opacity",
+          transitionTimingStyles,
+          selected ? "opacity-100" : "opacity-0",
+        )}
       >
         <path
           opacity="1"

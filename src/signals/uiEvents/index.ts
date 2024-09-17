@@ -22,11 +22,11 @@ import {
   dispatcher as buttonRetryDispatcher,
   eventsHandler as buttonRetryEvent,
 } from "./buttonRetry";
-import { requestAiStylize, onRequestAiStylize } from "./aiStylize";
+import { aiStylizeDispatchers, aiStylizeEvents } from "./aiStylize";
 
 export const uiEvents = {
   ...addMediaEvents,
-  onRequestAiStylize,
+  aiStylize: aiStylizeEvents,
   buttonRetry: buttonRetryEvent,
   buttonTest: buttonTestEvent,
   toolbarImage: toolbarImageEvents,
@@ -35,7 +35,7 @@ export const uiEvents = {
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
-  requestAiStylize,
+  aiStylize: aiStylizeDispatchers,
   buttonRetry: buttonRetryDispatcher,
   buttonTest: buttonTestDispatcher,
   toolbarImage: toolbarImageDispatchers,

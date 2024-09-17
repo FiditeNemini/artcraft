@@ -168,8 +168,14 @@ export class Engine {
       this.addVideo(video.url);
     });
 
-    uiEvents.onRequestAiStylize((data) => {
+    uiEvents.aiStylize.onRequest((data) => {
       console.log("Engine heard AI Stylize request: ", data);
+      console.log(
+        "you can also get initial values via uiEvents.aiStylize.getInitialValues",
+      );
+      console.log(
+        "if you missed the event, the current values can be accessed via uiEvents.aiStylize.getCurrentValues",
+      );
     });
     // TODO: You may listen to all the image toolbar events here
     uiEvents.toolbarImage.MOVE.onClick(() => {
@@ -185,7 +191,7 @@ export class Engine {
       //this.onRenderingSystemReceived(undefined);
     });
 
-    uiEvents.onRequestAiStylize(async () => {
+    uiEvents.aiStylize.onRequest(async () => {
       // uiAccess.toolbarMain.changeButtonState(
       //   ToolbarMainButtonNames.AI_STYLIZE,
       //   { disabled: true },

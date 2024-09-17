@@ -9,7 +9,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconClassName?: string;
   iconFlip?: boolean;
   htmlFor?: string;
-  variant?: "primary" | "secondary" | "action";
+  variant?: "primary" | "secondary" | "tertiary" | "action";
   loading?: boolean;
 }
 
@@ -27,6 +27,9 @@ export const Button = ({
 }: ButtonProps) => {
   function getVariantClassNames(variant: string) {
     switch (variant) {
+      case "tertiary": {
+        return "bg-tertiary hover:bg-tertiary-400 text-white focus-visible:outline-tertiary-600";
+      }
       case "secondary": {
         return "bg-secondary hover:bg-secondary-900 text-white focus-visible:outline-secondary";
       }
