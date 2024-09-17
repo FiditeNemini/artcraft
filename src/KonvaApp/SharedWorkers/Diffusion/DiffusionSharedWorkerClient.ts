@@ -40,8 +40,8 @@ export class DiffusionSharedWorkerClient<
     //console.log(`incoming`);
     // console.log(event);
     if (event.data.responseType === ResponseType.error) {
-      //console.log(`DiffusionSharedWorkerClient Error`);
-      //console.log(event.data);
+      console.log(`DiffusionSharedWorkerClient Error`);
+      console.log(event.data);
       this.messageReceived(event.data);
     } else if (event.data.responseType === ResponseType.progress) {
       // console.log(`DiffusionSharedWorkerClient Progress`);
@@ -52,8 +52,8 @@ export class DiffusionSharedWorkerClient<
       //console.log(event.data);
       this.messageReceived(event.data);
     } else {
-      // console.log(`DiffusionSharedWorkerClient Message Unknown?`);
-      // console.log(event.data);
+      console.log(`DiffusionSharedWorkerClient Message Unknown:`);
+      console.log(event.data);
     }
   }
 

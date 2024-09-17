@@ -23,7 +23,6 @@ import {
   DiffusionSharedWorker,
   DiffusionSharedWorkerItemData,
 } from "../SharedWorkers/Diffusion/DiffusionSharedWorker";
-import { Vector } from "@techstark/opencv-js";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 

@@ -15,7 +15,6 @@ import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 
 import * as ort from "onnxruntime-web";
 
-
 export class Engine {
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
@@ -121,10 +120,11 @@ export class Engine {
       );
     } else {
       // throw error to retry
-      console.log(response);
+      uiAccess.dialogueError.show({
+        title: "Generation Error",
+        message: response.data,
+      });
     }
-
-    console.log(response);
   }
 
   private setupEventSystem() {

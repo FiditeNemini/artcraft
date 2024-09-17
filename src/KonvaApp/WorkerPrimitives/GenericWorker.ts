@@ -101,7 +101,7 @@ export class WorkQueue<I, R, P> {
           }
         } catch (error) {
           // catches errors from the worker and sends it back as an error
-          console.error(`Error processing job ${workItem.jobID}:`, error);
+
           if (!this.errorFunction) {
             console.log("Didn't Setup Error Function in Generic Worker");
             return;

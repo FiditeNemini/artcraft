@@ -181,6 +181,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       });
 
       let resultURL = undefined;
+
       if (studioResponse.success && studioResponse.data?.inference_job_token) {
         console.log("Start Streaming Result");
         if (!studioResponse.data.inference_job_token) {
@@ -195,7 +196,6 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
           const job = await this.jobsAPI.GetJobByToken({ token: jobToken });
           console.log(job);
           if (!job.data) {
-            console.log("Job Data Not Found");
             throw Error("Job Data Not Found");
           }
           const status = job.data.status.status;
@@ -311,7 +311,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
     this.send({
       jobID: error.jobID,
       responseType: ResponseType.error,
-      data: undefined,
+      data: error.data?.toString(),
     });
   }
 
