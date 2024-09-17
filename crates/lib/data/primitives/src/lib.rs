@@ -23,6 +23,7 @@ pub mod iterators;
 pub mod lazy_any_option_true;
 pub mod numerics;
 pub mod optional_false_to_none;
+pub mod str;
 pub mod str_to_bool;
 pub mod traits;
 pub mod trim_or_empty;

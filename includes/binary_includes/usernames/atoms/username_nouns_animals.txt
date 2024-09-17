@@ -1,6 +1,6 @@
--- From: https://github.com/jneidel/animal-names
--- https://github.com/jneidel/animal-names/blob/master/animals-common.txt
--- This has been trimmed to remove potentially negative, offensive, uncool, or otherwise bad choices
+# From: https://github.com/jneidel/animal-names
+# https://github.com/jneidel/animal-names/blob/master/animals-common.txt
+# This has been trimmed to remove potentially negative, offensive, uncool, or otherwise bad choices
 
 alligator
 alpaca

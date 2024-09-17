@@ -2,20 +2,12 @@
 
 /// Read lines from a file in an iterator.
 /// Remove comment lines prefixed with `#`.
-pub fn iterate_trimmed_lines_without_comments<'a>(iterator: impl Iterator<Item=&'a str>)
-  -> impl Iterator<Item=String>
-//-> impl Iterator<Item = &'a str>
+pub fn iterate_trimmed_lines_without_comments<'a>(iterator: impl IntoIterator<Item=&'a str>)
+  -> impl Iterator<Item = &'a str>
 {
-  let f = iterator
-      .into_iter()
-      .map(|line| line.trim().to_string())
-      .collect::<Vec<_>>();
-
-  let f = f.into_iter()
+  iterator.into_iter()
+      .map(|line| line.trim())
       .filter(|line| !(line.starts_with("#") || line.is_empty()))
-      .collect::<Vec<_>>();
-
-  f.into_iter()
 }
 
 #[cfg(test)]
@@ -40,13 +32,11 @@ mod tests {
     let lines = contents.lines();
     let lines = iterate_trimmed_lines_without_comments(lines);
 
-    let lines: Vec<String> = lines.collect();
-
     assert_eq!(
-      lines,
+      lines.collect::<Vec<_>>(),
       vec![
-        "127.0.0.0/24".to_string(),
-        "192.168.0.0/24".to_string(),
+        "127.0.0.0/24",
+        "192.168.0.0/24",
       ]);
   }
 }

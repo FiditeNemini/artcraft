@@ -1,5 +1,5 @@
--- From https://gist.github.com/hugsy/8910dc78d208e40de42deb29e62df913#file-english-adjectives-txt
--- This has been trimmed to remove potentially negative, offensive, uncool, or otherwise bad choices
+# From https://gist.github.com/hugsy/8910dc78d208e40de42deb29e62df913#file-english-adjectives-txt
+# This has been trimmed to remove potentially negative, offensive, uncool, or otherwise bad choices
 
 able
 absolute
