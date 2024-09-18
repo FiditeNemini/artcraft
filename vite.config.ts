@@ -25,7 +25,7 @@ export default defineConfig({
         },
         {
           src: "src/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.js",
-          dest: "workers/",
+          dest: "assets/workers/",
         },
       ],
     }),
