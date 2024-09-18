@@ -267,14 +267,11 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       const responseData: DiffusionSharedWorkerResponseData = {
         videoUrl: resultURL,
       };
-
+      await this.reset();
       return [responseData, true];
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      // reset the state of the worker or kill it in the multicase.
-      await this.reset();
     }
   }
 

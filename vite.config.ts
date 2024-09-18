@@ -23,6 +23,10 @@ export default defineConfig({
           src: "node_modules/onnxruntime-web/dist/*.wasm",
           dest: "wasm/",
         },
+        {
+          src: "src/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.ts",
+          dest: "workers/",
+        },
       ],
     }),
     {
