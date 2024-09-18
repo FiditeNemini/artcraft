@@ -50,7 +50,6 @@ export const DialogAiStylize = ({
   }, []);
   const setStylizeOptions = useCallback(
     (newOptions: Partial<AIStylizeProps>) => {
-      console.log("setStylizeOptions", newOptions);
       setState((curr) => ({ ...curr, ...newOptions }));
     },
     [],
