@@ -36,12 +36,16 @@ export class DiffusionSharedWorkerClient<
         type: "module",
       });
     } else {
-      console.log("This is running a worker in production");
-      const url = new URL("DiffusionSharedWorker.ts", import.meta.url);
-      console.log(url);
-      this.sharedWorker = new SharedWorker(url, {
-        type: "module",
-      });
+      try {
+        console.log("This is running a worker in production");
+        const url = new URL("DiffusionSharedWorker.ts", import.meta.url);
+        console.log(url);
+        this.sharedWorker = new SharedWorker(url, {
+          type: "module",
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
     // // in production this is a work around .. https://github.com/vitejs/vite/issues/13680
     // const js = `import ${JSON.stringify(new URL(diffusionWorkerURL, import.meta.url))}`;
