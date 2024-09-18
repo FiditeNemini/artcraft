@@ -9,7 +9,7 @@ export const ToolbarUserProfile = () => {
     <div
       className={twMerge(
         paperWrapperStyles,
-        "mr-4 mt-2 flex h-fit w-fit items-center gap-2 py-0 pl-4",
+        "z-20 mr-4 mt-2 flex h-fit w-fit items-center gap-2 py-0 pl-4",
       )}
     >
       <div className="-mt-1.5 w-10">

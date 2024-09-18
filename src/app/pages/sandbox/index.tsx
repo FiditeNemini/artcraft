@@ -1,7 +1,7 @@
 import { ContextualToolbarImage } from "~/KonvaRootComponent/ContextualToolbarImage";
 import { ContextualLoadingBar } from "~/KonvaRootComponent/ContextualLoadingBar";
 import { ContextualButtonRetry } from "~/KonvaRootComponent/ContextualButtonRetry";
-import { SignaledDialogError } from "~/KonvaRootComponent/OtherSignaledComponents";
+import { SignaledDialogError } from "~/KonvaRootComponent/SignaledDialogs";
 
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 

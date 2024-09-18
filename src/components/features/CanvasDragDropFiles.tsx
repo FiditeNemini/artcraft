@@ -58,15 +58,8 @@ export const CanvasDragDropFiles = ({
   };
 
   useEffect(() => {
-    const mouseLeaveHandler = (event: MouseEvent) => {
-      if (
-        event.clientY <= 0 ||
-        event.clientX <= 0 ||
-        event.clientX >= window.innerWidth ||
-        event.clientY >= window.innerHeight
-      ) {
-        setDragging(DragStates.READY);
-      }
+    const mouseLeaveHandler = () => {
+      setDragging(DragStates.READY);
     };
     const mouseEnterHandler = () => {
       setDragging((curr) => {

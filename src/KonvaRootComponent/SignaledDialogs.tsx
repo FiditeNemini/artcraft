@@ -1,12 +1,15 @@
+import { useCallback } from "react";
 import { Signal } from "@preact/signals-react";
 import { dispatchUiEvents } from "~/signals";
 import {
   DialogAddImage,
   DialogAddVideo,
   DialogAiStylize,
+  DialogError,
 } from "~/components/features";
 
 import { AppUiSignalType } from "./contextSignals/appUi";
+import { dialogueError } from "~/signals/uiAccess/dialogueError";
 
 export const SignaledDialogs = ({
   appUiSignal,
@@ -46,6 +49,23 @@ export const SignaledDialogs = ({
         }}
         closeCallback={resetAll}
       />
+      <SignaledDialogError />
     </>
+  );
+};
+
+export const SignaledDialogError = () => {
+  const props = dialogueError.signal.value;
+  const { isShowing, title, message } = props;
+  const onClose = useCallback(() => {
+    dialogueError.hide();
+  }, []);
+  return (
+    <DialogError
+      isShowing={isShowing}
+      title={title}
+      message={message}
+      onClose={onClose}
+    />
   );
 };

@@ -70,7 +70,10 @@ export const DialogAddImage = ({
                 className="relative flex items-center justify-center bg-ui-border"
                 style={{ height: "calc(100vh - 500px)" }}
               >
-                <img src={URL.createObjectURL(currFile)} className="h-full" />
+                <img
+                  src={URL.createObjectURL(currFile)}
+                  className="max-h-full object-contain"
+                />
               </div>
             )}
           </div>

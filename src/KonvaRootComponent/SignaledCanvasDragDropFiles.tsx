@@ -1,30 +1,14 @@
 import { useCallback } from "react";
 
-import { DialogError, CanvasDragDropFiles } from "~/components/features";
+import { CanvasDragDropFiles } from "~/components/features";
 import { uiAccess } from "~/signals";
 
 // global signals
-import { dialogueError } from "~/signals/uiAccess/dialogueError";
+
 import { getFileExtension } from "~/utilities";
 
 // enums
 import { IMAGE_FILE_TYPE, VIDEO_FILE_TYPE } from "~/constants/fileTypeEnums";
-
-export const SignaledDialogError = () => {
-  const props = dialogueError.signal.value;
-  const { isShowing, title, message } = props;
-  const onClose = useCallback(() => {
-    dialogueError.hide();
-  }, []);
-  return (
-    <DialogError
-      isShowing={isShowing}
-      title={title}
-      message={message}
-      onClose={onClose}
-    />
-  );
-};
 
 export const SignaledCanvasDragDropFiles = ({
   openAddImage,

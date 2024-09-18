@@ -7,10 +7,7 @@ import { ContextualToolbarImage } from "./ContextualToolbarImage";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
 import { SignaledDialogs } from "./SignaledDialogs";
-import {
-  SignaledDialogError,
-  SignaledCanvasDragDropFiles,
-} from "./OtherSignaledComponents";
+import { SignaledCanvasDragDropFiles } from "./SignaledCanvasDragDropFiles";
 
 // The KonvaApp is the root of the Konva stage
 // and only entry point for anything in Konva JS
@@ -60,7 +57,6 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
       <ContextualToolbarImage />
       <ContextualButtonRetry />
       <ContextualLoadingBar />
-      <SignaledDialogError />
     </>
   );
 };
