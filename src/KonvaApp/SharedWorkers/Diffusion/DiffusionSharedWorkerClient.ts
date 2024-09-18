@@ -6,7 +6,7 @@ import { ResponseType } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 // import diffusionWorkerURL from "DiffusionSharedWorker.js?worker&url";
 // import diff from "~/KonvaApp/WorkerPrimitives/SharedWorkerBa"
 
-// compile
+//
 // tsc src\KonvaApp\SharedWorkers\Diffusion\DiffusionSharedWorker.ts --module esnext --target es2015 --outDir dist
 import worker from "~/KonvaApp/SharedWorker/DiffusionSharedWorker.ts?sharedworker";
 export class DiffusionSharedWorkerClient<
@@ -40,14 +40,14 @@ export class DiffusionSharedWorkerClient<
     // } else {
     try {
       console.log("This is running a worker in production");
-      const url = new URL("workers/DiffusionSharedWorker.js");
+      const url = new URL("workers/DiffusionSharedWorker.js", import.meta.url);
       console.log("launching shared worker", url);
       this.sharedWorker = new SharedWorker(url, {
         type: "module",
       });
 
       this.sharedWorker.addEventListener("error", (value) => {
-        console.log("Error Loading:");
+        console.log("ERROR?!?!");
         console.log(value);
       });
 
