@@ -26,7 +26,6 @@ import {
   ListTtsCategoriesForModelIsOk,
   TtsModelCategory,
 } from "@storyteller/components/src/api/category/ListTtsCategoriesForModel";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import {
   faExclamationCircle,
   faXmark,
@@ -35,11 +34,7 @@ import { useParams, Link } from "react-router-dom";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function TtsEditCategoriesPage(props: Props) {
+function TtsEditCategoriesPage() {
   let { token } = useParams() as { token: string };
   PosthogClient.recordPageview();
 
@@ -55,7 +50,7 @@ function TtsEditCategoriesPage(props: Props) {
     undefined
   );
 
-  const getModel = useCallback(async (token) => {
+  const getModel = useCallback(async token => {
     const model = await GetTtsModel(token);
 
     if (GetTtsModelIsOk(model)) {
@@ -79,7 +74,7 @@ function TtsEditCategoriesPage(props: Props) {
     }
   }, []);
 
-  const listTtsCategoriesForModel = useCallback(async (token) => {
+  const listTtsCategoriesForModel = useCallback(async token => {
     const categoryList = await ListTtsCategoriesForModel(token);
 
     if (ListTtsCategoriesForModelIsOk(categoryList)) {
@@ -150,7 +145,7 @@ function TtsEditCategoriesPage(props: Props) {
   const modelLink = WebUrl.ttsModelPage(token);
 
   const assignedCategoryTokens = new Set<string>(
-    assignedCategories.map((category) => category.category_token)
+    assignedCategories.map(category => category.category_token)
   );
 
   let currentCategoriesList = (
@@ -162,7 +157,7 @@ function TtsEditCategoriesPage(props: Props) {
   if (assignedCategories.length !== 0) {
     currentCategoriesList = (
       <>
-        {assignedCategories.map((category) => {
+        {assignedCategories.map(category => {
           let notApprovedWarning = null;
           let modelsNotAllowedWarning = null;
           let deletedWarning = null;
@@ -232,12 +227,12 @@ function TtsEditCategoriesPage(props: Props) {
   }
 
   const addCategoryOptions = allTtsCategories
-    .filter((category) => {
+    .filter(category => {
       const alreadyAdded = assignedCategoryTokens.has(category.category_token);
       const cannotAdd = !category.can_directly_have_models;
       return !alreadyAdded && !cannotAdd;
     })
-    .map((category) => {
+    .map(category => {
       return (
         <>
           <option value={category.category_token}>{category.name}</option>

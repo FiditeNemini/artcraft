@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
@@ -16,11 +15,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 
 const DEFAULT_VISIBILITY = "public";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lTemplateEditPage(props: Props) {
+function W2lTemplateEditPage() {
   let { templateToken }: { templateToken: string } = useParams();
 
   const history = useHistory();
@@ -34,7 +29,7 @@ function W2lTemplateEditPage(props: Props) {
   const [descriptionMarkdown, setDescriptionMarkdown] = useState<string>("");
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
 
-  const getTemplate = useCallback(async (token) => {
+  const getTemplate = useCallback(async token => {
     const template = await GetW2lTemplate(token);
 
     if (GetW2lTemplateIsOk(template)) {
@@ -101,15 +96,15 @@ function W2lTemplateEditPage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res === undefined || !res.success) {
           return; // Endpoint error?
         }
 
         history.push(templateLink);
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };

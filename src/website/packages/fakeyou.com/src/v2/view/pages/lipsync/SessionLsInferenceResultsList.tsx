@@ -13,7 +13,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowTurnUp } from "@fortawesome/pro-solid-svg-icons";
 
 interface SessionLpInferenceResultsListProps {
-  sessionSubscriptionsWrapper: any;
   onJobTokens: (
     maybeResultToken: string,
     jobToken: string,

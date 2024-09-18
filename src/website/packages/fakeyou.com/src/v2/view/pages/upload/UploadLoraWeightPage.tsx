@@ -17,23 +17,17 @@ import {
 } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import InferenceJobsList from "components/layout/InferenceJobsList";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import useLoraUpload from "hooks/useLoraUpload";
+import { useSession } from "hooks";
 
-interface UploadLoraWeightPageProps {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function UploadLoraWeightPage({
-  sessionWrapper,
-}: UploadLoraWeightPageProps) {
+export default function UploadLoraWeightPage() {
   usePrefixedDocumentTitle("Edit Voice");
+  const { sessionWrapper } = useSession();
 
   const visibilityOptions = [
     { label: "Public", value: "public" },
     { label: "Private", value: "private" },
   ];
-
 
   const failures = (fail = "") => {
     switch (fail) {

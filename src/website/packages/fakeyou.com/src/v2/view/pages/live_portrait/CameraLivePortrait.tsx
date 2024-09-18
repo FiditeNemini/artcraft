@@ -755,7 +755,6 @@ export default function LivePortrait() {
                 <Label label="Latest Outputs" />
                 <div>
                   <SessionLpInferenceResultsList
-                    sessionSubscriptionsWrapper={sessionSubscriptions}
                     onJobTokens={handleJobTokens}
                     addSourceToken={(newToken: string) =>
                       setSourceTokens(prevTokens =>

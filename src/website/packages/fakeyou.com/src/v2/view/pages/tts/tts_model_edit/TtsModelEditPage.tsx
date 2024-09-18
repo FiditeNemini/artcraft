@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, useHistory, Link } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
@@ -37,6 +36,7 @@ import {
 
 import { faFunction } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -44,12 +44,9 @@ const DEFAULT_PRETRAINED_VOCODER = "hifigan-superres";
 
 const UNSET_CUSTOM_VOCODER_SENTINEL = ""; // NB: Empty string
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function TtsModelEditPage(props: Props) {
-  let { token } = useParams() as { token: string };
+function TtsModelEditPage() {
+  const { token } = useParams() as { token: string };
+  const { sessionWrapper } = useSession();
   PosthogClient.recordPageview();
 
   const history = useHistory();
@@ -230,7 +227,7 @@ function TtsModelEditPage(props: Props) {
 
   const modelLink = WebUrl.ttsModelPage(token);
 
-  const isModerator = props.sessionWrapper.canEditOtherUsersTtsModels();
+  const isModerator = sessionWrapper.canEditOtherUsersTtsModels();
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();

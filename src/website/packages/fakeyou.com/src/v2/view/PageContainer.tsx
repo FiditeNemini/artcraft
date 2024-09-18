@@ -263,7 +263,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/weight/:weight_token/edit">
-                <WeightEditPage sessionWrapper={this.props.sessionWrapper} />
+                <WeightEditPage />
               </Route>
 
               <Route
@@ -278,40 +278,31 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/tts/result/:token/edit">
-                <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
+                <TtsResultEditPage />
               </Route>
 
               <Route path="/tts/result/:token/delete">
-                <TtsResultDeletePage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <TtsResultDeletePage />
               </Route>
 
               <Route path="/tts/result/:token">
-                <TtsResultViewPage sessionWrapper={this.props.sessionWrapper} />
+                <TtsResultViewPage />
               </Route>
 
               <Route path="/tts/:token/edit">
-                <TtsModelEditPage sessionWrapper={this.props.sessionWrapper} />
+                <TtsModelEditPage />
               </Route>
 
               <Route path="/tts/:token/delete">
-                <TtsModelDeletePage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <TtsModelDeletePage />
               </Route>
 
               <Route path="/tts/:token/categories">
-                <TtsEditCategoriesPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <TtsEditCategoriesPage />
               </Route>
 
               <Route path="/tts/:token">
                 <TtsModelViewPage
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
                   textBuffer={this.props.textBuffer}
                   setTextBuffer={this.props.setTextBuffer}
                   clearTextBuffer={this.props.clearTextBuffer}
@@ -319,95 +310,67 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/w2l/result/:token/edit">
-                <W2lResultEditPage sessionWrapper={this.props.sessionWrapper} />
+                <W2lResultEditPage />
               </Route>
 
               <Route path="/w2l/result/:token/delete">
-                <W2lResultDeletePage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <W2lResultDeletePage />
               </Route>
 
               <Route path="/w2l/result/:token">
-                <W2lResultViewPage sessionWrapper={this.props.sessionWrapper} />
+                <W2lResultViewPage />
               </Route>
 
               <Route path="/w2l/:templateToken/edit">
-                <W2lTemplateEditPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <W2lTemplateEditPage />
               </Route>
 
               <Route path="/w2l/:templateToken/approval">
-                <W2lTemplateApprovePage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <W2lTemplateApprovePage />
               </Route>
 
               <Route path="/w2l/:templateToken/delete">
-                <W2lTemplateDeletePage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <W2lTemplateDeletePage />
               </Route>
 
               <Route path="/video">
-                <W2lTemplateListPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <W2lTemplateListPage />
               </Route>
 
               <Route path="/upload/tts">
-                <UploadTtsModelPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <UploadTtsModelPage />
               </Route>
 
               <Route path="/upload/tts_model">
-                <UploadNewTtsModelPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <UploadNewTtsModelPage />
               </Route>
 
               <Route path="/upload/sd">
-                <UploadSdWeightPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <UploadSdWeightPage />
               </Route>
 
               <Route path="/upload/lora">
-                <UploadLoraWeightPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <UploadLoraWeightPage />
               </Route>
 
               <Route path="/upload/workflow">
-                <UploadWorkflowPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <UploadWorkflowPage />
               </Route>
 
               <Route path="/contribute">
-                <ContributeIndexPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ContributeIndexPage />
               </Route>
 
               <Route path="/moderation/user/list">
-                <ModerationUserListFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationUserListFc />
               </Route>
 
               <Route path="/moderation/user_feature_flags/:username?">
-                <ModerationUserFeatureFlagsPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationUserFeatureFlagsPage />
               </Route>
 
               <Route path="/moderation/ip_bans/:ipAddress">
-                <ModerationViewIpBanFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationViewIpBanFc />
               </Route>
 
               <Route path="/moderation/ip_bans">
@@ -562,19 +525,11 @@ class PageContainer extends React.Component<
 
               {/* NEW LIVE PORTRAIT PAGE */}
               <Route exact path="/ai-live-portrait">
-                <LivePortrait
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <LivePortrait />
               </Route>
 
               <Route exact path="/ai-lip-sync">
-                <Lipsync
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <Lipsync />
               </Route>
 
               <Route exact path="/webcam-acting">

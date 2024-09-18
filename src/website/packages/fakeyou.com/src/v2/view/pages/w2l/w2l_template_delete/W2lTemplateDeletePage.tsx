@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
   GetW2lTemplate,
@@ -12,13 +11,11 @@ import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW
 import { BackLink } from "../../../_common/BackLink";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lTemplateDeletePage(props: Props) {
+function W2lTemplateDeletePage() {
   const history = useHistory();
+  const { sessionWrapper } = useSession();
 
   PosthogClient.recordPageview();
 
@@ -31,7 +28,7 @@ function W2lTemplateDeletePage(props: Props) {
     number | undefined
   >(undefined);
 
-  const getTemplate = useCallback(async (templateToken) => {
+  const getTemplate = useCallback(async templateToken => {
     const template = await GetW2lTemplate(templateToken);
 
     if (GetW2lTemplateIsOk(template)) {
@@ -39,7 +36,7 @@ function W2lTemplateDeletePage(props: Props) {
     }
   }, []);
 
-  const getTemplateUseCount = useCallback(async (templateToken) => {
+  const getTemplateUseCount = useCallback(async templateToken => {
     const count = await GetW2lTemplateUseCount(templateToken);
     setW2lTemplateUseCount(count || 0);
   }, []);
@@ -61,7 +58,7 @@ function W2lTemplateDeletePage(props: Props) {
 
     const request = {
       set_delete: !currentlyDeleted,
-      as_mod: props.sessionWrapper.deleteTtsResultAsMod(
+      as_mod: sessionWrapper.deleteTtsResultAsMod(
         w2lTemplate?.creator_user_token
       ),
     };
@@ -75,17 +72,17 @@ function W2lTemplateDeletePage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
-          if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
+          if (sessionWrapper.canDeleteOtherUsersTtsResults()) {
             history.push(templateLink); // Mods can perform further actions
           } else {
             history.push("/");
           }
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
     return false;
   };
 
@@ -125,8 +122,8 @@ function W2lTemplateDeletePage(props: Props) {
   let moderatorRows = null;
 
   if (
-    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
-    props.sessionWrapper.canDeleteOtherUsersW2lTemplates()
+    sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    sessionWrapper.canDeleteOtherUsersW2lTemplates()
   ) {
     moderatorRows = (
       <>

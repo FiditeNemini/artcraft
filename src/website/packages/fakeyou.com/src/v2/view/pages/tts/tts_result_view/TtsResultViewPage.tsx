@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useParams, Link } from "react-router-dom";
@@ -41,14 +40,12 @@ import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 import "./TtsResult.scss";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function TtsResultViewPage(props: Props) {
-  let { token }: { token: string } = useParams();
+function TtsResultViewPage() {
+  const { token }: { token: string } = useParams();
+  const { sessionWrapper } = useSession();
   PosthogClient.recordPageview();
 
   const [ttsInferenceResult, setTtsInferenceResult] = useState<
@@ -72,13 +69,15 @@ function TtsResultViewPage(props: Props) {
   const documentTitle =
     ttsInferenceResult?.tts_model_title === undefined
       ? undefined
-      : `Deep Fake ${ttsInferenceResult.tts_model_title
-      } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
+      : `Deep Fake ${
+          ttsInferenceResult.tts_model_title
+        } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
   usePrefixedDocumentTitle(documentTitle);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(token)}`;
-  const shareTitle = `I just used FakeYou to generate speech as ${ttsInferenceResult?.tts_model_title || "one of my favorite characters"
-    }!`;
+  const shareTitle = `I just used FakeYou to generate speech as ${
+    ttsInferenceResult?.tts_model_title || "one of my favorite characters"
+  }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -156,8 +155,8 @@ function TtsResultViewPage(props: Props) {
   let moderatorRows = null;
 
   if (
-    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
-    props.sessionWrapper.canDeleteOtherUsersTtsModels()
+    sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    sessionWrapper.canDeleteOtherUsersTtsModels()
   ) {
     moderatorRows = (
       <>
@@ -285,7 +284,7 @@ function TtsResultViewPage(props: Props) {
     : "btn btn-destructive w-100";
 
   let editButton = null;
-  const canEdit = props.sessionWrapper.canEditTtsResultAsUserOrMod(
+  const canEdit = sessionWrapper.canEditTtsResultAsUserOrMod(
     ttsInferenceResult?.maybe_creator_user_token
   );
 
@@ -304,7 +303,7 @@ function TtsResultViewPage(props: Props) {
   }
 
   let deleteButton = null;
-  const canDelete = props.sessionWrapper.deleteTtsResultAsMod(
+  const canDelete = sessionWrapper.deleteTtsResultAsMod(
     ttsInferenceResult?.maybe_creator_user_token
   );
 
@@ -331,7 +330,7 @@ function TtsResultViewPage(props: Props) {
 
   let downloadButton = null;
 
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     downloadButton = (
       <>
         <a

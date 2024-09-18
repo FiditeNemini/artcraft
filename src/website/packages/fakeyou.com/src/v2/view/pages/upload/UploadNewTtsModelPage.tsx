@@ -1,22 +1,18 @@
 import React, { useState } from "react";
 import { SessionTtsModelUploadResultList } from "../../_common/SessionTtsModelUploadResultsList";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 
 import { EnqueueGsvModelDownload } from "@storyteller/components/src/api/model_downloads/EnqueueGsvModelDownload";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function UploadNewTtsModelPage(props: Props) {
-  let history = useHistory();
+function UploadNewTtsModelPage() {
+  const history = useHistory();
+  const { sessionWrapper } = useSession();
   const { enqueueInferenceJob } = useInferenceJobs();
 
   const [downloadUrl, setDownloadUrl] = useState("");
@@ -26,7 +22,7 @@ function UploadNewTtsModelPage(props: Props) {
   const [downloadUrlInvalidReason] = useState("");
   const [titleInvalidReason] = useState("");
 
-  if (!props.sessionWrapper.isLoggedIn()) {
+  if (!sessionWrapper.isLoggedIn()) {
     return (
       <div className="container py-5">
         <div className="py-5">

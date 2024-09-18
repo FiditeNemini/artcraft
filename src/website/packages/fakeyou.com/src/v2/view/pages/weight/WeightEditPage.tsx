@@ -18,18 +18,11 @@ import {
   TempSelect,
   TempTextArea,
 } from "components/common";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useSession, useWeightFetch } from "hooks";
 import "./WeightEditPage.scss";
 
-interface WeightEditPageProps {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function WeightEditPage({
-  sessionWrapper,
-}: WeightEditPageProps) {
+export default function WeightEditPage() {
   const { user, canEditTtsModel } = useSession();
   // const [language, languageSet] = useState("en");
   // const [fetched, fetchedSet] = useState(false);

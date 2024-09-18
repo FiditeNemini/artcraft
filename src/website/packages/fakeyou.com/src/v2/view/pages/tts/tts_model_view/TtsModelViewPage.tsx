@@ -46,7 +46,6 @@ import {
   faLock,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   TwitterShareButton,
   FacebookShareButton,
@@ -70,7 +69,6 @@ import { AITools } from "components/marketing";
 import { useSession } from "hooks";
 
 interface Props {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
   clearTextBuffer: () => void;

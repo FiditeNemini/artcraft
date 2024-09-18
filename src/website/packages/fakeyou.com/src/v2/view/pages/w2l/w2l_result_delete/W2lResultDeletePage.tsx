@@ -1,23 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
   GetW2lResult,
   GetW2lResultIsOk,
   W2lResult,
 } from "@storyteller/components/src/api/w2l/GetW2lResult";
+import { useSession } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lResultDeletePage(props: Props) {
+function W2lResultDeletePage() {
   const history = useHistory();
   PosthogClient.recordPageview();
+  const { sessionWrapper } = useSession();
 
   let { token } = useParams() as { token: string };
 
@@ -25,7 +22,7 @@ function W2lResultDeletePage(props: Props) {
     W2lResult | undefined
   >(undefined);
 
-  const getInferenceResult = useCallback(async (token) => {
+  const getInferenceResult = useCallback(async token => {
     const templateResponse = await GetW2lResult(token);
     if (GetW2lResultIsOk(templateResponse)) {
       setW2lInferenceResult(templateResponse);
@@ -47,7 +44,7 @@ function W2lResultDeletePage(props: Props) {
 
     const request = {
       set_delete: !currentlyDeleted,
-      as_mod: props.sessionWrapper.canDeleteOtherUsersW2lResults(),
+      as_mod: sessionWrapper.canDeleteOtherUsersW2lResults(),
     };
 
     fetch(endpointUrl, {
@@ -59,17 +56,17 @@ function W2lResultDeletePage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
-          if (props.sessionWrapper.canDeleteOtherUsersW2lResults()) {
+          if (sessionWrapper.canDeleteOtherUsersW2lResults()) {
             history.push(templateResultLink); // Mods can perform further actions
           } else {
             history.push("/");
           }
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
     return false;
   };
 

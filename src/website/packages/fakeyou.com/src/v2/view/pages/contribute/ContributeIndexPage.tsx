@@ -1,5 +1,4 @@
 import React from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
 import { WebUrl } from "../../../../common/WebUrl";
@@ -24,17 +23,15 @@ import {
 import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Button } from "components/common";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ContributeIndexPage(props: Props) {
-  const categoryHeading = props.sessionWrapper.canEditCategories()
+function ContributeIndexPage() {
+  const { sessionWrapper } = useSession();
+  const categoryHeading = sessionWrapper.canEditCategories()
     ? t("pages.contributeIndex.headingCreateCategory")
     : t("pages.contributeIndex.headingSuggestCategory");
 
-  const categoryButton = props.sessionWrapper.canEditCategories()
+  const categoryButton = sessionWrapper.canEditCategories()
     ? t("pages.contributeIndex.buttonCreateCategory")
     : t("pages.contributeIndex.buttonSuggestCategory");
 
@@ -57,7 +54,6 @@ function ContributeIndexPage(props: Props) {
   );
 
   return (
-
     <div>
       {/* <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">

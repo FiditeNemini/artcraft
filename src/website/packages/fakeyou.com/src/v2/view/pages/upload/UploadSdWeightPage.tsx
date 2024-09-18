@@ -15,18 +15,11 @@ import {
   TempSelect,
   TempTextArea,
 } from "components/common";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { useSdUpload } from "hooks";
+import { useSdUpload, useSession } from "hooks";
 
-interface UploadSdWeightPageProps {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function UploadSdWeightPage({
-  sessionWrapper,
-}: UploadSdWeightPageProps) {
+export default function UploadSdWeightPage() {
   usePrefixedDocumentTitle("Edit Voice");
-
+  const { sessionWrapper } = useSession();
   const visibilityOptions = [
     { label: "Public", value: "public" },
     { label: "Private", value: "private" },

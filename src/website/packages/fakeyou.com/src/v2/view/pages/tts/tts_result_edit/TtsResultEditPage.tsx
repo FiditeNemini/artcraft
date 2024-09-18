@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -52,11 +51,7 @@ interface TtsInferenceResultModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function TtsResultEditPage(props: Props) {
+function TtsResultEditPage() {
   let { token }: { token: string } = useParams();
   PosthogClient.recordPageview();
 
@@ -67,7 +62,7 @@ function TtsResultEditPage(props: Props) {
   >(undefined);
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
 
-  const getTtsResult = useCallback((token) => {
+  const getTtsResult = useCallback(token => {
     const api = new ApiConfig();
     const endpointUrl = api.viewTtsInferenceResult(token);
 
@@ -78,8 +73,8 @@ function TtsResultEditPage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const modelsResponse: TtsInferenceResultResponsePayload = res;
         if (!modelsResponse.success) {
           return;
@@ -90,7 +85,7 @@ function TtsResultEditPage(props: Props) {
           modelsResponse?.result?.creator_set_visibility || DEFAULT_VISIBILITY
         );
       })
-      .catch((e) => {});
+      .catch(e => {});
   }, []);
 
   useEffect(() => {
@@ -128,15 +123,15 @@ function TtsResultEditPage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res === undefined || !res.success) {
           return; // Endpoint error?
         }
 
         history.push(resultLink);
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };

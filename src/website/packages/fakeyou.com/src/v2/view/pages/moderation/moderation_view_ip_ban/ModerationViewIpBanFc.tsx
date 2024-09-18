@@ -1,65 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { ApiConfig } from '@storyteller/components';
-import { Link, useHistory, useParams } from 'react-router-dom';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { formatDistance } from 'date-fns';
-
-interface Props {
-  sessionWrapper: SessionWrapper,
-}
+import React, { useEffect, useState } from "react";
+import { ApiConfig } from "@storyteller/components";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { formatDistance } from "date-fns";
+import { useSession } from "hooks";
 
 interface IpBanListResponse {
-  success: boolean,
-  ip_address_ban: IpBan,
+  success: boolean;
+  ip_address_ban: IpBan;
 }
 
 interface IpBan {
-  ip_address: string,
-  maybe_target_user_token: string,
-  maybe_target_username: string,
+  ip_address: string;
+  maybe_target_user_token: string;
+  maybe_target_username: string;
 
-  mod_user_token: string,
-  mod_username: string,
-  mod_display_name: string,
-  mod_notes: string,
+  mod_user_token: string;
+  mod_username: string;
+  mod_display_name: string;
+  mod_notes: string;
 
-  created_at: string,
-  updated_at: string,
+  created_at: string;
+  updated_at: string;
 }
 
-function ModerationViewIpBanFc(props: Props) {
+function ModerationViewIpBanFc() {
+  const { sessionWrapper } = useSession();
   const { ipAddress } = useParams() as { ipAddress: string };
 
   const history = useHistory();
 
-  const [ipBan, setIpBan] = useState<IpBan|undefined>(undefined);
+  const [ipBan, setIpBan] = useState<IpBan | undefined>(undefined);
 
   useEffect(() => {
     const api = new ApiConfig();
     const endpointUrl = api.getModerationIpBan(ipAddress);
 
     fetch(endpointUrl, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-    .then(res => res.json())
-    .then(res => {
-      const response : IpBanListResponse = res;
-      if (!response.success) {
-        return;
-      }
+      .then(res => res.json())
+      .then(res => {
+        const response: IpBanListResponse = res;
+        if (!response.success) {
+          return;
+        }
 
-      setIpBan(response.ip_address_ban)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+        setIpBan(response.ip_address_ban);
+      })
+      .catch(e => {
+        //this.props.onSpeakErrorCallback();
+      });
   }, [ipAddress]); // NB: Empty array dependency sets to run ONLY on mount
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>): boolean => {
     ev.preventDefault();
 
     const api = new ApiConfig();
@@ -67,42 +64,40 @@ function ModerationViewIpBanFc(props: Props) {
 
     const request = {
       delete: true,
-    }
+    };
 
     fetch(endpointUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(request),
     })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        history.push('/moderation/ip_bans');
-      }
-    })
-    .catch(e => {});
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          history.push("/moderation/ip_bans");
+        }
+      })
+      .catch(e => {});
 
     return false;
-  }
+  };
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 
   const now = new Date();
 
-  let relativeCreateTime = '';
-  let modLink = <span />
+  let relativeCreateTime = "";
+  let modLink = <span />;
 
   if (ipBan !== undefined) {
-    const modLinkLocation = `/profile/${ipBan.mod_username}`
-    modLink = (
-      <Link to={modLinkLocation}>{ipBan.mod_username}</Link>
-    )
+    const modLinkLocation = `/profile/${ipBan.mod_username}`;
+    modLink = <Link to={modLinkLocation}>{ipBan.mod_username}</Link>;
 
     const createTime = new Date(ipBan.created_at);
     relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
@@ -138,10 +133,12 @@ function ModerationViewIpBanFc(props: Props) {
       </table>
 
       <form onSubmit={handleFormSubmit}>
-        <button className="button is-danger is-large is-fullwidth">Delete Ban</button>
+        <button className="button is-danger is-large is-fullwidth">
+          Delete Ban
+        </button>
       </form>
     </div>
-  )
+  );
 }
 
 export { ModerationViewIpBanFc };

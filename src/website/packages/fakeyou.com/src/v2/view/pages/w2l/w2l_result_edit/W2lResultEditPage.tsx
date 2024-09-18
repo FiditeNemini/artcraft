@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
@@ -52,11 +51,7 @@ interface W2lInferenceResultModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lResultEditPage(props: Props) {
+function W2lResultEditPage() {
   let { token }: { token: string } = useParams();
   PosthogClient.recordPageview();
 
@@ -67,7 +62,7 @@ function W2lResultEditPage(props: Props) {
   >(undefined);
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
 
-  const getW2lResult = useCallback((token) => {
+  const getW2lResult = useCallback(token => {
     const api = new ApiConfig();
     const endpointUrl = api.viewW2lInferenceResult(token);
 
@@ -78,8 +73,8 @@ function W2lResultEditPage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const modelsResponse: W2lInferenceResultResponsePayload = res;
         if (!modelsResponse.success) {
           return;
@@ -90,7 +85,7 @@ function W2lResultEditPage(props: Props) {
           modelsResponse?.result?.creator_set_visibility || DEFAULT_VISIBILITY
         );
       })
-      .catch((e) => {});
+      .catch(e => {});
   }, []);
 
   useEffect(() => {
@@ -128,15 +123,15 @@ function W2lResultEditPage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res === undefined || !res.success) {
           return; // Endpoint error?
         }
 
         history.push(resultLink);
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };

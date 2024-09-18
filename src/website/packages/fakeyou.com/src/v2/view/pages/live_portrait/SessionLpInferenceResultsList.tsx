@@ -17,7 +17,6 @@ import { Button } from "components/common";
 import { useHistory } from "react-router-dom";
 
 interface SessionLpInferenceResultsListProps {
-  sessionSubscriptionsWrapper: any;
   onJobTokens: (
     maybeResultToken: string,
     jobToken: string,
@@ -32,7 +31,6 @@ interface SessionLpInferenceResultsListProps {
 }
 
 export default function SessionLpInferenceResultsList({
-  sessionSubscriptionsWrapper,
   onJobTokens,
   addMotionToken,
   addSourceToken,

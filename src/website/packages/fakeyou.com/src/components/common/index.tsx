@@ -28,6 +28,7 @@ import JobsClearButton from "./JobsClearButton";
 import JobQueueTicker from "./JobQueueTicker";
 import Label from "./Label";
 import LikeButton from "./LikeButton";
+import LoadingSpinner from "./LoadingSpinner";
 import LoginBlock from "./LoginBlock";
 import MasonryGrid from "./MasonryGrid/MasonryGrid";
 import Modal, { ModalUtilities } from "./Modal";
@@ -104,6 +105,7 @@ export {
   JobQueueTicker,
   Label,
   LikeButton,
+  LoadingSpinner,
   LoginBlock,
   MasonryGrid,
   Modal,

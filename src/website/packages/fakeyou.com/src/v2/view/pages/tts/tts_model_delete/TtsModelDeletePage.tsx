@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { BackLink } from "../../../_common/BackLink";
+import { useSession } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
@@ -40,22 +40,18 @@ interface TtsModelModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function TtsModelDeletePage(props: Props) {
+function TtsModelDeletePage() {
   PosthogClient.recordPageview();
   const history = useHistory();
-
-  let { token } = useParams() as { token: string };
+  const { token } = useParams() as { token: string };
+  const { sessionWrapper } = useSession();
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number | undefined>(
     undefined
   );
 
-  const getModel = useCallback((token) => {
+  const getModel = useCallback(token => {
     const api = new ApiConfig();
     const endpointUrl = api.viewTtsModel(token);
 
@@ -66,8 +62,8 @@ function TtsModelDeletePage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const modelsResponse: TtsModelViewResponsePayload = res;
         if (!modelsResponse.success) {
           return;
@@ -75,10 +71,10 @@ function TtsModelDeletePage(props: Props) {
 
         setTtsModel(modelsResponse.model);
       })
-      .catch((e) => {});
+      .catch(e => {});
   }, []);
 
-  const getModelUseCount = useCallback((token) => {
+  const getModelUseCount = useCallback(token => {
     const api = new ApiConfig();
     const endpointUrl = api.getTtsModelUseCount(token);
 
@@ -89,8 +85,8 @@ function TtsModelDeletePage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const modelsResponse: TtsModelUseCountResponsePayload = res;
         if (!modelsResponse.success) {
           return;
@@ -98,7 +94,7 @@ function TtsModelDeletePage(props: Props) {
 
         setTtsModelUseCount(modelsResponse.count || 0);
       })
-      .catch((e) => {});
+      .catch(e => {});
   }, []);
 
   useEffect(() => {
@@ -118,9 +114,7 @@ function TtsModelDeletePage(props: Props) {
 
     const request = {
       set_delete: !currentlyDeleted,
-      as_mod: props.sessionWrapper.deleteTtsResultAsMod(
-        ttsModel?.creator_user_token
-      ),
+      as_mod: sessionWrapper.deleteTtsResultAsMod(ttsModel?.creator_user_token),
     };
 
     fetch(endpointUrl, {
@@ -132,17 +126,17 @@ function TtsModelDeletePage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
-          if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
+          if (sessionWrapper.canDeleteOtherUsersTtsResults()) {
             history.push(modelLink); // Mods can perform further actions
           } else {
             history.push("/");
           }
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
     return false;
   };
 
@@ -178,8 +172,8 @@ function TtsModelDeletePage(props: Props) {
   let moderatorRows = null;
 
   if (
-    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
-    props.sessionWrapper.canDeleteOtherUsersTtsModels()
+    sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    sessionWrapper.canDeleteOtherUsersTtsModels()
   ) {
     moderatorRows = (
       <>

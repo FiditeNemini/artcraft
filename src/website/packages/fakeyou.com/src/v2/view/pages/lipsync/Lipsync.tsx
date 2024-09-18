@@ -34,7 +34,6 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import {
@@ -54,16 +53,12 @@ import { LipsyncTokenMap } from "./LipsyncTokens";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { featuredTtsVoiceTokens } from "../audio_gen/tts/FeaturedTTSVoiceTokens";
 
-interface LipsyncProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
 // Initial source if no source or matching voice that has a source is provided
 const PRECOMPUTED_SOURCE_TOKENS: string[] = [
   "m_7ap2qssd4y5ew51dkx4awnng2key32", // Wednesday Addams
 ];
 
-export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
+export default function Lipsync() {
   useDocumentTitle("Lip Sync AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
   const { loggedIn, sessionFetched } = useSession();
@@ -564,7 +559,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                   weightToken={voiceToken}
                   onResultToken={handleAudioResultToken}
                   onAudioDelete={handleAudioDelete}
-                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                   loadingSelectedAudioResult={loadingSelectedAudioResult}
                   setLoadingSelectedAudioResult={setLoadingSelectedAudioResult}
                   currentAudioUrl={currentAudioUrl}
@@ -665,9 +659,6 @@ export default function Lipsync({ sessionSubscriptionsWrapper }: LipsyncProps) {
                     />
                     <div>
                       <SessionLsInferenceResultsList
-                        sessionSubscriptionsWrapper={
-                          sessionSubscriptionsWrapper
-                        }
                         onJobTokens={handleJobTokens}
                         onJobProgress={handleJobProgress}
                         onJobClick={handleJobClick}

@@ -16,17 +16,12 @@ import {
 } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import InferenceJobsList from "components/layout/InferenceJobsList";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import useWorkflowUpload from "hooks/useWorkflowUpload";
+import { useSession } from "hooks";
 
-interface UploadWorkflowPageProps {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function UploadWorkflowPage({
-  sessionWrapper,
-}: UploadWorkflowPageProps) {
+export default function UploadWorkflowPage() {
   usePrefixedDocumentTitle("Edit Voice");
+  const { sessionWrapper } = useSession();
 
   const visibilityOptions = [
     { label: "Public", value: "public" },

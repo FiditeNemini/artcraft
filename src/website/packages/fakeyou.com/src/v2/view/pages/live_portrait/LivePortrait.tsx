@@ -39,7 +39,6 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { AITools } from "components/marketing";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import SessionLpInferenceResultsList from "./SessionLpInferenceResultsList";
@@ -56,10 +55,6 @@ import OutputThumbnailImage from "./OutputThumbnailImage";
 import { useHistory } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import PremiumLock from "components/PremiumLock";
-
-interface LivePortraitProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
 
 interface GeneratedVideo {
   sourceIndex: number;
@@ -95,9 +90,7 @@ const PRECOMPUTED_DRIVER_TOKENS: string[] = [
   "m_ar300kqxy3ez8znq9p40y2qejfhsc2", // Slight Smile
 ];
 
-export default function LivePortrait({
-  sessionSubscriptionsWrapper,
-}: LivePortraitProps) {
+export default function LivePortrait() {
   useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
   const { loggedIn, loggedInOrModal, sessionFetched } = useSession();
@@ -1077,7 +1070,6 @@ export default function LivePortrait({
                   <Label label="Latest Outputs" />
                   <div>
                     <SessionLpInferenceResultsList
-                      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
                       onJobTokens={handleJobTokens}
                       addSourceToken={(newToken: string) =>
                         setSourceTokens(prevTokens =>

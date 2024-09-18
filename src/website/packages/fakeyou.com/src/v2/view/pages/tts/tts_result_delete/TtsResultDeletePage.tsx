@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { WebUrl } from "../../../../../common/WebUrl";
+import { useSession } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
@@ -47,12 +47,9 @@ interface TtsInferenceResultModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function TtsResultDeletePage(props: Props) {
+function TtsResultDeletePage() {
   const history = useHistory();
+  const { sessionWrapper } = useSession();
   PosthogClient.recordPageview();
 
   let { token }: { token: string } = useParams();
@@ -72,8 +69,8 @@ function TtsResultDeletePage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const modelsResponse: TtsInferenceResultResponsePayload = res;
         if (!modelsResponse.success) {
           return;
@@ -81,7 +78,7 @@ function TtsResultDeletePage(props: Props) {
 
         setTtsInferenceResult(modelsResponse.result);
       })
-      .catch((e) => {
+      .catch(e => {
         //this.props.onSpeakErrorCallback();
       });
   }, [token]); // NB: Empty array dependency sets to run ONLY on mount
@@ -102,7 +99,7 @@ function TtsResultDeletePage(props: Props) {
 
     const request = {
       set_delete: !currentlyDeleted,
-      as_mod: props.sessionWrapper.deleteTtsResultAsMod(
+      as_mod: sessionWrapper.deleteTtsResultAsMod(
         ttsInferenceResult?.maybe_creator_user_token
       ),
     };
@@ -116,17 +113,17 @@ function TtsResultDeletePage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
-          if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
+          if (sessionWrapper.canDeleteOtherUsersTtsResults()) {
             history.push(resultLink); // Mods can perform further actions
           } else {
             history.push("/");
           }
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
     return false;
   };
 

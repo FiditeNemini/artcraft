@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
   GetW2lTemplate,
@@ -15,11 +14,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 
 const DEFAULT_APPROVED_STATE = true;
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lTemplateApprovePage(props: Props) {
+function W2lTemplateApprovePage() {
   const history = useHistory();
 
   PosthogClient.recordPageview();
@@ -36,7 +31,7 @@ function W2lTemplateApprovePage(props: Props) {
     DEFAULT_APPROVED_STATE
   );
 
-  const getTemplate = useCallback(async (templateToken) => {
+  const getTemplate = useCallback(async templateToken => {
     const template = await GetW2lTemplate(templateToken);
 
     if (GetW2lTemplateIsOk(template)) {
@@ -46,7 +41,7 @@ function W2lTemplateApprovePage(props: Props) {
     }
   }, []);
 
-  const getTemplateUseCount = useCallback(async (templateToken) => {
+  const getTemplateUseCount = useCallback(async templateToken => {
     const count = await GetW2lTemplateUseCount(templateToken);
     setW2lTemplateUseCount(count || 0);
   }, []);
@@ -84,13 +79,13 @@ function W2lTemplateApprovePage(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
           history.push(templateLink);
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
     return false;
   };
 

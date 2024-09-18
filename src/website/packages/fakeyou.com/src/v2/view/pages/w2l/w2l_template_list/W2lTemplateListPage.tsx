@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { distance, duration } from "../../../../../data/animation";
@@ -14,6 +13,7 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { PageHeader } from "../../../_common/PageHeader";
 import { faVideo } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 
 const Fade = require("react-reveal/Fade");
 
@@ -40,11 +40,8 @@ interface W2lTemplate {
   updated_at: string;
 }
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lTemplateListPage(props: Props) {
+function W2lTemplateListPage() {
+  const { sessionWrapper } = useSession();
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
@@ -61,8 +58,8 @@ function W2lTemplateListPage(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const templatesResponse: W2lTemplateListResponsePayload = res;
         if (!templatesResponse.success) {
           return;
@@ -70,7 +67,7 @@ function W2lTemplateListPage(props: Props) {
 
         setW2lTemplates(templatesResponse.templates);
       })
-      .catch((e) => {
+      .catch(e => {
         //this.props.onSpeakErrorCallback();
       });
   }, []); // NB: Empty array dependency sets to run ONLY on mount
@@ -85,7 +82,7 @@ function W2lTemplateListPage(props: Props) {
 
   let templateElements: Array<JSX.Element> = [];
 
-  w2lTemplates.forEach((t) => {
+  w2lTemplates.forEach(t => {
     let object = null;
 
     if (
@@ -137,7 +134,7 @@ function W2lTemplateListPage(props: Props) {
 
   let nextRowSize = 1;
 
-  currentPageElements.forEach((el) => {
+  currentPageElements.forEach(el => {
     rowOfTemplateElements.push(el);
 
     if (rowOfTemplateElements.length === nextRowSize) {
@@ -146,7 +143,7 @@ function W2lTemplateListPage(props: Props) {
           className="col-6 col-sm-4 col-lg-3 d-flex w2l-ani-item"
           key={rowKey}
         >
-          {rowOfTemplateElements.map((el) => el)}
+          {rowOfTemplateElements.map(el => el)}
         </div>
       );
       rowOfTemplateElements = [];
@@ -165,7 +162,7 @@ function W2lTemplateListPage(props: Props) {
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
       <div className="col-6 col-sm-4 col-lg-3 d-flex w2l-ani-item" key={rowKey}>
-        {rowOfTemplateElements.map((el) => el)}
+        {rowOfTemplateElements.map(el => el)}
       </div>
     );
     rowOfTemplateElements = [];
@@ -173,7 +170,7 @@ function W2lTemplateListPage(props: Props) {
 
   let extraDetails = <p />;
 
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     extraDetails = (
       <p>
         Pick a template, then you can make it lip sync. If you want to use your
@@ -234,7 +231,7 @@ function W2lTemplateListPage(props: Props) {
         <div className="panel p-3 p-lg-4">
           <Fade bottom cascade duration={duration} distance={distance}>
             <div className="row gy-3 gx-3 gx-md-4 gy-md-4 w2l-ani">
-              {allRowsOfTemplateElements.map((el) => el)}
+              {allRowsOfTemplateElements.map(el => el)}
             </div>
           </Fade>
         </div>

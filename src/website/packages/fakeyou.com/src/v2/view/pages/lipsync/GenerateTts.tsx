@@ -24,11 +24,18 @@ import {
 import {
   Button,
   Label,
+  LoadingSpinner,
   Panel,
   TextArea,
   WeightCoverImage,
 } from "components/common";
-import { useDebounce, useInferenceJobs, useLocalize, useModal } from "hooks";
+import {
+  useDebounce,
+  useInferenceJobs,
+  useLocalize,
+  useModal,
+  useSession,
+} from "hooks";
 import LipsyncAudioPlayer from "./LipsyncAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -37,10 +44,7 @@ import {
   MediaLinks,
 } from "@storyteller/components/src/api/media_files";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { useHistory } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import LoadingSpinner from "components/common/LoadingSpinner";
+import { useHistory, useLocation } from "react-router-dom";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import { MediaBrowser } from "components/modals";
 import ExploreVoices from "../audio_gen/ExploreVoices";
@@ -49,7 +53,6 @@ interface GenerateTtsProps {
   weightToken?: string | null;
   onResultToken?: (token: string | null) => void;
   onAudioDelete?: () => void;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   loadingSelectedAudioResult: boolean;
   setLoadingSelectedAudioResult: React.Dispatch<React.SetStateAction<boolean>>;
   currentAudioUrl: string | null;
@@ -60,12 +63,12 @@ export const GenerateTts = memo(function GenerateTts({
   weightToken,
   onResultToken,
   onAudioDelete,
-  sessionSubscriptionsWrapper,
   loadingSelectedAudioResult,
   setLoadingSelectedAudioResult,
   currentAudioUrl,
   setCurrentAudioUrl,
 }: GenerateTtsProps) {
+  const { sessionSubscriptions } = useSession();
   const { modalState, open, close } = useModal();
   const [textBuffer, setTextBuffer] = useState("");
   const [maybeTtsError, setMaybeTtsError] = useState<
@@ -560,8 +563,8 @@ export const GenerateTts = memo(function GenerateTts({
           style={{
             height: "100%",
             maxHeight:
-              sessionSubscriptionsWrapper.hasActiveProSubscription() ||
-              sessionSubscriptionsWrapper.hasActiveEliteSubscription()
+              sessionSubscriptions?.hasActiveProSubscription() ||
+              sessionSubscriptions?.hasActiveEliteSubscription()
                 ? "460px"
                 : "520px",
             overflow: "auto",

@@ -1,24 +1,26 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { SetUserFeatureFlags } from '@storyteller/components/src/api/moderation/user/SetUserFeatureFlags';
-import { GetUserByUsername, GetUserByUsernameIsErr, GetUserByUsernameIsOk, User } from '@storyteller/components/src/api/user/GetUserByUsername';
-import { Button, Container, Input, Panel } from 'components/common';
-import PageHeader from 'components/layout/PageHeader';
-import { WebUrl } from 'common/WebUrl';
-import { faUser } from '@fortawesome/pro-solid-svg-icons';
+import React, { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { SetUserFeatureFlags } from "@storyteller/components/src/api/moderation/user/SetUserFeatureFlags";
+import {
+  GetUserByUsername,
+  GetUserByUsernameIsErr,
+  GetUserByUsernameIsOk,
+  User,
+} from "@storyteller/components/src/api/user/GetUserByUsername";
+import { Button, Container, Input, Panel } from "components/common";
+import PageHeader from "components/layout/PageHeader";
+import { WebUrl } from "common/WebUrl";
+import { faUser } from "@fortawesome/pro-solid-svg-icons";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper,
-}
-
-function hasFlag(field: string, maybeUserData?: User) : boolean {
+function hasFlag(field: string, maybeUserData?: User): boolean {
   const maybeFlags = maybeUserData?.maybe_moderator_fields?.maybe_feature_flags;
   const hasFlag = maybeFlags?.includes(field) || false;
   return hasFlag;
 }
 
-function ModerationUserFeatureFlagsPage(props: Props) {
+function ModerationUserFeatureFlagsPage() {
+  const { sessionWrapper } = useSession();
   const { username: urlUsername } = useParams() as { username?: string };
 
   const [username, setUsername] = useState<string>(urlUsername || "");
@@ -26,9 +28,10 @@ function ModerationUserFeatureFlagsPage(props: Props) {
   const [userData, setUserData] = useState<User | undefined>(undefined);
   const [canAccessStudio, setCanAccessStudio] = useState<boolean>(false);
   const [canExploreMedia, setCanExploreMedia] = useState<boolean>(false);
-  const [canVideoStyleTransfer, setCanVideoStyleTransfer] = useState<boolean>(false);
+  const [canVideoStyleTransfer, setCanVideoStyleTransfer] =
+    useState<boolean>(false);
 
-  const getUser = useCallback(async (username) => {
+  const getUser = useCallback(async username => {
     const lookupUsername = username?.trim()?.toLocaleLowerCase();
     if (!lookupUsername) {
       setUserData(undefined);
@@ -45,7 +48,6 @@ function ModerationUserFeatureFlagsPage(props: Props) {
       setCanAccessStudio(hasFlag("studio", response));
       setCanExploreMedia(hasFlag("explore_media", response));
       setCanVideoStyleTransfer(hasFlag("video_style_transfer", response));
-
     } else if (GetUserByUsernameIsErr(response)) {
       setUserData(undefined);
       setCanAccessStudio(false);
@@ -61,15 +63,19 @@ function ModerationUserFeatureFlagsPage(props: Props) {
   const onUsernameChange = (ev: React.FormEvent<HTMLInputElement>) => {
     const value = (ev.target as HTMLInputElement).value.trim();
     setUsername(value);
-  }
+  };
 
-  const handleUserLookup = (ev: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLButtonElement>) : boolean => {
+  const handleUserLookup = (
+    ev: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLButtonElement>
+  ): boolean => {
     ev.preventDefault();
     getUser(username);
     return false;
-  }
+  };
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLButtonElement>) : Promise<boolean> => {
+  const handleFormSubmit = async (
+    ev: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLButtonElement>
+  ): Promise<boolean> => {
     ev.preventDefault();
 
     let flags = [];
@@ -90,8 +96,8 @@ function ModerationUserFeatureFlagsPage(props: Props) {
       action: {
         SetExactFlags: {
           flags: flags,
-        }
-      }
+        },
+      },
     };
 
     await SetUserFeatureFlags(username, request);
@@ -99,9 +105,9 @@ function ModerationUserFeatureFlagsPage(props: Props) {
     getUser(username);
 
     return false;
-  }
+  };
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 
@@ -115,15 +121,14 @@ function ModerationUserFeatureFlagsPage(props: Props) {
         <br />
 
         <form onSubmit={handleFormSubmit}>
-
           <div className="form-check">
-            <input 
-              className="form-check-input" 
-              type="checkbox" 
-              value="" 
-              checked={canAccessStudio} 
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value=""
+              checked={canAccessStudio}
               onChange={() => setCanAccessStudio(!canAccessStudio)}
-              id="checkAccessStudio" 
+              id="checkAccessStudio"
             />
             <label className="form-check-label" htmlFor="checkAccessStudio">
               Access Studio
@@ -131,13 +136,13 @@ function ModerationUserFeatureFlagsPage(props: Props) {
           </div>
 
           <div className="form-check">
-            <input 
-              className="form-check-input" 
-              type="checkbox" 
-              value="" 
-              checked={canExploreMedia} 
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value=""
+              checked={canExploreMedia}
               onChange={() => setCanExploreMedia(!canExploreMedia)}
-              id="canExploreMedia" 
+              id="canExploreMedia"
             />
             <label className="form-check-label" htmlFor="canExploreMedia">
               Explore Media (dangerous, moderators only)
@@ -145,24 +150,23 @@ function ModerationUserFeatureFlagsPage(props: Props) {
           </div>
 
           <div className="form-check">
-            <input 
-              className="form-check-input" 
-              type="checkbox" 
-              value="" 
-              checked={canVideoStyleTransfer} 
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value=""
+              checked={canVideoStyleTransfer}
               onChange={() => setCanVideoStyleTransfer(!canVideoStyleTransfer)}
-              id="checkVideoStyleTransfer" 
+              id="checkVideoStyleTransfer"
             />
-            <label className="form-check-label" htmlFor="checkVideoStyleTransfer">
+            <label
+              className="form-check-label"
+              htmlFor="checkVideoStyleTransfer"
+            >
               Video Style Transfer
             </label>
           </div>
 
-          <Button
-            label="Set Flags"
-            onClick={handleFormSubmit}
-          />
-
+          <Button label="Set Flags" onClick={handleFormSubmit} />
         </form>
       </>
     );
@@ -170,20 +174,19 @@ function ModerationUserFeatureFlagsPage(props: Props) {
 
   return (
     <Container type="panel" className="mb-5">
-      <PageHeader {...{
-        back: { to: WebUrl.moderationMain(), label: "Back to moderation" },
-        title: "User Feature Flags",
-        subText: "Manage User Feature Flags"
-      }}/>
+      <PageHeader
+        {...{
+          back: { to: WebUrl.moderationMain(), label: "Back to moderation" },
+          title: "User Feature Flags",
+          subText: "Manage User Feature Flags",
+        }}
+      />
       <Panel {...{ padding: true }}>
-
-        <form
-          onSubmit={handleUserLookup}
-        >
+        <form onSubmit={handleUserLookup}>
           <div className="container">
             <div className="row">
               <div className="col-sm-8">
-                <Input 
+                <Input
                   icon={faUser}
                   onChange={onUsernameChange}
                   placeholder="username"
@@ -192,21 +195,16 @@ function ModerationUserFeatureFlagsPage(props: Props) {
               </div>
 
               <div className="col-sm-4">
-                <Button
-                  label="Do Lookup"
-                  onClick={handleUserLookup}
-                />
+                <Button label="Do Lookup" onClick={handleUserLookup} />
               </div>
             </div>
           </div>
         </form>
 
         {featureFlagForm}
-
-
       </Panel>
     </Container>
-  )
+  );
 }
 
 export { ModerationUserFeatureFlagsPage };

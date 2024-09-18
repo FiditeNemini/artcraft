@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link } from "react-router-dom";
 import { ReportDiscordLink } from "../../../_common/DiscordReportLink";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -21,13 +20,11 @@ import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function W2lResultViewPage(props: Props) {
+function W2lResultViewPage() {
   let { token } = useParams() as { token: string };
+  const { sessionWrapper } = useSession();
 
   PosthogClient.recordPageview();
 
@@ -36,7 +33,7 @@ function W2lResultViewPage(props: Props) {
   >(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
-  const getInferenceResult = useCallback(async (token) => {
+  const getInferenceResult = useCallback(async token => {
     const templateResponse = await GetW2lResult(token);
     if (GetW2lResultIsOk(templateResponse)) {
       setW2lInferenceResult(templateResponse);
@@ -99,8 +96,8 @@ function W2lResultViewPage(props: Props) {
   let moderatorRows = null;
 
   if (
-    props.sessionWrapper.canDeleteOtherUsersW2lResults() ||
-    props.sessionWrapper.canDeleteOtherUsersW2lTemplates()
+    sessionWrapper.canDeleteOtherUsersW2lResults() ||
+    sessionWrapper.canDeleteOtherUsersW2lTemplates()
   ) {
     moderatorRows = (
       <>
@@ -226,7 +223,7 @@ function W2lResultViewPage(props: Props) {
     : "btn btn-destructive w-100";
 
   let editButton = null;
-  const canEdit = props.sessionWrapper.canEditW2lResultAsUserOrMod(
+  const canEdit = sessionWrapper.canEditW2lResultAsUserOrMod(
     w2lInferenceResult?.maybe_creator_user_token
   );
 
@@ -245,7 +242,7 @@ function W2lResultViewPage(props: Props) {
   }
 
   let deleteButton = null;
-  const canDelete = props.sessionWrapper.canDeleteW2lResultAsUserOrMod(
+  const canDelete = sessionWrapper.canDeleteW2lResultAsUserOrMod(
     w2lInferenceResult?.maybe_creator_user_token
   );
 

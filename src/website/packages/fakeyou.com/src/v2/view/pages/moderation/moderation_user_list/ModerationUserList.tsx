@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
   GetUserList,
@@ -10,12 +9,10 @@ import {
 import { formatDistance } from "date-fns";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { BackLink } from "../../../_common/BackLink";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ModerationUserListFc(props: Props) {
+function ModerationUserListFc() {
+  const { sessionWrapper } = useSession();
   const [userList, setUserList] = useState<Array<UserForList>>([]);
 
   const getUsers = useCallback(async () => {
@@ -34,14 +31,14 @@ function ModerationUserListFc(props: Props) {
     return <div />;
   }
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 
   const now = new Date();
   let rows: Array<JSX.Element> = [];
 
-  userList.forEach((user) => {
+  userList.forEach(user => {
     const createTime = new Date(user.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
       addSuffix: true,

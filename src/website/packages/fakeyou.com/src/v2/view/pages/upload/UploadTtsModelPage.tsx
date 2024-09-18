@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionTtsModelUploadResultList } from "../../_common/SessionTtsModelUploadResultsList";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { useHistory } from "react-router-dom";
@@ -9,24 +8,21 @@ import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import MentionsSection from "components/common/MentionsSection";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 import { Container } from "components/common";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
 interface TtsModelUploadJobResponsePayload {
   success: boolean;
   job_token?: string;
 }
 
-function UploadTtsModelPage(props: Props) {
-  let history = useHistory();
+function UploadTtsModelPage() {
+  const history = useHistory();
+  const { sessionWrapper } = useSession();
   const { enqueueInferenceJob } = useInferenceJobs();
 
   PosthogClient.recordPageview();
@@ -39,7 +35,7 @@ function UploadTtsModelPage(props: Props) {
   const [downloadUrlInvalidReason] = useState("");
   const [titleInvalidReason] = useState("");
 
-  if (!props.sessionWrapper.isLoggedIn()) {
+  if (!sessionWrapper.isLoggedIn()) {
     return (
       <div className="container py-5">
         <div className="py-5">
