@@ -36,9 +36,6 @@ export class Engine {
 
   private selectionManager: SelectionManager;
 
-  // WIL need to fix this ui issue.
-  public ranOnce: Boolean = false;
-
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
     console.log("Engine Created!");
@@ -193,22 +190,16 @@ export class Engine {
 
     uiEvents.aiStylize.onRequest(async (data) => {
       console.log("Engine heard AI Stylize request: ", data);
-      //console.log(data);
-      // Hack to ensure this doesn't break because UI BUG
 
-      if (this.ranOnce === true) {
-        try {
-          await this.renderEngine.startProcessing(data);
-        } catch (error) {
-          // throw error to retry
-          uiAccess.dialogueError.show({
-            title: "Generation Error",
-            message: error.toString(),
-          });
-        }
+      try {
+        await this.renderEngine.startProcessing(data);
+      } catch (error) {
+        // throw error to retry
+        uiAccess.dialogueError.show({
+          title: "Generation Error",
+          message: error.toString(),
+        });
       }
-
-      this.ranOnce = true;
     });
 
     // TODO: You may listen to all the image toolbar events here
