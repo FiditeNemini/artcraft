@@ -24,7 +24,7 @@ export default defineConfig({
           dest: "wasm/",
         },
         {
-          src: "src/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.ts",
+          src: "src/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.js",
           dest: "workers/",
         },
       ],

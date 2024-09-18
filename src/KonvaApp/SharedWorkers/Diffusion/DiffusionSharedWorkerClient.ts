@@ -3,7 +3,7 @@ import {
   SharedWorkerResponse,
 } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 import { ResponseType } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
-import diffusionWorkerURL from "~/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.ts?worker&url";
+// import diffusionWorkerURL from "~/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.ts?worker&url";
 export class DiffusionSharedWorkerClient<
   DiffusionSharedWorkerItemData,
   DiffusionSharedWorkerResponseData,
@@ -34,13 +34,16 @@ export class DiffusionSharedWorkerClient<
       });
     } else {
       console.log("This is running a worker in production");
-      // in production this is a work around .. https://github.com/vitejs/vite/issues/13680
-      const js = `import ${JSON.stringify(new URL(diffusionWorkerURL, import.meta.url))}`;
-      const blob = new Blob([js], { type: "application/javascript" });
-      const objURL = URL.createObjectURL(blob);
-      this.sharedWorker = new SharedWorker(new URL(objURL, import.meta.url), {
+      this.sharedWorker = new SharedWorker("workers/DiffusionSharedWorker.js", {
         type: "module",
       });
+      // // in production this is a work around .. https://github.com/vitejs/vite/issues/13680
+      // const js = `import ${JSON.stringify(new URL(diffusionWorkerURL, import.meta.url))}`;
+      // const blob = new Blob([js], { type: "application/javascript" });
+      // const objURL = URL.createObjectURL(blob);
+      // this.sharedWorker = new SharedWorker(new URL(objURL, import.meta.url), {
+      //   type: "module",
+      // });
     }
     this.port = this.sharedWorker.port;
     this.port.onmessage = this.onMessage.bind(this);
