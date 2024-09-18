@@ -30,23 +30,24 @@ export class DiffusionSharedWorkerClient<
     ) => void,
   ) {
     this.messageReceived = messageReceived;
-    if (import.meta.env.DEV) {
-      console.log("This is running a worker in development");
-      this.sharedWorker = new SharedWorker(workerPath, {
+    // if (import.meta.env.DEV) {
+    //   console.log("This is running a worker in development");
+    //   this.sharedWorker = new SharedWorker(workerPath, {
+    //     type: "module",
+    //   });
+    // } else {
+    try {
+      console.log("This is running a worker in production");
+      const url = new URL("DiffusionSharedWorker.ts", import.meta.url);
+      console.log(url);
+      this.sharedWorker = new SharedWorker(url, {
         type: "module",
       });
-    } else {
-      try {
-        console.log("This is running a worker in production");
-        const url = new URL("DiffusionSharedWorker.ts", import.meta.url);
-        console.log(url);
-        this.sharedWorker = new SharedWorker(url, {
-          type: "module",
-        });
-      } catch (error) {
-        console.log(error);
-      }
+    } catch (error) {
+      console.log("Hello");
+      console.log(error);
     }
+    //}
     // // in production this is a work around .. https://github.com/vitejs/vite/issues/13680
     // const js = `import ${JSON.stringify(new URL(diffusionWorkerURL, import.meta.url))}`;
     // const blob = new Blob([js], { type: "application/javascript" });
