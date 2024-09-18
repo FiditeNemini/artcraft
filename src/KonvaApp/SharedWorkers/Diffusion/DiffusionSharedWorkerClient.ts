@@ -31,6 +31,7 @@ export class DiffusionSharedWorkerClient<
       this.sharedWorker = new SharedWorker(workerPath, {
         type: "module",
       });
+      console.log("This is running a worker in development");
     } else {
       // in production this is a work around .. https://github.com/vitejs/vite/issues/13680
       const js = `import ${JSON.stringify(new URL(diffusionWorkerURL, import.meta.url))}`;
@@ -39,6 +40,7 @@ export class DiffusionSharedWorkerClient<
       this.sharedWorker = new SharedWorker(new URL(objURL, import.meta.url), {
         type: "module",
       });
+      console.log("This is running a worker in production");
     }
     this.port = this.sharedWorker.port;
     this.port.onmessage = this.onMessage.bind(this);
