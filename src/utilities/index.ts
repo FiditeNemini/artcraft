@@ -8,5 +8,5 @@ export const getFileName = (file: File) => {
   return file.name.substring(0, file.name.lastIndexOf("."));
 };
 export const getFileExtension = (file: File) => {
-  return file.name.substring(file.name.lastIndexOf("."));
+  return file.name.substring(file.name.lastIndexOf(".") + 1);
 };

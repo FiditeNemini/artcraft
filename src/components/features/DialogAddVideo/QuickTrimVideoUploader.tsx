@@ -1,9 +1,11 @@
 import { useCallback, useState } from "react";
 import { Signal } from "@preact/signals-react";
 
-import { FileUploader, VIDEO_FILE_TYPE } from "../FileUploader";
+import { FileUploader } from "../FileUploader";
 import { VideoControls } from "./VideoControls";
 import { TrimmerPlaybar, TrimData } from "./TrimmerPlaybar";
+
+import { VIDEO_FILE_TYPE } from "~/constants/fileTypeEnums";
 
 export type { TrimData };
 
