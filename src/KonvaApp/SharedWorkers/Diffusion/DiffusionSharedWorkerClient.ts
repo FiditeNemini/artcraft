@@ -38,11 +38,8 @@ export class DiffusionSharedWorkerClient<
     // } else {
     try {
       console.log("This is running a worker in production");
-
       const url = new URL("workers/DiffusionSharedWorker.js", import.meta.url);
-
-      console.log(url);
-
+      console.log("launching shared worker", url);
       this.sharedWorker = new SharedWorker(url, {
         type: "module",
       });
@@ -51,9 +48,10 @@ export class DiffusionSharedWorkerClient<
         console.log("ERROR?!?!");
         console.log(value);
       });
+
+      console.log("launched shared worker (?)");
     } catch (error) {
-      console.log("ERROR!");
-      console.log("Hello");
+      console.log("ERROR with shared worker!");
       console.log(error);
     }
     //}
