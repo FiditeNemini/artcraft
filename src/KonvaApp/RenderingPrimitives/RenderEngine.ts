@@ -217,18 +217,10 @@ export class RenderEngine {
     if (typeof SharedWorker !== "undefined") {
       console.log("Shared Workers are supported in this browser.");
       // Debug chrome://inspect/#workers
-      if (import.meta.env.DEV) {
-        this.diffusionWorker = new DiffusionSharedWorkerClient(
-          "src\\KonvaApp\\SharedWorkers\\Diffusion\\DiffusionSharedWorker.ts",
-          this.onRenderingSystemMessageRecieved,
-        );
-      } else {
-        console.log("Initializing Shared Worker");
-        this.diffusionWorker = new DiffusionSharedWorkerClient(
-          "workers/DiffusionSharedWorker.ts",
-          this.onRenderingSystemMessageRecieved,
-        );
-      }
+      this.diffusionWorker = new DiffusionSharedWorkerClient(
+        "src\\KonvaApp\\SharedWorkers\\Diffusion\\DiffusionSharedWorker.ts",
+        this.onRenderingSystemMessageRecieved,
+      );
 
       this.canUseSharedWorker = true;
     } else {

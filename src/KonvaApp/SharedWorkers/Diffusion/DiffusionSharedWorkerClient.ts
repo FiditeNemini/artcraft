@@ -27,9 +27,18 @@ export class DiffusionSharedWorkerClient<
     ) => void,
   ) {
     this.messageReceived = messageReceived;
-    this.sharedWorker = new SharedWorker(workerPath, {
-      type: "module",
-    });
+    if (import.meta.env.DEV) {
+      this.sharedWorker = new SharedWorker(workerPath, {
+        type: "module",
+      });
+    } else {
+      this.sharedWorker = new SharedWorker(
+        new URL(workerPath, import.meta.url),
+        {
+          type: "module",
+        },
+      );
+    }
     this.port = this.sharedWorker.port;
     this.port.onmessage = this.onMessage.bind(this);
     this.port.start();
