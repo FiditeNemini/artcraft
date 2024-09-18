@@ -43,10 +43,10 @@ export class DiffusionSharedWorkerClient<
       //const url = new URL("workers/DiffusionSharedWorker.js", import.meta.url);
       //console.log("launching shared worker", url);
 
-      const url = new URL("worker.js", import.meta.url);
-      console.log("launching shared worker", url);
+      // const url = new URL("worker.js", import.meta.url);
+      // console.log("launching shared worker", url);
 
-      this.sharedWorker = new SharedWorker(url, {
+      this.sharedWorker = new SharedWorker("worker.js", {
         type: "module",
       });
 
