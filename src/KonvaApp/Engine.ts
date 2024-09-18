@@ -195,15 +195,20 @@ export class Engine {
       console.log("Engine heard AI Stylize request: ", data);
       //console.log(data);
       // Hack to ensure this doesn't break because UI BUG
-      try {
-        await this.renderEngine.startProcessing(data);
-      } catch (error) {
-        // throw error to retry
-        uiAccess.dialogueError.show({
-          title: "Generation Error",
-          message: error.toString(),
-        });
+
+      if (this.ranOnce === true) {
+        try {
+          await this.renderEngine.startProcessing(data);
+        } catch (error) {
+          // throw error to retry
+          uiAccess.dialogueError.show({
+            title: "Generation Error",
+            message: error.toString(),
+          });
+        }
       }
+
+      this.ranOnce = true;
     });
 
     // TODO: You may listen to all the image toolbar events here
