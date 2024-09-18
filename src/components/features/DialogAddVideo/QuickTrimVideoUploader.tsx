@@ -6,6 +6,7 @@ import { VideoControls } from "./VideoControls";
 import { TrimmerPlaybar, TrimData } from "./TrimmerPlaybar";
 
 import { VIDEO_FILE_TYPE } from "~/constants/fileTypeEnums";
+import { twMerge } from "tailwind-merge";
 
 export type { TrimData };
 
@@ -35,7 +36,12 @@ export const QuickTrimVideoUploader = ({
   ); //END videoRefCallback\
 
   return (
-    <div className="flex flex-col rounded-lg border-2 border-dashed border-ui-border">
+    <div
+      className={twMerge(
+        "flex flex-col rounded-lg border-2 border-dashed border-ui-border bg-gray-100",
+        file ? "h-fit" : "h-full items-center justify-center",
+      )}
+    >
       <FileUploader
         title=""
         fileTypes={Object.values(VIDEO_FILE_TYPE)}
@@ -56,7 +62,7 @@ export const QuickTrimVideoUploader = ({
               src={URL.createObjectURL(file)}
             />
           </div>
-          <div className="flex items-center justify-center bg-gray-100">
+          <div className="flex w-full items-center justify-center bg-gray-100">
             <VideoControls vidEl={vidEl} className="w-fit" />
             <TrimmerPlaybar
               trimData={trimData?.value}

@@ -49,7 +49,7 @@ export const DialogAddVideo = ({
   if (previouslyStagedVideoRef.current !== stagedVideo) {
     previouslyStagedVideoRef.current = stagedVideo;
   }
-  console.log(currFile);
+
   const trimDataRef = useRef(signal<TrimData | undefined>(undefined));
   const trimData = trimDataRef.current;
 
