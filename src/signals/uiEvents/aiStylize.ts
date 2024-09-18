@@ -28,7 +28,7 @@ const initialValues = {
   upscale: false,
   styleStrength: 0.8,
 };
-const stagedAiStylizeRequest = signal<AiStylizeSingalType>(initialValues);
+const stagedAiStylizeRequest = signal<AiStylizeSingalType>();
 
 const dispatchRequest = (data: AiStylizeSingalType) => {
   stagedAiStylizeRequest.value = data;
