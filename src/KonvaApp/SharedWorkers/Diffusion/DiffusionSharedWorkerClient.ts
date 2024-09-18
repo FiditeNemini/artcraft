@@ -40,8 +40,12 @@ export class DiffusionSharedWorkerClient<
     // } else {
     try {
       console.log("This is running a worker in production");
-      const url = new URL("workers/DiffusionSharedWorker.js", import.meta.url);
+      //const url = new URL("workers/DiffusionSharedWorker.js", import.meta.url);
+      //console.log("launching shared worker", url);
+
+      const url = new URL("worker.js", import.meta.url);
       console.log("launching shared worker", url);
+
       this.sharedWorker = new SharedWorker(url, {
         type: "module",
       });
