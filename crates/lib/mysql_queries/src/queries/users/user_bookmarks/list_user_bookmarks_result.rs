@@ -28,6 +28,16 @@ pub struct UserBookmark {
   pub maybe_media_file_creator_display_name: Option<String>,
   pub maybe_media_file_creator_gravatar_hash: Option<String>,
 
+  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  pub maybe_media_file_cover_image_public_bucket_hash: Option<String>,
+
+  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+
+  pub maybe_media_file_cover_image_public_bucket_prefix: Option<String>,
+
+  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  pub maybe_media_file_cover_image_public_bucket_extension: Option<String>,
+
   /// Something descriptive about the bookmarked entity.
   /// This might be TTS text, a username, etc. It depends on the entity type.
   pub maybe_entity_descriptive_text: Option<String>,
@@ -38,14 +48,14 @@ pub struct UserBookmark {
   /// Only set if the bookmark is of a model_weights record.
   pub maybe_model_weight_category: Option<WeightsCategory>,
 
-  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  /// Only set if the bookmark is of a model_weights record *AND* the model has a cover image.
   pub maybe_model_weight_cover_image_public_bucket_hash: Option<String>,
 
-  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  /// Only set if the bookmark is of a model_weights record *AND* the model has a cover image.
 
   pub maybe_model_weight_cover_image_public_bucket_prefix: Option<String>,
 
-  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  /// Only set if the bookmark is of a model_weights record *AND* the model has a cover image.
   pub maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
 
   pub maybe_model_weight_creator_user_token: Option<UserToken>,
@@ -99,6 +109,10 @@ pub struct RawUserBookmarkRecord {
   pub(crate) maybe_media_file_public_bucket_prefix: Option<String>,
   pub(crate) maybe_media_file_public_bucket_extension: Option<String>,
 
+  pub(crate) maybe_media_file_cover_image_public_bucket_hash: Option<String>,
+  pub(crate) maybe_media_file_cover_image_public_bucket_prefix: Option<String>,
+  pub(crate) maybe_media_file_cover_image_public_bucket_extension: Option<String>,
+
   pub(crate) maybe_media_file_creator_user_token: Option<UserToken>,
   pub(crate) maybe_media_file_creator_username: Option<String>,
   pub(crate) maybe_media_file_creator_display_name: Option<String>,
@@ -138,6 +152,9 @@ impl RawUserBookmarkRecord {
       maybe_media_file_creator_username: self.maybe_media_file_creator_username,
       maybe_media_file_creator_display_name: self.maybe_media_file_creator_display_name,
       maybe_media_file_creator_gravatar_hash: self.maybe_media_file_creator_gravatar_hash,
+      maybe_media_file_cover_image_public_bucket_hash: self.maybe_media_file_cover_image_public_bucket_hash,
+      maybe_media_file_cover_image_public_bucket_prefix: self.maybe_media_file_cover_image_public_bucket_prefix,
+      maybe_media_file_cover_image_public_bucket_extension: self.maybe_media_file_cover_image_public_bucket_extension,
       maybe_entity_descriptive_text: match self.entity_type {
         UserBookmarkEntityType::User => self.maybe_descriptive_text_user_display_name,
         UserBookmarkEntityType::ModelWeight => self.maybe_descriptive_text_model_weight_title,
@@ -216,6 +233,9 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         maybe_media_file_public_bucket_hash: row.try_get("maybe_media_file_public_bucket_hash")?,
         maybe_media_file_public_bucket_prefix: row.try_get("maybe_media_file_public_bucket_prefix")?,
         maybe_media_file_public_bucket_extension: row.try_get("maybe_media_file_public_bucket_extension")?,
+        maybe_media_file_cover_image_public_bucket_hash: row.try_get("maybe_media_file_cover_image_public_bucket_hash")?,
+        maybe_media_file_cover_image_public_bucket_prefix: row.try_get("maybe_media_file_cover_image_public_bucket_prefix")?,
+        maybe_media_file_cover_image_public_bucket_extension: row.try_get("maybe_media_file_cover_image_public_bucket_extension")?,
         maybe_media_file_creator_user_token: row.try_get("maybe_media_file_creator_user_token")?,
         maybe_media_file_creator_username: row.try_get("maybe_media_file_creator_username")?,
         maybe_media_file_creator_display_name: row.try_get("maybe_media_file_creator_display_name")?,

@@ -22,10 +22,11 @@ use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEnti
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
-
+use crate::http_server::common_responses::media_links::MediaLinks;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 
@@ -102,8 +103,12 @@ pub struct UserBookmarkDetailsForUserList {
 pub struct MediaFileData {
   pub media_type: MediaFileType,
 
-  /// URL to the media file.
+  /// (DEPRECATED) URL path to the media file
+  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
   pub public_bucket_path: String,
+
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
+  pub media_links: MediaLinks,
 
   /// Creator of the media file
   pub maybe_creator: Option<UserDetailsLight>,
@@ -167,7 +172,7 @@ impl fmt::Display for ListUserBookmarksForUserError {
   ),
 )]
 pub async fn list_user_bookmarks_for_user_handler(
-  _http_request: HttpRequest,
+  http_request: HttpRequest,
   path: Path<ListUserBookmarksPathInfo>,
   query: Query<ListUserBookmarksQueryData>,
   server_state: web::Data<Arc<ServerState>>
@@ -198,20 +203,23 @@ pub async fn list_user_bookmarks_for_user_handler(
     }
   };
 
+  let media_domain = get_media_domain(&http_request);
+
   let response = ListUserBookmarksForUserSuccessResponse {
     success: true,
     results: results_page.results.into_iter()
         .map(|user_bookmark| {
-          let maybe_media_file_path = user_bookmark.maybe_media_file_public_bucket_hash
+          let maybe_media_file_bucket_path = user_bookmark.maybe_media_file_public_bucket_hash
               .as_deref()
               .map(|hash| {
                 MediaFileBucketPath::from_object_hash(
                   hash,
                   user_bookmark.maybe_media_file_public_bucket_prefix.as_deref(),
                   user_bookmark.maybe_media_file_public_bucket_extension.as_deref())
-                    .get_full_object_path_str()
-                    .to_string()
               });
+
+          let maybe_media_file_media_links = maybe_media_file_bucket_path.as_ref()
+              .map(|bucket_path| MediaLinks::from_media_path(media_domain, bucket_path));
 
           let maybe_model_weight_cover_image = user_bookmark.maybe_model_weight_cover_image_public_bucket_hash
               .as_deref()
@@ -243,14 +251,15 @@ pub async fn list_user_bookmarks_for_user_handler(
             details: UserBookmarkDetailsForUserList {
               entity_type: user_bookmark.entity_type,
               entity_token: user_bookmark.entity_token,
-              maybe_media_file_data: match maybe_media_file_path {
-                None => None,
-                Some(path) => Some(MediaFileData {
+              maybe_media_file_data: match (maybe_media_file_bucket_path, maybe_media_file_media_links) {
+                (Some(path), Some(links)) => Some(MediaFileData {
                   // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
                   media_type: user_bookmark.maybe_media_file_type.unwrap_or(MediaFileType::Image),
-                  public_bucket_path: path,
+                  media_links: links,
+                  public_bucket_path: path.get_full_object_path_str().to_string(),
                   maybe_creator: maybe_media_file_creator,
                 }),
+                _ => None,
               },
               maybe_weight_data: match user_bookmark.entity_type {
                 UserBookmarkEntityType::ModelWeight => Some(WeightsData {
