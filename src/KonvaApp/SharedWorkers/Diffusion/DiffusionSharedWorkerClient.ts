@@ -43,10 +43,10 @@ export class DiffusionSharedWorkerClient<
       //   type: "module",
       // });
 
-      // this.sharedWorker.addEventListener("error", (value) => {
-      //   console.log("ERROR?!?!");
-      //   console.log(value);
-      // });
+      this.sharedWorker.addEventListener("error", (value) => {
+        console.log("Shared worker ERROR:");
+        console.log(value);
+      });
 
       console.log("launched shared worker (?)");
     } catch (error) {
