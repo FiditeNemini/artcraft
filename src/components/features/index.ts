@@ -1,3 +1,4 @@
+export { CanvasDragDropFiles } from "./CanvasDragDropFiles";
 export { DialogAddImage } from "./DialogAddImage";
 export { DialogAddVideo } from "./DialogAddVideo";
 export { DialogAiStylize } from "./DialogAiStylize";

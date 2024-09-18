@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
-import { FileUploader, IMAGE_FILE_TYPE } from "../FileUploader";
+import { FileUploader } from "../FileUploader";
 import { Button } from "~/components/ui";
+
+import { IMAGE_FILE_TYPE } from "~/constants/fileTypeEnums";
 
 import {
   paperWrapperStyles,
@@ -12,13 +14,26 @@ import {
 import { dispatchUiEvents } from "~/signals/uiEvents/";
 
 export const DialogAddImage = ({
+  stagedImage = null,
   isOpen,
   closeCallback,
 }: {
+  stagedImage?: File | null;
   isOpen: boolean;
   closeCallback: () => void;
 }) => {
   const [assetFile, setAssetFile] = useState<File | null>(null);
+  const previouslyStagedImageRef = useRef<File | null>(null);
+
+  const currFile =
+    stagedImage &&
+    stagedImage !== assetFile &&
+    stagedImage !== previouslyStagedImageRef.current
+      ? stagedImage
+      : assetFile;
+  if (previouslyStagedImageRef.current !== stagedImage) {
+    previouslyStagedImageRef.current = stagedImage;
+  }
 
   function handleClose() {
     setAssetFile(null);
@@ -26,8 +41,8 @@ export const DialogAddImage = ({
   }
 
   function handleEnter() {
-    if (assetFile) {
-      dispatchUiEvents.addImageToEngine(assetFile);
+    if (currFile) {
+      dispatchUiEvents.addImageToEngine(currFile);
     }
     handleClose();
   }
@@ -44,18 +59,18 @@ export const DialogAddImage = ({
           <FileUploader
             title=""
             fileTypes={Object.values(IMAGE_FILE_TYPE)}
-            file={assetFile}
+            file={currFile}
             setFile={(file: File | null) => {
               setAssetFile(file);
             }}
           />
-          {assetFile && (
+          {currFile && (
             <div className="relative flex items-center justify-center rounded-xl bg-ui-border">
               <label className="absolute left-0 top-0 rounded-br-xl rounded-tl-xl border border-ui-border bg-white p-2 shadow-md">
                 Preview
               </label>
               <img
-                src={URL.createObjectURL(assetFile)}
+                src={URL.createObjectURL(currFile)}
                 className="border border-dashed border-white"
               />
             </div>
@@ -64,7 +79,7 @@ export const DialogAddImage = ({
             <Button onClick={handleClose} variant="secondary">
               Cancel
             </Button>
-            <Button onClick={handleEnter} disabled={assetFile === null}>
+            <Button onClick={handleEnter} disabled={currFile === null}>
               Enter
             </Button>
           </div>

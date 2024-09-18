@@ -25,5 +25,3 @@ export const FileUploader = ({ fileTypes, title, file, setFile }: Props) => {
     </div>
   );
 };
-
-export { IMAGE_FILE_TYPE, VIDEO_FILE_TYPE } from "./enums";

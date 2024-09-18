@@ -5,9 +5,9 @@ import {
   faFileImage,
   faFileVideo,
 } from "@fortawesome/pro-solid-svg-icons";
-import { getFileName } from "~/utilities";
 
-import { VIDEO_FILE_TYPE } from "./enums";
+import { VIDEO_FILE_TYPE } from "~/constants/fileTypeEnums";
+// import { getFileName } from "~/utilities";
 
 interface Props {
   file: File | null;

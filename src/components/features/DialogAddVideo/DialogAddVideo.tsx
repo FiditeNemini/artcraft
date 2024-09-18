@@ -24,20 +24,32 @@ const initialState = {
   dialogStatus: DialogAddMediaStatuses.STAGING_FILE,
 };
 export const DialogAddVideo = ({
+  stagedVideo = null,
   isOpen,
   closeCallback,
   onUploadedVideo,
 }: {
+  stagedVideo?: File | null;
   isOpen: boolean;
   closeCallback: () => void;
   onUploadedVideo: (response: ApiResponse<MediaFile>) => void;
 }) => {
-  // useRenderCounter("DialogAddVideo");
-
   const [{ file, dialogStatus }, setStates] = useState<{
     file: File | null;
     dialogStatus: DialogAddMediaStatuses;
   }>(initialState);
+  const previouslyStagedVideoRef = useRef<File | null>(null);
+
+  const currFile =
+    stagedVideo &&
+    stagedVideo !== file &&
+    stagedVideo !== previouslyStagedVideoRef.current
+      ? stagedVideo
+      : file;
+  if (previouslyStagedVideoRef.current !== stagedVideo) {
+    previouslyStagedVideoRef.current = stagedVideo;
+  }
+  console.log(currFile);
   const trimDataRef = useRef(signal<TrimData | undefined>(undefined));
   const trimData = trimDataRef.current;
 
@@ -81,7 +93,7 @@ export const DialogAddVideo = ({
             {dialogStatus === DialogAddMediaStatuses.STAGING_FILE && (
               <>
                 <QuickTrimVideoUploader
-                  file={file}
+                  file={currFile}
                   onFileStaged={(file) => {
                     setStates((curr) => ({ ...curr, file }));
                   }}
