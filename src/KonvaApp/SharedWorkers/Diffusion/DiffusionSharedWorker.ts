@@ -18,6 +18,7 @@ import {
   ResponseType,
 } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 import { JobStatus } from "~/Classes/ApiManager/enums/Job";
+import { RenderingOptions } from "~/KonvaApp/Engine";
 
 export interface DiffusionSharedWorkerProgressData {
   url: string;
@@ -31,7 +32,9 @@ export interface DiffusionSharedWorkerItemData {
   frame: number;
   height: number;
   width: number;
+  prompt: RenderingOptions;
 }
+
 export interface DiffusionSharedWorkerErrorData {
   error: string;
 }
@@ -154,23 +157,24 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
         throw Error("Media Token Not Availible");
       }
 
+      console.log(item.prompt);
       const studioResponse = await this.videoAPI.EnqueueStudio({
         enqueueVideo: {
           disable_lcm: false,
-          enable_lipsync: false,
-          input_file: mediaToken,
-          negative_prompt: "",
-          prompt: "High quality anime style",
+          enable_lipsync: item.prompt.lipSync,
+          input_file: mediaToken, // Replace with actual media token
+          negative_prompt: item.prompt.negativePrompt,
+          prompt: item.prompt.positivePrompt,
           remove_watermark: false,
-          style: ArtStyleNames.Anime2_5D,
+          style: item.prompt.artstyle, // Map to the appropriate art style
           frame_skip: 2,
           travel_prompt: "",
           trim_end_millis: 7000,
           trim_start_millis: 0,
-          use_cinematic: true,
-          use_face_detailer: false,
-          use_strength: 1.0,
-          use_upscaler: false,
+          use_cinematic: item.prompt.cinematic,
+          use_face_detailer: item.prompt.faceDetail,
+          use_strength: item.prompt.styleStrength,
+          use_upscaler: item.prompt.upscale,
           uuid_idempotency_token: uuidv4(),
           global_ipa_media_token: "",
           input_depth_file: "",
@@ -214,13 +218,10 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
           };
 
           renderProgressData.status = status;
+
           switch (status) {
             case JobStatus.PENDING:
               reportProgress(renderProgressData); // once finished gives you up to 50%
-              break;
-            case JobStatus.DEAD:
-              renderProgressData.progress = 0;
-              reportProgress(renderProgressData);
               break;
             case JobStatus.STARTED:
               reportProgress(renderProgressData);
@@ -230,7 +231,6 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
               break;
             case JobStatus.COMPLETE_SUCCESS:
               renderProgressData.progress = 100;
-
               jobIsProcessing = false;
               if (!job.data.maybe_result.maybe_public_bucket_media_path) {
                 throw Error("Server Failed To Return Result");
@@ -246,6 +246,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
             case JobStatus.DEAD:
               jobIsProcessing = false;
               reportProgress(renderProgressData);
+              throw Error("Server Failed to Process Please Try Again.");
               break;
             case JobStatus.CANCCELLED_BY_SYSTEM:
               jobIsProcessing = false;

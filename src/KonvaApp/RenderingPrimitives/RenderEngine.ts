@@ -23,11 +23,14 @@ import {
   DiffusionSharedWorker,
   DiffusionSharedWorkerItemData,
 } from "../SharedWorkers/Diffusion/DiffusionSharedWorker";
+import { RenderingOptions } from "../Engine";
+import { ImageNode } from "../Nodes/ImageNode";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 
 export class RenderEngine {
   private videoNodes: VideoNode[];
+  private imageNodes: ImageNode[];
   private offScreenCanvas: OffscreenCanvas;
   private context: OffscreenCanvasRenderingContext2D | null;
 
@@ -143,6 +146,8 @@ export class RenderEngine {
   ) {
     this.videoLoadingCanvas = undefined;
     this.videoNodes = [];
+    this.imageNodes = [];
+
     this.isProcessing = false;
     this.onRenderingSystemMessageRecieved = onRenderingSystemMessageRecieved;
     // TODO: Make this dynamic and update this on change of canvas.
@@ -254,8 +259,12 @@ export class RenderEngine {
     return maxLength;
   }
 
-  public addNodes(node: VideoNode) {
-    this.videoNodes.push(node);
+  public addNodes(node: VideoNode | ImageNode) {
+    if (node instanceof VideoNode) {
+      this.videoNodes.push(node);
+    } else if (node instanceof ImageNode) {
+      this.imageNodes.push(node);
+    }
   }
 
   public removeNodes(node: VideoNode) {
@@ -267,14 +276,17 @@ export class RenderEngine {
   }
 
   // Do a bunch of precondition checks and error out early on.
-  public async startProcessing() {
+  public async startProcessing(renderingOptions: RenderingOptions) {
     // Start processing and lock everything
+
     this.isProcessing = true;
+
     try {
       // or not loaded
-
+      if (this.videoNodes.length + this.imageNodes.length < 1) {
+        throw Error("Must have atleast Media item on the board.");
+      }
       // error out if nodes are not all loaded.
-
       // todo remove when we have error handling + and ui
       var failed = false;
       for (let i = 0; i < this.videoNodes.length; i++) {
@@ -294,7 +306,7 @@ export class RenderEngine {
       // todo remove
       if (failed) {
         // throw error
-        throw Error("Wait For Items to Finish Processing");
+        throw Error("Wait For Items to Finish Processing.");
       }
 
       this.videoNodes.forEach((item: VideoNode) => {});
@@ -304,7 +316,7 @@ export class RenderEngine {
       numberOfFrames = Math.min(numberOfFrames, this.upperMaxFrames);
       console.log(`Number Of Frames: ${numberOfFrames}`);
 
-      await this.render(numberOfFrames);
+      await this.render(numberOfFrames, renderingOptions);
     } catch (error) {
       console.log(error);
       throw error;
@@ -333,7 +345,10 @@ export class RenderEngine {
   then seek through each node 1 step.
   stop ignore stepping if the duration is less.
   **/
-  private async render(largestNumberOfFrames: number) {
+  private async render(
+    largestNumberOfFrames: number,
+    renderingOptions: RenderingOptions,
+  ) {
     if (!this.isProcessing) return;
 
     // Stop all nodes first
@@ -429,6 +444,7 @@ export class RenderEngine {
           imageBitmap: this.offScreenCanvas.transferToImageBitmap(),
           frame: j,
           totalFrames: largestNumberOfFrames,
+          prompt: renderingOptions,
         };
 
         let isDoneStreaming = false;

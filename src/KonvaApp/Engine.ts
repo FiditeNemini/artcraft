@@ -15,6 +15,18 @@ import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 
 import * as ort from "onnxruntime-web";
 
+export interface RenderingOptions {
+  artstyle: string;
+  positivePrompt: string;
+  negativePrompt: string;
+  cinematic: boolean;
+  enginePreProcessing: boolean;
+  faceDetail: boolean;
+  lipSync: boolean;
+  upscale: boolean;
+  styleStrength: number;
+}
+
 export class Engine {
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
@@ -23,6 +35,9 @@ export class Engine {
   private offScreenCanvas: OffscreenCanvas;
 
   private selectionManager: SelectionManager;
+
+  // WIL need to fix this ui issue.
+  public ranOnce: Boolean = false;
 
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
@@ -124,6 +139,14 @@ export class Engine {
         title: "Generation Error",
         message: response.data,
       });
+
+      if (!this.renderEngine.videoLoadingCanvas) {
+        console.log("Did not setup video loading canvas.");
+        return;
+      }
+
+      this.renderEngine.videoLoadingCanvas.kNode.hide();
+      uiAccess.toolbarMain.loadingBar.hide();
     }
   }
 
@@ -168,15 +191,26 @@ export class Engine {
       this.addVideo(video.url);
     });
 
-    uiEvents.aiStylize.onRequest((data) => {
+    uiEvents.aiStylize.onRequest(async (data) => {
       console.log("Engine heard AI Stylize request: ", data);
-      console.log(
-        "you can also get initial values via uiEvents.aiStylize.getInitialValues",
-      );
-      console.log(
-        "if you missed the event, the current values can be accessed via uiEvents.aiStylize.getCurrentValues",
-      );
+      //console.log(data);
+      // Hack to ensure this doesn't break because UI BUG
+
+      if (this.ranOnce === true) {
+        try {
+          await this.renderEngine.startProcessing(data);
+        } catch (error) {
+          // throw error to retry
+          uiAccess.dialogueError.show({
+            title: "Generation Error",
+            message: error.toString(),
+          });
+        }
+      }
+
+      this.ranOnce = true;
     });
+
     // TODO: You may listen to all the image toolbar events here
     uiEvents.toolbarImage.MOVE.onClick(() => {
       console.log("move");
@@ -189,22 +223,6 @@ export class Engine {
     // TODO implement.
     uiEvents.toolbarMain.SAVE.onClick(async (event) => {
       //this.onRenderingSystemReceived(undefined);
-    });
-
-    uiEvents.aiStylize.onRequest(async () => {
-      // uiAccess.toolbarMain.changeButtonState(
-      //   ToolbarMainButtonNames.AI_STYLIZE,
-      //   { disabled: true },
-      // );
-
-      // TODO pull the values for stlyization
-
-      await this.renderEngine.startProcessing();
-
-      // uiAccess.toolbarMain.changeButtonState(
-      //   ToolbarMainButtonNames.AI_STYLIZE,
-      //   { disabled: false },
-      // );
     });
 
     // WIL please default hide this. TODO Remove
@@ -292,7 +310,6 @@ export class Engine {
 
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved TODO Save manager for resharing.
-
     uiAccess.toolbarImage.hide();
     uiAccess.loadingBar.hide();
     this.setupStage();
@@ -331,27 +348,10 @@ export class Engine {
     //   "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
     //   this.selectionManager,
     // );
-
-    // const videoNode2 = new VideoNode(
-    //   "",
-    //   this.offScreenCanvas,
-    //   this.videoLayer,
-    //   1560,
-    //   1000,
-    //   "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-    //   this.selectionManager,
-    // );
-
     // CODE TO TEST RENDER ENGINE
     // Testing render engine
     // this.renderEngine.addNodes(videoNode);
-    // this.renderEngine.addNodes(videoNode2);
-
     // await this.renderEngine.startProcessing();
-
-    // Call this when test video nodes
-    // await this.renderEngine.startProcessing();
-
     //videoNode.simulatedLoading();
     // TODO support Text nodes
 
@@ -367,6 +367,7 @@ export class Engine {
       imageFile,
       this.selectionManager,
     );
+    this.renderEngine.addNodes(imageNode);
   }
   public addVideo(url: string) {
     // Adding nodes here
