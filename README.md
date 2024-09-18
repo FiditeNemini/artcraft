@@ -3,6 +3,13 @@
 ## Installation & Dev
 
 ```sh
+npm install
+npm run dev
+```
+
+or
+
+```sh
 yarn      # this installs the node packages
 yarn dev  # this runs the vite dev server
 ```
