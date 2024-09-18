@@ -12,19 +12,19 @@ import Panel from "components/common/Panel/Panel";
 import { Link } from "react-router-dom";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
 import { RatingStats } from "v2/view/_common/ratings/RatingStats";
 import ShareButton from "components/common/ShareButton/ShareButton";
 import Container from "components/common/Container/Container";
 import VcGenerateAudioPanel from "../VcGenerateAudioPanel";
+import { useSession } from "hooks";
 
 interface VcModelViewPageProps {
   setMaybeSelectedInferenceJob: any;
-  sessionWrapper: SessionWrapper;
 }
 
 export default function VcModelViewPage(props: VcModelViewPageProps) {
+  const { sessionWrapper } = useSession();
   // let { token } = useParams() as { token: string };
 
   const title = "Solid Snake";
@@ -80,7 +80,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
   ];
 
   let ratingButtons = <></>;
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     ratingButtons = (
       <RatingButtons entity_type="v2v_model" entity_token="test" />
     );
@@ -105,7 +105,6 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
       />
 
       <VcGenerateAudioPanel
-        sessionWrapper={props.sessionWrapper}
         setVoiceConversionModels={() => {}}
         voiceConversionModels={[]}
         setMaybeSelectedVoiceConversionModel={() => {}}
@@ -136,7 +135,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
                 <td>{item.value}</td>
               </tr>
             ))}
-            {props.sessionWrapper.canBanUsers() &&
+            {sessionWrapper.canBanUsers() &&
               voiceDetailsModerator.map((item, index) => (
                 <tr key={index}>
                   <th scope="row" className="fw-semibold">
@@ -148,7 +147,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
           </tbody>
         </table>
 
-        {props.sessionWrapper.canBanUsers() && (
+        {sessionWrapper.canBanUsers() && (
           <div className="d-flex flex-column flex-md-row gap-3 mt-5">
             <Link className={"btn btn-secondary w-100"} to="">
               <FontAwesomeIcon icon={faEdit} className="me-2" />

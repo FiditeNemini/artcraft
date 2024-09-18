@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { faPause, faPlay, faShuffle } from "@fortawesome/pro-solid-svg-icons";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Panel, Button, TextArea, SelectionBubbles } from "components/common";
 import {
   FrontendInferenceJobType,
@@ -22,13 +21,11 @@ import { isMobile } from "react-device-detect";
 import { useInferenceJobs } from "hooks";
 
 interface TtsInferencePanelProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   showHanashi?: boolean;
   autoFocusTextBox?: boolean;
 }
 
 export default function LandingDemo({
-  sessionSubscriptionsWrapper,
   showHanashi = true,
   autoFocusTextBox = true,
 }: TtsInferencePanelProps) {

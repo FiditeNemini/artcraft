@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
 
 const radioButtonsWho = [
   {
@@ -44,7 +39,7 @@ const radioButtonsWhy = [
   },
 ];
 
-function ProductUsageInfoPage(props: Props) {
+function ProductUsageInfoPage() {
   usePrefixedDocumentTitle("Product Usage Survey");
   PosthogClient.recordPageview();
 

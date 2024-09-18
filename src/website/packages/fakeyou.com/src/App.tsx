@@ -299,11 +299,7 @@ class App extends React.Component<Props, State> {
                 <Switch>
                   <Route path="/">
                     <PageContainer
-                      sessionWrapper={this.state.sessionWrapper}
                       querySessionAction={this.querySession}
-                      sessionSubscriptionsWrapper={
-                        this.state.sessionSubscriptionsWrapper
-                      }
                       querySessionSubscriptionsAction={
                         this.querySessionSubscriptions
                       }

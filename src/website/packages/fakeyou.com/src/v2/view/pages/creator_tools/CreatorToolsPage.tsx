@@ -4,7 +4,6 @@ import {
   faScrewdriverWrench,
   faSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import {
   GetWebsite,
   WEBSITE,
@@ -18,11 +17,7 @@ import { AIToolsRow } from "components/marketing";
 import "./CreatorTools.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-interface CreatorToolsPageProps {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function CreatorToolsPage(props: CreatorToolsPageProps) {
+export default function CreatorToolsPage() {
   const { t } = useLocalize("LandingPage");
 
   usePrefixedDocumentTitle("Creator Tools");

@@ -8,7 +8,6 @@ import {
 } from "@storyteller/components/src/api/category/GetCategory";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { Link, useHistory } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams } from "react-router-dom";
 import {
   EditCategory,
@@ -23,12 +22,10 @@ import {
   TtsCategory,
 } from "@storyteller/components/src/api/category/ListTtsCategories";
 import { CategoryBreadcrumb } from "../../../_common/CategoryBreadcrumb";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ModerationTtsCategoryEditPage(props: Props) {
+function ModerationTtsCategoryEditPage() {
+  const { sessionWrapper } = useSession();
   const { token }: { token: string } = useParams();
 
   const history = useHistory();
@@ -92,7 +89,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
     listTtsCategories();
   }, [token, getCategory, listTtsCategories]);
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 
@@ -199,12 +196,12 @@ function ModerationTtsCategoryEditPage(props: Props) {
     : "";
 
   const superCategoryOptions = allTtsCategories
-    .filter((category) => {
+    .filter(category => {
       const isSelf = token === category.category_token;
       const cannotAdd = !category.can_have_subcategories;
       return !isSelf && !cannotAdd;
     })
-    .map((category) => {
+    .map(category => {
       return (
         <>
           <option value={category.category_token} key={category.category_token}>
@@ -408,7 +405,7 @@ function recursiveBuildHierarchy(
   currentToken: string
 ): TtsCategory[] {
   let found = allCategories.find(
-    (category) => category.category_token === currentToken
+    category => category.category_token === currentToken
   );
   if (found === undefined) {
     return [];

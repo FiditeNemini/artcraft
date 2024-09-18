@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { BackLink } from "../../../_common/BackLink";
 import {
@@ -17,12 +16,10 @@ import {
   KillTtsInferenceJobsIsSuccess,
   KillTtsInferenceJobs,
 } from "@storyteller/components/src/api/moderation/tts/KillTtsInferenceJobs";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ModerationJobStatsFc(props: Props) {
+function ModerationJobStatsFc() {
+  const { sessionWrapper } = useSession();
   // NB: We have more TTS stats than W2L stats now.
   const [ttsSecondsSinceFirst, setTtsSecondsSinceFirst] = useState<number>(-1);
   const [ttsPendingJobCount, setTtsPendingJobCount] = useState<number>(-1);
@@ -94,7 +91,7 @@ function ModerationJobStatsFc(props: Props) {
     return <div />;
   }
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 

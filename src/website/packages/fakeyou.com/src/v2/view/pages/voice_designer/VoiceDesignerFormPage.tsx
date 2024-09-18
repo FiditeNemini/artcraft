@@ -19,18 +19,13 @@ import { v4 as uuidv4 } from "uuid";
 import { useFile } from "hooks";
 import useVoiceRequests from "./useVoiceRequests";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useInferenceJobs, useSession } from "hooks";
 
 interface RouteParams {
   dataset_token?: string;
 }
 
-function VoiceDesignerFormPage({
-  sessionWrapper,
-}: {
-  sessionWrapper: SessionWrapper;
-}) {
+function VoiceDesignerFormPage() {
   const history = useHistory();
   const { datasets, inputCtrl, languages, visibilityOptions, voices } =
     useVoiceRequests({});
@@ -166,9 +161,9 @@ function VoiceDesignerFormPage({
         } else {
           // @ts-ignore
           window.dataLayer.push({
-            "event": "enqueue_failure",
-            "page": "/voice-designer/create",
-            "user_id": "$user_id"
+            event: "enqueue_failure",
+            page: "/voice-designer/create",
+            user_id: "$user_id",
           });
         }
       });

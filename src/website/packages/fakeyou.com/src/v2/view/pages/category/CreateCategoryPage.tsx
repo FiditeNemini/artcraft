@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -12,17 +11,15 @@ import { BackLink } from "../../_common/BackLink";
 import { WebUrl } from "../../../../common/WebUrl";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
 const DEFAULT_CAN_ONLY_MODS_APPLY = false;
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function CreateCategoryPage(props: Props) {
-  let history = useHistory();
+function CreateCategoryPage() {
+  const { sessionWrapper } = useSession();
+  const history = useHistory();
   PosthogClient.recordPageview();
 
   // Request
@@ -46,7 +43,7 @@ function CreateCategoryPage(props: Props) {
     undefined
   );
 
-  if (!props.sessionWrapper.isLoggedIn()) {
+  if (!sessionWrapper.isLoggedIn()) {
     return <div>You need to create an account or sign in.</div>;
   }
 
@@ -111,7 +108,7 @@ function CreateCategoryPage(props: Props) {
       can_directly_have_models: undefined,
     };
 
-    if (props.sessionWrapper.canEditCategories()) {
+    if (sessionWrapper.canEditCategories()) {
       // Moderator-only
       request.can_directly_have_models = canDirectlyHaveModels;
       request.can_have_subcategories = canHaveSubcategories;
@@ -129,7 +126,7 @@ function CreateCategoryPage(props: Props) {
     return false;
   };
 
-  const isMod = props.sessionWrapper.canEditCategories();
+  const isMod = sessionWrapper.canEditCategories();
   const categoryActionName = isMod ? "Create" : "Suggest";
 
   let errorFlash = <></>;
@@ -191,7 +188,7 @@ function CreateCategoryPage(props: Props) {
 
   let moderateCategoriesLink = undefined;
 
-  if (props.sessionWrapper.canEditCategories()) {
+  if (sessionWrapper.canEditCategories()) {
     moderateCategoriesLink = (
       <>
         <div className="container pt-4 pb-5">

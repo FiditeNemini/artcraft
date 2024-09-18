@@ -1,5 +1,4 @@
 import React from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 // import { useParams } from "react-router-dom";
 import { Input, TextArea, Select } from "components/common/Inputs/Inputs";
 import Panel from "components/common/Panel/Panel";
@@ -7,10 +6,6 @@ import { faEye, faFilePen, faSave } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import Button from "components/common/Button/Button";
 import PageContainer from "components/common/Container";
-
-interface VcModelEditPageProps {
-  sessionWrapper: SessionWrapper;
-}
 
 const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   console.log(event.target.value);
@@ -27,7 +22,7 @@ const visibility = [
   { value: "hidden", label: "Hidden" },
 ];
 
-export default function VcModelEditPage(props: VcModelEditPageProps) {
+export default function VcModelEditPage() {
   // let { token } = useParams() as { token: string };
   return (
     <PageContainer>

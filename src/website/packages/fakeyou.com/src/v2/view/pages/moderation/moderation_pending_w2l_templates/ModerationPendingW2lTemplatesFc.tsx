@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { formatDistance } from "date-fns";
 import { WebUrl } from "../../../../../common/WebUrl";
@@ -11,12 +10,10 @@ import {
   PendingW2lTemplatesEntryForList,
 } from "@storyteller/components/src/api/moderation/w2l/GetPendingW2lTemplates";
 import { PhotoVideoIcon } from "../../../_icons/PhotoVideoIcon";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ModerationPendingW2lTemplatesFc(props: Props) {
+function ModerationPendingW2lTemplatesFc() {
+  const { sessionWrapper } = useSession();
   const [templates, setTemplates] = useState<
     Array<PendingW2lTemplatesEntryForList>
   >([]);
@@ -37,14 +34,14 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
     return <div />;
   }
 
-  if (!props.sessionWrapper.canApproveW2lTemplates()) {
+  if (!sessionWrapper.canApproveW2lTemplates()) {
     return <h1>Unauthorized</h1>;
   }
 
   const now = new Date();
   let rows: Array<JSX.Element> = [];
 
-  templates.forEach((template) => {
+  templates.forEach(template => {
     const createTime = new Date(template.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
       addSuffix: true,

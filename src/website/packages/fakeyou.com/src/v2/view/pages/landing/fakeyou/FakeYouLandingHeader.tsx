@@ -1,5 +1,4 @@
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 // import Alert from "components/common/Alert/Alert";
 import { useLocalize } from "hooks";
 import React from "react";
@@ -8,12 +7,10 @@ import { Button, Panel } from "components/common";
 
 interface FakeYouLandingHeaderProps {
   experimental?: boolean;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 export default function FakeYouLandingHeader({
   experimental,
-  sessionSubscriptionsWrapper,
 }: FakeYouLandingHeaderProps) {
   const { t } = useLocalize("LandingPage");
 
@@ -40,10 +37,7 @@ export default function FakeYouLandingHeader({
       <div className="my-lg-5 py-lg-5 pt-3 pb-5">
         <div className="row g-5 m-0">
           <div className="col-12 col-lg-6 order-lg-2">
-            <LandingDemo
-              showHanashi={false}
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            />
+            <LandingDemo showHanashi={false} />
           </div>
           <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center pt-3 pt-lg-0">
             <Panel clear={true}>

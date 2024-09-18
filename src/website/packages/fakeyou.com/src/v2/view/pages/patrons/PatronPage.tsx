@@ -1,5 +1,4 @@
 import React from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { PATRONS } from "../../../../data/Patrons";
 import { PatreonLink } from "@storyteller/components/src/elements/PatreonLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,11 +8,7 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function PatronPage(props: Props) {
+function PatronPage() {
   usePrefixedDocumentTitle("Thank you to our Patrons!");
   PosthogClient.recordPageview();
 
@@ -61,7 +56,7 @@ function PatronPage(props: Props) {
           <div className="py-6">
             <div className="row text-center">
               <ul className="patrons-list col-12 col-md-4 w-100">
-                {PATRONS.map((patron) => {
+                {PATRONS.map(patron => {
                   return (
                     <li>
                       {patron.username} &mdash; ${patron.donationTotal}

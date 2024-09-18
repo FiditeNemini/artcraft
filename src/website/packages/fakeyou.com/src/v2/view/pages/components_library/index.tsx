@@ -1,13 +1,8 @@
-import React from 'react';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import React from "react";
 import SubRoutes from "./routes";
-import { Container } from 'components/common';
+import { Container } from "components/common";
 
-export default function ComponentsLibrary({
-  sessionWrapper
-}:{
-  sessionWrapper:SessionWrapper
-}){
+export default function ComponentsLibrary() {
   return (
     <Container type="panel" className="my-5">
       <SubRoutes />

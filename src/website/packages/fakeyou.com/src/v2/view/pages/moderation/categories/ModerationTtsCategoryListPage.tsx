@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 // import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { BackLink } from "../../../_common/BackLink";
@@ -14,10 +13,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBox, faBoxOpen, faLock } from "@fortawesome/free-solid-svg-icons";
 import { CategoryBreadcrumb } from "../../../_common/CategoryBreadcrumb";
-
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
+import { useSession } from "hooks";
 
 interface SortableCategoryHierarchy {
   hierarchy: ModerationTtsCategory[];
@@ -25,7 +21,8 @@ interface SortableCategoryHierarchy {
   category: ModerationTtsCategory;
 }
 
-function ModerationTtsCategoryListPage(props: Props) {
+function ModerationTtsCategoryListPage() {
+  const { sessionWrapper } = useSession();
   const [ttsCategories, setTtsCategories] = useState<ModerationTtsCategory[]>(
     []
   );
@@ -56,7 +53,7 @@ function ModerationTtsCategoryListPage(props: Props) {
     listTtsCategories();
   }, [listTtsCategories]);
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 
@@ -89,7 +86,7 @@ function ModerationTtsCategoryListPage(props: Props) {
   }
 
   let sortableHierarchies: SortableCategoryHierarchy[] = ttsCategories
-    .map((category) => {
+    .map(category => {
       const categoryHierarchy = recursiveBuildHierarchy(
         ttsCategories,
         category.category_token
@@ -241,7 +238,7 @@ function ModerationTtsCategoryListPage(props: Props) {
           </tr>
         </thead>
         <tbody>
-          {sortableHierarchies.map((sortableHierarchy) => {
+          {sortableHierarchies.map(sortableHierarchy => {
             const category = sortableHierarchy.category;
             const categoryHierarchy = sortableHierarchy.hierarchy;
 
@@ -371,7 +368,7 @@ function recursiveBuildHierarchy(
   currentToken: string
 ): ModerationTtsCategory[] {
   let found = allCategories.find(
-    (category) => category.category_token === currentToken
+    category => category.category_token === currentToken
   );
   if (found === undefined) {
     return [];

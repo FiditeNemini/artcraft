@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBan,
@@ -20,13 +19,12 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
+function ModerationPage() {
+  const { sessionWrapper } = useSession();
 
-function ModerationPage(props: Props) {
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 

@@ -5,22 +5,18 @@ import {
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Panel } from "components/common";
 import { AITools } from "components/marketing";
-import { useLocalize } from "hooks";
+import { useLocalize, useSession } from "hooks";
 import React from "react";
 import { Link } from "react-router-dom";
 
 interface DashboardProps {
   experimental?: boolean;
-  sessionWrapper: SessionWrapper;
 }
 
-export default function Dashboard({
-  experimental,
-  sessionWrapper,
-}: DashboardProps) {
+export default function Dashboard({ experimental }: DashboardProps) {
+  const { sessionWrapper } = useSession();
   const { t } = useLocalize("LandingPage");
   const isLoggedIn = sessionWrapper.isLoggedIn();
 

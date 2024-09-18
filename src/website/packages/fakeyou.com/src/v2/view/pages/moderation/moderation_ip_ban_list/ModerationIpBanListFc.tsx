@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { ApiConfig } from "@storyteller/components";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { formatDistance } from "date-fns";
 import { BackLink } from "../../../_common/BackLink";
 import { WebUrl } from "../../../../../common/WebUrl";
-
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
+import { useSession } from "hooks";
 
 interface IpBanListResponse {
   success: boolean;
@@ -29,8 +25,9 @@ interface IpBanListItem {
   updated_at: string;
 }
 
-function ModerationIpBanListFc(props: Props) {
+function ModerationIpBanListFc() {
   const history = useHistory();
+  const { sessionWrapper } = useSession();
 
   const [ipBanList, setIpBanList] = useState<Array<IpBanListItem>>([]);
 
@@ -49,8 +46,8 @@ function ModerationIpBanListFc(props: Props) {
       },
       credentials: "include",
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         const response: IpBanListResponse = res;
         if (!response.success) {
           return;
@@ -58,7 +55,7 @@ function ModerationIpBanListFc(props: Props) {
 
         setIpBanList(response.ip_address_bans);
       })
-      .catch((e) => {
+      .catch(e => {
         //this.props.onSpeakErrorCallback();
       });
   }, []); // NB: Empty array dependency sets to run ONLY on mount
@@ -91,25 +88,25 @@ function ModerationIpBanListFc(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
           history.go(0); // NB: Force reload
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 
   const now = new Date();
   let rows: Array<JSX.Element> = [];
 
-  ipBanList.forEach((ban) => {
+  ipBanList.forEach(ban => {
     const modUserLink = `/profile/${ban.mod_username}`;
     const viewBanLink = `/moderation/ip_bans/${ban.ip_address}`;
 

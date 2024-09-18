@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { useHistory } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams } from "react-router-dom";
 import {
   GetUserByUsername,
@@ -9,14 +8,11 @@ import {
   User,
 } from "@storyteller/components/src/api/user/GetUserByUsername";
 import { BackLink } from "../../../_common/BackLink";
-
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ProfileBanFc(props: Props) {
+function ProfileBanFc() {
+  const { sessionWrapper } = useSession();
   const { username }: { username: string } = useParams();
   const userProfilePage = `/profile/${username}`;
 
@@ -29,7 +25,7 @@ function ProfileBanFc(props: Props) {
   const [modComments, setModComments] = useState<string>("");
   const [isBanned, setIsBanned] = useState<boolean>(false);
 
-  const getUserProfile = useCallback(async (username) => {
+  const getUserProfile = useCallback(async username => {
     const user = await GetUserByUsername(username);
     if (GetUserByUsernameIsOk(user)) {
       setUserData(user);
@@ -64,13 +60,13 @@ function ProfileBanFc(props: Props) {
       credentials: "include",
       body: JSON.stringify(request),
     })
-      .then((res) => res.json())
-      .then((res) => {
+      .then(res => res.json())
+      .then(res => {
         if (res.success) {
           history.push(userProfilePage);
         }
       })
-      .catch((e) => {});
+      .catch(e => {});
 
     return false;
   };
@@ -80,7 +76,7 @@ function ProfileBanFc(props: Props) {
     return <span />;
   }
 
-  if (!!userData && !props.sessionWrapper.canEditUserProfile(username)) {
+  if (!!userData && !sessionWrapper.canEditUserProfile(username)) {
     // Loading and we don't have access.
     history.push(userProfilePage);
   }

@@ -7,7 +7,6 @@ import { Button } from "components/common";
 import { useDomainConfig } from "context/DomainConfigContext";
 import React, { useEffect, useRef, useState } from "react";
 import { useScroll, useTransform, motion } from "framer-motion";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import FeatureTitle from "./FeatureTitle";
 import { FeatureVideo } from "./FeatureCard";
 import {
@@ -24,15 +23,12 @@ import {
 import ScrollingSceneCarousel from "./ScrollingSceneCarousel";
 import EmailSignUp from "./EmailSignUp";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useModal } from "hooks";
+import { useModal, useSession } from "hooks";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { isMobile as isMobileDevice } from "react-device-detect";
 
-interface PostlaunchLandingProps {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function PostlaunchLanding(props: PostlaunchLandingProps) {
+export default function PostlaunchLanding() {
+  const { sessionWrapper } = useSession();
   const [imageHeight, setImageHeight] = useState("100vh");
   const domain: WebsiteConfig = useDomainConfig();
   const { open } = useModal();
@@ -123,7 +119,7 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
 
   let ctaButton;
 
-  if (props.sessionWrapper.canAccessStudio()) {
+  if (sessionWrapper.canAccessStudio()) {
     // Logged in + can access studio
     ctaButton = (
       <>
@@ -152,7 +148,7 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
         )}
       </>
     );
-  } else if (!props.sessionWrapper.isLoggedIn()) {
+  } else if (!sessionWrapper.isLoggedIn()) {
     // User is not logged in. For now, we can give them
     // immediate access if they sign up. This will only be a
     // brief state.
@@ -344,10 +340,10 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
             >
               <source src="/videos/landing/landing_reel.mp4" type="video/mp4" />
             </video>
-            {props.sessionWrapper.isLoggedIn() && ctaButton}
+            {sessionWrapper.isLoggedIn() && ctaButton}
           </div>
 
-          {!props.sessionWrapper.canAccessStudio() ? (
+          {!sessionWrapper.canAccessStudio() ? (
             <div style={{ marginTop: "100px" }}>
               <EmailSignUp mobile={true} showHanashi={false} />
             </div>
@@ -681,11 +677,11 @@ export default function PostlaunchLanding(props: PostlaunchLandingProps) {
             >
               <source src="/videos/landing/landing_reel.mp4" type="video/mp4" />
             </video>
-            {props.sessionWrapper.isLoggedIn() && ctaButton}
+            {sessionWrapper.isLoggedIn() && ctaButton}
           </div>
 
           <div className="container">
-            {!props.sessionWrapper.canAccessStudio() ? (
+            {!sessionWrapper.canAccessStudio() ? (
               <div style={{ marginTop: "260px" }}>
                 <EmailSignUp />
               </div>

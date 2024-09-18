@@ -1,7 +1,5 @@
 import React from "react";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container } from "components/common";
 // import { AIFaceMirrorCTA } from "components/marketing";
@@ -16,15 +14,13 @@ import {
 } from "@storyteller/components/src/env/GetWebsite";
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import MentionsSection from "components/common/MentionsSection";
+import { useSession } from "hooks";
 // import VstSectionV3 from "./components/VstSectionV3";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-function LandingPage(props: Props) {
+function LandingPage() {
   PosthogClient.recordPageview();
+
+  const { sessionWrapper } = useSession();
 
   const domain: WebsiteConfig = useDomainConfig();
 
@@ -35,7 +31,7 @@ function LandingPage(props: Props) {
 
   usePrefixedDocumentTitle(webpageTitle);
 
-  const isLoggedIn = props.sessionWrapper.isLoggedIn();
+  const isLoggedIn = sessionWrapper.isLoggedIn();
 
   //// DO NOT LEAK THIS YET!!
   //let protectedStudioOnboarding = <></>;
@@ -53,22 +49,16 @@ function LandingPage(props: Props) {
       {domain.website === Website.StorytellerAi && (
         // <LandingVideoReel sessionWrapper={props.sessionWrapper} />
         // <PrelaunchLanding sessionWrapper={props.sessionWrapper} />
-        <PostlaunchLanding sessionWrapper={props.sessionWrapper} />
+        <PostlaunchLanding />
       )}
       {domain.website === Website.FakeYou && (
         <>
           <Container type="panel">
-            <Dashboard
-              {...{ experimental: true }}
-              sessionWrapper={props.sessionWrapper}
-            />
+            <Dashboard {...{ experimental: true }} />
 
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
-              <FakeYouLandingHeader
-                {...{ experimental: true }}
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-              />
+              <FakeYouLandingHeader {...{ experimental: true }} />
             )}
 
             {/*         <div className="mt-5">

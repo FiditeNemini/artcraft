@@ -12,10 +12,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Panel from "components/common/Panel/Panel";
 import { Link } from "react-router-dom";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PageHeader from "components/layout/PageHeader";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Container from "components/common/Container/Container";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
@@ -28,16 +26,10 @@ import Skeleton from "components/common/Skeleton";
 import useVoiceRequests from "./useVoiceRequests";
 import { v4 as uuidv4 } from "uuid";
 import { useHistory } from "react-router-dom";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 
-interface VoiceDesignerUseVoicePageProps {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-}
-
-export default function VoiceDesignerUseVoicePage(
-  props: VoiceDesignerUseVoicePageProps
-) {
+export default function VoiceDesignerUseVoicePage() {
+  const { sessionWrapper } = useSession();
   const { voice_token } = useParams<{ voice_token: string }>();
   const [textBuffer, setTextBuffer] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -182,7 +174,7 @@ export default function VoiceDesignerUseVoicePage(
     );
   }
 
-  if (!props.sessionWrapper.isLoggedIn()) {
+  if (!sessionWrapper.isLoggedIn()) {
     history.push("/voice-designer");
   }
 
@@ -259,7 +251,7 @@ export default function VoiceDesignerUseVoicePage(
                 <td>{item.value}</td>
               </tr>
             ))}
-            {/* {props.sessionWrapper.canBanUsers() &&
+            {/* {sessionWrapper.canBanUsers() &&
               voiceDetailsModerator.map((item, index) => (
                 <tr key={index}>
                   <th scope="row" className="fw-semibold">
@@ -271,7 +263,7 @@ export default function VoiceDesignerUseVoicePage(
           </tbody>
         </table>
 
-        {props.sessionWrapper.canBanUsers() && (
+        {sessionWrapper.canBanUsers() && (
           <div className="d-flex flex-column flex-md-row gap-3 mt-5">
             <Link className={"btn btn-secondary w-100"} to="">
               <FontAwesomeIcon icon={faEdit} className="me-2" />

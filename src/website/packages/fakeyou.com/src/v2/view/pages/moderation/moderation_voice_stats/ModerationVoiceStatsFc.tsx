@@ -1,17 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { BackLink } from "../../../_common/BackLink";
 import {
   GetVoiceInventoryStats,
   GetVoiceInventoryStatsIsOk,
 } from "@storyteller/components/src/api/moderation/stats/GetVoiceInventoryStats";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ModerationVoiceStatsFc(props: Props) {
+function ModerationVoiceStatsFc() {
+  const { sessionWrapper } = useSession();
   const [allVoicesCount, setAllVoicesCount] = useState<number>(-1);
   const [publicVoicesCount, setPublicVoicesCount] = useState<number>(-1);
 
@@ -35,7 +32,7 @@ function ModerationVoiceStatsFc(props: Props) {
     return <div />;
   }
 
-  if (!props.sessionWrapper.canEditOtherUsersTtsModels()) {
+  if (!sessionWrapper.canEditOtherUsersTtsModels()) {
     return <h1>Unauthorized</h1>;
   }
 

@@ -8,19 +8,16 @@ import {
 } from "@storyteller/components/src/api/category/GetCategory";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { Link, useHistory } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams } from "react-router-dom";
 import {
   SetCategoryDeletionState,
   SetCategoryDeletionStateIsError,
   SetCategoryDeletionStateIsSuccess,
 } from "@storyteller/components/src/api/moderation/category/SetCategoryDeletionState";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function ModerationCategoryDeletePage(props: Props) {
+function ModerationCategoryDeletePage() {
+  const { sessionWrapper } = useSession();
   const { token }: { token: string } = useParams();
 
   const history = useHistory();
@@ -46,7 +43,7 @@ function ModerationCategoryDeletePage(props: Props) {
     getCategory(token);
   }, [token, getCategory]);
 
-  if (!props.sessionWrapper.canBanUsers()) {
+  if (!sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
 

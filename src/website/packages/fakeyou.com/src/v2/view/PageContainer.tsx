@@ -10,8 +10,6 @@ import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban
 import FaceAnimator from "./pages/face_animator";
 import VideoMocap from "./pages/video_mocap";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SignupPage } from "./pages/signup/SignupPage";
 import {
   Switch,
@@ -89,7 +87,6 @@ import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
-import VideoWorkflowPage from "./pages/video_workflow/VideoWorkflow";
 import ScrollToTop from "./_common/ScrollToTop";
 import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
@@ -128,10 +125,7 @@ import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoComp
 import Lipsync from "./pages/lipsync/Lipsync";
 
 interface Props {
-  sessionWrapper: SessionWrapper;
   querySessionAction: () => void;
-
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   querySessionSubscriptionsAction: () => void;
 
   textBuffer: string;
@@ -171,7 +165,7 @@ class PageContainer extends React.Component<
             <ProfileSidePanel />
             <Switch>
               <Route path="/comp-lib">
-                <ComponentsLibrary sessionWrapper={this.props.sessionWrapper} />
+                <ComponentsLibrary />
               </Route>
               <Route path="/firehose">
                 <FirehoseEventListPage />
@@ -216,7 +210,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/profile/:username/ban">
-                <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
+                <ProfileBanFc />
               </Route>
 
               <Route path="/profile/:username">
@@ -374,60 +368,43 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/moderation/ip_bans">
-                <ModerationIpBanListFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationIpBanListFc />
               </Route>
 
               <Route path="/moderation/voice_stats">
-                <ModerationVoiceStatsFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationVoiceStatsFc />
               </Route>
 
               <Route path="/moderation/job_stats">
-                <ModerationJobStatsFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationJobStatsFc />
               </Route>
 
               <Route path="/moderation/job_control">
-                <ModerationJobControlPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationJobControlPage />
               </Route>
+
               <Route path="/moderation/token_info">
-                <ModerationTokenInfoPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationTokenInfoPage />
               </Route>
 
               <Route path="/moderation/tts_category/list">
-                <ModerationTtsCategoryListPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationTtsCategoryListPage />
               </Route>
 
               <Route path="/moderation/tts_category/edit/:token">
-                <ModerationTtsCategoryEditPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationTtsCategoryEditPage />
               </Route>
 
               <Route path="/moderation/category/delete/:token">
-                <ModerationCategoryDeletePage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationCategoryDeletePage />
               </Route>
 
               <Route path="/moderation/approve/w2l_templates">
-                <ModerationPendingW2lTemplatesFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ModerationPendingW2lTemplatesFc />
               </Route>
 
               <Route path="/moderation">
-                <ModerationPage sessionWrapper={this.props.sessionWrapper} />
+                <ModerationPage />
               </Route>
 
               <Route exact={true} path="/clone">
@@ -435,26 +412,23 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/patrons">
-                <PatronPage sessionWrapper={this.props.sessionWrapper} />
+                <PatronPage />
               </Route>
 
               <Route path="/product-usage">
-                <ProductUsageInfoPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <ProductUsageInfoPage />
               </Route>
 
               <Route path="/voice-conversion/:token/delete">
-                <VcModelDeletePage sessionWrapper={this.props.sessionWrapper} />
+                <VcModelDeletePage />
               </Route>
 
               <Route path="/voice-conversion/:token/edit">
-                <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
+                <VcModelEditPage />
               </Route>
 
               <Route path="/voice-conversion/:token">
                 <VcModelViewPage
-                  sessionWrapper={this.props.sessionWrapper}
                   setMaybeSelectedInferenceJob={
                     this.props.maybeSelectedVoiceConversionModel
                   }
@@ -462,11 +436,11 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/dashboard">
-                <DashboardPage sessionWrapper={this.props.sessionWrapper} />
+                <DashboardPage />
               </Route>
 
               <Route path="/welcome-to-studio">
-                <WelcomePage sessionWrapper={this.props.sessionWrapper} />
+                <WelcomePage />
               </Route>
 
               <Route path="/about">
@@ -538,35 +512,17 @@ class PageContainer extends React.Component<
 
               {/* Route for initial voice creation */}
               <Route exact path="/voice-designer/create">
-                <VoiceDesignerFormPage
-                  {...{
-                    sessionWrapper: this.props.sessionWrapper,
-                    sessionSubscriptionsWrapper:
-                      this.props.sessionSubscriptionsWrapper,
-                  }}
-                />
+                <VoiceDesignerFormPage />
               </Route>
 
               {/* Route for editing the dataset details */}
               <Route exact path="/voice-designer/dataset/:dataset_token/edit">
-                <VoiceDesignerFormPage
-                  {...{
-                    sessionWrapper: this.props.sessionWrapper,
-                    sessionSubscriptionsWrapper:
-                      this.props.sessionSubscriptionsWrapper,
-                  }}
-                />
+                <VoiceDesignerFormPage />
               </Route>
 
               {/* Route for handling dataset token for uploading samples */}
               <Route exact path="/voice-designer/dataset/:dataset_token/upload">
-                <VoiceDesignerFormPage
-                  {...{
-                    sessionWrapper: this.props.sessionWrapper,
-                    sessionSubscriptionsWrapper:
-                      this.props.sessionSubscriptionsWrapper,
-                  }}
-                />
+                <VoiceDesignerFormPage />
               </Route>
 
               <Route path="/voice-designer/voice/:voice_token/edit">
@@ -574,12 +530,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/voice-designer/voice/:voice_token">
-                <VoiceDesignerUseVoicePage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <VoiceDesignerUseVoicePage />
               </Route>
 
               <Route path="/inference-jobs-list">
@@ -599,28 +550,11 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/video-mocap/:mediaToken?">
-                <VideoMocap
-                  {...{
-                    sessionWrapper: this.props.sessionWrapper,
-                  }}
-                />
-              </Route>
-
-              <Route path="/video-workflow">
-                <VideoWorkflowPage
-                  {...{
-                    sessionWrapper: this.props.sessionWrapper,
-                  }}
-                />
+                <VideoMocap />
               </Route>
 
               <Route path="/text-to-image">
-                <TextToImagePage
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <TextToImagePage />
               </Route>
 
               <Route path="/character/donald-trump">
@@ -668,9 +602,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/category/create">
-                <CreateCategoryPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+                <CreateCategoryPage />
               </Route>
 
               <Route path="/creator-onboarding">
@@ -703,7 +635,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/tools">
-                <CreatorToolsPage sessionWrapper={this.props.sessionWrapper} />
+                <CreatorToolsPage />
               </Route>
 
               <Route path="/waitlist-next-steps">
@@ -711,12 +643,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/" exact={true}>
-                <LandingPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
+                <LandingPage />
               </Route>
             </Switch>
           </div>

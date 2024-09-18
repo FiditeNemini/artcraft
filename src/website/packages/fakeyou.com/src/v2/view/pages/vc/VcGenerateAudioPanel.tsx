@@ -15,7 +15,6 @@ import {
   EnqueueVoiceConversionIsSuccess,
   EnqueueVoiceConversionRequest,
 } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import {
   VoiceConversionModelListItem,
   ListVoiceConversionModels,
@@ -29,8 +28,6 @@ import { v4 as uuidv4 } from "uuid";
 import { useInferenceJobs } from "hooks";
 
 interface VcGenerateAudioPanelProps {
-  sessionWrapper: SessionWrapper;
-
   voiceConversionModels: Array<VoiceConversionModelListItem>;
   setVoiceConversionModels: (
     ttsVoices: Array<VoiceConversionModelListItem>

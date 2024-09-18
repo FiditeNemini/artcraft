@@ -4,7 +4,7 @@ import { Redirect, useLocation } from "react-router-dom";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 import { Button, Container, Panel, Tabs } from "components/common";
-import { useInferenceJobs, useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize, useSession } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
@@ -18,14 +18,10 @@ import {
   faPersonRays,
 } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
-export default function VideoMotionCapture({
-  sessionWrapper,
-}: {
-  sessionWrapper: SessionWrapper;
-}) {
+export default function VideoMotionCapture() {
+  const { sessionWrapper } = useSession();
   const { t } = useLocalize("VideoMotionCapture");
   const { NO_FILE, FILE_UPLOADING, MOCAPNET_ENQUEUED } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
