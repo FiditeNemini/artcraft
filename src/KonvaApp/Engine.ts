@@ -12,8 +12,14 @@ import { ImageNode } from "./Nodes/ImageNode";
 
 import { LoadingBarStatus } from "~/components/ui";
 import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
-
+import { UndoStackManager } from "./UndoRedo/UndoRedoManager";
 import * as ort from "onnxruntime-web";
+
+import { CreateCommand } from "./UndoRedo/CreateCommand";
+import { DeleteCommand } from "./UndoRedo/DeleteCommand";
+import { RotateCommand } from "./UndoRedo/RotateCommand";
+import { ScaleCommand } from "./UndoRedo/ScaleCommand";
+import { TranslateCommand } from "./UndoRedo/TranslateCommand";
 
 export interface RenderingOptions {
   artstyle: string;
@@ -35,7 +41,7 @@ export class Engine {
   private offScreenCanvas: OffscreenCanvas;
 
   private selectionManager: SelectionManager;
-
+  private undoStackManager: UndoStackManager;
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
     console.log("Engine Created!");
@@ -45,7 +51,7 @@ export class Engine {
     }
 
     this.selectionManager = new SelectionManager();
-
+    this.undoStackManager = new UndoStackManager();
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
       container: this.canvasReference,
@@ -351,6 +357,8 @@ export class Engine {
     // TODO support Text nodes
 
     this.videoLayer.add(textNode);
+
+    this.addKeyboardShortcuts();
   }
 
   public addImage(imageFile: File) {
@@ -377,5 +385,51 @@ export class Engine {
       undefined,
     );
     this.renderEngine.addNodes(videoNode);
+  }
+
+  private addKeyboardShortcuts() {
+    window.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key === "z") {
+        this.undo();
+      } else if (
+        (event.ctrlKey && event.key === "y") ||
+        (event.ctrlKey && event.shiftKey && event.key === "Z")
+      ) {
+        this.redo();
+      }
+    });
+  }
+
+  translateNodes(nodes: Konva.Node[], newX: number, newY: number) {
+    const command = new TranslateCommand(nodes, newX, newY);
+    this.undoStackManager.executeCommand(command);
+  }
+
+  rotateNodes(nodes: Konva.Node[], newRotation: number) {
+    const command = new RotateCommand(nodes, newRotation);
+    this.undoStackManager.executeCommand(command);
+  }
+
+  deleteNodes(nodes: Konva.Node[]) {
+    const command = new DeleteCommand(nodes);
+    this.undoStackManager.executeCommand(command);
+  }
+
+  createNodes(nodes: Konva.Node[]) {
+    const command = new CreateCommand(nodes, this.videoLayer);
+    this.undoStackManager.executeCommand(command);
+  }
+
+  scaleNodes(nodes: Konva.Node[], newScaleX: number, newScaleY: number) {
+    const command = new ScaleCommand(nodes, newScaleX, newScaleY);
+    this.undoStackManager.executeCommand(command);
+  }
+
+  undo() {
+    this.undoStackManager.undo();
+  }
+
+  redo() {
+    this.undoStackManager.redo();
   }
 }
