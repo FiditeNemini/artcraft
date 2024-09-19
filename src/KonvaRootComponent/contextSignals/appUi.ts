@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react";
 import { signal } from "@preact/signals-react";
+
 export type AppUiSignalType = {
   isAddVideoOpen: boolean;
   stagedVideo: File | null;
@@ -16,6 +17,7 @@ const appUiInitialState = {
 };
 export const useAppUiContext = () => {
   const appUiRef = useRef(signal<AppUiSignalType>(appUiInitialState));
+
   const appUiSignal = appUiRef.current;
   const resetAll = useCallback(() => {
     appUiSignal.value = appUiInitialState;

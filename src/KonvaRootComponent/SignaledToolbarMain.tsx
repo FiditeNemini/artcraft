@@ -1,4 +1,5 @@
 import { MouseEventHandler } from "react";
+import { useSignalEffect } from "@preact/signals-react";
 import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { dispatchers } from "~/signals/uiEvents/toolbarMain";
 
@@ -6,16 +7,31 @@ import { ToolbarMain } from "~/components/features";
 import { LoadingBar } from "~/components/ui";
 
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+import { LayoutSignalType } from "./contextSignals/layout";
 
 export const SignaledToolbarMain = ({
+  layoutSignal,
   openAddImage,
   openAddVideo,
   openAIStylize,
 }: {
+  layoutSignal: LayoutSignalType;
   openAddImage: () => void;
   openAddVideo: () => void;
   openAIStylize: () => void;
 }) => {
+  //// for testing
+  const { isMobile } = layoutSignal;
+  useSignalEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log(
+        "Orientation Changed >> ",
+        `current orientation: ${isMobile.value ? "mobile" : "desktop"}`,
+      );
+    }
+  });
+  /// end for testing
+
   const loadingBar = toolbarMain.loadingBar.signal.value;
   const buttonProps = Object.values(ToolbarMainButtonNames).reduce(
     (acc, buttonName) => {

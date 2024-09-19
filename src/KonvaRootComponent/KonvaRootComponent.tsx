@@ -16,6 +16,7 @@ import { KonvaApp } from "~/KonvaApp";
 
 // all the signal-contexts are wrapped in hooks
 import { useAppUiContext } from "./contextSignals/appUi";
+import { useLayoutContext } from "./contextSignals/layout";
 
 // common hooks
 import { useRenderCounter } from "~/hooks/useRenderCounter";
@@ -25,6 +26,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
   // Let's make sure we only log once
   useRenderCounter("KonvaRootComponent");
   const appUiContext = useAppUiContext();
+  const layoutContext = useLayoutContext();
   const engineRef = useRef<EngineType | null>(null);
 
   const konvaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
@@ -45,6 +47,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
         openAddVideo={appUiContext.openAddVideo}
       />
       <SignaledToolbarMain
+        layoutSignal={layoutContext.signal}
         openAddImage={appUiContext.openAddImage}
         openAddVideo={appUiContext.openAddVideo}
         openAIStylize={appUiContext.openAIStylize}
