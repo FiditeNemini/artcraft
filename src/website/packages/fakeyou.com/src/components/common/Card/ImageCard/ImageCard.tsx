@@ -42,7 +42,9 @@ export default function ImageCard({
   // const { setToken, setWeightTitle } = useToken();
   const linkUrl = getCardUrl(data, source, type);
 
-  const { imageThumb } = MediaLinks(data.media_links);
+  const { imageThumb } = MediaLinks(
+    data.media_links || data.details?.maybe_media_file_data?.media_links
+  );
 
   const handleSelectModalResultSelect = () => {
     console.log("handleSelectModalResultSelect");

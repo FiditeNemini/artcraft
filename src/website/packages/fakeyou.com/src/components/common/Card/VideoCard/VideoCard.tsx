@@ -35,7 +35,9 @@ export default function VideoCard({
   onResultSelect,
 }: VideoCardProps) {
   const linkUrl = getCardUrl(data, source, type);
-  const { videoAnimated, videoStill } = MediaLinks(data.media_links);
+  const { videoAnimated, videoStill } = MediaLinks(
+    data.media_links || data.details.maybe_media_file_data.media_links
+  );
   const [hover, hoverProps] = useHover({});
 
   const handleSelectModalResultSelect = () => {
