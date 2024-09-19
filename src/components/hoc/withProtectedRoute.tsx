@@ -49,7 +49,7 @@ const RedirectToLogin = () => {
 
   useEffect(() => {
     if (!timeoutTimer.current) {
-      timeoutTimer.current = setTimeout(
+      timeoutTimer.current = window.setTimeout(
         () => navigate(`/login?redirect=${pathname}`),
         2000,
       );

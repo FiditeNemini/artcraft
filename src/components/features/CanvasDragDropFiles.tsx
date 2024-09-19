@@ -22,7 +22,6 @@ export const CanvasDragDropFiles = ({
   fileTypes,
   onSetFiles,
   className,
-  children,
 }: CanvasDragDropFilesInterface) => {
   const [dragging, setDragging] = useState<DragStates>(DragStates.IDLE);
   const lastDragging = useRef<DragStates>(DragStates.IDLE);
@@ -81,15 +80,20 @@ export const CanvasDragDropFiles = ({
   return (
     <div
       className={twMerge(
-        "h-full w-full border-4 border-dashed border-transparent bg-transparent",
+        "h-full w-full rounded-2xl border-4 border-dashed border-transparent bg-transparent",
         dragging === DragStates.IDLE && "pointer-events-none",
-        dragging === DragStates.DRAGGING && "border-gray-400 bg-gray-400/50",
+        dragging === DragStates.DRAGGING && "border-gray-200 bg-gray-700/50",
         "relative",
         className,
       )}
+      onDrop={handleDrop}
+      onDragEnter={handleDragOver}
+      onDragOver={handleDragOver}
+      onDragExit={handleDragExit}
+      onDragLeave={handleDragExit}
     >
       {dragging === DragStates.DRAGGING && (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-4">
+        <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center gap-4 text-white">
           <FontAwesomeIcon icon={faFilePlus} className="text-5xl" />
           <p className="mt-1 text-lg">
             Drag and drop files here to add them to the board!
@@ -106,15 +110,6 @@ export const CanvasDragDropFiles = ({
           </p>
         </div>
       )}
-      {children}
-      <div
-        className="absolute left-0 top-0 h-full w-full"
-        onDrop={handleDrop}
-        onDragEnter={handleDragOver}
-        onDragOver={handleDragOver}
-        onDragExit={handleDragExit}
-        onDragLeave={handleDragExit}
-      />
     </div>
   );
 };
