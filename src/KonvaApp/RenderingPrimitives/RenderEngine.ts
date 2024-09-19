@@ -51,7 +51,7 @@ export class RenderEngine {
   private port: MessagePort | undefined;
   private upperMaxFrames: number;
 
-  private captureCanvas: Konva.Rect;
+  public captureCanvas: Konva.Rect;
 
   public videoLoadingCanvas: VideoNode | undefined;
 
@@ -99,20 +99,20 @@ export class RenderEngine {
     this.captureCanvas.size({ width: this.width, height: this.height });
 
     // Setup loader and position it accordingly
-    if (this.videoLoadingCanvas === undefined) {
-      this.videoLoadingCanvas = new VideoNode(
-        "",
-        this.videoLayer,
-        this.positionX,
-        this.positionY,
-        "wipe.mp4",
-        undefined,
-        this.width,
-        this.height,
-      );
-    }
-    this.videoLoadingCanvas.highlight();
-    this.videoLoadingCanvas.kNode.hide();
+    // if (this.videoLoadingCanvas === undefined) {
+    //   this.videoLoadingCanvas = new VideoNode(
+    //     "",
+    //     this.videoLayer,
+    //     this.positionX,
+    //     this.positionY,
+    //     "wipe.mp4",
+    //     undefined,
+    //     this.width,
+    //     this.height,
+    //   );
+    // }
+    // this.videoLoadingCanvas.highlight();
+    // this.videoLoadingCanvas.kNode.hide();
 
     // this is the change in positions
     const deltaX = this.positionX - oldPositionX;
@@ -434,9 +434,6 @@ export class RenderEngine {
           this.width,
           this.height,
         );
-
-        // Test remove later.
-        // const largestNumberOfFrames = 4;
 
         const data: DiffusionSharedWorkerItemData = {
           height: this.height,

@@ -68,6 +68,7 @@ export class Engine {
     // core layer for all the work done.
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
+
     this.renderEngine = new RenderEngine(
       this.videoLayer,
       this.offScreenCanvas,
@@ -97,10 +98,11 @@ export class Engine {
     //     progress: 0.2,
     //   },
     // };
-    if (!this.renderEngine.videoLoadingCanvas) {
-      console.log("Missing Video Loading Canvas");
-      return;
-    }
+    // if (!this.renderEngine.videoLoadingCanvas) {
+    //   console.log("Missing Video Loading Canvas");
+    //   return;
+    // }
+
     if (response.responseType === ResponseType.result) {
       uiAccess.toolbarMain.loadingBar.hide();
       // create video node here.
@@ -111,8 +113,8 @@ export class Engine {
       const videoNode = new VideoNode(
         uuidv4(),
         this.videoLayer,
-        this.renderEngine.videoLoadingCanvas?.kNode.position().x,
-        this.renderEngine.videoLoadingCanvas?.kNode.position().y,
+        this.renderEngine.captureCanvas.position().x,
+        this.renderEngine.captureCanvas.position().y,
         media_url,
         this.selectionManager,
         undefined,
@@ -121,12 +123,12 @@ export class Engine {
       this.renderEngine.addNodes(videoNode);
 
       // hide the loader
-      this.renderEngine.videoLoadingCanvas.kNode.hide();
+      //this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
     } else if (response.responseType === ResponseType.progress) {
       // TODO wil fix this ?!?! parameter issue
       uiAccess.toolbarMain.loadingBar.show();
-      this.renderEngine.videoLoadingCanvas.kNode.show();
+      //this.renderEngine.videoLoadingCanvas.kNode.show();
       uiAccess.toolbarMain.loadingBar.updateProgress(
         response.data.progress * 100,
       );
@@ -137,12 +139,12 @@ export class Engine {
         message: response.data,
       });
 
-      if (!this.renderEngine.videoLoadingCanvas) {
-        console.log("Did not setup video loading canvas.");
-        return;
-      }
+      // if (!this.renderEngine.videoLoadingCanvas) {
+      //   console.log("Did not setup video loading canvas.");
+      //   return;
+      // }
+      //this.renderEngine.videoLoadingCanvas.kNode.hide();
 
-      this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
     }
   }
@@ -320,11 +322,13 @@ export class Engine {
 
     var anim = new Konva.Animation((frame) => {
       if (frame) {
-        const timeDiff = frame.timeDiff;
-        const frameRate = frame.frameRate;
-        textNode.setText(
-          `FrameTime:${timeDiff.toFixed(0)} ms\nFrameRate:${frameRate.toFixed(0)} fps`,
-        );
+        if (import.meta.env.DEV) {
+          const timeDiff = frame.timeDiff;
+          const frameRate = frame.frameRate;
+          textNode.setText(
+            `FrameTime:${timeDiff.toFixed(0)} ms\nFrameRate:${frameRate.toFixed(0)} fps`,
+          );
+        }
       }
     }, this.videoLayer);
     anim.start();
