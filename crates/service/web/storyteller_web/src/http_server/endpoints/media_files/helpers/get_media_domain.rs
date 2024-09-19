@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::http_server::common_responses::media::media_links::MediaDomain;
+use crate::http_server::common_responses::media::media_domain::MediaDomain;
 use crate::http_server::requests::get_request_domain_branding::{DomainBranding, get_request_domain_branding};
 
 pub fn get_media_domain(http_request: &HttpRequest) -> MediaDomain {

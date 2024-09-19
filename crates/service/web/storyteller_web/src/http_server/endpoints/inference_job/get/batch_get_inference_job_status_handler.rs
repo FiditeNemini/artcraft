@@ -12,7 +12,8 @@ use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 use utoipa::{IntoParams, ToSchema};
 
-use crate::http_server::common_responses::media::media_links::{MediaDomain, MediaLinks};
+use crate::http_server::common_responses::media::media_domain::MediaDomain;
+use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
 use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
 use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;

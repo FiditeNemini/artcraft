@@ -1,44 +1,12 @@
-use once_cell::sync::Lazy;
 use url::Url;
 use utoipa::ToSchema;
 
+use crate::http_server::common_responses::media::media_domain::MediaDomain;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-
-//const FAKEYOU_CDN_STR: &str = "https://storage.googleapis.com/dev-vocodes-public";
-const FAKEYOU_CDN_STR: &str = "https://cdn.fakeyou.com";
-
-const STORYTELLER_CDN_STR: &str = "https://cdn.storyteller.ai";
-
-const FAKEYOU_CDN: Lazy<Url> = Lazy::new(|| Url::parse(FAKEYOU_CDN_STR)
-    .expect("should never fail"));
-
-const STORYTELLER_CDN: Lazy<Url> = Lazy::new(|| Url::parse(STORYTELLER_CDN_STR)
-    .expect("should never fail"));
 
 // TODO(bt,2024-09-05): Worth reducing the quality at all?
 const QUALITY : u8 = 95;
 
-/// Which domain to generate CDN, etc. links for.
-#[derive(Copy, Clone, Debug)]
-pub enum MediaDomain {
-  FakeYou,
-  Storyteller,
-}
-
-impl MediaDomain {
-  pub fn new_cdn_url(&self) -> Url {
-    match self {
-      MediaDomain::FakeYou => FAKEYOU_CDN.clone(),
-      MediaDomain::Storyteller => STORYTELLER_CDN.clone(),
-    }
-  }
-  pub fn cdn_url_str(&self) -> &'static str {
-    match self {
-      MediaDomain::FakeYou => FAKEYOU_CDN_STR,
-      MediaDomain::Storyteller => STORYTELLER_CDN_STR,
-    }
-  }
-}
 
 /// Links to media file locations (bucket, CDN, etc.)
 #[derive(Serialize, ToSchema, Debug, Clone, Eq, PartialEq)]
@@ -155,7 +123,7 @@ fn video_preview_thumbnail_template(media_domain: MediaDomain, rooted_path: &str
 mod tests {
   use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
-  use crate::http_server::common_responses::media::media_links::MediaDomain;
+  use crate::http_server::common_responses::media::media_domain::MediaDomain;
   use crate::http_server::common_responses::media::media_links::MediaLinks;
 
   mod fakeyou {

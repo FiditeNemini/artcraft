@@ -10,7 +10,8 @@ use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 use utoipa::ToSchema;
 
-use crate::http_server::common_responses::media::media_links::{MediaDomain, MediaLinks};
+use crate::http_server::common_responses::media::media_domain::MediaDomain;
+use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::endpoints::inference_job::common_responses::lipsync::JobDetailsLipsyncRequest;
 use crate::http_server::endpoints::inference_job::common_responses::live_portrait::JobDetailsLivePortraitRequest;
 use crate::http_server::endpoints::inference_job::utils::estimates::estimate_job_progress::estimate_job_progress;
@@ -411,7 +412,7 @@ fn record_to_payload(
 
 #[cfg(test)]
 mod tests {
-  use crate::http_server::common_responses::media::media_links::MediaDomain;
+  use crate::http_server::common_responses::media::media_domain::MediaDomain;
   use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::record_to_payload;
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use mysql_queries::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};

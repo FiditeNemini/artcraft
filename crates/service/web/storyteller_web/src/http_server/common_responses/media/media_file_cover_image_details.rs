@@ -4,7 +4,7 @@ use url::Url;
 use utoipa::ToSchema;
 
 use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
-use crate::http_server::common_responses::media::media_links::MediaDomain;
+use crate::http_server::common_responses::media::media_domain::MediaDomain;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::media_files::MediaFileToken;
