@@ -300,7 +300,7 @@ function SignupPage(props: Props) {
 
   usePrefixedDocumentTitle("Create an account");
 
-  if (!sessionWrapper.isLoggedIn()) {
+  if (sessionWrapper.isLoggedIn()) {
     return (
       <div className="container py-5">
         <div className="py-5">
