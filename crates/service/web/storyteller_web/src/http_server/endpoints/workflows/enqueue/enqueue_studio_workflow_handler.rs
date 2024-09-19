@@ -5,10 +5,10 @@
 
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::{error, info, warn};
 use utoipa::ToSchema;
 
@@ -313,7 +313,7 @@ pub async fn enqueue_studio_workflow_handler(
     trim_start_seconds: None,
     trim_end_seconds: None,
     target_fps: None,
-    generate_fast_previews: Some(true),
+    generate_fast_previews: Some(false),
   };
 
   info!("Creating ComfyUI job record...");
