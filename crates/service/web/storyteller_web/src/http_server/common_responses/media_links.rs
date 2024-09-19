@@ -54,6 +54,7 @@ pub struct MediaLinks {
 
   /// Video preview images (still and animated gif) for mp4 video files.
   /// These are only set for video media files.
+  /// These are not set for "cover images" that are gif or webms, but rather video files.
   pub maybe_video_previews: Option<VideoPreviews>,
 }
 

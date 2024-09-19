@@ -1,23 +1,29 @@
 use url::Url;
 use utoipa::ToSchema;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
+use crate::http_server::common_responses::media_links::MediaDomain;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use crate::util::placeholder_images::cover_images::default_cover_image_color_from_token::default_cover_image_color_from_token;
 use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use tokens::tokens::model_weights::ModelWeightToken;
 
 /// Everything we need to create a cover image.
 /// Cover images are small descriptive images that can be set for any model.
 /// If a cover image is set, this is the path to the asset.
 #[derive(Clone, Serialize, ToSchema)]
 pub struct WeightsCoverImageDetails {
-  /// If a cover image is set, this is the path to the asset.
-  #[deprecated(note="This field doesn't point to the full URL. Use maybe_cover_image_public_bucket_url instead.")]
+  /// DEPRECATED. If a cover image is set, this is the path to the asset.
+  #[deprecated(note="Deprecated. Use `maybe_cdn_url` and `maybe_thumbnail_template` instead.")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
-  /// If a cover image is set, this is the URL to the asset.
+  /// DEPRECATED. If a cover image is set, this is the URL to the asset.
+  #[deprecated(note="Deprecated. Use `maybe_cdn_url` and `maybe_thumbnail_template` instead.")]
   pub maybe_cover_image_public_bucket_url: Option<Url>,
+
+  /// Links to the cover image (CDN direct link, thumbnail template)
+  pub maybe_links: Option<CoverImageLinks>,
 
   /// For items without a cover image, we can use one of our own.
   pub default_cover: WeightsDefaultCoverInfo,
@@ -35,6 +41,7 @@ pub struct WeightsDefaultCoverInfo {
 impl WeightsCoverImageDetails {
 
   pub fn from_optional_db_fields(
+    domain: MediaDomain,
     model_weight_token: &ModelWeightToken,
     maybe_cover_image_public_bucket_path: Option<&str>,
     maybe_cover_image_public_bucket_prefix: Option<&str>,
@@ -61,9 +68,13 @@ impl WeightsCoverImageDetails {
 
     let image_index = default_cover_image_from_token(model_weight_token);
 
+    let maybe_links = CoverImageLinks::from_maybe_media_path(
+      domain, maybe_bucket_path.as_ref());
+
     Self {
       maybe_cover_image_public_bucket_path,
       maybe_cover_image_public_bucket_url,
+      maybe_links,
       default_cover: WeightsDefaultCoverInfo::from_token(model_weight_token),
     }
   }
@@ -80,19 +91,21 @@ impl WeightsDefaultCoverInfo {
 
 #[cfg(test)]
 mod tests {
-  use url::Url;
-  use tokens::tokens::model_weights::ModelWeightToken;
-
+  use crate::http_server::common_responses::media_links::MediaDomain;
   use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+  use tokens::tokens::model_weights::ModelWeightToken;
+  use url::Url;
 
   #[test]
   fn test_from_optional_db_fields() {
+    let domain = MediaDomain::Storyteller;
     let token = ModelWeightToken::new_from_str("weight_token");
     let maybe_public_bucket_hash = Some("bucket_hash");
     let maybe_prefix = Some("image_");
     let maybe_extension= Some(".png");
 
     let cover_image = WeightsCoverImageDetails::from_optional_db_fields(
+      domain,
       &token,
       maybe_public_bucket_hash,
       maybe_prefix,

@@ -7,14 +7,21 @@ use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
+use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use log::error;
 use utoipa::ToSchema;
 
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::state::server_state::ServerState;
+use crate::util::title_to_url_slug::title_to_url_slug;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use elasticsearch_schema::searches::search_model_weights::{search_model_weights, SearchArgs};
 use enums::by_table::model_weights::weights_category::WeightsCategory;
@@ -23,13 +30,6 @@ use enums::common::visibility::Visibility;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use primitives::numerics::i32_to_u32_zero_clamped::i32_to_u32_zero_clamped;
 use tokens::tokens::model_weights::ModelWeightToken;
-
-use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
-use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::state::server_state::ServerState;
-use crate::util::title_to_url_slug::title_to_url_slug;
 
 #[derive(Deserialize, ToSchema)]
 pub struct SearchModelWeightsRequest {
@@ -113,8 +113,10 @@ impl fmt::Display for SearchModelWeightsError {
 }
 
 pub async fn search_model_weights_impl(
+  http_request: HttpRequest,
   request: SearchModelWeightsRequest,
-  server_state: web::Data<Arc<ServerState>>) -> Result<Json<SearchModelWeightsSuccessResponse>, SearchModelWeightsError>
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<SearchModelWeightsSuccessResponse>, SearchModelWeightsError>
 {
   let maybe_weights_categories = request.weight_category
       .map(|weight_category| {
@@ -144,9 +146,12 @@ pub async fn search_model_weights_impl(
         SearchModelWeightsError::ServerError
       })?;
 
+  let media_domain = get_media_domain(&http_request);
+
   let results = results.into_iter()
       .map(|result| {
         let cover_image_details = WeightsCoverImageDetails::from_optional_db_fields(
+          media_domain,
           &result.token,
           result.maybe_cover_image_public_bucket_hash.as_deref(),
           result.maybe_cover_image_public_bucket_prefix.as_deref(),

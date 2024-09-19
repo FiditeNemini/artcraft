@@ -1,10 +1,10 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
+use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
@@ -22,6 +22,7 @@ use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::state::server_state::ServerState;
 use crate::util::title_to_url_slug::title_to_url_slug;
 
@@ -194,9 +195,12 @@ pub async fn list_weights_by_user_handler(
     }
   };
 
+  let media_domain = get_media_domain(&http_request);
+
   let weights: Vec<Weight> = results_page.records.into_iter().map(|weight| {
 
     let cover_image_details = WeightsCoverImageDetails::from_optional_db_fields(
+      media_domain,
       &weight.token,
       weight.maybe_cover_image_public_bucket_hash.as_deref(),
       weight.maybe_cover_image_public_bucket_prefix.as_deref(),
