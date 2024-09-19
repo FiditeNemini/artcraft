@@ -5,6 +5,7 @@ use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
 use crate::http_server::common_responses::media_links::{MediaDomain, MediaLinks};
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 
@@ -30,10 +31,17 @@ pub struct MediaFileCoverImageDetails {
   #[deprecated(note="This points to the bucket. Use media_links instead to leverage the CDN.")]
   pub maybe_cover_image_public_bucket_url: Option<Url>,
 
+  // NB(bt,2024-09-19): I accidentally rolled this field out to production.
+  // I don't think this field is in use, but maybe ...
+  // /// (DEPRECATED) Use maybe_links instead.
+  // #[deprecated(note="Use `maybe_links` instead.")]
+  // pub maybe_media_links: Option<MediaLinks>,
+
+  /// Links to the cover image (CDN direct link, thumbnail template)
   /// If a cover image is set, this is the path to the asset.
   /// If a cover image is not set, use the information in `default_cover` instead.
   /// Rich CDN links to the media, including thumbnails, previews, and more.
-  pub maybe_media_links: Option<MediaLinks>,
+  pub maybe_links: Option<CoverImageLinks>,
 
   /// For items without a cover image, we can use one of our own.
   pub default_cover: MediaFileDefaultCover,
@@ -59,7 +67,8 @@ impl MediaFileCoverImageDetails {
       // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
       maybe_cover_image_public_bucket_path: None,
       maybe_cover_image_public_bucket_url: None,
-      maybe_media_links: None,
+      //maybe_media_links: None,
+      maybe_links: None,
       default_cover: MediaFileDefaultCover::from_token_str(token),
     }
   }
@@ -106,13 +115,17 @@ impl MediaFileCoverImageDetails {
         .map(|bucket_path| bucket_url_from_media_path(bucket_path).ok())
         .flatten();
 
-    let maybe_media_links = maybe_bucket_path
-        .map(|path| MediaLinks::from_media_path(domain, &path));
+    let maybe_links = CoverImageLinks::from_maybe_media_path(
+      domain, maybe_bucket_path.as_ref());
+
+    // let maybe_media_links = maybe_bucket_path
+    //     .map(|path| MediaLinks::from_media_path(domain, &path));
 
     Self {
       maybe_cover_image_public_bucket_path,
       maybe_cover_image_public_bucket_url,
-      maybe_media_links,
+      //maybe_media_links,
+      maybe_links,
       default_cover: MediaFileDefaultCover::from_token_str(token),
     }
   }

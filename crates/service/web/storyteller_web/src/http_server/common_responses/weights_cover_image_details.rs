@@ -23,6 +23,9 @@ pub struct WeightsCoverImageDetails {
   pub maybe_cover_image_public_bucket_url: Option<Url>,
 
   /// Links to the cover image (CDN direct link, thumbnail template)
+  /// If a cover image is set, this is the path to the asset.
+  /// If a cover image is not set, use the information in `default_cover` instead.
+  /// Rich CDN links to the media, including thumbnails, previews, and more.
   pub maybe_links: Option<CoverImageLinks>,
 
   /// For items without a cover image, we can use one of our own.
@@ -116,5 +119,12 @@ mod tests {
     assert_eq!(cover_image.maybe_cover_image_public_bucket_url,
                Some(Url::parse("https://storage.googleapis.com/vocodes-public/media/b/u/c/k/e/bucket_hash/image_bucket_hash.png").unwrap()));
     assert_eq!(cover_image.default_cover.image_index, 18);
+
+    let links = cover_image.maybe_links.unwrap();
+
+    assert_eq!(links.cdn_url, Url::parse(
+      "https://cdn.storyteller.ai/media/b/u/c/k/e/bucket_hash/image_bucket_hash.png").unwrap());
+    assert_eq!(links.thumbnail_template,
+               "https://cdn.storyteller.ai/cdn-cgi/image/width={WIDTH},quality=95/media/b/u/c/k/e/bucket_hash/image_bucket_hash.png");
   }
 }

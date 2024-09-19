@@ -47,6 +47,7 @@ use crate::http_server::common_responses::media_file_social_meta_lite::MediaFile
 use crate::http_server::common_responses::media_links::*;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::simple_response::SimpleResponse;
 use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
@@ -305,6 +306,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     Visibility,
 
     // Common cover image types
+    CoverImageLinks,
     MediaFileCoverImageDetails,
     MediaFileDefaultCover,
     UserDefaultAvatarInfo,
