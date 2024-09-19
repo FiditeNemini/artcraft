@@ -1,7 +1,6 @@
 import { Fragment, MouseEventHandler } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 
-import { useSignalEffect } from "@preact/signals-react/runtime";
 import {
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -22,10 +21,7 @@ import { ToolbarButton } from "../ToolbarButton";
 import { twMerge } from "tailwind-merge";
 
 // style constants
-import { paperWrapperStyles } from "~/components/styles";
-
-// for testing
-import { layout } from "~/signals";
+import { paperWrapperStyles, toolTipStyles } from "~/components/styles";
 
 import { ToolbarMainButtonNames } from "./enum";
 
@@ -48,18 +44,6 @@ export const ToolbarMain = ({
   openAddVideo: () => void;
   openAIStylize: () => void;
 }) => {
-  //// for testing
-  const {
-    signals: { isMobile },
-  } = layout;
-  useSignalEffect(() => {
-    console.info(
-      "orientation Changed",
-      `Oriendtation Change detected, current orientation: ${isMobile.value ? "mobile" : "desktop"}`,
-    );
-  });
-  /// end for testing
-
   return (
     <>
       <div
@@ -91,16 +75,7 @@ export const ToolbarMain = ({
                 data-tooltip="Add..."
                 className={twMerge(
                   "size-10 rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
-                  "before:absolute before:h-0 before:w-0",
-                  "before:bottom-full before:left-1/2 before:z-50 before:mb-[1px] before:-translate-x-1/2",
-                  "before:border-l-8 before:border-l-transparent",
-                  "before:border-r-8 before:border-r-transparent",
-                  "before:border-t-8 before:border-t-white",
-                  "after:absolute after:bottom-full after:left-1/2 after:z-40 after:-translate-x-1/2",
-                  "after:text-nowrap after:text-black after:content-[attr(data-tooltip)]",
-                  "after:mb-2 after:rounded-xl after:border after:border-ui-border after:bg-ui-panel after:px-2 after:py-1 after:shadow-xl",
-                  "before:hidden after:hidden hover:before:block hover:after:block",
-                  "relative",
+                  toolTipStyles,
                 )}
               >
                 <FontAwesomeIcon icon={faFilePlus} />

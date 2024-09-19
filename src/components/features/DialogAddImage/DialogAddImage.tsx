@@ -11,16 +11,17 @@ import {
   paperWrapperStyles,
   dialogBackgroundStyles,
 } from "~/components/styles";
-import { dispatchUiEvents } from "~/signals/uiEvents/";
 
 export const DialogAddImage = ({
   stagedImage = null,
   isOpen,
   closeCallback,
+  onAddImage,
 }: {
   stagedImage?: File | null;
   isOpen: boolean;
   closeCallback: () => void;
+  onAddImage: (file: File) => void;
 }) => {
   const [assetFile, setAssetFile] = useState<File | null>(null);
   const previouslyStagedImageRef = useRef<File | null>(null);
@@ -42,7 +43,7 @@ export const DialogAddImage = ({
 
   function handleEnter() {
     if (currFile) {
-      dispatchUiEvents.addImageToEngine(currFile);
+      onAddImage(currFile);
     }
     handleClose();
   }

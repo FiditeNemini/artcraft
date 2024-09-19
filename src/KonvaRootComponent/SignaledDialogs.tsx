@@ -24,6 +24,9 @@ export const SignaledDialogs = ({
         isOpen={appUiSignal.value.isAddImageOpen ?? false}
         stagedImage={appUiSignal.value.stagedImage}
         closeCallback={resetAll}
+        onAddImage={(file) => {
+          dispatchUiEvents.addImageToEngine(file);
+        }}
       />
       <DialogAddVideo
         isOpen={appUiSignal.value.isAddVideoOpen ?? false}
