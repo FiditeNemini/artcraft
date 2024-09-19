@@ -155,8 +155,8 @@ fn video_preview_thumbnail_template(media_domain: MediaDomain, rooted_path: &str
 mod tests {
   use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
-  use crate::http_server::common_responses::media_links::MediaDomain;
-  use crate::http_server::common_responses::media_links::MediaLinks;
+  use crate::http_server::common_responses::media::media_links::MediaDomain;
+  use crate::http_server::common_responses::media::media_links::MediaLinks;
 
   mod fakeyou {
     use super::*;

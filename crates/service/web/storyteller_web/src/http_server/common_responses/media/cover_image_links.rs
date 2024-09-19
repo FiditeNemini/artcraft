@@ -1,4 +1,4 @@
-use crate::http_server::common_responses::media_links::{MediaDomain, MediaLinks};
+use crate::http_server::common_responses::media::media_links::{MediaDomain, MediaLinks};
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use url::Url;
 use utoipa::ToSchema;

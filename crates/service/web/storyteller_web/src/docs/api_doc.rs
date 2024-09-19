@@ -46,7 +46,7 @@ use crate::http_server::common_responses::media::media_file_cover_image_details:
 use crate::http_server::common_responses::media::weights_cover_image_details::*;
 use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
-use crate::http_server::common_responses::media_links::*;
+use crate::http_server::common_responses::media::media_links::*;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;

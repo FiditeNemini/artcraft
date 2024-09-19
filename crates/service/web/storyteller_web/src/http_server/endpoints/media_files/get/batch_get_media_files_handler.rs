@@ -32,7 +32,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 
 use crate::http_server::common_responses::media::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
-use crate::http_server::common_responses::media_links::MediaLinks;
+use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::endpoints::media_files::common_responses::live_portrait::MediaFileLivePortraitDetails;

@@ -23,7 +23,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::http_server::common_responses::media::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
-use crate::http_server::common_responses::media_links::MediaLinks;
+use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;

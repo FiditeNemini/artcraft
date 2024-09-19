@@ -14,7 +14,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
 
-use crate::http_server::common_responses::media_links::MediaLinks;
+use crate::http_server::common_responses::media::media_links::MediaLinks;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
