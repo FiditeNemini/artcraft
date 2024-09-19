@@ -1,5 +1,4 @@
 pub mod media;
-pub mod media_file_cover_image_details;
 pub mod media_file_origin_details;
 pub mod media_file_social_meta_lite;
 pub mod media_links;
@@ -9,4 +8,3 @@ pub mod simple_entity_stats;
 pub mod simple_response;
 pub mod user_avatars;
 pub mod user_details_lite;
-pub mod weights_cover_image_details;

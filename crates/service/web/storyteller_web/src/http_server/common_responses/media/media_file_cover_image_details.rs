@@ -3,11 +3,11 @@ use std::hash::{Hash, Hasher};
 use url::Url;
 use utoipa::ToSchema;
 
+use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
+use crate::http_server::common_responses::media_links::MediaDomain;
+use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
-use crate::http_server::common_responses::media_links::{MediaDomain, MediaLinks};
-use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 
 /// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
@@ -162,7 +162,7 @@ fn hash(token: &str, max_number: u64, salt: u8) -> u8 {
 mod tests {
   use tokens::tokens::media_files::MediaFileToken;
 
-  use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
+  use crate::http_server::common_responses::media::media_file_cover_image_details::MediaFileDefaultCover;
 
   #[test]
   fn test() {

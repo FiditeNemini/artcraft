@@ -95,7 +95,7 @@ impl WeightsDefaultCoverInfo {
 #[cfg(test)]
 mod tests {
   use crate::http_server::common_responses::media_links::MediaDomain;
-  use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+  use crate::http_server::common_responses::media::weights_cover_image_details::WeightsCoverImageDetails;
   use tokens::tokens::model_weights::ModelWeightToken;
   use url::Url;
 

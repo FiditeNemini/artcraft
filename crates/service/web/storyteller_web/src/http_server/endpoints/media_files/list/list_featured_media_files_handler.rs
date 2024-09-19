@@ -26,7 +26,7 @@ use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::b
 use mysql_queries::queries::media_files::list::list_featured_media_files::{list_featured_media_files, FeaturedMediaFileListPage, ListFeaturedMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 
-use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
+use crate::http_server::common_responses::media::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::media_links::MediaLinks;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;

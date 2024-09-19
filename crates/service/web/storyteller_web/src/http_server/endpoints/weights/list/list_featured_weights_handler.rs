@@ -21,7 +21,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
-use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+use crate::http_server::common_responses::media::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::ListFeaturedMediaFilesError;
