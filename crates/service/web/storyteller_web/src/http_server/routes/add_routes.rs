@@ -189,7 +189,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/user_bookmarks/batch", batch_get_user_bookmarks_handler)
       .add_post("/v1/user_bookmarks/create", create_user_bookmark_handler)
       .add_post("/v1/user_bookmarks/delete/{user_bookmark_token}", delete_user_bookmark_handler)
-      .add_get("/v1/user_bookmarks/list/session", list_user_bookmarks_for_session_handler)
+      //.add_get("/v1/user_bookmarks/list/session", list_user_bookmarks_for_session_handler)
       .add_get("/v1/user_bookmarks/list/user/{username}", list_user_bookmarks_for_user_handler)
       .add_get("/v1/user_bookmarks/list/entity/{entity_type}/{entity_token}", list_user_bookmarks_for_entity_handler)
       .into_app();

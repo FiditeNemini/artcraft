@@ -80,6 +80,7 @@ impl fmt::Display for ListUserBookmarksError {
   }
 }
 
+#[deprecated(note="Removing from API 2024-09-19, can remove code after a while")]
 pub async fn list_user_bookmarks_for_session_handler(
   http_request: HttpRequest,
   query: Query<ListUserBookmarksQueryData>,
