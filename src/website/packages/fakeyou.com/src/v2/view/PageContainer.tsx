@@ -125,9 +125,6 @@ import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoComp
 import Lipsync from "./pages/lipsync/Lipsync";
 
 interface Props {
-  querySessionAction: () => void;
-  querySessionSubscriptionsAction: () => void;
-
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
   clearTextBuffer: () => void;
@@ -154,13 +151,7 @@ class PageContainer extends React.Component<
         <SearchProvider>
           <ScrollToTop />
           <div id="wrapper" className="no-padding">
-            <TopNav
-              logoutHandler={this.logout}
-              querySessionCallback={this.props.querySessionAction}
-              querySessionSubscriptionsCallback={
-                this.props.querySessionSubscriptionsAction
-              }
-            />
+            <TopNav />
 
             <ProfileSidePanel />
             <Switch>
@@ -184,21 +175,11 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/login">
-                <LoginPage
-                  querySessionAction={this.props.querySessionAction}
-                  querySessionSubscriptionsAction={
-                    this.props.querySessionSubscriptionsAction
-                  }
-                />
+                <LoginPage />
               </Route>
 
               <Route path="/password-reset/verify">
-                <PasswordResetVerificationPage
-                  querySessionAction={this.props.querySessionAction}
-                  querySessionSubscriptionsAction={
-                    this.props.querySessionSubscriptionsAction
-                  }
-                />
+                <PasswordResetVerificationPage />
               </Route>
 
               <Route path="/password-reset">
@@ -218,10 +199,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/signup">
-                <SignupPage
-                  querySessionCallback={() => {}}
-                  querySessionAction={this.props.querySessionAction}
-                />
+                <SignupPage />
               </Route>
 
               <Route path="/pricing" exact={true}>

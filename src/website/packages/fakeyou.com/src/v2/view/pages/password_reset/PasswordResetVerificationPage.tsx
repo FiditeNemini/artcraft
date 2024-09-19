@@ -13,11 +13,6 @@ import {
 } from "@storyteller/components/src/api/user/RedeemResetPassword";
 import { useSession } from "hooks";
 
-interface Props {
-  querySessionAction: () => void;
-  querySessionSubscriptionsAction: () => void;
-}
-
 // TODO(bt,2023-11-12): Localize error messages
 const ERR_CODE_NOT_SET = "password reset code is not set";
 const ERR_CODE_TOO_SHORT = "password reset code is too short";
@@ -26,9 +21,9 @@ const ERR_PASSWORD_DOES_NOT_MATCH = "new password does not match";
 const ERR_BACKEND =
   "There was an issue resetting your password. Perhaps your code expired?";
 
-function PasswordResetVerificationPage(props: Props) {
+function PasswordResetVerificationPage() {
   const history = useHistory();
-  const { sessionWrapper } = useSession();
+  const { querySession, querySubscriptions, sessionWrapper } = useSession();
 
   usePrefixedDocumentTitle("Password Reset Verification");
 
@@ -135,8 +130,8 @@ function PasswordResetVerificationPage(props: Props) {
 
     if (RedeemResetPasswordIsSuccess(response)) {
       setBackendError(undefined);
-      props.querySessionAction();
-      props.querySessionSubscriptionsAction();
+      querySession();
+      querySubscriptions();
       history.push("/");
     } else {
       setBackendError(ERR_BACKEND);

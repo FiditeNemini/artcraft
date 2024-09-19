@@ -299,10 +299,6 @@ class App extends React.Component<Props, State> {
                 <Switch>
                   <Route path="/">
                     <PageContainer
-                      querySessionAction={this.querySession}
-                      querySessionSubscriptionsAction={
-                        this.querySessionSubscriptions
-                      }
                       textBuffer={this.state.textBuffer}
                       setTextBuffer={this.setTextBuffer}
                       clearTextBuffer={this.clearTextBuffer}

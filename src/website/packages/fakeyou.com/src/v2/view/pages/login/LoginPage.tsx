@@ -17,15 +17,10 @@ import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/Scr
 import { InjectScript } from "common/InjectScript";
 import { useSession } from "hooks";
 
-interface Props {
-  querySessionAction: () => void;
-  querySessionSubscriptionsAction: () => void;
-}
-
-function LoginPage(props: Props) {
+function LoginPage() {
   let history = useHistory();
   const domain = useDomainConfig();
-  const { sessionWrapper } = useSession();
+  const { querySession, querySubscriptions, sessionWrapper } = useSession();
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -75,8 +70,8 @@ function LoginPage(props: Props) {
     if (CreateSessionIsError(response)) {
       setErrorMessage(response.error_message);
     } else if (CreateSessionIsSuccess(response)) {
-      props.querySessionAction();
-      props.querySessionSubscriptionsAction();
+      querySession();
+      querySubscriptions();
       Analytics.accountLoginSuccess();
       history.push(redirectUrl);
     }

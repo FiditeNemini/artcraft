@@ -27,16 +27,11 @@ enum FieldTriState {
   TRUE,
 }
 
-interface Props {
-  querySessionCallback: () => void;
-  querySessionAction: () => void;
-}
-
-function SignupPage(props: Props) {
+function SignupPage() {
   let history = useHistory();
   const domain = useDomainConfig();
   let location = useLocation();
-  const { sessionWrapper } = useSession();
+  const { querySession, querySubscriptions, sessionWrapper } = useSession();
   const queryParams = new URLSearchParams(location.search);
 
   const parsedQueryString = queryString.parse(window.location.search);
@@ -247,8 +242,8 @@ function SignupPage(props: Props) {
         setUsernameInvalidReason(reason);
       }
     } else if (CreateAccountIsSuccess(response)) {
-      props.querySessionCallback();
-      props.querySessionAction();
+      querySession();
+      querySubscriptions();
 
       Analytics.accountSignupComplete();
 

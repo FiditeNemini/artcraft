@@ -36,17 +36,9 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 import { WebUrl } from "common/WebUrl";
 
-interface TopNavProps {
-  logoutHandler: () => void;
-  querySessionCallback: () => void;
-  querySessionSubscriptionsCallback: () => void;
-}
-
-export default function TopNav({
-  querySessionCallback,
-  querySessionSubscriptionsCallback,
-}: TopNavProps) {
-  const { sessionWrapper, user } = useSession();
+export default function TopNav() {
+  const { querySession, querySubscriptions, sessionWrapper, user } =
+    useSession();
   const domain = useDomainConfig();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
@@ -149,8 +141,8 @@ export default function TopNav({
 
   const logoutHandler = async () => {
     await Logout();
-    querySessionCallback();
-    querySessionSubscriptionsCallback();
+    querySession();
+    querySubscriptions();
     history.push("/");
   };
 

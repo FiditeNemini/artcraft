@@ -18,19 +18,25 @@ export interface AccountModalEvents {
   onModalOpen?: () => void;
 }
 
-interface SessionContextType {
+export interface SessionUtilities {
+  querySession: () => void;
+  querySubscriptions: () => void;
+}
+
+interface SessionContextType extends SessionUtilities {
   canAccessStudio: () => boolean;
   canEditTtsModel: (creatorUserToken: string) => boolean;
   canEditMediaFile: (creatorUserToken?: string) => boolean;
   canBanUsers: () => boolean;
-  loggedInOrModal: (acctMsgs: AccountModalMessages, cfg?: AccountModalEvents) => boolean;
+  loggedInOrModal: (
+    acctMsgs: AccountModalMessages,
+    cfg?: AccountModalEvents
+  ) => boolean;
   loggedIn: boolean;
   modal: {
     close: () => void;
     open: (cfg: ModalConfig) => void;
   };
-  querySession?: any;
-  querySubscriptions?: any;
   sessionFetched: boolean;
   sessionSubscriptions?: SessionSubscriptionsWrapper;
   sessionWrapper: SessionWrapper;
@@ -40,10 +46,8 @@ interface SessionContextType {
   userTokenMatch: (token: string) => boolean;
 }
 
-interface Props {
+interface SessionProviderProps extends SessionUtilities {
   children?: any;
-  querySession: () => void;
-  querySubscriptions: () => void;
   sessionFetched: boolean;
   sessionSubscriptions: SessionSubscriptionsWrapper;
   sessionWrapper: SessionWrapper;
@@ -66,10 +70,12 @@ export const SessionContext = createContext<SessionContextType>({
   studioAccessCheck: () => null,
   styleVideoAccessCheck: () => null,
   modal: {
-    close: () => { },
-    open: () => { },
+    close: () => {},
+    open: () => {},
   },
   userTokenMatch: () => false,
+  querySession: () => {},
+  querySubscriptions: () => {},
   sessionWrapper: SessionWrapper.emptySession(),
 });
 
@@ -80,7 +86,7 @@ export default function SessionProvider({
   sessionFetched,
   sessionSubscriptions,
   sessionWrapper,
-}: Props) {
+}: SessionProviderProps) {
   const sessionResponse = sessionWrapper?.sessionStateResponse || {
     logged_in: false,
     user: null,
@@ -90,7 +96,10 @@ export default function SessionProvider({
   const { close, killModal, modalOpen, modalState, onModalCloseEnd, open } =
     useModalState({});
 
-  const loggedInOrModal = (accountModalMessages: AccountModalMessages, events?: AccountModalEvents) => {
+  const loggedInOrModal = (
+    accountModalMessages: AccountModalMessages,
+    events?: AccountModalEvents
+  ) => {
     if (user) {
       return true;
     } else {
@@ -99,7 +108,7 @@ export default function SessionProvider({
         scroll: true,
         width: "small",
         props: { ...accountModalMessages },
-        ...events
+        ...events,
       });
       return false;
     }
