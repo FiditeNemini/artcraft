@@ -452,7 +452,7 @@ export const GenerateTts = memo(function GenerateTts({
             <Panel
               padding={true}
               className="panel-inner h-100 position-relative rounded"
-              key={`${currentAudioUrl}-${Date.now()}`}
+              key={`${currentAudioUrl}`}
             >
               <div className="d-flex flex-column justify-content-center h-100">
                 <div className="d-flex gap-3 align-items-center justify-content-center">
