@@ -100,6 +100,7 @@ export class VideoNode extends NetworkedNodeContext {
     this.videoURL = videoURL;
 
     this.videoComponent = document.createElement("video");
+    this.videoComponent.crossOrigin = "anonymous";
 
     // Wrapping events
     this.frameDidFinishSeeking = new Promise<void>(() => {});
@@ -271,6 +272,8 @@ export class VideoNode extends NetworkedNodeContext {
   public async createVideoElement(newURL: string) {
     // try catch here with a retry button.
     const videoComponent = document.createElement("video");
+    videoComponent.crossOrigin = "anonymous";
+
     // Update to use image.
     videoComponent.src = newURL;
     console.log("Video Data");

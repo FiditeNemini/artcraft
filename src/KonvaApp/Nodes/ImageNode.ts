@@ -65,6 +65,7 @@ export class ImageNode extends NetworkedNodeContext {
 
     const imageObj = new Image();
     this.imageObject = imageObj;
+    this.imageObject.crossOrigin = "anonymous";
     imageObj.onload = () => {
       // TODO load this proper.
       this.kNode = new Konva.Image({
