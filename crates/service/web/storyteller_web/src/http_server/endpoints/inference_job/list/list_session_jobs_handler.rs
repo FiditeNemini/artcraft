@@ -32,6 +32,7 @@ use enums::common::job_status_plus::JobStatusPlus;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 use mysql_queries::queries::generic_inference::web::list_session_jobs::{list_session_jobs_from_connection, ListSessionJobsForUserArgs};
+use primitives::numerics::i64_to_u64_zero_clamped::i64_to_u64_zero_clamped;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
@@ -118,6 +119,10 @@ pub struct ListSessionStatusDetailsResponse {
   pub maybe_assigned_cluster: Option<String>,
 
   pub maybe_first_started_at: Option<DateTime<Utc>>,
+
+  /// If the job is currently running, this is how long it has been running in seconds.
+  /// This is heuristic estimate since we don't record the precise start time across runs.
+  pub maybe_current_execution_duration_seconds: Option<u64>,
 
   pub attempt_count: u8,
 
@@ -349,6 +354,18 @@ fn db_record_to_response_payload(
 
   let progress_percentage = estimate_job_progress(&record, maybe_polymorphic_args.as_ref());
 
+  /// If the job is currently running, this is how long it has been running in seconds.
+  /// This is heuristic estimate since we don't record the precise start time across runs.
+  /// If the job's updated_at timestamp is updated elsewhere, then this is not accurate at all.
+  let maybe_current_execution_duration_seconds = match record.status {
+    JobStatusPlus::Started => {
+      let now = Utc::now();
+      let duration = now.signed_duration_since(record.updated_at);
+      Some(i64_to_u64_zero_clamped(duration.num_seconds()))
+    }
+    _ => None,
+  };
+
   ListSessionJobsItem {
     job_token: record.job_token,
     request: ListSessionRequestDetailsResponse {
@@ -375,6 +392,7 @@ fn db_record_to_response_payload(
       requires_keepalive: record.is_keepalive_required,
       maybe_failure_category: record.maybe_frontend_failure_category,
       progress_percentage,
+      maybe_current_execution_duration_seconds,
     },
     maybe_result: record.maybe_result_details.map(|result_details| {
       // NB: Be careful here, because this varies based on the type of inference result.
