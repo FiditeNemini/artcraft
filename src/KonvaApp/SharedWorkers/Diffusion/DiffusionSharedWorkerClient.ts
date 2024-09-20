@@ -91,7 +91,7 @@ export class DiffusionSharedWorkerClient<
 
   async sendData(
     jobID: number,
-    data: DiffusionSharedWorkerItemData,
+    data: DiffusionSharedWorkerItemData | undefined,
     isDoneStreaming: boolean,
   ) {
     const payload: SharedWorkerRequest<DiffusionSharedWorkerItemData> = {

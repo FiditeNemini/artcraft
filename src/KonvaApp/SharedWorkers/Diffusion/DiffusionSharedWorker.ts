@@ -27,7 +27,7 @@ export interface DiffusionSharedWorkerProgressData {
 }
 
 export interface DiffusionSharedWorkerItemData {
-  imageBitmap: ImageBitmap;
+  imageBitmap: ImageBitmap | undefined;
   totalFrames: number;
   frame: number;
   height: number;
@@ -74,6 +74,8 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
     this.mediaAPI = new MediaUploadApi();
 
     this.blobs = [];
+
+    this.totalFrames = 0;
   }
 
   async zipBlobs(): Promise<Blob> {
@@ -102,6 +104,8 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
     // make request via api with options
 
     try {
+      this.totalFrames = item.totalFrames;
+
       if (this.offscreenCanvas === undefined) {
         this.offscreenCanvas = new OffscreenCanvas(item.width, item.height);
         this.bitmapContext = this.offscreenCanvas.getContext("bitmaprenderer");
@@ -112,18 +116,21 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
         throw Error("Bitmap Rendering Context Not Availible.");
       }
 
-      this.bitmapContext.transferFromImageBitmap(item.imageBitmap);
+      if (item.imageBitmap !== undefined) {
+        this.bitmapContext.transferFromImageBitmap(item.imageBitmap);
 
-      const blob = await this.offscreenCanvas.convertToBlob({
-        quality: 1.0,
-        type: this.imageType,
-      });
+        const blob = await this.offscreenCanvas.convertToBlob({
+          quality: 1.0,
+          type: this.imageType,
+        });
 
-      this.blobs.push(blob);
-      console.log("Length of blob");
-      console.log(this.blobs.length);
+        this.blobs.push(blob);
+        console.log("Length of blob");
+        console.log(this.blobs.length);
+      }
+
       // progress
-      const aproxSteps = item.totalFrames;
+      const aproxSteps = this.totalFrames;
       const totalPercent = 100.0;
 
       const progressData: DiffusionSharedWorkerProgressData = {

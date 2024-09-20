@@ -363,7 +363,6 @@ export class RenderEngine {
     }
 
     // only pick nodes that intersect with the canvas on screen bounds to freeze.
-
     for (let j = 0; j < largestNumberOfFrames; j++) {
       // Seek Video Nodes first then draw
       let frameTime = undefined;
@@ -444,24 +443,42 @@ export class RenderEngine {
           prompt: renderingOptions,
         };
 
-        let isDoneStreaming = false;
+        // let isDoneStreaming = false;
 
         console.log(`Processing Frame:${j} out of ${largestNumberOfFrames}`);
 
-        if (j == Math.floor(largestNumberOfFrames)) {
-          isDoneStreaming = true;
-        }
+        // if (j == Math.floor(largestNumberOfFrames)) {
+        //   isDoneStreaming = true;
+        // }
 
-        console.log(isDoneStreaming);
+        //console.log(isDoneStreaming);
 
-        this.diffusionWorker.sendData(1, data, isDoneStreaming);
+        this.diffusionWorker.sendData(1, data, false);
 
-        // To ensure there is no lingering frames.
-        if (isDoneStreaming) {
-          console.log("Done streaming");
-          break;
-        }
+        // // To ensure there is no lingering frames.
+        // if (isDoneStreaming) {
+        //   console.log("Done streaming");
+        //   break;
+        // }
       }
+    } // end of largest number of frames loop
+
+    // finished looping
+    if (!this.diffusionWorker) {
+      console.log("Didn't Initialize Diffusion");
+      return;
     }
+    this.diffusionWorker.sendData(
+      1,
+      {
+        height: this.height,
+        width: this.width,
+        imageBitmap: undefined,
+        frame: -1,
+        totalFrames: largestNumberOfFrames,
+        prompt: renderingOptions,
+      },
+      true,
+    );
   }
 }
