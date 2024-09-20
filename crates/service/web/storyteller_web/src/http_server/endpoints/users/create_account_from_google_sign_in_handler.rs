@@ -14,6 +14,7 @@ use log::{info, warn};
 use sqlx::MySqlPool;
 use utoipa::ToSchema;
 use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
+use errors::AnyhowResult;
 use google_sign_in::decode_and_verify_token_claims::decode_and_verify_token_claims;
 use google_sign_in::download_certs::download_cert_key_set;
 use google_sign_in::VerificationOptions;
@@ -30,6 +31,7 @@ use crate::http_server::session::http::http_user_session_manager::HttpUserSessio
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
 use crate::http_server::validations::validate_passwords::validate_passwords;
 use crate::http_server::validations::validate_username::validate_username;
+use crate::state::certs::google_sign_in_cert::GoogleSignInCert;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::enroll_in_studio::enroll_in_studio;
 use crate::util::generate_random_username::generate_random_username;
@@ -133,21 +135,37 @@ pub async fn create_account_from_google_sign_in_handler(
   request: web::Json<GoogleCreateAccountRequest>,
   mysql_pool: web::Data<MySqlPool>,
   session_cookie_manager: web::Data<HttpUserSessionManager>,
+  google_sign_in_cert: web::Data<GoogleSignInCert>,
 ) -> Result<HttpResponse, GoogleCreateAccountErrorResponse>
 {
-  // TODO(bt,2024-09-20): Cache certs in shared server state
-  let keys = download_cert_key_set()
+  let keys = google_sign_in_cert.fetch_key_map(false)
       .await
       .map_err(|e| {
         warn!("error downloading google certs: {:?}", e);
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
-  let claims = decode_and_verify_token_claims(&keys, &request.google_credential, None)
-    .map_err(|e| {
-      warn!("error decoding google token claims: {:?}", e);
-      GoogleCreateAccountErrorResponse::bad_request()
-    })?;
+  let claims = match decode_and_verify_token_claims(&keys, &request.google_credential, None) {
+    Ok(claims) => claims,
+    Err(err) => {
+      warn!("error decoding google token claims (will retry certs): {:?}", err);
+
+      let keys = google_sign_in_cert.fetch_key_map(true) // NB: REFRESH
+          .await
+          .map_err(|e| {
+            warn!("error refreshing google certs: {:?}", e);
+            GoogleCreateAccountErrorResponse::server_error()
+          })?;
+
+      let claims = decode_and_verify_token_claims(&keys, &request.google_credential, None)
+          .map_err(|e| {
+            warn!("error decoding google token claims: {:?}", e);
+            GoogleCreateAccountErrorResponse::bad_request()
+          })?;
+
+      claims
+    },
+  };
 
   info!("Google JWT credential claims: email {:?}, verified: {}",
     claims.email(),

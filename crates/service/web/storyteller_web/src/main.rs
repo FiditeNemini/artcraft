@@ -84,6 +84,7 @@ use crate::http_server::session::http::http_user_session_manager::HttpUserSessio
 use crate::http_server::session::session_checker::SessionChecker;
 use crate::http_server::web_utils::handle_multipart_error::handle_multipart_error;
 use crate::http_server::web_utils::scoped_temp_dir_creator::ScopedTempDirCreator;
+use crate::state::certs::google_sign_in_cert::GoogleSignInCert;
 use crate::state::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::state::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
@@ -457,6 +458,7 @@ async fn main() -> AnyhowResult<()> {
       ip_addresses: ip_address_troll_bans,
     },
     temp_dir_creator: ScopedTempDirCreator::for_directory(easyenv::get_env_pathbuf_or_default("TEMP_DIR", "/tmp")),
+    google_sign_in_cert: GoogleSignInCert::new(),
   };
 
   serve(server_state)
@@ -600,6 +602,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::new(server_state_arc.third_party_url_redirector))
+      .app_data(web::Data::new(server_state_arc.google_sign_in_cert.clone()))
       .app_data(web::Data::new(server_state_arc.email_sender.clone()))
       .app_data(web::Data::new(old_server_environment))
       .app_data(web::Data::new(new_server_environment))
