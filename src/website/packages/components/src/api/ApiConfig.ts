@@ -98,7 +98,11 @@ class ApiConfig {
   }
 
   createAccount(): string {
-    return `${this.getApiOrigin()}/create_account`;
+    return `${this.getApiOrigin()}/v1/create_account`;
+  }
+
+  googleCreateAccount(): string {
+    return `${this.getApiOrigin()}/v1/accounts/google_create`;
   }
 
   login(): string {

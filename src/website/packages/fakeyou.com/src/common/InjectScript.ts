@@ -1,4 +1,9 @@
+// https://developers.google.com/identity/gsi/web/guides/client-library
 const GOOGLE_AUTH_SIGN_IN_SCRIPT = "https://accounts.google.com/gsi/client";
+
+// DEPRECATED: https://developers.google.com/identity/gsi/web/guides/gis-migration
+// // https://developers.google.com/identity/sign-in/web/sign-in
+// const GOOGLE_AUTH_SIGN_IN_SCRIPT_2 = "https://apis.google.com/js/platform.js";
 
 enum AddTo {
   Head,
@@ -8,9 +13,6 @@ enum AddTo {
 export class InjectScript {
   
   public static addGoogleAuthLogin() {
-    // https://developers.google.com/identity/gsi/web/guides/client-library
-    // <script src="https://accounts.google.com/gsi/client" async></script>
-    console.log('adding google auth script...')
     InjectScript.addScriptOnce(GOOGLE_AUTH_SIGN_IN_SCRIPT, AddTo.Body);
   }
 
