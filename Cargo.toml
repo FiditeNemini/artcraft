@@ -28,6 +28,7 @@ members = [
   "crates/lib/actix_helpers",
   "crates/lib/api_clients/cloud_storage",
   "crates/lib/api_clients/google_drive_common",
+  "crates/lib/api_clients/google_sign_in",
   "crates/lib/api_clients/thumbnail_generator",
   "crates/lib/bootstrap",
   "crates/lib/caching/memory_caching",
