@@ -5,6 +5,9 @@ import {
   CreateSessionIsError,
   CreateSessionIsSuccess,
 } from "@storyteller/components/src/api/session/CreateSession";
+import {
+  GoogleCreateAccount,
+} from "@storyteller/components/src/api/sso/GoogleCreateAccount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,6 +20,11 @@ import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/Scr
 import { InjectScript } from "common/InjectScript";
 import { useSession } from "hooks";
 
+// NB: Google Sign In requires a global javascript function
+declare global {
+  function handleGoogleCredentialResponse(args: any): void;
+}
+
 function LoginPage() {
   let history = useHistory();
   const domain = useDomainConfig();
@@ -28,12 +36,14 @@ function LoginPage() {
   const queryParams = new URLSearchParams(location.search);
   const redirectUrl = queryParams.get("redirect") || "/";
 
-  PosthogClient.recordPageview();
-  InjectScript.addGoogleAuthLogin();
-
   if (sessionWrapper.isLoggedIn()) {
     history.push("/");
   }
+
+  PosthogClient.recordPageview();
+  InjectScript.addGoogleAuthLogin();
+  //InjectMetaTag.addGoogleSignInClientId();
+  usePrefixedDocumentTitle("Log in to your account");
 
   const handleUsernameOrEmailChange = (
     ev: React.FormEvent<HTMLInputElement>
@@ -79,7 +89,16 @@ function LoginPage() {
     return false;
   };
 
-  usePrefixedDocumentTitle("Log in to your account");
+  // This function ***MUST*** be attached to global state for the Google library to work.
+  globalThis.handleGoogleCredentialResponse = async (args: any) => {
+    console.log('>>>> Google Sign In Response', args)
+
+    let response = await GoogleCreateAccount({
+      google_credential: args.credential
+    });
+
+    console.log('>>> Google Create Account Response', response);
+  }
 
   let errorWarning = <span />;
   if (errorMessage) {
@@ -299,5 +318,34 @@ function LoginPage() {
     </div>
   );
 }
+
+// UNCOMMENT WHEN READY TO IMPLEMENT
+//
+// const CLIENT_ID = "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com";
+// 
+// function GoogleLogin() {
+//   return (
+//     // https://developers.google.com/identity/gsi/web/reference/html-reference
+//     // The button changes size and is difficult to control!
+//     // https://stackoverflow.com/q/72411548
+//     <>
+//       <div id="g_id_onload"
+//         data-client_id={CLIENT_ID}
+//         data-callback="handleGoogleCredentialResponse">
+//       </div>
+//       <div 
+//         className="g_id_signin" 
+//         data-type="standard"
+//         // Extra configs
+//         data-shape="rectangular"
+//         data-theme="outline"
+//         data-text="signin_with"
+//         data-size="large"
+//         data-width="100000"
+//         data-logo_alignment="left"
+//       ></div>
+//     </>
+//   )
+// }
 
 export { LoginPage };
