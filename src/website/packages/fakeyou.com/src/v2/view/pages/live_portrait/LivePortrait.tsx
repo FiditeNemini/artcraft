@@ -34,7 +34,7 @@ import {
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs, useModal, useSession } from "hooks";
+import { useInferenceJobs, useLocalize, useModal, useSession } from "hooks";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -136,6 +136,8 @@ export default function LivePortrait() {
 
   const location = useLocation();
   const history = useHistory();
+
+  const { t, language } = useLocalize("LivePortrait");
 
   const precomputedVideos = useMemo(
     () => [
@@ -395,8 +397,8 @@ export default function LivePortrait() {
               <div className="d-flex flex-column align-items-center gap-3 justify-content-center">
                 <LoadingSpinner padding={false} />
                 {currentProgress !== null
-                  ? `Generating video... ${currentProgress}%`
-                  : "Generating video..."}
+                  ? `${t("output.label.generating")} ${currentProgress}%`
+                  : `${t("output.label.generating")}`}
               </div>
             </h4>
           </div>
@@ -437,12 +439,18 @@ export default function LivePortrait() {
             }}
           >
             <h4 className="fw-medium">
-              Click{" "}
-              <b>
-                <FontAwesomeIcon icon={faSparkles} className="me-2 fs-6" />
-                Animate
-              </b>{" "}
-              to start generating
+              {language === "en" ? (
+                <>
+                  Click{" "}
+                  <b>
+                    <FontAwesomeIcon icon={faSparkles} className="me-2 fs-6" />
+                    Animate
+                  </b>{" "}
+                  to start generating
+                </>
+              ) : (
+                <>{t("instruction.animate")}</>
+              )}
             </h4>
           </div>
           <OutputThumbnailImage
@@ -855,14 +863,13 @@ export default function LivePortrait() {
         <Panel padding={true}>
           <h1 className="fw-bold fs-1 mb-0">
             <FontAwesomeIcon icon={faImageUser} className="me-3 fs-2" />
-            Live Portrait
+            {t("title.livePortrait")}
           </h1>
           <p
             className="opacity-75 fw-medium"
             style={{ marginBottom: "2.5rem" }}
           >
-            Use AI to transfer facial expressions, audio, and vocals from one
-            face video to an image or video.
+            {t("subtitle.livePortrait")}
           </p>
 
           {!loggedIn && (
@@ -879,17 +886,17 @@ export default function LivePortrait() {
                   mediaTokens={sourceTokens}
                   selectedIndex={selectedSourceIndex}
                   handleThumbnailClick={handleSourceSelect}
-                  title="Select Source"
-                  description="This image or video is what the final video will look like."
-                  badgeLabel="Source Media"
+                  title={t("step.one.title")}
+                  description={t("step.one.subtitle")}
+                  badgeLabel={t("badge.source")}
                   stepNumber={1}
                   onUploadClick={handleOpenUploadSourceModal}
                   onSelectedMediaChange={handleSelectedMediaChange}
                   uploadFocusPoint={uploadFocusPointSource}
                   uploadButtonText={
                     loggedIn
-                      ? "Upload your image/video"
-                      : "Sign up to upload image/video"
+                      ? t("button.uploadImageVideo")
+                      : t("button.signUpToUpload")
                   }
                 />
               </div>
@@ -909,9 +916,9 @@ export default function LivePortrait() {
                   mediaTokens={motionTokens}
                   selectedIndex={selectedMotionIndex}
                   handleThumbnailClick={handleMotionSelect}
-                  title="Select Motion Reference"
-                  description="This is what the face video will move like (contains audio)."
-                  badgeLabel="Motion Reference"
+                  title={t("step.two.title")}
+                  description={t("step.two.subtitle")}
+                  badgeLabel={t("badge.motion")}
                   cropper={true}
                   cropArea={cropArea}
                   setCropArea={setCropArea}
@@ -920,8 +927,8 @@ export default function LivePortrait() {
                   uploadFocusPoint={uploadFocusPointMotion}
                   uploadButtonText={
                     loggedIn
-                      ? "Upload your motion video"
-                      : "Sign up to upload image/video"
+                      ? t("button.uploadMotionVideo")
+                      : t("button.signUpToUpload")
                   }
                 />
               </div>
@@ -944,13 +951,13 @@ export default function LivePortrait() {
                   <div className="lp-tag">
                     <div className="d-flex gap-2 w-100">
                       <Badge
-                        label="Output Video"
+                        label={t("badge.output")}
                         color="ultramarine"
                         overlay={true}
                       />
                       {!isUserContent && (
                         <Badge
-                          label="Pre-generated Example"
+                          label={t("badge.pregeneratedExample")}
                           color="gray"
                           overlay={true}
                         />
@@ -964,7 +971,7 @@ export default function LivePortrait() {
                     {generatedVideoSrc && resultTokens[combinationKey] && (
                       <Button
                         icon={faLips}
-                        label="Use with Lipsync"
+                        label={t("button.useWithLipsync")}
                         onClick={() =>
                           history.push(
                             `/ai-lip-sync?source=${resultTokens[combinationKey]}`
@@ -980,14 +987,14 @@ export default function LivePortrait() {
                         icon={isUserContent ? faSparkles : undefined}
                         label={
                           !loggedIn && isUserContent
-                            ? "Sign Up and Animate"
+                            ? t("button.signUpToAnimate")
                             : isUserContent
                               ? generatedVideoSrc
-                                ? "Re-animate"
-                                : "Animate"
+                                ? t("button.reanimate")
+                                : t("button.animate")
                               : !loggedIn
-                                ? "Sign up now to Animate"
-                                : "Upload your media to generate"
+                                ? t("button.signUpToAnimate")
+                                : t("button.signUpToAnimate")
                         }
                         onClick={
                           loggedIn
@@ -1004,14 +1011,21 @@ export default function LivePortrait() {
                         variant={generatedVideoSrc ? "action" : "primary"}
                       />
 
-                      <Tippy theme="fakeyou" content="Download video">
+                      <Tippy
+                        theme="fakeyou"
+                        content={
+                          generatedVideoSrc && isUserContent
+                            ? t("tooltip.download")
+                            : t("tooltip.downloadNoOutput")
+                        }
+                      >
                         <div>
                           <Button
                             square={true}
                             icon={faArrowDownToLine}
                             variant="action"
                             onClick={handleDownloadClick}
-                            disabled={!loggedIn}
+                            disabled={!generatedVideoSrc}
                           />
                         </div>
                       </Tippy>
@@ -1026,7 +1040,7 @@ export default function LivePortrait() {
                     >
                       <div className="d-flex gap-3">
                         <Checkbox
-                          label={"Make Private"}
+                          label={t("check.makePrivate")}
                           onChange={() => {
                             setVisibility(prevVisibility =>
                               prevVisibility === "private"
@@ -1039,7 +1053,7 @@ export default function LivePortrait() {
                         />
 
                         <Checkbox
-                          label={"Remove Watermark"}
+                          label={t("check.removeWatermark")}
                           onChange={() => {
                             setRemoveWatermark(
                               prevRemoveWatermark => !prevRemoveWatermark
@@ -1067,7 +1081,7 @@ export default function LivePortrait() {
 
               {loggedIn && (
                 <div className="mt-5 pt-3 order-3">
-                  <Label label="Latest Outputs" />
+                  <Label label={t("label.latestOutputs")} />
                   <div>
                     <SessionLpInferenceResultsList
                       onJobTokens={handleJobTokens}

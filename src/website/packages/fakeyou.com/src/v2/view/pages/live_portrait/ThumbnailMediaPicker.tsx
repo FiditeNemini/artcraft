@@ -17,7 +17,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isMobile } from "react-device-detect";
 import { Area } from "react-easy-crop";
-import { useSession } from "hooks";
+import { useLocalize, useSession } from "hooks";
 
 interface ThumbnailMediaPickerProps {
   mediaTokens: string[];
@@ -85,6 +85,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
     const itemsPerPage = 8;
     const [resetTrigger, setResetTrigger] = useState<number>(0);
     const { loggedIn } = useSession();
+    const { t } = useLocalize("LivePortrait");
 
     useEffect(() => {
       const fetchMediaData = async () => {
@@ -185,9 +186,9 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
                 <Badge label={badgeLabel} color="ultramarine" overlay={true} />
               ) : (
                 <Badge
-                  label={`${
-                    isMobile ? "Zoom" : "Scroll zoom"
-                  } and drag to crop`}
+                  label={
+                    isMobile ? t("badge.cropMobile") : t("badge.cropDesktop")
+                  }
                   color="gray"
                   overlay={true}
                 />
@@ -196,7 +197,7 @@ const ThumbnailMediaPicker: React.FC<ThumbnailMediaPickerProps> = React.memo(
             {cropper && showCropButton && (
               <div>
                 <Button
-                  label={isCropping ? "Done" : "Crop Face"}
+                  label={isCropping ? t("button.done") : t("button.cropFace")}
                   className="py-1 px-2 fs-7"
                   variant={isCropping ? "primary" : "action"}
                   onClick={() => setIsCropping(prev => !prev)}

@@ -3,7 +3,7 @@ import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 import { LivePortraitDetails } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -39,7 +39,7 @@ export default function SessionLpInferenceResultsList({
   onJobStateChange,
 }: SessionLpInferenceResultsListProps) {
   const history = useHistory();
-
+  const { t } = useLocalize("LivePortrait");
   const { inferenceJobsByCategory } = useInferenceJobs();
   const hasInitialized = useRef(false);
 
@@ -143,14 +143,14 @@ export default function SessionLpInferenceResultsList({
   }, [livePortraitJobs, mediaSrc]);
 
   const jobStateTextMap: { [key in JobState]: string } = {
-    [JobState.UNKNOWN]: "Unknown",
-    [JobState.PENDING]: "Pending",
-    [JobState.STARTED]: "Generating",
-    [JobState.COMPLETE_SUCCESS]: "Completed",
-    [JobState.COMPLETE_FAILURE]: "Completed (Failure)",
-    [JobState.ATTEMPT_FAILED]: "Attempt Failed",
-    [JobState.DEAD]: "Dead",
-    [JobState.CANCELED_BY_USER]: "Canceled by User",
+    [JobState.UNKNOWN]: t("results.label.unknown"),
+    [JobState.PENDING]: t("results.label.pending"),
+    [JobState.STARTED]: t("results.label.started"),
+    [JobState.COMPLETE_SUCCESS]: t("results.label.completeSuccess"),
+    [JobState.COMPLETE_FAILURE]: t("results.label.completeFailure"),
+    [JobState.ATTEMPT_FAILED]: t("results.label.attemptFailed"),
+    [JobState.DEAD]: t("results.label.dead"),
+    [JobState.CANCELED_BY_USER]: t("results.label.canceled"),
   };
 
   const handleLipsyncCTA = (
@@ -234,7 +234,7 @@ export default function SessionLpInferenceResultsList({
                               className="fs-7 d-flex align-items-center gap-1 mt-1"
                               to={`/media/${job.maybeResultToken}`}
                             >
-                              More Details
+                              {t("results.link.details")}
                             </Link>
                           ) : (
                             <div className="fs-7 opacity-50 fw-medium mt-1">
@@ -251,7 +251,7 @@ export default function SessionLpInferenceResultsList({
 
                     <Button
                       icon={faLips}
-                      label="Use with Lip Sync"
+                      label={t("button.useWithLipsync")}
                       small={true}
                       variant={job.maybeResultToken ? "primary" : "action"}
                       disabled={!job.maybeResultToken}
@@ -272,7 +272,7 @@ export default function SessionLpInferenceResultsList({
           style={{ height: "94px" }}
         >
           <span className="fw-medium opacity-75">
-            Your latest live portrait generations will appear here.
+            {t("label.latestOutputsEmptyText")}
           </span>
         </div>
       )}
