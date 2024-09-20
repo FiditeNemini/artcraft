@@ -1,5 +1,7 @@
+use crate::certs::key_map::KeyMap;
 use crate::claims::claims::Claims;
 use crate::claims::google_custom_claims::GoogleCustomClaims;
+use crate::jwt::decode_jwt_header::decode_jwt_header;
 use errors::{anyhow, AnyhowResult};
 use jwt_simple::algorithms::RS256PublicKey;
 use jwt_simple::algorithms::RSAPublicKeyLike;
@@ -24,7 +26,20 @@ Example payload:
 
 /// Decode a Google Sign In JWT.
 /// Verification options can be supplied to increase clock skew tolerance, etc.
-pub fn decode_and_verify_token_claims(key: &RS256PublicKey, token: &str, options: Option<VerificationOptions>) -> AnyhowResult<Claims> {
+pub fn decode_and_verify_token_claims(keys: &KeyMap, token: &str, options: Option<VerificationOptions>) -> AnyhowResult<Claims> {
+  let header = decode_jwt_header(token)?;
+
+  let key_id = header.kid.as_deref()
+      .or_else(|| keys.keys().next().map(|k|k.as_str()))
+      .ok_or_else(|| anyhow!("No key ID found"))?;
+
+  let key = keys.get(key_id)
+      .ok_or_else(|| anyhow!("Key not found"))?;
+
+  decode_and_verify_token_claims_with_key(key, token, options)
+}
+
+pub fn decode_and_verify_token_claims_with_key(key: &RS256PublicKey, token: &str, options: Option<VerificationOptions>) -> AnyhowResult<Claims> {
   let claims = key.verify_token::<GoogleCustomClaims>(token, options)?;
 
   match claims.issuer.as_deref() {
@@ -42,7 +57,7 @@ pub fn decode_and_verify_token_claims(key: &RS256PublicKey, token: &str, options
 #[cfg(test)]
 mod tests {
   use crate::certs::jwk_to_public_key::jwk_to_public_key;
-  use crate::decode_and_verify_token_claims::decode_and_verify_token_claims;
+  use crate::decode_and_verify_token_claims::{decode_and_verify_token_claims, decode_and_verify_token_claims_with_key};
   use coarsetime::Duration;
   use jwt_simple::claims::Audiences;
   use jwt_simple::prelude::VerificationOptions;
@@ -68,7 +83,11 @@ mod tests {
       ..Default::default()
     };
 
-    let claims = decode_and_verify_token_claims(key, credential, Some(options)).unwrap();
+    // This should work
+    let claims = decode_and_verify_token_claims_with_key(key, credential, Some(options.clone())).unwrap();
+
+    // As should this much more ergonomic method
+    let claims = decode_and_verify_token_claims(&key_map, credential, Some(options)).unwrap();
 
     // Custom fields
     assert_eq!(claims.claims.custom.email, Some("vocodes2020@gmail.com".to_string()));
