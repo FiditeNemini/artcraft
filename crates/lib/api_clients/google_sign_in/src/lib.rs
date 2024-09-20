@@ -25,3 +25,5 @@ pub mod download_certs;
 
 pub(crate) mod jwt;
 
+// Export for external users
+pub use jwt_simple::common::VerificationOptions;

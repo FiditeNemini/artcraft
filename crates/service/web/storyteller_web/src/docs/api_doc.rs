@@ -132,6 +132,7 @@ use crate::http_server::endpoints::users::get_profile_handler::*;
 use crate::http_server::endpoints::users::login_handler::*;
 use crate::http_server::endpoints::users::logout_handler::*;
 use crate::http_server::endpoints::users::session_info_handler::*;
+use crate::http_server::endpoints::users::create_account_from_google_sign_in_handler::*;
 use crate::http_server::endpoints::users::session_token_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::enqueue_voice_conversion_inference_handler::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
@@ -188,6 +189,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::get::get_media_file_handler::get_media_file_handler,
     crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::list_media_files_by_batch_token_handler,
+    crate::http_server::endpoints::users::create_account_from_google_sign_in_handler::create_account_from_google_sign_in_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler,
     crate::http_server::endpoints::media_files::upload::upload_studio_shot::upload_studio_shot_media_file_handler::upload_studio_shot_media_file_handler,
@@ -348,6 +350,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ByQueueStats,
     ChangeMediaFileAnimationTypeError,
     ChangeMediaFileAnimationTypeRequest,
+    GoogleCreateAccountRequest,
+    GoogleCreateAccountErrorResponse,
+    GoogleCreateAccountSuccessResponse,
     ChangeMediaFileEngineCategoryError,
     ChangeMediaFileEngineCategoryRequest,
     ChangeMediaFileVisibilityError,

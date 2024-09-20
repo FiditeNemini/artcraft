@@ -1,3 +1,4 @@
+pub mod create_account_from_google_sign_in_handler;
 pub mod create_account_handler;
 pub mod edit_profile_handler;
 pub mod get_profile_handler;

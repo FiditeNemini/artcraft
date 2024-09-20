@@ -6,6 +6,7 @@ use actix_web::error::Error;
 
 use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_user_tts_inference_results_handler;
 use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
+use crate::http_server::endpoints::users::create_account_from_google_sign_in_handler::create_account_from_google_sign_in_handler;
 use crate::http_server::endpoints::users::create_account_handler::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile_handler::edit_profile_handler;
 use crate::http_server::endpoints::users::get_profile_handler::get_profile_handler;
@@ -39,6 +40,11 @@ pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
       .service(
         web::resource("/v1/create_account")
             .route(web::post().to(create_account_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/v1/accounts/google_create")
+            .route(web::post().to(create_account_from_google_sign_in_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(

@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use crate::certs::key_map::KeyMap;
 use crate::claims::claims::Claims;
 use crate::claims::google_custom_claims::GoogleCustomClaims;
@@ -6,27 +7,10 @@ use errors::{anyhow, AnyhowResult};
 use jwt_simple::algorithms::RS256PublicKey;
 use jwt_simple::algorithms::RSAPublicKeyLike;
 use jwt_simple::common::VerificationOptions;
-/*
-Example payload:
-  iss https://accounts.google.com
-  azp 788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com
-  aud 788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com
-  sub 113101967612396793777
-  email vocodes2020@gmail.com
-  email_verified true
-  nbf 1726786100
-  name Vocodes Vocodes
-  picture https://lh3.googleusercontent.com/a/ACg8ocLz2-2OaAm0MQxR6j8CNr-Po8_Xr-aryATiCn4c0i_TuDmL_g=s96-c
-  given_name Vocodes
-  family_name Vocodes
-  iat 1726786400
-  exp 1726790000
-  jti 4d44eeac06ce79fc0ab2270cfeea30d8acf77613
- */
 
 /// Decode a Google Sign In JWT.
 /// Verification options can be supplied to increase clock skew tolerance, etc.
-pub fn decode_and_verify_token_claims(keys: &KeyMap, token: &str, options: Option<VerificationOptions>) -> AnyhowResult<Claims> {
+pub fn decode_and_verify_token_claims(keys: &KeyMap, token: &str, mut options: Option<VerificationOptions>) -> AnyhowResult<Claims> {
   let header = decode_jwt_header(token)?;
 
   let key_id = header.kid.as_deref()
@@ -35,6 +19,16 @@ pub fn decode_and_verify_token_claims(keys: &KeyMap, token: &str, options: Optio
 
   let key = keys.get(key_id)
       .ok_or_else(|| anyhow!("Key not found"))?;
+
+  if options.is_none() {
+    options = Some(VerificationOptions {
+      allowed_issuers: Some(HashSet::from([
+        "https://accounts.google.com".to_string(),
+        "accounts.google.com".to_string(),
+      ])),
+      ..Default::default()
+    });
+  }
 
   decode_and_verify_token_claims_with_key(key, token, options)
 }
@@ -63,6 +57,24 @@ mod tests {
   use jwt_simple::prelude::VerificationOptions;
   use std::fs::read_to_string;
   use testing::test_file_path::test_file_path;
+
+  /*
+  Example payload:
+    iss https://accounts.google.com
+    azp 788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com
+    aud 788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com
+    sub 113101967612396793777
+    email vocodes2020@gmail.com
+    email_verified true
+    nbf 1726786100
+    name Vocodes Vocodes
+    picture https://lh3.googleusercontent.com/a/ACg8ocLz2-2OaAm0MQxR6j8CNr-Po8_Xr-aryATiCn4c0i_TuDmL_g=s96-c
+    given_name Vocodes
+    family_name Vocodes
+    iat 1726786400
+    exp 1726790000
+    jti 4d44eeac06ce79fc0ab2270cfeea30d8acf77613
+   */
 
   #[test]
   fn test_decode() {

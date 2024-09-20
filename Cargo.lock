@@ -7162,6 +7162,7 @@ dependencies = [
  "futures 0.3.29",
  "futures-core",
  "futures-util",
+ "google_sign_in",
  "hashing",
  "hostname 0.4.0",
  "http_server_common",

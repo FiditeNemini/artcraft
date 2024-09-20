@@ -45,6 +45,7 @@ enums = { path = "../../../_types/enums" }
 enums_public = { path = "../../../_types/enums_public" }
 errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
+google_sign_in = { path = "../../../lib/api_clients/google_sign_in" }
 hashing = { path = "../../../lib/files/hashing" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 idempotency = { path = "../../../lib/idempotency" }
