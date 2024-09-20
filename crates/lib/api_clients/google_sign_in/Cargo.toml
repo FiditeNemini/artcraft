@@ -29,6 +29,8 @@ errors = { path = "../../errors" }
 jwt-simple = { version = "0.12.10" , default-features=false, features=["pure-rust"] }
 base64 = "0.13"
 
+reqwest = "0.12.7"
+
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"

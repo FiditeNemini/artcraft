@@ -1,11 +1,7 @@
+use crate::certs::key_map::KeyMap;
 use errors::{anyhow, AnyhowResult};
 use jwt_simple::prelude::RS256PublicKey;
 use serde_derive::Deserialize;
-use std::collections::HashMap;
-
-/// Map of JWK `kid` to `RS256PublicKey`.
-/// (JWK sets typically contain more than one key.)
-pub type KeyMap = HashMap<String, RS256PublicKey>;
 
 /// Parse Google's JWK keys into usable public keys.
 /// Grab Google's keys from here: https://www.googleapis.com/oauth2/v3/certs
@@ -67,7 +63,7 @@ pub struct JsonKey {
 
 #[cfg(test)]
 mod tests {
-  use crate::jwk_to_public_key::jwk_to_public_key;
+  use crate::certs::jwk_to_public_key::jwk_to_public_key;
   use jwt_simple::algorithms::RSAPublicKeyLike;
   use std::fs::read_to_string;
   use testing::test_file_path::test_file_path;
