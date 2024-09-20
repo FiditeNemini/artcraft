@@ -133,6 +133,7 @@ use crate::http_server::endpoints::users::login_handler::*;
 use crate::http_server::endpoints::users::logout_handler::*;
 use crate::http_server::endpoints::users::session_info_handler::*;
 use crate::http_server::endpoints::users::create_account_from_google_sign_in_handler::*;
+use crate::http_server::endpoints::users::create_account_handler::*;
 use crate::http_server::endpoints::users::session_token_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::enqueue_voice_conversion_inference_handler::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
@@ -213,6 +214,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::edit_user_feature_flags_handler,
     crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handler,
     crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
+    crate::http_server::endpoints::users::create_account_handler::create_account_handler,
     crate::http_server::endpoints::stats::get_unified_queue_stats_handler::get_unified_queue_stats_handler,
     crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
@@ -353,6 +355,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GoogleCreateAccountRequest,
     GoogleCreateAccountErrorResponse,
     GoogleCreateAccountSuccessResponse,
+    GoogleCreateAccountErrorType,
+    CreateAccountRequest,
+    CreateAccountErrorResponse,
+    CreateAccountErrorType,
+    CreateAccountSuccessResponse,
     ChangeMediaFileEngineCategoryError,
     ChangeMediaFileEngineCategoryRequest,
     ChangeMediaFileVisibilityError,

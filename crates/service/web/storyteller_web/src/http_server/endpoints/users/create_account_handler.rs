@@ -12,7 +12,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{info, warn};
 use sqlx::MySqlPool;
-
+use utoipa::ToSchema;
 use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -30,7 +30,7 @@ use crate::http_server::validations::validate_username::validate_username;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::enroll_in_studio::enroll_in_studio;
 
-#[derive(Deserialize)]
+#[derive(ToSchema, Deserialize)]
 pub struct CreateAccountRequest {
   pub username: String,
   pub password: String,
@@ -38,7 +38,7 @@ pub struct CreateAccountRequest {
   pub email_address: String,
 }
 
-#[derive(Serialize)]
+#[derive(ToSchema, Serialize)]
 pub struct CreateAccountSuccessResponse {
   pub success: bool,
 
@@ -48,14 +48,14 @@ pub struct CreateAccountSuccessResponse {
   pub signed_session: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(ToSchema, Serialize, Debug)]
 pub struct CreateAccountErrorResponse {
   pub success: bool,
   pub error_type: CreateAccountErrorType,
   pub error_fields: HashMap<String, String>,
 }
 
-#[derive(Copy, Clone, Debug, Serialize)]
+#[derive(ToSchema, Copy, Clone, Debug, Serialize)]
 pub enum CreateAccountErrorType {
   BadRequest, // Other request malformed errors, eg. bad Origin header
   BadInput,
@@ -107,6 +107,21 @@ impl ResponseError for CreateAccountErrorResponse {
   }
 }
 
+/// Create a new account with username and password
+#[utoipa::path(
+  post,
+  tag = "Users",
+  path = "/v1/create_account",
+  responses(
+    (status = 200, description = "Success", body = CreateAccountSuccessResponse),
+    (status = 400, description = "Bad input", body = CreateAccountErrorResponse),
+    (status = 401, description = "Not authorized", body = CreateAccountErrorResponse),
+    (status = 500, description = "Server error", body = CreateAccountErrorResponse),
+  ),
+  params(
+    ("request" = CreateAccountRequest, description = "Payload for Request"),
+  )
+)]
 pub async fn create_account_handler(
   http_request: HttpRequest,
   request: web::Json<CreateAccountRequest>,
