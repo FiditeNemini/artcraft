@@ -9,17 +9,7 @@ use serde_derive::{Deserialize, Serialize};
 /// https://developers.google.com/identity/openid-connect/openid-connect
 /// https://stackoverflow.com/questions/31056412/what-all-these-fields-mean
 #[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct GoogleSsoPayload {
-  /// The audience that this ID token is intended for. It must be one of the
-  /// OAuth 2.0 client IDs of your application.
-  /// NB: You must check that this matches the audience (the app client id)
-  pub aud: Option<String>,
-
-  /// The Issuer Identifier for the Issuer of the response.
-  /// Always `https://accounts.google.com` or `accounts.google.com` for Google ID tokens.
-  /// NB: You must check that this matches the issuer.
-  pub iss: Option<String>,
-
+pub struct GoogleJwtPayloadExtraFields {
   /// The user's email address. Provided only if you included the email scope in your
   /// request. The value of this claim may not be unique to this account and could
   /// change over time, therefore you should not use this value as the primary identifier
@@ -33,6 +23,12 @@ pub struct GoogleSsoPayload {
   /// The user's full name, in a displayable form. (See Google documentation)
   pub name: Option<String>,
 
+  /// The user's given name(s) or first name(s). Might be provided when a name claim is present.
+  pub given_name: Option<String>,
+
+  /// The user's surname(s) or last name(s). Might be provided when a name claim is present.
+  pub family_name: Option<String>,
+
   /// The client_id of the authorized presenter. This claim is only needed when the party
   /// requesting the ID token is not the same as the audience of the ID token. This may be
   /// the case at Google for hybrid apps where a web application and Android app have a
@@ -45,9 +41,32 @@ pub struct GoogleSsoPayload {
   /// unique-identifier key for the user. Maximum length of 255 case-sensitive ASCII
   /// characters.
   pub sub: Option<String>,
+
+  /// The URL of the user's profile picture. Might be provided when:
+  ///  - The request scope included the string "profile"
+  ///  - The ID token is returned from a token refresh
+  /// When picture claims are present, you can use them to update your app's user records.
+  /// Note that this claim is never guaranteed to be present.
+  pub picture: Option<String>,
+
+  // /// The audience that this ID token is intended for. It must be one of the
+  // /// OAuth 2.0 client IDs of your application.
+  // /// NB: You must check that this matches the audience (the app client id)
+  // pub aud: Option<String>,
+
+  // /// The Issuer Identifier for the Issuer of the response.
+  // /// Always `https://accounts.google.com` or `accounts.google.com` for Google ID tokens.
+  // /// NB: You must check that this matches the issuer.
+  // pub iss: Option<String>,
+
+  // pub nbf: Option<String>,
+  // pub jti: Option<String>,
+  // pub iat: Option<String>,
+  // pub exp: Option<String>,
 }
 
 /*
+Example payload:
   iss https://accounts.google.com
   azp 788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com
   aud 788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com
@@ -66,8 +85,8 @@ pub struct GoogleSsoPayload {
 
 /// Decode a Google Sign In JWT.
 /// Verification options can be supplied to increase clock skew tolerance, etc.
-pub fn decode_token(key: &RS256PublicKey, token: &str, options: Option<VerificationOptions>) -> AnyhowResult<JWTClaims<GoogleSsoPayload>> {
-  let claims = key.verify_token::<GoogleSsoPayload>(token, options)?;
+pub fn decode_token(key: &RS256PublicKey, token: &str, options: Option<VerificationOptions>) -> AnyhowResult<JWTClaims<GoogleJwtPayloadExtraFields>> {
+  let claims = key.verify_token::<GoogleJwtPayloadExtraFields>(token, options)?;
   Ok(claims)
 }
 
@@ -76,6 +95,7 @@ mod tests {
   use crate::decode_token::decode_token;
   use crate::jwk_to_public_key::jwk_to_public_key;
   use coarsetime::Duration;
+  use jwt_simple::claims::Audiences;
   use jwt_simple::prelude::VerificationOptions;
   use std::fs::read_to_string;
   use testing::test_file_path::test_file_path;
@@ -101,13 +121,33 @@ mod tests {
 
     let claims = decode_token(key, credential, Some(options)).unwrap();
 
+    // Custom fields
+    assert_eq!(claims.custom.email, Some("vocodes2020@gmail.com".to_string()));
+    assert_eq!(claims.custom.email_verified, Some(true));
+    assert_eq!(claims.custom.azp, Some("788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com".to_string()));
+    assert_eq!(claims.custom.name, Some("Vocodes Vocodes".to_string()));
+    assert_eq!(claims.custom.picture, Some("https://lh3.googleusercontent.com/a/ACg8ocLz2-2OaAm0MQxR6j8CNr-Po8_Xr-aryATiCn4c0i_TuDmL_g=s96-c".to_string()));
+    assert_eq!(claims.custom.given_name, Some("Vocodes".to_string()));
+    assert_eq!(claims.custom.family_name, Some("Vocodes".to_string()));
+
+    // TODO: Why aren't these being decoded?
+    //assert_eq!(claims.custom.sub, Some("113101967612396793777".to_string()));
+    //assert_eq!(claims.custom.iss, Some("https://accounts.google.com".to_string()));
+    //assert_eq!(claims.custom.aud, Some("788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com".to_string()));
+    //assert_eq!(claims.custom.nbf, Some("".to_string()));
+    //assert_eq!(claims.custom.jti, Some("".to_string()));
+    //assert_eq!(claims.custom.iat, Some("".to_string()));
+    //assert_eq!(claims.custom.exp, Some("".to_string()));
+
+    // Standard fields
     assert_eq!(claims.jwt_id, Some("4d44eeac06ce79fc0ab2270cfeea30d8acf77613".to_string()));
     assert_eq!(claims.issuer, Some("https://accounts.google.com".to_string()));
     assert_eq!(claims.subject, Some("113101967612396793777".to_string()));
     assert_eq!(claims.issued_at.unwrap().as_secs(), 1726786400);
-    assert_eq!(claims.custom.email, Some("vocodes2020@gmail.com".to_string()));
-    assert_eq!(claims.custom.azp, Some("788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com".to_string()));
-    //assert_eq!(claims.custom.sub, Some("113101967612396793777".to_string()));
-    //assert_eq!(claims.custom.aud, Some("788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com".to_string()));
+
+    match claims.audiences.unwrap() {
+      Audiences::AsString(audience) => assert_eq!(audience, "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com"),
+      Audiences::AsSet(_audiences) => panic!("Expected a single audience"),
+    }
   }
 }
