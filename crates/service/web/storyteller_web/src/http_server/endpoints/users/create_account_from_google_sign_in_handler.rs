@@ -3,7 +3,7 @@
 //#![forbid(unused_mut)]
 //#![forbid(unused_variables)]
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::fmt::Formatter;
 
@@ -145,7 +145,9 @@ pub async fn create_account_from_google_sign_in_handler(
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
-  let claims = match decode_and_verify_token_claims(&keys, &request.google_credential, None) {
+  let verification_options = Some(build_options());
+
+  let claims = match decode_and_verify_token_claims(&keys, &request.google_credential, verification_options) {
     Ok(claims) => claims,
     Err(err) => {
       warn!("error decoding google token claims (will retry certs): {:?}", err);
@@ -157,7 +159,9 @@ pub async fn create_account_from_google_sign_in_handler(
             GoogleCreateAccountErrorResponse::server_error()
           })?;
 
-      let claims = decode_and_verify_token_claims(&keys, &request.google_credential, None)
+      let verification_options = Some(build_options());
+
+      let claims = decode_and_verify_token_claims(&keys, &request.google_credential, verification_options)
           .map_err(|e| {
             warn!("error decoding google token claims: {:?}", e);
             GoogleCreateAccountErrorResponse::bad_request()
@@ -351,4 +355,18 @@ pub async fn create_account_from_google_sign_in_handler(
     // .cookie(session_cookie) // TODO / FIXME
     .content_type("application/json")
     .body(body))
+}
+
+// TODO(bt,2024-09-22): Make this configurable via env vars.
+fn build_options() -> VerificationOptions {
+  VerificationOptions {
+    allowed_issuers: Some(HashSet::from([
+      "https://accounts.google.com".to_string(),
+      "accounts.google.com".to_string(),
+    ])),
+    allowed_audiences: Some(HashSet::from([
+      "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com".to_string(),
+    ])),
+    ..Default::default()
+  }
 }

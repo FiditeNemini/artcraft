@@ -15,8 +15,11 @@ pub enum VerifyError {
   /// This likely means we need to refresh our JWK key set.
   JwtKeyMissing { requested_key: String },
 
-  /// The issuer of the claims was unexpected
-  InvalidIssuer { issuer: Option<String> },
+  /// The audience for the JWT claims was absent or unexpected.
+  JwtInvalidAudience,
+
+  /// The issuer of the JWT claims was absent or unexpected.
+  JwtInvalidIssuer,
 
   /// Any other error type we haven't wrapped.
   AnyhowError(AnyhowError),
@@ -31,13 +34,16 @@ impl Display for VerifyError {
         write!(f, "JWT decode error: {}", source)
       }
       Self::JwtExpired => {
-        write!(f, "JWT expired")
+        write!(f, "JWT token has expired")
       }
       Self::JwtKeyMissing { requested_key } => {
-        write!(f, "JWT key absent: {}", requested_key)
+        write!(f, "JWT requested key absent from JWK: {}", requested_key)
       }
-      Self::InvalidIssuer { issuer } => {
-        write!(f, "Invalid issuer: {:?}", issuer)
+      Self::JwtInvalidAudience => {
+        write!(f, "Unexpected or missing JWT audience")
+      }
+      Self::JwtInvalidIssuer => {
+        write!(f, "Unexpected or missing JWT issuer")
       }
       Self::AnyhowError(err) => {
         write!(f, "AnyhowError: {}", err)
