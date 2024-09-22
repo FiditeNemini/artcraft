@@ -78,15 +78,13 @@ mod tests {
 
   #[test]
   fn test_decode() {
-    let jwk_file = test_file_path("test_data/crypto/google_signin.jwk").unwrap();
+    let jwk_file = test_file_path("test_data/crypto/google_sign_in.2024-09-20.jwk").unwrap();
+    //let jwk_file = test_file_path("test_data/crypto/google_sign_in.2024-04-01.jwk").unwrap();
     let jwk_payload = read_to_string(jwk_file).unwrap();
     let key_map = jwk_to_public_key(&jwk_payload).unwrap();
 
+    //let credential = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImIyNjIwZDVlN2YxMzJiNTJhZmU4ODc1Y2RmMzc3NmMwNjQyNDlkMDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3ODg4NDMwMzQyMzctdXFjZzh0YmdvZnJjZjF0bzM3ZTFicXBoZDkyNGphZjYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3ODg4NDMwMzQyMzctdXFjZzh0YmdvZnJjZjF0bzM3ZTFicXBoZDkyNGphZjYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTMxMDE5Njc2MTIzOTY3OTM3NzciLCJlbWFpbCI6InZvY29kZXMyMDIwQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYmYiOjE3MjY4Njk0OTgsIm5hbWUiOiJWb2NvZGVzIFZvY29kZXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jTHoyLTJPYUFtME1ReFI2ajhDTnItUG84X1hyLWFyeUFUaUNuNGMwaV9UdURtTF9nPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IlZvY29kZXMiLCJmYW1pbHlfbmFtZSI6IlZvY29kZXMiLCJpYXQiOjE3MjY4Njk3OTgsImV4cCI6MTcyNjg3MzM5OCwianRpIjoiMGUyZTI0ZjE0M2ZlODk1NDlkM2I0NTkxNjBmYTY0ODc0YzFkZmIyYiJ9.ciKy6sIbZx1Z4mtXdXwy6eVDW2Q96ed7MyP1jOdGow5p9FpDUR8lTqIdMiKEkrp3j99Ipjv2y7iMZH23pC5ipWKqkP_Z4yxotN3ULnKFqkFnyEsHtvQDfc5CSmICcREEwjf2n9ngGycxYZ342n9rKRr893TFzp5sjy2DHxv1zpt6hsA2NSjoKPA4fmBOdJ_GnyWZYMQ1ABVFFnCsEVME2C53DBAWNs3OSlDN4U-QCRlb0LtpxU9_f1GUN4Vff7aSuIyGKY9SCIWlbf772br4HEjLXCDygaTRTgBUa-f5XJaOKLnsORCQwki7EqHgGYemMoQCOVaFXHj7N_8xBxyDgw";
     let credential = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImIyNjIwZDVlN2YxMzJiNTJhZmU4ODc1Y2RmMzc3NmMwNjQyNDlkMDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3ODg4NDMwMzQyMzctdXFjZzh0YmdvZnJjZjF0bzM3ZTFicXBoZDkyNGphZjYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3ODg4NDMwMzQyMzctdXFjZzh0YmdvZnJjZjF0bzM3ZTFicXBoZDkyNGphZjYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTMxMDE5Njc2MTIzOTY3OTM3NzciLCJlbWFpbCI6InZvY29kZXMyMDIwQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYmYiOjE3MjY3ODYxMDAsIm5hbWUiOiJWb2NvZGVzIFZvY29kZXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jTHoyLTJPYUFtME1ReFI2ajhDTnItUG84X1hyLWFyeUFUaUNuNGMwaV9UdURtTF9nPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IlZvY29kZXMiLCJmYW1pbHlfbmFtZSI6IlZvY29kZXMiLCJpYXQiOjE3MjY3ODY0MDAsImV4cCI6MTcyNjc5MDAwMCwianRpIjoiNGQ0NGVlYWMwNmNlNzlmYzBhYjIyNzBjZmVlYTMwZDhhY2Y3NzYxMyJ9.EYg71yIkvhxFGc8ZVCXeTOAmPAtLYDphHnkdf1sh8b_Jz4Y7S1DpmiTqQ1ytxu7J1xNixvdwhuIDzSlCvlxaFl8475GvAlyPTNtZtmWbFD5SRM_XHLOynijOp8WQ4nej-CHvT1KjjqMfkZ1EeQMoWk1H72PxPg_RiUgzsklkUs1wOkLAySk7R3EIAl7bIzpoY_WH2pxv9ccFpBtKDHaDqHkxAWBUQX0-G7ZXZBPVz07V28ZfdbzFDapjZaUFbumazh_-J2-9AA6JkcteF4h_gpbBcLYAuxt5bWI5FECWbYe42khwb93WJ5SK12Tt0EPoyzIObJs14NWGAajtHTg3wA";
-    let key = key_map.get("b2620d5e7f132b52afe8875cdf3776c064249d04").unwrap();
-
-    // NB: This key won't work:
-    // let key = key_map.get("5aaff47c21d06e266cce395b2145c7c6d4730ea5").unwrap();
 
     let options = VerificationOptions {
       time_tolerance: Some(Duration::from_days(365 * 30)),
@@ -96,7 +94,12 @@ mod tests {
     };
 
     // This should work
-    let claims = decode_and_verify_token_claims_with_key(key, credential, Some(options.clone())).unwrap();
+    //let key = key_map.get("b2620d5e7f132b52afe8875cdf3776c064249d04").unwrap();
+
+    // NB: This key won't work:
+    // let key = key_map.get("5aaff47c21d06e266cce395b2145c7c6d4730ea5").unwrap();
+
+    //let claims = decode_and_verify_token_claims_with_key(key, credential, Some(options.clone())).unwrap();
 
     // As should this much more ergonomic method
     let claims = decode_and_verify_token_claims(&key_map, credential, Some(options)).unwrap();
