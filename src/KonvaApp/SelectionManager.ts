@@ -1,7 +1,8 @@
 import Konva from "konva";
 import { VideoNode } from "./Nodes/VideoNode";
 import { ImageNode } from "./Nodes/ImageNode";
-type MediaNode = VideoNode | ImageNode;
+import { NetworkedNodeContext } from "./Nodes/NetworkedNodeContext";
+type MediaNode = NetworkedNodeContext | VideoNode | ImageNode;
 export class SelectionManager {
   private selectedNodes: Set<MediaNode>;
   private initialPositions: Map<MediaNode, { x: number; y: number }>;
@@ -11,18 +12,18 @@ export class SelectionManager {
     this.initialPositions = new Map<MediaNode, { x: number; y: number }>();
   }
 
-  public selectNode(node: MediaNode, isMultiSelect: boolean): void {
-    if (!isMultiSelect) {
-      this.clearSelection();
-    }
-
+  public selectNode(node: MediaNode): void {
     if (this.selectedNodes.has(node)) {
-      this.deselectNode(node);
+      return;
     } else {
       this.selectedNodes.add(node);
       node.highlight();
     }
 
+    if (!node.kNode) {
+      console.log("KNode is initialized");
+      return;
+    }
     node.kNode.getLayer()?.batchDraw();
 
     console.log("Selected Nodes:");
@@ -31,6 +32,11 @@ export class SelectionManager {
 
   public deselectNode(node: MediaNode): void {
     this.selectedNodes.delete(node);
+    node.unHighLight();
+    if (!node.kNode) {
+      console.log("KNode is initialized");
+      return;
+    }
     node.kNode.getLayer()?.batchDraw();
   }
 
@@ -44,19 +50,27 @@ export class SelectionManager {
   }
 
   // Start State
-  public startDrag(node: MediaNode | ImageNode): void {
+  public startDrag(node: MediaNode): void {
     console.log("Starting Drag");
-
-    const position = node.kNode.position();
+    if (!node.kNode) {
+      console.log("KNode is initialized");
+      return;
+    }
 
     this.selectedNodes.forEach((selectedNode) => {
+      if (!selectedNode.kNode) {
+        console.log("selectedNode KNode is initialized");
+        return;
+      }
       this.initialPositions.set(selectedNode, {
         x: selectedNode.kNode.x(),
         y: selectedNode.kNode.y(),
       });
     });
   }
-
+  public isNodeSelected(node: MediaNode): boolean {
+    return this.selectedNodes.has(node);
+  }
   // Drag State
   public dragging(node: MediaNode): void {
     const initialPosition = this.initialPositions.get(node);
@@ -64,7 +78,10 @@ export class SelectionManager {
       console.log("Initial Position Undefined");
       return;
     }
-
+    if (!node.kNode) {
+      console.log("selectedNode KNode is initialized");
+      return;
+    }
     const dx = node.kNode.x() - initialPosition.x;
     const dy = node.kNode.y() - initialPosition.y;
 
@@ -75,6 +92,11 @@ export class SelectionManager {
       const initialPosition = this.initialPositions.get(selectedNode);
       if (!initialPosition) {
         console.log("Initial Position is Null");
+        return;
+      }
+
+      if (!selectedNode.kNode) {
+        console.log("selectedNode KNode is initialized");
         return;
       }
       selectedNode.kNode.x(initialPosition.x + dx);

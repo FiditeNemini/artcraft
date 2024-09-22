@@ -13,13 +13,14 @@ import { ImageNode } from "./Nodes/ImageNode";
 import { LoadingBarStatus } from "~/components/ui";
 import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 import { UndoStackManager } from "./UndoRedo/UndoRedoManager";
-import * as ort from "onnxruntime-web";
 
 import { CreateCommand } from "./UndoRedo/CreateCommand";
 import { DeleteCommand } from "./UndoRedo/DeleteCommand";
 import { RotateCommand } from "./UndoRedo/RotateCommand";
 import { ScaleCommand } from "./UndoRedo/ScaleCommand";
 import { TranslateCommand } from "./UndoRedo/TranslateCommand";
+
+import { FileUtilities } from "./FileUtilities/FileUtilities";
 
 export interface RenderingOptions {
   artstyle: string;
@@ -117,17 +118,13 @@ export class Engine {
       const media_url = `${media_api_base_url}vocodes-public${response.data.videoUrl}`;
 
       const videoNode = new VideoNode(
-        uuidv4(),
         this.videoLayer,
         this.renderEngine.captureCanvas.position().x,
         this.renderEngine.captureCanvas.position().y,
         media_url,
         this.selectionManager,
-        undefined,
-        undefined,
       );
       this.renderEngine.addNodes(videoNode);
-
       // hide the loader
       //this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
@@ -138,19 +135,17 @@ export class Engine {
       uiAccess.toolbarMain.loadingBar.updateProgress(
         response.data.progress * 100,
       );
+      console.log(response);
+
+      // if (response.data.zipBlob) {
+      //   FileUtilities.downloadBlobZip(response.data.zipBlob);
+      // }
     } else {
       // throw error to retry
       uiAccess.dialogueError.show({
         title: "Generation Error",
         message: response.data,
       });
-
-      // if (!this.renderEngine.videoLoadingCanvas) {
-      //   console.log("Did not setup video loading canvas.");
-      //   return;
-      // }
-      //this.renderEngine.videoLoadingCanvas.kNode.hide();
-
       uiAccess.toolbarMain.loadingBar.hide();
     }
   }
@@ -241,62 +236,7 @@ export class Engine {
 
     this.stage.width(this.canvasReference.offsetWidth);
     this.stage.height(this.canvasReference.offsetHeight);
-
     this.stage.draw(); // Redraw the canvas
-  }
-
-  public async onnx() {
-    try {
-      //DO NOT REMOVE, NECESSARY TO LOAD WASM FILES
-      ort.env.wasm.wasmPaths = "wasm/";
-
-      // Load the model and create InferenceSession
-      const modelPathE = "/models/image_encoder_hiera_t.onnx";
-      const modelPath = "/models/mask_decoder_hiera_t.onnx";
-      const modelPath1 = "/models/memory_attention_hiera_t.onnx";
-      const modelPath2 = "/models/memory_encoder_hiera_t.onnx";
-      const modelPath3 = "/models/mlp_hiera_t.onnx";
-      const modelPath4 = "/models/prompt_encoder_hiera_t.onnx";
-
-      const mask_decoder_hiera_t = await ort.InferenceSession.create(
-        modelPath,
-        {
-          executionProviders: ["wasm"],
-        },
-      );
-      console.log(mask_decoder_hiera_t);
-      const memory_attention_hiera_t = await ort.InferenceSession.create(
-        modelPath1,
-        {
-          executionProviders: ["wasm"],
-        },
-      );
-      console.log(memory_attention_hiera_t);
-      const memory_encoder_hiera_t = await ort.InferenceSession.create(
-        modelPath2,
-        {
-          executionProviders: ["wasm"],
-        },
-      );
-      console.log(memory_encoder_hiera_t);
-      const mlp_hiera_t = await ort.InferenceSession.create(modelPath3, {
-        executionProviders: ["wasm"],
-      });
-      console.log(mlp_hiera_t);
-      const prompt_encoder_hiera_t = await ort.InferenceSession.create(
-        modelPath4,
-        {
-          executionProviders: ["wasm"],
-        },
-      );
-      console.log(prompt_encoder_hiera_t);
-
-      // // Run inference
-      // const outputs = await session.run({ input: inputTensor });
-      // console.log(outputs);
-    } catch (err) {
-      console.error("error caught: ", err);
-    }
   }
 
   // Sandbox is quickly a way to test your idea.
@@ -311,11 +251,56 @@ export class Engine {
     // load canvas that was originaly saved TODO Save manager for resharing.
     uiAccess.toolbarImage.hide();
     uiAccess.loadingBar.hide();
+
     this.setupStage();
   }
   public isInitialized() {
     return this.stage !== null;
   }
+
+  public async populateWithDebugItems() {
+    const imageFile = await FileUtilities.createImageFileFromUrl(
+      "https://static.miraheze.org/pgrwiki/0/0d/Dialogue-2B-Icon.png",
+    );
+    const imageNode = new ImageNode(
+      this.videoLayer,
+      this.renderEngine.captureCanvas.position().x,
+      this.renderEngine.captureCanvas.position().y,
+      imageFile,
+      this.selectionManager,
+    );
+
+    const imageNode2 = new ImageNode(
+      this.videoLayer,
+      this.renderEngine.captureCanvas.position().x,
+      this.renderEngine.captureCanvas.position().y,
+      imageFile,
+      this.selectionManager,
+    );
+
+    // Adding nodes here
+    const videoNode = new VideoNode(
+      this.videoLayer,
+      this.renderEngine.captureCanvas.position().x,
+      this.renderEngine.captureCanvas.position().y,
+      "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+      this.selectionManager,
+    );
+
+    // CODE TO TEST RENDER ENGINE
+    // Testing render engine
+    // this.renderEngine.addNodes(videoNode);
+    // await this.renderEngine.startProcessing();
+    //videoNode.simulatedLoading();
+    // TODO support Text nodes
+
+    this.renderEngine.addNodes(videoNode);
+    this.renderEngine.addNodes(imageNode2);
+
+    // TODO if only image take image and just takes snapshots Edge case
+    this.renderEngine.addNodes(imageNode);
+  }
+
   public async setupStage() {
     var textNode = new Konva.Text({
       x: 0,
@@ -339,23 +324,6 @@ export class Engine {
     }, this.videoLayer);
     anim.start();
 
-    // Adding nodes here
-    // const videoNode = new VideoNode(
-    //   "",
-    //   this.offScreenCanvas,
-    //   this.videoLayer,
-    //   1560,
-    //   400,
-    //   "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-    //   this.selectionManager,
-    // );
-    // CODE TO TEST RENDER ENGINE
-    // Testing render engine
-    // this.renderEngine.addNodes(videoNode);
-    // await this.renderEngine.startProcessing();
-    //videoNode.simulatedLoading();
-    // TODO support Text nodes
-
     this.videoLayer.add(textNode);
 
     this.addKeyboardShortcuts();
@@ -363,39 +331,39 @@ export class Engine {
 
   public addImage(imageFile: File) {
     const imageNode = new ImageNode(
-      uuidv4(),
       this.videoLayer,
-      50,
-      50,
+      this.renderEngine.captureCanvas.position().x,
+      this.renderEngine.captureCanvas.position().y,
       imageFile,
       this.selectionManager,
     );
     this.renderEngine.addNodes(imageNode);
   }
+
   public addVideo(url: string) {
     // Adding nodes here
     const videoNode = new VideoNode(
-      uuidv4(),
       this.videoLayer,
-      1560,
-      400,
+      this.renderEngine.captureCanvas.position().x,
+      this.renderEngine.captureCanvas.position().y,
       url,
       this.selectionManager,
-      undefined,
-      undefined,
     );
     this.renderEngine.addNodes(videoNode);
   }
 
+  // Events for Undo and Redo
   private addKeyboardShortcuts() {
     window.addEventListener("keydown", (event) => {
       if (event.ctrlKey && event.key === "z") {
-        this.undo();
+        console.log("Undo");
+        this.undoStackManager.undo();
       } else if (
         (event.ctrlKey && event.key === "y") ||
         (event.ctrlKey && event.shiftKey && event.key === "Z")
       ) {
-        this.redo();
+        console.log("Redo");
+        this.undoStackManager.redo();
       }
     });
   }
@@ -410,26 +378,18 @@ export class Engine {
     this.undoStackManager.executeCommand(command);
   }
 
+  scaleNodes(nodes: Konva.Node[], newScaleX: number, newScaleY: number) {
+    const command = new ScaleCommand(nodes, newScaleX, newScaleY);
+    this.undoStackManager.executeCommand(command);
+  }
+
   deleteNodes(nodes: Konva.Node[]) {
     const command = new DeleteCommand(nodes);
     this.undoStackManager.executeCommand(command);
   }
 
   createNodes(nodes: Konva.Node[]) {
-    const command = new CreateCommand(nodes, this.videoLayer);
+    const command = new CreateCommand(nodes);
     this.undoStackManager.executeCommand(command);
-  }
-
-  scaleNodes(nodes: Konva.Node[], newScaleX: number, newScaleY: number) {
-    const command = new ScaleCommand(nodes, newScaleX, newScaleY);
-    this.undoStackManager.executeCommand(command);
-  }
-
-  undo() {
-    this.undoStackManager.undo();
-  }
-
-  redo() {
-    this.undoStackManager.redo();
   }
 }

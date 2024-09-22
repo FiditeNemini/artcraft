@@ -1,7 +1,9 @@
 import { VideoNode } from "../Nodes/VideoNode";
 import Konva from "konva";
 import { RenderTask } from "./RenderTask";
-
+import { Container } from "konva/lib/Container";
+import { Shape } from "konva/lib/Shape";
+import { Group } from "konva/lib/Group";
 // Hide these two to start. WIL
 // uiAccess.toolbarMain.loadingBar.hide();
 // uiEvents.toolbarMain.loadingBarRetry.onClick((e) => {
@@ -25,12 +27,15 @@ import {
 } from "../SharedWorkers/Diffusion/DiffusionSharedWorker";
 import { RenderingOptions } from "../Engine";
 import { ImageNode } from "../Nodes/ImageNode";
+import { FileUtilities } from "../FileUtilities/FileUtilities";
+import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 
 export class RenderEngine {
   private videoNodes: VideoNode[];
   private imageNodes: ImageNode[];
+
   private offScreenCanvas: OffscreenCanvas;
   private context: OffscreenCanvasRenderingContext2D | null;
 
@@ -83,6 +88,7 @@ export class RenderEngine {
     if (height) {
       this.height = height;
     }
+
     // Ensures that all the nodes stag in the same place should
     // there be a window resize.
     // recompute the position
@@ -132,6 +138,12 @@ export class RenderEngine {
         y: pos.y + deltaY,
       });
     }
+
+    // update the context menu
+    this.videoNodes.forEach((node) => {
+      // find selected node... TODO and update that position
+      node.updateContextMenu();
+    });
     this.videoLayer.batchDraw();
   }
   constructor(
@@ -217,8 +229,8 @@ export class RenderEngine {
     if (typeof SharedWorker !== "undefined") {
       console.log("Shared Workers are supported in this browser.");
       // Debug chrome://inspect/#workers
+      //  "src\\KonvaApp\\SharedWorkers\\Diffusion\\DiffusionSharedWorker.ts",
       this.diffusionWorker = new DiffusionSharedWorkerClient(
-        "src\\KonvaApp\\SharedWorkers\\Diffusion\\DiffusionSharedWorker.ts",
         this.onRenderingSystemMessageRecieved,
       );
 
@@ -228,6 +240,26 @@ export class RenderEngine {
       // Handle the lack of Shared Worker support (e.g., fallback to another solution)
       this.canUseSharedWorker = false;
     }
+  }
+
+  public placeDebugRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    layer: Konva.Layer,
+  ): void {
+    const rect = new Konva.Rect({
+      x: x,
+      y: y,
+      width: width, // Default width
+      height: height, // Default height
+      fill: "green",
+      draggable: false,
+    });
+
+    layer.add(rect);
+    layer.draw();
   }
 
   // This function uses a portion of the video layer to capture just the capture canvas.
@@ -291,7 +323,11 @@ export class RenderEngine {
       var failed = false;
       for (let i = 0; i < this.videoNodes.length; i++) {
         const item = this.videoNodes[i];
+        if (!item.kNode) {
+          return;
+        }
         item.kNode.listening(false);
+        item.unHighLight();
         if (item.didFinishLoading == false) {
           // error out and show error message
           //this.startProcessing();
@@ -309,7 +345,7 @@ export class RenderEngine {
         throw Error("Wait For Items to Finish Processing.");
       }
 
-      this.videoNodes.forEach((item: VideoNode) => {});
+      //this.videoNodes.forEach((item: VideoNode) => {});
 
       // find the longest video node
       let numberOfFrames = this.findLongestVideoLength();
@@ -326,6 +362,9 @@ export class RenderEngine {
       // enable all nodes again.
       for (let i = 0; i < this.videoNodes.length; i++) {
         const item = this.videoNodes[i];
+        if (!item.kNode) {
+          return;
+        }
         item.kNode.listening(true);
       }
     }
@@ -340,6 +379,79 @@ export class RenderEngine {
     return frameNumber / frameRate;
   }
 
+  /**
+   *
+   * @param config
+   */
+  private async renderFrame(config: {
+    layerOfInterest: Konva.Layer; // layer where the element that you want to clip lives.
+    // XY and height of a captureCanvas ( region of interest )
+    x?: number; // x position of the region of interest
+    y?: number; // y position of the region of interest
+    width?: number; // size of the region of interest
+    height?: number; // size of the region of interest
+    pixelRatio?: number; // higher means higher quality
+    mimeType?: string; // image/jpeg or image/png
+    quality?: number; // 1.0 is the best.
+    test: boolean; // true == blob else Image Bitmap
+  }): Promise<ImageBitmap | Blob> {
+    try {
+      const box = config.layerOfInterest.getClientRect();
+      const stage = config.layerOfInterest.getStage();
+
+      const x = config.x !== undefined ? config.x : Math.floor(box.x);
+      const y = config.y !== undefined ? config.y : Math.floor(box.y);
+      const pixelRatio = config.pixelRatio || 1;
+
+      const container = config.layerOfInterest as Container<Group | Shape>;
+
+      const offScreenSceneCanvas = new OffScreenSceneCanvas({
+        width:
+          config.width || Math.ceil(box.width) || (stage ? stage.width() : 0),
+        height:
+          config.height ||
+          Math.ceil(box.height) ||
+          (stage ? stage.height() : 0),
+        pixelRatio: pixelRatio,
+      });
+
+      const context = offScreenSceneCanvas.getContext();
+
+      const buffer = new OffScreenSceneCanvas({
+        width:
+          offScreenSceneCanvas.width / offScreenSceneCanvas.pixelRatio +
+          Math.abs(x),
+        height:
+          offScreenSceneCanvas.height / offScreenSceneCanvas.pixelRatio +
+          Math.abs(y),
+        pixelRatio: offScreenSceneCanvas.pixelRatio,
+      });
+
+      context.save();
+
+      if (x || y) {
+        context.translate(-1 * x, -1 * y);
+      }
+      container.drawScene(offScreenSceneCanvas, undefined, buffer);
+      // Not a type mistake ... DO NOT FIX
+      const offscreenCanvas = offScreenSceneCanvas._canvas as OffscreenCanvas;
+      let result = undefined;
+      if (config.test) {
+        const blob = await offscreenCanvas.convertToBlob({
+          quality: config.quality ?? 1.0,
+          type: "image/jpeg",
+        });
+        await FileUtilities.blobToFileJpeg(blob, "1");
+        result = blob;
+      } else {
+        result = offscreenCanvas.transferToImageBitmap();
+      }
+      context.restore();
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
   /** 
   find longest video
   then seek through each node 1 step.
@@ -353,13 +465,12 @@ export class RenderEngine {
 
     // Stop all nodes first
     console.log(`LargestNumberOfFrames:${largestNumberOfFrames}`);
-
     for (let k = 0; k < this.videoNodes.length; k++) {
       const videoNode = this.videoNodes[k];
       if (videoNode.didFinishLoading === false) {
         throw Error("Videos Did Not Finish Loading Please Try Again.");
       }
-      videoNode.stop();
+      await videoNode.reset();
     }
 
     // only pick nodes that intersect with the canvas on screen bounds to freeze.
@@ -401,14 +512,14 @@ export class RenderEngine {
             this.width,
             this.height,
           );
-          // TODO write the non webworker version
+          //TODO write the non webworker version
+          const blob = await this.offScreenCanvas.convertToBlob({
+            quality: 1.0,
+            type: "image/jpeg",
+          });
+          await FileUtilities.blobToFileJpeg(blob, "1");
 
-          // const blob = await this.offScreenCanvas.convertToBlob({
-          //   quality: 1.0,
-          //   type: "image/jpeg",
-          // });
-
-          //await this.blobToFile(blob, `${j}`);
+          break;
         } // end of for each frame
       } else {
         // decode on the shared webworker.
@@ -422,44 +533,32 @@ export class RenderEngine {
           return;
         }
 
-        this.context.drawImage(
-          this.videoLayer.canvas._canvas,
-          this.positionX,
-          this.positionY,
-          this.width,
-          this.height,
-          0,
-          0,
-          this.width,
-          this.height,
+        console.log(
+          `context: x:${this.positionX} y:${this.positionY} ${this.width} x ${this.height}`,
         );
+
+        const bitmap = await this.renderFrame({
+          layerOfInterest: this.videoLayer,
+          x: this.captureCanvas.x(),
+          y: this.captureCanvas.y(),
+          width: this.width,
+          height: this.height,
+          mimeType: "image/jpeg",
+          pixelRatio: 1,
+          quality: 1.0,
+          test: false,
+        });
 
         const data: DiffusionSharedWorkerItemData = {
           height: this.height,
           width: this.width,
-          imageBitmap: this.offScreenCanvas.transferToImageBitmap(),
+          imageBitmap: bitmap as ImageBitmap,
           frame: j,
           totalFrames: largestNumberOfFrames,
           prompt: renderingOptions,
         };
-
-        // let isDoneStreaming = false;
-
         console.log(`Processing Frame:${j} out of ${largestNumberOfFrames}`);
-
-        // if (j == Math.floor(largestNumberOfFrames)) {
-        //   isDoneStreaming = true;
-        // }
-
-        //console.log(isDoneStreaming);
-
         this.diffusionWorker.sendData(1, data, false);
-
-        // // To ensure there is no lingering frames.
-        // if (isDoneStreaming) {
-        //   console.log("Done streaming");
-        //   break;
-        // }
       }
     } // end of largest number of frames loop
 
@@ -468,8 +567,10 @@ export class RenderEngine {
       console.log("Didn't Initialize Diffusion");
       return;
     }
+
+    const jobID = 1;
     this.diffusionWorker.sendData(
-      1,
+      jobID,
       {
         height: this.height,
         width: this.width,

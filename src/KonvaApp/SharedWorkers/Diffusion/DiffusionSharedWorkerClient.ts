@@ -19,7 +19,6 @@ export class DiffusionSharedWorkerClient<
     >,
   ) => void;
   constructor(
-    workerPath: string,
     messageReceived: (
       response: SharedWorkerResponse<
         DiffusionSharedWorkerResponseData,
@@ -28,43 +27,25 @@ export class DiffusionSharedWorkerClient<
     ) => void,
   ) {
     this.messageReceived = messageReceived;
-    // if (import.meta.env.DEV) {
-    //   console.log("This is running a worker in development");
-    //   this.sharedWorker = new SharedWorker(workerPath, {
-    //     type: "module",
-    //   });
-    // } else {
     try {
       console.log("This is running a worker in production");
       this.sharedWorker = new DiffusionSharedWorker();
-
-      // Uncomment this to test your CORS
-      // this.sharedWorker = new SharedWorker("worker.js", {
-      //   type: "module",
-      // });
 
       this.sharedWorker.addEventListener("error", (value) => {
         console.log("Shared worker ERROR:");
         console.log(value);
       });
 
+      this.port = this.sharedWorker.port;
+      this.port.onmessage = this.onMessage.bind(this);
+      this.port.start();
+
       console.log("launched shared worker (?)");
     } catch (error) {
       console.log("ERROR with shared worker!");
       console.log(error);
+      throw Error("Could Not Start Worker");
     }
-    //}
-    // // in production this is a work around .. https://github.com/vitejs/vite/issues/13680
-    // const js = `import ${JSON.stringify(new URL(diffusionWorkerURL, import.meta.url))}`;
-    // const blob = new Blob([js], { type: "application/javascript" });
-    // const objURL = URL.createObjectURL(blob);
-    // this.sharedWorker = new SharedWorker(new URL(objURL, import.meta.url), {
-    //   type: "module",
-    // });
-    //}
-    this.port = this.sharedWorker.port;
-    this.port.onmessage = this.onMessage.bind(this);
-    this.port.start();
   }
 
   async onMessage(event: MessageEvent) {
@@ -91,7 +72,7 @@ export class DiffusionSharedWorkerClient<
 
   async sendData(
     jobID: number,
-    data: DiffusionSharedWorkerItemData | undefined,
+    data: DiffusionSharedWorkerItemData,
     isDoneStreaming: boolean,
   ) {
     const payload: SharedWorkerRequest<DiffusionSharedWorkerItemData> = {

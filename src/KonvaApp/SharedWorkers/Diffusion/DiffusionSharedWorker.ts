@@ -24,6 +24,7 @@ export interface DiffusionSharedWorkerProgressData {
   url: string;
   status: JobStatus;
   progress: number;
+  mediaToken: string;
 }
 
 export interface DiffusionSharedWorkerItemData {
@@ -137,7 +138,9 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
         url: "",
         status: JobStatus.PENDING,
         progress: (item.frame / aproxSteps / 2 / totalPercent) * 100,
+        mediaToken: "",
       };
+
       console.log("Lets report progress.");
       reportProgress(progressData); // once finished gives you up to 50%
 
@@ -150,6 +153,17 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 
       console.log(zipBlob);
       console.log("Zipped");
+
+      const progressMedia: DiffusionSharedWorkerProgressData = {
+        url: "",
+        status: JobStatus.PENDING,
+        progress: (item.frame / aproxSteps / 2 / totalPercent) * 100,
+        mediaToken: "",
+      };
+
+      console.log("Lets report progress.");
+      reportProgress(progressMedia); // once finished gives you up to 50%
+
       const response = await this.mediaAPI.UploadStudioShot({
         maybe_title: "",
         uuid_idempotency_token: uuidv4(),
@@ -222,6 +236,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
             url: "",
             status: JobStatus.DEAD,
             progress: computedProgress / totalPercent,
+            mediaToken: mediaToken,
           };
 
           renderProgressData.status = status;
@@ -254,7 +269,6 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
               jobIsProcessing = false;
               reportProgress(renderProgressData);
               throw Error("Server Failed to Process Please Try Again.");
-              break;
             case JobStatus.CANCCELLED_BY_SYSTEM:
               jobIsProcessing = false;
               reportProgress(renderProgressData);
