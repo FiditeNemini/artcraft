@@ -2,6 +2,9 @@ use crate::certs::jwk_to_public_key::jwk_to_public_key;
 use crate::certs::key_map::KeyMap;
 use errors::{anyhow, AnyhowResult};
 
+/// https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
+/// "These keys are regularly rotated; examine the Cache-Control header in
+///  the response to determine when you should retrieve them again."
 const GOOGLE_CERTS_URL : &str = "https://www.googleapis.com/oauth2/v3/certs";
 
 pub async fn download_cert_key_set() -> AnyhowResult<KeyMap> {
