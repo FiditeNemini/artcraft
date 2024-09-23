@@ -31,19 +31,19 @@ export const ContextualToolbarImage = () => {
     },
   );
   return (
-    <Transition show={isShowing}>
-      <div
-        className={twMerge(
-          transitionTimingStyles,
-          "fixed data-[closed]:opacity-0",
-        )}
-        style={{
-          top: position.y,
-          left: position.x,
-        }}
-      >
-        <ToolbarImage {...rest} buttonsProps={buttonsProps} />
-      </div>
+    <Transition
+      as="div"
+      show={isShowing}
+      className={twMerge(
+        transitionTimingStyles,
+        "fixed -translate-x-1/2 -translate-y-20 data-[closed]:opacity-0",
+      )}
+      style={{
+        top: position.y,
+        left: position.x,
+      }}
+    >
+      <ToolbarImage {...rest} buttonsProps={buttonsProps} />
     </Transition>
   );
 };

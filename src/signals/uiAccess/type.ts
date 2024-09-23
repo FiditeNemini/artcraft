@@ -10,7 +10,9 @@ export interface ContextualUi {
 
 export interface ContextualLoadingBarProps
   extends ContextualUi,
-    Omit<LoadingBarProps, "position"> {}
+    Omit<LoadingBarProps, "position"> {
+  width: number;
+}
 
 export interface ContextualButtonRetryProps extends ContextualUi {
   disabled: boolean;

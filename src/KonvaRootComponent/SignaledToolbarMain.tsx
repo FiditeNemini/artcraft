@@ -1,5 +1,6 @@
 import { MouseEventHandler } from "react";
 import { useSignalEffect } from "@preact/signals-react";
+import { Transition } from "@headlessui/react";
 import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { dispatchers } from "~/signals/uiEvents/toolbarMain";
 
@@ -57,14 +58,15 @@ export const SignaledToolbarMain = ({
   return (
     <div className="relative col-span-12 col-start-1 row-span-1 row-start-12">
       <div className="absolute left-0 right-0 mx-auto w-96 -translate-y-full items-end pb-4">
-        <LoadingBar
-          isShowing={loadingBar.isShowing}
-          progress={loadingBar.progress}
-          message={loadingBar.message}
-          status={loadingBar.status}
-          onRetry={handleOnClickRetry}
-          colReverse
-        />
+        <Transition show={loadingBar.isShowing}>
+          <LoadingBar
+            progress={loadingBar.progress}
+            message={loadingBar.message}
+            status={loadingBar.status}
+            onRetry={handleOnClickRetry}
+            colReverse
+          />
+        </Transition>
       </div>
       <ToolbarMain
         disabled={toolbarMain.signal.value.disabled}

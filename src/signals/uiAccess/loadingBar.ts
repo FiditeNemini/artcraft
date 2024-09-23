@@ -7,6 +7,7 @@ const loadingBarSignal = signal<ContextualLoadingBarProps>({
     x: 0,
     y: 0,
   },
+  width: 300,
   isShowing: false,
   progress: 0,
   status: LoadingBarStatus.IDLE,

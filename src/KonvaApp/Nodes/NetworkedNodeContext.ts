@@ -52,7 +52,7 @@ export class NetworkedNodeContext {
       return;
     }
 
-    this.kNode.stroke(null);
+    // this.kNode.stroke(null);
     this.kNode.strokeWidth(0);
     this.kNode.draw();
   }
@@ -62,8 +62,8 @@ export class NetworkedNodeContext {
       return;
     }
     toolbarVideo.setPosition({
-      x: this.kNode.getPosition().x + this.kNode.getSize().width / 4,
-      y: this.kNode.getPosition().y - 150,
+      x: this.kNode.getPosition().x + this.kNode.getSize().width / 2,
+      y: this.kNode.getPosition().y,
     });
   }
 
@@ -72,8 +72,8 @@ export class NetworkedNodeContext {
       return;
     }
     loadingBar.updatePosition({
-      x: this.kNode.getPosition().x + this.kNode.getSize().width / 4,
-      y: this.kNode.getPosition().y - 60,
+      x: this.kNode.getPosition().x + this.kNode.getSize().width / 2,
+      y: this.kNode.getPosition().y + this.kNode.getSize().height,
     });
   }
 
