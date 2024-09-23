@@ -57,17 +57,20 @@ export const SignaledToolbarMain = ({
   };
   return (
     <div className="relative col-span-12 col-start-1 row-span-1 row-start-12">
-      <div className="absolute left-0 right-0 mx-auto w-96 -translate-y-full items-end pb-4">
-        <Transition show={loadingBar.isShowing}>
-          <LoadingBar
-            progress={loadingBar.progress}
-            message={loadingBar.message}
-            status={loadingBar.status}
-            onRetry={handleOnClickRetry}
-            colReverse
-          />
-        </Transition>
-      </div>
+      <Transition
+        as="div"
+        className="absolute left-0 right-0 mx-auto w-96 -translate-y-full items-end pb-4"
+        show={loadingBar.isShowing}
+      >
+        <LoadingBar
+          progress={loadingBar.progress}
+          message={loadingBar.message}
+          status={loadingBar.status}
+          onRetry={handleOnClickRetry}
+          colReverse
+        />
+      </Transition>
+
       <ToolbarMain
         disabled={toolbarMain.signal.value.disabled}
         buttonProps={buttonProps}
