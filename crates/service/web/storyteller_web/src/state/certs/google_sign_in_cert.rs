@@ -1,4 +1,4 @@
-use crate::http_server::endpoints::users::create_account_from_google_sign_in_handler::GoogleCreateAccountErrorResponse;
+use crate::http_server::endpoints::users::google_sso_handler::GoogleCreateAccountErrorResponse;
 use errors::AnyhowResult;
 use google_sign_in::certs::download_certs::download_cert_key_set;
 use google_sign_in::certs::key_map::KeyMap;

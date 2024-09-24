@@ -10,6 +10,7 @@ pub mod email_sender_job_token;
 pub mod firehose_entries;
 pub mod generic_download_jobs;
 pub mod generic_inference_jobs;
+pub mod google_sign_in_accounts;
 pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;

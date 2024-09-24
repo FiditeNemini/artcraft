@@ -57,11 +57,11 @@ CREATE TABLE google_sign_in_accounts(
   -- The user's full name, in a displayable form. Might be provided when: [...]
   maybe_name VARCHAR(255) DEFAULT NULL,
 
-  -- The user's surname(s) or last name(s). Might be provided when a name claim is present.
-  maybe_family_name VARCHAR(255) DEFAULT NULL,
-
   -- The user's given name(s) or first name(s). Might be provided when a name claim is present.
   maybe_given_name VARCHAR(255) DEFAULT NULL,
+
+  -- The user's surname(s) or last name(s). Might be provided when a name claim is present.
+  maybe_family_name VARCHAR(255) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6

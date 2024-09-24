@@ -7,6 +7,10 @@ pub struct Claims {
 }
 
 impl Claims {
+  pub fn subject(&self) -> Option<&str> {
+    self.claims.subject.as_deref()
+  }
+
   pub fn email(&self) -> Option<&str> {
     self.claims.custom.email.as_deref()
   }

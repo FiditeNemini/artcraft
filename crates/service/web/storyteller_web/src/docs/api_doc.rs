@@ -132,7 +132,7 @@ use crate::http_server::endpoints::users::get_profile_handler::*;
 use crate::http_server::endpoints::users::login_handler::*;
 use crate::http_server::endpoints::users::logout_handler::*;
 use crate::http_server::endpoints::users::session_info_handler::*;
-use crate::http_server::endpoints::users::create_account_from_google_sign_in_handler::*;
+use crate::http_server::endpoints::users::google_sso_handler::*;
 use crate::http_server::endpoints::users::create_account_handler::*;
 use crate::http_server::endpoints::users::session_token_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::enqueue_voice_conversion_inference_handler::*;
