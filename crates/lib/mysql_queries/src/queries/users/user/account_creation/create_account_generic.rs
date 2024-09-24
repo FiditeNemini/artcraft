@@ -5,11 +5,13 @@
 
 use log::warn;
 use sqlx::error::Error::Database;
-use sqlx::MySqlPool;
-
+use sqlx::{MySql, MySqlPool, Transaction};
+use sqlx::mysql::MySqlArguments;
+use sqlx::query::Query;
+use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
 use tokens::tokens::users::UserToken;
 
-pub struct CreateAccountArgs<'a> {
+pub struct GenericCreateAccountArgs<'a> {
   pub username: &'a str,
   pub display_name: &'a str,
   pub email_address: &'a str,
@@ -24,22 +26,23 @@ pub struct CreateAccountArgs<'a> {
   pub maybe_user_token: Option<&'a UserToken>,
 }
 
+pub enum Transactor<'e, 't> {
+  Pool {
+    pool: &'e MySqlPool,
+  },
+  Transaction {
+    transaction: &'e mut Transaction<'t, MySql>,
+  },
+}
+
 pub struct CreateAccountSuccessResult {
   pub user_token: UserToken,
   pub user_id: u64,
 }
 
-#[derive(Debug, Copy, Clone)]
-pub enum CreateAccountError {
-  EmailIsTaken,
-  UsernameIsTaken,
-  DatabaseError,
-  OtherError,
-}
-
-pub async fn create_account(
-  mysql_pool: &MySqlPool,
-  args: CreateAccountArgs<'_>,
+pub async fn create_account_generic(
+  args: GenericCreateAccountArgs<'_>,
+  transactor: Transactor<'_, '_>,
 ) -> Result<CreateAccountSuccessResult, CreateAccountError>
 {
   const INITIAL_PROFILE_MARKDOWN : &str = "";
@@ -51,7 +54,7 @@ pub async fn create_account(
     Some(user_token) => user_token.clone(),
   };
 
-  let query_result = sqlx::query!(
+  let query = sqlx::query!(
         r#"
 INSERT INTO users (
   token,
@@ -83,9 +86,16 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         args.ip_address,
         args.ip_address,
         args.maybe_source,
-    )
-      .execute(mysql_pool)
-      .await;
+    );
+
+  let query_result = match transactor {
+    Transactor::Pool { pool } => {
+      query.execute(pool).await
+    },
+    Transactor::Transaction { transaction } => {
+      query.execute(&mut **transaction).await
+    },
+  };
 
   let record_id = match query_result {
     Ok(res) => {
@@ -120,4 +130,52 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     user_token,
     user_id: record_id,
   })
+}
+
+pub async fn build_query(
+  args: GenericCreateAccountArgs<'_>,
+) -> Query<MySql, MySqlArguments>
+{
+  const INITIAL_PROFILE_MARKDOWN : &str = "";
+  const INITIAL_PROFILE_RENDERED_HTML : &str = "";
+  const INITIAL_USER_ROLE: &str = "user";
+
+  let user_token = match args.maybe_user_token {
+    None => UserToken::generate(),
+    Some(user_token) => user_token.clone(),
+  };
+
+  sqlx::query!(
+        r#"
+INSERT INTO users (
+  token,
+  username,
+  display_name,
+  email_address,
+  email_gravatar_hash,
+  profile_markdown,
+  profile_rendered_html,
+  user_role_slug,
+  password_hash,
+  ip_address_creation,
+  ip_address_last_login,
+  ip_address_last_update,
+  maybe_source
+)
+VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+        "#,
+        &user_token,
+        args.username,
+        args.display_name,
+        args.email_address,
+        args.email_gravatar_hash,
+        INITIAL_PROFILE_MARKDOWN,
+        INITIAL_PROFILE_RENDERED_HTML,
+        INITIAL_USER_ROLE,
+        args.password_hash,
+        args.ip_address,
+        args.ip_address,
+        args.ip_address,
+        args.maybe_source,
+    )
 }

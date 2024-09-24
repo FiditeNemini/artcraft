@@ -32,7 +32,7 @@ use log::{info, warn};
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::google_sign_in_accounts::get_google_sign_in_account_by_subject::{get_google_sign_in_account, GoogleSignInAccount};
 use mysql_queries::queries::google_sign_in_accounts::insert_google_sign_in_account::{insert_google_sign_in_account, InsertGoogleSignInArgs};
-use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
+use mysql_queries::queries::users::user::account_creation::create_account_from_google_sso::{create_account_from_google_sso, CreateAccountFromGoogleSsoArgs, CreateAccountFromGoogleSsoError};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use sqlx::pool::PoolConnection;
@@ -271,7 +271,9 @@ async fn create_new_sso_account(
   subject: &str,
   mysql_connection: &mut PoolConnection<MySql>,
   claims: Claims,
-) -> Result<(), GoogleCreateAccountErrorResponse> {
+)
+  -> Result<(), GoogleCreateAccountErrorResponse>
+{
   let email_address = claims.email()
       .ok_or_else(|| {
         warn!("no email address in google claims");

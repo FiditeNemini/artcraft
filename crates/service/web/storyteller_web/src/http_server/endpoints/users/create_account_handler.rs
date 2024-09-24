@@ -7,21 +7,22 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Formatter;
 
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use log::{info, warn};
-use sqlx::MySqlPool;
-use utoipa::ToSchema;
-use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
+use actix_web::{web, HttpRequest, HttpResponse};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use log::{info, warn};
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
+use mysql_queries::queries::users::user::account_creation::create_account_error::CreateAccountError;
+use mysql_queries::queries::users::user::account_creation::create_account_from_email::{create_account_from_email, CreateAccountFromEmailArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
+use sqlx::MySqlPool;
 use tokens::tokens::user_sessions::UserSessionToken;
 use user_input_common::check_for_slurs::contains_slurs;
+use utoipa::ToSchema;
 
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
@@ -205,9 +206,9 @@ pub async fn create_account_handler(
     }
   }
 
-  let create_account_result = create_account(
+  let create_account_result = create_account_from_email(
     &mysql_pool,
-    CreateAccountArgs {
+    CreateAccountFromEmailArgs {
       username: &username,
       display_name: &display_name,
       email_address: &email_address,
