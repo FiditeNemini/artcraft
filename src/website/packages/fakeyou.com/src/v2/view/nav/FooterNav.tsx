@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { GitSha } from "@storyteller/components/src/elements/GitSha";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useLocation } from "react-router-dom";
 import { ModerationIcon } from "../_icons/ModerationIcon";
 import { WebUrl } from "../../../common/WebUrl";
@@ -13,39 +12,20 @@ import {
   faRedditAlien,
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
-import {
-  GetServerInfo,
-  GetServerInfoIsOk,
-  GetServerInfoSuccessResponse,
-} from "@storyteller/components/src/api/server/GetServerInfo";
 import { useLocalize } from "hooks";
 import { Container } from "components/common";
 import { useDomainConfig } from "context/DomainConfigContext";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
+import { AppStateContext } from "components/providers/AppStateProvider";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-function FooterNav(props: Props) {
+function FooterNav() {
+  const {
+    appState: { server_info },
+    sessionWrapper,
+  } = useContext(AppStateContext);
   const domain = useDomainConfig();
   const { t } = useLocalize("Footer");
-  const [serverInfo, setServerInfo] = useState<
-    GetServerInfoSuccessResponse | undefined
-  >(undefined);
   const location = useLocation();
-
-  const getServerInfo = useCallback(async () => {
-    const response = await GetServerInfo();
-    if (GetServerInfoIsOk(response)) {
-      setServerInfo(response);
-    }
-  }, []);
-
-  useEffect(() => {
-    getServerInfo();
-  }, [getServerInfo]);
-
   //let myDataLink = WebUrl.signupPage();
 
   //if (props.sessionWrapper.isLoggedIn()) {
@@ -55,7 +35,7 @@ function FooterNav(props: Props) {
 
   let moderationLink = <span />;
 
-  if (props.sessionWrapper.canBanUsers()) {
+  if (sessionWrapper.canBanUsers()) {
     moderationLink = (
       <div className="mb-4 mb-lg-0 me-0 me-lg-4">
         <Link to={WebUrl.moderationMain()}>
@@ -69,15 +49,13 @@ function FooterNav(props: Props) {
   let serverGitSha = <></>;
 
   if (
-    serverInfo !== undefined &&
-    !!serverInfo.server_build_sha &&
-    serverInfo.server_build_sha !== "undefined"
+    server_info !== undefined &&
+    !!server_info.build_sha_short &&
+    server_info.build_sha_short !== "undefined"
   ) {
     serverGitSha = (
       <div className="d-flex flex-column flex-lg-row align-items-center">
-        <div className="git-sha">
-          API: {serverInfo.server_build_sha.substring(0, 8)}
-        </div>
+        <div className="git-sha">API: {server_info.build_sha_short}</div>
       </div>
     );
   }

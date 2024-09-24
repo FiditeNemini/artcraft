@@ -2,28 +2,13 @@ import "./AppNew.scss";
 import "scss/custom-bootstrap.scss";
 
 import React from "react";
-import { ApiConfig } from "@storyteller/components";
-import Cookies from "universal-cookie";
-import {
-  DetectLocale,
-  DetectLocaleIsOk,
-} from "@storyteller/components/src/api/locale/DetectLocale";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import PageContainer from "./v2/view/PageContainer";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import deepEqual from "deep-equal";
-import {
-  AvailableLanguageKey,
-  AVAILABLE_LANGUAGE_MAP,
-  ENGLISH_LANGUAGE,
-} from "./_i18n/AvailableLanguageMap";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
@@ -77,33 +62,7 @@ enum MigrationMode {
 interface Props {}
 
 interface State {
-  // Migration Mode
-  // migrationMode: MigrationMode;
-
-  // Rollout of vocodes 2.0
-  // enableAlpha: boolean;
-
-  sessionFetched: boolean;
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-
-  // Locale + show flash notice to Spanish speakers
-  //localeLanguageCodes: string[],
-  //localeFullLanguageTags: string[],
-  // isShowingLanguageNotice: boolean;
-  // displayLanguage: Language;
-  // primaryLanguageCode: string;
-
-  // isShowingTwitchTtsNotice: boolean;
-  // isShowingPleaseFollowNotice: boolean;
-
-  // An improved notice for "new" languages asking users to help.
-  // isShowingBootstrapLanguageNotice: boolean;
-
-  // Current text entered
   textBuffer: string;
-
-  // voiceConversionModels: VoiceConversionModelListItem[];
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
 }
 
@@ -113,11 +72,6 @@ class App extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      sessionFetched: false,
-      sessionWrapper: SessionWrapper.emptySession(),
-      sessionSubscriptionsWrapper:
-        SessionSubscriptionsWrapper.emptySubscriptions(),
-
       textBuffer: "",
 
       maybeSelectedVoiceConversionModel: undefined,
@@ -141,132 +95,6 @@ class App extends React.Component<Props, State> {
     require("./v2/view/_css/footer.scss");
   }
 
-  async componentDidMount() {
-    await this.queryLanguage();
-    await this.querySession();
-    await this.querySessionSubscriptions();
-
-    setInterval(async () => {
-      // See warnings in the following methods when adding new methods
-      // that affect global "state"
-      await this.querySession();
-      await this.querySessionSubscriptions();
-    }, 60000);
-    // TODO: Use websockets, this is dumb
-  }
-
-  querySession = async () => {
-    // WARNING: Making setState calls in this scope without checking existing
-    // state can cause the whole site to refresh/worsen UX. Double check if
-    // state needs to be set here, or if instead can be refreshed locally on
-    // the page where the new "state" needed
-    const sessionWrapper = await SessionWrapper.lookupSession();
-    const username = sessionWrapper.getDisplayName();
-    const cookies = new Cookies();
-
-    if (username !== undefined) {
-      // Track only logged-in users (for now)
-      PosthogClient.enablePosthog();
-      PosthogClient.setUsername(username);
-      cookies.set("logged_in_username", username, {
-        path: "/",
-        expires: new Date(Date.now() + 3 * 86400000),
-      });
-      window.dataLayer.push({
-        user_id: username,
-      });
-    } else {
-      cookies.remove("logged_in_username", { path: "/" });
-    }
-
-    if (!deepEqual(sessionWrapper, this.state.sessionWrapper)) {
-      this.setState({
-        sessionWrapper: sessionWrapper,
-      });
-    }
-  };
-
-  querySessionSubscriptions = async () => {
-    // WARNING: Making setState calls in this scope without checking existing
-    // state can cause the whole site to refresh/worsen UX. Double check if
-    // state needs to be set here, or if instead can be refreshed locally on
-    // the page where the new "state" needed
-
-    if (this.state.sessionFetched === false) {
-      this.setState({ sessionFetched: true });
-    }
-
-    const cookies = new Cookies();
-
-    const sessionSubscriptionsWrapper =
-      await SessionSubscriptionsWrapper.lookupActiveSubscriptions();
-
-    const plan = sessionSubscriptionsWrapper.getActiveProductSlug();
-    if (plan !== undefined) {
-      cookies.set("logged_in_user_plan", plan, {
-        path: "/",
-        expires: new Date(Date.now() + 3 * 86400000),
-      });
-    } else {
-      cookies.remove("logged_in_user_plan", { path: "/" });
-    }
-
-    if (
-      !deepEqual(
-        sessionSubscriptionsWrapper,
-        this.state.sessionSubscriptionsWrapper
-      )
-    ) {
-      this.setState({
-        sessionSubscriptionsWrapper: sessionSubscriptionsWrapper,
-      });
-    }
-  };
-
-  queryLanguage = async () => {
-    let locale = await DetectLocale();
-    if (DetectLocaleIsOk(locale)) {
-      // NB: We treat the language preference as being the order in the array.
-      //  As of 2023-01-14, the backend does not handle quality values / q-weights,
-      //  so these may be slightly wrong. An adjustment to the server will fix this.
-
-      let preferredLanguage = ENGLISH_LANGUAGE;
-
-      for (let languageCode of locale.language_codes) {
-        let maybeLanguage =
-          AVAILABLE_LANGUAGE_MAP[languageCode as AvailableLanguageKey];
-
-        if (maybeLanguage !== undefined) {
-          preferredLanguage = maybeLanguage;
-          break;
-        }
-      }
-
-      i18n.changeLanguage(preferredLanguage.languageCode);
-      i18n2.changeLanguage(preferredLanguage.languageCode);
-    }
-  };
-
-  logoutSession = () => {
-    const api = new ApiConfig();
-    const endpointUrl = api.logout();
-
-    fetch(endpointUrl, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then(_raw_response => {
-        this.querySession();
-        this.querySessionSubscriptions();
-      })
-      .catch(e => {
-        /* Ignore. */
-      });
-  };
-
   setTextBuffer = (textBuffer: string) => {
     this.setState({ textBuffer: textBuffer });
   };
@@ -280,36 +108,17 @@ class App extends React.Component<Props, State> {
       <BrowserRouter>
         <div id="main" className="bg-gradient">
           <div id="viewable">
-            {/* This is the old vocodes1.0-compatible username and version switch
-            <MigrationTopNav
-              enableAlpha={this.state.enableAlpha}
-              sessionWrapper={this.state.sessionWrapper}
-              querySessionAction={this.querySession}
-              />
-            */}
-
             <div className="migrationComponentWrapper">
-              <CoreServicesProvider
-                {...{
-                  querySession: this.querySession,
-                  querySubscriptions: this.querySessionSubscriptions,
-                  state: this.state,
-                }}
-              >
-                <Switch>
-                  <Route path="/">
-                    <PageContainer
-                      textBuffer={this.state.textBuffer}
-                      setTextBuffer={this.setTextBuffer}
-                      clearTextBuffer={this.clearTextBuffer}
-                      maybeSelectedVoiceConversionModel={
-                        this.state.maybeSelectedVoiceConversionModel
-                      }
-                    />
-                  </Route>
-                </Switch>
-
-                <FooterNav sessionWrapper={this.state.sessionWrapper} />
+              <CoreServicesProvider>
+                <PageContainer
+                  textBuffer={this.state.textBuffer}
+                  setTextBuffer={this.setTextBuffer}
+                  clearTextBuffer={this.clearTextBuffer}
+                  maybeSelectedVoiceConversionModel={
+                    this.state.maybeSelectedVoiceConversionModel
+                  }
+                />
+                <FooterNav />
               </CoreServicesProvider>
             </div>
           </div>

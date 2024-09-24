@@ -11,26 +11,35 @@ const FAKEYOU_NAMESPACE = "fakeyou";
 export class SessionSubscriptionsWrapper {
   listActiveSubscriptionResponse?: ListActiveSubscriptionsSuccessResponse;
 
-  private constructor(listActiveSubscriptionsSuccessResponse?: ListActiveSubscriptionsSuccessResponse) {
+  private constructor(
+    listActiveSubscriptionsSuccessResponse?: ListActiveSubscriptionsSuccessResponse
+  ) {
     if (listActiveSubscriptionsSuccessResponse !== undefined) {
-        this.listActiveSubscriptionResponse = listActiveSubscriptionsSuccessResponse;
+      this.listActiveSubscriptionResponse =
+        listActiveSubscriptionsSuccessResponse;
     }
   }
 
-  public static async lookupActiveSubscriptions() : Promise<SessionSubscriptionsWrapper> {
+  public static async lookupActiveSubscriptions(): Promise<SessionSubscriptionsWrapper> {
     let response = await ListActiveSubscriptions();
     if (ListActiveSubscriptionsIsSuccess(response)) {
-      return new SessionSubscriptionsWrapper(response);
+      return SessionSubscriptionsWrapper.wrapResponse(response);
     } else {
       return SessionSubscriptionsWrapper.emptySubscriptions();
     }
   }
 
-  public static emptySubscriptions() : SessionSubscriptionsWrapper {
+  public static emptySubscriptions(): SessionSubscriptionsWrapper {
     return new SessionSubscriptionsWrapper();
   }
 
-  public ttsMaximumLength() : number {
+  public static wrapResponse(
+    sessionStateResponse: ListActiveSubscriptionsSuccessResponse
+  ): SessionSubscriptionsWrapper {
+    return new SessionSubscriptionsWrapper(sessionStateResponse);
+  }
+
+  public ttsMaximumLength(): number {
     if (this.hasActiveEliteSubscription()) {
       return 4096;
     } else if (this.hasActiveProSubscription()) {
@@ -43,37 +52,50 @@ export class SessionSubscriptionsWrapper {
     return 1024;
   }
 
-  public hasFreeOrPaidPremiumFeatures() : boolean {
+  public hasFreeOrPaidPremiumFeatures(): boolean {
     return this.hasLoyaltyProgram() || this.hasPaidFeatures();
   }
 
-  public hasLoyaltyProgram() : boolean {
+  public hasLoyaltyProgram(): boolean {
     return !!this.listActiveSubscriptionResponse?.maybe_loyalty_program;
   }
 
-  public hasPaidFeatures() : boolean {
-    const subs = this.listActiveSubscriptionResponse?.active_subscriptions || [];
+  public hasPaidFeatures(): boolean {
+    const subs =
+      this.listActiveSubscriptionResponse?.active_subscriptions || [];
     return subs.length > 0;
   }
 
-  public hasActivePlusSubscription() : boolean {
-    let maybePlan = FakeYouFrontendEnvironment.getInstance().useProductionStripePlans() ? 
-      this.findActiveSubscription(FAKEYOU_NAMESPACE, "fakeyou_plus") : 
-      this.findActiveSubscription(FAKEYOU_NAMESPACE, "development_fakeyou_plus"); 
+  public hasActivePlusSubscription(): boolean {
+    let maybePlan =
+      FakeYouFrontendEnvironment.getInstance().useProductionStripePlans()
+        ? this.findActiveSubscription(FAKEYOU_NAMESPACE, "fakeyou_plus")
+        : this.findActiveSubscription(
+            FAKEYOU_NAMESPACE,
+            "development_fakeyou_plus"
+          );
     return maybePlan !== undefined;
   }
 
-  public hasActiveProSubscription() : boolean {
-    let maybePlan = FakeYouFrontendEnvironment.getInstance().useProductionStripePlans() ? 
-      this.findActiveSubscription(FAKEYOU_NAMESPACE, "fakeyou_pro") : 
-      this.findActiveSubscription(FAKEYOU_NAMESPACE, "development_fakeyou_pro"); 
+  public hasActiveProSubscription(): boolean {
+    let maybePlan =
+      FakeYouFrontendEnvironment.getInstance().useProductionStripePlans()
+        ? this.findActiveSubscription(FAKEYOU_NAMESPACE, "fakeyou_pro")
+        : this.findActiveSubscription(
+            FAKEYOU_NAMESPACE,
+            "development_fakeyou_pro"
+          );
     return maybePlan !== undefined;
   }
 
-  public hasActiveEliteSubscription() : boolean {
-    let maybePlan = FakeYouFrontendEnvironment.getInstance().useProductionStripePlans() ? 
-      this.findActiveSubscription(FAKEYOU_NAMESPACE, "fakeyou_elite") : 
-      this.findActiveSubscription(FAKEYOU_NAMESPACE, "development_fakeyou_elite"); 
+  public hasActiveEliteSubscription(): boolean {
+    let maybePlan =
+      FakeYouFrontendEnvironment.getInstance().useProductionStripePlans()
+        ? this.findActiveSubscription(FAKEYOU_NAMESPACE, "fakeyou_elite")
+        : this.findActiveSubscription(
+            FAKEYOU_NAMESPACE,
+            "development_fakeyou_elite"
+          );
     return maybePlan !== undefined;
   }
 
@@ -95,7 +117,7 @@ export class SessionSubscriptionsWrapper {
     const subs =
       this.listActiveSubscriptionResponse?.active_subscriptions || [];
     return subs.find(
-      (sub) => sub.namespace === namespace && sub.product_slug === product_slug
+      sub => sub.namespace === namespace && sub.product_slug === product_slug
     );
   }
 }

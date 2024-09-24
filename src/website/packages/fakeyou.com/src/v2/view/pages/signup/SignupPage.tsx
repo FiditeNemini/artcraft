@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
 import {
@@ -19,7 +19,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
-import { useSession } from "hooks";
+import { AppStateContext } from "components/providers/AppStateProvider";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -31,7 +31,7 @@ function SignupPage() {
   let history = useHistory();
   const domain = useDomainConfig();
   let location = useLocation();
-  const { querySession, querySubscriptions, sessionWrapper } = useSession();
+  const { sessionWrapper, queryAppState } = useContext(AppStateContext);
   const queryParams = new URLSearchParams(location.search);
 
   const parsedQueryString = queryString.parse(window.location.search);
@@ -242,8 +242,7 @@ function SignupPage() {
         setUsernameInvalidReason(reason);
       }
     } else if (CreateAccountIsSuccess(response)) {
-      querySession();
-      querySubscriptions();
+      queryAppState();
 
       Analytics.accountSignupComplete();
 

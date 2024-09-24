@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import {
   CreateSession,
@@ -18,7 +18,7 @@ import Panel from "components/common/Panel";
 import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 import { InjectScript } from "common/InjectScript";
-import { useSession } from "hooks";
+import { AppStateContext } from "components/providers/AppStateProvider";
 
 // NB: Google Sign In requires a global javascript function
 declare global {
@@ -28,7 +28,7 @@ declare global {
 function LoginPage() {
   let history = useHistory();
   const domain = useDomainConfig();
-  const { querySession, querySubscriptions, sessionWrapper } = useSession();
+  const { sessionWrapper, queryAppState } = useContext(AppStateContext);
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -80,8 +80,7 @@ function LoginPage() {
     if (CreateSessionIsError(response)) {
       setErrorMessage(response.error_message);
     } else if (CreateSessionIsSuccess(response)) {
-      querySession();
-      querySubscriptions();
+      queryAppState();
       Analytics.accountLoginSuccess();
       history.push(redirectUrl);
     }
