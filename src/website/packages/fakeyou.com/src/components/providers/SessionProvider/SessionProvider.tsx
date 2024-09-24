@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useContext } from "react";
 import ModalLayer from "components/providers/ModalProvider/ModalLayer";
 import { ModalConfig, useModalState } from "hooks";
 import AccountModal from "components/layout/AccountModal";
@@ -7,6 +7,11 @@ import { StudioRolloutHostnameAllowed } from "@storyteller/components/src/utils/
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StyleVideoNotAvailable } from "v2/view/_common/StyleVideoNotAvailable";
+import { GetAppStateResponse } from "@storyteller/components/src/api/app_state/GetAppState";
+import {
+  AppStateContext,
+  emptyAppState,
+} from "components/providers/AppStateProvider";
 
 export interface AccountModalMessages {
   loginMessage?: string;
@@ -19,11 +24,11 @@ export interface AccountModalEvents {
 }
 
 export interface SessionUtilities {
-  querySession: () => void;
-  querySubscriptions: () => void;
+  queryAppState: () => void;
 }
 
 interface SessionContextType extends SessionUtilities {
+  appState: GetAppStateResponse;
   canAccessStudio: () => boolean;
   canEditTtsModel: (creatorUserToken: string) => boolean;
   canEditMediaFile: (creatorUserToken?: string) => boolean;
@@ -46,11 +51,8 @@ interface SessionContextType extends SessionUtilities {
   userTokenMatch: (token: string) => boolean;
 }
 
-interface SessionProviderProps extends SessionUtilities {
+interface SessionProviderProps {
   children?: any;
-  sessionFetched: boolean;
-  sessionSubscriptions: SessionSubscriptionsWrapper;
-  sessionWrapper: SessionWrapper;
 }
 
 // Functions are initially No-ops/dummies so that they are never undefined and never have to be called conditionally.
@@ -60,6 +62,7 @@ interface SessionProviderProps extends SessionUtilities {
 // const thingy = new SessionWrapper()
 
 export const SessionContext = createContext<SessionContextType>({
+  appState: emptyAppState,
   canAccessStudio: () => false,
   canEditTtsModel: () => false,
   canEditMediaFile: () => false,
@@ -74,19 +77,14 @@ export const SessionContext = createContext<SessionContextType>({
     open: () => {},
   },
   userTokenMatch: () => false,
-  querySession: () => {},
-  querySubscriptions: () => {},
+  queryAppState: () => {},
   sessionWrapper: SessionWrapper.emptySession(),
 });
 
-export default function SessionProvider({
-  children,
-  querySession,
-  querySubscriptions,
-  sessionFetched,
-  sessionSubscriptions,
-  sessionWrapper,
-}: SessionProviderProps) {
+export default function SessionProvider({ children }: SessionProviderProps) {
+  const { appState, sessionSubscriptions, sessionWrapper, queryAppState } =
+    useContext(AppStateContext);
+
   const sessionResponse = sessionWrapper?.sessionStateResponse || {
     logged_in: false,
     user: null,
@@ -143,6 +141,7 @@ export default function SessionProvider({
     <SessionContext.Provider
       {...{
         value: {
+          appState,
           canAccessStudio,
           canEditTtsModel,
           canEditMediaFile,
@@ -150,9 +149,8 @@ export default function SessionProvider({
           loggedInOrModal,
           loggedIn,
           modal,
-          querySession,
-          querySubscriptions,
-          sessionFetched,
+          queryAppState,
+          sessionFetched: appState.success,
           sessionSubscriptions,
           sessionWrapper,
           studioAccessCheck,

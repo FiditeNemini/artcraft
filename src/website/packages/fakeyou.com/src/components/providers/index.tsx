@@ -1,3 +1,4 @@
+import AppStateProvider from "./AppStateProvider";
 import CoreServicesProvider from "./CoreServicesProvider";
 import InferenceJobsProvider, {
   InferenceJobsContext,
@@ -8,6 +9,7 @@ import SessionProvider from "./SessionProvider";
 import SignUpQuestionnaireProvider from "./SignUpQuestionnaireProvider";
 
 export {
+  AppStateProvider,
   CoreServicesProvider,
   InferenceJobsContext,
   InferenceJobsProvider,

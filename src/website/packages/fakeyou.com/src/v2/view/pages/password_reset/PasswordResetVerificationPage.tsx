@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import Container from "components/common/Container";
@@ -11,7 +11,7 @@ import {
   RedeemResetPassword,
   RedeemResetPasswordIsSuccess,
 } from "@storyteller/components/src/api/user/RedeemResetPassword";
-import { useSession } from "hooks";
+import { AppStateContext } from "components/providers/AppStateProvider";
 
 // TODO(bt,2023-11-12): Localize error messages
 const ERR_CODE_NOT_SET = "password reset code is not set";
@@ -23,7 +23,7 @@ const ERR_BACKEND =
 
 function PasswordResetVerificationPage() {
   const history = useHistory();
-  const { querySession, querySubscriptions, sessionWrapper } = useSession();
+  const { sessionWrapper, queryAppState } = useContext(AppStateContext);
 
   usePrefixedDocumentTitle("Password Reset Verification");
 
@@ -130,8 +130,7 @@ function PasswordResetVerificationPage() {
 
     if (RedeemResetPasswordIsSuccess(response)) {
       setBackendError(undefined);
-      querySession();
-      querySubscriptions();
+      queryAppState();
       history.push("/");
     } else {
       setBackendError(ERR_BACKEND);

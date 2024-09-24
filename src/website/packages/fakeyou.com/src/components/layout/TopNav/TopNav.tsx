@@ -37,8 +37,7 @@ import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 import { WebUrl } from "common/WebUrl";
 
 export default function TopNav() {
-  const { querySession, querySubscriptions, sessionWrapper, user } =
-    useSession();
+  const { queryAppState, sessionWrapper, user } = useSession();
   const domain = useDomainConfig();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
@@ -141,8 +140,7 @@ export default function TopNav() {
 
   const logoutHandler = async () => {
     await Logout();
-    querySession();
-    querySubscriptions();
+    queryAppState();
     history.push("/");
   };
 
@@ -152,8 +150,8 @@ export default function TopNav() {
     let displayName = user.display_name;
     let username = user.username;
     let emailHash = user.email_gravatar_hash;
-    let avatarIndex = user.core_info.default_avatar.image_index;
-    let backgroundColorIndex = user.core_info.default_avatar.color_index;
+    let avatarIndex = user.core_info?.default_avatar?.image_index || 0;
+    let backgroundColorIndex = user.core_info?.default_avatar?.color_index || 0;
 
     profileDropdown = (
       <ProfileDropdown
