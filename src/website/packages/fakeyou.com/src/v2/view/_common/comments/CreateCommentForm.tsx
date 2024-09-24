@@ -92,8 +92,8 @@ function CreateCommentForm(props: Props) {
   let gravatar = <span />;
   let username = user?.username;
   let emailHash = user?.email_gravatar_hash;
-  let avatarIndex = user?.core_info.default_avatar.image_index;
-  let backgroundColorIndex = user?.core_info.default_avatar.color_index;
+  let avatarIndex = user?.core_info?.default_avatar.image_index || 0;
+  let backgroundColorIndex = user?.core_info?.default_avatar.color_index || 0;
 
   if (gravatarHash !== undefined) {
     gravatar = (
