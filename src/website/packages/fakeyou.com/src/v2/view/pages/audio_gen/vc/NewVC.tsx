@@ -226,9 +226,9 @@ export default function NewVC() {
             <p className="mb-4 opacity-75 fw-medium">{t("subtitle.vc")}</p>
 
             <div className="d-flex flex-column gap-3">
-              <div className="fy-featured-voices-section d-none d-lg-block">
+              <div className="fy-featured-voices-section">
                 <h5 className="fw-bold">{t("title.featuredVoices")}</h5>
-                <div className="row g-3">
+                <div className="fy-featured-voices-scroll-container">
                   {featuredVoiceTokens.map(token => (
                     <FeaturedVoice
                       key={token}

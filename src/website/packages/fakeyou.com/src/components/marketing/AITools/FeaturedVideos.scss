@@ -19,11 +19,8 @@
   width: 84%;
 }
 
-/* Adjust the width for larger screens */
 @media (min-width: 768px) {
   .featured-video-scroll-container > div {
-    width: calc(
-      (100% / 3) - (1.75rem * 2 / 3)
-    ); /* Adjust the width for larger screens */
+    width: calc((100% / 3) - (1.75rem * 2 / 3));
   }
 }

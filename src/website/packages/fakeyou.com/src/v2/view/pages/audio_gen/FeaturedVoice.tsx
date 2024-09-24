@@ -37,7 +37,7 @@ export const FeaturedVoice = ({ token, onClick }: FeaturedVoiceProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <div className="col-12 col-lg-6 col-xl-3">
+    <div>
       <div
         className="fy-featured-voices d-flex align-items-center position-relative"
         onClick={() => onClick && weight && onClick(weight)}

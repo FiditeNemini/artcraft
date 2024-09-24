@@ -4,7 +4,39 @@
 .fy-featured-voices-section {
   background-color: rgba($action, 0.25);
   border-radius: 0.5rem;
-  padding: 20px;
+  padding: 16px;
+}
+
+.fy-featured-voices-scroll-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 1rem;
+}
+
+.fy-featured-voices-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.fy-featured-voices-scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.fy-featured-voices-scroll-container > div {
+  flex: 0 0 auto;
+  width: 84%;
+}
+
+@media (min-width: 768px) {
+  .fy-featured-voices-scroll-container {
+    overflow-x: hidden;
+    flex-wrap: wrap;
+  }
+
+  .fy-featured-voices-scroll-container > div {
+    width: calc((100% / 4) - (1rem * 3 / 4));
+  }
 }
 
 .fy-featured-voices {
