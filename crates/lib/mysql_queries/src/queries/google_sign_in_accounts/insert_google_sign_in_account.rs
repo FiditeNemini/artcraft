@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use sqlx;
 use sqlx::{Executor, MySql, Transaction};
 

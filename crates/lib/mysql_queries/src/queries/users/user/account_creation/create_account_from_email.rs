@@ -6,7 +6,8 @@
 use sqlx::MySqlPool;
 
 use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
-use crate::queries::users::user::account_creation::create_account_generic::{create_account_generic, GenericCreateAccountArgs, Transactor};
+use crate::queries::users::user::account_creation::create_account_generic::{create_account_generic, GenericCreateAccountArgs};
+use crate::utils::transactor::Transactor;
 use tokens::tokens::users::UserToken;
 
 pub struct CreateAccountFromEmailArgs<'a> {
@@ -46,9 +47,7 @@ pub async fn create_account_from_email(
       maybe_source: args.maybe_source,
       maybe_user_token: args.maybe_user_token,
     },
-    Transactor::Pool {
-      pool: mysql_pool,
-    },
+    Transactor::for_pool(mysql_pool),
   ).await?;
 
   Ok(CreateAccountSuccessResult {
