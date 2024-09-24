@@ -28,7 +28,18 @@
   width: 84%;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 991px) {
+  .fy-featured-voices-scroll-container {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+
+  .fy-featured-voices-scroll-container > div {
+    width: calc((100% / 2) - (1rem / 2));
+  }
+}
+
+@media (min-width: 992px) {
   .fy-featured-voices-scroll-container {
     overflow-x: hidden;
     flex-wrap: wrap;
