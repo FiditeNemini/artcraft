@@ -38,8 +38,8 @@ use crate::http_server::endpoints::workflows::coordinate_workflow_args::{coordin
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_error::VstError;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_request::VstRequest;
 use crate::http_server::endpoints::workflows::enqueue::vst_common::vst_response::VstSuccessResponse;
-use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
-use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::requests::request_headers::get_routing_tag_header::get_routing_tag_header;
+use crate::http_server::requests::request_headers::has_debug_header::has_debug_header;
 use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

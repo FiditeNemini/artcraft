@@ -20,7 +20,7 @@ pub fn has_debug_header(http_request: &HttpRequest) -> bool {
 mod tests {
   use actix_web::test::TestRequest;
 
-  use crate::http_server::headers::has_debug_header::has_debug_header;
+  use crate::http_server::requests::request_headers::has_debug_header::has_debug_header;
 
   #[test]
   fn test_has_debug_header() {

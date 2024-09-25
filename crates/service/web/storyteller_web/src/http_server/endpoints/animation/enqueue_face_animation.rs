@@ -5,9 +5,9 @@
 
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::{info, warn};
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
@@ -26,8 +26,8 @@ use tokens::tokens::users::UserToken;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
-use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::requests::request_headers::get_routing_tag_header::get_routing_tag_header;
+use crate::http_server::requests::request_headers::has_debug_header::has_debug_header;
 use crate::http_server::session::lookup::user_session_extended::UserSessionExtended;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;

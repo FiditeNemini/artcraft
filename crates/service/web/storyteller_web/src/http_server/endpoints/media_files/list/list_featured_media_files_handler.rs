@@ -27,8 +27,8 @@ use mysql_queries::queries::media_files::list::list_featured_media_files::{list_
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::media::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
-use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::media::media_links::MediaLinks;
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
@@ -37,8 +37,8 @@ use crate::http_server::endpoints::media_files::helpers::get_scoped_engine_categ
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_classes::get_scoped_media_classes;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_media_types::get_scoped_media_types;
 use crate::http_server::endpoints::media_files::helpers::get_scoped_product_categories::get_scoped_product_categories;
-use crate::http_server::headers::get_cloudflare_ray_header::get_cloudflare_ray_header;
-use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::requests::request_headers::get_cloudflare_ray_header::get_cloudflare_ray_header;
+use crate::http_server::requests::request_headers::has_debug_header::has_debug_header;
 use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_explore_media_access::allowed_explore_media_access;

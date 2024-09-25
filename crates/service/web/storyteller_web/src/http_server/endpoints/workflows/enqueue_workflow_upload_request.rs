@@ -1,13 +1,13 @@
 #![forbid(unused_mut)]
 
-use std::fmt::{Display, Formatter};
 use std::fmt::Debug;
+use std::fmt::{Display, Formatter};
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::error;
 use log::warn;
 use serde::Deserialize;
@@ -40,8 +40,8 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
-use crate::http_server::headers::has_debug_header::has_debug_header;
+use crate::http_server::requests::request_headers::get_routing_tag_header::get_routing_tag_header;
+use crate::http_server::requests::request_headers::has_debug_header::has_debug_header;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;

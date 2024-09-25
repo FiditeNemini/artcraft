@@ -238,13 +238,13 @@ pub async fn google_sso_handler(
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
-  let mut maybe_user_token = None;
-  let mut maybe_user_display_name = None;
-  let mut username_not_yet_customized = false;
+  let user_token;
+  let maybe_user_display_name;
+  let username_not_yet_customized;
 
   match maybe_sso_account {
     Some(sso_account) => {
-      let user_token = handle_existing_sso_account(ExistingAccountArgs {
+      let existing_user_token = handle_existing_sso_account(ExistingAccountArgs {
         http_request: &http_request,
         sso_account: &sso_account,
         claims,
@@ -252,8 +252,9 @@ pub async fn google_sso_handler(
         mysql_connection: &mut mysql_connection,
       }).await?;
 
-      maybe_user_token = Some(user_token);
+      user_token = existing_user_token;
       maybe_user_display_name = sso_account.maybe_user_display_name.clone();
+      username_not_yet_customized = false;
     },
     None => {
       let result = handle_new_sso_account(NewSsoArgs {
@@ -264,17 +265,11 @@ pub async fn google_sso_handler(
         mysql_connection: &mut mysql_connection,
       }).await?;
 
-      maybe_user_token = Some(result.user_token);
+      user_token = result.user_token;
       maybe_user_display_name = Some(result.user_display_name);
       username_not_yet_customized = result.username_is_not_customized;
     },
   }
-
-  let user_token = maybe_user_token
-      .ok_or_else(|| {
-        error!("no user token after SSO flow");
-        GoogleCreateAccountErrorResponse::server_error()
-      })?;
 
   let ip_address = get_request_ip(&http_request);
 

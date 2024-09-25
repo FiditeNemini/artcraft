@@ -18,8 +18,8 @@ pub fn get_routing_tag_header(http_request: &HttpRequest) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
+  use crate::http_server::requests::request_headers::get_routing_tag_header::get_routing_tag_header;
   use actix_web::test::TestRequest;
-  use crate::http_server::headers::get_routing_tag_header::get_routing_tag_header;
 
   #[test]
   fn test_routing_tag_1() {
