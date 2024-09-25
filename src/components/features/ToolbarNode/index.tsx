@@ -45,6 +45,11 @@ export const ToolbarNode = ({
       )}
     >
       <ToolbarButton
+        buttonProps={{
+          className: locked
+            ? "text-primary hover:bg-primary hover:text-white"
+            : "",
+        }}
         tooltip={locked ? "Unlock" : "Lock"}
         icon={locked ? faLockKeyhole : faLockKeyholeOpen}
         onClick={handleOnLockClicked}

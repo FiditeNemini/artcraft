@@ -56,7 +56,7 @@ export const SignaledToolbarMain = ({
     dispatchers.loadingBarRetry(e);
   };
   return (
-    <div className="relative col-span-12 col-start-1 row-span-1 row-start-12">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2">
       <Transition
         as="div"
         className="absolute left-0 right-0 mx-auto w-96 -translate-y-full items-end pb-4"

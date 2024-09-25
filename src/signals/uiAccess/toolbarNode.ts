@@ -29,6 +29,9 @@ const toolbarNodeSignal = signal<ContextualToolbarProps>({
 
 export const toolbarNode = {
   signal: toolbarNodeSignal,
+  isShowing() {
+    return toolbarNodeSignal.value.isShowing;
+  },
   setup(props: ContextualToolbarProps) {
     toolbarNodeSignal.value = props;
   },

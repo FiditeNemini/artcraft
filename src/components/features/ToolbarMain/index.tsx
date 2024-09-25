@@ -1,6 +1,7 @@
 import { Fragment, MouseEventHandler } from "react";
+import { twMerge } from "tailwind-merge";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -13,16 +14,12 @@ import {
   faHatWizard,
   faImage,
   faLocationArrow,
-  faSquareDashed,
 } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { ToolbarButton } from "../ToolbarButton";
-import { twMerge } from "tailwind-merge";
 
-// style constants
+// style and constants
 import { paperWrapperStyles, toolTipStyles } from "~/components/styles";
-
 import { ToolbarMainButtonNames } from "./enum";
 
 export const ToolbarMain = ({
@@ -48,7 +45,7 @@ export const ToolbarMain = ({
     <>
       <div
         className={twMerge(
-          "m-auto flex w-fit items-center divide-x divide-ui-border",
+          "flex w-fit items-center divide-x divide-ui-border",
           paperWrapperStyles,
           disabled &&
             "pointer-events-none cursor-default bg-ui-border shadow-md",
@@ -61,7 +58,7 @@ export const ToolbarMain = ({
           <ToolbarButton
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}
-            buttonProps={buttonProps.SELECT_ONE}
+            buttonProps={buttonProps.SELECT}
             tooltip="Select"
           />
           <Popover className="relative">

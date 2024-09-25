@@ -4,12 +4,9 @@ import { MediaNode } from "./type";
 
 export class NodeTransformer {
   private kTransformer: Konva.Transformer;
-  private videoLayer: Konva.Layer;
   private selectedKNodes: Set<MediaNode> | undefined;
 
-  constructor({ videoLayer }: { videoLayer: Konva.Layer }) {
-    this.videoLayer = videoLayer;
-
+  constructor() {
     this.kTransformer = new Konva.Transformer({
       anchorStyleFunc: (anchor) => {
         // anchor is Konva.Rect instance
@@ -34,10 +31,10 @@ export class NodeTransformer {
         // e.g. you can set fillPatternImage to set icon to the anchor
       },
     });
-
-    this.videoLayer.add(this.kTransformer);
   }
-
+  public getKonvaNode() {
+    return this.kTransformer;
+  }
   public enable({ selectedNodes }: { selectedNodes: Set<MediaNode> }) {
     this.selectedKNodes = selectedNodes;
     const kNodesArray = Array.from(selectedNodes).reduce((acc, node) => {

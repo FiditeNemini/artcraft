@@ -2,10 +2,10 @@ import { MouseEventHandler } from "react";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
-import { ToolbarNode } from "~/components/features/ToolbarNode";
 import { uiAccess } from "~/signals/uiAccess";
 import { dispatchUiEvents } from "~/signals/uiEvents";
 
+import { ToolbarNode } from "~/components/features/ToolbarNode";
 import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 import { transitionTimingStyles } from "~/components/styles";
 

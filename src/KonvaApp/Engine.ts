@@ -8,6 +8,7 @@ import { toolbarNode } from "~/signals/uiAccess/toolbarNode";
 import { uiEvents } from "~/signals";
 
 import { SelectionManager } from "./SelectionManager";
+import { SelectorSquare } from "./SelectorSquare";
 import { NodeTransformer } from "./NodeTransformer";
 import { ImageNode } from "./Nodes/ImageNode";
 import { VideoNode } from "./Nodes/VideoNode";
@@ -20,6 +21,9 @@ import { ScaleCommand } from "./UndoRedo/ScaleCommand";
 import { TranslateCommand } from "./UndoRedo/TranslateCommand";
 
 import { FileUtilities } from "./FileUtilities/FileUtilities";
+
+import { AppModes } from "./type";
+import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export interface RenderingOptions {
   artstyle: string;
@@ -34,6 +38,7 @@ export interface RenderingOptions {
 }
 
 export class Engine {
+  private appMode: AppModes;
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
   private videoLayer: Konva.Layer;
@@ -41,15 +46,17 @@ export class Engine {
   private offScreenCanvas: OffscreenCanvas;
 
   private selectionManager: SelectionManager;
+  private selectorSquare: SelectorSquare;
   private nodeTransformer: NodeTransformer;
   private undoStackManager: UndoStackManager;
+
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
-    console.log("Engine Created!");
-
     if (import.meta.env.DEV) {
-      console.log("Engine Constructor ran");
+      console.log("Engine Created");
     }
+
+    this.appMode = AppModes.SELECT;
 
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
@@ -63,9 +70,11 @@ export class Engine {
     this.stage.add(videoLayer);
 
     // Konva Transformer
-    this.nodeTransformer = new NodeTransformer({
-      videoLayer: this.videoLayer,
-    });
+    this.nodeTransformer = new NodeTransformer();
+    this.videoLayer.add(this.nodeTransformer.getKonvaNode());
+    // Selector Square
+    this.selectorSquare = new SelectorSquare();
+    this.videoLayer.add(this.selectorSquare.getKonvaNode());
 
     this.selectionManager = new SelectionManager();
     this.undoStackManager = new UndoStackManager();
@@ -90,8 +99,6 @@ export class Engine {
 
     this.setupEventSystem();
   }
-
-  private isShowing: boolean = false;
 
   // TODO write code to show error and retry.
 
@@ -158,12 +165,17 @@ export class Engine {
   }
 
   private setupEventSystem() {
-    this.stage.on("mousedown", (e) => {
-      if (e.target === this.stage) {
-        this.nodeTransformer.clear();
-        this.selectionManager.clearSelection();
-      }
-    });
+    if (this.appMode === AppModes.SELECT) {
+      this.selectorSquare.enable({
+        captureCanvasRef: this.renderEngine.captureCanvas,
+        nodeTransformerRef: this.nodeTransformer,
+        selectionManagerRef: this.selectionManager,
+        stage: this.stage,
+      });
+      uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
+        active: true,
+      });
+    }
 
     uiEvents.toolbarNode.lock.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
@@ -221,15 +233,6 @@ export class Engine {
           message: error?.toString() || "Unknown Error",
         });
       }
-    });
-
-    // TODO: You may listen to all the image toolbar events here
-    // uiEvents.toolbarNode.MOVE.onClick(() => {
-    //   console.log("move");
-    // });
-
-    uiEvents.toolbarMain.SELECT_ONE.onClick(() => {
-      console.log("select one is clicked");
     });
 
     // TODO implement.
@@ -357,6 +360,7 @@ export class Engine {
       nodeTransformer: this.nodeTransformer,
     });
     this.renderEngine.addNodes(imageNode);
+    this.selectionManager.saveNode(imageNode);
   }
 
   public addVideo(url: string) {
@@ -370,6 +374,7 @@ export class Engine {
       nodeTransformerRef: this.nodeTransformer,
     });
     this.renderEngine.addNodes(videoNode);
+    this.selectionManager.saveNode(videoNode);
   }
 
   // Events for Undo and Redo

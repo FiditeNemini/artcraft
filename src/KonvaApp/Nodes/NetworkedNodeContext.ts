@@ -1,10 +1,12 @@
+import Konva from "konva";
+import { v4 as uuidv4 } from "uuid";
+
+import { Layer } from "konva/lib/Layer";
+import { Node, NodeConfig } from "konva/lib/Node";
+
 import { uiAccess } from "~/signals";
 import { SelectionManager } from "../SelectionManager";
 import { NodeTransformer } from "../NodeTransformer";
-import Konva from "konva";
-import { Layer } from "konva/lib/Layer";
-import { v4 as uuidv4 } from "uuid";
-import { Node, NodeConfig } from "konva/lib/Node";
 
 const toolbarNode = uiAccess.toolbarNode;
 const loadingBar = uiAccess.loadingBar;
@@ -21,6 +23,8 @@ export class NetworkedNodeContext {
   public didFinishLoading: boolean = false;
   // This locks interaction when the render engine is rendering
   protected isProcessing: boolean = false;
+  protected isDragging: boolean = false;
+  protected isSelecting: boolean = false;
   public isLocked: boolean = false;
 
   async setProcessing() {
@@ -157,98 +161,106 @@ export class NetworkedNodeContext {
   public async updateContextMenu() {
     this.updateContextMenuPosition();
     this.updateLoadingBarPosition();
-  }
-  selectThisNode() {
-    this.selectionManagerRef.selectNode(this);
-    // selection on click doesn't do a good job.
-    this.updateContextMenuPosition();
-    this.updateNodeTransformer();
-
-    if (this.didFinishLoading == false) {
-      this.updateLoadingBarPosition();
+    if (!toolbarNode.isShowing()) {
+      toolbarNode.show({
+        locked: this.isLocked,
+      });
     } else {
-      loadingBar.hide();
+      toolbarNode.update({
+        locked: this.isLocked,
+      });
+    }
+  }
+  public selectThisNode() {
+    const selected = this.selectionManagerRef.selectNode(this);
+    if (selected) {
+      this.updateContextMenu();
+      this.updateNodeTransformer();
+      if (this.didFinishLoading == false) {
+        this.updateLoadingBarPosition();
+      } else {
+        loadingBar.hide();
+      }
     }
   }
   public listenToBaseKNode() {
     if (!this.kNode) {
       return;
     }
-
-    this.kNode.on("dragstart", (e) => {
-      // console.log("Drag start");
-      this.updateContextMenuPosition();
-
-      // Multiselect
-      const isMultiSelect = e.evt.shiftKey;
-      if (isMultiSelect) {
-        this.selectionManagerRef.startDrag(this);
+    const handleDrag = () => {
+      if (!this.isDragging) {
+        return;
       }
+      this.selectionManagerRef.startDrag(this);
+      this.updateContextMenuPosition();
       if (this.didFinishLoading == false) {
         this.updateLoadingBarPosition();
       }
-    });
-
-    this.kNode.on("dragmove", (e) => {
-      // shouldn't be able to move if processing.
-      // console.log("Drag Move");
-      this.updateContextMenuPosition();
-
-      // Multiselect
-      const isMultiSelect = e.evt.shiftKey;
-      if (isMultiSelect) {
-        this.selectionManagerRef.dragging(this);
+    };
+    const handleSelect = (isMultiSelect: boolean) => {
+      if (!isMultiSelect) {
+        // clear selection if not multislect
+        console.log("No Shift >> no multiselect");
+        this.selectionManagerRef.clearSelection();
       }
-
+      this.selectThisNode();
+    };
+    this.kNode.on("dragstart", () => {
+      // console.log("Drag start");
+      // shouldn't be able to move if processing.
       if (this.isProcessing) {
         return;
       }
-
-      if (this.didFinishLoading == false) {
-        this.updateLoadingBarPosition();
-      }
+      this.isDragging = true;
+      handleDrag();
     });
 
-    this.kNode.on("dragend", (e) => {
-      // console.log("Drag End");
+    this.kNode.on("dragmove", () => {
+      // console.log("Drag Move");
+      handleDrag();
+    });
 
-      const isMultiSelect = e.evt.shiftKey;
-      if (isMultiSelect) {
-        this.selectionManagerRef.draggingStopped(this);
-      }
-      this.updateContextMenuPosition();
-      if (this.didFinishLoading == false) {
-        this.updateLoadingBarPosition();
-      }
+    this.kNode.on("dragend", () => {
+      // console.log("Drag End");
+      handleDrag();
     });
 
     this.kNode.on("mousedown", (e) => {
-      toolbarNode.show({
-        locked: this.isLocked,
-      });
-      console.log("Mouse Down");
+      console.log("Mouse down");
 
-      const isMultiSelect = e.evt.shiftKey;
-
-      if (!isMultiSelect) {
-        console.log("No Shift >> no multiselect");
-        this.selectionManagerRef.clearSelection();
-        this.selectThisNode();
-        return;
-      }
-      console.log("Shift >> multiselecting");
+      // selection node Node
       if (!this.selectionManagerRef.isNodeSelected(this)) {
-        this.selectThisNode();
-        return;
+        //checking for multiselect
+        this.isSelecting = true;
+        handleSelect(e.evt.shiftKey);
       }
-      this.selectionManagerRef.deselectNode(this);
-      this.updateNodeTransformer();
+
+      if (!toolbarNode.isShowing()) {
+        toolbarNode.show({
+          locked: this.isLocked,
+        });
+      }
     });
 
     this.kNode.on("mouseup", (e) => {
-      if (this.didFinishLoading == false) {
+      // just coming out of dragging or selecting mode
+      if (this.isDragging || this.isSelecting) {
+        this.isDragging = false;
+        this.isSelecting = false;
         return;
       }
+
+      // deselection mode, checking for multiselect
+      const isMultiSelect = e.evt.shiftKey;
+      if (isMultiSelect && this.selectionManagerRef.isNodeSelected(this)) {
+        this.selectionManagerRef.deselectNode(this);
+        this.updateNodeTransformer();
+        //TODO: show toolbarNode on another Node;
+        return;
+      }
+
+      // if the code gets here, we are selecting again from selected nodes
+      handleSelect(isMultiSelect);
     });
   }
 
