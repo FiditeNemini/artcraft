@@ -29,10 +29,11 @@ use google_sign_in::decode_and_verify_token_claims::decode_and_verify_token_clai
 use google_sign_in::VerificationOptions;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn};
+use log::{error, info, warn};
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::google_sign_in_accounts::get_google_sign_in_account_by_subject::{get_google_sign_in_account, GoogleSignInAccount};
 use mysql_queries::queries::google_sign_in_accounts::insert_google_sign_in_account::{insert_google_sign_in_account, InsertGoogleSignInArgs};
+use mysql_queries::queries::users::user::account_creation::create_account_error::CreateAccountError;
 use mysql_queries::queries::users::user::account_creation::create_account_from_google_sso::{create_account_from_google_sso, CreateAccountFromGoogleSsoArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use mysql_queries::utils::transactor::Transactor;
@@ -42,6 +43,7 @@ use sqlx::{Acquire, MySql, MySqlPool};
 use tokens::tokens::user_sessions::UserSessionToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
+use mysql_queries::queries::users::user_sessions::create_user_session_with_transactor::create_user_session_with_transactor;
 
 #[derive(ToSchema, Deserialize)]
 pub struct GoogleCreateAccountRequest {
@@ -179,6 +181,13 @@ pub async fn create_account_from_google_sign_in_handler(
       })?;
 
   match maybe_sso_account {
+    Some(sso_account) => {
+      login_existing_sso_account(
+        &http_request,
+        sso_account,
+        &mut mysql_connection,
+      ).await?
+    },
     None => {
       create_new_sso_account(
         &http_request,
@@ -187,7 +196,6 @@ pub async fn create_account_from_google_sign_in_handler(
         claims,
       ).await?
     },
-    Some(sso_account) => login_existing_sso_account(sso_account).await,
   }
 
   /*
@@ -267,6 +275,35 @@ fn build_options() -> VerificationOptions {
   }
 }
 
+async fn login_existing_sso_account(
+  http_request: &HttpRequest,
+  sso_account: GoogleSignInAccount,
+  mysql_connection: &mut PoolConnection<MySql>,
+)
+  -> Result<(), GoogleCreateAccountErrorResponse>
+{
+  let user_token = match sso_account.maybe_user_token {
+    Some(token) => token.clone(),
+    None => {
+      // NB: If accounts get into this state (e.g. if we support de-linking), we'll need to
+      // consider how to migrate accounts and handle all the various account states.
+      // For now, we'll just deny this possibility.
+      warn!("no user token for existing google sign in account");
+      return Err(GoogleCreateAccountErrorResponse::server_error());
+    },
+  };
+
+  let ip_address = get_request_ip(&http_request);
+
+  let create_session_result = create_user_session_with_transactor(
+    user_token.as_str(),
+    &ip_address,
+    Transactor::for_connection(mysql_connection),
+  ).await;
+
+  Ok(())
+}
+
 async fn create_new_sso_account(
   http_request: &HttpRequest,
   subject: &str,
@@ -283,11 +320,6 @@ async fn create_new_sso_account(
 
   let ip_address = get_request_ip(&http_request);
 
-  let display_name = generate_random_username();
-  let username = display_name.trim().to_lowercase();
-
-  info!("generated username: {}", username);
-
   let mut transaction = mysql_connection.begin()
       .await
       .map_err(|e| {
@@ -295,9 +327,58 @@ async fn create_new_sso_account(
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
+  // NB: We use this routine to "normalize" email addresses in the user table.
+  // It won't necessarily match the email address in the Google claims.
+  // A better normalization function in the future may handle dots and plus
+  // signs in Gmail addresses, for instance.
+  let user_email_address = email_address.trim().to_lowercase();
+  let user_email_gravatar_hash = email_to_gravatar(&user_email_address);
+
+  let mut maybe_user_token = None;
+
+  for _ in 0..3 {
+    // NB: We try a few times to make sure we don't hit a username collision.
+    let display_name = generate_random_username();
+    let username = display_name.trim().to_lowercase();
+
+    info!("generated username: {}", username);
+
+    let result = create_account_from_google_sso(
+      CreateAccountFromGoogleSsoArgs {
+        username: &username,
+        display_name: &display_name,
+        email_address: &user_email_address,
+        email_gravatar_hash: &user_email_gravatar_hash,
+        email_confirmed_by_google: claims.email_verified(),
+        ip_address: &ip_address,
+        maybe_source: None, // TOO: Add source
+      },
+      Transactor::for_transaction(&mut transaction),
+    ).await;
+
+    match result {
+      Ok(token) => {
+        maybe_user_token = Some(token);
+        break;
+      },
+      Err(CreateAccountError::UsernameIsTaken) => {
+        continue; // NB: We'll try again with a new username.
+      },
+      Err(err) => {
+        warn!("error creating account from google sso: {:?}", err);
+        return Err(GoogleCreateAccountErrorResponse::server_error());
+      },
+    }
+  }
+
+  let user_token = maybe_user_token.ok_or_else(|| {
+    error!("no username without collision after several tries");
+    GoogleCreateAccountErrorResponse::server_error()
+  })?;
+
   let _token = insert_google_sign_in_account(InsertGoogleSignInArgs {
     subject,
-    maybe_user_token: None,
+    maybe_user_token: Some(&user_token),
     email_address,
     is_email_verified: claims.email_verified(),
     maybe_locale: None,
@@ -311,28 +392,5 @@ async fn create_new_sso_account(
     GoogleCreateAccountErrorResponse::server_error()
   })?;
 
-  let email_address = email_address.trim().to_lowercase();
-  let email_gravatar_hash = email_to_gravatar(&email_address);
-
-  let user_token = create_account_from_google_sso(
-    CreateAccountFromGoogleSsoArgs {
-      username: &username,
-      display_name: &display_name,
-      email_address: &email_address,
-      email_gravatar_hash: &email_gravatar_hash,
-      email_confirmed_by_google: claims.email_verified(),
-      ip_address: &ip_address,
-      maybe_source: None,
-    },
-    Transactor::for_transaction(&mut transaction),
-  ).await.map_err(|err| {
-    warn!("error creating account from google sso: {:?}", err);
-    GoogleCreateAccountErrorResponse::server_error()
-  })?;
-
   Ok(())
-}
-
-async fn login_existing_sso_account(sso_account: GoogleSignInAccount) {
-
 }

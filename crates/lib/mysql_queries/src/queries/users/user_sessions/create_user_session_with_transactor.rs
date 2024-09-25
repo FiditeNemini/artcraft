@@ -2,16 +2,20 @@ use anyhow::anyhow;
 use log::info;
 use sqlx::MySqlPool;
 
+use crate::utils::transactor::Transactor;
 use errors::AnyhowResult;
 use tokens::tokens::user_sessions::UserSessionToken;
 
-#[deprecated(note="use create_user_session_with_transactor")]
-pub async fn create_user_session(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
+pub async fn create_user_session_with_transactor(
+  user_token: &str,
+  ip_address: &str,
+  mut transactor: Transactor<'_, '_>
+)
     -> AnyhowResult<String>
 {
   let session_token = UserSessionToken::generate().to_string();
 
-  let query_result = sqlx::query!(
+  let query = sqlx::query!(
         r#"
 INSERT INTO user_sessions (
   token,
@@ -24,9 +28,9 @@ VALUES ( ?, ?, ?, NOW() + interval 1 year )
         session_token,
         user_token.to_string(),
         ip_address.to_string(),
-    )
-    .execute(mysql_pool)
-    .await;
+    );
+
+  let query_result = transactor.execute(query).await;
 
   let record_id = match query_result {
     Ok(res) => {

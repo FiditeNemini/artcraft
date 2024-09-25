@@ -15,6 +15,11 @@ pub enum Transactor<'e, 't> {
     pool: &'e MySqlPool,
   },
 
+  /// Transactions over an open connection.
+  Connection {
+    connection: &'e mut sqlx::MySqlConnection,
+  },
+
   /// Operations over an open transaction.
   Transaction {
     transaction: &'e mut Transaction<'t, MySql>,
@@ -27,6 +32,13 @@ impl <'e, 't>Transactor<'e, 't> {
   pub fn for_pool(pool: &'e MySqlPool) -> Self {
     Transactor::Pool {
       pool,
+    }
+  }
+
+  /// Constructor
+  pub fn for_connection(connection: &'e mut sqlx::MySqlConnection) -> Self {
+    Transactor::Connection {
+      connection,
     }
   }
 
@@ -45,6 +57,9 @@ impl <'e, 't>Transactor<'e, 't> {
     match self {
       Transactor::Pool { pool } => {
         query.execute(pool).await
+      },
+      Transactor::Connection { connection } => {
+        query.execute(connection).await
       },
       Transactor::Transaction { transaction } => {
         query.execute(&mut **transaction).await
