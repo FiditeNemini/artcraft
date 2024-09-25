@@ -15,6 +15,7 @@ use mysql_queries::queries::users::user::lookup_user_for_login_result::UserRecor
 use mysql_queries::utils::transactor::Transactor;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql};
+use crate::http_server::requests::get_request_signup_source::get_request_signup_source;
 
 pub struct CreateArgs<'a> {
   pub http_request: &'a HttpRequest,
@@ -42,6 +43,8 @@ pub async fn handle_creating_user_account(
   let ip_address = get_request_ip(&args.http_request);
   let user_email_gravatar_hash = email_to_gravatar(&args.user_email_address);
 
+  let mut maybe_source = get_request_signup_source(&args.http_request);
+
   let mut maybe_user_token = None;
   let mut maybe_user_display_name = None;
 
@@ -61,7 +64,7 @@ pub async fn handle_creating_user_account(
         email_confirmed_by_google: args.claims.email_verified(),
         maybe_feature_flags: user_feature_flags.as_deref(),
         ip_address: &ip_address,
-        maybe_source: None, // TODO: Add source
+        maybe_source,
       },
       Transactor::for_transaction(&mut transaction),
     ).await;

@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Formatter;
 
-use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpRequest, HttpResponse};
@@ -23,7 +22,7 @@ use sqlx::MySqlPool;
 use tokens::tokens::user_sessions::UserSessionToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
-
+use crate::http_server::requests::get_request_signup_source::get_request_signup_source;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
 use crate::http_server::validations::validate_passwords::validate_passwords;
@@ -185,26 +184,7 @@ pub async fn create_account_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let maybe_origin = get_request_origin_uri(&http_request);
-
-  let mut maybe_source = None;
-
-  match maybe_origin {
-    Ok(Some(uri)) => {
-      if let Some(host) = uri.host() {
-        if host.contains("storyteller") {
-          maybe_source = Some("storyteller");
-        } else if host.contains("fakeyou") {
-          maybe_source = Some("fakeyou");
-        }
-      }
-    }
-    // Fail open for now.
-    Ok(None) => {}
-    Err(err) => {
-      warn!("Origin header error: {:?}", err);
-    }
-  }
+  let maybe_source = get_request_signup_source(&http_request);
 
   let create_account_result = create_account_from_email_and_password(
     &mysql_pool,

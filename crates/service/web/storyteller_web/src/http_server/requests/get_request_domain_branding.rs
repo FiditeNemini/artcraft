@@ -1,6 +1,7 @@
+use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
 use actix_web::http::header::HOST;
 use actix_web::HttpRequest;
-use log::info;
+use log::{info, warn};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DomainBranding {
@@ -9,7 +10,36 @@ pub enum DomainBranding {
 }
 
 pub fn get_request_domain_branding(http_request: &HttpRequest) -> Option<DomainBranding> {
-  // NB: http_request.uri() does not include the hostname - it only includes the path (!)
+  // NB: "Origin" vs "Referrer"
+  //
+  // Basically:
+  //  - "In order to preserve privacy, any browser request can decide to omit the Referer header."
+  //  - "The Origin header is similar to the Referer header, but does not disclose the path, and may be null."
+  //  - "Origin" is sent on cross-origin, same-origin (except GET and HEAD requests - typically).
+  //
+  // Reading:
+  //  - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
+  //  - https://stackoverflow.com/a/71040145
+  //
+  let maybe_origin = get_request_origin_uri(&http_request);
+
+  match maybe_origin {
+    Ok(Some(uri)) => {
+      if let Some(branding) = match_possible_hostname(uri.host()) {
+        info!("Origin header: {:?} Branding for hostname: {:?}", uri, branding);
+        return Some(branding);
+      }
+    }
+    // Fail open for now.
+    Ok(None) => {}
+    Err(err) => {
+      warn!("Origin header error: {:?}", err);
+    }
+  }
+
+  // NB: The "HOST" header contains the hostname. The `http_request.uri()` method we tried
+  // before does not include the hostname at all - it only includes the path (!), which is
+  // why we use "HOST" header instead.
   let maybe_host_header = http_request.headers()
       .get(HOST)
       .map(|header| header.to_str().ok())
@@ -17,14 +47,6 @@ pub fn get_request_domain_branding(http_request: &HttpRequest) -> Option<DomainB
 
   if let Some(branding) = match_possible_hostname(maybe_host_header) {
     info!("Host header: {:?} Branding for hostname: {:?}", maybe_host_header, branding);
-    return Some(branding);
-  }
-
-  // NB: This may not actually work against real requests. It fails in local dev. See above comment.
-  let maybe_hostname = http_request.uri().host();
-
-  if let Some(branding) = match_possible_hostname(maybe_hostname) {
-    info!("URI hostname: {:?} Branding for hostname: {:?}", maybe_hostname, branding);
     return Some(branding);
   }
 
@@ -47,7 +69,43 @@ fn match_possible_hostname(maybe_hostname: Option<&str>) -> Option<DomainBrandin
 mod tests {
   use actix_web::test::TestRequest;
 
-  use crate::http_server::requests::get_request_domain_branding::{DomainBranding, get_request_domain_branding};
+  use crate::http_server::requests::get_request_domain_branding::{get_request_domain_branding, DomainBranding};
+
+  mod origin_header {
+    use super::*;
+
+    #[test]
+    fn fakeyou_dot_com() {
+      let request = TestRequest::get()
+          .insert_header(("origin", "https://fakeyou.com"))
+          .to_http_request();
+      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::FakeYou));
+    }
+
+    #[test]
+    fn api_dot_fakeyou_dot_com() {
+      let request = TestRequest::get()
+          .insert_header(("origin", "https://api.fakeyou.com"))
+          .to_http_request();
+      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::FakeYou));
+    }
+
+    #[test]
+    fn storyteller_dot_ai() {
+      let request = TestRequest::get()
+          .insert_header(("origin", "https://storyteller.ai"))
+          .to_http_request();
+      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::Storyteller));
+    }
+
+    #[test]
+    fn api_dot_storyteller_dot_ai() {
+      let request = TestRequest::get()
+          .insert_header(("origin", "https://api.storyteller.ai"))
+          .to_http_request();
+      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::Storyteller));
+    }
+  }
 
   mod host_header {
     use super::*;
@@ -85,39 +143,39 @@ mod tests {
     }
   }
 
-  mod uri {
-    use super::*;
-
-    #[test]
-    fn fakeyou_dot_com() {
-      let request = TestRequest::get()
-          .uri("https://fakeyou.com")
-          .to_http_request();
-      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::FakeYou));
-    }
-
-    #[test]
-    fn api_dot_fakeyou_dot_com() {
-      let request = TestRequest::get()
-          .uri("https://api.fakeyou.com")
-          .to_http_request();
-      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::FakeYou));
-    }
-
-    #[test]
-    fn storyteller_dot_ai() {
-      let request = TestRequest::get()
-          .uri("https://storyteller.ai")
-          .to_http_request();
-      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::Storyteller));
-    }
-
-    #[test]
-    fn api_dot_storyteller_dot_ai() {
-      let request = TestRequest::get()
-          .uri("https://api.storyteller.ai")
-          .to_http_request();
-      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::Storyteller));
-    }
-  }
+//  mod uri {
+//    use super::*;
+//
+//    #[test]
+//    fn fakeyou_dot_com() {
+//      let request = TestRequest::get()
+//          .uri("https://fakeyou.com")
+//          .to_http_request();
+//      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::FakeYou));
+//    }
+//
+//    #[test]
+//    fn api_dot_fakeyou_dot_com() {
+//      let request = TestRequest::get()
+//          .uri("https://api.fakeyou.com")
+//          .to_http_request();
+//      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::FakeYou));
+//    }
+//
+//    #[test]
+//    fn storyteller_dot_ai() {
+//      let request = TestRequest::get()
+//          .uri("https://storyteller.ai")
+//          .to_http_request();
+//      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::Storyteller));
+//    }
+//
+//    #[test]
+//    fn api_dot_storyteller_dot_ai() {
+//      let request = TestRequest::get()
+//          .uri("https://api.storyteller.ai")
+//          .to_http_request();
+//      assert_eq!(get_request_domain_branding(&request), Some(DomainBranding::Storyteller));
+//    }
+//  }
 }
