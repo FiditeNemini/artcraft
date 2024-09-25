@@ -11,12 +11,7 @@ import FaceAnimator from "./pages/face_animator";
 import VideoMocap from "./pages/video_mocap";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SignupPage } from "./pages/signup/SignupPage";
-import {
-  Switch,
-  Route,
-  withRouter,
-  RouteComponentProps,
-} from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import { TermsPage } from "./pages/about/terms_page/TermsPage";
 import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeletePage";
 import { TtsModelEditPage } from "./pages/tts/tts_model_edit/TtsModelEditPage";
@@ -62,7 +57,6 @@ import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
-import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
@@ -124,511 +118,479 @@ import { Beta3DVideoCompositorForm } from "./pages/beta_products/Beta3DVideoComp
 import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoCompositorPage";
 import Lipsync from "./pages/lipsync/Lipsync";
 
-interface Props {
-  textBuffer: string;
-  setTextBuffer: (textBuffer: string) => void;
-  clearTextBuffer: () => void;
+export default function PageContainer() {
+  return (
+    <DomainConfigProvider>
+      <SearchProvider>
+        <ScrollToTop />
+        <div id="wrapper" className="no-padding">
+          <TopNav />
 
-  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
+          <ProfileSidePanel />
+          <Switch>
+            <Route path="/" exact={true}>
+              <LandingPage />
+            </Route>
+
+            <Route path="/comp-lib">
+              <ComponentsLibrary />
+            </Route>
+            <Route path="/firehose">
+              <FirehoseEventListPage />
+            </Route>
+
+            <Route path="/news">
+              <NewsPage />
+            </Route>
+
+            <Route path="/channels">
+              <ChannelsPage />
+            </Route>
+
+            <Route path="/leaderboard">
+              <LeaderboardPage />
+            </Route>
+
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+
+            <Route path="/password-reset/verify">
+              <PasswordResetVerificationPage />
+            </Route>
+
+            <Route path="/password-reset">
+              <PasswordResetEmailPage />
+            </Route>
+
+            <Route path="/profile/:username/edit">
+              <ProfileEditFc />
+            </Route>
+
+            <Route path="/profile/:username/ban">
+              <ProfileBanFc />
+            </Route>
+
+            <Route path="/profile/:username">
+              <ProfilePageV3 />
+            </Route>
+
+            <Route path="/signup">
+              <SignupPage />
+            </Route>
+
+            <Route path="/pricing" exact={true}>
+              <PricingPage />
+            </Route>
+
+            <Route path="/checkout_success" exact={true}>
+              <CheckoutSuccessPage />
+            </Route>
+
+            <Route path="/checkout_cancel" exact={true}>
+              <CheckoutCancelPage />
+            </Route>
+
+            <Route path="/portal_success" exact={true}>
+              <PortalSuccessPage />
+            </Route>
+
+            <Route path="/media/rename/:media_file_token">
+              <MediaRenamePage />
+            </Route>
+
+            <Route path="/media/:token">
+              <MediaPageSwitch />
+            </Route>
+
+            <Route path="/edit-cover-image/:token">
+              <EditCoverImage />
+            </Route>
+
+            <Route path="/explore">
+              <ExplorePage />
+            </Route>
+
+            <Route path="/weight/:weight_token/edit">
+              <WeightEditPage />
+            </Route>
+
+            <Route
+              path="/weight/:weight_token/:maybe_url_slug?"
+              render={props => (
+                <WeightPage key={props.match.params.weight_token} />
+              )}
+            />
+
+            <Route path="/search/weights">
+              <SearchPage />
+            </Route>
+
+            <Route path="/tts/result/:token/edit">
+              <TtsResultEditPage />
+            </Route>
+
+            <Route path="/tts/result/:token/delete">
+              <TtsResultDeletePage />
+            </Route>
+
+            <Route path="/tts/result/:token">
+              <TtsResultViewPage />
+            </Route>
+
+            <Route path="/tts/:token/edit">
+              <TtsModelEditPage />
+            </Route>
+
+            <Route path="/tts/:token/delete">
+              <TtsModelDeletePage />
+            </Route>
+
+            <Route path="/tts/:token/categories">
+              <TtsEditCategoriesPage />
+            </Route>
+
+            <Route path="/tts/:token">
+              <TtsModelViewPage />
+            </Route>
+
+            <Route path="/w2l/result/:token/edit">
+              <W2lResultEditPage />
+            </Route>
+
+            <Route path="/w2l/result/:token/delete">
+              <W2lResultDeletePage />
+            </Route>
+
+            <Route path="/w2l/result/:token">
+              <W2lResultViewPage />
+            </Route>
+
+            <Route path="/w2l/:templateToken/edit">
+              <W2lTemplateEditPage />
+            </Route>
+
+            <Route path="/w2l/:templateToken/approval">
+              <W2lTemplateApprovePage />
+            </Route>
+
+            <Route path="/w2l/:templateToken/delete">
+              <W2lTemplateDeletePage />
+            </Route>
+
+            <Route path="/video">
+              <W2lTemplateListPage />
+            </Route>
+
+            <Route path="/upload/tts">
+              <UploadTtsModelPage />
+            </Route>
+
+            <Route path="/upload/tts_model">
+              <UploadNewTtsModelPage />
+            </Route>
+
+            <Route path="/upload/sd">
+              <UploadSdWeightPage />
+            </Route>
+
+            <Route path="/upload/lora">
+              <UploadLoraWeightPage />
+            </Route>
+
+            <Route path="/upload/workflow">
+              <UploadWorkflowPage />
+            </Route>
+
+            <Route path="/contribute">
+              <ContributeIndexPage />
+            </Route>
+
+            <Route path="/moderation/user/list">
+              <ModerationUserListFc />
+            </Route>
+
+            <Route path="/moderation/user_feature_flags/:username?">
+              <ModerationUserFeatureFlagsPage />
+            </Route>
+
+            <Route path="/moderation/ip_bans/:ipAddress">
+              <ModerationViewIpBanFc />
+            </Route>
+
+            <Route path="/moderation/ip_bans">
+              <ModerationIpBanListFc />
+            </Route>
+
+            <Route path="/moderation/voice_stats">
+              <ModerationVoiceStatsFc />
+            </Route>
+
+            <Route path="/moderation/job_stats">
+              <ModerationJobStatsFc />
+            </Route>
+
+            <Route path="/moderation/job_control">
+              <ModerationJobControlPage />
+            </Route>
+
+            <Route path="/moderation/token_info">
+              <ModerationTokenInfoPage />
+            </Route>
+
+            <Route path="/moderation/tts_category/list">
+              <ModerationTtsCategoryListPage />
+            </Route>
+
+            <Route path="/moderation/tts_category/edit/:token">
+              <ModerationTtsCategoryEditPage />
+            </Route>
+
+            <Route path="/moderation/category/delete/:token">
+              <ModerationCategoryDeletePage />
+            </Route>
+
+            <Route path="/moderation/approve/w2l_templates">
+              <ModerationPendingW2lTemplatesFc />
+            </Route>
+
+            <Route path="/moderation">
+              <ModerationPage />
+            </Route>
+
+            <Route exact={true} path="/clone">
+              <VoiceCloneRequestPage />
+            </Route>
+
+            <Route path="/patrons">
+              <PatronPage />
+            </Route>
+
+            <Route path="/product-usage">
+              <ProductUsageInfoPage />
+            </Route>
+
+            <Route path="/voice-conversion/:token/delete">
+              <VcModelDeletePage />
+            </Route>
+
+            <Route path="/voice-conversion/:token/edit">
+              <VcModelEditPage />
+            </Route>
+
+            <Route path="/voice-conversion/:token">
+              <VcModelViewPage />
+            </Route>
+
+            <Route path="/dashboard">
+              <DashboardPage />
+            </Route>
+
+            <Route path="/welcome-to-studio">
+              <WelcomePage />
+            </Route>
+
+            <Route path="/about">
+              <AboutPage />
+            </Route>
+
+            <Route path="/face-animator/:mediaToken?">
+              <FaceAnimator />
+            </Route>
+
+            <Route path="/fbx-to-gltf/:mediaToken?">
+              <FbxToGltfPage />
+            </Route>
+
+            <Route path="/commissions">
+              <CommunityCommissionsPage />
+            </Route>
+
+            <Route path="/terms">
+              <TermsPage />
+            </Route>
+
+            <Route path="/privacy">
+              <PrivacyPage />
+            </Route>
+
+            <Route path="/guide">
+              <GuidePage />
+            </Route>
+
+            <Route path="/old">
+              <VocodesPage />
+            </Route>
+
+            <Route path="/dev-upload">
+              <DevUpload />
+            </Route>
+
+            <Route path="/dev-upload-alt">
+              <DevUploadAlt />
+            </Route>
+
+            <Route path="/dev-media-input">
+              <DevMediaInput />
+            </Route>
+
+            {/* NEW TTS PAGE */}
+            <Route exact path="/tts">
+              <NewTTS />
+            </Route>
+
+            {/* NEW VC PAGE */}
+            <Route exact path="/voice-conversion">
+              <NewVC />
+            </Route>
+
+            {/* NEW LIVE PORTRAIT PAGE */}
+            <Route exact path="/ai-live-portrait">
+              <LivePortrait />
+            </Route>
+
+            <Route exact path="/ai-lip-sync">
+              <Lipsync />
+            </Route>
+
+            <Route exact path="/webcam-acting">
+              <CameraLivePortrait />
+            </Route>
+
+            {/* Route for initial voice creation */}
+            <Route exact path="/voice-designer/create">
+              <VoiceDesignerFormPage />
+            </Route>
+
+            {/* Route for editing the dataset details */}
+            <Route exact path="/voice-designer/dataset/:dataset_token/edit">
+              <VoiceDesignerFormPage />
+            </Route>
+
+            {/* Route for handling dataset token for uploading samples */}
+            <Route exact path="/voice-designer/dataset/:dataset_token/upload">
+              <VoiceDesignerFormPage />
+            </Route>
+
+            <Route path="/voice-designer/voice/:voice_token/edit">
+              <VoiceDesignerVoiceEditPage />
+            </Route>
+
+            <Route path="/voice-designer/voice/:voice_token">
+              <VoiceDesignerUseVoicePage />
+            </Route>
+
+            <Route path="/inference-jobs-list">
+              <InferenceJobsPage />
+            </Route>
+
+            <Route path="/voice-designer">
+              <VoiceDesignerMainPage />
+            </Route>
+
+            <Route path="/style-video/:mediaToken?">
+              <StyleVideo />
+            </Route>
+
+            <Route path="/generate-speech">
+              <GenerateSpeechPage />
+            </Route>
+
+            <Route path="/video-mocap/:mediaToken?">
+              <VideoMocap />
+            </Route>
+
+            <Route path="/text-to-image">
+              <TextToImagePage />
+            </Route>
+
+            <Route path="/character/donald-trump">
+              <NewTrumpTTS />
+            </Route>
+
+            <Route path="/beta/webcam-acting/form">
+              <BetaWebcamActingForm />
+            </Route>
+
+            <Route path="/beta/webcam-acting">
+              <BetaWebcamActingPage />
+            </Route>
+
+            <Route path="/beta/3d-video-compositor/form">
+              <Beta3DVideoCompositorForm />
+            </Route>
+
+            <Route path="/beta/3d-video-compositor">
+              <Beta3DVideoCompositorPage />
+            </Route>
+
+            <Route path="/beta/2d-video-compositor/form">
+              <BetaVideoCompositorForm />
+            </Route>
+
+            <Route path="/beta/2d-video-compositor">
+              <BetaVideoCompositorPage />
+            </Route>
+
+            <Route path="/beta/lip-sync/form">
+              <BetaLipSyncForm />
+            </Route>
+
+            <Route path="/beta/lip-sync">
+              <BetaLipSyncPage />
+            </Route>
+
+            <Route path="/beta/lip-sync/form">
+              <BetaLipSyncForm />
+            </Route>
+
+            <Route path="/studio-mobile-check">
+              <StudioMobileCheckPage />
+            </Route>
+
+            <Route path="/category/create">
+              <CreateCategoryPage />
+            </Route>
+
+            <Route path="/creator-onboarding">
+              <CreatorTypeformPage />
+            </Route>
+
+            <Route path="/welcome">
+              <SignUpSuccessPage />
+            </Route>
+
+            <Route path="/beta-key/create">
+              <CreateBetaKeyPage />
+            </Route>
+
+            <Route path="/beta-key/redeem/success">
+              <RedeemSuccessPage />
+            </Route>
+
+            <Route path="/beta-key/redeem/:token?">
+              <RedeemBetaKeyPage />
+            </Route>
+
+            <Route path="/beta-key/list">
+              <BetaKeysListPage />
+            </Route>
+
+            {/* test page for tools */}
+            <Route path="/dev/tools">
+              <ToolsTestPage />
+            </Route>
+
+            <Route path="/tools">
+              <CreatorToolsPage />
+            </Route>
+
+            <Route path="/waitlist-next-steps">
+              <WaitlistNextStepsPage />
+            </Route>
+          </Switch>
+        </div>
+      </SearchProvider>
+    </DomainConfigProvider>
+  );
 }
-
-interface State {}
-
-class PageContainer extends React.Component<
-  Props & RouteComponentProps,
-  State
-> {
-  constructor(props: Props & RouteComponentProps) {
-    super(props);
-    this.state = {};
-  }
-
-  logout = () => {};
-
-  public render() {
-    return (
-      <DomainConfigProvider>
-        <SearchProvider>
-          <ScrollToTop />
-          <div id="wrapper" className="no-padding">
-            <TopNav />
-
-            <ProfileSidePanel />
-            <Switch>
-              <Route path="/comp-lib">
-                <ComponentsLibrary />
-              </Route>
-              <Route path="/firehose">
-                <FirehoseEventListPage />
-              </Route>
-
-              <Route path="/news">
-                <NewsPage />
-              </Route>
-
-              <Route path="/channels">
-                <ChannelsPage />
-              </Route>
-
-              <Route path="/leaderboard">
-                <LeaderboardPage />
-              </Route>
-
-              <Route path="/login">
-                <LoginPage />
-              </Route>
-
-              <Route path="/password-reset/verify">
-                <PasswordResetVerificationPage />
-              </Route>
-
-              <Route path="/password-reset">
-                <PasswordResetEmailPage />
-              </Route>
-
-              <Route path="/profile/:username/edit">
-                <ProfileEditFc />
-              </Route>
-
-              <Route path="/profile/:username/ban">
-                <ProfileBanFc />
-              </Route>
-
-              <Route path="/profile/:username">
-                <ProfilePageV3 />
-              </Route>
-
-              <Route path="/signup">
-                <SignupPage />
-              </Route>
-
-              <Route path="/pricing" exact={true}>
-                <PricingPage />
-              </Route>
-
-              <Route path="/checkout_success" exact={true}>
-                <CheckoutSuccessPage />
-              </Route>
-
-              <Route path="/checkout_cancel" exact={true}>
-                <CheckoutCancelPage />
-              </Route>
-
-              <Route path="/portal_success" exact={true}>
-                <PortalSuccessPage />
-              </Route>
-
-              <Route path="/media/rename/:media_file_token">
-                <MediaRenamePage />
-              </Route>
-
-              <Route path="/media/:token">
-                <MediaPageSwitch />
-              </Route>
-
-              <Route path="/edit-cover-image/:token">
-                <EditCoverImage />
-              </Route>
-
-              <Route path="/explore">
-                <ExplorePage />
-              </Route>
-
-              <Route path="/weight/:weight_token/edit">
-                <WeightEditPage />
-              </Route>
-
-              <Route
-                path="/weight/:weight_token/:maybe_url_slug?"
-                render={props => (
-                  <WeightPage key={props.match.params.weight_token} />
-                )}
-              />
-
-              <Route path="/search/weights">
-                <SearchPage />
-              </Route>
-
-              <Route path="/tts/result/:token/edit">
-                <TtsResultEditPage />
-              </Route>
-
-              <Route path="/tts/result/:token/delete">
-                <TtsResultDeletePage />
-              </Route>
-
-              <Route path="/tts/result/:token">
-                <TtsResultViewPage />
-              </Route>
-
-              <Route path="/tts/:token/edit">
-                <TtsModelEditPage />
-              </Route>
-
-              <Route path="/tts/:token/delete">
-                <TtsModelDeletePage />
-              </Route>
-
-              <Route path="/tts/:token/categories">
-                <TtsEditCategoriesPage />
-              </Route>
-
-              <Route path="/tts/:token">
-                <TtsModelViewPage
-                  textBuffer={this.props.textBuffer}
-                  setTextBuffer={this.props.setTextBuffer}
-                  clearTextBuffer={this.props.clearTextBuffer}
-                />
-              </Route>
-
-              <Route path="/w2l/result/:token/edit">
-                <W2lResultEditPage />
-              </Route>
-
-              <Route path="/w2l/result/:token/delete">
-                <W2lResultDeletePage />
-              </Route>
-
-              <Route path="/w2l/result/:token">
-                <W2lResultViewPage />
-              </Route>
-
-              <Route path="/w2l/:templateToken/edit">
-                <W2lTemplateEditPage />
-              </Route>
-
-              <Route path="/w2l/:templateToken/approval">
-                <W2lTemplateApprovePage />
-              </Route>
-
-              <Route path="/w2l/:templateToken/delete">
-                <W2lTemplateDeletePage />
-              </Route>
-
-              <Route path="/video">
-                <W2lTemplateListPage />
-              </Route>
-
-              <Route path="/upload/tts">
-                <UploadTtsModelPage />
-              </Route>
-
-              <Route path="/upload/tts_model">
-                <UploadNewTtsModelPage />
-              </Route>
-
-              <Route path="/upload/sd">
-                <UploadSdWeightPage />
-              </Route>
-
-              <Route path="/upload/lora">
-                <UploadLoraWeightPage />
-              </Route>
-
-              <Route path="/upload/workflow">
-                <UploadWorkflowPage />
-              </Route>
-
-              <Route path="/contribute">
-                <ContributeIndexPage />
-              </Route>
-
-              <Route path="/moderation/user/list">
-                <ModerationUserListFc />
-              </Route>
-
-              <Route path="/moderation/user_feature_flags/:username?">
-                <ModerationUserFeatureFlagsPage />
-              </Route>
-
-              <Route path="/moderation/ip_bans/:ipAddress">
-                <ModerationViewIpBanFc />
-              </Route>
-
-              <Route path="/moderation/ip_bans">
-                <ModerationIpBanListFc />
-              </Route>
-
-              <Route path="/moderation/voice_stats">
-                <ModerationVoiceStatsFc />
-              </Route>
-
-              <Route path="/moderation/job_stats">
-                <ModerationJobStatsFc />
-              </Route>
-
-              <Route path="/moderation/job_control">
-                <ModerationJobControlPage />
-              </Route>
-
-              <Route path="/moderation/token_info">
-                <ModerationTokenInfoPage />
-              </Route>
-
-              <Route path="/moderation/tts_category/list">
-                <ModerationTtsCategoryListPage />
-              </Route>
-
-              <Route path="/moderation/tts_category/edit/:token">
-                <ModerationTtsCategoryEditPage />
-              </Route>
-
-              <Route path="/moderation/category/delete/:token">
-                <ModerationCategoryDeletePage />
-              </Route>
-
-              <Route path="/moderation/approve/w2l_templates">
-                <ModerationPendingW2lTemplatesFc />
-              </Route>
-
-              <Route path="/moderation">
-                <ModerationPage />
-              </Route>
-
-              <Route exact={true} path="/clone">
-                <VoiceCloneRequestPage />
-              </Route>
-
-              <Route path="/patrons">
-                <PatronPage />
-              </Route>
-
-              <Route path="/product-usage">
-                <ProductUsageInfoPage />
-              </Route>
-
-              <Route path="/voice-conversion/:token/delete">
-                <VcModelDeletePage />
-              </Route>
-
-              <Route path="/voice-conversion/:token/edit">
-                <VcModelEditPage />
-              </Route>
-
-              <Route path="/voice-conversion/:token">
-                <VcModelViewPage
-                  setMaybeSelectedInferenceJob={
-                    this.props.maybeSelectedVoiceConversionModel
-                  }
-                />
-              </Route>
-
-              <Route path="/dashboard">
-                <DashboardPage />
-              </Route>
-
-              <Route path="/welcome-to-studio">
-                <WelcomePage />
-              </Route>
-
-              <Route path="/about">
-                <AboutPage />
-              </Route>
-
-              <Route path="/face-animator/:mediaToken?">
-                <FaceAnimator />
-              </Route>
-
-              <Route path="/fbx-to-gltf/:mediaToken?">
-                <FbxToGltfPage />
-              </Route>
-
-              <Route path="/commissions">
-                <CommunityCommissionsPage />
-              </Route>
-
-              <Route path="/terms">
-                <TermsPage />
-              </Route>
-
-              <Route path="/privacy">
-                <PrivacyPage />
-              </Route>
-
-              <Route path="/guide">
-                <GuidePage />
-              </Route>
-
-              <Route path="/old">
-                <VocodesPage />
-              </Route>
-
-              <Route path="/dev-upload">
-                <DevUpload />
-              </Route>
-
-              <Route path="/dev-upload-alt">
-                <DevUploadAlt />
-              </Route>
-
-              <Route path="/dev-media-input">
-                <DevMediaInput />
-              </Route>
-
-              {/* NEW TTS PAGE */}
-              <Route exact path="/tts">
-                <NewTTS />
-              </Route>
-
-              {/* NEW VC PAGE */}
-              <Route exact path="/voice-conversion">
-                <NewVC />
-              </Route>
-
-              {/* NEW LIVE PORTRAIT PAGE */}
-              <Route exact path="/ai-live-portrait">
-                <LivePortrait />
-              </Route>
-
-              <Route exact path="/ai-lip-sync">
-                <Lipsync />
-              </Route>
-
-              <Route exact path="/webcam-acting">
-                <CameraLivePortrait />
-              </Route>
-
-              {/* Route for initial voice creation */}
-              <Route exact path="/voice-designer/create">
-                <VoiceDesignerFormPage />
-              </Route>
-
-              {/* Route for editing the dataset details */}
-              <Route exact path="/voice-designer/dataset/:dataset_token/edit">
-                <VoiceDesignerFormPage />
-              </Route>
-
-              {/* Route for handling dataset token for uploading samples */}
-              <Route exact path="/voice-designer/dataset/:dataset_token/upload">
-                <VoiceDesignerFormPage />
-              </Route>
-
-              <Route path="/voice-designer/voice/:voice_token/edit">
-                <VoiceDesignerVoiceEditPage />
-              </Route>
-
-              <Route path="/voice-designer/voice/:voice_token">
-                <VoiceDesignerUseVoicePage />
-              </Route>
-
-              <Route path="/inference-jobs-list">
-                <InferenceJobsPage />
-              </Route>
-
-              <Route path="/voice-designer">
-                <VoiceDesignerMainPage />
-              </Route>
-
-              <Route path="/style-video/:mediaToken?">
-                <StyleVideo />
-              </Route>
-
-              <Route path="/generate-speech">
-                <GenerateSpeechPage />
-              </Route>
-
-              <Route path="/video-mocap/:mediaToken?">
-                <VideoMocap />
-              </Route>
-
-              <Route path="/text-to-image">
-                <TextToImagePage />
-              </Route>
-
-              <Route path="/character/donald-trump">
-                <NewTrumpTTS />
-              </Route>
-
-              <Route path="/beta/webcam-acting/form">
-                <BetaWebcamActingForm />
-              </Route>
-
-              <Route path="/beta/webcam-acting">
-                <BetaWebcamActingPage />
-              </Route>
-
-              <Route path="/beta/3d-video-compositor/form">
-                <Beta3DVideoCompositorForm />
-              </Route>
-
-              <Route path="/beta/3d-video-compositor">
-                <Beta3DVideoCompositorPage />
-              </Route>
-
-              <Route path="/beta/2d-video-compositor/form">
-                <BetaVideoCompositorForm />
-              </Route>
-
-              <Route path="/beta/2d-video-compositor">
-                <BetaVideoCompositorPage />
-              </Route>
-
-              <Route path="/beta/lip-sync/form">
-                <BetaLipSyncForm />
-              </Route>
-
-              <Route path="/beta/lip-sync">
-                <BetaLipSyncPage />
-              </Route>
-
-              <Route path="/beta/lip-sync/form">
-                <BetaLipSyncForm />
-              </Route>
-
-              <Route path="/studio-mobile-check">
-                <StudioMobileCheckPage />
-              </Route>
-
-              <Route path="/category/create">
-                <CreateCategoryPage />
-              </Route>
-
-              <Route path="/creator-onboarding">
-                <CreatorTypeformPage />
-              </Route>
-
-              <Route path="/welcome">
-                <SignUpSuccessPage />
-              </Route>
-
-              <Route path="/beta-key/create">
-                <CreateBetaKeyPage />
-              </Route>
-
-              <Route path="/beta-key/redeem/success">
-                <RedeemSuccessPage />
-              </Route>
-
-              <Route path="/beta-key/redeem/:token?">
-                <RedeemBetaKeyPage />
-              </Route>
-
-              <Route path="/beta-key/list">
-                <BetaKeysListPage />
-              </Route>
-
-              {/* test page for tools */}
-              <Route path="/dev/tools">
-                <ToolsTestPage />
-              </Route>
-
-              <Route path="/tools">
-                <CreatorToolsPage />
-              </Route>
-
-              <Route path="/waitlist-next-steps">
-                <WaitlistNextStepsPage />
-              </Route>
-
-              <Route path="/" exact={true}>
-                <LandingPage />
-              </Route>
-            </Switch>
-          </div>
-        </SearchProvider>
-      </DomainConfigProvider>
-    );
-  }
-}
-
-export default withRouter(PageContainer);

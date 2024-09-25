@@ -19,11 +19,7 @@ import Container from "components/common/Container/Container";
 import VcGenerateAudioPanel from "../VcGenerateAudioPanel";
 import { useSession } from "hooks";
 
-interface VcModelViewPageProps {
-  setMaybeSelectedInferenceJob: any;
-}
-
-export default function VcModelViewPage(props: VcModelViewPageProps) {
+export default function VcModelViewPage() {
   const { sessionWrapper } = useSession();
   // let { token } = useParams() as { token: string };
 

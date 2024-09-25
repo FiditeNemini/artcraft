@@ -68,16 +68,12 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 import { AITools } from "components/marketing";
 import { useSession } from "hooks";
 
-interface Props {
-  textBuffer: string;
-  setTextBuffer: (textBuffer: string) => void;
-  clearTextBuffer: () => void;
-}
-
-function TtsModelViewPage(props: Props) {
+function TtsModelViewPage() {
   let { token } = useParams() as { token: string };
   const { loggedIn, sessionWrapper } = useSession();
   PosthogClient.recordPageview();
+  const [textBuffer, textBufferSet] = useState("");
+  const clearTextBuffer = () => textBufferSet("");
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number | undefined>(
@@ -187,12 +183,12 @@ function TtsModelViewPage(props: Props) {
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
-    props.setTextBuffer(textValue);
+    textBufferSet(textValue);
   };
 
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
-    props.clearTextBuffer();
+    clearTextBuffer();
     return false;
   };
 
@@ -203,7 +199,7 @@ function TtsModelViewPage(props: Props) {
       return false;
     }
 
-    if (props.textBuffer === undefined) {
+    if (textBuffer === undefined) {
       return false;
     }
 
@@ -215,7 +211,7 @@ function TtsModelViewPage(props: Props) {
     const request = {
       uuid_idempotency_token: uuidv4(),
       tts_model_token: modelToken,
-      inference_text: props.textBuffer,
+      inference_text: textBuffer,
     };
 
     fetch(endpointUrl, {
@@ -817,7 +813,7 @@ function TtsModelViewPage(props: Props) {
               <form onSubmit={handleFormSubmit}>
                 <textarea
                   onChange={handleChangeText}
-                  value={props.textBuffer}
+                  value={textBuffer}
                   className="form-control text-message"
                   placeholder="Textual shenanigans go here..."
                   rows={6}

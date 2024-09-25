@@ -1,15 +1,15 @@
 import "./AppNew.scss";
 import "scss/custom-bootstrap.scss";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import PageContainer from "./v2/view/PageContainer";
-import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
+// import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+// import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
+// import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
 import { FooterNav } from "./v2/view/nav/FooterNav";
@@ -54,31 +54,21 @@ i18n2.use(HttpBackend).init({
   },
 });
 
-enum MigrationMode {
-  NEW_VOCODES,
-  OLD_VOCODES,
-}
+// enum MigrationMode {
+//   NEW_VOCODES,
+//   OLD_VOCODES,
+// }
 
-interface Props {}
+// interface Props {}
 
-interface State {
-  textBuffer: string;
-  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
-}
+// interface State {
+//   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
+// }
 
-// TODO: Port to functional component
-class App extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+export function App() {
+  const [loaded, loadedSet] = useState(false);
 
-    this.state = {
-      textBuffer: "",
-
-      maybeSelectedVoiceConversionModel: undefined,
-    };
-  }
-
-  componentWillMount() {
+  if (!loaded) {
     // Check to see if there is a cookie for darkMode;
     if (!window.localStorage.getItem("darkMode")) {
       // if not, set one to false to ensure we are defualting to dark mode.
@@ -90,42 +80,25 @@ class App extends React.Component<Props, State> {
       // if not, set one to true to ensure we are defualting to low spec mode.
       window.localStorage.setItem("lowSpec", "true");
     }
-
-    require("./AppOld.scss");
-    require("./v2/view/_css/footer.scss");
   }
+  useEffect(() => {
+    loadedSet(true);
+  }, []);
 
-  setTextBuffer = (textBuffer: string) => {
-    this.setState({ textBuffer: textBuffer });
-  };
-
-  clearTextBuffer = () => {
-    this.setState({ textBuffer: "" });
-  };
-
-  public render() {
-    return (
-      <BrowserRouter>
-        <div id="main" className="bg-gradient">
-          <div id="viewable">
-            <div className="migrationComponentWrapper">
-              <CoreServicesProvider>
-                <PageContainer
-                  textBuffer={this.state.textBuffer}
-                  setTextBuffer={this.setTextBuffer}
-                  clearTextBuffer={this.clearTextBuffer}
-                  maybeSelectedVoiceConversionModel={
-                    this.state.maybeSelectedVoiceConversionModel
-                  }
-                />
-                <FooterNav />
-              </CoreServicesProvider>
-            </div>
-          </div>
-        </div>
-      </BrowserRouter>
-    );
-  }
+  return (
+    <div id="main" className="bg-gradient">
+      <div id="viewable">
+        <BrowserRouter>
+          <CoreServicesProvider>
+            <PageContainer />
+            <FooterNav />
+          </CoreServicesProvider>
+        </BrowserRouter>
+      </div>
+    </div>
+  );
 }
 
-export { App, MigrationMode, TtsInferenceJob, W2lInferenceJob };
+//old exports
+
+// export { App, MigrationMode, TtsInferenceJob, W2lInferenceJob };
