@@ -21,7 +21,7 @@ pub struct CreateArgs<'a> {
   pub http_request: &'a HttpRequest,
   pub claims: Claims,
   pub claims_subject: &'a str,
-  pub claims_email: &'a str,
+  pub claims_email_address: &'a str,
   pub user_email_address: &'a str,
   pub mysql_connection: &'a mut PoolConnection<MySql>,
 }
@@ -98,7 +98,7 @@ pub async fn handle_creating_user_account(
   let _token = insert_google_sign_in_account(InsertGoogleSignInArgs {
     subject: args.claims_subject,
     maybe_user_token: Some(&user_token),
-    email_address: &args.claims_email, // NB: The one from the Google claims, not our canonicalized one.
+    email_address: &args.claims_email_address, // NB: The one from the Google claims, not our canonicalized one.
     is_email_verified: args.claims.email_verified(),
     maybe_locale: args.claims.locale(),
     maybe_name: args.claims.name(),

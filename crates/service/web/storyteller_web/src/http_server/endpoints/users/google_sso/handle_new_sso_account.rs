@@ -21,6 +21,14 @@ use sqlx::{Acquire, MySql};
 use tokens::tokens::user_sessions::UserSessionToken;
 use tokens::tokens::users::UserToken;
 
+pub struct NewSsoArgs<'a> {
+  pub http_request: &'a HttpRequest,
+  pub claims: Claims,
+  pub claims_subject: &'a str,
+  pub claims_email_address: &'a str,
+  pub mysql_connection: &'a mut PoolConnection<MySql>,
+}
+
 pub struct NewSsoAccountInfo {
   pub user_token: UserToken,
   pub user_display_name: String,
@@ -28,28 +36,18 @@ pub struct NewSsoAccountInfo {
 }
 
 pub async fn handle_new_sso_account(
-  http_request: &HttpRequest,
-  claims_subject: &str,
-  mysql_connection: &mut PoolConnection<MySql>,
-  claims: Claims,
+  args: NewSsoArgs<'_>
 )
   -> Result<NewSsoAccountInfo, GoogleCreateAccountErrorResponse>
 {
-  let claims_email_address = claims.email()
-      .map(|email| email.to_string())
-      .ok_or_else(|| {
-        warn!("no email address in google claims");
-        GoogleCreateAccountErrorResponse::bad_request()
-      })?;
-
   // NB: We use this routine to "normalize" email addresses in the user table.
   // It won't necessarily match the email address in the Google claims.
   // A better normalization function in the future may handle dots and plus
   // signs in Gmail addresses, for instance.
-  let user_email_address = canonicalize_email_for_users_table(&claims_email_address);
+  let user_email_address = canonicalize_email_for_users_table(&args.claims_email_address);
 
   let maybe_user_account =
-      lookup_user_for_login_by_email_with_transactor(&user_email_address, Transactor::for_connection(mysql_connection))
+      lookup_user_for_login_by_email_with_transactor(&user_email_address, Transactor::for_connection(args.mysql_connection))
           .await
           .map_err(|err| {
             warn!("error looking up user by email: {:?}", err);
@@ -59,21 +57,22 @@ pub async fn handle_new_sso_account(
   match maybe_user_account {
     Some(user_account) => {
       handle_linking_existing_account(LinkArgs {
-        http_request,
-        claims,
-        claims_subject,
+        http_request: args.http_request,
+        claims: args.claims,
+        claims_subject: args.claims_subject,
+        claims_email_address: &args.claims_email_address,
         user_account,
-        mysql_connection,
+        mysql_connection: args.mysql_connection,
       }).await
     },
     None => {
       handle_creating_user_account(CreateArgs {
-        http_request,
-        claims,
-        claims_subject,
-        claims_email: &claims_email_address,
+        http_request: args.http_request,
+        claims: args.claims,
+        claims_subject: args.claims_subject,
+        claims_email_address: &args.claims_email_address,
         user_email_address: &user_email_address,
-        mysql_connection,
+        mysql_connection: args.mysql_connection,
       }).await
     },
   }

@@ -10,7 +10,7 @@ use std::fmt::Formatter;
 use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::RedeemBetaKeyError;
 use crate::http_server::endpoints::users::create_account_handler::{CreateAccountErrorResponse, CreateAccountSuccessResponse};
 use crate::http_server::endpoints::users::google_sso::check_claims::check_claims;
-use crate::http_server::endpoints::users::google_sso::handle_new_sso_account::handle_new_sso_account;
+use crate::http_server::endpoints::users::google_sso::handle_new_sso_account::{handle_new_sso_account, NewSsoArgs};
 use crate::http_server::endpoints::users::session_info_handler::SessionInfoError;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
@@ -48,7 +48,7 @@ use tokens::tokens::user_sessions::UserSessionToken;
 use tokens::tokens::users::UserToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
-
+use crate::http_server::endpoints::users::google_sso::handle_existing_sso_link::{handle_existing_sso_link, ExistingLinkArgs};
 /* ALGORITHM
 --> [SSO RECORD LOOKUP]
   --> I. SSO Record Exists
@@ -93,12 +93,12 @@ use utoipa::ToSchema;
    - Other email providers may behave weirdly with their own canonicalization schemes.
 
  TODO:
-  - Handle existing account linkage
-  - Should we store canonical emails?
-  - User source enum
   - Store all the claims info
   - Verify all paths (including legacy sign up paths)
   - Update claims info on re-login (if diff exists)
+
+ Decisions:
+  - Should we store canonical emails? --> No, you can create more than one account per gmail.
  */
 
 #[derive(ToSchema, Deserialize)]
@@ -211,10 +211,17 @@ pub async fn google_sso_handler(
     claims.email(),
     claims.email_verified());
 
-  let subject = claims.subject()
+  let claims_subject = claims.subject()
       .map(|s| s.to_string())
       .ok_or_else(|| {
         warn!("no subject in google claims");
+        GoogleCreateAccountErrorResponse::bad_request()
+      })?;
+
+  let claims_email_address = claims.email()
+      .map(|email| email.to_string())
+      .ok_or_else(|| {
+        warn!("no email address in google claims");
         GoogleCreateAccountErrorResponse::bad_request()
       })?;
 
@@ -225,7 +232,7 @@ pub async fn google_sso_handler(
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
-  let maybe_sso_account = get_google_sign_in_account(&subject, &mut *mysql_connection)
+  let maybe_sso_account = get_google_sign_in_account(&claims_subject, &mut *mysql_connection)
       .await
       .map_err(|err| {
         warn!("error getting google sign in account: {:?}", err);
@@ -238,29 +245,25 @@ pub async fn google_sso_handler(
 
   match maybe_sso_account {
     Some(sso_account) => {
-      let user_token = match sso_account.maybe_user_token {
-        Some(token) => token.clone(),
-        None => {
-          // NB: If accounts get into this state (e.g. if we support de-linking), we'll need to
-          // consider how to migrate accounts and handle all the various account states.
-          // For now, we'll just deny this possibility.
-          warn!("no user token for existing google sign in account!");
-          return Err(GoogleCreateAccountErrorResponse::server_error());
-        },
-      };
-
-      // TODO: Handle updating SSO details (eg new profile picture).
+      let user_token = handle_existing_sso_link(ExistingLinkArgs {
+        http_request: &http_request,
+        sso_account: &sso_account,
+        claims,
+        claims_email_address: &claims_email_address,
+        mysql_connection: &mut mysql_connection,
+      }).await?;
 
       maybe_user_token = Some(user_token);
       maybe_user_display_name = sso_account.maybe_user_display_name.clone();
     },
     None => {
-      let result = handle_new_sso_account(
-        &http_request,
-        &subject,
-        &mut mysql_connection,
+      let result = handle_new_sso_account(NewSsoArgs {
+        http_request: &http_request,
         claims,
-      ).await?;
+        claims_subject: &claims_subject,
+        claims_email_address: &claims_email_address,
+        mysql_connection: &mut mysql_connection,
+      }).await?;
 
       maybe_user_token = Some(result.user_token);
       maybe_user_display_name = Some(result.user_display_name);

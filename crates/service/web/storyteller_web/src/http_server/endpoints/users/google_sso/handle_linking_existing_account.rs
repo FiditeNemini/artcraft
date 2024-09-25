@@ -13,6 +13,7 @@ pub struct LinkArgs<'a> {
   pub http_request: &'a HttpRequest,
   pub claims: Claims,
   pub claims_subject: &'a str,
+  pub claims_email_address: &'a str,
   pub user_account: UserRecordForLogin,
   pub mysql_connection: &'a mut PoolConnection<MySql>,
 }
@@ -21,8 +22,6 @@ pub async fn handle_linking_existing_account(
 )
   -> Result<NewSsoAccountInfo, GoogleCreateAccountErrorResponse>
 {
-  // TODO: Double check email address in the claims before linking!
-
   let mut transaction = args.mysql_connection.begin()
       .await
       .map_err(|e| {
@@ -35,7 +34,7 @@ pub async fn handle_linking_existing_account(
   let _token = insert_google_sign_in_account(InsertGoogleSignInArgs {
     subject: args.claims_subject,
     maybe_user_token: Some(&args.user_account.token),
-    email_address: "todo@todo.com", // TODO // NB: The one from the Google claims, not our canonicalized one.
+    email_address: args.claims_email_address,
     is_email_verified: args.claims.email_verified(),
     maybe_locale: args.claims.locale(),
     maybe_name: args.claims.name(),
