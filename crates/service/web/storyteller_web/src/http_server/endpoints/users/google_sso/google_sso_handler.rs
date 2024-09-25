@@ -10,7 +10,6 @@ use std::fmt::Formatter;
 use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::RedeemBetaKeyError;
 use crate::http_server::endpoints::users::create_account_handler::{CreateAccountErrorResponse, CreateAccountSuccessResponse};
 use crate::http_server::endpoints::users::google_sso::check_claims::check_claims;
-use crate::http_server::endpoints::users::google_sso::handle_existing_sso_account::handle_existing_sso_account;
 use crate::http_server::endpoints::users::google_sso::handle_new_sso_account::handle_new_sso_account;
 use crate::http_server::endpoints::users::session_info_handler::SessionInfoError;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
@@ -78,7 +77,6 @@ pub struct GoogleCreateAccountSuccessResponse {
 pub struct GoogleCreateAccountErrorResponse {
   pub success: bool,
   pub error_type: GoogleCreateAccountErrorType,
-  pub error_fields: HashMap<String, String>,
 }
 
 #[derive(ToSchema, Copy, Clone, Debug, Serialize)]
@@ -96,7 +94,6 @@ impl GoogleCreateAccountErrorResponse {
     Self {
       success: false,
       error_type: GoogleCreateAccountErrorType::ServerError,
-      error_fields: HashMap::new(),
     }
   }
 
@@ -104,7 +101,6 @@ impl GoogleCreateAccountErrorResponse {
     Self {
       success: false,
       error_type: GoogleCreateAccountErrorType::BadRequest,
-      error_fields: HashMap::new(),
     }
   }
 }
@@ -190,7 +186,8 @@ pub async fn create_account_from_google_sign_in_handler(
     --> I. SSO Record Exists
         --> [LOGIN DIRECTLY]
 
-            This should be the simple case.
+            This should be the simple case. We assume it is linked to a valid
+            users table record / account.
 
             Potential Problems:
             - If Google user changes their Google SSO email
@@ -215,8 +212,9 @@ pub async fn create_account_from_google_sign_in_handler(
                 or link the "wrong" / undesired account.
 
    Notes on non-canonical email addresses:
+
      - Email addresses may not 1:1 match user accounts.
-     
+
      - Our "canonicalization" is simply trimming and lower-casing the email.
        This may not even be correct in an i18n context with certain character sets.
 
@@ -225,6 +223,11 @@ pub async fn create_account_from_google_sign_in_handler(
        addresses from one Google account.
 
      - Other email providers may behave weirdly with their own canonicalization schemes.
+
+   TODO:
+    - Should we store canonical emails?
+    - User source enum
+    - Verify all paths (including legacy sign up paths)
    */
 
   let mut maybe_user_token = None;
@@ -232,11 +235,18 @@ pub async fn create_account_from_google_sign_in_handler(
 
   match maybe_sso_account {
     Some(sso_account) => {
-      let _result = handle_existing_sso_account(
-        &http_request,
-        sso_account,
-        &mut mysql_connection,
-      ).await?;
+      let user_token = match sso_account.maybe_user_token {
+        Some(token) => token.clone(),
+        None => {
+          // NB: If accounts get into this state (e.g. if we support de-linking), we'll need to
+          // consider how to migrate accounts and handle all the various account states.
+          // For now, we'll just deny this possibility.
+          warn!("no user token for existing google sign in account!");
+          return Err(GoogleCreateAccountErrorResponse::server_error());
+        },
+      };
+
+      maybe_user_token = Some(user_token);
     },
     None => {
       let result = handle_new_sso_account(
@@ -253,7 +263,7 @@ pub async fn create_account_from_google_sign_in_handler(
 
   let user_token = maybe_user_token
       .ok_or_else(|| {
-        error!("no user token after account creation");
+        error!("no user token after SSO flow");
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
@@ -280,16 +290,18 @@ pub async fn create_account_from_google_sign_in_handler(
 
   construct_http_response(
     &session_cookie_manager,
-    &user_token,
     &session_token,
+    &user_token,
+    maybe_user_display_name,
   )
 }
 
 
 pub fn construct_http_response(
   session_cookie_manager: &HttpUserSessionManager,
-  user_token: &UserToken,
   session_token: &UserSessionToken,
+  user_token: &UserToken,
+  maybe_user_display_name: Option<String>,
 ) -> Result<HttpResponse, GoogleCreateAccountErrorResponse> {
 
   let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user_token) {
