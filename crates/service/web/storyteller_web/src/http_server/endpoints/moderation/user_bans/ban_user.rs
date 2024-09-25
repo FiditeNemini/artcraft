@@ -6,7 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{log, warn};
 
-use mysql_queries::queries::users::user::set_user_ban_status::{set_user_ban_status, SetUserBanStatsArgs};
+use mysql_queries::queries::users::user::update::set_user_ban_status::{set_user_ban_status, SetUserBanStatsArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;

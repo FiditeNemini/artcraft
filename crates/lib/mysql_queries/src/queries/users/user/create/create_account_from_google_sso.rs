@@ -3,8 +3,8 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
-use crate::queries::users::user::account_creation::create_account_generic::{create_account_generic, GenericCreateAccountArgs};
+use crate::queries::users::user::create::create_account_error::CreateAccountError;
+use crate::queries::users::user::create::create_account_generic::{create_account_generic, GenericCreateAccountArgs};
 use crate::utils::transactor::Transactor;
 use enums::by_table::users::user_signup_method::UserSignupMethod;
 use tokens::tokens::users::UserToken;

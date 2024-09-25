@@ -30,7 +30,7 @@ mod tests {
     use crate::queries::model_weights::get::get_weight::get_weight_by_token;
     use crate::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
     use crate::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
-    use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+    use crate::queries::users::user::get::get_user_token_by_username::get_user_token_by_username;
 
     async fn setup() -> sqlx::Pool<sqlx::MySql> {
         println!("Dropping database model_weights");

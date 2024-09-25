@@ -1,5 +1,5 @@
 use crate::helpers::transform_optional_result::transform_optional_result;
-use crate::queries::users::user::lookup_user_for_login_result::{UserRecordForLogin, UserRecordForLoginRaw};
+use crate::queries::users::user::get::lookup_user_for_login_result::{UserRecordForLogin, UserRecordForLoginRaw};
 use crate::utils::transactor::Transactor;
 use errors::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
@@ -18,7 +18,7 @@ SELECT
   display_name,
   username_is_not_customized,
   email_address,
-  password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,
+  password_hash as `password_hash: crate::queries::users::user::get::lookup_user_for_login_result::VecBytes`,
   password_version,
   is_banned,
   maybe_feature_flags

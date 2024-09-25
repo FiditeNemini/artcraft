@@ -5,8 +5,8 @@
 
 use sqlx::MySqlPool;
 use enums::by_table::users::user_signup_method::UserSignupMethod;
-use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
-use crate::queries::users::user::account_creation::create_account_generic::{create_account_generic, GenericCreateAccountArgs};
+use crate::queries::users::user::create::create_account_error::CreateAccountError;
+use crate::queries::users::user::create::create_account_generic::{create_account_generic, GenericCreateAccountArgs};
 use crate::utils::transactor::Transactor;
 use tokens::tokens::users::UserToken;
 
@@ -39,7 +39,7 @@ pub async fn create_account_from_email_and_password(
   let result= create_account_generic(
     GenericCreateAccountArgs {
       maybe_signup_method: Some(UserSignupMethod::EmailPassword),
-      
+
       username: args.username,
       display_name: args.display_name,
 

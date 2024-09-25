@@ -1,11 +1,11 @@
 use sqlx::MySqlPool;
 
 use crate::helpers::transform_optional_result::transform_optional_result;
-use crate::queries::users::user::lookup_user_for_login_result::{UserRecordForLogin, UserRecordForLoginRaw};
+use crate::queries::users::user::get::lookup_user_for_login_result::{UserRecordForLogin, UserRecordForLoginRaw};
 use errors::AnyhowResult;
 
-pub async fn lookup_user_for_login_by_email(email: &str, pool: &MySqlPool) -> AnyhowResult<Option<UserRecordForLogin>> {
-  // NB: Lookup failure is Err(RowNotFound).
+pub async fn lookup_user_for_login_by_username(username: &str, pool: &MySqlPool) -> AnyhowResult<Option<UserRecordForLogin>>
+{
   let result = sqlx::query_as!(
     UserRecordForLoginRaw,
         r#"
@@ -15,15 +15,15 @@ SELECT
   display_name,
   username_is_not_customized,
   email_address,
-  password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,
+  password_hash as `password_hash: crate::queries::users::user::get::lookup_user_for_login_result::VecBytes`,
   password_version,
   is_banned,
   maybe_feature_flags
 FROM users
-WHERE email_address = ?
+WHERE username = ?
 LIMIT 1
         "#,
-        email.to_string(),
+        username,
     )
       .fetch_one(pool)
       .await;

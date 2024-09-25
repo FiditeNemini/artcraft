@@ -16,8 +16,8 @@ use idempotency::uuid::generate_random_uuid;
 use mysql_queries::payloads::email_sender_jobs::email_sender_job_args::{EmailSenderJobArgs, PolymorphicEmailSenderJobArgs};
 use mysql_queries::payloads::email_sender_jobs::subtypes::email_job_password_reset_args::EmailJobPasswordResetArgs;
 use mysql_queries::queries::email_sender_jobs::insert_email_sender_job::{insert_email_sender_job, InsertEmailSenderJobArgs};
-use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
-use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
+use mysql_queries::queries::users::user::get::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
+use mysql_queries::queries::users::user::get::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_password_resets::create_password_reset_request::create_password_reset;
 use server_environment::ServerEnvironment;
 

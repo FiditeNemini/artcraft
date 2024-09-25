@@ -5,7 +5,7 @@ use google_sign_in::claims::claims::Claims;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::warn;
 use mysql_queries::queries::google_sign_in_accounts::insert_google_sign_in_account::{insert_google_sign_in_account, InsertGoogleSignInArgs};
-use mysql_queries::queries::users::user::lookup_user_for_login_result::UserRecordForLogin;
+use mysql_queries::queries::users::user::get::lookup_user_for_login_result::UserRecordForLogin;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql};
 

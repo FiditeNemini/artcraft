@@ -13,7 +13,7 @@ use errors::{anyhow, AnyhowResult};
 use filesys::file_read_bytes::file_read_bytes;
 use idempotency::uuid::generate_random_uuid;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+use mysql_queries::queries::users::user::get::get_user_token_by_username::get_user_token_by_username;
 use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
 use mysql_queries::queries::voice_designer::voice_samples::insert_dataset_sample_and_media_file::{insert_dataset_sample_and_media_file, InsertDatasetSampleAndMediaFileArgs};
 use mysql_queries::queries::voice_designer::voices::create_voice::{create_voice, CreateVoiceArgs};

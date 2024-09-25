@@ -4,7 +4,7 @@ use sqlx::MySqlPool;
 use errors::AnyhowResult;
 use tokens::tokens::password_reset::PasswordResetToken;
 
-use crate::queries::users::user::lookup_user_for_login_result::UserRecordForLogin;
+use crate::queries::users::user::get::lookup_user_for_login_result::UserRecordForLogin;
 
 pub async fn create_password_reset(pool: &MySqlPool, user: &UserRecordForLogin, ip_address: &str, secret_key: String) -> AnyhowResult<()> {
     let token = PasswordResetToken::generate();

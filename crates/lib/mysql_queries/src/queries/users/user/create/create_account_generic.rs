@@ -3,7 +3,7 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
+use crate::queries::users::user::create::create_account_error::CreateAccountError;
 use crate::utils::transactor::Transactor;
 use log::warn;
 use sqlx::error::Error::Database;

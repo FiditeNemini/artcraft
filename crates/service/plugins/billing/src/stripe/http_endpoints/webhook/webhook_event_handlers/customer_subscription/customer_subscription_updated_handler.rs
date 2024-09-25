@@ -2,7 +2,7 @@ use log::{error, info};
 use sqlx::MySqlPool;
 use stripe::Subscription;
 
-use mysql_queries::queries::users::user::update_user_record_with_new_stripe_customer_id::update_user_record_with_new_stripe_customer_id;
+use mysql_queries::queries::users::user::update::update_user_record_with_new_stripe_customer_id::update_user_record_with_new_stripe_customer_id;
 use mysql_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
 use mysql_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;

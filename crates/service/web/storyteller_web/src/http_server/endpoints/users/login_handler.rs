@@ -15,8 +15,8 @@ use utoipa::ToSchema;
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
-use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
+use mysql_queries::queries::users::user::get::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
+use mysql_queries::queries::users::user::get::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_confirm_password::bcrypt_confirm_password;
 use tokens::tokens::user_sessions::UserSessionToken;

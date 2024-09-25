@@ -7,7 +7,7 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_cli_tool::{insert_media_file_from_cli_tool, InsertArgs};
-use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+use mysql_queries::queries::users::user::get::get_user_token_by_username::get_user_token_by_username;
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;

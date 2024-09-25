@@ -14,7 +14,7 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::model_weights::create::create_weight::{create_weight, CreateModelWeightsArgs};
-use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+use mysql_queries::queries::users::user::get::get_user_token_by_username::get_user_token_by_username;
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
