@@ -9,7 +9,7 @@ use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_mode
 use crate::http_server::endpoints::users::create_account_handler::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile_handler::edit_profile_handler;
 use crate::http_server::endpoints::users::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::users::google_sso::google_sso_handler::create_account_from_google_sign_in_handler;
+use crate::http_server::endpoints::users::google_sso::google_sso_handler::google_sso_handler;
 use crate::http_server::endpoints::users::login_handler::login_handler;
 use crate::http_server::endpoints::users::logout_handler::logout_handler;
 use crate::http_server::endpoints::users::password_reset_redeem_handler::password_reset_redeem_handler;
@@ -44,7 +44,7 @@ pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(
         web::resource("/v1/accounts/google_sso")
-            .route(web::post().to(create_account_from_google_sign_in_handler))
+            .route(web::post().to(google_sso_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(

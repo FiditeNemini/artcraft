@@ -66,4 +66,24 @@ impl <'e, 't>Transactor<'e, 't> {
       },
     }
   }
+
+  //pub async fn fetch_one<T: Send + Unpin>(
+  //  self,
+  //  query: Map<'_, MySql, Box<dyn Fn(MySqlRow) -> Result<T, sqlx::Error>>, MySqlArguments>
+  //) -> Result<T, sqlx::Error>
+  ////where
+  ////  T: sqlx::FromRow<'static, MySql>,
+  //{
+  //  match self {
+  //    Transactor::Pool { pool } => {
+  //      query.fetch_one(pool).await
+  //    },
+  //    Transactor::Connection { connection } => {
+  //      query.fetch_one(connection).await
+  //    },
+  //    Transactor::Transaction { transaction } => {
+  //      query.fetch_one(&mut **transaction).await
+  //    },
+  //  }
+  //}
 }

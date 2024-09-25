@@ -10,7 +10,7 @@ use crate::queries::users::user::account_creation::create_account_generic::{crea
 use crate::utils::transactor::Transactor;
 use tokens::tokens::users::UserToken;
 
-pub struct CreateAccountFromEmailArgs<'a> {
+pub struct CreateAccountFromEmailPasswordArgs<'a> {
   pub username: &'a str,
   pub display_name: &'a str,
   pub email_address: &'a str,
@@ -31,16 +31,18 @@ pub struct CreateAccountSuccessResult {
 }
 
 
-pub async fn create_account_from_email(
+pub async fn create_account_from_email_and_password(
   mysql_pool: &MySqlPool,
-  args: CreateAccountFromEmailArgs<'_>,
+  args: CreateAccountFromEmailPasswordArgs<'_>,
 ) -> Result<CreateAccountSuccessResult, CreateAccountError>
 {
   let result= create_account_generic(
     GenericCreateAccountArgs {
       username: args.username,
       display_name: args.display_name,
+
       ip_address: args.ip_address,
+
       maybe_feature_flags: None,
       maybe_source: args.maybe_source,
       maybe_create_method: None, // TODO
@@ -49,6 +51,10 @@ pub async fn create_account_from_email(
       email_address: args.email_address,
       email_gravatar_hash: args.email_gravatar_hash,
       email_confirmed_by_google: false,
+
+      // User-created accounts in this flow have custom usernames
+      username_is_generated: false,
+      username_is_not_customized: false,
 
       // Email+Password accounts have passwords (of course)
       password_hash: args.password_hash,

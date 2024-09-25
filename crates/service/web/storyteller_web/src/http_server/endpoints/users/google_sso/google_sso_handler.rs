@@ -68,9 +68,9 @@ pub struct GoogleCreateAccountSuccessResponse {
   /// their username.
   pub username_not_yet_customized: bool,
 
-  /// The user's username. If we want to present a username customization
-  /// flow, we'll need this.
-  pub username: String,
+  /// The user's display username. If we want to present a username
+  /// customization flow, we can use this to prevent another round trip.
+  pub user_display_name: String,
 }
 
 #[derive(ToSchema, Serialize, Debug)]
@@ -146,7 +146,7 @@ impl ResponseError for GoogleCreateAccountErrorResponse {
     ("request" = GoogleCreateAccountRequest, description = "Payload for Request"),
   )
 )]
-pub async fn create_account_from_google_sign_in_handler(
+pub async fn google_sso_handler(
   http_request: HttpRequest,
   request: Json<GoogleCreateAccountRequest>,
   mysql_pool: Data<MySqlPool>,
@@ -225,13 +225,17 @@ pub async fn create_account_from_google_sign_in_handler(
      - Other email providers may behave weirdly with their own canonicalization schemes.
 
    TODO:
+    - Handle existing account linkage
     - Should we store canonical emails?
     - User source enum
+    - Store all the claims info
     - Verify all paths (including legacy sign up paths)
+    - Update claims info on re-login (if diff exists)
    */
 
   let mut maybe_user_token = None;
   let mut maybe_user_display_name = None;
+  let mut username_not_yet_customized = false;
 
   match maybe_sso_account {
     Some(sso_account) => {
@@ -258,6 +262,7 @@ pub async fn create_account_from_google_sign_in_handler(
 
       maybe_user_token = Some(result.user_token);
       maybe_user_display_name = Some(result.user_display_name);
+      username_not_yet_customized = result.username_is_not_customized;
     },
   }
 
@@ -292,7 +297,8 @@ pub async fn create_account_from_google_sign_in_handler(
     &session_cookie_manager,
     &session_token,
     &user_token,
-    maybe_user_display_name,
+    "todo".to_string(),
+    username_not_yet_customized,
   )
 }
 
@@ -301,7 +307,8 @@ pub fn construct_http_response(
   session_cookie_manager: &HttpUserSessionManager,
   session_token: &UserSessionToken,
   user_token: &UserToken,
-  maybe_user_display_name: Option<String>,
+  user_display_name: String,
+  username_not_yet_customized: bool,
 ) -> Result<HttpResponse, GoogleCreateAccountErrorResponse> {
 
   let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user_token) {
@@ -317,8 +324,8 @@ pub fn construct_http_response(
   let response = GoogleCreateAccountSuccessResponse {
     success: true,
     signed_session,
-    username_not_yet_customized: false, // TODO
-    username: "todo".to_string(), // TODO
+    username_not_yet_customized,
+    user_display_name,
   };
 
   let body = serde_json::to_string(&response)

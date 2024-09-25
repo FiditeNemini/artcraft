@@ -46,6 +46,10 @@ pub async fn create_account_from_google_sso(
       email_gravatar_hash: args.email_gravatar_hash,
       email_confirmed_by_google: args.email_confirmed_by_google,
 
+      // User-created accounts in this flow have randomly generated usernames
+      username_is_generated: true,
+      username_is_not_customized: true,
+
       // SSO accounts start without a password
       password_hash: SSO_PASSWORD,
       is_without_password: true,

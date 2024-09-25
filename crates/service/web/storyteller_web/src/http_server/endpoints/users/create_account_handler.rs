@@ -16,7 +16,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use log::{info, warn};
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::users::user::account_creation::create_account_error::CreateAccountError;
-use mysql_queries::queries::users::user::account_creation::create_account_from_email::{create_account_from_email, CreateAccountFromEmailArgs};
+use mysql_queries::queries::users::user::account_creation::create_account_from_email_and_password::{create_account_from_email_and_password, CreateAccountFromEmailPasswordArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use sqlx::MySqlPool;
@@ -206,9 +206,9 @@ pub async fn create_account_handler(
     }
   }
 
-  let create_account_result = create_account_from_email(
+  let create_account_result = create_account_from_email_and_password(
     &mysql_pool,
-    CreateAccountFromEmailArgs {
+    CreateAccountFromEmailPasswordArgs {
       username: &username,
       display_name: &display_name,
       email_address: &email_address,

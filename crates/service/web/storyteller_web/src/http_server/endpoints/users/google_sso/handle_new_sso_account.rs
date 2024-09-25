@@ -1,6 +1,8 @@
 use crate::http_server::endpoints::users::google_sso::google_sso_handler::{GoogleCreateAccountErrorResponse, GoogleCreateAccountSuccessResponse};
+use crate::http_server::endpoints::users::google_sso::handle_linking_existing_account::handle_linking_existing_account;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
+use crate::util::canonicalize_email_for_users_table::canonicalize_email_for_users_table;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::generate_random_username::generate_random_username;
 use actix_web::{HttpRequest, HttpResponse};
@@ -11,6 +13,7 @@ use log::{error, info, warn};
 use mysql_queries::queries::google_sign_in_accounts::insert_google_sign_in_account::{insert_google_sign_in_account, InsertGoogleSignInArgs};
 use mysql_queries::queries::users::user::account_creation::create_account_error::CreateAccountError;
 use mysql_queries::queries::users::user::account_creation::create_account_from_google_sso::{create_account_from_google_sso, CreateAccountFromGoogleSsoArgs};
+use mysql_queries::queries::users::user::lookup_user_for_login_by_email_with_transactor::lookup_user_for_login_by_email_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql};
@@ -20,6 +23,7 @@ use tokens::tokens::users::UserToken;
 pub struct NewSsoAccountInfo {
   pub user_token: UserToken,
   pub user_display_name: String,
+  pub username_is_not_customized: bool,
 }
 
 pub async fn handle_new_sso_account(
@@ -31,6 +35,7 @@ pub async fn handle_new_sso_account(
   -> Result<NewSsoAccountInfo, GoogleCreateAccountErrorResponse>
 {
   let email_address = claims.email()
+      .map(|email| email.to_string())
       .ok_or_else(|| {
         warn!("no email address in google claims");
         GoogleCreateAccountErrorResponse::bad_request()
@@ -38,19 +43,43 @@ pub async fn handle_new_sso_account(
 
   let ip_address = get_request_ip(&http_request);
 
+  // NB: We use this routine to "normalize" email addresses in the user table.
+  // It won't necessarily match the email address in the Google claims.
+  // A better normalization function in the future may handle dots and plus
+  // signs in Gmail addresses, for instance.
+  let user_email_address = canonicalize_email_for_users_table(&email_address);
+  let user_email_gravatar_hash = email_to_gravatar(&user_email_address);
+
+  let maybe_user_account =
+      lookup_user_for_login_by_email_with_transactor(&user_email_address, Transactor::for_connection(mysql_connection))
+          .await
+          .map_err(|err| {
+            warn!("error looking up user by email: {:?}", err);
+            GoogleCreateAccountErrorResponse::server_error()
+          })?;
+
+  match maybe_user_account {
+    Some(user_account) => {
+      let account_info = handle_linking_existing_account(
+        user_account,
+        http_request,
+        subject,
+        mysql_connection,
+        claims,
+      ).await?;
+      
+      return Ok(account_info);
+    },
+    None => {
+    },
+  }
+
   let mut transaction = mysql_connection.begin()
       .await
       .map_err(|e| {
         warn!("Could not begin transaction: {:?}", e);
         GoogleCreateAccountErrorResponse::server_error()
       })?;
-
-  // NB: We use this routine to "normalize" email addresses in the user table.
-  // It won't necessarily match the email address in the Google claims.
-  // A better normalization function in the future may handle dots and plus
-  // signs in Gmail addresses, for instance.
-  let user_email_address = email_address.trim().to_lowercase();
-  let user_email_gravatar_hash = email_to_gravatar(&user_email_address);
 
   // Enroll users in studio temporarily.
   let user_feature_flags = studio_feature_flags();
@@ -108,12 +137,12 @@ pub async fn handle_new_sso_account(
   let _token = insert_google_sign_in_account(InsertGoogleSignInArgs {
     subject,
     maybe_user_token: Some(&user_token),
-    email_address,
+    email_address: &email_address, // NB: The one from the Google claims, not our canonicalized one.
     is_email_verified: claims.email_verified(),
-    maybe_locale: None,
-    maybe_name: None,
-    maybe_given_name: None,
-    maybe_family_name: None,
+    maybe_locale: None, // TODO
+    maybe_name: None, // TODO
+    maybe_given_name: None, // TODO
+    maybe_family_name: None, // TODO
     creator_ip_address: &ip_address,
     transaction: &mut transaction,
   }).await.map_err(|err| {
@@ -121,9 +150,17 @@ pub async fn handle_new_sso_account(
     GoogleCreateAccountErrorResponse::server_error()
   })?;
 
+  transaction.commit()
+      .await
+      .map_err(|e| {
+        warn!("Could not commit transaction: {:?}", e);
+        GoogleCreateAccountErrorResponse::server_error()
+      })?;
+
   Ok(NewSsoAccountInfo {
     user_token,
     user_display_name,
+    username_is_not_customized: true, // New account with random username
   })
 }
 

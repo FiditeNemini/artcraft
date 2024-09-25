@@ -6,16 +6,15 @@
 use std::fmt;
 use std::fmt::Formatter;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::{info, warn};
 use sqlx::MySqlPool;
 use utoipa::ToSchema;
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::helpers::boolean_converters::i8_to_bool;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
@@ -132,8 +131,7 @@ pub async fn login_handler(
     }
   };
 
-  let is_banned = i8_to_bool(user.is_banned);
-  if is_banned {
+  if user.is_banned {
     // We don't allow banned users back in.
     return Err(LoginErrorResponse::invalid_credentials());
   }

@@ -32,6 +32,15 @@ pub struct GoogleSignInAccount {
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+
+  /// If a user account is linked, this is the username.
+  pub maybe_username: Option<String>,
+
+  /// If a user account is linked, this is the display name.
+  pub maybe_user_display_name: Option<String>,
+
+  /// If a user account is linked, this is the flag.
+  pub username_is_not_customized: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -53,6 +62,10 @@ struct GoogleSignInAccountRaw {
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
+
+  maybe_username: Option<String>,
+  maybe_user_display_name: Option<String>,
+  username_is_not_customized: Option<i8>,
 }
 
 pub async fn get_google_sign_in_account<'a, 'e, E>(
@@ -81,6 +94,9 @@ where E: 'a + Executor<'e, Database = MySql>
     maybe_family_name: record.maybe_family_name,
     created_at: record.created_at,
     updated_at: record.updated_at,
+    maybe_username: record.maybe_username,
+    maybe_user_display_name: record.maybe_user_display_name,
+    username_is_not_customized: record.username_is_not_customized.map(|i| i8_to_bool(i)),
   }))
 }
 
@@ -95,26 +111,33 @@ where E: 'a + Executor<'e, Database = MySql>
       GoogleSignInAccountRaw,
         r#"
 SELECT
-    token as `token: tokens::tokens::google_sign_in_accounts::GoogleSignInAccountToken`,
+    g.token as `token: tokens::tokens::google_sign_in_accounts::GoogleSignInAccountToken`,
 
-    subject,
+    g.subject,
 
-    maybe_user_token as `maybe_user_token: tokens::tokens::users::UserToken`,
+    g.maybe_user_token as `maybe_user_token: tokens::tokens::users::UserToken`,
 
-    email_address,
-    is_email_verified,
+    g.email_address,
+    g.is_email_verified,
 
-    maybe_locale,
-    maybe_name,
-    maybe_given_name,
-    maybe_family_name,
+    g.maybe_locale,
+    g.maybe_name,
+    g.maybe_given_name,
+    g.maybe_family_name,
 
-    created_at,
-    updated_at
+    g.created_at,
+    g.updated_at,
 
-FROM google_sign_in_accounts
+    u.username as maybe_username,
+    u.display_name as maybe_user_display_name,
+    u.username_is_not_customized
+
+FROM google_sign_in_accounts AS g
+LEFT OUTER JOIN users AS u
+    ON g.maybe_user_token = u.token
+
 WHERE
-    subject = ?
+    g.subject = ?
         "#,
      subject
     )

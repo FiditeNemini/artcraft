@@ -13,6 +13,12 @@ pub struct GenericCreateAccountArgs<'a> {
   pub username: &'a str,
   pub display_name: &'a str,
 
+  /// If we randomly generated the username
+  pub username_is_generated: bool,
+
+  /// If the user hasn't changed or "accepted" a randomly generated username
+  pub username_is_not_customized: bool,
+
   pub email_address: &'a str,
   pub email_gravatar_hash: &'a str,
   pub email_confirmed_by_google: bool,
@@ -61,6 +67,9 @@ SET
   username = ?,
   display_name = ?,
 
+  username_is_generated = ?,
+  username_is_not_customized = ?,
+
   email_address = ?,
   email_gravatar_hash = ?,
 
@@ -86,6 +95,9 @@ SET
       user_token.as_str(),
       args.username,
       args.display_name,
+
+      args.username_is_generated,
+      args.username_is_not_customized,
 
       args.email_address,
       args.email_gravatar_hash,

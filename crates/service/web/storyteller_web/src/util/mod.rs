@@ -1,6 +1,7 @@
 pub mod allowed_explore_media_access;
 pub mod allowed_studio_access;
 pub mod allowed_video_style_transfer_access;
+pub mod canonicalize_email_for_users_table;
 pub mod check_creator_tokens;
 pub mod cleaners;
 pub mod delete_role_disambiguation;
