@@ -187,23 +187,44 @@ pub async fn create_account_from_google_sign_in_handler(
 
   /* ALGORITHM
   --> [SSO RECORD LOOKUP]
-    --> SSO Record Exists
+    --> I. SSO Record Exists
         --> [LOGIN DIRECTLY]
-          --> However, if the Google user changes their email, or if we let
-              our users change their email or unlink accounts, that could
-              result in account state issues.
-    --> SSO Record Does Not Exist
+
+            This should be the simple case.
+
+            Potential Problems:
+            - If Google user changes their Google SSO email
+            - If we let our users change their email or unlink accounts
+            - If user signs up with a new, non-canonical variant of their email address
+
+    --> II. SSO Record Does Not Exist
       --> [USER RECORD LOOKUP BY EMAIL]
-        --> User Record Does Not Exist
-          --> [CREATE NEW RECORDS, LOGIN]
-        --> User Record Exists
+        --> IIA. User Record Does Not Exist
+          --> [CREATE NEW (1) SSO ACCOUNT AND (2) USER RECORDS, LOGIN]
+
+              Potential Problems:
+              - If the user already had an account with a non-canonical variant
+
+        --> IIB. User Record Exists
           --> [CREATE SSO RECORD, LINK USER RECORD, LOGIN]
-            --> Problems:
-              - If it's not a Gmail account, we need to confirm the password.
-              - If it's a Gmail account, we don't need to confirm the password
-              - If it's a Gmail account, and the email address in the table has '.' or '+',
-                we might create non-canonical duplicates
-              - User may already have lots of non-canonical duplicates: foo+1@gmail.com, foo+2@gmail.com, etc.
+
+              Potential Problems:
+              - If the email is not a Gmail account, we need to confirm the password.
+              - If the user already had an account (or accounts) with a non-canonical
+                variant, we can't detect/link it. We might create a duplicate account
+                or link the "wrong" / undesired account.
+
+   Notes on non-canonical email addresses:
+     - Email addresses may not 1:1 match user accounts.
+     
+     - Our "canonicalization" is simply trimming and lower-casing the email.
+       This may not even be correct in an i18n context with certain character sets.
+
+     - Google emails treat period (.) and everything after a plus (+) specially. This
+       is a broad topic, but it could essentially enable users to create unlimited email
+       addresses from one Google account.
+
+     - Other email providers may behave weirdly with their own canonicalization schemes.
    */
 
   let mut maybe_user_token = None;
