@@ -7,6 +7,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::fmt::Formatter;
 
+use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::RedeemBetaKeyError;
 use crate::http_server::endpoints::users::session_info_handler::SessionInfoError;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
@@ -32,15 +33,15 @@ use log::{info, warn};
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::google_sign_in_accounts::get_google_sign_in_account_by_subject::{get_google_sign_in_account, GoogleSignInAccount};
 use mysql_queries::queries::google_sign_in_accounts::insert_google_sign_in_account::{insert_google_sign_in_account, InsertGoogleSignInArgs};
-use mysql_queries::queries::users::user::account_creation::create_account_from_google_sso::{create_account_from_google_sso, CreateAccountFromGoogleSsoArgs, CreateAccountFromGoogleSsoError};
+use mysql_queries::queries::users::user::account_creation::create_account_from_google_sso::{create_account_from_google_sso, CreateAccountFromGoogleSsoArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use mysql_queries::utils::transactor::Transactor;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql, MySqlPool};
 use tokens::tokens::user_sessions::UserSessionToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
-use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::RedeemBetaKeyError;
 
 #[derive(ToSchema, Deserialize)]
 pub struct GoogleCreateAccountRequest {
@@ -307,6 +308,25 @@ async fn create_new_sso_account(
     transaction: &mut transaction,
   }).await.map_err(|err| {
     warn!("error inserting google sign in account: {:?}", err);
+    GoogleCreateAccountErrorResponse::server_error()
+  })?;
+
+  let email_address = email_address.trim().to_lowercase();
+  let email_gravatar_hash = email_to_gravatar(&email_address);
+
+  let user_token = create_account_from_google_sso(
+    CreateAccountFromGoogleSsoArgs {
+      username: &username,
+      display_name: &display_name,
+      email_address: &email_address,
+      email_gravatar_hash: &email_gravatar_hash,
+      email_confirmed_by_google: claims.email_verified(),
+      ip_address: &ip_address,
+      maybe_source: None,
+    },
+    Transactor::for_transaction(&mut transaction),
+  ).await.map_err(|err| {
+    warn!("error creating account from google sso: {:?}", err);
     GoogleCreateAccountErrorResponse::server_error()
   })?;
 

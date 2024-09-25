@@ -40,12 +40,21 @@ pub async fn create_account_from_email(
     GenericCreateAccountArgs {
       username: args.username,
       display_name: args.display_name,
-      email_address: args.email_address,
-      email_gravatar_hash: args.email_gravatar_hash,
-      password_hash: args.password_hash,
       ip_address: args.ip_address,
       maybe_feature_flags: None,
       maybe_source: args.maybe_source,
+      maybe_create_method: None, // TODO
+
+      // Email+Password accounts do not yet have confirmed emails
+      email_address: args.email_address,
+      email_gravatar_hash: args.email_gravatar_hash,
+      email_confirmed_by_google: false,
+
+      // Email+Password accounts have passwords (of course)
+      password_hash: args.password_hash,
+      is_without_password: false,
+
+      // NB: This is just for testing.
       maybe_user_token: args.maybe_user_token,
     },
     Transactor::for_pool(mysql_pool),

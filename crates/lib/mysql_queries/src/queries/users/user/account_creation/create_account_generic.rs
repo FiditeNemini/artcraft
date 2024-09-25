@@ -15,11 +15,17 @@ use tokens::tokens::users::UserToken;
 pub struct GenericCreateAccountArgs<'a> {
   pub username: &'a str,
   pub display_name: &'a str,
+
   pub email_address: &'a str,
   pub email_gravatar_hash: &'a str,
+  pub email_confirmed_by_google: bool,
+
   pub password_hash: &'a str,
+  pub is_without_password: bool,
+
   pub ip_address: &'a str,
   pub maybe_source: Option<&'a str>,
+  pub maybe_create_method: Option<&'a str>,
 
   // Comma separated string of feature flags.
   pub maybe_feature_flags: Option<&'a str>,
@@ -61,11 +67,15 @@ SET
   email_address = ?,
   email_gravatar_hash = ?,
 
+  email_confirmed = FALSE,
+  email_confirmed_by_google = ?,
+
   profile_markdown = ?,
   profile_rendered_html = ?,
   user_role_slug = ?,
 
   password_hash = ?,
+  is_without_password = ?,
 
   maybe_feature_flags = ?,
 
@@ -73,20 +83,24 @@ SET
   ip_address_last_login = ?,
   ip_address_last_update = ?,
 
-  maybe_source = ?
+  maybe_source = ?,
+  maybe_create_method = ?
         "#,
-      &user_token,
+      user_token.as_str(),
       args.username,
       args.display_name,
 
       args.email_address,
       args.email_gravatar_hash,
 
+      args.email_confirmed_by_google,
+
       INITIAL_PROFILE_MARKDOWN,
       INITIAL_PROFILE_RENDERED_HTML,
       INITIAL_USER_ROLE,
 
       args.password_hash,
+      args.is_without_password,
 
       args.maybe_feature_flags,
 
@@ -95,6 +109,7 @@ SET
       args.ip_address,
 
       args.maybe_source,
+      args.maybe_create_method,
     );
 
 
