@@ -6,6 +6,7 @@
 use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
 use crate::queries::users::user::account_creation::create_account_generic::{create_account_generic, GenericCreateAccountArgs};
 use crate::utils::transactor::Transactor;
+use enums::by_table::users::user_signup_method::UserSignupMethod;
 use tokens::tokens::users::UserToken;
 
 /// SSO accounts do not have passwords at account creation
@@ -34,12 +35,13 @@ pub async fn create_account_from_google_sso(
 {
   let result= create_account_generic(
     GenericCreateAccountArgs {
+      maybe_signup_method: Some(UserSignupMethod::GoogleSignIn),
+
       username: args.username,
       display_name: args.display_name,
       ip_address: args.ip_address,
       maybe_feature_flags: args.maybe_feature_flags,
       maybe_source: args.maybe_source,
-      maybe_create_method: None, // TODO
 
       // SSO accounts have an email reported from Google
       email_address: args.email_address,

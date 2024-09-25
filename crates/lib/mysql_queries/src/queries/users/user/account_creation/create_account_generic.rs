@@ -7,6 +7,7 @@ use crate::queries::users::user::account_creation::create_account_error::CreateA
 use crate::utils::transactor::Transactor;
 use log::warn;
 use sqlx::error::Error::Database;
+use enums::by_table::users::user_signup_method::UserSignupMethod;
 use tokens::tokens::users::UserToken;
 
 pub struct GenericCreateAccountArgs<'a> {
@@ -28,7 +29,7 @@ pub struct GenericCreateAccountArgs<'a> {
 
   pub ip_address: &'a str,
   pub maybe_source: Option<&'a str>,
-  pub maybe_create_method: Option<&'a str>,
+  pub maybe_signup_method: Option<UserSignupMethod>,
 
   /// Comma separated string of feature flags.
   pub maybe_feature_flags: Option<&'a str>,
@@ -90,7 +91,8 @@ SET
   ip_address_last_update = ?,
 
   maybe_source = ?,
-  maybe_create_method = ?
+
+  maybe_signup_method = ?
         "#,
       user_token.as_str(),
       args.username,
@@ -118,7 +120,7 @@ SET
       args.ip_address,
 
       args.maybe_source,
-      args.maybe_create_method,
+      args.maybe_signup_method.map(|m| m.to_str()),
     );
 
 

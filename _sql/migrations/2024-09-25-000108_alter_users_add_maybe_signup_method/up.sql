@@ -2,4 +2,7 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
-ALTER TABLE users DROP COLUMN maybe_create_method;
+ALTER TABLE users
+    ADD COLUMN
+        maybe_signup_method VARCHAR(32) DEFAULT NULL
+    AFTER maybe_source;

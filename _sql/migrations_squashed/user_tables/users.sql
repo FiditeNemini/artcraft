@@ -185,14 +185,15 @@ CREATE TABLE users (
 
   -- ========== TRACKING ==========
 
-  -- Where the user signed up from
+  -- Where the user signed up from (NOT NECESSARILY AN ENUM!)
   -- For now this will be "fakeyou" and "storyteller", but we may extend
   -- or overload this to handle other cases or metadata.
   maybe_source VARCHAR(255) DEFAULT NULL,
 
   -- How users created their account
-  -- Initially this will be "email" or "google_sso"
-  maybe_create_method VARCHAR(32) DEFAULT NULL,
+  -- Initially this will be "email_password" or "google_sign_in"
+  -- Older users do not have a value and are assumed to be "email_sign_in"
+  maybe_signup_method VARCHAR(16) DEFAULT NULL,
 
   -- ========== MODERATION DETAILS ==========
 

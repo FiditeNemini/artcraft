@@ -19,6 +19,22 @@ impl Claims {
     self.claims.custom.email_verified.unwrap_or(false)
   }
 
+  pub fn name(&self) -> Option<&str> {
+    self.claims.custom.name.as_deref()
+  }
+
+  pub fn given_name(&self) -> Option<&str> {
+    self.claims.custom.given_name.as_deref()
+  }
+
+  pub fn family_name(&self) -> Option<&str> {
+    self.claims.custom.family_name.as_deref()
+  }
+
+  pub fn locale(&self) -> Option<&str> {
+    self.claims.custom.locale.as_deref()
+  }
+
   /// Determine if the claim audience is as expected.
   /// This is necessary so third parties don't send claims signed on their behalf by Google.
   pub fn audience_matches(&self, audience: &str) -> AnyhowResult<bool> {

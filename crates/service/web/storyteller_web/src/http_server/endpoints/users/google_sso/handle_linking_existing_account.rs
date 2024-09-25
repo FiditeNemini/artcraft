@@ -9,35 +9,38 @@ use mysql_queries::queries::users::user::lookup_user_for_login_result::UserRecor
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql};
 
+pub struct LinkArgs<'a> {
+  pub http_request: &'a HttpRequest,
+  pub claims: Claims,
+  pub claims_subject: &'a str,
+  pub user_account: UserRecordForLogin,
+  pub mysql_connection: &'a mut PoolConnection<MySql>,
+}
 pub async fn handle_linking_existing_account(
-  user_account: UserRecordForLogin,
-  http_request: &HttpRequest,
-  subject: &str,
-  mysql_connection: &mut PoolConnection<MySql>,
-  claims: Claims,
+  args: LinkArgs<'_>
 )
   -> Result<NewSsoAccountInfo, GoogleCreateAccountErrorResponse>
 {
   // TODO: Double check email address in the claims before linking!
 
-  let mut transaction = mysql_connection.begin()
+  let mut transaction = args.mysql_connection.begin()
       .await
       .map_err(|e| {
         warn!("Could not begin transaction: {:?}", e);
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
-  let ip_address = get_request_ip(&http_request);
+  let ip_address = get_request_ip(&args.http_request);
 
   let _token = insert_google_sign_in_account(InsertGoogleSignInArgs {
-    subject,
-    maybe_user_token: Some(&user_account.token),
+    subject: args.claims_subject,
+    maybe_user_token: Some(&args.user_account.token),
     email_address: "todo@todo.com", // TODO // NB: The one from the Google claims, not our canonicalized one.
-    is_email_verified: claims.email_verified(),
-    maybe_locale: None, // TODO
-    maybe_name: None, // TODO
-    maybe_given_name: None, // TODO
-    maybe_family_name: None, // TODO
+    is_email_verified: args.claims.email_verified(),
+    maybe_locale: args.claims.locale(),
+    maybe_name: args.claims.name(),
+    maybe_given_name: args.claims.given_name(),
+    maybe_family_name: args.claims.family_name(),
     creator_ip_address: &ip_address,
     transaction: &mut transaction,
   }).await.map_err(|err| {
@@ -53,8 +56,8 @@ pub async fn handle_linking_existing_account(
       })?;
 
   Ok(NewSsoAccountInfo {
-    user_token: user_account.token,
-    user_display_name: user_account.display_name,
-    username_is_not_customized: user_account.username_is_not_customized,
+    user_token: args.user_account.token,
+    user_display_name: args.user_account.display_name,
+    username_is_not_customized: args.user_account.username_is_not_customized,
   })
 }

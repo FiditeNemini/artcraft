@@ -49,6 +49,58 @@ use tokens::tokens::users::UserToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
 
+/* ALGORITHM
+--> [SSO RECORD LOOKUP]
+  --> I. SSO Record Exists
+      --> [LOGIN DIRECTLY]
+
+          This should be the simple case. We assume it is linked to a valid
+          users table record / account.
+
+          Potential Problems:
+          - If Google user changes their Google SSO email
+          - If we let our users change their email or unlink accounts
+          - If user signs up with a new, non-canonical variant of their email address
+
+  --> II. SSO Record Does Not Exist
+    --> [USER RECORD LOOKUP BY EMAIL]
+      --> IIA. User Record Does Not Exist
+        --> [CREATE NEW (1) SSO ACCOUNT AND (2) USER RECORDS, LOGIN]
+
+            Potential Problems:
+            - If the user already had an account with a non-canonical variant
+
+      --> IIB. User Record Exists
+        --> [CREATE SSO RECORD, LINK USER RECORD, LOGIN]
+
+            Potential Problems:
+            - If the email is not a Gmail account, we need to confirm the password.
+            - If the user already had an account (or accounts) with a non-canonical
+              variant, we can't detect/link it. We might create a duplicate account
+              or link the "wrong" / undesired account.
+
+ Notes on non-canonical email addresses:
+
+   - Email addresses may not 1:1 match user accounts.
+
+   - Our "canonicalization" is simply trimming and lower-casing the email.
+     This may not even be correct in an i18n context with certain character sets.
+
+   - Google emails treat period (.) and everything after a plus (+) specially. This
+     is a broad topic, but it could essentially enable users to create unlimited email
+     addresses from one Google account.
+
+   - Other email providers may behave weirdly with their own canonicalization schemes.
+
+ TODO:
+  - Handle existing account linkage
+  - Should we store canonical emails?
+  - User source enum
+  - Store all the claims info
+  - Verify all paths (including legacy sign up paths)
+  - Update claims info on re-login (if diff exists)
+ */
+
 #[derive(ToSchema, Deserialize)]
 pub struct GoogleCreateAccountRequest {
   pub google_credential: String,
@@ -70,7 +122,7 @@ pub struct GoogleCreateAccountSuccessResponse {
 
   /// The user's display username. If we want to present a username
   /// customization flow, we can use this to prevent another round trip.
-  pub user_display_name: String,
+  pub maybe_user_display_name: Option<String>,
 }
 
 #[derive(ToSchema, Serialize, Debug)]
@@ -129,7 +181,6 @@ impl ResponseError for GoogleCreateAccountErrorResponse {
   }
 }
 
-
 /// Sign in or sign up with "Sign in with Google" credentials.
 /// This supports both sign up for new users and sign in for existing users.
 #[utoipa::path(
@@ -181,58 +232,6 @@ pub async fn google_sso_handler(
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
-  /* ALGORITHM
-  --> [SSO RECORD LOOKUP]
-    --> I. SSO Record Exists
-        --> [LOGIN DIRECTLY]
-
-            This should be the simple case. We assume it is linked to a valid
-            users table record / account.
-
-            Potential Problems:
-            - If Google user changes their Google SSO email
-            - If we let our users change their email or unlink accounts
-            - If user signs up with a new, non-canonical variant of their email address
-
-    --> II. SSO Record Does Not Exist
-      --> [USER RECORD LOOKUP BY EMAIL]
-        --> IIA. User Record Does Not Exist
-          --> [CREATE NEW (1) SSO ACCOUNT AND (2) USER RECORDS, LOGIN]
-
-              Potential Problems:
-              - If the user already had an account with a non-canonical variant
-
-        --> IIB. User Record Exists
-          --> [CREATE SSO RECORD, LINK USER RECORD, LOGIN]
-
-              Potential Problems:
-              - If the email is not a Gmail account, we need to confirm the password.
-              - If the user already had an account (or accounts) with a non-canonical
-                variant, we can't detect/link it. We might create a duplicate account
-                or link the "wrong" / undesired account.
-
-   Notes on non-canonical email addresses:
-
-     - Email addresses may not 1:1 match user accounts.
-
-     - Our "canonicalization" is simply trimming and lower-casing the email.
-       This may not even be correct in an i18n context with certain character sets.
-
-     - Google emails treat period (.) and everything after a plus (+) specially. This
-       is a broad topic, but it could essentially enable users to create unlimited email
-       addresses from one Google account.
-
-     - Other email providers may behave weirdly with their own canonicalization schemes.
-
-   TODO:
-    - Handle existing account linkage
-    - Should we store canonical emails?
-    - User source enum
-    - Store all the claims info
-    - Verify all paths (including legacy sign up paths)
-    - Update claims info on re-login (if diff exists)
-   */
-
   let mut maybe_user_token = None;
   let mut maybe_user_display_name = None;
   let mut username_not_yet_customized = false;
@@ -250,7 +249,10 @@ pub async fn google_sso_handler(
         },
       };
 
+      // TODO: Handle updating SSO details (eg new profile picture).
+
       maybe_user_token = Some(user_token);
+      maybe_user_display_name = sso_account.maybe_user_display_name.clone();
     },
     None => {
       let result = handle_new_sso_account(
@@ -297,17 +299,16 @@ pub async fn google_sso_handler(
     &session_cookie_manager,
     &session_token,
     &user_token,
-    "todo".to_string(),
+    maybe_user_display_name,
     username_not_yet_customized,
   )
 }
-
 
 pub fn construct_http_response(
   session_cookie_manager: &HttpUserSessionManager,
   session_token: &UserSessionToken,
   user_token: &UserToken,
-  user_display_name: String,
+  maybe_user_display_name: Option<String>,
   username_not_yet_customized: bool,
 ) -> Result<HttpResponse, GoogleCreateAccountErrorResponse> {
 
@@ -325,7 +326,7 @@ pub fn construct_http_response(
     success: true,
     signed_session,
     username_not_yet_customized,
-    user_display_name,
+    maybe_user_display_name,
   };
 
   let body = serde_json::to_string(&response)
