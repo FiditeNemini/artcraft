@@ -1,5 +1,6 @@
 use crate::http_server::endpoints::users::google_sso::google_sso_handler::GoogleCreateAccountErrorResponse;
 use crate::http_server::endpoints::users::google_sso::handle_new_sso_account::NewSsoAccountInfo;
+use crate::http_server::requests::get_request_signup_source::get_request_signup_source;
 use crate::http_server::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::generate_random_username::generate_random_username;
@@ -15,7 +16,6 @@ use mysql_queries::queries::users::user::lookup_user_for_login_result::UserRecor
 use mysql_queries::utils::transactor::Transactor;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql};
-use crate::http_server::requests::get_request_signup_source::get_request_signup_source;
 
 pub struct CreateArgs<'a> {
   pub http_request: &'a HttpRequest,

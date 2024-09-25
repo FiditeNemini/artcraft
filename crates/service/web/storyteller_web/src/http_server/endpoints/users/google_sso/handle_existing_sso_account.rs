@@ -29,7 +29,7 @@ pub async fn handle_existing_sso_account(
     None => {
       // NB: If accounts get into this state (e.g. if we support de-linking), we'll need to
       // consider how to migrate accounts and handle all the various account states.
-      // For now, we'll just deny this possibility.
+      // For now, we'll just deny this possibility. It should not happen.
       warn!("no user token for existing google sign in account!");
       return Err(GoogleCreateAccountErrorResponse::server_error());
     },
@@ -38,7 +38,7 @@ pub async fn handle_existing_sso_account(
   if should_update_sso_claims(args.sso_account, &args.claims) {
     let ip_address = get_request_ip(args.http_request);
 
-    update_google_sign_in_account(UpdateGoogleSignInArgs {
+    let result = update_google_sign_in_account(UpdateGoogleSignInArgs {
       subject: &args.sso_account.subject,
       email_address: args.claims_email_address,
       is_email_verified: args.claims.email_verified(),
@@ -48,10 +48,12 @@ pub async fn handle_existing_sso_account(
       maybe_family_name: args.claims.family_name(),
       creator_ip_address: &ip_address,
       transactor: Transactor::for_connection(args.mysql_connection),
-    }).await.map_err(|err| {
-      warn!("error updating google sign in account: {:?}", err);
-      GoogleCreateAccountErrorResponse::server_error()
-    })?;
+    }).await;
+
+    if let Err(err) = result {
+      // NB: Fail open.
+      warn!("error updating google sign in account (failing open): {:?}", err);
+    };
   }
 
   Ok(user_token)
