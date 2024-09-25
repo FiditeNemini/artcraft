@@ -44,6 +44,7 @@ pub async fn create_account_from_email(
       email_gravatar_hash: args.email_gravatar_hash,
       password_hash: args.password_hash,
       ip_address: args.ip_address,
+      maybe_feature_flags: None,
       maybe_source: args.maybe_source,
       maybe_user_token: args.maybe_user_token,
     },

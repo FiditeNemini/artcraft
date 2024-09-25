@@ -16,8 +16,17 @@ CREATE TABLE users (
   username VARCHAR(20) NOT NULL,
   display_name VARCHAR(20) NOT NULL,
 
+  -- Set by the user at sign up:
+  --  - When email + password signup, this is the email provided.
+  --  - When Google SSO, this is the email provided by Google.
   email_address VARCHAR(255) NOT NULL,
+
+  -- Email address is confirmed by us.
+  -- We do not set this on 3rd party (ie. Google) "email confirmation", only our own.
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
+
+  -- Email address is confirmed by Google.
+  email_confirmed_by_google BOOLEAN NOT NULL DEFAULT false,
 
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
@@ -64,6 +73,9 @@ CREATE TABLE users (
 
   -- Incremented with every update to the password.
   password_version INT UNSIGNED NOT NULL DEFAULT 0,
+
+  -- Users signing up from SSO do not have a password at time of account creation.
+  is_without_password BOOLEAN NOT NULL DEFAULT false,
 
   -- ========== ABUSE TRACKING ==========
 
@@ -166,6 +178,10 @@ CREATE TABLE users (
   -- For now this will be "fakeyou" and "storyteller", but we may extend
   -- or overload this to handle other cases or metadata.
   maybe_source VARCHAR(255) DEFAULT NULL,
+
+  -- How users created their account
+  -- Initially this will be "email" or "google_sso"
+  maybe_create_method VARCHAR(32) DEFAULT NULL,
 
   -- ========== MODERATION DETAILS ==========
 

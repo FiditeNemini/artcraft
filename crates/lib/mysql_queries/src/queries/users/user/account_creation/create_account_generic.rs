@@ -21,6 +21,9 @@ pub struct GenericCreateAccountArgs<'a> {
   pub ip_address: &'a str,
   pub maybe_source: Option<&'a str>,
 
+  // Comma separated string of feature flags.
+  pub maybe_feature_flags: Option<&'a str>,
+
   /// In production code, send this as `None`.
   /// Only provide an external user token for db integration tests and db seeding tools.
   /// This allows for knowing the user token a priori.
@@ -64,6 +67,8 @@ SET
 
   password_hash = ?,
 
+  maybe_feature_flags = ?,
+
   ip_address_creation = ?,
   ip_address_last_login = ?,
   ip_address_last_update = ?,
@@ -82,6 +87,8 @@ SET
       INITIAL_USER_ROLE,
 
       args.password_hash,
+
+      args.maybe_feature_flags,
 
       args.ip_address,
       args.ip_address,
