@@ -1,8 +1,7 @@
 import Konva from "konva";
-import { VideoNode } from "./Nodes/VideoNode";
-import { ImageNode } from "./Nodes/ImageNode";
-import { NetworkedNodeContext } from "./Nodes/NetworkedNodeContext";
-type MediaNode = NetworkedNodeContext | VideoNode | ImageNode;
+
+import { MediaNode } from "./type";
+
 export class SelectionManager {
   private selectedNodes: Set<MediaNode>;
   private initialPositions: Map<MediaNode, { x: number; y: number }>;
@@ -25,7 +24,6 @@ export class SelectionManager {
       return;
     }
     node.kNode.getLayer()?.batchDraw();
-
     console.log("Selected Nodes:");
     console.log(this.selectedNodes);
   }

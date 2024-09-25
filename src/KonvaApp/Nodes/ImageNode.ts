@@ -2,20 +2,35 @@ import Konva from "konva";
 import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { SelectionManager } from "../SelectionManager";
+import { NodeTransformer } from "../NodeTransformer";
+
+interface ImageNodeContructor {
+  mediaLayer: Layer;
+  x: number;
+  y: number;
+  imageFile: File;
+  selectionManagerRef: SelectionManager;
+  nodeTransformer: NodeTransformer;
+}
+
 export class ImageNode extends NetworkedNodeContext {
   public imageURL: string;
 
   private imageObject: HTMLImageElement;
 
-  constructor(
-    mediaLayer: Layer,
-    x: number,
-    y: number,
-    imageFile: File,
-    selectionManagerRef: SelectionManager,
-  ) {
-    super(selectionManagerRef, mediaLayer);
-    this.selectionManagerRef = selectionManagerRef;
+  constructor({
+    mediaLayer,
+    x,
+    y,
+    imageFile,
+    selectionManagerRef,
+    nodeTransformer,
+  }: ImageNodeContructor) {
+    super({
+      nodeTransfomerRef: nodeTransformer,
+      selectionManagerRef: selectionManagerRef,
+      mediaLayer: mediaLayer,
+    });
     this.mediaLayer = mediaLayer;
     this.didFinishLoading = false;
 

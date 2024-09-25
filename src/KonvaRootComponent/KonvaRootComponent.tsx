@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 // Components
 import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
 import { ContextualButtonRetry } from "./ContextualButtonRetry";
-import { ContextualToolbarImage } from "./ContextualToolbarImage";
+import { ContextualToolbarNode } from "./ContextualToolbarNode";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
 import { SignaledDialogs } from "./SignaledDialogs";
@@ -57,9 +57,9 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
         resetAll={appUiContext.resetAll}
       />
 
-      <ContextualToolbarImage />
-      <ContextualButtonRetry />
       <ContextualLoadingBar />
+      <ContextualToolbarNode />
+      <ContextualButtonRetry />
     </>
   );
 };

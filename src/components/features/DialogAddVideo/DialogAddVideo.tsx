@@ -131,7 +131,7 @@ export const DialogAddVideo = ({
               </Button>
               {dialogStatus === DialogAddMediaStatuses.STAGING_FILE && (
                 <ButtonSubmitAdd
-                  file={file}
+                  file={currFile}
                   trimData={trimData}
                   onStatusChanged={changeDialogStatus}
                   onUploadedVideo={onUploadedVideo}

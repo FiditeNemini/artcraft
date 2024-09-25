@@ -1,0 +1,155 @@
+import { signal } from "@preact/signals-react";
+import { ContextualUi } from "./type";
+import { ToolbarNodeButtonNames as ButtonNames } from "~/components/features/ToolbarNode/enums";
+type ButtonStates = {
+  [key in ButtonNames]: {
+    disabled: boolean;
+    active: boolean;
+  };
+};
+interface ContextualToolbarProps extends ContextualUi {
+  disabled: boolean;
+  locked: boolean;
+  buttonStates: ButtonStates;
+}
+interface PartialContextualToolbarProps
+  extends Partial<Omit<ContextualToolbarProps, "buttonStates">> {
+  buttonStates?: Partial<ButtonStates>;
+}
+const toolbarNodeSignal = signal<ContextualToolbarProps>({
+  position: {
+    x: 0,
+    y: 0,
+  },
+  isShowing: false,
+  disabled: false,
+  locked: false,
+  buttonStates: initButtonStates(),
+});
+
+export const toolbarNode = {
+  signal: toolbarNodeSignal,
+  setup(props: ContextualToolbarProps) {
+    toolbarNodeSignal.value = props;
+  },
+  update(props: Partial<ContextualToolbarProps>) {
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      ...props,
+    };
+  },
+  setPosition(position: ContextualToolbarProps["position"]) {
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      position,
+    };
+  },
+  lock() {
+    const { buttonStates } = toolbarNodeSignal.value;
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      buttonStates: {
+        ...buttonStates,
+        [ButtonNames.TRANSFORM]: {
+          disabled: true,
+          active: buttonStates[ButtonNames.TRANSFORM].active,
+        },
+      },
+      locked: true,
+    };
+  },
+  unlock() {
+    const { buttonStates } = toolbarNodeSignal.value;
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      buttonStates: {
+        ...buttonStates,
+        [ButtonNames.TRANSFORM]: {
+          disabled: false,
+          active: buttonStates[ButtonNames.TRANSFORM].active,
+        },
+      },
+      locked: false,
+    };
+  },
+  show(
+    values: PartialContextualToolbarProps = {
+      locked: false,
+      buttonStates: {},
+    },
+  ) {
+    const { locked, buttonStates, ...rest } = values;
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      ...rest,
+      buttonStates: {
+        ...initButtonStates({
+          locked,
+        }),
+        ...buttonStates,
+      },
+      isShowing: true,
+      locked: locked ?? false,
+    };
+  },
+  hide() {
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      isShowing: false,
+    };
+  },
+  enable() {
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      disabled: false,
+    };
+  },
+  disable() {
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      disabled: true,
+    };
+  },
+  changeButtonState(
+    buttonName: ButtonNames,
+    { disabled, active }: { disabled?: boolean; active?: boolean },
+  ) {
+    const prevButtonState = toolbarNodeSignal.value.buttonStates[buttonName];
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      buttonStates: {
+        ...toolbarNodeSignal.value.buttonStates,
+        [buttonName]: {
+          disabled: disabled ?? prevButtonState.disabled,
+          active: active ?? prevButtonState.active,
+        },
+      },
+    };
+  },
+  resetAllButtonStates() {
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      buttonStates: initButtonStates(),
+    };
+  },
+};
+
+function initButtonStates(props: { locked?: boolean } = {}) {
+  return Object.values(ButtonNames).reduce(
+    (buttonStates, buttonName) => {
+      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
+        buttonStates[buttonName] = {
+          disabled: props.locked,
+          active: true,
+        };
+      } else {
+        buttonStates[buttonName] = {
+          disabled: false,
+          active: false,
+        };
+      }
+      return buttonStates;
+    },
+    {} as ContextualToolbarProps["buttonStates"],
+  );
+}

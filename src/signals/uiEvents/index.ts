@@ -3,17 +3,13 @@ import {
   events as addMediaEvents,
 } from "./addMedia";
 import {
-  dispatchers as toolbarImageDispatchers,
-  eventsHandlers as toolbarImageEvents,
-} from "./toolbarImage";
-import {
-  dispatchers as videoToolbarDispatchers,
-  eventsHandlers as videoToolbarEvents,
-} from "./toolbarVideo";
-import {
   dispatchers as toolbarMainDispatchers,
   eventsHandlers as toolbarMainEvents,
 } from "./toolbarMain";
+import {
+  dispatchers as toolbarNodeDispatchers,
+  eventsHandlers as toolbarNodeEvents,
+} from "./toolbarNode";
 import {
   dispatcher as buttonTestDispatcher,
   eventsHandler as buttonTestEvent,
@@ -29,16 +25,14 @@ export const uiEvents = {
   aiStylize: aiStylizeEvents,
   buttonRetry: buttonRetryEvent,
   buttonTest: buttonTestEvent,
-  toolbarImage: toolbarImageEvents,
   toolbarMain: toolbarMainEvents,
-  toolbarVideo: videoToolbarEvents,
+  toolbarNode: toolbarNodeEvents,
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
   aiStylize: aiStylizeDispatchers,
   buttonRetry: buttonRetryDispatcher,
   buttonTest: buttonTestDispatcher,
-  toolbarImage: toolbarImageDispatchers,
   toolbarMain: toolbarMainDispatchers,
-  toolbarVideo: videoToolbarDispatchers,
+  toolbarNode: toolbarNodeDispatchers,
 };

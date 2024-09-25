@@ -1,19 +1,18 @@
 import Konva from "konva";
-import { VideoNode } from "./Nodes/VideoNode";
-import { uiAccess } from "~/signals";
-import { uiEvents } from "~/signals";
+
 import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
-import { v4 as uuidv4 } from "uuid";
+import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
+
+import { uiAccess } from "~/signals";
+import { toolbarNode } from "~/signals/uiAccess/toolbarNode";
+import { uiEvents } from "~/signals";
 
 import { SelectionManager } from "./SelectionManager";
-import { toolbarImage } from "~/signals/uiAccess/toolbarImage";
-
+import { NodeTransformer } from "./NodeTransformer";
 import { ImageNode } from "./Nodes/ImageNode";
+import { VideoNode } from "./Nodes/VideoNode";
 
-import { LoadingBarStatus } from "~/components/ui";
-import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 import { UndoStackManager } from "./UndoRedo/UndoRedoManager";
-
 import { CreateCommand } from "./UndoRedo/CreateCommand";
 import { DeleteCommand } from "./UndoRedo/DeleteCommand";
 import { RotateCommand } from "./UndoRedo/RotateCommand";
@@ -42,6 +41,7 @@ export class Engine {
   private offScreenCanvas: OffscreenCanvas;
 
   private selectionManager: SelectionManager;
+  private nodeTransformer: NodeTransformer;
   private undoStackManager: UndoStackManager;
   // signal reference
   constructor(canvasReference: HTMLDivElement) {
@@ -51,8 +51,6 @@ export class Engine {
       console.log("Engine Constructor ran");
     }
 
-    this.selectionManager = new SelectionManager();
-    this.undoStackManager = new UndoStackManager();
     this.canvasReference = canvasReference;
     this.stage = new Konva.Stage({
       container: this.canvasReference,
@@ -63,6 +61,14 @@ export class Engine {
     const videoLayer = new Konva.Layer();
     this.videoLayer = videoLayer;
     this.stage.add(videoLayer);
+
+    // Konva Transformer
+    this.nodeTransformer = new NodeTransformer({
+      videoLayer: this.videoLayer,
+    });
+
+    this.selectionManager = new SelectionManager();
+    this.undoStackManager = new UndoStackManager();
 
     // Listen to changes in container size
     const resizeObserver = new ResizeObserver(() => {
@@ -117,13 +123,14 @@ export class Engine {
       const media_api_base_url = "https://storage.googleapis.com/";
       const media_url = `${media_api_base_url}vocodes-public${response.data.videoUrl}`;
 
-      const videoNode = new VideoNode(
-        this.videoLayer,
-        this.renderEngine.captureCanvas.position().x,
-        this.renderEngine.captureCanvas.position().y,
-        media_url,
-        this.selectionManager,
-      );
+      const videoNode = new VideoNode({
+        videoLayer: this.videoLayer,
+        x: this.renderEngine.captureCanvas.position().x,
+        y: this.renderEngine.captureCanvas.position().y,
+        videoURL: media_url,
+        selectionManagerRef: this.selectionManager,
+        nodeTransformerRef: this.nodeTransformer,
+      });
       this.renderEngine.addNodes(videoNode);
       // hide the loader
       //this.renderEngine.videoLoadingCanvas.kNode.hide();
@@ -153,29 +160,40 @@ export class Engine {
   private setupEventSystem() {
     this.stage.on("mousedown", (e) => {
       if (e.target === this.stage) {
+        this.nodeTransformer.clear();
         this.selectionManager.clearSelection();
       }
     });
 
-    uiEvents.toolbarImage.DELETE.onClick(() => {
+    uiEvents.toolbarNode.lock.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
-      toolbarImage.hide();
+      nodes.forEach((node) => {
+        node.toggleLock();
+      });
+      // this.nodeTransformer.enable({ selectedNodes: nodes });
+    });
+
+    uiEvents.toolbarNode.DELETE.onClick(() => {
+      const nodes = this.selectionManager.getSelectedNodes();
+      toolbarNode.hide();
 
       nodes.forEach((node) => {
         this.selectionManager.deselectNode(node);
+        const nodes = this.selectionManager.getSelectedNodes();
+        this.nodeTransformer.enable({ selectedNodes: nodes });
         this.renderEngine.removeNodes(node);
         node.delete();
       });
     });
 
-    uiEvents.toolbarImage.MOVE_LAYER_DOWN.onClick(() => {
+    uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
       nodes.forEach((node) => {
         node.sendBack();
       });
     });
 
-    uiEvents.toolbarImage.MOVE_LAYER_UP.onClick(() => {
+    uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
       nodes.forEach((node) => {
         node.bringToFront();
@@ -200,15 +218,15 @@ export class Engine {
         // throw error to retry
         uiAccess.dialogueError.show({
           title: "Generation Error",
-          message: error.toString(),
+          message: error?.toString() || "Unknown Error",
         });
       }
     });
 
     // TODO: You may listen to all the image toolbar events here
-    uiEvents.toolbarImage.MOVE.onClick(() => {
-      console.log("move");
-    });
+    // uiEvents.toolbarNode.MOVE.onClick(() => {
+    //   console.log("move");
+    // });
 
     uiEvents.toolbarMain.SELECT_ONE.onClick(() => {
       console.log("select one is clicked");
@@ -218,10 +236,6 @@ export class Engine {
     uiEvents.toolbarMain.SAVE.onClick(async (event) => {
       //this.onRenderingSystemReceived(undefined);
     });
-
-    // WIL please default hide this. TODO Remove
-    uiAccess.toolbarMain.loadingBar.hide();
-    uiAccess.toolbarMain.loadingBar.updateStatus(LoadingBarStatus.IDLE);
   }
 
   sleep(ms: number): Promise<void> {
@@ -249,7 +263,7 @@ export class Engine {
 
   public initializeStage(sceneToken: string) {
     // load canvas that was originaly saved TODO Save manager for resharing.
-    uiAccess.toolbarImage.hide();
+    uiAccess.toolbarNode.hide();
     uiAccess.loadingBar.hide();
 
     this.setupStage();
@@ -262,30 +276,34 @@ export class Engine {
     const imageFile = await FileUtilities.createImageFileFromUrl(
       "https://static.miraheze.org/pgrwiki/0/0d/Dialogue-2B-Icon.png",
     );
-    const imageNode = new ImageNode(
-      this.videoLayer,
-      this.renderEngine.captureCanvas.position().x,
-      this.renderEngine.captureCanvas.position().y,
-      imageFile,
-      this.selectionManager,
-    );
+    const imageNode = new ImageNode({
+      mediaLayer: this.videoLayer,
+      x: this.renderEngine.captureCanvas.position().x,
+      y: this.renderEngine.captureCanvas.position().y,
+      imageFile: imageFile,
+      selectionManagerRef: this.selectionManager,
+      nodeTransformer: this.nodeTransformer,
+    });
 
-    const imageNode2 = new ImageNode(
-      this.videoLayer,
-      this.renderEngine.captureCanvas.position().x,
-      this.renderEngine.captureCanvas.position().y,
-      imageFile,
-      this.selectionManager,
-    );
+    const imageNode2 = new ImageNode({
+      mediaLayer: this.videoLayer,
+      x: this.renderEngine.captureCanvas.position().x,
+      y: this.renderEngine.captureCanvas.position().y,
+      imageFile: imageFile,
+      selectionManagerRef: this.selectionManager,
+      nodeTransformer: this.nodeTransformer,
+    });
 
     // Adding nodes here
-    const videoNode = new VideoNode(
-      this.videoLayer,
-      this.renderEngine.captureCanvas.position().x,
-      this.renderEngine.captureCanvas.position().y,
-      "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-      this.selectionManager,
-    );
+    const videoNode = new VideoNode({
+      videoLayer: this.videoLayer,
+      x: this.renderEngine.captureCanvas.position().x,
+      y: this.renderEngine.captureCanvas.position().y,
+      videoURL:
+        "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
 
     // CODE TO TEST RENDER ENGINE
     // Testing render engine
@@ -330,25 +348,27 @@ export class Engine {
   }
 
   public addImage(imageFile: File) {
-    const imageNode = new ImageNode(
-      this.videoLayer,
-      this.renderEngine.captureCanvas.position().x,
-      this.renderEngine.captureCanvas.position().y,
-      imageFile,
-      this.selectionManager,
-    );
+    const imageNode = new ImageNode({
+      mediaLayer: this.videoLayer,
+      x: this.renderEngine.captureCanvas.position().x,
+      y: this.renderEngine.captureCanvas.position().y,
+      imageFile: imageFile,
+      selectionManagerRef: this.selectionManager,
+      nodeTransformer: this.nodeTransformer,
+    });
     this.renderEngine.addNodes(imageNode);
   }
 
   public addVideo(url: string) {
     // Adding nodes here
-    const videoNode = new VideoNode(
-      this.videoLayer,
-      this.renderEngine.captureCanvas.position().x,
-      this.renderEngine.captureCanvas.position().y,
-      url,
-      this.selectionManager,
-    );
+    const videoNode = new VideoNode({
+      videoLayer: this.videoLayer,
+      x: this.renderEngine.captureCanvas.position().x,
+      y: this.renderEngine.captureCanvas.position().y,
+      videoURL: url,
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
     this.renderEngine.addNodes(videoNode);
   }
 

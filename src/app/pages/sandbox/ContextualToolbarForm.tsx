@@ -4,11 +4,11 @@ import { Input, Button } from "~/components/ui";
 import { uiAccess } from "~/signals";
 import { uiEvents } from "~/signals";
 
-import { ToolbarImageButtonData } from "~/components/features/ToolbarImage/data";
-import { ToolbarImageButtonNames } from "~/components/features/ToolbarImage/enums";
+import { ToolbarNodeButtonData } from "~/components/features/ToolbarNode/data";
+import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 
 export const ContextualToolbarForm = () => {
-  const toolbarImage = uiAccess.toolbarImage;
+  const toolbarImage = uiAccess.toolbarNode;
 
   const {
     isShowing,
@@ -76,7 +76,7 @@ export const ContextualToolbarForm = () => {
         </Button>
       </div>
       <div className="grid max-w-2xl grid-cols-6 gap-2">
-        {Object.values(ToolbarImageButtonData).map((button) => (
+        {Object.values(ToolbarNodeButtonData).map((button) => (
           <Button
             key={button.name}
             icon={button.icon}
@@ -94,7 +94,7 @@ export const ContextualToolbarForm = () => {
             </span>
           </Button>
         ))}
-        {Object.values(ToolbarImageButtonData).map((button) => (
+        {Object.values(ToolbarNodeButtonData).map((button) => (
           <Button
             key={button.name}
             icon={button.icon}
@@ -117,10 +117,10 @@ export const ContextualToolbarForm = () => {
 };
 
 export const LittleThing = () => {
-  Object.values(ToolbarImageButtonNames).forEach((buttonName) => {
-    uiEvents.toolbarImage[buttonName].onClick(() => {
+  Object.values(ToolbarNodeButtonNames).forEach((buttonName) => {
+    uiEvents.toolbarNode[buttonName].onClick(() => {
       console.log(buttonName);
-      uiAccess.toolbarImage.changeButtonState(buttonName, {
+      uiAccess.toolbarNode.changeButtonState(buttonName, {
         disabled: true,
       });
     });

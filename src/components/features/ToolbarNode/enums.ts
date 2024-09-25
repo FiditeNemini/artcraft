@@ -1,6 +1,5 @@
-export enum ToolbarVideoButtonNames {
-  MOVE = "MOVE",
-  ROTATE = "ROTATE",
+export enum ToolbarNodeButtonNames {
+  TRANSFORM = "TRANSFORM",
   AI_STYLIZE = "AI_STYLIZE",
   DELETE = "DELETE",
   MOVE_LAYER_UP = "MOVE_LAYER_UP",

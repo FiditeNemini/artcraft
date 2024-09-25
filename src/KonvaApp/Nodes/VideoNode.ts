@@ -3,8 +3,9 @@ import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { uiAccess } from "~/signals";
 import { SelectionManager } from "../SelectionManager";
+import { NodeTransformer } from "../NodeTransformer";
 
-const toolbarVideo = uiAccess.toolbarImage;
+const toolbarNode = uiAccess.toolbarNode;
 const loadingBar = uiAccess.loadingBar;
 
 export class VideoNode extends NetworkedNodeContext {
@@ -38,14 +39,26 @@ export class VideoNode extends NetworkedNodeContext {
   private frameDidFinishSeeking: Promise<void>;
   private finishedLoadingOnStart: Promise<void>;
 
-  constructor(
-    videoLayer: Layer,
-    x: number,
-    y: number,
-    videoURL: string,
-    selectionManagerRef: SelectionManager,
-  ) {
-    super(selectionManagerRef, videoLayer);
+  constructor({
+    videoLayer,
+    x,
+    y,
+    videoURL,
+    selectionManagerRef,
+    nodeTransformerRef,
+  }: {
+    videoLayer: Layer;
+    x: number;
+    y: number;
+    videoURL: string;
+    selectionManagerRef: SelectionManager;
+    nodeTransformerRef: NodeTransformer;
+  }) {
+    super({
+      nodeTransfomerRef: nodeTransformerRef,
+      selectionManagerRef: selectionManagerRef,
+      mediaLayer: videoLayer,
+    });
 
     // state manage the node
     // use web codecs to get the frame rate 89% support

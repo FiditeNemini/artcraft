@@ -64,11 +64,6 @@ export const ToolbarMain = ({
             buttonProps={buttonProps.SELECT_ONE}
             tooltip="Select"
           />
-          <ToolbarButton
-            icon={faSquareDashed}
-            buttonProps={buttonProps.SELECT_AREA}
-            tooltip="Select Area"
-          />
           <Popover className="relative">
             <PopoverButton as={Fragment}>
               <button

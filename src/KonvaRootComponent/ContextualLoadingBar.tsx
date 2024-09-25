@@ -15,7 +15,7 @@ export const ContextualLoadingBar = () => {
       show={isShowing}
       className={twMerge(
         transitionTimingStyles,
-        "fixed -translate-x-1/2 translate-y-5 data-[closed]:opacity-0",
+        "fixed -translate-x-1/2 translate-y-24 border-t border-t-white data-[closed]:opacity-0",
       )}
       style={{
         top: position.y,

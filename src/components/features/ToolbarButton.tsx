@@ -39,7 +39,7 @@ export const ToolbarButton = ({
     "rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
     children ? "w-fit flex items-center gap-2 text-nowrap" : "size-10",
     disabled && "pointer-events-none text-secondary-300",
-    active && "pointer-events-none text-primary ",
+    !disabled && active && "pointer-events-none text-primary ",
     customButtonClassNames,
   );
 
