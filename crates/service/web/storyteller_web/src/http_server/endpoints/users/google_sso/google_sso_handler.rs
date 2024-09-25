@@ -8,6 +8,10 @@ use std::fmt;
 use std::fmt::Formatter;
 
 use crate::http_server::endpoints::beta_keys::redeem_beta_key_handler::RedeemBetaKeyError;
+use crate::http_server::endpoints::users::create_account_handler::{CreateAccountErrorResponse, CreateAccountSuccessResponse};
+use crate::http_server::endpoints::users::google_sso::check_claims::check_claims;
+use crate::http_server::endpoints::users::google_sso::handle_existing_sso_account::handle_existing_sso_account;
+use crate::http_server::endpoints::users::google_sso::handle_new_sso_account::handle_new_sso_account;
 use crate::http_server::endpoints::users::session_info_handler::SessionInfoError;
 use crate::http_server::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
@@ -36,14 +40,15 @@ use mysql_queries::queries::google_sign_in_accounts::insert_google_sign_in_accou
 use mysql_queries::queries::users::user::account_creation::create_account_error::CreateAccountError;
 use mysql_queries::queries::users::user::account_creation::create_account_from_google_sso::{create_account_from_google_sso, CreateAccountFromGoogleSsoArgs};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use mysql_queries::queries::users::user_sessions::create_user_session_with_transactor::create_user_session_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, MySql, MySqlPool};
 use tokens::tokens::user_sessions::UserSessionToken;
+use tokens::tokens::users::UserToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
-use mysql_queries::queries::users::user_sessions::create_user_session_with_transactor::create_user_session_with_transactor;
 
 #[derive(ToSchema, Deserialize)]
 pub struct GoogleCreateAccountRequest {
@@ -87,7 +92,7 @@ pub enum GoogleCreateAccountErrorType {
 }
 
 impl GoogleCreateAccountErrorResponse {
-  fn server_error() -> Self {
+  pub fn server_error() -> Self {
     Self {
       success: false,
       error_type: GoogleCreateAccountErrorType::ServerError,
@@ -95,7 +100,7 @@ impl GoogleCreateAccountErrorResponse {
     }
   }
 
-  fn bad_request() -> Self {
+  pub fn bad_request() -> Self {
     Self {
       success: false,
       error_type: GoogleCreateAccountErrorType::BadRequest,
@@ -153,7 +158,7 @@ pub async fn create_account_from_google_sign_in_handler(
   google_sign_in_cert: Data<GoogleSignInCert>,
 ) -> Result<HttpResponse, GoogleCreateAccountErrorResponse>
 {
-  let claims = check_claims(&request, google_sign_in_cert).await?;
+  let claims = check_claims(&request, &google_sign_in_cert).await?;
 
   info!("Google JWT credential claims: email {:?}, verified: {}",
     claims.email(),
@@ -180,217 +185,114 @@ pub async fn create_account_from_google_sign_in_handler(
         GoogleCreateAccountErrorResponse::server_error()
       })?;
 
+  /* ALGORITHM
+  --> [SSO RECORD LOOKUP]
+    --> SSO Record Exists
+        --> [LOGIN DIRECTLY]
+          --> However, if the Google user changes their email, or if we let
+              our users change their email or unlink accounts, that could
+              result in account state issues.
+    --> SSO Record Does Not Exist
+      --> [USER RECORD LOOKUP BY EMAIL]
+        --> User Record Does Not Exist
+          --> [CREATE NEW RECORDS, LOGIN]
+        --> User Record Exists
+          --> [CREATE SSO RECORD, LINK USER RECORD, LOGIN]
+            --> Problems:
+              - If it's not a Gmail account, we need to confirm the password.
+              - If it's a Gmail account, we don't need to confirm the password
+              - If it's a Gmail account, and the email address in the table has '.' or '+',
+                we might create non-canonical duplicates
+              - User may already have lots of non-canonical duplicates: foo+1@gmail.com, foo+2@gmail.com, etc.
+   */
+
+  let mut maybe_user_token = None;
+  let mut maybe_user_display_name = None;
+
   match maybe_sso_account {
     Some(sso_account) => {
-      login_existing_sso_account(
+      let _result = handle_existing_sso_account(
         &http_request,
         sso_account,
         &mut mysql_connection,
-      ).await?
+      ).await?;
     },
     None => {
-      create_new_sso_account(
+      let result = handle_new_sso_account(
         &http_request,
         &subject,
         &mut mysql_connection,
         claims,
-      ).await?
+      ).await?;
+
+      maybe_user_token = Some(result.user_token);
+      maybe_user_display_name = Some(result.user_display_name);
     },
   }
 
-  /*
-  - Record does not exist, no user with email exists --> create account
-  - Record does not exist, user with email exists
-       --> link account **ONLY** if Google or ask for password(?)
-  - Record exists --> update + login
-   */
+  let user_token = maybe_user_token
+      .ok_or_else(|| {
+        error!("no user token after account creation");
+        GoogleCreateAccountErrorResponse::server_error()
+      })?;
+
+  let ip_address = get_request_ip(&http_request);
+
+  let session_token = create_user_session_with_transactor(
+    &user_token,
+    &ip_address,
+    Transactor::for_connection(&mut mysql_connection))
+      .await
+      .map_err(|e| {
+        warn!("error creating user session: {:?}", e);
+        GoogleCreateAccountErrorResponse::server_error()
+      })?;
+
+  info!("new user session created");
+
+  //firehose_publisher.publish_user_sign_up(new_user_data.user_token.as_str())
+  //    .await
+  //    .map_err(|e| {
+  //      warn!("error publishing event: {:?}", e);
+  //      CreateAccountErrorResponse::server_error()
+  //    })?;
+
+  construct_http_response(
+    &session_cookie_manager,
+    &user_token,
+    &session_token,
+  )
+}
+
+
+pub fn construct_http_response(
+  session_cookie_manager: &HttpUserSessionManager,
+  user_token: &UserToken,
+  session_token: &UserSessionToken,
+) -> Result<HttpResponse, GoogleCreateAccountErrorResponse> {
+
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user_token) {
+    Ok(cookie) => cookie,
+    Err(_) => return Err(GoogleCreateAccountErrorResponse::server_error()),
+  };
+
+  let signed_session = match session_cookie_manager.encode_session_payload(&session_token, &user_token) {
+    Ok(payload) => payload,
+    Err(_) => return Err(GoogleCreateAccountErrorResponse::server_error()),
+  };
 
   let response = GoogleCreateAccountSuccessResponse {
     success: true,
-    signed_session: "todo".to_string(),
-    username_not_yet_customized: false,
-    username: "todo".to_string(),
+    signed_session,
+    username_not_yet_customized: false, // TODO
+    username: "todo".to_string(), // TODO
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|_e| GoogleCreateAccountErrorResponse::server_error())?;
+      .map_err(|_e| GoogleCreateAccountErrorResponse::server_error())?;
 
   Ok(HttpResponse::Ok()
-    // .cookie(session_cookie) // TODO / FIXME
-    .content_type("application/json")
-    .body(body))
-}
-
-async fn check_claims(
-  request: &Json<GoogleCreateAccountRequest>,
-  google_sign_in_cert: Data<GoogleSignInCert>,
-) -> Result<Claims, GoogleCreateAccountErrorResponse> {
-  let keys = google_sign_in_cert.fetch_key_map(false)
-      .await
-      .map_err(|e| {
-        warn!("error downloading google certs: {:?}", e);
-        GoogleCreateAccountErrorResponse::server_error()
-      })?;
-
-  let verification_options = Some(build_options());
-
-  let claims = match decode_and_verify_token_claims(&keys, &request.google_credential, verification_options) {
-    Ok(claims) => claims,
-    Err(err) => {
-      warn!("error decoding google token claims (will retry certs): {:?}", err);
-
-      let keys = google_sign_in_cert.fetch_key_map(true) // NB: REFRESH
-          .await
-          .map_err(|e| {
-            warn!("error refreshing google certs: {:?}", e);
-            GoogleCreateAccountErrorResponse::server_error()
-          })?;
-
-      let verification_options = Some(build_options());
-
-      let claims = decode_and_verify_token_claims(&keys, &request.google_credential, verification_options)
-          .map_err(|e| {
-            warn!("error decoding google token claims: {:?}", e);
-            GoogleCreateAccountErrorResponse::bad_request()
-          })?;
-
-      claims
-    },
-  };
-
-  Ok(claims)
-}
-
-// TODO(bt,2024-09-22): Make this configurable via env vars.
-fn build_options() -> VerificationOptions {
-  VerificationOptions {
-    allowed_issuers: Some(HashSet::from([
-      "https://accounts.google.com".to_string(),
-      "accounts.google.com".to_string(),
-    ])),
-    allowed_audiences: Some(HashSet::from([
-      "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com".to_string(),
-    ])),
-    ..Default::default()
-  }
-}
-
-async fn login_existing_sso_account(
-  http_request: &HttpRequest,
-  sso_account: GoogleSignInAccount,
-  mysql_connection: &mut PoolConnection<MySql>,
-)
-  -> Result<(), GoogleCreateAccountErrorResponse>
-{
-  let user_token = match sso_account.maybe_user_token {
-    Some(token) => token.clone(),
-    None => {
-      // NB: If accounts get into this state (e.g. if we support de-linking), we'll need to
-      // consider how to migrate accounts and handle all the various account states.
-      // For now, we'll just deny this possibility.
-      warn!("no user token for existing google sign in account");
-      return Err(GoogleCreateAccountErrorResponse::server_error());
-    },
-  };
-
-  let ip_address = get_request_ip(&http_request);
-
-  let create_session_result = create_user_session_with_transactor(
-    user_token.as_str(),
-    &ip_address,
-    Transactor::for_connection(mysql_connection),
-  ).await;
-
-  Ok(())
-}
-
-async fn create_new_sso_account(
-  http_request: &HttpRequest,
-  subject: &str,
-  mysql_connection: &mut PoolConnection<MySql>,
-  claims: Claims,
-)
-  -> Result<(), GoogleCreateAccountErrorResponse>
-{
-  let email_address = claims.email()
-      .ok_or_else(|| {
-        warn!("no email address in google claims");
-        GoogleCreateAccountErrorResponse::bad_request()
-      })?;
-
-  let ip_address = get_request_ip(&http_request);
-
-  let mut transaction = mysql_connection.begin()
-      .await
-      .map_err(|e| {
-        warn!("Could not begin transaction: {:?}", e);
-        GoogleCreateAccountErrorResponse::server_error()
-      })?;
-
-  // NB: We use this routine to "normalize" email addresses in the user table.
-  // It won't necessarily match the email address in the Google claims.
-  // A better normalization function in the future may handle dots and plus
-  // signs in Gmail addresses, for instance.
-  let user_email_address = email_address.trim().to_lowercase();
-  let user_email_gravatar_hash = email_to_gravatar(&user_email_address);
-
-  let mut maybe_user_token = None;
-
-  for _ in 0..3 {
-    // NB: We try a few times to make sure we don't hit a username collision.
-    let display_name = generate_random_username();
-    let username = display_name.trim().to_lowercase();
-
-    info!("generated username: {}", username);
-
-    let result = create_account_from_google_sso(
-      CreateAccountFromGoogleSsoArgs {
-        username: &username,
-        display_name: &display_name,
-        email_address: &user_email_address,
-        email_gravatar_hash: &user_email_gravatar_hash,
-        email_confirmed_by_google: claims.email_verified(),
-        ip_address: &ip_address,
-        maybe_source: None, // TOO: Add source
-      },
-      Transactor::for_transaction(&mut transaction),
-    ).await;
-
-    match result {
-      Ok(token) => {
-        maybe_user_token = Some(token);
-        break;
-      },
-      Err(CreateAccountError::UsernameIsTaken) => {
-        continue; // NB: We'll try again with a new username.
-      },
-      Err(err) => {
-        warn!("error creating account from google sso: {:?}", err);
-        return Err(GoogleCreateAccountErrorResponse::server_error());
-      },
-    }
-  }
-
-  let user_token = maybe_user_token.ok_or_else(|| {
-    error!("no username without collision after several tries");
-    GoogleCreateAccountErrorResponse::server_error()
-  })?;
-
-  let _token = insert_google_sign_in_account(InsertGoogleSignInArgs {
-    subject,
-    maybe_user_token: Some(&user_token),
-    email_address,
-    is_email_verified: claims.email_verified(),
-    maybe_locale: None,
-    maybe_name: None,
-    maybe_given_name: None,
-    maybe_family_name: None,
-    creator_ip_address: &ip_address,
-    transaction: &mut transaction,
-  }).await.map_err(|err| {
-    warn!("error inserting google sign in account: {:?}", err);
-    GoogleCreateAccountErrorResponse::server_error()
-  })?;
-
-  Ok(())
+      .cookie(session_cookie)
+      .content_type("application/json")
+      .body(body))
 }

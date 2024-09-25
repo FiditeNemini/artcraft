@@ -22,6 +22,9 @@ pub struct CreateAccountFromGoogleSsoArgs<'a> {
 
   pub ip_address: &'a str,
   pub maybe_source: Option<&'a str>,
+
+  /// Comma separated string of feature flags.
+  pub maybe_feature_flags: Option<&'a str>,
 }
 
 pub async fn create_account_from_google_sso(
@@ -29,14 +32,13 @@ pub async fn create_account_from_google_sso(
   transactor: Transactor<'_, '_>,
 ) -> Result<UserToken, CreateAccountError>
 {
-
   let result= create_account_generic(
     GenericCreateAccountArgs {
       username: args.username,
       display_name: args.display_name,
       ip_address: args.ip_address,
+      maybe_feature_flags: args.maybe_feature_flags,
       maybe_source: args.maybe_source,
-      maybe_feature_flags: None,
       maybe_create_method: None, // TODO
 
       // SSO accounts have an email reported from Google

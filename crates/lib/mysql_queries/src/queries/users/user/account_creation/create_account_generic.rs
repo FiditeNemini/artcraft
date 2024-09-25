@@ -1,15 +1,12 @@
 // NB: Incrementally getting rid of build warnings...
-//#![forbid(unused_imports)]
-//#![forbid(unused_mut)]
-//#![forbid(unused_variables)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
 
 use crate::queries::users::user::account_creation::create_account_error::CreateAccountError;
 use crate::utils::transactor::Transactor;
 use log::warn;
 use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlArguments;
-use sqlx::query::Query;
-use sqlx::{MySql, MySqlPool, Transaction};
 use tokens::tokens::users::UserToken;
 
 pub struct GenericCreateAccountArgs<'a> {
@@ -27,7 +24,7 @@ pub struct GenericCreateAccountArgs<'a> {
   pub maybe_source: Option<&'a str>,
   pub maybe_create_method: Option<&'a str>,
 
-  // Comma separated string of feature flags.
+  /// Comma separated string of feature flags.
   pub maybe_feature_flags: Option<&'a str>,
 
   /// In production code, send this as `None`.
@@ -44,7 +41,7 @@ pub struct CreateAccountSuccessResult {
 
 pub async fn create_account_generic(
   args: GenericCreateAccountArgs<'_>,
-  mut transactor: Transactor<'_, '_>,
+  transactor: Transactor<'_, '_>,
 ) -> Result<CreateAccountSuccessResult, CreateAccountError>
 {
   const INITIAL_PROFILE_MARKDOWN : &str = "";

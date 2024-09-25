@@ -1,10 +1,9 @@
-use crate::http_server::endpoints::users::google_sso_handler::GoogleCreateAccountErrorResponse;
+use anyhow::anyhow;
 use errors::AnyhowResult;
 use google_sign_in::certs::download_certs::download_cert_key_set;
 use google_sign_in::certs::key_map::KeyMap;
 use log::{error, info, warn};
 use std::sync::{Arc, LockResult, RwLock};
-use anyhow::anyhow;
 
 /// The Google Sign In cert needs to be refreshed periodically
 #[derive(Clone)]
