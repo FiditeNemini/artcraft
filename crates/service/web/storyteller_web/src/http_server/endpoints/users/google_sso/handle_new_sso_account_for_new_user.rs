@@ -25,7 +25,7 @@ pub struct CreateArgs<'a> {
   pub user_email_address: &'a str,
   pub mysql_connection: &'a mut PoolConnection<MySql>,
 }
-pub async fn handle_creating_user_account(
+pub async fn handle_new_sso_account_for_new_user(
   args: CreateArgs<'_>
 )
   -> Result<NewSsoAccountInfo, GoogleCreateAccountErrorResponse>

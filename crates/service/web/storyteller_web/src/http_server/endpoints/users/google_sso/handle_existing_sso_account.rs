@@ -11,7 +11,7 @@ use sqlx::pool::PoolConnection;
 use sqlx::MySql;
 use tokens::tokens::users::UserToken;
 
-pub struct ExistingLinkArgs<'a> {
+pub struct ExistingAccountArgs<'a> {
   pub http_request: &'a HttpRequest,
   pub sso_account: &'a GoogleSignInAccount,
   pub claims: Claims,
@@ -19,8 +19,8 @@ pub struct ExistingLinkArgs<'a> {
   pub mysql_connection: &'a mut PoolConnection<MySql>,
 }
 
-pub async fn handle_existing_sso_link(
-  args: ExistingLinkArgs<'_>
+pub async fn handle_existing_sso_account(
+  args: ExistingAccountArgs<'_>
 )
   -> Result<UserToken, GoogleCreateAccountErrorResponse>
 {

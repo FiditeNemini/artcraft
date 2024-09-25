@@ -17,7 +17,7 @@ pub struct LinkArgs<'a> {
   pub user_account: UserRecordForLogin,
   pub mysql_connection: &'a mut PoolConnection<MySql>,
 }
-pub async fn handle_linking_existing_account(
+pub async fn handle_new_sso_account_for_existing_user(
   args: LinkArgs<'_>
 )
   -> Result<NewSsoAccountInfo, GoogleCreateAccountErrorResponse>

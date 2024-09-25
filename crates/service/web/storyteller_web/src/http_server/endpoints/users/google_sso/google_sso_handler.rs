@@ -48,7 +48,7 @@ use tokens::tokens::user_sessions::UserSessionToken;
 use tokens::tokens::users::UserToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
-use crate::http_server::endpoints::users::google_sso::handle_existing_sso_link::{handle_existing_sso_link, ExistingLinkArgs};
+use crate::http_server::endpoints::users::google_sso::handle_existing_sso_account::{handle_existing_sso_account, ExistingAccountArgs};
 /* ALGORITHM
 --> [SSO RECORD LOOKUP]
   --> I. SSO Record Exists
@@ -95,7 +95,6 @@ use crate::http_server::endpoints::users::google_sso::handle_existing_sso_link::
  TODO:
   - Store all the claims info
   - Verify all paths (including legacy sign up paths)
-  - Update claims info on re-login (if diff exists)
 
  Decisions:
   - Should we store canonical emails? --> No, you can create more than one account per gmail.
@@ -245,7 +244,7 @@ pub async fn google_sso_handler(
 
   match maybe_sso_account {
     Some(sso_account) => {
-      let user_token = handle_existing_sso_link(ExistingLinkArgs {
+      let user_token = handle_existing_sso_account(ExistingAccountArgs {
         http_request: &http_request,
         sso_account: &sso_account,
         claims,
