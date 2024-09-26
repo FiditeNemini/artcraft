@@ -102,7 +102,7 @@ class ApiConfig {
   }
 
   googleCreateAccount(): string {
-    return `${this.getApiOrigin()}/v1/accounts/google_create`;
+    return `${this.getApiOrigin()}/v1/accounts/google_sso`;
   }
 
   login(): string {
@@ -506,10 +506,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
   }
 
-    // =============== Video Styletransfer ===============
-    enqueueVideoStyleTransfer(): string {
-      return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
-    }
+  // =============== Video Styletransfer ===============
+  enqueueVideoStyleTransfer(): string {
+    return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
+  }
 
   // =============== Convert FBX to glTF ===============
   enqueueFbxToGltf(): string {

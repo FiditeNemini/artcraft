@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
+import { NavLink, useHistory, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import {
@@ -49,6 +49,7 @@ export default function SideNav({
   querySessionSubscriptionsCallback,
 }: SideNavProps) {
   const { t } = useLocalize("SideNav");
+  const location = useLocation();
   const { queueStats } = useInferenceJobs();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
@@ -57,13 +58,12 @@ export default function SideNav({
   const wrapper = document.getElementById("wrapper");
   const isMenuOpen = wrapper?.classList.contains("toggled");
   const isLoggedIn = sessionWrapper.isLoggedIn();
-  const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginPage = window.location.pathname.includes("/login");
-  const isOnSignUpPage = window.location.pathname.includes("/signup");
-  const isOnStudioPage = window.location.pathname.includes("/studio");
-  const isOnProfilePage = window.location.pathname.includes("/profile/");
-  const isOnBetaKeyRedeemPage =
-    window.location.pathname.includes("/beta-key/redeem");
+  const isOnLandingPage = location.pathname === "/";
+  const isOnLoginPage = location.pathname.includes("/login");
+  const isOnSignUpPage = location.pathname.includes("/signup");
+  const isOnStudioPage = location.pathname.includes("/studio");
+  const isOnProfilePage = location.pathname.includes("/profile/");
+  const isOnBetaKeyRedeemPage = location.pathname.includes("/beta-key/redeem");
   const domain = GetWebsite();
 
   let history = useHistory();

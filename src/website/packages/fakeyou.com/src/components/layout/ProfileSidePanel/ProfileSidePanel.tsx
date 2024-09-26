@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import "./ProfileSidePanel.scss";
 import UserProfileInfo from "./UserProfileInfo";
+import { useLocation } from "react-router-dom";
 
 export default function ProfileSidePanel() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
+  const location = useLocation();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment();
-  const isOnProfilePage = window.location.pathname.includes("/profile/");
+  const isOnProfilePage = location.pathname.includes("/profile/");
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
