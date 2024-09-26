@@ -23,7 +23,7 @@ import {
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useLocalize, useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
@@ -45,30 +45,29 @@ export default function TopNav() {
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
+  const location = useLocation();
   const [isFocused, setIsFocused] = useState(false);
   const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   const { t } = useLocalize("SideNav");
-  const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginPage = window.location.pathname.includes("/login");
-  const isOnSignUpPage = window.location.pathname.includes("/signup");
-  const isOnStudioPage = window.location.pathname.includes("/studio");
-  const isOnBetaKeyRedeemPage =
-    window.location.pathname.includes("/beta-key/redeem");
-  const isOnWaitlistSuccessPage = window.location.pathname.includes(
+  const isOnLandingPage = location.pathname === "/";
+  const isOnLoginPage = location.pathname.includes("/login");
+  const isOnSignUpPage = location.pathname.includes("/signup");
+  const isOnStudioPage = location.pathname.includes("/studio");
+  const isOnBetaKeyRedeemPage = location.pathname.includes("/beta-key/redeem");
+  const isOnWaitlistSuccessPage = location.pathname.includes(
     "/waitlist-next-steps"
   );
-  const isOnCreatorOnboardingPage = window.location.pathname.includes(
+  const isOnCreatorOnboardingPage = location.pathname.includes(
     "/creator-onboarding"
   );
-  const isOnWelcomePage = window.location.pathname === "/welcome";
-  const isOnTtsPage = window.location.pathname.includes("/tts");
+  const isOnWelcomePage = location.pathname === "/welcome";
+  const isOnTtsPage = location.pathname.includes("/tts");
   const isOnVcPage =
-    window.location.pathname.includes("/voice-conversion") ||
-    window.location.pathname.includes("/dev-vc");
+    location.pathname.includes("/voice-conversion") ||
+    location.pathname.includes("/dev-vc");
   const isOnBetaForm =
-    window.location.pathname.includes("/beta") &&
-    window.location.pathname.includes("/form");
+    location.pathname.includes("/beta") && location.pathname.includes("/form");
 
   const { open } = useModal();
   const openModal = () =>
