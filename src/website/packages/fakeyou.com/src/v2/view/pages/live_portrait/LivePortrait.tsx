@@ -994,7 +994,7 @@ export default function LivePortrait() {
                                 : t("button.animate")
                               : !loggedIn
                                 ? t("button.signUpToAnimate")
-                                : t("button.signUpToAnimate")
+                                : t("button.uploadToGenerate")
                         }
                         onClick={
                           loggedIn
