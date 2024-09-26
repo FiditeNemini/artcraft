@@ -76,7 +76,7 @@ fn generate_candidate_username() -> Option<String> {
     UsernameFormat::ScreamingSnakeCase => format!("{}_{}", adjective.to_uppercase(), noun.to_uppercase()),
   };
 
-  if let Some(digit) = random_digit() {
+  if let Some(digit) = maybe_random_safe_digit() {
     candidate_username = match format {
       UsernameFormat::CamelCase => format!("{}{}", candidate_username, digit),
       UsernameFormat::KebabCase
@@ -90,16 +90,30 @@ fn generate_candidate_username() -> Option<String> {
   Some(candidate_username)
 }
 
-fn random_digit() -> Option<u32> {
-  // Give uniform probability for the number of digits
-  let num_digits = rand::thread_rng().gen_range(0..5u8);
-  match num_digits {
-    0 => None,
-    1 => Some(rand::thread_rng().gen_range(0..10)),
-    2 => Some(rand::thread_rng().gen_range(10..100)),
-    3 => Some(rand::thread_rng().gen_range(100..1000)),
-    4 => Some(rand::thread_rng().gen_range(1000..10000)),
-    _ => Some(rand::thread_rng().gen_range(10000..100000)),
+fn maybe_random_safe_digit() -> Option<u32> {
+  fn maybe_random_digit() -> Option<u32> {
+    // Give uniform probability for the number of digits
+    let num_digits = rand::thread_rng().gen_range(0..5u8);
+    match num_digits {
+      0 => None,
+      1 => Some(rand::thread_rng().gen_range(0..10)),
+      2 => Some(rand::thread_rng().gen_range(10..100)),
+      3 => Some(rand::thread_rng().gen_range(100..1000)),
+      4 => Some(rand::thread_rng().gen_range(1000..10000)),
+      _ => Some(rand::thread_rng().gen_range(10000..100000)),
+    }
+  }
+
+  // Don't return potentially offensive numbers
+  match maybe_random_digit() {
+    None => None,
+    Some(69) => None,
+    Some(420) => None,
+    Some(666) => None,
+    Some(8008) => None,
+    Some(80085) => None,
+    Some(8008135) => None,
+    Some(digit) => Some(digit),
   }
 }
 
