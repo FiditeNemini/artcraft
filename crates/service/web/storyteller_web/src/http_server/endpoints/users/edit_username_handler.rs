@@ -14,6 +14,7 @@ use log::warn;
 use utoipa::ToSchema;
 
 use crate::http_server::validations::is_reserved_username::is_reserved_username;
+use crate::http_server::validations::validate_username::validate_username;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::user_session::require_user_session_using_connection::require_user_session_using_connection;
 use crate::state::server_state::ServerState;
@@ -89,6 +90,10 @@ pub async fn edit_username_handler(
 {
   let username = request.display_name.trim().to_lowercase();
   let display_name = request.display_name.trim().to_string();
+
+  if let Err(reason) = validate_username(&display_name) {
+    return Err(EditUsernameError::BadInput(format!("bad username: {}", &reason)));
+  }
 
   if contains_slurs(&username) {
     return Err(EditUsernameError::BadInput("username contains slurs".to_string()));
