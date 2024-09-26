@@ -6,6 +6,7 @@ export interface EditUsernameRequest {
 
 export interface EditUsernameResponse {
   success: boolean;
+  error_reason?: string;
 }
 
 export const EditUsername = MakeRequest<
