@@ -132,6 +132,7 @@ use crate::http_server::endpoints::users::get_profile_handler::*;
 use crate::http_server::endpoints::users::login_handler::*;
 use crate::http_server::endpoints::users::logout_handler::*;
 use crate::http_server::endpoints::users::session_info_handler::*;
+use crate::http_server::endpoints::users::edit_username_handler::*;
 use crate::http_server::endpoints::users::google_sso::google_sso_handler::*;
 use crate::http_server::endpoints::users::create_account_handler::*;
 use crate::http_server::endpoints::users::session_token_info_handler::*;
@@ -185,6 +186,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::edit::change_media_file_engine_category_handler::change_media_file_engine_category_handler,
     crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::change_media_file_visibility_handler,
     crate::http_server::endpoints::media_files::edit::rename_media_file_handler::rename_media_file_handler,
+    crate::http_server::endpoints::users::edit_username_handler::edit_username_handler,
     crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::set_media_file_cover_image_handler,
     crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::batch_get_media_files_handler,
     crate::http_server::endpoints::media_files::get::get_media_file_handler::get_media_file_handler,
@@ -346,6 +348,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchMediaFileInfo,
     BatchRequestDetailsResponse,
     BatchResultDetailsResponse,
+    EditUsernameResponse,
+    EditUsernameError,
+    EditUsernameRequest,
     BatchStatusDetailsResponse,
     BetaKeyItem,
     BookmarkRow,

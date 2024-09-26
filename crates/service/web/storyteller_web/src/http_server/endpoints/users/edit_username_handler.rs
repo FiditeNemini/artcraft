@@ -73,7 +73,7 @@ impl fmt::Display for EditUsernameError {
   tag = "Users",
   path = "/v1/user/edit_username",
   responses(
-    (status = 200, description = "Success", body = EditUsernameSuccessResponse),
+    (status = 200, description = "Success", body = EditUsernameResponse),
     (status = 400, description = "Bad input", body = EditUsernameError),
     (status = 401, description = "Not authorized", body = EditUsernameError),
     (status = 500, description = "Server error", body = EditUsernameError),
