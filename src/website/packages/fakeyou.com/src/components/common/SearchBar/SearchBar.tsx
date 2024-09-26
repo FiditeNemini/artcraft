@@ -7,8 +7,8 @@ import SearchResultsDropdown from "./SearchResultsDropdown";
 import SearchField from "./SearchField";
 import "./SearchBar.scss";
 import { useHistory, useLocation } from "react-router-dom";
-import { useSearch } from "context/SearchContext";
 import debounce from "lodash.debounce";
+import useGlobalSearchStore from "hooks/useGlobalSearchStore";
 
 interface SearchBarProps {
   autoFocus?: boolean;
@@ -26,7 +26,7 @@ export default function SearchBar({
   let history = useHistory();
   let location = useLocation();
 
-  const { searchTerm, setSearchTerm } = useSearch();
+  const { searchTerm, setSearchTerm } = useGlobalSearchStore();
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const isOnSearchPage = location.pathname.startsWith("/search");

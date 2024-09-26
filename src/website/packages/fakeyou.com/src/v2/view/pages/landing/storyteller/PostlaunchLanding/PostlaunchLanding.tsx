@@ -1,10 +1,9 @@
 import {
+  GetWebsite,
   Website,
-  WebsiteConfig,
 } from "@storyteller/components/src/env/GetWebsite";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button } from "components/common";
-import { useDomainConfig } from "context/DomainConfigContext";
 import React, { useEffect, useRef, useState } from "react";
 import { useScroll, useTransform, motion } from "framer-motion";
 import FeatureTitle from "./FeatureTitle";
@@ -30,7 +29,7 @@ import { isMobile as isMobileDevice } from "react-device-detect";
 export default function PostlaunchLanding() {
   const { sessionWrapper } = useSession();
   const [imageHeight, setImageHeight] = useState("100vh");
-  const domain: WebsiteConfig = useDomainConfig();
+  const domain = GetWebsite();
   const { open } = useModal();
   const openModal = () =>
     open({

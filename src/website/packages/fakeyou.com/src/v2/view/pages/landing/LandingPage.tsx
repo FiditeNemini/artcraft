@@ -5,12 +5,11 @@ import { Container } from "components/common";
 // import { AIFaceMirrorCTA } from "components/marketing";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
-import { useDomainConfig } from "context/DomainConfigContext";
 import "./LandingPage.scss";
 // import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import {
-  WebsiteConfig,
   Website,
+  GetWebsite,
 } from "@storyteller/components/src/env/GetWebsite";
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import MentionsSection from "components/common/MentionsSection";
@@ -22,7 +21,7 @@ function LandingPage() {
 
   const { sessionWrapper } = useSession();
 
-  const domain: WebsiteConfig = useDomainConfig();
+  const domain = GetWebsite();
 
   const webpageTitle =
     domain.website === Website.FakeYou

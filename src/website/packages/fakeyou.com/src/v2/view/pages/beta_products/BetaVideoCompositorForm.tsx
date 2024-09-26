@@ -1,19 +1,22 @@
 import React from "react";
 import { Widget } from "@typeform/embed-react";
 import { useLocation } from "react-router-dom";
-import { useDomainConfig } from "context/DomainConfigContext";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import {
+  GetWebsite,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 
 export const BetaVideoCompositorForm = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
 
   const formId = "aoQgj41v?typeform-welcome=0";
 
   const fullFormUrl = `${formId}?${
-    domain.titlePart === "FakeYou"
+    domain.website === Website.FakeYou
       ? "typeform-source=fakeyou.com"
       : "typeform-source=storyteller.ai"
   }&email=${encodeURIComponent(email || "")}`;

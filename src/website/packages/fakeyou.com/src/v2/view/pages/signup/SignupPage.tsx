@@ -9,7 +9,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link, useHistory, useLocation } from "react-router-dom";
-
 import { Analytics } from "../../../../common/Analytics";
 import queryString from "query-string";
 import { WebUrl } from "../../../../common/WebUrl";
@@ -17,9 +16,12 @@ import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutF
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import Panel from "components/common/Panel";
-import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 import { AppStateContext } from "components/providers/AppStateProvider";
+import {
+  GetWebsite,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -29,7 +31,7 @@ enum FieldTriState {
 
 function SignupPage() {
   let history = useHistory();
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
   let location = useLocation();
   const { sessionWrapper, queryAppState } = useContext(AppStateContext);
   const queryParams = new URLSearchParams(location.search);
@@ -261,7 +263,7 @@ function SignupPage() {
   const afterSignupRedirect = async () => {
     const maybeInternalPlanKey = parsedQueryString["sub"] as string | undefined;
 
-    if (domain.titlePart === "FakeYou") {
+    if (domain.website === Website.FakeYou) {
       if (maybeInternalPlanKey !== undefined) {
         return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
       }
@@ -273,7 +275,7 @@ function SignupPage() {
         : redirectLink + "?from=signup"
       : WebUrl.pricingPageWithReferer("signup");
 
-    if (domain.titlePart === "Storyteller AI") {
+    if (domain.website === Website.StorytellerAi) {
       redirectUrl = redirectSignUpLink;
       if (redirectUrl === redirectSignUpLink) {
         sessionStorage.setItem("redirected", "true");
@@ -375,7 +377,7 @@ function SignupPage() {
     <div className="overflow-hidden auth-page-left">
       <div className="row h-100 g-0">
         <div className="col-12 col-lg-6 col-xl-7 bg-panel d-flex flex-column align-items-center justify-content-center order-2 order-lg-1 p-5 p-lg-0">
-          {domain.titlePart === "Storyteller AI" ? (
+          {domain.website === Website.StorytellerAi ? (
             <>
               <a href="https://storyteller.ai" style={{ marginBottom: "20px" }}>
                 <img

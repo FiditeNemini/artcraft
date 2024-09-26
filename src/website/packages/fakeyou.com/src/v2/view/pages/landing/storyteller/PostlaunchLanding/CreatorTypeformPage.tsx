@@ -1,19 +1,22 @@
 import React from "react";
 import { Widget } from "@typeform/embed-react";
 import { useLocation } from "react-router-dom";
-import { useDomainConfig } from "context/DomainConfigContext";
 import { set } from "local-storage";
+import {
+  GetWebsite,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 
 export const CreatorTypeformPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
 
   const formId = "ZQTkv9ha";
 
   const fullFormUrl = `${formId}?${
-    domain.titlePart === "FakeYou"
+    domain.website === Website.FakeYou
       ? "typeform-source=fakeyou.com"
       : "typeform-source=storyteller.ai"
   }&email=${encodeURIComponent(email || "")}`;

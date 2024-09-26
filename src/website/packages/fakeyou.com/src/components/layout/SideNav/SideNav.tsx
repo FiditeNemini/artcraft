@@ -32,10 +32,9 @@ import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Button } from "components/common";
 import { WebUrl } from "common/WebUrl";
 import {
-  WebsiteConfig,
+  GetWebsite,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
-import { useDomainConfig } from "context/DomainConfigContext";
 
 interface SideNavProps {
   sessionWrapper: SessionWrapper;
@@ -65,7 +64,7 @@ export default function SideNav({
   const isOnProfilePage = window.location.pathname.includes("/profile/");
   const isOnBetaKeyRedeemPage =
     window.location.pathname.includes("/beta-key/redeem");
-  const domain: WebsiteConfig = useDomainConfig();
+  const domain = GetWebsite();
 
   let history = useHistory();
   const handleNavLinkClick = () => {

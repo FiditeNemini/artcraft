@@ -27,7 +27,6 @@ import { Link, NavLink, useHistory } from "react-router-dom";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useLocalize, useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
-import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
 import "./TopNav.scss";
@@ -35,10 +34,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 import { WebUrl } from "common/WebUrl";
+import {
+  GetWebsite,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 
 export default function TopNav() {
   const { queryAppState, sessionWrapper, user } = useSession();
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
@@ -74,7 +77,7 @@ export default function TopNav() {
   const loggedIn = sessionWrapper.isLoggedIn();
   const showNavItem =
     (!loggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
-    domain.titlePart === "Storyteller AI";
+    domain.website === Website.StorytellerAi;
 
   const [mobileMenu, setMobileMenu] = useState("d-none");
 
@@ -201,7 +204,7 @@ export default function TopNav() {
 
     if (pageContentWrapper) {
       if (
-        (domain.titlePart === "Storyteller AI" && isOnLandingPage) ||
+        (domain.website === Website.StorytellerAi && isOnLandingPage) ||
         isOnBetaKeyRedeemPage ||
         isOnCreatorOnboardingPage ||
         isOnLoginPage ||
@@ -215,7 +218,6 @@ export default function TopNav() {
       }
     }
   }, [
-    domain.titlePart,
     isOnLandingPage,
     isOnBetaKeyRedeemPage,
     isOnWaitlistSuccessPage,
@@ -224,11 +226,12 @@ export default function TopNav() {
     isOnSignUpPage,
     isOnWelcomePage,
     isOnBetaForm,
+    domain.website,
   ]);
 
   if (
     topBarWrapper &&
-    domain.titlePart === "Storyteller AI" &&
+    domain.website === Website.StorytellerAi &&
     isOnLandingPage
   ) {
     topBarWrapper.classList.add("topbar-bg-transparent");
@@ -240,7 +243,7 @@ export default function TopNav() {
     const handleScroll = () => {
       if (
         topBarWrapper &&
-        domain.titlePart === "Storyteller AI" &&
+        domain.website === Website.StorytellerAi &&
         isOnLandingPage
       ) {
         if (window.scrollY > 500) {
@@ -256,7 +259,7 @@ export default function TopNav() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [domain.titlePart, isOnLandingPage, topBarWrapper]);
+  }, [domain.website, isOnLandingPage, topBarWrapper]);
 
   if (
     isOnBetaKeyRedeemPage ||
@@ -385,7 +388,7 @@ export default function TopNav() {
 
   return (
     <>
-      {/* {domain.titlePart === "Storyteller AI" &&
+      {/* {domain.website === Website.StorytellerAi &&
         isOnLandingPage &&
         !isScrolled && (
           <div
@@ -449,7 +452,7 @@ export default function TopNav() {
                   src={domain.logo}
                   alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
                   height="36"
-                  width={domain.titlePart === "FakeYou" ? "155" : "222"}
+                  width={domain.website === Website.FakeYou ? "155" : "222"}
                   className="mb-1 d-none d-lg-block"
                 />
                 <img
@@ -461,7 +464,7 @@ export default function TopNav() {
                 />
               </Link>
 
-              {domain.titlePart === "FakeYou" && (
+              {domain.website === Website.FakeYou && (
                 <div className="d-none d-lg-block no-wrap">
                   <NavItem
                     icon={faScrewdriverWrench}
@@ -489,7 +492,7 @@ export default function TopNav() {
           <div className="topbar-nav-center">
             {/* Search Bar */}
             <div className="d-none d-lg-block">
-              {domain.titlePart === "FakeYou" && (
+              {domain.website === Website.FakeYou && (
                 <>
                   {(!isOnLandingPage &&
                     !isOnLoginPage &&
@@ -520,7 +523,7 @@ export default function TopNav() {
           </div>
 
           <div className="topbar-nav-right">
-            {domain.titlePart === "Storyteller AI" &&
+            {domain.website === Website.StorytellerAi &&
               sessionWrapper.canAccessStudio() && (
                 <div className="d-none d-lg-block">
                   <Button
@@ -535,9 +538,9 @@ export default function TopNav() {
 
             <div className="d-flex align-items-center gap-2">
               <div className="d-none d-lg-flex gap-2">
-                {(domain.titlePart === "FakeYou" ||
+                {(domain.website === Website.FakeYou ||
                   (sessionWrapper.isLoggedIn() &&
-                    domain.titlePart === "Storyteller AI")) && (
+                    domain.website === Website.StorytellerAi)) && (
                   <Button
                     {...{
                       icon: faClipboardList,

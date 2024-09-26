@@ -14,16 +14,19 @@ import {
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { useLocalize } from "hooks";
 import { Container } from "components/common";
-import { useDomainConfig } from "context/DomainConfigContext";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 import { AppStateContext } from "components/providers/AppStateProvider";
+import {
+  GetWebsite,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 
 function FooterNav() {
   const {
     appState: { server_info },
     sessionWrapper,
   } = useContext(AppStateContext);
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
   const { t } = useLocalize("Footer");
   const location = useLocation();
   //let myDataLink = WebUrl.signupPage();
@@ -72,7 +75,7 @@ function FooterNav() {
           icon: null,
         },
         { link: "/explore", text: "Explore Videos", icon: null },
-        ...(domain.titlePart === "FakeYou"
+        ...(domain.website === Website.FakeYou
           ? [{ link: "/tools", text: "AI Tools", icon: null }]
           : []),
         // { link: "/upload-assets", text: "Upload Assets", icon: null },
@@ -143,7 +146,7 @@ function FooterNav() {
                     src={domain.logo}
                     alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
                     height="36"
-                    width={domain.titlePart === "FakeYou" ? "155" : "222"}
+                    width={domain.website === Website.FakeYou ? "155" : "222"}
                   />
                 </Link>
                 <div className="d-flex gap-3 mt-1">

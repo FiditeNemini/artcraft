@@ -5,20 +5,20 @@ import {
   CreateSessionIsError,
   CreateSessionIsSuccess,
 } from "@storyteller/components/src/api/session/CreateSession";
-import {
-  GoogleCreateAccount,
-} from "@storyteller/components/src/api/sso/GoogleCreateAccount";
+import { GoogleCreateAccount } from "@storyteller/components/src/api/sso/GoogleCreateAccount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
-
 import { Analytics } from "../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import Panel from "components/common/Panel";
-import { useDomainConfig } from "context/DomainConfigContext";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
 import { InjectScript } from "common/InjectScript";
 import { AppStateContext } from "components/providers/AppStateProvider";
+import {
+  GetWebsite,
+  Website,
+} from "@storyteller/components/src/env/GetWebsite";
 
 // NB: Google Sign In requires a global javascript function
 declare global {
@@ -27,7 +27,7 @@ declare global {
 
 function LoginPage() {
   let history = useHistory();
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
   const { sessionWrapper, queryAppState } = useContext(AppStateContext);
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -90,14 +90,14 @@ function LoginPage() {
 
   // This function ***MUST*** be attached to global state for the Google library to work.
   globalThis.handleGoogleCredentialResponse = async (args: any) => {
-    console.log('>>>> Google Sign In Response', args)
+    console.log(">>>> Google Sign In Response", args);
 
     let response = await GoogleCreateAccount({
-      google_credential: args.credential
+      google_credential: args.credential,
     });
 
-    console.log('>>> Google Create Account Response', response);
-  }
+    console.log(">>> Google Create Account Response", response);
+  };
 
   let errorWarning = <span />;
   if (errorMessage) {
@@ -120,7 +120,7 @@ function LoginPage() {
     <div className="overflow-hidden auth-page-left">
       <div className="row h-100 g-0">
         <div className="col-12 col-lg-6 col-xl-7 bg-panel d-flex flex-column align-items-center justify-content-center order-2 order-lg-1 p-5 p-lg-0">
-          {domain.titlePart === "Storyteller AI" ? (
+          {domain.website === Website.StorytellerAi ? (
             <>
               <a href="https://storyteller.ai" style={{ marginBottom: "20px" }}>
                 <img
@@ -321,7 +321,7 @@ function LoginPage() {
 // UNCOMMENT WHEN READY TO IMPLEMENT
 //
 // const CLIENT_ID = "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com";
-// 
+//
 // function GoogleLogin() {
 //   return (
 //     // https://developers.google.com/identity/gsi/web/reference/html-reference
@@ -332,8 +332,8 @@ function LoginPage() {
 //         data-client_id={CLIENT_ID}
 //         data-callback="handleGoogleCredentialResponse">
 //       </div>
-//       <div 
-//         className="g_id_signin" 
+//       <div
+//         className="g_id_signin"
 //         data-type="standard"
 //         // Extra configs
 //         data-shape="rectangular"

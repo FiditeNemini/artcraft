@@ -4,14 +4,14 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { Link } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { useDomainConfig } from "context/DomainConfigContext";
+import { GetWebsite } from "@storyteller/components/src/env/GetWebsite";
 
 interface Props {}
 
 function TermsPage(props: Props) {
   PosthogClient.recordPageview();
 
-  const domain = useDomainConfig();
+  const domain = GetWebsite();
 
   usePrefixedDocumentTitle("Terms of Use");
 
