@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { Node, NodeConfig } from "konva/lib/Node";
 
-import { MediaNode } from "./type";
+import { MediaNode } from "./types";
 import { uiAccess } from "~/signals";
 
 export class SelectionManager {

@@ -60,6 +60,71 @@ export class RenderEngine {
 
   public videoLoadingCanvas: VideoNode | undefined;
 
+  constructor({
+    width,
+    height,
+    videoLayer,
+    offScreenCanvas,
+    onRenderingSystemMessageRecieved,
+  }: {
+    width: number;
+    height: number;
+    videoLayer: Konva.Layer;
+    offScreenCanvas: OffscreenCanvas;
+    onRenderingSystemMessageRecieved: (
+      response: SharedWorkerResponse<
+        DiffusionSharedWorkerResponseData,
+        DiffusionSharedWorkerProgressData
+      >,
+    ) => void;
+  }) {
+    this.videoLoadingCanvas = undefined;
+    this.videoNodes = [];
+    this.imageNodes = [];
+
+    this.isProcessing = false;
+    this.onRenderingSystemMessageRecieved = onRenderingSystemMessageRecieved;
+    // TODO: Make this dynamic and update this on change of canvas.
+
+    this.width = width;
+    this.height = height;
+    this.positionX = window.innerWidth / 2 - this.width / 2;
+    this.positionY = window.innerHeight / 2 - this.height / 2;
+
+    this.offScreenCanvas = offScreenCanvas;
+    this.offScreenCanvas.width = this.width;
+    this.offScreenCanvas.height = this.height;
+    this.context = this.offScreenCanvas.getContext("2d");
+
+    this.frames = [];
+
+    this.videoLayer = videoLayer;
+
+    this.port = undefined;
+    this.captureCanvas = new Konva.Rect({
+      x: this.positionX,
+      y: this.positionY,
+      width: this.width,
+      height: this.height,
+      fill: "white",
+      stroke: "black",
+      strokeWidth: 1,
+      draggable: false,
+    });
+    this.captureCanvas.addName("CaptureCanvas");
+
+    this.upperMaxFrames = 7 * 24;
+
+    this.videoLayer.add(this.captureCanvas);
+    // send back
+    this.captureCanvas.setZIndex(0);
+
+    this.canUseSharedWorker = false;
+    this.setupSharedWorker();
+
+    //this.debug();
+  }
+
   private onRenderingSystemMessageRecieved: (
     response: SharedWorkerResponse<
       DiffusionSharedWorkerResponseData,
@@ -145,62 +210,6 @@ export class RenderEngine {
       node.updateContextMenu();
     });
     this.videoLayer.batchDraw();
-  }
-  constructor(
-    videoLayer: Konva.Layer,
-    offScreenCanvas: OffscreenCanvas,
-    onRenderingSystemMessageRecieved: (
-      response: SharedWorkerResponse<
-        DiffusionSharedWorkerResponseData,
-        DiffusionSharedWorkerProgressData
-      >,
-    ) => void,
-  ) {
-    this.videoLoadingCanvas = undefined;
-    this.videoNodes = [];
-    this.imageNodes = [];
-
-    this.isProcessing = false;
-    this.onRenderingSystemMessageRecieved = onRenderingSystemMessageRecieved;
-    // TODO: Make this dynamic and update this on change of canvas.
-
-    this.width = 720;
-    this.height = 1280;
-    this.positionX = window.innerWidth / 2 - this.width / 2;
-    this.positionY = window.innerHeight / 2 - this.height / 2;
-
-    this.offScreenCanvas = offScreenCanvas;
-    this.offScreenCanvas.width = this.width;
-    this.offScreenCanvas.height = this.height;
-    this.context = this.offScreenCanvas.getContext("2d");
-
-    this.frames = [];
-
-    this.videoLayer = videoLayer;
-
-    this.port = undefined;
-    this.captureCanvas = new Konva.Rect({
-      x: this.positionX,
-      y: this.positionY,
-      width: this.width,
-      height: this.height,
-      fill: "white",
-      stroke: "black",
-      strokeWidth: 1,
-      draggable: false,
-    });
-    this.captureCanvas.addName("CaptureCanvas");
-
-    this.upperMaxFrames = 7 * 24;
-
-    this.videoLayer.add(this.captureCanvas);
-    // send back
-    this.captureCanvas.setZIndex(0);
-
-    this.canUseSharedWorker = false;
-    this.setupSharedWorker();
-
-    //this.debug();
   }
 
   debug() {
