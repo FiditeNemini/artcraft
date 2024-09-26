@@ -1092,6 +1092,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "bucket_paths"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "my-workspace-hack",
+]
+
+[[package]]
 name = "buckets"
 version = "0.0.1"
 dependencies = [

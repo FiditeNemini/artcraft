@@ -31,6 +31,7 @@ members = [
   "crates/lib/api_clients/google_sign_in",
   "crates/lib/api_clients/thumbnail_generator",
   "crates/lib/bootstrap",
+  "crates/lib/bucket_paths",
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/redis_caching",
   "crates/lib/concurrency",
