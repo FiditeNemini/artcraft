@@ -1,5 +1,4 @@
 use sqlx;
-use sqlx::Executor;
 
 use crate::utils::transactor::Transactor;
 use errors::AnyhowResult;

@@ -8,6 +8,7 @@ use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_us
 use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
 use crate::http_server::endpoints::users::create_account_handler::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile_handler::edit_profile_handler;
+use crate::http_server::endpoints::users::edit_username_handler::edit_username_handler;
 use crate::http_server::endpoints::users::get_profile_handler::get_profile_handler;
 use crate::http_server::endpoints::users::google_sso::google_sso_handler::google_sso_handler;
 use crate::http_server::endpoints::users::login_handler::login_handler;
@@ -98,6 +99,11 @@ pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
 
       // NB(bt): Modern user profile routes
       .service(web::scope("/v1/user")
+          .service(
+            web::resource("/edit_username")
+                .route(web::get().to(edit_username_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
           .service(web::resource("/{username}/profile")
               .route(web::get().to(get_profile_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
