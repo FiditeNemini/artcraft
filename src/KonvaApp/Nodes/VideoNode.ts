@@ -4,9 +4,19 @@ import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { uiAccess } from "~/signals";
 import { SelectionManager } from "../SelectionManager";
 import { NodeTransformer } from "../NodeTransformer";
+import { Position, Size } from "../types";
 
-const toolbarNode = uiAccess.toolbarNode;
+// const toolbarNode = uiAccess.toolbarNode;
 const loadingBar = uiAccess.loadingBar;
+
+interface VideoNodeContructor {
+  mediaLayer: Layer;
+  position: Position;
+  canvasSize: Size;
+  videoURL: string;
+  selectionManagerRef: SelectionManager;
+  nodeTransformerRef: NodeTransformer;
+}
 
 export class VideoNode extends NetworkedNodeContext {
   public videoURL: string;
@@ -40,24 +50,17 @@ export class VideoNode extends NetworkedNodeContext {
   private finishedLoadingOnStart: Promise<void>;
 
   constructor({
-    videoLayer,
-    x,
-    y,
+    mediaLayer,
+    position,
+    canvasSize,
     videoURL,
     selectionManagerRef,
     nodeTransformerRef,
-  }: {
-    videoLayer: Layer;
-    x: number;
-    y: number;
-    videoURL: string;
-    selectionManagerRef: SelectionManager;
-    nodeTransformerRef: NodeTransformer;
-  }) {
+  }: VideoNodeContructor) {
     super({
       nodeTransfomerRef: nodeTransformerRef,
       selectionManagerRef: selectionManagerRef,
-      mediaLayer: videoLayer,
+      mediaLayer: mediaLayer,
     });
 
     // state manage the node
@@ -77,8 +80,8 @@ export class VideoNode extends NetworkedNodeContext {
 
     this.kNode = new Konva.Image({
       image: undefined,
-      x: x,
-      y: y,
+      x: position.x,
+      y: position.y,
       width: 200, // to do fix this with placeholder
       height: 200,
       draggable: true,
@@ -97,9 +100,17 @@ export class VideoNode extends NetworkedNodeContext {
         console.log("KNode Not Initialized Video Component");
         return;
       }
-      this.kNode.height(this.videoComponent.videoHeight);
-      this.kNode.width(this.videoComponent.videoWidth);
+
+      const renderSize = this.calculateRenderSizeOnLoad({
+        componentSize: {
+          width: this.videoComponent.videoWidth,
+          height: this.videoComponent.videoHeight,
+        },
+        maxSize: canvasSize,
+      });
+
       this.kNode.image(this.videoComponent);
+      this.kNode.setSize(renderSize);
 
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
       // it might have length here which we will need to trim down to 7 seconds.

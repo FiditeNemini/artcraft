@@ -22,7 +22,7 @@ import { TranslateCommand } from "./UndoRedo/TranslateCommand";
 
 import { FileUtilities } from "./FileUtilities/FileUtilities";
 
-import { AppModes } from "./type";
+import { AppModes, VideoResolutions } from "./constants";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export interface RenderingOptions {
@@ -91,11 +91,14 @@ export class Engine {
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
 
-    this.renderEngine = new RenderEngine(
-      this.videoLayer,
-      this.offScreenCanvas,
-      this.onRenderingSystemReceived.bind(this),
-    );
+    this.renderEngine = new RenderEngine({
+      width: VideoResolutions.VERTICAL_720.width,
+      height: VideoResolutions.VERTICAL_720.height,
+      videoLayer: this.videoLayer,
+      offScreenCanvas: this.offScreenCanvas,
+      onRenderingSystemMessageRecieved:
+        this.onRenderingSystemReceived.bind(this),
+    });
 
     this.setupEventSystem();
   }
@@ -131,9 +134,9 @@ export class Engine {
       const media_url = `${media_api_base_url}vocodes-public${response.data.videoUrl}`;
 
       const videoNode = new VideoNode({
-        videoLayer: this.videoLayer,
-        x: this.renderEngine.captureCanvas.position().x,
-        y: this.renderEngine.captureCanvas.position().y,
+        mediaLayer: this.videoLayer,
+        position: this.renderEngine.captureCanvas.position(),
+        canvasSize: this.renderEngine.captureCanvas.size(),
         videoURL: media_url,
         selectionManagerRef: this.selectionManager,
         nodeTransformerRef: this.nodeTransformer,
@@ -281,27 +284,27 @@ export class Engine {
     );
     const imageNode = new ImageNode({
       mediaLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformer: this.nodeTransformer,
+      nodeTransformerRef: this.nodeTransformer,
     });
 
     const imageNode2 = new ImageNode({
       mediaLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformer: this.nodeTransformer,
+      nodeTransformerRef: this.nodeTransformer,
     });
 
     // Adding nodes here
     const videoNode = new VideoNode({
-      videoLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      mediaLayer: this.videoLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL:
         "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
       selectionManagerRef: this.selectionManager,
@@ -353,11 +356,11 @@ export class Engine {
   public addImage(imageFile: File) {
     const imageNode = new ImageNode({
       mediaLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformer: this.nodeTransformer,
+      nodeTransformerRef: this.nodeTransformer,
     });
     this.renderEngine.addNodes(imageNode);
     this.selectionManager.saveNode(imageNode);
@@ -366,9 +369,9 @@ export class Engine {
   public addVideo(url: string) {
     // Adding nodes here
     const videoNode = new VideoNode({
-      videoLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      mediaLayer: this.videoLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL: url,
       selectionManagerRef: this.selectionManager,
       nodeTransformerRef: this.nodeTransformer,
