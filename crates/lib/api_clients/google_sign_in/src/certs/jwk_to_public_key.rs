@@ -70,7 +70,7 @@ mod tests {
 
   #[test]
   fn test_jwk_payload_decode() {
-    let file = test_file_path("../../../../../../test_data/crypto/google_sign_in.2024-09-20.jwk").unwrap();
+    let file = test_file_path("test_data/crypto/google_sign_in.2024-09-20.jwk").unwrap();
     let jwk_payload = read_to_string(file).unwrap();
 
     let key_map = jwk_to_public_key(&jwk_payload).unwrap();

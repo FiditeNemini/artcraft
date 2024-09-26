@@ -67,7 +67,7 @@ impl fmt::Display for EditUsernameError {
   }
 }
 
-/// Add a comment to an entity (file, model, user, etc.)
+/// Edit username of the current user.
 #[utoipa::path(
   post,
   tag = "Users",

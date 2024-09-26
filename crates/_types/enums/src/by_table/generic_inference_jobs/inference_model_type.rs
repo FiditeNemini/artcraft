@@ -97,6 +97,7 @@ impl InferenceModelType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::ComfyUi,
       Self::RvcV2,
       Self::SadTalker,
       Self::SoVitsSvc,
@@ -107,9 +108,8 @@ impl InferenceModelType {
       Self::StableDiffusion,
       Self::MocapNet,
       Self::StyleTTS2,
-      Self::ComfyUi,
       Self::ConvertFbxToGltf,
-        Self::BvhToWorkflow,
+      Self::BvhToWorkflow,
     ])
   }
 }
@@ -141,6 +141,7 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceModelType::RvcV2.to_str(), "rvc_v2");
       assert_eq!(InferenceModelType::SadTalker.to_str(), "sad_talker");
       assert_eq!(InferenceModelType::SoVitsSvc.to_str(), "so_vits_svc");
@@ -151,7 +152,6 @@ mod tests {
       assert_eq!(InferenceModelType::StableDiffusion.to_str(), "stable_diffusion");
       assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
       assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
-      assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceModelType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
       assert_eq!(InferenceModelType::BvhToWorkflow.to_str(), "bvh_to_workflow");
     }
@@ -178,6 +178,7 @@ mod tests {
       // Static check
       let mut variants = InferenceModelType::all_variants();
       assert_eq!(variants.len(), 13);
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
@@ -187,7 +188,6 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::StableDiffusion));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
-      assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::ConvertFbxToGltf));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::BvhToWorkflow));

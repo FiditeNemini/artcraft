@@ -4,7 +4,7 @@ use sqlx::{MySql, Pool};
 use errors::{anyhow, AnyhowResult};
 use hashing::bcrypt::bcrypt_password_hash::bcrypt_password_hash;
 use hashing::md5::email_to_gravatar_hash::email_to_gravatar_hash;
-use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs};
+use mysql_queries::queries::users::user::create::create_account_from_email_and_password::{create_account_from_email_and_password, CreateAccountFromEmailPasswordArgs};
 use tokens::tokens::users::UserToken;
 
 pub const ADMIN_USERNAME : &str = "admin";
@@ -54,7 +54,7 @@ async fn seed_user(
   let email_gravatar_hash = email_to_gravatar_hash(&email_address);
   let password_hash = bcrypt_password_hash(password)?;
 
-  create_account(mysql_pool, CreateAccountArgs {
+  create_account_from_email_and_password(mysql_pool, CreateAccountFromEmailPasswordArgs {
     username: &username,
     display_name,
     email_address: &email_address,

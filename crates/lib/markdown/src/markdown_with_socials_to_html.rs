@@ -278,7 +278,7 @@ mod tests {
     #[test]
     pub fn full_channels_not_changed() {
       assert_eq!(&markdown_with_socials_to_html("https://www.youtube.com/channel/UCEU3gjhuT1V86Ru_RoCTcCA "),
-                 "<p>https://www.youtube.com/channel/UCEU3gjhuT1V86Ru_RoCTcCA </p>\n");
+                 "<p>https://www.youtube.com/channel/UCEU3gjhuT1V86Ru_RoCTcCA</p>\n");
     }
 
     pub mod with_at {

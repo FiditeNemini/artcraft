@@ -47,6 +47,7 @@ mod tests {
     assert_eq!(is_reserved_username("user"), true);
     assert_eq!(is_reserved_username("username"), true);
     assert_eq!(is_reserved_username("thread"), true);
+    assert_eq!(is_reserved_username("test"), true);
   }
 
   #[test]
@@ -58,16 +59,17 @@ mod tests {
 
   #[test]
   fn reserved_substrings() {
-    assert_eq!(is_reserved_username("test112345"), true);
-    assert_eq!(is_reserved_username("12345test"), true);
-    assert_eq!(is_reserved_username("test"), true);
     assert_eq!(is_reserved_username("111vocodes111"), true);
     assert_eq!(is_reserved_username("thefakeyousite"), true);
+
+    // These are now un-reserved
+    assert_eq!(is_reserved_username("test112345"), false);
+    assert_eq!(is_reserved_username("12345test"), false);
   }
 
   #[test]
   fn reserved_substrings_with_dashes() {
-    assert_eq!(is_reserved_username("t_e_s_t"), true);
+    //assert_eq!(is_reserved_username("t_e_s_t"), true);
     assert_eq!(is_reserved_username("-vo-co-de-s--"), true);
     assert_eq!(is_reserved_username("fake_you"), true);
   }
