@@ -116,12 +116,16 @@ function LoginPage() {
       google_credential: args.credential,
     });
 
-    // console.log(">>> Google Create Account Response", response);
-
-    if (response.username_not_yet_customized === true) {
+    if (response.success) {
       queryAppState();
-      openModal();
+
+      if (response.username_not_yet_customized === true) {
+        openModal();
+      }
+
       history.push(redirectUrl);
+    } else {
+      console.error("Google account creation failed");
     }
   };
 
