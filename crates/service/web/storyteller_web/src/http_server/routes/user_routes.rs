@@ -101,7 +101,7 @@ pub fn add_user_routes<T, B> (app: App<T>) -> App<T>
       .service(web::scope("/v1/user")
           .service(
             web::resource("/edit_username")
-                .route(web::get().to(edit_username_handler))
+                .route(web::post().to(edit_username_handler))
                 .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(web::resource("/{username}/profile")
