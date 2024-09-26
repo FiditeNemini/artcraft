@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
 import {
@@ -22,6 +22,10 @@ import {
   GetWebsite,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
+import { GoogleCreateAccount } from "@storyteller/components/src/api/sso/GoogleCreateAccount";
+import GoogleSSO from "components/common/GoogleSSO";
+import { GOOGLE_AUTH_SIGN_IN_SCRIPT, InjectScript } from "common/InjectScript";
+import { Button } from "components/common";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -59,6 +63,20 @@ function SignupPage() {
     setPasswordConfirmationInvalidReason,
   ] = useState("");
 
+  // Hack to make the Google Button load in properly
+  useEffect(() => {
+    InjectScript.addGoogleAuthLogin();
+
+    return () => {
+      const existingScript = document.querySelector(
+        `script[src="${GOOGLE_AUTH_SIGN_IN_SCRIPT}"]`
+      );
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
   const handleUsernameChange = (ev: React.FormEvent<HTMLInputElement>) => {
     ev.preventDefault();
     PosthogClient.recordPageview();
@@ -85,6 +103,17 @@ function SignupPage() {
     setUsernameInvalidReason(usernameInvalidReason);
 
     return false;
+  };
+
+  // This function ***MUST*** be attached to global state for the Google library to work.
+  globalThis.handleGoogleCredentialResponse = async (args: any) => {
+    console.log(">>>> Google Sign In Response", args);
+
+    let response = await GoogleCreateAccount({
+      google_credential: args.credential,
+    });
+
+    console.log(">>> Google Create Account Response", response);
   };
 
   const handleEmailChange = (ev: React.FormEvent<HTMLInputElement>) => {
@@ -601,9 +630,13 @@ function SignupPage() {
                 it's added (there are more important features to work on). If
                 you lose your password, please let us know in Discord.
               </div>*/}
-                <button className="btn btn-primary btn-lg w-100 mt-2">
-                  {t("account.SignUpPage.signUpButton")}
-                </button>
+                <div>
+                  <Button
+                    label={t("account.SignUpPage.signUpButton")}
+                    className="btn btn-primary btn-lg w-100 mt-2 mb-0"
+                  />
+                  <GoogleSSO mode="signup" />
+                </div>
                 <p className="fs-7 mt-2">
                   <Trans i18nKey="account.SignUpPage.signInInstead">
                     Already have an account?{" "}

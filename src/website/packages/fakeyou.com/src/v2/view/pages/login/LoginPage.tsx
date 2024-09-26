@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import {
   CreateSession,
@@ -13,20 +13,19 @@ import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocument
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import Panel from "components/common/Panel";
 import ScrollingSceneCarousel from "../landing/storyteller/PostlaunchLanding/ScrollingSceneCarousel";
-import { InjectScript } from "common/InjectScript";
+import { GOOGLE_AUTH_SIGN_IN_SCRIPT, InjectScript } from "common/InjectScript";
 import { AppStateContext } from "components/providers/AppStateProvider";
 import {
   GetWebsite,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
-
-// NB: Google Sign In requires a global javascript function
-declare global {
-  function handleGoogleCredentialResponse(args: any): void;
-}
+import GoogleSSO from "components/common/GoogleSSO";
+import { useModal } from "hooks";
+import SetUsernameModal from "../signup/SetUsernameModal";
 
 function LoginPage() {
   let history = useHistory();
+  const { open } = useModal();
   const domain = GetWebsite();
   const { sessionWrapper, queryAppState } = useContext(AppStateContext);
   const [password, setPassword] = useState("");
@@ -36,14 +35,35 @@ function LoginPage() {
   const queryParams = new URLSearchParams(location.search);
   const redirectUrl = queryParams.get("redirect") || "/";
 
+  const openModal = () => {
+    open({
+      component: SetUsernameModal,
+      width: "small",
+      lockTint: true,
+    });
+  };
+
   if (sessionWrapper.isLoggedIn()) {
     history.push("/");
   }
 
   PosthogClient.recordPageview();
-  InjectScript.addGoogleAuthLogin();
   //InjectMetaTag.addGoogleSignInClientId();
   usePrefixedDocumentTitle("Log in to your account");
+
+  // Hack to make the Google Button load in properly
+  useEffect(() => {
+    InjectScript.addGoogleAuthLogin();
+
+    return () => {
+      const existingScript = document.querySelector(
+        `script[src="${GOOGLE_AUTH_SIGN_IN_SCRIPT}"]`
+      );
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
 
   const handleUsernameOrEmailChange = (
     ev: React.FormEvent<HTMLInputElement>
@@ -97,6 +117,10 @@ function LoginPage() {
     });
 
     console.log(">>> Google Create Account Response", response);
+
+    if (response.username_not_yet_customized === false) {
+      openModal();
+    }
   };
 
   let errorWarning = <span />;
@@ -310,7 +334,7 @@ function LoginPage() {
                 </div>
               </div>
               <button className="btn btn-primary w-100 mt-4">Login</button>
-              {/* <GoogleLogin /> */}
+              <GoogleSSO mode="login" />
             </form>
           </Panel>
         </div>
@@ -319,33 +343,33 @@ function LoginPage() {
   );
 }
 
-// const CLIENT_ID =
-//   "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com";
+const CLIENT_ID =
+  "788843034237-uqcg8tbgofrcf1to37e1bqphd924jaf6.apps.googleusercontent.com";
 
-// function GoogleLogin() {
-//   return (
-//     // https://developers.google.com/identity/gsi/web/reference/html-reference
-//     // The button changes size and is difficult to control!
-//     // https://stackoverflow.com/q/72411548
-//     <div className="mt-3">
-//       <div
-//         id="g_id_onload"
-//         data-client_id={CLIENT_ID}
-//         data-callback="handleGoogleCredentialResponse"
-//       />
-//       <div
-//         className="g_id_signin"
-//         data-type="standard"
-//         // Extra configs
-//         data-shape="rectangular"
-//         data-theme="outline"
-//         data-text="signin_with"
-//         data-size="large"
-//         data-width="100000"
-//         data-logo_alignment="left"
-//       />
-//     </div>
-//   );
-// }
+function GoogleLogin() {
+  return (
+    // https://developers.google.com/identity/gsi/web/reference/html-reference
+    // The button changes size and is difficult to control!
+    // https://stackoverflow.com/q/72411548
+    <div className="mt-3">
+      <div
+        id="g_id_onload"
+        data-client_id={CLIENT_ID}
+        data-callback="handleGoogleCredentialResponse"
+      />
+      <div
+        className="g_id_signin"
+        data-type="standard"
+        // Extra configs
+        data-shape="rectangular"
+        data-theme="outline"
+        data-text="signin_with"
+        data-size="large"
+        data-width="100000"
+        data-logo_alignment="left"
+      />
+    </div>
+  );
+}
 
 export { LoginPage };

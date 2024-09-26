@@ -1,5 +1,6 @@
 // https://developers.google.com/identity/gsi/web/guides/client-library
-const GOOGLE_AUTH_SIGN_IN_SCRIPT = "https://accounts.google.com/gsi/client";
+export const GOOGLE_AUTH_SIGN_IN_SCRIPT =
+  "https://accounts.google.com/gsi/client";
 
 // DEPRECATED: https://developers.google.com/identity/gsi/web/guides/gis-migration
 // // https://developers.google.com/identity/sign-in/web/sign-in
@@ -11,7 +12,6 @@ enum AddTo {
 }
 
 export class InjectScript {
-  
   public static addGoogleAuthLogin() {
     InjectScript.addScriptOnce(GOOGLE_AUTH_SIGN_IN_SCRIPT, AddTo.Body);
   }
@@ -31,16 +31,16 @@ export class InjectScript {
     }
   }
 
-  private static findScript(srcUrl: string) : Element | null {
+  private static findScript(srcUrl: string): Element | null {
     const selector = `script[src="${srcUrl}"]`;
     return document.querySelector(selector);
   }
 
-  private static createScript(srcUrl: string, async: boolean) : Element {
-    const tag = document.createElement('script');
-    tag.setAttribute('src', srcUrl);
+  private static createScript(srcUrl: string, async: boolean): Element {
+    const tag = document.createElement("script");
+    tag.setAttribute("src", srcUrl);
     if (async) {
-      tag.setAttribute('async', 'async');
+      tag.setAttribute("async", "async");
     }
     return tag;
   }

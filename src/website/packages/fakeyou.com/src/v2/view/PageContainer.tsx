@@ -113,6 +113,12 @@ import { BetaWebcamActingPage } from "./pages/beta_products/BetaWebcamActingPage
 import { Beta3DVideoCompositorForm } from "./pages/beta_products/Beta3DVideoCompositorForm";
 import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoCompositorPage";
 import Lipsync from "./pages/lipsync/Lipsync";
+import SetUsernamePage from "./pages/signup/SetUsernameModal";
+
+// NB: Google Sign In requires a global javascript function
+declare global {
+  function handleGoogleCredentialResponse(args: any): void;
+}
 
 export default function PageContainer() {
   return (
@@ -172,6 +178,10 @@ export default function PageContainer() {
 
           <Route path="/signup">
             <SignupPage />
+          </Route>
+
+          <Route exact path="/set-username">
+            <SetUsernamePage />
           </Route>
 
           <Route path="/pricing" exact={true}>

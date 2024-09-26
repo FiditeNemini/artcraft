@@ -13,11 +13,14 @@ import {
 } from "@storyteller/components/src/env/GetWebsite";
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import MentionsSection from "components/common/MentionsSection";
-import { useSession } from "hooks";
+import { useModal, useSession } from "hooks";
 // import VstSectionV3 from "./components/VstSectionV3";
+import SetUsernameModal from "../signup/SetUsernameModal";
 
 function LandingPage() {
   PosthogClient.recordPageview();
+
+  const { open } = useModal();
 
   const { sessionWrapper } = useSession();
 
@@ -43,6 +46,14 @@ function LandingPage() {
   //  );
   //}
 
+  const openModal = () => {
+    open({
+      component: SetUsernameModal,
+      width: "small",
+      lockTint: true,
+    });
+  };
+
   return (
     <>
       {domain.website === Website.StorytellerAi && (
@@ -53,6 +64,8 @@ function LandingPage() {
       {domain.website === Website.FakeYou && (
         <>
           <Container type="panel">
+            <button onClick={openModal}>test</button>
+
             <Dashboard {...{ experimental: true }} />
 
             {/* FAKEYOU.COM */}

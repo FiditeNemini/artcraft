@@ -49,6 +49,7 @@
 /privacy*              /website/index.html   200
 /product-usage*        /website/index.html   200
 /profile*              /website/index.html   200
+/set-username*         /website/index.html   200
 /signup*               /website/index.html   200
 /stream*               /website/index.html   200
 /studio*               /website/index.html   200

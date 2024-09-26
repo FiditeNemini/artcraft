@@ -87,6 +87,8 @@ class ApiConfig {
 
     this.useSsl = useSsl;
     this.apiHost = apiHost;
+    this.useSsl = true;
+    this.apiHost = "api.fakeyou.com";
   }
 
   speakEndpoint(): string {
