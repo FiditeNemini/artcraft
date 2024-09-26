@@ -26,6 +26,8 @@ import { GoogleCreateAccount } from "@storyteller/components/src/api/sso/GoogleC
 import GoogleSSO from "components/common/GoogleSSO";
 import { GOOGLE_AUTH_SIGN_IN_SCRIPT, InjectScript } from "common/InjectScript";
 import { Button } from "components/common";
+import SetUsernameModal from "./SetUsernameModal";
+import { useModal } from "hooks";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -36,9 +38,11 @@ enum FieldTriState {
 function SignupPage() {
   let history = useHistory();
   const domain = GetWebsite();
+  const { open } = useModal();
   let location = useLocation();
   const { sessionWrapper, queryAppState } = useContext(AppStateContext);
   const queryParams = new URLSearchParams(location.search);
+  const redirectUrl = queryParams.get("redirect") || "/";
 
   const parsedQueryString = queryString.parse(window.location.search);
 
@@ -62,6 +66,14 @@ function SignupPage() {
     passwordConfirmationInvalidReason,
     setPasswordConfirmationInvalidReason,
   ] = useState("");
+
+  const openModal = () => {
+    open({
+      component: SetUsernameModal,
+      width: "small",
+      lockTint: true,
+    });
+  };
 
   // Hack to make the Google Button load in properly
   useEffect(() => {
@@ -107,13 +119,19 @@ function SignupPage() {
 
   // This function ***MUST*** be attached to global state for the Google library to work.
   globalThis.handleGoogleCredentialResponse = async (args: any) => {
-    console.log(">>>> Google Sign In Response", args);
+    // console.log(">>>> Google Sign In Response", args);
 
     let response = await GoogleCreateAccount({
       google_credential: args.credential,
     });
 
-    console.log(">>> Google Create Account Response", response);
+    // console.log(">>> Google Create Account Response", response);
+
+    if (response.username_not_yet_customized === true) {
+      queryAppState();
+      openModal();
+      history.push(redirectUrl);
+    }
   };
 
   const handleEmailChange = (ev: React.FormEvent<HTMLInputElement>) => {

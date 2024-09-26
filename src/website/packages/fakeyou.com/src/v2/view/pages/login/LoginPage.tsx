@@ -110,16 +110,18 @@ function LoginPage() {
 
   // This function ***MUST*** be attached to global state for the Google library to work.
   globalThis.handleGoogleCredentialResponse = async (args: any) => {
-    console.log(">>>> Google Sign In Response", args);
+    // console.log(">>>> Google Sign In Response", args);
 
     let response = await GoogleCreateAccount({
       google_credential: args.credential,
     });
 
-    console.log(">>> Google Create Account Response", response);
+    // console.log(">>> Google Create Account Response", response);
 
-    if (response.username_not_yet_customized === false) {
+    if (response.username_not_yet_customized === true) {
+      queryAppState();
       openModal();
+      history.push(redirectUrl);
     }
   };
 
