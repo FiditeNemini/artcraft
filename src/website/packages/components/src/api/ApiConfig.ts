@@ -127,16 +127,8 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/session`;
   }
 
-  getQueueStats(): string {
-    return `${this.getApiOrigin()}/v1/stats/queues`;
-  }
-
   listTts(): string {
     return `${this.getApiOrigin()}/tts/list`;
-  }
-
-  searchTts(): string {
-    return `${this.getApiOrigin()}/tts/search`;
   }
 
   searchWeights(): string {
@@ -208,10 +200,6 @@ class ApiConfig {
     }
 
     return base_url + query;
-  }
-
-  getTtsInferenceJobState(jobToken: string): string {
-    return `${this.getApiOrigin()}/tts/job/${jobToken}`;
   }
 
   getTtsModelUploadJobState(jobToken: string): string {
@@ -426,22 +414,12 @@ class ApiConfig {
     return `${this.getApiOrigin()}/moderation/categories/${categoryToken}/delete`;
   }
 
-  detectLocale(): string {
-    return `${this.getApiOrigin()}/detect_locale`;
-  }
-
   createVoiceCloneRequest(): string {
     return `${this.getApiOrigin()}/voice_clone_requests/create`;
   }
 
   checkVoiceCloneRequest(): string {
     return `${this.getApiOrigin()}/voice_clone_requests/check`;
-  }
-
-  // =============== Media Files ===============
-
-  getMediaFile(mediaFileToken: string): string {
-    return `${this.getApiOrigin()}/v1/media_files/file/${mediaFileToken}`;
   }
 
   // =============== Weights Files ===============
@@ -462,18 +440,6 @@ class ApiConfig {
 
   uploadImage(): string {
     return `${this.getApiOrigin()}/v1/media_uploads/upload_image`;
-  }
-
-  uploadVideo(): string {
-    return `${this.getApiOrigin()}/v1/media_uploads/upload_video`;
-  }
-
-  uploadMedia(): string {
-    return `${this.getApiOrigin()}/v1/media_uploads/upload`;
-  }
-
-  uploadMediaFile(): string {
-    return `${this.getApiOrigin()}/v1/media_files/upload`;
   }
 
   // =============== Voice Conversion ===============
@@ -503,29 +469,9 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`;
   }
 
-  // =============== Video Workflow ===============
-  enqueueVideoWorkflow(): string {
-    return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
-  }
-
-  // =============== Video Styletransfer ===============
-  enqueueVideoStyleTransfer(): string {
-    return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
-  }
-
   // =============== Convert FBX to glTF ===============
   enqueueFbxToGltf(): string {
     return `${this.getApiOrigin()}/v1/conversion/enqueue_fbx_to_gltf`;
-  }
-
-  // =============== Generic Model Downloads ===============
-
-  enqueueRemoteDownloadJob(): string {
-    return `${this.getApiOrigin()}/v1/remote_download/enqueue`;
-  }
-
-  getRemoteDownloadJobStatus(jobToken: string): string {
-    return `${this.getApiOrigin()}/v1/remote_download/job_status/${jobToken}`;
   }
 
   // =============== Generic Model Inference ===============
@@ -564,43 +510,6 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/comments/delete/${commentToken}`;
   }
 
-  // =============== Storyteller-specific ===============
-
-  listTwitchEventRules(): string {
-    return `${this.getApiOrigin()}/twitch/event_rule/list`;
-  }
-
-  createTwitchEventRule(): string {
-    return `${this.getApiOrigin()}/twitch/event_rule/create`;
-  }
-
-  reorderTwitchEventRules(): string {
-    return `${this.getApiOrigin()}/twitch/event_rule/reorder`;
-  }
-
-  getTwitchEventRule(eventRuleToken: string): string {
-    return `${this.getApiOrigin()}/twitch/event_rule/${eventRuleToken}/info`;
-  }
-
-  editTwitchEventRule(eventRuleToken: string): string {
-    return `${this.getApiOrigin()}/twitch/event_rule/${eventRuleToken}/update`;
-  }
-
-  deleteTwitchEventRule(eventRuleToken: string): string {
-    return `${this.getApiOrigin()}/twitch/event_rule/${eventRuleToken}/delete`;
-  }
-
-  // =============== Twitch OAuth ===============
-
-  checkTwitchOauthStatus(): string {
-    return `${this.getApiOrigin()}/twitch/oauth/check`;
-  }
-
-  obsEventsWebsocket(twitchUsername: string): string {
-    //return `ws://localhost:54321/obs/${twitchUsername}`;
-    return `wss://ws.storyteller.io/obs/${twitchUsername}`;
-  }
-
   // =============== Premium ===============
 
   listActiveSubscriptions(): string {
@@ -613,12 +522,6 @@ class ApiConfig {
 
   createStripePortalRedirect(): string {
     return `${this.getApiOrigin()}/v1/stripe/portal/create_redirect`;
-  }
-
-  // =============== Server ===============
-
-  getServerInfo(): string {
-    return `${this.getApiOrigin()}/server_info`;
   }
 
   // =============== Helper ===============
