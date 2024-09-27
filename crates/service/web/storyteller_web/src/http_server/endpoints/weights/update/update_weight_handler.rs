@@ -1,10 +1,10 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::warn;
 use utoipa::ToSchema;
 
@@ -12,13 +12,13 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use markdown::simple_markdown_to_html::simple_markdown_to_html;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
-use mysql_queries::queries::model_weights::edit::update_weight::{CoverImageOption, update_weights, UpdateWeightArgs};
+use mysql_queries::queries::model_weights::edit::update_weight::{update_weights, CoverImageOption, UpdateWeightArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use user_input_common::check_for_slurs::contains_slurs;
-use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::state::server_state::ServerState;
 
@@ -190,7 +190,7 @@ pub async fn update_weight_handler(
             return Err(UpdateWeightError::BadInput("Description contains slurs".to_string()));
         }
         let markdown = markdown.trim().to_string();
-        let html = markdown_to_html(&markdown);
+        let html = simple_markdown_to_html(&markdown);
         description_markdown = Some(markdown);
         description_rendered_html = Some(html);
     }

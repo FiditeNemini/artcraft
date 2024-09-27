@@ -6,14 +6,15 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::warn;
 use utoipa::ToSchema;
 
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use http_server_common::request::get_request_ip::get_request_ip;
+use markdown::simple_markdown_to_html::simple_markdown_to_html;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use tokens::tokens::comments::CommentToken;
@@ -25,7 +26,6 @@ use tokens::tokens::users::UserToken;
 use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use user_input_common::check_for_slurs::contains_slurs;
-use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
@@ -154,7 +154,7 @@ pub async fn create_comment_handler(
   }
 
   let markdown = request.comment_markdown.trim().to_string();
-  let html = markdown_to_html(&markdown);
+  let html = simple_markdown_to_html(&markdown);
 
   let query_result = insert_comment(InsertCommentArgs {
     entity_token: &entity_token,

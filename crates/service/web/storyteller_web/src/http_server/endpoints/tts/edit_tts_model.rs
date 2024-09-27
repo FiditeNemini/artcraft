@@ -23,7 +23,7 @@ use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_tok
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use user_input_common::check_for_slurs::contains_slurs;
-use user_input_common::markdown_to_html::markdown_to_html;
+use markdown::simple_markdown_to_html::simple_markdown_to_html;
 use crate::configs::supported_languages_for_models::get_canonicalized_language_tag_for_model;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -225,7 +225,7 @@ pub async fn edit_tts_model_handler(
     }
 
     let markdown = markdown.trim().to_string();
-    let html = markdown_to_html(&markdown);
+    let html = simple_markdown_to_html(&markdown);
 
     description_markdown = Some(markdown);
     description_html = Some(html);

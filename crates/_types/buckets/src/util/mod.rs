@@ -1,2 +1,1 @@
 pub mod hashed_directory_path_long_string;
-pub mod hashed_directory_path_short_string;

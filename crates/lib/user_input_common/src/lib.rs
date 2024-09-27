@@ -12,5 +12,4 @@ pub (crate) const BANNED_SLURS : &str = include_str!("../../../../includes/binar
 
 pub mod check_for_slurs;
 pub mod latin_alphabet;
-pub mod markdown_to_html;
 pub mod validate_user_provided_ip_address;

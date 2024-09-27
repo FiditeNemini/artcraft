@@ -5,24 +5,24 @@
 
 use std::fmt;
 
-use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
+use actix_web::{web, HttpRequest, HttpResponse};
 use log::warn;
 use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
+use markdown::simple_markdown_to_html::simple_markdown_to_html;
 use mysql_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
 use mysql_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use mysql_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use user_input_common::check_for_slurs::contains_slurs;
-use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::http_server::session::session_checker::SessionChecker;
 use crate::http_server::validations::validate_profile_cashapp_username::{normalize_cashapp_username_for_storage, validate_profile_cashapp_username};
@@ -239,7 +239,7 @@ pub async fn edit_profile_handler(
     }
 
     let markdown = markdown.trim().to_string();
-    let html = markdown_to_html(&markdown);
+    let html = simple_markdown_to_html(&markdown);
 
     profile_markdown = Some(markdown);
     profile_html = Some(html);
