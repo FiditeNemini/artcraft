@@ -1095,6 +1095,7 @@ dependencies = [
 name = "bucket_paths"
 version = "0.0.1"
 dependencies = [
+ "crockford",
  "errors",
  "my-workspace-hack",
 ]

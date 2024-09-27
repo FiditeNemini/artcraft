@@ -20,6 +20,7 @@ normal = ["my-workspace-hack"]
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 # Internal
+crockford = { path = "../data/crockford" }
 errors = { path = "../errors" }
 
 # External

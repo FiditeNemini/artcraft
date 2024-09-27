@@ -1,6 +1,6 @@
-use bucket_paths::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
-use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-use buckets::util::hashed_directory_path_long_string;
+use crate::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
+use crate::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
 use crockford::crockford_entropy_lower;
 use std::path::PathBuf;
 
@@ -21,7 +21,7 @@ pub struct FileBucketDirectory {
     pub fn from_existing_bucket_details(bucket_details:RemoteCloudBucketDetails) -> Self {
       let file_descriptor = bucket_details.file_descriptor_from_bucket_details();
       let entropy = bucket_details.get_object_hash();
-      let middle = hashed_directory_path_long_string::hashed_directory_path_long_string(entropy.as_ref());
+      let middle = hashed_directory_path_long_string(entropy.as_ref());
       // gets you cloud bucket path e.g weights/a/b/c/d/clould_path_entropy
       let remote_cloud_base_directory = format!("{}/{}{}", file_descriptor.remote_directory_path(), middle, entropy);
       // gets you name of the file with suffix and prefix and entropy in the centre
@@ -41,7 +41,7 @@ pub struct FileBucketDirectory {
     pub fn new_from_file_descriptor(file_descriptor: Box<dyn FileDescriptor>) -> Self {
       let entropy = crockford_entropy_lower(32);
       // gets you wiki /a/b/c/d folder structure
-      let middle = hashed_directory_path_long_string::hashed_directory_path_long_string(entropy.as_ref());
+      let middle = hashed_directory_path_long_string(entropy.as_ref());
       // gets you cloud bucket path e.g weights/a/b/c/d/clould_path_entropy
       let remote_cloud_base_directory = format!("{}/{}{}", file_descriptor.remote_directory_path(), middle, entropy);
       // gets you name of the file with suffix and prefix and entropy in the centre
@@ -74,9 +74,9 @@ pub struct FileBucketDirectory {
     pub fn to_full_remote_cloud_file_path_pathbuf(&self) -> PathBuf {
       PathBuf::from(&self.full_remote_cloud_file_path)
     }
+
     pub fn get_file_name(&self) -> &str {
         &self.file_name
     }
-
   }
   

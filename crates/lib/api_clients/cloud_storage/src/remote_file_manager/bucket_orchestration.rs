@@ -7,7 +7,9 @@ use errors::AnyhowResult;
 use crate::bucket_client::BucketClient;
 
 #[async_trait]
+#[deprecated(note="this abstraction is too complicated, use another bucket client")]
 pub trait BucketOrchestrationCore {
+    #[deprecated(note="this abstraction is too complicated, use another bucket client")]
     async fn download_file_to_disk(
         &self,
         object_path: String,
@@ -15,6 +17,7 @@ pub trait BucketOrchestrationCore {
         is_public: bool,
     ) -> AnyhowResult<()>;
 
+    #[deprecated(note="this abstraction is too complicated, use another bucket client")]
     async fn upload_file_with_content_type_process(&self, object_name: &str,
                                                    bytes: &[u8],
                                                    content_type: &str,
@@ -22,6 +25,7 @@ pub trait BucketOrchestrationCore {
 }
 
 
+#[deprecated(note="this abstraction is too complicated, use another bucket client")]
 pub struct BucketOrchestration {
     access_key: String,
     secret_key: String,
@@ -57,6 +61,7 @@ impl BucketOrchestrationCore for BucketOrchestration {
 }
 
 impl BucketOrchestration {
+    #[deprecated(note="this abstraction is too complicated, use another bucket client")]
     pub fn new_bucket_client_from_existing_env() -> AnyhowResult<Self> {
         let access_key = easyenv::get_env_string_required("ACCESS_KEY")?;
         let secret_key = easyenv::get_env_string_required("SECRET_KEY")?;
@@ -82,6 +87,7 @@ impl BucketOrchestration {
         Ok(bucket_orchestration)
     }
 
+    #[deprecated(note="this abstraction is too complicated, use another bucket client")]
     pub fn new(
         access_key: String,
         secret_key: String,
@@ -99,7 +105,7 @@ impl BucketOrchestration {
         }
     }
 
-
+    #[deprecated(note="this abstraction is too complicated, use another bucket client")]
     async fn get_bucket_with_visibility(&self, public: bool) -> AnyhowResult<BucketClient> {
         let bucket_timeout = easyenv::get_env_duration_seconds_or_default(
             "BUCKET_TIMEOUT_SECONDS", Duration::from_secs(60 * 10));
