@@ -1,6 +1,6 @@
-use bucket_paths::legacy::remote_file_manager_paths::media_descriptor;
-use bucket_paths::legacy::remote_file_manager_paths::weights_descriptor::{self};
-use bucket_paths::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
+use crate::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
+use crate::legacy::remote_file_manager_paths::media_descriptor;
+use crate::legacy::remote_file_manager_paths::weights_descriptor;
 
 #[derive(Debug, Clone)]
 pub struct RemoteCloudBucketDetails {
@@ -71,14 +71,4 @@ impl RemoteCloudBucketDetails {
             _ => panic!("Unknown prefix: {}", self.prefix)
         }
     }
-}
-
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    pub fn test() {
-
-    }
- 
 }

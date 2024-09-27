@@ -62,11 +62,8 @@ mod tests {
     use std::path::PathBuf;
 
     use anyhow::anyhow;
-
-    use cloud_storage::remote_file_manager::{
-        remote_cloud_bucket_details::RemoteCloudBucketDetails,
-        remote_cloud_file_manager::RemoteCloudFileClient,
-    };
+    use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+    use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
     use errors::AnyhowResult;
 
     #[ignore]

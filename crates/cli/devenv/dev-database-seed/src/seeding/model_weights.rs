@@ -5,7 +5,7 @@ use log::info;
 use sqlx::{MySql, Pool};
 
 use bucket_paths::legacy::remote_file_manager_paths::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsWorkflowDescriptor};
-use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,

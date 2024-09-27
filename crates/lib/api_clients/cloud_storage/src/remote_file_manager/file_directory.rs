@@ -1,9 +1,8 @@
 use bucket_paths::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
+use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use buckets::util::hashed_directory_path_long_string;
 use crockford::crockford_entropy_lower;
 use std::path::PathBuf;
-
-use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 
 pub struct FileBucketDirectory {
     file_object_hash: String, 

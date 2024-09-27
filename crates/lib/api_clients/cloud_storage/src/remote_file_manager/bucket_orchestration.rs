@@ -130,9 +130,3 @@ impl BucketOrchestration {
         Ok(bucket_client)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    pub fn test() {}
-}
