@@ -1,7 +1,7 @@
 use log::info;
 use sqlx::{MySql, Pool};
 
-use cloud_storage::remote_file_manager::media_descriptor::MediaVideoMp4Descriptor;
+use bucket_paths::legacy::remote_file_manager_paths::media_descriptor::MediaVideoMp4Descriptor;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;

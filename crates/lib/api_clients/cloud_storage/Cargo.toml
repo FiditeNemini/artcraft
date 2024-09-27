@@ -16,18 +16,19 @@ path = "src/lib.rs"
 normal = ["my-workspace-hack"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # Internal
+bucket_paths = { path = "../../../lib/bucket_paths" }
 buckets = { path = "../../../_types/buckets" }
 crockford = { path = "../../../lib/data/crockford" }
-errors = { path = "../../../lib/errors" }
 easyenv = { path = "../../../lib/easyenv" }
+errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
 hashing = { path = "../../../lib/files/hashing" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
-# Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 anyhow = "1.0.86"

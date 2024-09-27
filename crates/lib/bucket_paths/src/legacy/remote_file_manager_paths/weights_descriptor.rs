@@ -101,7 +101,7 @@ impl FileDescriptor for WeightsSDXLDescriptor {
 
 pub struct WeightsSVCDescriptor;
 
-impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsSVCDescriptor {
+impl FileDescriptor for WeightsSVCDescriptor {
     fn remote_directory_path(&self) -> &str {
         REMOTE_FILE_DIRECTORY
     }
@@ -125,7 +125,7 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsS
 
 pub struct WeightsRVCDescriptor;
 
-impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsRVCDescriptor {
+impl FileDescriptor for WeightsRVCDescriptor {
     fn remote_directory_path(&self) -> &str {
         REMOTE_FILE_DIRECTORY
     }
@@ -149,7 +149,7 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsR
 
 pub struct WeightsRVCIndexDescriptor;
 
-impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsRVCIndexDescriptor {
+impl FileDescriptor for WeightsRVCIndexDescriptor {
     fn remote_directory_path(&self) -> &str {
         REMOTE_FILE_DIRECTORY
     }
@@ -173,7 +173,7 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsR
 
 pub struct WeightsVallePromptDescriptor;
 
-impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsVallePromptDescriptor {
+impl FileDescriptor for WeightsVallePromptDescriptor {
     fn remote_directory_path(&self) -> &str {
         REMOTE_FILE_DIRECTORY
     }

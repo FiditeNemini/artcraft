@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-
+use bucket_paths::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
@@ -11,7 +11,6 @@ use crate::remote_file_manager::bucket_orchestration::{BucketOrchestration, Buck
 use crate::remote_file_manager::file_directory::FileBucketDirectory;
 use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 
-use super::file_descriptor::FileDescriptor;
 use super::file_meta_data::FileMetaData;
 
 pub struct RemoteCloudFileClient {
@@ -112,15 +111,14 @@ impl RemoteCloudFileClient {
 
 #[cfg(test)]
 mod tests {
-  use async_trait::async_trait;
-  use env_logger;
+    use async_trait::async_trait;
+    use env_logger;
 
-  use errors::AnyhowResult;
+    use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
+    use bucket_paths::legacy::remote_file_manager_paths::weights_descriptor::WeightsLoRADescriptor;
+    use errors::AnyhowResult;
 
-  use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
-  use crate::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
-
-  struct BucketOrchestrationMock {}
+    struct BucketOrchestrationMock {}
 
     #[async_trait]
     impl BucketOrchestrationCore for BucketOrchestrationMock {

@@ -4,12 +4,12 @@ use std::vec;
 use log::info;
 use sqlx::{MySql, Pool};
 
+use bucket_paths::legacy::remote_file_manager_paths::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsWorkflowDescriptor};
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsWorkflowDescriptor};
 use enums::by_table::model_weights::{
-  weights_category::WeightsCategory,
-  weights_types::WeightsType,
+    weights_category::WeightsCategory,
+    weights_types::WeightsType,
 };
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};

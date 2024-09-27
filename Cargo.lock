@@ -1345,6 +1345,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "async-trait",
+ "bucket_paths",
  "buckets",
  "crockford",
  "easyenv",
@@ -2050,6 +2051,7 @@ dependencies = [
 name = "dev-database-seed"
 version = "0.0.1"
 dependencies = [
+ "bucket_paths",
  "buckets",
  "clap",
  "cloud_storage",
@@ -3646,6 +3648,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bootstrap",
+ "bucket_paths",
  "buckets",
  "chrono",
  "cloud_storage",

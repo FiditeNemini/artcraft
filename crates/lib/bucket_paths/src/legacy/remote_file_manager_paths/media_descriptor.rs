@@ -1,4 +1,4 @@
-use crate::remote_file_manager::file_descriptor::FileDescriptor;
+use crate::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
 
 // TODO ASK BRANDON WHAT path should this be?
 const MEDIA_FILE_DIRECTORY: &str = "/media";

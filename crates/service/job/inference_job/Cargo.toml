@@ -20,6 +20,7 @@ normal = ["my-workspace-hack"]
 # Internal
 actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
+bucket_paths = { path = "../../../lib/bucket_paths" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 collections = { path = "../../../lib/data/collections" }

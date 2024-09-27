@@ -1,7 +1,6 @@
-use crate::remote_file_manager::media_descriptor;
-use crate::remote_file_manager::weights_descriptor::{self};
-
-use super::file_descriptor::FileDescriptor;
+use bucket_paths::legacy::remote_file_manager_paths::media_descriptor;
+use bucket_paths::legacy::remote_file_manager_paths::weights_descriptor::{self};
+use bucket_paths::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
 
 #[derive(Debug, Clone)]
 pub struct RemoteCloudBucketDetails {

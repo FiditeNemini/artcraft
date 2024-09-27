@@ -5,8 +5,8 @@ use actix_web::dev::ResourcePath;
 use anyhow::anyhow;
 use log::{error, info, warn};
 
+use bucket_paths::legacy::remote_file_manager_paths::weights_descriptor::WeightsLoRADescriptor;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;

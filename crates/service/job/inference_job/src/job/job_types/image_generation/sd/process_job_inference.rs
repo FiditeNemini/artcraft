@@ -5,7 +5,7 @@ use anyhow::anyhow;
 use log::{error, info, warn};
 use serde_json;
 
-use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
+use bucket_paths::legacy::remote_file_manager_paths::media_descriptor::MediaImagePngDescriptor;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
