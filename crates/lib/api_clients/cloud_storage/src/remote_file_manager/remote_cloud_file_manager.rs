@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use bucket_paths::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
 use bucket_paths::legacy::remote_file_manager_paths::file_directory::FileBucketDirectory;
 use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;

@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use log::{error, info, warn};
 use zip::ZipArchive;
 
-use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_directory::WeightFileBucketDirectory;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;

@@ -9,7 +9,7 @@ use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
 use utoipa::{IntoParams, ToSchema};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::common::view_as::ViewAs;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;

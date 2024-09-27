@@ -5,8 +5,8 @@ use std::time::{Duration, Instant};
 use anyhow::anyhow;
 use log::{error, info, warn};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use buckets::public::weight_files::bucket_directory::WeightFileBucketDirectory;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_directory::WeightFileBucketDirectory;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_type::MediaFileType;

@@ -21,7 +21,7 @@ use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::buck
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_str_path::bucket_url_from_str_path;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;

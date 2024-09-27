@@ -17,7 +17,7 @@ normal = ["my-workspace-hack"]
 
 [dependencies]
 # Internal
-buckets = { path = "../../../_types/buckets" }
+bucket_paths = { path = "../../../lib/bucket_paths" }
 config = { path = "../../../lib/deprecated/config" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }

@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use crockford::crockford_entropy_lower;
 
-use crate::private::private_path::PrivatePath;
-use crate::private::zs_voices::bucket_directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
+use crate::legacy::typified_paths::private::private_path::PrivatePath;
+use crate::legacy::typified_paths::private::zs_voices::bucket_directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
 
 // TODO: Generate these from a macro.
 
@@ -74,8 +74,8 @@ mod tests {
   use std::path::PathBuf;
 
   mod with_prefix_and_extension {
-    use crate::private::zs_voices::bucket_directory::ModelCategory;
-    use crate::private::zs_voices::bucket_file_path::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
+    use crate::legacy::typified_paths::private::zs_voices::bucket_directory::ModelCategory;
+    use crate::legacy::typified_paths::private::zs_voices::bucket_file_path::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
 
     #[test]
     pub fn generate_new_entropy() {
@@ -94,8 +94,8 @@ mod tests {
   }
 
   mod without_prefix_and_extension {
-    use crate::private::zs_voices::bucket_directory::ModelCategory;
-    use crate::private::zs_voices::bucket_file_path::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
+    use crate::legacy::typified_paths::private::zs_voices::bucket_directory::ModelCategory;
+    use crate::legacy::typified_paths::private::zs_voices::bucket_file_path::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
 
     use super::*;
 

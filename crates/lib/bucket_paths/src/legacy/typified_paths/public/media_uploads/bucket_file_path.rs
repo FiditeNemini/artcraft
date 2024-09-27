@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use crockford::crockford_entropy_lower;
 
-use crate::public::media_uploads::bucket_directory::MediaUploadDirectory;
-use crate::public::public_path::PublicPath;
+use crate::legacy::typified_paths::public::media_uploads::bucket_directory::MediaUploadDirectory;
+use crate::legacy::typified_paths::public::public_path::PublicPath;
 
 const ORIGINAL_FILE_BASENAME : &str = "original_upload.bin";
 
@@ -69,7 +69,7 @@ impl MediaUploadOriginalFilePath {
 mod tests {
   use std::path::PathBuf;
 
-  use crate::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
+  use crate::legacy::typified_paths::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
 
   #[test]
   pub fn generate_new_entropy() {

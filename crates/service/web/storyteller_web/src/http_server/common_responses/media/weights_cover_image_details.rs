@@ -6,7 +6,7 @@ use crate::http_server::common_responses::media::media_domain::MediaDomain;
 use crate::http_server::web_utils::bucket_urls::bucket_url_from_media_path::bucket_url_from_media_path;
 use crate::util::placeholder_images::cover_images::default_cover_image_color_from_token::default_cover_image_color_from_token;
 use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 /// Everything we need to create a cover image.

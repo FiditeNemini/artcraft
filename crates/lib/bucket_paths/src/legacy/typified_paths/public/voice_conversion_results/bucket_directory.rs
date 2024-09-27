@@ -1,4 +1,4 @@
-use crate::public::public_path::PublicPath;
+use crate::legacy::typified_paths::public::public_path::PublicPath;
 use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
 
 // TODO: Generate these from a macro.
@@ -40,7 +40,7 @@ impl VoiceConversionResultDirectory {
 
 #[cfg(test)]
 mod tests {
-  use crate::public::voice_conversion_results::bucket_directory::VoiceConversionResultDirectory;
+  use crate::legacy::typified_paths::public::voice_conversion_results::bucket_directory::VoiceConversionResultDirectory;
 
   #[test]
   pub fn get_directory_path_str() {

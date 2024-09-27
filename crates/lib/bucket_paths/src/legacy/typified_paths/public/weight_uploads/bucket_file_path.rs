@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use crockford::crockford_entropy_lower;
 
-use crate::public::public_path::PublicPath;
-use crate::public::weight_uploads::bucket_directory::WeightUploadDirectory;
+use crate::legacy::typified_paths::public::public_path::PublicPath;
+use crate::legacy::typified_paths::public::weight_uploads::bucket_directory::WeightUploadDirectory;
 
 const ORIGINAL_FILE_BASENAME : &str = "original_upload.bin";
 
@@ -57,7 +57,7 @@ impl WeightUploadOriginalFilePath {
 mod tests {
   use std::path::PathBuf;
 
-  use crate::public::weight_uploads::bucket_file_path::WeightUploadOriginalFilePath;
+  use crate::legacy::typified_paths::public::weight_uploads::bucket_file_path::WeightUploadOriginalFilePath;
 
   #[test]
   pub fn generate_new_entropy() {

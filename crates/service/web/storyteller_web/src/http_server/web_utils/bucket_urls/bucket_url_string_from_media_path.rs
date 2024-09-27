@@ -1,4 +1,4 @@
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 /// An infallible version of `bucket_url_from_media_path` that returns a string.
 pub fn bucket_url_string_from_media_path(
@@ -10,7 +10,7 @@ pub fn bucket_url_string_from_media_path(
 
 #[cfg(test)]
 mod tests {
-  use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+  use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 
   use crate::http_server::web_utils::bucket_urls::bucket_url_string_from_media_path::bucket_url_string_from_media_path;
 

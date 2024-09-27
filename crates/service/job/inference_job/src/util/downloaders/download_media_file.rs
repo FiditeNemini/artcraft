@@ -4,7 +4,7 @@ use anyhow::anyhow;
 use log::{error, info};
 use sqlx::MySqlPool;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;

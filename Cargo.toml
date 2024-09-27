@@ -3,8 +3,6 @@ resolver = "2"
 
 members = [
   # Types: common strongly-typed tokens, ids, payloads, etc.
-  # Also common cloud buckets and other "strongly typed" configs.
-  "crates/_types/buckets",
   "crates/_types/composite_identifiers",
   "crates/_types/enums",
   "crates/_types/enums_public",

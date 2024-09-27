@@ -11,8 +11,8 @@ use r2d2_redis::redis::Commands;
 use r2d2_redis::RedisConnectionManager;
 use url::Url;
 
-use buckets::public::media_files::bucket_directory::MediaFileBucketDirectory;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_directory::MediaFileBucketDirectory;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use crockford::crockford_entropy_lower;
 use filesys::file_read_bytes::file_read_bytes;

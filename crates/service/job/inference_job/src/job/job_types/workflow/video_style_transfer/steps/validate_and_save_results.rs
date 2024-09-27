@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use log::{debug, error, info};
 use tempdir::TempDir;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;

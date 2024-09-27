@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::ToSchema;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::common::visibility::Visibility;

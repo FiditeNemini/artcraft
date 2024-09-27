@@ -10,7 +10,7 @@ use r2d2_redis::redis::Commands;
 use regex::Regex;
 use utoipa::{IntoParams, ToSchema};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
 use enums::common::view_as::ViewAs;
 use markdown::markdown_with_socials_to_html::markdown_with_socials_to_html;

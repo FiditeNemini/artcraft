@@ -1,6 +1,6 @@
 use crockford::crockford_entropy_lower;
 
-use crate::private::private_path::PrivatePath;
+use crate::legacy::typified_paths::private::private_path::PrivatePath;
 use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
 
 // TODO: Generate these from a macro.
@@ -81,7 +81,7 @@ impl ZeroShotVoiceEmbeddingBucketDirectory {
 
 #[cfg(test)]
 mod tests {
-  use crate::private::zs_voices::bucket_directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
+  use crate::legacy::typified_paths::private::zs_voices::bucket_directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
 
   #[test]
   pub fn generate_new_entropy() {

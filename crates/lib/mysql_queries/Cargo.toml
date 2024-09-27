@@ -18,7 +18,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
-buckets = { path = "../../_types/buckets" }
+bucket_paths = { path = "../bucket_paths" }
 composite_identifiers = { path = "../../_types/composite_identifiers" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../errors" }

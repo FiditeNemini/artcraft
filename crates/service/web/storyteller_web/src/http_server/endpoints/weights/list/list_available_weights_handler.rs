@@ -8,7 +8,7 @@ use log::warn;
 use rand::Rng;
 use utoipa::ToSchema;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
     weights_types::WeightsType,

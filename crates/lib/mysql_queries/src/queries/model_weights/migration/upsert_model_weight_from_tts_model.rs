@@ -1,6 +1,6 @@
 use sqlx::{MySql, MySqlPool, Transaction};
 
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;

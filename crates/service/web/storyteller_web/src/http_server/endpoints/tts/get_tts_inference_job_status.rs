@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use log::{error, log};
 use r2d2_redis::redis::{Commands, RedisResult};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use mysql_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
 use redis_common::redis_keys::RedisKeys;

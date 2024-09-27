@@ -17,8 +17,8 @@ use reqwest::Url;
 use utoipa::ToSchema;
 use web::Data;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;

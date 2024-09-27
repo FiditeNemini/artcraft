@@ -14,7 +14,7 @@ pub fn bucket_url_from_str_path(
 mod tests {
   use url::Url;
 
-  use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+  use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
   use crate::http_server::web_utils::bucket_urls::bucket_url_from_str_path::bucket_url_from_str_path;
 
   #[test]

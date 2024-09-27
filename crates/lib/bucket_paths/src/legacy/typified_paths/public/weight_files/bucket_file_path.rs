@@ -1,12 +1,13 @@
 use std::path::PathBuf;
 
 use crockford::crockford_entropy_lower;
-use crate::public::public_path::PublicPath;
+use crate::legacy::typified_paths::public::public_path::PublicPath;
 
 const ORIGINAL_FILE_BASENAME : &str = "file.bin";
 
 // TODO: Generate these from a macro.
-use crate::public::weight_files::bucket_directory::WeightFileBucketDirectory;
+use crate::legacy::typified_paths::public::weight_files::bucket_directory::WeightFileBucketDirectory;
+
 /// The original user upload file.
 /// It may have derivative files (down samples, crops, etc.) that live alongside it.
 #[derive(Clone)]
@@ -120,7 +121,7 @@ impl WeightFileBucketPath {
 mod tests {
   use std::path::PathBuf;
 
-  use crate::public::weight_files::bucket_file_path::WeightFileBucketPath;
+  use crate::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
   mod with_prefix_and_extension {
     use super::*;
 

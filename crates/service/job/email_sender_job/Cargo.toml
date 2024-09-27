@@ -20,7 +20,7 @@ normal = ["my-workspace-hack"]
 # Internal
 actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
-buckets = { path = "../../../_types/buckets" }
+bucket_paths = { path = "../../../lib/bucket_paths" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }
 easyenv = { path = "../../../lib/easyenv" }

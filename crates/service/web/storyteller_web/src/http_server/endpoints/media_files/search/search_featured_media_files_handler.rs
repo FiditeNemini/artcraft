@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use elasticsearch_schema::searches::search_media_files::{search_media_files, SearchArgs};
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;

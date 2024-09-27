@@ -24,8 +24,8 @@ use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_m
 use crate::http_server::web_utils::filter_model_name::maybe_filter_model_name;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;

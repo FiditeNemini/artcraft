@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use sqlx::MySqlPool;
 
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;

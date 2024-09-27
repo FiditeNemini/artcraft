@@ -6,7 +6,7 @@ use log::{error, info, warn};
 use once_cell::sync::Lazy;
 use zip::ZipArchive;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;

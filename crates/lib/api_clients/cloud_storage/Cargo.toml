@@ -21,7 +21,6 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # Internal
 bucket_paths = { path = "../../../lib/bucket_paths" }
-buckets = { path = "../../../_types/buckets" }
 crockford = { path = "../../../lib/data/crockford" }
 easyenv = { path = "../../../lib/easyenv" }
 errors = { path = "../../../lib/errors" }

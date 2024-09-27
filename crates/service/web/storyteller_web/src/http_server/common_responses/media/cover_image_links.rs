@@ -1,5 +1,5 @@
 use crate::http_server::common_responses::media::media_domain::MediaDomain;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use url::Url;
 use utoipa::ToSchema;
 

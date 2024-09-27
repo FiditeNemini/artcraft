@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::anyhow;
 use tempdir::TempDir;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;

@@ -10,7 +10,7 @@ use log::{debug, error, info, warn};
 use serde_json::Value;
 use walkdir::WalkDir;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;

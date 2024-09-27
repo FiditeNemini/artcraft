@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use log::{info, warn};
 
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;

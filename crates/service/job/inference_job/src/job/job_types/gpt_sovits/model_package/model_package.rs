@@ -2,7 +2,7 @@ use std::collections::{BTreeSet, HashSet};
 
 use once_cell::sync::Lazy;
 
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 
 pub const SUFFIX: &str = ".bin";
 

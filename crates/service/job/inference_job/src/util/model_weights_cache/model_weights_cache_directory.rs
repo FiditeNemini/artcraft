@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use log::{error, info, warn};
 
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
 use filesys::file_size::file_size;

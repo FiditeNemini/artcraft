@@ -8,7 +8,7 @@ use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
 use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;

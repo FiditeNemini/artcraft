@@ -3,7 +3,7 @@ use std::path::Path;
 use log::{info, warn};
 use sqlx::{MySql, Pool};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;

@@ -1,5 +1,5 @@
 use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use errors::AnyhowResult;
 use filesys::file_deletion::safe_delete_directory::safe_delete_directory;
 use filesys::file_deletion::safe_delete_file::safe_delete_file;

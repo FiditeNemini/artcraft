@@ -20,7 +20,6 @@ normal = ["my-workspace-hack"]
 # Internal
 bootstrap = { path = "../../../lib/bootstrap" }
 bucket_paths = { path = "../../../lib/bucket_paths" }
-buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }

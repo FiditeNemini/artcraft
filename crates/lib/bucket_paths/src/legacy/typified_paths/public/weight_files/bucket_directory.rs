@@ -1,6 +1,6 @@
 use crockford::crockford_entropy_lower;
 
-use crate::public::public_path::PublicPath;
+use crate::legacy::typified_paths::public::public_path::PublicPath;
 use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
 
 // TODO: Generate these from a macro.
@@ -46,7 +46,7 @@ impl WeightFileBucketDirectory {
 
 #[cfg(test)]
 mod tests {
-  use crate::public::weight_files::bucket_directory::WeightFileBucketDirectory;
+  use crate::legacy::typified_paths::public::weight_files::bucket_directory::WeightFileBucketDirectory;
 
   #[test]
   pub fn generate_new_entropy() {

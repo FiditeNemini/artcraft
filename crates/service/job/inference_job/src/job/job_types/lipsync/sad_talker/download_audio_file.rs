@@ -5,9 +5,9 @@ use log::{error, warn};
 use sqlx::MySqlPool;
 use tempdir::TempDir;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use buckets::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
-use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
+use bucket_paths::legacy::typified_paths::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use cloud_storage::bucket_client::BucketClient;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::payloads::generic_inference_args::inner_payloads::lipsync_payload::LipsyncAnimationAudioSource;

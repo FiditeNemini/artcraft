@@ -2,7 +2,7 @@ use url::Url;
 use utoipa::ToSchema;
 
 use crate::http_server::common_responses::media::media_domain::MediaDomain;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 // TODO(bt,2024-09-05): Worth reducing the quality at all?
 const QUALITY : u8 = 95;
@@ -121,7 +121,7 @@ fn video_preview_thumbnail_template(media_domain: MediaDomain, rooted_path: &str
 
 #[cfg(test)]
 mod tests {
-  use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+  use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 
   use crate::http_server::common_responses::media::media_domain::MediaDomain;
   use crate::http_server::common_responses::media::media_links::MediaLinks;

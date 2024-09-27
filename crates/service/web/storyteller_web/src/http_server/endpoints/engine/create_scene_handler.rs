@@ -8,7 +8,7 @@ use log::{error, info, warn};
 use once_cell::sync::Lazy;
 use utoipa::ToSchema;
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
