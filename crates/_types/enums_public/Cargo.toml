@@ -16,12 +16,11 @@ path = "src/lib.rs"
 normal = ["my-workspace-hack"]
 
 [dependencies]
-# Internal
-enums = { path = "../enums" }
-errors = { path = "../../lib/errors" }
-
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# Internal
+enums = { path = "../enums" }
 
 # Serialization
 serde = "1.0.125"
