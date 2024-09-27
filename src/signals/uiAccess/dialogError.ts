@@ -7,7 +7,7 @@ const initialState = {
 };
 const dialogErrorSignal = signal(initialState);
 
-export const dialogueError = {
+export const dialogError = {
   signal: dialogErrorSignal,
 
   show({ title, message }: { title?: string; message?: string }) {

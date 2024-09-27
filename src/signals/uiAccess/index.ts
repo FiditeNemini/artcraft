@@ -8,7 +8,8 @@ export type { uiAccessType };
 
 import { buttonRetry } from "./buttonRetry";
 import { buttonTest } from "./buttonTest";
-import { dialogueError } from "./dialogueError";
+import { dialogChromakey } from "./dialogChromakey";
+import { dialogError } from "./dialogError";
 import { loadingBar } from "./loadingBar";
 import { toolbarMain } from "./toolbarMain";
 import { toolbarNode } from "./toolbarNode";
@@ -16,7 +17,8 @@ import { toolbarNode } from "./toolbarNode";
 export const uiAccess = {
   buttonRetry,
   buttonTest,
-  dialogueError,
+  dialogChromakey,
+  dialogError,
   loadingBar,
   toolbarMain,
   toolbarNode,

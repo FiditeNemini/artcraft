@@ -1,7 +1,6 @@
 import { ContextualToolbarNode } from "~/KonvaRootComponent/ContextualToolbarNode";
 import { ContextualLoadingBar } from "~/KonvaRootComponent/ContextualLoadingBar";
 import { ContextualButtonRetry } from "~/KonvaRootComponent/ContextualButtonRetry";
-import { SignaledDialogError } from "~/KonvaRootComponent/SignaledDialogs";
 
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
@@ -29,7 +28,6 @@ export const Sandbox = () => {
       <ContextualToolbarNode />
       <ContextualLoadingBar />
       <ContextualButtonRetry />
-      <SignaledDialogError />
     </div>
   );
 };

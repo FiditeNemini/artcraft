@@ -2,6 +2,7 @@ export { CanvasDragDropFiles } from "./CanvasDragDropFiles";
 export { DialogAddImage } from "./DialogAddImage";
 export { DialogAddVideo } from "./DialogAddVideo";
 export { DialogAiStylize } from "./DialogAiStylize";
+export { DialogChromakey } from "./DialogChromakey";
 export { DialogError } from "./DialogError";
 export { ProfileDropdown } from "./ToolbarUserProfile/ProfileDropdown";
 export { ToolbarMain } from "./ToolbarMain";
