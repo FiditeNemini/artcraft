@@ -12,7 +12,7 @@ use actix_web::web::Data;
 use actix_cors_configs::cors::build_cors_config;
 use actix_helpers::route_builder::RouteBuilder;
 use errors::AnyhowResult;
-
+use crate::endpoints::dummy_app_state_handler::dummy_app_state_handler;
 use crate::endpoints::dummy_health_check_handler::dummy_health_check_handler;
 use crate::endpoints::dummy_queue_stats_handler::dummy_queue_stats_handler;
 use crate::endpoints::root_handler::root_handler;
@@ -101,6 +101,7 @@ fn build_routes<T, B> (app: App<T>) -> App<T>
   RouteBuilder::from_app(app)
       .add_get("/", root_handler)
       .add_get("/_status", dummy_health_check_handler)
+      .add_get("/v1/app_state", dummy_app_state_handler)
       .add_get("/v1/stats/queues", dummy_queue_stats_handler)
       .add_get("/v1/status_alert_check", status_alert_handler)
       .into_app()
