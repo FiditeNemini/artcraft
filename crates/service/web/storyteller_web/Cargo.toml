@@ -137,7 +137,7 @@ tempdir = "0.3.7"
 
 # The "never-encode-slash" feature seems to have been removed:
 # https://github.com/durch/rust-s3/pull/254
-rust-s3 = { version = "0.34.0" }
+rust-s3 = { version = "0.36.0-beta.2" }
 
 actix-cors = "0.6.4"
 actix-http = "3.7.0"

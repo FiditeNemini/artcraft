@@ -76,7 +76,7 @@ impl BucketClient {
     let optional_bucket_root = optional_bucket_root.map(|s| s.to_string());
 
     Ok(Self {
-      bucket,
+      bucket: *bucket, // NB: We don't need to keep this boxed on the heap.
       optional_bucket_root,
     })
   }
@@ -149,17 +149,6 @@ impl BucketClient {
     Ok(())
   }
 
-  // NB: New version has blocking client rather than blocking calls.
-  // pub fn upload_file_blocking(&self, object_name: &str, bytes: &[u8]) -> anyhow::Result<()> {
-  //   info!("Filename for bucket: {}", object_name);
-  //
-  //   let (_, code) = self.bucket.put_object_blocking(object_name, bytes)?;
-  //
-  //   info!("upload code: {}", code);
-  //
-  //   Ok(())
-  // }
-
   pub async fn upload_filename<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
     object_path: P,
@@ -201,16 +190,6 @@ impl BucketClient {
     self.upload_file_with_content_type(&object_path_str, &buffer, content_type).await
   }
 
-  // NB: New version has blocking client rather than blocking calls.
-  // pub fn upload_filename_blocking(&self, object_name: &str, filename: &Path) -> anyhow::Result<()> {
-  //   // TODO: does a newer version of this crate handle streaming/buffering file contents?
-  //   let mut file = File::open(filename)?;
-  //   let mut buffer : Vec<u8> = Vec::new();
-  //   file.read_to_end(&mut buffer)?;
-  //
-  //   self.upload_file_blocking(object_name, &buffer)
-  // }
-
   pub async fn download_file(&self, path: &str) -> anyhow::Result<Vec<u8>> {
     info!("downloading from bucket: {}", path);
 
@@ -251,18 +230,4 @@ impl BucketClient {
     info!("download code: {}", status_code);
     Ok(())
   }
-
-  // NB: New version has blocking client rather than blocking calls.
-  // pub fn download_file_blocking(&self, path: &str) -> anyhow::Result<Vec<u8>> {
-  //   info!("downloading from bucket: {}", path);
-  //   let (bytes, code) = self.bucket.get_object_blocking(path)?;
-  //
-  //   match code {
-  //     404 => bail!("File not found in bucket: {}", path),
-  //     _ => {},
-  //   }
-  //
-  //   info!("download code: {}", code);
-  //   Ok(bytes)
-  // }
 }
