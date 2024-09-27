@@ -5,7 +5,7 @@ import {
   ModalProvider,
   NotificationProvider,
   SessionProvider,
-  SignUpQuestionnaireProvider,
+  // SignUpQuestionnaireProvider,
 } from "components/providers";
 import ServerStatusChecker from "./ServerStatusChecker";
 
@@ -21,9 +21,9 @@ export default function CoreServicesProvider({ children }: Props) {
           <NotificationProvider>
             <ServerStatusChecker />
             <ModalProvider>
-              <SignUpQuestionnaireProvider>
-                {children}
-              </SignUpQuestionnaireProvider>
+              {/* <SignUpQuestionnaireProvider> */}
+              {children}
+              {/* </SignUpQuestionnaireProvider> */}
             </ModalProvider>
           </NotificationProvider>
         </InferenceJobsProvider>

@@ -324,7 +324,8 @@ function SignupPage() {
       ? redirectLink.includes("?")
         ? redirectLink + "&from=signup"
         : redirectLink + "?from=signup"
-      : WebUrl.pricingPageWithReferer("signup");
+      : "/";
+    // : WebUrl.pricingPageWithReferer("signup");
 
     if (domain.website === Website.StorytellerAi) {
       redirectUrl = redirectSignUpLink;
