@@ -1,5 +1,6 @@
 import React from "react";
 import { getBackgroundColor } from "./GetBGColor";
+import { GetWebsite, Website } from "../env/GetWebsite";
 
 interface Props {
   size: number;
@@ -12,14 +13,15 @@ interface Props {
 }
 
 function Gravatar(props: Props) {
-  const domain = window.location.hostname.includes("fakeyou.com")
-    ? "fakeyou.com"
-    : "storyteller.ai";
+  const domain = GetWebsite();
+
+  const link =
+    domain.website === Website.FakeYou ? "fakeyou.com" : "storyteller.ai";
   // TODO: staging domain + local dev support
   let defaultImageUrl =
     props.avatarIndex === undefined
-      ? `https://${domain}/images/avatars/default-pfp.png`
-      : `https://${domain}/images/avatars/2000x2000/${props.avatarIndex}.webp`;
+      ? `https://${link}/images/avatars/default-pfp.png`
+      : `https://${link}/images/avatars/2000x2000/${props.avatarIndex}.webp`;
 
   // NB: Gravatar suggests URI encoding these:
   // https://en.gravatar.com/site/implement/images/

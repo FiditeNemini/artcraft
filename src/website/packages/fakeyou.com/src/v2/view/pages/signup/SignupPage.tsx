@@ -656,6 +656,7 @@ function SignupPage() {
                   <Button
                     label={t("account.SignUpPage.signUpButton")}
                     className="btn btn-primary btn-lg w-100 mt-2 mb-0"
+                    onClick={handleFormSubmit}
                   />
                   <GoogleSSO mode="signup" />
                 </div>
