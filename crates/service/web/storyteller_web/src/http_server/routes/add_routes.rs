@@ -164,16 +164,13 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
   app = add_beta_key_routes(app); /* /v1/beta_keys */
-  app = add_image_gen_routes(app);
   app = add_weights_routes(app);
   app = add_model_download_routes(app);
   app = add_workflow_routes(app);
   app = add_job_routes(app);
   app = add_engine_routes(app); /* /v1/engine/... */
 
-  // if server_environment == ServerEnvironment::Development {
-  //
-  // }
+  // app = add_image_gen_routes(app);
 
   // ==================== Comments ====================
 
@@ -938,31 +935,31 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
 }
 
 
-fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
-    where
-        B: MessageBody,
-        T: ServiceFactory<
-            ServiceRequest,
-            Config = (),
-            Response = ServiceResponse<B>,
-            Error = Error,
-            InitError = (),
-        >,
-{
-  // 
-    app.service(
-        web::scope("/v1/image_gen")
-            .service(
-                web::scope("/upload")              
-                    .route("/lora", web::post().to(enqueue_image_generation_request))
-                    .route("/model", web::post().to(enqueue_image_generation_request))
-            )
-            .service(
-                web::scope("/enqueue")
-                    .route("/inference", web::post().to(enqueue_image_generation_request))
-            )
-    )
-}
+//fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
+//    where
+//        B: MessageBody,
+//        T: ServiceFactory<
+//            ServiceRequest,
+//            Config = (),
+//            Response = ServiceResponse<B>,
+//            Error = Error,
+//            InitError = (),
+//        >,
+//{
+//  //
+//    app.service(
+//        web::scope("/v1/image_gen")
+//            .service(
+//                web::scope("/upload")
+//                    .route("/lora", web::post().to(enqueue_image_generation_request))
+//                    .route("/model", web::post().to(enqueue_image_generation_request))
+//            )
+//            .service(
+//                web::scope("/enqueue")
+//                    .route("/inference", web::post().to(enqueue_image_generation_request))
+//            )
+//    )
+//}
 
 // ==================== Engine Routes ====================
 

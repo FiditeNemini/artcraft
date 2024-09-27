@@ -7,6 +7,14 @@ select count(*)
 from generic_inference_jobs
 where status = 'pending';
 
+-- Get pending job count by job type
+select
+  job_type,
+  count(*)
+from generic_inference_jobs
+where status = 'pending'
+group by job_type;
+
 -- Kill *ALL* pending / outstanding jobs of any type
 update generic_inference_jobs
 set status = 'dead'
