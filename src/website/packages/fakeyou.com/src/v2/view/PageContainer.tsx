@@ -1,5 +1,4 @@
 import React from "react";
-import ComponentsLibrary from "./pages/components_library";
 import { AboutPage } from "./pages/about/about_page/AboutPage";
 import { GuidePage } from "./pages/about/guide_page/GuidePage";
 import { FirehoseEventListPage } from "./pages/firehose/FirehoseEventListPage";
@@ -47,17 +46,14 @@ import { PatronPage } from "./pages/patrons/PatronPage";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
 import { PricingPage } from "./pages/premium/PricingPage";
-import { WelcomePage } from "./pages/welcome/WelcomePage";
 import { CheckoutSuccessPage } from "./pages/premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./pages/premium/PortalSuccessPage";
 import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
-import { ChannelsPage } from "./pages/channels/Channels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
-import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
@@ -108,8 +104,6 @@ import { BetaLipSyncPage } from "./pages/beta_products/BetaLipSyncPage";
 import { ToolsTestPage } from "./pages/tools_test/ToolsTestPage";
 import { BetaVideoCompositorForm } from "./pages/beta_products/BetaVideoCompositorForm";
 import { BetaVideoCompositorPage } from "./pages/beta_products/BetaVideoCompositorPage";
-import { BetaWebcamActingForm } from "./pages/beta_products/BetaWebcamActingForm";
-import { BetaWebcamActingPage } from "./pages/beta_products/BetaWebcamActingPage";
 import { Beta3DVideoCompositorForm } from "./pages/beta_products/Beta3DVideoCompositorForm";
 import { Beta3DVideoCompositorPage } from "./pages/beta_products/Beta3DVideoCompositorPage";
 import Lipsync from "./pages/lipsync/Lipsync";
@@ -133,19 +127,12 @@ export default function PageContainer() {
             <LandingPage />
           </Route>
 
-          <Route path="/comp-lib">
-            <ComponentsLibrary />
-          </Route>
           <Route path="/firehose">
             <FirehoseEventListPage />
           </Route>
 
           <Route path="/news">
             <NewsPage />
-          </Route>
-
-          <Route path="/channels">
-            <ChannelsPage />
           </Route>
 
           <Route path="/leaderboard">
@@ -391,10 +378,6 @@ export default function PageContainer() {
             <DashboardPage />
           </Route>
 
-          <Route path="/welcome-to-studio">
-            <WelcomePage />
-          </Route>
-
           <Route path="/about">
             <AboutPage />
           </Route>
@@ -497,10 +480,6 @@ export default function PageContainer() {
             <StyleVideo />
           </Route>
 
-          <Route path="/generate-speech">
-            <GenerateSpeechPage />
-          </Route>
-
           <Route path="/video-mocap/:mediaToken?">
             <VideoMocap />
           </Route>
@@ -511,14 +490,6 @@ export default function PageContainer() {
 
           <Route path="/character/donald-trump">
             <NewTrumpTTS />
-          </Route>
-
-          <Route path="/beta/webcam-acting/form">
-            <BetaWebcamActingForm />
-          </Route>
-
-          <Route path="/beta/webcam-acting">
-            <BetaWebcamActingPage />
           </Route>
 
           <Route path="/beta/3d-video-compositor/form">
