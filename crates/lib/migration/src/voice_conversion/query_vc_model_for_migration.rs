@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use sqlx::MySqlPool;
 
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
@@ -218,7 +218,7 @@ mod tests {
   mod legacy_voice_conversion_models {
     use std::path::PathBuf;
 
-    use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+    use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
     use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
     use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
     use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
@@ -306,7 +306,7 @@ mod tests {
   mod new_model_weights {
     use std::path::PathBuf;
 
-    use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+    use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
     use enums::by_table::model_weights::weights_types::WeightsType;
     use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
     use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::ModelWeightForVoiceConversionInference;

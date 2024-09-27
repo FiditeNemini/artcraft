@@ -1,6 +1,5 @@
+use crate::legacy::old_bespoke_paths::hashed_directory_path_short_string::hashed_directory_path_short_string;
 use std::path::PathBuf;
-
-use buckets::util::hashed_directory_path_short_string::hashed_directory_path_short_string;
 
 /// This is designed to make it centrally configurable where
 /// different types of objects are stored.
@@ -298,9 +297,8 @@ impl BucketPathUnifier {
 
 #[cfg(test)]
 mod tests {
+  use crate::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
   use std::path::PathBuf;
-
-  use crate::bucket_path_unifier::BucketPathUnifier;
 
   fn get_instance() -> BucketPathUnifier {
     BucketPathUnifier {

@@ -26,7 +26,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use sqlx::MySqlPool;
 
 use cloud_storage::bucket_client::BucketClient;
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use collections::multiple_random_from_vec::multiple_random_from_vec;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;

@@ -1,7 +1,7 @@
 use tempdir::TempDir;
 
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use errors::{anyhow, AnyhowResult};
 use filesys::file_deletion::safe_delete_directory::safe_delete_directory;

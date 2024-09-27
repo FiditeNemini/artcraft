@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use sqlx::MySqlPool;
 
 use cloud_storage::bucket_client::BucketClient;
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_stats::JobStats;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;

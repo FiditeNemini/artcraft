@@ -9,7 +9,7 @@ use buckets::private::zs_voices::bucket_directory::{ModelCategory, ModelType};
 use buckets::private::zs_voices::bucket_file_path::ZeroShotVoiceEmbeddingBucketPath;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use bucket_paths::legacy::old_bespoke_paths::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::zs_voices::encoding_type::ZsVoiceEncodingType;
 use enums::by_table::zs_voices::model_category::ZsVoiceModelCategory;

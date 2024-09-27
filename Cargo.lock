@@ -2213,6 +2213,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "bootstrap",
+ "bucket_paths",
  "buckets",
  "chrono",
  "cloud_storage",
@@ -4325,6 +4326,7 @@ name = "migration"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bucket_paths",
  "buckets",
  "chrono",
  "cloud_storage",
@@ -4347,6 +4349,7 @@ dependencies = [
 name = "migration-tool"
 version = "0.0.1"
 dependencies = [
+ "bucket_paths",
  "buckets",
  "clap",
  "cloud_storage",
@@ -8152,6 +8155,7 @@ name = "tts-download-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bucket_paths",
  "chrono",
  "cloud_storage",
  "config",
@@ -8183,6 +8187,7 @@ name = "tts-inference-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bucket_paths",
  "chrono",
  "cloud_storage",
  "collections",
@@ -8508,6 +8513,7 @@ name = "w2l-inference-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bucket_paths",
  "chrono",
  "cloud_storage",
  "config",

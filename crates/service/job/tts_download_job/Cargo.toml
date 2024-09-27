@@ -18,6 +18,7 @@ normal = ["my-workspace-hack"]
 [dependencies]
 
 # Internal
+bucket_paths = { path = "../../../lib/bucket_paths" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 easyenv = { path = "../../../lib/easyenv" }
