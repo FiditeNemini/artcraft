@@ -175,7 +175,8 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       const mediaToken = response.data;
 
       if (!mediaToken) {
-        throw Error("Media Token Not Availible");
+        this.reset();
+        throw Error(`Server Failed Try Again: ${response.errorMessage}`);
       }
 
       console.log(item.prompt);
@@ -210,6 +211,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       if (studioResponse.success && studioResponse.data?.inference_job_token) {
         console.log("Start Streaming Result");
         if (!studioResponse.data.inference_job_token) {
+          await this.reset(); // reset on error
           throw Error("No Job Token Returned Try Again");
         }
         const jobToken = studioResponse.data.inference_job_token;
@@ -221,6 +223,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
           const job = await this.jobsAPI.GetJobByToken({ token: jobToken });
           console.log(job);
           if (!job.data) {
+            await this.reset();
             throw Error("Job Data Not Found");
           }
           const status = job.data.status.status;
@@ -255,6 +258,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
               renderProgressData.progress = 100;
               jobIsProcessing = false;
               if (!job.data.maybe_result.maybe_public_bucket_media_path) {
+                await this.reset();
                 throw Error("Server Failed To Return Result");
               }
               resultURL = job.data.maybe_result.maybe_public_bucket_media_path;
@@ -282,6 +286,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
         } // end while loop
       }
       if (!resultURL) {
+        await this.reset(); // reset on error
         throw Error("Media URL Result Missing");
       }
 
@@ -291,6 +296,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       await this.reset();
       return [responseData, true];
     } catch (error) {
+      await this.reset();
       console.log(error);
       throw error;
     }
