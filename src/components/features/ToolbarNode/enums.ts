@@ -1,5 +1,6 @@
 export enum ToolbarNodeButtonNames {
   TRANSFORM = "TRANSFORM",
+  CHROMA = "CRHOMA",
   AI_STYLIZE = "AI_STYLIZE",
   DELETE = "DELETE",
   MOVE_LAYER_UP = "MOVE_LAYER_UP",

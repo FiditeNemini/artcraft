@@ -3,14 +3,15 @@ import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { SelectionManager } from "../SelectionManager";
 import { NodeTransformer } from "../NodeTransformer";
+import { Position, Size } from "../types";
 
 interface ImageNodeContructor {
   mediaLayer: Layer;
-  x: number;
-  y: number;
+  position: Position;
+  canvasSize: Size;
   imageFile: File;
   selectionManagerRef: SelectionManager;
-  nodeTransformer: NodeTransformer;
+  nodeTransformerRef: NodeTransformer;
 }
 
 export class ImageNode extends NetworkedNodeContext {
@@ -20,14 +21,14 @@ export class ImageNode extends NetworkedNodeContext {
 
   constructor({
     mediaLayer,
-    x,
-    y,
+    position,
+    canvasSize,
     imageFile,
     selectionManagerRef,
-    nodeTransformer,
+    nodeTransformerRef,
   }: ImageNodeContructor) {
     super({
-      nodeTransfomerRef: nodeTransformer,
+      nodeTransfomerRef: nodeTransformerRef,
       selectionManagerRef: selectionManagerRef,
       mediaLayer: mediaLayer,
     });
@@ -40,8 +41,8 @@ export class ImageNode extends NetworkedNodeContext {
     this.imageObject.crossOrigin = "anonymous";
 
     this.kNode = new Konva.Image({
-      x: x,
-      y: y,
+      x: position.x,
+      y: position.y,
       image: undefined, // to do replace with placeholder
       width: 100,
       height: 100,
@@ -56,9 +57,16 @@ export class ImageNode extends NetworkedNodeContext {
         return;
       }
 
+      const renderSize = this.calculateRenderSizeOnLoad({
+        componentSize: {
+          width: imageComponent.width,
+          height: imageComponent.height,
+        },
+        maxSize: canvasSize,
+      });
+
       this.kNode.image(imageComponent);
-      this.kNode.width(imageComponent.width);
-      this.kNode.height(imageComponent.height);
+      this.kNode.setSize(renderSize);
 
       this.listenToBaseKNode();
       this.kNode.fill(null);

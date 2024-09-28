@@ -2,14 +2,7 @@ import {
   dispatchers as addMediaDispatchers,
   events as addMediaEvents,
 } from "./addMedia";
-import {
-  dispatchers as toolbarMainDispatchers,
-  eventsHandlers as toolbarMainEvents,
-} from "./toolbarMain";
-import {
-  dispatchers as toolbarNodeDispatchers,
-  eventsHandlers as toolbarNodeEvents,
-} from "./toolbarNode";
+import { aiStylizeDispatchers, aiStylizeEvents } from "./aiStylize";
 import {
   dispatcher as buttonTestDispatcher,
   eventsHandler as buttonTestEvent,
@@ -18,10 +11,19 @@ import {
   dispatcher as buttonRetryDispatcher,
   eventsHandler as buttonRetryEvent,
 } from "./buttonRetry";
-import { aiStylizeDispatchers, aiStylizeEvents } from "./aiStylize";
+import { dispatchChromakeyRequest, onChromakeyRequest } from "./chromakey";
+import {
+  dispatchers as toolbarMainDispatchers,
+  eventsHandlers as toolbarMainEvents,
+} from "./toolbarMain";
+import {
+  dispatchers as toolbarNodeDispatchers,
+  eventsHandlers as toolbarNodeEvents,
+} from "./toolbarNode";
 
 export const uiEvents = {
   ...addMediaEvents,
+  onChromakeyRequest,
   aiStylize: aiStylizeEvents,
   buttonRetry: buttonRetryEvent,
   buttonTest: buttonTestEvent,
@@ -30,6 +32,7 @@ export const uiEvents = {
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
+  dispatchChromakeyRequest,
   aiStylize: aiStylizeDispatchers,
   buttonRetry: buttonRetryDispatcher,
   buttonTest: buttonTestDispatcher,

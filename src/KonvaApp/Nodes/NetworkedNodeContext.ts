@@ -7,6 +7,7 @@ import { Node, NodeConfig } from "konva/lib/Node";
 import { uiAccess } from "~/signals";
 import { SelectionManager } from "../SelectionManager";
 import { NodeTransformer } from "../NodeTransformer";
+import { Size } from "../types";
 
 const toolbarNode = uiAccess.toolbarNode;
 const loadingBar = uiAccess.loadingBar;
@@ -47,6 +48,29 @@ export class NetworkedNodeContext {
     this.nodeTransformerRef = nodeTransfomerRef;
     this.kNode = undefined;
     this.didFinishLoading = false;
+  }
+  protected calculateRenderSizeOnLoad({
+    componentSize,
+    maxSize,
+  }: {
+    componentSize: Size;
+    maxSize: Size;
+  }) {
+    const renderSize = {
+      width: componentSize.width,
+      height: componentSize.height,
+    };
+    if (renderSize.width > maxSize.width) {
+      const scaleDown = maxSize.width / renderSize.width;
+      renderSize.width = renderSize.width * scaleDown;
+      renderSize.height = renderSize.height * scaleDown;
+    }
+    if (renderSize.height > maxSize.height) {
+      const scaleDownAgain = maxSize.height / renderSize.height;
+      renderSize.width = renderSize.width * scaleDownAgain;
+      renderSize.height = renderSize.height * scaleDownAgain;
+    }
+    return renderSize;
   }
   public delete() {
     // Do any other clean up and delete the konva node.

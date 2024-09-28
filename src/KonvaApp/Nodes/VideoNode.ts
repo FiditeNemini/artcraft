@@ -4,9 +4,20 @@ import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { uiAccess } from "~/signals";
 import { SelectionManager } from "../SelectionManager";
 import { NodeTransformer } from "../NodeTransformer";
+import { Position, Size } from "../types";
+import ChromaWorker from "./ChromaWorker?sharedworker";
 
-const toolbarNode = uiAccess.toolbarNode;
+// const toolbarNode = uiAccess.toolbarNode;
 const loadingBar = uiAccess.loadingBar;
+
+interface VideoNodeContructor {
+  mediaLayer: Layer;
+  position: Position;
+  canvasSize: Size;
+  videoURL: string;
+  selectionManagerRef: SelectionManager;
+  nodeTransformerRef: NodeTransformer;
+}
 
 export class VideoNode extends NetworkedNodeContext {
   public videoURL: string;
@@ -17,13 +28,18 @@ export class VideoNode extends NetworkedNodeContext {
   private imageIndex: number = 0;
   public fps: number = 24;
 
-  async setProcessing() {
-    this.isProcessing = true;
-  }
+  // This locks interaction when the render engine is rendering
+  private videoCanvas: OffscreenCanvas;
+  context: OffscreenCanvasRenderingContext2D | null;
+  chromaWorker: SharedWorker | undefined;
+  drawingCanvas: OffscreenCanvas;
+  drawingContext: OffscreenCanvasRenderingContext2D | null;
+  blockSeeking: boolean;
 
-  getNumberFrames(): number {
-    return this.fps * this.duration;
-  }
+  isChroma: boolean;
+  chromaRed: number = 120;
+  chromaGreen: number = 150;
+  chromaBlue: number = 120;
 
   private imageSources: string[] = [
     "https://images-ng.pixai.art/images/orig/7ef23baa-2fc8-4e2f-8299-4f9241920090",
@@ -39,25 +55,56 @@ export class VideoNode extends NetworkedNodeContext {
   private frameDidFinishSeeking: Promise<void>;
   private finishedLoadingOnStart: Promise<void>;
 
+  async setProcessing() {
+    this.isProcessing = true;
+  }
+
+  getNumberFrames(): number {
+    return this.fps * this.duration;
+  }
+  public getChroma() {
+    return {
+      isChromakeyEnabled: this.isChroma,
+      chromakeyColor: {
+        red: this.chromaRed,
+        green: this.chromaGreen,
+        blue: this.chromaBlue,
+      },
+    };
+  }
+  public setChroma(isChroma: boolean) {
+    this.isChroma = isChroma;
+
+    if (this.isChroma === false) {
+      this.kNode?.image(this.videoComponent);
+    } else {
+      this.kNode?.image(this.videoCanvas);
+      if (this.videoComponent.paused || this.videoComponent.ended) {
+        this.chromaKeyRender(0, false, false, true);
+      } else {
+        this.chromaKeyRender(0);
+      }
+    }
+  }
+
+  public setChromaColor(red: number, green: number, blue: number) {
+    this.chromaRed = red;
+    this.chromaGreen = green;
+    this.chromaBlue = blue;
+  }
+
   constructor({
-    videoLayer,
-    x,
-    y,
+    mediaLayer,
+    position,
+    canvasSize,
     videoURL,
     selectionManagerRef,
     nodeTransformerRef,
-  }: {
-    videoLayer: Layer;
-    x: number;
-    y: number;
-    videoURL: string;
-    selectionManagerRef: SelectionManager;
-    nodeTransformerRef: NodeTransformer;
-  }) {
+  }: VideoNodeContructor) {
     super({
       nodeTransfomerRef: nodeTransformerRef,
       selectionManagerRef: selectionManagerRef,
-      mediaLayer: videoLayer,
+      mediaLayer: mediaLayer,
     });
 
     // state manage the node
@@ -71,19 +118,54 @@ export class VideoNode extends NetworkedNodeContext {
     this.videoComponent = document.createElement("video");
     this.videoComponent.crossOrigin = "anonymous";
 
+    this.videoCanvas = new OffscreenCanvas(1280, 720);
+    this.drawingCanvas = new OffscreenCanvas(1280, 720);
+
+    this.context = this.videoCanvas.getContext("2d");
+    this.drawingContext = this.drawingCanvas.getContext("2d");
+
     // Wrapping events
     this.frameDidFinishSeeking = new Promise<void>(() => {});
     this.finishedLoadingOnStart = new Promise<void>(() => {});
 
+    this.blockSeeking = false;
+
+    this.isChroma = false;
+
     this.kNode = new Konva.Image({
+      // image: undefined,
       image: undefined,
-      x: x,
-      y: y,
+      x: position.x,
+      y: position.y,
       width: 200, // to do fix this with placeholder
       height: 200,
       draggable: true,
       fill: "grey",
     });
+
+    // if (this.isChroma) {
+    //   this.kNode = new Konva.Image({
+    //     // image: undefined,
+    //     image: this.videoCanvas,
+    //     x: position.x,
+    //     y: position.y,
+    //     width: 200, // to do fix this with placeholder
+    //     height: 200,
+    //     draggable: true,
+    //     fill: "grey",
+    //   });
+    // } else {
+    //   this.kNode = new Konva.Image({
+    //     // image: undefined,
+    //     image: this.videoComponent,
+    //     x: position.x,
+    //     y: position.y,
+    //     width: 200, // to do fix this with placeholder
+    //     height: 200,
+    //     draggable: true,
+    //     fill: "grey",
+    //   });
+    // }
     this.mediaLayer.add(this.kNode);
 
     this.videoComponent.onloadstart = (event: Event) => {
@@ -97,9 +179,17 @@ export class VideoNode extends NetworkedNodeContext {
         console.log("KNode Not Initialized Video Component");
         return;
       }
-      this.kNode.height(this.videoComponent.videoHeight);
-      this.kNode.width(this.videoComponent.videoWidth);
+
+      const renderSize = this.calculateRenderSizeOnLoad({
+        componentSize: {
+          width: this.videoComponent.videoWidth,
+          height: this.videoComponent.videoHeight,
+        },
+        maxSize: canvasSize,
+      });
+
       this.kNode.image(this.videoComponent);
+      this.kNode.setSize(renderSize);
 
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
       // it might have length here which we will need to trim down to 7 seconds.
@@ -125,9 +215,10 @@ export class VideoNode extends NetworkedNodeContext {
       this.videoComponent.oncanplaythrough = (event: Event) => {
         this.didFinishLoading = true;
         // Might have to auto click? on first load this doesn't work in general how about after ?
-        this.videoComponent.play(); //sometimes race condition with the
         loadingBar.updateProgress(100);
         loadingBar.hide();
+
+        this.setChroma(this.isChroma);
         resolve();
       };
     });
@@ -150,16 +241,120 @@ export class VideoNode extends NetworkedNodeContext {
       if (this.videoComponent.paused) {
         console.log("Playing");
         this.videoComponent.play();
+        this.chromaKeyRender(0); // For starting Chroma
       } else {
         console.log("Pause");
         this.videoComponent.pause();
       }
     });
+
+    this.createChromaWorker();
+  }
+
+  uuidv4() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
+      (
+        +c ^
+        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))
+      ).toString(16),
+    );
+  }
+
+  createChromaWorker() {
+    this.chromaWorker = new ChromaWorker({
+      name: "ChromaWorker-" + this.uuidv4(),
+    });
+    this.chromaWorker.port.start();
   }
 
   async reset() {
     this.videoComponent.pause();
     await this.seek(0);
+  }
+
+  async chromaKeyRender(
+    _timestamp: number | undefined,
+    doLoop: boolean = true,
+    stopLoopIfVideoIsPausedOrEnded: boolean = true,
+    blockSeeking: boolean = false,
+  ) {
+    if (this.isChroma === false) return;
+    if (this.videoComponent !== undefined) {
+      if (stopLoopIfVideoIsPausedOrEnded)
+        if (this.videoComponent.paused || this.videoComponent.ended) return;
+      if (this.drawingContext != null) {
+        if (
+          this.videoCanvas.width !== this.videoComponent.videoWidth ||
+          this.videoCanvas.height !== this.videoComponent.videoHeight ||
+          this.drawingCanvas.width !== this.videoComponent.videoWidth ||
+          this.drawingCanvas.height !== this.videoComponent.videoHeight
+        ) {
+          this.videoCanvas.width = this.videoComponent.videoWidth;
+          this.videoCanvas.height = this.videoComponent.videoHeight;
+          this.drawingCanvas.width = this.videoComponent.videoWidth;
+          this.drawingCanvas.height = this.videoComponent.videoHeight;
+        }
+        if (blockSeeking) {
+          this.blockSeeking = true;
+        }
+
+        this.drawingContext.drawImage(
+          this.videoComponent,
+          0,
+          0,
+          this.drawingCanvas.width,
+          this.drawingCanvas.height,
+        );
+
+        const dataTransfer = this.drawingCanvas.transferToImageBitmap();
+
+        await this.waitForWorkerResponse(dataTransfer, blockSeeking);
+      } else {
+        console.error("Context does not exist!");
+      }
+    } else {
+      console.error("Video component does not exist!");
+    }
+
+    if (doLoop) requestAnimationFrame(this.chromaKeyRender.bind(this));
+  }
+
+  // Method to post the message and wait for the response
+  async waitForWorkerResponse(
+    dataTransfer: ImageBitmap,
+    blockSeeking: boolean,
+  ) {
+    return new Promise<void>((resolve, reject) => {
+      // Add an event listener for the worker response
+      const onMessage = (event: MessageEvent) => {
+        const { imageData } = event.data;
+        this.context?.putImageData(imageData, 0, 0);
+        this.mediaLayer.draw();
+        if (this.blockSeeking) {
+          this.blockSeeking = false;
+        }
+
+        // Clean up the event listener after receiving the message
+        this.chromaWorker?.port.removeEventListener("message", onMessage);
+        resolve();
+      };
+
+      // Attach the event listener
+      this.chromaWorker?.port.addEventListener("message", onMessage);
+
+      // Send the data to the worker
+      this.chromaWorker?.port.postMessage(
+        {
+          dataTransfer: dataTransfer,
+          color: {
+            red: this.chromaRed,
+            green: this.chromaGreen,
+            blue: this.chromaBlue,
+          },
+        },
+        [dataTransfer],
+      );
+    });
   }
 
   async updateImage(newImageSrc: string) {
@@ -265,10 +460,11 @@ export class VideoNode extends NetworkedNodeContext {
       this.videoComponent.currentTime = second;
 
       this.frameDidFinishSeeking = new Promise<void>((resolve, reject) => {
-        this.videoComponent.onseeked = (event: Event) => {
+        this.videoComponent.onseeked = async (event: Event) => {
           //console.log("Seeked Finished");
           // reimplement using the function
           // ensure that this doesn't race.
+          await this.chromaKeyRender(0, false, false, true);
           resolve();
         };
       });

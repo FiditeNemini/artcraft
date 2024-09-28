@@ -1,15 +1,17 @@
 import { useCallback } from "react";
 import { Signal } from "@preact/signals-react";
-import { dispatchUiEvents } from "~/signals";
+import { dispatchUiEvents, uiEvents } from "~/signals";
 import {
   DialogAddImage,
   DialogAddVideo,
   DialogAiStylize,
+  DialogChromakey,
   DialogError,
 } from "~/components/features";
 
 import { AppUiSignalType } from "./contextSignals/appUi";
-import { dialogueError } from "~/signals/uiAccess/dialogueError";
+import { dialogError } from "~/signals/uiAccess/dialogError";
+import { dialogChromakey } from "~/signals/uiAccess/dialogChromakey";
 
 export const SignaledDialogs = ({
   appUiSignal,
@@ -52,16 +54,17 @@ export const SignaledDialogs = ({
         }}
         closeCallback={resetAll}
       />
+      <SignaledDialogChromakey />
       <SignaledDialogError />
     </>
   );
 };
 
-export const SignaledDialogError = () => {
-  const props = dialogueError.signal.value;
+const SignaledDialogError = () => {
+  const props = dialogError.signal.value;
   const { isShowing, title, message } = props;
   const onClose = useCallback(() => {
-    dialogueError.hide();
+    dialogError.hide();
   }, []);
   return (
     <DialogError
@@ -69,6 +72,25 @@ export const SignaledDialogError = () => {
       title={title}
       message={message}
       onClose={onClose}
+    />
+  );
+};
+
+const SignaledDialogChromakey = () => {
+  const props = dialogChromakey.signal.value;
+  const { isShowing, chromakeyProps } = props;
+  const onClose = useCallback(() => {
+    dialogChromakey.hide();
+  }, []);
+  const onConfirm = (newProps: typeof chromakeyProps) => {
+    dispatchUiEvents.dispatchChromakeyRequest(newProps);
+  };
+  return (
+    <DialogChromakey
+      isShowing={isShowing}
+      {...chromakeyProps}
+      onClose={onClose}
+      onConfirm={onConfirm}
     />
   );
 };

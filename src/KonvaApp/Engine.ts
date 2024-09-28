@@ -22,7 +22,7 @@ import { TranslateCommand } from "./UndoRedo/TranslateCommand";
 
 import { FileUtilities } from "./FileUtilities/FileUtilities";
 
-import { AppModes } from "./type";
+import { AppModes, VideoResolutions } from "./constants";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export interface RenderingOptions {
@@ -91,11 +91,14 @@ export class Engine {
 
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
 
-    this.renderEngine = new RenderEngine(
-      this.videoLayer,
-      this.offScreenCanvas,
-      this.onRenderingSystemReceived.bind(this),
-    );
+    this.renderEngine = new RenderEngine({
+      width: VideoResolutions.VERTICAL_720.width,
+      height: VideoResolutions.VERTICAL_720.height,
+      videoLayer: this.videoLayer,
+      offScreenCanvas: this.offScreenCanvas,
+      onRenderingSystemMessageRecieved:
+        this.onRenderingSystemReceived.bind(this),
+    });
 
     this.setupEventSystem();
   }
@@ -131,9 +134,9 @@ export class Engine {
       const media_url = `${media_api_base_url}vocodes-public${response.data.videoUrl}`;
 
       const videoNode = new VideoNode({
-        videoLayer: this.videoLayer,
-        x: this.renderEngine.captureCanvas.position().x,
-        y: this.renderEngine.captureCanvas.position().y,
+        mediaLayer: this.videoLayer,
+        position: this.renderEngine.captureCanvas.position(),
+        canvasSize: this.renderEngine.captureCanvas.size(),
         videoURL: media_url,
         selectionManagerRef: this.selectionManager,
         nodeTransformerRef: this.nodeTransformer,
@@ -156,7 +159,7 @@ export class Engine {
       // }
     } else {
       // throw error to retry
-      uiAccess.dialogueError.show({
+      uiAccess.dialogError.show({
         title: "Generation Error",
         message: response.data,
       });
@@ -184,7 +187,30 @@ export class Engine {
       });
       // this.nodeTransformer.enable({ selectedNodes: nodes });
     });
-
+    uiEvents.toolbarNode.CRHOMA.onClick(() => {
+      const nodes = this.selectionManager.getSelectedNodes();
+      if (nodes.size > 1) {
+        uiAccess.dialogError.show({
+          title: "Error: Chroma Key",
+          message:
+            "Please do not select more than 1 item for the Chroma Key feature, we can only apply Chroma Key to 1 item at a time",
+        });
+        return;
+      }
+      const node = nodes.values().next().value;
+      try {
+        const nodeChromaProps = node.getChroma();
+        uiAccess.dialogChromakey.show({
+          isChromakeyEnabled: nodeChromaProps.isChromakeyEnabled,
+          chromakeyColor: nodeChromaProps.chromakeyColor,
+        });
+      } catch {
+        uiAccess.dialogError.show({
+          title: "Error: Chroma Key",
+          message: "This Node is not compatible is Chroma Key",
+        });
+      }
+    });
     uiEvents.toolbarNode.DELETE.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
       toolbarNode.hide();
@@ -220,7 +246,18 @@ export class Engine {
       console.log("Engine got video: " + video.url);
       this.addVideo(video.url);
     });
-
+    uiEvents.onChromakeyRequest((chromakeyProps) => {
+      const node = this.selectionManager
+        .getSelectedNodes()
+        .values()
+        .next().value;
+      node.setChroma(chromakeyProps.isChromakeyEnabled);
+      node.setChromaColor(
+        chromakeyProps.chromakeyColor?.red || 120,
+        chromakeyProps.chromakeyColor?.blue || 150,
+        chromakeyProps.chromakeyColor?.green || 120,
+      );
+    });
     uiEvents.aiStylize.onRequest(async (data) => {
       console.log("Engine heard AI Stylize request: ", data);
 
@@ -228,7 +265,7 @@ export class Engine {
         await this.renderEngine.startProcessing(data);
       } catch (error) {
         // throw error to retry
-        uiAccess.dialogueError.show({
+        uiAccess.dialogError.show({
           title: "Generation Error",
           message: error?.toString() || "Unknown Error",
         });
@@ -270,6 +307,7 @@ export class Engine {
     uiAccess.loadingBar.hide();
 
     this.setupStage();
+    // this.populateWithDebugItems();
   }
   public isInitialized() {
     return this.stage !== null;
@@ -281,27 +319,51 @@ export class Engine {
     );
     const imageNode = new ImageNode({
       mediaLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformer: this.nodeTransformer,
+      nodeTransformerRef: this.nodeTransformer,
     });
 
+    // this.renderEngine.addNodes(videoNode3);
+
+    const videoNode4 = new VideoNode({
+      mediaLayer: this.videoLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      videoURL:
+        "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
     const imageNode2 = new ImageNode({
       mediaLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformer: this.nodeTransformer,
+      nodeTransformerRef: this.nodeTransformer,
     });
 
+    this.renderEngine.addNodes(videoNode4);
+
+    const videoNode5 = new VideoNode({
+      mediaLayer: this.videoLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      videoURL:
+        "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
+
+    this.renderEngine.addNodes(videoNode5);
     // Adding nodes here
     const videoNode = new VideoNode({
-      videoLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      mediaLayer: this.videoLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL:
         "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
       selectionManagerRef: this.selectionManager,
@@ -315,11 +377,10 @@ export class Engine {
     //videoNode.simulatedLoading();
     // TODO support Text nodes
 
-    this.renderEngine.addNodes(videoNode);
-    this.renderEngine.addNodes(imageNode2);
+    // this.renderEngine.addNodes(imageNode2);
 
-    // TODO if only image take image and just takes snapshots Edge case
-    this.renderEngine.addNodes(imageNode);
+    // // TODO if only image take image and just takes snapshots Edge case
+    // this.renderEngine.addNodes(imageNode);
   }
 
   public async setupStage() {
@@ -353,11 +414,11 @@ export class Engine {
   public addImage(imageFile: File) {
     const imageNode = new ImageNode({
       mediaLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformer: this.nodeTransformer,
+      nodeTransformerRef: this.nodeTransformer,
     });
     this.renderEngine.addNodes(imageNode);
     this.selectionManager.saveNode(imageNode);
@@ -366,9 +427,9 @@ export class Engine {
   public addVideo(url: string) {
     // Adding nodes here
     const videoNode = new VideoNode({
-      videoLayer: this.videoLayer,
-      x: this.renderEngine.captureCanvas.position().x,
-      y: this.renderEngine.captureCanvas.position().y,
+      mediaLayer: this.videoLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL: url,
       selectionManagerRef: this.selectionManager,
       nodeTransformerRef: this.nodeTransformer,
