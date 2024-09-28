@@ -12,6 +12,8 @@
   flex-wrap: nowrap;
   overflow-x: auto;
   gap: 1rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .fy-featured-voices-scroll-container::-webkit-scrollbar {
@@ -59,6 +61,8 @@
   transition: all 0.2s;
   user-select: none;
   height: 100%;
+  scroll-snap-align: start;
+  flex: 0 0 auto;
 
   &:hover {
     border-color: $primary;
