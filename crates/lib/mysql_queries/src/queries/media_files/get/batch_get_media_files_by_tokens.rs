@@ -16,6 +16,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
+use crate::utils::transactor::Transactor;
 
 #[derive(Serialize, Clone)]
 pub struct MediaFilesByTokensRecord {
@@ -73,27 +74,34 @@ pub async fn batch_get_media_files_by_tokens(
   media_file_tokens: &[MediaFileToken],
   can_see_deleted: bool
 ) -> AnyhowResult<Vec<MediaFilesByTokensRecord>> {
+  batch_get_media_files_by_tokens_with_transactor(
+    Transactor::Pool { pool: mysql_pool },
+    media_file_tokens,
+    can_see_deleted
+  ).await
+}
 
+pub async fn batch_get_media_files_by_tokens_with_transactor(
+  transactor: Transactor<'_, '_>,
+  media_file_tokens: &[MediaFileToken],
+  can_see_deleted: bool
+) -> AnyhowResult<Vec<MediaFilesByTokensRecord>> {
   if media_file_tokens.is_empty() {
     // NB: We should always eagerly return, but if we don't, the query builder will build an
     // invalid query.
     return Ok(vec![]);
   }
 
-  let mut connection = mysql_pool.acquire().await?;
-
-  let raw_media_files: Vec<RawMediaFileJoinUser> = get_raw_media_files_by_tokens(&mut connection, media_file_tokens, can_see_deleted).await?;
+  let raw_media_files: Vec<RawMediaFileJoinUser> = get_raw_media_files_by_tokens(transactor, media_file_tokens, can_see_deleted).await?;
 
   Ok(map_to_media_files(raw_media_files))
 }
 
 async fn get_raw_media_files_by_tokens(
-  connection: &mut MySqlConnection,
+  mut transactor: Transactor<'_, '_>,
   media_file_tokens: &[MediaFileToken],
   can_see_deleted: bool
 ) -> AnyhowResult<Vec<RawMediaFileJoinUser>> {
-
-  let connection = connection.acquire().await?;
 
   let mut query_builder : QueryBuilder<MySql> = if can_see_deleted {
     QueryBuilder::new(r#"
@@ -234,7 +242,17 @@ async fn get_raw_media_files_by_tokens(
 
   let query = query_builder.build_query_as::<RawMediaFileJoinUser>();
 
-  let results = query.fetch_all(connection).await?;
+  let results = match transactor {
+    Transactor::Pool { pool } => {
+      query.fetch_all(pool).await?
+    },
+    Transactor::Connection { connection } => {
+      query.fetch_all(connection).await?
+    },
+    Transactor::Transaction { transaction } => {
+      query.fetch_all(&mut **transaction).await?
+    },
+  };
 
   Ok(results)
 }

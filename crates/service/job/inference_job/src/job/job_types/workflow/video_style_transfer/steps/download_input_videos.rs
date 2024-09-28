@@ -2,14 +2,15 @@ use std::path::{Path, PathBuf};
 
 use anyhow::anyhow;
 use log::{error, info};
-use sqlx::MySqlPool;
+use sqlx::{MySqlConnection, MySqlPool};
 
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
-use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::{batch_get_media_files_by_tokens, MediaFilesByTokensRecord};
-use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, MediaFile};
+use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::{batch_get_media_files_by_tokens, batch_get_media_files_by_tokens_with_transactor, MediaFilesByTokensRecord};
+use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, get_media_file_with_transactor, MediaFile};
+use mysql_queries::utils::transactor::Transactor;
 use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
@@ -22,21 +23,21 @@ use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::
 pub struct DownloadInputVideoArgs<'a> {
   pub job_args: &'a JobArgs<'a>,
   pub comfy_dirs: &'a ComfyDirs,
-  pub mysql_pool: &'a MySqlPool,
+  pub mysql_connection: &'a mut MySqlConnection,
   pub remote_cloud_file_client: &'a RemoteCloudFileClient,
 }
 
 pub async fn download_input_videos(
-  args: DownloadInputVideoArgs<'_>
+  mut args: DownloadInputVideoArgs<'_>,
 ) -> Result<VideoPathing, ProcessSingleJobError> {
-  let video_downloads = download_primary_video(&args).await?;
-  let video_downloads = maybe_download_secondary_videos(video_downloads, &args).await?;
+  let video_downloads = download_primary_video(&mut args).await?;
+  let video_downloads = maybe_download_secondary_videos(video_downloads, &mut args).await?;
   Ok(video_downloads)
 }
 
 // TODO: Consolidate primary video download with secondary download logic.
 async fn download_primary_video(
-  args: &DownloadInputVideoArgs<'_>,
+  args: &mut DownloadInputVideoArgs<'_>,
 ) -> Result<VideoPathing, ProcessSingleJobError> {
   let input_media_file_token = match args.job_args.maybe_input_file {
     None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("No primary input video file provided"))),
@@ -45,10 +46,10 @@ async fn download_primary_video(
 
   info!("Querying primary input media file by token: {:?} ...", &input_media_file_token);
 
-  let mut input_media_file =  get_media_file(
+  let mut input_media_file =  get_media_file_with_transactor(
     &input_media_file_token,
     false,
-    args.mysql_pool
+    Transactor::for_connection(args.mysql_connection),
   ).await?.ok_or_else(|| {
     error!("primary input media_file not found: {:?}", &input_media_file_token);
     ProcessSingleJobError::Other(anyhow!("primary input media_file not found: {:?}", &input_media_file_token))
@@ -62,10 +63,10 @@ async fn download_primary_video(
     // TODO(bt,2024-05-14): Perhaps fail open and use the first media file if the original
     //  isn't found?
     info!("Looking up original style transfer source media file...");
-    input_media_file =  get_media_file(
+    input_media_file =  get_media_file_with_transactor(
       &source_media_file_token,
       true, // NB: In case the original was deleted, allow this to continue.
-      args.mysql_pool
+      Transactor::for_connection(args.mysql_connection),
     ).await?.ok_or_else(|| {
       error!("source input media_file not found: {:?}", &input_media_file_token);
       ProcessSingleJobError::Other(anyhow!("source input media_file not found: {:?}",
@@ -115,7 +116,7 @@ enum SecondaryVideoType {
 
 async fn maybe_download_secondary_videos(
   mut video_downloads: VideoPathing,
-  args: &DownloadInputVideoArgs<'_>
+  args: &mut DownloadInputVideoArgs<'_>,
 ) -> Result<VideoPathing, ProcessSingleJobError> {
   const CAN_SEE_DELETED : bool = true; // We don't need to care about the deleted flag.
 
@@ -137,7 +138,10 @@ async fn maybe_download_secondary_videos(
     return Ok(video_downloads);
   }
 
-  let results = batch_get_media_files_by_tokens(args.mysql_pool, &tokens, CAN_SEE_DELETED)
+  let results = batch_get_media_files_by_tokens_with_transactor(
+    Transactor::for_connection(args.mysql_connection),
+    &tokens,
+    CAN_SEE_DELETED)
       .await
       .map_err(|err| {
         ProcessSingleJobError::Other(anyhow!("error querying secondary videos: {:?}", &err))

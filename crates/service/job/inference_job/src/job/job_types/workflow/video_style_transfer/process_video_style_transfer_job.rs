@@ -265,7 +265,7 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
     let mut videos = download_input_videos(DownloadInputVideoArgs {
         job_args: &job_args,
         comfy_dirs: &comfy_dirs,
-        mysql_pool: &deps.db.mysql_pool,
+        mysql_connection: &mut mysql_connection,
         remote_cloud_file_client: &remote_cloud_file_client,
     }).await?;
 
