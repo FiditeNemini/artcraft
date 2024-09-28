@@ -392,10 +392,10 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
                 Err(e) => {
                     fail_count += 1;
                     error!("Error #{fail_count} getting job status: {:?}", e);
-                    if fail_count > 5 {
-                        break;
+                    if fail_count > 3 {
+                        return;
                     }
-                    tokio::time::sleep(Duration::from_secs(5)).await;
+                    tokio::time::sleep(Duration::from_secs(3)).await;
                     continue
                 }
             };
