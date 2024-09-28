@@ -7,7 +7,8 @@ use sqlx::MySqlPool;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use filesys::path_to_string::path_to_string;
-use mysql_queries::queries::media_files::get::get_media_file::{get_media_file, MediaFile};
+use mysql_queries::queries::media_files::get::get_media_file::{get_media_file_with_transactor, MediaFile};
+use mysql_queries::utils::transactor::Transactor;
 use tokens::tokens::media_files::MediaFileToken;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 
@@ -24,20 +25,20 @@ pub struct IpaImageDownloadDetails {
 pub struct DownloadGlobalIpaImageArgs<'a> {
   pub ipa_media_token: &'a MediaFileToken,
   pub comfy_input_directory: &'a Path,
-  pub mysql_pool: &'a MySqlPool,
   pub remote_cloud_file_client: &'a RemoteCloudFileClient,
 }
 
 pub async fn download_global_ipa_image(
-  args: DownloadGlobalIpaImageArgs<'_>
+  args: DownloadGlobalIpaImageArgs<'_>,
+  transactor: Transactor<'_, '_>,
 ) -> Result<IpaImageDownloadDetails, ProcessSingleJobError> {
 
   info!("Querying global IPA input media file by token: {:?} ...", &args.ipa_media_token);
 
-  let input_media_file =  get_media_file(
+  let input_media_file =  get_media_file_with_transactor(
     &args.ipa_media_token,
     true,
-    args.mysql_pool
+    transactor,
   ).await?.ok_or_else(|| {
     error!("input global IPA media_file not found: {:?}", &args.ipa_media_token);
     ProcessSingleJobError::Other(anyhow!("input global IPA media_file not found: {:?}", &args.ipa_media_token))

@@ -2,7 +2,6 @@ use crate::helpers::transform_optional_result::transform_optional_result;
 use crate::queries::users::user::get::lookup_user_for_login_result::{UserRecordForLogin, UserRecordForLoginRaw};
 use crate::utils::transactor::Transactor;
 use errors::AnyhowResult;
-use crate::helpers::boolean_converters::i8_to_bool;
 
 pub async fn lookup_user_for_login_by_email_with_transactor(
   email: &str,

@@ -24,8 +24,10 @@ use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::{i64_to_bool, i8_to_bool};
+use crate::helpers::transform_optional_result::transform_optional_result;
 use crate::payloads::media_file_extra_info::media_file_extra_info::MediaFileExtraInfo;
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
+use crate::utils::transactor::Transactor;
 
 #[derive(Serialize, Debug)]
 pub struct MediaFile {
@@ -206,15 +208,28 @@ pub async fn get_media_file(
   can_see_deleted: bool,
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<Option<MediaFile>> {
+  get_media_file_with_transactor(
+    media_file_token,
+    can_see_deleted,
+    Transactor::for_pool(mysql_pool)
+  ).await
+}
+
+pub async fn get_media_file_with_transactor(
+  media_file_token: &MediaFileToken,
+  can_see_deleted: bool,
+  transactor: Transactor<'_, '_>,
+) -> AnyhowResult<Option<MediaFile>> {
 
   let record = if can_see_deleted {
-    select_including_deleted(media_file_token, mysql_pool).await
+    select_including_deleted(media_file_token, transactor).await
   } else {
-    select_without_deleted(media_file_token, mysql_pool).await
+    select_without_deleted(media_file_token, transactor).await
   };
 
   let record = match record {
-    Ok(record) => record,
+    Ok(Some(record)) => record,
+    Ok(None) => return Ok(None),
     Err(ref err) => {
       return match err {
         sqlx::Error::RowNotFound => Ok(None),
@@ -286,9 +301,9 @@ pub async fn get_media_file(
 
 async fn select_including_deleted(
   media_file_token: &MediaFileToken,
-  mysql_pool: &MySqlPool
-) -> Result<MediaFileRaw, sqlx::Error> {
-  sqlx::query_as!(
+  transactor: Transactor<'_, '_>,
+) -> Result<Option<MediaFileRaw>, sqlx::Error> {
+  let query = sqlx::query_as!(
       MediaFileRaw,
         r#"
 SELECT
@@ -388,16 +403,30 @@ WHERE
     m.token = ?
         "#,
       media_file_token
-    )
-    .fetch_one(mysql_pool)
-    .await
+    );
+
+  let result = match transactor {
+    Transactor::Pool { pool } => {
+      query.fetch_one(pool).await
+    },
+    Transactor::Connection { connection } => {
+      query.fetch_one(connection).await
+    },
+    Transactor::Transaction { transaction } => {
+      query.fetch_one(&mut **transaction).await
+    },
+  };
+
+  let maybe_record = transform_optional_result(result)?;
+
+  Ok(maybe_record)
 }
 
 async fn select_without_deleted(
   media_file_token: &MediaFileToken,
-  mysql_pool: &MySqlPool
-) -> Result<MediaFileRaw, sqlx::Error> {
-  sqlx::query_as!(
+  transactor: Transactor<'_, '_>,
+) -> Result<Option<MediaFileRaw>, sqlx::Error> {
+  let query = sqlx::query_as!(
       MediaFileRaw,
         r#"
 SELECT
@@ -500,7 +529,21 @@ WHERE
     AND m.mod_deleted_at IS NULL
         "#,
       media_file_token
-    )
-    .fetch_one(mysql_pool)
-    .await
+    );
+
+  let result = match transactor {
+    Transactor::Pool { pool } => {
+      query.fetch_one(pool).await
+    },
+    Transactor::Connection { connection } => {
+      query.fetch_one(connection).await
+    },
+    Transactor::Transaction { transaction } => {
+      query.fetch_one(&mut **transaction).await
+    },
+  };
+
+  let maybe_record = transform_optional_result(result)?;
+
+  Ok(maybe_record)
 }

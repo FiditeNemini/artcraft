@@ -13,9 +13,9 @@ use tokio::sync::mpsc;
 use tokio::sync::oneshot;
 use walkdir::WalkDir;
 
+use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_directory::MediaFileBucketDirectory;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
-use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::media_files::media_file_type::MediaFileType;
@@ -42,8 +42,9 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
-use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::{get_weight_by_token, get_weight_by_token_with_transactor};
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
+use mysql_queries::utils::transactor::Transactor;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 use tokens::tokens::media_files::MediaFileToken;
@@ -123,6 +124,8 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
     }
 
     let mut workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
+
+    info!("Grabbing redis connection from pool");
     let redis_pool = deps
       .db
       .maybe_keepalive_redis_pool
@@ -131,16 +134,22 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
       .transpose()
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("redis pool error: {:?}", err)))?;
 
+    info!("Grabbing mysql connection from pool");
 
-
+    let mut mysql_connection = deps.db.mysql_pool.acquire()
+        .await
+        .map_err(|e| {
+            warn!("Could not acquire DB pool: {:?}", e);
+            ProcessSingleJobError::Other(anyhow!("Could not acquire DB pool: {:?}", e))
+        })?;
 
     // download workflow if not none
     match job_args.workflow_source {
         Some(workflow_token) => {
-            let retrieved_workflow_record =  get_weight_by_token(
+            let retrieved_workflow_record =  get_weight_by_token_with_transactor(
                 workflow_token,
                 false,
-                &deps.db.mysql_pool
+                Transactor::for_connection(&mut mysql_connection)
             ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Workflow not found")))?;
 
             let bucket_details = RemoteCloudBucketDetails {
@@ -197,10 +206,10 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
 
             info!("Querying lora model by token: {:?} ...", &lora_model_weight_token);
 
-            let retrieved_lora_record =  get_weight_by_token(
+            let retrieved_lora_record =  get_weight_by_token_with_transactor(
                 lora_model_weight_token,
                 true,
-                &deps.db.mysql_pool
+                Transactor::for_connection(&mut mysql_connection)
             ).await?.ok_or_else(|| {
                 error!("Lora model not found: {:?}", lora_model_weight_token);
                 ProcessSingleJobError::Other(anyhow!("Lora model not found: {:?}", lora_model_weight_token))
@@ -243,9 +252,8 @@ pub async fn process_video_style_transfer_job(deps: &JobDependencies, job: &Avai
         let results = download_global_ipa_image(DownloadGlobalIpaImageArgs {
             ipa_media_token,
             comfy_input_directory: &input_dir,
-            mysql_pool: &deps.db.mysql_pool,
             remote_cloud_file_client: &remote_cloud_file_client,
-        }).await?;
+        }, Transactor::for_connection(&mut mysql_connection)).await?;
 
         info!("Downloaded global IPA image to {:?}", results.ipa_image_path);
 

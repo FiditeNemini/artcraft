@@ -11,7 +11,8 @@ use errors::AnyhowResult;
 use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
 use crate::helpers::boolean_converters::i64_to_bool;
-
+use crate::helpers::transform_optional_result::transform_optional_result;
+use crate::utils::transactor::Transactor;
 // Notes ensure that Enums have sqlx::Type
 //  'weights_type: enums::by_table::model_weights::weights_types::WeightsType' use this to map
 // Retrieved Model Weight can be constrained to the fields that are needed
@@ -75,17 +76,28 @@ pub async fn get_weights_by_token_with_connection(
     can_see_deleted: bool,
     mysql_connection: &mut PoolConnection<MySql>
 ) -> AnyhowResult<Option<RetrievedModelWeight>> {
+    get_weight_by_token_with_transactor(
+        weight_token,
+        can_see_deleted,
+        Transactor::for_connection(mysql_connection)
+    ).await
+}
+
+pub async fn get_weight_by_token_with_transactor(
+    weight_token: &ModelWeightToken,
+    can_see_deleted: bool,
+    transactor: Transactor<'_, '_>,
+) -> AnyhowResult<Option<RetrievedModelWeight>> {
     let maybe_result = if can_see_deleted {
-        select_include_deleted(weight_token, mysql_connection).await
+        select_include_deleted(weight_token, transactor).await
     } else {
-        select_without_deleted(weight_token, mysql_connection).await
+        select_without_deleted(weight_token, transactor).await
     };
 
     let record: RawWeight = match maybe_result {
-        Ok(record) => record,
-        Err(sqlx::Error::RowNotFound) => {
-            return Ok(None);
-        }
+        Ok(Some(record)) => record,
+        Ok(None) => return Ok(None),
+        Err(sqlx::Error::RowNotFound) => return Ok(None),
         Err(err) => {
             error!("Error fetching weights by token: {:?}", err);
             return Err(anyhow!("Error fetching weights by token: {:?}", err));
@@ -135,9 +147,9 @@ pub async fn get_weights_by_token_with_connection(
 
 async fn select_include_deleted(
     weight_token: &ModelWeightToken,
-    mysql_connection: &mut PoolConnection<MySql>
-) -> Result<RawWeight, sqlx::Error> {
-    sqlx
+    mut transactor: Transactor<'_, '_>,
+) -> Result<Option<RawWeight>, sqlx::Error> {
+    let query = sqlx
         ::query_as!(
             RawWeight,
             r#"
@@ -199,15 +211,30 @@ async fn select_include_deleted(
             wt.token = ?
             "#,
             weight_token.as_str()
-        )
-        .fetch_one(&mut **mysql_connection).await
+        );
+
+    let result = match transactor {
+        Transactor::Pool { pool } => {
+            query.fetch_one(pool).await
+        },
+        Transactor::Connection { connection } => {
+            query.fetch_one(connection).await
+        },
+        Transactor::Transaction { transaction } => {
+            query.fetch_one(&mut **transaction).await
+        },
+    };
+
+    let maybe_record = transform_optional_result(result)?;
+
+    Ok(maybe_record)
 }
 
 async fn select_without_deleted(
     weight_token: &ModelWeightToken,
-    mysql_connection: &mut PoolConnection<MySql>
-) -> Result<RawWeight, sqlx::Error> {
-    sqlx
+    mut transactor: Transactor<'_, '_>,
+) -> Result<Option<RawWeight>, sqlx::Error> {
+    let query = sqlx
         ::query_as!(
             RawWeight,
             r#"
@@ -270,8 +297,23 @@ async fn select_without_deleted(
             AND wt.mod_deleted_at IS NULL
         "#,
             weight_token.as_str()
-        )
-        .fetch_one(&mut **mysql_connection).await
+        );
+
+    let result = match transactor {
+        Transactor::Pool { pool } => {
+            query.fetch_one(pool).await
+        },
+        Transactor::Connection { connection } => {
+            query.fetch_one(connection).await
+        },
+        Transactor::Transaction { transaction } => {
+            query.fetch_one(&mut **transaction).await
+        },
+    };
+
+    let maybe_record = transform_optional_result(result)?;
+
+    Ok(maybe_record)
 }
 
 // RawWeight is the struct that is returned from the database in raw form.
