@@ -4397,7 +4397,6 @@ __metadata:
     "@fortawesome/free-brands-svg-icons": ^6.2.1
     "@fortawesome/free-solid-svg-icons": ^6.2.1
     "@fortawesome/pro-duotone-svg-icons": ^6.2.1
-    "@fortawesome/pro-light-svg-icons": ^6.2.1
     "@fortawesome/pro-regular-svg-icons": ^6.2.1
     "@fortawesome/pro-solid-svg-icons": ^6.2.1
     "@fortawesome/react-fontawesome": ^0.2.0
@@ -4412,13 +4411,10 @@ __metadata:
     "@typeform/embed-react": ^3.17.0
     "@types/axios": ^0.14.0
     "@types/deep-equal": ^1.0.3
-    "@types/google.analytics": ^0.0.42
     "@types/gtag.js": ^0.0.12
     "@types/howler": ^2.1.2
     "@types/imagesloaded": ^4.1.6
     "@types/infinite-scroll": ^4.0.3
-    "@types/jest": ^24.9.1
-    "@types/js-cookie": ^3.0.1
     "@types/lodash.debounce": ^4.0.9
     "@types/masonry-layout": ^4.2.7
     "@types/node": ^12.12.47
@@ -4431,7 +4427,6 @@ __metadata:
     "@types/wavesurfer.js": ^5.2.0
     axios: ^0.21.0
     bootstrap: 5.1.3
-    bulma: ^0.9.0
     craco: ^0.0.3
     date-fns: 2.22.1
     deep-equal: ^2.2.2
@@ -4440,10 +4435,8 @@ __metadata:
     i18next: ^21.6.11
     i18next-browser-languagedetector: ^7.1.0
     i18next-http-backend: ^2.2.1
-    iframe-resizer-react: ^1.1.0
     imagesloaded: ^5.0.0
     infinite-scroll: ^4.0.1
-    js-cookie: ^3.0.1
     lodash.debounce: ^4.0.8
     masonry-layout: ^4.2.2
     posthog-js: ^1.73.1
@@ -4451,7 +4444,6 @@ __metadata:
     query-string: ^8.1.0
     react: ^16.13.1
     react-audio-voice-recorder: ^1.0.5
-    react-autocomplete: ^1.8.1
     react-device-detect: ^2.2.3
     react-dom: ^16.13.1
     react-drag-drop-files: ^2.3.9
@@ -4461,14 +4453,12 @@ __metadata:
     react-infinite-scroll-component: ^6.1.0
     react-paginate: ^8.2.0
     react-range: ^1.8.14
-    react-range-slider-input: ^3.0.7
     react-reveal: ^1.2.2
     react-router-dom: ^5.2.0
     react-scripts: 5.0.0
     react-select: ^5.7.0
     react-share: ^4.4.1
     react-twitch-embed: ^3.0.1
-    react-typeform-embed: ^1.0.8
     react-use-measure: ^2.1.1
     react-wavesurfer.js: ^0.0.8
     sass: ^1.57.1
@@ -4971,13 +4961,6 @@ __metadata:
   version: 4.10.0
   resolution: "@typeform/embed@npm:4.10.0"
   checksum: 388c409428af05c8db7066b07ab85b78ce2ed3de9ed9f020c464a92d5fc2c7fb4c6081cb9311d93dd18d251381401be6ab427f1ec44aeca548e27d9b5f454780
-  languageName: node
-  linkType: hard
-
-"@typeform/embed@npm:^1.28.2":
-  version: 1.38.0
-  resolution: "@typeform/embed@npm:1.38.0"
-  checksum: 41115134e5cee28f5e031181b4525c7885d23707699cf183921110262717c7544bfd101428267410b812914c235687783e373ce98e37bdc447d72f8177663597
   languageName: node
   linkType: hard
 
@@ -8622,13 +8605,6 @@ __metadata:
   version: 3.20.3
   resolution: "core-js@npm:3.20.3"
   checksum: 2106cdfb1330abf9e27d577666fc0421feafe8c39bb5af90a63af16e9706c767a7e3a82edc21ce3ed6b9d806f3200d1cf6cc3d0597a8c0af12dbec287c781d65
-  languageName: node
-  linkType: hard
-
-"core-js@npm:^3.22.4":
-  version: 3.35.0
-  resolution: "core-js@npm:3.35.0"
-  checksum: 25c224aca3df012b98f08f13ccbd8171ef5852acd33fd5e58e106d27f5f0c97de2fdbc520f0b4364d26253caf2deb3e5d265310f57d2a66ae6cc922850e649f0
   languageName: node
   linkType: hard
 
@@ -12379,27 +12355,6 @@ __metadata:
   version: 0.1.5
   resolution: "iferr@npm:0.1.5"
   checksum: a18d19b6ad06a2d5412c0d37f6364869393ef6d1688d59d00082c1f35c92399094c031798340612458cd832f4f2e8b13bc9615934a7d8b0c53061307a3816aa1
-  languageName: node
-  linkType: hard
-
-"iframe-resizer-react@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "iframe-resizer-react@npm:1.1.0"
-  dependencies:
-    iframe-resizer: ^4.3.0
-    warning: ^4.0.3
-  peerDependencies:
-    prop-types: ">=15.7.2"
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 64ddf99d0246da71c5ef34fd6a9b35d14e9346bda0ff0e9f0f011041822eb99f477b8b8167a82126efdfc3a84eb428262518f9ade7601f0f208b69d4cdadb9f7
-  languageName: node
-  linkType: hard
-
-"iframe-resizer@npm:^4.3.0":
-  version: 4.3.9
-  resolution: "iframe-resizer@npm:4.3.9"
-  checksum: 8f40a6e9bf27bf60682d9a80f12c60d96a3b724f5e9ef5bdbcf5f2ac58b1b17f6924e34cfc54210a0a065d305380e77d79e28c551f54bd3b1dac1da2624a2144
   languageName: node
   linkType: hard
 
@@ -18080,16 +18035,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-range-slider-input@npm:^3.0.7":
-  version: 3.0.7
-  resolution: "react-range-slider-input@npm:3.0.7"
-  dependencies:
-    clsx: ^1.1.1
-    core-js: ^3.22.4
-  checksum: e304c950e1bd9a3140ae14519522221614d7000a30b8dea112e856fd267264305210cb6d6ffa73179a52f770e852b011d8534127dab44684307e673272cfecf7
-  languageName: node
-  linkType: hard
-
 "react-range@npm:^1.8.14":
   version: 1.8.14
   resolution: "react-range@npm:1.8.14"
@@ -18302,18 +18247,6 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
   checksum: 07e885abc479afcf2918584fd449f516c37d3a766762004fdbb92f84a3d3177287e92009755f16bbc9e68b022820e26af1bf86b1edddef2499abe750345b662b
-  languageName: node
-  linkType: hard
-
-"react-typeform-embed@npm:^1.0.8":
-  version: 1.0.8
-  resolution: "react-typeform-embed@npm:1.0.8"
-  dependencies:
-    "@typeform/embed": ^1.28.2
-  peerDependencies:
-    react: ^17.0.2
-    react-dom: ^17.0.2
-  checksum: f47ee0077046e282a482ef1a9d754ff255be65174e05b58f4c51c873ce8d771d1af98c5829f8860f2a33b0f4ebabcc4557e0f1e3b14b0d8bf3b23f460f1df18a
   languageName: node
   linkType: hard
 
@@ -21621,15 +21554,6 @@ __metadata:
   dependencies:
     makeerror: 1.0.12
   checksum: ad7a257ea1e662e57ef2e018f97b3c02a7240ad5093c392186ce0bcf1f1a60bbadd520d073b9beb921ed99f64f065efb63dfc8eec689a80e569f93c1c5d5e16c
-  languageName: node
-  linkType: hard
-
-"warning@npm:^4.0.3":
-  version: 4.0.3
-  resolution: "warning@npm:4.0.3"
-  dependencies:
-    loose-envify: ^1.0.0
-  checksum: 4f2cb6a9575e4faf71ddad9ad1ae7a00d0a75d24521c193fa464f30e6b04027bd97aa5d9546b0e13d3a150ab402eda216d59c1d0f2d6ca60124d96cd40dfa35c
   languageName: node
   linkType: hard
 
