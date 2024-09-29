@@ -19,6 +19,24 @@ pub async fn create_model_weight_document_from_record(
 
   let is_deleted = record.user_deleted_at.is_some() || record.mod_deleted_at.is_some();
 
+  let maybe_ietf_language_tag = record.maybe_ietf_language_tag
+      .as_deref()
+      .or_else(|| match record.weights_category {
+        WeightsCategory::TextToSpeech => record.maybe_tts_ietf_language_tag.as_deref(),
+        WeightsCategory::VoiceConversion => record.maybe_voice_conversion_ietf_language_tag.as_deref(),
+        _ => None,
+      })
+      .map(|t| t.to_string());
+
+  let maybe_ietf_primary_language_subtag = record.maybe_ietf_primary_language_subtag
+      .as_deref()
+      .or_else(|| match &record.weights_category {
+        WeightsCategory::TextToSpeech => record.maybe_tts_ietf_primary_language_subtag.as_deref(),
+        WeightsCategory::VoiceConversion => record.maybe_voice_conversion_ietf_primary_language_subtag.as_deref(),
+        _ => None,
+      })
+      .map(|t| t.to_string());
+
   let document = ModelWeightDocument {
     token: record.token,
 
@@ -48,17 +66,8 @@ pub async fn create_model_weight_document_from_record(
 
     cached_usage_count: Some(u64_to_i32_saturating(record.cached_usage_count)),
 
-    maybe_ietf_language_tag: match record.weights_category {
-      WeightsCategory::TextToSpeech => record.maybe_tts_ietf_language_tag,
-      WeightsCategory::VoiceConversion => record.maybe_voice_conversion_ietf_language_tag,
-      _ => None,
-    },
-
-    maybe_ietf_primary_language_subtag: match record.weights_category {
-      WeightsCategory::TextToSpeech => record.maybe_tts_ietf_primary_language_subtag,
-      WeightsCategory::VoiceConversion => record.maybe_voice_conversion_ietf_primary_language_subtag,
-      _ => None,
-    },
+    maybe_ietf_language_tag,
+    maybe_ietf_primary_language_subtag,
 
     created_at: record.created_at,
     updated_at: record.updated_at,

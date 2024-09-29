@@ -50,6 +50,15 @@ pub struct ModelWeightSearchResult {
 
   pub title: String,
 
+  /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+  /// this will report it. Example values: "en", "en-US", "es-419", "ja-JP", etc.
+  pub maybe_ietf_language_tag: Option<String>,
+
+  /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+  /// this will return the primary language subtag, e.g. "en", "es", etc. This excludes the
+  /// portion after the dash (eg "en-US" would be reported as "en").
+  pub maybe_ietf_primary_language_subtag: Option<String>,
+
   /// Optional SEO-friendly URL slug for the model weight.
   pub maybe_url_slug: Option<String>,
 
@@ -70,9 +79,6 @@ pub struct ModelWeightSearchResult {
   /// Number of times the model has been used.
   /// (This isn't in SimpleEntityStats since that also applies to media files, etc.)
   pub usage_count: u32,
-
-  pub maybe_ietf_language_tag: Option<String>,
-  pub maybe_ietf_primary_language_subtag: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,

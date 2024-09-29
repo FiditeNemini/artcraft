@@ -27,6 +27,10 @@ pub struct ModelWeightForElasticsearchRecord {
 
   pub title: String,
 
+  // NB: These language tags are built into the `model_weights` table.
+  pub maybe_ietf_language_tag: Option<String>,
+  pub maybe_ietf_primary_language_subtag: Option<String>,
+
   // Cover images
   pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
   pub maybe_cover_image_public_bucket_hash: Option<String>,
@@ -49,11 +53,15 @@ pub struct ModelWeightForElasticsearchRecord {
   pub cached_usage_count: u64,
 
   // TTS extensions
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_tts_ietf_language_tag: Option<String>,
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_tts_ietf_primary_language_subtag: Option<String>,
 
   // VC extensions
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_voice_conversion_ietf_language_tag: Option<String>,
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_voice_conversion_ietf_primary_language_subtag: Option<String>,
 
   pub created_at: DateTime<Utc>,
@@ -98,6 +106,8 @@ pub async fn batch_get_model_weights_for_elastic_search_backfill<'e, 'c, E>(
           title: model.title,
           weights_type: model.weights_type,
           weights_category: model.weights_category,
+          maybe_ietf_language_tag: model.maybe_ietf_language_tag,
+          maybe_ietf_primary_language_subtag: model.maybe_ietf_primary_language_subtag,
           maybe_cover_image_media_file_token: model.maybe_cover_image_media_file_token,
           maybe_cover_image_public_bucket_hash: model.maybe_cover_image_public_bucket_hash,
           maybe_cover_image_public_bucket_prefix: model.maybe_cover_image_public_bucket_prefix,
@@ -148,6 +158,9 @@ SELECT
     w.weights_category,
 
     w.title,
+
+    w.maybe_ietf_language_tag,
+    w.maybe_ietf_primary_language_subtag,
 
     cover_image.token as maybe_cover_image_media_file_token,
     cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
@@ -232,6 +245,10 @@ struct RawRecord {
 
   pub title: String,
 
+  // NB: These language tags are built into the `model_weights` table.
+  pub maybe_ietf_language_tag: Option<String>,
+  pub maybe_ietf_primary_language_subtag: Option<String>,
+
   // Cover images
   pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
   pub maybe_cover_image_public_bucket_hash: Option<String>,
@@ -254,11 +271,15 @@ struct RawRecord {
   pub cached_usage_count: u64,
 
   // TTS extensions
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_tts_ietf_language_tag: Option<String>,
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_tts_ietf_primary_language_subtag: Option<String>,
 
   // Voice conversion extensions
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_vc_ietf_language_tag: Option<String>,
+  #[deprecated(note="use the fields built into the model_weights table rather than in the join table")]
   pub maybe_vc_ietf_primary_language_subtag: Option<String>,
 
   pub created_at: DateTime<Utc>,
@@ -297,6 +318,9 @@ impl FromRow<'_, MySqlRow> for RawRecord {
       weights_category: WeightsCategory::try_from_mysql_row(row, "weights_category")?,
 
       title: row.try_get("title")?,
+
+      maybe_ietf_language_tag: row.try_get("maybe_ietf_language_tag")?,
+      maybe_ietf_primary_language_subtag: row.try_get("maybe_ietf_primary_language_subtag")?,
 
       maybe_cover_image_media_file_token: maybe_cover_image_media_file_token.map(|token| MediaFileToken::new(token)),
       maybe_cover_image_public_bucket_hash: row.try_get("maybe_cover_image_public_bucket_hash")?,
