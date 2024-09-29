@@ -53,6 +53,22 @@ CREATE TABLE model_weights (
   -- models don't deserve a description).
   maybe_description_rendered_html TEXT DEFAULT NULL,
 
+  -- OPTIONAL. Only for TTS and Voice Conversion models.
+  -- The full IETF BCP47 language tag (eg. en, en-US, es-419, ja-JP, pt, etc.)
+  -- (Not that it matters apart from categorization, since voice conversion is universal.)
+  -- NB: There's another set of tables (model_weights_extension_voice_conversion_details, etc.) that
+  -- may have older post-migration data for some models. We'll want to backfill this field from there
+  -- and then make this one authoritative.
+  maybe_ietf_language_tag VARCHAR(64) DEFAULT NULL,
+
+  -- OPTIONAL. Only for TTS and Voice Conversion models.
+  -- The IETF BCP47 language tag's primary language subtag (eg. "es-419" becomes "es")
+  -- (Not that it matters apart from categorization, since voice conversion is universal.)
+  -- NB: There's another set of tables (model_weights_extension_voice_conversion_details, etc.) that
+  -- may have older post-migration data for some models. We'll want to backfill this field from there
+  -- and then make this one authoritative.
+  maybe_ietf_primary_language_subtag VARCHAR(12) DEFAULT NULL,
+
 
   -- ========== CREATOR DETAILS ==========
 
