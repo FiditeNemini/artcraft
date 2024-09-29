@@ -1,6 +1,6 @@
-use std::collections::{HashMap, HashSet};
-
+use language_tags::LanguageTag;
 use once_cell::sync::Lazy;
+use std::collections::{HashMap, HashSet};
 
 /// These are language tags we try to support.
 static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
@@ -38,6 +38,10 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "de-DE", //	German (Germany)
     "de-LI", //	German (Liechtenstein)
     "de-LU", //	German (Luxembourg)
+
+    // Hindi
+    "hi",
+    "hi-IN", // Hindi (India)
 
     // Italian
     "it",
@@ -112,9 +116,16 @@ pub fn is_valid_language_for_models(language_tag: &str) -> bool {
   SUPPORTED_LANGUAGES_FOR_MODELS.contains(language_tag)
 }
 
+/// Parse a language tag like "en-US" to "en".
+pub fn get_primary_language_subtag(language_tag: &str) -> Option<String> {
+  LanguageTag::parse(language_tag)
+      .map(|language_tag| language_tag.primary_language().to_string())
+      .ok()
+}
+
 #[cfg(test)]
 mod tests {
-  use crate::configs::supported_languages_for_models::{get_canonicalized_language_tag_for_model, is_valid_language_for_models};
+  use crate::configs::supported_languages_for_models::{get_canonicalized_language_tag_for_model, get_primary_language_subtag, is_valid_language_for_models};
 
   #[test]
   fn get_canonical_language_for_model_success() {
@@ -147,6 +158,18 @@ mod tests {
     assert!(!is_valid_language_for_models(""));
     assert!(!is_valid_language_for_models("foo"));
     assert!(!is_valid_language_for_models("en-FOO"));
+  }
+
+  #[test]
+  fn test_primary_language_subtag() {
+    assert_eq!(Some("en".to_string()), get_primary_language_subtag("en-US"));
+    assert_eq!(Some("es".to_string()), get_primary_language_subtag("es-419"));
+    assert_eq!(Some("it".to_string()), get_primary_language_subtag("it-CH"));
+    assert_eq!(Some("ja".to_string()), get_primary_language_subtag("ja-JP"));
+    assert_eq!(Some("zh".to_string()), get_primary_language_subtag("zh-CN"));
+    assert_eq!(Some("zh".to_string()), get_primary_language_subtag("zh-HK"));
+    assert_eq!(Some("tr".to_string()), get_primary_language_subtag("tr-TR"));
+    assert_eq!(Some("ar".to_string()), get_primary_language_subtag("ar-EG"));
   }
 }
 
