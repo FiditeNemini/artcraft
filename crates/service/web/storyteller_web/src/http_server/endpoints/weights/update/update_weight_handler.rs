@@ -6,6 +6,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{web, HttpRequest, HttpResponse};
 use log::warn;
+use sqlx::MySqlPool;
 use utoipa::ToSchema;
 
 use enums::by_table::media_files::media_file_type::MediaFileType;
@@ -15,11 +16,13 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use markdown::simple_markdown_to_html::simple_markdown_to_html;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::edit::update_weight::{update_weights, CoverImageOption, UpdateWeightArgs};
-use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::{get_weight_by_token, get_weight_by_token_with_transactor};
+use mysql_queries::utils::transactor::Transactor;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use user_input_common::check_for_slurs::contains_slurs;
-
+use crate::http_server::web_utils::user_session::require_user_session::RequireUserSessionError;
+use crate::http_server::web_utils::user_session::require_user_session_using_connection::require_user_session_using_connection;
 use crate::state::server_state::ServerState;
 
 // TODO will eventually be polymorphic
@@ -80,6 +83,8 @@ impl fmt::Display for UpdateWeightError {
 }
 
 // =============== Handler ===============
+
+/// Handle updates to model weight metadata (using sparse field updates!)
 #[utoipa::path(
     post,
     tag = "Model Weights",
@@ -99,34 +104,39 @@ pub async fn update_weight_handler(
     http_request: HttpRequest,
     path: Path<UpdateWeightPathInfo>,
     request: web::Json<UpdateWeightRequest>,
+    mysql_pool: web::Data<MySqlPool>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, UpdateWeightError> {
-    let my_sql_pool = &server_state.mysql_pool;
-
-    let maybe_user_session = server_state.session_checker
-        .maybe_get_user_session(&http_request, &server_state.mysql_pool).await
-        .map_err(|e| {
-            warn!("Session checker error: {:?}", e);
+    let mut mysql_connection = mysql_pool
+        .acquire()
+        .await
+        .map_err(|err| {
+            warn!("could not acquire mysql connection: {:?}", err);
             UpdateWeightError::ServerError
         })?;
 
-    let user_session = match maybe_user_session {
-        Some(session) => session,
-        None => {
-            warn!("not logged in");
-            return Err(UpdateWeightError::NotAuthorized);
-        }
-    };
+    let user_session = require_user_session_using_connection(
+        &http_request,
+        &server_state.session_checker,
+        &mut mysql_connection)
+        .await
+        .map_err(|err| match err {
+            RequireUserSessionError::NotAuthorized => UpdateWeightError::NotAuthorized,
+            _ => {
+                warn!("get user session error: {:?}", err);
+                UpdateWeightError::ServerError
+            },
+        })?;
 
     let weight_token = path.weight_token.clone();
 
     // TODO wouldn't we want to instead use a function that will query the DB for the user and determine if they are a mod?
-    let is_mod = user_session.can_ban_users;
+    let is_mod = user_session.role.can_ban_users;
 
-    let weight_lookup_result = get_weight_by_token(
+    let weight_lookup_result = get_weight_by_token_with_transactor(
         &ModelWeightToken::new(weight_token.clone()),
         is_mod,
-        &server_state.mysql_pool
+        Transactor::for_connection(&mut mysql_connection)
     ).await;
 
     let weight = match weight_lookup_result {
@@ -197,16 +207,16 @@ pub async fn update_weight_handler(
 
     let query_result = update_weights(UpdateWeightArgs {
         weight_token: &ModelWeightToken::new(path.weight_token.clone()),
-        mysql_pool: &server_state.mysql_pool,
         title: weight_title.as_deref(),
         cover_image,
         maybe_description_markdown: description_markdown.as_deref(),
         maybe_description_rendered_html: description_rendered_html.as_deref(),
         creator_set_visibility: request.visibility.as_ref(),
+        transactor: Transactor::for_connection(&mut mysql_connection),
     }).await;
 
     match query_result {
-        Ok(_) => {}
+        Ok(()) => {}
         Err(err) => {
             warn!("Update Weight DB error: {:?}", err);
             return Err(UpdateWeightError::ServerError);

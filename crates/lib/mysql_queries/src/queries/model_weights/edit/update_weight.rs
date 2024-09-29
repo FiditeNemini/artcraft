@@ -1,19 +1,20 @@
 use anyhow::anyhow;
-use sqlx::{MySql, MySqlPool, QueryBuilder};
+use sqlx::{MySql, QueryBuilder};
 
+use crate::utils::transactor::Transactor;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-pub struct UpdateWeightArgs<'a> {
+pub struct UpdateWeightArgs<'a, 't> {
     pub weight_token: &'a ModelWeightToken,
     pub title: Option<&'a str>,
     pub cover_image: Option<CoverImageOption<'a>>,
     pub maybe_description_markdown: Option<&'a str>,
     pub maybe_description_rendered_html: Option<&'a str>,
     pub creator_set_visibility: Option<&'a Visibility>,
-    pub mysql_pool: &'a MySqlPool,
+    pub transactor: Transactor<'a, 't>,
 }
 
 pub enum CoverImageOption<'a> {
@@ -21,7 +22,7 @@ pub enum CoverImageOption<'a> {
     SetCoverImage(&'a MediaFileToken),
 }
 
-pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
+pub async fn update_weights(args: UpdateWeightArgs<'_, '_>) -> AnyhowResult<()> {
     if args.title.is_none()
         && args.maybe_description_markdown.is_none()
         && args.maybe_description_rendered_html.is_none()
@@ -74,16 +75,10 @@ SET
     separated.push_bind_unseparated(args.weight_token.as_str());
     separated.push_unseparated(" LIMIT 1");
 
-    let transaction = args.mysql_pool.begin().await?;
-    let query_result = query_builder.build().execute(args.mysql_pool).await;
-    transaction.commit().await?;
+    let query = query_builder.build();
+    let _r = args.transactor.execute(query).await?;
 
-    match query_result {
-        Ok(_) => Ok(()),
-        Err(err) => { 
-            Err(anyhow!("weights update error: {:?}", err))
-        }
-    }
+    Ok(())
 }
 
 #[cfg(test)]
