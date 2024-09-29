@@ -37,6 +37,15 @@ pub struct PinnedModelWeightForList {
 
   pub title: String,
 
+  /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+  /// this will report it. Example values: "en", "en-US", "es-419", "ja-JP", etc.
+  pub maybe_ietf_language_tag: Option<String>,
+
+  /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+  /// this will return the primary language subtag, e.g. "en", "es", etc. This excludes the
+  /// portion after the dash (eg "en-US" would be reported as "en").
+  pub maybe_ietf_primary_language_subtag: Option<String>,
+
   /// Optional SEO-friendly URL slug for the model weight.
   pub maybe_url_slug: Option<String>,
 
@@ -168,6 +177,8 @@ pub async fn list_pinned_weights_handler(
             weight_token: w.token,
             maybe_url_slug: title_to_url_slug(&w.title),
             title: w.title,
+            maybe_ietf_language_tag: w.maybe_ietf_language_tag,
+            maybe_ietf_primary_language_subtag: w.maybe_ietf_primary_language_subtag,
             weight_type: PublicWeightsType::from_enum(w.weights_type),
             weight_category: w.weights_category,
             cover_image: cover_image_details,

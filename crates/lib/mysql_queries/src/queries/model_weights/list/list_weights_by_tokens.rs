@@ -20,6 +20,9 @@ pub struct WeightsByTokensRecord {
 
   pub title: String,
 
+  pub maybe_ietf_language_tag: Option<String>,
+  pub maybe_ietf_primary_language_subtag: Option<String>,
+
   pub creator_user_token: UserToken,
   pub creator_username: String,
   pub creator_display_name: String,
@@ -72,6 +75,8 @@ async fn get_raw_weights_by_tokens(
           mw.title,
           mw.weights_type,
           mw.weights_category,
+          mw.maybe_ietf_language_tag,
+          mw.maybe_ietf_primary_language_subtag,
           users.token as creator_user_token,
           users.username as creator_username,
           users.display_name as creator_display_name,
@@ -111,6 +116,8 @@ async fn get_raw_weights_by_tokens(
           mw.title,
           mw.weights_type,
           mw.weights_category,
+          mw.maybe_ietf_language_tag,
+          mw.maybe_ietf_primary_language_subtag,
           users.token as creator_user_token,
           users.username as creator_username,
           users.display_name as creator_display_name,
@@ -177,6 +184,9 @@ fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsByTokensRecord> 
           weights_type: weight.weights_type,
           weights_category: weight.weights_category,
 
+          maybe_ietf_language_tag: weight.maybe_ietf_language_tag,
+          maybe_ietf_primary_language_subtag: weight.maybe_ietf_primary_language_subtag,
+
           creator_user_token: weight.creator_user_token,
           creator_username: weight.creator_username,
           creator_display_name: weight.creator_display_name,
@@ -205,37 +215,40 @@ fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsByTokensRecord> 
   weights
 }
 
-  #[derive(Serialize)]
-  pub struct RawWeightJoinUser {
-    pub token: ModelWeightToken,
+#[derive(Serialize)]
+struct RawWeightJoinUser {
+  token: ModelWeightToken,
 
-    pub weights_type: WeightsType,
-    pub weights_category: WeightsCategory,
-    
-    pub title: String,
-    
-    pub creator_user_token: UserToken,
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
+  weights_type: WeightsType,
+  weights_category: WeightsCategory,
 
-    pub public_bucket_hash: String,
-    pub maybe_public_bucket_prefix: Option<String>,
-    pub maybe_public_bucket_extension: Option<String>,
+  title: String,
 
-    pub maybe_cover_image_public_bucket_hash: Option<String>,
-    pub maybe_cover_image_public_bucket_prefix: Option<String>,
-    pub maybe_cover_image_public_bucket_extension: Option<String>,
+  maybe_ietf_language_tag: Option<String>,
+  maybe_ietf_primary_language_subtag: Option<String>,
 
-    pub maybe_ratings_positive_count: Option<u32>,
-    pub maybe_ratings_negative_count: Option<u32>,
-    pub maybe_bookmark_count: Option<u32>,
-    pub cached_usage_count: u64,
+  creator_user_token: UserToken,
+  creator_username: String,
+  creator_display_name: String,
+  creator_email_gravatar_hash: String,
 
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub user_deleted_at: Option<DateTime<Utc>>,
-    pub mod_deleted_at: Option<DateTime<Utc>>,
+  public_bucket_hash: String,
+  maybe_public_bucket_prefix: Option<String>,
+  maybe_public_bucket_extension: Option<String>,
+
+  maybe_cover_image_public_bucket_hash: Option<String>,
+  maybe_cover_image_public_bucket_prefix: Option<String>,
+  maybe_cover_image_public_bucket_extension: Option<String>,
+
+  maybe_ratings_positive_count: Option<u32>,
+  maybe_ratings_negative_count: Option<u32>,
+  maybe_bookmark_count: Option<u32>,
+  cached_usage_count: u64,
+
+  created_at: DateTime<Utc>,
+  updated_at: DateTime<Utc>,
+  user_deleted_at: Option<DateTime<Utc>>,
+  mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 // NB(bt,2023-12-05): There's an issue with type hinting in the `as` clauses with QueryBuilder (or
@@ -257,6 +270,8 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
       weights_type: WeightsType::try_from_mysql_row(row, "weights_type")?,
       weights_category: WeightsCategory::try_from_mysql_row(row, "weights_category")?,
       title: row.try_get("title")?,
+      maybe_ietf_language_tag: row.try_get("maybe_ietf_language_tag")?,
+      maybe_ietf_primary_language_subtag: row.try_get("maybe_ietf_primary_language_subtag")?,
       creator_user_token: UserToken::new_from_str(row.try_get("creator_user_token")?),
       creator_username: row.try_get("creator_username")?,
       creator_display_name: row.try_get("creator_display_name")?,

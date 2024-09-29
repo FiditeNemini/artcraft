@@ -54,6 +54,15 @@ pub struct ModelWeightForList {
 
     pub title: String,
 
+    /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+    /// this will report it. Example values: "en", "en-US", "es-419", "ja-JP", etc.
+    pub maybe_ietf_language_tag: Option<String>,
+
+    /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+    /// this will return the primary language subtag, e.g. "en", "es", etc. This excludes the
+    /// portion after the dash (eg "en-US" would be reported as "en").
+    pub maybe_ietf_primary_language_subtag: Option<String>,
+
     // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
     //  Hopefully we don't break the frontend by omitting these.
     //pub description_markdown: String,
@@ -248,6 +257,9 @@ pub async fn list_available_weights_handler(
                     title: weight.title,
                     weight_type: weight.weights_type,
                     weight_category: weight.weights_category,
+
+                    maybe_ietf_language_tag: weight.maybe_ietf_language_tag,
+                    maybe_ietf_primary_language_subtag: weight.maybe_ietf_primary_language_subtag,
 
                     maybe_cover_image_public_bucket_path: maybe_cover_image,
                     cover_image: cover_image_details,

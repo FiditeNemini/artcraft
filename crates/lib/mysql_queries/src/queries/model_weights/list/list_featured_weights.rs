@@ -40,6 +40,9 @@ pub struct FeaturedWeight {
   //pub maybe_description_markdown: String,
   //pub maybe_description_rendered_html: String,
 
+  pub maybe_ietf_language_tag: Option<String>,
+  pub maybe_ietf_primary_language_subtag: Option<String>,
+
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
@@ -155,6 +158,8 @@ fn select_result_fields() -> String {
     mw.title,
     mw.weights_type,
     mw.weights_category,
+    mw.maybe_ietf_language_tag,
+    mw.maybe_ietf_primary_language_subtag,
     u.token as maybe_creator_user_token,
     u.username as maybe_creator_username,
     u.display_name as maybe_creator_display_name,
@@ -329,6 +334,9 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<FeaturedWeight> {
           weights_type: weight.weights_type,
           weights_category: weight.weights_category,
 
+          maybe_ietf_language_tag: weight.maybe_ietf_language_tag,
+          maybe_ietf_primary_language_subtag: weight.maybe_ietf_primary_language_subtag,
+
           maybe_creator_user_token: weight.maybe_creator_user_token,
           maybe_creator_username: weight.maybe_creator_username,
           maybe_creator_display_name: weight.maybe_creator_display_name,
@@ -374,6 +382,9 @@ struct RawWeightJoinUser {
   weights_category: WeightsCategory,
 
   title: String,
+
+  maybe_ietf_language_tag: Option<String>,
+  maybe_ietf_primary_language_subtag: Option<String>,
 
   // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
   //  Hopefully we don't break the frontend by omitting these.
@@ -426,6 +437,8 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
             weights_type: row.try_get("weights_type")?,
             weights_category: row.try_get("weights_category")?,
             title: row.try_get("title")?,
+            maybe_ietf_language_tag: row.try_get("maybe_ietf_language_tag")?,
+            maybe_ietf_primary_language_subtag: row.try_get("maybe_ietf_primary_language_subtag")?,
             // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
             //  Hopefully we don't break the frontend by omitting these.
             //maybe_description_markdown: row.try_get("maybe_description_markdown")?,

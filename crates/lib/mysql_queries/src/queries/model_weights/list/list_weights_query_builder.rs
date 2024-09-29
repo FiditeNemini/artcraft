@@ -37,6 +37,9 @@ pub struct WeightJoinUser {
 
     pub title: String,
 
+    pub maybe_ietf_language_tag: Option<String>,
+    pub maybe_ietf_primary_language_subtag: Option<String>,
+
     pub maybe_description_markdown: Option<String>,
     pub maybe_description_rendered_html: Option<String>,
 
@@ -216,6 +219,8 @@ impl ListWeightsQueryBuilder {
                         record.weights_category.as_str()
                     ).unwrap(),
                     title: record.title,
+                    maybe_ietf_language_tag: record.maybe_ietf_language_tag,
+                    maybe_ietf_primary_language_subtag: record.maybe_ietf_primary_language_subtag,
                     maybe_description_markdown: record.maybe_description_markdown,
                     maybe_description_rendered_html: record.maybe_description_rendered_html,
                     creator_user_token: UserToken::new_from_str(&record.creator_user_token),
@@ -271,6 +276,8 @@ impl ListWeightsQueryBuilder {
             model_weights.title,
             model_weights.maybe_description_markdown,
             model_weights.maybe_description_rendered_html,
+            model_weights.maybe_ietf_language_tag,
+            model_weights.maybe_ietf_primary_language_subtag,
             model_weights.creator_user_token,
             model_weights.creator_ip_address,
             model_weights.creator_set_visibility,
@@ -417,53 +424,56 @@ impl ListWeightsQueryBuilder {
 #[derive(Serialize)]
 #[derive(sqlx::FromRow)]
 struct RawWeightJoinUser {
-    pub weight_id: i64,
-    pub token: ModelWeightToken,
+    weight_id: i64,
+    token: ModelWeightToken,
 
-    pub weights_type: String,
-    pub weights_category: String,
+    weights_type: String,
+    weights_category: String,
 
-    pub title: String,
+    title: String,
 
-    pub maybe_description_markdown: Option<String>,
-    pub maybe_description_rendered_html: Option<String>,
+    maybe_description_markdown: Option<String>,
+    maybe_description_rendered_html: Option<String>,
 
-    pub creator_user_token: String,
-    pub creator_ip_address: String,
-    pub creator_set_visibility: String,
+    maybe_ietf_language_tag: Option<String>,
+    maybe_ietf_primary_language_subtag: Option<String>,
 
-    pub maybe_last_update_user_token: Option<String>,
+    creator_user_token: String,
+    creator_ip_address: String,
+    creator_set_visibility: String,
 
-    pub original_download_url: Option<String>,
-    pub original_filename: Option<String>,
+    maybe_last_update_user_token: Option<String>,
 
-    pub file_size_bytes: i32,
-    pub file_checksum_sha2: String,
+    original_download_url: Option<String>,
+    original_filename: Option<String>,
 
-    pub public_bucket_hash: String,
-    pub maybe_public_bucket_prefix: Option<String>,
-    pub maybe_public_bucket_extension: Option<String>,
+    file_size_bytes: i32,
+    file_checksum_sha2: String,
 
-    pub maybe_cover_image_public_bucket_hash: Option<String>,
-    pub maybe_cover_image_public_bucket_prefix: Option<String>,
-    pub maybe_cover_image_public_bucket_extension: Option<String>,
+    public_bucket_hash: String,
+    maybe_public_bucket_prefix: Option<String>,
+    maybe_public_bucket_extension: Option<String>,
 
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
+    maybe_cover_image_public_bucket_hash: Option<String>,
+    maybe_cover_image_public_bucket_prefix: Option<String>,
+    maybe_cover_image_public_bucket_extension: Option<String>,
 
-    pub maybe_ratings_positive_count: Option<u32>,
-    pub maybe_ratings_negative_count: Option<u32>,
-    pub maybe_bookmark_count: Option<u32>,
-    pub cached_usage_count: u64,
+    creator_username: String,
+    creator_display_name: String,
+    creator_email_gravatar_hash: String,
 
-    pub version: i32,
+    maybe_ratings_positive_count: Option<u32>,
+    maybe_ratings_negative_count: Option<u32>,
+    maybe_bookmark_count: Option<u32>,
+    cached_usage_count: u64,
 
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    version: i32,
 
-    pub user_deleted_at: Option<DateTime<Utc>>,
-    pub mod_deleted_at: Option<DateTime<Utc>>,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+
+    user_deleted_at: Option<DateTime<Utc>>,
+    mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 #[cfg(test)]

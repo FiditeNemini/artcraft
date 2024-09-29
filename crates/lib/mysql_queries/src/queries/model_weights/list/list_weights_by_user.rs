@@ -31,6 +31,9 @@ pub struct WeightsJoinUserRecord {
     
     pub title: String,
 
+    pub maybe_ietf_language_tag: Option<String>,
+    pub maybe_ietf_primary_language_subtag: Option<String>,
+
     // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
     //  Hopefully we don't break the frontend by omitting these.
     //pub maybe_description_markdown: String,
@@ -144,6 +147,8 @@ fn select_result_fields() -> String {
         mw.title,
         mw.weights_type,
         mw.weights_category,
+        mw.maybe_ietf_language_tag,
+        mw.maybe_ietf_primary_language_subtag,
         u.token as creator_user_token,
         u.username as creator_username,
         u.display_name as creator_display_name,
@@ -255,6 +260,10 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
                 title: weight.title,
                 weights_type: weight.weights_type,
                 weights_category: weight.weights_category,
+
+                maybe_ietf_language_tag: weight.maybe_ietf_language_tag,
+                maybe_ietf_primary_language_subtag: weight.maybe_ietf_primary_language_subtag,
+
                 //maybe_description_markdown: weight.maybe_description_markdown,
                 //maybe_description_rendered_html: weight.maybe_description_rendered_html,
 
@@ -296,55 +305,58 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
 }
 
 
-  pub struct RawWeightJoinUser {
-    pub token: ModelWeightToken,
+struct RawWeightJoinUser {
+  token: ModelWeightToken,
 
-    pub weights_type: WeightsType,
-    pub weights_category: WeightsCategory,
-    
-    pub title: String,
+  weights_type: WeightsType,
+  weights_category: WeightsCategory,
 
-    // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
-    //  Hopefully we don't break the frontend by omitting these.
-    //pub description_markdown: String,
-    //pub description_rendered_html: String,
-    
-    pub creator_user_token: UserToken,
-    pub creator_ip_address: String,
-    pub creator_set_visibility: Visibility,
-    
-    pub maybe_last_update_user_token: Option<UserToken>,
-    
-    pub original_download_url: Option<String>,
-    pub original_filename: Option<String>,
-    
-    pub file_size_bytes: i32,
-    pub file_checksum_sha2: String,
-    
-    pub public_bucket_hash: String,
-    pub maybe_public_bucket_prefix: Option<String>,
-    pub maybe_public_bucket_extension: Option<String>,
+  title: String,
 
-    pub maybe_cover_image_public_bucket_hash: Option<String>,
-    pub maybe_cover_image_public_bucket_prefix: Option<String>,
-    pub maybe_cover_image_public_bucket_extension: Option<String>,
+  maybe_ietf_language_tag: Option<String>,
+  maybe_ietf_primary_language_subtag: Option<String>,
 
-    pub maybe_ratings_positive_count: Option<u32>,
-    pub maybe_ratings_negative_count: Option<u32>,
-    pub maybe_bookmark_count: Option<u32>,
-    pub cached_usage_count: u64,
+  // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
+  //  Hopefully we don't break the frontend by omitting these.
+  //pub description_markdown: String,
+  //pub description_rendered_html: String,
 
-    pub version: i32,
-    
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    
-    pub user_deleted_at: Option<DateTime<Utc>>,
-    pub mod_deleted_at: Option<DateTime<Utc>>,
-    
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
+  creator_user_token: UserToken,
+  creator_ip_address: String,
+  creator_set_visibility: Visibility,
+
+  maybe_last_update_user_token: Option<UserToken>,
+
+  original_download_url: Option<String>,
+  original_filename: Option<String>,
+
+  file_size_bytes: i32,
+  file_checksum_sha2: String,
+
+  public_bucket_hash: String,
+  maybe_public_bucket_prefix: Option<String>,
+  maybe_public_bucket_extension: Option<String>,
+
+  maybe_cover_image_public_bucket_hash: Option<String>,
+  maybe_cover_image_public_bucket_prefix: Option<String>,
+  maybe_cover_image_public_bucket_extension: Option<String>,
+
+  maybe_ratings_positive_count: Option<u32>,
+  maybe_ratings_negative_count: Option<u32>,
+  maybe_bookmark_count: Option<u32>,
+  cached_usage_count: u64,
+
+  version: i32,
+
+  created_at: DateTime<Utc>,
+  updated_at: DateTime<Utc>,
+
+  user_deleted_at: Option<DateTime<Utc>>,
+  mod_deleted_at: Option<DateTime<Utc>>,
+
+  creator_username: String,
+  creator_display_name: String,
+  creator_email_gravatar_hash: String,
 }
 
 impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
@@ -354,6 +366,8 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
             weights_type: row.try_get("weights_type")?,
             weights_category: row.try_get("weights_category")?,
             title: row.try_get("title")?,
+            maybe_ietf_language_tag: row.try_get("maybe_ietf_language_tag")?,
+            maybe_ietf_primary_language_subtag: row.try_get("maybe_ietf_primary_language_subtag")?,
             // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
             //  Hopefully we don't break the frontend by omitting these.
             //maybe_description_markdown: row.try_get("maybe_description_markdown")?,

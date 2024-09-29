@@ -29,9 +29,20 @@ use crate::util::title_to_url_slug::title_to_url_slug;
 #[derive(Serialize, Clone, ToSchema)]
 pub struct Weight {
   weight_token: ModelWeightToken,
-  title: String,
   weight_type: String,
   weight_category: String,
+
+  title: String,
+
+  /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+  /// this will report it. Example values: "en", "en-US", "es-419", "ja-JP", etc.
+  maybe_ietf_language_tag: Option<String>,
+
+  /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+  /// this will return the primary language subtag, e.g. "en", "es", etc. This excludes the
+  /// portion after the dash (eg "en-US" would be reported as "en").
+  maybe_ietf_primary_language_subtag: Option<String>,
+
   creator: UserDetailsLight,
   creator_set_visibility: Visibility,
 
@@ -224,6 +235,8 @@ pub async fn list_weights_by_user_handler(
       title: weight.title,
       weight_type: weight.weights_type.to_string(),
       weight_category: weight.weights_category.to_string(),
+      maybe_ietf_language_tag: weight.maybe_ietf_language_tag,
+      maybe_ietf_primary_language_subtag: weight.maybe_ietf_primary_language_subtag,
       creator: UserDetailsLight::from_db_fields(
         &weight.creator_user_token,
         &weight.creator_username,

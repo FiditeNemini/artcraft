@@ -18,9 +18,9 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use primitives::numerics::u64_to_u32_saturating::u64_to_u32_saturating;
 use tokens::tokens::model_weights::ModelWeightToken;
 
+use crate::http_server::common_responses::media::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
-use crate::http_server::common_responses::media::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::endpoints::media_files::helpers::get_media_domain::get_media_domain;
 use crate::state::server_state::ServerState;
 use crate::util::title_to_url_slug::title_to_url_slug;
@@ -41,6 +41,15 @@ pub struct GetWeightResponse {
 
     // TODO(bt,2023-12-24): Migrated the column. We should return nullables, but I don't want to break the frontend
     description_rendered_html: String,
+
+    /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+    /// this will report it. Example values: "en", "en-US", "es-419", "ja-JP", etc.
+    maybe_ietf_language_tag: Option<String>,
+
+    /// If this is a voice model (voice conversion, TTS, etc.) and a language has been set,
+    /// this will return the primary language subtag, e.g. "en", "es", etc. This excludes the
+    /// portion after the dash (eg "en-US" would be reported as "en").
+    maybe_ietf_primary_language_subtag: Option<String>,
 
     creator: UserDetailsLight,
     creator_set_visibility: Visibility,
@@ -210,6 +219,8 @@ pub async fn get_weight_handler(
         // TODO(bt,2023-12-24): Migrated the column. We should return nullable fields, but I don't want to break the frontend
         description_markdown: weight.maybe_description_markdown.unwrap_or_else(|| "".to_string()),
         description_rendered_html: weight.maybe_description_rendered_html.unwrap_or_else(|| "".to_string()),
+        maybe_ietf_language_tag: weight.maybe_ietf_language_tag,
+        maybe_ietf_primary_language_subtag: weight.maybe_ietf_primary_language_subtag,
         cover_image: cover_image_details,
         maybe_cover_image_public_bucket_path: maybe_cover_image,
         creator,
