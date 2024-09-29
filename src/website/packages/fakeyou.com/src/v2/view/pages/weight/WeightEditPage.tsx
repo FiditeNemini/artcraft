@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   faCircleExclamation,
   faEye,
+  faLanguage,
   faWaveform,
 } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
@@ -21,6 +22,8 @@ import {
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useSession, useWeightFetch } from "hooks";
 import "./WeightEditPage.scss";
+import { LanguageLabels } from "@storyteller/components/src/api/Languages";
+import { WeightCategory } from "@storyteller/components/src/api/_common/enums";
 
 export default function WeightEditPage() {
   const { user, canEditTtsModel } = useSession();
@@ -40,6 +43,7 @@ export default function WeightEditPage() {
     title,
     update,
     visibility,
+    languageTag,
     writeStatus,
     // status
   } = useWeightFetch({ token: weight_token });
@@ -55,27 +59,36 @@ export default function WeightEditPage() {
     { label: "Private", value: "private" },
   ];
 
+  const languageOptions = Object.entries(LanguageLabels).map(
+    ([value, label]) => ({
+      label,
+      value,
+    })
+  );
+
   let weightToken = weight?.creator?.user_token;
 
   if (isLoading) {
     return (
-      <Panel padding={true}>
-        <div className="d-flex flex-column gap-3">
-          <Skeleton type="short" />
-          <Skeleton height="40px" />
-          <Skeleton type="short" />
-          <Skeleton height="40px" />
-          <div className="d-flex justify-content-end mt-3 gap-2">
-            <Skeleton height="40px" width="120px" />
-            <Skeleton height="40px" width="120px" />
+      <Container type="panel" className="mt-5">
+        <Panel padding={true}>
+          <div className="d-flex flex-column gap-3">
+            <Skeleton type="short" />
+            <Skeleton height="40px" />
+            <Skeleton type="short" />
+            <Skeleton height="40px" />
+            <div className="d-flex justify-content-end mt-3 gap-2">
+              <Skeleton height="40px" width="120px" />
+              <Skeleton height="40px" width="120px" />
+            </div>
           </div>
-        </div>
-      </Panel>
+        </Panel>
+      </Container>
     );
   } else {
     if (!weightToken) {
       return (
-        <Container type="panel">
+        <Container type="panel" className="mt-5">
           <PageHeader
             titleIcon={faCircleExclamation}
             title="Access Denied"
@@ -152,6 +165,21 @@ export default function WeightEditPage() {
                     value: title,
                   }}
                 />
+                {(weight?.weight_category === WeightCategory.TTS ||
+                  weight?.weight_category === WeightCategory.VC) && (
+                  <TempSelect
+                    {...{
+                      icon: faLanguage,
+                      label: "Language",
+                      name: "languageTag",
+                      options: languageOptions,
+                      onChange,
+                      placeholder: "Select language",
+                      value: languageTag,
+                    }}
+                  />
+                )}
+
                 <TempSelect
                   {...{
                     icon: faEye,

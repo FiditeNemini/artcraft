@@ -8,6 +8,7 @@ import {
 import { UpdateWeight } from "@storyteller/components/src/api/weights/UpdateWeight";
 import { DeleteWeight } from "@storyteller/components/src/api/weights/DeleteWeight";
 import { useCoverImgUpload } from "hooks";
+import { LanguageTag } from "@storyteller/components/src/api/Languages";
 
 interface Props {
   onSuccess?: (res: Weight) => any;
@@ -30,6 +31,7 @@ export default function useWeightFetch({
   const [title, titleSet] = useState("");
   const [maybeUrlSlug, maybeUrlSlugSet] = useState(undefined);
   const [visibility, visibilitySet] = useState("public");
+  const [languageTag, languageTagSet] = useState<LanguageTag>("en");
   const [descriptionMD, descriptionMDSet] = useState("");
   const isLoading =
     status === FetchStatus.ready || status === FetchStatus.in_progress;
@@ -42,6 +44,7 @@ export default function useWeightFetch({
       descriptionMDSet,
       titleSet,
       visibilitySet,
+      languageTagSet,
     };
     todo[target.name + "Set"](target.value);
   };
@@ -56,6 +59,7 @@ export default function useWeightFetch({
       description_rendered_html: data?.description_rendered_html || "",
       title,
       visibility,
+      language_tag: languageTag,
       weight_category: data?.weight_category || "",
       weight_type: data?.weight_type || "",
     })
@@ -88,6 +92,7 @@ export default function useWeightFetch({
       maybeUrlSlugSet(undefined);
       descriptionMDSet("");
       visibilitySet("public");
+      languageTagSet("en");
     }
   }, [token, refetch]);
 
@@ -102,6 +107,7 @@ export default function useWeightFetch({
               description_markdown,
               title: resTitle,
               maybe_url_slug: resMaybeUrlSlug,
+              language_tag,
             } = res;
 
             statusSet(FetchStatus.success);
@@ -109,6 +115,7 @@ export default function useWeightFetch({
             maybeUrlSlugSet(resMaybeUrlSlug);
             descriptionMDSet(description_markdown);
             visibilitySet(creator_set_visibility);
+            languageTagSet(language_tag);
             onSuccess(res);
             setData(res);
           } else {
@@ -135,5 +142,6 @@ export default function useWeightFetch({
     update,
     visibility,
     writeStatus,
+    languageTag,
   };
 }

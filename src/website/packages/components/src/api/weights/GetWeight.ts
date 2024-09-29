@@ -2,6 +2,7 @@ import MakeRequest from "../MakeRequest";
 import { UserDetailsLight } from "../_common/UserDetailsLight";
 import { WeightCategory } from "../_common/enums/WeightCategory";
 import { WeightType } from "../_common/enums/WeightType";
+import { LanguageTag } from "../Languages";
 
 export interface Weight {
   weight_token: string;
@@ -32,6 +33,7 @@ export interface Weight {
     positive_rating_count: number;
   };
   usage_count: number;
+  language_tag: LanguageTag;
 }
 
 export interface GetWeightRequest {}
