@@ -130,6 +130,7 @@ function UploadNewTtsModelPage() {
               disabled={title === "" || !downloadUrl}
               label="Upload Model"
               icon={faUpload}
+              type="submit"
             />
           </div>
         </form>
