@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { SessionTtsModelUploadResultList } from "../../_common/SessionTtsModelUploadResultsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
