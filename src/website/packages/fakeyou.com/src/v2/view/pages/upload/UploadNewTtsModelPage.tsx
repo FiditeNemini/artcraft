@@ -13,7 +13,7 @@ import { Button, Container, Input, Label, Panel } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
 
 function UploadNewTtsModelPage() {
-  const history = useHistory();
+  // const history = useHistory();
   const { sessionWrapper } = useSession();
   const { enqueueInferenceJob } = useInferenceJobs();
 
