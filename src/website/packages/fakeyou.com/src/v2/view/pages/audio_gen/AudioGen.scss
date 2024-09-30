@@ -104,12 +104,24 @@
   background-color: rgba($action, 0.8);
   border: 2px solid lighten($action, 12%);
   display: flex;
-  align-items: center;
   transition: all 0.2s;
   cursor: pointer;
 
   .cover-img {
     margin-right: 16px;
+  }
+
+  &.fy-weight-picker-preview-selected {
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+      font-size: 18px;
+    }
   }
 
   .fy-weight-picker-preview-text {
