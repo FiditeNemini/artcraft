@@ -6,21 +6,21 @@
 //! The intent is to be able to quickly populate documents and indices.
 //!
 
+use elasticsearch::http::transport::Transport;
+use elasticsearch::Elasticsearch;
+use log::info;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::{MySql, Pool};
 use std::collections::HashSet;
 use std::iter::FromIterator;
-use elasticsearch::Elasticsearch;
-use elasticsearch::http::transport::Transport;
-use log::info;
-use sqlx::{MySql, Pool};
-use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::DEFAULT_RUST_LOG;
-use elasticsearch_schema::searches::search_model_weights::{search_model_weights, SearchArgs};
+use elasticsearch_schema::searches::search_model_weights::{search_model_weights, ModelWeightsSortDirection, ModelWeightsSortField, SearchArgs};
 use elasticsearch_schema::searches::search_tts_models::search_tts_models;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
 
-use crate::cli_args::{Action, Environment, parse_cli_args};
+use crate::cli_args::{parse_cli_args, Action, Environment};
 use crate::plans::create_all_model_weight_documents::create_all_model_weight_documents;
 use crate::plans::create_all_tts_documents::create_all_tts_documents;
 use crate::plans::media_files::create_dimensional_media_file_documents::create_dimensional_media_file_documents;
@@ -63,11 +63,15 @@ pub async fn main() -> AnyhowResult<()> {
       info!("Searching model weights...");
 
       let results = search_model_weights(SearchArgs {
-        search_term: "zel",
+        //search_term: "zel",
+        search_term: "mariano",
         maybe_creator_user_token: None,
         maybe_ietf_primary_language_subtag: None,
         maybe_weights_categories: None,
-        maybe_weights_types: Some(HashSet::from_iter(vec![WeightsType::RvcV2])),
+        maybe_weights_types: Some(HashSet::from_iter(vec![WeightsType::Tacotron2])),
+        sort_field: Some(ModelWeightsSortField::UsageCount),
+        sort_direction: Some(ModelWeightsSortDirection::Ascending),
+        minimum_score: None,
         client: &elasticsearch,
       }).await?;
 

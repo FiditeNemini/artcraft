@@ -2,14 +2,17 @@ use std::collections::HashSet;
 
 use elasticsearch::{Elasticsearch, SearchParts};
 use once_cell::sync::Lazy;
-use serde_json::{json, Value};
+use serde_json::{json, Number, Value};
 
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
-use errors::{anyhow, AnyhowResult};
+use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
 
-use crate::documents::model_weight_document::{MODEL_WEIGHT_INDEX, ModelWeightDocument};
+use crate::documents::model_weight_document::{ModelWeightDocument, MODEL_WEIGHT_INDEX};
+
+/// Cut off scores below this threshold
+const DEFAULT_MINIMUM_SCORE : u64 = 30;
 
 static JSON_QUERY : Lazy<Value> = Lazy::new(|| {
   const QUERY_TEMPLATE : &str = include_str!("../../../../../_elasticsearch/searches/model_weights/search.json");
@@ -20,99 +23,34 @@ static JSON_QUERY : Lazy<Value> = Lazy::new(|| {
   json
 });
 
-pub struct SearchModelWeightsQuery<'a> {
-  pub search_term: &'a str,
-  pub maybe_language_subtag: Option<&'a str>,
-  pub maybe_weights_type: Option<WeightsType>,
-  pub maybe_weights_category: Option<WeightsCategory>,
+#[derive(Default, Copy, Clone, Eq, PartialEq)]
+pub enum ModelWeightsSortField {
+  /// Sort based on the match score of the search term alone.
+  #[default]
+  MatchScore,
+  /// Sort based on the creation date
+  CreatedAt,
+  /// Sort based on the model usage count
+  UsageCount,
+  /// Sort based on the model bookmark count
+  BookmarkCount,
+  /// Sort based on the model positive ratings count
+  PositiveRatingCount,
 }
 
-impl <'a>SearchModelWeightsQuery<'a> {
+#[derive(Default, Copy, Clone, Eq, PartialEq)]
+pub enum ModelWeightsSortDirection {
+  Ascending,
+  #[default]
+  Descending,
+}
 
-  fn base_query(&self) -> Value {
-    json!({
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "bool": {
-                "should": [
-                  {
-                    "fuzzy": {
-                      "title": {
-                        "value": self.search_term,
-                        "fuzziness": 2
-                      }
-                    }
-                  },
-                  {
-                    "match": {
-                      "title": {
-                        "query": self.search_term,
-                        "boost": 1
-                      }
-                    }
-                  },
-                  {
-                    "multi_match": {
-                      "query": self.search_term,
-                      "type": "bool_prefix",
-                      "fields": [
-                        "title",
-                        "title._2gram",
-                        "title._3gram"
-                      ],
-                      "boost": 50
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    })
-  }
-
-  pub fn query(&self) -> AnyhowResult<Value> {
-    let mut search_json = self.base_query();
-
-    let must_clause = search_json.pointer_mut("/query/bool/must")
-        .map(|pointer| pointer.as_array_mut())
-        .flatten()
-        .ok_or_else(|| anyhow!("could not get pointer to must clause"))?;
-
-    if let Some(maybe_language_subtag) = &self.maybe_language_subtag {
-      must_clause.push(json!(
-        {
-          "match": {
-            "maybe_ietf_primary_language_subtag": maybe_language_subtag
-          }
-        }
-      ));
+impl ModelWeightsSortDirection {
+  pub fn to_str(&self) -> &str {
+    match self {
+      Self::Ascending => "asc",
+      Self::Descending => "desc",
     }
-
-    if let Some(weights_type) = &self.maybe_weights_type {
-      must_clause.push(json!(
-        {
-          "match": {
-            "weights_type": weights_type.to_string(),
-          }
-        }
-      ));
-    }
-
-    if let Some(weights_category) = &self.maybe_weights_category {
-      must_clause.push(json!(
-        {
-          "match": {
-            "weights_category": weights_category.to_string(),
-          }
-        }
-      ));
-    }
-
-    Ok(search_json)
   }
 }
 
@@ -124,11 +62,20 @@ pub struct SearchArgs<'a> {
   pub maybe_weights_categories: Option<HashSet<WeightsCategory>>,
   pub maybe_weights_types: Option<HashSet<WeightsType>>,
 
+  pub sort_field: Option<ModelWeightsSortField>,
+  pub sort_direction: Option<ModelWeightsSortDirection>,
+
+  pub minimum_score: Option<u64>,
+
   pub client: &'a Elasticsearch,
 }
 
 pub async fn search_model_weights(args: SearchArgs<'_>) -> AnyhowResult<Vec<ModelWeightDocument>> {
   let query = build_query(&args)?;
+
+  let json_query = serde_json::to_string(&query)?;
+
+  println!("Query: {:#?}", json_query);
 
   let search_response = args.client
       .search(SearchParts::Index(&[MODEL_WEIGHT_INDEX]))
@@ -213,7 +160,69 @@ fn build_query(args: &SearchArgs) -> AnyhowResult<Value> {
     Some(json!(args.search_term))
   })?;
 
+  let mut query = add_sort(query, args.sort_field, args.sort_direction);
+
+  if let Some(mut object) = query.as_object_mut() {
+    object.insert(
+      "min_score".to_string(),
+      Value::Number(Number::from(args.minimum_score.unwrap_or(DEFAULT_MINIMUM_SCORE)))
+    );
+  }
+
   Ok(query)
+}
+
+fn add_sort(
+  mut query: Value,
+  sort_field: Option<ModelWeightsSortField>,
+  sort_direction: Option<ModelWeightsSortDirection>,
+) -> Value {
+  let sort_field = sort_field.unwrap_or_default();
+  let sort_direction = sort_direction.unwrap_or_default();
+
+  if sort_field == ModelWeightsSortField::MatchScore
+      && sort_direction == ModelWeightsSortDirection::Descending {
+    return query;
+  }
+
+  let sort = match sort_field {
+    ModelWeightsSortField::CreatedAt => json!([
+      {
+        "created_at": {
+          "order": sort_direction.to_str(),
+        }
+      },
+      "_score"
+    ]),
+    ModelWeightsSortField::UsageCount => json!([
+      {
+        "cached_usage_count": {
+          "order": sort_direction.to_str(),
+        }
+      },
+      "_score"
+    ]),
+    ModelWeightsSortField::BookmarkCount => json!([
+      {
+        "bookmark_count": {
+          "order": sort_direction.to_str(),
+        }
+      },
+      "_score"
+    ]),
+    ModelWeightsSortField::PositiveRatingCount => json!({
+      "ratings_positive_count": {
+        "order": sort_direction.to_str(),
+      }
+    }),
+    _ => return query,
+  };
+
+  if let Some(mut object) = query.as_object_mut() {
+    object.insert("sort".to_string(), sort);
+  }
+
+  query
 }
 
 fn must_be_not_deleted() -> Value {
@@ -305,6 +314,9 @@ mod tests {
       maybe_ietf_primary_language_subtag: None,
       maybe_weights_categories: None,
       maybe_weights_types: None,
+      sort_field: Default::default(),
+      sort_direction: Default::default(),
+      minimum_score: None,
       client: &elasticsearch::Elasticsearch::default(),
     }).unwrap();
 
@@ -337,6 +349,9 @@ mod tests {
       maybe_ietf_primary_language_subtag: None,
       maybe_weights_categories: None,
       maybe_weights_types: None,
+      sort_field: Default::default(),
+      sort_direction: Default::default(),
+      minimum_score: None,
       client: &elasticsearch::Elasticsearch::default(),
     }).unwrap();
 
@@ -375,6 +390,9 @@ mod tests {
       maybe_weights_categories: None,
       maybe_weights_types: None,
       client: &elasticsearch::Elasticsearch::default(),
+      minimum_score: None,
+      sort_field: Default::default(),
+      sort_direction: Default::default(),
     }).unwrap();
 
     let value = jsonpath_lib::select(
@@ -414,6 +432,9 @@ mod tests {
         WeightsType::Tacotron2,
         WeightsType::GptSoVits,
       ])),
+      sort_field: Default::default(),
+      sort_direction: Default::default(),
+      minimum_score: None,
       client: &elasticsearch::Elasticsearch::default(),
     }).unwrap();
 
@@ -441,6 +462,9 @@ mod tests {
         WeightsCategory::VoiceConversion,
       ])),
       client: &elasticsearch::Elasticsearch::default(),
+      minimum_score: None,
+      sort_field: Default::default(),
+      sort_direction: Default::default(),
     }).unwrap();
 
     let value = select(&search, "$.query.bool.must[0].bool.must[0].term.is_deleted");
@@ -468,166 +492,5 @@ mod tests {
           }
         })
         .collect()
-  }
-
-  mod old_tests {
-    use regex::Regex;
-
-    use enums::by_table::model_weights::weights_category::WeightsCategory;
-    use enums::by_table::model_weights::weights_types::WeightsType;
-    use errors::AnyhowResult;
-
-    use crate::searches::search_model_weights::SearchModelWeightsQuery;
-
-    fn query_to_json_string(query: SearchModelWeightsQuery<'_>) -> AnyhowResult<String> {
-      let json = query.query()?;
-      let json = serde_json::to_string(&json)?;
-      Ok(json)
-    }
-
-    fn compact_json(json: &str) -> String {
-      let regex = Regex::new("\\s+").expect("regex should parse");
-      let json = regex.replace_all(&json, "");
-      json.to_string()
-    }
-
-    #[test]
-    fn default_search_only_keyword() {
-      let query = SearchModelWeightsQuery {
-        search_term: "FOO_BAR_BAZ",
-        maybe_language_subtag: None,
-        maybe_weights_type: None,
-        maybe_weights_category: None,
-      };
-
-      let json = query_to_json_string(query).unwrap();
-
-      // NB: Keys in emitted JSON are sorted.
-      let expected_json = r#"
-      {
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "bool": {
-                  "should": [
-                    {
-                      "fuzzy": {
-                        "title": {
-                          "value": "FOO_BAR_BAZ",
-                          "fuzziness": 2
-                        }
-                      }
-                    },
-                    {
-                      "match": {
-                        "title": {
-                          "query": "FOO_BAR_BAZ",
-                          "boost": 1
-                        }
-                      }
-                    },
-                    {
-                      "multi_match": {
-                        "query": "FOO_BAR_BAZ",
-                        "type": "bool_prefix",
-                        "fields": [
-                          "title",
-                          "title._2gram",
-                          "title._3gram"
-                        ],
-                        "boost": 50
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      }
-    "#;
-
-      let expected_json = compact_json(&expected_json);
-
-      assert_eq!(&json, &expected_json);
-    }
-
-    #[test]
-    fn search_with_language_and_weights() {
-      let query = SearchModelWeightsQuery {
-        search_term: "FOO_BAR_BAZ",
-        maybe_language_subtag: Some("en"),
-        maybe_weights_type: Some(WeightsType::SoVitsSvc),
-        maybe_weights_category: Some(WeightsCategory::Vocoder),
-      };
-
-      let json = query_to_json_string(query).unwrap();
-
-      // NB: Keys in emitted JSON are sorted.
-      let expected_json = r#"
-      {
-        "query": {
-          "bool": {
-            "must": [
-              {
-                "bool": {
-                  "should": [
-                    {
-                      "fuzzy": {
-                        "title": {
-                          "value": "FOO_BAR_BAZ",
-                          "fuzziness": 2
-                        }
-                      }
-                    },
-                    {
-                      "match": {
-                        "title": {
-                          "query": "FOO_BAR_BAZ",
-                          "boost": 1
-                        }
-                      }
-                    },
-                    {
-                      "multi_match": {
-                        "query": "FOO_BAR_BAZ",
-                        "type": "bool_prefix",
-                        "fields": [
-                          "title",
-                          "title._2gram",
-                          "title._3gram"
-                        ],
-                        "boost": 50
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "match": {
-                  "maybe_ietf_primary_language_subtag": "en"
-                }
-              },
-              {
-                "match": {
-                  "weights_type": "so_vits_svc"
-                }
-              },
-              {
-                "match": {
-                  "weights_category": "vocoder"
-                }
-              }
-            ]
-          }
-        }
-      }
-    "#;
-
-      let expected_json = compact_json(&expected_json);
-
-      assert_eq!(&json, &expected_json);
-    }
   }
 }

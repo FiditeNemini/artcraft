@@ -560,6 +560,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SearchMediaFilesSuccessResponse,
     SearchModelWeightsError,
     SearchModelWeightsRequest,
+    SearchModelWeightsSortDirection,
+    SearchModelWeightsSortField,
     SearchModelWeightsSuccessResponse,
     SessionInfoError,
     SessionInfoSuccessResponse,

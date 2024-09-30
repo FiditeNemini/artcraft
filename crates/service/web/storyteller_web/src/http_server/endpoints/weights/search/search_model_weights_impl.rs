@@ -23,7 +23,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::title_to_url_slug::title_to_url_slug;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
-use elasticsearch_schema::searches::search_model_weights::{search_model_weights, SearchArgs};
+use elasticsearch_schema::searches::search_model_weights::{search_model_weights, ModelWeightsSortDirection, ModelWeightsSortField, SearchArgs};
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
@@ -37,6 +37,31 @@ pub struct SearchModelWeightsRequest {
   pub weight_type: Option<WeightsType>,
   pub weight_category: Option<WeightsCategory>,
   pub ietf_language_subtag: Option<String>,
+  pub minimum_score: Option<u64>,
+  pub sort_field: Option<SearchModelWeightsSortField>,
+  pub sort_direction: Option<SearchModelWeightsSortDirection>,
+}
+
+#[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SearchModelWeightsSortField {
+  /// Sort based on the match score of the search term alone.
+  MatchScore,
+  /// Sort based on the creation date
+  CreatedAt,
+  /// Sort based on the model usage count
+  UsageCount,
+  /// Sort based on the model bookmark count
+  BookmarkCount,
+  /// Sort based on the model positive ratings count
+  PositiveRatingCount,
+}
+
+#[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SearchModelWeightsSortDirection {
+  Ascending,
+  Descending,
 }
 
 #[derive(Serialize, Clone, ToSchema)]
@@ -138,12 +163,30 @@ pub async fn search_model_weights_impl(
         set
       });
 
+  let sort_field = match request.sort_field {
+    Some(SearchModelWeightsSortField::MatchScore) => Some(ModelWeightsSortField::MatchScore),
+    Some(SearchModelWeightsSortField::CreatedAt) => Some(ModelWeightsSortField::CreatedAt),
+    Some(SearchModelWeightsSortField::UsageCount) => Some(ModelWeightsSortField::UsageCount),
+    Some(SearchModelWeightsSortField::BookmarkCount) => Some(ModelWeightsSortField::BookmarkCount),
+    Some(SearchModelWeightsSortField::PositiveRatingCount) => Some(ModelWeightsSortField::PositiveRatingCount),
+    None => None,
+  };
+
+  let sort_direction = match request.sort_direction {
+    Some(SearchModelWeightsSortDirection::Ascending) => Some(ModelWeightsSortDirection::Ascending),
+    Some(SearchModelWeightsSortDirection::Descending) => Some(ModelWeightsSortDirection::Descending),
+    None => None,
+  };
+
   let results = search_model_weights(SearchArgs {
     search_term: &request.search_term,
     maybe_creator_user_token: None,
     maybe_ietf_primary_language_subtag: request.ietf_language_subtag.as_deref(),
     maybe_weights_categories,
     maybe_weights_types,
+    sort_field,
+    sort_direction,
+    minimum_score: request.minimum_score,
     client: &server_state.elasticsearch,
   })
       .await
