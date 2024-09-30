@@ -4,7 +4,11 @@ import {
   FontAwesomeIcon,
   FontAwesomeIcon as Icon,
 } from "@fortawesome/react-fontawesome";
-import { faSearch, faXmark } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faSearch,
+  faXmark,
+  faXmarkCircle,
+} from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   children?: any;
@@ -47,32 +51,44 @@ export default function ModalHeader({
         }}
       >
         {search !== undefined ? (
-          <div className="position-relative w-100">
-            <Input
-              autoFocus
-              {...{
-                onChange: handleInputChange,
-                value: search,
-                placeholder: "Search...",
-                icon: faSearch,
-              }}
-            />
-            {search && (
-              <FontAwesomeIcon
-                icon={faXmark}
-                className="position-absolute opacity-75 fs-5"
-                style={{
-                  right: "1rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
+          <div className="d-flex align-items-center gap-2 flex-grow-1">
+            <div className="position-relative w-100">
+              <Input
+                autoFocus
+                {...{
+                  onChange: handleInputChange,
+                  value: search,
+                  placeholder: "Search...",
+                  icon: faSearch,
                 }}
-                onClick={clearSearch}
+              />
+              {search && (
+                <FontAwesomeIcon
+                  icon={faXmarkCircle}
+                  className="position-absolute opacity-75 fs-5"
+                  style={{
+                    right: "1rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                  }}
+                  onClick={clearSearch}
+                />
+              )}
+            </div>
+
+            {handleClose && (
+              <Icon
+                {...{
+                  className: "icon-close-button d-block d-md-none ms-1",
+                  icon: faXmark,
+                  onClick: () => handleClose(),
+                }}
               />
             )}
           </div>
         ) : (
-          <div className="d-flex gap-2 align-items-center">
+          <div className="d-flex gap-2 align-items-center flex-grow-1">
             {title && (
               <h4 className={`mb-0 fw-bold ${titleClassName}`.trim()}>
                 {title}
@@ -88,7 +104,7 @@ export default function ModalHeader({
         {handleClose && (
           <Icon
             {...{
-              className: "icon-close-button",
+              className: "icon-close-button d-none d-md-block ms-1",
               icon: faXmark,
               onClick: () => handleClose(),
             }}

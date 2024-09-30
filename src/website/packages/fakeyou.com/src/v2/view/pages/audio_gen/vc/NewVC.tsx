@@ -99,9 +99,12 @@ export default function NewVC() {
         filterCategory="voice_conversion"
       />
     ),
-    showFilters: false,
+    showFilters: true,
     showPagination: false,
     searchFilter: "voice_conversion",
+    showUserUploadCheckbox: false,
+    showTypeFilter: false,
+    showSearchFilters: true,
   };
 
   useDebounce({

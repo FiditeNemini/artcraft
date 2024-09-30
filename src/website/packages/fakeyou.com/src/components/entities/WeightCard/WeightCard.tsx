@@ -10,6 +10,10 @@ import { WeightType } from "@storyteller/components/src/api/_common/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import Stat from "components/common/Stat/Stat";
+import {
+  LanguageLabels,
+  LanguageTag,
+} from "@storyteller/components/src/api/Languages";
 
 interface Props {
   data: any;
@@ -58,21 +62,25 @@ export default function WeightCard({
   const weightTypeInfo = useWeightTypeInfo(weight_type || WeightType.NONE);
   const { label: weightType, color: weightTagColor } = weightTypeInfo;
 
+  const languageLabel =
+    LanguageLabels[data?.maybe_ietf_primary_language_subtag as LanguageTag] ||
+    "-";
+
   return (
     <>
       <div className="d-flex">
         {showCover && (
           <WeightCoverImage
             src={coverImage}
-            height={100}
-            width={100}
+            height={110}
+            width={110}
             coverIndex={data?.cover_image?.default_cover?.image_index}
           />
         )}
 
         <div className="flex-grow-1">
           <div className="d-flex align-items-center">
-            <div className="flex-grow-1">
+            <div className="d-flex flex-column flex-grow-1">
               <h6 className="fw-semibold text-white mb-1">
                 {title || details.maybe_weight_data.title}
               </h6>
@@ -89,13 +97,19 @@ export default function WeightCard({
                   showGravatar: false,
                 }}
               />
-              <div className="d-flex flex-grow-1 align-items-center gap-2 mt-2">
+              <div className="d-flex flex-grow-1 align-items-center gap-1 mt-1">
                 <CardBadge
                   className={`fy-entity-type-${weight_type || ""}`}
                   label={weightType || ""}
                   small={true}
                   color={weightTagColor || ""}
                 />
+
+                {data?.maybe_ietf_primary_language_subtag && (
+                  <CardBadge label={languageLabel} small={true} color="gray" />
+                )}
+              </div>
+              <div className="d-flex gap-2 align-items-center mt-2">
                 <div className="opacity-50">
                   <Stat count={data?.usage_count} icon={faWaveformLines} />
                 </div>

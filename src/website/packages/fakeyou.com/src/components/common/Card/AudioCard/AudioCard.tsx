@@ -16,6 +16,10 @@ import {
   // MediaFile,
   MediaLinks,
 } from "@storyteller/components/src/api/media_files";
+import {
+  LanguageLabels,
+  LanguageTag,
+} from "@storyteller/components/src/api/Languages";
 // import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
@@ -75,6 +79,10 @@ export default function AudioCard({
       data.weight_type || data.details?.maybe_weight_data?.weight_type
     );
 
+  const languageLabel =
+    LanguageLabels[data?.maybe_ietf_primary_language_subtag as LanguageTag] ||
+    "-";
+
   const card = (
     <Card
       padding={true}
@@ -126,8 +134,8 @@ export default function AudioCard({
             {showCover && (
               <WeightCoverImage
                 src={coverImage}
-                height={100}
-                width={100}
+                height={110}
+                width={110}
                 coverIndex={data?.cover_image?.default_cover?.image_index}
               />
             )}
@@ -155,26 +163,30 @@ export default function AudioCard({
                       }}
                     />
                   )}
-                  <div className="d-flex align-items-center mt-2">
-                    <div className="d-flex flex-grow-1 align-items-center gap-2">
-                      <Badge
-                        small={true}
-                        label={weightBadgeLabel}
-                        color={weightBadgeColor}
-                      />
-                      {data.usage_count && (
-                        <div className="opacity-50">
-                          <Stat
-                            count={data?.usage_count}
-                            icon={faWaveformLines}
-                          />
-                        </div>
-                      )}
-                      <span className="d-flex align-items-center gap-1 fs-7 opacity-50 text-white">
-                        <FontAwesomeIcon icon={faThumbsUp} />
-                        {data?.stats?.positive_rating_count}
-                      </span>
-                    </div>
+                  <div className="d-flex flex-grow-1 align-items-center gap-1 mt-1">
+                    <Badge
+                      small={true}
+                      label={weightBadgeLabel}
+                      color={weightBadgeColor}
+                    />
+
+                    {data?.maybe_ietf_primary_language_subtag && (
+                      <Badge label={languageLabel} small={true} color="gray" />
+                    )}
+                  </div>
+                  <div className="d-flex gap-2 align-items-center mt-2">
+                    {data.usage_count && (
+                      <div className="opacity-50">
+                        <Stat
+                          count={data?.usage_count}
+                          icon={faWaveformLines}
+                        />
+                      </div>
+                    )}
+                    <span className="d-flex align-items-center gap-1 fs-7 opacity-50 text-white">
+                      <FontAwesomeIcon icon={faThumbsUp} />
+                      {data?.stats?.positive_rating_count}
+                    </span>
                   </div>
                 </div>
               </div>

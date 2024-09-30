@@ -7,6 +7,7 @@ import {
 } from "components/entities/EntityTypes";
 import {
   Checkbox,
+  LoadingSpinner,
   ModalUtilities,
   Pagination,
   TempSelect as Select,
@@ -27,10 +28,15 @@ import {
 import {
   faArrowDownWideShort,
   faFilter,
+  faGlobe,
 } from "@fortawesome/pro-solid-svg-icons";
 import prepFilter from "resources/prepFilter";
 import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
+import {
+  LanguageLabels,
+  LanguageTag,
+} from "@storyteller/components/src/api/Languages";
 
 const n = () => {};
 
@@ -46,6 +52,9 @@ export interface MediaBrowserProps {
   showFilters?: boolean;
   showPagination?: boolean;
   searchFilter?: string;
+  showUserUploadCheckbox?: boolean;
+  showTypeFilter?: boolean;
+  showSearchFilters?: boolean;
 }
 
 interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps {}
@@ -62,7 +71,10 @@ export default function MediaBrowser({
   emptyContent,
   showFilters = true,
   showPagination = true,
-  searchFilter,
+  searchFilter = "text_to_speech", // Default
+  showUserUploadCheckbox = true,
+  showTypeFilter = true,
+  showSearchFilters = false,
 }: MediaBrowserInternal) {
   // const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
@@ -71,6 +83,11 @@ export default function MediaBrowser({
   const [localSearch, localSearchSet] = useState(search);
   const [searchUpdated, searchUpdatedSet] = useState(false);
   const [showUserUploads, showUserUploadsSet] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageTag | null>(
+    null
+  );
+  const [sortField, setSortField] = useState("mostUsed");
+  const [isSearching, isSearchingSet] = useState(false);
 
   const fetcher = [
     GetBookmarksByUser,
@@ -79,11 +96,42 @@ export default function MediaBrowser({
     SearchWeight,
   ][inputMode];
 
+  const getSortParams = (selectedValue: string) => {
+    switch (selectedValue) {
+      case "mostUsed":
+        return { sort_field: "usage_count", sort_direction: "descending" };
+      case "newest":
+        return { sort_field: "created_at", sort_direction: "descending" };
+      case "oldest":
+        return { sort_field: "created_at", sort_direction: "ascending" };
+      case "bestRated":
+        return {
+          sort_field: "positive_rating_count",
+          sort_direction: "descending",
+        };
+      case "featured":
+      default:
+        return { sort_field: null, sort_direction: null };
+    }
+  };
+
+  const sortParams = getSortParams(sortField);
+
   const entities = useListContent({
     // debug: "media browser",
     addQueries: {
-      include_user_uploads: showUserUploads,
-      ...(localSearch ? {} : { page_size: 24 }),
+      ...(showUserUploadCheckbox && { include_user_uploads: showUserUploads }),
+      ...(localSearch
+        ? {
+            sort_field: sortParams.sort_field,
+            sort_direction: sortParams.sort_direction,
+            search_term: localSearch,
+            weight_category: searchFilter,
+            ...(selectedLanguage !== null && {
+              ietf_language_subtag: selectedLanguage,
+            }),
+          }
+        : {}),
       ...prepFilter(
         filterType,
         [
@@ -100,18 +148,8 @@ export default function MediaBrowser({
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
-      // bookmarks.gather({ res, key: "token" });
-      // ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
-    ...(localSearch
-      ? {
-          request: {
-            search_term: localSearch,
-            weight_category: searchFilter ? searchFilter : "text_to_speech",
-          },
-        }
-      : {}),
     requestList: true,
     ...(localSearch ? { resultsKey: "weights" } : {}),
     urlParam: owner || username || "",
@@ -122,11 +160,13 @@ export default function MediaBrowser({
     blocked: !searchUpdated,
     onTimeout: () => {
       searchUpdatedSet(false);
+      isSearchingSet(false);
       entities.reFetch();
     },
   });
 
   const localSearchChange = ({ target }: { target: any }) => {
+    isSearchingSet(true);
     searchUpdatedSet(true);
     // entities.reFetch();
     onSearchChange({ target });
@@ -144,9 +184,26 @@ export default function MediaBrowser({
   };
 
   const sortOptions = [
-    { value: false, label: "Newest" },
-    { value: true, label: "Oldest" },
-    // { value: "mostliked", label: "Most Liked" },
+    // { value: "featured", label: "Featured" },
+    { value: "mostUsed", label: "Most Used" },
+    { value: "bestRated", label: "Best Rated" },
+    { value: "newest", label: "Newest" },
+    { value: "oldest", label: "Oldest" },
+  ];
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSortField(selectedValue);
+    getSortParams(selectedValue);
+    entities.reFetch();
+  };
+
+  const languageOptions = [
+    { value: "all", label: "All Languages" },
+    ...Object.entries(LanguageLabels).map(([value, label]) => ({
+      value,
+      label,
+    })),
   ];
 
   const onwerTxt = (entityName: string) =>
@@ -185,36 +242,52 @@ export default function MediaBrowser({
           <>
             {showFilters && (
               <>
-                <Checkbox
-                  {...{
-                    className: "mb-0",
-                    checked: showUserUploads,
-                    label: "Show my uploads",
-                    onChange: ({ target }: any) => {
+                {showUserUploadCheckbox && (
+                  <Checkbox
+                    className="mb-0"
+                    checked={showUserUploads}
+                    label="Show my uploads"
+                    onChange={({ target }: any) => {
                       entities.reFetch();
                       showUserUploadsSet(target.checked);
-                    },
-                    variant: "secondary",
-                  }}
-                />
-                <Select
-                  {...{
-                    icon: faArrowDownWideShort,
-                    options: sortOptions,
-                    name: "sort",
-                    onChange: entities.onChange,
-                    value: entities.sort,
-                  }}
-                />
-                {(!accept || (accept && accept.length)) && (
-                  <Select
-                    {...{
-                      icon: faFilter,
-                      options: filterOptions,
-                      name: "filterType",
-                      onChange: entities.onChange,
-                      value: filterType,
                     }}
+                    variant="secondary"
+                  />
+                )}
+
+                {showSearchFilters && (
+                  <div className="d-flex gap-2">
+                    <Select
+                      icon={faArrowDownWideShort}
+                      options={sortOptions}
+                      name="sortField"
+                      onChange={handleSortChange}
+                      value={sortField}
+                    />
+
+                    <Select
+                      icon={faGlobe}
+                      options={languageOptions}
+                      name="language"
+                      onChange={(selectedOption: any) => {
+                        const value = selectedOption.target.value;
+                        setSelectedLanguage(
+                          value === "all" ? null : (value as LanguageTag)
+                        );
+                        entities.reFetch();
+                      }}
+                      value={selectedLanguage || "all"}
+                    />
+                  </div>
+                )}
+
+                {((showTypeFilter && !accept) || (accept && accept.length)) && (
+                  <Select
+                    icon={faFilter}
+                    options={filterOptions}
+                    name="filterType"
+                    onChange={entities.onChange}
+                    value={filterType}
                   />
                 )}
               </>
@@ -240,7 +313,20 @@ export default function MediaBrowser({
                     list: entities.list,
                     success: entities.status === 3,
                     onClick,
-                    emptyContent: emptyContent,
+                    emptyContent:
+                      localSearch === "" ? (
+                        emptyContent
+                      ) : (
+                        <>
+                          {isSearching ? (
+                            <LoadingSpinner className="mt-5" />
+                          ) : (
+                            <div className="text-center mt-4 opacity-75">
+                              No results found.
+                            </div>
+                          )}
+                        </>
+                      ),
                   }}
                 />
               </div>

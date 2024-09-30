@@ -1,19 +1,31 @@
+import { LanguageTag } from "../Languages";
 import MakeRequest from "../MakeRequest";
+import { WeightCategory, WeightType } from "../_common/enums";
 import { Weight } from "./GetWeight";
 
-export interface SearchWeightRequest {
-  search_term: string;
-  weight_type?: string;
-  weight_category?: string;
-  ietf_language_tag?: string;
-}
+export interface SearchWeightRequest {}
 
 export interface SearchWeightResponse {
   success: boolean;
   weights?: Weight[];
 }
 
-export const SearchWeight = MakeRequest<string, SearchWeightRequest, SearchWeightResponse, {}>({
-  method: "POST",
+export interface SearchWeightParams {
+  search_term: string;
+  weight_type?: WeightType;
+  weight_category?: WeightCategory;
+  ietf_language_subtag?: LanguageTag;
+  minimum_score?: number;
+  sort_direction?: string;
+  sort_field?: string;
+}
+
+export const SearchWeight = MakeRequest<
+  string,
+  SearchWeightRequest,
+  SearchWeightResponse,
+  SearchWeightParams
+>({
+  method: "GET",
   routingFunction: () => `/v1/weights/search`,
 });

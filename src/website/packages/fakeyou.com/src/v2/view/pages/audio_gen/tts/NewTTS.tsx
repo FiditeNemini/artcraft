@@ -82,9 +82,12 @@ export default function NewTTS() {
         filterCategory="text_to_speech"
       />
     ),
-    showFilters: false,
+    showFilters: true,
     showPagination: false,
     searchFilter: "text_to_speech",
+    showUserUploadCheckbox: false,
+    showTypeFilter: false,
+    showSearchFilters: true,
   };
 
   useDebounce({

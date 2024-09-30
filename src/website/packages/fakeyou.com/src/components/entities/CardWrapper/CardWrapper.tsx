@@ -39,7 +39,14 @@ export default function CardWrapper({
   } ${onClick || canHover ? "card-clickable" : ""}`.trim();
 
   return onClick ? (
-    <div {...{ className, onClick: () => onClick(data), ...hoverProps }}>
+    <div
+      {...{
+        className,
+        onClick: () => onClick(data),
+        ...hoverProps,
+        style: { minHeight: "153px" },
+      }}
+    >
       <Card {...cardProps} />
       {featured && (
         <div className="card-featured-badge">
@@ -49,7 +56,14 @@ export default function CardWrapper({
       )}
     </div>
   ) : (
-    <Link {...{ className, to: linkUrl, ...hoverProps }}>
+    <Link
+      {...{
+        className,
+        to: linkUrl,
+        ...hoverProps,
+        style: { minHeight: "153px" },
+      }}
+    >
       <Card {...cardProps} />
     </Link>
   );

@@ -24,7 +24,7 @@ export default function Stat(props: Props) {
   return (
     <>
       {props.count !== null ? (
-        <span className="d-flex align-items-center gap-1 fs-7">
+        <span className="d-flex align-items-center gap-1 fs-7 text-white">
           {icon}
           {friendlyCount}
         </span>

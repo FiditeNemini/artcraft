@@ -44,6 +44,7 @@ export default function Card({
           //       backgroundPosition: "center",
           //     }
           //   : {}),
+          minHeight: "153px",
           height: height || "auto",
           borderWidth: borderWidth || "2px",
           borderStyle: "solid",
