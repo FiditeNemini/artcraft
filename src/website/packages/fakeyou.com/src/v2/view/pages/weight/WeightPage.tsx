@@ -47,6 +47,10 @@ import { useCanonicalLink } from "@storyteller/components/src/hooks/UseCanonical
 import { AITools } from "components/marketing";
 import Stat from "components/common/Stat/Stat";
 import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+import {
+  LanguageLabels,
+  LanguageTag,
+} from "@storyteller/components/src/api/Languages";
 
 export default function WeightPage() {
   const { canEditTtsModel, canBanUsers, user } = useSession();
@@ -278,6 +282,11 @@ export default function WeightPage() {
       [WeightCategory.WF]: { weightCategory: "Workflow Config" },
     };
 
+  const languageSubtag =
+    weight.maybe_ietf_primary_language_subtag as LanguageTag;
+
+  const languageValue: string = LanguageLabels[languageSubtag] || "Not set";
+
   let { weightCategory } = weightCategoryMap[weight.weight_category] || {
     weightCategory: "none",
   };
@@ -285,6 +294,10 @@ export default function WeightPage() {
   const voiceDetails = [
     { property: "Type", value: weightTypeFull || WeightType.NONE },
     { property: "Category", value: weightCategory },
+    {
+      property: "Language",
+      value: languageValue || "Not set",
+    },
     {
       property: "Visibility",
       value: weight.creator_set_visibility,

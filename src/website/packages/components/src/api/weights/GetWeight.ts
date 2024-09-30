@@ -33,7 +33,7 @@ export interface Weight {
     positive_rating_count: number;
   };
   usage_count: number;
-  language_tag: LanguageTag;
+  maybe_ietf_primary_language_subtag?: LanguageTag | null;
 }
 
 export interface GetWeightRequest {}

@@ -31,7 +31,7 @@ export default function useWeightFetch({
   const [title, titleSet] = useState("");
   const [maybeUrlSlug, maybeUrlSlugSet] = useState(undefined);
   const [visibility, visibilitySet] = useState("public");
-  const [languageTag, languageTagSet] = useState<LanguageTag>("en");
+  const [languageTag, languageTagSet] = useState<LanguageTag>("en" || null);
   const [descriptionMD, descriptionMDSet] = useState("");
   const isLoading =
     status === FetchStatus.ready || status === FetchStatus.in_progress;
@@ -107,7 +107,7 @@ export default function useWeightFetch({
               description_markdown,
               title: resTitle,
               maybe_url_slug: resMaybeUrlSlug,
-              language_tag,
+              maybe_ietf_primary_language_subtag,
             } = res;
 
             statusSet(FetchStatus.success);
@@ -115,7 +115,7 @@ export default function useWeightFetch({
             maybeUrlSlugSet(resMaybeUrlSlug);
             descriptionMDSet(description_markdown);
             visibilitySet(creator_set_visibility);
-            languageTagSet(language_tag);
+            languageTagSet(maybe_ietf_primary_language_subtag);
             onSuccess(res);
             setData(res);
           } else {

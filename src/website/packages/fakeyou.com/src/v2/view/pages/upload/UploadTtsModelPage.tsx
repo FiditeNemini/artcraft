@@ -9,11 +9,16 @@ import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { useInferenceJobs, useSession } from "hooks";
-
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
-import { Container } from "components/common";
+import {
+  Button,
+  Container,
+  Input,
+  Label,
+  Panel,
+  TempSelect,
+} from "components/common";
+import { faUpload } from "@fortawesome/pro-solid-svg-icons";
 
 interface TtsModelUploadJobResponsePayload {
   success: boolean;
@@ -122,8 +127,8 @@ function UploadTtsModelPage() {
   };
 
   return (
-    <div>
-      <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
+    <Container type="panel" className="mt-5">
+      <Panel clear={true}>
         <div className="d-flex flex-column">
           <h1 className=" fw-bold">Upload Voice (TTS Model)</h1>
           <h4>This works just like YouTube!</h4>
@@ -134,9 +139,7 @@ function UploadTtsModelPage() {
             />
           </div>
         </div>
-      </div>
 
-      <div className="container px-md-4 px-lg-5 px-xl-3">
         <div className="alert alert-primary">
           <strong>Content Creator Rewards!</strong>
           {/*<p>You can help FakeYou grow by uploading Tacotron2 models. 
@@ -149,9 +152,7 @@ function UploadTtsModelPage() {
             featured roles in Discord, queue priority, and more!
           </div>
         </div>
-      </div>
 
-      <div className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3">
         <p>
           If you're new to voice cloning, join our{" "}
           <span>
@@ -177,77 +178,66 @@ function UploadTtsModelPage() {
         Please do not upload voices that you didn't train yourself or voices of individuals
         who wish to not be voice cloned. We'll post a list of banned voices soon.
       </p>*/}
-      </div>
+      </Panel>
 
-      <form onSubmit={handleFormSubmit}>
-        <div className="container-panel py-5">
-          <div className="panel p-3 py-4 p-lg-4">
-            <div className="d-flex flex-column gap-4">
-              {/* Model Type */}
-              <div>
-                <label className="sub-title">TTS Model Type</label>
-                <div className="control select">
-                  <select
-                    className="form-select"
-                    name="tts_model_type"
-                    onChange={handleModelTypeChange}
-                    value={modelType}
-                  >
-                    <option value="tacotron2">Tacotron 2</option>
-                    <option value="vits">VITS</option>
-                  </select>
-                </div>
-              </div>
+      <Panel padding={true} className="mt-5">
+        <form onSubmit={handleFormSubmit}>
+          <div className="d-flex flex-column gap-4 mb-4">
+            {/* Model Type */}
+            <div>
+              <Label label="TTS Model Type" />
+              <TempSelect
+                name="tts_model_type"
+                onChange={handleModelTypeChange}
+                value={modelType}
+                options={[
+                  { value: "tacotron2", label: "Tacotron 2" },
+                  { value: "vits", label: "VITS" },
+                ]}
+              />
+            </div>
 
-              {/* Title */}
-              <div>
-                <label className="sub-title">
-                  Title, eg. "Goku (Sean Schemmel)"
-                </label>
-                <div className="form-group">
-                  <input
-                    className="form-control"
-                    type="text"
-                    placeholder="Title"
-                    value={title}
-                    onChange={handleTitleChange}
-                  />
-                </div>
-                <p className="help">{titleInvalidReason}</p>
-              </div>
+            {/* Title */}
+            <div>
+              <Label label='Title, eg. "Goku (Sean Schemmel)"' />
+              <Input
+                type="text"
+                placeholder="Title"
+                value={title}
+                onChange={handleTitleChange}
+              />
+              <p className="help">{titleInvalidReason}</p>
+            </div>
 
-              {/* Download URL */}
-              <div>
-                <label className="sub-title">
-                  Download URL, eg. Google Drive link
-                </label>
-                <div className="form-group">
-                  <input
-                    className="form-control"
-                    type="text"
-                    placeholder="Download URL"
-                    value={downloadUrl}
-                    onChange={handleDownloadUrlChange}
-                  />
-                </div>
+            {/* Download URL */}
+            <div>
+              <Label label="Download URL, eg. Google Drive link" />
+              <Input
+                type="text"
+                placeholder="Download URL"
+                value={downloadUrl}
+                onChange={handleDownloadUrlChange}
+              />
+              {downloadUrlInvalidReason && (
                 <p className="help">{downloadUrlInvalidReason}</p>
-              </div>
+              )}
             </div>
           </div>
-        </div>
 
-        <div className="container pb-5">
-          <button className="btn btn-primary w-100">Upload</button>
-        </div>
-      </form>
+          <div className="d-flex justify-content-end w-100">
+            <Button
+              disabled={title === "" || !downloadUrl}
+              label="Upload Model"
+              icon={faUpload}
+            />
+          </div>
+        </form>
+      </Panel>
 
-      <SessionTtsModelUploadResultList />
-
-      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
-        <MentionsSection />
-        <StorytellerStudioCTA />
-      </Container>
-    </div>
+      <div className="mt-5">
+        <SessionTtsModelUploadResultList />
+      </div>
+    </Container>
   );
 }
 

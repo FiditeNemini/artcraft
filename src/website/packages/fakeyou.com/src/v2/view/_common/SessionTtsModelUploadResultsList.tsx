@@ -1,11 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { useInferenceJobs } from "hooks";
+import { Button, Panel } from "components/common";
 
 // interface Props {}
 
@@ -52,17 +52,21 @@ function SessionTtsModelUploadResultList() {
           </div>
         );
       } else {
-        let ttsPermalink = `/tts/${job.maybeModelToken}`;
+        let ttsPermalink = `/weight/${job.maybeModelToken}`;
 
         results.push(
-          <div key={job.jobToken}>
-            <div className="panel py-4 p-3 p-lg-4 gap-4">
-              Complete!
-              <Link to={ttsPermalink} className="btn btn-primary ms-4">
-                See &amp; use TTS model
-              </Link>
+          <Panel padding={true} key={job.jobToken}>
+            <div className="d-flex align-items-center">
+              <span className="flex-grow-1 fs-5 fw-medium">Complete!</span>
+              <div>
+                <Button
+                  variant="secondary"
+                  label="See &amp; use TTS model"
+                  to={ttsPermalink}
+                />
+              </div>
             </div>
-          </div>
+          </Panel>
         );
       }
     });
@@ -84,10 +88,8 @@ function SessionTtsModelUploadResultList() {
 
   return (
     <div>
-      <div className="container-panel pt-4 pb-5">
-        <div className="pb-4">{title}</div>
-        <div className="d-flex flex-column gap-4">{results}</div>
-      </div>
+      <div className="pb-4">{title}</div>
+      <div className="d-flex flex-column gap-4">{results}</div>
     </div>
   );
 }
