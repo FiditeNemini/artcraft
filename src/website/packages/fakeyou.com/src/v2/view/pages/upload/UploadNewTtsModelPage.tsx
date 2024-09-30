@@ -74,7 +74,6 @@ function UploadNewTtsModelPage() {
           res.job_token,
           FrontendInferenceJobType.TextToSpeech
         );
-        history.push("/");
       }
     });
 

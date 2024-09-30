@@ -15,7 +15,6 @@ export interface SearchWeightParams {
   weight_type?: WeightType;
   weight_category?: WeightCategory;
   ietf_language_subtag?: LanguageTag;
-  minimum_score?: number;
   sort_direction?: string;
   sort_field?: string;
 }

@@ -86,7 +86,7 @@ export default function MediaBrowser({
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageTag | null>(
     null
   );
-  const [sortField, setSortField] = useState("mostUsed");
+  const [sortField, setSortField] = useState("bestMatch");
   const [isSearching, isSearchingSet] = useState(false);
 
   const fetcher = [
@@ -98,6 +98,8 @@ export default function MediaBrowser({
 
   const getSortParams = (selectedValue: string) => {
     switch (selectedValue) {
+      case "bestMatch":
+        return { sort_field: "match_score", sort_direction: null };
       case "mostUsed":
         return { sort_field: "usage_count", sort_direction: "descending" };
       case "newest":
@@ -123,8 +125,12 @@ export default function MediaBrowser({
       ...(showUserUploadCheckbox && { include_user_uploads: showUserUploads }),
       ...(localSearch
         ? {
-            sort_field: sortParams.sort_field,
-            sort_direction: sortParams.sort_direction,
+            ...(sortParams.sort_field !== null && {
+              sort_field: sortParams.sort_field,
+            }),
+            ...(sortParams.sort_direction !== null && {
+              sort_direction: sortParams.sort_direction,
+            }),
             search_term: localSearch,
             weight_category: searchFilter,
             ...(selectedLanguage !== null && {
@@ -185,6 +191,7 @@ export default function MediaBrowser({
 
   const sortOptions = [
     // { value: "featured", label: "Featured" },
+    { value: "bestMatch", label: "Best Match" },
     { value: "mostUsed", label: "Most Used" },
     { value: "bestRated", label: "Best Rated" },
     { value: "newest", label: "Newest" },
