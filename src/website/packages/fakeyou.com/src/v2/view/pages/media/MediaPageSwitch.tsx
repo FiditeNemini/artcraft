@@ -23,12 +23,11 @@ import { ActionButtonProps, Container, Modal } from "components/common";
 import MediaPage from "./MediaPage";
 import VideoMediaPage from "./VideoMediaPage";
 
-import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
+import { faStarShooting, faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
 import { faStarShooting as faStarShootingOutline } from "@fortawesome/pro-regular-svg-icons";
 
 import "./MediaPage.scss";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import { faThumbsUp } from "@fortawesome/pro-solid-svg-icons";
 import { faThumbsUp as faThumbsUpOutline } from "@fortawesome/pro-regular-svg-icons";
 
 type AnimationOptions = AnimationType | null;

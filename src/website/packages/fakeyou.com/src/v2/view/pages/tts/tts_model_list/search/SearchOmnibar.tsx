@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { ExploreVoicesTray } from "./components/ExploreVoicesTray";
-import { faChevronDown, faChevronUp } from "@fortawesome/pro-duotone-svg-icons";
+import { faChevronDown, faChevronUp } from "@fortawesome/pro-solid-svg-icons";
 import { ScopedVoiceModelOptions } from "./components/ScopedVoiceModelOptions";
 import { VoiceCountLabel } from "./components/VoiceCountLabel";
 import { Analytics } from "../../../../../../common/Analytics";

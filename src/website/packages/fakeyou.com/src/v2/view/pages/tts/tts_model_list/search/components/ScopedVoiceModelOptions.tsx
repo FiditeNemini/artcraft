@@ -7,7 +7,7 @@ import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../../../_common/react_select/FastReactSelectOption";
 import { Analytics } from "../../../../../../../common/Analytics";
 import { FixedSingleValueSelectOption } from "../../../../../_common/react_select/FixedSingleValueSelectOption";
-import { faMicrophone } from "@fortawesome/pro-duotone-svg-icons";
+import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -66,7 +66,7 @@ export function ScopedVoiceModelOptions(props: Props) {
   }
 
   let options: DropdownOption[] = leafiestCategoryModels
-    .filter((ttsModel) => {
+    .filter(ttsModel => {
       // Scope to currently selected language
       if (props.selectedTtsLanguageScope === "*") {
         return true; // NB: Sentinel value of "*" means all languages.
@@ -75,7 +75,7 @@ export function ScopedVoiceModelOptions(props: Props) {
         ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope
       );
     })
-    .map((ttsModel) => {
+    .map(ttsModel => {
       return {
         label: ttsModel.title,
         value: ttsModel.model_token,
@@ -85,7 +85,7 @@ export function ScopedVoiceModelOptions(props: Props) {
     });
 
   let selectedOption = options.find(
-    (option) => option.value === maybeSelectedTtsModel?.model_token
+    option => option.value === maybeSelectedTtsModel?.model_token
   );
 
   if (selectedOption === undefined && options.length > 0) {

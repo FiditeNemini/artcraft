@@ -5,7 +5,7 @@ import {
   faStar,
   faStarHalfAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { faStarExclamation } from "@fortawesome/pro-duotone-svg-icons";
+import { faStarExclamation } from "@fortawesome/pro-solid-svg-icons";
 import { prettyNum, ROUNDING_MODE } from "pretty-num";
 import { useLocalize } from "hooks";
 

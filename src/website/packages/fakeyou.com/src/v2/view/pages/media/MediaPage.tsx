@@ -22,6 +22,8 @@ import {
   faArrowRightArrowLeft,
   faFilm,
   faLips,
+  faCube,
+  faStarShooting,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -50,7 +52,6 @@ import { DeleteFeaturedItem } from "@storyteller/components/src/api/featured_ite
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
-import { faCube, faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
 import { AITools } from "components/marketing";
