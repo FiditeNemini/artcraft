@@ -9,19 +9,28 @@ import { useInferenceJobs, useSession } from "hooks";
 
 import { EnqueueGsvModelDownload } from "@storyteller/components/src/api/model_downloads/EnqueueGsvModelDownload";
 import { Button, Container, Input, Label, Panel } from "components/common";
-import { faUpload } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowRight,
+  faCheckCircle,
+  faUpload,
+} from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function UploadNewTtsModelPage() {
   // const history = useHistory();
-  const { sessionWrapper } = useSession();
+  const { sessionWrapper, user } = useSession();
   const { enqueueInferenceJob } = useInferenceJobs();
 
   const [downloadUrl, setDownloadUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
 
   // Form errors
   const [downloadUrlInvalidReason] = useState("");
   const [titleInvalidReason] = useState("");
+
+  const [isUploading, setIsUploading] = useState(false);
 
   if (!sessionWrapper.isLoggedIn()) {
     return (
@@ -47,6 +56,8 @@ function UploadNewTtsModelPage() {
     ev.preventDefault();
     const downloadUrlValue = (ev.target as HTMLInputElement).value;
     setDownloadUrl(downloadUrlValue);
+    setAlertTitle("");
+    setShowAlert(false);
     return false;
   };
 
@@ -54,11 +65,15 @@ function UploadNewTtsModelPage() {
     ev.preventDefault();
     const titleValue = (ev.target as HTMLInputElement).value;
     setTitle(titleValue);
+    setAlertTitle("");
+    setShowAlert(false);
     return false;
   };
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
+
+    setIsUploading(true);
 
     await EnqueueGsvModelDownload("", {
       uuid_idempotency_token: uuidv4(),
@@ -69,10 +84,12 @@ function UploadNewTtsModelPage() {
       //creator_set_visibility?:	string;
     }).then((res: any) => {
       if (res && res.success) {
-        enqueueInferenceJob(
-          res.job_token,
-          FrontendInferenceJobType.TextToSpeech
-        );
+        enqueueInferenceJob(res.job_token, FrontendInferenceJobType.Unknown);
+        setIsUploading(false);
+        setAlertTitle(title);
+        setShowAlert(true);
+        setDownloadUrl("");
+        setTitle("");
       }
     });
 
@@ -123,12 +140,35 @@ function UploadNewTtsModelPage() {
             </div>
           </div>
 
-          <div className="d-flex justify-content-end w-100">
+          <div className="d-flex justify-content-end align-items-center w-100 gap-4 flex-wrap">
+            {showAlert && (
+              <div className="alert alert-success alert-dismissible fade show flex-grow-1 mb-0">
+                <button
+                  type="button"
+                  className="btn-close p-3 fs-7"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                  onClick={() => setShowAlert(false)}
+                />
+                <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                Voice model <span className="fw-bold">'{alertTitle}'</span>{" "}
+                upload enqueued successfully! It should appear on your profile
+                in a minute or two if your download link is valid.{" "}
+                <Link
+                  to={`/profile/${user.display_name}/weights`}
+                  className="fw-semibold"
+                >
+                  Go to your profile <FontAwesomeIcon icon={faArrowRight} />
+                </Link>
+              </div>
+            )}
+
             <Button
               disabled={title === "" || !downloadUrl}
               label="Upload Model"
               icon={faUpload}
               type="submit"
+              isLoading={isUploading}
             />
           </div>
         </form>
