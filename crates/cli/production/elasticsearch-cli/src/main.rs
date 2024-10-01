@@ -15,16 +15,16 @@ use std::collections::HashSet;
 use std::iter::FromIterator;
 
 use config::shared_constants::DEFAULT_RUST_LOG;
-use elasticsearch_schema::searches::search_model_weights::{search_model_weights, ModelWeightsSortDirection, ModelWeightsSortField, SearchArgs};
 use elasticsearch_schema::searches::search_tts_models::search_tts_models;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
 
 use crate::cli_args::{parse_cli_args, Action, Environment};
-use crate::plans::create_all_model_weight_documents::create_all_model_weight_documents;
 use crate::plans::create_all_tts_documents::create_all_tts_documents;
 use crate::plans::media_files::create_dimensional_media_file_documents::create_dimensional_media_file_documents;
 use crate::plans::media_files::test_search_media_files_documents::test_search_media_files;
+use crate::plans::model_weights::create_all_model_weight_documents::create_all_model_weight_documents;
+use crate::plans::model_weights::test_search_model_weights_documents::test_search_model_weights_documents;
 
 pub mod cli_args;
 pub mod plans;
@@ -61,19 +61,7 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::SearchModelWeights => {
       info!("Searching model weights...");
-
-      let results = search_model_weights(SearchArgs {
-        //search_term: "zel",
-        search_term: "mariano",
-        maybe_creator_user_token: None,
-        maybe_ietf_primary_language_subtag: None,
-        maybe_weights_categories: None,
-        maybe_weights_types: Some(HashSet::from_iter(vec![WeightsType::Tacotron2])),
-        sort_field: Some(ModelWeightsSortField::UsageCount),
-        sort_direction: Some(ModelWeightsSortDirection::Ascending),
-        minimum_score: None,
-        client: &elasticsearch,
-      }).await?;
+      let results = test_search_model_weights_documents(&elasticsearch).await?;
 
       for result in results {
         println!("Result: {:#?}", result);

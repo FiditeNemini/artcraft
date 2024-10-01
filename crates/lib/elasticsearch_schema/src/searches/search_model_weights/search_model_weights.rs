@@ -10,12 +10,12 @@ use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
 
 use crate::documents::model_weight_document::{ModelWeightDocument, MODEL_WEIGHT_INDEX};
-
-/// Cut off scores below this threshold
-const DEFAULT_MINIMUM_SCORE : u64 = 30;
+use crate::searches::search_model_weights::min_score::add_min_score;
+use crate::searches::search_model_weights::predicates::{creator_user_token_predicate, language_subtag_predicate, must_be_not_deleted, weights_categories_predicates, weights_types_predicates};
+use crate::searches::search_model_weights::sort::add_sort;
 
 static JSON_QUERY : Lazy<Value> = Lazy::new(|| {
-  const QUERY_TEMPLATE : &str = include_str!("../../../../../_elasticsearch/searches/model_weights/search.json");
+  const QUERY_TEMPLATE : &str = include_str!("../../../../../../_elasticsearch/searches/model_weights/search.json");
 
   let json : Value = serde_json::from_str(QUERY_TEMPLATE)
       .expect("json should parse");
@@ -160,135 +160,10 @@ fn build_query(args: &SearchArgs) -> AnyhowResult<Value> {
     Some(json!(args.search_term))
   })?;
 
-  let mut query = add_sort(query, args.sort_field, args.sort_direction);
-
-  if let Some(mut object) = query.as_object_mut() {
-    object.insert(
-      "min_score".to_string(),
-      Value::Number(Number::from(args.minimum_score.unwrap_or(DEFAULT_MINIMUM_SCORE)))
-    );
-  }
+  let query = add_sort(query, args.sort_field, args.sort_direction);
+  let query = add_min_score(query, args.search_term, args.minimum_score);
 
   Ok(query)
-}
-
-fn add_sort(
-  mut query: Value,
-  sort_field: Option<ModelWeightsSortField>,
-  sort_direction: Option<ModelWeightsSortDirection>,
-) -> Value {
-  let sort_field = sort_field.unwrap_or_default();
-  let sort_direction = sort_direction.unwrap_or_default();
-
-  if sort_field == ModelWeightsSortField::MatchScore
-      && sort_direction == ModelWeightsSortDirection::Descending {
-    return query;
-  }
-
-  let sort = match sort_field {
-    ModelWeightsSortField::CreatedAt => json!([
-      {
-        "created_at": {
-          "order": sort_direction.to_str(),
-        }
-      },
-      "_score"
-    ]),
-    ModelWeightsSortField::UsageCount => json!([
-      {
-        "cached_usage_count": {
-          "order": sort_direction.to_str(),
-        }
-      },
-      "_score"
-    ]),
-    ModelWeightsSortField::BookmarkCount => json!([
-      {
-        "bookmark_count": {
-          "order": sort_direction.to_str(),
-        }
-      },
-      "_score"
-    ]),
-    ModelWeightsSortField::PositiveRatingCount => json!({
-      "ratings_positive_count": {
-        "order": sort_direction.to_str(),
-      }
-    }),
-    _ => return query,
-  };
-
-  if let Some(mut object) = query.as_object_mut() {
-    object.insert("sort".to_string(), sort);
-  }
-
-  query
-}
-
-fn must_be_not_deleted() -> Value {
-  json!({
-    "term": {
-      "is_deleted": false,
-    }
-  })
-}
-
-// fn featured_predicate(is_featured: bool) -> Value {
-//   json!({
-//     "term": {
-//       "is_featured": is_featured,
-//     }
-//   })
-// }
-
-fn creator_user_token_predicate(creator_user_token: &UserToken) -> Value {
-  json!({
-    "term": {
-      "maybe_creator_user_token": creator_user_token.as_str(),
-    }
-  })
-}
-
-fn language_subtag_predicate(language_subtag: &str) -> Value {
-  json!({
-    "term": {
-      "maybe_ietf_primary_language_subtag": language_subtag,
-    }
-  })
-}
-
-
-fn weights_categories_predicates(weights_categories: &HashSet<WeightsCategory>) -> Value {
-  should_predicates(weights_categories.iter()
-      .map(|weight_category| {
-        json!({
-          "term": {
-            "weights_category": weight_category.to_str(),
-          }
-        })
-      })
-      .collect())
-}
-
-fn weights_types_predicates(weights_types: &HashSet<WeightsType>) -> Value {
-  should_predicates(weights_types.iter()
-      .map(|weights_type| {
-        json!({
-          "term": {
-            "weights_type": weights_type.to_str(),
-          }
-        })
-      })
-      .collect())
-}
-
-// NB: "Should" is a logical OR.
-fn should_predicates(predicates: Vec<Value>) -> Value {
-  json!({
-    "bool": {
-      "should": predicates,
-    }
-  })
 }
 
 
@@ -303,8 +178,8 @@ mod tests {
   use enums::by_table::model_weights::weights_types::WeightsType;
   use tokens::tokens::users::UserToken;
 
-  use crate::searches::search_model_weights::build_query;
-  use crate::searches::search_model_weights::SearchArgs;
+  use crate::searches::search_model_weights::search_model_weights::build_query;
+  use crate::searches::search_model_weights::search_model_weights::SearchArgs;
 
   #[test]
   fn test_default_search() {
