@@ -88,6 +88,7 @@
 /dev-vc*               /website/index.html   200
 /testing*              /website/index.html   200
 /tts-dev*              /website/index.html   200
+/test-privacy          /website/privacy_policy_fakeyou.html   200
 
 # Old paths - Live Portrait
 /acting-face*          /ai-live-portrait     301
