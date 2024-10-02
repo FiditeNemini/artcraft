@@ -4,7 +4,7 @@ use tokens::tokens::tags::TagToken;
 
 use crate::utils::transactor::Transactor;
 
-pub struct Tag {
+pub struct EntityTag {
   pub token: TagToken,
   pub tag_value: String,
 }
@@ -12,7 +12,7 @@ pub struct Tag {
 pub async fn list_tags_for_entity(
   tag_entity: TagUseEntity,
   transactor: Transactor<'_, '_>,
-) -> AnyhowResult<Vec<Tag>> {
+) -> AnyhowResult<Vec<EntityTag>> {
 
   let (entity_type, entity_token) = tag_entity.get_composite_keys();
 
@@ -51,7 +51,7 @@ LIMIT 500
   };
 
   Ok(results.into_iter()
-      .map(|record| Tag {
+      .map(|record| EntityTag {
         token: record.token,
         tag_value: record.tag_value,
       })
