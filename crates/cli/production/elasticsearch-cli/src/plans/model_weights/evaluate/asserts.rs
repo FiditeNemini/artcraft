@@ -1,9 +1,11 @@
 use std::collections::HashSet;
 use elasticsearch::Elasticsearch;
 use log::error;
+use elasticsearch_schema::documents::model_weight_document::ModelWeightDocument;
 use errors::{anyhow, AnyhowResult};
+use tokens::tokens::model_weights::ModelWeightToken;
 use crate::plans::model_weights::evaluate::search::search_term_only;
-use crate::plans::model_weights::evaluate::titles::{print_titles, to_title_set};
+use crate::plans::model_weights::evaluate::print_debugging::{print_titles, to_title_set};
 
 pub async fn assert_search_term_contains_titles(
   client: &Elasticsearch,
@@ -42,3 +44,40 @@ pub fn assert_contains_all(titles: &HashSet<String>, expected: &Vec<&str>, searc
   Ok(())
 }
 
+pub fn assert_results_contain_tokens(
+  results: &Vec<ModelWeightDocument>,
+  expected_tokens: &[&str],
+) -> AnyhowResult<()> {
+  let tokens = results.iter()
+      .map(|result| result.token.clone())
+      .collect::<HashSet<_>>();
+
+  for token in expected_tokens.iter() {
+    let token = ModelWeightToken::new_from_str(token);
+    if !tokens.contains(&token) {
+      error!("Expected token not found: {}", token);
+      return Err(anyhow!("Expected token not found: {}", token));
+    }
+  }
+
+  Ok(())
+}
+
+pub fn assert_results_do_not_contain_tokens(
+  results: &Vec<ModelWeightDocument>,
+  expected_tokens: &[&str],
+) -> AnyhowResult<()> {
+  let tokens = results.iter()
+      .map(|result| result.token.clone())
+      .collect::<HashSet<_>>();
+
+  for token in expected_tokens.iter() {
+    let token = ModelWeightToken::new_from_str(token);
+    if tokens.contains(&token) {
+      error!("Unexpected token found: {}", token);
+      return Err(anyhow!("Unexpected token found: {}", token));
+    }
+  }
+
+  Ok(())
+}
