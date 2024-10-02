@@ -34,6 +34,7 @@ use sqlx::MySqlConnection;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::tags::TagToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_results::TtsResultToken;
 use tokens::tokens::users::UserToken;
@@ -41,7 +42,6 @@ use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
-use tokens::tokens::tags::TagToken;
 
 /// For the URL PathInfo
 #[derive(Deserialize, ToSchema)]
