@@ -88,7 +88,10 @@
 /dev-vc*               /website/index.html   200
 /testing*              /website/index.html   200
 /tts-dev*              /website/index.html   200
-/test-privacy          /website/privacy_policy_fakeyou.html   200
+/test-privacy-fy       /website/privacy_policy_fakeyou.html   200
+/test-privacy-st       /website/privacy_policy_storyteller.html   200
+/test-terms-fy         /website/tos_fakeyou.html   200
+/test-terms-st         /website/tos_storyteller.html   200
 
 # Old paths - Live Portrait
 /acting-face*          /ai-live-portrait     301
@@ -136,6 +139,10 @@
 /favicon-16x16.png            /website/favicon-16x16.png           200
 /favicon-32x32.png            /website/favicon-32x32.png           200
 /favicon.ico                  /website/favicon.ico                 200
+
+
+# CSS for staic pages:
+/static.css   /static.css  200
 
 # NB: We can't use a root level glob as that blocks 
 # downstream netlify.toml redirects.
