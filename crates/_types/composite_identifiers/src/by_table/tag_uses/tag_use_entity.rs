@@ -10,6 +10,13 @@ pub enum TagUseEntity {
 
 // TODO(bt, 2024-01-16): Codegen? Make traits for these? Maybe overkill.
 impl TagUseEntity {
+  pub fn from_entity_type_and_token(entity_type: TagUseEntityType, token: &str) -> Self {
+    match entity_type {
+      TagUseEntityType::ModelWeight => Self::ModelWeight(ModelWeightToken::new_from_str(token)),
+      TagUseEntityType::MediaFile => Self::MediaFile(MediaFileToken::new_from_str(token)),
+    }
+  }
+
   pub fn get_entity_type(&self) -> TagUseEntityType {
     match self {
       Self::MediaFile(_) => TagUseEntityType::MediaFile,

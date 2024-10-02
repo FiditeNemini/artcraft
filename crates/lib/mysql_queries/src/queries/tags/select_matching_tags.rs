@@ -9,8 +9,8 @@ pub struct MatchingTag {
   pub tag_value: String,
 }
 
-pub async fn list_tags_for_entity(
-  tag_values: &[&str],
+pub async fn select_matching_tags(
+  tag_values: &[String],
   transactor: Transactor<'_, '_>,
 ) -> AnyhowResult<Vec<MatchingTag>> {
   if tag_values.is_empty() {
@@ -26,7 +26,6 @@ pub async fn list_tags_for_entity(
 SELECT
     t.token as `token: tokens::tokens::tags::TagToken`,
     t.tag_value
-
 FROM
     tags AS t
 WHERE

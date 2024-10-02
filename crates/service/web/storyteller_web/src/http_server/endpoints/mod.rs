@@ -26,6 +26,7 @@ pub mod service;
 pub mod stats;
 pub mod stubs;
 pub mod subscriptions;
+pub mod tags;
 pub mod trending;
 pub mod tts;
 pub mod user_bookmarks;
