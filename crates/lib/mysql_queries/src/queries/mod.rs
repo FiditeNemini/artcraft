@@ -24,6 +24,7 @@ pub mod model_weights;
 pub mod prompts;
 pub mod public_event_feed;
 pub mod stats;
+pub mod tags;
 pub mod trending_model_analytics;
 pub mod tts;
 pub mod twitch;

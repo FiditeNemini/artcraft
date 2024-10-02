@@ -1,4 +1,5 @@
 
+// TODO(bt,2024-10-01): This is only used for inserts into the idempotency table. We should move or rename it.
 #[derive(Debug)]
 pub enum DatabaseQueryError {
   /// A duplicate idempotency token error occurred.

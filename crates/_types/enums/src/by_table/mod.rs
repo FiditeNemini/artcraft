@@ -14,6 +14,7 @@ pub mod media_uploads;
 pub mod model_categories;
 pub mod model_weights;
 pub mod prompts;
+pub mod tag_uses;
 pub mod trending_model_analytics;
 pub mod tts_models;
 pub mod usages;
