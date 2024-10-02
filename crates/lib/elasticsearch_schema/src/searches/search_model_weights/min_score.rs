@@ -21,12 +21,12 @@ pub fn add_min_score(
   }
 
   let minimum_score = match search_term.len() {
-    1..=3 => 1,
-    4 => 5,
-    5 => 10,
-    6 => 30,
-    7 => 50,
-    _ => 100,
+    1..=3 => 0,
+    4 => 1,
+    5 => 3,
+    6 => 5,
+    7 => 7,
+    _ => 10,
   };
 
   if let Some(mut object) = query.as_object_mut() {

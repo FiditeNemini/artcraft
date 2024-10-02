@@ -30,6 +30,9 @@ pub enum Action {
   /// Search the model weights
   SearchModelWeights,
 
+  /// Evaluate the search algorithm
+  EvaluateModelWeights,
+
   /// Reindex media_files into ElasticSearch
   /// For now, this is just media files that are relevant to the engine.
   ReindexMediaFiles,

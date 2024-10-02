@@ -24,6 +24,7 @@ use crate::plans::create_all_tts_documents::create_all_tts_documents;
 use crate::plans::media_files::create_dimensional_media_file_documents::create_dimensional_media_file_documents;
 use crate::plans::media_files::test_search_media_files_documents::test_search_media_files;
 use crate::plans::model_weights::create_all_model_weight_documents::create_all_model_weight_documents;
+use crate::plans::model_weights::evaluate::evaluate_model_weights_search::evaluate_model_weights_search;
 use crate::plans::model_weights::test_search_model_weights_documents::test_search_model_weights_documents;
 
 pub mod cli_args;
@@ -33,7 +34,7 @@ pub mod plans;
 pub async fn main() -> AnyhowResult<()> {
   println!("elasticsearch-cli: operational tooling for Elasticsearch");
 
-  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+  easyenv::init_all_with_default_logging(Some("info"));
 
   // NB: This secrets file differs from the rest because we might actually want to cross
   // development/production boundaries for seeding, or scope to production for rebuilding indices.
@@ -66,6 +67,10 @@ pub async fn main() -> AnyhowResult<()> {
       for result in results {
         println!("Result: {:#?}", result);
       }
+    }
+    Action::EvaluateModelWeights => {
+      info!("Evaluate model weights search...");
+      let _ = evaluate_model_weights_search(&elasticsearch).await?;
     }
     Action::ReindexMediaFiles => {
       info!("Reindexing media files...");
