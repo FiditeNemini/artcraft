@@ -11,7 +11,6 @@ import VideoMocap from "./pages/video_mocap";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SignupPage } from "./pages/signup/SignupPage";
 import { Switch, Route } from "react-router-dom";
-import { TermsPage } from "./pages/about/terms_page/TermsPage";
 import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeletePage";
 import { TtsModelEditPage } from "./pages/tts/tts_model_edit/TtsModelEditPage";
 import { TtsModelViewPage } from "./pages/tts/tts_model_view/TtsModelViewPage";
@@ -49,7 +48,6 @@ import { PricingPage } from "./pages/premium/PricingPage";
 import { CheckoutSuccessPage } from "./pages/premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./pages/premium/PortalSuccessPage";
-import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
@@ -392,14 +390,6 @@ export default function PageContainer() {
 
           <Route path="/commissions">
             <CommunityCommissionsPage />
-          </Route>
-
-          <Route path="/terms">
-            <TermsPage />
-          </Route>
-
-          <Route path="/privacy">
-            <PrivacyPage />
           </Route>
 
           <Route path="/guide">

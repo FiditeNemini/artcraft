@@ -56,7 +56,6 @@
 /password-reset*       /website/index.html   200
 /portal_success*       /website/index.html   200
 /pricing*              /website/index.html   200
-/privacy*              /website/index.html   200
 /product-usage*        /website/index.html   200
 /profile*              /website/index.html   200
 /search*               /website/index.html   200
@@ -66,7 +65,6 @@
 /studio*               /website/index.html   200
 /studio-mobile-check*  /website/index.html   200
 /style-video*          /website/index.html   200
-/terms*                /website/index.html   200
 /text-to-image*        /website/index.html   200
 /tools*                /website/index.html   200
 /tts*                  /website/index.html   200
@@ -76,6 +74,10 @@
 /voice-designer*       /website/index.html   200
 /waitlist-next-steps*  /website/index.html   200
 /weight*               /website/index.html   200
+
+# Static paths
+/privacy               /website/privacy_policy_fakeyou.html   200
+/terms                 /website/tos_fakeyou.html   200
 
 # Broken paths that collide with the FakeYou /public/ folder:
 # /video*                /website/index.html   200
@@ -88,10 +90,6 @@
 /dev-vc*               /website/index.html   200
 /testing*              /website/index.html   200
 /tts-dev*              /website/index.html   200
-/test-privacy-fy       /website/privacy_policy_fakeyou.html   200
-/test-privacy-st       /website/privacy_policy_storyteller.html   200
-/test-terms-fy         /website/tos_fakeyou.html   200
-/test-terms-st         /website/tos_storyteller.html   200
 
 # Old paths - Live Portrait
 /acting-face*          /ai-live-portrait     301
