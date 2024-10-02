@@ -22,7 +22,12 @@
       rel="stylesheet"
     />
 
-    <link href="static.css" rel="stylesheet" />
+    <!-- on error here loads in the css file while editing locally -->
+    <link
+      href="/website/static.css"
+      onerror="this.onerror=null;this.href='static.css';"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <header>
