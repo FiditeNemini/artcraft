@@ -93,7 +93,7 @@ impl fmt::Display for ListTagsForEntityError {
 
 /// List the tags for an entity
 #[utoipa::path(
-  post,
+  get,
   tag = "Tags",
   path = "/v1/tags/list/{entity_type}/{entity_token}",
   responses(
