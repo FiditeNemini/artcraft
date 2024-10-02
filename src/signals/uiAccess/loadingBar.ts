@@ -73,9 +73,11 @@ export const loadingBar = {
     };
   },
   hide() {
-    loadingBarSignal.value = {
-      ...loadingBarSignal.value,
-      isShowing: false,
-    };
+    if (loadingBarSignal.value.isShowing !== false) {
+      loadingBarSignal.value = {
+        ...loadingBarSignal.value,
+        isShowing: false,
+      };
+    }
   },
 };

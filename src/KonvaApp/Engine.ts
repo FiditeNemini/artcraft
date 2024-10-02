@@ -4,22 +4,37 @@ import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
 import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 
 import { uiAccess } from "~/signals";
-import { toolbarNode } from "~/signals/uiAccess/toolbarNode";
 import { uiEvents } from "~/signals";
+// import { toolbarNode } from "~/signals/uiAccess/toolbarNode";
 
-import { SelectionManager } from "./SelectionManager";
-import { SelectorSquare } from "./SelectorSquare";
-import { NodeTransformer } from "./NodeTransformer";
+import {
+  NodesManager,
+  NodeTransformer,
+  NodesTranslationEventDetails,
+  SelectionManager,
+  SelectionManagerEvents,
+  SelectorSquare,
+} from "./NodesManagers";
 import { ImageNode } from "./Nodes/ImageNode";
 import { VideoNode } from "./Nodes/VideoNode";
+import { MediaNode, Position } from "./types";
 
-import { UndoStackManager } from "./UndoRedo/UndoRedoManager";
-import { CreateCommand } from "./UndoRedo/CreateCommand";
-import { DeleteCommand } from "./UndoRedo/DeleteCommand";
-import { RotateCommand } from "./UndoRedo/RotateCommand";
-import { ScaleCommand } from "./UndoRedo/ScaleCommand";
-import { TranslateCommand } from "./UndoRedo/TranslateCommand";
+import {
+  CreateCommand,
+  DeleteCommand,
+  MoveLayerDown,
+  MoveLayerUp,
+  RotateCommand,
+  ScaleCommand,
+  TranslateCommand,
+  UndoStackManager,
+} from "./UndoRedo";
 
+import { SharedWorkerResponse } from "./WorkerPrimitives/SharedWorkerBase";
+import {
+  DiffusionSharedWorkerProgressData,
+  DiffusionSharedWorkerResponseData,
+} from "./SharedWorkers/Diffusion/DiffusionSharedWorker";
 import { FileUtilities } from "./FileUtilities/FileUtilities";
 
 import { AppModes, VideoResolutions } from "./constants";
@@ -41,13 +56,17 @@ export class Engine {
   private appMode: AppModes;
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
-  private videoLayer: Konva.Layer;
+  private bgLayer: Konva.Layer;
+  private mediaLayer: Konva.Layer;
+  private uiLayer: Konva.Layer;
   private renderEngine: RenderEngine;
   private offScreenCanvas: OffscreenCanvas;
 
+  private nodesManager: NodesManager;
+  private nodeTransformer: NodeTransformer;
   private selectionManager: SelectionManager;
   private selectorSquare: SelectorSquare;
-  private nodeTransformer: NodeTransformer;
+
   private undoStackManager: UndoStackManager;
 
   // signal reference
@@ -64,20 +83,26 @@ export class Engine {
       width: window.innerWidth,
       height: window.innerHeight,
     });
+    this.bgLayer = new Konva.Layer();
+    this.mediaLayer = new Konva.Layer();
+    this.uiLayer = new Konva.Layer();
+    this.stage.add(this.bgLayer);
+    this.stage.add(this.mediaLayer);
+    this.stage.add(this.uiLayer);
 
-    const videoLayer = new Konva.Layer();
-    this.videoLayer = videoLayer;
-    this.stage.add(videoLayer);
+    // Collection of all Nodes
+    this.nodesManager = new NodesManager();
+    // Partial Collection of selected Nodes
+    this.selectionManager = new SelectionManager();
+    // Collection of commands for undo-redo
+    this.undoStackManager = new UndoStackManager();
 
     // Konva Transformer
     this.nodeTransformer = new NodeTransformer();
-    this.videoLayer.add(this.nodeTransformer.getKonvaNode());
+    this.uiLayer.add(this.nodeTransformer.getKonvaNode());
     // Selector Square
     this.selectorSquare = new SelectorSquare();
-    this.videoLayer.add(this.selectorSquare.getKonvaNode());
-
-    this.selectionManager = new SelectionManager();
-    this.undoStackManager = new UndoStackManager();
+    this.uiLayer.add(this.selectorSquare.getKonvaNode());
 
     // Listen to changes in container size
     const resizeObserver = new ResizeObserver(() => {
@@ -94,7 +119,8 @@ export class Engine {
     this.renderEngine = new RenderEngine({
       width: VideoResolutions.VERTICAL_720.width,
       height: VideoResolutions.VERTICAL_720.height,
-      videoLayer: this.videoLayer,
+      mediaLayerRef: this.mediaLayer,
+      bgLayerRef: this.bgLayer,
       offScreenCanvas: this.offScreenCanvas,
       onRenderingSystemMessageRecieved:
         this.onRenderingSystemReceived.bind(this),
@@ -126,15 +152,26 @@ export class Engine {
     //   return;
     // }
 
+    if (!response.data) {
+      // throw error to retry
+      uiAccess.dialogError.show({
+        title: "Generation Error",
+        message: response.data?.toString(),
+      });
+      uiAccess.toolbarMain.loadingBar.hide();
+      return;
+    }
+
     if (response.responseType === ResponseType.result) {
+      const data = response.data as DiffusionSharedWorkerResponseData;
       uiAccess.toolbarMain.loadingBar.hide();
       // create video node here.
       // choose it to be the size of the rendering output, this case its mobile. (1560, 400)
       const media_api_base_url = "https://storage.googleapis.com/";
-      const media_url = `${media_api_base_url}vocodes-public${response.data.videoUrl}`;
+      const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
 
       const videoNode = new VideoNode({
-        mediaLayer: this.videoLayer,
+        mediaLayer: this.mediaLayer,
         position: this.renderEngine.captureCanvas.position(),
         canvasSize: this.renderEngine.captureCanvas.size(),
         videoURL: media_url,
@@ -145,25 +182,21 @@ export class Engine {
       // hide the loader
       //this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
-    } else if (response.responseType === ResponseType.progress) {
+      return;
+    }
+
+    if (response.responseType === ResponseType.progress) {
+      const data = response.data as DiffusionSharedWorkerProgressData;
       // TODO wil fix this ?!?! parameter issue
       uiAccess.toolbarMain.loadingBar.show();
       //this.renderEngine.videoLoadingCanvas.kNode.show();
-      uiAccess.toolbarMain.loadingBar.updateProgress(
-        response.data.progress * 100,
-      );
-      console.log(response);
+      uiAccess.toolbarMain.loadingBar.updateProgress(data.progress * 100);
 
+      // console.log(response);
       // if (response.data.zipBlob) {
       //   FileUtilities.downloadBlobZip(response.data.zipBlob);
       // }
-    } else {
-      // throw error to retry
-      uiAccess.dialogError.show({
-        title: "Generation Error",
-        message: response.data,
-      });
-      uiAccess.toolbarMain.loadingBar.hide();
+      return;
     }
   }
 
@@ -171,6 +204,7 @@ export class Engine {
     if (this.appMode === AppModes.SELECT) {
       this.selectorSquare.enable({
         captureCanvasRef: this.renderEngine.captureCanvas,
+        nodesManagerRef: this.nodesManager,
         nodeTransformerRef: this.nodeTransformer,
         selectionManagerRef: this.selectionManager,
         stage: this.stage,
@@ -179,7 +213,13 @@ export class Engine {
         active: true,
       });
     }
-
+    this.selectionManager.eventTarget.addEventListener(
+      SelectionManagerEvents.NODES_TRANSLATIONS,
+      ((event: CustomEvent<NodesTranslationEventDetails>) => {
+        console.log(event);
+        this.translateNodes(event.detail);
+      }) as EventListener,
+    );
     uiEvents.toolbarNode.lock.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
       nodes.forEach((node) => {
@@ -212,30 +252,15 @@ export class Engine {
       }
     });
     uiEvents.toolbarNode.DELETE.onClick(() => {
-      const nodes = this.selectionManager.getSelectedNodes();
-      toolbarNode.hide();
-
-      nodes.forEach((node) => {
-        this.selectionManager.deselectNode(node);
-        const nodes = this.selectionManager.getSelectedNodes();
-        this.nodeTransformer.enable({ selectedNodes: nodes });
-        this.renderEngine.removeNodes(node);
-        node.delete();
-      });
+      this.deleteNodes();
     });
 
     uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => {
-      const nodes = this.selectionManager.getSelectedNodes();
-      nodes.forEach((node) => {
-        node.sendBack();
-      });
+      this.moveNodesDown();
     });
 
     uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() => {
-      const nodes = this.selectionManager.getSelectedNodes();
-      nodes.forEach((node) => {
-        node.bringToFront();
-      });
+      this.moveNodesUp();
     });
 
     uiEvents.onGetStagedImage((image) => {
@@ -272,7 +297,12 @@ export class Engine {
       }
     });
 
-    // TODO implement.
+    uiEvents.toolbarMain.UNDO.onClick(() => {
+      this.undoStackManager.undo();
+    });
+    uiEvents.toolbarMain.REDO.onClick(() => {
+      this.undoStackManager.redo();
+    });
     uiEvents.toolbarMain.SAVE.onClick(async (event) => {
       //this.onRenderingSystemReceived(undefined);
     });
@@ -313,76 +343,6 @@ export class Engine {
     return this.stage !== null;
   }
 
-  public async populateWithDebugItems() {
-    const imageFile = await FileUtilities.createImageFileFromUrl(
-      "https://static.miraheze.org/pgrwiki/0/0d/Dialogue-2B-Icon.png",
-    );
-    const imageNode = new ImageNode({
-      mediaLayer: this.videoLayer,
-      position: this.renderEngine.captureCanvas.position(),
-      canvasSize: this.renderEngine.captureCanvas.size(),
-      imageFile: imageFile,
-      selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
-    });
-
-    // this.renderEngine.addNodes(videoNode3);
-
-    const videoNode4 = new VideoNode({
-      mediaLayer: this.videoLayer,
-      position: this.renderEngine.captureCanvas.position(),
-      canvasSize: this.renderEngine.captureCanvas.size(),
-      videoURL:
-        "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
-      selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
-    });
-    const imageNode2 = new ImageNode({
-      mediaLayer: this.videoLayer,
-      position: this.renderEngine.captureCanvas.position(),
-      canvasSize: this.renderEngine.captureCanvas.size(),
-      imageFile: imageFile,
-      selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
-    });
-
-    this.renderEngine.addNodes(videoNode4);
-
-    const videoNode5 = new VideoNode({
-      mediaLayer: this.videoLayer,
-      position: this.renderEngine.captureCanvas.position(),
-      canvasSize: this.renderEngine.captureCanvas.size(),
-      videoURL:
-        "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
-      selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
-    });
-
-    this.renderEngine.addNodes(videoNode5);
-    // Adding nodes here
-    const videoNode = new VideoNode({
-      mediaLayer: this.videoLayer,
-      position: this.renderEngine.captureCanvas.position(),
-      canvasSize: this.renderEngine.captureCanvas.size(),
-      videoURL:
-        "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-      selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
-    });
-
-    // CODE TO TEST RENDER ENGINE
-    // Testing render engine
-    // this.renderEngine.addNodes(videoNode);
-    // await this.renderEngine.startProcessing();
-    //videoNode.simulatedLoading();
-    // TODO support Text nodes
-
-    // this.renderEngine.addNodes(imageNode2);
-
-    // // TODO if only image take image and just takes snapshots Edge case
-    // this.renderEngine.addNodes(imageNode);
-  }
-
   public async setupStage() {
     var textNode = new Konva.Text({
       x: 0,
@@ -403,59 +363,63 @@ export class Engine {
           );
         }
       }
-    }, this.videoLayer);
+    }, this.mediaLayer);
     anim.start();
 
-    this.videoLayer.add(textNode);
+    this.mediaLayer.add(textNode);
 
     this.addKeyboardShortcuts();
   }
 
   public addImage(imageFile: File) {
     const imageNode = new ImageNode({
-      mediaLayer: this.videoLayer,
+      mediaLayer: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
       nodeTransformerRef: this.nodeTransformer,
     });
-    this.renderEngine.addNodes(imageNode);
-    this.selectionManager.saveNode(imageNode);
+    this.createNode(imageNode);
   }
 
   public addVideo(url: string) {
-    // Adding nodes here
     const videoNode = new VideoNode({
-      mediaLayer: this.videoLayer,
+      mediaLayer: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL: url,
       selectionManagerRef: this.selectionManager,
       nodeTransformerRef: this.nodeTransformer,
     });
-    this.renderEngine.addNodes(videoNode);
-    this.selectionManager.saveNode(videoNode);
+    this.createNode(videoNode);
   }
 
   // Events for Undo and Redo
   private addKeyboardShortcuts() {
     window.addEventListener("keydown", (event) => {
       if (event.ctrlKey && event.key === "z") {
-        console.log("Undo");
         this.undoStackManager.undo();
       } else if (
         (event.ctrlKey && event.key === "y") ||
         (event.ctrlKey && event.shiftKey && event.key === "Z")
       ) {
-        console.log("Redo");
         this.undoStackManager.redo();
+      } else if (event.key === "Delete") {
+        this.deleteNodes();
       }
     });
   }
 
-  translateNodes(nodes: Konva.Node[], newX: number, newY: number) {
-    const command = new TranslateCommand(nodes, newX, newY);
+  translateNodes(props: {
+    nodes: Set<MediaNode>;
+    initialPositions: Map<MediaNode, Position>;
+    finalPositions: Map<MediaNode, Position>;
+  }) {
+    const command = new TranslateCommand({
+      ...props,
+      layerRef: this.mediaLayer,
+    });
     this.undoStackManager.executeCommand(command);
   }
 
@@ -468,14 +432,119 @@ export class Engine {
     const command = new ScaleCommand(nodes, newScaleX, newScaleY);
     this.undoStackManager.executeCommand(command);
   }
-
-  deleteNodes(nodes: Konva.Node[]) {
-    const command = new DeleteCommand(nodes);
+  moveNodesUp() {
+    const command = new MoveLayerUp({
+      nodes: this.selectionManager.getSelectedNodes(),
+      nodesManagerRef: this.nodesManager,
+      mediaLayerRef: this.mediaLayer,
+    });
+    this.undoStackManager.executeCommand(command);
+  }
+  moveNodesDown() {
+    const command = new MoveLayerDown({
+      nodes: this.selectionManager.getSelectedNodes(),
+      nodesManagerRef: this.nodesManager,
+      mediaLayerRef: this.mediaLayer,
+    });
+    this.undoStackManager.executeCommand(command);
+  }
+  deleteNodes() {
+    const nodes = this.selectionManager.getSelectedNodes();
+    const command = new DeleteCommand({
+      nodes: nodes,
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      nodeTransformerRef: this.nodeTransformer,
+      selectionManagerRef: this.selectionManager,
+      renderEngineRef: this.renderEngine,
+    });
     this.undoStackManager.executeCommand(command);
   }
 
-  createNodes(nodes: Konva.Node[]) {
-    const command = new CreateCommand(nodes);
+  createNode(node: VideoNode | ImageNode) {
+    const command = new CreateCommand({
+      nodes: new Set<MediaNode>([node]),
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      nodeTransformerRef: this.nodeTransformer,
+      selectionManagerRef: this.selectionManager,
+      renderEngineRef: this.renderEngine,
+    });
     this.undoStackManager.executeCommand(command);
+  }
+
+  /********************************
+   *
+   * Code for debug and Testing
+   *
+   ********************************/
+  public async populateWithDebugItems() {
+    const imageFile = await FileUtilities.createImageFileFromUrl(
+      "https://static.miraheze.org/pgrwiki/0/0d/Dialogue-2B-Icon.png",
+    );
+    const imageNode = new ImageNode({
+      mediaLayer: this.mediaLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      imageFile: imageFile,
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
+
+    // this.renderEngine.addNodes(videoNode3);
+
+    const videoNode4 = new VideoNode({
+      mediaLayer: this.mediaLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      videoURL:
+        "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
+    const imageNode2 = new ImageNode({
+      mediaLayer: this.mediaLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      imageFile: imageFile,
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
+
+    this.renderEngine.addNodes(videoNode4);
+
+    const videoNode5 = new VideoNode({
+      mediaLayer: this.mediaLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      videoURL:
+        "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
+
+    this.renderEngine.addNodes(videoNode5);
+    // Adding nodes here
+    const videoNode = new VideoNode({
+      mediaLayer: this.mediaLayer,
+      position: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
+      videoURL:
+        "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
+      selectionManagerRef: this.selectionManager,
+      nodeTransformerRef: this.nodeTransformer,
+    });
+
+    // CODE TO TEST RENDER ENGINE
+    // Testing render engine
+    // this.renderEngine.addNodes(videoNode);
+    // await this.renderEngine.startProcessing();
+    //videoNode.simulatedLoading();
+    // TODO support Text nodes
+
+    // this.renderEngine.addNodes(imageNode2);
+
+    // // TODO if only image take image and just takes snapshots Edge case
+    // this.renderEngine.addNodes(imageNode);
   }
 }

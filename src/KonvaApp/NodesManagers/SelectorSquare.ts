@@ -1,4 +1,5 @@
 import Konva from "konva";
+import { NodesManager } from "./NodesManager";
 import { NodeTransformer } from "./NodeTransformer";
 import { SelectionManager } from "./SelectionManager";
 
@@ -32,11 +33,13 @@ export class SelectorSquare {
   }
   public enable({
     captureCanvasRef,
+    nodesManagerRef,
     nodeTransformerRef,
     selectionManagerRef,
     stage,
   }: {
     captureCanvasRef: Konva.Rect;
+    nodesManagerRef: NodesManager;
     nodeTransformerRef: NodeTransformer;
     selectionManagerRef: SelectionManager;
     stage: Konva.Stage;
@@ -113,7 +116,10 @@ export class SelectorSquare {
           Konva.Util.haveIntersection(box, shape.getClientRect()),
         );
         if (foundKNodes.length > 0) {
-          selectionManagerRef.selectKNodes(foundKNodes);
+          selectionManagerRef.selectKNodes({
+            allNodes: nodesManagerRef.getAllNodes(),
+            kNodes: foundKNodes,
+          });
           nodeTransformerRef.enable({
             selectedNodes: selectionManagerRef.getSelectedNodes(),
           });

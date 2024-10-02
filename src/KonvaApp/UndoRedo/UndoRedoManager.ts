@@ -6,7 +6,12 @@ export class UndoStackManager {
   private readonly STACK_LIMIT = 20;
 
   executeCommand(command: ICommand) {
-    command.execute();
+    const result = command.execute();
+    if (result !== undefined && result === false) {
+      //command is not executed if it deliberatly returned false;
+      //in that case, no need to do anything
+      return;
+    }
     this.undoStack.push(command);
     this.redoStack = []; // Clear the redo stack
 
@@ -14,6 +19,7 @@ export class UndoStackManager {
     if (this.undoStack.length > this.STACK_LIMIT) {
       this.undoStack.shift(); // Remove the oldest command
     }
+    console.log("command stack:", this.undoStack);
   }
 
   undo() {
@@ -26,8 +32,7 @@ export class UndoStackManager {
       if (this.redoStack.length > this.STACK_LIMIT) {
         this.redoStack.shift(); // Remove the oldest command
       }
-      console.log("undo:");
-      console.log(this.undoStack);
+      console.log("undo:", this.undoStack);
     }
   }
 
@@ -42,8 +47,7 @@ export class UndoStackManager {
         this.undoStack.shift(); // Remove the oldest command
       }
 
-      console.log("Redo:");
-      console.log(this.redoStack);
+      console.log("Redo:", this.redoStack);
     }
   }
 }

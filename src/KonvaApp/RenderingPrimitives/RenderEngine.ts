@@ -1,33 +1,27 @@
-import { VideoNode } from "../Nodes/VideoNode";
 import Konva from "konva";
-import { RenderTask } from "./RenderTask";
 import { Container } from "konva/lib/Container";
 import { Shape } from "konva/lib/Shape";
 import { Group } from "konva/lib/Group";
-// Hide these two to start. WIL
-// uiAccess.toolbarMain.loadingBar.hide();
-// uiEvents.toolbarMain.loadingBarRetry.onClick((e) => {
-//   console.log(
-//     "toolbarMain > loadingBar > retry : onClick heard in Engine",
-//     e,
-//   );
-// });
-// uiAccess.toolbarMain.loadingBar.updateProgress(100);
 
 import { DiffusionSharedWorkerClient } from "../SharedWorkers/Diffusion/DiffusionSharedWorkerClient";
 import {
-  SharedWorkerRequest,
+  // SharedWorkerRequest,
   SharedWorkerResponse,
 } from "../WorkerPrimitives/SharedWorkerBase";
 import {
   DiffusionSharedWorkerProgressData,
   DiffusionSharedWorkerResponseData,
-  DiffusionSharedWorker,
+  // DiffusionSharedWorker,
   DiffusionSharedWorkerItemData,
 } from "../SharedWorkers/Diffusion/DiffusionSharedWorker";
+
 import { RenderingOptions } from "../Engine";
-import { ImageNode } from "../Nodes/ImageNode";
 import { FileUtilities } from "../FileUtilities/FileUtilities";
+import { ImageNode } from "../Nodes/ImageNode";
+import { VideoNode } from "../Nodes/VideoNode";
+import { MediaNode } from "../types";
+
+import { RenderTask } from "./RenderTask";
 import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
@@ -44,7 +38,8 @@ export class RenderEngine {
   private frames: ImageBitmap[];
 
   // capturing composite within window
-  private videoLayer: Konva.Layer;
+  private bgLayerRef: Konva.Layer;
+  private mediaLayerRef: Konva.Layer;
 
   private height: number;
   private width: number;
@@ -63,13 +58,15 @@ export class RenderEngine {
   constructor({
     width,
     height,
-    videoLayer,
+    bgLayerRef,
+    mediaLayerRef,
     offScreenCanvas,
     onRenderingSystemMessageRecieved,
   }: {
     width: number;
     height: number;
-    videoLayer: Konva.Layer;
+    bgLayerRef: Konva.Layer;
+    mediaLayerRef: Konva.Layer;
     offScreenCanvas: OffscreenCanvas;
     onRenderingSystemMessageRecieved: (
       response: SharedWorkerResponse<
@@ -98,7 +95,8 @@ export class RenderEngine {
 
     this.frames = [];
 
-    this.videoLayer = videoLayer;
+    this.bgLayerRef = bgLayerRef;
+    this.mediaLayerRef = mediaLayerRef;
 
     this.port = undefined;
     this.captureCanvas = new Konva.Rect({
@@ -115,7 +113,7 @@ export class RenderEngine {
 
     this.upperMaxFrames = 7 * 24;
 
-    this.videoLayer.add(this.captureCanvas);
+    this.bgLayerRef.add(this.captureCanvas);
     // send back
     this.captureCanvas.setZIndex(0);
 
@@ -189,7 +187,7 @@ export class RenderEngine {
     const deltaX = this.positionX - oldPositionX;
     const deltaY = this.positionY - oldPositionY;
 
-    var children = this.videoLayer.getChildren();
+    var children = this.mediaLayerRef.getChildren();
     for (let i = 0; i < children.length; i++) {
       let node = children[i];
 
@@ -209,7 +207,7 @@ export class RenderEngine {
       // find selected node... TODO and update that position
       node.updateContextMenu();
     });
-    this.videoLayer.batchDraw();
+    this.mediaLayerRef.batchDraw();
   }
 
   debug() {
@@ -224,7 +222,7 @@ export class RenderEngine {
       strokeWidth: 1,
       draggable: false,
     });
-    this.videoLayer.add(rectangle);
+    this.mediaLayerRef.add(rectangle);
   }
 
   async sendCanvasPayload(renderTask: RenderTask) {
@@ -300,7 +298,7 @@ export class RenderEngine {
     return maxLength;
   }
 
-  public addNodes(node: VideoNode | ImageNode) {
+  public addNodes(node: MediaNode) {
     if (node instanceof VideoNode) {
       this.videoNodes.push(node);
     } else if (node instanceof ImageNode) {
@@ -308,11 +306,17 @@ export class RenderEngine {
     }
   }
 
-  public removeNodes(node: VideoNode) {
-    const index = this.videoNodes.indexOf(node);
-    if (index > -1) {
-      this.videoNodes.splice(index, 1);
-      this.videoLayer.draw();
+  public removeNodes(node: MediaNode) {
+    if (node instanceof VideoNode) {
+      const index = this.videoNodes.indexOf(node);
+      if (index > -1) {
+        this.videoNodes.splice(index, 1);
+      }
+    } else if (node instanceof ImageNode) {
+      const index = this.imageNodes.indexOf(node);
+      if (index > -1) {
+        this.imageNodes.splice(index, 1);
+      }
     }
   }
 
@@ -498,7 +502,7 @@ export class RenderEngine {
           await currentVideoNode.seek(frameTime);
         } // end of if context
       } // End frame time
-      this.videoLayer.draw();
+      this.mediaLayerRef.draw();
 
       // use main thread
       if (this.canUseSharedWorker === false) {
@@ -511,7 +515,7 @@ export class RenderEngine {
           // Then picks the height and width range
           // then we draw it at 0,0,width and height of the canvas
           this.context.drawImage(
-            this.videoLayer.canvas._canvas,
+            this.mediaLayerRef.canvas._canvas,
             this.positionX,
             this.positionY,
             this.width,
@@ -547,7 +551,7 @@ export class RenderEngine {
         );
 
         const bitmap = await this.renderFrame({
-          layerOfInterest: this.videoLayer,
+          layerOfInterest: this.mediaLayerRef,
           x: this.captureCanvas.x(),
           y: this.captureCanvas.y(),
           width: this.width,

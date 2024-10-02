@@ -2,8 +2,7 @@ import Konva from "konva";
 import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { uiAccess } from "~/signals";
-import { SelectionManager } from "../SelectionManager";
-import { NodeTransformer } from "../NodeTransformer";
+import { NodeTransformer, SelectionManager } from "../NodesManagers";
 import { Position, Size } from "../types";
 import ChromaWorker from "./ChromaWorker?sharedworker";
 
@@ -101,16 +100,28 @@ export class VideoNode extends NetworkedNodeContext {
     selectionManagerRef,
     nodeTransformerRef,
   }: VideoNodeContructor) {
+    // kNodes need to be created first to guaruntee it is not undefined in parent's context
+    const kNode = new Konva.Image({
+      image: undefined,
+      x: position.x,
+      y: position.y,
+      width: 200, // to do fix this with placeholder
+      height: 200,
+      draggable: true,
+      fill: "grey",
+    });
+
     super({
       nodeTransfomerRef: nodeTransformerRef,
       selectionManagerRef: selectionManagerRef,
       mediaLayer: mediaLayer,
+      kNode: kNode,
     });
+    this.mediaLayer.add(this.kNode);
 
     // state manage the node
     // use web codecs to get the frame rate 89% support
     // assume 60fps for now.
-
     this.fps = 24; // need to query this from the media
     this.duration = -1; // video duration
 
@@ -131,42 +142,6 @@ export class VideoNode extends NetworkedNodeContext {
     this.blockSeeking = false;
 
     this.isChroma = false;
-
-    this.kNode = new Konva.Image({
-      // image: undefined,
-      image: undefined,
-      x: position.x,
-      y: position.y,
-      width: 200, // to do fix this with placeholder
-      height: 200,
-      draggable: true,
-      fill: "grey",
-    });
-
-    // if (this.isChroma) {
-    //   this.kNode = new Konva.Image({
-    //     // image: undefined,
-    //     image: this.videoCanvas,
-    //     x: position.x,
-    //     y: position.y,
-    //     width: 200, // to do fix this with placeholder
-    //     height: 200,
-    //     draggable: true,
-    //     fill: "grey",
-    //   });
-    // } else {
-    //   this.kNode = new Konva.Image({
-    //     // image: undefined,
-    //     image: this.videoComponent,
-    //     x: position.x,
-    //     y: position.y,
-    //     width: 200, // to do fix this with placeholder
-    //     height: 200,
-    //     draggable: true,
-    //     fill: "grey",
-    //   });
-    // }
-    this.mediaLayer.add(this.kNode);
 
     this.videoComponent.onloadstart = (event: Event) => {
       loadingBar.show();
