@@ -2,7 +2,7 @@ use crate::plans::model_weights::evaluate::asserts::assert_search_term_contains_
 use elasticsearch::Elasticsearch;
 use errors::AnyhowResult;
 
-pub async fn test_zelda_searches(
+pub async fn test_search_term_zelda(
   client: &Elasticsearch
 ) -> AnyhowResult<()> {
 

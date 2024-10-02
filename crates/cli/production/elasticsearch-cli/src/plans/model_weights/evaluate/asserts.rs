@@ -1,11 +1,11 @@
-use std::collections::HashSet;
+use crate::plans::model_weights::evaluate::print_debugging::{print_titles, to_title_set};
+use crate::plans::model_weights::evaluate::search::search_term_only;
 use elasticsearch::Elasticsearch;
-use log::error;
 use elasticsearch_schema::documents::model_weight_document::ModelWeightDocument;
 use errors::{anyhow, AnyhowResult};
+use log::error;
+use std::collections::HashSet;
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::plans::model_weights::evaluate::search::search_term_only;
-use crate::plans::model_weights::evaluate::print_debugging::{print_titles, to_title_set};
 
 pub async fn assert_search_term_contains_titles(
   client: &Elasticsearch,
