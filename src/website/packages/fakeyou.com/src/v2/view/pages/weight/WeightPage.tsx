@@ -336,7 +336,6 @@ export default function WeightPage() {
       weightDetails = (
         <>
           <DataTable data={voiceDetails} />
-          <div></div>
           {tags && (
             <>
               <hr className="m-0" />
