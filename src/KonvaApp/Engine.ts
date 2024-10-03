@@ -11,23 +11,25 @@ import {
   NodesManager,
   NodeTransformer,
   NodesTranslationEventDetails,
+  NodeTransformationEventDetails,
   SelectionManager,
   SelectionManagerEvents,
   SelectorSquare,
 } from "./NodesManagers";
 import { ImageNode } from "./Nodes/ImageNode";
 import { VideoNode } from "./Nodes/VideoNode";
-import { MediaNode, Position } from "./types";
+import { MediaNode, Position, Transformation } from "./types";
 
 import {
   CreateCommand,
   DeleteCommand,
+  LockNodesCommand,
   MoveLayerDown,
   MoveLayerUp,
-  RotateCommand,
-  ScaleCommand,
+  TransformCommand,
   TranslateCommand,
   UndoStackManager,
+  UnlockNodesCommand,
 } from "./UndoRedo";
 
 import { SharedWorkerResponse } from "./WorkerPrimitives/SharedWorkerBase";
@@ -90,19 +92,22 @@ export class Engine {
     this.stage.add(this.mediaLayer);
     this.stage.add(this.uiLayer);
 
-    // Collection of all Nodes
-    this.nodesManager = new NodesManager();
-    // Partial Collection of selected Nodes
-    this.selectionManager = new SelectionManager();
-    // Collection of commands for undo-redo
-    this.undoStackManager = new UndoStackManager();
-
     // Konva Transformer
     this.nodeTransformer = new NodeTransformer();
     this.uiLayer.add(this.nodeTransformer.getKonvaNode());
     // Selector Square
     this.selectorSquare = new SelectorSquare();
     this.uiLayer.add(this.selectorSquare.getKonvaNode());
+
+    // Collection of all Nodes
+    this.nodesManager = new NodesManager();
+    // Partial Collection of selected Nodes
+    this.selectionManager = new SelectionManager({
+      nodeTransformerRef: this.nodeTransformer,
+      mediaLayerRef: this.mediaLayer,
+    });
+    // Collection of commands for undo-redo
+    this.undoStackManager = new UndoStackManager();
 
     // Listen to changes in container size
     const resizeObserver = new ResizeObserver(() => {
@@ -171,12 +176,11 @@ export class Engine {
       const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
 
       const videoNode = new VideoNode({
-        mediaLayer: this.mediaLayer,
+        mediaLayerRef: this.mediaLayer,
         position: this.renderEngine.captureCanvas.position(),
         canvasSize: this.renderEngine.captureCanvas.size(),
         videoURL: media_url,
         selectionManagerRef: this.selectionManager,
-        nodeTransformerRef: this.nodeTransformer,
       });
       this.renderEngine.addNodes(videoNode);
       // hide the loader
@@ -205,7 +209,6 @@ export class Engine {
       this.selectorSquare.enable({
         captureCanvasRef: this.renderEngine.captureCanvas,
         nodesManagerRef: this.nodesManager,
-        nodeTransformerRef: this.nodeTransformer,
         selectionManagerRef: this.selectionManager,
         stage: this.stage,
       });
@@ -216,16 +219,19 @@ export class Engine {
     this.selectionManager.eventTarget.addEventListener(
       SelectionManagerEvents.NODES_TRANSLATIONS,
       ((event: CustomEvent<NodesTranslationEventDetails>) => {
-        console.log(event);
+        //console.log("Event: SelectionManager -> Engine", event);
         this.translateNodes(event.detail);
       }) as EventListener,
     );
+    this.selectionManager.eventTarget.addEventListener(
+      SelectionManagerEvents.NODES_TRANSFORMATION,
+      ((event: CustomEvent<NodeTransformationEventDetails>) => {
+        //console.log("Event: SelectionManager -> Engine", event);
+        this.transformNodes(event.detail);
+      }) as EventListener,
+    );
     uiEvents.toolbarNode.lock.onClick(() => {
-      const nodes = this.selectionManager.getSelectedNodes();
-      nodes.forEach((node) => {
-        node.toggleLock();
-      });
-      // this.nodeTransformer.enable({ selectedNodes: nodes });
+      this.toggleLockNodes();
     });
     uiEvents.toolbarNode.CRHOMA.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
@@ -251,17 +257,9 @@ export class Engine {
         });
       }
     });
-    uiEvents.toolbarNode.DELETE.onClick(() => {
-      this.deleteNodes();
-    });
-
-    uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => {
-      this.moveNodesDown();
-    });
-
-    uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() => {
-      this.moveNodesUp();
-    });
+    uiEvents.toolbarNode.DELETE.onClick(() => this.deleteNodes());
+    uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => this.moveNodesDown());
+    uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() => this.moveNodesUp());
 
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
@@ -271,6 +269,7 @@ export class Engine {
       console.log("Engine got video: " + video.url);
       this.addVideo(video.url);
     });
+
     uiEvents.onChromakeyRequest((chromakeyProps) => {
       const node = this.selectionManager
         .getSelectedNodes()
@@ -297,13 +296,9 @@ export class Engine {
       }
     });
 
-    uiEvents.toolbarMain.UNDO.onClick(() => {
-      this.undoStackManager.undo();
-    });
-    uiEvents.toolbarMain.REDO.onClick(() => {
-      this.undoStackManager.redo();
-    });
-    uiEvents.toolbarMain.SAVE.onClick(async (event) => {
+    uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
+    uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
+    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
       //this.onRenderingSystemReceived(undefined);
     });
   }
@@ -373,24 +368,22 @@ export class Engine {
 
   public addImage(imageFile: File) {
     const imageNode = new ImageNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
     this.createNode(imageNode);
   }
 
   public addVideo(url: string) {
     const videoNode = new VideoNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL: url,
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
     this.createNode(videoNode);
   }
@@ -411,26 +404,43 @@ export class Engine {
     });
   }
 
-  translateNodes(props: {
-    nodes: Set<MediaNode>;
-    initialPositions: Map<MediaNode, Position>;
-    finalPositions: Map<MediaNode, Position>;
-  }) {
-    const command = new TranslateCommand({
-      ...props,
-      layerRef: this.mediaLayer,
+  createNode(node: VideoNode | ImageNode) {
+    const command = new CreateCommand({
+      nodes: new Set<MediaNode>([node]),
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      nodeTransformerRef: this.nodeTransformer,
+      selectionManagerRef: this.selectionManager,
+      renderEngineRef: this.renderEngine,
     });
     this.undoStackManager.executeCommand(command);
   }
-
-  rotateNodes(nodes: Konva.Node[], newRotation: number) {
-    const command = new RotateCommand(nodes, newRotation);
+  deleteNodes() {
+    const nodes = this.selectionManager.getSelectedNodes();
+    const command = new DeleteCommand({
+      nodes: nodes,
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      nodeTransformerRef: this.nodeTransformer,
+      selectionManagerRef: this.selectionManager,
+      renderEngineRef: this.renderEngine,
+    });
     this.undoStackManager.executeCommand(command);
   }
-
-  scaleNodes(nodes: Konva.Node[], newScaleX: number, newScaleY: number) {
-    const command = new ScaleCommand(nodes, newScaleX, newScaleY);
-    this.undoStackManager.executeCommand(command);
+  toggleLockNodes() {
+    const nodes = this.selectionManager.getSelectedNodes();
+    const node = nodes.values().next().value;
+    if (node.isLocked()) {
+      const command = new UnlockNodesCommand({
+        nodes: this.selectionManager.getSelectedNodes(),
+      });
+      this.undoStackManager.executeCommand(command);
+    } else {
+      const command = new LockNodesCommand({
+        nodes: this.selectionManager.getSelectedNodes(),
+      });
+      this.undoStackManager.executeCommand(command);
+    }
   }
   moveNodesUp() {
     const command = new MoveLayerUp({
@@ -448,29 +458,27 @@ export class Engine {
     });
     this.undoStackManager.executeCommand(command);
   }
-  deleteNodes() {
-    const nodes = this.selectionManager.getSelectedNodes();
-    const command = new DeleteCommand({
-      nodes: nodes,
-      mediaLayerRef: this.mediaLayer,
-      nodesManagerRef: this.nodesManager,
-      nodeTransformerRef: this.nodeTransformer,
-      selectionManagerRef: this.selectionManager,
-      renderEngineRef: this.renderEngine,
+  translateNodes(props: {
+    nodes: Set<MediaNode>;
+    initialPositions: Map<MediaNode, Position>;
+    finalPositions: Map<MediaNode, Position>;
+  }) {
+    const command = new TranslateCommand({
+      ...props,
+      layerRef: this.mediaLayer,
     });
-    this.undoStackManager.executeCommand(command);
+    this.undoStackManager.pushCommand(command);
   }
-
-  createNode(node: VideoNode | ImageNode) {
-    const command = new CreateCommand({
-      nodes: new Set<MediaNode>([node]),
-      mediaLayerRef: this.mediaLayer,
-      nodesManagerRef: this.nodesManager,
-      nodeTransformerRef: this.nodeTransformer,
-      selectionManagerRef: this.selectionManager,
-      renderEngineRef: this.renderEngine,
+  transformNodes(props: {
+    nodes: Set<MediaNode>;
+    initialTransformations: Map<MediaNode, Transformation>;
+    finalTransformations: Map<MediaNode, Transformation>;
+  }) {
+    const command = new TransformCommand({
+      ...props,
+      layerRef: this.mediaLayer,
     });
-    this.undoStackManager.executeCommand(command);
+    this.undoStackManager.pushCommand(command);
   }
 
   /********************************
@@ -483,56 +491,51 @@ export class Engine {
       "https://static.miraheze.org/pgrwiki/0/0d/Dialogue-2B-Icon.png",
     );
     const imageNode = new ImageNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
 
     // this.renderEngine.addNodes(videoNode3);
 
     const videoNode4 = new VideoNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL:
         "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
     const imageNode2 = new ImageNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
 
     this.renderEngine.addNodes(videoNode4);
 
     const videoNode5 = new VideoNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL:
         "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
 
     this.renderEngine.addNodes(videoNode5);
     // Adding nodes here
     const videoNode = new VideoNode({
-      mediaLayer: this.mediaLayer,
+      mediaLayerRef: this.mediaLayer,
       position: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
       videoURL:
         "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
       selectionManagerRef: this.selectionManager,
-      nodeTransformerRef: this.nodeTransformer,
     });
 
     // CODE TO TEST RENDER ENGINE

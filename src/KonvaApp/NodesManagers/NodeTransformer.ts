@@ -1,10 +1,8 @@
 import Konva from "konva";
-import { Node, NodeConfig } from "konva/lib/Node";
 import { MediaNode } from "../types";
 
 export class NodeTransformer {
   private kTransformer: Konva.Transformer;
-  private selectedKNodes: Set<MediaNode> | undefined;
 
   constructor() {
     this.kTransformer = new Konva.Transformer({
@@ -36,22 +34,17 @@ export class NodeTransformer {
     return this.kTransformer;
   }
   public enable({ selectedNodes }: { selectedNodes: Set<MediaNode> }) {
-    this.selectedKNodes = selectedNodes;
     const kNodesArray = Array.from(selectedNodes).reduce((acc, node) => {
-      if (node.kNode) {
-        node.listenToBaseKNodeTransformations();
-        acc.push(node.kNode);
-      }
+      acc.push(node.kNode);
       return acc;
-    }, [] as Node<NodeConfig>[]);
-    this.kTransformer.moveToTop();
+    }, [] as Konva.Node[]);
+
+    //if there are more things in the ui layer, turn this on
+    // this.kTransformer.moveToTop();
+
     this.kTransformer.nodes(kNodesArray);
   }
   public clear() {
     this.kTransformer.nodes([]);
-    this.selectedKNodes?.forEach((node) => {
-      node.removeListenToBaseKNodeTransformations();
-    });
-    this.selectedKNodes = undefined;
   }
 }

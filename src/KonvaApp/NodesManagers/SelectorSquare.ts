@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { NodesManager } from "./NodesManager";
-import { NodeTransformer } from "./NodeTransformer";
 import { SelectionManager } from "./SelectionManager";
+import { MediaNode } from "../types";
 
 interface SqaureCoordinates {
   x1: number;
@@ -34,13 +34,11 @@ export class SelectorSquare {
   public enable({
     captureCanvasRef,
     nodesManagerRef,
-    nodeTransformerRef,
     selectionManagerRef,
     stage,
   }: {
     captureCanvasRef: Konva.Rect;
     nodesManagerRef: NodesManager;
-    nodeTransformerRef: NodeTransformer;
     selectionManagerRef: SelectionManager;
     stage: Konva.Stage;
   }) {
@@ -58,7 +56,6 @@ export class SelectorSquare {
       e.evt.preventDefault();
       if (e.target === stage || e.target === captureCanvasRef) {
         //moused down on empty space, clear previous selection first
-        nodeTransformerRef.clear();
         selectionManagerRef.clearSelection();
       }
 
@@ -116,13 +113,17 @@ export class SelectorSquare {
           Konva.Util.haveIntersection(box, shape.getClientRect()),
         );
         if (foundKNodes.length > 0) {
-          selectionManagerRef.selectKNodes({
-            allNodes: nodesManagerRef.getAllNodes(),
-            kNodes: foundKNodes,
-          });
-          nodeTransformerRef.enable({
-            selectedNodes: selectionManagerRef.getSelectedNodes(),
-          });
+          const kNodeIds = foundKNodes.map((kNode) => kNode._id);
+          const foundNodes = Array.from(nodesManagerRef.getAllNodes()).reduce(
+            (accNodes, currNode) => {
+              if (kNodeIds.includes(currNode.kNode._id)) {
+                accNodes.push(currNode);
+              }
+              return accNodes;
+            },
+            [] as MediaNode[],
+          );
+          selectionManagerRef.selectNodes(foundNodes);
         }
       });
     });

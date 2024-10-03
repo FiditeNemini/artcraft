@@ -12,6 +12,9 @@ export class UndoStackManager {
       //in that case, no need to do anything
       return;
     }
+    this.pushCommand(command);
+  }
+  pushCommand(command: ICommand) {
     this.undoStack.push(command);
     this.redoStack = []; // Clear the redo stack
 

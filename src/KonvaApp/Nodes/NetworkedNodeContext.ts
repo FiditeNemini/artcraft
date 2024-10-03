@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Layer } from "konva/lib/Layer";
 
 import { uiAccess } from "~/signals";
-import { NodeTransformer, SelectionManager } from "../NodesManagers";
+import { SelectionManager } from "../NodesManagers";
 import { Size } from "../types";
 
 const toolbarNode = uiAccess.toolbarNode;
@@ -12,9 +12,8 @@ const loadingBar = uiAccess.loadingBar;
 
 export class NetworkedNodeContext {
   public selectionManagerRef: SelectionManager;
-  private nodeTransformerRef: NodeTransformer;
   public kNode: Konva.Image;
-  protected mediaLayer: Layer;
+  protected mediaLayerRef: Layer;
   public uuid: string;
 
   // Internal State members
@@ -22,30 +21,26 @@ export class NetworkedNodeContext {
   public didFinishLoading: boolean = false;
   // This locks interaction when the render engine is rendering
   protected isProcessing: boolean = false;
-  protected isDragging: boolean = false;
   protected isSelecting: boolean = false;
-  public isLocked: boolean = false;
+  protected _isLocked: boolean = false;
 
   async setProcessing() {
     this.isProcessing = true;
   }
 
   constructor({
-    nodeTransfomerRef,
     selectionManagerRef,
-    mediaLayer,
+    mediaLayerRef,
     kNode,
   }: {
-    nodeTransfomerRef: NodeTransformer;
     selectionManagerRef: SelectionManager;
-    mediaLayer: Layer;
+    mediaLayerRef: Layer;
     kNode: Konva.Image;
   }) {
     console.log("reconstructed");
     this.uuid = uuidv4();
-    this.mediaLayer = mediaLayer;
+    this.mediaLayerRef = mediaLayerRef;
     this.selectionManagerRef = selectionManagerRef;
-    this.nodeTransformerRef = nodeTransfomerRef;
     this.kNode = kNode;
     this.didFinishLoading = false;
   }
@@ -80,32 +75,32 @@ export class NetworkedNodeContext {
   public highlight() {
     this.kNode.stroke("salmon");
     this.kNode.strokeWidth(10);
-    this.kNode.draw();
   }
 
   public unHighLight() {
+    console.log("unHighlight", this.kNode._id);
     this.kNode.strokeWidth(0);
-    this.kNode.draw();
   }
-  public toggleLock() {
-    this.isLocked = !this.isLocked;
-    if (this.isLocked) {
-      toolbarNode.lock();
-      this.kNode.setDraggable(false);
-    } else {
-      toolbarNode.unlock();
-      this.kNode.setDraggable(true);
-    }
+  public moveLayerUp() {
+    this.kNode.moveUp();
   }
-  updateNodeTransformer() {
-    const selectedNodes = this.selectionManagerRef.getSelectedNodes();
-    const transformableNodes = new Set(
-      Array.from(selectedNodes).filter((node) => {
-        return !node.isLocked;
-      }),
-    );
-    this.nodeTransformerRef.enable({ selectedNodes: transformableNodes });
+  public moveLayerDown() {
+    this.kNode.moveDown();
   }
+  public isLocked() {
+    return this._isLocked;
+  }
+  public lock() {
+    this._isLocked = true;
+    toolbarNode.lock();
+    this.kNode.setDraggable(false);
+  }
+  public unlock() {
+    this._isLocked = false;
+    toolbarNode.unlock();
+    this.kNode.setDraggable(true);
+  }
+
   calculateContextualsPosition(kNode: Konva.Node) {
     const w = kNode.getSize().width * kNode.scaleX();
     const h = kNode.getSize().height * kNode.scaleY();
@@ -148,46 +143,25 @@ export class NetworkedNodeContext {
     });
   }
 
-  public moveLayerUp() {
-    this.kNode.moveUp();
-  }
-  public moveLayerDown() {
-    this.kNode.moveDown();
-  }
-
   public updateContextComponents() {
     this.updateContextMenuPosition();
-    if (this.didFinishLoading == false) {
-      this.updateLoadingBarPosition();
+    this.updateLoadingBarPosition();
+    if (this.didFinishLoading == false && !loadingBar.isShowing()) {
+      loadingBar.show();
     } else {
       loadingBar.hide();
     }
     if (!toolbarNode.isShowing()) {
       toolbarNode.show({
-        locked: this.isLocked,
+        locked: this._isLocked,
       });
     } else {
       toolbarNode.update({
-        locked: this.isLocked,
+        locked: this._isLocked,
       });
     }
   }
-  public selectThisNode() {
-    const selected = this.selectionManagerRef.selectNode(this);
-    if (selected) {
-      this.highlight();
-      if (this.selectionManagerRef.getSelectedNodes().size === 1) {
-        this.listenToBaseKNodeDrags();
-        this.updateContextComponents();
-      }
-      this.updateNodeTransformer();
-    }
-  }
-  public unselectThisNode() {
-    this.unHighLight();
-    this.removeListenToBaseKNodeDrags();
-    this.selectionManagerRef.deselectNode(this);
-  }
+
   public listenToBaseKNode() {
     const handleSelect = (isMultiSelect: boolean) => {
       if (!isMultiSelect) {
@@ -195,73 +169,60 @@ export class NetworkedNodeContext {
         //console.log("No Shift >> no multiselect");
         this.selectionManagerRef.clearSelection();
       }
-      this.selectThisNode();
+      if (this.selectionManagerRef.isNodeSelected(this)) {
+        this.selectionManagerRef.deselectNode(this);
+        return;
+      }
+      this.selectionManagerRef.selectNode(this);
     };
 
     this.kNode.on("mousedown", (e) => {
       // console.log("Mouse down");
       // Selection of Node
       if (!this.selectionManagerRef.isNodeSelected(this)) {
-        //checking for multiselect
         this.isSelecting = true;
+        //checking for multiselect
         handleSelect(e.evt.shiftKey);
-      } else {
-        this.isDragging = true;
       }
 
       if (!toolbarNode.isShowing()) {
         toolbarNode.show({
-          locked: this.isLocked,
+          locked: this._isLocked,
         });
       }
     });
 
     this.kNode.on("mouseup", (e) => {
-      // just coming out of dragging or selecting mode
       // console.log("MOUSE UP");
-      if (this.isDragging || this.isSelecting) {
+
+      // just coming out of dragging or selecting mode
+      // no need to handle select
+      if (this.selectionManagerRef.isDragging() || this.isSelecting) {
         this.isSelecting = false;
         return;
       }
 
       // checking for multiselect, in multiselect deselection is possible
-      const isMultiSelect = e.evt.shiftKey;
-      if (isMultiSelect && this.selectionManagerRef.isNodeSelected(this)) {
-        this.selectionManagerRef.deselectNode(this);
-        this.updateNodeTransformer();
-        //TODO: show toolbarNode on another Node;
-        return;
-      }
-
-      // if the code gets here, we are selecting again from selected nodes
-      handleSelect(isMultiSelect);
+      handleSelect(e.evt.shiftKey);
     });
   }
   public listenToBaseKNodeDrags() {
     this.kNode.on("dragstart", () => {
-      console.log("Drag start", this.kNode._id);
+      // console.log("Drag start", this.kNode._id);
       if (this.isProcessing) {
         return;
       }
-      this.isDragging = true;
       this.selectionManagerRef.dragStart();
       this.updateContextComponents();
     });
 
     this.kNode.on("dragmove", () => {
       // console.log("Drag Move");
-      if (!this.isDragging) {
-        return;
-      }
       this.updateContextComponents();
     });
 
     this.kNode.on("dragend", () => {
-      console.log("Drag End");
-      if (!this.isDragging) {
-        return;
-      }
-      this.isDragging = false;
+      // console.log("Drag End", this.kNode._id);
       this.selectionManagerRef.dragEnd();
       this.updateContextComponents();
     });
@@ -272,15 +233,20 @@ export class NetworkedNodeContext {
     this.kNode.removeEventListener("dragend");
   }
   public listenToBaseKNodeTransformations() {
-    this.kNode.on("transform", () => {
-      // console.log("kNode tansformed");
-      this.updateContextMenuPosition();
+    this.kNode.on("transformstart", (event) => {
+      console.log("transformstart", event.target._id);
+      this.selectionManagerRef.transformStart();
+      toolbarNode.hide();
+      loadingBar.hide();
+    });
+
+    this.kNode.on("transformend", (event) => {
+      console.log("transformend", event.target._id);
+      this.selectionManagerRef.transformEnd();
+      this.updateContextComponents();
     });
   }
   public removeListenToBaseKNodeTransformations() {
-    if (!this.kNode) {
-      return;
-    }
-    this.kNode.removeEventListener("transform");
+    this.kNode.removeEventListener("transformend");
   }
 }

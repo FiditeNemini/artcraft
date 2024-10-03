@@ -1,8 +1,7 @@
 import Konva from "konva";
-import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
 import { uiAccess } from "~/signals";
-import { NodeTransformer, SelectionManager } from "../NodesManagers";
+import { SelectionManager } from "../NodesManagers";
 import { Position, Size } from "../types";
 import ChromaWorker from "./ChromaWorker?sharedworker";
 
@@ -10,12 +9,11 @@ import ChromaWorker from "./ChromaWorker?sharedworker";
 const loadingBar = uiAccess.loadingBar;
 
 interface VideoNodeContructor {
-  mediaLayer: Layer;
+  mediaLayerRef: Konva.Layer;
   position: Position;
   canvasSize: Size;
   videoURL: string;
   selectionManagerRef: SelectionManager;
-  nodeTransformerRef: NodeTransformer;
 }
 
 export class VideoNode extends NetworkedNodeContext {
@@ -93,12 +91,11 @@ export class VideoNode extends NetworkedNodeContext {
   }
 
   constructor({
-    mediaLayer,
+    mediaLayerRef,
     position,
     canvasSize,
     videoURL,
     selectionManagerRef,
-    nodeTransformerRef,
   }: VideoNodeContructor) {
     // kNodes need to be created first to guaruntee it is not undefined in parent's context
     const kNode = new Konva.Image({
@@ -112,12 +109,11 @@ export class VideoNode extends NetworkedNodeContext {
     });
 
     super({
-      nodeTransfomerRef: nodeTransformerRef,
       selectionManagerRef: selectionManagerRef,
-      mediaLayer: mediaLayer,
+      mediaLayerRef: mediaLayerRef,
       kNode: kNode,
     });
-    this.mediaLayer.add(this.kNode);
+    this.mediaLayerRef.add(this.kNode);
 
     // state manage the node
     // use web codecs to get the frame rate 89% support
@@ -304,7 +300,7 @@ export class VideoNode extends NetworkedNodeContext {
       const onMessage = (event: MessageEvent) => {
         const { imageData } = event.data;
         this.context?.putImageData(imageData, 0, 0);
-        this.mediaLayer.draw();
+        this.mediaLayerRef.draw();
         if (this.blockSeeking) {
           this.blockSeeking = false;
         }

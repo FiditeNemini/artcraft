@@ -1,16 +1,14 @@
 import Konva from "konva";
-import { Layer } from "konva/lib/Layer";
 import { NetworkedNodeContext } from "./NetworkedNodeContext";
-import { NodeTransformer, SelectionManager } from "../NodesManagers";
+import { SelectionManager } from "../NodesManagers";
 import { Position, Size } from "../types";
 
 interface ImageNodeContructor {
-  mediaLayer: Layer;
   position: Position;
   canvasSize: Size;
   imageFile: File;
+  mediaLayerRef: Konva.Layer;
   selectionManagerRef: SelectionManager;
-  nodeTransformerRef: NodeTransformer;
 }
 
 export class ImageNode extends NetworkedNodeContext {
@@ -19,12 +17,11 @@ export class ImageNode extends NetworkedNodeContext {
   private imageObject: HTMLImageElement;
 
   constructor({
-    mediaLayer,
     position,
     canvasSize,
     imageFile,
+    mediaLayerRef,
     selectionManagerRef,
-    nodeTransformerRef,
   }: ImageNodeContructor) {
     // kNodes need to be created first to guaruntee it is not undefined in parent's context
     const kNode = new Konva.Image({
@@ -38,12 +35,11 @@ export class ImageNode extends NetworkedNodeContext {
     });
 
     super({
-      nodeTransfomerRef: nodeTransformerRef,
       selectionManagerRef: selectionManagerRef,
-      mediaLayer: mediaLayer,
+      mediaLayerRef: mediaLayerRef,
       kNode: kNode,
     });
-    this.mediaLayer.add(this.kNode);
+    this.mediaLayerRef.add(this.kNode);
 
     const imageComponent = new Image();
     this.imageObject = imageComponent;
@@ -68,7 +64,7 @@ export class ImageNode extends NetworkedNodeContext {
 
       this.listenToBaseKNode();
       this.kNode.fill(null);
-      this.mediaLayer.draw();
+      this.mediaLayerRef.draw();
 
       this.didFinishLoading = true;
     };

@@ -3,4 +3,7 @@ export { NodeTransformer } from "./NodeTransformer";
 export { SelectionManager, SelectionManagerEvents } from "./SelectionManager";
 export { SelectorSquare } from "./SelectorSquare";
 
-export type { NodesTranslationEventDetails } from "./SelectionManager";
+export type {
+  NodesTranslationEventDetails,
+  NodeTransformationEventDetails,
+} from "./SelectionManager";

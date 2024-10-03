@@ -17,6 +17,9 @@ const loadingBarSignal = signal<ContextualLoadingBarProps>({
 
 export const loadingBar = {
   signal: loadingBarSignal,
+  isShowing() {
+    return loadingBarSignal.value.isShowing;
+  },
   update(props: Omit<ContextualLoadingBarProps, "isShowing">) {
     loadingBarSignal.value = {
       ...loadingBarSignal.value,
