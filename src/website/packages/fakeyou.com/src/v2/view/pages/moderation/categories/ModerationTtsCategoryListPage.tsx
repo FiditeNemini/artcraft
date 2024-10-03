@@ -21,7 +21,7 @@ interface SortableCategoryHierarchy {
   category: ModerationTtsCategory;
 }
 
-function ModerationTtsCategoryListPage() {
+export default function ModerationTtsCategoryListPage() {
   const { sessionWrapper } = useSession();
   const [ttsCategories, setTtsCategories] = useState<ModerationTtsCategory[]>(
     []
@@ -381,5 +381,3 @@ function recursiveBuildHierarchy(
     found,
   ];
 }
-
-export { ModerationTtsCategoryListPage };

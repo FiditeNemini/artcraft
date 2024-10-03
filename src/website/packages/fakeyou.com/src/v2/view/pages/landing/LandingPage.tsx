@@ -13,7 +13,7 @@ import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding
 import MentionsSection from "components/common/MentionsSection";
 import { useSession } from "hooks";
 
-function LandingPage() {
+export default function LandingPage() {
   PosthogClient.recordPageview();
 
   const { sessionWrapper } = useSession();
@@ -52,5 +52,3 @@ function LandingPage() {
     </>
   );
 }
-
-export { LandingPage };

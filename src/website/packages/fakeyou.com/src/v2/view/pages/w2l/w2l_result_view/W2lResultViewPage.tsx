@@ -22,7 +22,7 @@ import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useSession } from "hooks";
 
-function W2lResultViewPage() {
+export default function W2lResultViewPage() {
   let { token } = useParams() as { token: string };
   const { sessionWrapper } = useSession();
 
@@ -363,5 +363,3 @@ function W2lResultViewPage() {
     </div>
   );
 }
-
-export { W2lResultViewPage };

@@ -23,7 +23,7 @@ interface IpBan {
   updated_at: string;
 }
 
-function ModerationViewIpBanFc() {
+export default function ModerationViewIpBanFc() {
   const { sessionWrapper } = useSession();
   const { ipAddress } = useParams() as { ipAddress: string };
 
@@ -140,5 +140,3 @@ function ModerationViewIpBanFc() {
     </div>
   );
 }
-
-export { ModerationViewIpBanFc };

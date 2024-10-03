@@ -14,7 +14,7 @@ import { Button, TempSelect } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 import { useHistory } from "react-router-dom";
 
-function VoiceDesignerVoiceEditPage() {
+export default function VoiceDesignerVoiceEditPage() {
   const [language, languageSet] = useState("en");
   const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
@@ -116,5 +116,3 @@ function VoiceDesignerVoiceEditPage() {
     </Container>
   );
 }
-
-export { VoiceDesignerVoiceEditPage };

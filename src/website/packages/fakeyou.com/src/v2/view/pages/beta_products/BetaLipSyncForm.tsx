@@ -7,7 +7,7 @@ import {
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
 
-export const BetaLipSyncForm = () => {
+export default function BetaLipSyncForm() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
@@ -33,4 +33,4 @@ export const BetaLipSyncForm = () => {
       <Widget id={fullFormUrl} className="h-100" />
     </div>
   );
-};
+}

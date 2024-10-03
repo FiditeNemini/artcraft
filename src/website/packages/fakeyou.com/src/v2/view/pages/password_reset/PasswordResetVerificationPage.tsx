@@ -21,7 +21,7 @@ const ERR_PASSWORD_DOES_NOT_MATCH = "new password does not match";
 const ERR_BACKEND =
   "There was an issue resetting your password. Perhaps your code expired?";
 
-function PasswordResetVerificationPage() {
+export default function PasswordResetVerificationPage() {
   const history = useHistory();
   const { sessionWrapper, queryAppState } = useContext(AppStateContext);
 
@@ -232,5 +232,3 @@ function getResetCodeErrors(code: string | null): string | undefined {
     return ERR_CODE_TOO_SHORT;
   }
 }
-
-export { PasswordResetVerificationPage };

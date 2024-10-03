@@ -25,7 +25,7 @@ interface TtsModelUploadJobResponsePayload {
   job_token?: string;
 }
 
-function UploadTtsModelPage() {
+export default function UploadTtsModelPage() {
   const history = useHistory();
   const { sessionWrapper } = useSession();
   const { enqueueInferenceJob } = useInferenceJobs();
@@ -241,5 +241,3 @@ function UploadTtsModelPage() {
     </Container>
   );
 }
-
-export { UploadTtsModelPage };

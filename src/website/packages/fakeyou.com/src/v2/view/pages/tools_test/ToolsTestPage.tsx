@@ -2,11 +2,7 @@ import { Container, Panel } from "components/common";
 import { AITools } from "components/marketing";
 import React from "react";
 
-interface ToolsTestPageProps {
-  // Define props here
-}
-
-export const ToolsTestPage = (props: ToolsTestPageProps) => {
+export default function ToolsTestPage() {
   return (
     <Container type="panel" className="mt-5">
       <Panel clear={true}>
@@ -15,4 +11,4 @@ export const ToolsTestPage = (props: ToolsTestPageProps) => {
       </Panel>
     </Container>
   );
-};
+}

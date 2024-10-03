@@ -20,7 +20,7 @@ import MentionsSection from "components/common/MentionsSection";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import { useSession } from "hooks";
 
-function PricingPage() {
+export default function PricingPage() {
   const history = useHistory();
   const { sessionSubscriptions, sessionWrapper } = useSession();
   PosthogClient.recordPageview();
@@ -716,5 +716,3 @@ function PricingPage() {
     </>
   );
 }
-
-export { PricingPage };

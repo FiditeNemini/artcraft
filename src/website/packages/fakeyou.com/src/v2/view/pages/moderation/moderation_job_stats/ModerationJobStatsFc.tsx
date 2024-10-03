@@ -18,7 +18,7 @@ import {
 } from "@storyteller/components/src/api/moderation/tts/KillTtsInferenceJobs";
 import { useSession } from "hooks";
 
-function ModerationJobStatsFc() {
+export default function ModerationJobStatsFc() {
   const { sessionWrapper } = useSession();
   // NB: We have more TTS stats than W2L stats now.
   const [ttsSecondsSinceFirst, setTtsSecondsSinceFirst] = useState<number>(-1);
@@ -257,5 +257,3 @@ function humanWaitTime(seconds: number): string {
     return `${(seconds / (60 * 60)).toFixed(1)} hours`;
   }
 }
-
-export { ModerationJobStatsFc };

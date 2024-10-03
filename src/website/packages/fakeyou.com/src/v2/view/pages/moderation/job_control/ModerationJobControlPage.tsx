@@ -17,7 +17,7 @@ import {
 } from "components/entities/EntityTypes";
 import { useSession } from "hooks";
 
-function ModerationJobControlPage() {
+export default function ModerationJobControlPage() {
   const { sessionWrapper } = useSession();
   const [filter, filterSet] = useState<string | undefined>();
   const objNumKeys = (obj = {}) =>
@@ -167,5 +167,3 @@ function ModerationJobControlPage() {
     </Container>
   );
 }
-
-export { ModerationJobControlPage };

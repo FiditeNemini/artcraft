@@ -13,7 +13,7 @@ import { BackLink } from "../../../_common/BackLink";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useSession } from "hooks";
 
-function W2lTemplateDeletePage() {
+export default function W2lTemplateDeletePage() {
   const history = useHistory();
   const { sessionWrapper } = useSession();
 
@@ -226,5 +226,3 @@ function W2lTemplateDeletePage() {
     </div>
   );
 }
-
-export { W2lTemplateDeletePage };

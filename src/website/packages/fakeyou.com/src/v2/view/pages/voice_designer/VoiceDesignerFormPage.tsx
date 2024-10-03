@@ -25,7 +25,7 @@ interface RouteParams {
   dataset_token?: string;
 }
 
-function VoiceDesignerFormPage() {
+export default function VoiceDesignerFormPage() {
   const history = useHistory();
   const { datasets, inputCtrl, languages, visibilityOptions, voices } =
     useVoiceRequests({});
@@ -225,5 +225,3 @@ function VoiceDesignerFormPage() {
     </Container>
   );
 }
-
-export { VoiceDesignerFormPage };

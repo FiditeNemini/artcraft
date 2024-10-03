@@ -68,7 +68,7 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 import { AITools } from "components/marketing";
 import { useSession } from "hooks";
 
-function TtsModelViewPage() {
+export default function TtsModelViewPage() {
   let { token } = useParams() as { token: string };
   const { loggedIn, sessionWrapper } = useSession();
   PosthogClient.recordPageview();
@@ -894,5 +894,3 @@ function recursiveBuildHierarchy(
     found,
   ];
 }
-
-export { TtsModelViewPage };

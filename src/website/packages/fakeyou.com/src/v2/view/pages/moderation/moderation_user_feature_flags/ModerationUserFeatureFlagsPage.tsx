@@ -19,7 +19,7 @@ function hasFlag(field: string, maybeUserData?: User): boolean {
   return hasFlag;
 }
 
-function ModerationUserFeatureFlagsPage() {
+export default function ModerationUserFeatureFlagsPage() {
   const { sessionWrapper } = useSession();
   const { username: urlUsername } = useParams() as { username?: string };
 
@@ -206,5 +206,3 @@ function ModerationUserFeatureFlagsPage() {
     </Container>
   );
 }
-
-export { ModerationUserFeatureFlagsPage };

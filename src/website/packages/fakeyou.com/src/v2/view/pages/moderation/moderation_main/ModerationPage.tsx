@@ -21,7 +21,7 @@ import { Button, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 import { useSession } from "hooks";
 
-function ModerationPage() {
+export default function ModerationPage() {
   const { sessionWrapper } = useSession();
 
   if (!sessionWrapper.canBanUsers()) {
@@ -150,5 +150,3 @@ function ModerationPage() {
     </Container>
   );
 }
-
-export { ModerationPage };

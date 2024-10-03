@@ -24,7 +24,7 @@ import {
 import { CategoryBreadcrumb } from "../../../_common/CategoryBreadcrumb";
 import { useSession } from "hooks";
 
-function ModerationTtsCategoryEditPage() {
+export default function ModerationTtsCategoryEditPage() {
   const { sessionWrapper } = useSession();
   const { token }: { token: string } = useParams();
 
@@ -418,5 +418,3 @@ function recursiveBuildHierarchy(
     found,
   ];
 }
-
-export { ModerationTtsCategoryEditPage };

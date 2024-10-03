@@ -34,7 +34,7 @@ import { useParams, Link } from "react-router-dom";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-function TtsEditCategoriesPage() {
+export default function TtsEditCategoriesPage() {
   let { token } = useParams() as { token: string };
   PosthogClient.recordPageview();
 
@@ -300,5 +300,3 @@ function TtsEditCategoriesPage() {
     </div>
   );
 }
-
-export { TtsEditCategoriesPage };

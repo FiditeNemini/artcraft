@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-function PortalSuccessPage() {
+export default function PortalSuccessPage() {
   PosthogClient.recordPageview();
 
   return (
@@ -43,5 +43,3 @@ function PortalSuccessPage() {
     </div>
   );
 }
-
-export { PortalSuccessPage };

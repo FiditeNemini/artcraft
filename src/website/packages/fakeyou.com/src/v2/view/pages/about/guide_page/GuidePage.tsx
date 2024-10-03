@@ -5,9 +5,7 @@ import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2"
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-interface Props {}
-
-function GuidePage(props: Props) {
+export default function GuidePage() {
   PosthogClient.recordPageview();
   usePrefixedDocumentTitle("Guide to all things Deep Fake");
 
@@ -162,5 +160,3 @@ function GuidePage(props: Props) {
     </div>
   );
 }
-
-export { GuidePage };

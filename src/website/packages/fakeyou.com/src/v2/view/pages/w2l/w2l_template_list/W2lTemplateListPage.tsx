@@ -40,7 +40,7 @@ interface W2lTemplate {
   updated_at: string;
 }
 
-function W2lTemplateListPage() {
+export default function W2lTemplateListPage() {
   const { sessionWrapper } = useSession();
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -268,5 +268,3 @@ function W2lTemplateListPage() {
     </div>
   );
 }
-
-export { W2lTemplateListPage };

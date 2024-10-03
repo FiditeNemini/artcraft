@@ -11,7 +11,7 @@ import { useSession } from "hooks";
 
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-function W2lResultDeletePage() {
+export default function W2lResultDeletePage() {
   const history = useHistory();
   PosthogClient.recordPageview();
   const { sessionWrapper } = useSession();
@@ -150,5 +150,3 @@ function W2lResultDeletePage() {
     </div>
   );
 }
-
-export { W2lResultDeletePage };

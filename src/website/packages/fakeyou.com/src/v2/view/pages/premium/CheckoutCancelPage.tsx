@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-function CheckoutCancelPage() {
+export default function CheckoutCancelPage() {
   PosthogClient.recordPageview();
 
   return (
@@ -63,5 +63,3 @@ function CheckoutCancelPage() {
     </div>
   );
 }
-
-export { CheckoutCancelPage };

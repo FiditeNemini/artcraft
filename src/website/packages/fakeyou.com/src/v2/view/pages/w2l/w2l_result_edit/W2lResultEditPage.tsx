@@ -51,7 +51,7 @@ interface W2lInferenceResultModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-function W2lResultEditPage() {
+export default function W2lResultEditPage() {
   let { token }: { token: string } = useParams();
   PosthogClient.recordPageview();
 
@@ -182,5 +182,3 @@ function W2lResultEditPage() {
     </div>
   );
 }
-
-export { W2lResultEditPage };

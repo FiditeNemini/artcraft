@@ -13,7 +13,7 @@ import {
 } from "@storyteller/components/src/api/user/RequestResetPassword";
 import { useSession } from "hooks";
 
-function PasswordResetEmailPage() {
+export default function PasswordResetEmailPage() {
   let history = useHistory();
   const { user } = useSession();
 
@@ -95,5 +95,3 @@ function PasswordResetEmailPage() {
     </Container>
   );
 }
-
-export { PasswordResetEmailPage };

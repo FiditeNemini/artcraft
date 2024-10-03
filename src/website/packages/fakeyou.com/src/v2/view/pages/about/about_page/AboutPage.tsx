@@ -5,9 +5,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Container, Panel } from "components/common";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 
-interface Props {}
-
-function AboutPage(props: Props) {
+export default function AboutPage() {
   PosthogClient.recordPageview();
   usePrefixedDocumentTitle("About Us");
 
@@ -192,5 +190,3 @@ function AboutPage(props: Props) {
     </Container>
   );
 }
-
-export { AboutPage };

@@ -15,7 +15,7 @@ import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2"
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-function LeaderboardPage() {
+export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>(
     undefined
   );
@@ -151,5 +151,3 @@ function LeaderboardPage() {
     </div>
   );
 }
-
-export { LeaderboardPage };

@@ -8,7 +8,7 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
-function PatronPage() {
+export default function PatronPage() {
   usePrefixedDocumentTitle("Thank you to our Patrons!");
   PosthogClient.recordPageview();
 
@@ -87,5 +87,3 @@ function PatronPage() {
     </div>
   );
 }
-
-export { PatronPage };

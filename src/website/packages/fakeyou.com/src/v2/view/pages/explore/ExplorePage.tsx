@@ -13,9 +13,7 @@ import WeightsTab from "./tabs/WeightsTab";
 import MediaTab from "./tabs/MediaTab";
 import { Redirect, useLocation } from "react-router-dom";
 
-interface ExplorePageProps {}
-
-export default function ExplorePage(props: ExplorePageProps) {
+export default function ExplorePage() {
   const { pathname } = useLocation();
 
   if (pathname === `/explore` || pathname === `/explore/`) {

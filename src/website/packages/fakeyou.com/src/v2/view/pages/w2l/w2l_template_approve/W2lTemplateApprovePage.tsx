@@ -14,7 +14,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 
 const DEFAULT_APPROVED_STATE = true;
 
-function W2lTemplateApprovePage() {
+export default function W2lTemplateApprovePage() {
   const history = useHistory();
 
   PosthogClient.recordPageview();
@@ -189,5 +189,3 @@ function W2lTemplateApprovePage() {
     </div>
   );
 }
-
-export { W2lTemplateApprovePage };
