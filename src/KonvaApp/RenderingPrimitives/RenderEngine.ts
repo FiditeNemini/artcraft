@@ -205,7 +205,7 @@ export class RenderEngine {
     // update the context menu
     this.videoNodes.forEach((node) => {
       // find selected node... TODO and update that position
-      node.updateContextMenu();
+      node.updateContextComponents();
     });
     this.mediaLayerRef.batchDraw();
   }
