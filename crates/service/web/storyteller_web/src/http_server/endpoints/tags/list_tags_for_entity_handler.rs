@@ -6,6 +6,7 @@
 use std::fmt;
 use std::sync::Arc;
 
+use crate::http_server::common_responses::tag_info::TagInfo;
 use crate::http_server::endpoints::comments::list_comments_handler::ListCommentsPathInfo;
 use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::SetMediaFileCoverImageError;
 use crate::http_server::endpoints::users::edit_username_handler::EditUsernameError;
@@ -54,7 +55,7 @@ pub struct ListTagsForEntityPathInfo {
 #[derive(Serialize, ToSchema)]
 pub struct ListTagsForEntitySuccessResponse {
   pub success: bool,
-  pub tags: Vec<String>,
+  pub tags: Vec<TagInfo>,
 }
 
 #[derive(Debug, ToSchema)]
@@ -145,7 +146,10 @@ pub async fn list_tags_for_entity_handler(
     success: true,
     tags: tags
         .into_iter()
-        .map(|tag| tag.tag_value)
+        .map(|tag| TagInfo {
+          token: tag.token,
+          value: tag.tag_value,
+        })
         .collect(),
   }))
 }

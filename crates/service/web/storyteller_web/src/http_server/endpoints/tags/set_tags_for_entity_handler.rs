@@ -6,6 +6,7 @@
 use std::fmt;
 use std::sync::Arc;
 
+use crate::http_server::common_responses::tag_info::TagInfo;
 use crate::http_server::endpoints::comments::list_comments_handler::ListCommentsPathInfo;
 use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::SetMediaFileCoverImageError;
 use crate::http_server::endpoints::users::edit_username_handler::EditUsernameError;
@@ -43,6 +44,9 @@ use tokens::tokens::w2l_templates::W2lTemplateToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use utoipa::ToSchema;
 
+/// Maximum number of tags allowed per item.
+const MAX_TAGS : usize = 30;
+
 /// For the URL PathInfo
 #[derive(Deserialize, ToSchema)]
 pub struct SetTagsForEntityPathInfo {
@@ -59,7 +63,7 @@ pub struct SetTagsForEntityRequest {
 #[derive(Serialize, ToSchema)]
 pub struct SetTagsForEntitySuccessResponse {
   pub success: bool,
-  pub tag_tokens: Vec<TagToken>,
+  pub tags: Vec<TagInfo>,
 }
 
 #[derive(Debug, ToSchema)]
@@ -171,6 +175,12 @@ pub async fn set_tags_for_entity_handler(
 
   let matching_tags = select_matching_tags(&request_tags, Transactor::for_connection(&mut *mysql_connection))
       .await
+      .map(|tags| tags.into_iter()
+          .map(|tag| TagInfo {
+            token: tag.token,
+            value: tag.tag_value.to_string(),
+          })
+          .collect::<Vec<TagInfo>>())
       .map_err(|e| {
         warn!("error selecting tags: {:?}", e);
         SetTagsForEntityError::ServerError
@@ -178,7 +188,7 @@ pub async fn set_tags_for_entity_handler(
 
   let matching_tag_values = matching_tags
       .iter()
-      .map(|tag| tag.tag_value.to_string())
+      .map(|tag| tag.value.to_string())
       .collect::<Vec<String>>();
 
   let new_tag_values = request_tags.iter()
@@ -186,7 +196,7 @@ pub async fn set_tags_for_entity_handler(
       .map(|tag| tag.as_str())
       .collect::<Vec<&str>>();
 
-  let mut new_tag_tokens = Vec::new();
+  let mut new_tags = Vec::new();
 
   // TODO(bt): Bulk insert instead of insert per tag.
 
@@ -197,24 +207,26 @@ pub async fn set_tags_for_entity_handler(
           warn!("error creating tag: {:?}", e);
           SetTagsForEntityError::ServerError
         })?;
-    new_tag_tokens.push(token);
+    new_tags.push(TagInfo {
+      token,
+      value: new_tag_value.to_string(),
+    });
   }
 
-  let existing_tag_tokens = matching_tags.iter()
-      .map(|tag| tag.token.clone())
-      .collect::<Vec<_>>();
+  let final_tag_set = matching_tags.into_iter()
+      .chain(new_tags.into_iter())
+      .collect::<Vec<TagInfo>>();
 
-  let final_tag_set = existing_tag_tokens.iter()
-      .chain(new_tag_tokens.iter())
-      .map(|token| token.clone())
-      .collect::<Vec<_>>();
+  let final_tag_tokens = final_tag_set.iter()
+      .map(|tag_info| tag_info.token.clone())
+      .collect::<Vec<TagToken>>();
 
   let entity = TagUseEntity::from_entity_type_and_token(
     path.entity_type, &path.entity_token);
 
   update_tags_for_entity(
     entity,
-    &final_tag_set,
+    &final_tag_tokens,
     &mut mysql_connection)
       .await
       .map_err(|e| {
@@ -224,8 +236,7 @@ pub async fn set_tags_for_entity_handler(
 
   Ok(Json(SetTagsForEntitySuccessResponse {
     success: true,
-    tag_tokens: final_tag_set
-    ,
+    tags: final_tag_set,
   }))
 }
 
@@ -277,8 +288,12 @@ async fn get_is_creator(
 }
 
 fn to_normalized_tags(tags: &str) -> Vec<String> {
-  tags.split(',')
+  let mut tags : Vec<String> = tags.split(',')
       .map(|tag| tag.trim().to_lowercase())
       .filter(|tag| !tag.is_empty())
-      .collect()
+      .collect();
+
+  tags.truncate(MAX_TAGS);
+
+  tags
 }

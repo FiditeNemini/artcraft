@@ -1,4 +1,3 @@
-use log::info;
 use crate::utils::transactor::Transactor;
 use errors::AnyhowResult;
 use sqlx::mysql::MySqlRow;

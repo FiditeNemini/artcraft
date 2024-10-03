@@ -43,14 +43,15 @@ use crate::http_server::common_requests::media_file_token_path_info::MediaFileTo
 use crate::http_server::common_responses::media::cover_image_links::CoverImageLinks;
 use crate::http_server::common_responses::media::media_file_cover_image_details::MediaFileCoverImageDetails;
 use crate::http_server::common_responses::media::media_file_cover_image_details::MediaFileDefaultCover;
+use crate::http_server::common_responses::media::media_links::*;
 use crate::http_server::common_responses::media::weights_cover_image_details::*;
 use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
-use crate::http_server::common_responses::media::media_links::*;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::simple_response::SimpleResponse;
+use crate::http_server::common_responses::tag_info::TagInfo;
 use crate::http_server::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::endpoints::analytics::log_browser_session_handler::*;
 use crate::http_server::endpoints::app_state::components::get_permissions::AppStateLegacyPermissionFlags;
@@ -119,6 +120,8 @@ use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_fea
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::stats::get_unified_queue_stats_handler::*;
+use crate::http_server::endpoints::tags::list_tags_for_entity_handler::*;
+use crate::http_server::endpoints::tags::set_tags_for_entity_handler::*;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
@@ -128,15 +131,13 @@ use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_
 use crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
-use crate::http_server::endpoints::tags::list_tags_for_entity_handler::*;
-use crate::http_server::endpoints::tags::set_tags_for_entity_handler::*;
+use crate::http_server::endpoints::users::create_account_handler::*;
+use crate::http_server::endpoints::users::edit_username_handler::*;
 use crate::http_server::endpoints::users::get_profile_handler::*;
+use crate::http_server::endpoints::users::google_sso::google_sso_handler::*;
 use crate::http_server::endpoints::users::login_handler::*;
 use crate::http_server::endpoints::users::logout_handler::*;
 use crate::http_server::endpoints::users::session_info_handler::*;
-use crate::http_server::endpoints::users::edit_username_handler::*;
-use crate::http_server::endpoints::users::google_sso::google_sso_handler::*;
-use crate::http_server::endpoints::users::create_account_handler::*;
 use crate::http_server::endpoints::users::session_token_info_handler::*;
 use crate::http_server::endpoints::voice_conversion::enqueue_voice_conversion_inference_handler::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
@@ -311,6 +312,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SimpleEntityStats,
     SimpleGenericJsonSuccess,
     SimpleResponse,
+    TagInfo,
     UserDetailsLight,
     VideoPreviews,
     Visibility,

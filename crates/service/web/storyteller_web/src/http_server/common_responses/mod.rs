@@ -5,5 +5,6 @@ pub mod pagination_cursors;
 pub mod pagination_page;
 pub mod simple_entity_stats;
 pub mod simple_response;
+pub mod tag_info;
 pub mod user_avatars;
 pub mod user_details_lite;
