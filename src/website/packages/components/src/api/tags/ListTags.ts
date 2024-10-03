@@ -4,7 +4,12 @@ export interface ListTagsRequest {}
 
 export interface ListTagsResponse {
   success: boolean;
-  tags: string[];
+  tags: [
+    {
+      token: string;
+      value: string;
+    },
+  ];
 }
 
 export const ListTags = MakeRequest<

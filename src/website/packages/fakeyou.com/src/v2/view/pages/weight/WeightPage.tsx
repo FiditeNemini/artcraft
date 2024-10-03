@@ -51,6 +51,7 @@ import {
   LanguageLabels,
   LanguageTag,
 } from "@storyteller/components/src/api/Languages";
+import "./WeightTags.scss";
 
 export default function WeightPage() {
   const { canEditTtsModel, canBanUsers, user } = useSession();
@@ -85,7 +86,14 @@ export default function WeightPage() {
     },
     token: weight_token,
   });
-  const { data: weight, fetchError, isLoading, title, remove } = fetchedWeight;
+  const {
+    data: weight,
+    fetchError,
+    isLoading,
+    title,
+    remove,
+    tags,
+  } = fetchedWeight;
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.created_at || "").format("LLL");
@@ -325,7 +333,24 @@ export default function WeightPage() {
     case WeightCategory.TTS:
     case WeightCategory.VC:
     case WeightCategory.ZS:
-      weightDetails = <DataTable data={voiceDetails} />;
+      weightDetails = (
+        <>
+          <DataTable data={voiceDetails} />
+          <div></div>
+          {tags && (
+            <>
+              <hr className="m-0" />
+              <div className="fy-weight-tag-container">
+                {tags.map((tag, index) => (
+                  <div key={index} className="fy-weight-tag">
+                    {tag}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      );
       break;
     case WeightCategory.WF:
     case WeightCategory.SD:

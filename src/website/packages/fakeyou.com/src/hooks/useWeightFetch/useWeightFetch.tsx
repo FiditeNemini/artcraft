@@ -128,7 +128,10 @@ export default function useWeightFetch({
 
             ListTags(token, {}).then((res: any) => {
               if (res.success) {
-                tagsSet(res.tags);
+                const tagValues = res.tags.map(
+                  (tag: { value: string }) => tag.value
+                );
+                tagsSet(tagValues);
               }
             });
           } else {
