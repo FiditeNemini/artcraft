@@ -1,19 +1,8 @@
 use composite_identifiers::by_table::tag_uses::tag_use_entity::TagUseEntity;
 use errors::AnyhowResult;
 use sqlx::pool::PoolConnection;
-use sqlx::{Acquire, Executor, FromRow, MySql, QueryBuilder, Transaction};
-use sqlx::mysql::MySqlRow;
-use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
-use enums::by_table::media_files::media_file_class::MediaFileClass;
-use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
-use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
-use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
-use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
-use enums::by_table::media_files::media_file_type::MediaFileType;
-use enums::common::visibility::Visibility;
-use tokens::tokens::media_files::MediaFileToken;
+use sqlx::{Acquire, Executor, MySql, QueryBuilder, Transaction};
 use tokens::tokens::tags::TagToken;
-use crate::queries::beta_keys::get_beta_key_by_value::RawRecord;
 
 pub async fn update_tags_for_entity(
   entity: TagUseEntity,
@@ -42,10 +31,10 @@ async fn delete_query(
 ) -> AnyhowResult<()> {
   let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new("DELETE FROM tag_uses ");
 
-  query_builder.push(" WHERE entity_type = ? ");;
+  query_builder.push(" WHERE entity_type = ");;
   query_builder.push_bind(entity.get_entity_type().to_str());
 
-  query_builder.push(" AND entity_token = ? ");;
+  query_builder.push(" AND entity_token = ");;
   query_builder.push_bind(entity.get_entity_token_str());
 
   query_builder.push(" AND tag_token IN ( ");
@@ -75,13 +64,18 @@ async fn insert_query(
 
   query_builder.push(" (entity_type, entity_token, tag_token) VALUES ");
 
-  for tag in tags.iter() {
-    query_builder.push(" ( ?, ");;
+  for (i, tag) in tags.iter().enumerate() {
+    query_builder.push(" ( ");;
     query_builder.push_bind(entity.get_entity_type().to_str());
-    query_builder.push(" ?, ");;
+    query_builder.push(", ");;
     query_builder.push_bind(entity.get_entity_token_str());
-    query_builder.push(" ? )");;
+    query_builder.push(", ");;
     query_builder.push_bind(tag.as_str());
+    query_builder.push(" ) ");
+    
+    if i < tags.len() - 1 {
+      query_builder.push(", ");
+    }
   }
 
   let query = query_builder.build();

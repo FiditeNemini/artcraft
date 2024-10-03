@@ -19,11 +19,11 @@ where
   app.service(
     web
     ::scope("/v1/tags")
-        .service(web::resource("/list/{entity_type}{entity_token}")
+        .service(web::resource("/list/{entity_type}/{entity_token}")
             .route(web::get().to(list_tags_for_entity_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )
-        .service(web::resource("/edit/{entity_type}{entity_token}")
+        .service(web::resource("/edit/{entity_type}/{entity_token}")
             .route(web::post().to(set_tags_for_entity_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )

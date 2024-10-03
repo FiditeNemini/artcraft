@@ -1,3 +1,4 @@
+use log::info;
 use crate::utils::transactor::Transactor;
 use errors::AnyhowResult;
 use sqlx::mysql::MySqlRow;
@@ -24,12 +25,12 @@ pub async fn select_matching_tags(
   let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
         r#"
 SELECT
-    t.token as `token: tokens::tokens::tags::TagToken`,
-    t.tag_value
+    token,
+    tag_value
 FROM
-    tags AS t
+    tags
 WHERE
-    t.tag_value IN (
+    tag_value IN (
         "#,
     );
 
