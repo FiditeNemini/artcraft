@@ -24,6 +24,7 @@ import { useSession, useWeightFetch } from "hooks";
 import "./WeightEditPage.scss";
 import { LanguageLabels } from "@storyteller/components/src/api/Languages";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums";
+import TagsInput from "components/common/TagsInput/TagsInput";
 
 export default function WeightEditPage() {
   const { user, canEditTtsModel } = useSession();
@@ -45,6 +46,8 @@ export default function WeightEditPage() {
     visibility,
     languageTag,
     writeStatus,
+    tags,
+    tagsSet,
     // status
   } = useWeightFetch({ token: weight_token });
 
@@ -179,6 +182,14 @@ export default function WeightEditPage() {
                     }}
                   />
                 )}
+
+                <TagsInput
+                  label="Tags"
+                  value={tags}
+                  onChange={tagsSet}
+                  className="mb-3"
+                  tagsLimit={10}
+                />
 
                 <TempSelect
                   {...{

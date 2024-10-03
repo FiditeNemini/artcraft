@@ -9,6 +9,8 @@ import { UpdateWeight } from "@storyteller/components/src/api/weights/UpdateWeig
 import { DeleteWeight } from "@storyteller/components/src/api/weights/DeleteWeight";
 import { useCoverImgUpload } from "hooks";
 import { LanguageTag } from "@storyteller/components/src/api/Languages";
+import { ListTags } from "@storyteller/components/src/api/tags/ListTags";
+import { EditTags } from "@storyteller/components/src/api/tags/EditTags";
 
 interface Props {
   onSuccess?: (res: Weight) => any;
@@ -32,6 +34,7 @@ export default function useWeightFetch({
   const [maybeUrlSlug, maybeUrlSlugSet] = useState(undefined);
   const [visibility, visibilitySet] = useState("public");
   const [languageTag, languageTagSet] = useState<LanguageTag>("en" || null);
+  const [tags, tagsSet] = useState<string[]>([]);
   const [descriptionMD, descriptionMDSet] = useState("");
   const isLoading =
     status === FetchStatus.ready || status === FetchStatus.in_progress;
@@ -64,6 +67,9 @@ export default function useWeightFetch({
       weight_type: data?.weight_type || "",
     })
       .then((res: any) => {
+        EditTags(token, {
+          tags: tags.join(","),
+        });
         writeStatusSet(FetchStatus.success);
         history.replace(`/weight/${token}`);
       })
@@ -93,6 +99,7 @@ export default function useWeightFetch({
       descriptionMDSet("");
       visibilitySet("public");
       languageTagSet("en");
+      tagsSet([]);
     }
   }, [token, refetch]);
 
@@ -118,6 +125,12 @@ export default function useWeightFetch({
             languageTagSet(maybe_ietf_primary_language_subtag);
             onSuccess(res);
             setData(res);
+
+            ListTags(token, {}).then((res: any) => {
+              if (res.success) {
+                tagsSet(res.tags);
+              }
+            });
           } else {
             statusSet(FetchStatus.error);
           }
@@ -143,5 +156,7 @@ export default function useWeightFetch({
     visibility,
     writeStatus,
     languageTag,
+    tags,
+    tagsSet,
   };
 }
