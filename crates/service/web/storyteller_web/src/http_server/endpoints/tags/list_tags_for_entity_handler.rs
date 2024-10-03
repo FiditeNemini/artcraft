@@ -135,12 +135,14 @@ pub async fn list_tags_for_entity_handler(
   let entity = TagUseEntity::from_entity_type_and_token(
     path.entity_type, &path.entity_token);
 
-  let tags = list_tags_for_entity(entity, Transactor::for_connection(&mut *mysql_connection))
+  let mut tags = list_tags_for_entity(entity, Transactor::for_connection(&mut *mysql_connection))
       .await
       .map_err(|e| {
         warn!("error listing tags: {:?}", e);
         ListTagsForEntityError::ServerError
       })?;
+
+  tags.sort_by(|a, b| a.tag_value.cmp(&b.tag_value));
 
   Ok(Json(ListTagsForEntitySuccessResponse {
     success: true,
