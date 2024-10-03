@@ -1,4 +1,3 @@
-use log::info;
 use composite_identifiers::by_table::tag_uses::tag_use_entity::TagUseEntity;
 use errors::AnyhowResult;
 use sqlx::pool::PoolConnection;
@@ -11,13 +10,12 @@ pub async fn update_tags_for_entity(
   mysql_connection: &mut PoolConnection<MySql>,
 ) -> AnyhowResult<()>
 {
-  let mut transaction = mysql_connection.begin().await?;
-
   if tags.is_empty() {
-    delete_all_query(&entity, tags, &mut transaction).await?;
-    transaction.commit().await?;
+    delete_all_query(&entity, mysql_connection).await?;
     return Ok(());
   }
+
+  let mut transaction = mysql_connection.begin().await?;
 
   delete_query(&entity, tags, &mut transaction).await?;
   insert_query(&entity, tags, &mut transaction).await?;
@@ -50,8 +48,6 @@ async fn delete_query(
 
   separated.push_unseparated(") ");
 
-  info!("delete_query: {}", query_builder.sql());
-
   let query = query_builder.build();
 
   transaction.execute(query).await?;
@@ -61,22 +57,20 @@ async fn delete_query(
 
 async fn delete_all_query(
   entity: &TagUseEntity,
-  tags: &[TagToken],
-  transaction: &mut Transaction<'_, MySql>,
+  mysql_connection: &mut PoolConnection<MySql>,
 ) -> AnyhowResult<()> {
-  let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new("DELETE FROM tag_uses ");
+  let query = sqlx::query!(
+        r#"
+DELETE FROM tag_uses
+WHERE entity_type = ?
+AND entity_token = ?
+LIMIT 1
+        "#,
+      entity.get_entity_type().to_str(),
+      entity.get_entity_token_str(),
+    );
 
-  query_builder.push(" WHERE entity_type = ");;
-  query_builder.push_bind(entity.get_entity_type().to_str());
-
-  query_builder.push(" AND entity_token = ");;
-  query_builder.push_bind(entity.get_entity_token_str());
-
-  info!("delete_query: {}", query_builder.sql());
-
-  let query = query_builder.build();
-
-  transaction.execute(query).await?;
+  mysql_connection.execute(query).await?;
 
   Ok(())
 }
