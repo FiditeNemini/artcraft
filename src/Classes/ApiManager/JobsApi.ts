@@ -1,7 +1,26 @@
 import { ApiManager, ApiResponse } from "./ApiManager";
-import { Job } from "./models/Job";
+import { Job, JobPreview } from "./models/Job";
 
 export class JobsApi extends ApiManager {
+  public GetPreviewStatusByJobToken({
+    token,
+  }: {
+    token: string;
+  }): Promise<ApiResponse<JobPreview>> {
+    console.log(token);
+
+    const endpoint = `${this.ApiTargets.BaseApi}/v1/workflows/preview_status/${token}`;
+
+    return this.get<ApiResponse<JobPreview>>({ endpoint })
+      .then((response) => ({
+        success: response.success,
+        data: response.data,
+      }))
+      .catch((err) => {
+        return { success: false, errorMessage: err.message };
+      });
+  }
+
   public GetJobByToken({
     token,
   }: {
