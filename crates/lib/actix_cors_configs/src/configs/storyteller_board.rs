@@ -2,11 +2,12 @@ use actix_cors::Cors;
 
 use crate::util::netlify_branch_domain_matches::netlify_branch_domain_matches;
 
-pub fn add_video_compositor(cors: Cors, _is_production: bool) -> Cors {
+pub fn add_storyteller_board(cors: Cors, _is_production: bool) -> Cors {
   cors
       // Hypothetical domains
       .allowed_origin("https://memeboard.ai")
       .allowed_origin("https://dingboard.ai")
+      .allowed_origin("https://board.storyteller.ai")
       // Netlify project
       .allowed_origin_fn(|origin, _req_head| {
         netlify_branch_domain_matches(origin, "storyteller-board.netlify.app")
@@ -36,6 +37,12 @@ mod tests {
     async fn dingboard() {
       let production_cors = build_cors_config(ServerEnvironment::Production);
       assert_origin_ok(&production_cors, "https://dingboard.ai").await;
+    }
+
+    #[actix_rt::test]
+    async fn board_dot_storyteller() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://board.storyteller.ai").await;
     }
   }
 
