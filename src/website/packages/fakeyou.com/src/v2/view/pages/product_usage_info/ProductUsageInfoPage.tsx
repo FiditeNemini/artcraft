@@ -39,7 +39,7 @@ const radioButtonsWhy = [
   },
 ];
 
-function ProductUsageInfoPage() {
+export default function ProductUsageInfoPage() {
   usePrefixedDocumentTitle("Product Usage Survey");
   PosthogClient.recordPageview();
 
@@ -133,5 +133,3 @@ function ProductUsageInfoPage() {
     </div>
   );
 }
-
-export { ProductUsageInfoPage };

@@ -33,7 +33,7 @@ import { useSession } from "hooks";
 
 const TWITCH_CHANNEL = "FakeYouLabs";
 
-function NewsPage() {
+export default function NewsPage() {
   const { sessionSubscriptions } = useSession();
   usePrefixedDocumentTitle("AI News");
   PosthogClient.recordPageview();
@@ -187,5 +187,3 @@ function NewsPage() {
     </div>
   );
 }
-
-export { NewsPage };

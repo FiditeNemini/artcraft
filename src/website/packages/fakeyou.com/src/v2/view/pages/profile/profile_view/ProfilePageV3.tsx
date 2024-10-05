@@ -31,7 +31,7 @@ import VideosTab from "./tabs/VideosTab";
 import AudiosTab from "./tabs/AudiosTab";
 import UserProfileInfo from "components/layout/ProfileSidePanel/UserProfileInfo";
 
-function ProfilePageV3() {
+export default function ProfilePageV3() {
   const { username }: { username: string } = useParams();
   const { pathname } = useLocation();
   PosthogClient.recordPageview();

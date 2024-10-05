@@ -1,7 +1,7 @@
 import { DeviceNotSupported } from "components/common";
 import React from "react";
 
-export const StudioMobileCheckPage = () => {
+export default function StudioMobileCheckPage() {
   return (
     <div className="mt-5">
       <DeviceNotSupported
@@ -11,4 +11,4 @@ export const StudioMobileCheckPage = () => {
       />
     </div>
   );
-};
+}

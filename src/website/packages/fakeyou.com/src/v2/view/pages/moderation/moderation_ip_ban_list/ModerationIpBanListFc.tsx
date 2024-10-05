@@ -25,7 +25,7 @@ interface IpBanListItem {
   updated_at: string;
 }
 
-function ModerationIpBanListFc() {
+export default function ModerationIpBanListFc() {
   const history = useHistory();
   const { sessionWrapper } = useSession();
 
@@ -220,5 +220,3 @@ function ModerationIpBanListFc() {
     </div>
   );
 }
-
-export { ModerationIpBanListFc };

@@ -44,7 +44,7 @@ const DEFAULT_PRETRAINED_VOCODER = "hifigan-superres";
 
 const UNSET_CUSTOM_VOCODER_SENTINEL = ""; // NB: Empty string
 
-function TtsModelEditPage() {
+export default function TtsModelEditPage() {
   const { token } = useParams() as { token: string };
   const { sessionWrapper } = useSession();
   PosthogClient.recordPageview();
@@ -626,5 +626,3 @@ function TtsModelEditPage() {
     </div>
   );
 }
-
-export { TtsModelEditPage };

@@ -7,7 +7,7 @@ import {
 } from "@storyteller/components/src/api/moderation/stats/GetVoiceInventoryStats";
 import { useSession } from "hooks";
 
-function ModerationVoiceStatsFc() {
+export default function ModerationVoiceStatsFc() {
   const { sessionWrapper } = useSession();
   const [allVoicesCount, setAllVoicesCount] = useState<number>(-1);
   const [publicVoicesCount, setPublicVoicesCount] = useState<number>(-1);
@@ -65,5 +65,3 @@ function ModerationVoiceStatsFc() {
     </div>
   );
 }
-
-export { ModerationVoiceStatsFc };

@@ -5,7 +5,7 @@ import { AITools } from "components/marketing";
 import React from "react";
 // import { Widget } from "@typeform/embed-react";
 
-export const BetaVideoCompositorPage = () => {
+export default function BetaVideoCompositorPage() {
   usePrefixedDocumentTitle("Beta 2D Video Compositor");
   return (
     <>
@@ -71,4 +71,4 @@ export const BetaVideoCompositorPage = () => {
       </div>
     </>
   );
-};
+}

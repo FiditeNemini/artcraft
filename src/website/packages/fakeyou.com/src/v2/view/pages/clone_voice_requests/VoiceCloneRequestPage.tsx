@@ -27,9 +27,9 @@ import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocument
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
-interface Props { }
+interface Props {}
 
-function VoiceCloneRequestPage(props: Props) {
+export default function VoiceCloneRequestPage(props: Props) {
   usePrefixedDocumentTitle("Create a Custom Voice Clone with Deep Fake TTS");
   PosthogClient.recordPageview();
 
@@ -659,5 +659,3 @@ function VoiceCloneRequestPage(props: Props) {
     </div>
   );
 }
-
-export { VoiceCloneRequestPage };

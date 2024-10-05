@@ -7,7 +7,7 @@ import {
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
 
-export const CreatorTypeformPage = () => {
+export default function CreatorTypeformPage() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
@@ -38,4 +38,4 @@ export const CreatorTypeformPage = () => {
       />
     </div>
   );
-};
+}

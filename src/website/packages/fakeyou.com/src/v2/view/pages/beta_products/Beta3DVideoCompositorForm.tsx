@@ -7,7 +7,7 @@ import {
   GetWebsite,
 } from "@storyteller/components/src/env/GetWebsite";
 
-export const Beta3DVideoCompositorForm = () => {
+export default function Beta3DVideoCompositorForm() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
@@ -34,4 +34,4 @@ export const Beta3DVideoCompositorForm = () => {
       <Widget id={fullFormUrl} className="h-100" />
     </div>
   );
-};
+}

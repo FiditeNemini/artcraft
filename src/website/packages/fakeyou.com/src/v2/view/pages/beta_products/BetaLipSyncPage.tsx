@@ -5,7 +5,7 @@ import { AITools } from "components/marketing";
 import React from "react";
 // import { Widget } from "@typeform/embed-react";
 
-export const BetaLipSyncPage = () => {
+export default function BetaLipSyncPage() {
   usePrefixedDocumentTitle("Beta Lip Sync");
   return (
     <>
@@ -72,4 +72,4 @@ export const BetaLipSyncPage = () => {
       </div>
     </>
   );
-};
+}

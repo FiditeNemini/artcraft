@@ -40,7 +40,7 @@ interface TtsModelModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-function TtsModelDeletePage() {
+export default function TtsModelDeletePage() {
   PosthogClient.recordPageview();
   const history = useHistory();
   const { token } = useParams() as { token: string };
@@ -272,5 +272,3 @@ function TtsModelDeletePage() {
     </div>
   );
 }
-
-export { TtsModelDeletePage };

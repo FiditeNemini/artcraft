@@ -6,7 +6,7 @@ import { ModerationTokenInfo } from "@storyteller/components/src/api/moderation/
 import { faDatabase } from "@fortawesome/pro-solid-svg-icons";
 import { useSession } from "hooks";
 
-function ModerationTokenInfoPage() {
+export default function ModerationTokenInfoPage() {
   const { sessionWrapper } = useSession();
   const [token, setToken] = useState<string>("");
   const [payload, setPayload] = useState<string>("");
@@ -95,5 +95,3 @@ function ModerationTokenInfoPage() {
     </Container>
   );
 }
-
-export { ModerationTokenInfoPage };

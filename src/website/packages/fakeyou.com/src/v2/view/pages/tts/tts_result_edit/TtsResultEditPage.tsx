@@ -51,7 +51,7 @@ interface TtsInferenceResultModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-function TtsResultEditPage() {
+export default function TtsResultEditPage() {
   let { token }: { token: string } = useParams();
   PosthogClient.recordPageview();
 
@@ -186,5 +186,3 @@ function TtsResultEditPage() {
     </div>
   );
 }
-
-export { TtsResultEditPage };

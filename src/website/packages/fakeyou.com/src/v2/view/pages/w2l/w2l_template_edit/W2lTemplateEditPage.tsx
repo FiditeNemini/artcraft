@@ -15,7 +15,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 
 const DEFAULT_VISIBILITY = "public";
 
-function W2lTemplateEditPage() {
+export default function W2lTemplateEditPage() {
   let { templateToken }: { templateToken: string } = useParams();
 
   const history = useHistory();
@@ -189,5 +189,3 @@ function W2lTemplateEditPage() {
     </div>
   );
 }
-
-export { W2lTemplateEditPage };

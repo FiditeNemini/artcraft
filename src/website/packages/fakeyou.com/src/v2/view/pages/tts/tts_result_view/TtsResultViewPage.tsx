@@ -43,7 +43,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { useSession } from "hooks";
 import "./TtsResult.scss";
 
-function TtsResultViewPage() {
+export default function TtsResultViewPage() {
   const { token }: { token: string } = useParams();
   const { sessionWrapper } = useSession();
   PosthogClient.recordPageview();
@@ -555,5 +555,3 @@ function TtsResultViewPage() {
     </div>
   );
 }
-
-export { TtsResultViewPage };

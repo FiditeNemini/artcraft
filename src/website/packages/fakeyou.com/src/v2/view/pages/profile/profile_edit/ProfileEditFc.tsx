@@ -55,7 +55,7 @@ interface UserPayload {
   preferred_w2l_result_visibility: string;
 }
 
-function ProfileEditFc() {
+export default function ProfileEditFc() {
   const { username } = useParams() as { username: string };
   PosthogClient.recordPageview();
 
@@ -526,5 +526,3 @@ function ProfileEditFc() {
     </div>
   );
 }
-
-export { ProfileEditFc };

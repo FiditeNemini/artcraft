@@ -23,7 +23,7 @@ import GoogleSSO from "components/common/GoogleSSO";
 import { useModal } from "hooks";
 import SetUsernameModal from "../signup/SetUsernameModal";
 
-function LoginPage() {
+export default function LoginPage() {
   let history = useHistory();
   const { open } = useModal();
   const domain = GetWebsite();
@@ -109,6 +109,7 @@ function LoginPage() {
   };
 
   // This function ***MUST*** be attached to global state for the Google library to work.
+  // @ts-ignore
   globalThis.handleGoogleCredentialResponse = async (args: any) => {
     // console.log(">>>> Google Sign In Response", args);
 
@@ -348,5 +349,3 @@ function LoginPage() {
     </div>
   );
 }
-
-export { LoginPage };

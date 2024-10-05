@@ -16,7 +16,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function UploadNewTtsModelPage() {
+export default function UploadNewTtsModelPage() {
   // const history = useHistory();
   const { sessionWrapper, user } = useSession();
   const { enqueueInferenceJob } = useInferenceJobs();
@@ -180,5 +180,3 @@ function UploadNewTtsModelPage() {
     </Container>
   );
 }
-
-export { UploadNewTtsModelPage };

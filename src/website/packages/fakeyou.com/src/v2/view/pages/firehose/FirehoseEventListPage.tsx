@@ -58,7 +58,7 @@ interface TargetUserInfo {
   default_avatar_color_index: number;
 }
 
-function FirehoseEventListPage() {
+export default function FirehoseEventListPage() {
   const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
     []
   );
@@ -418,5 +418,3 @@ function FirehoseEventListPage() {
     </div>
   );
 }
-
-export { FirehoseEventListPage };

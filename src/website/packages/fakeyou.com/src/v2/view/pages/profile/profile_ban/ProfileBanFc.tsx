@@ -11,7 +11,7 @@ import { BackLink } from "../../../_common/BackLink";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useSession } from "hooks";
 
-function ProfileBanFc() {
+export default function ProfileBanFc() {
   const { sessionWrapper } = useSession();
   const { username }: { username: string } = useParams();
   const userProfilePage = `/profile/${username}`;
@@ -174,5 +174,3 @@ function ProfileBanFc() {
     </div>
   );
 }
-
-export { ProfileBanFc };

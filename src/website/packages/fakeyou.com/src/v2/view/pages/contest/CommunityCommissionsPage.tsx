@@ -8,9 +8,7 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 
-interface Props {}
-
-function CommunityCommissionsPage(props: Props) {
+export default function CommunityCommissionsPage() {
   usePrefixedDocumentTitle("Voice to Voice Community Commissions");
   PosthogClient.recordPageview();
 
@@ -109,5 +107,3 @@ function CommunityCommissionsPage(props: Props) {
     </div>
   );
 }
-
-export { CommunityCommissionsPage };

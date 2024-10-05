@@ -25,7 +25,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Button } from "components/common";
 import { useSession } from "hooks";
 
-function ContributeIndexPage() {
+export default function ContributeIndexPage() {
   const { sessionWrapper } = useSession();
   const categoryHeading = sessionWrapper.canEditCategories()
     ? t("pages.contributeIndex.headingCreateCategory")
@@ -195,5 +195,3 @@ function ContributeIndexPage() {
     </div>
   );
 }
-
-export { ContributeIndexPage };

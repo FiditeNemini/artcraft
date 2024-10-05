@@ -25,9 +25,7 @@ import "./VoiceDesigner.scss";
 import MentionsSection from "components/common/MentionsSection";
 import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
 
-// interface Props {}
-
-function VoiceDesignerMainPage() {
+export default function VoiceDesignerMainPage() {
   usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
@@ -302,5 +300,3 @@ function VoiceDesignerMainPage() {
     </>
   );
 }
-
-export { VoiceDesignerMainPage };

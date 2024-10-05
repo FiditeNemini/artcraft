@@ -17,7 +17,7 @@ const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
 const DEFAULT_CAN_ONLY_MODS_APPLY = false;
 
-function CreateCategoryPage() {
+export default function CreateCategoryPage() {
   const { sessionWrapper } = useSession();
   const history = useHistory();
   PosthogClient.recordPageview();
@@ -264,5 +264,3 @@ function CreateCategoryPage() {
     </div>
   );
 }
-
-export { CreateCategoryPage };

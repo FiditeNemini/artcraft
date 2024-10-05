@@ -35,7 +35,7 @@ enum FieldTriState {
   TRUE,
 }
 
-function SignupPage() {
+export default function SignupPage() {
   let history = useHistory();
   const domain = GetWebsite();
   const { open } = useModal();
@@ -118,6 +118,7 @@ function SignupPage() {
   };
 
   // This function ***MUST*** be attached to global state for the Google library to work.
+  // @ts-ignore
   globalThis.handleGoogleCredentialResponse = async (args: any) => {
     // console.log(">>>> Google Sign In Response", args);
 
@@ -675,5 +676,3 @@ function SignupPage() {
     </div>
   );
 }
-
-export { SignupPage };

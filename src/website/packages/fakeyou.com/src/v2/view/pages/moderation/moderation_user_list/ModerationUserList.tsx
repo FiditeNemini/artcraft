@@ -11,7 +11,7 @@ import { WebUrl } from "../../../../../common/WebUrl";
 import { BackLink } from "../../../_common/BackLink";
 import { useSession } from "hooks";
 
-function ModerationUserListFc() {
+export default function ModerationUserListFc() {
   const { sessionWrapper } = useSession();
   const [userList, setUserList] = useState<Array<UserForList>>([]);
 
@@ -104,5 +104,3 @@ function ModerationUserListFc() {
     </div>
   );
 }
-
-export { ModerationUserListFc };

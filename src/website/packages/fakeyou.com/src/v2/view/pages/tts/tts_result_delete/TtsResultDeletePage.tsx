@@ -47,7 +47,7 @@ interface TtsInferenceResultModeratorFields {
   user_deleted_at: string | undefined | null;
 }
 
-function TtsResultDeletePage() {
+export default function TtsResultDeletePage() {
   const history = useHistory();
   const { sessionWrapper } = useSession();
   PosthogClient.recordPageview();
@@ -243,5 +243,3 @@ function TtsResultDeletePage() {
     </div>
   );
 }
-
-export { TtsResultDeletePage };

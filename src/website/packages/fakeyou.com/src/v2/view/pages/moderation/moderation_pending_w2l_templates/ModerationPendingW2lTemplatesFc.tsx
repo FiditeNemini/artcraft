@@ -12,7 +12,7 @@ import {
 import { PhotoVideoIcon } from "../../../_icons/PhotoVideoIcon";
 import { useSession } from "hooks";
 
-function ModerationPendingW2lTemplatesFc() {
+export default function ModerationPendingW2lTemplatesFc() {
   const { sessionWrapper } = useSession();
   const [templates, setTemplates] = useState<
     Array<PendingW2lTemplatesEntryForList>
@@ -119,5 +119,3 @@ function ModerationPendingW2lTemplatesFc() {
     </div>
   );
 }
-
-export { ModerationPendingW2lTemplatesFc };

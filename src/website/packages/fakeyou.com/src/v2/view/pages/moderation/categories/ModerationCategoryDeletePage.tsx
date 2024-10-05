@@ -16,7 +16,7 @@ import {
 } from "@storyteller/components/src/api/moderation/category/SetCategoryDeletionState";
 import { useSession } from "hooks";
 
-function ModerationCategoryDeletePage() {
+export default function ModerationCategoryDeletePage() {
   const { sessionWrapper } = useSession();
   const { token }: { token: string } = useParams();
 
@@ -160,5 +160,3 @@ function ModerationCategoryDeletePage() {
     </div>
   );
 }
-
-export { ModerationCategoryDeletePage };
