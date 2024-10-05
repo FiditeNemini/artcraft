@@ -3,7 +3,7 @@ import "scss/custom-bootstrap.scss";
 
 import React, { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
-import PageContainer from "./v2/view/PageContainer";
+import PageContainer from "./v2/view/PageContainer-fixed-load";
 // import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 // import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
