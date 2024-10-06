@@ -5,10 +5,11 @@ use reusable_types::server_environment::ServerEnvironment;
 
 use crate::configs::development_only::add_development_only;
 use crate::configs::fakeyou::{add_fakeyou, add_fakeyou_dev_proxy};
-use crate::configs::storyteller_studio::add_storyteller_studio;
 use crate::configs::legacy::{add_legacy_storyteller_stream, add_legacy_trumped, add_legacy_vocodes, add_power_stream};
 use crate::configs::storyteller::{add_storyteller, add_storyteller_dev_proxy};
 use crate::configs::storyteller_board::add_storyteller_board;
+use crate::configs::storyteller_render::add_storyteller_render;
+use crate::configs::storyteller_studio::add_storyteller_studio;
 
 /// Return cors config for FakeYou / Vocodes / OBS / local development
 pub fn build_cors_config(server_environment: ServerEnvironment) -> Cors {
@@ -37,6 +38,7 @@ fn do_build_cors_config(is_production: bool) -> Cors {
   cors = add_storyteller_dev_proxy(cors, is_production);
   cors = add_storyteller_studio(cors, is_production);
   cors = add_storyteller_board(cors, is_production);
+  cors = add_storyteller_render(cors, is_production);
 
   // Legacy
   cors = add_legacy_trumped(cors, is_production);
