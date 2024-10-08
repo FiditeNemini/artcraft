@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { Button, TextEditor } from "~/components/ui";
@@ -72,7 +72,7 @@ export const DialogEditText = ({
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,
-            "flex w-full max-w-5xl flex-col justify-between gap-4 px-6 pb-6 pt-4",
+            "flex w-fit max-w-5xl flex-col justify-between gap-4 px-6 pb-6 pt-4",
           )}
           // style={{ height: "calc(100vh - 200px)" }}
         >

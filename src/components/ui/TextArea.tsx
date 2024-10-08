@@ -1,4 +1,4 @@
-import { TextareaHTMLAttributes } from "react";
+import { TextareaHTMLAttributes, forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { kebabCase } from "~/utilities";
 
@@ -16,39 +16,39 @@ export interface TextareaInterface
   label?: string;
   resize?: ResizeType;
 }
-export const Textarea = ({
-  className,
-  label,
-  resize = "vertical",
-  id,
-  ...rest
-}: TextareaInterface) => {
-  return (
-    <div className="flex flex-col">
-      {label && <label htmlFor={id ? id : kebabCase(label)}>{label}</label>}
+export const Textarea = forwardRef<HTMLTextAreaElement>(
+  (
+    { className, label, resize = "vertical", id, ...rest }: TextareaInterface,
+    ref,
+  ) => {
+    return (
+      <div className="flex flex-col">
+        {label && <label htmlFor={id ? id : kebabCase(label)}>{label}</label>}
 
-      <textarea
-        id={id ? id : label ? kebabCase(label) : undefined}
-        className={twMerge(
-          "border-ui-panel-border bg-ui-controls rounded-lg border px-3 py-2",
-          className,
-        )}
-        style={{
-          outline: "2px solid transparent",
-          transition: "outline-color 0.15s ease-in-out",
-          resize: resize,
-        }}
-        onFocus={(e) => {
-          // disableHotkeyInput(DomLevels.INPUT);
-          e.currentTarget.style.outlineColor = "#e66462";
-        }}
-        onBlur={(e) => {
-          // enableHotkeyInput(DomLevels.INPUT);
-          e.currentTarget.style.outlineColor = "transparent";
-        }}
-        onKeyDown={(event) => event.stopPropagation()}
-        {...rest}
-      />
-    </div>
-  );
-};
+        <textarea
+          ref={ref}
+          id={id ? id : label ? kebabCase(label) : undefined}
+          className={twMerge(
+            "border-ui-panel-border bg-ui-controls rounded-lg border px-3 py-2",
+            className,
+          )}
+          style={{
+            outline: "2px solid transparent",
+            transition: "outline-color 0.15s ease-in-out",
+            resize: resize,
+          }}
+          onFocus={(e) => {
+            // disableHotkeyInput(DomLevels.INPUT);
+            e.currentTarget.style.outlineColor = "#e66462";
+          }}
+          onBlur={(e) => {
+            // enableHotkeyInput(DomLevels.INPUT);
+            e.currentTarget.style.outlineColor = "transparent";
+          }}
+          onKeyDown={(event) => event.stopPropagation()}
+          {...rest}
+        />
+      </div>
+    );
+  },
+);

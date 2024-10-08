@@ -29,25 +29,25 @@ export const Combobox = ({ options, value, onChange }: ComboBoxInterface) => {
       onChange={onChange}
       onClose={() => setQuery("")}
     >
-      <div className="flex">
+      <div className="relative flex h-10 rounded-md border">
         <ComboboxInput
-          aria-label="Assignee"
+          className="rounded-md"
           displayValue={(font: string) => font}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <ComboboxButton className="">
-          <FontAwesomeIcon
-            icon={faChevronDown}
-            className="size-4 fill-black/60 group-data-[hover]:fill-black"
-          />
+        <ComboboxButton className="absolute right-0 top-0 flex h-10 items-center justify-center hover:text-primary">
+          <FontAwesomeIcon icon={faChevronDown} className="size-4 p-2" />
         </ComboboxButton>
       </div>
-      <ComboboxOptions anchor="bottom" className="border empty:invisible">
+      <ComboboxOptions
+        anchor="bottom"
+        className="mt-1 w-[var(--input-width)] rounded-lg border empty:invisible"
+      >
         {filteredOptions.map((option, idx) => (
           <ComboboxOption
             key={idx}
             value={option}
-            className="data-[focus]:bg-blue-100"
+            className="cursor-pointer bg-white p-2 data-[focus]:bg-primary-200 data-[selected]:font-medium"
           >
             {option}
           </ComboboxOption>

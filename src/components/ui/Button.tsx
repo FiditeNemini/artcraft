@@ -31,7 +31,7 @@ export const Button = ({
         return "bg-tertiary hover:bg-tertiary-400 text-white focus-visible:outline-tertiary-600";
       }
       case "secondary": {
-        return "bg-secondary hover:bg-secondary-900 text-white focus-visible:outline-secondary";
+        return "bg-secondary-600 hover:bg-secondary-400 text-white focus-visible:outline-secondary";
       }
       case "action": {
         return " bg-action hover:bg-action-500 text-white focus-visible:outline-action";

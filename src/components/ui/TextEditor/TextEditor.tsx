@@ -1,20 +1,12 @@
-import { ChangeEvent } from "react";
-import { faFont } from "@fortawesome/pro-solid-svg-icons";
-import {
-  CloseButton,
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-} from "@headlessui/react";
-import { HexColorPicker } from "react-colorful";
+import { ChangeEvent, useCallback, useEffect, useRef } from "react";
 
 import { Textarea, TextareaInterface, ResizeType } from "../TextArea";
 import { InputNumber } from "../InputNumber";
 import { Combobox } from "../ComboBox";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import { ButtonsAlignments } from "./ButtonsAlignment";
 import { ButtonsTextStyles } from "./ButtonTextStyles";
-
+import { ColorPicker } from "./ColorPicker";
 import {
   TextFormatData,
   TextAlign,
@@ -38,57 +30,99 @@ export const TextEditor = ({
   onChangeFormatting: (newFormatData: Partial<TextFormatData>) => void;
   TextareaProps?: TextareaInterface;
 }) => {
-  const handleOnChangeText = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    onChangeText(e.target.value);
-  };
-  const onChangeTextAlignment = (newAlignment: TextAlign) => {
-    onChangeFormatting({
-      textAlign: newAlignment,
-    });
-  };
-  const onChangeFontStyle = (newStyle: FontStyle) => {
-    onChangeFormatting({
-      fontStyle: newStyle,
-    });
-  };
-  const onChangeFontWeight = (newWeight: FontWeight) => {
-    onChangeFormatting({
-      fontWeight: newWeight,
-    });
-  };
-  const onChangeTextDecoration = (newDecor: TextDecoration) => {
-    onChangeFormatting({
-      textDecoration: newDecor,
-    });
-  };
-  const onChangeFontFamily = (newFontFamily: string) => {
-    onChangeFormatting({
-      fontFamily: newFontFamily,
-    });
-  };
-  const onChangeTextColor = (newTextColor: string) => {
-    onChangeFormatting({
-      color: newTextColor,
-    });
-  };
-  const onChangeFontSize = (newVal: number) => {
-    onChangeFormatting({
-      fontSize: newVal,
-    });
-  };
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const focusOnTextArea = useCallback(() => {
+    if (textAreaRef.current === null) {
+      return;
+    }
+    textAreaRef.current.focus();
+  }, []);
+  useEffect(() => {
+    focusOnTextArea();
+  }, []);
+
+  const handleOnChangeText = useCallback(
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
+      onChangeText(e.target.value);
+      focusOnTextArea();
+    },
+    [onChangeText],
+  );
+  const onChangeTextAlignment = useCallback(
+    (newAlignment: TextAlign) => {
+      onChangeFormatting({
+        textAlign: newAlignment,
+      });
+      focusOnTextArea();
+    },
+    [onChangeFormatting],
+  );
+  const onChangeFontStyle = useCallback(
+    (newStyle: FontStyle) => {
+      onChangeFormatting({
+        fontStyle: newStyle,
+      });
+      focusOnTextArea();
+    },
+    [onChangeFormatting],
+  );
+  const onChangeFontWeight = useCallback(
+    (newWeight: FontWeight) => {
+      onChangeFormatting({
+        fontWeight: newWeight,
+      });
+      focusOnTextArea();
+    },
+    [onChangeFormatting],
+  );
+  const onChangeTextDecoration = useCallback(
+    (newDecor: TextDecoration) => {
+      onChangeFormatting({
+        textDecoration: newDecor,
+      });
+      focusOnTextArea();
+    },
+    [onChangeFormatting],
+  );
+  const onChangeFontFamily = useCallback(
+    (newFontFamily: string) => {
+      onChangeFormatting({
+        fontFamily: newFontFamily,
+      });
+      focusOnTextArea();
+    },
+    [onChangeFormatting],
+  );
+  const onChangeTextColor = useCallback(
+    (newTextColor: string) => {
+      onChangeFormatting({
+        color: newTextColor,
+      });
+    },
+    [onChangeFormatting],
+  );
+  const onChangeFontSize = useCallback(
+    (newVal: number) => {
+      onChangeFormatting({
+        fontSize: newVal,
+      });
+      // focusOnTextArea();
+    },
+    [onChangeFormatting],
+  );
 
   const TextAreaStates = {
     style: {
       ...formatData,
       width: "500px",
+      height: "500px",
     },
-    rows: 7,
     placeholder: "...",
     resize: "none" as ResizeType,
     onChange: handleOnChangeText,
     value: text,
   };
-  const unionTextAreaProps = {
+  const unionedTextAreaProps = {
     ...TextareaProps,
     ...TextAreaStates,
   };
@@ -100,23 +134,7 @@ export const TextEditor = ({
           value={formatData.fontFamily}
           onChange={onChangeFontFamily}
         />
-        <Popover className="relative">
-          <PopoverButton className="flex size-10 flex-col items-center gap-1 rounded-md border p-2">
-            <FontAwesomeIcon icon={faFont} />
-            <span
-              className="h-1 w-full"
-              style={{ backgroundColor: formatData.color }}
-            />
-          </PopoverButton>
-          <PopoverPanel anchor="bottom" className="flex flex-col">
-            <HexColorPicker
-              color={formatData.color}
-              onChange={onChangeTextColor}
-            />
-            <p>{formatData.color}</p>
-            <CloseButton>OK</CloseButton>
-          </PopoverPanel>
-        </Popover>
+        <ColorPicker color={formatData.color} onChange={onChangeTextColor} />
         <InputNumber value={formatData.fontSize} onChange={onChangeFontSize} />
       </div>
       <div className="flex items-center gap-4">
@@ -133,7 +151,7 @@ export const TextEditor = ({
           onChangeTextDecoration={onChangeTextDecoration}
         />
       </div>
-      <Textarea {...unionTextAreaProps} />
+      <Textarea {...unionedTextAreaProps} ref={textAreaRef} />
     </div>
   );
 };
