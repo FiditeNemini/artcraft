@@ -245,11 +245,13 @@ export class Engine {
       }
       const node = nodes.values().next().value;
       try {
-        const nodeChromaProps = node.getChroma();
-        uiAccess.dialogChromakey.show({
-          isChromakeyEnabled: nodeChromaProps.isChromakeyEnabled,
-          chromakeyColor: nodeChromaProps.chromakeyColor,
-        });
+        if (node instanceof VideoNode) {
+          const nodeChromaProps = node.getChroma();
+          uiAccess.dialogChromakey.show({
+            isChromakeyEnabled: nodeChromaProps.isChromakeyEnabled,
+            chromakeyColor: nodeChromaProps.chromakeyColor,
+          });
+        }
       } catch {
         uiAccess.dialogError.show({
           title: "Error: Chroma Key",
@@ -278,12 +280,18 @@ export class Engine {
         .getSelectedNodes()
         .values()
         .next().value;
-      node.setChroma(chromakeyProps.isChromakeyEnabled);
-      node.setChromaColor(
-        chromakeyProps.chromakeyColor?.red || 120,
-        chromakeyProps.chromakeyColor?.blue || 150,
-        chromakeyProps.chromakeyColor?.green || 120,
-      );
+      if (!node) {
+        console.log("Node was not returned.");
+        return;
+      }
+      if (node instanceof VideoNode) {
+        node.setChroma(chromakeyProps.isChromakeyEnabled);
+        node.setChromaColor(
+          chromakeyProps.chromakeyColor?.red || 120,
+          chromakeyProps.chromakeyColor?.blue || 150,
+          chromakeyProps.chromakeyColor?.green || 120,
+        );
+      }
     });
     uiEvents.aiStylize.onRequest(async (data) => {
       console.log("Engine heard AI Stylize request: ", data);
@@ -377,7 +385,9 @@ export class Engine {
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
     });
+
     this.createNode(imageNode);
+    this.renderEngine.addNodes(imageNode);
   }
 
   public addVideo(url: string) {
@@ -433,6 +443,10 @@ export class Engine {
   toggleLockNodes() {
     const nodes = this.selectionManager.getSelectedNodes();
     const node = nodes.values().next().value;
+    if (!node) {
+      console.log("Node Not Found for Locking");
+      return;
+    }
     if (node.isLocked()) {
       const command = new UnlockNodesCommand({
         nodes: this.selectionManager.getSelectedNodes(),

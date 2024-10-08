@@ -50,7 +50,6 @@ export class VideoNode extends NetworkedNodeContext {
   ];
 
   private frameDidFinishSeeking: Promise<void>;
-  private finishedLoadingOnStart: Promise<void>;
 
   async setProcessing() {
     this.isProcessing = true;
