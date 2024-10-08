@@ -51,6 +51,7 @@ export const DialogEditText = ({
       text: text,
       fill: textFormatData.color,
       fontFamily: textFormatData.fontFamily,
+      fontSize: textFormatData.fontSize,
       align: textFormatData.textAlign,
       fontStyle:
         textFormatData.fontStyle === FontStyle.NORMAL &&
