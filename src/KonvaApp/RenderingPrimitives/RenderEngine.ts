@@ -55,6 +55,7 @@ export class RenderEngine {
 
   public videoLoadingCanvas: VideoNode | undefined;
 
+  public fps: number = 24;
   constructor({
     width,
     height,
@@ -99,6 +100,8 @@ export class RenderEngine {
     this.mediaLayerRef = mediaLayerRef;
 
     this.port = undefined;
+
+    this.fps = 24;
     this.captureCanvas = new Konva.Rect({
       x: this.positionX,
       y: this.positionY,
@@ -111,7 +114,7 @@ export class RenderEngine {
     });
     this.captureCanvas.addName("CaptureCanvas");
 
-    this.upperMaxFrames = 7 * 24;
+    this.upperMaxFrames = 7 * this.fps; // seconds by fps
 
     this.bgLayerRef.add(this.captureCanvas);
     // send back
@@ -289,6 +292,11 @@ export class RenderEngine {
 
   private findLongestVideoLength(): number {
     let maxLength = 0;
+    // could simplify this logic to ensure that imageNodes has number of frames.
+    if (this.imageNodes.length > 0 && this.videoNodes.length === 0) {
+      return this.fps * 3; // three seconds determine whether to change this
+    }
+
     this.videoNodes.forEach((node) => {
       const videoLength = node.getNumberFrames();
       if (videoLength > maxLength) {
@@ -334,6 +342,8 @@ export class RenderEngine {
       // error out if nodes are not all loaded.
       // todo remove when we have error handling + and ui
       var failed = false;
+
+      // if there are atleast 1 video node images are all covered.
       for (let i = 0; i < this.videoNodes.length; i++) {
         const item = this.videoNodes[i];
         if (!item.kNode) {
@@ -348,7 +358,6 @@ export class RenderEngine {
           setTimeout(this.startProcessing.bind(this), 1000);
           break;
         }
-
         item.setProcessing();
       }
 
