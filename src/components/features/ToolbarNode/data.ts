@@ -2,7 +2,8 @@ import { ToolbarNodeButtonNames as ButtonNames } from "./enums";
 import {
   faArrowUpFromLine,
   faArrowDownFromLine,
-  faHatWitch,
+  // faHatWitch,
+  faMask,
   faTransporter,
   faTrashCan,
   faVectorSquare,
@@ -17,12 +18,17 @@ export const ToolbarNodeButtonData = [
   {
     name: ButtonNames.CHROMA,
     icon: faTransporter,
-    tooltip: "Chroma Key",
+    tooltip: "Background Removal",
   },
+  // {
+  //   name: ButtonNames.AI_STYLIZE,
+  //   icon: faHatWitch,
+  //   tooltip: "AI Stylize",
+  // },
   {
-    name: ButtonNames.AI_STYLIZE,
-    icon: faHatWitch,
-    tooltip: "AI Stylize",
+    name: ButtonNames.SEGMENTATION,
+    icon: faMask,
+    tooltip: "Select an Extraction",
   },
   {
     name: ButtonNames.MOVE_LAYER_UP,

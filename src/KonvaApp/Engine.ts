@@ -257,6 +257,9 @@ export class Engine {
         });
       }
     });
+    uiEvents.toolbarNode.SEGMENTATION.onClick(() => {
+      console.log("Segmentation Button Clicked");
+    });
     uiEvents.toolbarNode.DELETE.onClick(() => this.deleteNodes());
     uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => this.moveNodesDown());
     uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() => this.moveNodesUp());
