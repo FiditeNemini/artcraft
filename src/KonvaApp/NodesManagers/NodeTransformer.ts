@@ -6,6 +6,7 @@ export class NodeTransformer {
 
   constructor() {
     this.kTransformer = new Konva.Transformer({
+      padding: 0,
       anchorStyleFunc: (anchor) => {
         // anchor is Konva.Rect instance
         // you manually change its styling

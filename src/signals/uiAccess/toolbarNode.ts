@@ -47,32 +47,21 @@ export const toolbarNode = {
       position,
     };
   },
-  lock() {
-    const { buttonStates } = toolbarNodeSignal.value;
-    toolbarNodeSignal.value = {
-      ...toolbarNodeSignal.value,
-      buttonStates: {
-        ...buttonStates,
-        [ButtonNames.TRANSFORM]: {
-          disabled: true,
-          active: buttonStates[ButtonNames.TRANSFORM].active,
-        },
-      },
-      locked: true,
-    };
+  isLocked() {
+    return toolbarNodeSignal.value.locked;
   },
-  unlock() {
+  setLocked(locked: boolean) {
     const { buttonStates } = toolbarNodeSignal.value;
     toolbarNodeSignal.value = {
       ...toolbarNodeSignal.value,
       buttonStates: {
         ...buttonStates,
         [ButtonNames.TRANSFORM]: {
-          disabled: false,
+          disabled: locked,
           active: buttonStates[ButtonNames.TRANSFORM].active,
         },
       },
-      locked: false,
+      locked: locked,
     };
   },
   show(

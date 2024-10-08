@@ -4,8 +4,8 @@ import { MediaNode, Transformation } from "../types";
 
 export class TransformCommand implements ICommand {
   private nodes: Set<MediaNode>;
-  private initialTransformations: Map<MediaNode, Transformation>;
-  private finalTransformations: Map<MediaNode, Transformation>;
+  private initialTransformations: Map<MediaNode, Transformation[]>;
+  private finalTransformations: Map<MediaNode, Transformation[]>;
   private layerRef: Konva.Layer;
 
   constructor({
@@ -15,24 +15,54 @@ export class TransformCommand implements ICommand {
     layerRef,
   }: {
     nodes: Set<MediaNode>;
-    initialTransformations: Map<MediaNode, Transformation>;
-    finalTransformations: Map<MediaNode, Transformation>;
+    initialTransformations: Map<MediaNode, Transformation[]>;
+    finalTransformations: Map<MediaNode, Transformation[]>;
     layerRef: Konva.Layer;
   }) {
     this.nodes = new Set<MediaNode>(nodes);
     this.initialTransformations = initialTransformations;
     this.finalTransformations = finalTransformations;
     this.layerRef = layerRef;
+    console.log("transform command", this);
   }
+  private transformKNode(kNode: Konva.Node, transform: Transformation) {
+    kNode.setAttrs({
+      position: transform.position,
+      size: transform.size,
+      rotation: transform.rotation,
+      scale: transform.scale,
+    });
+  }
+  private findKNodeOfTransform = (
+    node: MediaNode,
+    transform: Transformation,
+  ) => {
+    const parentKNode = node.kNode;
+    if (parentKNode._id === transform.kNodeId) {
+      this.transformKNode(parentKNode, transform);
+      return;
+    }
+    if (parentKNode instanceof Konva.Group) {
+      const childKNode = parentKNode
+        .getChildren()
+        .find((currChild) => currChild._id === transform.kNodeId);
+      if (childKNode) {
+        this.transformKNode(childKNode, transform);
+        return;
+      }
+    }
+    if (import.meta.env.DEV) {
+      console.warn("Error in Transform", node, transform);
+    }
+  };
+
   execute() {
     this.nodes.forEach((node) => {
-      const finalTransformation = this.finalTransformations.get(node);
-      if (finalTransformation) {
-        node.kNode.position(finalTransformation.position);
-        node.kNode.size(finalTransformation.size);
-        node.kNode.rotation(finalTransformation.rotation);
-        node.kNode.scaleX(finalTransformation.scale.scaleX);
-        node.kNode.scaleY(finalTransformation.scale.scaleY);
+      const finalTransformations = this.finalTransformations.get(node);
+      if (finalTransformations) {
+        finalTransformations.forEach((transform) =>
+          this.findKNodeOfTransform(node, transform),
+        );
       }
     });
     this.layerRef.draw();
@@ -40,13 +70,11 @@ export class TransformCommand implements ICommand {
 
   undo() {
     this.nodes.forEach((node) => {
-      const initialTransformation = this.initialTransformations.get(node);
-      if (initialTransformation) {
-        node.kNode.position(initialTransformation.position);
-        node.kNode.size(initialTransformation.size);
-        node.kNode.rotation(initialTransformation.rotation);
-        node.kNode.scaleX(initialTransformation.scale.scaleX);
-        node.kNode.scaleY(initialTransformation.scale.scaleY);
+      const initialTransformations = this.initialTransformations.get(node);
+      if (initialTransformations) {
+        initialTransformations.forEach((transform) =>
+          this.findKNodeOfTransform(node, transform),
+        );
       }
     });
     this.layerRef.draw();

@@ -1,22 +1,24 @@
 import Konva from "konva";
-import { NetworkedNodeContext } from "./NetworkedNodeContext";
+import { NetworkedNode } from "./NetworkedNode";
 import { uiAccess } from "~/signals";
 import { SelectionManager } from "../NodesManagers";
 import { Position, Size } from "../types";
 import ChromaWorker from "./ChromaWorker?sharedworker";
+import { minNodeSize, transparent } from "./constants";
+import { NodeUtilities } from "./NodeUtilities";
 
-// const toolbarNode = uiAccess.toolbarNode;
 const loadingBar = uiAccess.loadingBar;
 
 interface VideoNodeContructor {
   mediaLayerRef: Konva.Layer;
-  position: Position;
+  canvasPosition: Position;
   canvasSize: Size;
   videoURL: string;
   selectionManagerRef: SelectionManager;
 }
 
-export class VideoNode extends NetworkedNodeContext {
+export class VideoNode extends NetworkedNode {
+  public kNode: Konva.Image;
   public videoURL: string;
   public videoComponent: HTMLVideoElement;
 
@@ -91,7 +93,7 @@ export class VideoNode extends NetworkedNodeContext {
 
   constructor({
     mediaLayerRef,
-    position,
+    canvasPosition,
     canvasSize,
     videoURL,
     selectionManagerRef,
@@ -99,12 +101,16 @@ export class VideoNode extends NetworkedNodeContext {
     // kNodes need to be created first to guaruntee it is not undefined in parent's context
     const kNode = new Konva.Image({
       image: undefined,
-      x: position.x,
-      y: position.y,
-      width: 200, // to do fix this with placeholder
-      height: 200,
-      draggable: true,
+      // to do fix this with placeholder
+      size: minNodeSize,
+      position: NodeUtilities.positionNodeOnCanvasCenter({
+        canvasOffset: canvasPosition,
+        componentSize: minNodeSize,
+        maxSize: canvasSize,
+      }),
       fill: "grey",
+      draggable: true,
+      strokeScaleEnabled: false,
     });
 
     super({
@@ -112,6 +118,7 @@ export class VideoNode extends NetworkedNodeContext {
       mediaLayerRef: mediaLayerRef,
       kNode: kNode,
     });
+    this.kNode = kNode;
     this.mediaLayerRef.add(this.kNode);
 
     // state manage the node
@@ -150,22 +157,28 @@ export class VideoNode extends NetworkedNodeContext {
         return;
       }
 
-      const renderSize = this.calculateRenderSizeOnLoad({
+      const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
         componentSize: {
           width: this.videoComponent.videoWidth,
           height: this.videoComponent.videoHeight,
         },
         maxSize: canvasSize,
       });
+      const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
+        canvasOffset: canvasPosition,
+        componentSize: adjustedSize,
+        maxSize: canvasSize,
+      });
 
       this.kNode.image(this.videoComponent);
-      this.kNode.setSize(renderSize);
+      this.kNode.setSize(adjustedSize);
+      this.kNode.setPosition(centerPosition);
 
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
       // it might have length here which we will need to trim down to 7 seconds.
       console.log(`Video Duration: ${this.videoComponent.duration}`);
       this.duration = this.videoComponent.duration;
-      this.kNode.fill(null);
+      this.kNode.fill(transparent);
       loadingBar.updateProgress(50);
     };
 
@@ -390,7 +403,7 @@ export class VideoNode extends NetworkedNodeContext {
     await this.updateImage(this.imageSources[this.imageIndex]);
     this.imageIndex = this.imageIndex + 1;
 
-    this.updateLoadingBarPosition();
+    // this.updateLoadingBarPosition();
 
     loadingBar.updateMessage("Generating");
 

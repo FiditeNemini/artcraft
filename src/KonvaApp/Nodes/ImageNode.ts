@@ -1,23 +1,26 @@
 import Konva from "konva";
-import { NetworkedNodeContext } from "./NetworkedNodeContext";
+import { NetworkedNode } from "./NetworkedNode";
 import { SelectionManager } from "../NodesManagers";
 import { Position, Size } from "../types";
+import { minNodeSize, transparent } from "./constants";
+import { NodeUtilities } from "./NodeUtilities";
 
 interface ImageNodeContructor {
-  position: Position;
+  canvasPosition: Position;
   canvasSize: Size;
   imageFile: File;
   mediaLayerRef: Konva.Layer;
   selectionManagerRef: SelectionManager;
 }
 
-export class ImageNode extends NetworkedNodeContext {
-  public imageURL: string;
+export class ImageNode extends NetworkedNode {
+  // public imageURL: string;
+  public kNode: Konva.Image;
 
   private imageObject: HTMLImageElement;
 
   constructor({
-    position,
+    canvasPosition,
     canvasSize,
     imageFile,
     mediaLayerRef,
@@ -25,13 +28,16 @@ export class ImageNode extends NetworkedNodeContext {
   }: ImageNodeContructor) {
     // kNodes need to be created first to guaruntee it is not undefined in parent's context
     const kNode = new Konva.Image({
-      x: position.x,
-      y: position.y,
       image: undefined, // to do replace with placeholder
-      width: 100,
-      height: 100,
+      size: minNodeSize,
+      position: NodeUtilities.positionNodeOnCanvasCenter({
+        canvasOffset: canvasPosition,
+        componentSize: minNodeSize,
+        maxSize: canvasSize,
+      }),
       fill: "gray",
       draggable: true,
+      strokeScaleEnabled: false,
     });
 
     super({
@@ -39,6 +45,7 @@ export class ImageNode extends NetworkedNodeContext {
       mediaLayerRef: mediaLayerRef,
       kNode: kNode,
     });
+    this.kNode = kNode;
     this.mediaLayerRef.add(this.kNode);
 
     const imageComponent = new Image();
@@ -51,19 +58,24 @@ export class ImageNode extends NetworkedNodeContext {
         return;
       }
 
-      const renderSize = this.calculateRenderSizeOnLoad({
+      const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
         componentSize: {
           width: imageComponent.width,
           height: imageComponent.height,
         },
         maxSize: canvasSize,
       });
-
+      const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
+        canvasOffset: canvasPosition,
+        componentSize: adjustedSize,
+        maxSize: canvasSize,
+      });
       this.kNode.image(imageComponent);
-      this.kNode.setSize(renderSize);
+      this.kNode.setSize(adjustedSize);
+      this.kNode.setPosition(centerPosition);
 
       this.listenToBaseKNode();
-      this.kNode.fill(null);
+      this.kNode.fill(transparent);
       this.mediaLayerRef.draw();
 
       this.didFinishLoading = true;
@@ -82,7 +94,7 @@ export class ImageNode extends NetworkedNodeContext {
       this.kNode.image(newImage);
       this.kNode.width(newImage.width);
       this.kNode.height(newImage.height);
-      this.kNode.fill(null);
+      this.kNode.fill(transparent);
       this.kNode.draw();
     };
   }

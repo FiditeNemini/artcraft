@@ -3,6 +3,7 @@ export { DialogAddImage } from "./DialogAddImage";
 export { DialogAddVideo } from "./DialogAddVideo";
 export { DialogAiStylize } from "./DialogAiStylize";
 export { DialogChromakey } from "./DialogChromakey";
+export { DialogEditText } from "./DialogEditText";
 export { DialogError } from "./DialogError";
 export { ProfileDropdown } from "./ToolbarUserProfile/ProfileDropdown";
 export { ToolbarMain } from "./ToolbarMain";

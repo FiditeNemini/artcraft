@@ -1,12 +1,20 @@
 import { useCallback, useRef } from "react";
 import { signal } from "@preact/signals-react";
 
+export interface AppUiContextInterface {
+  resetAll: () => void;
+  openAddImage: (file?: File) => void;
+  openAddVideo: (file?: File) => void;
+  openAIStylize: () => void;
+  openEditText: () => void;
+}
 export type AppUiSignalType = {
   isAddVideoOpen: boolean;
   stagedVideo: File | null;
   isAddImageOpen: boolean;
   stagedImage: File | null;
   isAiStylizeOpen: boolean;
+  isEditTextOpen: boolean;
 };
 const appUiInitialState = {
   isAddVideoOpen: false,
@@ -14,6 +22,7 @@ const appUiInitialState = {
   isAddImageOpen: false,
   stagedImage: null,
   isAiStylizeOpen: false,
+  isEditTextOpen: false,
 };
 export const useAppUiContext = () => {
   const appUiRef = useRef(signal<AppUiSignalType>(appUiInitialState));
@@ -42,11 +51,18 @@ export const useAppUiContext = () => {
       isAiStylizeOpen: true,
     };
   }, []);
+  const openEditText = useCallback(() => {
+    appUiSignal.value = {
+      ...appUiInitialState,
+      isEditTextOpen: true,
+    };
+  }, []);
   return {
     signal: appUiSignal,
     resetAll,
     openAddImage,
     openAddVideo,
     openAIStylize,
+    openEditText,
   };
 };

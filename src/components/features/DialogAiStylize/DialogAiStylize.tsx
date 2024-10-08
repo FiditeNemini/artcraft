@@ -86,9 +86,7 @@ export const DialogAiStylize = ({
         >
           {panelState === SubPanelNames.BASIC && (
             <>
-              <DialogTitle className="font-bold">
-                Use AI to Stylize{" "}
-              </DialogTitle>
+              <DialogTitle className="font-bold">Use AI to Stylize</DialogTitle>
               <SubPanelBasic
                 selectedArtStyle={selectedArtStyle}
                 positivePrompt={positivePrompt}

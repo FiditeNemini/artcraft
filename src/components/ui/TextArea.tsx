@@ -2,7 +2,7 @@ import { TextareaHTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 import { kebabCase } from "~/utilities";
 
-type ResizeType =
+export type ResizeType =
   | "none"
   | "both"
   | "horizontal"
@@ -11,16 +11,18 @@ type ResizeType =
   | "inline"
   | undefined;
 
+export interface TextareaInterface
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  resize?: ResizeType;
+}
 export const Textarea = ({
   className,
   label,
   resize = "vertical",
   id,
   ...rest
-}: TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  label?: string;
-  resize?: ResizeType;
-}) => {
+}: TextareaInterface) => {
   return (
     <div className="flex flex-col">
       {label && <label htmlFor={id ? id : kebabCase(label)}>{label}</label>}

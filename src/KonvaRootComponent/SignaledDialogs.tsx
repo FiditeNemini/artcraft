@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { Signal } from "@preact/signals-react";
-import { dispatchUiEvents, uiEvents } from "~/signals";
+import { dispatchUiEvents } from "~/signals";
 import {
   DialogAddImage,
   DialogAddVideo,
   DialogAiStylize,
   DialogChromakey,
+  DialogEditText,
   DialogError,
 } from "~/components/features";
 
@@ -22,6 +23,7 @@ export const SignaledDialogs = ({
 }) => {
   return (
     <>
+      {/* Dialogs that are opened from within Reactland*/}
       <DialogAddImage
         isOpen={appUiSignal.value.isAddImageOpen ?? false}
         stagedImage={appUiSignal.value.stagedImage}
@@ -54,6 +56,14 @@ export const SignaledDialogs = ({
         }}
         closeCallback={resetAll}
       />
+      <DialogEditText
+        isOpen={appUiSignal.value.isEditTextOpen ?? false}
+        onDoneEditText={(data) => {
+          dispatchUiEvents.addTextToEngine(data);
+        }}
+        closeCallback={resetAll}
+      />
+      {/* Dialogs that are opened from the Engine*/}
       <SignaledDialogChromakey />
       <SignaledDialogError />
     </>

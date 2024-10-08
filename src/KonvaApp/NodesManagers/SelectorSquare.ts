@@ -33,19 +33,21 @@ export class SelectorSquare {
   }
   public enable({
     captureCanvasRef,
+    mediaLayerRef,
     nodesManagerRef,
     selectionManagerRef,
-    stage,
+    stageRef,
   }: {
     captureCanvasRef: Konva.Rect;
+    mediaLayerRef: Konva.Layer;
     nodesManagerRef: NodesManager;
     selectionManagerRef: SelectionManager;
-    stage: Konva.Stage;
+    stageRef: Konva.Stage;
   }) {
-    stage.on("mousedown touchstart", (e) => {
-      const stagePointerPos = stage.getPointerPosition();
+    stageRef.on("mousedown touchstart", (e) => {
+      const stagePointerPos = stageRef.getPointerPosition();
       if (
-        (e.target !== stage && e.target !== captureCanvasRef) || // do nothing if we mousedown on any shape
+        (e.target !== stageRef && e.target !== captureCanvasRef) || // do nothing if we mousedown on any shape
         stagePointerPos === null || // do nothing if pointers not available
         e.evt.shiftKey // do nothing so then multiselect is more forgiving in misclicks
       ) {
@@ -54,7 +56,7 @@ export class SelectorSquare {
 
       // start handle mousedown
       e.evt.preventDefault();
-      if (e.target === stage || e.target === captureCanvasRef) {
+      if (e.target === stageRef || e.target === captureCanvasRef) {
         //moused down on empty space, clear previous selection first
         selectionManagerRef.clearSelection();
       }
@@ -73,9 +75,9 @@ export class SelectorSquare {
       this.selecting = true;
     });
 
-    stage.on("mousemove touchmove", (e) => {
+    stageRef.on("mousemove touchmove", (e) => {
       // do nothing if we didn't start selection
-      const stagePointerPos = stage.getPointerPosition();
+      const stagePointerPos = stageRef.getPointerPosition();
       if (!this.selecting || stagePointerPos === null) {
         return;
       }
@@ -97,7 +99,7 @@ export class SelectorSquare {
         height: Math.abs(y2 - y1),
       });
 
-      stage.on("mouseup touchend", (e) => {
+      stageRef.on("mouseup touchend", (e) => {
         // do nothing if we didn't start selection
         this.selecting = false;
         if (!this.kSquare.visible()) {
@@ -107,7 +109,7 @@ export class SelectorSquare {
         // update visibility
         this.kSquare.visible(false);
         // Find all the Nodes and feed them into Selectmanager
-        var shapes = stage.find("Image");
+        var shapes = mediaLayerRef.getChildren();
         var box = this.kSquare.getClientRect();
         var foundKNodes = shapes.filter((shape) =>
           Konva.Util.haveIntersection(box, shape.getClientRect()),

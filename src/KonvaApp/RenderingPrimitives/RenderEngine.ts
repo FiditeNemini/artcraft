@@ -206,10 +206,11 @@ export class RenderEngine {
     }
 
     // update the context menu
-    this.videoNodes.forEach((node) => {
-      // find selected node... TODO and update that position
-      node.updateContextComponents();
-    });
+    // TODO: find selected node and update that position
+    // this.videoNodes.forEach((node) => {
+    //   node.updateContextComponents();
+    // });
+
     this.mediaLayerRef.batchDraw();
   }
 
@@ -350,7 +351,7 @@ export class RenderEngine {
           return;
         }
         item.kNode.listening(false);
-        item.unHighLight();
+        item.unhighlight();
         if (item.didFinishLoading == false) {
           // error out and show error message
           //this.startProcessing();

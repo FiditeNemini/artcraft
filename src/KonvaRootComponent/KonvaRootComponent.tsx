@@ -48,9 +48,7 @@ export const KonvaRootComponent = ({ className }: { className: string }) => {
       />
       <SignaledToolbarMain
         layoutSignal={layoutContext.signal}
-        openAddImage={appUiContext.openAddImage}
-        openAddVideo={appUiContext.openAddVideo}
-        openAIStylize={appUiContext.openAIStylize}
+        appUiContext={appUiContext}
       />
       <SignaledDialogs
         appUiSignal={appUiContext.signal}

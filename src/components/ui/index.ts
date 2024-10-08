@@ -9,4 +9,5 @@ export * from "./Slider";
 export * from "./Spinner";
 export * from "./Switches";
 export * from "./TextArea";
+export * from "./TextEditor";
 export * from "./Tooltip";

@@ -9,17 +9,14 @@ import { LoadingBar } from "~/components/ui";
 
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 import { LayoutSignalType } from "./contextSignals/layout";
+import { AppUiContextInterface } from "./contextSignals/appUi";
 
 export const SignaledToolbarMain = ({
   layoutSignal,
-  openAddImage,
-  openAddVideo,
-  openAIStylize,
+  appUiContext,
 }: {
   layoutSignal: LayoutSignalType;
-  openAddImage: () => void;
-  openAddVideo: () => void;
-  openAIStylize: () => void;
+  appUiContext: AppUiContextInterface;
 }) => {
   //// for testing
   const { isMobile } = layoutSignal;
@@ -34,12 +31,26 @@ export const SignaledToolbarMain = ({
   /// end for testing
 
   const loadingBar = toolbarMain.loadingBar.signal.value;
+  const getButtonDispatcher = (buttonName: ToolbarMainButtonNames) => {
+    switch (buttonName) {
+      case ToolbarMainButtonNames.ADD_TEXT:
+        return () => appUiContext.openEditText();
+      case ToolbarMainButtonNames.AI_STYLIZE:
+        return () => appUiContext.openAIStylize();
+      case ToolbarMainButtonNames.ADD_IMAGE:
+        return () => appUiContext.openAddImage();
+      case ToolbarMainButtonNames.ADD_VIDEO:
+        return () => appUiContext.openAddVideo();
+      default:
+        return dispatchers[buttonName];
+    }
+  };
   const buttonProps = Object.values(ToolbarMainButtonNames).reduce(
     (acc, buttonName) => {
       acc[buttonName] = {
         disabled: toolbarMain.signal.value.buttonStates[buttonName].disabled,
         active: toolbarMain.signal.value.buttonStates[buttonName].active,
-        onClick: dispatchers[buttonName],
+        onClick: getButtonDispatcher(buttonName),
       };
       return acc;
     },
@@ -74,9 +85,6 @@ export const SignaledToolbarMain = ({
       <ToolbarMain
         disabled={toolbarMain.signal.value.disabled}
         buttonProps={buttonProps}
-        openAddImage={() => openAddImage()}
-        openAddVideo={() => openAddVideo()}
-        openAIStylize={() => openAIStylize()}
       />
     </div>
   );
