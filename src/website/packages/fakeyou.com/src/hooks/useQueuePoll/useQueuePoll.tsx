@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import {
+  // useEffect,
+  useState,
+} from "react";
 import {
   BaseQueueObject,
   GetQueues,
@@ -10,7 +13,7 @@ import { useInterval } from "hooks";
 export default function useQueuePoll() {
   const [queueStats, setQueueStats] =
     useState<GetQueuesResponse>(BaseQueueObject());
-  const [initialized, initializedSet] = useState(false);
+  // const [initialized, initializedSet] = useState(false);
 
   const interval = Math.max(
     QueuePollRefreshDefault,
@@ -33,18 +36,18 @@ export default function useQueuePoll() {
     });
   };
 
-  useEffect(() => {
-    if (!initialized) {
-      initializedSet(true);
-      onTick({ eventProps: { queueStats } });
-    }
-  }, [initialized, queueStats]);
+  // useEffect(() => {
+  //   if (!initialized) {
+  //     initializedSet(true);
+  //     onTick({ eventProps: { queueStats } });
+  //   }
+  // }, [initialized, queueStats]);
 
   useInterval({
     eventProps: { queueStats },
     interval,
     onTick,
-    locked: !initialized,
+    locked: true,
   });
 
   return queueStats;
