@@ -79,13 +79,40 @@ const buttonDispatchers = Object.values(ButtonNames).reduce(
   },
 );
 
+const retryEvent = signal<React.MouseEvent<HTMLButtonElement> | undefined>();
+let lastRetryEventTimeStamp: number | undefined = undefined;
+let retryEffectCleanup: (() => void) | undefined;
+const retryEventHandler = (callback: MouseEventHandler<HTMLButtonElement>) => {
+  if (retryEffectCleanup) {
+    retryEffectCleanup();
+  }
+  retryEffectCleanup = effect(() => {
+    if (retryEvent.value) {
+      if (
+        lastRetryEventTimeStamp === undefined ||
+        lastRetryEventTimeStamp !== retryEvent.value.timeStamp
+      ) {
+        lastRetryEventTimeStamp = retryEvent.value.timeStamp;
+        callback(retryEvent.value);
+      }
+    }
+  });
+};
+
+const retryDispatcher = (e: React.MouseEvent<HTMLButtonElement>) => {
+  retryEvent.value = e;
+};
 export const dispatchers = {
   lock: lockDispatcher,
+  retry: retryDispatcher,
   ...buttonDispatchers,
 };
 export const eventsHandlers = {
   lock: {
     onClick: lockEventHandler,
+  },
+  retry: {
+    onClick: retryEventHandler,
   },
   ...buttonEventsHandlers,
 };

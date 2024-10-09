@@ -1,5 +1,4 @@
 import Konva from "konva";
-import { v4 as uuidv4 } from "uuid";
 
 import { SelectionManager } from "../NodesManagers";
 import { highlightStrokeWidth, primaryOrange } from "./constants";
@@ -8,7 +7,7 @@ export class BaseNode {
   protected selectionManagerRef: SelectionManager;
   public kNode: Konva.Node;
   protected mediaLayerRef: Konva.Layer;
-  protected uuid: string;
+  // protected uuid: string;
 
   // Internal State members
   // do not modify internal
@@ -28,7 +27,7 @@ export class BaseNode {
     kNode: Konva.Image | Konva.Group;
   }) {
     console.log("Node constructed");
-    this.uuid = uuidv4();
+    // this.uuid = uuidv4();
     this.mediaLayerRef = mediaLayerRef;
     this.selectionManagerRef = selectionManagerRef;
     this.kNode = kNode;

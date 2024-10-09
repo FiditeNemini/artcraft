@@ -52,9 +52,9 @@ export const LoadingBar = ({
           <Button
             icon={faArrowRightRotate}
             onClick={onRetry}
-            className="flex items-center gap-2 hover:text-primary"
+            className="flex items-center gap-2"
           >
-            <label className="cursor-pointer">Retry</label>
+            Retry
           </Button>
         )}
       </div>

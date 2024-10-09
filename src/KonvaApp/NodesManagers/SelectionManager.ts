@@ -1,8 +1,9 @@
 import Konva from "konva";
 import { NodeTransformer } from "./NodeTransformer";
 import { MediaNode, Position, Transformation } from "../types";
-import { uiAccess } from "~/signals";
+import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
+import { LoadingBarStatus } from "~/components/ui";
 
 export enum SelectionManagerEvents {
   NODES_TRANSLATIONS = "nodestranslation",
@@ -243,7 +244,9 @@ export class SelectionManager {
 
   public hideContextComponents() {
     uiAccess.toolbarNode.hide();
+    uiAccess.loadingBar.hide();
   }
+
   public showContextComponents(node: MediaNode) {
     if (!uiAccess.toolbarNode.isShowing()) {
       uiAccess.toolbarNode.show({
@@ -260,6 +263,7 @@ export class SelectionManager {
       }
     }
   }
+
   public updateContextComponents(node: MediaNode) {
     const coord = this.calculateContextualsPosition(node.kNode);
     if (node.isLocked() !== uiAccess.toolbarNode.isLocked()) {
@@ -270,10 +274,22 @@ export class SelectionManager {
       y: coord.y,
     });
     if (node instanceof NetworkedNode) {
-      uiAccess.loadingBar.updatePosition({
-        x: coord.x,
-        y: coord.y,
+      uiAccess.loadingBar.update({
+        position: coord,
+        progress: node.progress(),
+        status: node.isError()
+          ? LoadingBarStatus.ERROR
+          : LoadingBarStatus.LOADING,
       });
+      uiEvents.toolbarNode.retry.onClick((e) => {
+        if (e) {
+          console.log("CONTEXTUAL LOADING BAR RETRY ONCLICK", e, node);
+          node.retry();
+        }
+      });
+      if (node.progress() === 100) {
+        uiAccess.loadingBar.hide();
+      }
     }
   }
 }

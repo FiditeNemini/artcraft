@@ -1,7 +1,10 @@
 import Konva from "konva";
-import { NetworkedNode } from "./NetworkedNode";
+import { MediaFilesApi, MediaUploadApi } from "~/Classes/ApiManager";
+
 import { SelectionManager } from "../NodesManagers";
 import { Position, Size } from "../types";
+
+import { NetworkedNode, UploadStatus } from "./NetworkedNode";
 import { minNodeSize, transparent } from "./constants";
 import { NodeUtilities } from "./NodeUtilities";
 
@@ -14,10 +17,8 @@ interface ImageNodeContructor {
 }
 
 export class ImageNode extends NetworkedNode {
-  // public imageURL: string;
   public kNode: Konva.Image;
-
-  private imageObject: HTMLImageElement;
+  private imageSize: Size;
 
   constructor({
     canvasPosition,
@@ -26,7 +27,8 @@ export class ImageNode extends NetworkedNode {
     mediaLayerRef,
     selectionManagerRef,
   }: ImageNodeContructor) {
-    // kNodes need to be created first to guaruntee it is not undefined in parent's context
+    // kNodes need to be created first to guaruntee
+    // that it is not undefined in parent's context
     const kNode = new Konva.Image({
       image: undefined, // to do replace with placeholder
       size: minNodeSize,
@@ -39,30 +41,26 @@ export class ImageNode extends NetworkedNode {
       draggable: true,
       strokeScaleEnabled: false,
     });
-
     super({
       selectionManagerRef: selectionManagerRef,
       mediaLayerRef: mediaLayerRef,
       kNode: kNode,
+      localFile: imageFile,
     });
     this.kNode = kNode;
+    this.imageSize = minNodeSize;
     this.mediaLayerRef.add(this.kNode);
 
     const imageComponent = new Image();
-    this.imageObject = imageComponent;
-    this.imageObject.crossOrigin = "anonymous";
-    this.didFinishLoading = false;
 
     imageComponent.onload = () => {
-      if (!this.kNode) {
-        return;
-      }
-
+      this.setProgress(0, UploadStatus.FILE_STAGED);
+      this.imageSize = {
+        width: imageComponent.width,
+        height: imageComponent.height,
+      };
       const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
-        componentSize: {
-          width: imageComponent.width,
-          height: imageComponent.height,
-        },
+        componentSize: this.imageSize,
         maxSize: canvasSize,
       });
       const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
@@ -74,28 +72,80 @@ export class ImageNode extends NetworkedNode {
       this.kNode.setSize(adjustedSize);
       this.kNode.setPosition(centerPosition);
 
-      this.listenToBaseKNode();
       this.kNode.fill(transparent);
+      this.listenToBaseKNode();
       this.mediaLayerRef.draw();
-
-      this.didFinishLoading = true;
+      this.uploadImage(imageFile);
     };
-
+    imageComponent.onerror = () => {
+      this.setProgress(0, UploadStatus.ERROR_ON_FILE);
+    };
     imageComponent.src = URL.createObjectURL(imageFile);
   }
 
-  async updateImage(newImageSrc: string) {
+  private async updateImage(newImageSrc: string) {
+    this.setProgress(75, UploadStatus.LOADING);
     const newImage = new Image();
     newImage.src = newImageSrc;
-    newImage.onload = () => {
-      if (!this.kNode) {
-        return;
-      }
-      this.kNode.image(newImage);
-      this.kNode.width(newImage.width);
-      this.kNode.height(newImage.height);
-      this.kNode.fill(transparent);
-      this.kNode.draw();
+    newImage.onerror = () => {
+      this.setProgress(90, UploadStatus.ERROR_ON_LOAD);
     };
+    newImage.onload = () => {
+      // console.log("network image", newImage);
+      this.kNode.image(newImage);
+      this.kNode.draw();
+      this.setProgress(100, UploadStatus.SUCCESS);
+    };
+  }
+
+  private async uploadImage(imageFile: File) {
+    this.setProgress(10, UploadStatus.UPLOADING);
+    const mediaUploadApi = new MediaUploadApi();
+    const uploadResponse = await mediaUploadApi.UploadImage({
+      blob: imageFile,
+      uuid: this.uuidGenerate(),
+      fileName: imageFile.name,
+    });
+    // console.log(uploadResponse);
+    if (!uploadResponse.success || !uploadResponse.data) {
+      this.setStatus(UploadStatus.ERROR_ON_UPLOAD, uploadResponse.errorMessage);
+      return;
+    }
+    this.mediaFileToken = uploadResponse.data;
+    this.retreiveImage(this.mediaFileToken);
+  }
+
+  private async retreiveImage(mediaFileToken: string) {
+    this.setProgress(50, UploadStatus.RETREIVING);
+    const mediaFileApi = new MediaFilesApi();
+    const mediaFileResponse = await mediaFileApi.GetMediaFileByToken({
+      mediaFileToken: mediaFileToken,
+    });
+    // console.log(mediaFileResponse);
+    if (!mediaFileResponse.success || !mediaFileResponse.data) {
+      this.setStatus(
+        UploadStatus.ERROR_ON_RETREIVE,
+        mediaFileResponse.errorMessage,
+      );
+      return;
+    }
+    this.mediaFileUrl = mediaFileResponse.data.public_bucket_url;
+    this.updateImage(this.mediaFileUrl);
+  }
+
+  public async retry() {
+    if (this.mediaFileUrl) {
+      this.updateImage(this.mediaFileUrl);
+      return;
+    }
+    if (this.mediaFileToken) {
+      this.retreiveImage(this.mediaFileToken);
+      return;
+    }
+    if (this.localFile) {
+      this.uploadImage(this.localFile);
+      return;
+    }
+    console.warn("Image Node has no data to recontruct itself!");
   }
 }

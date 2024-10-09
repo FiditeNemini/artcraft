@@ -1,8 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { Transition } from "@headlessui/react";
 import { LoadingBar } from "~/components/ui";
-import { uiAccess } from "~/signals/uiAccess";
-
+import { dispatchUiEvents, uiAccess } from "~/signals";
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualLoadingBar = () => {
@@ -23,7 +22,13 @@ export const ContextualLoadingBar = () => {
         width: width ? `${width}px` : undefined,
       }}
     >
-      <LoadingBar {...rest} />
+      <LoadingBar
+        {...rest}
+        onRetry={(e) => {
+          // console.log("CONTEXTUAL LOADING BAR DISPATCH");
+          dispatchUiEvents.toolbarNode.retry(e);
+        }}
+      />
     </Transition>
   );
 };

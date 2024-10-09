@@ -312,9 +312,7 @@ export class Engine {
 
     uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
     uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
-    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
-      //this.onRenderingSystemReceived(undefined);
-    });
+    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {});
   }
 
   sleep(ms: number): Promise<void> {

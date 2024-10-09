@@ -20,10 +20,10 @@ export const loadingBar = {
   isShowing() {
     return loadingBarSignal.value.isShowing;
   },
-  update(props: Omit<ContextualLoadingBarProps, "isShowing">) {
+  update(props: Partial<Omit<ContextualLoadingBarProps, "isShowing">>) {
     loadingBarSignal.value = {
       ...loadingBarSignal.value,
-      isShowing: true,
+      // isShowing: true,
       ...props,
     };
   },
