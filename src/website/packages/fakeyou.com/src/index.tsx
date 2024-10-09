@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import * as serviceWorker from "./serviceWorker";
+// import * as serviceWorker from "./serviceWorker";
 // import AppTranslated from "./AppTranslated";
 import { App } from "./App";
 
@@ -17,19 +17,6 @@ document.getElementsByTagName("html")[0].classList.add(designSystemClass);
 // bootstrapCss.setAttribute("href", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css");
 // document.getElementsByTagName("head")[0].appendChild(bootstrapCss);
 
-const bootstrapJs = document.createElement("script");
-bootstrapJs.setAttribute("rel", "stylesheet");
-bootstrapJs.setAttribute("crossorigin", "anonymous");
-bootstrapJs.setAttribute(
-  "integrity",
-  "sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-);
-bootstrapJs.setAttribute(
-  "src",
-  "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-);
-document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
-
 // NB: Posthog turned off for most users (anonymous users) due to cost.
 // We'll track for logged-in users only
 // Posthog analytics
@@ -45,4 +32,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+// serviceWorker.unregister();
