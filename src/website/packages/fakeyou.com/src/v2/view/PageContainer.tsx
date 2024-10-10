@@ -4,11 +4,12 @@ import ProfileSidePanel from "components/layout/ProfileSidePanel/ProfileSidePane
 import TopNav from "components/layout/TopNav/TopNav";
 import ScrollToTop from "./_common/ScrollToTop";
 import { Spinner } from "components/common";
+import LandingPage from "./pages/landing/LandingPage";
 
 const routes = [
   {
     path: "/",
-    component: lazy(() => import("./pages/landing/LandingPage")),
+    fixedComponent: LandingPage,
     exact: true,
   },
   {
@@ -544,16 +545,24 @@ const routes = [
       () => import("./pages/waitlist_next_steps/WaitlistNextStepsPage")
     ),
   },
-].map(({ path, component, exact }, key) => {
-  const PageComponent = component;
-  return (
-    <Route {...{ key, path, exact }}>
-      <Suspense {...{ fallback: Spinner }}>
-        <PageComponent />
-      </Suspense>
-    </Route>
-  );
-});
+].map(
+  (
+    { fixedComponent: FixedComponent, path, component: PageComponent, exact },
+    key
+  ) => {
+    return (
+      <Route {...{ key, path, exact }}>
+        {FixedComponent ? (
+          <FixedComponent />
+        ) : PageComponent ? (
+          <Suspense {...{ fallback: Spinner }}>
+            <PageComponent />
+          </Suspense>
+        ) : null}
+      </Route>
+    );
+  }
+);
 
 export default function PageContainer() {
   return (
