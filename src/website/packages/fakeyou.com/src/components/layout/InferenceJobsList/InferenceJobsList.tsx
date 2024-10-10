@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboardList } from "@fortawesome/pro-solid-svg-icons";
 
 interface JobsListProps {
+  debug?: string;
   failures: (fail: string) => string;
   jobType?: FrontendInferenceJobType | AllInferenceJobs;
   onSelect?: (e: any) => any;
@@ -42,6 +43,7 @@ const resultPaths = {
 };
 
 export default function InferenceJobsList({
+  debug,
   failures,
   jobType,
   onSelect,
@@ -60,7 +62,7 @@ export default function InferenceJobsList({
     inferenceJobsByCategory,
     jobStatusDescription,
     someJobsAreDone,
-  } = useInferenceJobs();
+  } = useInferenceJobs(debug);
   const { t } = useLocalize("InferenceJobs");
 
   const selectedJobs =

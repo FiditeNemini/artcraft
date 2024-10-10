@@ -1,11 +1,16 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { InferenceJobsContext } from "components/providers";
 import { useModal } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 
-export default function useInferenceJobs(debug = false) {
+// interface UseInferenceJobsProps {
+//   autoStart?: boolean;
+//   debug?: string;
+// }
+
+export default function useInferenceJobs(debug = "") {
   const {
     byCategory,
     clearJobs,
@@ -14,11 +19,25 @@ export default function useInferenceJobs(debug = false) {
     inferenceJobs,
     queueStats,
     someJobsAreDone,
+    startJobs,
   } = useContext(InferenceJobsContext);
 
   const { open } = useModal();
+  const [loaded, loadedSet] = useState(false);
+
   const openJobListModal = (jobType?: FrontendInferenceJobType) =>
     open({ component: InferenceJobsModal, props: { jobType } });
+
+  if (debug) {
+    console.log(`debug location: ${debug}`);
+  }
+
+  useEffect(() => {
+    if (!loaded && startJobs) {
+      loadedSet(true);
+      startJobs();
+    }
+  }, [loaded, startJobs]);
 
   return {
     clearJobs,

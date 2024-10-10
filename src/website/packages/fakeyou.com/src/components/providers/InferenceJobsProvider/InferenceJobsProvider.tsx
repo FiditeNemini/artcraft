@@ -14,6 +14,7 @@ interface InferenceJobsContextType {
 	enqueue?: any;
 	queueStats: GetQueuesResponse;
 	someJobsAreDone?: boolean;
+	startJobs?: () => void;
 }
 
 export const InferenceJobsContext = createContext<InferenceJobsContextType>({
@@ -34,6 +35,7 @@ export default function InferenceJobsProvider({ children }: Props) {
 		enqueueInferenceJob,
 		inferenceJobs,
 		someJobsAreDone,
+		startJobs,
 	} = useInferenceJobsPolling({ sessionWrapper });
 
 	return (
@@ -48,6 +50,7 @@ export default function InferenceJobsProvider({ children }: Props) {
 					inferenceJobs,
 					someJobsAreDone,
 					queueStats,
+					startJobs,
 				},
 			}}
 		>

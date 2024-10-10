@@ -82,11 +82,11 @@ export default function useInferenceJobsPolling({
 
   // this is to acccomodate async session loading
   useEffect(() => {
-    if (!initialized && user && !keepAlive) {
-      initializedSet(true);
+    if (user && !keepAlive) {
+      // initializedSet(true);
       keepAliveSet(true);
     }
-  }, [initialized, keepAlive, user]);
+  }, [keepAlive, user]);
 
   if (debug)
     console.log("💀 keepAlive", { keepAlive, inferenceJobs, byCategory });
@@ -226,11 +226,17 @@ export default function useInferenceJobsPolling({
     !!inferenceJobs &&
     inferenceJobs.some(job => !jobStateCanChange(job.jobState));
 
+  const startJobs = () => {
+    if (!initialized) {
+      setTimeout(() => initializedSet(true), 250);
+    }
+  };
+
   useInterval({
     eventProps: { byCategory, inferenceJobs },
     interval,
     onTick,
-    locked: !keepAlive,
+    locked: !initialized || !keepAlive,
   });
 
   return {
@@ -241,5 +247,6 @@ export default function useInferenceJobsPolling({
     enqueueInferenceJob,
     inferenceJobs,
     someJobsAreDone,
+    startJobs,
   };
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container } from "components/common";
-import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
+// import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import "./LandingPage.scss";
 import {
@@ -38,9 +38,9 @@ export default function LandingPage() {
             <Dashboard {...{ experimental: true }} />
 
             {/* FAKEYOU.COM */}
-            {!isLoggedIn && (
+            {/*              !isLoggedIn && (
               <FakeYouLandingHeader {...{ experimental: true }} />
-            )}
+            )*/}
           </Container>
           {!isLoggedIn && (
             <Container type="panel">
