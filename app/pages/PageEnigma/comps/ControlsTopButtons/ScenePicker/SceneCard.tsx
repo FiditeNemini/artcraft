@@ -39,7 +39,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
     <button
       key={scene.token}
       className={twMerge(
-        "relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out ",
+        "relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg border transition-colors ease-in-out",
         selectedSceneId === scene.token
           ? "border-brand-primary"
           : "border-ui-controls-button/25 hover:border-ui-controls-button",

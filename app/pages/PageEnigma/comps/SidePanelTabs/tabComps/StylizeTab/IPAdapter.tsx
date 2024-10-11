@@ -193,7 +193,7 @@ export const IPAdapter: React.FC = () => {
 
   const DragAndDropZone = () => {
     return (
-      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border-2 border-dashed border-ui-controls-button/50 bg-brand-secondary p-3 transition-all duration-150 hover:bg-ui-controls-button/40">
+      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border border-dashed border-[#3F3F3F] bg-brand-secondary p-3 transition-all duration-150 hover:bg-ui-controls-button/40">
         <FontAwesomeIcon icon={faFileImage} className="text-3xl" />
         <div className="flex flex-col gap-0 text-sm">
           <P className="font-medium">
@@ -232,7 +232,7 @@ export const IPAdapter: React.FC = () => {
             name="file"
             types={FILE_TYPES}
           >
-            <div className="relative h-[88px] cursor-pointer overflow-hidden rounded-lg border-2 border-white/10 bg-black/25">
+            <div className="relative h-[88px] cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-black/25">
               <img
                 src={adapterImage.value}
                 alt="IPAdapter"

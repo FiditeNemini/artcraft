@@ -66,7 +66,7 @@ export function StyleOptions() {
                 className={twMerge(
                   lipSync.value
                     ? "bg-brand-primary hover:bg-brand-primary-400"
-                    : "bg-gray-500 hover:bg-gray-400",
+                    : "bg-brand-secondary-800 hover:bg-brand-secondary-600",
                   "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
                 )}
               >
@@ -98,7 +98,7 @@ export function StyleOptions() {
                   className={twMerge(
                     faceDetail.value
                       ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400",
+                      : "bg-brand-secondary-800 hover:bg-brand-secondary-600",
                     "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
                   )}
                 >
@@ -128,7 +128,7 @@ export function StyleOptions() {
                   className={twMerge(
                     upscale.value
                       ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400",
+                      : "bg-brand-secondary-800 hover:bg-brand-secondary-600",
                     "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
                   )}
                 >
@@ -157,7 +157,7 @@ export function StyleOptions() {
                   className={twMerge(
                     cinematic.value
                       ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400",
+                      : "bg-brand-secondary-800 hover:bg-brand-secondary-600",
                     "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-all focus:outline-none focus:ring-0 focus:ring-offset-0",
                   )}
                 >
@@ -185,7 +185,7 @@ export function StyleOptions() {
                   className={twMerge(
                     enginePreProcessing.value
                       ? "bg-brand-primary hover:bg-brand-primary-400"
-                      : "bg-gray-500 hover:bg-gray-400",
+                      : "bg-brand-secondary-800 hover:bg-brand-secondary-600",
                     "focus:ring-indigo-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-0 focus:ring-offset-0",
                   )}
                 >

@@ -34,21 +34,17 @@ export const Textarea = ({
       <textarea
         id={id ? id : label ? kebabCase(label) : undefined}
         className={twMerge(
-          "rounded-lg border border-ui-panel-border bg-ui-controls px-3 py-2",
+          "rounded-lg border border-[#3F3F3F] bg-brand-secondary px-3 py-2 placeholder-white/50 outline-none transition-all duration-150 ease-in-out hover:border-brand-primary/60 focus:border-brand-primary focus:outline-none",
           className,
         )}
         style={{
-          outline: "2px solid transparent",
-          transition: "outline-color 0.15s ease-in-out",
           resize: resize,
         }}
-        onFocus={(e) => {
+        onFocus={() => {
           disableHotkeyInput(DomLevels.INPUT);
-          e.currentTarget.style.outlineColor = "#e66462";
         }}
-        onBlur={(e) => {
+        onBlur={() => {
           enableHotkeyInput(DomLevels.INPUT);
-          e.currentTarget.style.outlineColor = "transparent";
         }}
         onKeyDown={(event) => event.stopPropagation()}
         {...rest}

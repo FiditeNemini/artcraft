@@ -51,8 +51,8 @@ export const Input = React.forwardRef(
             ref={ref}
             id={id ? id : label ? kebabCase(label) : undefined}
             className={twMerge(
-              "h-10 w-full rounded-lg bg-brand-secondary px-3 py-2.5 text-white outline-none",
-              "outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary",
+              "h-10 w-full rounded-lg bg-brand-secondary px-3 py-2.5 text-white placeholder-white/50 outline-none",
+              "border border-[#3F3F3F] transition-all duration-150 ease-in-out hover:border-brand-primary/60 focus:border-brand-primary focus:!outline-none",
               icon && "pl-10",
               isError && "outline-red focus:outline-red",
               inputClassName,

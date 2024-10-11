@@ -88,7 +88,7 @@ export const Slider: React.FC<SliderProps> = ({
     <div
       ref={sliderRef}
       className={twMerge(
-        "relative h-2.5 w-full cursor-pointer rounded-full bg-gray-500",
+        "relative h-2.5 w-full cursor-pointer rounded-full bg-brand-secondary-900",
         className,
       )}
       onMouseDown={handleMouseDown}

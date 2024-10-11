@@ -54,7 +54,7 @@ export const Controls3D = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <div className="rounded-b-lg bg-ui-controls p-1.5 text-white shadow-md">
+        <div className="rounded-b-lg border border-[#3F3F3F] bg-ui-controls p-1.5 text-white shadow-md">
           <div className="flex items-center justify-center gap-3">
             <ButtonIconSelect
               options={modes}

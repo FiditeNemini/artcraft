@@ -43,18 +43,18 @@ export default {
       },
       "brand-secondary": {
         //gunpowder
-        DEFAULT: "#39394c", //=950
-        "50": "#f5f6f9",
-        "100": "#e8eaf1",
-        "200": "#d7dbe6",
-        "300": "#bbc1d5",
-        "400": "#9aa2c0",
-        "500": "#8188b0",
-        "600": "#6f74a1",
-        "700": "#636492",
-        "800": "#545579",
-        "900": "#464762",
-        "950": "#39394c",
+        DEFAULT: "#2E2E2E",
+        "50": "#f6f6f6",
+        "100": "#e7e7e7",
+        "200": "#d1d1d1",
+        "300": "#b0b0b0",
+        "400": "#888888",
+        "500": "#6d6d6d",
+        "600": "#5d5d5d",
+        "700": "#4f4f4f",
+        "800": "#454545",
+        "900": "#3d3d3d",
+        "950": "#2e2e2e",
       },
       "brand-tertiary": {
         //Aquamarine Blue
@@ -105,18 +105,18 @@ export default {
 
       action: {
         //comet
-        DEFAULT: "#55556b", //600
-        "50": "#f7f7f8",
-        "100": "#eeedf1",
-        "200": "#d8d8df",
-        "300": "#b5b5c4",
-        "400": "#8d8da3",
-        "500": "#6f7088",
-        "600": "#55556b",
-        "700": "#49495b",
-        "800": "#3f3f4d",
-        "900": "#373743",
-        "950": "#26252c",
+        DEFAULT: "#2E2E2E",
+        "50": "#f6f6f6",
+        "100": "#e7e7e7",
+        "200": "#d1d1d1",
+        "300": "#b0b0b0",
+        "400": "#888888",
+        "500": "#6d6d6d",
+        "600": "#5d5d5d",
+        "700": "#4f4f4f",
+        "800": "#454545",
+        "900": "#3d3d3d",
+        "950": "#2e2e2e",
       },
 
       character: {
@@ -159,8 +159,8 @@ export default {
         selected: "#FFDE67",
       },
       assets: {
-        background: "#39394D",
-        selectedTab: "#55556B",
+        background: "#242424",
+        selectedTab: "#2E2E2E",
       },
       dnd: {
         canDrop: "#46936E",
@@ -172,11 +172,11 @@ export default {
       },
 
       ui: {
-        background: "#1a1a27",
-        panel: "#242433",
-        "panel-border": "#393948",
-        controls: "#39394D",
-        "controls-button": "#676781",
+        background: "#242424",
+        panel: "#1F1F1F",
+        "panel-border": "#3F3F3F",
+        controls: "#2E2E2E",
+        "controls-button": "#2E2E2E",
         divider: "#515168",
       },
 

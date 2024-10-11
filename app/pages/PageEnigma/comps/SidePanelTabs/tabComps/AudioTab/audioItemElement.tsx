@@ -35,7 +35,7 @@ export const AudioItemElement = ({ item }: Props) => {
         DndAsset.onPointerDown(event, item);
       }}
     >
-      <div className="flex w-full flex-col gap-0.5 rounded-lg bg-assets-background p-2.5">
+      <div className="flex w-full flex-col gap-0.5 rounded-lg bg-brand-secondary p-2.5">
         <div className="flex justify-between">
           <AudioTypePill category={item.category} />
           {/* <p>{item.length}</p> */}

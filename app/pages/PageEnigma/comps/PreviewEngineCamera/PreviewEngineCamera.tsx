@@ -87,7 +87,7 @@ export const PreviewEngineCamera = () => {
       >
         <div
           className={twMerge(
-            "origin -z-10 flex h-auto w-full flex-wrap items-center gap-1.5 rounded-t-lg bg-ui-controls p-2 text-white",
+            "origin -z-10 flex h-auto w-full flex-wrap items-center gap-1.5 rounded-t-lg bg-ui-panel p-2 text-white",
             cameraAspectRatio.value !== CameraAspectRatio.VERTICAL_9_16
               ? "justify-between"
               : "flex-col justify-center",
@@ -118,7 +118,7 @@ export const PreviewEngineCamera = () => {
             )}
 
             <Button
-              variant="action"
+              variant="secondary"
               onClick={handleButtonCameraView}
               className="rounded-md px-2 py-1 text-sm"
             >

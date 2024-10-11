@@ -30,7 +30,7 @@ export function StyleSelectionButton({
     <div className="flex flex-col">
       <Label>Select a Style</Label>
       <button
-        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-white/30 bg-ui-controls-button/70 p-2 pr-3 text-start transition-all hover:border-brand-primary hover:bg-ui-controls-button/60"
+        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-[#3F3F3F] bg-brand-secondary p-2 pr-3 text-start transition-all hover:border-brand-primary hover:bg-brand-primary/20"
         onClick={onClick}
       >
         <div className="aspect-video w-20 overflow-hidden rounded-md bg-ui-controls-button/100">

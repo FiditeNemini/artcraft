@@ -35,7 +35,7 @@ export function ButtonIconSelect({
         <button
           key={value}
           className={twMerge(
-            `flex h-8 items-center justify-center rounded-lg border-2 text-sm transition-all duration-150`,
+            `flex h-8 items-center justify-center rounded-lg border text-sm transition-all duration-150`,
             text ? "h-auto w-auto gap-2 px-2.5 py-1" : "w-8",
             selectedOption === value
               ? "border-brand-primary bg-ui-panel/[0.3]"

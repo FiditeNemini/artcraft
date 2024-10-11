@@ -4,6 +4,7 @@ import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import {
   faCheckSquare,
   faFile,
+  faQuestion,
   faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
 
@@ -291,9 +292,7 @@ export const ControlsTopButtons = () => {
           className="shadow-xl"
           iconClassName={twMerge(
             "text-[16px]",
-            outlinerIsShowing.value
-              ? "text-white"
-              : "text-ui-controls-button/90",
+            outlinerIsShowing.value ? "text-white" : "text-white/20",
           )}
           variant="secondary"
           onClick={handleShowOutliner}
@@ -306,6 +305,7 @@ export const ControlsTopButtons = () => {
             variant: "secondary",
             label: "Help",
             className: "shadow-xl",
+            icon: faQuestion,
           }}
           dialogProps={{
             className: "max-w-6xl w-auto",

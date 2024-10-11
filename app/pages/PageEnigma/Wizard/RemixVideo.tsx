@@ -60,7 +60,7 @@ export const RemixVideo = ({
       <button
         key={card.token}
         className={twMerge(
-          "relative block aspect-video w-[352px] overflow-hidden rounded-lg border-2 transition-all duration-150",
+          "relative block aspect-video w-[352px] overflow-hidden rounded-lg border transition-all duration-150",
           card.token === selectedRemixCard.value?.token
             ? "border-brand-primary"
             : "border-white/5 hover:border-white/25",

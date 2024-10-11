@@ -30,15 +30,12 @@ export const SidePanel = () => {
     <>
       <div
         className={[
-          "fixed",
-          "z-[25] border-l border-l-ui-panel-border bg-ui-panel",
-          "flex",
-          "transition-all duration-300 ease-in-out",
+          "fixed z-20 flex border-l border-[#3F3F3F] bg-ui-panel transition-all duration-100",
         ].join(" ")}
         style={{
           top: 64,
-          right: 84,
-          width: sidePanelVisible.value ? displayWidth : 0,
+          right: sidePanelVisible.value ? 84 : -320,
+          width: displayWidth,
         }}
       >
         <div className="relative block h-full w-full bg-ui-panel">

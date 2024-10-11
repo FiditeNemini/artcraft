@@ -12,10 +12,10 @@ export const VoiceModelElement = ({
 
   return (
     <button
-      className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-transparent bg-brand-secondary p-3 text-start transition-all hover:border-ui-controls-button hover:bg-ui-controls-button/40"
+      className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-transparent bg-brand-secondary p-3 text-start transition-all hover:border-ui-controls-button hover:bg-ui-controls-button/40"
       onClick={() => onSelect(model)}
     >
-      <span className="h-12 w-12 rounded-lg bg-ui-controls-button/100" />
+      <span className="h-12 w-12 rounded-lg bg-white/10" />
       <div className="grow">
         <H4>{model.title}</H4>
         {creatorName && <H6 className="text-white/70">{creatorName}</H6>}

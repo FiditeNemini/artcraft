@@ -40,10 +40,10 @@ export const ItemPicker = ({
   return (
     <button
       className={twMerge(
-        "relative cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out",
+        "relative cursor-pointer overflow-hidden rounded-lg border transition-colors ease-in-out",
         selected
           ? "border-brand-primary"
-          : "border-[#4B4B5C] hover:border-ui-controls-button",
+          : "border-[#3F3F3F] hover:border-brand-primary",
         className,
       )}
       style={{

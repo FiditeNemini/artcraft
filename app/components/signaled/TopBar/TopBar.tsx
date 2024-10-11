@@ -22,7 +22,7 @@ export const TopBar = ({ pageName }: Props) => {
   );
 
   return (
-    <header className="fixed left-0 top-0 z-30 w-full border-b border-ui-panel-border bg-ui-panel">
+    <header className="fixed left-0 top-0 z-30 w-full border-b border-ui-panel-border bg-ui-background">
       <nav
         className="mx-auto grid h-[64px] w-screen grid-cols-3 items-center justify-between p-3"
         aria-label="Global"

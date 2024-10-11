@@ -20,7 +20,7 @@ export default function PremiumLockTimeline({
             className="absolute top-1/2 ml-[720px] -translate-y-1/2 transform border-l border-[#43435C] bg-ui-panel/70 backdrop-blur-sm"
           >
             <div className="flex h-full w-full flex-col justify-center pl-12">
-              <div className="flex w-[400px] flex-col gap-1 rounded-lg border-2 border-white/40 bg-ui-controls p-4 text-center shadow-lg">
+              <div className="flex w-[400px] flex-col gap-1 rounded-lg border border-white/40 bg-ui-controls p-4 text-center shadow-lg">
                 <h6 className="text-md font-medium">
                   Your timeline is currently limited to 3 seconds.
                 </h6>

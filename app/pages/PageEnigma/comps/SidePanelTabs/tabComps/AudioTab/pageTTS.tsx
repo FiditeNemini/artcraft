@@ -65,7 +65,7 @@ export const PageTTS = ({
         className="flex cursor-pointer items-center justify-between gap-3 rounded-lg bg-brand-secondary p-3 text-start transition-all hover:bg-ui-controls-button/40"
         onClick={() => changePage(AudioTabPages.SELECT_TTS_MODEL)}
       >
-        <span className="h-12 w-12 rounded-lg bg-ui-controls-button/100" />
+        <span className="h-12 w-12 rounded-lg bg-white/10" />
         <div className="grow">
           {!ttsState.voice && <H4>None Selected</H4>}
           {ttsState.voice && (

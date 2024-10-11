@@ -20,7 +20,7 @@ export function ObjectSelectionButton({
   return (
     <div className="flex flex-col">
       <button
-        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-white/30 bg-ui-controls-button/70 p-2 pr-3 text-start transition-all hover:border-brand-primary hover:bg-ui-controls-button/60"
+        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-white/30 bg-ui-controls-button/70 p-2 pr-3 text-start transition-all hover:border-brand-primary hover:bg-ui-controls-button/60"
         onClick={onClick}
         disabled={disabled}
       >

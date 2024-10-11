@@ -16,7 +16,7 @@ export const PreviewImages = () => {
   return (
     <div className="flex justify-center gap-1">
       <div
-        className="block w-full overflow-hidden rounded-lg border-2 border-ui-controls/25 bg-ui-panel"
+        className="block w-full overflow-hidden rounded-lg border border-ui-controls/25 bg-ui-panel"
         style={{ height: imageHeight, width: imageWidth }}
       >
         <canvas id="raw-preview" width={imageWidth} height={imageHeight} />
@@ -28,7 +28,7 @@ export const PreviewImages = () => {
         />
       </div>
       <div
-        className="block w-full overflow-hidden rounded-lg border-2 border-ui-controls/25 bg-ui-panel"
+        className="block w-full overflow-hidden rounded-lg border border-ui-controls/25 bg-ui-panel"
         style={{ height: imageHeight, width: imageWidth }}
       >
         <img

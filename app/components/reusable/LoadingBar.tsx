@@ -49,7 +49,7 @@ export const LoadingBar = ({
     propsInnerWrapperClassName,
   );
   const progressBackgroundClassName = twMerge(
-    "w-full bg-gray-500 rounded-full h-2.5",
+    "w-full bg-brand-secondary-800 rounded-full h-2.5",
     propsProgressBackgroundClassName,
   );
   const progressClassName = twMerge(

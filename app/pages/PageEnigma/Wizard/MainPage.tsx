@@ -21,7 +21,7 @@ export const MainPage = () => {
             {option.label === "Remix" && (
               <button
                 className={twMerge(
-                  "group relative flex h-[249px] w-full flex-col items-center rounded-lg border-2 border-white/5 bg-brand-secondary/50 px-2 pt-[58px] transition-all duration-150 hover:border-brand-primary hover:bg-brand-secondary",
+                  "group relative flex h-[249px] w-full flex-col items-center rounded-lg border border-white/5 bg-brand-secondary/50 px-2 pt-[58px] transition-all duration-150 hover:border-brand-primary hover:bg-brand-primary/20",
                 )}
                 onClick={() => (showWizard.value = option.value as string)}
               >
@@ -56,7 +56,7 @@ export const MainPage = () => {
             {option.label === "Blank Scene" && (
               <button
                 className={twMerge(
-                  "group relative flex h-[249px] w-full flex-col items-center rounded-lg border-2 border-white/5 bg-brand-secondary/50 px-2 pt-[58px] transition-all duration-150 hover:border-brand-primary hover:bg-brand-secondary",
+                  "group relative flex h-[249px] w-full flex-col items-center rounded-lg border border-white/5 bg-brand-secondary/50 px-2 pt-[58px] transition-all duration-150 hover:border-brand-primary hover:bg-brand-primary/20",
                 )}
                 onClick={() => (showWizard.value = option.value as string)}
               >

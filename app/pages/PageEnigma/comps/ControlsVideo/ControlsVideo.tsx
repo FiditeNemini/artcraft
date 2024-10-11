@@ -140,8 +140,8 @@ export const ControlsVideo = () => {
                   className={twMerge(
                     "h-7 w-7 p-0 text-sm",
                     isRepeating
-                      ? "border-2 border-brand-primary"
-                      : "border-2 border-transparent",
+                      ? "border border-brand-primary"
+                      : "border border-transparent",
                   )}
                 />
               </Tooltip>

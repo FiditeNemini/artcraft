@@ -116,7 +116,7 @@ export const ButtonDropdown = ({
                         disabled={option.disabled}
                         className={twMerge(
                           "duration-50 bg-brand-secondary font-medium text-white transition-all",
-                          active ? "bg-ui-controls-button/60" : "",
+                          active ? "bg-brand-secondary-800" : "",
                           option.disabled
                             ? "pointer-events-none opacity-40"
                             : "",

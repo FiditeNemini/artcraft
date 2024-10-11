@@ -9,22 +9,10 @@ import { useSignals } from "@preact/signals-react/runtime";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-
-import {
-  faceDetail,
-  upscale,
-  lipSync,
-  cinematic,
-  enginePreProcessing,
-} from "~/pages/PageEnigma/signals/stylizeTab";
-
-import { useContext } from "react";
-import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { StyleStrength } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/StylizeTab/StyleStrength";
 import { StyleOptions } from "~/pages/PageEnigma/comps/SidePanelTabs/tabComps/StylizeTab/StyleOptions";
 export function StyleButtons() {
   useSignals();
-  const editorEngine = useContext(EngineContext);
 
   const switchPreview = async () => {
     if (editorState.value === EditorStates.EDIT) {
@@ -59,7 +47,7 @@ export function StyleButtons() {
 
   return (
     <div className="flex w-full flex-col justify-center gap-4 rounded-b-lg bg-ui-panel">
-      <div className="w-full">
+      <div className="flex w-full flex-col gap-3">
         <div className="w-full">
           <Label>Render the camera view with AI</Label>
           <div className="mb-2 text-xs text-white/70">
@@ -69,7 +57,7 @@ export function StyleButtons() {
             <>
               <Button
                 icon={faArrowsRotate}
-                variant="primary"
+                variant="action"
                 className="mt-1.5 w-full"
                 onClick={switchPreview}
               >

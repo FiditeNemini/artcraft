@@ -1,6 +1,5 @@
 import { signal } from "@preact/signals-core";
 import { SceneObject } from "./types";
-import { faCamera, faCube, faPerson } from "@fortawesome/pro-solid-svg-icons";
 import { SceneManager } from "../../Editor/scene_manager_api";
 
 export const outlinerState = {

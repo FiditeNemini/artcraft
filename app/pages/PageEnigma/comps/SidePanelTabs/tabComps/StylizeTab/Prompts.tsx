@@ -73,7 +73,7 @@ export const Prompts = () => {
       <div className="relative w-full">
         <Textarea
           label="Enter a Prompt"
-          className="w-full"
+          className="w-full text-sm"
           rows={3}
           name="positive-prompt"
           placeholder="Type here to describe your scene"
@@ -106,7 +106,7 @@ export const Prompts = () => {
             <div className="relative w-full">
               <Textarea
                 label="Negative Prompt"
-                className="w-full"
+                className="w-full text-sm"
                 rows={2}
                 name="negative-prompt"
                 placeholder="Type here to filter out the things you don't want in the scene"
@@ -141,7 +141,7 @@ export const Prompts = () => {
         <div className="relative w-full">
           <Textarea
             label="Negative Prompt"
-            className="w-full"
+            className="w-full text-sm"
             rows={2}
             name="negative-prompt"
             placeholder="Type here to filter out the things you don't want in the scene"

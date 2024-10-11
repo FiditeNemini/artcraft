@@ -207,7 +207,7 @@ export const Outliner = () => {
 
       <div className="relative mx-4 my-2.5">
         <Input
-          inputClassName="h-8 rounded-lg text-sm bg-ui-controls-button/30 pr-8"
+          inputClassName="h-8 rounded-lg text-sm pr-8"
           placeholder="Search..."
           value={searchTerm}
           onInput={handleSearchChange}

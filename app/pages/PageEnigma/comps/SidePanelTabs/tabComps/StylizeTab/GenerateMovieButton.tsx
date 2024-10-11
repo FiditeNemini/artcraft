@@ -73,7 +73,7 @@ export function GenerateMovieButton({
   return (
     <div
       ref={ref}
-      className="absolute bottom-0 border-t border-white/15 bg-ui-controls/60 p-4 shadow-lg"
+      className="absolute bottom-0 border-t border-[#3F3F3F] bg-ui-controls/60 p-4 shadow-lg"
     >
       <Label>
         <div className="mb-2 leading-tight">
@@ -87,7 +87,7 @@ export function GenerateMovieButton({
       <Button
         icon={faFilm}
         variant="primary"
-        className="w-full"
+        className="h-11 w-full"
         onClick={generateMovie}
       >
         Generate Movie

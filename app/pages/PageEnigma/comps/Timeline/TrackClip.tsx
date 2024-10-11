@@ -47,7 +47,7 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
       <button
         className={[
           ...classes,
-          "w-[15px] rounded-l-md border-2 border-transparent",
+          "w-[15px] rounded-l-md border border-transparent",
           "block h-full cursor-ew-resize",
           clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-2 border-r-0 border-t-2"
@@ -109,7 +109,7 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
       <button
         className={[
           ...classes,
-          "w-[15px] rounded-r-md border-2 border-transparent",
+          "w-[15px] rounded-r-md border border-transparent",
           "block h-full cursor-ew-resize",
           clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-0 border-r-2 border-t-2"

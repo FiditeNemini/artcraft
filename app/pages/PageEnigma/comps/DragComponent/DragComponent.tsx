@@ -47,7 +47,7 @@ export const DragComponent = () => {
             className={[
               "absolute p-2",
               "rounded opacity-60",
-              "border-2-dnd-timeGridBorder border bg-dnd-timeGrid",
+              "border border-dnd-timeGridBorder bg-dnd-timeGrid",
             ].join(" ")}
             style={{
               bottom: timelineHeight.value - 60,
