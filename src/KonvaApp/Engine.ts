@@ -5,6 +5,7 @@ import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 
 import { uiAccess, uiEvents } from "~/signals";
 
+import { SceneManager } from "./SceneManager";
 import {
   NodesManager,
   NodeTransformer,
@@ -15,7 +16,13 @@ import {
   SelectorSquare,
 } from "./NodesManagers";
 import { ImageNode, VideoNode, TextNode } from "./Nodes";
-import { MediaNode, Position, TextNodeData, Transformation } from "./types";
+import {
+  EngineOptions,
+  MediaNode,
+  Position,
+  TextNodeData,
+  Transformation,
+} from "./types";
 
 import {
   CreateCommand,
@@ -37,6 +44,7 @@ import {
 
 import { AppModes, VideoResolutions } from "./constants";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+import { NavigateFunction } from "react-router-dom";
 
 // for testing loading files from system
 // import { FileUtilities } from "./FileUtilities/FileUtilities";
@@ -54,6 +62,7 @@ export interface RenderingOptions {
 }
 
 export class Engine {
+  private navigateRef: NavigateFunction;
   private appMode: AppModes;
   private canvasReference: HTMLDivElement;
   private stage: Konva.Stage;
@@ -68,14 +77,15 @@ export class Engine {
   private selectionManager: SelectionManager;
   private selectorSquare: SelectorSquare;
 
+  private sceneManager: SceneManager;
   private undoStackManager: UndoStackManager;
 
   // signal reference
-  constructor(canvasReference: HTMLDivElement) {
+  constructor(canvasReference: HTMLDivElement, options: EngineOptions) {
     if (import.meta.env.DEV) {
       console.log("Engine Created");
     }
-
+    this.navigateRef = options.navigate;
     this.appMode = AppModes.SELECT;
 
     this.canvasReference = canvasReference;
@@ -98,13 +108,6 @@ export class Engine {
     this.selectorSquare = new SelectorSquare();
     this.uiLayer.add(this.selectorSquare.getKonvaNode());
 
-    // Collection of all Nodes
-    this.nodesManager = new NodesManager();
-    // Partial Collection of selected Nodes
-    this.selectionManager = new SelectionManager({
-      nodeTransformerRef: this.nodeTransformer,
-      mediaLayerRef: this.mediaLayer,
-    });
     // Collection of commands for undo-redo
     this.undoStackManager = new UndoStackManager();
 
@@ -130,6 +133,28 @@ export class Engine {
         this.onRenderingSystemReceived.bind(this),
     });
 
+    // Collection of all Nodes
+    this.nodesManager = new NodesManager();
+    // Partial Collection of selected Nodes
+    this.selectionManager = new SelectionManager({
+      nodeTransformerRef: this.nodeTransformer,
+      mediaLayerRef: this.mediaLayer,
+    });
+
+    // set up secene manager
+    this.sceneManager = new SceneManager({
+      navigateRef: this.navigateRef,
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      selectionManagerRef: this.selectionManager,
+      renderEngineRef: this.renderEngine,
+    });
+    // load the scene if there's a scenetoken
+    if (options.sceneToken) {
+      this.sceneManager.loadScene(options.sceneToken);
+    }
+    // some of the managers has events
+    // hence, lastly, setup these events
     this.setupEventSystem();
   }
 
@@ -173,15 +198,8 @@ export class Engine {
       // choose it to be the size of the rendering output, this case its mobile. (1560, 400)
       const media_api_base_url = "https://storage.googleapis.com/";
       const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
-
-      const videoNode = new VideoNode({
-        mediaLayerRef: this.mediaLayer,
-        canvasPosition: this.renderEngine.captureCanvas.position(),
-        canvasSize: this.renderEngine.captureCanvas.size(),
-        videoURL: media_url,
-        selectionManagerRef: this.selectionManager,
-      });
-      this.renderEngine.addNodes(videoNode);
+      console.log("Engine got stylized video: " + media_url);
+      this.addVideo(media_url);
       // hide the loader
       //this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
@@ -271,7 +289,7 @@ export class Engine {
     });
 
     uiEvents.onGetStagedVideo((video) => {
-      console.log("Engine got video: " + video.url);
+      console.log("Engine got user video: " + video.url);
       this.addVideo(video.url);
     });
     uiEvents.onAddTextToEngine((textdata) => {
@@ -312,7 +330,9 @@ export class Engine {
 
     uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
     uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
-    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {});
+    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
+      this.sceneManager.saveScene();
+    });
   }
 
   sleep(ms: number): Promise<void> {
@@ -383,12 +403,8 @@ export class Engine {
       textNodeData: textNodeData,
       mediaLayerRef: this.mediaLayer,
       selectionManagerRef: this.selectionManager,
-      position: {
-        x: this.renderEngine.captureCanvas.x() + 20,
-        y:
-          this.renderEngine.captureCanvas.y() +
-          this.renderEngine.captureCanvas.height() / 3,
-      },
+      canvasPosition: this.renderEngine.captureCanvas.position(),
+      canvasSize: this.renderEngine.captureCanvas.size(),
     });
     this.createNode(textNode);
   }

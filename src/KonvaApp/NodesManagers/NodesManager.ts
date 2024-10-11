@@ -11,6 +11,7 @@ export class NodesManager {
   public getAllNodes() {
     return this.allNodes;
   }
+
   public getAllZIndices() {
     return this.allZIndices;
   }

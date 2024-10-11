@@ -457,6 +457,7 @@ export class RenderEngine {
       }
       container.drawScene(offScreenSceneCanvas, undefined, buffer);
       // Not a type mistake ... DO NOT FIX
+      // @ts-ignore
       const offscreenCanvas = offScreenSceneCanvas._canvas as OffscreenCanvas;
       let result = undefined;
       if (config.test) {

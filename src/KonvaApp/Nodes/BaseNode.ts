@@ -2,12 +2,12 @@ import Konva from "konva";
 
 import { SelectionManager } from "../NodesManagers";
 import { highlightStrokeWidth, primaryOrange } from "./constants";
+import { NodeData, Position } from "../types";
 
-export class BaseNode {
+export abstract class BaseNode {
   protected selectionManagerRef: SelectionManager;
-  public kNode: Konva.Node;
+  public kNode: Konva.Image | Konva.Group;
   protected mediaLayerRef: Konva.Layer;
-  // protected uuid: string;
 
   // Internal State members
   // do not modify internal
@@ -16,6 +16,8 @@ export class BaseNode {
   protected isProcessing: boolean = false;
   protected _isLocked: boolean = false;
   protected _isKEventRef: boolean = false;
+
+  abstract getNodeData(captureCanvasPosition: Position): NodeData;
 
   constructor({
     selectionManagerRef,

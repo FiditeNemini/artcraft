@@ -4,7 +4,13 @@ import { BaseNode } from "./Nodes/BaseNode";
 import { VideoNode } from "./Nodes/VideoNode";
 import { ImageNode } from "./Nodes/ImageNode";
 import { TextNode } from "./Nodes/TextNodes";
+import { NodeType } from "./Nodes/constants";
+import { NavigateFunction } from "react-router-dom";
 
+export interface EngineOptions {
+  navigate: NavigateFunction;
+  sceneToken?: string;
+}
 export interface TextNodeData {
   text: string;
 }
@@ -26,4 +32,24 @@ export interface Transformation {
   size: Size;
   scale: Scale;
   rotation: number;
+}
+
+export interface TransformationData extends Omit<Transformation, "kNodeId"> {
+  zIndex: number;
+}
+
+export interface TextNodeChildrenTransformData {
+  wrapperRectTransform: TransformationData;
+  textNodeTransform: TransformationData;
+}
+export interface NodeData {
+  type: NodeType;
+  transform: TransformationData;
+  // Image Node / Video Node data
+  mediaFileUrl?: string;
+  mediaFileToken?: string;
+
+  //Text Node Data
+  textNodeData?: TextNodeData;
+  textChildrenTransforms?: TextNodeChildrenTransformData;
 }

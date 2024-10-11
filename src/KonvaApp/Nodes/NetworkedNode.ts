@@ -16,7 +16,7 @@ export enum UploadStatus {
   SUCCESS = "success",
 }
 
-export class NetworkedNode extends BaseNode {
+export abstract class NetworkedNode extends BaseNode {
   public kNode: Konva.Image;
   public didFinishLoading: boolean = false;
   protected _progress: number = 0;
@@ -25,7 +25,7 @@ export class NetworkedNode extends BaseNode {
   protected mediaFileUrl?: string;
   protected mediaFileStatus: UploadStatus = UploadStatus.INIT;
   public errorMessage?: string;
-
+  abstract retry(): void;
   constructor({
     kNode,
     selectionManagerRef,
@@ -61,11 +61,7 @@ export class NetworkedNode extends BaseNode {
     ];
     return errorStatues.includes(this.mediaFileStatus);
   }
-  public retry() {
-    console.warn(
-      "Retry function of Networked Node should be overridden by children",
-    );
-  }
+
   protected uuidGenerate() {
     return uuidv4();
   }

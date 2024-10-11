@@ -2,42 +2,60 @@ import Konva from "konva";
 import { MediaFilesApi, MediaUploadApi } from "~/Classes/ApiManager";
 
 import { SelectionManager } from "../NodesManagers";
-import { Position, Size } from "../types";
+import { Position, Size, NodeData, TransformationData } from "../types";
 
 import { NetworkedNode, UploadStatus } from "./NetworkedNode";
-import { minNodeSize, transparent } from "./constants";
+import { minNodeSize, NodeType, transparent } from "./constants";
 import { NodeUtilities } from "./NodeUtilities";
 
 interface ImageNodeContructor {
   canvasPosition: Position;
   canvasSize: Size;
-  imageFile: File;
+  imageFile?: File;
+  mediaFileToken?: string;
+  mediaFileUrl?: string;
+  transform?: TransformationData;
   mediaLayerRef: Konva.Layer;
   selectionManagerRef: SelectionManager;
 }
 
 export class ImageNode extends NetworkedNode {
   public kNode: Konva.Image;
-  private imageSize: Size;
+  public imageSize?: Size;
 
   constructor({
     canvasPosition,
     canvasSize,
     imageFile,
+    mediaFileToken,
+    mediaFileUrl,
+    transform: existingTransform,
     mediaLayerRef,
     selectionManagerRef,
   }: ImageNodeContructor) {
     // kNodes need to be created first to guaruntee
     // that it is not undefined in parent's context
+    const transform = existingTransform
+      ? {
+          ...existingTransform,
+          position: {
+            x: existingTransform.position.x + canvasPosition.x,
+            y: existingTransform.position.y + canvasPosition.y,
+          },
+          fill: transparent,
+        }
+      : {
+          position: NodeUtilities.positionNodeOnCanvasCenter({
+            canvasOffset: canvasPosition,
+            componentSize: minNodeSize,
+            maxSize: canvasSize,
+          }),
+          size: minNodeSize,
+          fill: "gray",
+        };
     const kNode = new Konva.Image({
       image: undefined, // to do replace with placeholder
-      size: minNodeSize,
-      position: NodeUtilities.positionNodeOnCanvasCenter({
-        canvasOffset: canvasPosition,
-        componentSize: minNodeSize,
-        maxSize: canvasSize,
-      }),
-      fill: "gray",
+      ...transform,
       draggable: true,
       strokeScaleEnabled: false,
     });
@@ -48,11 +66,35 @@ export class ImageNode extends NetworkedNode {
       localFile: imageFile,
     });
     this.kNode = kNode;
-    this.imageSize = minNodeSize;
+    // this.imageSize = minNodeSize;
     this.mediaLayerRef.add(this.kNode);
 
+    if (imageFile) {
+      this.loadImageFromFile({
+        imageFile: imageFile,
+        maxSize: canvasSize,
+        refPosition: canvasPosition,
+      });
+      return;
+    }
+    if (mediaFileUrl && transform) {
+      this.mediaFileToken = mediaFileToken;
+      this.mediaFileUrl = mediaFileUrl;
+      this.loadImageFromUrl(mediaFileUrl);
+      return;
+    }
+    console.log("image node creation is fucked");
+  }
+  private loadImageFromFile({
+    imageFile,
+    maxSize,
+    refPosition,
+  }: {
+    imageFile: File;
+    maxSize: Size;
+    refPosition: Position;
+  }) {
     const imageComponent = new Image();
-
     imageComponent.onload = () => {
       this.setProgress(0, UploadStatus.FILE_STAGED);
       this.imageSize = {
@@ -61,12 +103,12 @@ export class ImageNode extends NetworkedNode {
       };
       const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
         componentSize: this.imageSize,
-        maxSize: canvasSize,
+        maxSize: maxSize,
       });
       const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
-        canvasOffset: canvasPosition,
+        canvasOffset: refPosition,
         componentSize: adjustedSize,
-        maxSize: canvasSize,
+        maxSize: maxSize,
       });
       this.kNode.image(imageComponent);
       this.kNode.setSize(adjustedSize);
@@ -82,11 +124,9 @@ export class ImageNode extends NetworkedNode {
     };
     imageComponent.src = URL.createObjectURL(imageFile);
   }
-
-  private async updateImage(newImageSrc: string) {
+  private async loadImageFromUrl(mediaFileUrl: string) {
     this.setProgress(75, UploadStatus.LOADING);
     const newImage = new Image();
-    newImage.src = newImageSrc;
     newImage.onerror = () => {
       this.setProgress(90, UploadStatus.ERROR_ON_LOAD);
     };
@@ -96,6 +136,8 @@ export class ImageNode extends NetworkedNode {
       this.kNode.draw();
       this.setProgress(100, UploadStatus.SUCCESS);
     };
+    newImage.src = mediaFileUrl;
+    this.listenToBaseKNode();
   }
 
   private async uploadImage(imageFile: File) {
@@ -130,12 +172,12 @@ export class ImageNode extends NetworkedNode {
       return;
     }
     this.mediaFileUrl = mediaFileResponse.data.public_bucket_url;
-    this.updateImage(this.mediaFileUrl);
+    this.loadImageFromUrl(this.mediaFileUrl);
   }
 
   public async retry() {
     if (this.mediaFileUrl) {
-      this.updateImage(this.mediaFileUrl);
+      this.loadImageFromUrl(this.mediaFileUrl);
       return;
     }
     if (this.mediaFileToken) {
@@ -147,5 +189,30 @@ export class ImageNode extends NetworkedNode {
       return;
     }
     console.warn("Image Node has no data to recontruct itself!");
+  }
+  public getNodeData(canvasPostion: Position) {
+    const data: NodeData = {
+      type: NodeType.IMAGE,
+      transform: {
+        position: {
+          x: this.kNode.position().x - canvasPostion.x,
+          y: this.kNode.position().y - canvasPostion.y,
+        },
+        size: this.kNode.size(),
+        rotation: this.kNode.rotation(),
+        scale: {
+          x: this.kNode.scaleX(),
+          y: this.kNode.scaleY(),
+        },
+        zIndex: this.kNode.getZIndex(),
+      },
+    };
+    if (this.mediaFileUrl) {
+      data.mediaFileUrl = this.mediaFileUrl;
+    }
+    if (this.mediaFileToken) {
+      data.mediaFileToken = this.mediaFileToken;
+    }
+    return data;
   }
 }

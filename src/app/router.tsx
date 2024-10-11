@@ -12,6 +12,10 @@ export const router = createBrowserRouter([
     path: "/login",
     element: <Login />,
   },
+  {
+    path: "/:sceneToken",
+    element: <Main />,
+  },
   // {
   //   path: "/sandbox",
   //   element: <Sandbox />,

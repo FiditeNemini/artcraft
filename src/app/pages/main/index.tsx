@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import { withProtectionRoute } from "~/components/hoc";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
@@ -12,10 +13,14 @@ export const Main = withProtectionRoute(() => {
   // This is a hook that will log the number of times the component has rerendered
   // Let's make sure we only log once
   useRenderCounter("Pages/Main");
+  const { sceneToken } = useParams();
 
   return (
     <div className="fixed grid h-full w-full grid-cols-12 grid-rows-12">
-      <KonvaRootComponent className="col-span-12 col-start-1 row-span-12 row-start-1" />
+      <KonvaRootComponent
+        sceneToken={sceneToken}
+        className="col-span-12 col-start-1 row-span-12 row-start-1"
+      />
       <div
         className={twMerge(
           "col-span-8 col-start-5 row-span-1 row-start-1 flex justify-end",

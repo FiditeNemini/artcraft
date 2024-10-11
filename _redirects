@@ -7,4 +7,4 @@
 #   configuration file.
 
 /login               /index.html                   200!
-
+/m_*                   /index.html                   200!

@@ -1,8 +1,16 @@
 import Konva from "konva";
 import { SelectionManager } from "../NodesManagers";
 import { BaseNode } from "./BaseNode";
-import { Position, Size, TextNodeData } from "../types";
+import {
+  NodeData,
+  Position,
+  Size,
+  TextNodeChildrenTransformData,
+  TextNodeData,
+  TransformationData,
+} from "../types";
 import { NodeUtilities } from "./NodeUtilities";
+import { NodeType } from "./constants";
 
 export class TextNode extends BaseNode {
   public kNode: Konva.Group;
@@ -17,14 +25,19 @@ export class TextNode extends BaseNode {
     textNodeData,
     selectionManagerRef,
     mediaLayerRef,
-    position,
+    canvasPosition,
+    canvasSize,
+    transform: existingTransform,
+    textChildrenTransforms,
   }: {
     textNodeData: TextNodeData;
     selectionManagerRef: SelectionManager;
     mediaLayerRef: Konva.Layer;
-    position: Position;
+    canvasSize: Size;
+    canvasPosition: Position;
+    transform?: TransformationData;
+    textChildrenTransforms?: TextNodeChildrenTransformData;
   }) {
-    console.log(textNodeData);
     const textNode = new Konva.Text({
       ...textNodeData,
       x: 10,
@@ -32,7 +45,14 @@ export class TextNode extends BaseNode {
       width: 500,
     });
     const kNode = new Konva.Group({
-      position: position,
+      position: NodeUtilities.positionNodeOnCanvasCenter({
+        canvasOffset: canvasPosition,
+        componentSize: {
+          width: textNode.width() + 20,
+          height: textNode.height() + 20,
+        },
+        maxSize: canvasSize,
+      }),
       width: textNode.width() + 20,
       height: textNode.height() + 20,
       draggable: true,
@@ -57,6 +77,13 @@ export class TextNode extends BaseNode {
     this.rectNode = rectNode;
     this.kNode.add(this.rectNode);
     this.kNode.add(this.textNode);
+    if (existingTransform && textChildrenTransforms) {
+      this.applyTransform({
+        existingTransform,
+        textChildrenTransforms,
+        canvasPosition,
+      });
+    }
     this.mediaLayerRef.add(this.kNode);
     this.originalTextSize = this.textNode.size();
     this.listenToBaseKNode();
@@ -94,5 +121,66 @@ export class TextNode extends BaseNode {
       NodeUtilities.printKNodeAttrs(this.textNode);
       this.selectionManagerRef.transformEnd(this);
     });
+  }
+  public getNodeData(canvasPostion: Position) {
+    const data: NodeData = {
+      type: NodeType.TEXT,
+      transform: {
+        position: {
+          x: this.kNode.position().x - canvasPostion.x,
+          y: this.kNode.position().y - canvasPostion.y,
+        },
+        size: this.kNode.size(),
+        rotation: this.kNode.rotation(),
+        scale: {
+          x: this.kNode.scaleX(),
+          y: this.kNode.scaleY(),
+        },
+        zIndex: this.kNode.getZIndex(),
+      },
+      textNodeData: this.textNodeData,
+      textChildrenTransforms: {
+        wrapperRectTransform: {
+          position: this.rectNode.position(),
+          size: this.rectNode.size(),
+          rotation: this.rectNode.rotation(),
+          scale: {
+            x: this.rectNode.scaleX(),
+            y: this.rectNode.scaleY(),
+          },
+          zIndex: this.rectNode.getZIndex(),
+        },
+        textNodeTransform: {
+          position: this.textNode.position(),
+          size: this.textNode.size(),
+          rotation: this.textNode.rotation(),
+          scale: {
+            x: this.textNode.scaleX(),
+            y: this.textNode.scaleY(),
+          },
+          zIndex: this.textNode.getZIndex(),
+        },
+      },
+    };
+    return data;
+  }
+  private applyTransform({
+    canvasPosition,
+    existingTransform,
+    textChildrenTransforms,
+  }: {
+    canvasPosition: Position;
+    existingTransform: TransformationData;
+    textChildrenTransforms: TextNodeChildrenTransformData;
+  }) {
+    this.kNode.setAttrs({
+      ...existingTransform,
+      position: {
+        x: existingTransform.position.x + canvasPosition.x,
+        y: existingTransform.position.y + canvasPosition.y,
+      },
+    });
+    this.rectNode.setAttrs(textChildrenTransforms.wrapperRectTransform);
+    this.textNode.setAttrs(textChildrenTransforms.textNodeTransform);
   }
 }

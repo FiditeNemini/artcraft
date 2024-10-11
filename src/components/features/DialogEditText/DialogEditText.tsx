@@ -57,7 +57,7 @@ export const DialogEditText = ({
         textFormatData.fontStyle === FontStyle.NORMAL &&
         textFormatData.fontWeight === FontWeight.NORMAL
           ? "normal"
-          : `${textFormatData.fontWeight !== FontWeight.NORMAL && textFormatData.fontWeight} ${textFormatData.fontStyle !== FontStyle.NORMAL && textFormatData.fontStyle}`,
+          : `${textFormatData.fontWeight !== FontWeight.NORMAL ? textFormatData.fontWeight : ""} ${textFormatData.fontStyle !== FontStyle.NORMAL ? textFormatData.fontStyle : ""}`,
       textDecoration:
         textFormatData.textDecoration === TextDecoration.NONE
           ? ""

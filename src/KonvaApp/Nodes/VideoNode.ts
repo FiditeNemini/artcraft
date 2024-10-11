@@ -1,11 +1,11 @@
 import Konva from "konva";
 import { NetworkedNode } from "./NetworkedNode";
 import { uiAccess } from "~/signals";
-import { SelectionManager } from "../NodesManagers";
-import { Position, Size } from "../types";
 import ChromaWorker from "./ChromaWorker?sharedworker";
-import { minNodeSize, transparent } from "./constants";
+import { SelectionManager } from "../NodesManagers";
+import { Position, Size, NodeData, TransformationData } from "../types";
 import { NodeUtilities } from "./NodeUtilities";
+import { minNodeSize, transparent, NodeType } from "./constants";
 
 const loadingBar = uiAccess.loadingBar;
 
@@ -15,6 +15,7 @@ interface VideoNodeContructor {
   canvasSize: Size;
   videoURL: string;
   selectionManagerRef: SelectionManager;
+  transform?: TransformationData;
 }
 
 export class VideoNode extends NetworkedNode {
@@ -34,6 +35,7 @@ export class VideoNode extends NetworkedNode {
   drawingCanvas: OffscreenCanvas;
   drawingContext: OffscreenCanvasRenderingContext2D | null;
   blockSeeking: boolean;
+  finishedLoadingOnStart?: Promise<void>;
 
   isChroma: boolean;
   chromaRed: number = 120;
@@ -97,18 +99,31 @@ export class VideoNode extends NetworkedNode {
     canvasSize,
     videoURL,
     selectionManagerRef,
+    transform: existingTransform,
   }: VideoNodeContructor) {
+    const transform = existingTransform
+      ? {
+          ...existingTransform,
+          position: {
+            x: existingTransform.position.x + canvasPosition.x,
+            y: existingTransform.position.y + canvasPosition.y,
+          },
+          fill: transparent,
+        }
+      : {
+          position: NodeUtilities.positionNodeOnCanvasCenter({
+            canvasOffset: canvasPosition,
+            componentSize: minNodeSize,
+            maxSize: canvasSize,
+          }),
+          size: minNodeSize,
+          fill: "gray",
+        };
     // kNodes need to be created first to guaruntee it is not undefined in parent's context
     const kNode = new Konva.Image({
       image: undefined,
       // to do fix this with placeholder
-      size: minNodeSize,
-      position: NodeUtilities.positionNodeOnCanvasCenter({
-        canvasOffset: canvasPosition,
-        componentSize: minNodeSize,
-        maxSize: canvasSize,
-      }),
-      fill: "grey",
+      ...transform,
       draggable: true,
       strokeScaleEnabled: false,
     });
@@ -157,23 +172,24 @@ export class VideoNode extends NetworkedNode {
         return;
       }
 
-      const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
-        componentSize: {
-          width: this.videoComponent.videoWidth,
-          height: this.videoComponent.videoHeight,
-        },
-        maxSize: canvasSize,
-      });
-      const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
-        canvasOffset: canvasPosition,
-        componentSize: adjustedSize,
-        maxSize: canvasSize,
-      });
+      if (!existingTransform) {
+        const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
+          componentSize: {
+            width: this.videoComponent.videoWidth,
+            height: this.videoComponent.videoHeight,
+          },
+          maxSize: canvasSize,
+        });
+        const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
+          canvasOffset: canvasPosition,
+          componentSize: adjustedSize,
+          maxSize: canvasSize,
+        });
+        this.kNode.setSize(adjustedSize);
+        this.kNode.setPosition(centerPosition);
+      }
 
       this.kNode.image(this.videoComponent);
-      this.kNode.setSize(adjustedSize);
-      this.kNode.setPosition(centerPosition);
-
       this.videoComponent.currentTime = 0; // ensure it shows up on screen
       // it might have length here which we will need to trim down to 7 seconds.
       console.log(`Video Duration: ${this.videoComponent.duration}`);
@@ -455,5 +471,32 @@ export class VideoNode extends NetworkedNode {
     } else {
       console.log("Video Not Seekable");
     }
+  }
+
+  public async retry() {
+    console.log("Video Node has not implement retry");
+  }
+  public getNodeData(canvasPostion: Position) {
+    const data: NodeData = {
+      type: NodeType.VIDEO,
+      transform: {
+        position: {
+          x: this.kNode.position().x - canvasPostion.x,
+          y: this.kNode.position().y - canvasPostion.y,
+        },
+        size: this.kNode.size(),
+        rotation: this.kNode.rotation(),
+        scale: {
+          x: this.kNode.scaleX(),
+          y: this.kNode.scaleY(),
+        },
+        zIndex: this.kNode.getZIndex(),
+      },
+    };
+    data.mediaFileUrl = this.videoURL;
+    if (this.mediaFileToken) {
+      data.mediaFileToken = this.mediaFileToken;
+    }
+    return data;
   }
 }

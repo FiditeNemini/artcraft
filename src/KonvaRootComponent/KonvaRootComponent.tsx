@@ -20,18 +20,30 @@ import { useLayoutContext } from "./contextSignals/layout";
 
 // common hooks
 import { useRenderCounter } from "~/hooks/useRenderCounter";
+import { useNavigate } from "react-router-dom";
 
-export const KonvaRootComponent = ({ className }: { className: string }) => {
+export const KonvaRootComponent = ({
+  className,
+  sceneToken,
+}: {
+  className: string;
+  sceneToken?: string;
+}) => {
   // This is a hook that will log the number of times the component has rerendered
   // Let's make sure we only log once
   useRenderCounter("KonvaRootComponent");
+  const navigate = useNavigate();
   const appUiContext = useAppUiContext();
   const layoutContext = useLayoutContext();
   const engineRef = useRef<EngineType | null>(null);
 
   const konvaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
     if (node !== null && engineRef.current === null) {
-      engineRef.current = KonvaApp(node);
+      const options = {
+        navigate: navigate,
+        sceneToken: sceneToken,
+      };
+      engineRef.current = KonvaApp(node, options);
     }
   }, []);
 
