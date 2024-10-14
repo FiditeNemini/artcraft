@@ -78,7 +78,7 @@ function FooterNav() {
         ...(domain.website === Website.FakeYou
           ? [{ link: "/tools", text: "AI Tools", icon: null }]
           : []),
-        { link: "/tools", text: "AI Video Tools", icon: null },
+        // { link: "/upload-assets", text: "Upload Assets", icon: null },
       ],
       condition: true,
     },

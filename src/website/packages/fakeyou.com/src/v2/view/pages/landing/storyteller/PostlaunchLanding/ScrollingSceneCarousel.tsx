@@ -96,7 +96,7 @@ export default function ScrollingSceneCarousel({
           direction="right"
         >
           {secondHalf.map((item, index) => (
-            <div key={index} style={{ aspectRatio: "16 / 9" }}>
+            <div key={index}>
               <SceneCard
                 image={
                   MediaLinks(item.media_links).videoAnimated

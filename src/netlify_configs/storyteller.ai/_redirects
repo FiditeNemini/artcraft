@@ -23,8 +23,6 @@
 # Website paths:
 /about*                /website/index.html   200
 /acting-face*          /website/index.html   200
-/ai-live-portrait*     /website/index.html   200
-/beta*                 /website/index.html   200
 /beta-key*             /website/index.html   200
 /beta-keys*            /website/index.html   200
 /category*             /website/index.html   200
@@ -38,7 +36,6 @@
 /edit-cover-image*     /website/index.html   200
 /engine-compositor*    /website/index.html   200
 /explore*              /website/index.html   200
-/face-animator*        /website/index.html   200
 /fbx-to-gltf*          /website/index.html   200
 /leaderboard*          /website/index.html   200
 /login*                /website/index.html   200
@@ -66,7 +63,6 @@
 /video-style*          /website/index.html   200
 /voice-conversion*     /website/index.html   200
 /waitlist-next-steps*  /website/index.html   200
-/webcam-acting*        /website/index.html   200
 /weight*               /website/index.html   200
 /welcome               /website/index.html   200
 /welcome-to-studio*    /website/index.html   200

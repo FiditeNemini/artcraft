@@ -19,7 +19,6 @@ import {
   faScrewdriverWrench,
   faImageUser,
   faSparkles,
-  faVideo,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -374,28 +373,18 @@ export default function TopNav() {
                 </div>
               )}
 
-              <div className="d-flex gap-2 align-items-center">
-                <NavItem
-                  icon={faCompass}
-                  label="Explore"
-                  link="/explore"
-                  className="d-none d-lg-block no-wrap"
-                />
-                {domain.website === Website.StorytellerAi && (
-                  <NavItem
-                    icon={faVideo}
-                    label="Video Tools"
-                    link="/tools"
-                    className="d-none d-lg-block no-wrap"
-                  />
-                )}
-                <NavItem
-                  icon={faStar}
-                  label="Pricing"
-                  link="/pricing"
-                  className="d-none d-lg-block no-wrap"
-                />
-              </div>
+              <NavItem
+                icon={faCompass}
+                label="Explore"
+                link="/explore"
+                className="d-none d-lg-block no-wrap"
+              />
+              <NavItem
+                icon={faStar}
+                label="Pricing"
+                link="/pricing"
+                className="me-3 d-none d-lg-block no-wrap"
+              />
             </div>
           </div>
 
