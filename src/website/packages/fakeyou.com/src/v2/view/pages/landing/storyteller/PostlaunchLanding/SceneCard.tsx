@@ -19,7 +19,11 @@ export default function SceneCard({
   return (
     <div
       className="position-relative overflow-hidden rounded"
-      style={{ width: "max-content", marginRight: small ? "24px" : "32px" }}
+      style={{
+        width: "max-content",
+        marginRight: small ? "24px" : "32px",
+        aspectRatio: "16 / 9",
+      }}
     >
       {/* <AnimatePresence>
         {showOverlay && (
@@ -60,7 +64,12 @@ export default function SceneCard({
           </motion.div>
         )}
       </AnimatePresence> */}
-      <img src={image} alt={alt} width={small ? 180 : 340} />
+      <img
+        src={image}
+        alt={alt}
+        width={small ? 180 : 340}
+        className="object-fit-cover w-100 h-100"
+      />
     </div>
   );
 }
