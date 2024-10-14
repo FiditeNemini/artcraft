@@ -22,10 +22,10 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
-import React, { useEffect, useState } from "react";
-import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link, NavLink, useHistory } from "react-router-dom";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { useLocalize, useModal, useSession } from "hooks";
+import { useLocalize, useModal, usePageLocation, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
@@ -42,33 +42,25 @@ import {
 export default function TopNav() {
   const { queryAppState, sessionWrapper, user } = useSession();
   const domain = GetWebsite();
-  let history = useHistory();
+  const history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
-  const location = useLocation();
   const [isFocused, setIsFocused] = useState(false);
-  const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   const { t } = useLocalize("SideNav");
-  const isOnLandingPage = location.pathname === "/";
-  const isOnLoginPage = location.pathname.includes("/login");
-  const isOnSignUpPage = location.pathname.includes("/signup");
-  const isOnStudioPage = location.pathname.includes("/studio");
-  const isOnBetaKeyRedeemPage = location.pathname.includes("/beta-key/redeem");
-  const isOnWaitlistSuccessPage = location.pathname.includes(
-    "/waitlist-next-steps"
-  );
-  const isOnCreatorOnboardingPage = location.pathname.includes(
-    "/creator-onboarding"
-  );
-  const isOnWelcomePage = location.pathname === "/welcome";
-  const isOnTtsPage = location.pathname.includes("/tts");
-  const isOnVcPage =
-    location.pathname.includes("/voice-conversion") ||
-    location.pathname.includes("/dev-vc");
-  const isOnBetaForm =
-    location.pathname.includes("/beta") && location.pathname.includes("/form");
-
+  const {
+    isOnLandingPage,
+    isOnLoginPage,
+    isOnSignUpPage,
+    isOnStudioPage,
+    isOnBetaKeyRedeemPage,
+    isOnWaitlistSuccessPage,
+    isOnCreatorOnboardingPage,
+    isOnWelcomePage,
+    isOnTtsPage,
+    isOnVcPage,
+    isOnBetaForm,
+  } = usePageLocation();
   const { open } = useModal();
   const openModal = () =>
     open({ component: InferenceJobsModal, props: { scroll: true } });
@@ -77,48 +69,43 @@ export default function TopNav() {
   const showNavItem =
     (!loggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
     domain.website === Website.StorytellerAi;
-
   const [mobileMenu, setMobileMenu] = useState("d-none");
+  const topBarWrapperRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSearchButtonClick = () => {
+  const handleSearchButtonClick = useCallback(() => {
     setIsMobileSearchBarVisible(true);
     setMenuButtonIcon(faBars);
-    if (window.innerWidth < 1200) {
-      if (wrapper) {
-        wrapper.classList.remove("toggled");
-      }
+    if (window.innerWidth < 1200 && wrapperRef.current) {
+      wrapperRef.current.classList.remove("toggled");
     }
-  };
+  }, []);
 
-  const onFocusHandler = () => {
+  const onFocusHandler = useCallback(() => {
     setIsFocused(true);
-  };
+  }, []);
 
-  const onBlurHandler = () => {
-    // Search field blur/Unfocusing hack: needs a little bit of delay for the result click event to register
+  const onBlurHandler = useCallback(() => {
     setTimeout(() => {
       setIsFocused(false);
-
       if (isMobileSearchBarVisible) {
         setIsMobileSearchBarVisible(false);
       }
     }, 100);
-  };
+  }, [isMobileSearchBarVisible]);
 
   useEffect(() => {
-    const topBarWrapper = document.getElementById("topbar-wrapper");
-
     const handleMenuToggle = (event: any) => {
       setMenuButtonIcon(event.detail.isOpen ? faXmark : faBars);
-      if (event.detail.isOpen) {
-        topBarWrapper?.classList.remove("topbar-wrapper-transparent");
-      } else {
-        topBarWrapper?.classList.add("topbar-wrapper-transparent");
+      if (topBarWrapperRef.current) {
+        topBarWrapperRef.current.classList.toggle(
+          "topbar-wrapper-transparent",
+          !event.detail.isOpen
+        );
       }
     };
 
     window.addEventListener("menuToggle", handleMenuToggle);
-
     return () => {
       window.removeEventListener("menuToggle", handleMenuToggle);
     };
@@ -126,25 +113,20 @@ export default function TopNav() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 100);
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const logoutHandler = async () => {
+  const logoutHandler = useCallback(async () => {
     await Logout();
     queryAppState();
     history.push("/");
-  };
+  }, [history, queryAppState]);
 
   let profileDropdown = <></>;
 
@@ -166,35 +148,6 @@ export default function TopNav() {
       />
     );
   }
-
-  // const aiToolsDropdown = [
-  //   { id: 1, name: "Text to Speech", link: "/tts", icon: faMessageDots },
-  //   {
-  //     id: 2,
-  //     name: "Voice to Voice",
-  //     link: "/voice-conversion",
-  //     icon: faWaveformLines,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Face Animator",
-  //     link: "/face-animator",
-  //     icon: faFaceViewfinder,
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Voice Designer",
-  //     link: "/voice-designer",
-  //     icon: faWandMagicSparkles,
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "Text to Image",
-  //     link: "/text-to-image",
-  //     icon: faMessageImage,
-  //   },
-  //   // { id: 4, name: "Text to Image", link: "/text-to-image" },
-  // ];
 
   const topBarWrapper = document.getElementById("topbar-wrapper");
 
@@ -260,6 +213,16 @@ export default function TopNav() {
     };
   }, [domain.website, isOnLandingPage, topBarWrapper]);
 
+  const handleNavLinkClick = useCallback(() => {
+    setMobileMenu("d-none");
+    setMenuButtonIcon(faBars);
+  }, []);
+
+  const handleMenuButtonClick = useCallback(() => {
+    setMobileMenu(prev => (prev === "d-none" ? "d-block" : "d-none"));
+    setMenuButtonIcon(prev => (prev === faBars ? faXmark : faBars));
+  }, []);
+
   if (
     isOnBetaKeyRedeemPage ||
     isOnWaitlistSuccessPage ||
@@ -271,21 +234,6 @@ export default function TopNav() {
   ) {
     return null;
   }
-
-  const handleNavLinkClick = () => {
-    setMobileMenu("d-none");
-    setMenuButtonIcon(faBars);
-  };
-
-  const handleMenuButtonClick = () => {
-    if (mobileMenu === "d-none") {
-      setMobileMenu("d-block");
-      setMenuButtonIcon(faXmark);
-    } else {
-      setMobileMenu("d-none");
-      setMenuButtonIcon(faBars);
-    }
-  };
 
   let userOrLoginButton = (
     <>
@@ -316,8 +264,6 @@ export default function TopNav() {
 
   if (loggedIn) {
     let displayName = sessionWrapper.getDisplayName();
-    // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
-    // let gravatar = <span />;
 
     if (displayName === undefined) {
       displayName = "My Account";
@@ -387,52 +333,6 @@ export default function TopNav() {
 
   return (
     <>
-      {/* {domain.website === Website.StorytellerAi &&
-        isOnLandingPage &&
-        !isScrolled && (
-          <div
-            className="position-fixed top-0 end-0 pe-3 ps-3 d-flex align-items-center gap-2"
-            style={{
-              zIndex: 20,
-              height: "65px",
-              borderRadius: "0 0 0 0.75rem",
-              backgroundColor: "#242433",
-            }}
-          >
-            {loggedIn ? (
-              <div className="d-flex gap-2 align-items-center">
-                <Button
-                  {...{
-                    icon: faClipboardList,
-                    label: "My Jobs",
-                    onClick: openModal,
-                    variant: "secondary",
-                    small: true,
-                  }}
-                />
-                {profileDropdown}
-              </div>
-            ) : (
-              <>
-                <Button
-                  label="Login"
-                  small
-                  variant="secondary"
-                  onClick={() => {
-                    history.push("/login");
-                  }}
-                />
-                <Button
-                  label="Sign Up"
-                  small
-                  onClick={() => {
-                    history.push("/signup");
-                  }}
-                />
-              </>
-            )}
-          </div>
-        )} */}
       <div
         id="topbar-wrapper"
         className={`position-fixed ${

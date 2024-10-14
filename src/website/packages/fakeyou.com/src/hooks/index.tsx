@@ -28,6 +28,7 @@ import useModal from "./useModal";
 import useModalState, { ModalConfig, ModalWidth } from "./useModalState";
 import useNotifications from "./useNotifications";
 import useOnScreen from "./useOnScreen";
+import usePageLocation from "./usePageLocation";
 import usePrevious from "./usePrevious";
 import useQueuePoll from "./useQueuePoll";
 import useRatings, { MakeRatingsProps } from "./useRatings";
@@ -66,6 +67,7 @@ export {
   useModalState,
   useNotifications,
   useOnScreen,
+  usePageLocation,
   usePrevious,
   useQueuePoll,
   useRatings,
