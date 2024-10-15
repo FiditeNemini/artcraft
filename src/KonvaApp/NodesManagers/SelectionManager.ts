@@ -4,6 +4,7 @@ import { MediaNode, Position, Transformation } from "../types";
 import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
 import { LoadingBarStatus } from "~/components/ui";
+import { VideoNode } from "../Nodes/VideoNode";
 
 export enum SelectionManagerEvents {
   NODES_TRANSLATIONS = "nodestranslation",
@@ -29,6 +30,8 @@ export class SelectionManager {
   public eventTarget: EventTarget;
   private _isDragging: boolean = false;
 
+  public firstSelectedNode: MediaNode | undefined;
+
   constructor({
     mediaLayerRef,
     nodeTransformerRef,
@@ -36,6 +39,7 @@ export class SelectionManager {
     mediaLayerRef: Konva.Layer;
     nodeTransformerRef: NodeTransformer;
   }) {
+    this.firstSelectedNode = undefined;
     this.selectedNodes = new Set();
     this.initialPositions = new Map<MediaNode, Position>();
     this.initialTransformations = new Map<MediaNode, Transformation[]>();
@@ -63,6 +67,7 @@ export class SelectionManager {
     ) {
       return false;
     }
+
     node.highlight();
     if (this.selectedNodes.size === 0) {
       node.setIsKEventRef(true);
@@ -207,7 +212,7 @@ export class SelectionManager {
     this.showContextComponents(refNode);
   }
 
-  private updateNodeTransformer() {
+  public updateNodeTransformer() {
     const transformableNodes = new Set(
       Array.from(this.selectedNodes).filter((node) => {
         return !node.isLocked();
@@ -266,6 +271,14 @@ export class SelectionManager {
 
   public updateContextComponents(node: MediaNode) {
     const coord = this.calculateContextualsPosition(node.kNode);
+    console.log("SelectionManager > updateContextComponents for node:", node);
+    if (node instanceof VideoNode) {
+      if (node.isSegmentationMode && !uiAccess.toolbarNode.isLockDisabled()) {
+        uiAccess.toolbarNode.disableLock();
+      } else {
+        uiAccess.toolbarNode.enableLock();
+      }
+    }
     if (node.isLocked() !== uiAccess.toolbarNode.isLocked()) {
       uiAccess.toolbarNode.setLocked(node.isLocked());
     }

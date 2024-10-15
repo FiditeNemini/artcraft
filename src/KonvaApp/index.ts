@@ -5,6 +5,6 @@ export { Engine as EngineType };
 
 export const KonvaApp = (element: HTMLDivElement, options: EngineOptions) => {
   const engine = new Engine(element, options);
-  engine.initializeStage("");
+  engine.initializeStage(options.sceneToken);
   return engine;
 };

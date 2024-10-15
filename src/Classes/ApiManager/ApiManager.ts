@@ -1,3 +1,4 @@
+import { bool } from "@techstark/opencv-js";
 import { API_TARGETS } from "./enums/Api";
 
 type NonNullableObject<T extends object> = NonNullable<T>;
@@ -62,6 +63,11 @@ export class ApiManager {
       credentials: "include",
       body: bodyInString,
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     return response.json();
   }
 
@@ -128,6 +134,37 @@ export class ApiManager {
     });
   }
 
+  protected async postFormVideo<T>({
+    endpoint,
+    formRecord,
+    uuid,
+    blob,
+    blobFileName,
+  }: {
+    endpoint: string;
+    formRecord: Record<string, string>;
+    uuid: string;
+    blob?: Blob | File;
+    blobFileName?: string;
+  }): Promise<T> {
+    const formData = new FormData();
+    formData.append("uuid_idempotency_token", uuid);
+    Object.entries(formRecord).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    if (blob && blobFileName) {
+      formData.append("video", blob, blobFileName);
+    } else if (blob) {
+      formData.append("video", blob);
+    }
+
+    return this.fetchMultipartFormData<T>(endpoint, {
+      method: "POST",
+      body: formData,
+    });
+  }
+
   protected async postForm<T>({
     endpoint,
     formRecord,
@@ -146,6 +183,7 @@ export class ApiManager {
     Object.entries(formRecord).forEach(([key, value]) => {
       formData.append(key, value);
     });
+
     if (blob && blobFileName) {
       formData.append("file", blob, blobFileName);
     } else if (blob) {

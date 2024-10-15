@@ -15,7 +15,9 @@ export abstract class BaseNode {
   // This locks interaction when the render engine is rendering
   protected isProcessing: boolean = false;
   protected _isLocked: boolean = false;
-  protected _isKEventRef: boolean = false;
+  protected _areBaseEventsListening: boolean = false;
+  protected _isKDragEventListening: boolean = false;
+  protected _isKTranformEventListening: boolean = false;
 
   abstract getNodeData(captureCanvasPosition: Position): NodeData;
 
@@ -43,10 +45,11 @@ export abstract class BaseNode {
     this.isProcessing = true;
   }
   public isKEventRef() {
-    return this._isKEventRef;
+    return this._isKDragEventListening && this._isKTranformEventListening;
   }
   public setIsKEventRef(flag: boolean) {
-    this._isKEventRef = flag;
+    this._isKDragEventListening = flag;
+    this._isKTranformEventListening = flag;
     this.removeListenToBaseKNodeTransformations();
     this.removeListenToBaseKNodeDrags();
     if (flag) {
@@ -104,20 +107,27 @@ export abstract class BaseNode {
   public lock() {
     this._isLocked = true;
     this.kNode.setDraggable(false);
-    if (this._isKEventRef) {
+    this.selectionManagerRef.updateNodeTransformer();
+    if (this.isKEventRef()) {
       this.selectionManagerRef.updateContextComponents(this);
     }
   }
   public unlock() {
     this._isLocked = false;
     this.kNode.setDraggable(true);
-    if (this._isKEventRef) {
+    this.selectionManagerRef.updateNodeTransformer();
+    if (this.isKEventRef()) {
       this.selectionManagerRef.updateContextComponents(this);
     }
   }
 
   public listenToBaseKNode() {
+    if (this._areBaseEventsListening) {
+      return;
+    }
+    this._areBaseEventsListening = true;
     const handleSelect = (isMultiSelect: boolean) => {
+      // console.log("handle select");
       if (!isMultiSelect) {
         // clear selection if not multislect
         //console.log("No Shift >> no multiselect");
@@ -127,22 +137,24 @@ export abstract class BaseNode {
         this.selectionManagerRef.deselectNode(this);
         return;
       }
-      this.selectionManagerRef.selectNode(this);
+      if (this.isSelecting) {
+        this.selectionManagerRef.selectNode(this);
+        return;
+      }
     };
 
     this.kNode.on("mousedown", (e) => {
-      // console.log("Mouse down");
+      // console.log("MOUSE DOWN");
       // Selection of Node
       if (!this.selectionManagerRef.isNodeSelected(this)) {
         this.isSelecting = true;
-        //checking for multiselect
+        // send shift key to check for multiselect
         handleSelect(e.evt.shiftKey);
       }
     });
 
     this.kNode.on("mouseup", (e) => {
       // console.log("MOUSE UP");
-
       // just coming out of dragging or selecting mode
       // no need to handle select
       if (this.selectionManagerRef.isDragging() || this.isSelecting) {
@@ -153,6 +165,10 @@ export abstract class BaseNode {
       // checking for multiselect, in multiselect deselection is possible
       handleSelect(e.evt.shiftKey);
     });
+  }
+  public removeListenToBaseKNode() {
+    this._areBaseEventsListening = false;
+    this.kNode.removeEventListener("mousedown mouseup");
   }
   public listenToBaseKNodeDrags() {
     this.kNode.on("dragstart", () => {
@@ -168,6 +184,7 @@ export abstract class BaseNode {
       this.selectionManagerRef.dragEnd(this);
     });
   }
+
   public removeListenToBaseKNodeDrags() {
     this.kNode.removeEventListener("dragstart");
     this.kNode.removeEventListener("dragend");

@@ -2,13 +2,19 @@ import Konva from "konva";
 import { NetworkedNode } from "./NetworkedNode";
 import { uiAccess } from "~/signals";
 import ChromaWorker from "./ChromaWorker?sharedworker";
+import { v4 as uuidv4 } from "uuid";
+// const toolbarNode = uiAccess.toolbarNode;
+import { minNodeSize, transparent, NodeType } from "./constants";
 import { SelectionManager } from "../NodesManagers";
 import { Position, Size, NodeData, TransformationData } from "../types";
 import { NodeUtilities } from "./NodeUtilities";
-import { minNodeSize, transparent, NodeType } from "./constants";
 
 const loadingBar = uiAccess.loadingBar;
-
+import {
+  Coordinates,
+  SegmentationApi,
+} from "~/Classes/ApiManager/SegmentationApi";
+import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 interface VideoNodeContructor {
   mediaLayerRef: Konva.Layer;
   canvasPosition: Position;
@@ -42,6 +48,10 @@ export class VideoNode extends NetworkedNode {
   chromaGreen: number = 150;
   chromaBlue: number = 120;
 
+  // todo move to seg manager
+  selectedPointsForSegmentation: Coordinates[] = [];
+
+  private videoSegmentationAPI = new SegmentationApi();
   private imageSources: string[] = [
     "https://images-ng.pixai.art/images/orig/7ef23baa-2fc8-4e2f-8299-4f9241920090",
     "https://images-ng.pixai.art/images/orig/98196e9f-b968-4fe1-97ec-083ffd77c263",
@@ -54,7 +64,7 @@ export class VideoNode extends NetworkedNode {
   ];
 
   private frameDidFinishSeeking: Promise<void>;
-
+  // private finishedLoadingOnStart: Promise<void>;
   async setProcessing() {
     this.isProcessing = true;
   }
@@ -159,11 +169,11 @@ export class VideoNode extends NetworkedNode {
     this.blockSeeking = false;
 
     this.isChroma = false;
-
     this.videoComponent.onloadstart = (event: Event) => {
       loadingBar.show();
       loadingBar.updateProgress(0);
     };
+
     this.videoComponent.onloadedmetadata = (event: Event) => {
       loadingBar.updateProgress(25);
       console.log("Loaded Metadata");
@@ -227,13 +237,18 @@ export class VideoNode extends NetworkedNode {
 
     this.listenToBaseKNode();
     // only for video
-    this.kNode.on("mouseup", () => {
-      console.log("Mouse Up");
+    this.kNode.on("click", () => {
+      console.log("click");
       // Shouldn't play if anything things are true
       if (this.didFinishLoading == false) {
         return;
       }
       if (this.isProcessing == true) {
+        return;
+      }
+
+      if (this.isSegmentationMode) {
+        console.log("Not Playing because Segmenting");
         return;
       }
 
@@ -248,20 +263,14 @@ export class VideoNode extends NetworkedNode {
     });
 
     this.createChromaWorker();
-  }
 
-  uuidv4() {
-    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
-      (
-        +c ^
-        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))
-      ).toString(16),
-    );
+    // Testing code for segmentation
+    //this.videoSegmentationMode(true);
   }
 
   createChromaWorker() {
     this.chromaWorker = new ChromaWorker({
-      name: "ChromaWorker-" + this.uuidv4(),
+      name: "ChromaWorker-" + uuidv4(),
     });
     this.chromaWorker.port.start();
   }
@@ -372,7 +381,7 @@ export class VideoNode extends NetworkedNode {
   public async createVideoElement(newURL: string) {
     // try catch here with a retry button.
     if (!this.kNode) {
-      console.log("selectedNode KNode is initialized");
+      console.log("selectedNode KNode is not initialized");
       return;
     }
     this.kNode.fill("grey"); // todo fix with loader
@@ -386,13 +395,41 @@ export class VideoNode extends NetworkedNode {
 
     videoComponent.onloadstart = (event: Event) => {
       this.didFinishLoading = false;
+      loadingBar.show();
+      loadingBar.updateProgress(0);
       console.log("OnLoadStart");
     };
 
+    videoComponent.onerror = (
+      event: Event | string,
+      source?: string,
+      lineno?: number,
+      colno?: number,
+      error?: Error,
+    ) => {
+      loadingBar.hide();
+      loadingBar.updateProgress(0);
+      console.error("Error loading video:", event);
+    };
+
+    this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
+      videoComponent.oncanplaythrough = (event: Event) => {
+        this.didFinishLoading = true;
+        // Might have to auto click? on first load this doesn't work in general how about after ?
+        loadingBar.updateProgress(100);
+        loadingBar.hide();
+
+        this.setChroma(this.isChroma);
+
+        resolve();
+      };
+    });
+
     videoComponent.onloadedmetadata = (event: Event) => {
       console.log("Loaded Metadata");
+      loadingBar.updateProgress(25);
       if (!this.kNode) {
-        console.log("selectedNode KNode is initialized");
+        console.log("selectedNode KNode is not initialized");
         return;
       }
       this.kNode.width(videoComponent.videoWidth);
@@ -403,6 +440,8 @@ export class VideoNode extends NetworkedNode {
       videoComponent.currentTime = 0; // ensure it shows up on screen
       this.duration = videoComponent.duration;
       this.videoComponent = videoComponent;
+      // make this transparent.
+      this.kNode.fill(transparent);
     };
   }
 
@@ -455,12 +494,12 @@ export class VideoNode extends NetworkedNode {
         return;
       }
       //console.log(`Seeking to Position ${second}`);
-
+      this.videoComponent.pause();
       this.videoComponent.currentTime = second;
 
       this.frameDidFinishSeeking = new Promise<void>((resolve, reject) => {
         this.videoComponent.onseeked = async (event: Event) => {
-          //console.log("Seeked Finished");
+          console.log("Seeked Finished");
           // reimplement using the function
           // ensure that this doesn't race.
           await this.chromaKeyRender(0, false, false, true);
@@ -473,6 +512,271 @@ export class VideoNode extends NetworkedNode {
     }
   }
 
+  public isSegmentationMode: boolean = false;
+
+  public videoSegmentationMode(on: boolean) {
+    if (on) {
+      this.removeListenToBaseKNode();
+      this.kNode.on("click", this.handleSegmentation.bind(this));
+      this.isSegmentationMode = true;
+    } else {
+      this.isSegmentationMode = false;
+      this.kNode.off("click", this.handleSegmentation.bind(this));
+      this.listenToBaseKNode();
+    }
+  }
+
+  private segmentationSession: { session_id: string } | undefined = undefined;
+
+  public async urlToBlob(url: string): Promise<Blob> {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch resource: ${response.statusText}`);
+    }
+    const blob = await response.blob();
+    return blob;
+  }
+
+  async sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  // Function to check if the URL returns a 200 status
+  public async checkUrl(url: string): Promise<boolean> {
+    try {
+      const response = await fetch(url);
+      return response.status === 200;
+    } catch (error) {
+      console.error("Error fetching URL:", error);
+      return false;
+    }
+  }
+
+  // to do debug code
+
+  public async startSegmentation() {
+    if (this.segmentationSession === undefined) {
+      await this.seek(0);
+
+      loadingBar.show();
+      loadingBar.updateProgress(0);
+
+      const blob = await this.urlToBlob(this.videoURL);
+      this.segmentationSession =
+        await this.videoSegmentationAPI.createSession(blob);
+      console.log("Sessions", this.segmentationSession);
+      loadingBar.updateMessage("Start Adding Mask Points To the Video");
+      loadingBar.updateProgress(100);
+    }
+  }
+
+  public disableAllExceptSegmentation() {
+    const buttonNames = Object.values(ToolbarNodeButtonNames);
+    const buttonStates: any = {};
+    for (const name of buttonNames) {
+      const value = name === ToolbarNodeButtonNames.SEGMENTATION ? false : true;
+
+      buttonStates[name] = {
+        disabled: value,
+        active: false,
+      };
+    }
+    uiAccess.toolbarNode.show({
+      buttonStates: buttonStates,
+    });
+  }
+
+  public disableAllForSegmentation() {
+    const buttonNames = Object.values(ToolbarNodeButtonNames);
+    const buttonStates: any = {};
+    for (const name of buttonNames) {
+      buttonStates[name] = {
+        disabled: name,
+        active: false,
+      };
+    }
+    uiAccess.toolbarNode.show({
+      buttonStates: buttonStates,
+    });
+  }
+
+  private isStillProcessingSegmentationEvent: Boolean = false;
+
+  public async handleSegmentation(event) {
+    // Get the local coordinates of the click relative to the rectangle
+    if (!this.isSegmentationMode) {
+      console.log("Segmentation Mode Not On");
+      return;
+    }
+
+    this.disableAllForSegmentation();
+
+    if (!this.segmentationSession) {
+      console.log("Segmentation Session Not Ready");
+      loadingBar.updateMessage("Still Processing Please Wait");
+      return;
+    }
+    if (this.isStillProcessingSegmentationEvent) {
+      console.log("Still Processing");
+      loadingBar.updateMessage("Still Processing Please Wait");
+      return;
+    }
+    this.isStillProcessingSegmentationEvent = true;
+    loadingBar.show();
+    const localPos = this.kNode.getRelativePointerPosition();
+    console.log("Local coordinates:", localPos);
+    if (!localPos) {
+      return;
+    }
+    // handle undo as well.
+    this.selectedPointsForSegmentation.push({
+      coordinates: [localPos.x, localPos.y],
+      include: true,
+    });
+
+    loadingBar.updateMessage("Start Processing Mask");
+    loadingBar.updateProgress(0);
+    try {
+      console.log("Requesting");
+      const response = await this.videoSegmentationAPI.addPointsToSession(
+        this.segmentationSession.session_id,
+        24,
+        [
+          {
+            b64_image_data: 0,
+            idx: 0,
+            timestamp: 0,
+            objects: [
+              {
+                style: "<mask style - default transparent>",
+                object_id: 0,
+                points: this.selectedPointsForSegmentation,
+              },
+            ],
+          },
+        ],
+        false,
+      );
+      loadingBar.updateMessage("Processing");
+      loadingBar.updateProgress(50);
+
+      var image = response.frames[0].b64_image_data;
+
+      await this.setBase64ImageForSegementationPreview(image);
+      loadingBar.updateProgress(100);
+
+      this.disableAllExceptSegmentation();
+      loadingBar.updateMessage("Masking Region Done");
+      this.isStillProcessingSegmentationEvent = false;
+    } catch (error) {
+      console.error(error);
+      loadingBar.updateMessage(`Error:${error} Try Segmenting Again`);
+      loadingBar.updateProgress(0);
+      this.disableAllExceptSegmentation();
+      this.isStillProcessingSegmentationEvent = false;
+    }
+  }
+
+  async endSession(): Promise<boolean> {
+    // wait for url to come through and fake load
+    // edge case
+    if (this.isStillProcessingSegmentationEvent) {
+      console.log("Still Processing Frame Cannot Clip Please Wait");
+      loadingBar.updateMessage("Still Processing Please Wait");
+      return false;
+    }
+    // prevent requests to add points while doing this.
+    this.isStillProcessingSegmentationEvent = true;
+    loadingBar.updateMessage("Processing.");
+    loadingBar.updateProgress(0);
+    this.disableAllForSegmentation();
+    if (!this.segmentationSession) {
+      console.log("Segmentation Session Lost?");
+      return false;
+    }
+
+    try {
+      console.log("Requesting a close");
+      const response = await this.videoSegmentationAPI.addPointsToSession(
+        this.segmentationSession.session_id,
+        24,
+        [
+          {
+            b64_image_data: 0,
+            idx: 0,
+            timestamp: 0,
+            objects: [
+              {
+                style: "<mask style - default transparent>",
+                object_id: 0,
+                points: this.selectedPointsForSegmentation,
+              },
+            ],
+          },
+        ],
+        true, // this makes it all
+      );
+      loadingBar.updateProgress(25);
+
+      console.log(response);
+      // replace the video component and reregister all the other elements.
+      console.log(response["masked_video_cdn_url"]); // wait using a while loop to display the result.
+      // URL to check
+      const videoUrl = response["masked_video_cdn_url"];
+      // While loop to repeatedly check the URL
+
+      loadingBar.updateMessage("Processing..");
+
+      while (true) {
+        const isAvailable = await this.checkUrl(videoUrl);
+        if (isAvailable) {
+          console.log("Video is available:", videoUrl);
+          loadingBar.updateMessage("Processing...");
+          loadingBar.updateProgress(50);
+
+          break;
+        }
+        console.log("Video not available yet, retrying...");
+        await this.sleep(2000);
+      }
+
+      loadingBar.updateProgress(75);
+
+      // set chroma automatically.
+      this.isChroma = true;
+      await this.createVideoElement(videoUrl);
+
+      loadingBar.updateProgress(100);
+
+      loadingBar.hide();
+      this.disableAllExceptSegmentation();
+
+      this.isStillProcessingSegmentationEvent = false;
+      return true;
+    } catch (error) {
+      console.error(error);
+      this.disableAllExceptSegmentation();
+      this.isStillProcessingSegmentationEvent = false;
+      return false;
+    }
+  }
+
+  public base64: Promise<void> | undefined;
+  public async setBase64ImageForSegementationPreview(baseImage64: number) {
+    const imageObj = new Image();
+
+    this.base64 = new Promise((resolve, reject) => {
+      imageObj.onload = () => {
+        this.kNode.image(imageObj);
+        this.mediaLayerRef.draw();
+        resolve();
+      };
+      imageObj.onerror = () => {
+        reject("Image Failed To Load");
+      };
+    });
+    imageObj.src = `data:image/png;base64,${baseImage64}`;
+  }
   public async retry() {
     console.log("Video Node has not implement retry");
   }

@@ -7,11 +7,14 @@ export interface Coordinates {
 }
 
 export interface ObjectData {
+  style: "<mask style - default transparent>";
   object_id: number;
   points: Coordinates[];
 }
 
 export interface Frame {
+  b64_image_data: number;
+  idx: number;
   timestamp: number;
   objects: ObjectData[];
 }
@@ -20,30 +23,32 @@ export interface SegmentationRequest {
   session_id: string;
   fps: number;
   frames: Frame[];
-  propogate: boolean;
+  propagate: boolean;
 }
 
 export interface SegmentationResponse {
   session_id: string;
   fps: number;
+  masked_video_cdn_url: string;
   frames: Frame[];
-  propogate: boolean;
+  propagate: boolean;
 }
 
 export class SegmentationApi extends ApiManager {
   // returns uuid
   public async createSession(
-    b64Video: string,
+    blobVideo: File | Blob,
   ): Promise<{ session_id: string }> {
     const endpoint = `https://hax.storyteller.ai/segmentation/new_session`;
     const id = uuidv4().toString();
-    return this.postForm<{ session_id: "fix-mimetype" }>({
+    return this.postFormVideo<{ session_id: "fix-mimetype" }>({
       endpoint: endpoint,
       formRecord: {
         session_id: "fix-mimetype",
       },
       uuid: id,
       blobFileName: id,
+      blob: blobVideo,
     });
   }
 
@@ -51,15 +56,15 @@ export class SegmentationApi extends ApiManager {
     session_id: string,
     fps: number,
     frames: Frame[],
-    proprogate: boolean,
-  ): Promise<{}> {
-    const endpoint = `https://hax.storyteller.ai/segmentation/new_session`;
+    propagate: boolean,
+  ): Promise<SegmentationResponse> {
+    const endpoint = `https://hax.storyteller.ai/segmentation/generate_masks`;
 
     const segmentationRequest: SegmentationRequest = {
       session_id: session_id,
       fps: fps,
       frames: frames,
-      propogate: proprogate,
+      propagate: propagate,
     };
 
     return this.post<SegmentationRequest, SegmentationResponse>({

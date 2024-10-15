@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals-react";
 import { ContextualUi } from "./type";
 import { ToolbarNodeButtonNames as ButtonNames } from "~/components/features/ToolbarNode/enums";
+
 type ButtonStates = {
   [key in ButtonNames]: {
     disabled: boolean;
@@ -9,7 +10,8 @@ type ButtonStates = {
 };
 interface ContextualToolbarProps extends ContextualUi {
   disabled: boolean;
-  locked: boolean;
+  locked: boolean | "unknown";
+  lockDisabled: boolean;
   buttonStates: ButtonStates;
 }
 interface PartialContextualToolbarProps
@@ -24,6 +26,7 @@ const toolbarNodeSignal = signal<ContextualToolbarProps>({
   isShowing: false,
   disabled: false,
   locked: false,
+  lockDisabled: false,
   buttonStates: initButtonStates(),
 });
 
@@ -49,6 +52,15 @@ export const toolbarNode = {
   },
   isLocked() {
     return toolbarNodeSignal.value.locked;
+  },
+  isLockDisabled() {
+    return toolbarNodeSignal.value.lockDisabled;
+  },
+  disableLock() {
+    toolbarNodeSignal.value.lockDisabled = true;
+  },
+  enableLock() {
+    toolbarNodeSignal.value.lockDisabled = false;
   },
   setLocked(locked: boolean) {
     const { buttonStates } = toolbarNodeSignal.value;
@@ -126,12 +138,12 @@ export const toolbarNode = {
   },
 };
 
-function initButtonStates(props: { locked?: boolean } = {}) {
+function initButtonStates(props: { locked?: boolean | "unknown" } = {}) {
   return Object.values(ButtonNames).reduce(
     (buttonStates, buttonName) => {
       if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
         buttonStates[buttonName] = {
-          disabled: props.locked,
+          disabled: props.locked === "unknown" || props.locked === true,
           active: true,
         };
       } else {

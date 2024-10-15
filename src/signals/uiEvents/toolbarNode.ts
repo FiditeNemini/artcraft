@@ -19,27 +19,26 @@ const lockDispatcher = (e: React.MouseEvent<HTMLButtonElement>) => {
   lockEvent.value = e;
 };
 
-const buttonEvents = Object.values(ButtonNames).reduce(
+const buttonEventsRecords = Object.values(ButtonNames).reduce(
   (acc, buttonName) => {
-    acc[buttonName] = signal<
-      React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-    >();
+    acc[buttonName] = {
+      eventSignal: signal<
+        React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+      >(),
+      effectCleanup: undefined,
+      lastEventTimestamp: undefined,
+    };
     return acc;
   },
   {} as {
-    [key in ButtonNames]: Signal<
-      (React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined) | undefined
-    >;
-  },
-);
-
-const effectsCleanups = Object.values(ButtonNames).reduce(
-  (acc, buttonName) => {
-    acc[buttonName] = undefined;
-    return acc;
-  },
-  {} as {
-    [key in ButtonNames]: (() => void) | undefined;
+    [key in ButtonNames]: {
+      eventSignal: Signal<
+        | (React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined)
+        | undefined
+      >;
+      effectCleanup: (() => void) | undefined;
+      lastEventTimestamp: number | undefined;
+    };
   },
 );
 
@@ -47,13 +46,22 @@ const buttonEventsHandlers = Object.values(ButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = {
       onClick: (callback: MouseEventHandler<HTMLButtonElement>) => {
-        if (effectsCleanups[buttonName]) {
-          effectsCleanups[buttonName]();
+        const { eventSignal, effectCleanup, lastEventTimestamp } =
+          buttonEventsRecords[buttonName];
+        if (effectCleanup !== undefined) {
+          // this clears the effect listener to rebind a new one for the onClick
+          effectCleanup();
         }
-        effectsCleanups[buttonName] = effect(() => {
-          if (buttonEvents[buttonName].value) {
-            callback(buttonEvents[buttonName].value);
-            buttonEvents[buttonName].value = undefined;
+        buttonEventsRecords[buttonName].effectCleanup = effect(() => {
+          if (
+            eventSignal.value &&
+            lastEventTimestamp !== eventSignal.value.timeStamp
+          ) {
+            buttonEventsRecords[buttonName].lastEventTimestamp =
+              eventSignal.value.timeStamp;
+            // console.log(buttonName, "EFFECT is triggered");
+            callback(eventSignal.value);
+            buttonEventsRecords[buttonName].eventSignal.value = undefined;
           }
         });
       },
@@ -70,7 +78,8 @@ const buttonEventsHandlers = Object.values(ButtonNames).reduce(
 const buttonDispatchers = Object.values(ButtonNames).reduce(
   (acc, buttonName) => {
     acc[buttonName] = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      buttonEvents[buttonName].value = e;
+      // console.log(buttonName + " DISPATCHED", e);
+      buttonEventsRecords[buttonName].eventSignal.value = e;
     };
     return acc;
   },

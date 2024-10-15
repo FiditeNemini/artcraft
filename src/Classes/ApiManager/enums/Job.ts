@@ -6,7 +6,7 @@ export enum JobStatus {
   COMPLETE_FAILURE = "complete_failure",
   DEAD = "dead",
   CANCELLED_BY_USER = "cancelled_by_user",
-  CANCCELLED_BY_SYSTEM = "cancelled_by_system",
+  CANCELLED_BY_SYSTEM = "cancelled_by_system",
 }
 
 export enum JobType {

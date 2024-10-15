@@ -1,9 +1,8 @@
 // Example of this working.
-import { error } from "@techstark/opencv-js";
+
 import { BlobReader, BlobWriter, ZipWriter } from "@zip.js/zip.js";
 import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
 import { Visibility } from "~/Classes/ApiManager/enums/Visibility";
-import { ArtStyleNames } from "~/components/features/DialogAiStylize/enums";
 import { v4 as uuidv4 } from "uuid";
 import { JobsApi } from "~/Classes/ApiManager";
 import {
@@ -223,8 +222,10 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
           const job = await this.jobsAPI.GetJobByToken({ token: jobToken });
           console.log(job);
           if (!job.data) {
+            console.log("No Job Data resetting the zip state");
             await this.reset();
-            throw Error("Job Data Not Found");
+            console.log(job.data);
+            continue;
           }
           const status = job.data.status.status;
           const progress = job.data.status.progress_percentage;
@@ -246,15 +247,19 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 
           switch (status) {
             case JobStatus.PENDING:
+              console.log("Pending");
               reportProgress(renderProgressData); // once finished gives you up to 50%
               break;
             case JobStatus.STARTED:
+              console.log("Started");
               reportProgress(renderProgressData);
               break;
             case JobStatus.ATTEMPT_FAILED:
+              console.log("Attempt Failed");
               reportProgress(renderProgressData);
               break;
             case JobStatus.COMPLETE_SUCCESS:
+              console.log("Complete Success");
               renderProgressData.progress = 100;
               jobIsProcessing = false;
               if (!job.data.maybe_result.maybe_public_bucket_media_path) {
@@ -265,19 +270,23 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
               reportProgress(renderProgressData);
               break;
             case JobStatus.COMPLETE_FAILURE:
+              console.log("Complete Failure");
               jobIsProcessing = false;
               renderProgressData.progress = 0;
               reportProgress(renderProgressData);
               break;
             case JobStatus.DEAD:
+              console.log("Dead");
               jobIsProcessing = false;
               reportProgress(renderProgressData);
               throw Error("Server Failed to Process Please Try Again.");
-            case JobStatus.CANCCELLED_BY_SYSTEM:
+            case JobStatus.CANCELLED_BY_SYSTEM:
+              console.log("Cancelled by system");
               jobIsProcessing = false;
               reportProgress(renderProgressData);
               break;
             case JobStatus.CANCELLED_BY_USER:
+              console.log("Cancelled by user");
               jobIsProcessing = false;
               reportProgress(renderProgressData);
               break;

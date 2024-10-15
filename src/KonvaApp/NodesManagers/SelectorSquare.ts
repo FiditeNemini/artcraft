@@ -31,6 +31,12 @@ export class SelectorSquare {
   public getKonvaNode() {
     return this.kSquare;
   }
+
+  public disable({ stageRef }: { stageRef: Konva.Stage }) {
+    stageRef.off("mousedown touchstart");
+    stageRef.off("mousemove touchmove");
+    stageRef.off("mouseup touchend");
+  }
   public enable({
     captureCanvasRef,
     mediaLayerRef,
@@ -118,13 +124,17 @@ export class SelectorSquare {
           const kNodeIds = foundKNodes.map((kNode) => kNode._id);
           const foundNodes = Array.from(nodesManagerRef.getAllNodes()).reduce(
             (accNodes, currNode) => {
-              if (kNodeIds.includes(currNode.kNode._id)) {
+              if (
+                kNodeIds.includes(currNode.kNode._id) &&
+                !currNode.isLocked()
+              ) {
                 accNodes.push(currNode);
               }
               return accNodes;
             },
             [] as MediaNode[],
           );
+          console.log("selector square found", foundNodes);
           selectionManagerRef.selectNodes(foundNodes);
         }
       });

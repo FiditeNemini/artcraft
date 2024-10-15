@@ -13,8 +13,10 @@ export const Main = withProtectionRoute(() => {
   // This is a hook that will log the number of times the component has rerendered
   // Let's make sure we only log once
   useRenderCounter("Pages/Main");
-  const { sceneToken } = useParams();
-
+  let { sceneToken } = useParams();
+  if (import.meta.env.DEV && sceneToken === "debug") {
+    sceneToken = "m_p8nkry6m5j22w586xyex0w4a4pznbx";
+  }
   return (
     <div className="fixed grid h-full w-full grid-cols-12 grid-rows-12">
       <KonvaRootComponent

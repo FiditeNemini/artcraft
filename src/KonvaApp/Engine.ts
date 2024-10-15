@@ -8,6 +8,7 @@ import { uiAccess, uiEvents } from "~/signals";
 import { SceneManager } from "./SceneManager";
 import {
   NodesManager,
+  NodeIsolator,
   NodeTransformer,
   NodesTranslationEventDetails,
   NodeTransformationEventDetails,
@@ -44,6 +45,8 @@ import {
 
 import { AppModes, VideoResolutions } from "./constants";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
+
+import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 import { NavigateFunction } from "react-router-dom";
 
 // for testing loading files from system
@@ -68,11 +71,13 @@ export class Engine {
   private stage: Konva.Stage;
   private bgLayer: Konva.Layer;
   private mediaLayer: Konva.Layer;
+  private nodeIsolationLayer: Konva.Layer;
   private uiLayer: Konva.Layer;
   private renderEngine: RenderEngine;
   private offScreenCanvas: OffscreenCanvas;
 
   private nodesManager: NodesManager;
+  private nodeIsolator: NodeIsolator;
   private nodeTransformer: NodeTransformer;
   private selectionManager: SelectionManager;
   private selectorSquare: SelectorSquare;
@@ -80,6 +85,7 @@ export class Engine {
   private sceneManager: SceneManager;
   private undoStackManager: UndoStackManager;
 
+  public segmentationButtonCanBePressed: boolean = true;
   // signal reference
   constructor(canvasReference: HTMLDivElement, options: EngineOptions) {
     if (import.meta.env.DEV) {
@@ -96,9 +102,11 @@ export class Engine {
     });
     this.bgLayer = new Konva.Layer();
     this.mediaLayer = new Konva.Layer();
+    this.nodeIsolationLayer = new Konva.Layer();
     this.uiLayer = new Konva.Layer();
     this.stage.add(this.bgLayer);
     this.stage.add(this.mediaLayer);
+    this.stage.add(this.nodeIsolationLayer);
     this.stage.add(this.uiLayer);
 
     // Konva Transformer
@@ -107,6 +115,11 @@ export class Engine {
     // Selector Square
     this.selectorSquare = new SelectorSquare();
     this.uiLayer.add(this.selectorSquare.getKonvaNode());
+    // Node Isolator
+    this.nodeIsolator = new NodeIsolator({
+      mediaLayerRef: this.mediaLayer,
+      nodeIsolationLayerRef: this.nodeIsolationLayer,
+    });
 
     // Collection of commands for undo-redo
     this.undoStackManager = new UndoStackManager();
@@ -149,10 +162,7 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
       renderEngineRef: this.renderEngine,
     });
-    // load the scene if there's a scenetoken
-    if (options.sceneToken) {
-      this.sceneManager.loadScene(options.sceneToken);
-    }
+
     // some of the managers has events
     // hence, lastly, setup these events
     this.setupEventSystem();
@@ -221,15 +231,21 @@ export class Engine {
     }
   }
 
+  private enableSelectorSquare() {
+    this.selectorSquare.enable({
+      captureCanvasRef: this.renderEngine.captureCanvas,
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      selectionManagerRef: this.selectionManager,
+      stageRef: this.stage,
+    });
+  }
+  private disableSelectorSquare() {
+    this.selectorSquare.disable({ stageRef: this.stage });
+  }
   private setupEventSystem() {
     if (this.appMode === AppModes.SELECT) {
-      this.selectorSquare.enable({
-        captureCanvasRef: this.renderEngine.captureCanvas,
-        mediaLayerRef: this.mediaLayer,
-        nodesManagerRef: this.nodesManager,
-        selectionManagerRef: this.selectionManager,
-        stageRef: this.stage,
-      });
+      this.enableSelectorSquare();
       uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
         active: true,
       });
@@ -255,9 +271,9 @@ export class Engine {
       const nodes = this.selectionManager.getSelectedNodes();
       if (nodes.size > 1) {
         uiAccess.dialogError.show({
-          title: "Error: Chroma Key",
+          title: "Error: Background Removal",
           message:
-            "Please do not select more than 1 item for the Chroma Key feature, we can only apply Chroma Key to 1 item at a time",
+            "Please do not select more than 1 item for the Background Removal feature, we can only apply Background Removal to 1 item at a time",
         });
         return;
       }
@@ -272,13 +288,74 @@ export class Engine {
         }
       } catch {
         uiAccess.dialogError.show({
-          title: "Error: Chroma Key",
-          message: "This Node is not compatible is Chroma Key",
+          title: "Error: Background Removal",
+          message: "This item is not compatible is Background Removal",
         });
       }
     });
-    uiEvents.toolbarNode.SEGMENTATION.onClick(() => {
-      console.log("Segmentation Button Clicked");
+
+    uiEvents.toolbarNode.SEGMENTATION.onClick(async (e) => {
+      console.log("ENGINE SEGMENTATION CALLBACK", e);
+      if (this.segmentationButtonCanBePressed == false) {
+        console.log("Debounce");
+        return;
+      }
+      console.log("ENGINE SEGMENTATION Button Clicked ACCEPTED");
+      // disable all the buttons except segmentation button again.
+      // create a state to prevent it from being clicked again. through the manager. and block.
+      const nodes = this.selectionManager.getSelectedNodes();
+      if (nodes.size > 1) {
+        // display error that segmentation cannot be done on more than 1 at a time.
+        uiAccess.dialogError.show({
+          title: "Error: Video Extraction",
+          message: "Video Extraction cannot be done on more than 1 item",
+        });
+        this.selectionManager.clearSelection();
+      } else {
+        // todo create segmentation manager ...
+        const element = nodes.values().next().value;
+        console.log("ENGINE SEGMENTATION for 1 node", element);
+        if (element instanceof VideoNode) {
+          const node = element as VideoNode;
+          console.log("ENGEINE prepare Segmentation.", node);
+          this.segmentationButtonCanBePressed = false;
+          this.disableAllButtons();
+          this.disableSelectorSquare();
+          node.lock();
+          this.nodeIsolator.enterIsolation(node);
+          if (!node.isSegmentationMode) {
+            console.log("ENGEINE start Segmentation.", node);
+            node.videoSegmentationMode(true);
+            this.selectionManager.updateContextComponents(node);
+
+            await node.startSegmentation();
+            this.segmentationButtonCanBePressed = true;
+          } else {
+            console.log("ENGEINE Attemping to close Segmentation.");
+            const endSessionResult = await node.endSession();
+            if (endSessionResult) {
+              // TODO: one bug is that the lock unables quickly
+              node.videoSegmentationMode(false);
+              this.nodeIsolator.exitIsolation();
+              this.enableAllButtons();
+              this.enableSelectorSquare();
+              this.segmentationButtonCanBePressed = true;
+              node.unlock();
+              this.selectionManager.updateContextComponents(node);
+              // to close off the session.
+            } else {
+              console.log("Busy Processing Video.");
+            }
+          }
+        } else {
+          uiAccess.dialogError.show({
+            title: "Error: Video Extraction",
+            message:
+              "Extraction is only available for Videos, it is not avaliable for other Assets yet",
+          });
+          this.selectionManager.clearSelection();
+        }
+      }
     });
     uiEvents.toolbarNode.DELETE.onClick(() => this.deleteNodes());
     uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => this.moveNodesDown());
@@ -335,6 +412,20 @@ export class Engine {
     });
   }
 
+  disableAllButtons() {
+    const buttonNames = Object.values(ToolbarNodeButtonNames);
+    for (const name of buttonNames) {
+      uiAccess.toolbarNode.changeButtonState(name, { disabled: true });
+    }
+  }
+
+  async enableAllButtons() {
+    const buttonNames = Object.values(ToolbarNodeButtonNames);
+    for (const name of buttonNames) {
+      await uiAccess.toolbarNode.changeButtonState(name, { disabled: false });
+    }
+  }
+
   sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -358,11 +449,14 @@ export class Engine {
     console.log(event);
   }
 
-  public initializeStage(sceneToken: string) {
+  public initializeStage(sceneToken?: string) {
     // load canvas that was originaly saved TODO Save manager for resharing.
     uiAccess.toolbarNode.hide();
     uiAccess.loadingBar.hide();
-
+    // load the scene if there's a scenetoken
+    if (sceneToken) {
+      this.sceneManager.loadScene(sceneToken);
+    }
     this.setupStage();
     // this.populateWithDebugItems();
   }
@@ -390,10 +484,10 @@ export class Engine {
           );
         }
       }
-    }, this.mediaLayer);
+    }, this.uiLayer);
     anim.start();
 
-    this.mediaLayer.add(textNode);
+    this.uiLayer.add(textNode);
 
     this.addKeyboardShortcuts();
   }
@@ -529,74 +623,4 @@ export class Engine {
     });
     this.undoStackManager.pushCommand(command);
   }
-
-  /********************************
-   *
-   * Code for debug and Testing
-   *
-   ********************************/
-  // public async populateWithDebugItems() {
-  //   const imageFile = await FileUtilities.createImageFileFromUrl(
-  //     "https://static.miraheze.org/pgrwiki/0/0d/Dialogue-2B-Icon.png",
-  //   );
-  //   const imageNode = new ImageNode({
-  //     mediaLayerRef: this.mediaLayer,
-  //     canvasPosition: this.renderEngine.captureCanvas.position(),
-  //     canvasSize: this.renderEngine.captureCanvas.size(),
-  //     imageFile: imageFile,
-  //     selectionManagerRef: this.selectionManager,
-  //   });
-
-  //   // this.renderEngine.addNodes(videoNode3);
-
-  //   const videoNode4 = new VideoNode({
-  //     mediaLayerRef: this.mediaLayer,
-  //     canvasPosition: this.renderEngine.captureCanvas.position(),
-  //     canvasSize: this.renderEngine.captureCanvas.size(),
-  //     videoURL:
-  //       "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
-  //     selectionManagerRef: this.selectionManager,
-  //   });
-  //   const imageNode2 = new ImageNode({
-  //     mediaLayerRef: this.mediaLayer,
-  //     canvasPosition: this.renderEngine.captureCanvas.position(),
-  //     canvasSize: this.renderEngine.captureCanvas.size(),
-  //     imageFile: imageFile,
-  //     selectionManagerRef: this.selectionManager,
-  //   });
-
-  //   this.renderEngine.addNodes(videoNode4);
-
-  //   const videoNode5 = new VideoNode({
-  //     mediaLayerRef: this.mediaLayer,
-  //     canvasPosition: this.renderEngine.captureCanvas.position(),
-  //     canvasSize: this.renderEngine.captureCanvas.size(),
-  //     videoURL:
-  //       "https://storage.googleapis.com/vocodes-public/media/0/2/8/1/n/0281nc0f3kgwvxf8eprywtd01r72rfp6/video_0281nc0f3kgwvxf8eprywtd01r72rfp6.mp4",
-  //     selectionManagerRef: this.selectionManager,
-  //   });
-
-  //   this.renderEngine.addNodes(videoNode5);
-  //   // Adding nodes here
-  //   const videoNode = new VideoNode({
-  //     mediaLayerRef: this.mediaLayer,
-  //     canvasPosition: this.renderEngine.captureCanvas.position(),
-  //     canvasSize: this.renderEngine.captureCanvas.size(),
-  //     videoURL:
-  //       "https://storage.googleapis.com/vocodes-public/media/r/q/p/r/e/rqpret6mkh18dqwjqwghhdqf15x720s1/storyteller_rqpret6mkh18dqwjqwghhdqf15x720s1.mp4",
-  //     selectionManagerRef: this.selectionManager,
-  //   });
-
-  //   // CODE TO TEST RENDER ENGINE
-  //   // Testing render engine
-  //   // this.renderEngine.addNodes(videoNode);
-  //   // await this.renderEngine.startProcessing();
-  //   //videoNode.simulatedLoading();
-  //   // TODO support Text nodes
-
-  //   // this.renderEngine.addNodes(imageNode2);
-
-  //   // // TODO if only image take image and just takes snapshots Edge case
-  //   // this.renderEngine.addNodes(imageNode);
-  // }
 }

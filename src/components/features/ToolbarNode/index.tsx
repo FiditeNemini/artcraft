@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import {
   faLockKeyholeOpen,
   faLockKeyhole,
+  faUnlockKeyhole,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   ToolbarButton,
@@ -12,13 +13,14 @@ import { paperWrapperStyles } from "~/components/styles";
 import { ToolbarNodeButtonNames } from "./enums";
 import { ToolbarNodeButtonData } from "./data";
 
-export interface ToolbarImageProps {
+export interface ToolbarNodeProps {
   disabled?: boolean;
-  locked?: boolean;
+  locked: boolean | "unknown";
   onLockClicked: (
     e: React.MouseEvent<HTMLButtonElement>,
     currLock: boolean,
   ) => void;
+  lockDisabled?: boolean;
   buttonsProps?: {
     [key in ToolbarNodeButtonNames]: ToolbarButtonProps;
   };
@@ -26,13 +28,14 @@ export interface ToolbarImageProps {
 export const ToolbarNode = ({
   disabled,
   locked,
+  lockDisabled,
   onLockClicked,
   buttonsProps,
-}: ToolbarImageProps) => {
+}: ToolbarNodeProps) => {
   const handleOnLockClicked: React.MouseEventHandler<HTMLButtonElement> = (
     e,
   ) => {
-    if (onLockClicked) {
+    if (onLockClicked && locked !== "unknown") {
       onLockClicked(e, locked ?? false);
     }
   };
@@ -49,9 +52,18 @@ export const ToolbarNode = ({
           className: locked
             ? "text-primary hover:bg-primary hover:text-white"
             : "",
+          disabled: lockDisabled || locked === "unknown",
         }}
-        tooltip={locked ? "Unlock" : "Lock"}
-        icon={locked ? faLockKeyhole : faLockKeyholeOpen}
+        tooltip={
+          locked === "unknown" ? "Unavailable" : locked ? "Unlock" : "Lock"
+        }
+        icon={
+          locked === "unknown"
+            ? faUnlockKeyhole
+            : locked
+              ? faLockKeyhole
+              : faLockKeyholeOpen
+        }
         onClick={handleOnLockClicked}
       />
       <span className="border-r border-r-ui-border" />
