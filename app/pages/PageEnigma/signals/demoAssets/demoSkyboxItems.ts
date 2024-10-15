@@ -25,4 +25,12 @@ export const demoSkyboxItems = signal<MediaItem[]>([
     thumbnail:
       "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_0_FrontZ.png",
   },
+  {
+    version: 1,
+    media_id: "SKY::m_2",
+    type: AssetType.SKYBOX,
+    name: "Black Skybox",
+    thumbnail:
+      "/resources/skybox/black.jpg",
+  },
 ]);

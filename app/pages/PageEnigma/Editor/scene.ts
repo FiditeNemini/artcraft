@@ -748,6 +748,8 @@ class Scene {
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_1_Back-Z.png",
       ]);
       this.scene.background = texture;
+    } else if (this.skybox == "m_2") {
+      this.scene.background = new THREE.Color("#000000");
     } else {
       const texture = loader.load([
         "/resources/skybox/day/px.png",
