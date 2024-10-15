@@ -1,16 +1,17 @@
+import { Signal } from "@preact/signals-react";
 import { TrimmerPlaybarCore } from "./TrimmerPlaybarCore";
 import { TrimmingPlaybarLoading } from "./TrimmerPlaybarLoading";
 import { TrimData } from "./utilities";
 export type { TrimData };
 export const TrimmerPlaybar = ({
   vidEl,
-  trimData,
+  trimDataSignal,
   className,
   onTrimChange,
 }: {
   vidEl: HTMLVideoElement | undefined;
   className?: string;
-  trimData?: TrimData;
+  trimDataSignal: Signal<TrimData | undefined>;
   onTrimChange: (trimData: TrimData) => void;
 }) => {
   if (!vidEl) {
@@ -20,7 +21,7 @@ export const TrimmerPlaybar = ({
     <TrimmerPlaybarCore
       vidEl={vidEl}
       className={className}
-      trimData={trimData}
+      trimData={trimDataSignal.value}
       onTrimChange={onTrimChange}
     />
   );

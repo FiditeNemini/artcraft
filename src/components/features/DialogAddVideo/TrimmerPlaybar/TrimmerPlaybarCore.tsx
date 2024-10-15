@@ -1,15 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import {
-  faBracketCurly,
-  faBracketCurlyRight,
-} from "@fortawesome/pro-solid-svg-icons";
 
-import { MAX_TRIM_DURATION } from "./utilities";
-
+import { ButtonTrimDuration } from "./ButtonTrimDuration";
 import { TrimmingPlaybarLoading } from "./TrimmerPlaybarLoading";
 import { PlayProgressCursor } from "./PlayProgressCursor";
-import { TrimScrubber } from "./TrimScrubber";
+import { TrimAreaScrubber } from "./TrimAreaScrubber";
+
 import { TrimData } from "./utilities";
 
 export const TrimmerPlaybarCore = ({
@@ -28,18 +24,24 @@ export const TrimmerPlaybarCore = ({
     currentTimeMs: number | undefined;
     trimStartMs: number | undefined;
     trimEndMs: number | undefined;
+    trimDurationMs: number;
   }>({
     durationMs: undefined,
     currentTimeMs: undefined,
     trimStartMs: undefined,
     trimEndMs: undefined,
+    trimDurationMs: 6000,
   });
+  const { durationMs, currentTimeMs, trimStartMs, trimEndMs, trimDurationMs } =
+    states;
 
-  const { durationMs, currentTimeMs, trimStartMs, trimEndMs } = states;
+  const handleChangeTrimDuration = (newTrimDurationMs: number) => {
+    setStates((curr) => ({ ...curr, trimDurationMs: newTrimDurationMs }));
+  };
 
-  const setTrimStartMs = useCallback((newTrimMs: number) => {
+  const setTrimStartMs = (newTrimMs: number) => {
     setStates((prev) => {
-      if (prev.trimEndMs === undefined) {
+      if (prev.trimEndMs === undefined || prev.durationMs === undefined) {
         if (import.meta.env.DEV) {
           console.warn("Logical Error in Trim Start Setting");
         }
@@ -49,30 +51,42 @@ export const TrimmerPlaybarCore = ({
         ...prev,
         trimStartMs: newTrimMs,
         trimEndMs:
-          prev.trimEndMs - newTrimMs >= MAX_TRIM_DURATION
-            ? newTrimMs + MAX_TRIM_DURATION
-            : prev.trimEndMs,
+          trimDurationMs >= prev.durationMs
+            ? prev.durationMs
+            : newTrimMs + trimDurationMs,
       };
     });
-  }, []);
-  const setTrimEndMs = useCallback((newTrimMs: number) => {
+  };
+
+  useEffect(() => {
     setStates((prev) => {
-      if (prev.trimStartMs === undefined) {
-        if (import.meta.env.DEV) {
-          console.warn("Logical Error in Trim End Setting");
-        }
+      if (prev.trimStartMs === undefined || prev.durationMs === undefined) {
+        // video is not ready, no data
         return prev;
       }
+      // normal case
+      if (prev.trimStartMs + trimDurationMs <= prev.durationMs) {
+        return {
+          ...prev,
+          trimEndMs: prev.trimStartMs + trimDurationMs,
+        };
+      }
+      // not enough duration to fit
+      if (trimDurationMs >= prev.durationMs) {
+        return {
+          ...prev,
+          trimStartMs: 0,
+          trimEndMs: prev.durationMs,
+        };
+      }
+      // shimmy the area to left
       return {
         ...prev,
-        trimEndMs: newTrimMs,
-        trimStartMs:
-          newTrimMs - prev.trimStartMs >= MAX_TRIM_DURATION
-            ? newTrimMs - MAX_TRIM_DURATION
-            : prev.trimStartMs,
+        trimStartMs: prev.durationMs - trimDurationMs,
+        trimEndMs: prev.durationMs,
       };
     });
-  }, []);
+  }, [trimDurationMs]);
 
   useEffect(() => {
     if (trimStartMs !== undefined && trimEndMs !== undefined) {
@@ -89,8 +103,8 @@ export const TrimmerPlaybarCore = ({
         trimStartMs: trimData?.trimStartMs ?? 0,
         trimEndMs: trimData?.trimEndMs
           ? trimData.trimEndMs
-          : vidEl.duration * 1000 >= MAX_TRIM_DURATION
-            ? MAX_TRIM_DURATION
+          : vidEl.duration * 1000 >= trimDurationMs
+            ? trimDurationMs
             : vidEl.duration * 1000,
       }));
     };
@@ -120,35 +134,30 @@ export const TrimmerPlaybarCore = ({
   }
 
   return (
-    <div
-      className={twMerge(
-        "relative mx-4 h-10 w-full border-l border-r border-dotted border-l-ui-border border-r-ui-border",
-        className,
-      )}
-    >
-      <div className="mt-3 h-4 w-full bg-secondary-300" />
-      <PlayProgressCursor
-        vidEl={vidEl}
-        currentTimePercent={(currentTimeMs / durationMs) * 100}
-      />
-      <TrimScrubber
-        // trim start scrubber
-        icon={faBracketCurly}
-        className="-translate-x-full"
-        trimPosMs={trimStartMs}
-        maxTrimPosMs={trimEndMs}
-        minTrimPosMs={0}
-        totalDurationMs={durationMs}
-        onChange={setTrimStartMs}
-      />
-      <TrimScrubber
-        // trim end scrubber
-        icon={faBracketCurlyRight}
-        trimPosMs={trimEndMs}
-        maxTrimPosMs={durationMs}
-        minTrimPosMs={trimStartMs}
-        totalDurationMs={durationMs}
-        onChange={setTrimEndMs}
+    <div className="mx-2 flex grow items-center gap-2">
+      <div
+        className={twMerge(
+          "relative h-10 w-full border-l border-r border-dotted border-l-ui-border border-r-ui-border",
+          className,
+        )}
+      >
+        <div className="mt-3 h-4 w-full bg-secondary-300" />
+        <PlayProgressCursor
+          vidEl={vidEl}
+          currentTimePercent={(currentTimeMs / durationMs) * 100}
+        />
+        <TrimAreaScrubber
+          trimStartMs={trimStartMs}
+          trimDurationMs={
+            durationMs > trimDurationMs ? trimDurationMs : durationMs
+          }
+          totalDurationMs={durationMs}
+          onChange={setTrimStartMs}
+        />
+      </div>
+      <ButtonTrimDuration
+        trimDurationMs={trimDurationMs}
+        onChange={handleChangeTrimDuration}
       />
     </div>
   );

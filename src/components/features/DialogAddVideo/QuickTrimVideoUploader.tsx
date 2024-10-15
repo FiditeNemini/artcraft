@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { Signal } from "@preact/signals-react";
+import { useCallback, useState, useRef } from "react";
+import { signal, Signal } from "@preact/signals-react";
 
 import { FileUploader } from "../FileUploader";
 import { VideoControls } from "./VideoControls";
@@ -14,15 +14,14 @@ export const QuickTrimVideoUploader = ({
   file,
   onFileStaged,
   onTrimChange,
-  trimData,
+  trimDataSignal,
 }: {
   file: File | null;
   onFileStaged: (newFile: File | null) => void;
   onTrimChange: (trimData: TrimData) => void;
-  trimData?: Signal<TrimData | undefined>;
+  trimDataSignal: Signal<TrimData | undefined>;
 }) => {
   const [vidEl, setVidEl] = useState<HTMLVideoElement | undefined>(undefined);
-
   const videoRefCallback = useCallback(
     (node: HTMLVideoElement) => {
       if (node !== null) {
@@ -62,10 +61,14 @@ export const QuickTrimVideoUploader = ({
               src={URL.createObjectURL(file)}
             />
           </div>
-          <div className="flex w-full items-center justify-center bg-gray-100">
-            <VideoControls vidEl={vidEl} className="w-fit" />
+          <div className="my-1 flex w-full items-center justify-center gap-2 bg-gray-100">
+            <VideoControls
+              className="w-fit"
+              vidEl={vidEl}
+              trimDataSignal={trimDataSignal}
+            />
             <TrimmerPlaybar
-              trimData={trimData?.value}
+              trimDataSignal={trimDataSignal}
               vidEl={vidEl}
               className="grow"
               onTrimChange={onTrimChange}

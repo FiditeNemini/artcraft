@@ -92,7 +92,7 @@ export const PlayProgressCursor = ({
         className={twMerge(
           verticalPositionStyles,
           buttonStyles,
-          "size-5 -translate-x-1/2 rounded-full",
+          "z-20 size-5 -translate-x-1/2 rounded-full",
           isScrubbing && "cursor-grabbing",
         )}
         onMouseDown={handleScrubbingCurrentTime}

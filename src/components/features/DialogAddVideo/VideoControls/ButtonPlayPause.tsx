@@ -46,7 +46,7 @@ export function ButtonPlaypause({ vidEl }: { vidEl: HTMLVideoElement }) {
 
   return (
     <Button
-      className="w-10"
+      className="h-8 w-12"
       icon={getIcon()}
       variant={playpause === PlayPauseStatus.PLAYING ? "secondary" : "primary"}
       onClick={togglePlaypause}

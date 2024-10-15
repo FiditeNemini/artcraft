@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { faVolumeSlash, faVolume } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button } from "~/components/ui";
-
+import { Tooltip } from "~/components/ui";
 export function ButtonMute({ vidEl }: { vidEl: HTMLVideoElement }) {
   const [isMuted, setIsMuted] = useState<boolean>(vidEl.muted || false);
 
@@ -26,11 +26,13 @@ export function ButtonMute({ vidEl }: { vidEl: HTMLVideoElement }) {
   }, [vidEl]);
 
   return (
-    <Button
-      className="w-10"
-      icon={isMuted ? faVolumeSlash : faVolume}
-      variant="secondary"
-      onClick={toggleMute}
-    />
+    <Tooltip tip={isMuted ? "Unmute" : "Mute"}>
+      <Button
+        className="size-8"
+        icon={isMuted ? faVolumeSlash : faVolume}
+        variant="secondary"
+        onClick={toggleMute}
+      />
+    </Tooltip>
   );
 }

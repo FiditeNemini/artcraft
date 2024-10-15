@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from "react";
+import { Signal } from "@preact/signals-react";
 import { twMerge } from "tailwind-merge";
 
+import { Spinner } from "~/components/ui";
 import { VIDEO_STATE_STATUSES } from "./enum";
+import { TrimData } from "../TrimmerPlaybar";
 import { ButtonPlaypause } from "./ButtonPlayPause";
 import { ButtonMute } from "./ButtonMute";
 import { LabelTimeDuration } from "./LabelTimeDuration";
-import { Spinner } from "~/components/ui";
+import { ButtonRepeat } from "./ButtonRepeat";
 
 export const VideoControls = ({
   vidEl,
+  trimDataSignal,
   className,
 }: {
   vidEl: HTMLVideoElement | undefined;
+  trimDataSignal: Signal<TrimData | undefined>;
   className?: string;
 }) => {
   const prevVidEl = useRef<HTMLVideoElement | undefined>(undefined);
@@ -54,9 +59,9 @@ export const VideoControls = ({
     return (
       <div className={wrapperClass}>
         <ButtonPlaypause vidEl={vidEl} />
+        <ButtonRepeat trimDataSignal={trimDataSignal} vidEl={vidEl} />
         <ButtonMute vidEl={vidEl} />
         <LabelTimeDuration vidEl={vidEl} />
-        <div className="grow"></div>
       </div>
     );
   }

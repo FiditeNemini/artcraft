@@ -14,7 +14,6 @@ import { ButtonSubmitAdd } from "./ButtonSumbitAdd";
 
 import { DialogAddMediaStatuses } from "./enums";
 import { LoadingScreens } from "./LoadingScreens";
-// import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 import { ApiResponse } from "~/Classes/ApiManager/ApiManager";
 import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
@@ -97,7 +96,7 @@ export const DialogAddVideo = ({
                   onFileStaged={(file) => {
                     setStates((curr) => ({ ...curr, file }));
                   }}
-                  trimData={trimData}
+                  trimDataSignal={trimData}
                   onTrimChange={(newTrimData: TrimData) => {
                     trimData.value = newTrimData;
                   }}
