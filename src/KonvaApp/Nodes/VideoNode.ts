@@ -647,12 +647,12 @@ export class VideoNode extends NetworkedNode {
         24,
         [
           {
-            b64_image_data: 0,
-            idx: 0,
             timestamp: 0,
             objects: [
               {
-                style: "<mask style - default transparent>",
+                style: {
+                  color: [0, 0, 1],
+                },
                 object_id: 0,
                 points: this.selectedPointsForSegmentation,
               },
@@ -664,10 +664,23 @@ export class VideoNode extends NetworkedNode {
       loadingBar.updateMessage("Processing");
       loadingBar.updateProgress(50);
 
-      var image = response.frames[0].b64_image_data;
-      // TODO: wil make a loop to wait for the image
+      // var image = response.frames[0].b64_image_data;
+      // await this.setBase64ImageForSegementationPreview(image);
 
-      await this.setBase64ImageForSegementationPreview(image);
+      // TODO: wil make a loop to wait for the image
+      const previewImageUrl = response.frames[0].preview_image_url;
+      while (true) {
+        const isAvailable = await this.checkUrl(previewImageUrl);
+        if (isAvailable) {
+          console.log("Preview Image is available:", previewImageUrl);
+          loadingBar.updateMessage("Processing...");
+          loadingBar.updateProgress(50);
+          break;
+        }
+        console.log("Preview Image not available yet, retrying...");
+        await this.sleep(500);
+      }
+      await this.setSegementationPreview(previewImageUrl);
       loadingBar.updateProgress(100);
 
       this.disableAllExceptSegmentation();
@@ -707,16 +720,19 @@ export class VideoNode extends NetworkedNode {
         24,
         [
           {
-            b64_image_data: 0,
-            idx: 0,
+            // b64_image_data: 0,
+            // idx: 0,
             timestamp: 0,
             objects: [
               {
-                style: "<mask style - default transparent>",
+                style: {
+                  color: [0, 0, 1],
+                },
                 object_id: 0,
                 points: this.selectedPointsForSegmentation,
               },
             ],
+            // preview_image_url: "",
           },
         ],
         true, // this makes it all
@@ -768,7 +784,22 @@ export class VideoNode extends NetworkedNode {
   }
 
   public base64: Promise<void> | undefined;
-  public async setBase64ImageForSegementationPreview(baseImage64: number) {
+  // private async setBase64ImageForSegementationPreview(baseImage64: number) {
+  //   const imageObj = new Image();
+
+  //   this.base64 = new Promise((resolve, reject) => {
+  //     imageObj.onload = () => {
+  //       this.kNode.image(imageObj);
+  //       this.mediaLayerRef.draw();
+  //       resolve();
+  //     };
+  //     imageObj.onerror = () => {
+  //       reject("Image Failed To Load");
+  //     };
+  //   });
+  //   imageObj.src = `data:image/png;base64,${baseImage64}`;
+  // }
+  private async setSegementationPreview(previewImageUrl: string) {
     const imageObj = new Image();
 
     this.base64 = new Promise((resolve, reject) => {
@@ -781,7 +812,7 @@ export class VideoNode extends NetworkedNode {
         reject("Image Failed To Load");
       };
     });
-    imageObj.src = `data:image/png;base64,${baseImage64}`;
+    imageObj.src = previewImageUrl;
   }
   public async retry() {
     console.log("Video Node has not implement retry");

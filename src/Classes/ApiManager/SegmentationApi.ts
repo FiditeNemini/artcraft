@@ -7,22 +7,31 @@ export interface Coordinates {
 }
 
 export interface ObjectData {
-  style: "<mask style - default transparent>";
+  style: {
+    color: SegmentationColor;
+  };
   object_id: number;
   points: Coordinates[];
 }
 
-export interface Frame {
+export type SegmentationColor = [number, number, number];
+
+export interface RequestFrame {
+  timestamp: number;
+  objects: ObjectData[];
+}
+export interface ResponseFrame {
   b64_image_data: number;
   idx: number;
   timestamp: number;
   objects: ObjectData[];
+  preview_image_url: string;
 }
 
 export interface SegmentationRequest {
   session_id: string;
   fps: number;
-  frames: Frame[];
+  frames: RequestFrame[];
   propagate: boolean;
 }
 
@@ -30,7 +39,7 @@ export interface SegmentationResponse {
   session_id: string;
   fps: number;
   masked_video_cdn_url: string;
-  frames: Frame[];
+  frames: ResponseFrame[];
   propagate: boolean;
 }
 
@@ -55,7 +64,7 @@ export class SegmentationApi extends ApiManager {
   public addPointsToSession(
     session_id: string,
     fps: number,
-    frames: Frame[],
+    frames: RequestFrame[],
     propagate: boolean,
   ): Promise<SegmentationResponse> {
     const endpoint = `https://hax.storyteller.ai/segmentation/generate_masks`;
