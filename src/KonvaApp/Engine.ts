@@ -485,7 +485,7 @@ export class Engine {
           );
         }
       }
-    }, this.uiLayer);
+    }, this.mediaLayer);
     anim.start();
 
     this.uiLayer.add(textNode);
