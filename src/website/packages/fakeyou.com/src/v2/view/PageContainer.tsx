@@ -442,6 +442,10 @@ const routes = [
     ),
   },
   {
+    path: "/f5-tts",
+    component: lazy(() => import("./pages/voice_designer_v2/VoiceDesignerV2")),
+  },
+  {
     path: "/style-video/:mediaToken?",
     component: lazy(() => import("./pages/style-video")),
   },

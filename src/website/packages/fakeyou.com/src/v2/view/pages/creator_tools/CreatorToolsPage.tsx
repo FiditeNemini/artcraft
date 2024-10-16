@@ -57,7 +57,7 @@ export default function CreatorToolsPage() {
       title: t("productVideoStyleTransferTitle"),
       text: t("productVideoStyleTransferText"),
       videoSrc: "/videos/ai-tools/vst_video.mp4",
-      videoPosterSrc: "/images/ai-tools/vst_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/vst",
       imgAlt: "Video Style Transfer",
       badgeContent: {
         type: "new",
@@ -71,7 +71,7 @@ export default function CreatorToolsPage() {
       title: t("productLivePortraitTitle"),
       text: t("productLivePortraitText"),
       videoSrc: "/videos/ai-tools/lp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/lp_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/live_portrait",
       imgAlt: "Live Portrait",
       badgeContent: {
         type: "new",
@@ -84,7 +84,7 @@ export default function CreatorToolsPage() {
       title: t("productLipsyncTitle"),
       text: t("productLipsyncText"),
       videoSrc: "/videos/ai-tools/ls_video.mp4",
-      videoPosterSrc: "/images/ai-tools/ls_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/lipsync",
       imgAlt: "Lipsync",
     },
     {
@@ -92,7 +92,7 @@ export default function CreatorToolsPage() {
       title: "2D Video Compositor",
       text: "Compose videos and images with AI",
       videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
-      videoPosterSrc: "/images/ai-tools/vcomp_video_poster_2.jpg",
+      videoPosterSrc: "/images/ai-tools/2d_vid_com",
       imgAlt: "Video Compositor",
       videoPosition: "top",
     },
@@ -101,7 +101,7 @@ export default function CreatorToolsPage() {
       title: "3D Video Compositor",
       text: "Build videos with AI 3D engine",
       videoSrc: "/videos/ai-tools/vcomp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/vcomp_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/3d_vid_com",
       imgAlt: "Video Compositor",
     },
     {
@@ -109,7 +109,7 @@ export default function CreatorToolsPage() {
       title: "Webcam Acting",
       text: "Act as your character through your camera",
       videoSrc: "/videos/ai-tools/ca_video.mp4",
-      videoPosterSrc: "/images/ai-tools/ca_video_poster.jpg",
+      videoPosterSrc: "/images/ai-tools/webcam_acting",
       imgAlt: "Video Compositor",
     },
   ];
@@ -128,6 +128,13 @@ export default function CreatorToolsPage() {
       text: t("productVcText"),
       imgSrc: "/images/landing/select-v2v.webp",
       imgAlt: "Voice Conversion",
+    },
+    {
+      to: "/f5-tts",
+      title: "F5-TTS Voice Cloning",
+      text: "Zero-shot voice cloning",
+      imgSrc: "/images/landing/select-f5-tts.webp",
+      imgAlt: "Voice Cloning",
     },
     {
       to: "/voice-designer",

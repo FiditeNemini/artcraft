@@ -101,6 +101,13 @@ export default function AITools() {
       imgAlt: "Voice Conversion",
     },
     {
+      to: "/f5-tts",
+      title: "F5-TTS Voice Cloning",
+      text: "Zero-shot voice cloning",
+      imgSrc: "/images/landing/select-f5-tts.webp",
+      imgAlt: "Voice Cloning",
+    },
+    {
       to: "/voice-designer",
       title: t("productVdTitle"),
       text: t("productVdText"),
@@ -201,11 +208,15 @@ export default function AITools() {
   }
 
   if (currentPath.includes("/style-video")) {
-    items = [items[1], items[2], items[9]];
+    items = [items[1], items[2], items[10]];
   }
 
   if (currentPath.includes("/face-animator")) {
-    items = [items[0], items[1], items[9]];
+    items = [items[0], items[1], items[10]];
+  }
+
+  if (currentPath.includes("/webcam-acting")) {
+    items = [items[0], items[1], items[10]];
   }
 
   if (
@@ -214,7 +225,7 @@ export default function AITools() {
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp")
   ) {
-    items = [items[0], items[2], items[9]];
+    items = [items[0], items[2], items[10]];
   }
 
   return <AIToolsRow {...{ items }} />;

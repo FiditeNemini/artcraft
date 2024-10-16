@@ -41,6 +41,7 @@
 /edit-cover-image*     /website/index.html   200
 /engine-compositor*    /website/index.html   200
 /explore*              /website/index.html   200
+/f5-tts*               /website/index.html   200
 /face-animator*        /website/index.html   200
 /fbx-to-gltf*          /website/index.html   200
 /firehose*             /website/index.html   200
