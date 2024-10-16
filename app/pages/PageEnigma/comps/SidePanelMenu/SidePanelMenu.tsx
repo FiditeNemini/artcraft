@@ -61,14 +61,14 @@ export const SidePanelMenu = ({
             <button
               key={tab.title}
               className={twMerge([
-                "flex flex-col items-center rounded-lg border border-transparent px-2 py-3 transition-all duration-200 hover:bg-brand-secondary",
+                "flex flex-col items-center rounded-lg border border-transparent px-2 py-3 transition-all duration-200 hover:bg-brand-secondary-900/75",
                 tab.title === selectedTab.title && sidePanelVisible.value
                   ? "border-[#363636] bg-brand-secondary-900/60 opacity-100 hover:bg-brand-secondary-900/60"
                   : "opacity-60",
-                tab.title === TabTitles.RENDER &&
+                tab.title === TabTitles.STYLIZE &&
                   "bg-brand-primary font-medium opacity-90 hover:border-white/25 hover:bg-brand-primary hover:opacity-100",
                 tab.title === selectedTab.title &&
-                tab.title === TabTitles.RENDER
+                tab.title === TabTitles.STYLIZE
                   ? "border-white/50 opacity-100 hover:border-white/50"
                   : "",
               ])}
