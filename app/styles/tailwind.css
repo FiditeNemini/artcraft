@@ -4,7 +4,7 @@
 
 @layer components {
   .filter-tab {
-    @apply text-nowrap rounded-lg border border-[#3F3F3F] bg-ui-controls-button px-2.5 py-1 text-[13px] font-medium text-white/80 transition-all duration-150 hover:border-brand-primary/50 hover:bg-assets-background/80;
+    @apply text-nowrap rounded-lg border border-[#363636] bg-ui-controls-button px-2.5 py-1 text-[13px] font-medium text-white/80 transition-all duration-150 hover:border-brand-primary/50 hover:bg-assets-background/80;
   }
 
   .filter-tab.active {

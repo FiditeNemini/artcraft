@@ -20,7 +20,7 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
 
   if (!file) {
     return (
-      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border border-dashed border-[#3F3F3F] bg-brand-secondary p-3">
+      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border border-dashed border-[#363636] bg-brand-secondary p-3">
         <FontAwesomeIcon icon={faFileArrowUp} className="text-4xl" />
         <div className="flex flex-col gap-0">
           <P className="font-medium">
@@ -34,7 +34,7 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
     );
   } else {
     return (
-      <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-lg border border-dashed border-[#3F3F3F] bg-brand-secondary p-3">
+      <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-lg border border-dashed border-[#363636] bg-brand-secondary p-3">
         <FontAwesomeIcon icon={faFileAudio} className="text-4xl" />
         <div className="flex grow flex-col gap-0">
           <P className="font-medium">

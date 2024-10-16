@@ -193,7 +193,7 @@ export const IPAdapter: React.FC = () => {
 
   const DragAndDropZone = () => {
     return (
-      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border border-dashed border-[#3F3F3F] bg-brand-secondary p-3 transition-all duration-150 hover:bg-ui-controls-button/40">
+      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border border-dashed border-[#363636] bg-brand-secondary p-3 transition-all duration-150 hover:bg-ui-controls-button/40">
         <FontAwesomeIcon icon={faFileImage} className="text-3xl" />
         <div className="flex flex-col gap-0 text-sm">
           <P className="font-medium">

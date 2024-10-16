@@ -30,7 +30,7 @@ export const SidePanel = () => {
     <>
       <div
         className={[
-          "fixed z-20 flex border-l border-[#3F3F3F] bg-ui-panel transition-all duration-100",
+          "fixed z-20 flex border-l border-[#363636] bg-ui-panel transition-all duration-100",
         ].join(" ")}
         style={{
           top: 64,

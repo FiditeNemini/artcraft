@@ -23,7 +23,7 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
     <>
       {currentPage.value === Pages.EDIT && (
         <div
-          className="absolute z-10 h-1 w-full cursor-ns-resize bg-ui-panel-border"
+          className="absolute z-10 h-[3px] w-full cursor-ns-resize bg-ui-panel-border"
           style={{ bottom: displayHeight }}
           onPointerDown={onPointerDown}
         />

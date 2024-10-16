@@ -52,7 +52,7 @@ const OutlinerItem = ({ item }: { item: SceneObject }) => {
     <div
       role="button"
       className={twMerge(
-        "flex cursor-pointer justify-between px-4 py-[7px] text-[13px] font-normal text-white/80 outline-none transition-all duration-100 hover:bg-action/50 focus:outline-none",
+        "flex cursor-pointer justify-between px-4 py-[7px] text-[13px] font-normal text-white/80 outline-none transition-all duration-100 hover:bg-action-900/35 focus:outline-none",
         isSelected &&
           "bg-brand-primary/80 font-medium text-white hover:bg-brand-primary/80",
       )}

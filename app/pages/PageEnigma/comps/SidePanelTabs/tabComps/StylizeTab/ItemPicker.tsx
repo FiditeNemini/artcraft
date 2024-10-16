@@ -43,7 +43,7 @@ export const ItemPicker = ({
         "relative cursor-pointer overflow-hidden rounded-lg border transition-colors ease-in-out",
         selected
           ? "border-brand-primary"
-          : "border-[#3F3F3F] hover:border-brand-primary",
+          : "border-[#363636] hover:border-brand-primary",
         className,
       )}
       style={{

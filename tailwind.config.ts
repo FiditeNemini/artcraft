@@ -43,7 +43,7 @@ export default {
       },
       "brand-secondary": {
         //gunpowder
-        DEFAULT: "#2E2E2E",
+        DEFAULT: "#242424",
         "50": "#f6f6f6",
         "100": "#e7e7e7",
         "200": "#d1d1d1",
@@ -54,7 +54,7 @@ export default {
         "700": "#4f4f4f",
         "800": "#454545",
         "900": "#3d3d3d",
-        "950": "#2e2e2e",
+        "950": "#242424",
       },
       "brand-tertiary": {
         //Aquamarine Blue
@@ -105,7 +105,7 @@ export default {
 
       action: {
         //comet
-        DEFAULT: "#2E2E2E",
+        DEFAULT: "#242424",
         "50": "#f6f6f6",
         "100": "#e7e7e7",
         "200": "#d1d1d1",
@@ -116,7 +116,7 @@ export default {
         "700": "#4f4f4f",
         "800": "#454545",
         "900": "#3d3d3d",
-        "950": "#2e2e2e",
+        "950": "#242424",
       },
 
       character: {
@@ -172,11 +172,11 @@ export default {
       },
 
       ui: {
-        background: "#242424",
-        panel: "#1F1F1F",
-        "panel-border": "#3F3F3F",
-        controls: "#2E2E2E",
-        "controls-button": "#2E2E2E",
+        background: "#121212",
+        panel: "#171717",
+        "panel-border": "#363636",
+        controls: "#1C1C1C",
+        "controls-button": "#1C1C1C",
         divider: "#515168",
       },
 

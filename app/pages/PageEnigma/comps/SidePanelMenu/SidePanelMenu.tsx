@@ -37,7 +37,7 @@ export const SidePanelMenu = ({
       className={twMerge(
         "fixed z-[25] bg-assets-background",
         "right-0 top-[64px] w-[84px] overflow-auto border-l px-2 py-2",
-        sidePanelVisible.value ? "border-transparent" : "border-[#3F3F3F]",
+        sidePanelVisible.value ? "border-transparent" : "border-[#363636]",
       )}
       style={{
         height: pageHeight.value - 64,
@@ -63,7 +63,7 @@ export const SidePanelMenu = ({
               className={twMerge([
                 "flex flex-col items-center rounded-lg border border-transparent px-2 py-3 transition-all duration-200 hover:bg-brand-secondary",
                 tab.title === selectedTab.title && sidePanelVisible.value
-                  ? "border-[#3F3F3F] bg-brand-secondary-900/60 opacity-100 hover:bg-brand-secondary-900/60"
+                  ? "border-[#363636] bg-brand-secondary-900/60 opacity-100 hover:bg-brand-secondary-900/60"
                   : "opacity-60",
                 tab.title === TabTitles.RENDER &&
                   "bg-brand-primary font-medium opacity-90 hover:border-white/25 hover:bg-brand-primary hover:opacity-100",
