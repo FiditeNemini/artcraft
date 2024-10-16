@@ -39,6 +39,7 @@ export const ToolbarNode = ({
       onLockClicked(e, locked ?? false);
     }
   };
+  const lockDisabledOrUnknown = lockDisabled || locked === "unknown";
   return (
     <div
       className={twMerge(
@@ -49,10 +50,12 @@ export const ToolbarNode = ({
     >
       <ToolbarButton
         buttonProps={{
-          className: locked
-            ? "text-primary hover:bg-primary hover:text-white"
-            : "",
-          disabled: lockDisabled || locked === "unknown",
+          className: twMerge(
+            locked && "text-primary hover:bg-primary hover:text-white",
+            lockDisabledOrUnknown &&
+              "text-secondary-300 hover:text-secondary-300",
+          ),
+          disabled: lockDisabledOrUnknown,
         }}
         tooltip={
           locked === "unknown" ? "Unavailable" : locked ? "Unlock" : "Lock"

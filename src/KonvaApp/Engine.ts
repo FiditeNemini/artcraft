@@ -318,13 +318,14 @@ export class Engine {
         if (element instanceof VideoNode) {
           const node = element as VideoNode;
           console.log("ENGEINE prepare Segmentation.", node);
-          this.segmentationButtonCanBePressed = false;
-          this.disableAllButtons();
-          this.disableSelectorSquare();
-          node.lock();
-          this.nodeIsolator.enterIsolation(node);
+
           if (!node.isSegmentationMode) {
             console.log("ENGEINE start Segmentation.", node);
+            this.segmentationButtonCanBePressed = false;
+            this.disableAllButtons();
+            this.disableSelectorSquare();
+            node.lock();
+            this.nodeIsolator.enterIsolation(node);
             node.videoSegmentationMode(true);
             this.selectionManager.updateContextComponents(node);
 

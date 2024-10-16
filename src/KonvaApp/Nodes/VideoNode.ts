@@ -581,7 +581,9 @@ export class VideoNode extends NetworkedNode {
         active: false,
       };
     }
-    uiAccess.toolbarNode.show({
+    uiAccess.toolbarNode.update({
+      locked: this.isLocked(),
+      lockDisabled: this.isSegmentationMode,
       buttonStates: buttonStates,
     });
   }
@@ -595,14 +597,16 @@ export class VideoNode extends NetworkedNode {
         active: false,
       };
     }
-    uiAccess.toolbarNode.show({
+    uiAccess.toolbarNode.update({
+      locked: this.isLocked(),
+      lockDisabled: this.isSegmentationMode,
       buttonStates: buttonStates,
     });
   }
 
   private isStillProcessingSegmentationEvent: Boolean = false;
 
-  public async handleSegmentation(event) {
+  public async handleSegmentation() {
     // Get the local coordinates of the click relative to the rectangle
     if (!this.isSegmentationMode) {
       console.log("Segmentation Mode Not On");
@@ -661,6 +665,7 @@ export class VideoNode extends NetworkedNode {
       loadingBar.updateProgress(50);
 
       var image = response.frames[0].b64_image_data;
+      // TODO: wil make a loop to wait for the image
 
       await this.setBase64ImageForSegementationPreview(image);
       loadingBar.updateProgress(100);
@@ -727,6 +732,7 @@ export class VideoNode extends NetworkedNode {
 
       loadingBar.updateMessage("Processing..");
 
+      // sleep and wait for the video
       while (true) {
         const isAvailable = await this.checkUrl(videoUrl);
         if (isAvailable) {

@@ -4,6 +4,7 @@ import { MediaNode, TransformationData } from "../types";
 export class NodeIsolator {
   private mediaLayerRef: Konva.Layer;
   private backgroundRect: Konva.Rect;
+  private referenceRect: Konva.Rect;
   private nodeIsolationLayerRef: Konva.Layer;
   private currentNode: MediaNode | undefined;
   private originalKNodeTransformation: TransformationData | undefined;
@@ -21,6 +22,13 @@ export class NodeIsolator {
     this.backgroundRect = new Konva.Rect({
       fill: "rgba(0,0,0,0.5)",
     });
+    this.referenceRect = new Konva.Rect({
+      fill: "gray",
+      stroke: "salmon",
+      strokeWidth: 10,
+      dash: [20, 10],
+      strokeScaleEnabled: false,
+    });
   }
 
   private adjustSizes() {
@@ -28,7 +36,10 @@ export class NodeIsolator {
       width: window.innerWidth,
       height: window.innerHeight,
     });
+
     if (this.currentNode && this.originalKNodeTransformation) {
+      this.referenceRect.setAttrs(this.originalKNodeTransformation);
+
       const originalSize = {
         width:
           this.originalKNodeTransformation.size.width *
@@ -61,18 +72,22 @@ export class NodeIsolator {
     }
   }
   public enterIsolation(node: MediaNode) {
+    // console.log("NodeIsolator > enterIsolation");
     this.currentNode = node;
-    this.preserveKNodeTransformation(node.kNode);
-    this.currentNode.kNode.remove();
-
     this.adjustSizeFnRef = () => this.adjustSizes();
-    this.adjustSizeFnRef();
-    window.addEventListener("resize", this.adjustSizeFnRef);
+    this.preserveKNodeTransformation(node.kNode);
+
+    this.currentNode.kNode.remove();
     this.nodeIsolationLayerRef.add(this.backgroundRect);
     this.nodeIsolationLayerRef.add(this.currentNode.kNode);
+    this.mediaLayerRef.add(this.referenceRect);
+    this.adjustSizeFnRef();
+
+    window.addEventListener("resize", this.adjustSizeFnRef);
   }
 
   public exitIsolation() {
+    // console.log("NodeIsolator > exitIsolation");
     if (this.adjustSizeFnRef) {
       window.removeEventListener("resize", this.adjustSizeFnRef);
       this.adjustSizeFnRef = undefined;
@@ -83,8 +98,11 @@ export class NodeIsolator {
     }
     this.currentNode.kNode.remove();
     this.backgroundRect.remove();
+    this.referenceRect.remove();
     this.mediaLayerRef.add(this.currentNode.kNode);
     this.currentNode.kNode.setAttrs(this.originalKNodeTransformation);
+    this.currentNode = undefined;
+    this.originalKNodeTransformation = undefined;
   }
   private preserveKNodeTransformation(kNode: Konva.Node) {
     this.originalKNodeTransformation = {

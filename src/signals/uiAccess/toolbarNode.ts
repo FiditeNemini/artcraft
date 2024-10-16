@@ -130,6 +130,16 @@ export const toolbarNode = {
       },
     };
   },
+  batchButtonStates({ buttonStates }: { buttonStates: Partial<ButtonStates> }) {
+    const prevButtonStates = toolbarNodeSignal.value.buttonStates;
+    toolbarNodeSignal.value = {
+      ...toolbarNodeSignal.value,
+      buttonStates: {
+        ...prevButtonStates,
+        ...buttonStates,
+      },
+    };
+  },
   resetAllButtonStates() {
     toolbarNodeSignal.value = {
       ...toolbarNodeSignal.value,
