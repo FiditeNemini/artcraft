@@ -35,6 +35,7 @@ class Scene {
 
   updateSurfaceIdAttributeToMesh: Function;
   helper: MMDAnimationHelper;
+  ambientLight: THREE.AmbientLight | undefined;
 
   // This is used to ensure we do not rerender or process the video if we already have done so.
   // This allows us to reprompt things quickly. This is only written when a snap shot is taken.
@@ -738,6 +739,8 @@ class Scene {
         "/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png",
       ]);
       this.scene.background = texture;
+      if(this.ambientLight)
+        this.scene.remove(this.ambientLight);
     } else if (this.skybox == "m_1") {
       const texture = loader.load([
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
@@ -748,8 +751,13 @@ class Scene {
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_1_Back-Z.png",
       ]);
       this.scene.background = texture;
+      if(this.ambientLight)
+        this.scene.remove(this.ambientLight);
     } else if (this.skybox == "m_2") {
       this.scene.background = new THREE.Color("#000000");
+      if(this.ambientLight)
+      this.scene.add(this.ambientLight);
+
     } else {
       const texture = loader.load([
         "/resources/skybox/day/px.png",
@@ -760,6 +768,8 @@ class Scene {
         "/resources/skybox/day/nz.png",
       ]);
       this.scene.background = texture;
+      if(this.ambientLight)
+        this.scene.remove(this.ambientLight);
     }
 
     console.log("Backround creation..");
@@ -784,6 +794,8 @@ class Scene {
     const color = 0xfcece7;
     const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
     this.scene.add(light);
+
+    this.ambientLight = new THREE.AmbientLight(new THREE.Color("#ffffff"), 3)
 
     const directional_light = new THREE.DirectionalLight(color, 2.0);
 
