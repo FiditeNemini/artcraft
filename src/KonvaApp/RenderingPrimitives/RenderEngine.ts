@@ -23,12 +23,13 @@ import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
 import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
+import { TextNode } from "../Nodes";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 
 export class RenderEngine {
   private videoNodes: VideoNode[];
-  private imageNodes: ImageNode[];
+  private imageNodes: (ImageNode | TextNode)[];
 
   private offScreenCanvas: OffscreenCanvas;
   private context: OffscreenCanvasRenderingContext2D | null;
@@ -103,6 +104,7 @@ export class RenderEngine {
 
     this.fps = 24;
     this.captureCanvas = new Konva.Rect({
+      name: "CaptureCanvas",
       x: this.positionX,
       y: this.positionY,
       width: this.width,
@@ -112,7 +114,6 @@ export class RenderEngine {
       strokeWidth: 1,
       draggable: false,
     });
-    this.captureCanvas.addName("CaptureCanvas");
 
     this.upperMaxFrames = 7 * this.fps; // seconds by fps
 
@@ -310,7 +311,7 @@ export class RenderEngine {
   public addNodes(node: MediaNode) {
     if (node instanceof VideoNode) {
       this.videoNodes.push(node);
-    } else if (node instanceof ImageNode) {
+    } else if (node instanceof ImageNode || node instanceof TextNode) {
       this.imageNodes.push(node);
     }
   }
@@ -321,7 +322,7 @@ export class RenderEngine {
       if (index > -1) {
         this.videoNodes.splice(index, 1);
       }
-    } else if (node instanceof ImageNode) {
+    } else if (node instanceof ImageNode || node instanceof TextNode) {
       const index = this.imageNodes.indexOf(node);
       if (index > -1) {
         this.imageNodes.splice(index, 1);
