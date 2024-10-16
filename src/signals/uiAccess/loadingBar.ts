@@ -57,7 +57,7 @@ export const loadingBar = {
       status,
     };
   },
-  show(props?: Omit<ContextualLoadingBarProps, "isShowing">) {
+  show(props?: Partial<Omit<ContextualLoadingBarProps, "isShowing">>) {
     if (loadingBarSignal.value.isShowing) {
       if (import.meta.env.DEV) {
         console.warn(

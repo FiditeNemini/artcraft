@@ -181,7 +181,10 @@ export class VideoNode extends NetworkedNode {
         console.log("KNode Not Initialized Video Component");
         return;
       }
-
+      this.mediaFileSize = {
+        width: this.videoComponent.videoWidth,
+        height: this.videoComponent.videoHeight,
+      };
       if (!existingTransform) {
         const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
           componentSize: {
@@ -528,45 +531,27 @@ export class VideoNode extends NetworkedNode {
 
   private segmentationSession: { session_id: string } | undefined = undefined;
 
-  public async urlToBlob(url: string): Promise<Blob> {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch resource: ${response.statusText}`);
-    }
-    const blob = await response.blob();
-    return blob;
-  }
-
-  async sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  // Function to check if the URL returns a 200 status
-  public async checkUrl(url: string): Promise<boolean> {
-    try {
-      const response = await fetch(url);
-      return response.status === 200;
-    } catch (error) {
-      console.error("Error fetching URL:", error);
-      return false;
-    }
-  }
-
-  // to do debug code
-
   public async startSegmentation() {
     if (this.segmentationSession === undefined) {
+      this.didFinishLoading = false;
+      this.selectionManagerRef.updateContextComponents(this);
+      this.selectionManagerRef.showContextComponents(this);
+      loadingBar.show({ progress: 0, message: "Loading Video Extractor..." });
+      console.log("loadingbar should show");
       await this.seek(0);
-
-      loadingBar.show();
-      loadingBar.updateProgress(0);
-
-      const blob = await this.urlToBlob(this.videoURL);
+      loadingBar.update({
+        progress: 25,
+        message: "Loading Video Extractor...",
+      });
+      const blob = await NodeUtilities.urlToBlob(this.videoURL);
       this.segmentationSession =
         await this.videoSegmentationAPI.createSession(blob);
       console.log("Sessions", this.segmentationSession);
-      loadingBar.updateMessage("Start Adding Mask Points To the Video");
-      loadingBar.updateProgress(100);
+      loadingBar.update({
+        progress: 100,
+        message: "Start Adding Mask Points To the Video",
+      });
+      this.didFinishLoading = true;
     }
   }
 
@@ -629,17 +614,27 @@ export class VideoNode extends NetworkedNode {
     loadingBar.show();
     const localPos = this.kNode.getRelativePointerPosition();
     console.log("Local coordinates:", localPos);
-    if (!localPos) {
+    console.log("mediaFileSize:", this.mediaFileSize);
+    if (!localPos || !this.mediaFileSize) {
       return;
     }
+    const adjustedLocalPos = {
+      x:
+        (localPos.x / this.kNode.width()) *
+        this.kNode.scaleX() *
+        this.mediaFileSize.width,
+      y:
+        (localPos.y / this.kNode.height()) *
+        this.kNode.scaleY() *
+        this.mediaFileSize.height,
+    };
     // handle undo as well.
     this.selectedPointsForSegmentation.push({
-      coordinates: [localPos.x, localPos.y],
+      coordinates: [adjustedLocalPos.x, adjustedLocalPos.y],
       include: true,
     });
 
-    loadingBar.updateMessage("Start Processing Mask");
-    loadingBar.updateProgress(0);
+    loadingBar.update({ progress: 0, message: "Start Processing Mask" });
     try {
       console.log("Requesting");
       const response = await this.videoSegmentationAPI.addPointsToSession(
@@ -661,38 +656,23 @@ export class VideoNode extends NetworkedNode {
         ],
         false,
       );
-      loadingBar.updateMessage("Processing");
-      loadingBar.updateProgress(50);
-
-      // var image = response.frames[0].b64_image_data;
-      // await this.setBase64ImageForSegementationPreview(image);
-
-      // TODO: wil make a loop to wait for the image
+      loadingBar.update({ progress: 50, message: "Processing" });
       const previewImageUrl = response.frames[0].preview_image_url;
-      while (true) {
-        const isAvailable = await this.checkUrl(previewImageUrl);
-        if (isAvailable) {
-          console.log("Preview Image is available:", previewImageUrl);
-          loadingBar.updateMessage("Processing...");
-          loadingBar.updateProgress(50);
-          break;
-        }
-        console.log("Preview Image not available yet, retrying...");
-        await this.sleep(500);
-      }
-      await this.setSegementationPreview(previewImageUrl);
-      loadingBar.updateProgress(100);
 
-      this.disableAllExceptSegmentation();
-      loadingBar.updateMessage("Masking Region Done");
-      this.isStillProcessingSegmentationEvent = false;
+      // TODO: we assumed success of the loading of the AssetUrl
+      await NodeUtilities.isAssetUrlAvailable({ url: previewImageUrl });
+      loadingBar.update({ progress: 50, message: "Processing..." });
+      await this.setSegementationPreview(previewImageUrl);
+      loadingBar.update({ progress: 100, message: "Masking Region Done" });
     } catch (error) {
       console.error(error);
-      loadingBar.updateMessage(`Error:${error} Try Segmenting Again`);
-      loadingBar.updateProgress(0);
-      this.disableAllExceptSegmentation();
-      this.isStillProcessingSegmentationEvent = false;
+      loadingBar.update({
+        progress: 0,
+        message: `Error:${error} Please try picking extraction points again`,
+      });
     }
+    this.disableAllExceptSegmentation();
+    this.isStillProcessingSegmentationEvent = false;
   }
 
   async endSession(): Promise<boolean> {
@@ -705,8 +685,8 @@ export class VideoNode extends NetworkedNode {
     }
     // prevent requests to add points while doing this.
     this.isStillProcessingSegmentationEvent = true;
-    loadingBar.updateMessage("Processing.");
-    loadingBar.updateProgress(0);
+    loadingBar.update({ progress: 0, message: "Processing Video..." });
+
     this.disableAllForSegmentation();
     if (!this.segmentationSession) {
       console.log("Segmentation Session Lost?");
@@ -720,8 +700,6 @@ export class VideoNode extends NetworkedNode {
         24,
         [
           {
-            // b64_image_data: 0,
-            // idx: 0,
             timestamp: 0,
             objects: [
               {
@@ -732,37 +710,25 @@ export class VideoNode extends NetworkedNode {
                 points: this.selectedPointsForSegmentation,
               },
             ],
-            // preview_image_url: "",
           },
         ],
-        true, // this makes it all
+        true, // propagation = true, this requests the entire video to be processed
       );
-      loadingBar.updateProgress(25);
+      loadingBar.update({ progress: 25, message: "Processing Video..." });
 
-      console.log(response);
       // replace the video component and reregister all the other elements.
-      console.log(response["masked_video_cdn_url"]); // wait using a while loop to display the result.
-      // URL to check
+      console.log(
+        "Masked Video URL",
+        response["masked_video_cdn_url"],
+        response,
+      );
+      // TODO: we assume the URL to be checked will eventually return true
       const videoUrl = response["masked_video_cdn_url"];
-      // While loop to repeatedly check the URL
-
-      loadingBar.updateMessage("Processing..");
-
-      // sleep and wait for the video
-      while (true) {
-        const isAvailable = await this.checkUrl(videoUrl);
-        if (isAvailable) {
-          console.log("Video is available:", videoUrl);
-          loadingBar.updateMessage("Processing...");
-          loadingBar.updateProgress(50);
-
-          break;
-        }
-        console.log("Video not available yet, retrying...");
-        await this.sleep(2000);
-      }
-
-      loadingBar.updateProgress(75);
+      await NodeUtilities.isAssetUrlAvailable({
+        url: videoUrl,
+        sleepDurationMs: 2000,
+      });
+      loadingBar.update({ progress: 50, message: "Processing Video..." });
 
       // set chroma automatically.
       this.isChroma = true;
@@ -783,26 +749,10 @@ export class VideoNode extends NetworkedNode {
     }
   }
 
-  public base64: Promise<void> | undefined;
-  // private async setBase64ImageForSegementationPreview(baseImage64: number) {
-  //   const imageObj = new Image();
-
-  //   this.base64 = new Promise((resolve, reject) => {
-  //     imageObj.onload = () => {
-  //       this.kNode.image(imageObj);
-  //       this.mediaLayerRef.draw();
-  //       resolve();
-  //     };
-  //     imageObj.onerror = () => {
-  //       reject("Image Failed To Load");
-  //     };
-  //   });
-  //   imageObj.src = `data:image/png;base64,${baseImage64}`;
-  // }
   private async setSegementationPreview(previewImageUrl: string) {
     const imageObj = new Image();
 
-    this.base64 = new Promise((resolve, reject) => {
+    const imageLoadPromise = new Promise<void>((resolve, reject) => {
       imageObj.onload = () => {
         this.kNode.image(imageObj);
         this.mediaLayerRef.draw();
@@ -813,7 +763,9 @@ export class VideoNode extends NetworkedNode {
       };
     });
     imageObj.src = previewImageUrl;
+    return imageLoadPromise;
   }
+
   public async retry() {
     console.log("Video Node has not implement retry");
   }

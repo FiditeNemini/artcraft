@@ -3,8 +3,10 @@ import { Position, Size } from "../types";
 
 export const NodeUtilities = {
   adjustNodeSizeToCanvas,
+  isAssetUrlAvailable,
   positionNodeOnCanvasCenter,
   printKNodeAttrs,
+  urlToBlob,
 };
 function adjustNodeSizeToCanvas({
   componentSize,
@@ -52,4 +54,57 @@ function printKNodeAttrs(kNode: Konva.Node) {
     scale: kNode.scale(),
     rotation: kNode.rotation(),
   });
+}
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Function to check if the URL returns a 200 status
+async function checkUrl(url: string): Promise<boolean> {
+  try {
+    const response = await fetch(url);
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error fetching URL:", error);
+    return false;
+  }
+}
+// wait using a while loop to display the result.
+async function isAssetUrlAvailable({
+  url,
+  sleepDurationMs = 500,
+  totalRetries,
+}: {
+  url: string;
+  sleepDurationMs?: number;
+  totalRetries?: number;
+}): Promise<boolean> {
+  let retryCount = 0;
+  let isAvailable = false;
+  const totalRetriesReached = () => {
+    if (!totalRetries) {
+      return false;
+    }
+    return retryCount >= totalRetries;
+  };
+  while (!isAvailable && !totalRetriesReached()) {
+    isAvailable = await checkUrl(url);
+    if (!isAvailable) {
+      console.log("Asset at Url not available yet, retrying...");
+      retryCount = retryCount + 1;
+      await sleep(sleepDurationMs);
+    } else if (import.meta.env.DEV) {
+      console.log("Preview Image is available:", url);
+    }
+  }
+  return isAvailable;
+}
+
+async function urlToBlob(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch resource: ${response.statusText}`);
+  }
+  const blob = await response.blob();
+  return blob;
 }

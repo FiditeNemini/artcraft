@@ -325,11 +325,11 @@ export class Engine {
             this.disableAllButtons();
             this.disableSelectorSquare();
             node.lock();
+
+            await node.startSegmentation();
             this.nodeIsolator.enterIsolation(node);
             node.videoSegmentationMode(true);
             this.selectionManager.updateContextComponents(node);
-
-            await node.startSegmentation();
             this.segmentationButtonCanBePressed = true;
           } else {
             console.log("ENGEINE Attemping to close Segmentation.");

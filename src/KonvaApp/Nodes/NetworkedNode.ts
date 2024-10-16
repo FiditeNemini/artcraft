@@ -2,6 +2,7 @@ import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 import { SelectionManager } from "../NodesManagers";
 import { BaseNode } from "./BaseNode";
+import { Size } from "../types";
 
 export enum UploadStatus {
   INIT = "init",
@@ -23,6 +24,7 @@ export abstract class NetworkedNode extends BaseNode {
   protected localFile?: File;
   protected mediaFileToken?: string;
   protected mediaFileUrl?: string;
+  protected mediaFileSize?: Size;
   protected mediaFileStatus: UploadStatus = UploadStatus.INIT;
   public errorMessage?: string;
   abstract retry(): void;
