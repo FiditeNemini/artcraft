@@ -45,7 +45,6 @@ export class SceneManager {
       "board_" + timestamp.toISOString().substring(0, 19).replace(/\D/g, "");
 
     const saveJson = this.extractAllNodesData();
-    console.log("save scene", sceneTitle);
     console.log("saveJson", saveJson);
     const file = new File([saveJson], `${sceneTitle}`, {
       type: "application/json",
@@ -65,6 +64,7 @@ export class SceneManager {
         return;
       }
       this.currentSceneToken = uploadResponse.data;
+      this.navigateRef(`/${this.currentSceneToken}`);
     } else {
       const uploadResponse = await mediaUploadApi.UploadSavedScene({
         blob: file,
