@@ -201,6 +201,17 @@ export class Engine {
       return;
     }
 
+    if (response.responseType === ResponseType.error) {
+      console.log("Error Data?");
+      console.log(response.data);
+      uiAccess.dialogError.show({
+        title: "Generation Error Try again.",
+        message: response.data?.toString(),
+      });
+      uiAccess.toolbarMain.loadingBar.hide();
+      return;
+    }
+
     if (response.responseType === ResponseType.result) {
       const data = response.data as DiffusionSharedWorkerResponseData;
       uiAccess.toolbarMain.loadingBar.hide();
