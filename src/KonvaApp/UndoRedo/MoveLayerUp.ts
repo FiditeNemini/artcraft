@@ -48,6 +48,9 @@ export class MoveLayerUp implements ICommand {
     });
     this.nodesManagerRef.updateAllZIndices();
     this.mediaLayerRef.draw();
+    // if (import.meta.env.DEV && !hasMovedNode) {
+    //   console.log("No Node Moved-UP");
+    // }
     return hasMovedNode;
   }
 

@@ -37,7 +37,7 @@ export class MoveLayerDown implements ICommand {
 
   execute() {
     let hasMovedNode = false;
-    let currMinIndex = 1;
+    let currMinIndex = 0;
     this.sortedMovingNodes.forEach(([movingNode, movingNodeZindex]) => {
       if (movingNodeZindex === currMinIndex) {
         currMinIndex = currMinIndex + 1;
@@ -48,6 +48,9 @@ export class MoveLayerDown implements ICommand {
     });
     this.nodesManagerRef.updateAllZIndices();
     this.mediaLayerRef.draw();
+    // if (import.meta.env.DEV && !hasMovedNode) {
+    //   console.log("No Node Moved-DOWN");
+    // }
     return hasMovedNode;
   }
 

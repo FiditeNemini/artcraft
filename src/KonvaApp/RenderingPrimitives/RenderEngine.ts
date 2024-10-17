@@ -461,6 +461,9 @@ export class RenderEngine {
       // @ts-ignore
       const offscreenCanvas = offScreenSceneCanvas._canvas as OffscreenCanvas;
       let result = undefined;
+
+      // if config.test is true, the result is downloaded to the local files
+      // config.test = true;
       if (config.test) {
         const blob = await offscreenCanvas.convertToBlob({
           quality: config.quality ?? 1.0,

@@ -220,6 +220,8 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 
         while (jobIsProcessing) {
           const job = await this.jobsAPI.GetJobByToken({ token: jobToken });
+
+          // TODO: MAKE REQUEST FOR PREVIEW HERE
           console.log(job);
           if (!job.data) {
             console.log("No Job Data resetting the zip state");
