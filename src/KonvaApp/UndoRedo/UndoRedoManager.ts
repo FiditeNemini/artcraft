@@ -1,10 +1,17 @@
 import { ICommand } from "./ICommand";
 
 export class UndoStackManager {
+  private disabled: boolean = false;
   private undoStack: ICommand[] = [];
   private redoStack: ICommand[] = [];
   private readonly STACK_LIMIT = 20;
 
+  setDisabled(newState: boolean) {
+    this.disabled = newState;
+  }
+  isDisabled() {
+    return this.disabled;
+  }
   executeCommand(command: ICommand) {
     const result = command.execute();
     if (result !== undefined && result === false) {
@@ -26,6 +33,9 @@ export class UndoStackManager {
   }
 
   undo() {
+    if (this.disabled) {
+      return;
+    }
     const command = this.undoStack.pop();
     if (command) {
       command.undo();
@@ -40,6 +50,9 @@ export class UndoStackManager {
   }
 
   redo() {
+    if (this.disabled) {
+      return;
+    }
     const command = this.redoStack.pop();
     if (command) {
       command.execute();

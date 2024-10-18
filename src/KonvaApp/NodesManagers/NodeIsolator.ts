@@ -1,5 +1,6 @@
 import Konva from "konva";
 import { MediaNode, TransformationData } from "../types";
+import { uiAccess } from "~/signals";
 
 export class NodeIsolator {
   private mediaLayerRef: Konva.Layer;
@@ -73,6 +74,7 @@ export class NodeIsolator {
   }
   public enterIsolation(node: MediaNode) {
     // console.log("NodeIsolator > enterIsolation");
+    uiAccess.toolbarMain.disable();
     this.currentNode = node;
     this.adjustSizeFnRef = () => this.adjustSizes();
     this.preserveKNodeTransformation(node.kNode);
@@ -103,6 +105,7 @@ export class NodeIsolator {
     this.currentNode.kNode.setAttrs(this.originalKNodeTransformation);
     this.currentNode = undefined;
     this.originalKNodeTransformation = undefined;
+    uiAccess.toolbarMain.enable();
   }
   private preserveKNodeTransformation(kNode: Konva.Node) {
     this.originalKNodeTransformation = {

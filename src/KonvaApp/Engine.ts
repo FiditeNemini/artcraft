@@ -336,19 +336,28 @@ export class Engine {
             this.disableAllButtons();
             this.disableSelectorSquare();
             node.lock();
-
+            this.undoStackManager.setDisabled(true);
             await node.startSegmentation();
             this.nodeIsolator.enterIsolation(node);
             node.videoSegmentationMode(true);
             this.selectionManager.updateContextComponents(node);
+            uiAccess.loadingBar.update({
+              progress: 0,
+              message: "Start Adding Mask Points To the Video",
+            });
+            uiAccess.loadingBar.show();
+
             this.segmentationButtonCanBePressed = true;
           } else {
             console.log("ENGEINE Attemping to close Segmentation.");
             const endSessionResult = await node.endSession();
             if (endSessionResult) {
-              // TODO: one bug is that the lock unables quickly
               node.videoSegmentationMode(false);
               this.nodeIsolator.exitIsolation();
+              node.seek(1 / node.fps);
+              this.undoStackManager.setDisabled(false);
+              // TODO : 1 frame is missing from extracted video,
+              // need to move 1 frame forward to accomodate
               this.enableAllButtons();
               this.enableSelectorSquare();
               this.segmentationButtonCanBePressed = true;

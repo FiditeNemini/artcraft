@@ -1,9 +1,9 @@
 import Konva from "konva";
-import { NetworkedNode } from "./NetworkedNode";
+import { v4 as uuidv4 } from "uuid";
+
+import { NetworkedNode, UploadStatus } from "./NetworkedNode";
 import { uiAccess } from "~/signals";
 import ChromaWorker from "./ChromaWorker?sharedworker";
-import { v4 as uuidv4 } from "uuid";
-// const toolbarNode = uiAccess.toolbarNode;
 import { minNodeSize, transparent, NodeType } from "./constants";
 import { SelectionManager } from "../NodesManagers";
 import { Position, Size, NodeData, TransformationData } from "../types";
@@ -28,10 +28,10 @@ export class VideoNode extends NetworkedNode {
   public kNode: Konva.Image;
   public videoURL: string;
   public videoComponent: HTMLVideoElement;
+  protected _isVideoEventListening: boolean = false;
 
   // Use Context Menu Item
   public duration: number = 0;
-  private imageIndex: number = 0;
   public fps: number = 24;
 
   // This locks interaction when the render engine is rendering
@@ -52,56 +52,11 @@ export class VideoNode extends NetworkedNode {
   selectedPointsForSegmentation: Coordinates[] = [];
 
   private videoSegmentationAPI = new SegmentationApi();
-  private imageSources: string[] = [
-    "https://images-ng.pixai.art/images/orig/7ef23baa-2fc8-4e2f-8299-4f9241920090",
-    "https://images-ng.pixai.art/images/orig/98196e9f-b968-4fe1-97ec-083ffd77c263",
-    "https://images-ng.pixai.art/images/orig/a05a49dd-6764-4bfe-902f-1dfad67e49c9",
-    "https://images-ng.pixai.art/images/orig/a449179c-c549-4627-8806-49dc5a30c429",
-    "https://images-ng.pixai.art/images/orig/809eafc6-79c8-4c7a-89cd-bfc7ab39f142",
-    "https://images-ng.pixai.art/images/orig/5f004e09-e3ac-4461-b2b1-0d70f2255c34",
-    "https://images-ng.pixai.art/images/orig/56dcbb5f-7a31-4328-b4ea-1312df6e77a0",
-    "https://videos.pixai.art/f7df019d-79a2-4ed2-bb99-775c941f7ec6",
-  ];
 
   private frameDidFinishSeeking: Promise<void>;
-  // private finishedLoadingOnStart: Promise<void>;
-  async setProcessing() {
-    this.isProcessing = true;
-  }
 
-  getNumberFrames(): number {
-    return this.fps * this.duration;
-  }
-  public getChroma() {
-    return {
-      isChromakeyEnabled: this.isChroma,
-      chromakeyColor: {
-        red: this.chromaRed,
-        green: this.chromaGreen,
-        blue: this.chromaBlue,
-      },
-    };
-  }
-  public setChroma(isChroma: boolean) {
-    this.isChroma = isChroma;
-
-    if (this.isChroma === false) {
-      this.kNode?.image(this.videoComponent);
-    } else {
-      this.kNode?.image(this.videoCanvas);
-      if (this.videoComponent.paused || this.videoComponent.ended) {
-        this.chromaKeyRender(0, false, false, true);
-      } else {
-        this.chromaKeyRender(0);
-      }
-    }
-  }
-
-  public setChromaColor(red: number, green: number, blue: number) {
-    this.chromaRed = red;
-    this.chromaGreen = green;
-    this.chromaBlue = blue;
-  }
+  public isSegmentationMode: boolean = false;
+  private segmentationSession: { session_id: string } | undefined = undefined;
 
   constructor({
     mediaLayerRef,
@@ -167,79 +122,18 @@ export class VideoNode extends NetworkedNode {
     this.finishedLoadingOnStart = new Promise<void>(() => {});
 
     this.blockSeeking = false;
-
     this.isChroma = false;
-    this.videoComponent.onloadstart = (event: Event) => {
-      loadingBar.show();
-      loadingBar.updateProgress(0);
-    };
 
-    this.videoComponent.onloadedmetadata = (event: Event) => {
-      loadingBar.updateProgress(25);
-      console.log("Loaded Metadata");
-      if (!this.kNode) {
-        console.log("KNode Not Initialized Video Component");
-        return;
-      }
-      this.mediaFileSize = {
-        width: this.videoComponent.videoWidth,
-        height: this.videoComponent.videoHeight,
-      };
-      if (!existingTransform) {
-        const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
-          componentSize: {
-            width: this.videoComponent.videoWidth,
-            height: this.videoComponent.videoHeight,
-          },
-          maxSize: canvasSize,
-        });
-        const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
-          canvasOffset: canvasPosition,
-          componentSize: adjustedSize,
-          maxSize: canvasSize,
-        });
-        this.kNode.setSize(adjustedSize);
-        this.kNode.setPosition(centerPosition);
-      }
-
-      this.kNode.image(this.videoComponent);
-      this.videoComponent.currentTime = 0; // ensure it shows up on screen
-      // it might have length here which we will need to trim down to 7 seconds.
-      console.log(`Video Duration: ${this.videoComponent.duration}`);
-      this.duration = this.videoComponent.duration;
-      this.kNode.fill(transparent);
-      loadingBar.updateProgress(50);
-    };
-
-    this.videoComponent.onerror = (
-      event: Event | string,
-      source?: string,
-      lineno?: number,
-      colno?: number,
-      error?: Error,
-    ) => {
-      loadingBar.hide();
-      loadingBar.updateProgress(0);
-      console.error("Error loading video:", event);
-    };
-
-    this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
-      this.videoComponent.oncanplaythrough = (event: Event) => {
-        this.didFinishLoading = true;
-        // Might have to auto click? on first load this doesn't work in general how about after ?
-        loadingBar.updateProgress(100);
-        loadingBar.hide();
-
-        this.setChroma(this.isChroma);
-        resolve();
-      };
+    this.loadVideoFromUrl({
+      mediaFileUrl: this.videoURL,
+      existingTransform,
+      canvasPosition,
+      canvasSize,
     });
 
-    // assign video to start process.
-    this.videoComponent.src = this.videoURL;
-
     this.listenToBaseKNode();
-    // only for video
+
+    // TODO: for controling video playpause, can be improved with bette ui
     this.kNode.on("click", () => {
       console.log("click");
       // Shouldn't play if anything things are true
@@ -249,12 +143,10 @@ export class VideoNode extends NetworkedNode {
       if (this.isProcessing == true) {
         return;
       }
-
       if (this.isSegmentationMode) {
-        console.log("Not Playing because Segmenting");
+        // console.log("Not Playing because Segmenting");
         return;
       }
-
       if (this.videoComponent.paused) {
         console.log("Playing");
         this.videoComponent.play();
@@ -266,9 +158,122 @@ export class VideoNode extends NetworkedNode {
     });
 
     this.createChromaWorker();
+  }
+  private async loadVideoFromUrl({
+    mediaFileUrl,
+    existingTransform,
+    canvasSize,
+    canvasPosition,
+  }: {
+    mediaFileUrl: string;
+    existingTransform?: TransformationData;
+    canvasSize?: Size;
+    canvasPosition?: Position;
+  }) {
+    if (!this._isVideoEventListening) {
+      this.videoComponent.onloadstart = () => {
+        this.setProgress(25, UploadStatus.LOADING);
+      };
+      this.videoComponent.onloadedmetadata = () => {
+        this.setProgress(50, UploadStatus.LOADING);
+        console.log("Loaded Metadata");
+        this.mediaFileSize = {
+          width: this.videoComponent.videoWidth,
+          height: this.videoComponent.videoHeight,
+        };
+        if (!existingTransform && canvasSize && canvasPosition) {
+          const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
+            componentSize: {
+              width: this.videoComponent.videoWidth,
+              height: this.videoComponent.videoHeight,
+            },
+            maxSize: canvasSize,
+          });
+          const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
+            canvasOffset: canvasPosition,
+            componentSize: adjustedSize,
+            maxSize: canvasSize,
+          });
+          this.kNode.setSize(adjustedSize);
+          this.kNode.setPosition(centerPosition);
+        }
 
-    // Testing code for segmentation
-    //this.videoSegmentationMode(true);
+        this.kNode.image(this.videoComponent);
+        this.videoComponent.currentTime = 0; // ensure it shows up on screen
+        // it might have length here which we will need to trim down to 7 seconds.
+        console.log(`Video Duration: ${this.videoComponent.duration}`);
+        this.duration = this.videoComponent.duration;
+        this.kNode.fill(transparent);
+        this.setProgress(75, UploadStatus.LOADING);
+      };
+
+      this.videoComponent.onerror = () =>
+        // event: Event | string,
+        // source?: string,
+        // lineno?: number,
+        // colno?: number,
+        // error?: Error,
+        {
+          this.setProgress(0, UploadStatus.ERROR_ON_LOAD);
+        };
+    }
+    //can play through
+    this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
+      this.videoComponent.oncanplaythrough = () => {
+        this.didFinishLoading = true;
+        this.setProgress(100, UploadStatus.SUCCESS);
+        this.setChroma(this.isChroma);
+        resolve();
+      };
+    });
+    this.videoComponent.src = mediaFileUrl;
+    try {
+      await this.finishedLoadingOnStart;
+      console.log("Finished Loading, Can play through");
+    } catch (err) {
+      //nothing
+    }
+  }
+
+  async setProcessing() {
+    this.isProcessing = true;
+  }
+  async reset() {
+    this.videoComponent.pause();
+    await this.seek(0);
+  }
+  getNumberFrames(): number {
+    return this.fps * this.duration;
+  }
+  public getChroma() {
+    return {
+      isChromakeyEnabled: this.isChroma,
+      chromakeyColor: {
+        red: this.chromaRed,
+        green: this.chromaGreen,
+        blue: this.chromaBlue,
+      },
+    };
+  }
+  public setChroma(isChroma: boolean) {
+    this.isChroma = isChroma;
+
+    if (this.isChroma === false) {
+      this.kNode?.image(this.videoComponent);
+    } else {
+      this.kNode?.image(this.videoCanvas);
+      if (this.videoComponent.paused || this.videoComponent.ended) {
+        this.chromaKeyRender(0, false, false, true);
+      } else {
+        this.chromaKeyRender(0);
+      }
+    }
+  }
+
+  public setChromaColor(red: number, green: number, blue: number) {
+    this.chromaRed = red;
+    this.chromaGreen = green;
+    this.chromaBlue = blue;
   }
 
   createChromaWorker() {
@@ -276,11 +281,6 @@ export class VideoNode extends NetworkedNode {
       name: "ChromaWorker-" + uuidv4(),
     });
     this.chromaWorker.port.start();
-  }
-
-  async reset() {
-    this.videoComponent.pause();
-    await this.seek(0);
   }
 
   async chromaKeyRender(
@@ -368,120 +368,6 @@ export class VideoNode extends NetworkedNode {
     });
   }
 
-  async updateImage(newImageSrc: string) {
-    const newImage = new Image();
-    newImage.src = newImageSrc;
-    newImage.onload = () => {
-      if (!this.kNode) {
-        console.log("selectedNode KNode is initialized");
-        return;
-      }
-      this.kNode.image(newImage);
-      this.kNode.draw();
-    };
-  }
-
-  public async createVideoElement(newURL: string) {
-    // try catch here with a retry button.
-    if (!this.kNode) {
-      console.log("selectedNode KNode is not initialized");
-      return;
-    }
-    this.kNode.fill("grey"); // todo fix with loader
-    const videoComponent = document.createElement("video");
-    videoComponent.crossOrigin = "anonymous";
-
-    // Update to use image.
-    videoComponent.src = newURL;
-    console.log("Video Data");
-    console.log(newURL);
-
-    videoComponent.onloadstart = (event: Event) => {
-      this.didFinishLoading = false;
-      loadingBar.show();
-      loadingBar.updateProgress(0);
-      console.log("OnLoadStart");
-    };
-
-    videoComponent.onerror = (
-      event: Event | string,
-      source?: string,
-      lineno?: number,
-      colno?: number,
-      error?: Error,
-    ) => {
-      loadingBar.hide();
-      loadingBar.updateProgress(0);
-      console.error("Error loading video:", event);
-    };
-
-    this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
-      videoComponent.oncanplaythrough = (event: Event) => {
-        this.didFinishLoading = true;
-        // Might have to auto click? on first load this doesn't work in general how about after ?
-        loadingBar.updateProgress(100);
-        loadingBar.hide();
-
-        this.setChroma(this.isChroma);
-
-        resolve();
-      };
-    });
-
-    videoComponent.onloadedmetadata = (event: Event) => {
-      console.log("Loaded Metadata");
-      loadingBar.updateProgress(25);
-      if (!this.kNode) {
-        console.log("selectedNode KNode is not initialized");
-        return;
-      }
-      this.kNode.width(videoComponent.videoWidth);
-      this.kNode.height(videoComponent.videoHeight);
-      this.kNode.image(videoComponent);
-      // it might have length here which we will need to trim down to 7 seconds.
-      console.log(`Video Duration: ${videoComponent.duration}`);
-      videoComponent.currentTime = 0; // ensure it shows up on screen
-      this.duration = videoComponent.duration;
-      this.videoComponent = videoComponent;
-      // make this transparent.
-      this.kNode.fill(transparent);
-    };
-  }
-
-  async simulatedLoading() {
-    // need to block playing while loading
-    this.didFinishLoading = false;
-
-    console.log(this.imageIndex);
-
-    if (this.imageIndex == 0) {
-      loadingBar.show();
-    }
-
-    await this.updateImage(this.imageSources[this.imageIndex]);
-    this.imageIndex = this.imageIndex + 1;
-
-    // this.updateLoadingBarPosition();
-
-    loadingBar.updateMessage("Generating");
-
-    if (this.imageIndex == this.imageSources.length - 1) {
-      // show final video
-      console.log("Final Video Element");
-      await this.createVideoElement(
-        this.imageSources[this.imageSources.length - 1],
-      );
-      console.log("Done Video Element");
-    }
-
-    if (this.imageIndex < this.imageSources.length - 1) {
-      loadingBar.updateProgress(
-        (this.imageIndex / this.imageSources.length) * 100,
-      );
-      setTimeout(this.simulatedLoading.bind(this), 500); // Update every second
-    }
-  }
-
   // use sub milisecond for frames.
   async seek(second: number) {
     // prevent interaction
@@ -515,8 +401,6 @@ export class VideoNode extends NetworkedNode {
     }
   }
 
-  public isSegmentationMode: boolean = false;
-
   public videoSegmentationMode(on: boolean) {
     if (on) {
       this.removeListenToBaseKNode();
@@ -529,29 +413,30 @@ export class VideoNode extends NetworkedNode {
     }
   }
 
-  private segmentationSession: { session_id: string } | undefined = undefined;
-
   public async startSegmentation() {
     if (this.segmentationSession === undefined) {
       this.didFinishLoading = false;
+      this.videoComponent.pause();
+      this.videoComponent.currentTime = 0;
       this.selectionManagerRef.updateContextComponents(this);
       this.selectionManagerRef.showContextComponents(this);
-      loadingBar.show({ progress: 0, message: "Loading Video Extractor..." });
-      console.log("loadingbar should show");
-      await this.seek(0);
       loadingBar.update({
         progress: 25,
         message: "Loading Video Extractor...",
       });
+
+      console.log("loadingbar should show");
+
       const blob = await NodeUtilities.urlToBlob(this.videoURL);
+      loadingBar.update({
+        progress: 75,
+        message: "Loading Video Extractor...",
+      });
       this.segmentationSession =
         await this.videoSegmentationAPI.createSession(blob);
       console.log("Sessions", this.segmentationSession);
-      loadingBar.update({
-        progress: 100,
-        message: "Start Adding Mask Points To the Video",
-      });
-      this.didFinishLoading = true;
+
+      // this.didFinishLoading = true;
     }
   }
 
@@ -732,11 +617,11 @@ export class VideoNode extends NetworkedNode {
 
       // set chroma automatically.
       this.isChroma = true;
-      await this.createVideoElement(videoUrl);
+      await this.loadVideoFromUrl({ mediaFileUrl: videoUrl });
 
-      loadingBar.updateProgress(100);
+      // loadingBar.updateProgress(100);
 
-      loadingBar.hide();
+      // loadingBar.hide();
       this.disableAllExceptSegmentation();
 
       this.isStillProcessingSegmentationEvent = false;
@@ -792,4 +677,65 @@ export class VideoNode extends NetworkedNode {
     }
     return data;
   }
+
+  // BACKUPS
+
+  // 1. DUMMY VIDEO with IMAGES
+  // private imageIndex: number = 0;
+  // private imageSources: string[] = [
+  //   "https://images-ng.pixai.art/images/orig/7ef23baa-2fc8-4e2f-8299-4f9241920090",
+  //   "https://images-ng.pixai.art/images/orig/98196e9f-b968-4fe1-97ec-083ffd77c263",
+  //   "https://images-ng.pixai.art/images/orig/a05a49dd-6764-4bfe-902f-1dfad67e49c9",
+  //   "https://images-ng.pixai.art/images/orig/a449179c-c549-4627-8806-49dc5a30c429",
+  //   "https://images-ng.pixai.art/images/orig/809eafc6-79c8-4c7a-89cd-bfc7ab39f142",
+  //   "https://images-ng.pixai.art/images/orig/5f004e09-e3ac-4461-b2b1-0d70f2255c34",
+  //   "https://images-ng.pixai.art/images/orig/56dcbb5f-7a31-4328-b4ea-1312df6e77a0",
+  //   "https://videos.pixai.art/f7df019d-79a2-4ed2-bb99-775c941f7ec6",
+  // ];
+
+  // async updateImage(newImageSrc: string) {
+  //   const newImage = new Image();
+  //   newImage.src = newImageSrc;
+  //   newImage.onload = () => {
+  //     if (!this.kNode) {
+  //       console.log("selectedNode KNode is initialized");
+  //       return;
+  //     }
+  //     this.kNode.image(newImage);
+  //     this.kNode.draw();
+  //   };
+  // }
+  // async simulatedLoading() {
+  //   // need to block playing while loading
+  //   this.didFinishLoading = false;
+
+  //   console.log(this.imageIndex);
+
+  //   if (this.imageIndex == 0) {
+  //     loadingBar.show();
+  //   }
+
+  //   await this.updateImage(this.imageSources[this.imageIndex]);
+  //   this.imageIndex = this.imageIndex + 1;
+
+  //   // this.updateLoadingBarPosition();
+
+  //   loadingBar.updateMessage("Generating");
+
+  //   if (this.imageIndex == this.imageSources.length - 1) {
+  //     // show final video
+  //     console.log("Final Video Element");
+  //     await this.createVideoElement(
+  //       this.imageSources[this.imageSources.length - 1],
+  //     );
+  //     console.log("Done Video Element");
+  //   }
+
+  //   if (this.imageIndex < this.imageSources.length - 1) {
+  //     loadingBar.updateProgress(
+  //       (this.imageIndex / this.imageSources.length) * 100,
+  //     );
+  //     setTimeout(this.simulatedLoading.bind(this), 500); // Update every second
+  //   }
+  // }
 }

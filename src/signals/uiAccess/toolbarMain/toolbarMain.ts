@@ -14,6 +14,18 @@ const toolbarMainSignal = signal<ToolbarMainSignalInterface>({
 
 export const toolbarMain = {
   signal: toolbarMainSignal,
+  enable() {
+    toolbarMainSignal.value = {
+      ...toolbarMainSignal.value,
+      disabled: false,
+    };
+  },
+  disable() {
+    toolbarMainSignal.value = {
+      ...toolbarMainSignal.value,
+      disabled: true,
+    };
+  },
 
   changeButtonState(
     buttonName: ToolbarMainButtonNames,

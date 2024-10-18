@@ -3,7 +3,7 @@ import {
   faArrowUpFromLine,
   faArrowDownFromLine,
   // faHatWitch,
-  faMask,
+  faScalpelLineDashed,
   faTransporter,
   faTrashCan,
   faVectorSquare,
@@ -27,7 +27,7 @@ export const ToolbarNodeButtonData = [
   // },
   {
     name: ButtonNames.SEGMENTATION,
-    icon: faMask,
+    icon: faScalpelLineDashed,
     tooltip: "Select an Extraction",
   },
   {
