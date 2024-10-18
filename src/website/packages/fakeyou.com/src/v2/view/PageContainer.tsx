@@ -443,7 +443,7 @@ const routes = [
   },
   {
     path: "/f5-tts",
-    component: lazy(() => import("./pages/voice_designer_v2/VoiceDesignerV2")),
+    component: lazy(() => import("./pages/f5_tts/F5TTS")),
   },
   {
     path: "/style-video/:mediaToken?",

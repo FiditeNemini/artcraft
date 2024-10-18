@@ -207,6 +207,10 @@ export default function AITools() {
     items = [items[0], items[1], items[2], items[3], items[4], items[5]];
   }
 
+  if (currentPath.includes("/f5-tts")) {
+    items = [items[0], items[1], items[2], items[3], items[4], items[5]];
+  }
+
   if (currentPath.includes("/style-video")) {
     items = [items[1], items[2], items[8]];
   }

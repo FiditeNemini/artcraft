@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import "./VoiceDesignerV2.scss";
+import "./F5TTS.scss";
 import { Button, Container, Panel } from "components/common";
 import {
   faArrowRight,
@@ -80,7 +80,7 @@ export default function VoiceDesignerV2(): JSX.Element {
         >
           <Panel padding={true}>
             <div className="countdown-container">
-              <FontAwesomeIcon icon={faMicrophoneAlt} className="icon" />
+              <FontAwesomeIcon icon={faMicrophoneAlt} className="icon mb-3" />
               <h1 className="fw-bold mb-1">F5-TTS Voice Cloning</h1>
               <p className="description">
                 New zero-shot voice cloning coming soon...

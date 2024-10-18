@@ -20,6 +20,7 @@ export enum FrontendInferenceJobType {
   VideoWorkflow, // workflow ?
   VideoStyleTransfer, // video_filter
   LivePortrait, // live_portrait
+  F5Tts, // f5_tts
 }
 
 export enum AllInferenceJobs {

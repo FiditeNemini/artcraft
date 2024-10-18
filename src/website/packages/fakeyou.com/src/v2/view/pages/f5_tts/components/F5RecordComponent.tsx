@@ -10,7 +10,7 @@ import {
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
 import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useLocalize, useVcStore } from "hooks";
+import { useLocalize, useF5Store } from "hooks";
 import { Button } from "components/common";
 
 interface Props {
@@ -33,7 +33,7 @@ export default function VCRecordComponent(props: Props) {
     setRecordingBlobStore,
     isUploadDisabled,
     setIsUploadDisabled,
-  } = useVcStore();
+  } = useF5Store();
 
   useEffect(() => {
     if (!recordingBlob) {

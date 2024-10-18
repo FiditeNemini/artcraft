@@ -134,12 +134,10 @@ function FooterNav() {
     return null;
   }
 
-  const isOnF5TtsPage = location.pathname === "/f5-tts";
-
   return (
     <>
       {!isOnStudioPage && (
-        <footer id="footer" className={isOnF5TtsPage ? "mt-0" : ""}>
+        <footer id="footer">
           <Container type="panel" className="py-5">
             <div className="row g-5 m-0">
               <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start pb-2">

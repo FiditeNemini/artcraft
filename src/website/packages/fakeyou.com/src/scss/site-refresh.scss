@@ -1450,6 +1450,14 @@ styles with important tags:
           height: 100px;
         }
       }
+
+      &.empty-zone-f5 {
+        height: 120px;
+
+        @media (max-width: 768px) {
+          height: 100px;
+        }
+      }
     }
 
     .upload-zone-drag {
@@ -1887,6 +1895,10 @@ textarea {
 
     .session-vc-section {
       height: 511px;
+    }
+
+    .session-f5-section {
+      height: 637px;
     }
 
     .session-tts-section::-webkit-scrollbar {

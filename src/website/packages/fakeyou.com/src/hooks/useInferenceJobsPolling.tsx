@@ -42,6 +42,8 @@ const JobCategoryToType = (jobCategory: string) => {
       return FrontendInferenceJobType.EngineComposition;
     case "live_portrait":
       return FrontendInferenceJobType.LivePortrait;
+    case "f5_tts":
+      return FrontendInferenceJobType.F5Tts;
     default:
       return FrontendInferenceJobType.Unknown;
   }
