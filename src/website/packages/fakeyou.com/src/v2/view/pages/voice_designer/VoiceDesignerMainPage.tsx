@@ -294,7 +294,7 @@ export default function VoiceDesignerMainPage() {
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3 mt-5">Try other AI video tools</h2>
+          <h2 className="fw-bold mb-3 mt-5">Try other AI tools</h2>
           <AITools />
         </Panel>
       </Container>
