@@ -208,15 +208,15 @@ export default function AITools() {
   }
 
   if (currentPath.includes("/style-video")) {
-    items = [items[1], items[2], items[10]];
+    items = [items[1], items[2], items[8]];
   }
 
   if (currentPath.includes("/face-animator")) {
-    items = [items[0], items[1], items[10]];
+    items = [items[0], items[1], items[8]];
   }
 
   if (currentPath.includes("/webcam-acting")) {
-    items = [items[0], items[1], items[10]];
+    items = [items[0], items[1], items[8]];
   }
 
   if (
@@ -225,7 +225,7 @@ export default function AITools() {
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp")
   ) {
-    items = [items[0], items[2], items[10]];
+    items = [items[0], items[2], items[8]];
   }
 
   return <AIToolsRow {...{ items }} />;

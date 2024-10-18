@@ -22,8 +22,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import "./VoiceDesigner.scss";
-import MentionsSection from "components/common/MentionsSection";
-import StorytellerStudioCTA from "components/common/StorytellerStudioCTA";
+import { AITools } from "components/marketing";
 
 export default function VoiceDesignerMainPage() {
   usePrefixedDocumentTitle("AI Voice Designer");
@@ -293,9 +292,11 @@ export default function VoiceDesignerMainPage() {
         />
       </Container>
 
-      <Container type="panel" className="py-5 mt-5 d-flex flex-column gap-5">
-        <MentionsSection />
-        <StorytellerStudioCTA />
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3 mt-5">Try other AI video tools</h2>
+          <AITools />
+        </Panel>
       </Container>
     </>
   );
