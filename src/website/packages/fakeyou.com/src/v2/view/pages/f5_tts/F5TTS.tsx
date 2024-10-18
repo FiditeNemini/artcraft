@@ -1,7 +1,9 @@
 import {
   faArrowDownToLine,
+  faDeleteLeft,
   faFlask,
   faMicrophoneAlt,
+  faSparkles,
   faTextSize,
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -168,9 +170,17 @@ export default function F5TTS() {
                     />
                   </div>
 
-                  <div className="d-flex justify-content-end">
+                  <div className="d-flex gap-2 justify-content-end">
                     <Button
-                      icon={faWaveformLines}
+                      icon={faDeleteLeft}
+                      variant="secondary"
+                      label="Clear Text"
+                      onClick={() => setText("")}
+                      type="button"
+                      disabled={!text}
+                    />
+                    <Button
+                      icon={faSparkles}
                       label="Generate Speech"
                       type="submit"
                       isLoading={isGenerating}
