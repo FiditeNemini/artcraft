@@ -33,7 +33,7 @@ import { AITools } from "components/marketing";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { AppStateContext } from "components/providers/AppStateProvider";
-import { Helmet } from "react-helmet-async";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export default function F5TTS() {
   const { sessionWrapper } = useContext(AppStateContext);
@@ -53,6 +53,8 @@ export default function F5TTS() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isRecordingAudio, setIsRecordingAudio] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  usePrefixedDocumentTitle("F5-TTS Zero-Shot Voice Cloning");
 
   const textChange = ({ target }: { target: any }) => {
     setText(target.value);
@@ -96,24 +98,6 @@ export default function F5TTS() {
 
   return (
     <>
-      <Helmet prioritizeSeoTags={true}>
-        <title>F5-TTS: AI Voice Cloning & Text-to-Speech Tool</title>
-        <meta
-          property="og:title"
-          content="F5-TTS: AI Voice Cloning & Text-to-Speech Tool"
-        />
-        <meta
-          property="og:description"
-          content="What is F5-TTS?
-F5-TTS is an AI-driven text-to-speech tool that transforms written text into lifelike speech. With real-time processing, it’s great for generating dynamic audio content, whether it's for voice-overs, digital storytelling, or any other project that requires high-quality spoken output."
-        />
-
-        <meta
-          name="description"
-          content="What is F5-TTS?
-F5-TTS is an AI-driven text-to-speech tool that transforms written text into lifelike speech. With real-time processing, it’s great for generating dynamic audio content, whether it's for voice-overs, digital storytelling, or any other project that requires high-quality spoken output."
-        />
-      </Helmet>
       <Container type="panel" className="mt-3 mt-lg-5">
         <Panel padding={true} className="p-lg-5">
           <form onSubmit={handleConvert}>

@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 // import * as serviceWorker from "./serviceWorker";
 // import AppTranslated from "./AppTranslated";
 import { App } from "./App";
-import { HelmetProvider } from "react-helmet-async";
 
 const designSystemClass = "fakeyou-refresh";
 
@@ -25,9 +24,7 @@ document.getElementsByTagName("html")[0].classList.add(designSystemClass);
 
 ReactDOM.render(
   <React.StrictMode>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
+    <App />
   </React.StrictMode>,
   document.getElementById("root")
 );
