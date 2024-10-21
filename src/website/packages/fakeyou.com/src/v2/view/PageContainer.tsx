@@ -446,6 +446,10 @@ const routes = [
     component: lazy(() => import("./pages/f5_tts/F5TTS")),
   },
   {
+    path: "/seed-vc",
+    component: lazy(() => import("./pages/seed_vc/SeedVC")),
+  },
+  {
     path: "/style-video/:mediaToken?",
     component: lazy(() => import("./pages/style-video")),
   },

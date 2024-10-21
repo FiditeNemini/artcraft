@@ -107,13 +107,17 @@ export function AIToolsItem({
               <h4 className="fw-bold text-white d-inline-flex align-items-center mb-0">
                 <span>{title}</span>
               </h4>
-              <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+              {text && (
+                <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+              )}
             </div>
           )}
           {!badgeContent && (
             <>
               <h3 className="fw-bold text-white mb-1">{title}</h3>
-              <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+              {text && (
+                <h6 className="fw-normal opacity-75 text-white">{text}</h6>
+              )}
             </>
           )}
         </div>

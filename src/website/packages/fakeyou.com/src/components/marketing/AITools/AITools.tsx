@@ -13,7 +13,7 @@ export default function AITools() {
     to?: string;
     externalLink?: string;
     title: string;
-    text: string;
+    text?: string;
     imgSrc?: string;
     imgAlt: string;
     videoSrc?: string;
@@ -108,6 +108,13 @@ export default function AITools() {
       imgAlt: "Voice Cloning",
     },
     {
+      to: "/seed-vc",
+      title: "Seed-VC Voice Conversion",
+      text: "Zero-shot voice conversion",
+      imgSrc: "/images/landing/select-seed-vc.webp",
+      imgAlt: "Zero-shot Voice Conversion",
+    },
+    {
       to: "/voice-designer",
       title: t("productVdTitle"),
       text: t("productVdText"),
@@ -130,7 +137,8 @@ export default function AITools() {
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp") ||
     currentPath.includes("/beta/") ||
-    currentPath.includes("/face-animator")
+    currentPath.includes("/face-animator") ||
+    currentPath.includes("/webcam-acting")
   ) {
     items.push({
       externalLink: "https://discord.gg/fakeyou",
@@ -178,25 +186,14 @@ export default function AITools() {
   //   );
   // }
 
+  const discordItem = items.find(item => item.imgAlt === "Discord Link");
+
   if (currentPath.includes("/tts")) {
     items = items.filter(item => item.to !== "/tts");
   }
 
   if (currentPath.includes("/voice-conversion")) {
     items = items.filter(item => item.to !== "/voice-conversion");
-  }
-
-  if (currentPath.includes("/beta/")) {
-    items = items.filter(
-      item =>
-        item.to !== "/tts" &&
-        item.to !== "/voice-conversion" &&
-        item.to !== "/voice-designer" &&
-        item.to !== "/face-animator" &&
-        item.to !== "/beta/2d-video-compositor" &&
-        item.to !== "/beta/3d-video-compositor" &&
-        item.to !== "/beta/webcam-acting"
-    );
   }
 
   if (currentPath.includes("/tts")) {
@@ -212,15 +209,15 @@ export default function AITools() {
   }
 
   if (currentPath.includes("/style-video")) {
-    items = [items[1], items[2], items[8]];
+    items = [items[1], items[2], discordItem].filter(Boolean) as Item[];
   }
 
   if (currentPath.includes("/face-animator")) {
-    items = [items[0], items[1], items[8]];
+    items = [items[0], items[1], discordItem].filter(Boolean) as Item[];
   }
 
   if (currentPath.includes("/webcam-acting")) {
-    items = [items[0], items[1], items[8]];
+    items = [items[0], items[1], discordItem].filter(Boolean) as Item[];
   }
 
   if (
@@ -229,7 +226,7 @@ export default function AITools() {
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp")
   ) {
-    items = [items[0], items[2], items[8]];
+    items = [items[0], items[2], discordItem].filter(Boolean) as Item[];
   }
 
   return <AIToolsRow {...{ items }} />;
