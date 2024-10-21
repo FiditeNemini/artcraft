@@ -129,13 +129,7 @@ export default function CreatorToolsPage() {
       imgSrc: "/images/landing/select-v2v.webp",
       imgAlt: "Voice Conversion",
     },
-    {
-      to: "/f5-tts",
-      title: "F5-TTS Voice Cloning",
-      text: "Zero-shot voice cloning",
-      imgSrc: "/images/landing/select-f5-tts.webp",
-      imgAlt: "Voice Cloning",
-    },
+
     {
       to: "/voice-designer",
       title: t("productVdTitle"),
@@ -147,6 +141,20 @@ export default function CreatorToolsPage() {
         icon: faFlask,
         label: "BETA",
       },
+    },
+    {
+      to: "/f5-tts",
+      title: "F5-TTS Voice Cloning",
+      text: "Zero-shot voice cloning",
+      imgSrc: "/images/landing/select-f5-tts.webp",
+      imgAlt: "Voice Cloning",
+    },
+    {
+      to: "/seed-vc",
+      title: "Seed-VC Voice Conversion",
+      text: "Zero-shot voice conversion",
+      imgSrc: "/images/landing/select-seed-vc.webp",
+      imgAlt: "Zero-shot Voice Conversion",
     },
   ];
 
