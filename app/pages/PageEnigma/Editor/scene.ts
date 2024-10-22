@@ -10,6 +10,9 @@ import { LoadingPlaceHolderManager } from "./placeholder_manager";
 import { MMDAnimationHelper, Water } from "three/examples/jsm/Addons.js";
 import { MediaFileType } from "../enums";
 import { ChromaKeyMaterial } from "./chromakey";
+import { TimeLine } from "./timeline";
+import { ClipGroup, ClipType } from "~/enums";
+import { ClipUI } from "../datastructures/clips/clip_ui";
 
 class Scene {
   name: string;
@@ -36,6 +39,8 @@ class Scene {
   updateSurfaceIdAttributeToMesh: Function;
   helper: MMDAnimationHelper;
   ambientLight: THREE.AmbientLight | undefined;
+  timeline: TimeLine | undefined;
+  version: number;
 
   // This is used to ensure we do not rerender or process the video if we already have done so.
   // This allows us to reprompt things quickly. This is only written when a snap shot is taken.
@@ -45,7 +50,9 @@ class Scene {
     name: string,
     camera_name: string,
     updateSurfaceIdAttributeToMesh: Function,
+    version: number,
   ) {
+    this.version = version;
     this.name = name;
     this.gridHelper;
     this.scene = new THREE.Scene();
@@ -647,6 +654,29 @@ class Scene {
 
     if (auto_add) {
       this.scene.add(child_result);
+      if (glb.animations.length > 0) {
+        console.log(glb.animations);
+        const animation = glb.animations[0];
+        child_result.animations = glb.animations;
+        // load first animation
+        this.timeline?.addSelfAnimationClip(
+          new ClipUI(
+            this.version,
+            ClipType.ANIMATION,
+            ClipGroup.CHARACTER,
+            animation.name,
+            "SelfClip",
+            animation.uuid,
+            child_result.uuid,
+            name,
+            0,
+            100,
+            0,
+            MediaFileType.GLB,
+          ),
+          animation,
+        );
+      }
     }
     this.updateSurfaceIdAttributeToMesh(this.scene);
     return child_result;
@@ -739,8 +769,7 @@ class Scene {
         "/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png",
       ]);
       this.scene.background = texture;
-      if(this.ambientLight)
-        this.scene.remove(this.ambientLight);
+      if (this.ambientLight) this.scene.remove(this.ambientLight);
     } else if (this.skybox == "m_1") {
       const texture = loader.load([
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
@@ -751,13 +780,10 @@ class Scene {
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_1_Back-Z.png",
       ]);
       this.scene.background = texture;
-      if(this.ambientLight)
-        this.scene.remove(this.ambientLight);
+      if (this.ambientLight) this.scene.remove(this.ambientLight);
     } else if (this.skybox == "m_2") {
       this.scene.background = new THREE.Color("#000000");
-      if(this.ambientLight)
-      this.scene.add(this.ambientLight);
-
+      if (this.ambientLight) this.scene.add(this.ambientLight);
     } else {
       const texture = loader.load([
         "/resources/skybox/day/px.png",
@@ -768,8 +794,7 @@ class Scene {
         "/resources/skybox/day/nz.png",
       ]);
       this.scene.background = texture;
-      if(this.ambientLight)
-        this.scene.remove(this.ambientLight);
+      if (this.ambientLight) this.scene.remove(this.ambientLight);
     }
 
     console.log("Backround creation..");
@@ -795,7 +820,7 @@ class Scene {
     const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
     this.scene.add(light);
 
-    this.ambientLight = new THREE.AmbientLight(new THREE.Color("#ffffff"), 3)
+    this.ambientLight = new THREE.AmbientLight(new THREE.Color("#ffffff"), 3);
 
     const directional_light = new THREE.DirectionalLight(color, 2.0);
 

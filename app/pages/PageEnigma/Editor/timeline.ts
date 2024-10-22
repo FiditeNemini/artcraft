@@ -549,6 +549,44 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
+  public async addSelfAnimationClip(data: ClipUI, animation_clip: THREE.AnimationClip) {
+    const object_uuid = data.object_uuid;
+    const media_id = data.media_id;
+    const name = data.name;
+    const group = data.group;
+    const version = 1;
+    const type = data.type;
+    const offset = data.offset;
+    const end_offset = data.length + offset;
+    const object_name =
+      this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
+    const clip_uuid = data.clip_uuid;
+
+    this.animation_engine.load_object(object_uuid, media_id, name);
+    this.animation_engine.clips[object_uuid + media_id].animation_clip = animation_clip;
+    
+    // media id for this as well it can be downloaded
+    this.addPlayableClip(
+      new ClipUI(
+        version,
+        type,
+        group,
+        name,
+        media_id,
+        clip_uuid,
+        object_uuid,
+        object_name,
+        offset,
+        end_offset, // length
+        0,
+        this.scene.get_object_by_uuid(object_uuid)?.userData["media_file_type"],
+      ),
+    );
+
+    this.checkEditorCanPlay();
+    this.updateUI();
+  }
+
   public async deleteKeyFrame(data: Keyframe) {
     const keyframe_uuid = data.keyframe_uuid;
     const object_uuid = data.object_uuid;

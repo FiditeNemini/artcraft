@@ -129,7 +129,14 @@ export class AnimationClip {
 
   async _get_clip() {
     if (this.animation_clip == null && this.mixer !== null) {
-      this.animation_clip = await this._load_animation();
+      console.log(this.media_id)
+      if(this.media_id === "SelfClip") {
+        const rootObject = this.mixer?.getRoot();
+        if(rootObject)
+          this.animation_clip = (rootObject as THREE.Object3D<THREE.Object3DEventMap>).animations[0];
+      } else {
+        this.animation_clip = await this._load_animation();
+      }
     }
     return this.animation_clip;
   }

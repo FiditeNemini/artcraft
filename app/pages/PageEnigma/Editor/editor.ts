@@ -221,6 +221,7 @@ class Editor {
       "" + this.version,
       this.camera_name,
       this.updateSurfaceIdAttributeToMesh.bind(this),
+      this.version
     );
     this.activeScene.initialize();
     this.generating_preview = false;
@@ -272,6 +273,8 @@ class Editor {
       this.mouse,
       this.camera_name,
     );
+
+    this.activeScene.timeline = this.timeline;
 
     this.utils = new Utils(this, this.activeScene);
     this.videoGeneration = new VideoGeneration(this);
