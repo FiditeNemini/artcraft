@@ -88,24 +88,7 @@ export default function CreatorToolsPage() {
       imgAlt: "Lipsync",
     },
     {
-      to: "/beta/2d-video-compositor",
-      title: "2D Video Compositor",
-      text: "Compose videos and images with AI",
-      videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
-      videoPosterSrc: "/images/ai-tools/2d_vid_com",
-      imgAlt: "Video Compositor",
-      videoPosition: "top",
-    },
-    {
-      to: "/beta/3d-video-compositor",
-      title: "3D Video Compositor",
-      text: "Build videos with AI 3D engine",
-      videoSrc: "/videos/ai-tools/vcomp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/3d_vid_com",
-      imgAlt: "Video Compositor",
-    },
-    {
-      to: "/beta/webcam-acting",
+      to: "/webcam-acting",
       title: "Webcam Acting",
       text: "Act as your character through your camera",
       videoSrc: "/videos/ai-tools/ca_video.mp4",
@@ -155,6 +138,20 @@ export default function CreatorToolsPage() {
       text: "Zero-shot voice conversion",
       imgSrc: "/images/landing/select-seed-vc.webp",
       imgAlt: "Zero-shot Voice Conversion",
+    },
+    {
+      to: "/hallo2",
+      title: "Hallo2 Portrait Animation",
+      text: "High-res, long-duration and audio-driven",
+      imgSrc: "/images/landing/select-hallo2.webp",
+      imgAlt: "High-resolution, long-duration and audio-driven",
+    },
+    {
+      to: "/cogvideo",
+      title: "CogVideo Generation",
+      text: "Text and image to video generation",
+      imgSrc: "/images/landing/select-cogvideo.webp",
+      imgAlt: "Text and image to video generation",
     },
   ];
 

@@ -450,6 +450,14 @@ const routes = [
     component: lazy(() => import("./pages/seed_vc/SeedVC")),
   },
   {
+    path: "/hallo2",
+    component: lazy(() => import("./pages/hallo2/Hallo2")),
+  },
+  {
+    path: "/cogvideo",
+    component: lazy(() => import("./pages/cogvideo/CogVideo")),
+  },
+  {
     path: "/style-video/:mediaToken?",
     component: lazy(() => import("./pages/style-video")),
   },

@@ -101,6 +101,18 @@ export default function AITools() {
       imgAlt: "Voice Conversion",
     },
     {
+      to: "/voice-designer",
+      title: t("productVdTitle"),
+      text: t("productVdText"),
+      imgSrc: "/images/landing/select-vd.webp",
+      imgAlt: "Voice Cloning",
+      badgeContent: {
+        type: "beta",
+        icon: faFlask,
+        label: "BETA",
+      },
+    },
+    {
       to: "/f5-tts",
       title: "F5-TTS Voice Cloning",
       text: "Zero-shot voice cloning",
@@ -115,16 +127,18 @@ export default function AITools() {
       imgAlt: "Zero-shot Voice Conversion",
     },
     {
-      to: "/voice-designer",
-      title: t("productVdTitle"),
-      text: t("productVdText"),
-      imgSrc: "/images/landing/select-vd.webp",
-      imgAlt: "Voice Cloning",
-      badgeContent: {
-        type: "beta",
-        icon: faFlask,
-        label: "BETA",
-      },
+      to: "/hallo2",
+      title: "Hallo2 Portrait Animation",
+      text: "High-res, long-duration and audio-driven",
+      imgSrc: "/images/landing/select-hallo2.webp",
+      imgAlt: "High-resolution, long-duration and audio-driven",
+    },
+    {
+      to: "/cogvideo",
+      title: "CogVideo Generation",
+      text: "Text and image to video generation",
+      imgSrc: "/images/landing/select-cogvideo.webp",
+      imgAlt: "Text and image to video generation",
     },
   ];
 
