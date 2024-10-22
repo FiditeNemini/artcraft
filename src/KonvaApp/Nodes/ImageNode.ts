@@ -5,7 +5,7 @@ import { SelectionManager } from "../NodesManagers";
 import { Position, Size, NodeData, TransformationData } from "../types";
 
 import { NetworkedNode, UploadStatus } from "./NetworkedNode";
-import { minNodeSize, NodeType, transparent } from "./constants";
+import { NodeType, transparent } from "./constants";
 import { NodeUtilities } from "./NodeUtilities";
 
 interface ImageNodeContructor {
@@ -82,6 +82,7 @@ export class ImageNode extends NetworkedNode {
     refPosition: Position;
   }) {
     const imageComponent = new Image();
+    imageComponent.crossOrigin = "anonymous";
     imageComponent.onload = () => {
       this.setProgress(0, UploadStatus.FILE_STAGED);
       this.imageSize = {
@@ -114,6 +115,7 @@ export class ImageNode extends NetworkedNode {
   private async loadImageFromUrl(mediaFileUrl: string) {
     this.setProgress(75, UploadStatus.LOADING);
     const newImage = new Image();
+    newImage.crossOrigin = "anonymous";
     newImage.onerror = () => {
       this.setProgress(90, UploadStatus.ERROR_ON_LOAD);
     };
@@ -158,7 +160,7 @@ export class ImageNode extends NetworkedNode {
       );
       return;
     }
-    this.mediaFileUrl = mediaFileResponse.data.public_bucket_url;
+    this.mediaFileUrl = mediaFileResponse.data.media_links.cdn_url;
     this.loadImageFromUrl(this.mediaFileUrl);
   }
 

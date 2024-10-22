@@ -28,6 +28,10 @@ export interface MediaFile {
   maybe_style_name: null | string;
   public_bucket_path: string;
   public_bucket_url: string;
+  media_links: {
+    cdn_url: string;
+    thumbnail_template: string;
+  };
   cover_image: {
     maybe_cover_image_public_bucket_path: null | string;
     default_cover: {

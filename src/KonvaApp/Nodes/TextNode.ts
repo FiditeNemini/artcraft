@@ -115,6 +115,7 @@ export class TextNode extends BaseNode {
 
     // Create a new Image object
     const imageComponent = new Image();
+    imageComponent.crossOrigin = "anonymous";
     imageComponent.onload = () => {
       if (existingTransform) {
         this.kNode.setAttrs({
