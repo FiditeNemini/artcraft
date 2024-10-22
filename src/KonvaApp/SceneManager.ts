@@ -2,7 +2,13 @@ import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 import { MediaFilesApi, MediaUploadApi } from "~/Classes/ApiManager";
 import { NodesManager, SelectionManager } from "./NodesManagers";
-import { NodeData, TextNodeData, TransformationData } from "./types";
+import {
+  ImageNodeData,
+  NodeData,
+  TextNodeData,
+  TransformationData,
+  VideoNodeData,
+} from "./types";
 import { uiAccess } from "~/signals";
 import { NavigateFunction } from "react-router-dom";
 import { NodeType } from "./Nodes/constants";
@@ -139,9 +145,12 @@ export class SceneManager {
   private extractAllNodesData() {
     const nodesData: NodeData[] = [];
     this.nodesManagerRef.getAllNodes().forEach((node) => {
-      nodesData.push(
-        node.getNodeData(this.renderEngineRef.captureCanvas.position()),
+      const nodeData = node.getNodeData(
+        this.renderEngineRef.captureCanvas.position(),
       );
+      if (nodeData !== null) {
+        nodesData.push(nodeData);
+      }
     });
     nodesData.sort((a, b) => a.transform.zIndex - b.transform.zIndex);
     return JSON.stringify(nodesData);
@@ -150,27 +159,25 @@ export class SceneManager {
   private rebuildScene(nodesData: NodeData[]) {
     console.log(nodesData);
     nodesData.forEach((nodeDatum) => {
-      if (nodeDatum.type === NodeType.IMAGE && nodeDatum.mediaFileUrl) {
-        this.addImage(nodeDatum.mediaFileUrl, nodeDatum.transform);
-      } else if (nodeDatum.type === NodeType.VIDEO && nodeDatum.mediaFileUrl) {
-        this.addVideo(nodeDatum.mediaFileUrl, nodeDatum.transform);
-      } else if (
-        nodeDatum.type === NodeType.TEXT &&
-        nodeDatum.textNodeData &&
-        nodeDatum.textChildrenTransforms
-      ) {
+      if (nodeDatum.type === NodeType.IMAGE && nodeDatum.imageNodeData) {
+        this.addImage(nodeDatum.imageNodeData, nodeDatum.transform);
+      } else if (nodeDatum.type === NodeType.VIDEO && nodeDatum.videoNodeData) {
+        this.addVideo(nodeDatum.videoNodeData, nodeDatum.transform);
+      } else if (nodeDatum.type === NodeType.TEXT && nodeDatum.textNodeData) {
         this.addText({
           textNodeData: nodeDatum.textNodeData,
-          textChildrenTransforms: nodeDatum.textChildrenTransforms,
           transform: nodeDatum.transform,
         });
       }
     });
   }
 
-  private addImage(mediaFileUrl: string, transform: TransformationData) {
+  private addImage(
+    imageNodeData: ImageNodeData,
+    transform: TransformationData,
+  ) {
     const imageNode = new ImageNode({
-      mediaFileUrl: mediaFileUrl,
+      mediaFileUrl: imageNodeData.mediaFileUrl,
       mediaLayerRef: this.mediaLayerRef,
       canvasPosition: this.renderEngineRef.captureCanvas.position(),
       canvasSize: this.renderEngineRef.captureCanvas.size(),
@@ -180,9 +187,15 @@ export class SceneManager {
     this.nodesManagerRef.saveNode(imageNode);
     this.renderEngineRef.addNodes(imageNode);
   }
-  private addVideo(mediaFileUrl: string, transform: TransformationData) {
+  private addVideo(
+    videoNodeData: VideoNodeData,
+    transform: TransformationData,
+  ) {
     const videoNode = new VideoNode({
-      videoURL: mediaFileUrl,
+      videoURL: videoNodeData.mediaFileUrl,
+      extractionURL: videoNodeData.extractionURL,
+      isChroma: videoNodeData.isChroma,
+      chormaColor: videoNodeData.chromaColor,
       mediaLayerRef: this.mediaLayerRef,
       canvasPosition: this.renderEngineRef.captureCanvas.position(),
       canvasSize: this.renderEngineRef.captureCanvas.size(),
@@ -195,19 +208,13 @@ export class SceneManager {
   private addText({
     textNodeData,
     transform,
-    textChildrenTransforms,
   }: {
     textNodeData: TextNodeData;
     transform: TransformationData;
-    textChildrenTransforms: {
-      wrapperRectTransform: TransformationData;
-      textNodeTransform: TransformationData;
-    };
   }) {
     const textNode = new TextNode({
       textNodeData: textNodeData,
       transform: transform,
-      textChildrenTransforms: textChildrenTransforms,
       mediaLayerRef: this.mediaLayerRef,
       canvasPosition: this.renderEngineRef.captureCanvas.position(),
       canvasSize: this.renderEngineRef.captureCanvas.size(),

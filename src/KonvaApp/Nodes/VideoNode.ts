@@ -4,9 +4,15 @@ import { v4 as uuidv4 } from "uuid";
 import { NetworkedNode, UploadStatus } from "./NetworkedNode";
 import { uiAccess } from "~/signals";
 import ChromaWorker from "./ChromaWorker?sharedworker";
-import { minNodeSize, transparent, NodeType } from "./constants";
+import { transparent, NodeType } from "./constants";
 import { SelectionManager } from "../NodesManagers";
-import { Position, Size, NodeData, TransformationData } from "../types";
+import {
+  Position,
+  Size,
+  NodeData,
+  TransformationData,
+  RGBColor,
+} from "../types";
 import { NodeUtilities } from "./NodeUtilities";
 
 const loadingBar = uiAccess.loadingBar;
@@ -21,12 +27,16 @@ interface VideoNodeContructor {
   canvasSize: Size;
   videoURL: string;
   selectionManagerRef: SelectionManager;
+  extractionURL?: string;
   transform?: TransformationData;
+  isChroma?: boolean;
+  chormaColor?: RGBColor;
 }
 
 export class VideoNode extends NetworkedNode {
   public kNode: Konva.Image;
   public videoURL: string;
+  public extractionURL: string | undefined;
   public videoComponent: HTMLVideoElement;
   protected _isVideoEventListening: boolean = false;
 
@@ -44,9 +54,7 @@ export class VideoNode extends NetworkedNode {
   finishedLoadingOnStart?: Promise<void>;
 
   isChroma: boolean;
-  chromaRed: number = 120;
-  chromaGreen: number = 150;
-  chromaBlue: number = 120;
+  chromaColor: RGBColor;
 
   // todo move to seg manager
   selectedPointsForSegmentation: Coordinates[] = [];
@@ -63,27 +71,17 @@ export class VideoNode extends NetworkedNode {
     canvasPosition,
     canvasSize,
     videoURL,
+    extractionURL,
+    isChroma,
+    chormaColor,
     selectionManagerRef,
     transform: existingTransform,
   }: VideoNodeContructor) {
-    const transform = existingTransform
-      ? {
-          ...existingTransform,
-          position: {
-            x: existingTransform.position.x + canvasPosition.x,
-            y: existingTransform.position.y + canvasPosition.y,
-          },
-          fill: transparent,
-        }
-      : {
-          position: NodeUtilities.positionNodeOnCanvasCenter({
-            canvasOffset: canvasPosition,
-            componentSize: minNodeSize,
-            maxSize: canvasSize,
-          }),
-          size: minNodeSize,
-          fill: "gray",
-        };
+    const transform = NodeUtilities.getInitialTransform({
+      existingTransform,
+      canvasPosition,
+      canvasSize,
+    });
     // kNodes need to be created first to guaruntee it is not undefined in parent's context
     const kNode = new Konva.Image({
       image: undefined,
@@ -108,6 +106,7 @@ export class VideoNode extends NetworkedNode {
     this.duration = -1; // video duration
 
     this.videoURL = videoURL;
+    this.extractionURL = extractionURL;
     this.videoComponent = document.createElement("video");
     this.videoComponent.crossOrigin = "anonymous";
 
@@ -122,7 +121,12 @@ export class VideoNode extends NetworkedNode {
     this.finishedLoadingOnStart = new Promise<void>(() => {});
 
     this.blockSeeking = false;
-    this.isChroma = false;
+    this.isChroma = isChroma ?? false;
+    this.chromaColor = chormaColor ?? {
+      red: 120,
+      blue: 150,
+      green: 120,
+    };
 
     this.loadVideoFromUrl({
       mediaFileUrl: this.videoURL,
@@ -248,11 +252,7 @@ export class VideoNode extends NetworkedNode {
   public getChroma() {
     return {
       isChromakeyEnabled: this.isChroma,
-      chromakeyColor: {
-        red: this.chromaRed,
-        green: this.chromaGreen,
-        blue: this.chromaBlue,
-      },
+      chromakeyColor: this.chromaColor,
     };
   }
   public setChroma(isChroma: boolean) {
@@ -271,9 +271,11 @@ export class VideoNode extends NetworkedNode {
   }
 
   public setChromaColor(red: number, green: number, blue: number) {
-    this.chromaRed = red;
-    this.chromaGreen = green;
-    this.chromaBlue = blue;
+    this.chromaColor = {
+      red,
+      green,
+      blue,
+    };
   }
 
   createChromaWorker() {
@@ -357,11 +359,7 @@ export class VideoNode extends NetworkedNode {
       this.chromaWorker?.port.postMessage(
         {
           dataTransfer: dataTransfer,
-          color: {
-            red: this.chromaRed,
-            green: this.chromaGreen,
-            blue: this.chromaBlue,
-          },
+          color: this.chromaColor,
         },
         [dataTransfer],
       );
@@ -670,11 +668,16 @@ export class VideoNode extends NetworkedNode {
         },
         zIndex: this.kNode.getZIndex(),
       },
+
+      // video specific values
+      videoNodeData: {
+        mediaFileUrl: this.videoURL,
+        mediaFileToken: this.mediaFileToken,
+        isChroma: this.isChroma,
+        chromaColor: this.chromaColor,
+        extractionURL: this.extractionURL,
+      },
     };
-    data.mediaFileUrl = this.videoURL;
-    if (this.mediaFileToken) {
-      data.mediaFileToken = this.mediaFileToken;
-    }
     return data;
   }
 

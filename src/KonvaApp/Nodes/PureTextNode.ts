@@ -12,7 +12,7 @@ import {
 import { NodeUtilities } from "./NodeUtilities";
 import { NodeType } from "./constants";
 
-export class TextNode extends BaseNode {
+export class PureTextNode extends BaseNode {
   public kNode: Konva.Group;
   public rectNode: Konva.Rect;
   public textNode: Konva.Text;

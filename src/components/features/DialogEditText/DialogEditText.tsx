@@ -29,6 +29,7 @@ export const DialogEditText = ({
   const [text, setText] = useState<string>("");
   const [textFormatData, setTextFormatData] = useState<TextFormatData>({
     color: "#000000",
+    maxWidth: 500,
     fontFamily: "Arial",
     fontSize: 20,
     fontStyle: FontStyle.NORMAL,
@@ -49,19 +50,20 @@ export const DialogEditText = ({
   const handleOnDoneEditText = () => {
     const textNodeData = {
       text: text,
-      fill: textFormatData.color,
-      fontFamily: textFormatData.fontFamily,
-      fontSize: textFormatData.fontSize,
-      align: textFormatData.textAlign,
-      fontStyle:
-        textFormatData.fontStyle === FontStyle.NORMAL &&
-        textFormatData.fontWeight === FontWeight.NORMAL
-          ? "normal"
-          : `${textFormatData.fontWeight !== FontWeight.NORMAL ? textFormatData.fontWeight : ""} ${textFormatData.fontStyle !== FontStyle.NORMAL ? textFormatData.fontStyle : ""}`,
-      textDecoration:
-        textFormatData.textDecoration === TextDecoration.NONE
-          ? ""
-          : textFormatData.textDecoration,
+      ...textFormatData,
+      // fill: textFormatData.color,
+      // fontFamily: textFormatData.fontFamily,
+      // fontSize: textFormatData.fontSize,
+      // align: textFormatData.textAlign,
+      // fontStyle:
+      //   textFormatData.fontStyle === FontStyle.NORMAL &&
+      //   textFormatData.fontWeight === FontWeight.NORMAL
+      //     ? "normal"
+      //     : `${textFormatData.fontWeight !== FontWeight.NORMAL ? textFormatData.fontWeight : ""} ${textFormatData.fontStyle !== FontStyle.NORMAL ? textFormatData.fontStyle : ""}`,
+      // textDecoration:
+      //   textFormatData.textDecoration === TextDecoration.NONE
+      //     ? ""
+      //     : textFormatData.textDecoration,
     };
     onDoneEditText(textNodeData);
     closeCallback();

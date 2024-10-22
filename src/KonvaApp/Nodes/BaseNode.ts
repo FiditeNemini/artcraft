@@ -19,7 +19,7 @@ export abstract class BaseNode {
   protected _isKDragEventListening: boolean = false;
   protected _isKTranformEventListening: boolean = false;
 
-  abstract getNodeData(captureCanvasPosition: Position): NodeData;
+  abstract getNodeData(captureCanvasPosition: Position): NodeData | null;
 
   constructor({
     selectionManagerRef,

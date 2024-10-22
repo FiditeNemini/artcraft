@@ -67,6 +67,7 @@ export const ButtonsTextStyles = ({
       <button
         data-selected={isSelectedDecoration(TextDecoration.STRIKETHROUGH)}
         className={buttonGroupButton}
+        disabled
         onClick={() =>
           handleOnChangeTextDecoration(TextDecoration.STRIKETHROUGH)
         }
@@ -76,6 +77,7 @@ export const ButtonsTextStyles = ({
       <button
         data-selected={isSelectedDecoration(TextDecoration.UNDERLINE)}
         className={buttonGroupButton}
+        disabled
         onClick={() => handleOnChangeTextDecoration(TextDecoration.UNDERLINE)}
       >
         <FontAwesomeIcon icon={faUnderline} />

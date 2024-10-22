@@ -35,24 +35,11 @@ export class ImageNode extends NetworkedNode {
   }: ImageNodeContructor) {
     // kNodes need to be created first to guaruntee
     // that it is not undefined in parent's context
-    const transform = existingTransform
-      ? {
-          ...existingTransform,
-          position: {
-            x: existingTransform.position.x + canvasPosition.x,
-            y: existingTransform.position.y + canvasPosition.y,
-          },
-          fill: transparent,
-        }
-      : {
-          position: NodeUtilities.positionNodeOnCanvasCenter({
-            canvasOffset: canvasPosition,
-            componentSize: minNodeSize,
-            maxSize: canvasSize,
-          }),
-          size: minNodeSize,
-          fill: "gray",
-        };
+    const transform = NodeUtilities.getInitialTransform({
+      existingTransform,
+      canvasPosition,
+      canvasSize,
+    });
     const kNode = new Konva.Image({
       image: undefined, // to do replace with placeholder
       ...transform,
@@ -191,6 +178,10 @@ export class ImageNode extends NetworkedNode {
     console.warn("Image Node has no data to recontruct itself!");
   }
   public getNodeData(canvasPostion: Position) {
+    if (!this.mediaFileUrl) {
+      console.error("Image Node can not be saved");
+      return null;
+    }
     const data: NodeData = {
       type: NodeType.IMAGE,
       transform: {
@@ -206,13 +197,11 @@ export class ImageNode extends NetworkedNode {
         },
         zIndex: this.kNode.getZIndex(),
       },
+      imageNodeData: {
+        mediaFileUrl: this.mediaFileUrl,
+        mediaFileToken: this.mediaFileToken,
+      },
     };
-    if (this.mediaFileUrl) {
-      data.mediaFileUrl = this.mediaFileUrl;
-    }
-    if (this.mediaFileToken) {
-      data.mediaFileToken = this.mediaFileToken;
-    }
     return data;
   }
 }

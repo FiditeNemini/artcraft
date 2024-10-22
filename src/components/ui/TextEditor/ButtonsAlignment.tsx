@@ -39,13 +39,6 @@ export const ButtonsAlignments = ({
       >
         <FontAwesomeIcon icon={faAlignRight} />
       </button>
-      <button
-        data-selected={isSelected(TextAlign.JUSTIFY)}
-        className={buttonGroupButton}
-        onClick={() => onChange(TextAlign.JUSTIFY)}
-      >
-        <FontAwesomeIcon icon={faAlignJustify} />
-      </button>
     </div>
   );
 };

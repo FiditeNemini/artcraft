@@ -1,13 +1,44 @@
 import Konva from "konva";
-import { Position, Size } from "../types";
+import { Position, Size, TransformationData } from "../types";
+import { minNodeSize, transparent } from "./constants";
 
 export const NodeUtilities = {
   adjustNodeSizeToCanvas,
+  getInitialTransform,
   isAssetUrlAvailable,
   positionNodeOnCanvasCenter,
   printKNodeAttrs,
   urlToBlob,
 };
+function getInitialTransform({
+  existingTransform,
+  canvasPosition,
+  canvasSize,
+}: {
+  existingTransform?: TransformationData;
+  canvasPosition: Position;
+  canvasSize: Size;
+}) {
+  return existingTransform
+    ? {
+        ...existingTransform,
+        position: {
+          x: existingTransform.position.x + canvasPosition.x,
+          y: existingTransform.position.y + canvasPosition.y,
+        },
+        fill: transparent,
+      }
+    : {
+        position: positionNodeOnCanvasCenter({
+          canvasOffset: canvasPosition,
+          componentSize: minNodeSize,
+          maxSize: canvasSize,
+        }),
+        size: minNodeSize,
+        fill: "gray",
+      };
+}
+
 function adjustNodeSizeToCanvas({
   componentSize,
   maxSize,
