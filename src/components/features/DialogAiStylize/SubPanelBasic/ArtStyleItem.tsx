@@ -16,7 +16,7 @@ export const ArtStyleItem = ({
   label,
   type,
   selected = false,
-  defaultImg = "/resources/placeholders/style_placeholder.png",
+  defaultImg = "/placeholder_images/style_placeholder.png",
   src = defaultImg,
   onSelected,
   className,
@@ -38,7 +38,7 @@ export const ArtStyleItem = ({
   return (
     <button
       className={twMerge(
-        "relative cursor-pointer overflow-hidden rounded-lg border-2 transition-colors",
+        "relative aspect-video cursor-pointer overflow-hidden rounded-lg border-2 transition-colors",
         transitionTimingStyles,
         selected
           ? "border-primary"

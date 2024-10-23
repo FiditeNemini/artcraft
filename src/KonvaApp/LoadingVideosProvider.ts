@@ -27,8 +27,8 @@ export class LoadingVideosProvider {
       }
     };
 
-    this.horizontalLoadingVideo.src = "/loading_videos/light.mp4";
-    this.verticalLoadingVideo.src = "/loading_videos/light_portrait_v2.mp4";
+    this.horizontalLoadingVideo.src = "/placeholder_videos/light.mp4";
+    this.verticalLoadingVideo.src = "/placeholder_videos/light_portrait_v2.mp4";
   }
   getHorizontalLoadingVideo() {
     if (this.isLoadingVideoReady) {

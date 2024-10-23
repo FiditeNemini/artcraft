@@ -41,14 +41,14 @@ export const SubPanelBasic = ({
           onChangeNegativePrompt={onChangeNegativePrompt}
         />
         <span className="grow" />
-        <Button
+        {/* <Button
           onClick={() => onChangePanel(SubPanelNames.ADVANCED)}
           variant="tertiary"
           className="w-fit self-end"
         >
           Advanced Options
           <FontAwesomeIcon icon={faChevronRight} />
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
