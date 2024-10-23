@@ -138,6 +138,17 @@ export class SelectorSquare {
           selectionManagerRef.selectNodes(foundNodes);
         }
       });
+
+      stageRef.on("mouseleave", (e) => {
+        this.selecting = false;
+        if (!this.kSquare.visible()) {
+          return;
+        }
+        e.evt.preventDefault();
+        // update visibility
+        this.kSquare.visible(false);
+        // and then do nothing, this is considered a cancel
+      });
     });
   }
 }

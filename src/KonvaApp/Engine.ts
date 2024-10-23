@@ -302,15 +302,14 @@ export class Engine {
       }
     });
 
-    uiEvents.toolbarNode.SEGMENTATION.onClick(async (e) => {
-      console.log("ENGINE SEGMENTATION CALLBACK", e);
+    uiEvents.toolbarNode.SEGMENTATION.onClick(async () => {
       if (this.segmentationButtonCanBePressed == false) {
-        console.log("Debounce");
+        console.log("VideoExtraction Button DEBOUNCED ");
         return;
       }
-      console.log("ENGINE SEGMENTATION Button Clicked ACCEPTED");
-      // disable all the buttons except segmentation button again.
-      // create a state to prevent it from being clicked again. through the manager. and block.
+      console.log("VideoExtraction Button Clicked ACCEPTED");
+
+      // Gating for an appropriate selection
       const nodes = this.selectionManager.getSelectedNodes();
       if (nodes.size > 1) {
         // display error that segmentation cannot be done on more than 1 at a time.
@@ -318,77 +317,87 @@ export class Engine {
           title: "Error: Video Extraction",
           message: "Video Extraction cannot be done on more than 1 item",
         });
+        return;
+      }
+      const element = nodes.values().next().value;
+      if (element instanceof VideoNode !== true) {
+        uiAccess.dialogError.show({
+          title: "Error: Video Extraction",
+          message:
+            "Extraction is only available for Videos, it is not avaliable for other Assets yet",
+        });
         this.selectionManager.clearSelection();
-      } else {
-        // todo create segmentation manager ...
-        const element = nodes.values().next().value;
-        console.log("ENGINE SEGMENTATION for 1 node", element);
-        if (element instanceof VideoNode) {
-          const node = element as VideoNode;
-          console.log("ENGEINE prepare Segmentation.", node);
-          const prevIsChroma = node.isChroma;
-          const prevChromaColor = node.chromaColor;
-          if (!node.isSegmentationMode) {
-            if (prevIsChroma) {
-              node.setChroma(false);
-            }
-            if (node.extractionUrl === node.videoComponent.src) {
-              await node.loadVideoFromUrl({
-                videoUrl: node.mediaFileUrl,
-                hasExistingTransform: true,
-              });
-            }
-            console.log("ENGEINE start Segmentation.", node);
-            this.segmentationButtonCanBePressed = false;
-            this.disableAllButtons();
-            this.disableSelectorSquare();
-            node.lock();
-            this.undoStackManager.setDisabled(true);
-            await node.startSegmentation();
-            this.nodeIsolator.enterIsolation(node);
-            node.videoSegmentationMode(true);
-            this.selectionManager.updateContextComponents(node);
-            uiAccess.loadingBar.update({
-              progress: 0,
-              message: "Start Adding Extraction Points To the Video",
-            });
-            uiAccess.loadingBar.show();
+      }
+      // Gating done
 
-            this.segmentationButtonCanBePressed = true;
-          } else {
-            console.log("ENGEINE Attemping to close Segmentation.");
-            const endSessionResult = await node.endSession();
-            if (typeof endSessionResult === "string") {
-              node.videoSegmentationMode(false);
-              this.commandManager.useVideoExtraction({
-                videoNode: node,
-                extractionUrl: endSessionResult,
-                prevIsChroma: prevIsChroma,
-                prevChromaColor: prevChromaColor,
-              });
-              this.nodeIsolator.exitIsolation();
-
-              this.undoStackManager.setDisabled(false);
-              // TODO : 1 frame is missing from extracted video,
-              // need to move 1 frame forward to accomodate
-              this.enableAllButtons();
-              this.enableSelectorSquare();
-              this.segmentationButtonCanBePressed = true;
-              node.unlock();
-              this.selectionManager.updateContextComponents(node);
-              // to close off the session.
-            } else {
-              console.log("Busy Processing Video.");
-            }
-          }
-        } else {
-          uiAccess.dialogError.show({
-            title: "Error: Video Extraction",
-            message:
-              "Extraction is only available for Videos, it is not avaliable for other Assets yet",
-          });
-          this.selectionManager.clearSelection();
+      console.log("VideoExtraction on node", element);
+      const node = element as VideoNode; //cast medianode to videonode
+      const prevIsChroma = node.isChroma;
+      const prevChromaColor = node.chromaColor;
+      if (!node.isSegmentationMode) {
+        // when the button is pressed to enter extraction mode
+        console.log("ENGEINE prepare Extraction Session.", node);
+        // disable most of the UI before we get a session
+        this.segmentationButtonCanBePressed = false;
+        document.body.style.cursor = "wait";
+        this.selectionManager.disable();
+        this.disableAllButtons();
+        this.disableSelectorSquare();
+        node.lock();
+        this.undoStackManager.setDisabled(true);
+        // if the video has chroma, disable it
+        if (prevIsChroma) {
+          node.setChroma(false);
         }
+        // if the video is already using extraction
+        // bring the original video back
+        if (node.extractionUrl === node.videoComponent.src) {
+          await node.loadVideoFromUrl({
+            videoUrl: node.mediaFileUrl,
+            hasExistingTransform: true,
+          });
+        }
+        // actually start and wait for session
+        await node.startSegmentation();
+        this.nodeIsolator.enterIsolation(node);
+        node.videoSegmentationMode(true);
+        this.selectionManager.updateContextComponents(node);
+        uiAccess.loadingBar.update({
+          progress: 0,
+          message: "Start Adding Extraction Points To the Video",
+        });
+        uiAccess.loadingBar.show();
+
+        document.body.style.cursor = "default";
+        this.segmentationButtonCanBePressed = true;
+      } else {
+        // when the button is pressed to exit extraction mode
+        console.log("ENGEINE Attemping to close Extraction Session.");
+        document.body.style.cursor = "wait";
+        const endSessionResult = await node.endSession();
+        if (typeof endSessionResult === "string") {
+          node.videoSegmentationMode(false);
+          this.commandManager.useVideoExtraction({
+            videoNode: node,
+            extractionUrl: endSessionResult,
+            prevIsChroma: prevIsChroma,
+            prevChromaColor: prevChromaColor,
+          });
+          this.nodeIsolator.exitIsolation();
+
+          // unlock the ui
+          this.undoStackManager.setDisabled(false);
+          this.enableAllButtons();
+          this.enableSelectorSquare();
+          this.segmentationButtonCanBePressed = true;
+          node.unlock();
+          this.selectionManager.updateContextComponents(node);
+          this.selectionManager.enable();
+          // to close off the session.
+        } else {
+          console.log("Busy Processing Video.");
+        }
+        document.body.style.cursor = "default";
       }
     });
     uiEvents.toolbarNode.DELETE.onClick(() =>

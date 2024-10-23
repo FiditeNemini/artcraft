@@ -29,6 +29,7 @@ export class SelectionManager {
   private initialTransformations: Map<MediaNode, Transformation[]>;
   public eventTarget: EventTarget;
   private _isDragging: boolean = false;
+  private disabled: boolean = false;
 
   public firstSelectedNode: MediaNode | undefined;
 
@@ -60,8 +61,18 @@ export class SelectionManager {
     });
     this.mediaLayerRef.batchDraw();
   }
+  public disable() {
+    this.disabled = true;
+  }
+  public enable() {
+    this.disabled = false;
+  }
+  public isDisabled() {
+    return this.disable;
+  }
   public selectNode(node: MediaNode, doNotDraw?: boolean): boolean {
     if (
+      this.disabled || // no-op when disabled
       this.selectedNodes.has(node) || // if the node is already selected
       (this.selectedNodes.size > 0 && node.isLocked()) // if in multiselect but picked a locked item
     ) {
@@ -83,6 +94,10 @@ export class SelectionManager {
   }
 
   public deselectNode(node: MediaNode, doNotDraw?: boolean): void {
+    if (this.disabled) {
+      // no-op when disabled
+      return;
+    }
     node.unhighlight();
     if (node.isKEventRef()) {
       node.setIsKEventRef(false);
@@ -95,7 +110,10 @@ export class SelectionManager {
   }
 
   public clearSelection(): void {
-    console.log("Clearing Selection");
+    if (this.disabled) {
+      //no-op when disabled
+      return;
+    }
     this.selectedNodes.forEach((node) => {
       node.unhighlight();
       if (node.isKEventRef()) {
