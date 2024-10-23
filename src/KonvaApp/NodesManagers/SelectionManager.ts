@@ -4,7 +4,7 @@ import { MediaNode, Position, Transformation } from "../types";
 import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
 import { LoadingBarStatus } from "~/components/ui";
-import { VideoNode } from "../Nodes/VideoNode";
+import { VideoNode } from "../Nodes";
 
 export enum SelectionManagerEvents {
   NODES_TRANSLATIONS = "nodestranslation",
@@ -174,7 +174,7 @@ export class SelectionManager {
       const transformations = [this.getKNodeTransformation(selectedNode.kNode)];
       if (selectedNode.kNode instanceof Konva.Group) {
         const childKNodes = selectedNode.kNode.getChildren();
-        childKNodes.forEach((childKNode) => {
+        childKNodes.forEach((childKNode: Konva.Node) => {
           transformations.push(this.getKNodeTransformation(childKNode));
         });
       }
@@ -189,7 +189,7 @@ export class SelectionManager {
       const transformations = [this.getKNodeTransformation(selectedNode.kNode)];
       if (selectedNode.kNode instanceof Konva.Group) {
         const childKNodes = selectedNode.kNode.getChildren();
-        childKNodes.forEach((childKNode) => {
+        childKNodes.forEach((childKNode: Konva.Node) => {
           transformations.push(this.getKNodeTransformation(childKNode));
         });
       }
@@ -264,6 +264,7 @@ export class SelectionManager {
     }
     if (node instanceof NetworkedNode) {
       if (!node.didFinishLoading && !uiAccess.loadingBar.isShowing()) {
+        // console.log("show loading bar");
         uiAccess.loadingBar.show();
       }
     }
@@ -271,7 +272,7 @@ export class SelectionManager {
 
   public updateContextComponents(node: MediaNode) {
     const coord = this.calculateContextualsPosition(node.kNode);
-    console.log("SelectionManager > updateContextComponents for node:", node);
+    // console.log("SelectionManager > updateContextComponents for node:", node);
     if (node instanceof VideoNode) {
       if (node.isSegmentationMode && !uiAccess.toolbarNode.isLockDisabled()) {
         uiAccess.toolbarNode.disableLock();
@@ -293,6 +294,7 @@ export class SelectionManager {
         status: node.isError()
           ? LoadingBarStatus.ERROR
           : LoadingBarStatus.LOADING,
+        message: node.progressMessage(),
       });
       uiEvents.toolbarNode.retry.onClick((e) => {
         if (e) {
@@ -300,7 +302,8 @@ export class SelectionManager {
           node.retry();
         }
       });
-      if (node.progress() === 100) {
+      if (node.didFinishLoading) {
+        // console.log("node finished loading", node);
         uiAccess.loadingBar.hide();
       }
     }

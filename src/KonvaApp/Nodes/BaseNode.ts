@@ -30,7 +30,7 @@ export abstract class BaseNode {
     mediaLayerRef: Konva.Layer;
     kNode: Konva.Image | Konva.Group;
   }) {
-    console.log("Node constructed");
+    // console.log("Node constructed");
     // this.uuid = uuidv4();
     this.mediaLayerRef = mediaLayerRef;
     this.selectionManagerRef = selectionManagerRef;

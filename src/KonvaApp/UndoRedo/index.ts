@@ -7,3 +7,6 @@ export { MoveLayerDown } from "./MoveLayerDown";
 export { TransformCommand } from "./TransformCommand";
 export { TranslateCommand } from "./TranslateCommand";
 export { UnlockNodesCommand } from "./UnlockNodesCommand";
+export { UseVideoExtraction } from "./UseVideoExtraction";
+export { AddChromaKey } from "./ChromaKeyAdd";
+export { RemoveChromaKey } from "./ChromaKeyRemove";

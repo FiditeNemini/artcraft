@@ -12,10 +12,12 @@ export const NodeUtilities = {
 };
 function getInitialTransform({
   existingTransform,
+  mediaFileSize,
   canvasPosition,
   canvasSize,
 }: {
   existingTransform?: TransformationData;
+  mediaFileSize?: Size;
   canvasPosition: Position;
   canvasSize: Size;
 }) {
@@ -31,10 +33,10 @@ function getInitialTransform({
     : {
         position: positionNodeOnCanvasCenter({
           canvasOffset: canvasPosition,
-          componentSize: minNodeSize,
+          componentSize: mediaFileSize ?? minNodeSize,
           maxSize: canvasSize,
         }),
-        size: minNodeSize,
+        size: mediaFileSize ?? minNodeSize,
         fill: "gray",
       };
 }

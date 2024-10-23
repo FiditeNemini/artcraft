@@ -1,19 +1,20 @@
 import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
-import { NetworkedNode, UploadStatus } from "./NetworkedNode";
+import { NetworkedNode, UploadStatus } from "../NetworkedNode";
 import { uiAccess } from "~/signals";
-import ChromaWorker from "./ChromaWorker?sharedworker";
-import { transparent, NodeType } from "./constants";
-import { SelectionManager } from "../NodesManagers";
+import ChromaWorker from "../ChromaWorker?sharedworker";
+import { transparent, NodeType } from "../constants";
+import { SelectionManager } from "../../NodesManagers";
 import {
   Position,
   Size,
   NodeData,
   TransformationData,
   RGBColor,
-} from "../types";
-import { NodeUtilities } from "./NodeUtilities";
+  VideoNodeData,
+} from "../../types";
+import { NodeUtilities } from "../NodeUtilities";
 
 const loadingBar = uiAccess.loadingBar;
 import {
@@ -21,22 +22,23 @@ import {
   SegmentationApi,
 } from "~/Classes/ApiManager/SegmentationApi";
 import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
+import { LoadingVideosProvider } from "~/KonvaApp/LoadingVideosProvider";
 interface VideoNodeContructor {
   mediaLayerRef: Konva.Layer;
+  selectionManagerRef: SelectionManager;
+  loadingVideosProviderRef: LoadingVideosProvider;
   canvasPosition: Position;
   canvasSize: Size;
-  videoURL: string;
-  selectionManagerRef: SelectionManager;
-  extractionURL?: string;
   transform?: TransformationData;
-  isChroma?: boolean;
-  chormaColor?: RGBColor;
+  videoNodeData: Partial<VideoNodeData> & {
+    mediaFileUrl: string;
+  };
 }
 
 export class VideoNode extends NetworkedNode {
   public kNode: Konva.Image;
-  public videoURL: string;
-  public extractionURL: string | undefined;
+  public mediaFileUrl: string;
+  public extractionUrl: string | undefined;
   public videoComponent: HTMLVideoElement;
   protected _isVideoEventListening: boolean = false;
 
@@ -70,15 +72,18 @@ export class VideoNode extends NetworkedNode {
     mediaLayerRef,
     canvasPosition,
     canvasSize,
-    videoURL,
-    extractionURL,
-    isChroma,
-    chormaColor,
+    videoNodeData,
     selectionManagerRef,
+    loadingVideosProviderRef,
     transform: existingTransform,
   }: VideoNodeContructor) {
+    const mediaFileSize =
+      videoNodeData.videoWidth && videoNodeData.videoHeight
+        ? { width: videoNodeData.videoWidth, height: videoNodeData.videoHeight }
+        : undefined;
     const transform = NodeUtilities.getInitialTransform({
       existingTransform,
+      mediaFileSize,
       canvasPosition,
       canvasSize,
     });
@@ -94,6 +99,7 @@ export class VideoNode extends NetworkedNode {
     super({
       selectionManagerRef: selectionManagerRef,
       mediaLayerRef: mediaLayerRef,
+      loadingVideosProviderRef: loadingVideosProviderRef,
       kNode: kNode,
     });
     this.kNode = kNode;
@@ -105,8 +111,12 @@ export class VideoNode extends NetworkedNode {
     this.fps = 24; // need to query this from the media
     this.duration = -1; // video duration
 
-    this.videoURL = videoURL;
-    this.extractionURL = extractionURL;
+    // console.log("constructing new video node with data:", videoNodeData);
+    this.mediaFileUrl = videoNodeData.mediaFileUrl;
+    this.extractionUrl = videoNodeData.extractionUrl;
+    this.mediaFileToken = videoNodeData.mediaFileToken;
+    this.mediaFileSize = mediaFileSize;
+
     this.videoComponent = document.createElement("video");
     this.videoComponent.crossOrigin = "anonymous";
 
@@ -121,25 +131,29 @@ export class VideoNode extends NetworkedNode {
     this.finishedLoadingOnStart = new Promise<void>(() => {});
 
     this.blockSeeking = false;
-    this.isChroma = isChroma ?? false;
-    this.chromaColor = chormaColor ?? {
+    this.isChroma = videoNodeData.isChroma ?? false;
+    this.chromaColor = videoNodeData.chromaColor ?? {
       red: 120,
       blue: 150,
       green: 120,
     };
 
     this.loadVideoFromUrl({
-      mediaFileUrl: this.videoURL,
-      existingTransform,
+      videoUrl: this.extractionUrl ?? this.mediaFileUrl,
+      // videoUrl: "", // for debug loading video
+      hasExistingTransform: !!existingTransform || !!mediaFileSize,
       canvasPosition,
       canvasSize,
     });
 
     this.listenToBaseKNode();
 
+    this.createChromaWorker();
+  }
+  private listenToVideoPlayPause() {
     // TODO: for controling video playpause, can be improved with bette ui
     this.kNode.on("click", () => {
-      console.log("click");
+      // console.log("click");
       // Shouldn't play if anything things are true
       if (this.didFinishLoading == false) {
         return;
@@ -152,40 +166,71 @@ export class VideoNode extends NetworkedNode {
         return;
       }
       if (this.videoComponent.paused) {
-        console.log("Playing");
+        console.log("Playing", this.videoComponent.src);
         this.videoComponent.play();
         this.chromaKeyRender(0); // For starting Chroma
       } else {
-        console.log("Pause");
+        console.log("Pause", this.videoComponent.src);
         this.videoComponent.pause();
       }
     });
-
-    this.createChromaWorker();
   }
-  private async loadVideoFromUrl({
-    mediaFileUrl,
-    existingTransform,
+  private removeLisentoVideoPlayPause() {
+    this.kNode.removeEventListener("click");
+  }
+  public async loadVideoFromUrl({
+    videoUrl,
+    hasExistingTransform,
     canvasSize,
     canvasPosition,
   }: {
-    mediaFileUrl: string;
-    existingTransform?: TransformationData;
+    videoUrl: string;
+    hasExistingTransform: boolean;
     canvasSize?: Size;
     canvasPosition?: Position;
   }) {
+    let loadingVideo: HTMLVideoElement | undefined = undefined;
+    if (
+      this.mediaFileSize &&
+      this.mediaFileSize.width < this.mediaFileSize.height
+    ) {
+      loadingVideo = this.loadingVideosProviderRef?.getVerticalLoadingVideo();
+    } else {
+      loadingVideo = this.loadingVideosProviderRef?.getHorizontalLoadingVideo();
+    }
+    if (loadingVideo) {
+      this.kNode.image(loadingVideo);
+      loadingVideo.currentTime = 0;
+      this.removeLisentoVideoPlayPause();
+      const tryPlayLoadingVideo = async () => {
+        try {
+          await loadingVideo.play();
+        } catch (err) {
+          /*** catch and supress this error
+           * NotAllowedError: play() failed because the user didn't
+           * interact with the document first. https://goo.gl/xX8pDD
+           ***/
+          if (loadingVideo.paused) {
+            setTimeout(tryPlayLoadingVideo, 500);
+          }
+        }
+      };
+      tryPlayLoadingVideo();
+    } else {
+      console.log("Loading Video not ready");
+    }
     if (!this._isVideoEventListening) {
       this.videoComponent.onloadstart = () => {
-        this.setProgress(25, UploadStatus.LOADING);
+        this.setProgress(25, { newStatus: UploadStatus.LOADING });
       };
       this.videoComponent.onloadedmetadata = () => {
-        this.setProgress(50, UploadStatus.LOADING);
+        this.setProgress(50, { newStatus: UploadStatus.LOADING });
         console.log("Loaded Metadata");
         this.mediaFileSize = {
           width: this.videoComponent.videoWidth,
           height: this.videoComponent.videoHeight,
         };
-        if (!existingTransform && canvasSize && canvasPosition) {
+        if (!hasExistingTransform && canvasSize && canvasPosition) {
           const adjustedSize = NodeUtilities.adjustNodeSizeToCanvas({
             componentSize: {
               width: this.videoComponent.videoWidth,
@@ -201,39 +246,41 @@ export class VideoNode extends NetworkedNode {
           this.kNode.setSize(adjustedSize);
           this.kNode.setPosition(centerPosition);
         }
-
+        console.log(
+          "Replace Loading video with mediafile",
+          this.videoComponent.src,
+        );
         this.kNode.image(this.videoComponent);
-        this.videoComponent.currentTime = 0; // ensure it shows up on screen
-        // it might have length here which we will need to trim down to 7 seconds.
-        console.log(`Video Duration: ${this.videoComponent.duration}`);
         this.duration = this.videoComponent.duration;
+        this.videoComponent.currentTime = 0; // ensure it shows up on screen
+        this.listenToVideoPlayPause();
         this.kNode.fill(transparent);
-        this.setProgress(75, UploadStatus.LOADING);
+        this.setProgress(75, { newStatus: UploadStatus.LOADING });
       };
-
-      this.videoComponent.onerror = () =>
-        // event: Event | string,
-        // source?: string,
-        // lineno?: number,
-        // colno?: number,
-        // error?: Error,
-        {
-          this.setProgress(0, UploadStatus.ERROR_ON_LOAD);
-        };
     }
     //can play through
     this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
       this.videoComponent.oncanplaythrough = () => {
         this.didFinishLoading = true;
-        this.setProgress(100, UploadStatus.SUCCESS);
+        this.setProgress(100, { newStatus: UploadStatus.SUCCESS });
         this.setChroma(this.isChroma);
         resolve();
       };
+
+      this.videoComponent.onerror = () => {
+        this.setProgress(0, { newStatus: UploadStatus.ERROR_ON_LOAD });
+        reject();
+      };
     });
-    this.videoComponent.src = mediaFileUrl;
+    this.videoComponent.src = videoUrl;
     try {
       await this.finishedLoadingOnStart;
-      console.log("Finished Loading, Can play through");
+      // if (this.isChroma) {
+      //   await this.seek(1 / this.fps);
+      // } else {
+      //   await this.seek(0);
+      // }
+      // console.log("Finished Loading, Can play through");
     } catch (err) {
       //nothing
     }
@@ -270,12 +317,8 @@ export class VideoNode extends NetworkedNode {
     }
   }
 
-  public setChromaColor(red: number, green: number, blue: number) {
-    this.chromaColor = {
-      red,
-      green,
-      blue,
-    };
+  public setChromaColor(newChromaColor: RGBColor) {
+    this.chromaColor = newChromaColor;
   }
 
   createChromaWorker() {
@@ -416,20 +459,16 @@ export class VideoNode extends NetworkedNode {
       this.didFinishLoading = false;
       this.videoComponent.pause();
       this.videoComponent.currentTime = 0;
+      this.setProgress(25, { message: "Loading Video Extractor..." });
       this.selectionManagerRef.updateContextComponents(this);
       this.selectionManagerRef.showContextComponents(this);
-      loadingBar.update({
-        progress: 25,
-        message: "Loading Video Extractor...",
-      });
 
       console.log("loadingbar should show");
 
-      const blob = await NodeUtilities.urlToBlob(this.videoURL);
-      loadingBar.update({
-        progress: 75,
-        message: "Loading Video Extractor...",
-      });
+      const blob = await NodeUtilities.urlToBlob(this.mediaFileUrl);
+      this.setProgress(75, { message: "Loading Video Extractor..." });
+      this.selectionManagerRef.updateContextComponents(this);
+
       this.segmentationSession =
         await this.videoSegmentationAPI.createSession(blob);
       console.log("Sessions", this.segmentationSession);
@@ -517,7 +556,7 @@ export class VideoNode extends NetworkedNode {
       include: true,
     });
 
-    loadingBar.update({ progress: 0, message: "Start Processing Mask" });
+    loadingBar.update({ progress: 0, message: "Start Processing Extraction" });
     try {
       console.log("Requesting");
       const response = await this.videoSegmentationAPI.addPointsToSession(
@@ -546,7 +585,7 @@ export class VideoNode extends NetworkedNode {
       await NodeUtilities.isAssetUrlAvailable({ url: previewImageUrl });
       loadingBar.update({ progress: 50, message: "Processing..." });
       await this.setSegementationPreview(previewImageUrl);
-      loadingBar.update({ progress: 100, message: "Masking Region Done" });
+      loadingBar.update({ progress: 100, message: "Extracting Region Done" });
     } catch (error) {
       console.error(error);
       loadingBar.update({
@@ -558,7 +597,7 @@ export class VideoNode extends NetworkedNode {
     this.isStillProcessingSegmentationEvent = false;
   }
 
-  async endSession(): Promise<boolean> {
+  async endSession(): Promise<boolean | string> {
     // wait for url to come through and fake load
     // edge case
     if (this.isStillProcessingSegmentationEvent) {
@@ -601,29 +640,29 @@ export class VideoNode extends NetworkedNode {
 
       // replace the video component and reregister all the other elements.
       console.log(
-        "Masked Video URL",
+        "Extracted Video URL",
         response["masked_video_cdn_url"],
         response,
       );
       // TODO: we assume the URL to be checked will eventually return true
-      const videoUrl = response["masked_video_cdn_url"];
+      const extractionUrl = response["masked_video_cdn_url"];
       await NodeUtilities.isAssetUrlAvailable({
-        url: videoUrl,
+        url: extractionUrl,
         sleepDurationMs: 2000,
       });
       loadingBar.update({ progress: 50, message: "Processing Video..." });
-
+      this.extractionUrl = extractionUrl;
       // set chroma automatically.
       this.isChroma = true;
-      await this.loadVideoFromUrl({ mediaFileUrl: videoUrl });
+      await this.loadVideoFromUrl({
+        videoUrl: extractionUrl,
+        hasExistingTransform: true,
+      });
 
-      // loadingBar.updateProgress(100);
-
-      // loadingBar.hide();
       this.disableAllExceptSegmentation();
 
       this.isStillProcessingSegmentationEvent = false;
-      return true;
+      return extractionUrl;
     } catch (error) {
       console.error(error);
       this.disableAllExceptSegmentation();
@@ -671,11 +710,13 @@ export class VideoNode extends NetworkedNode {
 
       // video specific values
       videoNodeData: {
-        mediaFileUrl: this.videoURL,
+        mediaFileUrl: this.mediaFileUrl,
         mediaFileToken: this.mediaFileToken,
         isChroma: this.isChroma,
         chromaColor: this.chromaColor,
-        extractionURL: this.extractionURL,
+        extractionUrl: this.extractionUrl,
+        videoWidth: this.mediaFileSize?.width,
+        videoHeight: this.mediaFileSize?.height,
       },
     };
     return data;

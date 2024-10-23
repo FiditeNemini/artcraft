@@ -15,13 +15,15 @@ export type ImageNodeData = {
 export type VideoNodeData = {
   mediaFileUrl: string;
   mediaFileToken?: string;
+  videoWidth?: number;
+  videoHeight?: number;
   isChroma: boolean;
   chromaColor: {
     red: number;
     green: number;
     blue: number;
   };
-  extractionURL?: string;
+  extractionUrl?: string;
 };
 
 export type NodeData = {

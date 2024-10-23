@@ -14,10 +14,12 @@ import { NavigateFunction } from "react-router-dom";
 import { NodeType } from "./Nodes/constants";
 import { ImageNode, VideoNode, TextNode } from "./Nodes";
 import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
+import { LoadingVideosProvider } from "./LoadingVideosProvider";
 
 export class SceneManager {
   private navigateRef: NavigateFunction;
 
+  private loadingVideosProviderRef: LoadingVideosProvider;
   private mediaLayerRef: Konva.Layer;
   private nodesManagerRef: NodesManager;
   private selectionManagerRef: SelectionManager;
@@ -26,18 +28,21 @@ export class SceneManager {
 
   constructor({
     navigateRef,
+    loadingVideosProviderRef,
     mediaLayerRef,
     nodesManagerRef,
     selectionManagerRef,
     renderEngineRef,
   }: {
     navigateRef: NavigateFunction;
+    loadingVideosProviderRef: LoadingVideosProvider;
     mediaLayerRef: Konva.Layer;
     nodesManagerRef: NodesManager;
     selectionManagerRef: SelectionManager;
     renderEngineRef: RenderEngine;
   }) {
     this.navigateRef = navigateRef;
+    this.loadingVideosProviderRef = loadingVideosProviderRef;
     this.mediaLayerRef = mediaLayerRef;
     this.nodesManagerRef = nodesManagerRef;
     this.selectionManagerRef = selectionManagerRef;
@@ -102,8 +107,8 @@ export class SceneManager {
       return;
     }
     this.currentSceneToken = mediaFileToken;
-    console.log(getSceneResponse.data);
-    console.log(getSceneResponse.data.public_bucket_path);
+    // console.log(getSceneResponse.data);
+    // console.log(getSceneResponse.data.public_bucket_path);
     const fileResponse = await fetch(getSceneResponse.data.public_bucket_url);
     if (!fileResponse.ok) {
       uiAccess.dialogError.show({
@@ -157,7 +162,7 @@ export class SceneManager {
   }
 
   private rebuildScene(nodesData: NodeData[]) {
-    console.log(nodesData);
+    // console.log(nodesData);
     nodesData.forEach((nodeDatum) => {
       if (nodeDatum.type === NodeType.IMAGE && nodeDatum.imageNodeData) {
         this.addImage(nodeDatum.imageNodeData, nodeDatum.transform);
@@ -192,15 +197,13 @@ export class SceneManager {
     transform: TransformationData,
   ) {
     const videoNode = new VideoNode({
-      videoURL: videoNodeData.mediaFileUrl,
-      extractionURL: videoNodeData.extractionURL,
-      isChroma: videoNodeData.isChroma,
-      chormaColor: videoNodeData.chromaColor,
+      loadingVideosProviderRef: this.loadingVideosProviderRef,
       mediaLayerRef: this.mediaLayerRef,
+      selectionManagerRef: this.selectionManagerRef,
       canvasPosition: this.renderEngineRef.captureCanvas.position(),
       canvasSize: this.renderEngineRef.captureCanvas.size(),
+      videoNodeData: videoNodeData,
       transform: transform,
-      selectionManagerRef: this.selectionManagerRef,
     });
     this.nodesManagerRef.saveNode(videoNode);
     this.renderEngineRef.addNodes(videoNode);

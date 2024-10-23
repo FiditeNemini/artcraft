@@ -36,12 +36,15 @@ export const SignaledDialogs = ({
         isOpen={appUiSignal.value.isAddVideoOpen ?? false}
         stagedVideo={appUiSignal.value.stagedVideo}
         closeCallback={resetAll}
-        onUploadedVideo={(response) => {
+        onUploadedVideo={(videoProps, response) => {
           if (!response.data) {
             return;
           }
           dispatchUiEvents.addVideoToEngine({
-            url: response.data.public_bucket_url,
+            mediaFileToken: response.data.token,
+            mediaFileUrl: response.data.media_links.cdn_url,
+            videoWidth: videoProps.width,
+            videoHeight: videoProps.height,
           });
         }}
       />

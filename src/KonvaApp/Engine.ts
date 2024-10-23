@@ -5,6 +5,8 @@ import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 
 import { uiAccess, uiEvents } from "~/signals";
 
+import { UndoStackManager } from "./UndoRedo";
+import { CommandManager } from "./CommandManager";
 import { SceneManager } from "./SceneManager";
 import {
   NodesManager,
@@ -17,25 +19,7 @@ import {
   SelectorSquare,
 } from "./NodesManagers";
 import { ImageNode, VideoNode, TextNode } from "./Nodes";
-import {
-  EngineOptions,
-  MediaNode,
-  Position,
-  TextNodeData,
-  Transformation,
-} from "./types";
-
-import {
-  CreateCommand,
-  DeleteCommand,
-  LockNodesCommand,
-  MoveLayerDown,
-  MoveLayerUp,
-  TransformCommand,
-  TranslateCommand,
-  UndoStackManager,
-  UnlockNodesCommand,
-} from "./UndoRedo";
+import { EngineOptions, TextNodeData, VideoNodeData } from "./types";
 
 import { SharedWorkerResponse } from "./WorkerPrimitives/SharedWorkerBase";
 import {
@@ -48,6 +32,7 @@ import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 import { NavigateFunction } from "react-router-dom";
+import { LoadingVideosProvider } from "./LoadingVideosProvider";
 
 // for testing loading files from system
 // import { FileUtilities } from "./FileUtilities/FileUtilities";
@@ -81,9 +66,11 @@ export class Engine {
   private nodeTransformer: NodeTransformer;
   private selectionManager: SelectionManager;
   private selectorSquare: SelectorSquare;
+  private loadingVideosProvider: LoadingVideosProvider;
 
   private sceneManager: SceneManager;
   private undoStackManager: UndoStackManager;
+  private commandManager: CommandManager;
 
   public segmentationButtonCanBePressed: boolean = true;
   // signal reference
@@ -115,14 +102,13 @@ export class Engine {
     // Selector Square
     this.selectorSquare = new SelectorSquare();
     this.uiLayer.add(this.selectorSquare.getKonvaNode());
+    // Loading Placeholders
+    this.loadingVideosProvider = new LoadingVideosProvider();
     // Node Isolator
     this.nodeIsolator = new NodeIsolator({
       mediaLayerRef: this.mediaLayer,
       nodeIsolationLayerRef: this.nodeIsolationLayer,
     });
-
-    // Collection of commands for undo-redo
-    this.undoStackManager = new UndoStackManager();
 
     // Listen to changes in container size
     const resizeObserver = new ResizeObserver(() => {
@@ -154,9 +140,20 @@ export class Engine {
       mediaLayerRef: this.mediaLayer,
     });
 
+    // Collection of commands for undo-redo
+    this.undoStackManager = new UndoStackManager();
+    this.commandManager = new CommandManager({
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      nodeTransformerRef: this.nodeTransformer,
+      selectionManagerRef: this.selectionManager,
+      renderEngineRef: this.renderEngine,
+      undoStackManagerRef: this.undoStackManager,
+    });
     // set up secene manager
     this.sceneManager = new SceneManager({
       navigateRef: this.navigateRef,
+      loadingVideosProviderRef: this.loadingVideosProvider,
       mediaLayerRef: this.mediaLayer,
       nodesManagerRef: this.nodesManager,
       selectionManagerRef: this.selectionManager,
@@ -220,7 +217,7 @@ export class Engine {
       const media_api_base_url = "https://storage.googleapis.com/";
       const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
       console.log("Engine got stylized video: " + media_url);
-      this.addVideo(media_url);
+      this.addVideo({ mediaFileUrl: media_url });
       // hide the loader
       //this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
@@ -265,18 +262,18 @@ export class Engine {
       SelectionManagerEvents.NODES_TRANSLATIONS,
       ((event: CustomEvent<NodesTranslationEventDetails>) => {
         //console.log("Event: SelectionManager -> Engine", event);
-        this.translateNodes(event.detail);
+        this.commandManager.translateNodes(event.detail);
       }) as EventListener,
     );
     this.selectionManager.eventTarget.addEventListener(
       SelectionManagerEvents.NODES_TRANSFORMATION,
       ((event: CustomEvent<NodeTransformationEventDetails>) => {
         //console.log("Event: SelectionManager -> Engine", event);
-        this.transformNodes(event.detail);
+        this.commandManager.transformNodes(event.detail);
       }) as EventListener,
     );
     uiEvents.toolbarNode.lock.onClick(() => {
-      this.toggleLockNodes();
+      this.commandManager.toggleLockNodes();
     });
     uiEvents.toolbarNode.CRHOMA.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
@@ -329,8 +326,18 @@ export class Engine {
         if (element instanceof VideoNode) {
           const node = element as VideoNode;
           console.log("ENGEINE prepare Segmentation.", node);
-
+          const prevIsChroma = node.isChroma;
+          const prevChromaColor = node.chromaColor;
           if (!node.isSegmentationMode) {
+            if (prevIsChroma) {
+              node.setChroma(false);
+            }
+            if (node.extractionUrl === node.videoComponent.src) {
+              await node.loadVideoFromUrl({
+                videoUrl: node.mediaFileUrl,
+                hasExistingTransform: true,
+              });
+            }
             console.log("ENGEINE start Segmentation.", node);
             this.segmentationButtonCanBePressed = false;
             this.disableAllButtons();
@@ -343,7 +350,7 @@ export class Engine {
             this.selectionManager.updateContextComponents(node);
             uiAccess.loadingBar.update({
               progress: 0,
-              message: "Start Adding Mask Points To the Video",
+              message: "Start Adding Extraction Points To the Video",
             });
             uiAccess.loadingBar.show();
 
@@ -351,10 +358,16 @@ export class Engine {
           } else {
             console.log("ENGEINE Attemping to close Segmentation.");
             const endSessionResult = await node.endSession();
-            if (endSessionResult) {
+            if (typeof endSessionResult === "string") {
               node.videoSegmentationMode(false);
+              this.commandManager.useVideoExtraction({
+                videoNode: node,
+                extractionUrl: endSessionResult,
+                prevIsChroma: prevIsChroma,
+                prevChromaColor: prevChromaColor,
+              });
               this.nodeIsolator.exitIsolation();
-              node.seek(1 / node.fps);
+
               this.undoStackManager.setDisabled(false);
               // TODO : 1 frame is missing from extracted video,
               // need to move 1 frame forward to accomodate
@@ -378,17 +391,23 @@ export class Engine {
         }
       }
     });
-    uiEvents.toolbarNode.DELETE.onClick(() => this.deleteNodes());
-    uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() => this.moveNodesDown());
-    uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() => this.moveNodesUp());
+    uiEvents.toolbarNode.DELETE.onClick(() =>
+      this.commandManager.deleteNodes(),
+    );
+    uiEvents.toolbarNode.MOVE_LAYER_DOWN.onClick(() =>
+      this.commandManager.moveNodesDown(),
+    );
+    uiEvents.toolbarNode.MOVE_LAYER_UP.onClick(() =>
+      this.commandManager.moveNodesUp(),
+    );
 
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
     });
 
-    uiEvents.onGetStagedVideo((video) => {
-      console.log("Engine got user video: " + video.url);
-      this.addVideo(video.url);
+    uiEvents.onGetStagedVideo((videoData) => {
+      console.log("Engine got user video: " + videoData.mediaFileUrl);
+      this.addVideo(videoData);
     });
     uiEvents.onAddTextToEngine((textdata) => {
       this.addText(textdata);
@@ -404,12 +423,20 @@ export class Engine {
         return;
       }
       if (node instanceof VideoNode) {
-        node.setChroma(chromakeyProps.isChromakeyEnabled);
-        node.setChromaColor(
-          chromakeyProps.chromakeyColor?.red || 120,
-          chromakeyProps.chromakeyColor?.blue || 150,
-          chromakeyProps.chromakeyColor?.green || 120,
-        );
+        if (chromakeyProps.isChromakeyEnabled) {
+          this.commandManager.addChromaKey({
+            videoNode: node,
+            newChromaColor: chromakeyProps.chromakeyColor ?? {
+              red: 120,
+              green: 150,
+              blue: 120,
+            },
+          });
+        } else {
+          this.commandManager.removeChromaKey({
+            videoNode: node,
+          });
+        }
       }
     });
     uiEvents.aiStylize.onRequest(async (data) => {
@@ -521,7 +548,7 @@ export class Engine {
       canvasPosition: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
     });
-    this.createNode(textNode);
+    this.commandManager.createNode(textNode);
   }
 
   public addImage(imageFile: File) {
@@ -533,19 +560,22 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
     });
 
-    this.createNode(imageNode);
+    this.commandManager.createNode(imageNode);
     this.renderEngine.addNodes(imageNode);
   }
 
-  public addVideo(url: string) {
+  public addVideo(
+    videNodeData: Partial<VideoNodeData> & { mediaFileUrl: string },
+  ) {
     const videoNode = new VideoNode({
       mediaLayerRef: this.mediaLayer,
+      selectionManagerRef: this.selectionManager,
+      loadingVideosProviderRef: this.loadingVideosProvider,
       canvasPosition: this.renderEngine.captureCanvas.position(),
       canvasSize: this.renderEngine.captureCanvas.size(),
-      videoURL: url,
-      selectionManagerRef: this.selectionManager,
+      videoNodeData: videNodeData,
     });
-    this.createNode(videoNode);
+    this.commandManager.createNode(videoNode);
   }
 
   // Events for Undo and Redo
@@ -559,89 +589,8 @@ export class Engine {
       ) {
         this.undoStackManager.redo();
       } else if (event.key === "Delete") {
-        this.deleteNodes();
+        this.commandManager.deleteNodes();
       }
     });
-  }
-
-  createNode(node: VideoNode | ImageNode | TextNode) {
-    const command = new CreateCommand({
-      nodes: new Set<MediaNode>([node]),
-      mediaLayerRef: this.mediaLayer,
-      nodesManagerRef: this.nodesManager,
-      nodeTransformerRef: this.nodeTransformer,
-      selectionManagerRef: this.selectionManager,
-      renderEngineRef: this.renderEngine,
-    });
-    this.undoStackManager.executeCommand(command);
-  }
-  deleteNodes() {
-    const nodes = this.selectionManager.getSelectedNodes();
-    const command = new DeleteCommand({
-      nodes: nodes,
-      mediaLayerRef: this.mediaLayer,
-      nodesManagerRef: this.nodesManager,
-      nodeTransformerRef: this.nodeTransformer,
-      selectionManagerRef: this.selectionManager,
-      renderEngineRef: this.renderEngine,
-    });
-    this.undoStackManager.executeCommand(command);
-  }
-  toggleLockNodes() {
-    const nodes = this.selectionManager.getSelectedNodes();
-    const node = nodes.values().next().value;
-    if (!node) {
-      console.log("Node Not Found for Locking");
-      return;
-    }
-    if (node.isLocked()) {
-      const command = new UnlockNodesCommand({
-        nodes: this.selectionManager.getSelectedNodes(),
-      });
-      this.undoStackManager.executeCommand(command);
-    } else {
-      const command = new LockNodesCommand({
-        nodes: this.selectionManager.getSelectedNodes(),
-      });
-      this.undoStackManager.executeCommand(command);
-    }
-  }
-  moveNodesUp() {
-    const command = new MoveLayerUp({
-      nodes: this.selectionManager.getSelectedNodes(),
-      nodesManagerRef: this.nodesManager,
-      mediaLayerRef: this.mediaLayer,
-    });
-    this.undoStackManager.executeCommand(command);
-  }
-  moveNodesDown() {
-    const command = new MoveLayerDown({
-      nodes: this.selectionManager.getSelectedNodes(),
-      nodesManagerRef: this.nodesManager,
-      mediaLayerRef: this.mediaLayer,
-    });
-    this.undoStackManager.executeCommand(command);
-  }
-  translateNodes(props: {
-    nodes: Set<MediaNode>;
-    initialPositions: Map<MediaNode, Position>;
-    finalPositions: Map<MediaNode, Position>;
-  }) {
-    const command = new TranslateCommand({
-      ...props,
-      layerRef: this.mediaLayer,
-    });
-    this.undoStackManager.pushCommand(command);
-  }
-  transformNodes(props: {
-    nodes: Set<MediaNode>;
-    initialTransformations: Map<MediaNode, Transformation[]>;
-    finalTransformations: Map<MediaNode, Transformation[]>;
-  }) {
-    const command = new TransformCommand({
-      ...props,
-      layerRef: this.mediaLayer,
-    });
-    this.undoStackManager.pushCommand(command);
   }
 }

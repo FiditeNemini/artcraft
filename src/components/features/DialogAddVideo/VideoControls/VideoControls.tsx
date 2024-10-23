@@ -10,12 +10,15 @@ import { ButtonMute } from "./ButtonMute";
 import { LabelTimeDuration } from "./LabelTimeDuration";
 import { ButtonRepeat } from "./ButtonRepeat";
 
+export type VideoProps = { width: number; height: number };
 export const VideoControls = ({
   vidEl,
+  videoPropsSignal,
   trimDataSignal,
   className,
 }: {
   vidEl: HTMLVideoElement | undefined;
+  videoPropsSignal: Signal<VideoProps | undefined>;
   trimDataSignal: Signal<TrimData | undefined>;
   className?: string;
 }) => {
@@ -29,6 +32,10 @@ export const VideoControls = ({
     const handleLoadedmetadata = () => {
       if (vidEl) {
         setStatus(VIDEO_STATE_STATUSES.METADATA_LOADED);
+        videoPropsSignal.value = {
+          width: vidEl.videoWidth,
+          height: vidEl.videoHeight,
+        };
         prevVidEl.current = vidEl;
       }
     };

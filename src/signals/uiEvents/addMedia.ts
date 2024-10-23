@@ -15,13 +15,19 @@ const onGetStagedImage = (callback: (file: File) => void) => {
 };
 
 // ADDING VIDEOS
-const stagedVideo = signal<{ url: string } | null>(null);
+type VideoSignal = {
+  mediaFileToken: string;
+  mediaFileUrl: string;
+  videoWidth: number;
+  videoHeight: number;
+};
+const stagedVideo = signal<VideoSignal | null>(null);
 
-const addVideoToEngine = (videoData: { url: string }) => {
+const addVideoToEngine = (videoData: VideoSignal) => {
   stagedVideo.value = videoData;
 };
 
-const onGetStagedVideo = (callback: (videoData: { url: string }) => void) => {
+const onGetStagedVideo = (callback: (videoData: VideoSignal) => void) => {
   effect(() => {
     if (stagedVideo.value) {
       callback(stagedVideo.value);

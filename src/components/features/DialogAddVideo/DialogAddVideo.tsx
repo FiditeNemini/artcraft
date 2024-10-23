@@ -9,7 +9,11 @@ import {
 } from "~/components/styles";
 import { Button } from "~/components/ui";
 
-import { QuickTrimVideoUploader, TrimData } from "./QuickTrimVideoUploader";
+import {
+  QuickTrimVideoUploader,
+  TrimData,
+  VideoProps,
+} from "./QuickTrimVideoUploader";
 import { ButtonSubmitAdd } from "./ButtonSumbitAdd";
 
 import { DialogAddMediaStatuses } from "./enums";
@@ -31,7 +35,13 @@ export const DialogAddVideo = ({
   stagedVideo?: File | null;
   isOpen: boolean;
   closeCallback: () => void;
-  onUploadedVideo: (response: ApiResponse<MediaFile>) => void;
+  onUploadedVideo: (
+    videoProperties: {
+      width: number;
+      height: number;
+    },
+    response: ApiResponse<MediaFile>,
+  ) => void;
 }) => {
   const [{ file, dialogStatus }, setStates] = useState<{
     file: File | null;
@@ -51,6 +61,25 @@ export const DialogAddVideo = ({
 
   const trimDataRef = useRef(signal<TrimData | undefined>(undefined));
   const trimData = trimDataRef.current;
+  const videoPropsRef = useRef(signal<VideoProps | undefined>(undefined));
+  const videoProps = videoPropsRef.current;
+
+  const handleOnUploadedVideo = useCallback(
+    (response: ApiResponse<MediaFile>) => {
+      if (!videoProps.value) {
+        console.error("Video Props not recorded in Uploader Dialog");
+        return;
+      }
+      onUploadedVideo(
+        {
+          width: videoProps.value.width,
+          height: videoProps.value.height,
+        },
+        response,
+      );
+    },
+    [],
+  );
 
   const handleClose = useCallback(() => {
     closeCallback();
@@ -96,6 +125,7 @@ export const DialogAddVideo = ({
                   onFileStaged={(file) => {
                     setStates((curr) => ({ ...curr, file }));
                   }}
+                  videoPropsSignal={videoProps}
                   trimDataSignal={trimData}
                   onTrimChange={(newTrimData: TrimData) => {
                     trimData.value = newTrimData;
@@ -111,7 +141,7 @@ export const DialogAddVideo = ({
                   file={file}
                   trimData={trimData}
                   onStatusChanged={changeDialogStatus}
-                  onUploadedVideo={onUploadedVideo}
+                  onUploadedVideo={handleOnUploadedVideo}
                   retry
                 />
               }
@@ -133,7 +163,7 @@ export const DialogAddVideo = ({
                   file={currFile}
                   trimData={trimData}
                   onStatusChanged={changeDialogStatus}
-                  onUploadedVideo={onUploadedVideo}
+                  onUploadedVideo={handleOnUploadedVideo}
                 />
               )}
               {(dialogStatus === DialogAddMediaStatuses.ERROR_FILE_UPLOAD ||

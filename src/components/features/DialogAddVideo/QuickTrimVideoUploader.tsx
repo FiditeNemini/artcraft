@@ -1,25 +1,27 @@
-import { useCallback, useState, useRef } from "react";
-import { signal, Signal } from "@preact/signals-react";
+import { useCallback, useState } from "react";
+import { Signal } from "@preact/signals-react";
 
 import { FileUploader } from "../FileUploader";
-import { VideoControls } from "./VideoControls";
+import { VideoControls, VideoProps } from "./VideoControls";
 import { TrimmerPlaybar, TrimData } from "./TrimmerPlaybar";
 
 import { VIDEO_FILE_TYPE } from "~/constants/fileTypeEnums";
 import { twMerge } from "tailwind-merge";
 
-export type { TrimData };
+export type { TrimData, VideoProps };
 
 export const QuickTrimVideoUploader = ({
   file,
   onFileStaged,
   onTrimChange,
   trimDataSignal,
+  videoPropsSignal,
 }: {
   file: File | null;
   onFileStaged: (newFile: File | null) => void;
   onTrimChange: (trimData: TrimData) => void;
   trimDataSignal: Signal<TrimData | undefined>;
+  videoPropsSignal: Signal<VideoProps | undefined>;
 }) => {
   const [vidEl, setVidEl] = useState<HTMLVideoElement | undefined>(undefined);
   const videoRefCallback = useCallback(
@@ -65,6 +67,7 @@ export const QuickTrimVideoUploader = ({
             <VideoControls
               className="w-fit"
               vidEl={vidEl}
+              videoPropsSignal={videoPropsSignal}
               trimDataSignal={trimDataSignal}
             />
             <TrimmerPlaybar

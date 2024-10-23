@@ -17,13 +17,11 @@ import {
 
 import { RenderingOptions } from "../Engine";
 import { FileUtilities } from "../FileUtilities/FileUtilities";
-import { ImageNode } from "../Nodes/ImageNode";
-import { VideoNode } from "../Nodes/VideoNode";
+import { ImageNode, VideoNode, TextNode } from "../Nodes";
 import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
 import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
-import { TextNode } from "../Nodes";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 
@@ -36,7 +34,7 @@ export class RenderEngine {
 
   private isProcessing: boolean;
 
-  private frames: ImageBitmap[];
+  // private frames: ImageBitmap[];
 
   // capturing composite within window
   private bgLayerRef: Konva.Layer;
@@ -95,7 +93,7 @@ export class RenderEngine {
     this.offScreenCanvas.height = this.height;
     this.context = this.offScreenCanvas.getContext("2d");
 
-    this.frames = [];
+    // this.frames = [];
 
     this.bgLayerRef = bgLayerRef;
     this.mediaLayerRef = mediaLayerRef;
