@@ -14,7 +14,7 @@ import {
   UploadAudioIsOk,
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
-import { useF5Store, useLocalize } from "hooks";
+import { useLocalize } from "hooks";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
@@ -23,28 +23,25 @@ interface Props {
   formIsCleared: boolean;
   setFormIsCleared: (cleared: boolean) => void;
   setHasUploadedFile: (hasUploadedFile: boolean) => void;
+  isUploadDisabled: boolean;
+  setIsUploadDisabled: (value: boolean) => void;
+  file: File | undefined;
+  setFile: (file: File | undefined) => void;
+  audioLink: string | undefined;
+  setAudioLink: (link: string | undefined) => void;
 }
 
-function F5UploadComponent(props: Props) {
+function UploadComponent(props: Props) {
   const { t } = useLocalize("UploadComponent");
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploaderKey, setUploaderKey] = useState(uuidv4());
-  const {
-    isUploadDisabled,
-    setIsUploadDisabled,
-    file,
-    setFile,
-    audioLink,
-    setAudioLink,
-  } = useF5Store();
 
   const handleChange = (file: any) => {
-    console.log("handle change");
-    setFile(file);
+    props.setFile(file);
     const audioUrl = URL.createObjectURL(file);
-    setAudioLink(audioUrl ?? "");
+    props.setAudioLink(audioUrl ?? "");
     props.setFormIsCleared(false);
-    setIsUploadDisabled(false);
+    props.setIsUploadDisabled(false);
     props.setHasUploadedFile(true);
   };
 
@@ -61,9 +58,9 @@ function F5UploadComponent(props: Props) {
   };
 
   const handleClear = () => {
-    setFile(null);
-    setAudioLink("");
-    setIsUploadDisabled(false);
+    props.setFile(undefined);
+    props.setAudioLink("");
+    props.setIsUploadDisabled(false);
     props.setMediaUploadToken(undefined);
     props.setFormIsCleared(true);
     props.setHasUploadedFile(false);
@@ -71,7 +68,7 @@ function F5UploadComponent(props: Props) {
   };
 
   const handleUploadFile = async () => {
-    if (file === undefined) {
+    if (props.file === undefined) {
       return false;
     }
 
@@ -79,14 +76,14 @@ function F5UploadComponent(props: Props) {
 
     const request: UploadAudioRequest = {
       uuid_idempotency_token: uuidv4(),
-      file: file,
+      file: props.file,
       source: "file",
     };
 
     let result = await UploadAudio(request);
 
     if (UploadAudioIsOk(result)) {
-      setIsUploadDisabled(true);
+      props.setIsUploadDisabled(true);
       props.setMediaUploadToken(result.upload_token);
       props.setFormIsCleared(false);
     }
@@ -95,13 +92,13 @@ function F5UploadComponent(props: Props) {
   };
 
   const fileSize =
-    file && file.size >= 1024 * 1024
-      ? (file.size / 1024 / 1024).toFixed(2) + " MB"
-      : file
-        ? `${Math.floor(file.size / 1024)} KB`
+    props.file && props.file.size >= 1024 * 1024
+      ? (props.file.size / 1024 / 1024).toFixed(2) + " MB"
+      : props.file
+        ? `${Math.floor(props.file.size / 1024)} KB`
         : null;
 
-  const uploadBtnClass = isUploadDisabled
+  const uploadBtnClass = props.isUploadDisabled
     ? "btn fw-medium btn-uploaded w-100 disabled"
     : "btn fw-medium btn-primary w-100";
 
@@ -116,13 +113,13 @@ function F5UploadComponent(props: Props) {
         children={
           <div
             className={`panel panel-inner upload-zone d-flex align-items-center justify-content-center p-4 ${
-              !file ? "empty-zone-f5" : ""
+              !props.file ? "empty-zone-short" : ""
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
           >
             <div className="me-3">
-              {file ? (
+              {props.file ? (
                 <FontAwesomeIcon icon={faFileAudio} className="upload-icon" />
               ) : (
                 <FontAwesomeIcon icon={faFileArrowUp} className="upload-icon" />
@@ -130,9 +127,9 @@ function F5UploadComponent(props: Props) {
             </div>
             <div>
               <div className="pb-0">
-                {file ? (
-                  <span className="filename" title={file.name}>
-                    {file.name.slice(0, file.name.lastIndexOf("."))}
+                {props.file ? (
+                  <span className="filename" title={props.file.name}>
+                    {props.file.name.slice(0, props.file.name.lastIndexOf("."))}
                   </span>
                 ) : (
                   <>
@@ -143,10 +140,14 @@ function F5UploadComponent(props: Props) {
               </div>
               <div className="d-flex gap-1">
                 <div>
-                  {file ? (
+                  {props.file ? (
                     <p>
                       <span className="opacity-50">
-                        {file && `${file.name.split(".").pop().toUpperCase()}`}{" "}
+                        {props.file &&
+                          `${props.file?.name
+                            .split(".")
+                            .pop()
+                            ?.toUpperCase()}`}{" "}
                         file size: {fileSize}
                       </span>{" "}
                       <u className="fw-medium opacity-100 ms-1">
@@ -164,15 +165,15 @@ function F5UploadComponent(props: Props) {
           </div>
         }
       />
-      {file ? (
+      {props.audioLink ? (
         <div className="panel panel-inner rounded p-3">
-          <InputVcAudioPlayer filename={audioLink as string} />
+          <InputVcAudioPlayer filename={props.audioLink as string} />
         </div>
       ) : (
         <></>
       )}
 
-      {file ? (
+      {props.file ? (
         <div className="d-flex gap-3">
           <button
             className={uploadBtnClass}
@@ -180,9 +181,9 @@ function F5UploadComponent(props: Props) {
               handleUploadFile();
             }}
             type="submit"
-            disabled={uploadLoading || isUploadDisabled}
+            disabled={uploadLoading || props.isUploadDisabled}
           >
-            {isUploadDisabled ? (
+            {props.isUploadDisabled ? (
               <>
                 <FontAwesomeIcon icon={faCheck} className="me-2" />
                 {t("uploadButtonUploaded")}
@@ -224,4 +225,4 @@ const LoadingIcon: React.FC = () => {
   );
 };
 
-export default F5UploadComponent;
+export default UploadComponent;

@@ -17,8 +17,8 @@ import {
 } from "components/common";
 import React, { useContext, useState } from "react";
 import useF5Store from "hooks/useF5Store";
-import F5RecordComponent from "./components/F5RecordComponent";
-import F5UploadComponent from "./components/F5UploadComponent";
+import RecordComponent from "components/common/RecordComponent";
+import UploadComponent from "components/common/UploadComponent";
 import { SessionF5TtsResultsList } from "v2/view/_common/SessionF5TtsResultsList";
 import { useInferenceJobs } from "hooks";
 import { v4 as uuidv4 } from "uuid";
@@ -49,9 +49,17 @@ export default function F5TTS() {
     setFormIsCleared,
     setText,
     text,
+    recordingBlobStore,
+    setRecordingBlobStore,
+    isUploadDisabled,
+    setIsUploadDisabled,
+    file,
+    setFile,
+    audioLink,
+    setAudioLink,
   } = useF5Store();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isRecordingAudio, setIsRecordingAudio] = useState(false);
+  const [_isRecordingAudio, setIsRecordingAudio] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   usePrefixedDocumentTitle("F5-TTS Zero-Shot Voice Cloning");
@@ -126,13 +134,17 @@ export default function F5TTS() {
                     <div className="d-flex flex-column gap-3">
                       {!hasUploadedFile && (
                         <div>
-                          <F5RecordComponent
+                          <RecordComponent
                             setMediaUploadToken={setMediaUploadToken}
                             formIsCleared={formIsCleared}
                             setFormIsCleared={setFormIsCleared}
                             setHasRecordedFile={setHasRecordedFile}
                             hasRecordedFile={hasRecordedFile}
                             setIsRecordingAudio={setIsRecordingAudio}
+                            recordingBlobStore={recordingBlobStore}
+                            setRecordingBlobStore={setRecordingBlobStore}
+                            isUploadDisabled={isUploadDisabled}
+                            setIsUploadDisabled={setIsUploadDisabled}
                           />
                         </div>
                       )}
@@ -147,11 +159,17 @@ export default function F5TTS() {
                       {!hasRecordedFile && (
                         <div>
                           <div className="upload-component">
-                            <F5UploadComponent
+                            <UploadComponent
                               setMediaUploadToken={setMediaUploadToken}
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
                               setHasUploadedFile={setHasUploadedFile}
+                              isUploadDisabled={isUploadDisabled}
+                              setIsUploadDisabled={setIsUploadDisabled}
+                              file={file}
+                              setFile={setFile}
+                              audioLink={audioLink}
+                              setAudioLink={setAudioLink}
                             />
                           </div>
                         </div>

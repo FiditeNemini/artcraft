@@ -10,7 +10,7 @@ import {
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
 import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useLocalize, useF5Store } from "hooks";
+import { useLocalize } from "hooks";
 import { Button } from "components/common";
 
 interface Props {
@@ -20,26 +20,24 @@ interface Props {
   setHasRecordedFile: (hasRecordedFile: boolean) => void;
   hasRecordedFile: boolean;
   setIsRecordingAudio: (isRecordingAudio: boolean) => void;
+  recordingBlobStore: Blob | undefined;
+  setRecordingBlobStore: (blob: Blob | undefined) => void;
+  isUploadDisabled: boolean;
+  setIsUploadDisabled: (value: boolean) => void;
 }
 
-export default function VCRecordComponent(props: Props) {
+export default function RecordComponent(props: Props) {
   const { t } = useLocalize("NewVC");
   const [uploadLoading, setUploadLoading] = useState(false);
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
 
-  const {
-    recordingBlobStore,
-    setRecordingBlobStore,
-    isUploadDisabled,
-    setIsUploadDisabled,
-  } = useF5Store();
-
   useEffect(() => {
     if (!recordingBlob) {
       return;
-    } else setRecordingBlobStore(recordingBlob);
-  }, [recordingBlob, setRecordingBlobStore]);
+    } else props.setRecordingBlobStore(recordingBlob);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordingBlob, props.setRecordingBlobStore]);
 
   const handleStartRecording = async () => {
     startRecording();
@@ -49,7 +47,7 @@ export default function VCRecordComponent(props: Props) {
   const handleStopRecording = async (blob: any) => {
     stopRecording();
     props.setFormIsCleared(false);
-    setIsUploadDisabled(false);
+    props.setIsUploadDisabled(false);
     props.setHasRecordedFile(true);
   };
 
@@ -63,7 +61,7 @@ export default function VCRecordComponent(props: Props) {
   const handleUpload = async () => {
     const request: UploadAudioRequest = {
       uuid_idempotency_token: uuidv4(),
-      file: recordingBlobStore,
+      file: props.recordingBlobStore,
       source: "device",
     };
 
@@ -74,7 +72,7 @@ export default function VCRecordComponent(props: Props) {
     if (UploadAudioIsOk(result)) {
       props.setMediaUploadToken(result.upload_token);
       props.setFormIsCleared(false);
-      setIsUploadDisabled(true);
+      props.setIsUploadDisabled(true);
     } else {
       // @ts-ignore
       window.dataLayer.push({
@@ -88,11 +86,13 @@ export default function VCRecordComponent(props: Props) {
   };
 
   const enableMediaReview =
-    !props.formIsCleared && recordingBlobStore !== undefined;
+    !props.formIsCleared && props.recordingBlobStore !== undefined;
   const enableUploadButton =
-    !props.formIsCleared && recordingBlobStore !== undefined && !isRecording;
+    !props.formIsCleared &&
+    props.recordingBlobStore !== undefined &&
+    !isRecording;
 
-  const speakButtonClass = isUploadDisabled
+  const speakButtonClass = props.isUploadDisabled
     ? "btn btn-uploaded w-100 disabled"
     : "btn btn-primary w-100";
 
@@ -130,7 +130,7 @@ export default function VCRecordComponent(props: Props) {
 
       {enableMediaReview ? (
         <>
-          <RecordedAudioComponent recordingBlob={recordingBlobStore} />
+          <RecordedAudioComponent recordingBlob={props.recordingBlobStore} />
 
           <div className="d-flex gap-3">
             <button
@@ -138,10 +138,10 @@ export default function VCRecordComponent(props: Props) {
               onClick={handleUpload}
               type="submit"
               disabled={
-                isUploadDisabled || uploadLoading || !enableUploadButton
+                props.isUploadDisabled || uploadLoading || !enableUploadButton
               }
             >
-              {isUploadDisabled ? (
+              {props.isUploadDisabled ? (
                 <>
                   <FontAwesomeIcon icon={faCheck} className="me-2" />
                   {t("button.recordUploaded")}

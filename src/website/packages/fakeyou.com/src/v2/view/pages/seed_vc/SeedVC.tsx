@@ -1,36 +1,236 @@
-import React from "react";
-import { faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import React, { useState } from "react";
+import {
+  faArrowDownToLine,
+  faFlask,
+  faMicrophoneAlt,
+  faSparkles,
+  faWaveform,
+  faWaveformLines,
+} from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import Countdown from "components/common/Countdown";
 import FAQSection from "components/common/FAQSection";
-//
-
-const endDate = new Date("2024-10-23T12:00:00-04:00");
+import HowToUseSection from "components/common/HowToUseSection";
+import { Badge, Button, Container, Label, Panel } from "components/common";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SessionSeedVCResultsList } from "v2/view/_common/SessionSeedVCResultsList";
+import useSeedVCStore from "hooks/useSeedVCStore";
+import {
+  GenerateSeedVcAudio,
+  GenerateSeedVcAudioRequest,
+  GenerateSeedVcAudioResponse,
+} from "@storyteller/components/src/api/seed_vc/GenerateSeedVcAudio";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { v4 as uuidv4 } from "uuid";
+import { useInferenceJobs } from "hooks";
+import UploadComponent from "components/common/UploadComponent";
+import RecordComponent from "components/common/RecordComponent";
+import "./SeedVC.scss";
 
 export default function SeedVC() {
   usePrefixedDocumentTitle("Seed-VC Zero-shot Voice Conversion");
+  const { enqueueInferenceJob } = useInferenceJobs();
+  const {
+    mediaUploadTokenReference,
+    setMediaUploadTokenReference,
+    mediaUploadTokenSource,
+    setMediaUploadTokenSource,
+    setHasUploadedFileReference,
+    hasUploadedFileSource,
+    setHasUploadedFileSource,
+    hasRecordedFileSource,
+    setHasRecordedFileSource,
+    recordingBlobStoreSource,
+    setRecordingBlobStoreSource,
+    isUploadDisabledSource,
+    setIsUploadDisabledSource,
+    isUploadDisabledReference,
+    setIsUploadDisabledReference,
+    fileSource,
+    setFileSource,
+    fileReference,
+    setFileReference,
+    audioLinkSource,
+    setAudioLinkSource,
+    audioLinkReference,
+    setAudioLinkReference,
+    formIsClearedSource,
+    setFormIsClearedSource,
+    formIsClearedReference,
+    setFormIsClearedReference,
+  } = useSeedVCStore();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_isRecordingAudio, setIsRecordingAudio] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleConvert = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+
+    setIsGenerating(true);
+
+    if (!mediaUploadTokenReference || !mediaUploadTokenSource) return;
+
+    const request: GenerateSeedVcAudioRequest = {
+      uuid_idempotency_token: uuidv4(),
+      reference_media_file_token: mediaUploadTokenReference,
+      source_media_file_token: mediaUploadTokenSource,
+      creator_set_visibility: "public",
+    };
+
+    try {
+      const response: GenerateSeedVcAudioResponse = await GenerateSeedVcAudio(
+        "",
+        request
+      );
+      if (response) {
+        console.log(
+          "Seed-VC queued successfully:",
+          response.inference_job_token
+        );
+        enqueueInferenceJob(
+          response.inference_job_token,
+          FrontendInferenceJobType.SeedVc
+        );
+        setIsGenerating(false);
+      } else {
+        console.error("Error queuing TTS");
+        setIsGenerating(false);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <>
-      <div
-        style={{
-          background: `url("/images/bg-svg.svg") no-repeat center center`,
-          backgroundSize: "cover",
-          width: "100%",
-          height: "100vh",
-        }}
-      >
-        <Countdown
-          endDate={endDate}
-          title="Seed-VC Zero-shot Voice Conversion"
-          description="New zero-shot voice conversion coming soon..."
-          icon={faWaveform}
-        />
-      </div>
+      <Container type="panel" className="mt-3 mt-lg-5">
+        <Panel padding={true} className="p-lg-5">
+          <form onSubmit={handleConvert}>
+            <div className="d-flex flex-column flex-lg-row gap-3 align-items-center mb-3 text-center text-lg-start">
+              <FontAwesomeIcon icon={faWaveform} className="seed-vc-icon" />
+              <div>
+                <div className="d-flex gap-2 gap-lg-3 align-items-center justify-content-center justify-content-lg-start flex-wrap mb-1">
+                  <h1 className="fw-bold fs-1 mb-0">
+                    Seed-VC Zero-shot Voice Conversion
+                  </h1>
+                  <Badge label="Beta" icon={faFlask} color="gray" />
+                </div>
+                <p
+                  className="opacity-75 fw-medium"
+                  style={{ fontSize: "18px" }}
+                >
+                  Convert your voice to any other voice with just a short audio
+                  reference.
+                </p>
+              </div>
+            </div>
 
-      {/* <HowToUseSection title="How to Use F5-TTS" steps={howToUseSteps} /> */}
+            <div className="d-flex flex-column gap-3 pt-3 pt-lg-5">
+              <div className="row g-5">
+                <div className="d-flex flex-column gap-3 col-12 col-lg-6">
+                  <div>
+                    <Label label="Reference Audio" />
+                    <div className="d-flex flex-column gap-3">
+                      <div>
+                        <div className="upload-component">
+                          <UploadComponent
+                            setMediaUploadToken={setMediaUploadTokenReference}
+                            formIsCleared={formIsClearedReference}
+                            setFormIsCleared={setFormIsClearedReference}
+                            setHasUploadedFile={setHasUploadedFileReference}
+                            isUploadDisabled={isUploadDisabledReference}
+                            setIsUploadDisabled={setIsUploadDisabledReference}
+                            file={fileReference}
+                            setFile={setFileReference}
+                            audioLink={audioLinkReference}
+                            setAudioLink={setAudioLinkReference}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-      <FAQSection faqItems={faqItems} className="mt-5 pt-5" />
+                  <div>
+                    <Label label="Source Audio" />
+                    <div className="d-flex flex-column gap-3">
+                      {!hasUploadedFileSource && (
+                        <div>
+                          <RecordComponent
+                            setMediaUploadToken={setMediaUploadTokenSource}
+                            formIsCleared={formIsClearedSource}
+                            setFormIsCleared={setFormIsClearedSource}
+                            setHasRecordedFile={setHasRecordedFileSource}
+                            hasRecordedFile={hasRecordedFileSource}
+                            setIsRecordingAudio={setIsRecordingAudio}
+                            recordingBlobStore={recordingBlobStoreSource}
+                            setRecordingBlobStore={setRecordingBlobStoreSource}
+                            isUploadDisabled={isUploadDisabledSource}
+                            setIsUploadDisabled={setIsUploadDisabledSource}
+                          />
+                        </div>
+                      )}
+
+                      {!hasUploadedFileSource && !hasRecordedFileSource && (
+                        <div className="d-flex gap-3 align-items-center">
+                          <hr className="w-100" />
+                          <span className="opacity-75 fw-medium">or</span>
+                          <hr className="w-100" />
+                        </div>
+                      )}
+                      {!hasRecordedFileSource && (
+                        <div>
+                          <div className="upload-component">
+                            <UploadComponent
+                              setMediaUploadToken={setMediaUploadTokenSource}
+                              formIsCleared={formIsClearedSource}
+                              setFormIsCleared={setFormIsClearedSource}
+                              setHasUploadedFile={setHasUploadedFileSource}
+                              isUploadDisabled={isUploadDisabledSource}
+                              setIsUploadDisabled={setIsUploadDisabledSource}
+                              file={fileSource}
+                              setFile={setFileSource}
+                              audioLink={audioLinkSource}
+                              setAudioLink={setAudioLinkSource}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="d-flex gap-2 justify-content-end mt-3">
+                    <Button
+                      icon={faSparkles}
+                      label="Convert Speech"
+                      type="submit"
+                      isLoading={isGenerating}
+                      disabled={
+                        !mediaUploadTokenReference || !mediaUploadTokenSource
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                  <div className="d-flex flex-column">
+                    <Label label="Output" />
+                    <div className="d-flex flex-column session-f5-section">
+                      <SessionSeedVCResultsList />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </Panel>
+      </Container>
+
+      <HowToUseSection
+        title="How to Use SeedVC Voice Conversion"
+        steps={howToUseSteps}
+      />
+
+      <FAQSection faqItems={faqItems} />
     </>
   );
 }
@@ -58,30 +258,30 @@ const faqItems = [
   },
 ];
 
-// const howToUseSteps = [
-//   {
-//     icon: faWaveformLines,
-//     title: "Step 1: Upload Your Audio",
-//     description:
-//       "In the panel above, start by adding a reference audio, either record your own voice or upload an audio file. This audio will be used by F5-TTS to clone the voice, enabling the generation of speech that closely resembles the reference voice. For optimal results, ensure the audio is clear and of high quality.",
-//   },
-//   {
-//     icon: faTextSize,
-//     title: "Step 2: Enter Your Text",
-//     description:
-//       "Next, input the text you wish to convert into speech. This text will be synthesized using the voice from your reference audio, allowing you to create personalized audio content. Ensure your text is clear and concise for the best results.",
-//   },
-//   {
-//     icon: faArrowDownToLine,
-//     title: "Step 3: Generate and Save",
-//     description: (
-//       <>
-//         With your audio and text prepared, click 'Generate Speech' to activate
-//         F5-TTS and transform your text into lifelike speech. Once the process is
-//         complete, you can listen to the synthesized audio directly in the output
-//         panel above. If you're happy with the result, click the download button
-//         to save the audio file and use it in your projects!
-//       </>
-//     ),
-//   },
-// ];
+const howToUseSteps = [
+  {
+    icon: faWaveformLines,
+    title: "Step 1: Upload Reference Audio",
+    description:
+      "In the panel above, start by uploading a reference audio. This short audio clip (1-30 seconds) represents the target voice you want to convert to. For the best results, make sure that the audio is clear and of high quality.",
+  },
+  {
+    icon: faMicrophoneAlt,
+    title: "Step 2: Add Source Audio",
+    description:
+      "Next, add your source audio. You can either record your own voice directly or upload an audio file. This is the voice that will be transformed into the target voice from step 1. For both fields, don't forget to click 'Upload Audio' after you've added your audio!",
+  },
+  {
+    icon: faArrowDownToLine,
+    title: "Step 3: Convert and Download",
+    description: (
+      <>
+        With both audio files prepared, click 'Convert Speech' to activate
+        Seed-VC and transform your source audio into the target voice. Once the
+        process is complete, you can listen to the converted audio directly in
+        the output panel above. If you're happy with the result, click the
+        download button to save the audio file and use it in your projects!
+      </>
+    ),
+  },
+];

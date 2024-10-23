@@ -21,6 +21,7 @@ export enum FrontendInferenceJobType {
   VideoStyleTransfer, // video_filter
   LivePortrait, // live_portrait
   F5Tts, // f5_tts
+  SeedVc, // seed_vc
 }
 
 export enum AllInferenceJobs {
