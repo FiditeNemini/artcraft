@@ -137,7 +137,7 @@ export class VideoNode extends NetworkedNode {
       blue: 150,
       green: 120,
     };
-
+    this.createChromaWorker();
     this.loadVideoFromUrl({
       videoUrl: this.extractionUrl ?? this.mediaFileUrl,
       // videoUrl: "", // for debug loading video
@@ -147,8 +147,6 @@ export class VideoNode extends NetworkedNode {
     });
 
     this.listenToBaseKNode();
-
-    this.createChromaWorker();
   }
   private listenToVideoPlayPause() {
     // TODO: for controling video playpause, can be improved with bette ui
@@ -223,7 +221,7 @@ export class VideoNode extends NetworkedNode {
       this.videoComponent.onloadstart = () => {
         this.setProgress(25, { newStatus: UploadStatus.LOADING });
       };
-      this.videoComponent.onloadedmetadata = () => {
+      this.videoComponent.onloadedmetadata = async () => {
         this.setProgress(50, { newStatus: UploadStatus.LOADING });
         console.log("Loaded Metadata");
         this.mediaFileSize = {
@@ -250,9 +248,16 @@ export class VideoNode extends NetworkedNode {
           "Replace Loading video with mediafile",
           this.videoComponent.src,
         );
-        this.kNode.image(this.videoComponent);
+
         this.duration = this.videoComponent.duration;
         this.videoComponent.currentTime = 0; // ensure it shows up on screen
+        await setTimeout(() => {
+          this.setChroma(this.isChroma);
+          // set chroma will do
+          // this.kNode.image(this.videoComponent);
+          // or
+          // this.kNode.image(this.videoCanvas);
+        }, 100);
         this.listenToVideoPlayPause();
         this.kNode.fill(transparent);
         this.setProgress(75, { newStatus: UploadStatus.LOADING });
@@ -260,10 +265,10 @@ export class VideoNode extends NetworkedNode {
     }
     //can play through
     this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
-      this.videoComponent.oncanplaythrough = () => {
+      this.videoComponent.oncanplaythrough = async () => {
+        console.log("Can play through the Mediafile:", this.videoComponent.src);
         this.didFinishLoading = true;
         this.setProgress(100, { newStatus: UploadStatus.SUCCESS });
-        this.setChroma(this.isChroma);
         resolve();
       };
 
@@ -306,9 +311,10 @@ export class VideoNode extends NetworkedNode {
     this.isChroma = isChroma;
 
     if (this.isChroma === false) {
-      this.kNode?.image(this.videoComponent);
+      this.kNode.image(this.videoComponent);
     } else {
-      this.kNode?.image(this.videoCanvas);
+      console.log("set video to use its videocanvas counterpart");
+      this.kNode.image(this.videoCanvas);
       if (this.videoComponent.paused || this.videoComponent.ended) {
         this.chromaKeyRender(0, false, false, true);
       } else {
@@ -363,7 +369,6 @@ export class VideoNode extends NetworkedNode {
         );
 
         const dataTransfer = this.drawingCanvas.transferToImageBitmap();
-
         await this.waitForWorkerResponse(dataTransfer, blockSeeking);
       } else {
         console.error("Context does not exist!");
@@ -373,6 +378,21 @@ export class VideoNode extends NetworkedNode {
     }
 
     if (doLoop) requestAnimationFrame(this.chromaKeyRender.bind(this));
+  }
+
+  downloadOffscreenCanvas(canvas: OffscreenCanvas) {
+    canvas.convertToBlob().then((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "offscreen-canvas-image.png"; // Specify the file name
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up
+      }
+    });
   }
 
   // Method to post the message and wait for the response
