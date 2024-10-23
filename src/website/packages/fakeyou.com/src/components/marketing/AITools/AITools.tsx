@@ -152,7 +152,9 @@ export default function AITools() {
     currentPath.includes("/dev-lp") ||
     currentPath.includes("/beta/") ||
     currentPath.includes("/face-animator") ||
-    currentPath.includes("/webcam-acting")
+    currentPath.includes("/webcam-acting") ||
+    currentPath.includes("/seed-vc") ||
+    currentPath.includes("/f5-tts")
   ) {
     items.push({
       externalLink: "https://discord.gg/fakeyou",
@@ -219,7 +221,11 @@ export default function AITools() {
   }
 
   if (currentPath.includes("/f5-tts")) {
-    items = [items[0], items[1], items[2], items[3], items[4], items[5]];
+    items = items.filter(item => item.to !== "/f5-tts");
+  }
+
+  if (currentPath.includes("/seed-vc")) {
+    items = items.filter(item => item.to !== "/seed-vc");
   }
 
   if (currentPath.includes("/style-video")) {

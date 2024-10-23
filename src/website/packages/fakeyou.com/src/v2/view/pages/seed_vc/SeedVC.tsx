@@ -25,6 +25,7 @@ import { useInferenceJobs } from "hooks";
 import UploadComponent from "components/common/UploadComponent";
 import RecordComponent from "components/common/RecordComponent";
 import "./SeedVC.scss";
+import { AITools } from "components/marketing";
 
 export default function SeedVC() {
   usePrefixedDocumentTitle("Seed-VC Zero-shot Voice Conversion");
@@ -231,6 +232,13 @@ export default function SeedVC() {
       />
 
       <FAQSection faqItems={faqItems} />
+
+      <Container type="panel" className="pt-5 mt-5">
+        <Panel clear={true}>
+          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
+          <AITools />
+        </Panel>
+      </Container>
     </>
   );
 }
