@@ -17,6 +17,7 @@
     "@zip.js/zip.js": "^2.7.52",
     "konva": "^9.3.14",
     "onnxruntime-web": "^1.19.2",
+    "posthog-js": "^1.174.3",
     "react": "^18.3.1",
     "react-colorful": "^5.6.1",
     "react-dom": "^18.3.1",
