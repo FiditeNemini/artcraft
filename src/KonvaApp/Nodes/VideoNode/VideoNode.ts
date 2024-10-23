@@ -217,11 +217,15 @@ export class VideoNode extends NetworkedNode {
     } else {
       console.log("Loading Video not ready");
     }
+
+    /**
+     * for the events that does not need to be replaced
+     */
     if (!this._isVideoEventListening) {
       this.videoComponent.onloadstart = () => {
         this.setProgress(25, { newStatus: UploadStatus.LOADING });
       };
-      this.videoComponent.onloadedmetadata = async () => {
+      this.videoComponent.onloadedmetadata = () => {
         this.setProgress(50, { newStatus: UploadStatus.LOADING });
         console.log("Loaded Metadata");
         this.mediaFileSize = {
@@ -244,13 +248,13 @@ export class VideoNode extends NetworkedNode {
           this.kNode.setSize(adjustedSize);
           this.kNode.setPosition(centerPosition);
         }
-        console.log(
-          "Replace Loading video with mediafile",
-          this.videoComponent.src,
-        );
-
         this.duration = this.videoComponent.duration;
         this.videoComponent.currentTime = 0; // ensure it shows up on screen
+        this.listenToVideoPlayPause();
+        this.kNode.fill(transparent);
+      };
+      this.videoComponent.onloadeddata = async () => {
+        this.setProgress(75, { newStatus: UploadStatus.LOADING });
         await setTimeout(() => {
           this.setChroma(this.isChroma);
           // set chroma will do
@@ -258,12 +262,12 @@ export class VideoNode extends NetworkedNode {
           // or
           // this.kNode.image(this.videoCanvas);
         }, 100);
-        this.listenToVideoPlayPause();
-        this.kNode.fill(transparent);
-        this.setProgress(75, { newStatus: UploadStatus.LOADING });
       };
     }
-    //can play through
+    /*
+     * Events to specifically listen to on each loading
+     * video datat from url
+     */
     this.finishedLoadingOnStart = new Promise<void>((resolve, reject) => {
       this.videoComponent.oncanplaythrough = async () => {
         console.log("Can play through the Mediafile:", this.videoComponent.src);
@@ -278,16 +282,14 @@ export class VideoNode extends NetworkedNode {
       };
     });
     this.videoComponent.src = videoUrl;
+
     try {
       await this.finishedLoadingOnStart;
-      // if (this.isChroma) {
-      //   await this.seek(1 / this.fps);
-      // } else {
-      //   await this.seek(0);
-      // }
-      // console.log("Finished Loading, Can play through");
+      this.videoComponent.oncanplaythrough = null;
+      this.videoComponent.onerror = null;
     } catch (err) {
-      //nothing
+      // nothing for now
+      // TODO: impolement retry
     }
   }
 
@@ -380,21 +382,6 @@ export class VideoNode extends NetworkedNode {
     if (doLoop) requestAnimationFrame(this.chromaKeyRender.bind(this));
   }
 
-  downloadOffscreenCanvas(canvas: OffscreenCanvas) {
-    canvas.convertToBlob().then((blob) => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "offscreen-canvas-image.png"; // Specify the file name
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url); // Clean up
-      }
-    });
-  }
-
   // Method to post the message and wait for the response
   async waitForWorkerResponse(
     dataTransfer: ImageBitmap,
@@ -456,7 +443,12 @@ export class VideoNode extends NetworkedNode {
           resolve();
         };
       });
-      await this.frameDidFinishSeeking;
+      try {
+        await this.frameDidFinishSeeking;
+        this.videoComponent.onseeked = null;
+      } catch (err) {
+        // do nothing for now
+      }
     } else {
       console.log("Video Not Seekable");
     }

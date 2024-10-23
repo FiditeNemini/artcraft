@@ -4,12 +4,27 @@ import { minNodeSize, transparent } from "./constants";
 
 export const NodeUtilities = {
   adjustNodeSizeToCanvas,
+  downloadOffscreenCanvas,
   getInitialTransform,
   isAssetUrlAvailable,
   positionNodeOnCanvasCenter,
   printKNodeAttrs,
   urlToBlob,
 };
+function downloadOffscreenCanvas(canvas: OffscreenCanvas) {
+  canvas.convertToBlob().then((blob) => {
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "offscreen-canvas-image.png"; // Specify the file name
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url); // Clean up
+    }
+  });
+}
 function getInitialTransform({
   existingTransform,
   mediaFileSize,
