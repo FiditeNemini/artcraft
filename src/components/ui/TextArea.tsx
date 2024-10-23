@@ -16,7 +16,7 @@ export interface TextareaInterface
   label?: string;
   resize?: ResizeType;
 }
-export const Textarea = forwardRef<HTMLTextAreaElement>(
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaInterface>(
   (
     { className, label, resize = "vertical", id, ...rest }: TextareaInterface,
     ref,

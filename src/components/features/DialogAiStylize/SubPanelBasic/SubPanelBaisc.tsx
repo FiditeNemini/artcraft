@@ -1,9 +1,9 @@
-import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ArtStyleSelector } from "./ArtStyleSelector";
 import { Prompts } from "./Prompts";
 
-import { Button } from "~/components/ui";
+// import { Button } from "~/components/ui";
 import { ArtStyleNames, SubPanelNames } from "../enums";
 
 export const SubPanelBasic = ({
@@ -13,14 +13,14 @@ export const SubPanelBasic = ({
   onSelectedArtStyle,
   onChangePositivePrompt,
   onChangeNegativePrompt,
-  onChangePanel,
+  // onChangePanel,
 }: {
   selectedArtStyle: ArtStyleNames;
   positivePrompt: string;
   negativePrompt: string;
   onSelectedArtStyle: (artStyle: ArtStyleNames) => void;
-  onChangePositivePrompt: (newPrompt: string) => void;
-  onChangeNegativePrompt: (newPrompt: string) => void;
+  onChangePositivePrompt: (newPrompt: string, isUserInput?: boolean) => void;
+  onChangeNegativePrompt: (newPrompt: string, isUserInput?: boolean) => void;
   onChangePanel: (newP: SubPanelNames) => void;
 }) => {
   return (

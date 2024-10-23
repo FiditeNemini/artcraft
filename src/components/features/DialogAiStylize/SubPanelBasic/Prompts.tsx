@@ -19,24 +19,24 @@ export const Prompts = ({
   selectedArtStyle: ArtStyleNames;
   positivePrompt: string;
   negativePrompt: string;
-  onChangePositivePrompt: (newPrompt: string) => void;
-  onChangeNegativePrompt: (newPrompt: string) => void;
+  onChangePositivePrompt: (newPrompt: string, isUserInput?: boolean) => void;
+  onChangeNegativePrompt: (newPrompt: string, isUserInput?: boolean) => void;
 }) => {
   const onChangePositivePromptHandler = (
     event: ChangeEvent<HTMLTextAreaElement>,
   ) => {
-    onChangePositivePrompt(event.target.value);
+    onChangePositivePrompt(event.target.value, true);
   };
   const onChangeNegativePromptHandler = (
     event: ChangeEvent<HTMLTextAreaElement>,
   ) => {
-    onChangeNegativePrompt(event.target.value);
+    onChangeNegativePrompt(event.target.value, true);
   };
   const generateRandomTextPositiveHandler = useCallback(() => {
-    onChangePositivePrompt(generateRandomTextPositive(selectedArtStyle));
+    onChangePositivePrompt(generateRandomTextPositive(selectedArtStyle), false);
   }, [selectedArtStyle]);
   const generateRandomTextNegativeHandler = useCallback(() => {
-    onChangeNegativePrompt(generateRandomTextNegative(selectedArtStyle));
+    onChangeNegativePrompt(generateRandomTextNegative(selectedArtStyle), false);
   }, [selectedArtStyle]);
 
   return (

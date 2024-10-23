@@ -17,12 +17,22 @@ import {
   generateRandomTextPositive,
   generateRandomTextNegative,
   AIStylizeProps,
-  initialValues,
+  initialValues as initialAIStylizeProps,
 } from "./utilities";
 
 import { SubPanelBasic } from "./SubPanelBasic";
 import { SubPanelAdvance } from "./SubPanelAdvance";
 
+type DialogStates = AIStylizeProps & {
+  panelState: SubPanelNames;
+  isPosPromptUserInput: boolean;
+  isNegPromptUserInput: boolean;
+};
+const initialDialogStates = {
+  panelState: SubPanelNames.BASIC,
+  isPosPromptUserInput: false,
+  isNegPromptUserInput: false,
+};
 export const DialogAiStylize = ({
   isOpen,
   closeCallback,
@@ -32,11 +42,9 @@ export const DialogAiStylize = ({
   closeCallback: () => void;
   onRequestAIStylize: (data: AIStylizeProps) => void;
 }) => {
-  const [state, setState] = useState<
-    AIStylizeProps & { panelState: SubPanelNames }
-  >({
-    ...initialValues,
-    panelState: SubPanelNames.BASIC,
+  const [state, setState] = useState<DialogStates>({
+    ...initialAIStylizeProps,
+    ...initialDialogStates,
   });
   const { panelState, ...aiStylizeProps } = state;
   const { selectedArtStyle, positivePrompt, negativePrompt } = aiStylizeProps;
@@ -48,29 +56,52 @@ export const DialogAiStylize = ({
   const onChangePanel = useCallback((newP: SubPanelNames) => {
     setState((curr) => ({ ...curr, panelState: newP }));
   }, []);
-  const setStylizeOptions = useCallback(
-    (newOptions: Partial<AIStylizeProps>) => {
-      setState((curr) => ({ ...curr, ...newOptions }));
-    },
-    [],
-  );
+  const setStylizeOptions = useCallback((newOptions: Partial<DialogStates>) => {
+    setState((curr) => {
+      if (newOptions.selectedArtStyle) {
+        const promptOptions = {
+          positivePrompt: curr.isPosPromptUserInput
+            ? curr.positivePrompt
+            : generateRandomTextPositive(newOptions.selectedArtStyle),
+          negativePrompt: curr.isNegPromptUserInput
+            ? curr.negativePrompt
+            : generateRandomTextNegative(newOptions.selectedArtStyle),
+        };
+        return { ...curr, ...newOptions, ...promptOptions };
+      }
+      return { ...curr, ...newOptions };
+    });
+  }, []);
   const onSelectedArtStyle = useCallback((newArtstyle: ArtStyleNames) => {
     setStylizeOptions({
       selectedArtStyle: newArtstyle,
-      positivePrompt: generateRandomTextPositive(newArtstyle),
-      negativePrompt: generateRandomTextNegative(newArtstyle),
     });
   }, []);
-  const onChangeNegativePrompt = useCallback((newPrompt: string) => {
-    setStylizeOptions({ negativePrompt: newPrompt });
-  }, []);
-  const onChangePositivePrompt = useCallback((newPrompt: string) => {
-    setStylizeOptions({ positivePrompt: newPrompt });
-  }, []);
+  const onChangeNegativePrompt = useCallback(
+    (newPrompt: string, isUserInput?: boolean) => {
+      setStylizeOptions({
+        negativePrompt: newPrompt,
+        isNegPromptUserInput: isUserInput,
+      });
+    },
+    [],
+  );
+  const onChangePositivePrompt = useCallback(
+    (newPrompt: string, isUserInput?: boolean) => {
+      setStylizeOptions({
+        positivePrompt: newPrompt,
+        isPosPromptUserInput: isUserInput,
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!isOpen) {
-      setState({ ...initialValues, panelState: SubPanelNames.BASIC });
+      setState({
+        ...initialAIStylizeProps,
+        ...initialDialogStates,
+      });
     }
   }, [isOpen]);
 
