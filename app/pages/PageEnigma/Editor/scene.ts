@@ -39,6 +39,7 @@ class Scene {
   updateSurfaceIdAttributeToMesh: Function;
   helper: MMDAnimationHelper;
   ambientLight: THREE.AmbientLight | undefined;
+  directional_light: THREE.DirectionalLight | undefined;
   timeline: TimeLine | undefined;
   version: number;
 
@@ -770,6 +771,8 @@ class Scene {
       ]);
       this.scene.background = texture;
       if (this.ambientLight) this.scene.remove(this.ambientLight);
+      if (this.directional_light) this.scene.add(this.directional_light);
+
     } else if (this.skybox == "m_1") {
       const texture = loader.load([
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
@@ -781,9 +784,13 @@ class Scene {
       ]);
       this.scene.background = texture;
       if (this.ambientLight) this.scene.remove(this.ambientLight);
+      if (this.directional_light) this.scene.add(this.directional_light);
+
     } else if (this.skybox == "m_2") {
       this.scene.background = new THREE.Color("#000000");
       if (this.ambientLight) this.scene.add(this.ambientLight);
+      if (this.directional_light) this.scene.remove(this.directional_light);
+
     } else {
       const texture = loader.load([
         "/resources/skybox/day/px.png",
@@ -795,6 +802,8 @@ class Scene {
       ]);
       this.scene.background = texture;
       if (this.ambientLight) this.scene.remove(this.ambientLight);
+      if (this.directional_light) this.scene.add(this.directional_light);
+
     }
 
     console.log("Backround creation..");
@@ -822,19 +831,19 @@ class Scene {
 
     this.ambientLight = new THREE.AmbientLight(new THREE.Color("#ffffff"), 3);
 
-    const directional_light = new THREE.DirectionalLight(color, 2.0);
+    this.directional_light = new THREE.DirectionalLight(color, 2.0);
 
-    directional_light.position.set(5, 10, 3);
-    directional_light.shadow.mapSize.width = 2048;
-    directional_light.shadow.mapSize.height = 2048;
-    directional_light.shadow.map = null;
-    directional_light.castShadow = false;
-    directional_light.shadow.bias = 0.00004;
-    directional_light.userData["media_id"] = "DirectionalLight";
+    this.directional_light.position.set(5, 10, 3);
+    this.directional_light.shadow.mapSize.width = 2048;
+    this.directional_light.shadow.mapSize.height = 2048;
+    this.directional_light.shadow.map = null;
+    this.directional_light.castShadow = false;
+    this.directional_light.shadow.bias = 0.00004;
+    this.directional_light.userData["media_id"] = "DirectionalLight";
 
-    this.scene.add(directional_light);
-    this.scene.add(directional_light.target);
-    return directional_light;
+    this.scene.add(this.directional_light);
+    this.scene.add(this.directional_light.target);
+    return this.directional_light;
   }
 
   _createGrid() {
