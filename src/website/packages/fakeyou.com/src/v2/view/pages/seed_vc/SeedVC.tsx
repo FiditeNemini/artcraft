@@ -131,7 +131,7 @@ export default function SeedVC() {
               <div className="row g-5">
                 <div className="d-flex flex-column gap-3 col-12 col-lg-6">
                   <div>
-                    <Label label="Reference Audio" />
+                    <Label label="Reference Audio (1~30 seconds)" />
                     <div className="d-flex flex-column gap-3">
                       <div>
                         <div className="upload-component">

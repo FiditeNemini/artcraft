@@ -113,9 +113,9 @@ function SessionSeedVCResultsList() {
             break;
           case JobState.ATTEMPT_FAILED:
             cssStyle = "alert alert-danger mb-0";
-            stateDescription = `${
-              (t("resultsProgressFail"), { 0: job.attemptCount || "0" })
-            }}`;
+            stateDescription = `${t("resultsProgressFail", {
+              0: job.attemptCount || "0",
+            })}}`;
             loadingSpinner = (
               <LoadingSpinner
                 className="fs-6"
