@@ -3,6 +3,7 @@ import { useSignalEffect } from "@preact/signals-react";
 import { Transition } from "@headlessui/react";
 import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { dispatchers } from "~/signals/uiEvents/toolbarMain";
+import { authentication } from "~/signals";
 
 import { ToolbarMain } from "~/components/features";
 import { LoadingBar } from "~/components/ui";
@@ -41,6 +42,12 @@ export const SignaledToolbarMain = ({
         return () => appUiContext.openAddImage();
       case ToolbarMainButtonNames.ADD_VIDEO:
         return () => appUiContext.openAddVideo();
+      case ToolbarMainButtonNames.DOWNLOAD:
+        return () =>
+          window.open(
+            `https://www.storyteller.ai/profile/${authentication.signals.userInfo.value?.core_info.display_name}`,
+            "_blank",
+          );
       default:
         return dispatchers[buttonName];
     }

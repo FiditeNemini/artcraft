@@ -6,8 +6,9 @@ import {
   faArrowRotateLeft,
   faArrowRotateRight,
   faBars,
-  faCameraRotate,
-  faDownload,
+  // faCameraRotate,
+  // faDownload,
+  faCloudArrowDown,
   faFilePlus,
   faFilm,
   faFloppyDisk,
@@ -117,9 +118,9 @@ export const ToolbarMain = ({
             tooltip="Save"
           />
           <ToolbarButton
-            icon={faDownload}
+            icon={faCloudArrowDown}
             buttonProps={buttonProps.DOWNLOAD}
-            tooltip="Download"
+            tooltip="View & Download Videos"
           />
         </div>
       </div>
