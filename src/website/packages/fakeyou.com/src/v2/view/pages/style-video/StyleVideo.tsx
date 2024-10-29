@@ -29,8 +29,15 @@ import StyleSelectionList from "./StyleSelection/StyleSelectionList";
 import { isMobile } from "react-device-detect";
 import { AITools } from "components/marketing";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faLock,
+  faPaintBrush,
+  faSparkles,
+  faVideo,
+} from "@fortawesome/pro-solid-svg-icons";
 import PremiumLock from "components/PremiumLock";
+import HowToUseSection from "components/common/HowToUseSection";
+import FAQSection from "components/common/FAQSection";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -265,6 +272,56 @@ export default function StyleVideo() {
       />
     );
   }
+
+  const faqItems = [
+    {
+      question: "What is AI Video Style Transfer?",
+      answer:
+        "FakeYou's AI Video Style Transfer is a powerful tool that transforms your videos by applying artistic styles and visual effects using advanced AI technology. Upload any video and choose from our collection of styles to create stunning visual transformations. With features like face detailing, cinematic enhancement, and upscaling, you can create professional-looking stylized videos for content creation, social media, or artistic projects.",
+    },
+    {
+      question: "How do I start using AI Video Style Transfer?",
+      answer:
+        "Getting started is simple: Upload your video, choose your preferred style, and customize settings like style strength (0-100%) and quality options. You can enhance your results using features like Face Detailer for better facial details, Cinematic mode for dramatic effects, and our Upscaler for higher quality output. You can even add a reference image to further guide the style transfer process.",
+    },
+    {
+      question: "What types of video styles can I choose from?",
+      answer:
+        "Our style collection offers a wide range of options, from artistic styles like anime, watercolor, and oil painting to modern effects like cyberpunk, noir, and fantasy themes. Each style can be fine-tuned using our style strength slider, and you can further customize the look using positive and negative text prompts to guide the AI transformation process.",
+    },
+    {
+      question: "Can I use AI Video Style Transfer for any type of video?",
+      answer:
+        "Yes! Our AI Video Style Transfer works with most types of videos, though best results are achieved with clear, well-lit footage.",
+    },
+    {
+      question: "How long does it take to process a video?",
+      answer:
+        "Processing time varies depending on video length (3-7 seconds), selected quality options, and current system load. Using features like Face Detailer, Cinematic mode, or Upscaler will increase processing time but deliver higher quality results. You can generate multiple style variations simultaneously (up to 3) to explore different looks for your video.",
+    },
+  ];
+
+  const howToUseSteps = [
+    {
+      icon: faVideo,
+      title: "Step 1: Upload Your Video",
+      description:
+        "Start by uploading your video (up to 7 seconds with Pro/Elite subscription). For best results, use clear, well-lit footage. Your video will be the foundation for the style transformation, so quality matters!",
+    },
+    {
+      icon: faPaintBrush,
+      title: "Step 2: Choose Your Style",
+      description:
+        "Select from our diverse collection of AI video styles. Fine-tune your selection using the style strength slider (0-100%) and enhance it further with text prompts. You can even upload a reference image to guide the style transfer process.",
+    },
+
+    {
+      icon: faSparkles,
+      title: "Step 3: Generate and Share",
+      description:
+        "Click 'Generate Styled Video' to start the transformation. You can create up to 3 variations simultaneously to explore different looks. Once complete, download your stylized video for sharing on social media, content creation, or artistic projects.",
+    },
+  ];
 
   return (
     <>
@@ -545,6 +602,13 @@ export default function StyleVideo() {
           />
         )}
       </div>
+
+      <HowToUseSection
+        title="How to Use AI Video Style Transfer"
+        steps={howToUseSteps}
+      />
+
+      <FAQSection faqItems={faqItems} />
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>

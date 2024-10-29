@@ -20,6 +20,7 @@ import {
   faDeleteLeft,
   faSearch,
   faSparkles,
+  faTextSize,
   faWaveformLines,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -43,6 +44,8 @@ import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import ExploreVoices from "../ExploreVoices";
 import { featuredTtsVoiceTokens } from "./FeaturedTTSVoiceTokens";
 import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+import HowToUseSection from "components/common/HowToUseSection";
+import FAQSection from "components/common/FAQSection";
 
 export default function NewTTS() {
   const { enqueueInferenceJob } = useInferenceJobs();
@@ -166,6 +169,61 @@ export default function NewTTS() {
     generationCount += 1;
     setLocalStorageItem(generationCountKey, generationCount.toString(), ttl);
   };
+
+  const faqItems = [
+    {
+      question: "What is FakeYou's Text to Speech?",
+      answer:
+        "FakeYou's Text to Speech is a community-powered AI platform that lets you convert text into speech using over 3,500 character voices. Our vibrant community of voice creators regularly contributes new voices, making it one of the largest collections of AI voices available. Whether you need voices for content creation, gaming, or creative projects, you'll find voices ranging from popular characters to original creations.",
+    },
+    {
+      question: "Where do all these voices come from?",
+      answer:
+        "The majority of our voices are created and contributed by our amazing community members. Voice creators from around the world train and share AI voice models, resulting in our diverse library of over 3,500 voices. This community-driven approach means you'll find both popular character voices and unique, original creations that you won't find anywhere else.",
+    },
+    {
+      question: "How good is the voice quality?",
+      answer:
+        "Voice quality can vary since our models come from different community creators, but we maintain high standards. Many of our popular voices deliver remarkably natural-sounding speech with proper intonation and character accuracy. Our rating system can help you find the highest-quality voices that best suit your needs, or pick from our featured voices list.",
+    },
+    {
+      question: "Can I create and share my own AI voices?",
+      answer:
+        "Absolutely! FakeYou is built on community contributions. You can join our growing community of voice creators, train your own AI voice models, upload and share them with others. Whether you're interested in creating character voices or original content, our platform provides the tools and community support to help you get started.",
+    },
+  ];
+
+  const howToUseSteps = [
+    {
+      icon: faSearch,
+      title: "Step 1: Find Your Perfect Voice",
+      description:
+        "Browse our collection of 3,500+ community-created voices. Check out our featured voices for popular options, or use the search bar to find specific characters. You can filter by language, and community ratings to find exactly what you need.",
+    },
+    {
+      icon: faTextSize,
+      title: "Step 2: Write Your Message",
+      description:
+        "Enter the text you want your chosen voice to speak. For best results, use clear punctuation and consider the character's speaking style. Pro tip: Many community members share tips in our Discord about getting the best performance from specific voices!",
+    },
+    {
+      icon: faWaveformLines,
+      title: "Step 3: Generate and Share",
+      description: (
+        <>
+          Click 'Speak' to generate your audio. Once complete, you can play it
+          back, download it, or share it with our community.{" "}
+          {!loggedIn && (
+            <span>
+              {" "}
+              Create a free account to save your history and join our community
+              of voice enthusiasts!
+            </span>
+          )}
+        </>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -304,6 +362,10 @@ export default function NewTTS() {
           </form>
         </Panel>
       </Container>
+
+      <HowToUseSection title="How to Use FakeYou TTS" steps={howToUseSteps} />
+
+      <FAQSection faqItems={faqItems} />
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>

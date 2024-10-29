@@ -18,11 +18,13 @@ import {
   faArrowDown,
   faArrowDownToLine,
   faEquals,
+  faImage,
   faImageUser,
   faLips,
   faLock,
   faPlus,
   faSparkles,
+  faVideo,
 } from "@fortawesome/pro-solid-svg-icons";
 import "./LivePortrait.scss";
 import ThumbnailMediaPicker from "./ThumbnailMediaPicker";
@@ -55,6 +57,8 @@ import OutputThumbnailImage from "./OutputThumbnailImage";
 import { useHistory } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import PremiumLock from "components/PremiumLock";
+import HowToUseSection from "components/common/HowToUseSection";
+import FAQSection from "components/common/FAQSection";
 
 interface GeneratedVideo {
   sourceIndex: number;
@@ -1111,6 +1115,13 @@ export default function LivePortrait() {
         </Panel>
       </Container>
 
+      <HowToUseSection
+        title="How to Use Live Portrait AI"
+        steps={howToUseSteps}
+      />
+
+      <FAQSection faqItems={faqItems} />
+
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try other AI video tools</h2>
@@ -1120,3 +1131,47 @@ export default function LivePortrait() {
     </>
   );
 }
+
+const faqItems = [
+  {
+    question: "What is Live Portrait AI?",
+    answer:
+      "Live Portrait AI is an advanced animation tool that transforms static photos into dynamic videos using AI technology. It can animate faces in photos to match the expressions, movements, and emotions from a driver video, creating realistic and engaging animations.",
+  },
+  {
+    question: "What types of images can I animate?",
+    answer:
+      "Live Portrait AI works with a wide range of images, including human portraits, pet photos, artwork, and character illustrations. The image should have a clear, visible face for the best results. It works particularly well with front-facing portraits.",
+  },
+  {
+    question: "How does Live Portrait AI work?",
+    answer:
+      "The technology uses AI-powered reenactment to map facial movements from a driver video onto your source image. It analyzes facial features and expressions in both the source image and driver video, then creates a seamless animation that maintains the identity of your source image while adopting the movements from the driver.",
+  },
+  {
+    question: "Can I use my own motion videos?",
+    answer:
+      "Yes! While we provide a selection of pre-made motion videos, you can upload your own custom videos to drive the animation. This gives you complete creative control over how your portrait will move and express itself.",
+  },
+];
+
+const howToUseSteps = [
+  {
+    icon: faImage,
+    title: "Step 1: Upload Your Photo or Video",
+    description:
+      "Select a clear portrait photo with a visible face. Our AI will automatically detect and prepare it for animation.",
+  },
+  {
+    icon: faVideo,
+    title: "Step 2: Choose Motion",
+    description:
+      "Pick a motion face video that defines how your photo will move. Use our preset animations or upload your own custom motion video. Make sure the video has a clear face and minimal shoulder movements for the best results.",
+  },
+  {
+    icon: faSparkles,
+    title: "Step 3: Generate Animation",
+    description:
+      "Click 'Animate' and watch as our AI brings your photo to life. Download your animated video in high quality for sharing or further editing.",
+  },
+];

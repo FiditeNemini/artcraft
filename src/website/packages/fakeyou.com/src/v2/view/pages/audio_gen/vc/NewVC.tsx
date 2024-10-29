@@ -17,6 +17,7 @@ import {
 } from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faMicrophoneAlt,
   faSearch,
   faWaveformLines,
   faXmark,
@@ -44,6 +45,8 @@ import VCPitchEstimateMethodComponent from "./VCPitchEstimateMethodComponent";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+import HowToUseSection from "components/common/HowToUseSection";
+import FAQSection from "components/common/FAQSection";
 
 export default function NewVC() {
   const { enqueueInferenceJob } = useInferenceJobs();
@@ -219,6 +222,69 @@ export default function NewVC() {
     generationCount += 1;
     setLocalStorageItem(generationCountKey, generationCount.toString(), ttl);
   };
+
+  const faqItems = [
+    {
+      question: "What is FakeYou Voice Conversion?",
+      answer:
+        "FakeYou Voice Conversion is a community-powered AI voice changer that transforms your voice into any voice from our extensive library of user-created voice models. Our advanced voice conversion technology lets you convert both speaking and singing voices in real-time, while maintaining natural-sounding results. Join thousands of creators who use our voice conversion tool for content creation, music covers, and creative projects.",
+    },
+    {
+      question: "Where do the voice conversion models come from?",
+      answer:
+        "Our voice models are created and shared by our vibrant community of voice enthusiasts. Community members train AI models for voice conversion, resulting in a diverse collection of voices. This collaborative approach means you'll find both popular character voices and unique creations that aren't available anywhere else. Anyone can contribute to our growing library of voice conversion models!",
+    },
+    {
+      question: "How does AI Voice Conversion work?",
+      answer:
+        "Our AI voice changer works in three simple steps: First, upload or record your audio. Then, select a target voice from our community-created collection. Finally, our advanced AI analyzes your input and transforms it to match your chosen voice. Fine-tune the results using pitch control and other settings for the perfect voice conversion. The entire process happens in real-time, making it perfect for both quick conversions and professional projects.",
+    },
+    {
+      question: "What can I use Voice Conversion for?",
+      answer:
+        "FakeYou's Voice Conversion is incredibly versatile! Use it for content creation, voice acting, music covers, and creative projects. The pitch control features are especially popular for singing voice conversion, letting you match specific musical keys or vocal ranges. Our community regularly uses it for YouTube videos, TikTok content, music covers, and voice acting practice. Whether you're a content creator, musician, or voice enthusiast, our AI voice changer has you covered.",
+    },
+    {
+      question: "How good is the voice conversion quality?",
+      answer:
+        "Our AI voice converter delivers high-quality transformations that preserve the natural flow and emotion of your original audio while adopting the characteristics of the target voice. The quality can vary based on factors like input audio clarity, chosen voice model, and pitch settings. Since our models are community-trained, you can preview any voice before converting and use our rating system to find the highest-quality voice models for your needs.",
+    },
+  ];
+
+  const howToUseSteps = [
+    {
+      icon: faSearch,
+      title: "Step 1: Choose Your Target Voice",
+      description:
+        "Browse our collection of community-created voice conversion models. Check out featured voices for popular options, or use our search to find specific voices. Each model is trained and shared by our community members, giving you access to a unique library of voices. Preview voices before converting to ensure they match your needs.",
+    },
+    {
+      icon: faMicrophoneAlt,
+      title: "Step 2: Prepare Your Audio",
+      description:
+        "Record your voice directly through our interface or upload an existing audio file. For optimal voice conversion results, ensure your recording is clear and free from background noise. Our community recommends using a good microphone and recording in a quiet environment for the best voice transformations.",
+    },
+    {
+      icon: faWaveformLines,
+      title: "Step 3: Adjust and Convert",
+      description: (
+        <>
+          Fine-tune your voice conversion using our advanced settings. Adjust
+          the pitch shift (up to 36 semitones), choose pitch estimation methods,
+          and toggle automatic F0 conversion for precise control. Once
+          satisfied, click 'Convert' to transform your audio using our AI voice
+          changer.{" "}
+          {!loggedIn && (
+            <span>
+              {" "}
+              Create a free account to save your conversion history and join our
+              growing community of voice creators!
+            </span>
+          )}
+        </>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -397,6 +463,13 @@ export default function NewVC() {
           </form>
         </Panel>
       </Container>
+
+      <HowToUseSection
+        title="How to Use FakeYou Voice Conversion"
+        steps={howToUseSteps}
+      />
+
+      <FAQSection faqItems={faqItems} />
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>
