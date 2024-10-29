@@ -5,6 +5,7 @@ import {
 } from "./data/randomTextList";
 
 export type AIStylizeProps = {
+  globalIpaMediaToken?: string;
   selectedArtStyle: ArtStyleNames;
   positivePrompt: string;
   negativePrompt: string;

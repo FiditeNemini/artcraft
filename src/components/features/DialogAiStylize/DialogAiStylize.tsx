@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import {
-  faWandSparkles,
-  faChevronLeft,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faWandSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button } from "~/components/ui";
 import {
@@ -115,35 +112,25 @@ export const DialogAiStylize = ({
           )}
           style={{ height: "calc(100vh - 200px)" }}
         >
+          <DialogTitle className="font-bold">Use AI to Stylize</DialogTitle>
+
           {panelState === SubPanelNames.BASIC && (
-            <>
-              <DialogTitle className="font-bold">Use AI to Stylize</DialogTitle>
-              <SubPanelBasic
-                selectedArtStyle={selectedArtStyle}
-                positivePrompt={positivePrompt}
-                negativePrompt={negativePrompt}
-                onSelectedArtStyle={onSelectedArtStyle}
-                onChangeNegativePrompt={onChangeNegativePrompt}
-                onChangePositivePrompt={onChangePositivePrompt}
-                onChangePanel={onChangePanel}
-              />
-            </>
+            <SubPanelBasic
+              selectedArtStyle={selectedArtStyle}
+              positivePrompt={positivePrompt}
+              negativePrompt={negativePrompt}
+              onSelectedArtStyle={onSelectedArtStyle}
+              onChangeNegativePrompt={onChangeNegativePrompt}
+              onChangePositivePrompt={onChangePositivePrompt}
+              onChangePanel={onChangePanel}
+            />
           )}
           {panelState === SubPanelNames.ADVANCED && (
-            <>
-              <Button
-                onClick={() => onChangePanel(SubPanelNames.BASIC)}
-                variant="tertiary"
-                className="my-1 w-fit"
-                icon={faChevronLeft}
-              >
-                Back to Basic Options
-              </Button>
-              <SubPanelAdvance
-                aiStylizeProps={aiStylizeProps}
-                onStylizeOptionsChanged={setStylizeOptions}
-              />
-            </>
+            <SubPanelAdvance
+              aiStylizeProps={aiStylizeProps}
+              onStylizeOptionsChanged={setStylizeOptions}
+              onChangePanel={onChangePanel}
+            />
           )}
           <div className="flex w-full justify-center gap-4">
             <Button onClick={closeCallback} variant="secondary">

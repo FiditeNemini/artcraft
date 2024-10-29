@@ -11,8 +11,8 @@ export const ArtStyleSelector = ({
 }) => {
   return (
     <div className="flex h-0 flex-auto overflow-hidden">
-      <div className="overflow-y-auto">
-        <div className="grid grid-cols-3 gap-2">
+      <div className="w-full overflow-y-auto">
+        <div className="grid w-full grid-cols-3 gap-2">
           {styleList.map((style) => (
             <ArtStyleItem
               key={style.type}

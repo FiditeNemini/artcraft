@@ -1,9 +1,9 @@
-// import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ArtStyleSelector } from "./ArtStyleSelector";
 import { Prompts } from "./Prompts";
 
-// import { Button } from "~/components/ui";
+import { Button } from "~/components/ui";
 import { ArtStyleNames, SubPanelNames } from "../enums";
 
 export const SubPanelBasic = ({
@@ -13,7 +13,7 @@ export const SubPanelBasic = ({
   onSelectedArtStyle,
   onChangePositivePrompt,
   onChangeNegativePrompt,
-  // onChangePanel,
+  onChangePanel,
 }: {
   selectedArtStyle: ArtStyleNames;
   positivePrompt: string;
@@ -24,7 +24,7 @@ export const SubPanelBasic = ({
   onChangePanel: (newP: SubPanelNames) => void;
 }) => {
   return (
-    <div className="flex w-full grow gap-2">
+    <div className="flex w-full grow gap-4">
       <div className="flex w-2/3 flex-col">
         <h4>Pick a Style</h4>
         <ArtStyleSelector
@@ -41,14 +41,14 @@ export const SubPanelBasic = ({
           onChangeNegativePrompt={onChangeNegativePrompt}
         />
         <span className="grow" />
-        {/* <Button
+        <Button
           onClick={() => onChangePanel(SubPanelNames.ADVANCED)}
           variant="tertiary"
           className="w-fit self-end"
         >
           Advanced Options
           <FontAwesomeIcon icon={faChevronRight} />
-        </Button> */}
+        </Button>
       </div>
     </div>
   );

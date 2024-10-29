@@ -38,7 +38,7 @@ export const ArtStyleItem = ({
   return (
     <button
       className={twMerge(
-        "relative aspect-video cursor-pointer overflow-hidden rounded-lg border-2 transition-colors",
+        "relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg border-2 transition-colors",
         transitionTimingStyles,
         selected
           ? "border-primary"
@@ -47,12 +47,7 @@ export const ArtStyleItem = ({
       )}
       onClick={handleSelected}
     >
-      <img
-        className="h-full w-full object-cover"
-        src={imageSrc}
-        {...imgProps}
-        alt={label}
-      />
+      <img className="object-cover" src={imageSrc} {...imgProps} alt={label} />
       <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
       <h4 className="absolute bottom-0 left-1 truncate text-start text-sm drop-shadow-md">
         {label}
