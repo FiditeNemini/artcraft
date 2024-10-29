@@ -9,20 +9,23 @@ import { PostHogProvider } from "posthog-js/react";
 import "./global.css";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
-// function PostHogInit() {
-//   const apiKey = "phc_jBFgac0mVALAFk3negnSfYCcHgvkT00yBLQDmCDYNBb";
-//   posthog.init(apiKey, {
-//     api_host: "https://us.i.posthog.com/",
-//     ui_host: "https://us.i.posthog.com/",
-//   });
-// }
+function PostHogInit() {
+  const apiKey = "phc_jBFgac0mVALAFk3negnSfYCcHgvkT00yBLQDmCDYNBb";
+  posthog.init(apiKey, {
+    api_host: "https://us.i.posthog.com/",
+    ui_host: "https://us.i.posthog.com/",
+  });
+}
 
 const App = () => {
   const useStrictMode = false;
   useRenderCounter("App");
-  // useEffect(() => {
-  //   PostHogInit();
-  // }, []);
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      return;
+    }
+    PostHogInit();
+  }, []);
   if (useStrictMode) {
     return (
       <StrictMode>
