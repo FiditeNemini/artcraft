@@ -1,25 +1,10 @@
-import { ApiConfig } from "../ApiConfig";
+import MakeRequest from "../MakeRequest";
 
-interface ResponsePayload {
-  success: boolean,
+export interface LogoutResponse {
+  success: boolean;
 }
 
-export async function Logout() : Promise<boolean> {
-  const endpoint = new ApiConfig().logout();
-  
-  return await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-  })
-  .then(res => res.json())
-  .then(res => {
-    const response : ResponsePayload = res;
-    return response.success;
-  })
-  .catch(e => {
-    return false;
-  });
-}
+export const Logout = MakeRequest<string, {}, LogoutResponse, {}>({
+  method: "POST",
+  routingFunction: () => "/v1/logout",
+});

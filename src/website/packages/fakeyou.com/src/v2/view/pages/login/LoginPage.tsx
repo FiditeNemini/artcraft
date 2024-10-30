@@ -95,7 +95,7 @@ export default function LoginPage() {
 
     Analytics.accountLoginAttempt();
 
-    const response = await CreateSession(request);
+    const response = await CreateSession("", request, {});
 
     if (CreateSessionIsError(response)) {
       setErrorMessage(response.error_message);

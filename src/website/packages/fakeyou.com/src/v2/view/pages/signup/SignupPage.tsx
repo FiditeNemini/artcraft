@@ -256,7 +256,7 @@ export default function SignupPage() {
       password_confirmation: passwordConfirmation,
     };
 
-    const response = await CreateAccount(request);
+    const response = await CreateAccount("", request, {});
 
     if (CreateAccountIsError(response)) {
       if ("email_address" in response.error_fields) {
@@ -325,8 +325,8 @@ export default function SignupPage() {
       ? redirectLink.includes("?")
         ? redirectLink + "&from=signup"
         : redirectLink + "?from=signup"
-      // : "/";
-    : WebUrl.pricingPageWithReferer("signup");
+      : // : "/";
+        WebUrl.pricingPageWithReferer("signup");
 
     if (domain.website === Website.StorytellerAi) {
       redirectUrl = redirectSignUpLink;
