@@ -3,7 +3,7 @@ import { FilterEngineCategories } from "./enums/QueryFilters";
 import { Visibility } from "./enums/Visibility";
 
 export class MediaUploadApi extends ApiManager {
-  private sessionToken: string = undefined;
+  private sessionToken?: string = undefined;
 
   private async Upload({
     endpoint,
@@ -285,9 +285,9 @@ export class MediaUploadApi extends ApiManager {
     const endpoint = `https://upload.storyteller.ai/v1/media_files/upload/studio_shot`;
 
     if (!this.sessionToken) {
-      console.log("Session Token");
+      console.log("Get Session Token");
       const response = await this.getSessionTokenForUploadStudioShot();
-      if (response.success && response.data) {
+      if (response.success && "data" in response) {
         this.sessionToken = response.data;
         console.log(`Token ${this.sessionToken}`);
       } else {

@@ -1,4 +1,7 @@
-import { ICanvasConfig } from "konva/lib/Canvas"; // have to export and modify the code TODO:/
+//@ts-ignore
+// TODO: have to export and modify the code
+import { ICanvasConfig } from "konva/lib/Canvas";
+
 import { Canvas } from "konva/lib/Canvas";
 import { OffScreenSceneContext } from "./OffScreenSceneContext";
 
@@ -7,12 +10,14 @@ export class OffScreenSceneCanvas extends Canvas {
     config: ICanvasConfig = { width: 0, height: 0, willReadFrequently: false },
   ) {
     super(config); // creates canvas then you have to replace it
+    //@ts-ignore
     // replace here also kills the css but thats ok
     this._canvas = new OffscreenCanvas(config.width, config.height);
 
     this.context = new OffScreenSceneContext(this, {
       willReadFrequently: config.willReadFrequently,
     });
+    console.log("Created Offscreen Scene Canvas");
     this.setSize(config.width, config.height);
   }
 
@@ -27,7 +32,7 @@ export class OffScreenSceneCanvas extends Canvas {
   }
   public override setWidth(width: number) {
     // take into account pixel ratio
-    console.log("overriden setWidth");
+    // console.log("overriden setWidth");
     this.width = this._canvas.width = width * this.pixelRatio;
     var pixelRatio = this.pixelRatio,
       _context = this.getContext()._context;
@@ -35,7 +40,7 @@ export class OffScreenSceneCanvas extends Canvas {
   }
   public override setHeight(height: number) {
     // take into account pixel ratio
-    console.log("overriden setHeight");
+    // console.log("overriden setHeight");
     this.height = this._canvas.height = height * this.pixelRatio;
     var pixelRatio = this.pixelRatio,
       _context = this.getContext()._context;

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import {
   SharedWorkerRequest,
   SharedWorkerResponse,
@@ -29,7 +30,9 @@ export class DiffusionSharedWorkerClient<
     this.messageReceived = messageReceived;
     try {
       console.log("This is running a worker in production");
-      this.sharedWorker = new DiffusionSharedWorker();
+      this.sharedWorker = new DiffusionSharedWorker({
+        name: "DiffusionWorker-" + uuidv4(),
+      });
 
       this.sharedWorker.addEventListener("error", (value) => {
         console.log("Shared worker ERROR:");

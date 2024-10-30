@@ -47,6 +47,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
   DiffusionSharedWorkerResponseData,
   DiffusionSharedWorkerProgressData
 > {
+  public name: string;
   public zipFileWriter: BlobWriter;
   public zipWriter: ZipWriter<Blob>;
   public imageType: string;
@@ -61,6 +62,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
   public blobs: Blob[];
   constructor(port: MessagePort) {
     super(port);
+    this.name = "DiffusionWorker";
     this.setup(this.workFunction.bind(this), this.progressFunction.bind(this));
     this.offscreenCanvas = undefined;
     this.bitmapContext = undefined;
@@ -149,9 +151,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 
       console.log("Prepare to Zip");
       const zipBlob = await this.zipBlobs();
-
-      console.log(zipBlob);
-      console.log("Zipped");
+      console.log("Zipped", zipBlob);
 
       const progressMedia: DiffusionSharedWorkerProgressData = {
         url: "",
@@ -363,6 +363,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 }
 
 // This is a copy paste to create a worker now.
+//@ts-ignore
 self.onconnect = (e: any) => {
   const port = e.ports[0];
   console.log("DiffusionSharedWorker Started");

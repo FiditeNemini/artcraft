@@ -200,7 +200,7 @@ export class Engine {
 
     if (response.responseType === ResponseType.error) {
       console.log("Error Data?");
-      console.log(response.data);
+      console.log(response.data, response);
       uiAccess.dialogError.show({
         title: "Generation Error Try again.",
         message: response.data?.toString(),
