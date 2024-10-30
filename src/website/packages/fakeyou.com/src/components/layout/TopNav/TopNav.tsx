@@ -123,7 +123,7 @@ export default function TopNav() {
   }, []);
 
   const logoutHandler = useCallback(async () => {
-    await Logout();
+    await Logout("", {});
     queryAppState();
     history.push("/");
   }, [history, queryAppState]);
