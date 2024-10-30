@@ -2,11 +2,12 @@ import { ToolbarNodeButtonNames as ButtonNames } from "./enums";
 import {
   faArrowUpFromLine,
   faArrowDownFromLine,
-  // faHatWitch,
+  faHatWitch,
   faScalpelLineDashed,
   faTransporter,
   faTrashCan,
   faVectorSquare,
+  faDownload,
 } from "@fortawesome/pro-solid-svg-icons";
 
 export const ToolbarNodeButtonData = [
@@ -20,11 +21,11 @@ export const ToolbarNodeButtonData = [
     icon: faTransporter,
     tooltip: "Background Removal",
   },
-  // {
-  //   name: ButtonNames.AI_STYLIZE,
-  //   icon: faHatWitch,
-  //   tooltip: "AI Stylize",
-  // },
+  {
+    name: ButtonNames.AI_STYLIZE,
+    icon: faHatWitch,
+    tooltip: "AI Stylize",
+  },
   {
     name: ButtonNames.SEGMENTATION,
     icon: faScalpelLineDashed,
@@ -44,5 +45,10 @@ export const ToolbarNodeButtonData = [
     name: ButtonNames.DELETE,
     icon: faTrashCan,
     tooltip: "Delete",
+  },
+  {
+    name: ButtonNames.DOWNLOAD,
+    icon: faDownload,
+    tooltip: "Download",
   },
 ];

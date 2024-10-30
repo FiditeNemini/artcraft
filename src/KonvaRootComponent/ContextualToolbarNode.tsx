@@ -17,6 +17,8 @@ export const ContextualToolbarNode = () => {
         onClick: dispatchUiEvents.toolbarNode[buttonName],
         disabled:
           uiAccess.toolbarNode.signal.value.buttonStates[buttonName].disabled,
+        hidden:
+          uiAccess.toolbarNode.signal.value.buttonStates[buttonName].hidden,
         active:
           uiAccess.toolbarNode.signal.value.buttonStates[buttonName].active,
       };
@@ -26,6 +28,7 @@ export const ContextualToolbarNode = () => {
       [key in ToolbarNodeButtonNames]: {
         onClick: MouseEventHandler<HTMLButtonElement>;
         disabled: boolean;
+        hidden: boolean;
         active: boolean;
       };
     },

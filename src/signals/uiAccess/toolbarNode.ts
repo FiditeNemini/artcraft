@@ -6,10 +6,13 @@ type ButtonStates = {
   [key in ButtonNames]: {
     disabled: boolean;
     active: boolean;
+    hidden: boolean;
   };
 };
-interface ContextualToolbarProps extends ContextualUi {
+export interface ContextualToolbarProps extends ContextualUi {
+  knodeIds: number[];
   disabled: boolean;
+  downloadUrl?: string;
   locked: boolean | "unknown";
   lockDisabled: boolean;
   buttonStates: ButtonStates;
@@ -19,6 +22,7 @@ interface PartialContextualToolbarProps
   buttonStates?: Partial<ButtonStates>;
 }
 const toolbarNodeSignal = signal<ContextualToolbarProps>({
+  knodeIds: [],
   position: {
     x: 0,
     y: 0,
@@ -70,6 +74,7 @@ export const toolbarNode = {
         ...buttonStates,
         [ButtonNames.TRANSFORM]: {
           disabled: locked,
+          hidden: false,
           active: buttonStates[ButtonNames.TRANSFORM].active,
         },
       },
@@ -149,21 +154,20 @@ export const toolbarNode = {
 };
 
 function initButtonStates(props: { locked?: boolean | "unknown" } = {}) {
-  return Object.values(ButtonNames).reduce(
-    (buttonStates, buttonName) => {
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates[buttonName] = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          active: true,
-        };
-      } else {
-        buttonStates[buttonName] = {
-          disabled: false,
-          active: false,
-        };
-      }
-      return buttonStates;
-    },
-    {} as ContextualToolbarProps["buttonStates"],
-  );
+  return Object.values(ButtonNames).reduce((buttonStates, buttonName) => {
+    if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
+      buttonStates[buttonName] = {
+        disabled: props.locked === "unknown" || props.locked === true,
+        hidden: false,
+        active: true,
+      };
+    } else {
+      buttonStates[buttonName] = {
+        disabled: false,
+        hidden: false,
+        active: false,
+      };
+    }
+    return buttonStates;
+  }, {} as ButtonStates);
 }

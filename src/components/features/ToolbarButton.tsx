@@ -11,6 +11,7 @@ import { Tooltip } from "~/components/ui";
 export interface ToolbarButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
+  hidden?: boolean;
 }
 
 export const ToolbarButton = ({
@@ -32,14 +33,20 @@ export const ToolbarButton = ({
     className: customButtonClassNames,
     disabled,
     active,
+    hidden,
     onClick: customOnClick,
     ...restButtonProps
   } = buttonProps;
+
+  if (hidden) {
+    return null;
+  }
+
   const mergedButtonClasses = twMerge(
     "rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
     children ? "w-fit flex items-center gap-2 text-nowrap" : "size-10",
+    active && "pointer-events-none text-primary ",
     disabled && "pointer-events-none text-secondary-300",
-    !disabled && active && "pointer-events-none text-primary ",
     customButtonClassNames,
   );
 

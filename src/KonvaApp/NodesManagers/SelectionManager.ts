@@ -4,7 +4,9 @@ import { MediaNode, Position, Transformation } from "../types";
 import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
 import { LoadingBarStatus } from "~/components/ui";
-import { VideoNode } from "../Nodes";
+import { ImageNode, TextNode, VideoNode } from "../Nodes";
+import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode";
+import { ContextualToolbarProps } from "~/signals/uiAccess/toolbarNode";
 
 export enum SelectionManagerEvents {
   NODES_TRANSLATIONS = "nodestranslation",
@@ -271,15 +273,30 @@ export class SelectionManager {
   }
 
   public showContextComponents(node: MediaNode) {
-    if (!uiAccess.toolbarNode.isShowing()) {
-      uiAccess.toolbarNode.show({
+    const showOrUpdate = uiAccess.toolbarNode.isShowing()
+      ? uiAccess.toolbarNode.update
+      : uiAccess.toolbarNode.show;
+
+    if (node instanceof ImageNode) {
+      showOrUpdate({
         locked: node.isLocked(),
-      });
-    } else {
-      uiAccess.toolbarNode.update({
-        locked: node.isLocked(),
+        buttonStates: getImageNodeButtonStates({ locked: node.isLocked() }),
       });
     }
+    if (node instanceof TextNode) {
+      showOrUpdate({
+        locked: node.isLocked(),
+        buttonStates: getTextNodeButtonStates({ locked: node.isLocked() }),
+      });
+    }
+    if (node instanceof VideoNode) {
+      showOrUpdate({
+        locked: node.isLocked(),
+        buttonStates: getVideoNodeButtonStates({ locked: node.isLocked() }),
+      });
+    }
+
+    // show loading bar is the node is noding
     if (node instanceof NetworkedNode) {
       if (!node.didFinishLoading && !uiAccess.loadingBar.isShowing()) {
         // console.log("show loading bar");
@@ -326,4 +343,122 @@ export class SelectionManager {
       }
     }
   }
+}
+
+function getImageNodeButtonStates(
+  props: { locked?: boolean | "unknown" } = {},
+) {
+  const ButtonNames = ToolbarNodeButtonNames;
+  return Object.values(ButtonNames).reduce(
+    (buttonStates, buttonName) => {
+      // transform button depends on locked state
+      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
+        buttonStates.TRANSFORM = {
+          disabled: props.locked === "unknown" || props.locked === true,
+          hidden: false,
+          active: true,
+        };
+        return buttonStates;
+      }
+
+      // hidden buttons
+      if (
+        buttonName === ButtonNames.AI_STYLIZE ||
+        buttonName === ButtonNames.SEGMENTATION ||
+        buttonName === ButtonNames.DOWNLOAD ||
+        buttonName === ButtonNames.CHROMA
+      ) {
+        buttonStates[buttonName] = {
+          disabled: true,
+          hidden: true,
+          active: false,
+        };
+        return buttonStates;
+      }
+
+      // all other buttons
+      buttonStates[buttonName] = {
+        disabled: false,
+        hidden: false,
+        active: false,
+      };
+      return buttonStates;
+    },
+    {} as ContextualToolbarProps["buttonStates"],
+  );
+}
+function getTextNodeButtonStates(props: { locked?: boolean | "unknown" } = {}) {
+  const ButtonNames = ToolbarNodeButtonNames;
+  return Object.values(ButtonNames).reduce(
+    (buttonStates, buttonName) => {
+      // transform button depends on locked state
+      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
+        buttonStates[buttonName] = {
+          disabled: props.locked === "unknown" || props.locked === true,
+          hidden: false,
+          active: true,
+        };
+        return buttonStates;
+      }
+
+      // hidden buttons
+      if (
+        buttonName === ButtonNames.AI_STYLIZE ||
+        buttonName === ButtonNames.SEGMENTATION ||
+        buttonName === ButtonNames.DOWNLOAD ||
+        buttonName === ButtonNames.CHROMA
+      ) {
+        buttonStates[buttonName] = {
+          disabled: true,
+          hidden: true,
+          active: false,
+        };
+        return buttonStates;
+      }
+
+      // all other buttons
+      buttonStates[buttonName] = {
+        disabled: false,
+        hidden: false,
+        active: false,
+      };
+      return buttonStates;
+    },
+    {} as ContextualToolbarProps["buttonStates"],
+  );
+}
+function getVideoNodeButtonStates(
+  props: { locked?: boolean | "unknown" } = {},
+) {
+  const ButtonNames = ToolbarNodeButtonNames;
+  return Object.values(ButtonNames).reduce(
+    (buttonStates, buttonName) => {
+      // transform button depends on locked state
+      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
+        buttonStates.TRANSFORM = {
+          disabled: props.locked === "unknown" || props.locked === true,
+          hidden: false,
+          active: true,
+        };
+        return buttonStates;
+      }
+      // soon to come feature is disabled
+      if (buttonName === ButtonNames.AI_STYLIZE) {
+        buttonStates[buttonName] = {
+          disabled: true,
+          hidden: true,
+          active: false,
+        };
+        return buttonStates;
+      }
+      // all other buttons
+      buttonStates[buttonName] = {
+        disabled: false,
+        hidden: false,
+        active: false,
+      };
+      return buttonStates;
+    },
+    {} as ContextualToolbarProps["buttonStates"],
+  );
 }

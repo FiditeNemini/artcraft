@@ -591,7 +591,9 @@ export class RenderEngine {
           totalFrames: largestNumberOfFrames,
           prompt: renderingOptions,
         };
-        console.log(`Processing Frame:${j} out of ${largestNumberOfFrames}`);
+        console.log(
+          `Processing Frame:${j + 1} out of ${largestNumberOfFrames}`,
+        );
         this.diffusionWorker.sendData(1, data, false);
       }
     } // end of largest number of frames loop

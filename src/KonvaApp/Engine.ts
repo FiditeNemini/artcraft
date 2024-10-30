@@ -275,6 +275,38 @@ export class Engine {
     uiEvents.toolbarNode.lock.onClick(() => {
       this.commandManager.toggleLockNodes();
     });
+    uiEvents.toolbarNode.DOWNLOAD.onClick(() => {
+      const nodes = this.selectionManager.getSelectedNodes();
+      if (nodes.size > 1) {
+        uiAccess.dialogError.show({
+          title: "Error: Download Node Content",
+          message:
+            "Please do not select more than 1 item for the Download Node Content feature, you can only download 1 item at a time",
+        });
+        return;
+      }
+      const node = nodes.values().next().value;
+      try {
+        if (node instanceof VideoNode && node.currentUrl) {
+          function downloadURI(uri: string, name: string) {
+            const link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+          downloadURI(node.currentUrl, `Download Video Node-${node.kNode.id}`);
+        } else {
+          throw new Error();
+        }
+      } catch {
+        uiAccess.dialogError.show({
+          title: "Error: Download Node Content",
+          message: "This item does not have content for download.",
+        });
+      }
+    });
     uiEvents.toolbarNode.CRHOMA.onClick(() => {
       const nodes = this.selectionManager.getSelectedNodes();
       if (nodes.size > 1) {
@@ -293,6 +325,8 @@ export class Engine {
             isChromakeyEnabled: nodeChromaProps.isChromakeyEnabled,
             chromakeyColor: nodeChromaProps.chromakeyColor,
           });
+        } else {
+          throw new Error();
         }
       } catch {
         uiAccess.dialogError.show({

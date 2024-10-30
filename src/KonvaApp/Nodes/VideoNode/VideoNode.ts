@@ -39,6 +39,7 @@ export class VideoNode extends NetworkedNode {
   public kNode: Konva.Image;
   public mediaFileUrl: string;
   public extractionUrl: string | undefined;
+  public currentUrl: string;
   public videoComponent: HTMLVideoElement;
   protected _isVideoEventListening: boolean = false;
 
@@ -114,6 +115,7 @@ export class VideoNode extends NetworkedNode {
     // console.log("constructing new video node with data:", videoNodeData);
     this.mediaFileUrl = videoNodeData.mediaFileUrl;
     this.extractionUrl = videoNodeData.extractionUrl;
+    this.currentUrl = this.extractionUrl ?? this.mediaFileUrl;
     this.mediaFileToken = videoNodeData.mediaFileToken;
     this.mediaFileSize = mediaFileSize;
 
@@ -281,7 +283,10 @@ export class VideoNode extends NetworkedNode {
         reject();
       };
     });
-    this.videoComponent.src = videoUrl;
+
+    // the actual LOADING of the VIDEOURL
+    this.currentUrl = videoUrl;
+    this.videoComponent.src = this.currentUrl;
 
     try {
       await this.finishedLoadingOnStart;
