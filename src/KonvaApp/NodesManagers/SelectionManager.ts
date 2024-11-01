@@ -5,8 +5,13 @@ import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
 import { LoadingBarStatus } from "~/components/ui";
 import { ImageNode, TextNode, VideoNode } from "../Nodes";
-import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode";
-import { ContextualToolbarProps } from "~/signals/uiAccess/toolbarNode";
+import {
+  calculateContextualsPosition,
+  getImageNodeButtonStates,
+  getMultiSelectButtonStates,
+  getTextNodeButtonStates,
+  getVideoNodeButtonStates,
+} from "./ToolbarNodeUtilities";
 
 export enum SelectionManagerEvents {
   NODES_TRANSLATIONS = "nodestranslation",
@@ -44,6 +49,7 @@ export class SelectionManager {
   }) {
     this.firstSelectedNode = undefined;
     this.selectedNodes = new Set();
+
     this.initialPositions = new Map<MediaNode, Position>();
     this.initialTransformations = new Map<MediaNode, Transformation[]>();
     this.eventTarget = new EventTarget();
@@ -76,7 +82,11 @@ export class SelectionManager {
     if (
       this.disabled || // no-op when disabled
       this.selectedNodes.has(node) || // if the node is already selected
-      (this.selectedNodes.size > 0 && node.isLocked()) // if in multiselect but picked a locked item
+      (this.selectedNodes.size > 0 && node.isLocked()) ||
+      // if in multiselect but picked a locked item
+      (this.selectedNodes.size > 0 &&
+        this.selectedNodes.values().next().value?.isLocked())
+      // if the first node picked is a locked item
     ) {
       return false;
     }
@@ -84,11 +94,12 @@ export class SelectionManager {
     node.highlight();
     if (this.selectedNodes.size === 0) {
       node.setIsKEventRef(true);
-      this.updateContextComponents(node);
-      this.showContextComponents(node);
     }
     this.selectedNodes.add(node);
     this.updateNodeTransformer();
+    this.updateContextComponents();
+    this.showContextComponents();
+
     if (!doNotDraw) {
       this.mediaLayerRef.batchDraw();
     }
@@ -106,6 +117,8 @@ export class SelectionManager {
     }
     this.selectedNodes.delete(node);
     this.updateNodeTransformer();
+    this.updateContextComponents();
+    this.showContextComponents();
     if (!doNotDraw) {
       this.mediaLayerRef.batchDraw();
     }
@@ -129,8 +142,8 @@ export class SelectionManager {
     this.mediaLayerRef.batchDraw();
   }
 
-  public onToggleLock(node: MediaNode) {
-    this.updateContextComponents(node);
+  public onToggleLock() {
+    this.updateContextComponents();
   }
   public isDragging() {
     return this._isDragging;
@@ -150,7 +163,7 @@ export class SelectionManager {
     });
   }
 
-  public dragEnd(refNode: MediaNode) {
+  public dragEnd() {
     // release the dragging state for mouseevents in nodes
     this._isDragging = false;
     // track and map the final positions
@@ -173,8 +186,8 @@ export class SelectionManager {
     );
     // done, clear data and show menu
     this.initialPositions.clear();
-    this.updateContextComponents(refNode);
-    this.showContextComponents(refNode);
+    this.updateContextComponents();
+    this.showContextComponents();
   }
   private getKNodeTransformation(kNode: Konva.Node) {
     return {
@@ -202,7 +215,7 @@ export class SelectionManager {
     });
     this.hideContextComponents();
   }
-  public transformEnd(refNode: MediaNode) {
+  public transformEnd() {
     // track and map the final positions
     const finalTransformations = new Map<MediaNode, Transformation[]>();
     this.selectedNodes.forEach((selectedNode) => {
@@ -228,43 +241,18 @@ export class SelectionManager {
         },
       ),
     );
-    this.updateContextComponents(refNode);
-    this.showContextComponents(refNode);
+    this.updateContextComponents();
+    this.showContextComponents();
   }
 
   public updateNodeTransformer() {
-    const transformableNodes = new Set(
-      Array.from(this.selectedNodes).filter((node) => {
-        return !node.isLocked();
-      }),
-    );
-    this.nodeTransformerRef.enable({ selectedNodes: transformableNodes });
-  }
-
-  protected calculateContextualsPosition(kNode: Konva.Node) {
-    const w = kNode.getSize().width * kNode.scaleX();
-    const h = kNode.getSize().height * kNode.scaleY();
-    const x0 = kNode.getPosition().x;
-    const y0 = kNode.getPosition().y;
-
-    const d = kNode.getAbsoluteRotation();
-    const r = d >= 0 ? (d * Math.PI) / 180 : ((360 + d) * Math.PI) / 180;
-
-    let px: number, py: number;
-    if (r < Math.PI / 2) {
-      px = x0 + (h * Math.sin(r) + w * Math.cos(r)) / 2 - h * Math.sin(r);
-      py = y0 + h * Math.cos(r) + w * Math.cos(Math.PI / 2 - r);
-    } else if (r < Math.PI) {
-      px = x0 - (h * Math.sin(r) - w * Math.cos(r)) / 2;
-      py = y0 + w * Math.cos(Math.PI / 2 - r);
-    } else if (r < (Math.PI * 3) / 2) {
-      px = x0 + h * Math.cos(r) - (h * Math.cos(r) + w * Math.sin(r)) / 2;
-      py = y0;
+    const lockFlag = this.selectedNodes.values().next().value?.isLocked();
+    if (lockFlag) {
+      this.nodeTransformerRef.disable();
     } else {
-      px = x0 + (-h * Math.sin(r) + w * Math.cos(r)) / 2;
-      py = y0 + h * Math.cos(r);
+      this.nodeTransformerRef.enable();
     }
-    return { x: px, y: py };
+    this.nodeTransformerRef.addNodes({ selectedNodes: this.selectedNodes });
   }
 
   public hideContextComponents() {
@@ -272,42 +260,65 @@ export class SelectionManager {
     uiAccess.loadingBar.hide();
   }
 
-  public showContextComponents(node: MediaNode) {
+  public showContextComponents() {
     const showOrUpdate = uiAccess.toolbarNode.isShowing()
       ? uiAccess.toolbarNode.update
       : uiAccess.toolbarNode.show;
+    const node = this.selectedNodes.values().next().value;
+    if (node === undefined) {
+      this.hideContextComponents();
+      return; // no node
+    }
+    if (this.selectedNodes.size === 1) {
+      if (node instanceof ImageNode) {
+        showOrUpdate({
+          locked: node.isLocked(),
+          buttonStates: getImageNodeButtonStates({ locked: node.isLocked() }),
+        });
+      }
+      if (node instanceof TextNode) {
+        showOrUpdate({
+          locked: node.isLocked(),
+          buttonStates: getTextNodeButtonStates({ locked: node.isLocked() }),
+        });
+      }
+      if (node instanceof VideoNode) {
+        showOrUpdate({
+          locked: node.isLocked(),
+          buttonStates: getVideoNodeButtonStates({ locked: node.isLocked() }),
+        });
+      }
 
-    if (node instanceof ImageNode) {
-      showOrUpdate({
-        locked: node.isLocked(),
-        buttonStates: getImageNodeButtonStates({ locked: node.isLocked() }),
-      });
-    }
-    if (node instanceof TextNode) {
-      showOrUpdate({
-        locked: node.isLocked(),
-        buttonStates: getTextNodeButtonStates({ locked: node.isLocked() }),
-      });
-    }
-    if (node instanceof VideoNode) {
-      showOrUpdate({
-        locked: node.isLocked(),
-        buttonStates: getVideoNodeButtonStates({ locked: node.isLocked() }),
-      });
-    }
-
-    // show loading bar is the node is noding
-    if (node instanceof NetworkedNode) {
-      if (!node.didFinishLoading && !uiAccess.loadingBar.isShowing()) {
-        // console.log("show loading bar");
-        uiAccess.loadingBar.show();
+      // show loading bar is the node is noding
+      if (node instanceof NetworkedNode) {
+        if (!node.didFinishLoading && !uiAccess.loadingBar.isShowing()) {
+          // console.log("show loading bar");
+          uiAccess.loadingBar.show();
+        }
+      }
+    } else {
+      if (node) {
+        showOrUpdate({
+          locked: node.isLocked(),
+          buttonStates: getMultiSelectButtonStates({ locked: node.isLocked() }),
+        });
       }
     }
   }
 
-  public updateContextComponents(node: MediaNode) {
-    const coord = this.calculateContextualsPosition(node.kNode);
+  public updateContextComponents() {
+    // use first node as reference
+    const node = this.selectedNodes.values().next().value;
+    if (node === undefined) {
+      this.hideContextComponents();
+      return; // no nodes
+    }
+
     // console.log("SelectionManager > updateContextComponents for node:", node);
+    const coord = calculateContextualsPosition(
+      this.nodeTransformerRef.getKonvaNode(),
+    );
+
     if (node instanceof VideoNode) {
       if (node.isSegmentationMode && !uiAccess.toolbarNode.isLockDisabled()) {
         uiAccess.toolbarNode.disableLock();
@@ -316,6 +327,7 @@ export class SelectionManager {
       }
     }
     if (node.isLocked() !== uiAccess.toolbarNode.isLocked()) {
+      // console.log("setting lock");
       uiAccess.toolbarNode.setLocked(node.isLocked());
     }
     uiAccess.toolbarNode.setPosition({
@@ -343,122 +355,4 @@ export class SelectionManager {
       }
     }
   }
-}
-
-function getImageNodeButtonStates(
-  props: { locked?: boolean | "unknown" } = {},
-) {
-  const ButtonNames = ToolbarNodeButtonNames;
-  return Object.values(ButtonNames).reduce(
-    (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates.TRANSFORM = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-
-      // hidden buttons
-      if (
-        buttonName === ButtonNames.AI_STYLIZE ||
-        buttonName === ButtonNames.SEGMENTATION ||
-        buttonName === ButtonNames.DOWNLOAD ||
-        buttonName === ButtonNames.CHROMA
-      ) {
-        buttonStates[buttonName] = {
-          disabled: true,
-          hidden: true,
-          active: false,
-        };
-        return buttonStates;
-      }
-
-      // all other buttons
-      buttonStates[buttonName] = {
-        disabled: false,
-        hidden: false,
-        active: false,
-      };
-      return buttonStates;
-    },
-    {} as ContextualToolbarProps["buttonStates"],
-  );
-}
-function getTextNodeButtonStates(props: { locked?: boolean | "unknown" } = {}) {
-  const ButtonNames = ToolbarNodeButtonNames;
-  return Object.values(ButtonNames).reduce(
-    (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates[buttonName] = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-
-      // hidden buttons
-      if (
-        buttonName === ButtonNames.AI_STYLIZE ||
-        buttonName === ButtonNames.SEGMENTATION ||
-        buttonName === ButtonNames.DOWNLOAD ||
-        buttonName === ButtonNames.CHROMA
-      ) {
-        buttonStates[buttonName] = {
-          disabled: true,
-          hidden: true,
-          active: false,
-        };
-        return buttonStates;
-      }
-
-      // all other buttons
-      buttonStates[buttonName] = {
-        disabled: false,
-        hidden: false,
-        active: false,
-      };
-      return buttonStates;
-    },
-    {} as ContextualToolbarProps["buttonStates"],
-  );
-}
-function getVideoNodeButtonStates(
-  props: { locked?: boolean | "unknown" } = {},
-) {
-  const ButtonNames = ToolbarNodeButtonNames;
-  return Object.values(ButtonNames).reduce(
-    (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates.TRANSFORM = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-      // soon to come feature is disabled
-      if (buttonName === ButtonNames.AI_STYLIZE) {
-        buttonStates[buttonName] = {
-          disabled: true,
-          hidden: true,
-          active: false,
-        };
-        return buttonStates;
-      }
-      // all other buttons
-      buttonStates[buttonName] = {
-        disabled: false,
-        hidden: false,
-        active: false,
-      };
-      return buttonStates;
-    },
-    {} as ContextualToolbarProps["buttonStates"],
-  );
 }

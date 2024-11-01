@@ -477,14 +477,14 @@ export class VideoNode extends NetworkedNode {
       this.videoComponent.pause();
       this.videoComponent.currentTime = 0;
       this.setProgress(25, { message: "Loading Video Extractor..." });
-      this.selectionManagerRef.updateContextComponents(this);
-      this.selectionManagerRef.showContextComponents(this);
+      this.selectionManagerRef.updateContextComponents();
+      this.selectionManagerRef.showContextComponents();
 
       console.log("loadingbar should show");
 
       const blob = await NodeUtilities.urlToBlob(this.mediaFileUrl);
       this.setProgress(75, { message: "Loading Video Extractor..." });
-      this.selectionManagerRef.updateContextComponents(this);
+      this.selectionManagerRef.updateContextComponents();
 
       this.segmentationSession =
         await this.videoSegmentationAPI.createSession(blob);

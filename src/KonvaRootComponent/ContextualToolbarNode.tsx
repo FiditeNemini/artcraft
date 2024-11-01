@@ -1,4 +1,4 @@
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { twMerge } from "tailwind-merge";
 
@@ -10,6 +10,10 @@ import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums"
 import { transitionTimingStyles } from "~/components/styles";
 
 export const ContextualToolbarNode = () => {
+  const [winSize, setWinSize] = useState<{ width: number; height: number }>({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const { isShowing, position, ...rest } = uiAccess.toolbarNode.signal.value;
   const buttonsProps = Object.values(ToolbarNodeButtonNames).reduce(
     (acc, buttonName) => {
@@ -33,6 +37,20 @@ export const ContextualToolbarNode = () => {
       };
     },
   );
+  useEffect(() => {
+    function resizeHandler() {
+      setWinSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
+    window.addEventListener("resize", resizeHandler);
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, []);
+
+  const boundedTopPosition = Math.min(position.y, winSize.height - 164);
   return (
     <Transition
       as="div"
@@ -42,7 +60,7 @@ export const ContextualToolbarNode = () => {
         "fixed -translate-x-1/2 translate-y-5 data-[closed]:opacity-0",
       )}
       style={{
-        top: position.y,
+        top: boundedTopPosition,
         left: position.x,
       }}
     >

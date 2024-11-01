@@ -79,7 +79,7 @@ export abstract class NetworkedNode extends BaseNode {
   protected setStatus(newStatus: UploadStatus, message?: string) {
     this.mediaFileStatus = newStatus;
     this.errorMessage = message;
-    this.selectionManagerRef.updateContextComponents(this);
+    this.selectionManagerRef.updateContextComponents();
   }
   protected setProgress(
     newProgress: number,
@@ -99,6 +99,6 @@ export abstract class NetworkedNode extends BaseNode {
     if (this._progress === 100) {
       this.didFinishLoading = true;
     }
-    this.selectionManagerRef.updateContextComponents(this);
+    this.selectionManagerRef.updateContextComponents();
   }
 }

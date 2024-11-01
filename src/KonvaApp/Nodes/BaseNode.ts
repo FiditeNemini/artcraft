@@ -109,7 +109,7 @@ export abstract class BaseNode {
     this.kNode.setDraggable(false);
     this.selectionManagerRef.updateNodeTransformer();
     if (this.isKEventRef()) {
-      this.selectionManagerRef.updateContextComponents(this);
+      this.selectionManagerRef.updateContextComponents();
     }
   }
   public unlock() {
@@ -117,7 +117,7 @@ export abstract class BaseNode {
     this.kNode.setDraggable(true);
     this.selectionManagerRef.updateNodeTransformer();
     if (this.isKEventRef()) {
-      this.selectionManagerRef.updateContextComponents(this);
+      this.selectionManagerRef.updateContextComponents();
     }
   }
 
@@ -181,7 +181,7 @@ export abstract class BaseNode {
 
     this.kNode.on("dragend", () => {
       // console.log("Drag End", this.kNode._id);
-      this.selectionManagerRef.dragEnd(this);
+      this.selectionManagerRef.dragEnd();
     });
   }
 
@@ -204,7 +204,7 @@ export abstract class BaseNode {
     });
     this.kNode.on("transformend", (event) => {
       console.log("transformend", event.target._id);
-      this.selectionManagerRef.transformEnd(this);
+      this.selectionManagerRef.transformEnd();
     });
   }
   public removeListenToBaseKNodeTransformations() {

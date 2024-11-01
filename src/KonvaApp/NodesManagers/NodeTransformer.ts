@@ -34,7 +34,7 @@ export class NodeTransformer {
   public getKonvaNode() {
     return this.kTransformer;
   }
-  public enable({ selectedNodes }: { selectedNodes: Set<MediaNode> }) {
+  public addNodes({ selectedNodes }: { selectedNodes: Set<MediaNode> }) {
     const kNodesArray = Array.from(selectedNodes).reduce((acc, node) => {
       acc.push(node.kNode);
       return acc;
@@ -47,5 +47,15 @@ export class NodeTransformer {
   }
   public clear() {
     this.kTransformer.nodes([]);
+  }
+  public enable() {
+    this.kTransformer.rotateEnabled(true);
+    this.kTransformer.resizeEnabled(true);
+    this.kTransformer.draggable(true);
+  }
+  public disable() {
+    this.kTransformer.rotateEnabled(false);
+    this.kTransformer.resizeEnabled(false);
+    this.kTransformer.draggable(false);
   }
 }

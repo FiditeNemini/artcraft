@@ -395,7 +395,7 @@ export class Engine {
         await node.startSegmentation();
         this.nodeIsolator.enterIsolation(node);
         node.videoSegmentationMode(true);
-        this.selectionManager.updateContextComponents(node);
+        this.selectionManager.updateContextComponents();
         uiAccess.loadingBar.update({
           progress: 0,
           message: "Start Adding Extraction Points To the Video",
@@ -425,7 +425,7 @@ export class Engine {
           this.enableSelectorSquare();
           this.segmentationButtonCanBePressed = true;
           node.unlock();
-          this.selectionManager.updateContextComponents(node);
+          this.selectionManager.updateContextComponents();
           this.selectionManager.enable();
           // to close off the session.
         } else {
