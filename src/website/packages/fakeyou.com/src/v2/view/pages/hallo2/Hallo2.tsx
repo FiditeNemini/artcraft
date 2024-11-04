@@ -5,7 +5,7 @@ import Countdown from "components/common/Countdown";
 import FAQSection from "components/common/FAQSection";
 //
 
-const endDate = new Date("2024-11-06T12:00:00-04:00");
+const endDate = new Date("2024-11-18T12:00:00-04:00");
 
 export default function Hallo2() {
   usePrefixedDocumentTitle(
