@@ -19,25 +19,14 @@ export class SelectorSquare {
     y2: 0,
   };
 
-  constructor() {
-    this.kSquare = new Konva.Rect({
-      fill: "	rgb(250, 128, 114, 0.3)",
-      stroke: "salmon",
-      visible: false,
-      // disable events to not interrupt with events
-      listening: false,
-    });
-  }
-  public getKonvaNode() {
-    return this.kSquare;
-  }
+  // engine class references
+  private captureCanvasRef: Konva.Rect;
+  private mediaLayerRef: Konva.Layer;
+  private nodesManagerRef: NodesManager;
+  private selectionManagerRef: SelectionManager;
+  private stageRef: Konva.Stage;
 
-  public disable({ stageRef }: { stageRef: Konva.Stage }) {
-    stageRef.off("mousedown touchstart");
-    stageRef.off("mousemove touchmove");
-    stageRef.off("mouseup touchend");
-  }
-  public enable({
+  constructor({
     captureCanvasRef,
     mediaLayerRef,
     nodesManagerRef,
@@ -50,10 +39,33 @@ export class SelectorSquare {
     selectionManagerRef: SelectionManager;
     stageRef: Konva.Stage;
   }) {
-    stageRef.on("mousedown touchstart", (e) => {
-      const stagePointerPos = stageRef.getPointerPosition();
+    this.kSquare = new Konva.Rect({
+      fill: "	rgb(250, 128, 114, 0.3)",
+      stroke: "salmon",
+      visible: false,
+      // disable events to not interrupt with events
+      listening: false,
+    });
+    this.captureCanvasRef = captureCanvasRef;
+    this.mediaLayerRef = mediaLayerRef;
+    this.nodesManagerRef = nodesManagerRef;
+    this.selectionManagerRef = selectionManagerRef;
+    this.stageRef = stageRef;
+  }
+  public getKonvaNode() {
+    return this.kSquare;
+  }
+
+  public disable() {
+    this.stageRef.off("mousedown touchstart");
+    this.stageRef.off("mousemove touchmove");
+    this.stageRef.off("mouseup touchend");
+  }
+  public enable() {
+    this.stageRef.on("mousedown touchstart", (e) => {
+      const stagePointerPos = this.stageRef.getPointerPosition();
       if (
-        (e.target !== stageRef && e.target !== captureCanvasRef) || // do nothing if we mousedown on any shape
+        (e.target !== this.stageRef && e.target !== this.captureCanvasRef) || // do nothing if we mousedown on any shape
         stagePointerPos === null || // do nothing if pointers not available
         e.evt.shiftKey // do nothing so then multiselect is more forgiving in misclicks
       ) {
@@ -62,9 +74,9 @@ export class SelectorSquare {
 
       // start handle mousedown
       e.evt.preventDefault();
-      if (e.target === stageRef || e.target === captureCanvasRef) {
+      if (e.target === this.stageRef || e.target === this.captureCanvasRef) {
         //moused down on empty space, clear previous selection first
-        selectionManagerRef.clearSelection();
+        this.selectionManagerRef.clearSelection();
       }
 
       // this starts drawing the square
@@ -81,9 +93,9 @@ export class SelectorSquare {
       this.selecting = true;
     });
 
-    stageRef.on("mousemove touchmove", (e) => {
+    this.stageRef.on("mousemove touchmove", (e) => {
       // do nothing if we didn't start selection
-      const stagePointerPos = stageRef.getPointerPosition();
+      const stagePointerPos = this.stageRef.getPointerPosition();
       if (!this.selecting || stagePointerPos === null) {
         return;
       }
@@ -105,7 +117,7 @@ export class SelectorSquare {
         height: Math.abs(y2 - y1),
       });
 
-      stageRef.on("mouseup touchend", (e) => {
+      this.stageRef.on("mouseup touchend", (e) => {
         // do nothing if we didn't start selection
         this.selecting = false;
         if (!this.kSquare.visible()) {
@@ -115,31 +127,27 @@ export class SelectorSquare {
         // update visibility
         this.kSquare.visible(false);
         // Find all the Nodes and feed them into Selectmanager
-        var shapes = mediaLayerRef.getChildren();
+        var shapes = this.mediaLayerRef.getChildren();
         var box = this.kSquare.getClientRect();
         var foundKNodes = shapes.filter((shape) =>
           Konva.Util.haveIntersection(box, shape.getClientRect()),
         );
         if (foundKNodes.length > 0) {
           const kNodeIds = foundKNodes.map((kNode) => kNode._id);
-          const foundNodes = Array.from(nodesManagerRef.getAllNodes()).reduce(
-            (accNodes, currNode) => {
-              if (
-                kNodeIds.includes(currNode.kNode._id) &&
-                !currNode.isLocked()
-              ) {
-                accNodes.push(currNode);
-              }
-              return accNodes;
-            },
-            [] as MediaNode[],
-          );
+          const foundNodes = Array.from(
+            this.nodesManagerRef.getAllNodes(),
+          ).reduce((accNodes, currNode) => {
+            if (kNodeIds.includes(currNode.kNode._id) && !currNode.isLocked()) {
+              accNodes.push(currNode);
+            }
+            return accNodes;
+          }, [] as MediaNode[]);
           console.log("selector square found", foundNodes);
-          selectionManagerRef.selectNodes(foundNodes);
+          this.selectionManagerRef.selectNodes(foundNodes);
         }
       });
 
-      stageRef.on("mouseleave", (e) => {
+      this.stageRef.on("mouseleave", (e) => {
         this.selecting = false;
         if (!this.kSquare.visible()) {
           return;

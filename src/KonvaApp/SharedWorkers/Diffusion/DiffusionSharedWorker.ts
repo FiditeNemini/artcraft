@@ -1,7 +1,7 @@
 // Example of this working.
 
 import { BlobReader, BlobWriter, ZipWriter } from "@zip.js/zip.js";
-import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
+import { MediaUploadApi, VideoApi, MediaFilesApi } from "~/Classes/ApiManager";
 import { Visibility } from "~/Classes/ApiManager/enums/Visibility";
 import { v4 as uuidv4 } from "uuid";
 import { JobsApi } from "~/Classes/ApiManager";
@@ -18,6 +18,7 @@ import {
 } from "~/KonvaApp/WorkerPrimitives/SharedWorkerBase";
 import { JobStatus } from "~/Classes/ApiManager/enums/Job";
 import { RenderingOptions } from "~/KonvaApp/Engine";
+import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
 
 export interface DiffusionSharedWorkerProgressData {
   url: string;
@@ -32,7 +33,7 @@ export interface DiffusionSharedWorkerItemData {
   frame: number;
   height: number;
   width: number;
-  prompt: RenderingOptions;
+  prompt?: RenderingOptions;
 }
 
 export interface DiffusionSharedWorkerErrorData {
@@ -44,7 +45,7 @@ export interface DiffusionSharedWorkerResponseData {
 
 export class DiffusionSharedWorker extends SharedWorkerBase<
   DiffusionSharedWorkerItemData,
-  DiffusionSharedWorkerResponseData,
+  DiffusionSharedWorkerResponseData | MediaFile,
   DiffusionSharedWorkerProgressData
 > {
   public name: string;
@@ -57,9 +58,11 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
   public bitmapContext: ImageBitmapRenderingContext | undefined | null;
 
   public mediaAPI: MediaUploadApi;
+  public mediaFilesAPI: MediaFilesApi;
   public videoAPI: VideoApi;
   public jobsAPI: JobsApi;
   public blobs: Blob[];
+
   constructor(port: MessagePort) {
     super(port);
     this.name = "DiffusionWorker";
@@ -74,6 +77,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
     this.videoAPI = new VideoApi();
     this.jobsAPI = new JobsApi();
     this.mediaAPI = new MediaUploadApi();
+    this.mediaFilesAPI = new MediaFilesApi();
 
     this.blobs = [];
 
@@ -102,7 +106,9 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
     isDoneStreaming: boolean,
     item: DiffusionSharedWorkerItemData,
     reportProgress: (data: DiffusionSharedWorkerProgressData) => void,
-  ): Promise<[DiffusionSharedWorkerResponseData | undefined, boolean]> {
+  ): Promise<
+    [DiffusionSharedWorkerResponseData | MediaFile | undefined, boolean]
+  > {
     // make request via api with options
 
     try {
@@ -133,12 +139,12 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
 
       // progress
       const aproxSteps = this.totalFrames;
-      const totalPercent = 100.0;
+      const totalPercent = item.prompt ? 0.25 : 0.9;
 
       const progressData: DiffusionSharedWorkerProgressData = {
         url: "",
         status: JobStatus.PENDING,
-        progress: (item.frame / aproxSteps / 2 / totalPercent) * 100,
+        progress: (item.frame / aproxSteps) * totalPercent,
         mediaToken: "",
       };
 
@@ -156,7 +162,7 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
       const progressMedia: DiffusionSharedWorkerProgressData = {
         url: "",
         status: JobStatus.PENDING,
-        progress: (item.frame / aproxSteps / 2 / totalPercent) * 100,
+        progress: ((item.frame + 0.5) / aproxSteps) * totalPercent,
         mediaToken: "",
       };
 
@@ -177,7 +183,14 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
         this.reset();
         throw Error(`Server Failed Try Again: ${response.errorMessage}`);
       }
-
+      if (!item.prompt) {
+        console.log("got video >>", response);
+        const videoRepsonse = await this.mediaFilesAPI.GetMediaFileByToken({
+          mediaFileToken: mediaToken,
+        });
+        this.reset();
+        return [videoRepsonse.data, true];
+      }
       console.log(item.prompt);
       const studioResponse = await this.videoAPI.EnqueueStudio({
         enqueueVideo: {
@@ -232,16 +245,16 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
           const status = job.data.status.status;
           const progress = job.data.status.progress_percentage;
 
-          let computedProgress = 50;
+          let computedProgress = 30;
           if (progress === 0) {
-            computedProgress = 50;
+            computedProgress = 30;
           }
-          computedProgress = 50 + progress / 2;
+          computedProgress = 30 + progress * 0.7;
 
           let renderProgressData: DiffusionSharedWorkerProgressData = {
             url: "",
-            status: JobStatus.DEAD,
-            progress: computedProgress / totalPercent,
+            status: status,
+            progress: computedProgress / 100,
             mediaToken: mediaToken,
           };
 

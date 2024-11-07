@@ -1,14 +1,8 @@
 import { signal } from "@preact/signals-react";
 import { LoadingBarStatus } from "~/components/ui";
+import { LoadingBarInterface } from "../type";
 
-interface LoadingParInterface {
-  isShowing: boolean;
-  progress: number;
-  status: LoadingBarStatus;
-  message?: string;
-}
-
-const loadingBarSignal = signal<LoadingParInterface>({
+const loadingBarSignal = signal<LoadingBarInterface>({
   isShowing: false,
   progress: 0,
   status: LoadingBarStatus.IDLE,
@@ -17,7 +11,7 @@ const loadingBarSignal = signal<LoadingParInterface>({
 
 export const loadingBar = {
   signal: loadingBarSignal,
-  update: (props: Omit<LoadingParInterface, "isShowing">) => {
+  update: (props: Partial<LoadingBarInterface>) => {
     loadingBarSignal.value = { ...loadingBarSignal.value, ...props };
   },
   updateMessage(message: string | undefined) {
@@ -38,7 +32,7 @@ export const loadingBar = {
       status,
     };
   },
-  show: (props?: Omit<LoadingParInterface, "isShowing">) => {
+  show: (props?: Omit<LoadingBarInterface, "isShowing">) => {
     const mergedProps = props
       ? { ...props, ...loadingBarSignal.value }
       : loadingBarSignal.value;

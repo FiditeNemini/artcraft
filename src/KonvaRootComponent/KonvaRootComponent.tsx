@@ -5,9 +5,10 @@ import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
 import { ContextualButtonRetry } from "./ContextualButtonRetry";
 import { ContextualToolbarNode } from "./ContextualToolbarNode";
 import { ContextualLoadingBar } from "./ContextualLoadingBar";
-import { SignaledToolbarMain } from "./SignaledToolbarMain";
-import { SignaledDialogs } from "./SignaledDialogs";
 import { SignaledCanvasDragDropFiles } from "./SignaledCanvasDragDropFiles";
+import { SignaledDialogs } from "./SignaledDialogs";
+import { SignaledToolbarMain } from "./SignaledToolbarMain";
+import { SignaledToolbarVideoExtraction } from "./SignaledToolbarVideoExtraction";
 
 // The KonvaApp is the root of the Konva stage
 // and only entry point for anything in Konva JS
@@ -21,6 +22,7 @@ import { useLayoutContext } from "./contextSignals/layout";
 // common hooks
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 import { useNavigate } from "react-router-dom";
+import { SignaledMagicBox } from "./SignaledMagicBox";
 
 export const KonvaRootComponent = ({
   className,
@@ -54,6 +56,7 @@ export const KonvaRootComponent = ({
         className={className}
         // retreive the classNames from the parent for sizing/styling
       />
+      <SignaledMagicBox />
       <SignaledCanvasDragDropFiles
         openAddImage={appUiContext.openAddImage}
         openAddVideo={appUiContext.openAddVideo}
@@ -62,6 +65,7 @@ export const KonvaRootComponent = ({
         layoutSignal={layoutContext.signal}
         appUiContext={appUiContext}
       />
+      <SignaledToolbarVideoExtraction />
       <SignaledDialogs
         appUiSignal={appUiContext.signal}
         resetAll={appUiContext.resetAll}

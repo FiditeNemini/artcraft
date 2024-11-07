@@ -11,8 +11,10 @@ import { buttonTest } from "./buttonTest";
 import { dialogChromakey } from "./dialogChromakey";
 import { dialogError } from "./dialogError";
 import { loadingBar } from "./loadingBar";
+import { magicBox } from "./magicBox";
 import { toolbarMain } from "./toolbarMain";
 import { toolbarNode } from "./toolbarNode";
+import { toolbarVideoExtraction } from "./toolbarVideoExtraction";
 
 export const uiAccess = {
   buttonRetry,
@@ -20,6 +22,8 @@ export const uiAccess = {
   dialogChromakey,
   dialogError,
   loadingBar,
+  magicBox,
   toolbarMain,
   toolbarNode,
+  toolbarVideoExtraction,
 };

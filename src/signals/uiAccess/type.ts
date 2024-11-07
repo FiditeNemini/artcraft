@@ -1,5 +1,15 @@
-import { LoadingBarProps } from "~/components/ui";
+import { LoadingBarProps, LoadingBarStatus } from "~/components/ui";
 
+export type LoadingBarState = {
+  progress: number;
+  status: string;
+  message: string | undefined;
+};
+export type ButtonState = {
+  disabled: boolean;
+  active: boolean;
+  hidden: boolean;
+};
 export interface ContextualUi {
   position: {
     x: number;
@@ -16,4 +26,11 @@ export interface ContextualLoadingBarProps
 
 export interface ContextualButtonRetryProps extends ContextualUi {
   disabled: boolean;
+}
+
+export interface LoadingBarInterface {
+  isShowing: boolean;
+  progress: number;
+  status: LoadingBarStatus;
+  message?: string;
 }

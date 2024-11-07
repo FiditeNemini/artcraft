@@ -1,8 +1,6 @@
 import { MouseEventHandler } from "react";
 import { twMerge } from "tailwind-merge";
-
 import { faArrowRightRotate } from "@fortawesome/pro-solid-svg-icons";
-
 import { Button } from "./Button";
 
 export enum LoadingBarStatus {
@@ -35,7 +33,14 @@ export const LoadingBar = ({
         colReverse && "flex-col-reverse",
       )}
     >
-      <div className="h-2.5 w-full rounded-full bg-gray-200">
+      <div
+        className={twMerge(
+          "h-2.5 w-full rounded-full",
+          status && status === LoadingBarStatus.IDLE
+            ? "border-1 bg-gray-50 ring-1 ring-inset ring-gray-200"
+            : "bg-gray-200",
+        )}
+      >
         <div
           className={twMerge(
             "h-2.5 rounded-full bg-primary-500",

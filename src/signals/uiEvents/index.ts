@@ -20,6 +20,10 @@ import {
   dispatchers as toolbarNodeDispatchers,
   eventsHandlers as toolbarNodeEvents,
 } from "./toolbarNode";
+import {
+  dispatchers as toolbarVideoExtractionDispatchers,
+  eventsHandlers as toolbarVideoExtractionEvents,
+} from "./toolbarVideoExtraction";
 
 export const uiEvents = {
   ...addMediaEvents,
@@ -29,6 +33,7 @@ export const uiEvents = {
   buttonTest: buttonTestEvent,
   toolbarMain: toolbarMainEvents,
   toolbarNode: toolbarNodeEvents,
+  toolbarVideoExtraction: toolbarVideoExtractionEvents,
 };
 export const dispatchUiEvents = {
   ...addMediaDispatchers,
@@ -38,4 +43,5 @@ export const dispatchUiEvents = {
   buttonTest: buttonTestDispatcher,
   toolbarMain: toolbarMainDispatchers,
   toolbarNode: toolbarNodeDispatchers,
+  toolbarVideoExtraction: toolbarVideoExtractionDispatchers,
 };

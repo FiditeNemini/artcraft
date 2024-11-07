@@ -1,19 +1,19 @@
 import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 import { MediaFilesApi, MediaUploadApi } from "~/Classes/ApiManager";
-import { NodesManager, SelectionManager } from "./NodesManagers";
+import { NodesManager, SelectionManager } from "../NodesManagers";
 import {
   ImageNodeData,
   NodeData,
   TextNodeData,
   TransformationData,
   VideoNodeData,
-} from "./types";
+} from "../types";
 import { uiAccess } from "~/signals";
 import { NavigateFunction } from "react-router-dom";
-import { NodeType } from "./Nodes/constants";
-import { ImageNode, VideoNode, TextNode } from "./Nodes";
-import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
+import { NodeType } from "../Nodes/constants";
+import { ImageNode, VideoNode, TextNode } from "../Nodes";
+import { RenderEngine } from "../RenderingPrimitives/RenderEngine";
 import { LoadingVideosProvider } from "./LoadingVideosProvider";
 
 export class SceneManager {

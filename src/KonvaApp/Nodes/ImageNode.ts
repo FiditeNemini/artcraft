@@ -84,7 +84,7 @@ export class ImageNode extends NetworkedNode {
     const imageComponent = new Image();
     imageComponent.crossOrigin = "anonymous";
     imageComponent.onload = () => {
-      this.setProgress(0, { newStatus: UploadStatus.FILE_STAGED });
+      this.setProgress({ progress: 0, status: UploadStatus.FILE_STAGED });
       this.imageSize = {
         width: imageComponent.width,
         height: imageComponent.height,
@@ -108,29 +108,31 @@ export class ImageNode extends NetworkedNode {
       this.uploadImage(imageFile);
     };
     imageComponent.onerror = () => {
-      this.setProgress(0, { newStatus: UploadStatus.ERROR_ON_FILE });
+      this.setProgress({ progress: 0, status: UploadStatus.ERROR_ON_FILE });
     };
     imageComponent.src = URL.createObjectURL(imageFile);
   }
   private async loadImageFromUrl(mediaFileUrl: string) {
-    this.setProgress(75, { newStatus: UploadStatus.LOADING });
+    this.setProgress({ progress: 75, status: UploadStatus.LOADING });
+
     const newImage = new Image();
     newImage.crossOrigin = "anonymous";
     newImage.onerror = () => {
-      this.setProgress(90, { newStatus: UploadStatus.ERROR_ON_LOAD });
+      this.setProgress({ progress: 90, status: UploadStatus.ERROR_ON_LOAD });
     };
     newImage.onload = () => {
       // console.log("network image", newImage);
       this.kNode.image(newImage);
       this.kNode.draw();
-      this.setProgress(100, { newStatus: UploadStatus.SUCCESS });
+      this.setProgress({ progress: 100, status: UploadStatus.SUCCESS });
     };
     newImage.src = mediaFileUrl;
     this.listenToBaseKNode();
   }
 
   private async uploadImage(imageFile: File) {
-    this.setProgress(10, { newStatus: UploadStatus.UPLOADING });
+    this.setProgress({ progress: 10, status: UploadStatus.UPLOADING });
+
     const mediaUploadApi = new MediaUploadApi();
     const uploadResponse = await mediaUploadApi.UploadImage({
       blob: imageFile,
@@ -147,7 +149,7 @@ export class ImageNode extends NetworkedNode {
   }
 
   private async retreiveImage(mediaFileToken: string) {
-    this.setProgress(50, { newStatus: UploadStatus.RETREIVING });
+    this.setProgress({ progress: 50, status: UploadStatus.RETREIVING });
     const mediaFileApi = new MediaFilesApi();
     const mediaFileResponse = await mediaFileApi.GetMediaFileByToken({
       mediaFileToken: mediaFileToken,

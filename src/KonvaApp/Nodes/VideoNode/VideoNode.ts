@@ -2,7 +2,6 @@ import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
 import { NetworkedNode, UploadStatus } from "../NetworkedNode";
-import { uiAccess } from "~/signals";
 import ChromaWorker from "../ChromaWorker?sharedworker";
 import { transparent, NodeType } from "../constants";
 import { SelectionManager } from "../../NodesManagers";
@@ -16,13 +15,13 @@ import {
 } from "../../types";
 import { NodeUtilities } from "../NodeUtilities";
 
-const loadingBar = uiAccess.loadingBar;
 import {
   Coordinates,
   SegmentationApi,
 } from "~/Classes/ApiManager/SegmentationApi";
-import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
-import { LoadingVideosProvider } from "~/KonvaApp/LoadingVideosProvider";
+
+import { LoadingVideosProvider } from "~/KonvaApp/EngineUtitlities/LoadingVideosProvider";
+import { VideoExtractionEvents } from "~/KonvaApp/types/events";
 interface VideoNodeContructor {
   mediaLayerRef: Konva.Layer;
   selectionManagerRef: SelectionManager;
@@ -225,10 +224,10 @@ export class VideoNode extends NetworkedNode {
      */
     if (!this._isVideoEventListening) {
       this.videoComponent.onloadstart = () => {
-        this.setProgress(25, { newStatus: UploadStatus.LOADING });
+        this.setProgress({ progress: 25, status: UploadStatus.LOADING });
       };
       this.videoComponent.onloadedmetadata = () => {
-        this.setProgress(50, { newStatus: UploadStatus.LOADING });
+        this.setProgress({ progress: 50, status: UploadStatus.LOADING });
         console.log("Loaded Metadata");
         this.mediaFileSize = {
           width: this.videoComponent.videoWidth,
@@ -256,7 +255,7 @@ export class VideoNode extends NetworkedNode {
         this.kNode.fill(transparent);
       };
       this.videoComponent.onloadeddata = async () => {
-        this.setProgress(75, { newStatus: UploadStatus.LOADING });
+        this.setProgress({ progress: 75, status: UploadStatus.LOADING });
         await setTimeout(() => {
           this.setChroma(this.isChroma);
           // set chroma will do
@@ -274,12 +273,12 @@ export class VideoNode extends NetworkedNode {
       this.videoComponent.oncanplaythrough = async () => {
         console.log("Can play through the Mediafile:", this.videoComponent.src);
         this.didFinishLoading = true;
-        this.setProgress(100, { newStatus: UploadStatus.SUCCESS });
+        this.setProgress({ progress: 100, status: UploadStatus.SUCCESS });
         resolve();
       };
 
       this.videoComponent.onerror = () => {
-        this.setProgress(0, { newStatus: UploadStatus.ERROR_ON_LOAD });
+        this.setProgress({ progress: 0, status: UploadStatus.ERROR_ON_LOAD });
         reject();
       };
     });
@@ -476,87 +475,61 @@ export class VideoNode extends NetworkedNode {
       this.didFinishLoading = false;
       this.videoComponent.pause();
       this.videoComponent.currentTime = 0;
-      this.setProgress(25, { message: "Loading Video Extractor..." });
-      this.selectionManagerRef.updateContextComponents();
-      this.selectionManagerRef.showContextComponents();
-
-      console.log("loadingbar should show");
+      this.setProgress({
+        name: "videoextraction",
+        progress: 25,
+        status: VideoExtractionEvents.SESSION_CREATING,
+        message: "Loading Video Extractor...",
+      });
 
       const blob = await NodeUtilities.urlToBlob(this.mediaFileUrl);
-      this.setProgress(75, { message: "Loading Video Extractor..." });
-      this.selectionManagerRef.updateContextComponents();
+      this.setProgress({
+        name: "videoextraction",
+        progress: 75,
+        status: VideoExtractionEvents.SESSION_CREATING,
+        message: "Loading Video Extractor...",
+      });
 
       this.segmentationSession =
         await this.videoSegmentationAPI.createSession(blob);
+      this.setProgress({
+        name: "videoextraction",
+        progress: 100,
+        status: VideoExtractionEvents.SESSION_CREATING,
+        message: "Loaded Video Extractor",
+      });
       console.log("Sessions", this.segmentationSession);
-
-      // this.didFinishLoading = true;
     }
-  }
-
-  public disableAllExceptSegmentation() {
-    const buttonNames = Object.values(ToolbarNodeButtonNames);
-    const buttonStates: any = {};
-    for (const name of buttonNames) {
-      const value = name === ToolbarNodeButtonNames.SEGMENTATION ? false : true;
-
-      buttonStates[name] = {
-        disabled: value,
-        active: false,
-      };
-    }
-    uiAccess.toolbarNode.update({
-      locked: this.isLocked(),
-      lockDisabled: this.isSegmentationMode,
-      buttonStates: buttonStates,
-    });
-  }
-
-  public disableAllForSegmentation() {
-    const buttonNames = Object.values(ToolbarNodeButtonNames);
-    const buttonStates: any = {};
-    for (const name of buttonNames) {
-      buttonStates[name] = {
-        disabled: name,
-        active: false,
-      };
-    }
-    uiAccess.toolbarNode.update({
-      locked: this.isLocked(),
-      lockDisabled: this.isSegmentationMode,
-      buttonStates: buttonStates,
-    });
   }
 
   private isStillProcessingSegmentationEvent: Boolean = false;
 
   public async handleSegmentation() {
-    // Get the local coordinates of the click relative to the rectangle
     if (!this.isSegmentationMode) {
       console.log("Segmentation Mode Not On");
       return;
     }
-
-    this.disableAllForSegmentation();
-
     if (!this.segmentationSession) {
       console.log("Segmentation Session Not Ready");
-      loadingBar.updateMessage("Still Processing Please Wait");
       return;
     }
     if (this.isStillProcessingSegmentationEvent) {
       console.log("Still Processing");
-      loadingBar.updateMessage("Still Processing Please Wait");
       return;
     }
+
     this.isStillProcessingSegmentationEvent = true;
-    loadingBar.show();
+
+    // Get the local coordinates of the click relative to the rectangle
     const localPos = this.kNode.getRelativePointerPosition();
     console.log("Local coordinates:", localPos);
     console.log("mediaFileSize:", this.mediaFileSize);
     if (!localPos || !this.mediaFileSize) {
+      // TODO: error handling
       return;
     }
+    document.body.style.cursor = "wait";
+
     const adjustedLocalPos = {
       x:
         (localPos.x / this.kNode.width()) *
@@ -572,8 +545,13 @@ export class VideoNode extends NetworkedNode {
       coordinates: [adjustedLocalPos.x, adjustedLocalPos.y],
       include: true,
     });
+    this.setProgress({
+      name: "videoextraction",
+      progress: 25,
+      status: VideoExtractionEvents.EXTRACTION_POINT_REQUEST,
+      message: "Start Processing Extraction...",
+    });
 
-    loadingBar.update({ progress: 0, message: "Start Processing Extraction" });
     try {
       console.log("Requesting");
       const response = await this.videoSegmentationAPI.addPointsToSession(
@@ -595,22 +573,39 @@ export class VideoNode extends NetworkedNode {
         ],
         false,
       );
-      loadingBar.update({ progress: 50, message: "Processing" });
+      this.setProgress({
+        name: "videoextraction",
+        progress: 50,
+        status: VideoExtractionEvents.EXTRACTION_POINT_REQUEST,
+        message: "Processing Extraction Point...",
+      });
       const previewImageUrl = response.frames[0].preview_image_url;
 
       // TODO: we assumed success of the loading of the AssetUrl
       await NodeUtilities.isAssetUrlAvailable({ url: previewImageUrl });
-      loadingBar.update({ progress: 50, message: "Processing..." });
+      this.setProgress({
+        name: "videoextraction",
+        progress: 75,
+        status: VideoExtractionEvents.EXTRACTION_POINT_REQUEST,
+        message: "Processing Extraction Point...",
+      });
       await this.setSegementationPreview(previewImageUrl);
-      loadingBar.update({ progress: 100, message: "Extracting Region Done" });
+      this.setProgress({
+        name: "videoextraction",
+        progress: 100,
+        status: VideoExtractionEvents.EXTRACTION_POINT_REQUEST,
+        message: "Extraction of Region Done",
+      });
     } catch (error) {
       console.error(error);
-      loadingBar.update({
+      this.setProgress({
+        name: "videoextraction",
         progress: 0,
+        status: VideoExtractionEvents.EXTRACTION_POINT_REQUEST,
         message: `Error:${error} Please try picking extraction points again`,
       });
     }
-    this.disableAllExceptSegmentation();
+    document.body.style.cursor = "default";
     this.isStillProcessingSegmentationEvent = false;
   }
 
@@ -619,14 +614,16 @@ export class VideoNode extends NetworkedNode {
     // edge case
     if (this.isStillProcessingSegmentationEvent) {
       console.log("Still Processing Frame Cannot Clip Please Wait");
-      loadingBar.updateMessage("Still Processing Please Wait");
       return false;
     }
     // prevent requests to add points while doing this.
     this.isStillProcessingSegmentationEvent = true;
-    loadingBar.update({ progress: 0, message: "Processing Video..." });
-
-    this.disableAllForSegmentation();
+    this.setProgress({
+      name: "videoextraction",
+      progress: 25,
+      status: VideoExtractionEvents.SESSION_CLOSING,
+      message: "Processing Video...",
+    });
     if (!this.segmentationSession) {
       console.log("Segmentation Session Lost?");
       return false;
@@ -653,8 +650,12 @@ export class VideoNode extends NetworkedNode {
         ],
         true, // propagation = true, this requests the entire video to be processed
       );
-      loadingBar.update({ progress: 25, message: "Processing Video..." });
-
+      this.setProgress({
+        name: "videoextraction",
+        progress: 50,
+        status: VideoExtractionEvents.SESSION_CLOSING,
+        message: "Processing Video...",
+      });
       // replace the video component and reregister all the other elements.
       console.log(
         "Extracted Video URL",
@@ -667,7 +668,12 @@ export class VideoNode extends NetworkedNode {
         url: extractionUrl,
         sleepDurationMs: 2000,
       });
-      loadingBar.update({ progress: 50, message: "Processing Video..." });
+      this.setProgress({
+        name: "videoextraction",
+        progress: 75,
+        status: VideoExtractionEvents.SESSION_CLOSING,
+        message: "Processing Video...",
+      });
       this.extractionUrl = extractionUrl;
       // set chroma automatically.
       this.isChroma = true;
@@ -675,14 +681,17 @@ export class VideoNode extends NetworkedNode {
         videoUrl: extractionUrl,
         hasExistingTransform: true,
       });
-
-      this.disableAllExceptSegmentation();
-
+      this.setProgress({
+        name: "videoextraction",
+        progress: 100,
+        status: VideoExtractionEvents.SESSION_CLOSING,
+        message: "Done Processing Video",
+      });
       this.isStillProcessingSegmentationEvent = false;
+
       return extractionUrl;
     } catch (error) {
       console.error(error);
-      this.disableAllExceptSegmentation();
       this.isStillProcessingSegmentationEvent = false;
       return false;
     }

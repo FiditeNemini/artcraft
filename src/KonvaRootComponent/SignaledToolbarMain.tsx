@@ -1,9 +1,8 @@
 import { MouseEventHandler } from "react";
-import { useSignalEffect } from "@preact/signals-react";
+// import { useSignalEffect } from "@preact/signals-react";
 import { Transition } from "@headlessui/react";
 import { toolbarMain } from "~/signals/uiAccess/toolbarMain";
 import { dispatchers } from "~/signals/uiEvents/toolbarMain";
-import { authentication } from "~/signals";
 
 import { ToolbarMain } from "~/components/features";
 import { LoadingBar } from "~/components/ui";
@@ -11,24 +10,26 @@ import { LoadingBar } from "~/components/ui";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 import { LayoutSignalType } from "./contextSignals/layout";
 import { AppUiContextInterface } from "./contextSignals/appUi";
+import { twMerge } from "tailwind-merge";
+import { paperWrapperStyles } from "~/components/styles";
 
 export const SignaledToolbarMain = ({
-  layoutSignal,
+  // layoutSignal,
   appUiContext,
 }: {
   layoutSignal: LayoutSignalType;
   appUiContext: AppUiContextInterface;
 }) => {
   //// for testing
-  const { isMobile } = layoutSignal;
-  useSignalEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log(
-        "Orientation Changed >> ",
-        `current orientation: ${isMobile.value ? "mobile" : "desktop"}`,
-      );
-    }
-  });
+  // const { isMobile } = layoutSignal;
+  // useSignalEffect(() => {
+  //   if (import.meta.env.DEV) {
+  //     console.log(
+  //       "Orientation Changed >> ",
+  //       `current orientation: ${isMobile.value ? "mobile" : "desktop"}`,
+  //     );
+  //   }
+  // });
   /// end for testing
 
   const loadingBar = toolbarMain.loadingBar.signal.value;
@@ -42,12 +43,6 @@ export const SignaledToolbarMain = ({
         return () => appUiContext.openAddImage();
       case ToolbarMainButtonNames.ADD_VIDEO:
         return () => appUiContext.openAddVideo();
-      case ToolbarMainButtonNames.DOWNLOAD:
-        return () =>
-          window.open(
-            `https://www.storyteller.ai/profile/${authentication.signals.userInfo.value?.core_info.display_name}`,
-            "_blank",
-          );
       default:
         return dispatchers[buttonName];
     }
@@ -77,7 +72,10 @@ export const SignaledToolbarMain = ({
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2">
       <Transition
         as="div"
-        className="absolute left-0 right-0 mx-auto w-96 -translate-y-full items-end pb-4"
+        className={twMerge(
+          paperWrapperStyles,
+          "absolute left-0 right-0 -m-8 mx-auto w-96 -translate-y-14 items-end p-4",
+        )}
         show={loadingBar.isShowing}
       >
         <LoadingBar

@@ -6,8 +6,7 @@ import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 import { uiAccess, uiEvents } from "~/signals";
 
 import { UndoStackManager } from "./UndoRedo";
-import { CommandManager } from "./CommandManager";
-import { SceneManager } from "./SceneManager";
+import { CommandManager, MatteBox, SceneManager } from "./EngineUtitlities";
 import {
   NodesManager,
   NodeIsolator,
@@ -32,7 +31,9 @@ import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 import { NavigateFunction } from "react-router-dom";
-import { LoadingVideosProvider } from "./LoadingVideosProvider";
+import { LoadingVideosProvider } from "./EngineUtitlities/LoadingVideosProvider";
+import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
+import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandler";
 
 // for testing loading files from system
 // import { FileUtilities } from "./FileUtilities/FileUtilities";
@@ -51,8 +52,8 @@ export interface RenderingOptions {
 
 export class Engine {
   private navigateRef: NavigateFunction;
-  private appMode: AppModes;
-  private canvasReference: HTMLDivElement;
+  private appMode: AppModes = AppModes.INIT;
+  private boardCanvasRef: HTMLDivElement;
   private stage: Konva.Stage;
   private bgLayer: Konva.Layer;
   private mediaLayer: Konva.Layer;
@@ -67,23 +68,25 @@ export class Engine {
   private selectionManager: SelectionManager;
   private selectorSquare: SelectorSquare;
   private loadingVideosProvider: LoadingVideosProvider;
+  private matteBox: MatteBox;
 
   private sceneManager: SceneManager;
   private undoStackManager: UndoStackManager;
   private commandManager: CommandManager;
+  private videoExtractionHandler: VideoExtractionHandler;
 
   public segmentationButtonCanBePressed: boolean = true;
   // signal reference
-  constructor(canvasReference: HTMLDivElement, options: EngineOptions) {
+  constructor(boardCanvasRef: HTMLDivElement, options: EngineOptions) {
     if (import.meta.env.DEV) {
       console.log("Engine Created");
     }
     this.navigateRef = options.navigate;
     this.appMode = AppModes.SELECT;
 
-    this.canvasReference = canvasReference;
+    this.boardCanvasRef = boardCanvasRef;
     this.stage = new Konva.Stage({
-      container: this.canvasReference,
+      container: this.boardCanvasRef,
       width: window.innerWidth,
       height: window.innerHeight,
     });
@@ -99,9 +102,6 @@ export class Engine {
     // Konva Transformer
     this.nodeTransformer = new NodeTransformer();
     this.uiLayer.add(this.nodeTransformer.getKonvaNode());
-    // Selector Square
-    this.selectorSquare = new SelectorSquare();
-    this.uiLayer.add(this.selectorSquare.getKonvaNode());
     // Loading Placeholders
     this.loadingVideosProvider = new LoadingVideosProvider();
     // Node Isolator
@@ -109,14 +109,6 @@ export class Engine {
       mediaLayerRef: this.mediaLayer,
       nodeIsolationLayerRef: this.nodeIsolationLayer,
     });
-
-    // Listen to changes in container size
-    const resizeObserver = new ResizeObserver(() => {
-      this.applyChanges();
-    });
-
-    resizeObserver.observe(this.canvasReference);
-    this.applyChanges();
 
     // core layer for all the work done.
 
@@ -139,6 +131,15 @@ export class Engine {
       nodeTransformerRef: this.nodeTransformer,
       mediaLayerRef: this.mediaLayer,
     });
+    // Selector Square to select Nodes
+    this.selectorSquare = new SelectorSquare({
+      captureCanvasRef: this.renderEngine.captureCanvas,
+      mediaLayerRef: this.mediaLayer,
+      nodesManagerRef: this.nodesManager,
+      selectionManagerRef: this.selectionManager,
+      stageRef: this.stage,
+    });
+    this.uiLayer.add(this.selectorSquare.getKonvaNode());
 
     // Collection of commands for undo-redo
     this.undoStackManager = new UndoStackManager();
@@ -150,6 +151,7 @@ export class Engine {
       renderEngineRef: this.renderEngine,
       undoStackManagerRef: this.undoStackManager,
     });
+
     // set up secene manager
     this.sceneManager = new SceneManager({
       navigateRef: this.navigateRef,
@@ -159,35 +161,36 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
       renderEngineRef: this.renderEngine,
     });
+    this.videoExtractionHandler = new VideoExtractionHandler({
+      nodeIsolatorRef: this.nodeIsolator,
+      selectionManagerRef: this.selectionManager,
+      selectorSquareRef: this.selectorSquare,
+      undoStackManagerRef: this.undoStackManager,
+      commandManagerRef: this.commandManager,
+    });
+    this.matteBox = new MatteBox({
+      boardCanvasSize: {
+        width: this.boardCanvasRef.clientWidth,
+        height: this.boardCanvasRef.clientHeight,
+      },
+      captureCanvasSize: this.renderEngine.captureCanvas.getSize(),
+      uiLayerRef: this.uiLayer,
+    });
 
     // some of the managers has events
     // hence, lastly, setup these events
     this.setupEventSystem();
+    this.setAppMode(AppModes.SELECT);
   }
 
   // TODO write code to show error and retry.
 
   onRenderingSystemReceived(
     response: SharedWorkerResponse<
-      DiffusionSharedWorkerResponseData,
+      DiffusionSharedWorkerResponseData | MediaFile,
       DiffusionSharedWorkerProgressData
     >,
   ) {
-    // Test URL to quickly test the code.
-    // show the loader.
-    // const response = {
-    //   data: {
-    //     status: "complete_success",
-    //     videoUrl:
-    //       "/media/j/3/c/v/j/j3cvjjdstr4fqs477d3ech8rp2c9skpy/storyteller_j3cvjjdstr4fqs477d3ech8rp2c9skpy.mp4",
-    //     progress: 0.2,
-    //   },
-    // };
-    // if (!this.renderEngine.videoLoadingCanvas) {
-    //   console.log("Missing Video Loading Canvas");
-    //   return;
-    // }
-
     if (!response.data) {
       // throw error to retry
       uiAccess.dialogError.show({
@@ -195,6 +198,7 @@ export class Engine {
         message: response.data?.toString(),
       });
       uiAccess.toolbarMain.loadingBar.hide();
+      this.setAppMode(AppModes.SELECT);
       return;
     }
 
@@ -206,30 +210,44 @@ export class Engine {
         message: response.data?.toString(),
       });
       uiAccess.toolbarMain.loadingBar.hide();
+      this.setAppMode(AppModes.SELECT);
       return;
     }
 
     if (response.responseType === ResponseType.result) {
-      const data = response.data as DiffusionSharedWorkerResponseData;
-      uiAccess.toolbarMain.loadingBar.hide();
+      console.log(response.data);
+      const data = response.data;
       // create video node here.
       // choose it to be the size of the rendering output, this case its mobile. (1560, 400)
-      const media_api_base_url = "https://storage.googleapis.com/";
-      const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
-      console.log("Engine got stylized video: " + media_url);
-      this.addVideo({ mediaFileUrl: media_url });
+      if (typeof data === "string" || data === undefined) {
+        return;
+      }
+      if ("videoUrl" in data) {
+        const media_api_base_url = "https://storage.googleapis.com/";
+        const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
+        console.log("Engine got stylized video: " + media_url);
+        this.addVideo({ mediaFileUrl: media_url });
+      } else if ("media_links" in data) {
+        console.log("Engine got rendered video: " + data.media_links.cdn_url);
+        downloadURI(data.media_links.cdn_url, "Download Video");
+      }
+
       // hide the loader
       //this.renderEngine.videoLoadingCanvas.kNode.hide();
       uiAccess.toolbarMain.loadingBar.hide();
+      this.setAppMode(AppModes.SELECT);
       return;
     }
 
     if (response.responseType === ResponseType.progress) {
       const data = response.data as DiffusionSharedWorkerProgressData;
       // TODO wil fix this ?!?! parameter issue
-      uiAccess.toolbarMain.loadingBar.show();
       //this.renderEngine.videoLoadingCanvas.kNode.show();
-      uiAccess.toolbarMain.loadingBar.updateProgress(data.progress * 100);
+      uiAccess.toolbarMain.loadingBar.update({
+        message: "Rendering Frames...",
+        progress: data.progress * 100,
+        isShowing: true,
+      });
 
       // console.log(response);
       // if (response.data.zipBlob) {
@@ -239,25 +257,56 @@ export class Engine {
     }
   }
 
-  private enableSelectorSquare() {
-    this.selectorSquare.enable({
-      captureCanvasRef: this.renderEngine.captureCanvas,
-      mediaLayerRef: this.mediaLayer,
-      nodesManagerRef: this.nodesManager,
-      selectionManagerRef: this.selectionManager,
-      stageRef: this.stage,
-    });
-  }
-  private disableSelectorSquare() {
-    this.selectorSquare.disable({ stageRef: this.stage });
+  private setAppMode(newAppMode: AppModes) {
+    this.appMode = newAppMode;
+    switch (this.appMode) {
+      case AppModes.SELECT: {
+        console.log("APPMODE: SELECT");
+        this.selectorSquare.enable();
+        this.selectionManager.enable();
+        uiAccess.toolbarMain.enable();
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
+          active: true,
+        });
+        this.matteBox.disable();
+        document.body.style.cursor = "default";
+        return;
+      }
+      case AppModes.RENDERING: {
+        console.log("APPMODE: RENDER");
+        this.selectorSquare.disable();
+        this.selectionManager.disable();
+        uiAccess.toolbarMain.disable();
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
+          active: false,
+        });
+        this.matteBox.enable(true);
+        document.body.style.cursor = "wait";
+        return;
+      }
+      case AppModes.INIT:
+      default: {
+        console.log("APPMODE: INIT");
+        this.selectorSquare.disable();
+        uiAccess.toolbarMain.disable();
+        this.selectionManager.disable();
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
+          active: false,
+        });
+        document.body.style.cursor = "wait";
+        this.matteBox.disable();
+      }
+    }
   }
   private setupEventSystem() {
-    if (this.appMode === AppModes.SELECT) {
-      this.enableSelectorSquare();
-      uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
-        active: true,
-      });
-    }
+    // Listen to changes in container size
+    const resizeObserver = new ResizeObserver(() => {
+      this.onBoardCanvasResize();
+    });
+    resizeObserver.observe(this.boardCanvasRef);
+    this.onBoardCanvasResize();
+
+    // Listen to Nodes
     this.selectionManager.eventTarget.addEventListener(
       SelectionManagerEvents.NODES_TRANSLATIONS,
       ((event: CustomEvent<NodesTranslationEventDetails>) => {
@@ -272,6 +321,8 @@ export class Engine {
         this.commandManager.transformNodes(event.detail);
       }) as EventListener,
     );
+
+    // Listen to Tooolbar Node
     uiEvents.toolbarNode.lock.onClick(() => {
       this.commandManager.toggleLockNodes();
     });
@@ -288,14 +339,6 @@ export class Engine {
       const node = nodes.values().next().value;
       try {
         if (node instanceof VideoNode && node.currentUrl) {
-          function downloadURI(uri: string, name: string) {
-            const link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }
           downloadURI(node.currentUrl, `Download Video Node-${node.kNode.id}`);
         } else {
           throw new Error();
@@ -364,75 +407,8 @@ export class Engine {
       }
       // Gating done
 
-      console.log("VideoExtraction on node", element);
-      const node = element as VideoNode; //cast medianode to videonode
-      const prevIsChroma = node.isChroma;
-      const prevChromaColor = node.chromaColor;
-      if (!node.isSegmentationMode) {
-        // when the button is pressed to enter extraction mode
-        console.log("ENGEINE prepare Extraction Session.", node);
-        // disable most of the UI before we get a session
-        this.segmentationButtonCanBePressed = false;
-        document.body.style.cursor = "wait";
-        this.selectionManager.disable();
-        this.disableAllButtons();
-        this.disableSelectorSquare();
-        node.lock();
-        this.undoStackManager.setDisabled(true);
-        // if the video has chroma, disable it
-        if (prevIsChroma) {
-          node.setChroma(false);
-        }
-        // if the video is already using extraction
-        // bring the original video back
-        if (node.extractionUrl === node.videoComponent.src) {
-          await node.loadVideoFromUrl({
-            videoUrl: node.mediaFileUrl,
-            hasExistingTransform: true,
-          });
-        }
-        // actually start and wait for session
-        await node.startSegmentation();
-        this.nodeIsolator.enterIsolation(node);
-        node.videoSegmentationMode(true);
-        this.selectionManager.updateContextComponents();
-        uiAccess.loadingBar.update({
-          progress: 0,
-          message: "Start Adding Extraction Points To the Video",
-        });
-        uiAccess.loadingBar.show();
-
-        document.body.style.cursor = "default";
-        this.segmentationButtonCanBePressed = true;
-      } else {
-        // when the button is pressed to exit extraction mode
-        console.log("ENGEINE Attemping to close Extraction Session.");
-        document.body.style.cursor = "wait";
-        const endSessionResult = await node.endSession();
-        if (typeof endSessionResult === "string") {
-          node.videoSegmentationMode(false);
-          this.commandManager.useVideoExtraction({
-            videoNode: node,
-            extractionUrl: endSessionResult,
-            prevIsChroma: prevIsChroma,
-            prevChromaColor: prevChromaColor,
-          });
-          this.nodeIsolator.exitIsolation();
-
-          // unlock the ui
-          this.undoStackManager.setDisabled(false);
-          this.enableAllButtons();
-          this.enableSelectorSquare();
-          this.segmentationButtonCanBePressed = true;
-          node.unlock();
-          this.selectionManager.updateContextComponents();
-          this.selectionManager.enable();
-          // to close off the session.
-        } else {
-          console.log("Busy Processing Video.");
-        }
-        document.body.style.cursor = "default";
-      }
+      //cast medianode to videonode
+      this.videoExtractionHandler.startVideoExtraction(element as VideoNode);
     });
     uiEvents.toolbarNode.DELETE.onClick(() =>
       this.commandManager.deleteNodes(),
@@ -444,6 +420,33 @@ export class Engine {
       this.commandManager.moveNodesUp(),
     );
 
+    // Listen to Toolbar Main
+    uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
+    uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
+    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
+      this.sceneManager.saveScene();
+    });
+    uiEvents.toolbarMain.DOWNLOAD.onClick(async () => {
+      console.log("Toolbar Main Render and Download");
+      try {
+        this.setAppMode(AppModes.RENDERING);
+        await this.renderEngine.startProcessing();
+      } catch (error) {
+        // throw error to retry
+        uiAccess.dialogError.show({
+          title: "Generation Error",
+          message: error?.toString() || "Unknown Error",
+        });
+        this.setAppMode(AppModes.SELECT);
+      }
+    });
+    // Listen to other toolbars
+    // VideoExtraction Toolbar
+    uiEvents.toolbarVideoExtraction.DONE.onClick(() => {
+      this.videoExtractionHandler.endVideoExtraction();
+    });
+
+    // Listen to other requests coming from the UI
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
     });
@@ -486,6 +489,7 @@ export class Engine {
       console.log("Engine heard AI Stylize request: ", data);
 
       try {
+        this.setAppMode(AppModes.RENDERING);
         await this.renderEngine.startProcessing(data);
       } catch (error) {
         // throw error to retry
@@ -493,13 +497,8 @@ export class Engine {
           title: "Generation Error",
           message: error?.toString() || "Unknown Error",
         });
+        this.setAppMode(AppModes.SELECT);
       }
-    });
-
-    uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
-    uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
-    uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
-      this.sceneManager.saveScene();
     });
   }
 
@@ -521,14 +520,17 @@ export class Engine {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  private applyChanges() {
-    if (this.renderEngine) {
-      // won't update the first time.
-      this.renderEngine.updateCaptureCanvas(undefined, undefined);
-    }
-
-    this.stage.width(this.canvasReference.offsetWidth);
-    this.stage.height(this.canvasReference.offsetHeight);
+  private onBoardCanvasResize() {
+    this.renderEngine.updateCaptureCanvas(undefined, undefined);
+    this.matteBox.updateSize({
+      boardCanvasSize: {
+        width: this.boardCanvasRef.offsetWidth,
+        height: this.boardCanvasRef.offsetHeight,
+      },
+    });
+    this.uiLayer.draw();
+    this.stage.width(this.boardCanvasRef.offsetWidth);
+    this.stage.height(this.boardCanvasRef.offsetHeight);
     this.stage.draw(); // Redraw the canvas
   }
 
@@ -636,4 +638,14 @@ export class Engine {
       }
     });
   }
+}
+
+function downloadURI(uri: string, name: string) {
+  const link = document.createElement("a");
+  link.download = name;
+  link.target = "_blank";
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }

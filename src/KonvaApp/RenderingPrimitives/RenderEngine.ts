@@ -169,22 +169,6 @@ export class RenderEngine {
     this.captureCanvas.setPosition({ x: this.positionX, y: this.positionY });
     this.captureCanvas.size({ width: this.width, height: this.height });
 
-    // Setup loader and position it accordingly
-    // if (this.videoLoadingCanvas === undefined) {
-    //   this.videoLoadingCanvas = new VideoNode(
-    //     "",
-    //     this.videoLayer,
-    //     this.positionX,
-    //     this.positionY,
-    //     "wipe.mp4",
-    //     undefined,
-    //     this.width,
-    //     this.height,
-    //   );
-    // }
-    // this.videoLoadingCanvas.highlight();
-    // this.videoLoadingCanvas.kNode.hide();
-
     // this is the change in positions
     const deltaX = this.positionX - oldPositionX;
     const deltaY = this.positionY - oldPositionY;
@@ -329,7 +313,7 @@ export class RenderEngine {
   }
 
   // Do a bunch of precondition checks and error out early on.
-  public async startProcessing(renderingOptions: RenderingOptions) {
+  public async startProcessing(renderingOptions?: RenderingOptions) {
     // Start processing and lock everything
 
     this.isProcessing = true;
@@ -337,7 +321,7 @@ export class RenderEngine {
     try {
       // or not loaded
       if (this.videoNodes.length + this.imageNodes.length < 1) {
-        throw Error("Must have atleast Media item on the board.");
+        throw Error("Must at least have 1 item on the board.");
       }
       // error out if nodes are not all loaded.
       // todo remove when we have error handling + and ui
@@ -437,15 +421,15 @@ export class RenderEngine {
         pixelRatio: pixelRatio,
       });
 
-      // to fill canvas white
+      // TODO: fill canvas white properly
       const context = offScreenSceneCanvas.getContext();
-      context.fillStyle = "white";
-      context.fillRect(
-        0,
-        0,
-        offScreenSceneCanvas.width,
-        offScreenSceneCanvas.height,
-      );
+      // context.fillStyle = "white";
+      // context.fillRect(
+      //   0,
+      //   0,
+      //   offScreenSceneCanvas.width,
+      //   offScreenSceneCanvas.height,
+      // );
 
       const buffer = new OffScreenSceneCanvas({
         width:
@@ -493,7 +477,7 @@ export class RenderEngine {
   **/
   private async render(
     largestNumberOfFrames: number,
-    renderingOptions: RenderingOptions,
+    renderingOptions?: RenderingOptions,
   ) {
     if (!this.isProcessing) return;
 

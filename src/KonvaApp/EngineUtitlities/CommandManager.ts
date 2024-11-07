@@ -1,6 +1,6 @@
 import Konva from "konva";
-import { ImageNode, TextNode, VideoNode } from "./Nodes";
-import { MediaNode, Position, RGBColor, Transformation } from "./types";
+import { ImageNode, TextNode, VideoNode } from "../Nodes";
+import { MediaNode, Position, RGBColor, Transformation } from "../types";
 import {
   AddChromaKey,
   CreateCommand,
@@ -14,13 +14,13 @@ import {
   UndoStackManager,
   UnlockNodesCommand,
   UseVideoExtraction,
-} from "./UndoRedo";
+} from "../UndoRedo";
 import {
   NodesManager,
   NodeTransformer,
   SelectionManager,
-} from "./NodesManagers";
-import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
+} from "../NodesManagers";
+import { RenderEngine } from "../RenderingPrimitives/RenderEngine";
 
 interface EngineReferences {
   mediaLayerRef: Konva.Layer;

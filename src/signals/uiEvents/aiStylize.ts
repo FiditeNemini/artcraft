@@ -33,11 +33,15 @@ const stagedAiStylizeRequest = signal<AiStylizeSingalType>();
 const dispatchRequest = (data: AiStylizeSingalType) => {
   stagedAiStylizeRequest.value = data;
 };
-
+let onRequestEffectCleanup: (() => void) | undefined;
 const onRequest = (callback: (data: AiStylizeSingalType) => void) => {
-  effect(() => {
+  if (onRequestEffectCleanup) {
+    onRequestEffectCleanup();
+  }
+  onRequestEffectCleanup = effect(() => {
     if (stagedAiStylizeRequest.value) {
       callback(stagedAiStylizeRequest.value);
+      stagedAiStylizeRequest.value = undefined;
     }
   });
 };

@@ -70,6 +70,7 @@ export class SelectionManager {
     this.mediaLayerRef.batchDraw();
   }
   public disable() {
+    this.clearSelection();
     this.disabled = true;
   }
   public enable() {

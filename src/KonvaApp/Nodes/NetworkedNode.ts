@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import { SelectionManager } from "../NodesManagers";
 import { BaseNode } from "./BaseNode";
 import { Size } from "../types";
-import { LoadingVideosProvider } from "../LoadingVideosProvider";
+import { LoadingVideosProvider } from "../EngineUtitlities/LoadingVideosProvider";
+import { NodeProgressEventDetail } from "../types/events";
 
 export enum UploadStatus {
   INIT = "init",
@@ -20,17 +21,27 @@ export enum UploadStatus {
 
 export abstract class NetworkedNode extends BaseNode {
   public kNode: Konva.Image;
+
+  // members to deal with loading progress
   public didFinishLoading: boolean = false;
   protected _progress: number = 0;
   protected _progressMessage?: string;
+  protected progressStatus: string = UploadStatus.INIT;
+  public progressEvent: EventTarget;
+
+  // members to deal with the file carried
   protected localFile?: File;
   protected mediaFileToken?: string;
   protected mediaFileUrl?: string;
   protected mediaFileSize?: Size;
-  protected mediaFileStatus: UploadStatus = UploadStatus.INIT;
+
+  // loading screen
   protected loadingVideosProviderRef?: LoadingVideosProvider;
+
+  // error and retry handling
   public errorMessage?: string;
   abstract retry(): void;
+
   constructor({
     kNode,
     selectionManagerRef,
@@ -52,6 +63,7 @@ export abstract class NetworkedNode extends BaseNode {
     this.kNode = kNode;
     this.loadingVideosProviderRef = loadingVideosProviderRef;
     this.didFinishLoading = false;
+    this.progressEvent = new EventTarget();
     this.localFile = localFile;
   }
   public progress() {
@@ -61,44 +73,62 @@ export abstract class NetworkedNode extends BaseNode {
     return this._progressMessage;
   }
   public status() {
-    return this.mediaFileStatus;
+    return this.progressStatus;
   }
   public isError() {
-    const errorStatues = [
+    const errorStatues: string[] = [
       UploadStatus.ERROR_ON_FILE,
       UploadStatus.ERROR_ON_UPLOAD,
       UploadStatus.ERROR_ON_RETREIVE,
       UploadStatus.ERROR_ON_LOAD,
     ];
-    return errorStatues.includes(this.mediaFileStatus);
+    return errorStatues.includes(this.progressStatus);
   }
 
   protected uuidGenerate() {
     return uuidv4();
   }
-  protected setStatus(newStatus: UploadStatus, message?: string) {
-    this.mediaFileStatus = newStatus;
+  protected setStatus(newStatus: string, message?: string) {
+    this.progressStatus = newStatus;
     this.errorMessage = message;
     this.selectionManagerRef.updateContextComponents();
   }
-  protected setProgress(
-    newProgress: number,
-    progressProps?: {
-      newStatus?: UploadStatus;
-      message?: string;
-    },
-  ) {
-    this._progress = newProgress;
-    if (progressProps?.message) {
-      this._progressMessage = progressProps.message;
+  protected setProgress<S>({
+    progress,
+    name,
+    status,
+    message,
+  }: {
+    progress: number;
+    name?: string;
+    status?: S;
+    message?: string;
+  }) {
+    this._progress = progress;
+    if (message) {
+      this._progressMessage = message;
     }
-    if (progressProps?.newStatus) {
-      this.mediaFileStatus = progressProps.newStatus;
+    if (status && typeof status === "string") {
+      this.progressStatus = status;
     }
 
     if (this._progress === 100) {
       this.didFinishLoading = true;
     }
+    // TODO: change to use
+    this.progressEvent.dispatchEvent(
+      new CustomEvent<NodeProgressEventDetail<S>>(
+        name ? name : "GenericNodeProgress",
+        {
+          detail: {
+            node: this,
+            progress: this._progress,
+            message: message,
+            status: status,
+          },
+        },
+      ),
+    );
     this.selectionManagerRef.updateContextComponents();
   }
 }
