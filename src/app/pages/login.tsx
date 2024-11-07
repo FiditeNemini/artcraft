@@ -62,61 +62,70 @@ export const Login = () => {
   });
 
   return (
-    <div className="fixed flex h-full w-full flex-col items-center justify-center">
-      <div className="mx-auto my-6 flex w-10/12 max-w-2xl gap-4">
-        <img src="/brand/Storyteller-Logo.png" alt="Storyteller Logo" />
+    <div className="fixed flex h-full w-full flex-col items-center justify-center bg-[url('/svg/bg-dots.svg')] bg-[length:200px_200px] bg-center bg-repeat">
+      <div className="my-7 flex w-10/12 max-w-2xl items-center justify-center gap-4">
+        <img
+          src="/brand/Storyteller-Logo-Black.png"
+          alt="Storyteller Logo"
+          className="h-11 select-none"
+        />
       </div>
-      <div
-        className={twMerge(
-          paperWrapperStyles,
-          "relative mx-auto w-10/12 max-w-2xl p-6",
-        )}
-      >
-        <form
-          ref={formRef}
-          onSubmit={handleOnSumbit}
+      <div className="w-full max-w-xl rounded-xl shadow-lg">
+        <div
           className={twMerge(
-            "flex flex-col gap-4",
-            shouldShowLoader && "opacity-0",
+            paperWrapperStyles,
+            "relative mx-auto w-full rounded-none rounded-t-xl p-8 shadow-none",
           )}
         >
-          <Input
-            label="Username or Email"
-            icon={faUser}
-            name="usernameOrEmail"
-            placeholder="Username or Email"
-            autoComplete="username"
-            required
-          />
-          <Input
-            label="Password"
-            icon={faKey}
-            type="password"
-            name="password"
-            placeholder="Password"
-            autoComplete="current-password"
-            required
-          />
-          <div className="align-items mb-3 flex">
-            <a
-              href="https://storyteller.ai/password-reset"
-              className="text-brand-primary hover:text-brand-primary-400 grow text-sm transition-all duration-150"
-            >
-              Forgot your password?
-            </a>
-            <div className="flex justify-end gap-1 text-sm">
-              <p>Don&apos;t have an account?</p>
-              <Link to="/signup">Sign Up</Link>
-            </div>
-          </div>
+          <h1 className="mb-9 text-center text-2xl font-bold">
+            Log in to Board
+          </h1>
+          <form
+            ref={formRef}
+            onSubmit={handleOnSumbit}
+            className={twMerge(
+              "flex flex-col gap-4",
+              shouldShowLoader && "opacity-0",
+            )}
+          >
+            <Input
+              label="Username or Email"
+              icon={faUser}
+              name="usernameOrEmail"
+              placeholder="Username or Email"
+              autoComplete="username"
+              required
+            />
+            <Input
+              label="Password"
+              icon={faKey}
+              type="password"
+              name="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              required
+            />
 
-          <Button>Login</Button>
-        </form>
-        {shouldShowLoader && (
-          <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-            <LoadingSpinner isShowing={true} message={authLoaderMessage} />
+            <Button className="mt-6 py-3">Continue</Button>
+          </form>
+          {shouldShowLoader && (
+            <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+              <LoadingSpinner isShowing={true} message={authLoaderMessage} />
+            </div>
+          )}
+        </div>
+        <div className="align-items flex w-full max-w-xl rounded-b-xl border border-t-0 bg-gray-100 px-8 py-4">
+          <a
+            href="https://storyteller.ai/password-reset"
+            className="text-brand-primary hover:text-brand-primary-400 grow text-sm transition-all duration-150"
+          >
+            Forgot your password?
+          </a>
+          <div className="flex justify-end gap-1 text-sm">
+            <p className="opacity-75">Don&apos;t have an account?</p>
+            <Link to="/signup">Sign Up</Link>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    @apply bg-ui-background font-sans text-black;
+    @apply bg-ui-background font-sans text-[#222222];
   }
   .pegboard {
     background-image: radial-gradient(#3f3f46 1px, transparent 0);
@@ -31,10 +31,10 @@
     @apply text-sm;
   }
   p {
-    @apply text-sm font-light;
+    @apply text-sm font-normal;
   }
   a {
-    @apply font-light text-primary-400 hover:text-primary-200;
+    @apply font-medium text-primary-400 hover:text-primary-300;
   }
   a:visited {
     @apply text-primary-600 hover:text-primary-400;

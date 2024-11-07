@@ -48,7 +48,7 @@ export const Button = ({
   );
 
   const className = twMerge(
-    "text-sm font-medium rounded-lg px-3 py-2 shadow-sm",
+    "text-[15px] font-semibold rounded-lg px-3 py-2 shadow-sm",
     "flex gap-2 items-center justify-center",
     "transition-all duration-150",
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",

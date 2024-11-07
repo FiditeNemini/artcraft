@@ -33,7 +33,10 @@ export const Input = React.forwardRef(
     return (
       <div className={twMerge("flex flex-col", className)}>
         {label && (
-          <label htmlFor={id ? id : kebabCase(label)} className="pb-2">
+          <label
+            htmlFor={id ? id : kebabCase(label)}
+            className="pb-2 font-medium"
+          >
             {label}
           </label>
         )}
@@ -42,14 +45,17 @@ export const Input = React.forwardRef(
           {icon && (
             <FontAwesomeIcon
               icon={icon}
-              className={twMerge("text-md absolute pl-3 pt-3", iconClassName)}
+              className={twMerge(
+                "absolute pl-3.5 pt-3 text-sm opacity-70",
+                iconClassName,
+              )}
             />
           )}
           <input
             ref={ref}
             id={id ? id : label ? kebabCase(label) : undefined}
             className={twMerge(
-              "h-10 w-full rounded-lg px-3 py-2.5 outline-ui-border",
+              "h-10 w-full rounded-md px-3 py-2.5 outline-1 outline-ui-border",
               // on focus
               "outline-offset-0 transition-all duration-150 ease-in-out focus:outline-primary",
               icon && "pl-10",
