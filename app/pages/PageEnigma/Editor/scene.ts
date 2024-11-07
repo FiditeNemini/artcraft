@@ -39,6 +39,7 @@ class Scene {
   updateSurfaceIdAttributeToMesh: Function;
   helper: MMDAnimationHelper;
   ambientLight: THREE.AmbientLight | undefined;
+  hemisphereLight: THREE.HemisphereLight | undefined;
   directional_light: THREE.DirectionalLight | undefined;
   timeline: TimeLine | undefined;
   version: number;
@@ -772,7 +773,7 @@ class Scene {
       this.scene.background = texture;
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
-
+      if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     } else if (this.skybox == "m_1") {
       const texture = loader.load([
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
@@ -785,12 +786,12 @@ class Scene {
       this.scene.background = texture;
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
-
+      if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     } else if (this.skybox == "m_2") {
       this.scene.background = new THREE.Color("#000000");
       if (this.ambientLight) this.scene.add(this.ambientLight);
       if (this.directional_light) this.scene.remove(this.directional_light);
-
+      if (this.hemisphereLight) this.scene.remove(this.hemisphereLight);
     } else {
       const texture = loader.load([
         "/resources/skybox/day/px.png",
@@ -803,7 +804,7 @@ class Scene {
       this.scene.background = texture;
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
-
+      if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     }
 
     console.log("Backround creation..");
@@ -826,8 +827,8 @@ class Scene {
 
   _create_base_lighting() {
     const color = 0xfcece7;
-    const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
-    this.scene.add(light);
+    this.hemisphereLight = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
+    this.scene.add(this.hemisphereLight);
 
     this.ambientLight = new THREE.AmbientLight(new THREE.Color("#ffffff"), 3);
 
