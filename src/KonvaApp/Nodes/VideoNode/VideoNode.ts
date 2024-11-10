@@ -152,26 +152,7 @@ export class VideoNode extends NetworkedNode {
   private listenToVideoPlayPause() {
     // TODO: for controling video playpause, can be improved with bette ui
     this.kNode.on("click", () => {
-      // console.log("click");
-      // Shouldn't play if anything things are true
-      if (this.didFinishLoading == false) {
-        return;
-      }
-      if (this.isProcessing == true) {
-        return;
-      }
-      if (this.isSegmentationMode) {
-        // console.log("Not Playing because Segmenting");
-        return;
-      }
-      if (this.videoComponent.paused) {
-        console.log("Playing", this.videoComponent.src);
-        this.videoComponent.play();
-        this.chromaKeyRender(0); // For starting Chroma
-      } else {
-        console.log("Pause", this.videoComponent.src);
-        this.videoComponent.pause();
-      }
+      this.togglePlay();
     });
   }
   private removeLisentoVideoPlayPause() {
@@ -296,10 +277,29 @@ export class VideoNode extends NetworkedNode {
       // TODO: impolement retry
     }
   }
+  public togglePlay() {
+    // Shouldn't play in these situations
+    if (this.didFinishLoading == false) {
+      return;
+    }
+    if (this.isProcessing == true) {
+      return;
+    }
+    if (this.isSegmentationMode) {
+      // console.log("Not Playing because Segmenting");
+      return;
+    }
 
-  async setProcessing() {
-    this.isProcessing = true;
+    if (this.videoComponent.paused) {
+      console.log("Playing", this.videoComponent.src);
+      this.videoComponent.play();
+      this.chromaKeyRender(0); // For starting Chroma
+    } else {
+      console.log("Pause", this.videoComponent.src);
+      this.videoComponent.pause();
+    }
   }
+
   async reset() {
     this.videoComponent.pause();
     await this.seek(0);

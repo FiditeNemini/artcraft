@@ -6,10 +6,6 @@ import {
   faArrowRotateLeft,
   faArrowRotateRight,
   faBars,
-  faCameraMovie,
-  // faCameraRotate,
-  // faDownload,
-  // faCloudArrowDown,
   faFilePlus,
   faFilm,
   faFloppyDisk,
@@ -19,12 +15,12 @@ import {
   faText,
 } from "@fortawesome/pro-solid-svg-icons";
 
-import { ToolbarButton, ToolbarButtonProps } from "../ToolbarButton";
+import { ToolbarButton } from "../ToolbarButton";
 
 // style and constants
 import { paperWrapperStyles, toolTipStyles } from "~/components/styles";
 import { ToolbarMainButtonNames } from "./enum";
-import { Button, Tooltip } from "~/components/ui";
+import { ButtonPreviewAndRender } from "./ButtonPreviewAndRender";
 
 export const ToolbarMain = ({
   disabled = false,
@@ -92,11 +88,6 @@ export const ToolbarMain = ({
               </ToolbarButton>
             </PopoverPanel>
           </Popover>
-          {/* <ToolbarButton
-            icon={faCameraRotate}
-            buttonProps={buttonProps.CHANGE_CAMERA_ORIENTATION}
-            tooltip="Change Orientation"
-          /> */}
           <ToolbarButton
             icon={faHatWizard}
             buttonProps={buttonProps.AI_STYLIZE}
@@ -119,41 +110,12 @@ export const ToolbarMain = ({
             buttonProps={buttonProps.SAVE}
             tooltip="Save"
           />
-          <DownloadButton {...buttonProps.DOWNLOAD} />
+          <ButtonPreviewAndRender
+            buttonPreviewProps={buttonProps.PREVIEW}
+            buttonRenderProps={buttonProps.DOWNLOAD}
+          />
         </div>
       </div>
     </>
-  );
-};
-
-const DownloadButton = (buttonProps: ToolbarButtonProps) => {
-  const {
-    className: customButtonClassNames,
-    disabled,
-    active,
-    hidden,
-    onClick,
-    ...restButtonProps
-  } = buttonProps;
-
-  return (
-    <Tooltip tip="Click to Finish Movie">
-      <Button
-        className="text-nowrap"
-        icon={faCameraMovie}
-        disabled={disabled}
-        {...restButtonProps}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (onClick) {
-            onClick(e);
-          }
-        }}
-        {...restButtonProps}
-      >
-        Render Movie
-      </Button>
-    </Tooltip>
   );
 };

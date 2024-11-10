@@ -41,8 +41,8 @@ export abstract class BaseNode {
     // Do any other clean up and delete the konva node.
     this.kNode.destroy();
   }
-  protected async setProcessing() {
-    this.isProcessing = true;
+  public async setProcessing(val: boolean) {
+    this.isProcessing = val;
   }
   public isKEventRef() {
     return this._isKDragEventListening && this._isKTranformEventListening;

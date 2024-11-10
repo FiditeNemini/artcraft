@@ -272,6 +272,18 @@ export class Engine {
         document.body.style.cursor = "default";
         return;
       }
+      case AppModes.PREVIEW: {
+        console.log("APPMODE: RENDER");
+        this.selectorSquare.disable();
+        this.selectionManager.disable();
+        uiAccess.toolbarMain.disable();
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
+          active: false,
+        });
+        this.matteBox.enable();
+        document.body.style.cursor = "not-allowed";
+        return;
+      }
       case AppModes.RENDERING: {
         console.log("APPMODE: RENDER");
         this.selectorSquare.disable();
@@ -426,8 +438,14 @@ export class Engine {
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
       this.sceneManager.saveScene();
     });
+    uiEvents.toolbarMain.PREVIEW.onClick(async () => {
+      console.log("Toolbar Main >> Preview");
+      this.setAppMode(AppModes.PREVIEW);
+      await this.handlePreview();
+      this.setAppMode(AppModes.SELECT);
+    });
     uiEvents.toolbarMain.DOWNLOAD.onClick(async () => {
-      console.log("Toolbar Main Render and Download");
+      console.log("Toolbar Main >> Render Download");
       try {
         this.setAppMode(AppModes.RENDERING);
         await this.renderEngine.startProcessing();
@@ -558,30 +576,27 @@ export class Engine {
   }
 
   public async setupStage() {
-    var textNode = new Konva.Text({
-      x: 0,
-      y: 0,
+    // Frame rate inicator
+    const textNode = new Konva.Text({
+      x: 5,
+      y: 5,
       text: "",
       fontSize: 32,
-      fontFamily: "Calibri",
+      fontFamily: "Source Sans 3",
       fill: "black",
     });
-
-    var anim = new Konva.Animation((frame) => {
-      if (frame) {
-        if (import.meta.env.DEV) {
-          const timeDiff = frame.timeDiff;
-          const frameRate = frame.frameRate;
-          textNode.setText(
-            `FrameTime:${timeDiff.toFixed(0)} ms\nFrameRate:${frameRate.toFixed(0)} fps`,
-          );
-        }
+    const anim = new Konva.Animation((frame) => {
+      if (frame && import.meta.env.DEV) {
+        const timeDiff = frame.timeDiff;
+        const frameRate = frame.frameRate;
+        textNode.setText(
+          `FrameTime: ${timeDiff.toFixed(0)} ms\nFrameRate: ${frameRate.toFixed(0)} fps`,
+        );
       }
     }, this.mediaLayer);
+
     anim.start();
-
     this.uiLayer.add(textNode);
-
     this.addKeyboardShortcuts();
   }
 
@@ -636,6 +651,47 @@ export class Engine {
       } else if (event.key === "Delete") {
         this.commandManager.deleteNodes();
       }
+    });
+  }
+
+  private async handlePreview(): Promise<void> {
+    return new Promise((resolve) => {
+      const allNodes = this.nodesManager.getAllNodes();
+      let longestVideoNode: VideoNode | undefined;
+      allNodes.forEach((node) => {
+        if (node instanceof VideoNode) {
+          node.videoComponent.pause();
+          node.videoComponent.currentTime = 0;
+          if (
+            longestVideoNode === undefined ||
+            node.videoComponent.duration >
+              longestVideoNode.videoComponent.duration
+          ) {
+            longestVideoNode = node;
+          }
+        }
+      });
+      const timer = setTimeout(() => {
+        resolve();
+      }, 7000);
+      if (longestVideoNode !== undefined) {
+        longestVideoNode.videoComponent.addEventListener("ended", () => {
+          clearTimeout(timer);
+          resolve();
+        });
+      } else {
+        // no videonode
+        uiAccess.dialogError.show({
+          title: "No Video Node",
+          message: "You have not yet put a video on the board",
+        });
+        resolve();
+      }
+      allNodes.forEach((node) => {
+        if (node instanceof VideoNode) {
+          node.togglePlay();
+        }
+      });
     });
   }
 }

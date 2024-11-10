@@ -342,7 +342,7 @@ export class RenderEngine {
           setTimeout(this.startProcessing.bind(this), 1000);
           break;
         }
-        item.setProcessing();
+        item.setProcessing(true);
       }
 
       // todo remove
@@ -371,14 +371,15 @@ export class RenderEngine {
         if (!item.kNode) {
           return;
         }
+        item.setProcessing(false);
         item.kNode.listening(true);
       }
     }
   }
 
-  public stopProcessing() {
-    this.isProcessing = false;
-  }
+  // public stopProcessing() {
+  //   this.isProcessing = false;
+  // }
 
   // find the frame time given the frame number
   private calculateFrameTime(frameNumber: number, frameRate: number): number {
