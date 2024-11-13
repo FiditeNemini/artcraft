@@ -247,22 +247,22 @@ const faqItems = [
   {
     question: "What is Seed-VC Zero-shot Voice Conversion?",
     answer:
-      "Seed-VC Zero-shot Voice Conversion is an advanced AI-powered tool designed for state-of-the-art voice conversion and singing voice conversion. It uses in-context learning to transform one voice into another without any prior training, making it an ideal choice for projects that require versatile voice modification.",
+      "Seed-VC Zero-shot Voice Conversion is an advanced AI-powered tool designed for state-of-the-art voice conversion. It uses in-context learning to transform one voice into another without any prior training, making it an ideal choice for projects that require versatile voice modification.",
   },
   {
     question: "How does Seed-VC work?",
     answer:
-      "Seed-VC leverages cutting-edge AI techniques, including zero-shot learning, to convert voices with just a short audio reference (1–30 seconds). It can adapt to both speaking and singing voices, creating natural-sounding results without the need for extensive data or training.",
+      "Seed-VC leverages cutting-edge AI techniques, including zero-shot learning, to convert voices with just a short audio reference (1–30 seconds). It can adapt to different voices, creating natural-sounding results without the need for extensive data or training.",
   },
   {
     question: "What kind of voice quality can I expect from Seed-VC?",
     answer:
-      "Seed-VC delivers high-quality, natural-sounding voice conversions, suitable for professional applications like dubbing, voice-overs, and even singing voice transformations. The AI is designed to retain the unique qualities of the target voice while maintaining clear and lifelike output.",
+      "Seed-VC delivers high-quality, natural-sounding voice conversions, suitable for professional applications like dubbing and voice-overs. The AI is designed to retain the unique qualities of the target voice while maintaining clear and lifelike output.",
   },
   {
     question: "Can Seed-VC be used for voice-over and dubbing work?",
     answer:
-      "Definitely! Seed-VC's zero-shot capabilities make it perfect for voice-over and dubbing. Whether you need to create different voices for various characters or adapt a voice to a new language, it can handle the task seamlessly. It also supports singing voice conversion, adding flexibility to musical projects.",
+      "Definitely! Seed-VC's zero-shot capabilities make it perfect for voice-over and dubbing. Whether you need to create different voices for various characters or adapt a voice to a new language, it can handle the task seamlessly.",
   },
 ];
 
