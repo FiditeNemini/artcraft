@@ -39,11 +39,15 @@ export const DialogPanelChromakey = ({
     <DialogPanel
       className={twMerge(paperWrapperStyles, "w-full max-w-lg space-y-4 p-8")}
     >
-      <DialogTitle className="font-bold">Chroma Key</DialogTitle>
+      <DialogTitle className="font-bold">Green Background Removal</DialogTitle>
       <div>
-        <p>Turn on chroma key for this node.</p>
         <p>
-          The key'ing color is:{" "}
+          If your video node has a green screen background, you can turn on
+          chroma key to make the green area transparent.
+        </p>
+        <br />
+        <p>
+          The target green of this chroma key feature is:{" "}
           {`rgb(${chromakeyColor?.red},${chromakeyColor?.green},${chromakeyColor?.blue})`}
         </p>
       </div>
