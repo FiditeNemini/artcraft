@@ -6,5 +6,6 @@
 #   are always processed first, followed by rules in the Netlify 
 #   configuration file.
 
-/login               /index.html                   200!
+/landing               /index.html                   200!
+/login                 /index.html                   200!
 /m_*                   /index.html                   200!

@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Login } from "~/app/pages/login";
 import { Main } from "~/app/pages/main";
+import Landing from "~/app/pages/landing";
 // import { Sandbox } from "~/app/pages/sandbox";
 
 export const router = createBrowserRouter([
@@ -20,4 +21,8 @@ export const router = createBrowserRouter([
   //   path: "/sandbox",
   //   element: <Sandbox />,
   // },
+  {
+    path: "/landing",
+    element: <Landing />,
+  },
 ]);

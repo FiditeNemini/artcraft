@@ -10,6 +10,15 @@ export default {
       fontFamily: {
         sans: ["'Source Sans 3'", ...defaultTheme.fontFamily.sans],
       },
+      fontSize: {
+        "7xl": "5rem",
+      },
+      boxShadow: {
+        soft: "0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)",
+      },
+      animation: {
+        bounce: "bounce 2s infinite",
+      },
     },
     colors: {
       // color value shorthands
