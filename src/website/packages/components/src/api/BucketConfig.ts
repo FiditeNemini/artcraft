@@ -16,7 +16,7 @@ class BucketConfig {
       path = "/" + path;
     }
     if (!this.isLocalDev) {
-      return `https://cdn-2.fakeyou.com/${path}`;
+      return `https://cdn-2.fakeyou.com${path}`;
     }
     return `https://storage.googleapis.com/${bucket}${path}`;
   }
