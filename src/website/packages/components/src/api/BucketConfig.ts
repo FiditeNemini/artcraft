@@ -32,7 +32,7 @@ class BucketConfig {
   ): string {
     const basePath = this.isLocalDev
       ? "https://dev-cdn.fakeyou.com"
-      : "https://cdn.fakeyou.com";
+      : "https://cdn-2.fakeyou.com";
     let path = bucketRelativePath?.startsWith("/")
       ? bucketRelativePath
       : "/" + bucketRelativePath;
