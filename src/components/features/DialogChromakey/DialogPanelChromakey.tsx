@@ -8,7 +8,7 @@ import { DialogPanel, DialogTitle } from "@headlessui/react";
 
 import { Button } from "~/components/ui";
 import { ChromakeyProps, DialogChromakeyProps } from "./type";
-import { paperWrapperStyles } from "~/components/styles";
+import { dialogPanelStyles, paperWrapperStyles } from "~/components/styles";
 
 export const DialogPanelChromakey = ({
   isChromakeyEnabled,
@@ -37,9 +37,9 @@ export const DialogPanelChromakey = ({
 
   return (
     <DialogPanel
-      className={twMerge(paperWrapperStyles, "w-full max-w-lg space-y-4 p-8")}
+      className={twMerge(paperWrapperStyles, dialogPanelStyles, "max-w-xl")}
     >
-      <DialogTitle className="font-bold">Green Background Removal</DialogTitle>
+      <DialogTitle className="font-bold">Green Screen Removal</DialogTitle>
       <div>
         <p>
           If your video node has a green screen background, you can turn on

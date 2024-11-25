@@ -19,7 +19,7 @@ export const ToolbarNodeButtonData = [
   {
     name: ButtonNames.CHROMA,
     icon: faTransporter,
-    tooltip: "Background Removal",
+    tooltip: "Green Screen Removal",
   },
   {
     name: ButtonNames.AI_STYLIZE,

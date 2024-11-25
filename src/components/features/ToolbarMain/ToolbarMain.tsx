@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRotateLeft,
   faArrowRotateRight,
-  faBars,
   faFilePlus,
   faFilm,
   faFloppyDisk,
@@ -45,10 +44,7 @@ export const ToolbarMain = ({
             "pointer-events-none cursor-default bg-ui-border shadow-md",
         )}
       >
-        <div className="pl-1 pr-2">
-          <ToolbarButton icon={faBars} buttonProps={buttonProps.MENU} />
-        </div>
-        <div className="flex items-center gap-2 px-2">
+        <div className="flex items-center gap-2 pr-2">
           <ToolbarButton
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}
@@ -65,7 +61,7 @@ export const ToolbarMain = ({
               <button
                 data-tooltip="Add..."
                 className={twMerge(
-                  "size-10 rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
+                  "size-10 rounded-xl p-2 hover:bg-gray-200/50",
                   toolTipStyles,
                 )}
               >
@@ -94,7 +90,7 @@ export const ToolbarMain = ({
             tooltip="AI Stylize"
           />
         </div>
-        <div className="flex items-center gap-2 px-2">
+        <div className="flex items-center gap-2 pl-2">
           <ToolbarButton
             icon={faArrowRotateLeft}
             buttonProps={buttonProps.UNDO}

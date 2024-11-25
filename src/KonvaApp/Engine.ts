@@ -578,10 +578,10 @@ export class Engine {
   public async setupStage() {
     // Frame rate inicator
     const textNode = new Konva.Text({
-      x: 5,
-      y: 5,
+      x: 10,
+      y: 80,
       text: "",
-      fontSize: 32,
+      fontSize: 24,
       fontFamily: "Source Sans 3",
       fill: "black",
     });

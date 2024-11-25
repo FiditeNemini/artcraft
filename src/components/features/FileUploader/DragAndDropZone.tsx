@@ -24,20 +24,23 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
 
   // const fileName = file && getFileName(file).toUpperCase();
   const wrapperClassName = twMerge(
-    "group cursor-pointer p-3 bg-gray-100",
-    !file && "flex flex-col items-center justify-center gap-6",
-    file && "flex items-center gap-3.5",
+    "group cursor-pointer px-6 py-12 bg-gray-100 hover:bg-gray-200/60 transition-colors duration-150 ease-in-out",
+    !file && "flex flex-col items-center justify-center gap-",
+    file && "flex items-center gap-2 py-6",
     // "rounded-lg border-2 border-dashed border-ui-border",
   );
 
   if (!file) {
     return (
       <div className={wrapperClassName}>
-        <FontAwesomeIcon icon={faFileArrowUp} className="text-7xl" />
-        <p className="text-2xl font-medium">
+        <FontAwesomeIcon
+          icon={faFileArrowUp}
+          className="mb-3 text-5xl opacity-50"
+        />
+        <p className="text-xl font-semibold">
           <u>Upload a file</u> or drop it here
         </p>
-        <p className="flex items-center gap-2 text-lg font-normal opacity-50">
+        <p className="text-md mt-1.5 flex items-center gap-1 font-normal opacity-70">
           Supported file types:{" "}
           <b>{fileTypes.join(", ").toString().toUpperCase()}</b>
         </p>
@@ -49,7 +52,7 @@ export const DragAndDropZone = ({ file, fileTypes }: Props) => {
       : faFileImage;
     return (
       <div className={wrapperClassName}>
-        <FontAwesomeIcon icon={icon} className="text-4xl" />
+        <FontAwesomeIcon icon={icon} className="mr-2 text-4xl opacity-70" />
         <div className="flex grow flex-col gap-0">
           <p className="font-medium">
             {file.name.slice(0, file.name.lastIndexOf("."))}

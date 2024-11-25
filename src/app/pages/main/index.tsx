@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import { twMerge } from "tailwind-merge";
 import { withProtectionRoute } from "~/components/hoc";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
@@ -8,6 +7,7 @@ import { ToolbarUserProfile } from "~/components/features";
 
 //Components of the Konva App are all in the KonvaComponent
 import { KonvaRootComponent } from "~/KonvaRootComponent";
+import { ToolbarTopLeft } from "~/components/features/ToolbarTopLeft";
 
 export const Main = withProtectionRoute(() => {
   // This is a hook that will log the number of times the component has rerendered
@@ -23,13 +23,8 @@ export const Main = withProtectionRoute(() => {
         sceneToken={sceneToken}
         className="col-span-12 col-start-1 row-span-12 row-start-1"
       />
-      <div
-        className={twMerge(
-          "col-span-8 col-start-5 row-span-1 row-start-1 flex justify-end",
-          "md:col-span-6 md:col-start-7",
-          "lg:col-span-3 lg:col-start-10",
-        )}
-      >
+      <div className="absolute top-0 flex w-full justify-between px-2">
+        <ToolbarTopLeft />
         <ToolbarUserProfile />
       </div>
     </div>

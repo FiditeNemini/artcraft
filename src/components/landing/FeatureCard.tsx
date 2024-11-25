@@ -13,7 +13,7 @@ const FeatureCard = ({
   title,
   description,
   image,
-  gradient,
+  // gradient,
   isReversed,
 }: FeatureCardProps) => {
   return (
@@ -22,17 +22,14 @@ const FeatureCard = ({
     >
       {/* Image Section */}
       <div className="group relative w-full lg:w-3/5">
-        <div
-          className={`absolute inset-0 ${gradient} opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-60`}
-        />
-        <div className="relative rounded-3xl border border-gray-100 bg-white/50 p-2 backdrop-blur-sm">
+        <div className="relative rounded-3xl border border-gray-100 bg-gray-100 p-1 backdrop-blur-sm">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
             <img
               src={image}
               alt={title}
               className="h-full w-full transform object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-black/10" />
+            {/* <div className="absolute inset-0 bg-black/10" /> */}
           </div>
         </div>
       </div>
@@ -45,7 +42,7 @@ const FeatureCard = ({
         <p className="text-lg leading-relaxed text-gray-600">{description}</p>
         <div className="flex flex-wrap gap-3">
           <a
-            href="/create"
+            href="/signup"
             className="group inline-flex items-center !text-primary-500 transition-colors hover:!text-primary-600"
           >
             Start Creating Now

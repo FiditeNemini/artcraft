@@ -2,9 +2,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter, faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { Button } from "../ui";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
 
   return (
     <footer className="border-t border-gray-100 bg-gray-50">
@@ -16,7 +18,10 @@ const Footer = () => {
             className="h-9"
           />
 
-          <Button className="group rounded-xl px-8 py-4 text-lg">
+          <Button
+            onClick={() => navigate("/signup")}
+            className="group rounded-xl px-8 py-4 text-lg"
+          >
             <span className="relative flex items-center">
               Start Creating for Free
               <FontAwesomeIcon

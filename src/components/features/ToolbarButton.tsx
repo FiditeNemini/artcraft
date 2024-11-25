@@ -43,7 +43,7 @@ export const ToolbarButton = ({
   }
 
   const mergedButtonClasses = twMerge(
-    "rounded-2xl p-2 hover:bg-secondary-500 hover:text-white",
+    "rounded-lg py-2 px-3 hover:bg-gray-200/50 transition-all duration-100",
     children ? "w-fit flex items-center gap-2 text-nowrap" : "size-10",
     active && "pointer-events-none text-primary ",
     disabled && "pointer-events-none text-secondary-300",

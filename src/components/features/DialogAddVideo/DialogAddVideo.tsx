@@ -6,6 +6,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import {
   dialogBackgroundStyles,
   paperWrapperStyles,
+  dialogPanelStyles,
 } from "~/components/styles";
 import { Button } from "~/components/ui";
 
@@ -109,15 +110,13 @@ export const DialogAddVideo = ({
   return (
     <Dialog open={isOpen} onClose={closeCallback} className="relative z-50">
       <div className={dialogBackgroundStyles}>
-        <DialogPanel className="w-full max-w-5xl">
-          <div
-            className={twMerge(
-              paperWrapperStyles,
-              "flex w-full max-w-5xl flex-col justify-between gap-4 px-6 pb-6 pt-4",
-            )}
-            style={{ height: "calc(100vh - 200px)" }}
-          >
-            <DialogTitle className="font-bold">Upload Video</DialogTitle>
+        <DialogPanel
+          className={twMerge("w-full", file ? "max-w-5xl" : "max-w-2xl")}
+        >
+          <div className={twMerge(paperWrapperStyles, dialogPanelStyles)}>
+            <DialogTitle className="text-3xl font-bold">
+              Upload Video
+            </DialogTitle>
             {dialogStatus === DialogAddMediaStatuses.STAGING_FILE && (
               <>
                 <QuickTrimVideoUploader
@@ -147,7 +146,7 @@ export const DialogAddVideo = ({
               }
             />
 
-            <div className="flex w-full justify-center gap-4">
+            <div className="-mt-2 flex w-full justify-end gap-2">
               <Button
                 onClick={handleClose}
                 variant="secondary"

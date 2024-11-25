@@ -7,6 +7,7 @@ import { Button } from "~/components/ui";
 import {
   dialogBackgroundStyles,
   paperWrapperStyles,
+  dialogPanelStyles,
 } from "~/components/styles";
 
 import { ArtStyleNames, SubPanelNames } from "./enums";
@@ -108,11 +109,13 @@ export const DialogAiStylize = ({
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,
-            "flex w-full max-w-5xl flex-col justify-between gap-4 px-6 pb-6 pt-4",
+            dialogPanelStyles,
+            "min-h-[calc(100vh-300px)] max-w-7xl",
           )}
-          style={{ height: "calc(100vh - 200px)" }}
         >
-          <DialogTitle className="font-bold">Use AI to Stylize</DialogTitle>
+          <DialogTitle className="text-3xl font-bold">
+            Use AI to Stylize
+          </DialogTitle>
 
           {panelState === SubPanelNames.BASIC && (
             <SubPanelBasic
@@ -132,7 +135,7 @@ export const DialogAiStylize = ({
               onChangePanel={onChangePanel}
             />
           )}
-          <div className="flex w-full justify-center gap-4">
+          <div className="flex w-full justify-end gap-2">
             <Button onClick={closeCallback} variant="secondary">
               Cancel
             </Button>

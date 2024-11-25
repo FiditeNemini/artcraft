@@ -22,23 +22,28 @@ export function ProfileDropdown() {
     fetchers: { logout },
   } = authentication;
 
-  if (!userInfo.value) {
-    return null;
-  }
-  const username = userInfo.value.core_info.username;
-  const emailHash = userInfo.value.core_info.gravatar_hash;
-  const profileUrl = `https://storyteller.ai/profile/${userInfo.value.core_info.display_name}`;
-  const avatarIndex = userInfo.value.core_info.default_avatar.image_index;
-  const backgroundColorIndex =
-    userInfo.value.core_info.default_avatar.color_index;
+  if (!userInfo.value) return null;
 
-  const options = [
+  // Extract user info for better readability
+  const {
+    core_info: {
+      username,
+      gravatar_hash: emailHash,
+      display_name,
+      default_avatar: {
+        image_index: avatarIndex,
+        color_index: backgroundColorIndex,
+      },
+    },
+  } = userInfo.value;
+
+  const profileUrl = `https://storyteller.ai/profile/${display_name}`;
+
+  const menuOptions = [
     {
       label: "Logout",
       icon: faRightFromBracket,
-      onClick: () => {
-        logout();
-      },
+      onClick: logout,
     },
   ];
 
@@ -46,7 +51,7 @@ export function ProfileDropdown() {
     <Menu as="div" className="relative">
       <MenuButton
         className={twMerge(
-          "flex size-16 cursor-pointer items-center gap-1.5",
+          "flex cursor-pointer items-center gap-1.5",
           "data-[hover]:opacity-70",
         )}
       >
@@ -57,44 +62,50 @@ export function ProfileDropdown() {
           avatarIndex={avatarIndex}
           backgroundIndex={backgroundColorIndex}
         />
-
         <FontAwesomeIcon icon={faChevronDown} />
       </MenuButton>
+
       <MenuItems
         anchor="bottom end"
         transition
         className={twMerge(
           paperWrapperStyles,
-          "mt-4 flex w-fit flex-col px-0 focus:outline-none",
+          "mt-4 flex w-48 flex-col rounded-xl shadow-lg",
           transitionTimingStyles,
           "data-[closed]:scale-95 data-[closed]:opacity-0",
         )}
       >
         <MenuItem
-          key={0}
           as="a"
           href={profileUrl}
           target="_blank"
           rel="noreferrer"
           className={twMerge(
-            "flex w-full items-center gap-2 text-nowrap px-4 py-2 text-start text-sm font-medium",
-            "data-[focus]:bg-gray-200 data-[focus]:text-primary-600",
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2",
+            "text-md font-medium text-gray-700 hover:bg-gray-100",
+            "transition-colors duration-150",
           )}
         >
-          <FontAwesomeIcon icon={faUser} />
-          <span>My Profile</span>
+          <FontAwesomeIcon icon={faUser} className="w-4 text-gray-700" />
+          <span className="text-gray-700">My Profile</span>
         </MenuItem>
-        {options.map((option, index) => (
+
+        {menuOptions.map((option, index) => (
           <MenuItem
+            key={index}
             as="button"
-            key={index + 1}
             className={twMerge(
-              "flex w-full items-center gap-2 px-4 py-2 text-start text-sm font-medium",
-              "data-[focus]:bg-gray-200",
+              "flex w-full items-center gap-3 rounded-lg px-3 py-2",
+              "text-md font-medium text-gray-700 hover:bg-gray-100",
+              "transition-colors duration-150",
             )}
-            onClick={option.onClick}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              option.onClick();
+            }}
           >
-            <FontAwesomeIcon icon={option.icon} />
+            <FontAwesomeIcon icon={option.icon} className="w-4 text-gray-700" />
             <span>{option.label}</span>
           </MenuItem>
         ))}

@@ -26,7 +26,7 @@ export const SubPanelBasic = ({
   return (
     <div className="flex w-full grow gap-4">
       <div className="flex w-2/3 flex-col">
-        <h4>Pick a Style</h4>
+        <h4 className="mb-1 font-semibold">Pick a Style</h4>
         <ArtStyleSelector
           onSelectedArtStyle={onSelectedArtStyle}
           selectedArtStyle={selectedArtStyle}

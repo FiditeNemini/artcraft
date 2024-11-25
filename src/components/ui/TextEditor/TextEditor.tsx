@@ -115,7 +115,7 @@ export const TextEditor = ({
     style: {
       ...formatData,
       width: "500px",
-      height: "500px",
+      height: "240px",
     },
     placeholder: "...",
     resize: "none" as ResizeType,

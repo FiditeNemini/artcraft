@@ -10,6 +10,7 @@ import { IMAGE_FILE_TYPE } from "~/constants/fileTypeEnums";
 import {
   paperWrapperStyles,
   dialogBackgroundStyles,
+  dialogPanelStyles,
 } from "~/components/styles";
 
 export const DialogAddImage = ({
@@ -53,10 +54,11 @@ export const DialogAddImage = ({
         <DialogPanel
           className={twMerge(
             paperWrapperStyles,
-            "w-full max-w-xl space-y-4 p-8",
+            dialogPanelStyles,
+            "w-full max-w-2xl",
           )}
         >
-          <DialogTitle className="font-bold">Upload Image</DialogTitle>
+          <DialogTitle className="text-3xl font-bold">Upload Image</DialogTitle>
           <div className="flex flex-col rounded-lg border-2 border-dashed border-ui-border">
             <FileUploader
               title=""
@@ -78,7 +80,7 @@ export const DialogAddImage = ({
               </div>
             )}
           </div>
-          <div className="flex w-full justify-end gap-4 pt-4">
+          <div className="flex w-full justify-end gap-2">
             <Button onClick={handleClose} variant="secondary">
               Cancel
             </Button>

@@ -17,6 +17,10 @@ export const toolTipStyles = twMerge(
   "before:border-t-8 before:border-t-white",
   "after:absolute after:left-1/2 after:bottom-full after:-translate-x-1/2 after:z-40 ",
   "after:content-[attr(data-tooltip)] after:text-black after:text-nowrap",
-  "after:rounded-xl after:border after:border-ui-border after:bg-ui-panel after:px-2 after:py-1 after:mb-2 after:shadow-xl",
+  "after:rounded-lg after:border after:border-ui-border after:bg-ui-panel after:px-2.5 after:py-1.5 after:mb-2 after:shadow-xl",
   "after:hidden before:hidden hover:after:block hover:before:block",
+);
+
+export const dialogPanelStyles = twMerge(
+  "flex max-w-5xl flex-col justify-between gap-4 p-6",
 );

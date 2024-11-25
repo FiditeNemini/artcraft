@@ -48,8 +48,8 @@ export const ArtStyleItem = ({
       onClick={handleSelected}
     >
       <img className="object-cover" src={imageSrc} {...imgProps} alt={label} />
-      <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
-      <h4 className="absolute bottom-0 left-1 truncate text-start text-sm drop-shadow-md">
+      <div className="absolute bottom-0 left-0 h-2/5 w-full bg-gradient-to-t from-gray-800/90" />
+      <h4 className="absolute bottom-1.5 left-2 truncate text-start text-sm font-semibold text-white drop-shadow-lg">
         {label}
       </h4>
       <svg

@@ -6,6 +6,7 @@ import { TextNodeData } from "~/KonvaApp/types";
 
 import {
   dialogBackgroundStyles,
+  dialogPanelStyles,
   paperWrapperStyles,
 } from "~/components/styles";
 
@@ -71,21 +72,15 @@ export const DialogEditText = ({
   return (
     <Dialog open={isOpen} onClose={closeCallback} className="relative z-50">
       <div className={dialogBackgroundStyles}>
-        <DialogPanel
-          className={twMerge(
-            paperWrapperStyles,
-            "flex w-fit max-w-5xl flex-col justify-between gap-4 px-6 pb-6 pt-4",
-          )}
-          // style={{ height: "calc(100vh - 200px)" }}
-        >
-          <DialogTitle className="font-bold">Edit Text</DialogTitle>
+        <DialogPanel className={twMerge(paperWrapperStyles, dialogPanelStyles)}>
+          <DialogTitle className="text-3xl font-bold">Edit Text</DialogTitle>
           <TextEditor
             text={text}
             formatData={textFormatData}
             onChangeText={handleOnChangeText}
             onChangeFormatting={handleOnChangeFormatting}
           />
-          <div className="flex w-full justify-center gap-4">
+          <div className="flex w-full justify-end gap-2">
             <Button onClick={closeCallback} variant="secondary">
               Cancel
             </Button>
