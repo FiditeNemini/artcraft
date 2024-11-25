@@ -43,9 +43,11 @@ export class AudioClip {
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_api_base_url = environmentVariables.values.GOOGLE_API;
-    const media_base_url = `${media_api_base_url}/vocodes-public`;
-    const media_url = `${media_base_url}${bucketPath}`;
+    //const media_api_base_url = environmentVariables.values.GOOGLE_API;
+    const media_api_base_url = 'https://cdn-2.fakeyou.com';
+    //const media_base_url = `${media_api_base_url}/vocodes-public`;
+    //const media_url = `${media_base_url}${bucketPath}`;
+    const media_url = `${media_api_base_url}${bucketPath}`;
     return media_url;
   }
 

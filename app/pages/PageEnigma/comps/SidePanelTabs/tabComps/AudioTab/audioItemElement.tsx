@@ -10,12 +10,13 @@ import { updateDemoAudioItemLength } from "~/pages/PageEnigma/signals";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
-  const bucket = "vocodes-public";
+  //const bucket = "vocodes-public";
   let path = bucketRelativePath;
   if (path !== undefined && path !== null && !path.startsWith("/")) {
     path = "/" + path;
   }
-  return `https://storage.googleapis.com/${bucket}${path}`;
+  //return `https://storage.googleapis.com/${bucket}${path}`;
+  return `https://cdn-2.fakeyou.com/${path}`;
 }
 
 interface Props {

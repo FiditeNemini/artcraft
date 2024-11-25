@@ -197,8 +197,10 @@ export class APIManager {
       });
     }
     const bucket_path = json["media_file"]["public_bucket_path"];
-    const media_base_url = environmentVariables.values.GOOGLE_API;
-    const media_url = `${media_base_url}/vocodes-public${bucket_path}`; // gets you a bucket path
+    //const media_base_url = environmentVariables.values.GOOGLE_API;
+    const media_base_url = 'https://cdn-2.fakeyou.com';
+    //const media_url = `${media_base_url}/vocodes-public${bucket_path}`; // gets you a bucket path
+    const media_url = `${media_base_url}${bucket_path}`; // gets you a bucket path
 
     const file_response = await fetch(media_url);
 
@@ -228,8 +230,10 @@ export class APIManager {
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = environmentVariables.values.GOOGLE_API;
-    const media_url = `${media_base_url}/vocodes-public${bucketPath}`; // gets you a bucket path
+    //const media_base_url = environmentVariables.values.GOOGLE_API;
+    const media_base_url = 'https://cdn-2.fakeyou.com';
+    //const media_url = `${media_base_url}/vocodes-public${bucketPath}`; // gets you a bucket path
+    const media_url = `${media_base_url}${bucketPath}`; // gets you a bucket path
     return media_url;
   }
 

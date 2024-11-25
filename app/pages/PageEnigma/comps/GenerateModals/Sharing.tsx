@@ -29,8 +29,10 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
   // TODO: ApiManager should provide all endpoints
-  const media_api_base_url = environmentVariables.values.GOOGLE_API;
-  const downloadLink = `${media_api_base_url}/vocodes-public${mediaFile?.public_bucket_path}`;
+  //const media_api_base_url = environmentVariables.values.GOOGLE_API;
+  //const downloadLink = `${media_api_base_url}/vocodes-public${mediaFile?.public_bucket_path}`;
+  const media_api_base_url = 'https://cdn-2.fakeyou.com';
+  const downloadLink = `${media_api_base_url}${mediaFile?.public_bucket_path}`;
 
   const handleCopyLink = () => {
     if (navigator.clipboard) {

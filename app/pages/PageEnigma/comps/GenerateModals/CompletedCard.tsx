@@ -25,7 +25,8 @@ export function CompletedCard({ movie, setMovieId }: Props) {
   useSignals();
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
-  const downloadLink = `${environmentVariables.values.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
+  //const downloadLink = `${environmentVariables.values.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
+  const downloadLink = `https://cdn-2.fakeyou.com${movie.public_bucket_path}`;
 
   const imageUrl = bucketConfig.current.getCdnUrl(
     movie.public_bucket_path + "-thumb.gif",
