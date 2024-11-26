@@ -34,7 +34,7 @@ export const SidePanel = () => {
         ].join(" ")}
         style={{
           top: 64,
-          right: sidePanelVisible.value ? 84 : -320,
+          right: sidePanelVisible.value ? 84 : -400,
           width: displayWidth,
         }}
       >

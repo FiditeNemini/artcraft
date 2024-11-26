@@ -35,7 +35,7 @@ export const SidePanelMenu = ({
   return (
     <div
       className={twMerge(
-        "fixed z-[25] bg-assets-background",
+        "fixed z-30 bg-assets-background",
         "right-0 top-[64px] w-[84px] overflow-auto border-l px-2 py-2",
         sidePanelVisible.value ? "border-transparent" : "border-[#363636]",
       )}
