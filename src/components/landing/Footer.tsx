@@ -33,14 +33,14 @@ const Footer = () => {
 
           <div className="flex justify-center space-x-8">
             <a
-              href="#"
+              href="https://twitter.com/get_storyteller"
               className="!text-gray-500 transition-colors hover:!text-gray-600"
             >
               <FontAwesomeIcon icon={faTwitter} className="h-6 w-6" />
               <span className="sr-only">Twitter</span>
             </a>
             <a
-              href="#"
+              href="https://discord.gg/storyteller"
               className="!text-gray-500 transition-colors hover:!text-gray-600"
             >
               <FontAwesomeIcon icon={faDiscord} className="h-6 w-6" />
