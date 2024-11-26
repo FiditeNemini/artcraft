@@ -39,10 +39,30 @@ export const withProtectionRoute = <P extends object>(
       return <Component {...rest} />;
     }
 
-    return <RedirectToLogin />;
+    return <RedirectToLanding />;
   };
 
-const RedirectToLogin = () => {
+// const RedirectToLogin = () => {
+//   const navigate = useNavigate();
+//   const { pathname } = useLocation();
+//   const timeoutTimer = useRef<number | undefined>(undefined);
+
+//   useEffect(() => {
+//     if (!timeoutTimer.current) {
+//       timeoutTimer.current = window.setTimeout(
+//         () => navigate(`/login?redirect=${pathname}`),
+//         2000,
+//       );
+//     }
+//   }, [navigate, pathname]);
+//   return (
+//     <div className="fixed flex h-full w-full flex-col items-center justify-center">
+//       <LoadingSpinner isShowing={true} message="Loading...." />
+//     </div>
+//   );
+// };
+
+const RedirectToLanding = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const timeoutTimer = useRef<number | undefined>(undefined);
@@ -50,7 +70,7 @@ const RedirectToLogin = () => {
   useEffect(() => {
     if (!timeoutTimer.current) {
       timeoutTimer.current = window.setTimeout(
-        () => navigate(`/login?redirect=${pathname}`),
+        () => navigate("/landing"),
         2000,
       );
     }
