@@ -223,10 +223,8 @@ export class Engine {
         return;
       }
       if ("videoUrl" in data) {
-        const media_api_base_url = "https://storage.googleapis.com/";
-        const media_url = `${media_api_base_url}vocodes-public${data.videoUrl}`;
-        console.log("Engine got stylized video: " + media_url);
-        this.addVideo({ mediaFileUrl: media_url });
+        console.log("Engine got stylized video: " + data.videoUrl);
+        this.addVideo({ mediaFileUrl: data.videoUrl });
       } else if ("media_links" in data) {
         console.log("Engine got rendered video: " + data.media_links.cdn_url);
         downloadURI(data.media_links.cdn_url, "Download Video");

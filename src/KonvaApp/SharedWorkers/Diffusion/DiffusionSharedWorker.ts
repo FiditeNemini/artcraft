@@ -277,11 +277,11 @@ export class DiffusionSharedWorker extends SharedWorkerBase<
               console.log("Complete Success");
               renderProgressData.progress = 100;
               jobIsProcessing = false;
-              if (!job.data.maybe_result.maybe_public_bucket_media_path) {
+              if (!job.data.maybe_result.media_links.cdn_url) {
                 await this.reset();
                 throw Error("Server Failed To Return Result");
               }
-              resultURL = job.data.maybe_result.maybe_public_bucket_media_path;
+              resultURL = job.data.maybe_result.media_links.cdn_url;
               reportProgress(renderProgressData);
               break;
             case JobStatus.COMPLETE_FAILURE:

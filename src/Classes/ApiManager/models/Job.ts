@@ -12,8 +12,11 @@ export interface Job {
 export interface JobMaybeResult {
   entity_token: string;
   entity_type: string;
-  maybe_public_bucket_media_path: string;
+  // maybe_public_bucket_media_path: string;
   maybe_successfully_completed_at: string;
+  media_links: {
+    cdn_url: string;
+  };
 }
 export interface JobRequest {
   inference_category: string;

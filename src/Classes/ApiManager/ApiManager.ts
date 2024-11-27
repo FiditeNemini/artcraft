@@ -1,4 +1,4 @@
-import { bool } from "@techstark/opencv-js";
+// import { bool } from "@techstark/opencv-js";
 import { API_TARGETS } from "./enums/Api";
 
 type NonNullableObject<T extends object> = NonNullable<T>;
