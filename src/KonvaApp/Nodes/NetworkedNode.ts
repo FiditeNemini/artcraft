@@ -33,7 +33,7 @@ export abstract class NetworkedNode extends BaseNode {
   protected localFile?: File;
   protected mediaFileToken?: string;
   protected mediaFileUrl?: string;
-  protected mediaFileSize?: Size;
+  public mediaFileSize?: Size;
 
   // loading screen
   protected loadingVideosProviderRef?: LoadingVideosProvider;

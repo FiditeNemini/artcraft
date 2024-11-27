@@ -33,7 +33,7 @@ import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums"
 import { NavigateFunction } from "react-router-dom";
 import { LoadingVideosProvider } from "./EngineUtitlities/LoadingVideosProvider";
 import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
-import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandler";
+import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandler/VideoExtractionHandler";
 
 // for testing loading files from system
 // import { FileUtilities } from "./FileUtilities/FileUtilities";
@@ -460,9 +460,7 @@ export class Engine {
     });
     // Listen to other toolbars
     // VideoExtraction Toolbar
-    uiEvents.toolbarVideoExtraction.DONE.onClick(() => {
-      this.videoExtractionHandler.endVideoExtraction();
-    });
+    this.videoExtractionHandler.listenToToolbarEvents();
 
     // Listen to other requests coming from the UI
     uiEvents.onGetStagedImage((image) => {

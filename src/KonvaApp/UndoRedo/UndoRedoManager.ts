@@ -12,8 +12,8 @@ export class UndoStackManager {
   isDisabled() {
     return this.disabled;
   }
-  executeCommand(command: ICommand) {
-    const result = command.execute();
+  async executeCommand(command: ICommand) {
+    const result = await command.execute();
     if (result !== undefined && result === false) {
       //command is not executed if it deliberatly returned false;
       //in that case, no need to do anything
@@ -31,7 +31,10 @@ export class UndoStackManager {
     }
     console.log("command stack:", this.undoStack);
   }
-
+  clear() {
+    this.undoStack = [];
+    this.redoStack = [];
+  }
   undo() {
     if (this.disabled) {
       return;

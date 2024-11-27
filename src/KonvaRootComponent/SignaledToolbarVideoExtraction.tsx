@@ -48,6 +48,8 @@ export const SignaledToolbarVideoExtraction = () => {
       show={toolbarVideoExtraction.signal.value.isShowing}
     >
       <ToolbarVideoExtraction
+        readyToSubmit={toolbarVideoExtraction.signal.value.ready}
+        extractionMode={toolbarVideoExtraction.signal.value.mode}
         disabled={toolbarVideoExtraction.signal.value.disabled}
         buttonsProps={buttonProps}
         loadingBarProps={loadingBarProps}

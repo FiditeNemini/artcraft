@@ -10,11 +10,15 @@ type ButtonStates = {
 export interface ToolbarVideoExtractionProps {
   isShowing: boolean;
   disabled: boolean;
+  mode: "inclusion" | "exclusion";
+  ready: boolean;
   buttonStates: ButtonStates;
   loadingBarState: LoadingBarState;
 }
 
 const toolbarVideoExtractionSignal = signal<ToolbarVideoExtractionProps>({
+  ready: false,
+  mode: "inclusion",
   isShowing: false,
   disabled: false,
   buttonStates: initButtonStates(),
@@ -31,6 +35,18 @@ export const toolbarVideoExtraction = {
     toolbarVideoExtractionSignal.value = {
       ...toolbarVideoExtractionSignal.value,
       ...updateProps,
+    };
+  },
+  setReady(ready: boolean) {
+    toolbarVideoExtractionSignal.value = {
+      ...toolbarVideoExtractionSignal.value,
+      ready,
+    };
+  },
+  setMode(mode: "inclusion" | "exclusion") {
+    toolbarVideoExtractionSignal.value = {
+      ...toolbarVideoExtractionSignal.value,
+      mode,
     };
   },
   updateProgress(newLoadingBarState: LoadingBarState) {
