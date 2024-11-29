@@ -159,6 +159,11 @@ export default function CreatorToolsPage() {
       text: "Create visual stories on our intelligent canvas",
       imgSrc: "/images/landing/select-board.webp",
       imgAlt: "Create visual stories on our intelligent canvas",
+      badgeContent: {
+        type: "new",
+        icon: faSparkles,
+        label: "NEW",
+      },
     },
   ];
 
