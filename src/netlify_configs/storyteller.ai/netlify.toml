@@ -33,8 +33,3 @@ from = "/asdf"
 to = "https://storyteller.ai/about"
 status = 301
 force = true
-
-[[headers]]
-for = "/*"
-[headers.values]
-Cross-Origin-Embedder-Policy = "credentialless"
