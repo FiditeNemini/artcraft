@@ -12,6 +12,7 @@ export interface ToolbarButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
   hidden?: boolean;
+  prominent?: boolean;
 }
 
 export const ToolbarButton = ({
@@ -47,6 +48,8 @@ export const ToolbarButton = ({
     children ? "w-fit flex items-center gap-2 text-nowrap" : "size-10",
     active && "pointer-events-none text-primary ",
     disabled && "pointer-events-none text-secondary-300",
+    buttonProps.prominent &&
+      "highlight-button border border-primary-400/30 text-primary-500 hover:bg-primary-100/40 hover:border-primary-400/60",
     customButtonClassNames,
   );
 

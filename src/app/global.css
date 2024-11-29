@@ -72,6 +72,31 @@
     );
     background-size: 300% auto;
   }
+
+  .highlight-button {
+    @apply relative;
+    background: linear-gradient(
+      120deg,
+      theme("colors.primary.50/10") 0%,
+      theme("colors.primary.50/10") 40%,
+      theme("colors.primary.100/50") 45%,
+      theme("colors.primary.50/10") 50%,
+      theme("colors.primary.50/10") 100%
+    );
+    background-size: 200% 100%;
+    background-position: 100% 0;
+    animation: highlight-sweep 3s infinite linear;
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px 2px rgba(var(--color-primary-500-rgb), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(var(--color-primary-500-rgb), 0.7);
+  }
 }
 
 /* Custom animations */
@@ -129,4 +154,13 @@
 .animate-gradient {
   animation: gradient 4s linear infinite;
   background-size: 300% auto;
+}
+
+@keyframes highlight-sweep {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

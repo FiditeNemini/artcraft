@@ -15,7 +15,7 @@ export const toolTipStyles = twMerge(
   "before:border-l-8 before:border-l-transparent",
   "before:border-r-8 before:border-r-transparent",
   "before:border-t-8 before:border-t-white",
-  "after:absolute after:left-1/2 after:bottom-full after:-translate-x-1/2 after:z-40 ",
+  "after:absolute after:left-1/2 after:bottom-full after:-translate-x-1/2 after:z-40",
   "after:content-[attr(data-tooltip)] after:text-black after:text-nowrap",
   "after:rounded-lg after:border after:border-ui-border after:bg-ui-panel after:px-2.5 after:py-1.5 after:mb-2 after:shadow-xl",
   "after:hidden before:hidden hover:after:block hover:before:block",

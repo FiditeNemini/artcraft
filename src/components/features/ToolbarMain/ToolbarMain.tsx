@@ -8,9 +8,9 @@ import {
   faFilePlus,
   faFilm,
   faFloppyDisk,
-  faHatWizard,
   faImage,
   faLocationArrow,
+  faMagicWandSparkles,
   faText,
 } from "@fortawesome/pro-solid-svg-icons";
 
@@ -61,7 +61,7 @@ export const ToolbarMain = ({
               <button
                 data-tooltip="Add..."
                 className={twMerge(
-                  "size-10 rounded-xl p-2 hover:bg-gray-200/50",
+                  "size-10 rounded-lg p-2 hover:bg-gray-200/50",
                   toolTipStyles,
                 )}
               >
@@ -85,8 +85,11 @@ export const ToolbarMain = ({
             </PopoverPanel>
           </Popover>
           <ToolbarButton
-            icon={faHatWizard}
-            buttonProps={buttonProps.AI_STYLIZE}
+            icon={faMagicWandSparkles}
+            buttonProps={{
+              ...buttonProps.AI_STYLIZE,
+              prominent: true,
+            }}
             tooltip="AI Stylize"
           />
         </div>
