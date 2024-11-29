@@ -140,13 +140,20 @@ export default function AITools() {
       imgSrc: "/images/landing/select-cogvideo.webp",
       imgAlt: "Text and image to video generation",
     },
+    {
+      to: "/board",
+      title: "Storyteller Board",
+      text: "Create visual stories on our intelligent canvas",
+      imgSrc: "/images/landing/select-board.webp",
+      imgAlt: "Create visual stories on our intelligent canvas",
+    },
   ];
 
   if (
     currentPath.includes("/style-video") ||
     currentPath.includes("/ai-face-mirror") ||
     currentPath.includes("/ai-live-portrait") ||
-    currentPath.includes("/voice-conversion") ||
+    currentPath.includes("/voice-conversio  n") ||
     currentPath.includes("/tts") ||
     currentPath.includes("/live-portrait") ||
     currentPath.includes("/dev-lp") ||
