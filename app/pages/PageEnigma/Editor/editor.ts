@@ -26,7 +26,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { editorState } from "../signals/engine";
-import { Utils } from "./helper";
+import { SceneUtils } from "./helper";
 import { VideoGeneration } from "./video_generation";
 import { MouseControls } from "./keybinds_controls";
 import { SaveManager } from "./save_manager";
@@ -147,7 +147,7 @@ class Editor {
   // global names of scene entities
   camera_name: string;
 
-  utils: Utils;
+  utils: SceneUtils;
   videoGeneration: VideoGeneration;
   mouse_controls: MouseControls | undefined;
   save_manager: SaveManager;
@@ -276,7 +276,7 @@ class Editor {
 
     this.activeScene.timeline = this.timeline;
 
-    this.utils = new Utils(this, this.activeScene);
+    this.utils = new SceneUtils(this, this.activeScene);
     this.videoGeneration = new VideoGeneration(this);
     this.save_manager = new SaveManager(this);
     this.current_frame = 0;

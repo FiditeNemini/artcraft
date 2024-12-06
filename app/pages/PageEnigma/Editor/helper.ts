@@ -11,7 +11,7 @@ import { MediaItem } from "~/pages/PageEnigma/models";
 import { AssetType } from "~/enums";
 import { hideObjectPanel } from "../signals";
 
-export class Utils {
+export class SceneUtils {
   scene: Scene;
   editor: Editor;
   constructor(editor: Editor, scene: Scene) {
