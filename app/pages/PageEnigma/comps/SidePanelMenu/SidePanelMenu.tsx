@@ -26,11 +26,6 @@ export const SidePanelMenu = ({
   selectedTab: TabItem;
 }) => {
   useSignals();
-  const showSetsTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SETS_TAB);
-  const showSkyboxesTab = usePosthogFeatureFlag(FeatureFlags.SHOW_SKYBOXES_TAB);
-  const showCreaturesTab = usePosthogFeatureFlag(
-    FeatureFlags.SHOW_CREATURES_TAB,
-  );
   const showStylePage = usePosthogFeatureFlag(FeatureFlags.SHOW_STYLE_PAGE);
   return (
     <div
@@ -45,18 +40,6 @@ export const SidePanelMenu = ({
     >
       <div className="flex w-full flex-col gap-2">
         {(tabs ?? []).map((tab) => {
-          if (tab.title === TabTitles.OBJECTS_SETS && !showSetsTab) {
-            return;
-          }
-          if (tab.title === TabTitles.SKYBOXES && !showSkyboxesTab) {
-            return;
-          }
-          if (tab.title === TabTitles.OBJECTS_CREATURES && !showCreaturesTab) {
-            return;
-          }
-          if (tab.title === TabTitles.RENDER && !showStylePage) {
-            return;
-          }
           return (
             <button
               key={tab.title}
@@ -66,9 +49,9 @@ export const SidePanelMenu = ({
                   ? "border-[#363636] bg-brand-secondary-900/60 opacity-100 hover:bg-brand-secondary-900/60"
                   : "opacity-60",
                 tab.title === TabTitles.STYLIZE &&
-                  "bg-brand-primary font-medium opacity-90 hover:border-white/25 hover:bg-brand-primary hover:opacity-100",
+                "bg-brand-primary font-medium opacity-90 hover:border-white/25 hover:bg-brand-primary hover:opacity-100",
                 tab.title === selectedTab.title &&
-                tab.title === TabTitles.STYLIZE
+                  tab.title === TabTitles.STYLIZE
                   ? "border-white/50 opacity-100 hover:border-white/50"
                   : "",
               ])}
