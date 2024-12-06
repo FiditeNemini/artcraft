@@ -143,26 +143,6 @@ export const Character = ({ character }: Props) => {
           updateKeyframe={updateClipPosition}
           group={ClipGroup.CHARACTER}
         />
-        {(character.animationType === MediaFileAnimationType.Mixamo ||
-          character.mediaType === MediaFileType.GLB) && (
-          <TrackClips
-            id={character.object_uuid}
-            clips={expressionClips}
-            updateClip={updateClipEmotions}
-            group={ClipGroup.CHARACTER}
-            type={ClipType.EXPRESSION}
-          />
-        )}
-        {editorEngine &&
-          editorEngine.isObjectLipsync(character.object_uuid) && (
-            <TrackClips
-              id={character.object_uuid}
-              clips={lipSyncClips}
-              updateClip={updateClipLipSync}
-              group={ClipGroup.CHARACTER}
-              type={ClipType.AUDIO}
-            />
-          )}
       </div>
     </div>
   );
