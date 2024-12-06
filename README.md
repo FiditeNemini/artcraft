@@ -52,6 +52,14 @@ Server API docs live here: https://storyteller-docs.netlify.app/
 
 ## Local Testing & Development
 
+### Apple Silicon package installation issues
+
+Installation of some dependencies via npm may fail on M-series macs (like node-canvas) and may require additional setup including python3 and some brew dependencies:
+
+```
+brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman python-setuptools
+```
+
 ### Set up `.env` and the Proxy Server
 
 Copy & paste the env settings from `.env-local-proxy` to `.env`, (if the file `.env` do not exist, simply create one at the root of this project's folder beside the other env settings files).
