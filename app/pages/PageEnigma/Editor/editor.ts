@@ -946,14 +946,14 @@ class Editor {
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 1024
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 576
               : 1000;
         const height =
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 576
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 1024
               : 1000;
 
@@ -1144,11 +1144,11 @@ class Editor {
       }
     } else if (
       this.last_scrub === this.timeline.scrubber_frame_position &&
-      this.utils.getselectedSum() !== this.last_selected_sum
+      this.utils.getSelectedSum() !== this.last_selected_sum
     ) {
       this.updateSelectedUI();
     }
-    this.last_selected_sum = this.utils.getselectedSum();
+    this.last_selected_sum = this.utils.getSelectedSum();
 
     await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
