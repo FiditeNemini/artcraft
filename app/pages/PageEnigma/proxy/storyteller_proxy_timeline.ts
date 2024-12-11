@@ -1,9 +1,9 @@
-import { AnimationClip } from "../datastructures/clips/animation_clip";
-import { AudioClip } from "../datastructures/clips/audio_clip";
-import { ClipUI } from "../datastructures/clips/clip_ui";
-import { EmotionClip } from "../datastructures/clips/emotion_clip";
-import { LipSyncClip } from "../datastructures/clips/lipsync_clip";
-import { TransformClip } from "../datastructures/clips/transform_clip";
+import { AnimationClip } from "../clips/animation_clip";
+import { AudioClip } from "../clips/audio_clip";
+import { ClipUI } from "../clips/clip_ui";
+import { EmotionClip } from "../clips/emotion_clip";
+import { LipSyncClip } from "../clips/lipsync_clip";
+import { TransformClip } from "../clips/transform_clip";
 import AnimationEngine from "../Editor/animation_engine";
 import AudioEngine from "../Editor/audio_engine";
 import EmotionEngine from "../Editor/emotion_engine";

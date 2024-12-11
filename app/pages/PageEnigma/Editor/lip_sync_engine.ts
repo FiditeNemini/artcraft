@@ -1,4 +1,4 @@
-import { LipSyncClip } from "../datastructures/clips/lipsync_clip";
+import { LipSyncClip } from "../clips/lipsync_clip";
 
 // needs to be apart of the editor window.
 export class LipSyncEngine {

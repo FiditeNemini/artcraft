@@ -1,4 +1,4 @@
-import { TransformClip } from "../datastructures/clips/transform_clip";
+import { TransformClip } from "../clips/transform_clip";
 import * as THREE from "three";
 
 class TransformEngine {

@@ -12,7 +12,7 @@ import { MediaFileType } from "../enums";
 import { ChromaKeyMaterial } from "./chromakey";
 import { TimeLine } from "./timeline";
 import { ClipGroup, ClipType } from "~/enums";
-import { ClipUI } from "../datastructures/clips/clip_ui";
+import { ClipUI } from "../clips/clip_ui";
 
 class Scene {
   name: string;
@@ -397,7 +397,7 @@ class Scene {
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
     //const media_base_url = `${media_api_base_url}/vocodes-public`;
-    const media_base_url = 'https://cdn-2.fakeyou.com';
+    const media_base_url = "https://cdn-2.fakeyou.com";
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }

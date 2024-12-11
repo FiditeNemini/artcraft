@@ -1,4 +1,4 @@
-import { AudioClip } from "../datastructures/clips/audio_clip";
+import { AudioClip } from "../clips/audio_clip";
 
 class AudioEngine {
   clips: { [key: string]: AudioClip } = {};
@@ -55,7 +55,8 @@ class AudioEngine {
     if (doPlay && clip.audio_data?.audioContext) {
       const startTime = pos / 60.0;
       const endTime = frameBuffer / 60.0;
-      clip.audio_data.source = clip.audio_data.audioContext.createBufferSource();
+      clip.audio_data.source =
+        clip.audio_data.audioContext.createBufferSource();
       clip.audio_data.source.buffer = clip.audio_data.audioBuffer;
       clip.audio_data.source.connect(clip.audio_data.audioContext.destination);
       clip.audio_data.source.start(0, startTime, endTime);

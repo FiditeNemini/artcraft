@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { ClipUI } from "../datastructures/clips/clip_ui";
+import { ClipUI } from "../clips/clip_ui";
 
 import Scene from "./scene.js";
 import AudioEngine from "./audio_engine";
@@ -549,7 +549,10 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public async addSelfAnimationClip(data: ClipUI, animation_clip: THREE.AnimationClip) {
+  public async addSelfAnimationClip(
+    data: ClipUI,
+    animation_clip: THREE.AnimationClip,
+  ) {
     const object_uuid = data.object_uuid;
     const media_id = data.media_id;
     const name = data.name;
@@ -563,8 +566,9 @@ export class TimeLine {
     const clip_uuid = data.clip_uuid;
 
     this.animation_engine.load_object(object_uuid, media_id, name);
-    this.animation_engine.clips[object_uuid + media_id].animation_clip = animation_clip;
-    
+    this.animation_engine.clips[object_uuid + media_id].animation_clip =
+      animation_clip;
+
     // media id for this as well it can be downloaded
     this.addPlayableClip(
       new ClipUI(

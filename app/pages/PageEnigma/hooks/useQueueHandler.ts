@@ -30,7 +30,7 @@ import { CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { addToast } from "~/signals";
 import { ToastTypes, ClipGroup } from "~/enums";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
-import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { ClipUI } from "~/pages/PageEnigma/clips/clip_ui";
 import { cameraAspectRatio } from "../signals/engine";
 import { loadPromptTravelData } from "~/pages/PageEnigma/signals/promptTravelGroup";
 

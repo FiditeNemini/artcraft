@@ -8,7 +8,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
-import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { ClipUI } from "~/pages/PageEnigma/clips/clip_ui";
 import { ToastTypes } from "~/enums";
 import { addToast } from "~/signals";
 

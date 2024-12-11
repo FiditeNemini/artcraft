@@ -1,4 +1,4 @@
-import { EmotionClip } from "../datastructures/clips/emotion_clip";
+import { EmotionClip } from "../clips/emotion_clip";
 
 class EmotionEngine {
   clips: { [key: string]: EmotionClip } = {};

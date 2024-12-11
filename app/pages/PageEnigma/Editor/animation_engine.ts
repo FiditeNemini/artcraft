@@ -1,4 +1,4 @@
-import { AnimationClip } from "../datastructures/clips/animation_clip";
+import { AnimationClip } from "../clips/animation_clip";
 
 export class AnimationEngine {
   clips: { [key: string]: AnimationClip } = {};

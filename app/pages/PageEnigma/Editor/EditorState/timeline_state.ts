@@ -6,7 +6,7 @@ import { LipSyncEngine } from "../lip_sync_engine";
 import { TimeLine } from "../timeline";
 import TransformEngine from "../transform_engine";
 import { TimelineStateJson } from "./EditorStateJSON/timeline_state_json";
-import { ClipUI } from "../../datastructures/clips/clip_ui";
+import { ClipUI } from "../../clips/clip_ui";
 
 export class TimelineState {
   version: number;
