@@ -10,9 +10,10 @@ import {
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
 
-import { ClipUI } from "../datastructures/clips/clip_ui";
+import { ClipUI } from "../clips/clip_ui";
 import { IGenerationOptions } from "../models/generationOptions";
 import { ToastDataType } from "~/components";
+import { QueueNames } from "./QueueNames";
 
 export type UnionedActionTypes =
   | fromEngineActions
@@ -35,65 +36,88 @@ export type QueueSubscribeType = {
   data: UnionedDataTypes;
 };
 
+export type SubscribeHandler = (entry: {
+  action: UnionedActionTypes;
+  data: UnionedDataTypes;
+}) => void;
+
 class Queue {
-  private _queue: Record<
-    string,
-    {
+  private _queues: Record<
+    QueueNames,
+    Array<{
       action: UnionedActionTypes;
       data: UnionedDataTypes;
-    }[]
-  > = {};
-  private _subscribers: Record<
-    string,
-    {
-      id: string;
-      handler: (entry: {
-        action: UnionedActionTypes;
-        data: UnionedDataTypes;
-      }) => void;
-    }[]
-  > = {};
+    }>
+  > = {
+      [QueueNames.FROM_ENGINE]: [],
+      [QueueNames.TO_ENGINE]: [],
+      [QueueNames.TO_TIMELINE]: []
+    };
 
+  private _subscribers: Record<
+    QueueNames,
+    Map<
+      string,
+      SubscribeHandler
+    >
+  > = {
+      [QueueNames.FROM_ENGINE]: new Map<string, SubscribeHandler>(),
+      [QueueNames.TO_ENGINE]: new Map<string, SubscribeHandler>(),
+      [QueueNames.TO_TIMELINE]: new Map<string, SubscribeHandler>(),
+    };
+
+  // Enqueues actions to a specified queue
   public publish({
     queueName,
     action,
     data,
   }: {
-    queueName: string;
+    queueName: QueueNames;
     action: UnionedActionTypes;
     data: UnionedDataTypes;
   }) {
-    if (!this._queue[queueName]) {
-      this._queue[queueName] = [];
+    // Queues for all QueueNames should be initialized above but this is a safeguard for future enum additions
+    // Make sure the queue exists
+    if (!this._queues[queueName]) {
+      this._queues[queueName] = [];
     }
-    this._queue[queueName].push({ action, data });
-    // console.log("Queued", queueName, action, data);
 
-    if (this._subscribers[queueName].length) {
-      this._subscribers[queueName].forEach((item) =>
-        item.handler(this._queue[queueName][0]),
+    // Queue the task in the right queue
+    this._queues[queueName].push({ action, data });
+
+    // TODO: Ideally the publisher shouldn't deal at all with the subscribers
+    // It should only publish the events to the right queue
+    // It also doesn't make sense to fire an event on publish because the operations are then dispersed
+    // leading to potential race conditions
+    // FIXME: Add some sort of queue loop using internal event and add queue locks using promises to serialize queue publishes
+    if (this._subscribers[queueName]) {
+      this._subscribers[queueName].forEach((subcribeHandler) =>
+        subcribeHandler(this._queues[queueName][0]),
       );
-      this._queue[queueName].splice(0, 1);
+      this._queues[queueName].shift();
     }
   }
 
   public subscribe(
-    queueName: string,
+    queueName: QueueNames,
     id: string,
     onMessage: (entry: QueueSubscribeType) => void,
   ) {
+
+    // Queues for all QueueNames should be initialized above but this is a safeguard for future enum additions
+    // Make sure the queue exists
     if (!this._subscribers[queueName]) {
-      this._subscribers[queueName] = [];
+      this._subscribers[queueName] = new Map<string, SubscribeHandler>();
     }
-    this._subscribers[queueName] = this._subscribers[queueName].filter(
-      (handler) => handler.id !== id,
-    );
-    this._subscribers[queueName].push({ id, handler: onMessage });
-    while (this._queue[queueName]?.length) {
-      this._subscribers[queueName].forEach((item) =>
-        item.handler(this._queue[queueName][0]),
+
+    // Set the handler mapped to the ID
+    this._subscribers[queueName].set(id, onMessage);
+
+    while (this._queues[queueName]?.length) {
+      this._subscribers[queueName].forEach((subscribeHandler) =>
+        subscribeHandler(this._queues[queueName][0]),
       );
-      this._queue[queueName].splice(0, 1);
+      this._queues[queueName].splice(0, 1);
     }
   }
 }
