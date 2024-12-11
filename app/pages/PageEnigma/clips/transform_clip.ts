@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Scene from "../../Editor/scene";
+import Scene from "../Editor/scene";
 
 export class TransformFrame {
   position: THREE.Vector3;
@@ -112,11 +112,18 @@ export class TransformClip {
 
   request_point_location(keyframe_uuid: string, scene: Scene) {
     const point = scene.getPoint(keyframe_uuid);
-    if (point == undefined) {console.log("Could not find point."); return;}
-    this.keyframes.forEach(keyframe => {
-      if(keyframe.keyframe_uuid == keyframe_uuid) {
+    if (point == undefined) {
+      console.log("Could not find point.");
+      return;
+    }
+    this.keyframes.forEach((keyframe) => {
+      if (keyframe.keyframe_uuid == keyframe_uuid) {
         keyframe.position = point.position;
-        keyframe.rotation = new THREE.Vector3(point.rotation.x, point.rotation.y, point.rotation.z);
+        keyframe.rotation = new THREE.Vector3(
+          point.rotation.x,
+          point.rotation.y,
+          point.rotation.z,
+        );
         keyframe.scale = point.scale;
       }
     });

@@ -7,16 +7,19 @@ import {
 } from "three/examples/jsm/Addons.js";
 import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
 
-import { MoveAIResult, Retarget } from "../../Editor/retargeting";
+import { MoveAIResult, Retarget } from "../Editor/retargeting";
 import environmentVariables from "~/Classes/EnvironmentVariables";
+import IAnimationClip from "./ClipInterfaces/IAnimationClip";
 
-export class AnimationClip {
+export class AnimationClip implements IAnimationClip {
   version: number;
   media_id: string; // comes from the server
   object_uuid: string;
   type: "animation";
   location: "glb" | "remote";
   speed: number;
+  duration: number;
+  startTime: number;
   length: number;
   clip_name: string;
   mixer: THREE.AnimationMixer | undefined;
@@ -25,6 +28,7 @@ export class AnimationClip {
   special_properties: MoveAIResult[];
   retargeted: boolean;
   last_frame: number;
+
 
   private isMMD: boolean = false;
   private obj: MMDAnimationHelperMixer | undefined;
@@ -42,6 +46,8 @@ export class AnimationClip {
     speed: number,
     length: number,
     clip_name: string,
+    startTime: number,
+    duration: number,
   ) {
     this.version = version;
     this.media_id = media_id;
@@ -50,6 +56,8 @@ export class AnimationClip {
     this.location = location;
     this.speed = speed;
     this.length = length;
+    this.startTime = startTime;
+    this.duration = duration;
     this.clip_name = clip_name;
     this.animation_clip;
     this.mixer;
@@ -58,6 +66,12 @@ export class AnimationClip {
     this.retargeted = false;
     this.last_frame = 0;
   }
+
+  get endTime() {
+    return this.startTime + this.duration
+  }
+
+  evaluate: (time: number) => void;
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
@@ -69,7 +83,7 @@ export class AnimationClip {
     const bucketPath = json["media_file"]["public_bucket_path"];
 
     //const media_api_base_url = environmentVariables.values.GOOGLE_API;
-    const media_api_base_url = 'https://cdn-2.fakeyou.com';
+    const media_api_base_url = "https://cdn-2.fakeyou.com";
     //const media_base_url = `${media_api_base_url}/vocodes-public`;
     //const media_url = `${media_base_url}${bucketPath}`;
     const media_url = `${media_api_base_url}${bucketPath}`;
@@ -131,11 +145,13 @@ export class AnimationClip {
 
   async _get_clip() {
     if (this.animation_clip == null && this.mixer !== null) {
-      console.log(this.media_id)
-      if(this.media_id === "SelfClip") {
+      console.log(this.media_id);
+      if (this.media_id === "SelfClip") {
         const rootObject = this.mixer?.getRoot();
-        if(rootObject)
-          this.animation_clip = (rootObject as THREE.Object3D<THREE.Object3DEventMap>).animations[0];
+        if (rootObject)
+          this.animation_clip = (
+            rootObject as THREE.Object3D<THREE.Object3DEventMap>
+          ).animations[0];
       } else {
         this.animation_clip = await this._load_animation();
       }
@@ -245,16 +261,16 @@ export class AnimationClip {
 
       const mesh = this.mixer?.getRoot() as THREE.SkinnedMesh;
 
-      if(this.helper){
+      if (this.helper) {
         this.helper._restoreBones(mesh); // Privateish js function for resetting bones.
         this.obj?.mixer?.setTime(deltatime); // Sets the time.
-        this.helper._saveBones( mesh ); // Saves the bones location for restoration later.
+        this.helper._saveBones(mesh); // Saves the bones location for restoration later.
 
-        mesh.updateMatrixWorld( true ); // Updates mesh.
+        mesh.updateMatrixWorld(true); // Updates mesh.
         this.obj?.ikSolver.update(); // Updates IK Solver.
         this.obj?.grantSolver.update(); // Updates Grant which moves the bones.
       }
-      
+
       // Changing of animation.
       if (
         this.obj &&
@@ -262,7 +278,7 @@ export class AnimationClip {
         this.processingClip === false &&
         this.obj.mixer &&
         this.mixer._actions[0]._clip.name !==
-          this.obj.mixer._actions[0]._clip.name &&
+        this.obj.mixer._actions[0]._clip.name &&
         this.mixer !== undefined
       ) {
         // On animation change.
