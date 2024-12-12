@@ -117,7 +117,7 @@ class Queue {
       this._subscribers[queueName].forEach((subscribeHandler) =>
         subscribeHandler(this._queues[queueName][0]),
       );
-      this._queues[queueName].splice(0, 1);
+      this._queues[queueName].shift();
     }
   }
 }
