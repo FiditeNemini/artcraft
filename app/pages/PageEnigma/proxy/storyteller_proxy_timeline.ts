@@ -5,11 +5,11 @@ import { EmotionClip } from "../clips/emotion_clip";
 import { LipSyncClip } from "../clips/lipsync_clip";
 import { TransformClip } from "../clips/transform_clip";
 import AnimationEngine from "../Editor/Engines/animation_engine";
-import AudioEngine from "../Editor/audio_engine";
-import EmotionEngine from "../Editor/emotion_engine";
-import LipSyncEngine from "../Editor/lip_sync_engine";
+import AudioEngine from "../Editor/Engines/audio_engine";
+import EmotionEngine from "../Editor/Engines/emotion_engine";
+import LipSyncEngine from "../Editor/Engines/lip_sync_engine";
 import { TimeLine } from "../Editor/timeline";
-import TransformEngine from "../Editor/transform_engine";
+import TransformEngine from "../Editor/Engines/transform_engine";
 
 export class StoryTellerProxyTimeline {
   timeline: TimeLine;

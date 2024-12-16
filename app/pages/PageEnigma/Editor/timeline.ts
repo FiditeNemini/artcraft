@@ -3,9 +3,9 @@ import * as THREE from "three";
 import { ClipUI } from "../clips/clip_ui";
 
 import Scene from "./scene.js";
-import AudioEngine from "./audio_engine";
-import TransformEngine from "./transform_engine";
-import { LipSyncEngine } from "./lip_sync_engine";
+import AudioEngine from "./Engines/audio_engine";
+import TransformEngine from "./Engines/transform_engine";
+import { LipSyncEngine } from "./Engines/lip_sync_engine";
 import { AnimationEngine } from "./Engines/animation_engine";
 
 import Queue, {
@@ -19,7 +19,7 @@ import { ClipGroup, ClipType, AssetType } from "~/enums";
 import { CameraAspectRatio, MediaFileType } from "~/pages/PageEnigma/enums";
 import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/Editor/editor";
-import EmotionEngine from "./emotion_engine";
+import EmotionEngine from "./Engines/emotion_engine";
 import { IGenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
@@ -517,7 +517,7 @@ export class TimeLine {
               end_offset,
               0, // length
               this.scene.get_object_by_uuid(object_uuid)?.userData[
-                "media_file_type"
+              "media_file_type"
               ],
             ),
           );

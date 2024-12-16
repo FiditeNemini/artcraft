@@ -1,4 +1,4 @@
-import { AudioClip } from "../clips/audio_clip";
+import { AudioClip } from "../../clips/audio_clip";
 
 class AudioEngine {
   clips: { [key: string]: AudioClip } = {};
@@ -37,7 +37,7 @@ class AudioEngine {
   async step(audio_media_id: string, frame: number, offset: number) {
     const frameBuffer = 12;
 
-    let pos = frame - offset;
+    const pos = frame - offset;
 
     let doPlay = true;
     if (
@@ -50,7 +50,7 @@ class AudioEngine {
       doPlay = true;
     }
 
-    let clip = this.clips[audio_media_id];
+    const clip = this.clips[audio_media_id];
 
     if (doPlay && clip.audio_data?.audioContext) {
       const startTime = pos / 60.0;
