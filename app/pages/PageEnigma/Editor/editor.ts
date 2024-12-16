@@ -16,7 +16,7 @@ import TransformEngine from "./transform_engine.js";
 import EmotionEngine from "./emotion_engine";
 import { TimeLine } from "./timeline.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
-import { AnimationEngine } from "./animation_engine.js";
+import { AnimationEngine } from "./Engines/animation_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { EditorStates, CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { AssetType, ClipGroup } from "~/enums";
@@ -221,7 +221,7 @@ class Editor {
       "" + this.version,
       this.camera_name,
       this.updateSurfaceIdAttributeToMesh.bind(this),
-      this.version
+      this.version,
     );
     this.activeScene.initialize();
     this.generating_preview = false;
@@ -946,14 +946,14 @@ class Editor {
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 1024
             : this.render_camera_aspect_ratio ===
-              CameraAspectRatio.VERTICAL_9_16
+                CameraAspectRatio.VERTICAL_9_16
               ? 576
               : 1000;
         const height =
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 576
             : this.render_camera_aspect_ratio ===
-              CameraAspectRatio.VERTICAL_9_16
+                CameraAspectRatio.VERTICAL_9_16
               ? 1024
               : 1000;
 

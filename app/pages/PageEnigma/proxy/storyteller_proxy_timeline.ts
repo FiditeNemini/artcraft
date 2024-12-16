@@ -4,7 +4,7 @@ import { ClipUI } from "../clips/clip_ui";
 import { EmotionClip } from "../clips/emotion_clip";
 import { LipSyncClip } from "../clips/lipsync_clip";
 import { TransformClip } from "../clips/transform_clip";
-import AnimationEngine from "../Editor/animation_engine";
+import AnimationEngine from "../Editor/Engines/animation_engine";
 import AudioEngine from "../Editor/audio_engine";
 import EmotionEngine from "../Editor/emotion_engine";
 import LipSyncEngine from "../Editor/lip_sync_engine";

@@ -1,5 +1,5 @@
 import { deepCopySerializableObjects as deepCopy } from "~/utilities";
-import { AnimationEngine } from "../animation_engine";
+import { AnimationEngine } from "../Engines/animation_engine";
 import AudioEngine from "../audio_engine";
 import EmotionEngine from "../emotion_engine";
 import { LipSyncEngine } from "../lip_sync_engine";

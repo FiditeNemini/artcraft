@@ -6,7 +6,7 @@ import Scene from "./scene.js";
 import AudioEngine from "./audio_engine";
 import TransformEngine from "./transform_engine";
 import { LipSyncEngine } from "./lip_sync_engine";
-import { AnimationEngine } from "./animation_engine";
+import { AnimationEngine } from "./Engines/animation_engine";
 
 import Queue, {
   UnionedActionTypes,
