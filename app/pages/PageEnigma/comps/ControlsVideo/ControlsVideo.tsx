@@ -30,11 +30,11 @@ export const ControlsVideo = () => {
   const [refresh, setRefresh] = useState(0);
   const showStylePage = usePosthogFeatureFlag(FeatureFlags.SHOW_STYLE_PAGE);
 
-  function formatTime(seconds: number) {
-    const date = new Date(seconds * 1000);
-    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  function formatTime(millis: number) {
+    const date = new Date(millis);
     const secs = String(date.getUTCSeconds()).padStart(2, "0");
-    return `00:${minutes}:${secs}`;
+    const ms = String(date.getUTCMilliseconds()).padStart(2, "0").slice(0, 2);
+    return `00:${secs}:${ms}`;
   }
 
   const isPlaying =
@@ -52,7 +52,7 @@ export const ControlsVideo = () => {
   };
 
   const handleToEnd = () => {
-    currentTime.value = filmLength.value * 60;
+    currentTime.value = filmLength.value * 1000;
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.UPDATE_TIME,
@@ -80,7 +80,7 @@ export const ControlsVideo = () => {
     editorEngine?.togglePlayback();
   };
   const handleForwardStep = () => {
-    currentTime.value = Math.min(currentTime.value + 1, filmLength.value * 60);
+    currentTime.value = Math.min(currentTime.value + 1, filmLength.value * 1000);
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.UPDATE_TIME,
@@ -127,7 +127,7 @@ export const ControlsVideo = () => {
             </span>
             <span className="opacity-50">/</span>
             <span className="w-[54px] opacity-50">
-              {formatTime(filmLength.value * 60)}
+              {formatTime(filmLength.value * 1000)}
             </span>
           </div>
           {showStylePage && (

@@ -60,7 +60,7 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
       (event.clientX - position.x) / 4 / scale.value,
     );
 
-    if (clipOffset + 30 > filmLength.value * 60) {
+    if (clipOffset + 500 > filmLength.value * 1000) {
       DndAsset.notDropText = "Not enough room to hold item";
       canDrop.value = false;
       return;
@@ -116,7 +116,7 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
           max={
             index < clips.length - 1
               ? clips[index + 1].offset
-              : filmLength.value * 60
+              : filmLength.value * 1000
           }
           group={group}
           updateClip={updateClip}

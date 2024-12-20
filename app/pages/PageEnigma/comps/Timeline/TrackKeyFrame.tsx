@@ -13,7 +13,7 @@ export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
 
   const { onPointerDown, offset } = useMouseEventsKeyframe({
     keyframe,
-    max: filmLength.value * 60,
+    max: filmLength.value * 1000,
     min: 0,
     updateKeyframe,
   });

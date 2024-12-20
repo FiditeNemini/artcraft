@@ -26,7 +26,7 @@ export const TrackClipsPrompt = ({ id, clips, updateClip }: Props) => {
   const clientX = useRef(0);
 
   function onPointerOver(event: PointerEvent) {
-    const max = filmLength.value * 60 * 4 * scale.value;
+    const max = filmLength.value * 1000 * 4 * scale.value;
     if (event.pageX < 320) {
       setHover(320);
     } else {
@@ -41,7 +41,7 @@ export const TrackClipsPrompt = ({ id, clips, updateClip }: Props) => {
     if (hover === -1) {
       return;
     }
-    const max = filmLength.value * 60 * 4 * scale.value;
+    const max = filmLength.value * 1000 * 4 * scale.value;
     const offset =
       (event.pageX < 320 ? 0 : Math.min(event.pageX - 320, max + 80)) /
       4 /
@@ -86,7 +86,7 @@ export const TrackClipsPrompt = ({ id, clips, updateClip }: Props) => {
           max={
             index < clips.length - 1
               ? clips[index + 1].offset
-              : filmLength.value * 60
+              : filmLength.value * 1000
           }
           group={ClipGroup.PROMPT_TRAVEL}
           updateClip={updateClip}
