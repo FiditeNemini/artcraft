@@ -33,7 +33,7 @@ export const ControlsVideo = () => {
   function formatTime(millis: number) {
     const date = new Date(millis);
     const secs = String(date.getUTCSeconds()).padStart(2, "0");
-    const ms = String(date.getUTCMilliseconds()).padStart(2, "0").slice(0, 2);
+    const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
     return `00:${secs}:${ms}`;
   }
 
