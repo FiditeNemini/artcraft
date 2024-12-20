@@ -16,7 +16,6 @@ import TransformEngine from "./Engines/transform_engine.js";
 import EmotionEngine from "./Engines/emotion_engine";
 import { TimeLine } from "./timeline.js";
 import { LipSyncEngine } from "./Engines/lip_sync_engine.js";
-import { AnimationEngine } from "./Engines/animation_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { EditorStates, CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { AssetType, ClipGroup } from "~/enums";
@@ -52,6 +51,7 @@ import {
 import { BufferType, EngineFrameBuffers } from "./VideoProcessor/engine_buffer";
 
 import Stats from "three/examples/jsm/libs/stats.module.js";
+import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -105,7 +105,7 @@ class Editor {
   transform_engine: TransformEngine;
   emotion_engine: EmotionEngine;
   lipsync_engine: LipSyncEngine;
-  animation_engine: AnimationEngine;
+  animation_engine: CharacterAnimationEngine;
   timeline: TimeLine;
   current_frame: number;
   lockControls: PointerLockControls | undefined;
@@ -259,7 +259,7 @@ class Editor {
     this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
-    this.animation_engine = new AnimationEngine(this.version);
+    this.animation_engine = new CharacterAnimationEngine(this.version);
 
     this.timeline = new TimeLine(
       this,
@@ -645,7 +645,7 @@ class Editor {
     this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
-    this.animation_engine = new AnimationEngine(this.version);
+    this.animation_engine = new CharacterAnimationEngine(this.version);
 
     this.timeline = new TimeLine(
       this,
@@ -946,14 +946,14 @@ class Editor {
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 1024
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 576
               : 1000;
         const height =
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 576
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 1024
               : 1000;
 
