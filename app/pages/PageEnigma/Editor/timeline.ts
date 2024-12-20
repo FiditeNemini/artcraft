@@ -805,6 +805,11 @@ export class TimeLine {
     //this.scrubber_frame_position += 1;
     //2. allow stopping.
     //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
+
+    // Since the animation engine is newer we can just call an evaluation on it instead of having the timeline process it
+    this.animation_engine.evaluate(this.current_time);
+
+    // Iterate over the clips and play them as fit
     for (const element of this.timeline_items) {
       if (
         element.offset <= this.scrubber_frame_position &&
@@ -858,8 +863,6 @@ export class TimeLine {
               element.object_uuid + element.media_id
             ].step(this.scrubber_frame_position, element.offset);
           }
-        } else if (element.type === ClipType.ANIMATION) {
-          this.animation_engine.evaluate(this.current_time);
         } else if (element.type === ClipType.EXPRESSION) {
           if (object) {
             await this.emotion_engine.clips[
