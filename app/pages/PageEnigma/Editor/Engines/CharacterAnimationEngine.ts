@@ -105,14 +105,18 @@ export class CharacterAnimationEngine {
     nextAction.setEffectiveWeight(progress);
 
     // Make sure we hold that last frame for the previous action
-    prevAction.paused = true;
+    prevAction.clampWhenFinished = true;
 
     // The next action should stay at the first frame
     nextAction.paused = true;
 
+    // Necessary to ensure the actions are active - the default is inactive, mixer won't do anything
     prevAction.play();
     nextAction.play();
-    mixer.setTime(timestamp / 1000);
+
+    // The clip time would still be relative to the previous clip 
+    const clipTime = timestamp - prevClip.offset;
+    mixer.setTime(clipTime / 1000);
     console.log("Prev action status")
     console.log(prevAction);
   }
@@ -146,9 +150,14 @@ export class CharacterAnimationEngine {
 
     // Play only this action
     const animationAction = mixer.clipAction(animationTrack);
+
+    // Since it's the only clip in this timestamp, make it full weight and make sure it's not paused (from interpolation or otherwise)
     animationAction.setEffectiveWeight(1);
     animationAction.paused = false;
+
+    // Necessary to ensure the actions are active - the default is inactive, mixer won't do anything
     animationAction.play();
+
     mixer.setTime(clipTime / 1000);
     console.log("Action status")
     console.log(animationAction);
