@@ -105,6 +105,7 @@ export class CharacterAnimationEngine {
     nextAction.setEffectiveWeight(progress);
 
     // Make sure we hold that last frame for the previous action
+    prevAction.loop = THREE.LoopOnce;
     prevAction.clampWhenFinished = true;
 
     // The next action should stay at the first frame
@@ -132,7 +133,6 @@ export class CharacterAnimationEngine {
 
     // If timestamp not in any clip, do nothing.
     // If timestamp in clip, set mixer to the timestamp inside the clip
-    console.log(currentClip)
     if (!currentClip) {
       console.log("INTERPOLATING CLIPS")
       // Let the interpolation function handle this actions
@@ -154,6 +154,7 @@ export class CharacterAnimationEngine {
     // Since it's the only clip in this timestamp, make it full weight and make sure it's not paused (from interpolation or otherwise)
     animationAction.setEffectiveWeight(1);
     animationAction.paused = false;
+    animationAction.loop = THREE.LoopRepeat;
 
     // Necessary to ensure the actions are active - the default is inactive, mixer won't do anything
     animationAction.play();
