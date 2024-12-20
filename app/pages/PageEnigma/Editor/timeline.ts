@@ -6,7 +6,6 @@ import Scene from "./scene.js";
 import AudioEngine from "./Engines/audio_engine";
 import TransformEngine from "./Engines/transform_engine";
 import { LipSyncEngine } from "./Engines/lip_sync_engine";
-import { AnimationEngine } from "./Engines/animation_engine";
 
 import Queue, {
   UnionedActionTypes,
@@ -24,6 +23,7 @@ import { IGenerationOptions } from "~/pages/PageEnigma/models/generationOptions"
 import { Vector3 } from "three";
 
 import { outlinerState } from "../signals";
+import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -40,7 +40,7 @@ export class TimeLine {
   // key framing
   transform_engine: TransformEngine;
   // animation engine
-  animation_engine: AnimationEngine;
+  animation_engine: CharacterAnimationEngine;
   // lip sync engine
   lipSync_engine: LipSyncEngine;
   // emotion engine
@@ -65,7 +65,7 @@ export class TimeLine {
     audio_engine: AudioEngine,
     transform_engine: TransformEngine,
     lipsync_engine: LipSyncEngine,
-    animation_engine: AnimationEngine,
+    animation_engine: CharacterAnimationEngine,
     emotion_engine: EmotionEngine,
     scene: Scene,
     camera: THREE.Camera | null,
@@ -194,7 +194,6 @@ export class TimeLine {
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
-        //console.log(result);
         if (result) outlinerState.items.value = result.items;
         break;
       }
@@ -466,7 +465,6 @@ export class TimeLine {
         element.type == ClipType.TRANSFORM &&
         element.object_uuid == object_uuid
       ) {
-        // console.log(element);
         this.scene.deletePoint(element.clip_uuid);
       }
     });
@@ -485,13 +483,15 @@ export class TimeLine {
     const type = data.type;
     const offset = data.offset;
     const end_offset = data.length + offset;
+    const object = this.scene.get_object_by_uuid(object_uuid);
     const object_name =
-      this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
+      object?.name ?? "undefined";
     const clip_uuid = data.clip_uuid;
 
     switch (type) {
       case "animation":
-        this.animation_engine.load_object(object_uuid, media_id, name);
+        await this.animation_engine.addCharacterAnimationMedia(object!, media_id, data);
+        console.warn(this.animation_engine)
         break;
       case "transform":
         this.transform_engine.loadObject(object_uuid, data.length);
@@ -561,13 +561,12 @@ export class TimeLine {
     const type = data.type;
     const offset = data.offset;
     const end_offset = data.length + offset;
+    const object = this.scene.get_object_by_uuid(object_uuid);
     const object_name =
-      this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
+      object?.name ?? "undefined";
     const clip_uuid = data.clip_uuid;
 
-    this.animation_engine.load_object(object_uuid, media_id, name);
-    this.animation_engine.clips[object_uuid + media_id].animation_clip =
-      animation_clip;
+    this.animation_engine.addCharacterAnimation(object!, animation_clip, data);
 
     // media id for this as well it can be downloaded
     this.addPlayableClip(
@@ -733,9 +732,7 @@ export class TimeLine {
         this.audio_engine.loadClip(element.media_id);
         this.audio_engine.stopClip(element.media_id);
       } else if (element.type === ClipType.ANIMATION) {
-        this.animation_engine.clips[
-          element.object_uuid + element.media_id
-        ].stop();
+        this.animation_engine.stop();
       } else if (
         element.type === ClipType.AUDIO &&
         element.group === ClipGroup.CHARACTER
@@ -847,7 +844,7 @@ export class TimeLine {
           //     element.object_uuid + element.media_id,
           //   this.scrubber_frame_position, element.offset);
           // }
-          await this.audio_engine.playClip(element.media_id);
+          this.audio_engine.playClip(element.media_id);
           await this.audio_engine.step(
             element.media_id,
             this.scrubber_frame_position,
@@ -867,20 +864,7 @@ export class TimeLine {
             ].step(this.scrubber_frame_position, element.offset);
           }
         } else if (element.type === ClipType.ANIMATION) {
-          if (object) {
-            await this.animation_engine.clips[
-              object.uuid + element.media_id
-            ].play(object);
-            const fps = 60;
-            await this.animation_engine.clips[
-              object.uuid + element.media_id
-            ].step(
-              (this.scrubber_frame_position - element.offset) / fps,
-              this.is_playing,
-              this.scrubber_frame_position, // Double FPS for best result.
-            );
-            //this.animation_engine.clips[object.uuid + element.media_id].update_bones();
-          }
+          this.animation_engine.evaluate(this.current_time);
         } else if (element.type === ClipType.EXPRESSION) {
           if (object) {
             await this.emotion_engine.clips[
