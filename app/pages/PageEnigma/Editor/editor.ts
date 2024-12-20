@@ -114,6 +114,7 @@ class Editor {
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
+  lastFrameTime: number;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -247,6 +248,7 @@ class Editor {
     this.playback_location = 0;
     this.last_scrub = 0;
     this.frames = 0;
+    this.lastFrameTime = 0;
     this.last_selected_sum = 0;
     this.selectedCanvas = false;
     // Audio Engine Test.
@@ -1070,8 +1072,7 @@ class Editor {
     return decision;
   }
 
-  // Basicly Unity 3D's update loop.
-  async updateLoop() {
+  async renderSingleFrame() {
     //console.timeEnd("Single Frame Time");
     //console.time("Single Frame Time");
     this.containerMayReset();
@@ -1161,6 +1162,20 @@ class Editor {
       },
       1000 / (this.cap_fps * 2),
     ); // Get the most FPS we can out of the renderer.
+  }
+
+  // Basicly Unity 3D's update loop.
+  async updateLoop() {
+    // Performance improvement: Handle frame cap
+    // Request the next render already - this is necessary so the loop doesn't stop if the fps cap is hit
+    requestAnimationFrame(this.updateLoop.bind(this));
+    const frameTime = performance.now();
+    if (frameTime - this.lastFrameTime < 1000 / this.cap_fps) {
+      return;
+    }
+
+    this.lastFrameTime = frameTime;
+    this.renderSingleFrame();
   }
 
   change_mode(type: "translate" | "rotate" | "scale") {
