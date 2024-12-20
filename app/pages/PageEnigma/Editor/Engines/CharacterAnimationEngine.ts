@@ -94,7 +94,7 @@ export class CharacterAnimationEngine {
 
     const animationAction = mixer.clipAction(animationTrack);
     animationAction.play();
-    mixer.setTime(clipTime);
+    mixer.setTime(clipTime / 1000);
   }
 
   /** Evaluate all character animations at a given timestamp (milliseconds) */
