@@ -771,12 +771,7 @@ export class TimeLine {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {
-      // When rendering we want to increase it by 1 but when in playback we want it dynamic based on deltatime.
-      if (isRendering) {
-        this.current_time += 1;
-      } else {
-        this.current_time += delta_time * this.editorEngine.cap_fps;
-      }
+      this.current_time += delta_time * 1000;
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
         currentTime: this.current_time,
       });
