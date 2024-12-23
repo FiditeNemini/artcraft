@@ -397,7 +397,7 @@ class Scene {
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
     //const media_base_url = `${media_api_base_url}/vocodes-public`;
-    const media_base_url = 'https://cdn-2.fakeyou.com';
+    const media_base_url = "https://cdn-2.fakeyou.com";
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
@@ -794,15 +794,7 @@ class Scene {
       if (this.directional_light) this.scene.remove(this.directional_light);
       if (this.hemisphereLight) this.scene.remove(this.hemisphereLight);
     } else {
-      const texture = loader.load([
-        "/resources/skybox/day/px.png",
-        "/resources/skybox/day/nx.png",
-        "/resources/skybox/day/py.png",
-        "/resources/skybox/day/ny.png",
-        "/resources/skybox/day/pz.png",
-        "/resources/skybox/day/nz.png",
-      ]);
-      this.scene.background = texture;
+      this.scene.background = new THREE.Color("#282828");
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
