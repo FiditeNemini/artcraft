@@ -22,7 +22,7 @@ import EmotionEngine from "./Engines/emotion_engine";
 import { IGenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
-import { outlinerState } from "../signals";
+import { filmLength, outlinerState } from "../signals";
 import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 
 export class TimeLine {
@@ -451,7 +451,7 @@ export class TimeLine {
   }
 
   public checkEditorCanPlay() {
-    this.editorEngine.can_playback = this.getEndPoint() > 1;
+    this.editorEngine.can_playback = this.getLastClipEnd() > 1;
     this.editorEngine.updateSelectedUI();
   }
 
@@ -753,7 +753,7 @@ export class TimeLine {
     }
   }
 
-  public getEndPoint(): number {
+  public getLastClipEnd(): number {
     let longest = 0;
     for (const element of this.timeline_items) {
       if (longest < element.length) {
@@ -763,13 +763,17 @@ export class TimeLine {
     return longest;
   }
 
+  public getTimelineEnd(): number {
+    return filmLength.peek() * 1000;
+  }
+
   // called by the editor update loop on each frame
   public async update(
     isRendering = false,
     delta_time: number = 0,
   ): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
-    this.timeline_limit = this.getEndPoint();
+    this.timeline_limit = this.getTimelineEnd();
     if (this.is_playing) {
       this.current_time += delta_time * 1000;
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
@@ -807,7 +811,7 @@ export class TimeLine {
     //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
 
     // Since the animation engine is newer we can just call an evaluation on it instead of having the timeline process it
-    this.animation_engine.evaluate(this.current_time);
+    this.animation_engine.evaluate(this.current_time, this.timeline_limit);
 
     // Iterate over the clips and play them as fit
     for (const element of this.timeline_items) {
