@@ -794,15 +794,7 @@ class Scene {
       if (this.directional_light) this.scene.remove(this.directional_light);
       if (this.hemisphereLight) this.scene.remove(this.hemisphereLight);
     } else {
-      const texture = loader.load([
-        "/resources/skybox/day/px.png",
-        "/resources/skybox/day/nx.png",
-        "/resources/skybox/day/py.png",
-        "/resources/skybox/day/ny.png",
-        "/resources/skybox/day/pz.png",
-        "/resources/skybox/day/nz.png",
-      ]);
-      this.scene.background = texture;
+      this.scene.background = new THREE.Color("#282828");
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
