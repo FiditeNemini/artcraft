@@ -68,61 +68,79 @@ export class CharacterAnimationEngine {
     return this.characterMixers.get(character)!;
   }
 
-  #interpolateClips(character: THREE.Object3D, timestamp: number) {
+  #interpolateClips(character: THREE.Object3D, timestamp: number, maxTime: number) {
     const clips = this.characterAnimations.get(character)!;
 
     // The timestamp isn't inside any clip, we're in interpolation land
     // If there's no clips to interpolate between, we're done
-    // TODO: Remove the bound early exit condition, we'll need to interpolate between endpoint frames
-    if (clips.length < 2 || timestamp < clips[0].offset || timestamp > clips[clips.length - 1].offset + clips[clips.length - 1].length) {
+    if (clips.length <= 0) {
       return;
     }
 
     const mixer = this.getMixer(character);
 
-    // Find the two clips we're in between
+    // Find the two clips we're interpolating between
     // TODO: Binary search? We won't need it because the amount of clips is too low
-    let prevClipIndex = 0;
+    let prevClip = null;
+    let nextClip = null;
+    const lastClip = clips[clips.length - 1];
 
-    // Loop until the next clip is after the timestamp
-    while (clips[prevClipIndex + 1].offset < timestamp) {
-      prevClipIndex++;
+    // If we're before the first clip, interpolate it in from base pose
+    // TODO: Replace with starting frame
+    if (clips[0].offset > timestamp) {
+      prevClip = null;
+      nextClip = clips[0];
+    } else if (lastClip.offset + lastClip.length < timestamp) { // After last clip, interpolate it out
+      prevClip = lastClip;
+      nextClip = null;
+    } else {
+      let prevClipIndex = 0;
+
+      // Loop until the next clip is after the timestamp
+      while (prevClipIndex < clips.length - 1 && clips[prevClipIndex + 1].offset < timestamp) {
+        prevClipIndex++;
+      }
+
+      prevClip = clips[prevClipIndex];
+      nextClip = clips[prevClipIndex + 1];
     }
 
-    const prevClip = clips[prevClipIndex];
-    const nextClip = clips[prevClipIndex + 1];
-    const prevAction = mixer.clipAction(this.getCharacterAnimationTrack(character, prevClip.media_id)!);
-    const nextAction = mixer.clipAction(this.getCharacterAnimationTrack(character, nextClip.media_id)!);
+    const prevAction = prevClip ? mixer.clipAction(this.getCharacterAnimationTrack(character, prevClip!.media_id)!) : null;
+    const nextAction = nextClip ? mixer.clipAction(this.getCharacterAnimationTrack(character, nextClip!.media_id)!) : null;
 
     // Calculate the progress of timestamp from end of prev action to start of next action
-    const left = prevClip.offset + prevClip.length;
-    const right = nextClip.offset;
+    const left = (prevClip?.offset ?? 0) + (prevClip?.length ?? 0);
+    const right = nextClip?.offset ?? maxTime;
 
     // Simple Linear interpolation for now
     // TODO: Take an interpolation dependency, or better yet, write a transition engine
     const progress = (timestamp - left) / (right - left);
-    prevAction.setEffectiveWeight(1 - progress);
-    nextAction.setEffectiveWeight(progress);
+    prevAction?.setEffectiveWeight(1 - progress);
+    nextAction?.setEffectiveWeight(progress);
 
     // Make sure we hold that last frame for the previous action
-    prevAction.loop = THREE.LoopOnce;
-    prevAction.clampWhenFinished = true;
+    if (prevAction) {
+      prevAction.loop = THREE.LoopOnce;
+      prevAction.clampWhenFinished = true;
+    }
 
     // The next action should stay at the first frame
-    nextAction.paused = true;
+    if (nextAction) {
+      nextAction.paused = true;
+    }
 
     // Necessary to ensure the actions are active - the default is inactive, mixer won't do anything
-    prevAction.play();
-    nextAction.play();
+    prevAction?.play();
+    nextAction?.play();
 
     // The clip time would still be relative to the previous clip 
-    const clipTime = timestamp - prevClip.offset;
+    const clipTime = timestamp - (prevClip?.offset ?? 0);
     mixer.setTime(clipTime / 1000);
     console.log("Prev action status")
     console.log(prevAction);
   }
 
-  evaluateCharacter(character: THREE.Object3D, timestamp: number) {
+  evaluateCharacter(character: THREE.Object3D, timestamp: number, maxTime: number) {
     const mixer = this.getMixer(character);
     const clips = this.characterAnimations.get(character)!;
 
@@ -136,7 +154,7 @@ export class CharacterAnimationEngine {
     if (!currentClip) {
       console.log("INTERPOLATING CLIPS")
       // Let the interpolation function handle this actions
-      this.#interpolateClips(character, timestamp)
+      this.#interpolateClips(character, timestamp, maxTime)
       return;
     }
 
@@ -169,10 +187,9 @@ export class CharacterAnimationEngine {
   }
 
   /** Evaluate all character animations at a given timestamp (milliseconds) */
-  evaluate(timestamp: number) {
-    console.log("Evaluating character animations at timestamp:", timestamp);
+  evaluate(timestamp: number, maxTime: number) {
     this.characterMixers.forEach((_, character) => {
-      this.evaluateCharacter(character, timestamp);
+      this.evaluateCharacter(character, timestamp, maxTime);
     })
   }
 
