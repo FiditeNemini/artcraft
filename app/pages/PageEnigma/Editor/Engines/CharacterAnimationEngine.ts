@@ -81,8 +81,8 @@ export class CharacterAnimationEngine {
 
     // Find the two clips we're interpolating between
     // TODO: Binary search? We won't need it because the amount of clips is too low
-    let prevClip = null;
-    let nextClip = null;
+    let prevClip: ClipUI | null = null;
+    let nextClip: ClipUI | null = null;
     const lastClip = clips[clips.length - 1];
 
     // If we're before the first clip, interpolate it in from base pose
