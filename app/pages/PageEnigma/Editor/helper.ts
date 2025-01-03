@@ -105,7 +105,7 @@ export class SceneUtils {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.editor.sceneManager?.selected_objects) {
-      let object = this.editor.sceneManager?.selected_objects[0];
+      const object = this.editor.sceneManager?.selected_objects[0];
       if (object != undefined || object != null) {
         object.position.x = position.x;
         object.position.y = position.y;
@@ -157,7 +157,7 @@ export class SceneUtils {
           () =>
             document
               .getElementById("letterbox")
-              ?.addEventListener("contextmenu", function(event) {
+              ?.addEventListener("contextmenu", function (event) {
                 event.preventDefault();
               }),
           250,
@@ -232,46 +232,51 @@ function removeObject3D(object3D) {
 
   deleteObject(uuid: string) {
     const obj = this.scene.get_object_by_uuid(uuid);
+
+    if (!obj) {
+      return
+    }
+
     this.removeTransformControls();
-    if (obj?.name === this.editor.camera_name) {
+    if (obj.name === this.editor.camera_name) {
       return;
     }
-    if (obj) {
-      // Finally remove the object from the scene
-      this.scene.scene.remove(obj);
 
-      obj.traverse(child => {
-        (child as THREE.Mesh)?.geometry?.dispose()
-        if (Array.isArray((child as THREE.Mesh).texture)) {
-          (child as THREE.Mesh).texture.forEach(mat => mat.dispose());
-        } else if ((child as THREE.Mesh).texture) {
-          (child as THREE.Mesh).texture.dispose();
-        }
+    // Finally remove the object from the scene
+    this.scene.scene.remove(obj);
 
-        if (Array.isArray((child as THREE.Mesh).material)) {
-          (child as THREE.Mesh).material.forEach(mat => mat.dispose());
-        } else if ((child as THREE.Mesh).material) {
-          (child as THREE.Mesh).material.dispose();
-        }
-      })
-
-      if (Array.isArray((obj as THREE.Mesh).texture)) {
-        (obj as THREE.Mesh).texture.forEach(mat => mat.dispose());
-      } else if ((obj as THREE.Mesh).texture) {
-        (obj as THREE.Mesh).texture.dispose();
+    obj.traverse(child => {
+      (child as THREE.Mesh)?.geometry?.dispose()
+      if (Array.isArray((child as THREE.Mesh).texture)) {
+        (child as THREE.Mesh).texture.forEach(mat => mat.dispose());
+      } else if ((child as THREE.Mesh).texture) {
+        (child as THREE.Mesh).texture.dispose();
       }
 
-      if (Array.isArray((obj as THREE.Mesh).material)) {
-        (obj as THREE.Mesh).material.forEach(mat => mat.dispose());
-      } else if ((obj as THREE.Mesh).material) {
-        (obj as THREE.Mesh).material.dispose();
+      if (Array.isArray((child as THREE.Mesh).material)) {
+        (child as THREE.Mesh).material.forEach(mat => mat.dispose());
+      } else if ((child as THREE.Mesh).material) {
+        (child as THREE.Mesh).material.dispose();
       }
+    })
 
-      if ((obj as THREE.Mesh).geometry) {
-        (obj as THREE.Mesh).geometry.dispose()
-      }
+    if (Array.isArray((obj as THREE.Mesh).texture)) {
+      (obj as THREE.Mesh).texture.forEach(mat => mat.dispose());
+    } else if ((obj as THREE.Mesh).texture) {
+      (obj as THREE.Mesh).texture.dispose();
     }
-    this.editor.timeline.deleteObject(uuid);
+
+    if (Array.isArray((obj as THREE.Mesh).material)) {
+      (obj as THREE.Mesh).material.forEach(mat => mat.dispose());
+    } else if ((obj as THREE.Mesh).material) {
+      (obj as THREE.Mesh).material.dispose();
+    }
+
+    if ((obj as THREE.Mesh).geometry) {
+      (obj as THREE.Mesh).geometry.dispose()
+    }
+
+    this.editor.timeline.deleteObject(obj);
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.DELETE_OBJECT,
@@ -286,6 +291,6 @@ function removeObject3D(object3D) {
     this.editor.selected = undefined;
     this.editor.publishSelect();
     hideObjectPanel();
-    this.editor.timeline.deleteObject(uuid);
+    this.editor.timeline.deleteObject(obj);
   }
 }
