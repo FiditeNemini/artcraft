@@ -4,7 +4,7 @@ import { ClipUI } from "../clips/clip_ui";
 import { EmotionClip } from "../clips/emotion_clip";
 import { LipSyncClip } from "../clips/lipsync_clip";
 import { TransformClip } from "../clips/transform_clip";
-import AnimationEngine from "../Editor/Engines/animation_engine";
+import { CharacterAnimationEngine } from "../Editor/Engines/CharacterAnimationEngine";
 import AudioEngine from "../Editor/Engines/audio_engine";
 import EmotionEngine from "../Editor/Engines/emotion_engine";
 import LipSyncEngine from "../Editor/Engines/lip_sync_engine";
@@ -14,7 +14,7 @@ import TransformEngine from "../Editor/Engines/transform_engine";
 export class StoryTellerProxyTimeline {
   timeline: TimeLine;
   transform_engine: TransformEngine;
-  animation_engine: AnimationEngine;
+  animation_engine: CharacterAnimationEngine;
   audio_engine: AudioEngine;
   lipsync_engine: LipSyncEngine;
   emotion_engine: EmotionEngine;
@@ -23,7 +23,7 @@ export class StoryTellerProxyTimeline {
     version: number,
     timeline: TimeLine,
     transform_engine: TransformEngine,
-    animation_engine: AnimationEngine,
+    animation_engine: CharacterAnimationEngine,
     audio_engine: AudioEngine,
     lipsync_engine: LipSyncEngine,
     emotion_engine: EmotionEngine,
@@ -36,19 +36,17 @@ export class StoryTellerProxyTimeline {
     this.emotion_engine = emotion_engine;
   }
 
-  private async getItems(items: any[]): Promise<any[]> {
-    let timeline_items_data = [];
-    for (let index = 0; index < items.length; index++) {
-      const element = items[index];
-      timeline_items_data.push(element.toJSON());
-    }
+  private async getItemsToJson(items: unknown[]): Promise<unknown[]> {
+    const timeline_items_data: unknown[] = [];
+    items.forEach((element) => { timeline_items_data.push(element.toJSON()); });
+
     return timeline_items_data;
   }
 
   private async getItemsDict(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
-    let timeline_items_data: { [key: string]: any } = {};
+    const timeline_items_data: { [key: string]: any } = {};
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
         const element = items[key];
@@ -58,9 +56,9 @@ export class StoryTellerProxyTimeline {
     return timeline_items_data;
   }
 
-  public async saveToJson(): Promise<any> {
-    let timeline_json = {
-      timeline: await this.getItems(this.timeline.timeline_items),
+  public async saveToJson(): Promise<unknown> {
+    const timeline_json = {
+      timeline: await this.getItemsToJson(this.timeline.timeline_items),
       transform: await this.getItemsDict(this.transform_engine.clips),
       animation: await this.getItemsDict(this.animation_engine.clips),
       audio: await this.getItemsDict(this.audio_engine.clips),
@@ -73,11 +71,11 @@ export class StoryTellerProxyTimeline {
   }
 
   private async loadTimelineClips(timeline_clips: any[]): Promise<any[]> {
-    let new_clips = [];
+    const new_clips = [];
     if (timeline_clips) {
       for (let index = 0; index < timeline_clips.length; index++) {
         const element = timeline_clips[index];
-        let clip = new ClipUI(
+        const clip = new ClipUI(
           element.version,
           element.type,
           element.group,
@@ -100,7 +98,7 @@ export class StoryTellerProxyTimeline {
   private async loadTransformClips(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
-    let timeline_items_data: { [key: string]: any } = {};
+    const timeline_items_data: { [key: string]: any } = {};
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
         const element = items[key];
@@ -119,7 +117,7 @@ export class StoryTellerProxyTimeline {
   private async loadAudioClips(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
-    let timeline_items_data: { [key: string]: any } = {};
+    const timeline_items_data: { [key: string]: any } = {};
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
         const element = items[key];
@@ -136,7 +134,7 @@ export class StoryTellerProxyTimeline {
   private async loadAnimationClips(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
-    let timeline_items_data: { [key: string]: any } = {};
+    const timeline_items_data: { [key: string]: any } = {};
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
         const element = items[key];
@@ -157,7 +155,7 @@ export class StoryTellerProxyTimeline {
   private async loadLipsyncClips(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
-    let timeline_items_data: { [key: string]: any } = {};
+    const timeline_items_data: { [key: string]: any } = {};
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
         const element = items[key];
@@ -174,7 +172,7 @@ export class StoryTellerProxyTimeline {
   private async loadEmotionClips(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
-    let timeline_items_data: { [key: string]: any } = {};
+    const timeline_items_data: { [key: string]: any } = {};
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
         const element = items[key];
