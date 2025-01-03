@@ -191,6 +191,11 @@ export class CharacterAnimationEngine {
     })
   }
 
+  stopCharacter(character: THREE.Object3D) {
+    const mixer = this.characterMixers.get(character);
+    mixer?.stopAllAction();
+  }
+
   stop() {
     this.characterMixers.forEach((mixer) => {
       mixer.stopAllAction();
@@ -235,5 +240,28 @@ export class CharacterAnimationEngine {
       }
     });
   }
+
+  removeCharacter(character: THREE.Object3D) {
+    console.debug("Removing character from animation engine", character);
+    this.characterAnimations.delete(character);
+    this.characterMixers.delete(character);
+  }
+
+  removeAnimation(character: THREE.Object3D, clip: ClipUI) {
+    console.debug("Removing animation from character", character, clip);
+    const clips = this.characterAnimations.get(character)!;
+
+    const clipIndex = clips.findIndex((c) => c.clip_uuid === clip.clip_uuid);
+    if (clipIndex < 0) {
+      return;
+    }
+
+    // Remove the clip from character's tracked clips
+    clips.splice(clipIndex, 1);
+
+    // Stop all character animations to cleanly reset
+    this.stopCharacter(character);
+  }
+
 
 }
