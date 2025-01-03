@@ -1,6 +1,7 @@
 import { LipSync } from "../Editor/lipsync";
 import * as THREE from "three";
 import environmentVariables from "~/Classes/EnvironmentVariables";
+import Ijson from "~/interfaces/Ijson";
 
 interface AudioDataInterface {
   audioContext: AudioContext;
@@ -29,7 +30,7 @@ class BlendShapeHelper {
   }
 }
 
-export class LipSyncClip {
+export class LipSyncClip implements Ijson {
   version: number;
   media_id: string;
   type: "lipsync";

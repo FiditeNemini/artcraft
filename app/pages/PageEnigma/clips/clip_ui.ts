@@ -2,8 +2,9 @@
 // it is created from a media id.
 import { MediaFileType } from "~/pages/PageEnigma/enums";
 import { ClipGroup, ClipType } from "~/enums";
+import Ijson from "~/interfaces/Ijson";
 
-export class ClipUI {
+export class ClipUI implements Ijson {
   version: number;
   type: ClipType;
   group: ClipGroup;
@@ -50,7 +51,7 @@ export class ClipUI {
     this.media_file_type = media_file_type;
   }
 
-  toJSON(): any {
+  toJSON() {
     return {
       version: this.version,
       group: this.group,
@@ -67,3 +68,4 @@ export class ClipUI {
     };
   }
 }
+
