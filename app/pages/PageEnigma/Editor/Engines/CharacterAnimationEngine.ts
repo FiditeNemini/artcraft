@@ -120,7 +120,6 @@ export class CharacterAnimationEngine {
 
     // Make sure we hold that last frame for the previous action
     if (prevAction) {
-      prevAction.loop = THREE.LoopOnce;
       prevAction.clampWhenFinished = true;
     }
 
@@ -172,7 +171,6 @@ export class CharacterAnimationEngine {
     // Since it's the only clip in this timestamp, make it full weight and make sure it's not paused (from interpolation or otherwise)
     animationAction.setEffectiveWeight(1);
     animationAction.paused = false;
-    animationAction.loop = THREE.LoopRepeat;
 
     // Necessary to ensure the actions are active - the default is inactive, mixer won't do anything
     animationAction.play();
