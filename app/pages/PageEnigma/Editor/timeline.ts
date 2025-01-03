@@ -455,11 +455,19 @@ export class TimeLine {
     this.editorEngine.updateSelectedUI();
   }
 
-  public deleteObject(object_uuid: string) {
-    const object = this.scene.get_object_by_uuid(object_uuid);
-    if (object?.name === this.camera_name) {
+  // This method is NOT responsible for deletion of the object from scene or other editor parts
+  // It is only responsible for deleting the object from the timeline and its corresponding elements
+  public deleteObject(object: THREE.Object3D<THREE.Object3DEventMap>) {
+    if (!object) {
+      return
+    }
+
+    if (object.name === this.camera_name) {
       return;
     }
+
+    const object_uuid = object.uuid;
+
     this.timeline_items.forEach((element) => {
       if (
         element.type == ClipType.TRANSFORM &&
@@ -468,9 +476,16 @@ export class TimeLine {
         this.scene.deletePoint(element.clip_uuid);
       }
     });
+
+    // TODO: In the future object should have relations that can be deleted inside the engines
+    // and the engines handle the deletion of objects.
+    // Character Animation Engine already does this.
     this.timeline_items = this.timeline_items.filter(
       (element) => element.object_uuid !== object_uuid,
     );
+
+    this.animation_engine.removeCharacter(object);
+
     // Update react land here.
   }
 
@@ -491,7 +506,7 @@ export class TimeLine {
     switch (type) {
       case "animation":
         await this.animation_engine.addCharacterAnimationMedia(object!, media_id, data);
-        console.warn(this.animation_engine)
+        this.animation_engine.evaluate(this.current_time, this.timeline_limit);
         break;
       case "transform":
         this.transform_engine.loadObject(object_uuid, data.length);
@@ -666,6 +681,7 @@ export class TimeLine {
     const media_id = data.media_id;
     const clip_uuid = data.clip_uuid;
 
+    // Remove the clip from the items array
     for (let i = 0; i < this.timeline_items.length; i++) {
       const element = this.timeline_items[i];
       if (
@@ -676,6 +692,14 @@ export class TimeLine {
         this.timeline_items.splice(i, 1);
         break;
       }
+    }
+
+    // Once the clip is removed, we need to make sure the engines aren't tracking it either
+    // TODO: Ideally the engines should just handle this individually and we check them based on clip type/group
+    // This way we won't need to iterate over all timeline items
+    if (data.type === ClipType.ANIMATION) {
+      const object = this.scene.get_object_by_uuid(object_uuid)!;
+      this.animation_engine.removeAnimation(object, data)
     }
 
     this.checkEditorCanPlay();
