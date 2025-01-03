@@ -276,6 +276,9 @@ function removeObject3D(object3D) {
       (obj as THREE.Mesh).geometry.dispose()
     }
 
+    // TODO
+    // FIXME: Timeline deletion is called twice, as well as a queue event.
+    // Why is this necessary?
     this.editor.timeline.deleteObject(obj);
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
