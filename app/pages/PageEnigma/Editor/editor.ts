@@ -15,7 +15,7 @@ import AudioEngine from "./Engines/audio_engine.js";
 import TransformEngine from "./Engines/transform_engine.js";
 import EmotionEngine from "./Engines/emotion_engine";
 import { TimeLine } from "./timeline.js";
-import { LipSyncEngine } from "./Engines/lip_sync_engine.js";
+import LipSyncEngine from "./Engines/lip_sync_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { EditorStates, CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { AssetType, ClipGroup } from "~/enums";

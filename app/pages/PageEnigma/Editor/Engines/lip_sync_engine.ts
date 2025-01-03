@@ -1,7 +1,7 @@
 import { LipSyncClip } from "../../clips/lipsync_clip";
 
 // needs to be apart of the editor window.
-export class LipSyncEngine {
+export default class LipSyncEngine {
   clips: { [key: string]: LipSyncClip } = {};
   audio_sources: { [key: string]: AudioBufferSourceNode } = {};
   version: number;

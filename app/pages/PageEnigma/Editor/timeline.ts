@@ -5,7 +5,7 @@ import { ClipUI } from "../clips/clip_ui";
 import Scene from "./scene.js";
 import AudioEngine from "./Engines/audio_engine";
 import TransformEngine from "./Engines/transform_engine";
-import { LipSyncEngine } from "./Engines/lip_sync_engine";
+import LipSyncEngine from "./Engines/lip_sync_engine";
 
 import Queue, {
   UnionedActionTypes,

@@ -2,7 +2,7 @@ import { deepCopySerializableObjects as deepCopy } from "~/utilities";
 import { ClipUI } from "../../clips/clip_ui";
 import AudioEngine from "../Engines/audio_engine";
 import EmotionEngine from "../Engines/emotion_engine";
-import { LipSyncEngine } from "../Engines/lip_sync_engine";
+import LipSyncEngine from "../Engines/lip_sync_engine";
 import { TimeLine } from "../timeline";
 import TransformEngine from "../Engines/transform_engine";
 import { TimelineStateJson } from "./EditorStateJSON/timeline_state_json";
