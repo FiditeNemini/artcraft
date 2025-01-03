@@ -1,12 +1,11 @@
 import * as THREE from "three";
 
-import { ClipUI } from "../datastructures/clips/clip_ui";
+import { ClipUI } from "../clips/clip_ui";
 
 import Scene from "./scene.js";
-import AudioEngine from "./audio_engine";
-import TransformEngine from "./transform_engine";
-import { LipSyncEngine } from "./lip_sync_engine";
-import { AnimationEngine } from "./animation_engine";
+import AudioEngine from "./Engines/audio_engine";
+import TransformEngine from "./Engines/transform_engine";
+import LipSyncEngine from "./Engines/lip_sync_engine";
 
 import Queue, {
   UnionedActionTypes,
@@ -19,11 +18,12 @@ import { ClipGroup, ClipType, AssetType } from "~/enums";
 import { CameraAspectRatio, MediaFileType } from "~/pages/PageEnigma/enums";
 import { Keyframe, MediaItem, UpdateTime } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/Editor/editor";
-import EmotionEngine from "./emotion_engine";
+import EmotionEngine from "./Engines/emotion_engine";
 import { IGenerationOptions } from "~/pages/PageEnigma/models/generationOptions";
 import { Vector3 } from "three";
 
-import { outlinerState } from "../signals";
+import { filmLength, outlinerState } from "../signals";
+import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -40,7 +40,7 @@ export class TimeLine {
   // key framing
   transform_engine: TransformEngine;
   // animation engine
-  animation_engine: AnimationEngine;
+  animation_engine: CharacterAnimationEngine;
   // lip sync engine
   lipSync_engine: LipSyncEngine;
   // emotion engine
@@ -65,7 +65,7 @@ export class TimeLine {
     audio_engine: AudioEngine,
     transform_engine: TransformEngine,
     lipsync_engine: LipSyncEngine,
-    animation_engine: AnimationEngine,
+    animation_engine: CharacterAnimationEngine,
     emotion_engine: EmotionEngine,
     scene: Scene,
     camera: THREE.Camera | null,
@@ -194,7 +194,6 @@ export class TimeLine {
         const result = this.editorEngine.sceneManager?.render_outliner(
           this.characters,
         );
-        //console.log(result);
         if (result) outlinerState.items.value = result.items;
         break;
       }
@@ -452,27 +451,41 @@ export class TimeLine {
   }
 
   public checkEditorCanPlay() {
-    this.editorEngine.can_playback = this.getEndPoint() > 1;
+    this.editorEngine.can_playback = this.getLastClipEnd() > 1;
     this.editorEngine.updateSelectedUI();
   }
 
-  public deleteObject(object_uuid: string) {
-    const object = this.scene.get_object_by_uuid(object_uuid);
-    if (object?.name === this.camera_name) {
+  // This method is NOT responsible for deletion of the object from scene or other editor parts
+  // It is only responsible for deleting the object from the timeline and its corresponding elements
+  public deleteObject(object: THREE.Object3D<THREE.Object3DEventMap>) {
+    if (!object) {
+      return
+    }
+
+    if (object.name === this.camera_name) {
       return;
     }
+
+    const object_uuid = object.uuid;
+
     this.timeline_items.forEach((element) => {
       if (
         element.type == ClipType.TRANSFORM &&
         element.object_uuid == object_uuid
       ) {
-        // console.log(element);
         this.scene.deletePoint(element.clip_uuid);
       }
     });
+
+    // TODO: In the future object should have relations that can be deleted inside the engines
+    // and the engines handle the deletion of objects.
+    // Character Animation Engine already does this.
     this.timeline_items = this.timeline_items.filter(
       (element) => element.object_uuid !== object_uuid,
     );
+
+    this.animation_engine.removeCharacter(object);
+
     // Update react land here.
   }
 
@@ -485,13 +498,15 @@ export class TimeLine {
     const type = data.type;
     const offset = data.offset;
     const end_offset = data.length + offset;
+    const object = this.scene.get_object_by_uuid(object_uuid);
     const object_name =
-      this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
+      object?.name ?? "undefined";
     const clip_uuid = data.clip_uuid;
 
     switch (type) {
       case "animation":
-        this.animation_engine.load_object(object_uuid, media_id, name);
+        await this.animation_engine.addCharacterAnimationMedia(object!, media_id, data);
+        this.animation_engine.evaluate(this.current_time, this.timeline_limit);
         break;
       case "transform":
         this.transform_engine.loadObject(object_uuid, data.length);
@@ -517,7 +532,7 @@ export class TimeLine {
               end_offset,
               0, // length
               this.scene.get_object_by_uuid(object_uuid)?.userData[
-                "media_file_type"
+              "media_file_type"
               ],
             ),
           );
@@ -549,7 +564,10 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public async addSelfAnimationClip(data: ClipUI, animation_clip: THREE.AnimationClip) {
+  public async addSelfAnimationClip(
+    data: ClipUI,
+    animation_clip: THREE.AnimationClip,
+  ) {
     const object_uuid = data.object_uuid;
     const media_id = data.media_id;
     const name = data.name;
@@ -558,13 +576,13 @@ export class TimeLine {
     const type = data.type;
     const offset = data.offset;
     const end_offset = data.length + offset;
+    const object = this.scene.get_object_by_uuid(object_uuid);
     const object_name =
-      this.scene.get_object_by_uuid(object_uuid)?.name ?? "undefined";
+      object?.name ?? "undefined";
     const clip_uuid = data.clip_uuid;
 
-    this.animation_engine.load_object(object_uuid, media_id, name);
-    this.animation_engine.clips[object_uuid + media_id].animation_clip = animation_clip;
-    
+    this.animation_engine.addCharacterAnimation(object!, animation_clip, data);
+
     // media id for this as well it can be downloaded
     this.addPlayableClip(
       new ClipUI(
@@ -663,6 +681,7 @@ export class TimeLine {
     const media_id = data.media_id;
     const clip_uuid = data.clip_uuid;
 
+    // Remove the clip from the items array
     for (let i = 0; i < this.timeline_items.length; i++) {
       const element = this.timeline_items[i];
       if (
@@ -673,6 +692,14 @@ export class TimeLine {
         this.timeline_items.splice(i, 1);
         break;
       }
+    }
+
+    // Once the clip is removed, we need to make sure the engines aren't tracking it either
+    // TODO: Ideally the engines should just handle this individually and we check them based on clip type/group
+    // This way we won't need to iterate over all timeline items
+    if (data.type === ClipType.ANIMATION) {
+      const object = this.scene.get_object_by_uuid(object_uuid)!;
+      this.animation_engine.removeAnimation(object, data)
     }
 
     this.checkEditorCanPlay();
@@ -729,9 +756,7 @@ export class TimeLine {
         this.audio_engine.loadClip(element.media_id);
         this.audio_engine.stopClip(element.media_id);
       } else if (element.type === ClipType.ANIMATION) {
-        this.animation_engine.clips[
-          element.object_uuid + element.media_id
-        ].stop();
+        this.animation_engine.stop();
       } else if (
         element.type === ClipType.AUDIO &&
         element.group === ClipGroup.CHARACTER
@@ -752,7 +777,7 @@ export class TimeLine {
     }
   }
 
-  public getEndPoint(): number {
+  public getLastClipEnd(): number {
     let longest = 0;
     for (const element of this.timeline_items) {
       if (longest < element.length) {
@@ -762,20 +787,19 @@ export class TimeLine {
     return longest;
   }
 
+  public getTimelineEnd(): number {
+    return filmLength.peek() * 1000;
+  }
+
   // called by the editor update loop on each frame
   public async update(
     isRendering = false,
     delta_time: number = 0,
   ): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
-    this.timeline_limit = this.getEndPoint();
+    this.timeline_limit = this.getTimelineEnd();
     if (this.is_playing) {
-      // When rendering we want to increase it by 1 but when in playback we want it dynamic based on deltatime.
-      if (isRendering) {
-        this.current_time += 1;
-      } else {
-        this.current_time += delta_time * this.editorEngine.cap_fps;
-      }
+      this.current_time += delta_time * 1000;
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
         currentTime: this.current_time,
       });
@@ -809,6 +833,11 @@ export class TimeLine {
     //this.scrubber_frame_position += 1;
     //2. allow stopping.
     //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
+
+    // Since the animation engine is newer we can just call an evaluation on it instead of having the timeline process it
+    this.animation_engine.evaluate(this.current_time, this.timeline_limit);
+
+    // Iterate over the clips and play them as fit
     for (const element of this.timeline_items) {
       if (
         element.offset <= this.scrubber_frame_position &&
@@ -843,7 +872,7 @@ export class TimeLine {
           //     element.object_uuid + element.media_id,
           //   this.scrubber_frame_position, element.offset);
           // }
-          await this.audio_engine.playClip(element.media_id);
+          this.audio_engine.playClip(element.media_id);
           await this.audio_engine.step(
             element.media_id,
             this.scrubber_frame_position,
@@ -861,21 +890,6 @@ export class TimeLine {
             this.lipSync_engine.clips[
               element.object_uuid + element.media_id
             ].step(this.scrubber_frame_position, element.offset);
-          }
-        } else if (element.type === ClipType.ANIMATION) {
-          if (object) {
-            await this.animation_engine.clips[
-              object.uuid + element.media_id
-            ].play(object);
-            const fps = 60;
-            await this.animation_engine.clips[
-              object.uuid + element.media_id
-            ].step(
-              (this.scrubber_frame_position - element.offset) / fps,
-              this.is_playing,
-              this.scrubber_frame_position, // Double FPS for best result.
-            );
-            //this.animation_engine.clips[object.uuid + element.media_id].update_bones();
           }
         } else if (element.type === ClipType.EXPRESSION) {
           if (object) {

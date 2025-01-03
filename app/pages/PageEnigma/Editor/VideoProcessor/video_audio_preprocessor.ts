@@ -1,7 +1,7 @@
 import { MediaFilesApi } from "~/Classes/ApiManager/MediaFilesApi";
 import { BucketConfig } from "~/api/BucketConfig";
 // import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
-import { ClipUI } from "../../datastructures/clips/clip_ui";
+import { ClipUI } from "../../clips/clip_ui";
 
 export interface VideoPreProcessorError {
   message: string;

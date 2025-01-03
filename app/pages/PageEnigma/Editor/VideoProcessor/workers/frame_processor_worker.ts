@@ -5,7 +5,7 @@ interface Task {
   id: number;
 }
 
-import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { ClipUI } from "~/pages/PageEnigma/clips/clip_ui";
 import { BlobReader, BlobWriter, ZipWriter } from "@zip.js/zip.js";
 
 class FrameProcessorWorker {

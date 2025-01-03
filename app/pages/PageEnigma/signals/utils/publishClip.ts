@@ -14,8 +14,8 @@ export function publishClip(
     action: toEngineActions.ADD_CLIP,
     data: newClip,
   });
-  if (offset + (dragItem.length ?? 0) > filmLength.value * 60) {
-    newClip.length = filmLength.value * 60 - offset;
+  if (offset + (dragItem.length ?? 0) > filmLength.value * 1000) {
+    newClip.length = filmLength.value * 1000 - offset;
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.UPDATE_CLIP,

@@ -12,7 +12,7 @@ import { MediaFileType } from "../enums";
 import { ChromaKeyMaterial } from "./chromakey";
 import { TimeLine } from "./timeline";
 import { ClipGroup, ClipType } from "~/enums";
-import { ClipUI } from "../datastructures/clips/clip_ui";
+import { ClipUI } from "../clips/clip_ui";
 
 class Scene {
   name: string;

@@ -1,11 +1,12 @@
 import * as THREE from "three";
 
 import environmentVariables from "~/Classes/EnvironmentVariables";
+import Ijson from "~/interfaces/Ijson";
 interface CsvJson {
   [key: string]: string[];
 }
 
-export class EmotionClip {
+export class EmotionClip implements Ijson {
   version: number;
   media_id: string;
   type: "expression";
@@ -94,7 +95,7 @@ export class EmotionClip {
           if (index === undefined) {
             index =
               element.morphTargetDictionary?.[
-                key.charAt(0).toLowerCase() + key.slice(1)
+              key.charAt(0).toLowerCase() + key.slice(1)
               ];
           }
           if (

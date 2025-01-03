@@ -22,7 +22,7 @@ export default function useTimelineClick(page: Pages) {
     if (newTime < 0) {
       return;
     }
-    const max = filmLength.value * 60;
+    const max = filmLength.value * 1000;
     if (newTime > max) {
       return;
     }

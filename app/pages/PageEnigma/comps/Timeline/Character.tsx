@@ -8,12 +8,11 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { CharacterTrack } from "~/pages/PageEnigma/models";
-import { MediaFileType } from "~/pages/PageEnigma/enums";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
-import { MediaFileAnimationType, ClipGroup, ClipType } from "~/enums";
+import { ClipGroup, ClipType } from "~/enums";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -143,26 +142,6 @@ export const Character = ({ character }: Props) => {
           updateKeyframe={updateClipPosition}
           group={ClipGroup.CHARACTER}
         />
-        {(character.animationType === MediaFileAnimationType.Mixamo ||
-          character.mediaType === MediaFileType.GLB) && (
-          <TrackClips
-            id={character.object_uuid}
-            clips={expressionClips}
-            updateClip={updateClipEmotions}
-            group={ClipGroup.CHARACTER}
-            type={ClipType.EXPRESSION}
-          />
-        )}
-        {editorEngine &&
-          editorEngine.isObjectLipsync(character.object_uuid) && (
-            <TrackClips
-              id={character.object_uuid}
-              clips={lipSyncClips}
-              updateClip={updateClipLipSync}
-              group={ClipGroup.CHARACTER}
-              type={ClipType.AUDIO}
-            />
-          )}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import { MediaItem } from "~/pages/PageEnigma/models";
 import { AssetType } from "~/enums";
 import { hideObjectPanel } from "../signals";
 
-export class Utils {
+export class SceneUtils {
   scene: Scene;
   editor: Editor;
   constructor(editor: Editor, scene: Scene) {
@@ -105,7 +105,7 @@ export class Utils {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.editor.sceneManager?.selected_objects) {
-      let object = this.editor.sceneManager?.selected_objects[0];
+      const object = this.editor.sceneManager?.selected_objects[0];
       if (object != undefined || object != null) {
         object.position.x = position.x;
         object.position.y = position.y;
@@ -184,7 +184,7 @@ export class Utils {
   }
 
   // Returns the "check sum" of the editors selected object.
-  getselectedSum(): number {
+  getSelectedSum(): number {
     if (this.editor.sceneManager?.selected_objects === undefined) {
       return 0;
     }
@@ -230,13 +230,18 @@ function removeObject3D(object3D) {
 
  */
 
-deleteObject(uuid: string) {
-  const obj = this.scene.get_object_by_uuid(uuid);
-  this.removeTransformControls();
-  if (obj?.name === this.editor.camera_name) {
-    return;
-  }
-  if (obj) {
+  deleteObject(uuid: string) {
+    const obj = this.scene.get_object_by_uuid(uuid);
+
+    if (!obj) {
+      return
+    }
+
+    this.removeTransformControls();
+    if (obj.name === this.editor.camera_name) {
+      return;
+    }
+
     // Finally remove the object from the scene
     this.scene.scene.remove(obj);
 
@@ -267,25 +272,28 @@ deleteObject(uuid: string) {
       (obj as THREE.Mesh).material.dispose();
     }
 
-    if((obj as THREE.Mesh).geometry){
+    if ((obj as THREE.Mesh).geometry) {
       (obj as THREE.Mesh).geometry.dispose()
     }
+
+    // TODO
+    // FIXME: Timeline deletion is called twice, as well as a queue event.
+    // Why is this necessary?
+    this.editor.timeline.deleteObject(obj);
+    Queue.publish({
+      queueName: QueueNames.FROM_ENGINE,
+      action: fromEngineActions.DELETE_OBJECT,
+      data: {
+        version: 1,
+        type: AssetType.OBJECT,
+        media_id: "",
+        object_uuid: uuid,
+        name: "",
+      } as MediaItem,
+    });
+    this.editor.selected = undefined;
+    this.editor.publishSelect();
+    hideObjectPanel();
+    this.editor.timeline.deleteObject(obj);
   }
-  this.editor.timeline.deleteObject(uuid);
-  Queue.publish({
-    queueName: QueueNames.FROM_ENGINE,
-    action: fromEngineActions.DELETE_OBJECT,
-    data: {
-      version: 1,
-      type: AssetType.OBJECT,
-      media_id: "",
-      object_uuid: uuid,
-      name: "",
-    } as MediaItem,
-  });
-  this.editor.selected = undefined;
-  this.editor.publishSelect();
-  hideObjectPanel();
-  this.editor.timeline.deleteObject(uuid);
-}
 }

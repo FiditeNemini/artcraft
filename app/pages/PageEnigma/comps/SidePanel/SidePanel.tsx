@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { usePosthogFeatureFlag } from "~/hooks/usePosthogFeatureFlag";
-import { FeatureFlags } from "~/enums";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
   dndSidePanelWidth,
@@ -14,9 +12,8 @@ import { TabItem, tabList } from "./tabList";
 
 export const SidePanel = () => {
   useSignals();
-  const initialTabIdx = usePosthogFeatureFlag(FeatureFlags.SHOW_SETS_TAB)
-    ? 0
-    : 0;
+
+  const initialTabIdx = 0;
   const [selectedTab, setSelectedTab] = useState<TabItem>(
     tabList[initialTabIdx],
   );

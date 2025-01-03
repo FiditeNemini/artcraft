@@ -9,7 +9,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 export const TimerGrid = () => {
   useSignals();
-  const sectionWidth = 60 * 4 * scale.value;
+  const sectionWidth = 1000 * 4 * scale.value;
   const scrollX = timelineScrollX.value;
 
   return (

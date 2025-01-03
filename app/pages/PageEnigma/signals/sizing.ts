@@ -5,8 +5,8 @@ import { pageWidth } from "~/signals";
 import { timelineScrollX } from "~/pages/PageEnigma/signals/timing";
 
 // timeline
-export const scale = signal(1);
-export const filmLength = signal(7);
+export const scale = signal(0.1);
+export const filmLength = signal(7); // seconds
 export const timelineHeight = signal(0);
 
 export const cameraMinimized = signal(false);
@@ -59,7 +59,7 @@ export const timelinePremiumLockPosition = computed(() => {
 });
 
 export const fullWidth = computed(() => {
-  return filmLength.value * 60 * 4 * scale.value;
+  return filmLength.value * 1000 * 4 * scale.value;
 });
 
 // side panel

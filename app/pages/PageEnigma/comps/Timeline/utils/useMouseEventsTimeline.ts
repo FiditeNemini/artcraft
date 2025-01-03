@@ -48,7 +48,7 @@ export const useMouseEventsTimeline = () => {
         if (newPosition < 0) {
           newPosition = 0;
         }
-        const max = filmLength.value * 60;
+        const max = filmLength.value * 1000;
         if (newPosition > max) {
           newPosition = max;
         }

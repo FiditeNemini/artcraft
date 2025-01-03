@@ -11,12 +11,11 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import AudioEngine from "./audio_engine.js";
-import TransformEngine from "./transform_engine.js";
-import EmotionEngine from "./emotion_engine";
+import AudioEngine from "./Engines/audio_engine.js";
+import TransformEngine from "./Engines/transform_engine.js";
+import EmotionEngine from "./Engines/emotion_engine";
 import { TimeLine } from "./timeline.js";
-import { LipSyncEngine } from "./lip_sync_engine.js";
-import { AnimationEngine } from "./animation_engine.js";
+import LipSyncEngine from "./Engines/lip_sync_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { EditorStates, CameraAspectRatio } from "~/pages/PageEnigma/enums";
 import { AssetType, ClipGroup } from "~/enums";
@@ -26,7 +25,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { editorState } from "../signals/engine";
-import { Utils } from "./helper";
+import { SceneUtils } from "./helper";
 import { VideoGeneration } from "./video_generation";
 import { MouseControls } from "./keybinds_controls";
 import { SaveManager } from "./save_manager";
@@ -52,6 +51,7 @@ import {
 import { BufferType, EngineFrameBuffers } from "./VideoProcessor/engine_buffer";
 
 import Stats from "three/examples/jsm/libs/stats.module.js";
+import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -105,7 +105,7 @@ class Editor {
   transform_engine: TransformEngine;
   emotion_engine: EmotionEngine;
   lipsync_engine: LipSyncEngine;
-  animation_engine: AnimationEngine;
+  animation_engine: CharacterAnimationEngine;
   timeline: TimeLine;
   current_frame: number;
   lockControls: PointerLockControls | undefined;
@@ -114,6 +114,7 @@ class Editor {
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
+  lastFrameTime: number;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -147,7 +148,7 @@ class Editor {
   // global names of scene entities
   camera_name: string;
 
-  utils: Utils;
+  utils: SceneUtils;
   videoGeneration: VideoGeneration;
   mouse_controls: MouseControls | undefined;
   save_manager: SaveManager;
@@ -221,7 +222,7 @@ class Editor {
       "" + this.version,
       this.camera_name,
       this.updateSurfaceIdAttributeToMesh.bind(this),
-      this.version
+      this.version,
     );
     this.activeScene.initialize();
     this.generating_preview = false;
@@ -247,6 +248,7 @@ class Editor {
     this.playback_location = 0;
     this.last_scrub = 0;
     this.frames = 0;
+    this.lastFrameTime = 0;
     this.last_selected_sum = 0;
     this.selectedCanvas = false;
     // Audio Engine Test.
@@ -259,7 +261,7 @@ class Editor {
     this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
-    this.animation_engine = new AnimationEngine(this.version);
+    this.animation_engine = new CharacterAnimationEngine(this.version);
 
     this.timeline = new TimeLine(
       this,
@@ -276,7 +278,7 @@ class Editor {
 
     this.activeScene.timeline = this.timeline;
 
-    this.utils = new Utils(this, this.activeScene);
+    this.utils = new SceneUtils(this, this.activeScene);
     this.videoGeneration = new VideoGeneration(this);
     this.save_manager = new SaveManager(this);
     this.current_frame = 0;
@@ -645,7 +647,7 @@ class Editor {
     this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
-    this.animation_engine = new AnimationEngine(this.version);
+    this.animation_engine = new CharacterAnimationEngine(this.version);
 
     this.timeline = new TimeLine(
       this,
@@ -946,14 +948,14 @@ class Editor {
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 1024
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 576
               : 1000;
         const height =
           this.render_camera_aspect_ratio === CameraAspectRatio.HORIZONTAL_16_9
             ? 576
             : this.render_camera_aspect_ratio ===
-                CameraAspectRatio.VERTICAL_9_16
+              CameraAspectRatio.VERTICAL_9_16
               ? 1024
               : 1000;
 
@@ -1070,8 +1072,7 @@ class Editor {
     return decision;
   }
 
-  // Basicly Unity 3D's update loop.
-  async updateLoop() {
+  async renderSingleFrame() {
     //console.timeEnd("Single Frame Time");
     //console.time("Single Frame Time");
     this.containerMayReset();
@@ -1144,11 +1145,11 @@ class Editor {
       }
     } else if (
       this.last_scrub === this.timeline.scrubber_frame_position &&
-      this.utils.getselectedSum() !== this.last_selected_sum
+      this.utils.getSelectedSum() !== this.last_selected_sum
     ) {
       this.updateSelectedUI();
     }
-    this.last_selected_sum = this.utils.getselectedSum();
+    this.last_selected_sum = this.utils.getSelectedSum();
 
     await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
@@ -1161,6 +1162,20 @@ class Editor {
       },
       1000 / (this.cap_fps * 2),
     ); // Get the most FPS we can out of the renderer.
+  }
+
+  // Basicly Unity 3D's update loop.
+  async updateLoop() {
+    // Performance improvement: Handle frame cap
+    // Request the next render already - this is necessary so the loop doesn't stop if the fps cap is hit
+    requestAnimationFrame(this.updateLoop.bind(this));
+    const frameTime = performance.now();
+    if (frameTime - this.lastFrameTime < 1000 / this.cap_fps) {
+      return;
+    }
+
+    this.lastFrameTime = frameTime;
+    this.renderSingleFrame();
   }
 
   change_mode(type: "translate" | "rotate" | "scale") {

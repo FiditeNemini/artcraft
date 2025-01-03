@@ -99,13 +99,6 @@ export const RowHeaders = () => {
               <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Position
               </div>
-              {(character.animationType === MediaFileAnimationType.Mixamo ||
-                character.mediaType === MediaFileType.GLB) && (
-                <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                  Expression
-                </div>
-              )}
-              <LipSyncSubHeader character={character} />
             </div>
           );
         })}

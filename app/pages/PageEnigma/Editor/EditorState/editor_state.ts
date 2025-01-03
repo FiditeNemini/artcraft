@@ -3,7 +3,7 @@ import { EditorStateJson } from "./EditorStateJSON";
 // import Scene from "../scene";
 // import { TimeLine } from "../timeline";
 import { SceneState } from "./scene_state";
-import { TimelineState } from "./timeline_state";
+import { TimelineState } from "./TimelineState";
 
 export class EditorState {
   version: number;

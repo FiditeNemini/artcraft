@@ -18,7 +18,7 @@ export const useMouseEventsScrubber = () => {
   const [time, setTime] = useState(-1);
 
   const getDelta = useCallback((event: MouseEvent) => {
-    const max = filmLength.value * 60;
+    const max = filmLength.value * 1000;
 
     const delta = Math.round(
       (event.clientX - clientX.current) / 4 / scale.value + currentTime.value,

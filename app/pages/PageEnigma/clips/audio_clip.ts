@@ -1,4 +1,5 @@
 import environmentVariables from "~/Classes/EnvironmentVariables";
+import Ijson from "~/interfaces/Ijson";
 
 interface AudioDataInterface {
   audioContext: AudioContext;
@@ -16,7 +17,7 @@ class AudioData implements AudioDataInterface {
   }
 }
 
-export class AudioClip {
+export class AudioClip implements Ijson {
   version: number;
   media_id: string;
   type: "audio";

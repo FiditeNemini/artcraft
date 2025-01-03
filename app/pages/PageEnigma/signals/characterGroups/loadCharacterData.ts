@@ -1,4 +1,4 @@
-import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { ClipUI } from "~/pages/PageEnigma/clips/clip_ui";
 import { CharacterTrack, Clip, Keyframe } from "~/pages/PageEnigma/models";
 import { ClipType } from "~/enums";
 import { characterGroup } from "~/pages/PageEnigma/signals";

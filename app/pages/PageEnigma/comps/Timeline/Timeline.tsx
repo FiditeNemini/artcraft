@@ -141,7 +141,7 @@ export const Timeline = () => {
             >
               <div
                 className=""
-                style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}
+                style={{ width: filmLength.value * 1000 * 4 * scale.value + 72 }}
               >
                 {currentPage.value === Pages.EDIT ? (
                   <>

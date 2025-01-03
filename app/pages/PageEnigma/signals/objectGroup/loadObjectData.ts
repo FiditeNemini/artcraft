@@ -1,4 +1,4 @@
-import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { ClipUI } from "~/pages/PageEnigma/clips/clip_ui";
 import { Keyframe, ObjectTrack } from "~/pages/PageEnigma/models";
 import { objectGroup } from "~/pages/PageEnigma/signals";
 

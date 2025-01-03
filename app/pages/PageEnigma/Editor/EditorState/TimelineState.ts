@@ -1,23 +1,24 @@
 import { deepCopySerializableObjects as deepCopy } from "~/utilities";
-import { AnimationEngine } from "../animation_engine";
-import AudioEngine from "../audio_engine";
-import EmotionEngine from "../emotion_engine";
-import { LipSyncEngine } from "../lip_sync_engine";
+import { ClipUI } from "../../clips/clip_ui";
+import AudioEngine from "../Engines/audio_engine";
+import EmotionEngine from "../Engines/emotion_engine";
+import LipSyncEngine from "../Engines/lip_sync_engine";
 import { TimeLine } from "../timeline";
-import TransformEngine from "../transform_engine";
+import TransformEngine from "../Engines/transform_engine";
 import { TimelineStateJson } from "./EditorStateJSON/timeline_state_json";
-import { ClipUI } from "../../datastructures/clips/clip_ui";
+import { CharacterAnimationEngine } from "../Engines/CharacterAnimationEngine";
+
 
 export class TimelineState {
   version: number;
   timeline_items: ClipUI[] | undefined;
   transform_engine: TransformEngine | undefined;
-  animation_engine: AnimationEngine | undefined;
+  animation_engine: CharacterAnimationEngine | undefined;
   audio_engine: AudioEngine | undefined;
   lipsync_engine: LipSyncEngine | undefined;
   emotion_engine: EmotionEngine | undefined;
 
-  constructor({ editorVersion }: { editorVersion: number }) {
+  constructor({ editorVersion }: { editorVersion: number; }) {
     this.version = editorVersion;
   }
 
@@ -37,7 +38,7 @@ export class TimelineState {
     });
   }
   public async initializeFromTimelineStateJson(
-    jsonObject: TimelineStateJson,
+    jsonObject: TimelineStateJson
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
@@ -62,3 +63,4 @@ export class TimelineState {
     return result;
   }
 }
+
