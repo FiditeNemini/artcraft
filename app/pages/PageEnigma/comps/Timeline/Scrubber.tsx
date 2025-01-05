@@ -5,6 +5,7 @@ import {
   timelineScrollX,
   pointerScrubber,
   secondaryScrubber,
+  frameTrackButtonWidthPx,
 } from "~/pages/PageEnigma/signals";
 import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -33,12 +34,12 @@ export const Scrubber = () => {
 
   return (
     <>
-      {pointerScrubber.value * 4 * scale.value - scrollX >= 0 && (
+      {pointerScrubber.value * 4 * scale.value - scrollX + frameTrackButtonWidthPx >= 0 && (
         <div
           className="absolute z-[20] flex cursor-ew-resize flex-col items-center"
           style={{
             top: 8,
-            left: pointerScrubber.value * 4 * scale.value + 199 - scrollX,
+            left: pointerScrubber.value * 4 * scale.value + 199 - scrollX + frameTrackButtonWidthPx,
           }}
           onPointerDown={onPointerDown}
         >
