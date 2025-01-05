@@ -64,3 +64,5 @@ export const fullWidth = computed(() => {
 
 // side panel
 export const sidePanelWidth = signal(0);
+
+export const frameTrackButtonWidthPx = 50;
