@@ -1,6 +1,6 @@
 import { Button } from "~/components";
 import { selectedTab, sidePanelVisible } from "~/pages/PageEnigma/signals";
-import { tabList } from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
+import { tabList } from "~/pages/PageEnigma/comps/SidePanel/tabList";
 
 export const SidePanelButtons = () => {
   return (

@@ -8,7 +8,7 @@ import {
   timelineHeight,
 } from "~/pages/PageEnigma/signals";
 import { SidePanelTabs } from "~/pages/PageEnigma/comps/SidePanelTabs";
-import { tabList } from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
+import { tabList } from "~/pages/PageEnigma/comps/SidePanel/tabList";
 import { RenderStoryContent } from "./RenderStoryContent";
 import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 
