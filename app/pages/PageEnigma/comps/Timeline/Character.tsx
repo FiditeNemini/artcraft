@@ -1,18 +1,21 @@
+import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useMemo } from "react";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
-import {
-  fullWidth,
-  minimizeIconPosition,
-  toggleCharacterMinimized,
-  updateCharacters,
-} from "~/pages/PageEnigma/signals";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { CharacterTrack } from "~/pages/PageEnigma/models";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
+import {
+  filmLength,
+  frameTrackButtonWidthPx,
+  fullWidth,
+  minimizeIconPosition,
+  scale,
+  toggleCharacterMinimized,
+  updateCharacters
+} from "~/pages/PageEnigma/signals";
 
-import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 import { ClipGroup, ClipType } from "~/enums";
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -87,13 +90,13 @@ export const Character = ({ character }: Props) => {
     return (
       <div
         id={`track-character-${character.object_uuid}`}
-        className="relative flex h-[30px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4"
-        style={{ width: fullWidth.value + 16 }}
+        className="relative flex h-[30px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4 box-content"
+        style={{ width: filmLength.value * 1000 * 4 * scale.value + frameTrackButtonWidthPx * 2 }}
       >
         <button
           className="absolute"
           style={{
-            left: minimizeIconPosition.value,
+            right: minimizeIconPosition.value,
           }}
           onClick={(event) => {
             event.stopPropagation();
@@ -111,13 +114,12 @@ export const Character = ({ character }: Props) => {
     <div
       id={`track-character-${character.object_uuid}`}
       className="relative block rounded-r-lg bg-character-groupBg pb-2 pr-4"
-      style={{ width: fullWidth.value + 16 }}
     >
       <div className="flex h-[30px] items-center justify-end">
         <button
           className="absolute"
           style={{
-            left: minimizeIconPosition.value,
+            right: minimizeIconPosition.value,
           }}
           onClick={(event) => {
             event.stopPropagation();

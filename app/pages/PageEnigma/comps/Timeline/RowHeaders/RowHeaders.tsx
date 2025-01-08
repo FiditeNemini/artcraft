@@ -93,7 +93,7 @@ export const RowHeaders = () => {
                   <CharacterHeader name={character.name} />
                 </div>
               </div>
-              <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+              <div className="mb-1 flex h-[60px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Animation
               </div>
               <div className="mb-1 flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
@@ -143,7 +143,7 @@ export const RowHeaders = () => {
             </div>
           </div>
         ) : (
-          <div className="mb-1 h-[72px] w-full rounded-l-lg bg-global_audio-groupBg">
+          <div className="mb-1 h-[102px] w-full rounded-l-lg bg-global_audio-groupBg">
             <div className="h-[30px]  text-xs font-medium text-white">
               <div
                 className={[
@@ -154,7 +154,7 @@ export const RowHeaders = () => {
                 <GlobalAudioHeader />
               </div>
             </div>
-            <div className="flex h-[30px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+            <div className="flex h-[60px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
               <div className="flex gap-3">
                 Track 1
                 <button

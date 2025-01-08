@@ -6,6 +6,7 @@ import { Audio } from "./Audio";
 import {
   characterGroup,
   filmLength,
+  frameTrackButtonWidthPx,
   ignoreKeyDelete,
   isHotkeyDisabled,
   objectsMinimized,
@@ -139,15 +140,12 @@ export const Timeline = () => {
                 height: timelineHeight.value - 36,
               }}
             >
-              <div
-                className=""
-                style={{ width: filmLength.value * 1000 * 4 * scale.value + 72 }}
-              >
+              <div className="w-fit">
                 {currentPage.value === Pages.EDIT ? (
                   <>
                     <PremiumLockTimeline locked={false} />
                     <Characters />
-                    <div className="pb-1 pr-8">
+                    <div className="pb-1 pr-4">
                       <Camera />
                     </div>
                     <div className="pb-1 pr-8">

@@ -5,15 +5,18 @@ import {
   canDrop,
   dragItem,
   filmLength,
+  frameTrackButtonWidthPx,
   scale,
 } from "~/pages/PageEnigma/signals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowUp, faImage } from "@fortawesome/pro-solid-svg-icons";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 import { ClipGroup, ClipType } from "~/enums";
 import { currentPage } from "~/signals";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import { getCanDrop } from "~/pages/PageEnigma/comps/Timeline/utils/getCanDrop";
+import { ButtonIconStack } from "~/components/reusable/ButtonIconStack";
+import CharacterFrameButton, { CharacterFrameTarget } from "./CharacterFrameButtons";
 
 interface Props {
   id: string;
@@ -92,39 +95,43 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     <div
       id={`track-${trackType}-${id}`}
       className={[
-        "relative mb-1 block h-[30px] w-full rounded-md",
-        `bg-${group}-unselected`,
-        clips.length === 0 ? "border border-dashed border-white/30" : "",
+        "relative mb-1 flex h-[60px] w-fit rounded-md overflow-clip",
       ].join(" ")}
+      style={{ marginLeft: (group === ClipGroup.CHARACTER ? 0 : frameTrackButtonWidthPx) }}
     >
+      {(group === ClipGroup.CHARACTER &&
+        <CharacterFrameButton className={"h-full rounded-l-md"} target={CharacterFrameTarget.Start} characterId={id} />
+      )}
       <div
         className={[
-          "absolute inset-0 rounded-md",
+          `bg-${group}-unselected inset-0`,
           canDropAsset
             ? "animate-pulse bg-white/30 duration-[750ms]"
-            : "opacity-0",
+            : "",
         ].join(" ")}
+        style={{ left: frameTrackButtonWidthPx, width: filmLength.value * 1000 * 4 * scale.value }}
         onPointerOver={onPointerOver}
         onPointerMove={onPointerMove}
-      />
-      {clips.map((clip, index) => (
-        <TrackClip
-          key={clip.clip_uuid}
-          min={
-            index > 0 ? clips[index - 1].offset + clips[index - 1].length : 0
-          }
-          max={
-            index < clips.length - 1
-              ? clips[index + 1].offset
-              : filmLength.value * 1000
-          }
-          group={group}
-          updateClip={updateClip}
-          clip={clip}
-        />
-      ))}
+      >
+        {clips.map((clip, index) => (
+          <TrackClip
+            key={clip.clip_uuid}
+            min={
+              index > 0 ? clips[index - 1].offset + clips[index - 1].length : 0
+            }
+            max={
+              index < clips.length - 1
+                ? clips[index + 1].offset
+                : filmLength.value * 1000
+            }
+            group={group}
+            updateClip={updateClip}
+            clip={clip}
+          />
+        ))}
+      </div>
       {clips.length === 0 && currentPage.value === Pages.EDIT && (
-        <div className="prevent-select absolute flex h-full items-center gap-2 ps-2 text-xs font-medium text-white">
+        <div className="prevent-select absolute flex h-full items-center gap-2 ps-2 text-xs font-medium text-white" style={{ marginLeft: frameTrackButtonWidthPx + 10 }}>
           <div className="animate-bounce">
             <FontAwesomeIcon icon={faArrowUp} className="text-white/80" />
           </div>
@@ -142,6 +149,9 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
                       : "Drag and drop uploaded music clips or sound effects from the audio tab here"}
           </div>
         </div>
+      )}
+      {(group === ClipGroup.CHARACTER &&
+        <CharacterFrameButton className={"h-full rounded-r-md"} target={CharacterFrameTarget.End} characterId={id} />
       )}
     </div>
   );

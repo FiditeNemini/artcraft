@@ -5,7 +5,7 @@ import { pageWidth } from "~/signals";
 import { timelineScrollX } from "~/pages/PageEnigma/signals/timing";
 
 // timeline
-export const scale = signal(0.1);
+export const scale = signal(0.02);
 export const filmLength = signal(7); // seconds
 export const timelineHeight = signal(0);
 
@@ -44,12 +44,7 @@ export const fullHeight = computed(() => {
   );
 });
 
-export const minimizeIconPosition = computed(() => {
-  return Math.min(
-    pageWidth.value - 270 + timelineScrollX.value,
-    fullWidth.value - 24,
-  );
-});
+export const minimizeIconPosition = signal(20);
 
 export const timelinePremiumLockPosition = computed(() => {
   return Math.min(
@@ -65,4 +60,4 @@ export const fullWidth = computed(() => {
 // side panel
 export const sidePanelWidth = signal(0);
 
-export const frameTrackButtonWidthPx = 50;
+export const frameTrackButtonWidthPx = 80;

@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import {
   currentTime,
   filmLength,
+  frameTrackButtonWidthPx,
   scale,
   selectedItem,
   stylizeScrollX,
@@ -17,7 +18,7 @@ export default function useTimelineClick(page: Pages) {
     const scrollX =
       page === Pages.EDIT ? timelineScrollX.value : stylizeScrollX.value;
     const newTime = Math.round(
-      (event.clientX + scrollX - 204) / 4 / scale.value,
+      (event.clientX + scrollX - 204 - frameTrackButtonWidthPx) / 4 / scale.value,
     );
     if (newTime < 0) {
       return;
@@ -33,5 +34,5 @@ export default function useTimelineClick(page: Pages) {
       action: toEngineActions.UPDATE_TIME,
       data: { currentTime: newTime },
     });
-  }, []);
+  }, [page]);
 }

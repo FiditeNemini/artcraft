@@ -43,13 +43,12 @@ export const Camera = () => {
     <div
       id="track-camera"
       className="relative block rounded-r-lg bg-camera-groupBg pb-2 pr-4"
-      style={{ width: fullWidth.value + 16 }}
     >
       <div className="flex justify-end">
         <button
           className="absolute"
           style={{
-            left: minimizeIconPosition.value,
+            right: minimizeIconPosition.value,
           }}
           onClick={(event) => {
             event.stopPropagation();
