@@ -123,6 +123,7 @@ export default {
         clip: "#7E92DA",
         groupBg: "#2B3448",
         titleBg: "#384763",
+        frame: "#6B83D8"
       },
       camera: {
         unselected: "#466C7C",
