@@ -1,3 +1,4 @@
+import { EIntermediateFile } from "~/enums/EIntermediateFile";
 import { ApiManager, ApiResponse } from "./ApiManager";
 import { FilterEngineCategories, Visibility } from "~/enums";
 
@@ -169,16 +170,18 @@ export class MediaUploadApi extends ApiManager {
     uuid,
     maybe_title,
     maybe_visibility = Visibility.Public,
+    is_intermediate_system_file = EIntermediateFile.true
   }: {
     blob: Blob;
     fileName: string;
     uuid: string;
     maybe_title?: string | undefined;
     maybe_visibility?: Visibility | undefined;
+    is_intermediate_system_file?: EIntermediateFile;
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/image`;
     const options: Record<string, string | number | undefined> = {
-      is_intermediate_system_file: "true",
+      is_intermediate_system_file: is_intermediate_system_file.toString(),
       maybe_title,
       maybe_visibility: maybe_visibility?.toString(),
     };
