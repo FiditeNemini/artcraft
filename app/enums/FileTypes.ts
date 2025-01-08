@@ -31,6 +31,13 @@ export enum THUMBNAILS_FILE_TYPE {
   GIF = "gif",
 }
 
+export enum CHARACTER_FRAME_FILE_TYPE {
+  PNG = "png",
+  JPG = "jpg",
+  JPEG = "jpeg",
+  GIF = "gif",
+}
+
 export enum OBJECT_FILE_TYPE {
   GLB = "glb",
 }
@@ -43,7 +50,7 @@ export enum CHARACTER_MMD_FILE_TYPE {
 
 export enum CHARACTER_MIXAMO_FILE_TYPE {
   GLB = "glb",
-  // FBX = "FBX",
-  // OBJ = "OBJ",
-  // ZIP = "ZIP",
+// FBX = "FBX",
+// OBJ = "OBJ",
+// ZIP = "ZIP",
 }
