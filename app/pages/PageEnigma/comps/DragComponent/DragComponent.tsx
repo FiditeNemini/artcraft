@@ -8,6 +8,7 @@ import {
 } from "~/pages/PageEnigma/signals";
 import { useSignals } from "@preact/signals-react/runtime";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
+import { MIN_ANIM_DURATION } from "~/constants";
 
 export const DragComponent = () => {
   useSignals();
@@ -38,8 +39,8 @@ export const DragComponent = () => {
               top: DndAsset.overElement.top,
               left: currX + 1,
               zIndex: 10000,
-              width: (dragItem.value.length ?? 0) * 4 * scale.value,
-              height: 30,
+              width: Math.max(dragItem.value.length ?? 0, MIN_ANIM_DURATION) * 4 * scale.value,
+              height: 80,
             }}
           />
           <div
@@ -53,7 +54,7 @@ export const DragComponent = () => {
               bottom: timelineHeight.value - 60,
               left: currX + 1,
               zIndex: 10000,
-              width: (dragItem.value.length ?? 0) * 4 * scale.value,
+              width: Math.max(dragItem.value.length ?? 0, MIN_ANIM_DURATION) * 4 * scale.value,
               height: 16,
             }}
           />

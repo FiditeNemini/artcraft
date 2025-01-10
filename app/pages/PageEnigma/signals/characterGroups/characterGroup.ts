@@ -29,6 +29,7 @@ export function addCharacterAnimation({
   characterId: string;
   offset: number;
 }) {
+  console.log("Adding character animation of length ", dragItem.length);
   const clip_uuid = uuid.v4();
   const newClip = {
     version: 1,
