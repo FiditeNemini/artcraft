@@ -14,6 +14,7 @@ import { ToastTypes, ClipGroup, ClipType } from "~/enums";
 import { addToast } from "~/signals";
 // import { filmLength } from "~/pages/PageEnigma/signals";
 import { publishClip } from "~/pages/PageEnigma/signals/utils/publishClip";
+import { MIN_ANIM_DURATION } from "~/constants";
 
 export const characterGroup = signal<CharacterGroup>({
   id: "CG1",
@@ -37,7 +38,7 @@ export function addCharacterAnimation({
     group: ClipGroup.CHARACTER,
     type: ClipType.ANIMATION,
     offset,
-    length: dragItem.length,
+    length: Math.max(dragItem.length ?? 0, MIN_ANIM_DURATION),
     clip_uuid,
     name: dragItem.name,
     object_uuid: characterId,

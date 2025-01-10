@@ -9,3 +9,4 @@ export const SEVEN_SECONDS = 7000;
 export const TEN_SECONDS = 10000;
 
 export const MAX_FAILED_FETCHES = 5;
+export const MIN_ANIM_DURATION = 500; // millis
