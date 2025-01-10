@@ -95,7 +95,7 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     <div
       id={`track-${trackType}-${id}`}
       className={[
-        "relative mb-1 flex h-[60px] w-fit rounded-md overflow-clip",
+        "relative mb-1 flex h-[60px] w-fit rounded-md overflow-hidden",
       ].join(" ")}
       style={{ marginLeft: (group === ClipGroup.CHARACTER ? 0 : frameTrackButtonWidthPx) }}
     >

@@ -1,11 +1,18 @@
-import { faImage } from "@fortawesome/pro-solid-svg-icons";
+import { faImage, faTrashCan } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIconStack } from "~/components/reusable/ButtonIconStack";
 import { frameTrackButtonWidthPx } from "../../signals";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { EngineContext } from "../../contexts/EngineContext";
 import { CHARACTER_FRAME_FILE_TYPE } from "~/enums";
 import { UploadModalMedia } from "~/components/reusable/UploadModalMedia";
 import { UploadImageMediaModal } from "~/components/reusable/UploadModalMedia/UploadImageMediaModal";
+import { MediaFilesApi } from "~/Classes/ApiManager";
+import { MediaFile } from "../../models";
+import { ApiResponse } from "~/Classes/ApiManager/ApiManager";
+import { get_media_url } from "~/Classes/ApiHelpers";
+import { twMerge } from "tailwind-merge";
+import { ButtonIcon } from "~/components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export enum CharacterFrameTarget {
   Start,
@@ -31,25 +38,93 @@ export default function CharacterFrameButton(
   }: CharacterFrameButtonProps
 ) {
 
+  const clickable = useRef(true);
   const editorEngine = useContext(EngineContext);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [mediaFile, setMediaFile] = useState<string | undefined>(undefined);
 
   const handleFrameClick = useCallback(() => {
+    if (!clickable.current) {
+      return;
+    }
 
-  })
+    // Make button unresponsive to clicks until modal is closed
+    clickable.current = false;
+    setIsUploadModalOpen(true);
+  }, [])
 
-  return (
-    <>
-      <div className={className} style={{ minWidth: frameTrackButtonWidthPx, width: frameTrackButtonWidthPx }}>
-        <ButtonIconStack icon={faImage} additionalStyle="bg-character-frame" text={CharacterFrameStrings[target]} onClick={() => setIsUploadModalOpen(true)} />
-      </div>
-      <UploadImageMediaModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        onSuccess={(data) => { console.log(data); setIsUploadModalOpen(false) }}
-        title={"Upload Character Frame Image"}
-        fileTypes={Object.values(CHARACTER_FRAME_FILE_TYPE)}
-      />
-    </>
-  )
+
+  const unlockButton = useCallback(() => {
+    clickable.current = true;
+    setIsUploadModalOpen(false);
+  }, [setIsUploadModalOpen]);
+
+
+  const handleFrameSet = useCallback((token?: string) => {
+    if (!token) {
+      return;
+    }
+
+    // TODO: Fetch the image and pass the token to the character engine
+
+    // Fetch the image and set as button bg
+    get_media_url(token)
+      .then((url) => {
+        setMediaFile(url);
+      })
+      .catch((error) => {
+        console.error("Error fetching media file", error);
+      })
+      .finally(() => {
+        unlockButton();
+      })
+
+  }, [unlockButton, setMediaFile]);
+
+  const handleDeleteFrame = useCallback(() => {
+    setMediaFile(undefined);
+    unlockButton();
+  }, [unlockButton, setMediaFile]);
+
+
+  if (!mediaFile) {
+    return (
+      <>
+        <div className={className} style={{ minWidth: frameTrackButtonWidthPx, width: frameTrackButtonWidthPx }}>
+          <ButtonIconStack icon={faImage} additionalStyle="bg-character-frame" text={CharacterFrameStrings[target]} onClick={handleFrameClick} />
+        </div>
+        <UploadImageMediaModal
+          isOpen={isUploadModalOpen}
+          onClose={unlockButton}
+          onSuccess={handleFrameSet}
+          title={"Upload Character Frame Image"}
+          fileTypes={Object.values(CHARACTER_FRAME_FILE_TYPE)}
+        />
+      </>
+    )
+  } else {
+    const classes = twMerge([
+      className,
+      "bg-character-unselected overflow-hidden"
+    ]);
+
+    const buttonClasses = twMerge([
+      "absolute flex box-content top-1 right-1 w-6 h-6 rounded-md invisible group-hover:visible items-center justify-center",
+      "bg-gray-800 hover:bg-red text-gray-500 hover:text-gray-100 border-2 border-transparent hover:border-white",
+      "transition-all duration-150",
+    ])
+
+    return (
+      <>
+        <div className={classes} style={{ minWidth: frameTrackButtonWidthPx, width: frameTrackButtonWidthPx }}>
+          <div className={"rounded-md w-full h-full relative group border-2 border-gray-400"}>
+            <img crossOrigin="anonymous" src={mediaFile} alt={CharacterFrameStrings[target]} className={"rounded-md object-cover w-full h-full"} />
+            <button className={buttonClasses} onClick={handleDeleteFrame}>
+              <FontAwesomeIcon icon={faTrashCan} size={"xs"} className={""} />
+            </button>
+          </div>
+        </div>
+      </>
+    )
+  }
 }

@@ -11,7 +11,7 @@ import { UploadImageMedia } from "./UploadImageMedia";
 
 interface Props {
   onClose: () => void;
-  onSuccess: (data?: unknown) => void;
+  onSuccess: (data?: string) => void;
   isOpen: boolean;
   title: string;
   fileTypes: string[];

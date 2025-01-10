@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   canDrop,
   dragItem,
+  frameTrackButtonWidthPx,
   scale,
   selectedItem,
 } from "~/pages/PageEnigma/signals";
@@ -54,7 +55,7 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
             : "",
         ].join(" ")}
         style={{
-          left: offset * 4 * scale.value,
+          left: offset * 4 * scale.value + frameTrackButtonWidthPx,
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
         onPointerMove={() => {
@@ -83,7 +84,7 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
         ].join(" ")}
         style={{
           width: length * 4 * scale.value - 30,
-          left: offset * 4 * scale.value + 15,
+          left: offset * 4 * scale.value + 15 + frameTrackButtonWidthPx,
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
@@ -116,7 +117,7 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
             : "",
         ].join(" ")}
         style={{
-          left: offset * 4 * scale.value + length * 4 * scale.value - 15,
+          left: offset * 4 * scale.value + length * 4 * scale.value - 15 + frameTrackButtonWidthPx,
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
         onPointerMove={() => {
