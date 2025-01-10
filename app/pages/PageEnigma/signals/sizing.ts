@@ -5,7 +5,7 @@ import { pageWidth } from "~/signals";
 import { timelineScrollX } from "~/pages/PageEnigma/signals/timing";
 
 // timeline
-export const scale = signal(0.02);
+export const scale = signal(0.05);
 export const filmLength = signal(7); // seconds
 export const timelineHeight = signal(0);
 
@@ -61,3 +61,5 @@ export const fullWidth = computed(() => {
 export const sidePanelWidth = signal(0);
 
 export const frameTrackButtonWidthPx = 80;
+export const dragHandleWidth = 10;
+export const unitPx = 4; // Used for front-end dimension calculation between time and px
