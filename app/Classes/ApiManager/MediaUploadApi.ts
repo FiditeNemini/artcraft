@@ -181,7 +181,7 @@ export class MediaUploadApi extends ApiManager {
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/media_files/upload/image`;
     const options: Record<string, string | number | undefined> = {
-      is_intermediate_system_file: is_intermediate_system_file.toString(),
+      is_intermediate_system_file: EIntermediateFile[is_intermediate_system_file],
       maybe_title,
       maybe_visibility: maybe_visibility?.toString(),
     };
