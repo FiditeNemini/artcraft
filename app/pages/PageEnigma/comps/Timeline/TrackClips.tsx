@@ -17,6 +17,7 @@ import { Pages } from "~/pages/PageEnigma/constants/page";
 import { getCanDrop } from "~/pages/PageEnigma/comps/Timeline/utils/getCanDrop";
 import { ButtonIconStack } from "~/components/reusable/ButtonIconStack";
 import CharacterFrameButton, { CharacterFrameTarget } from "./CharacterFrameButtons";
+import { MIN_ANIM_DURATION } from "~/constants";
 
 interface Props {
   id: string;
@@ -60,10 +61,10 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     // Now check if the clip fits
     const position = track.getBoundingClientRect();
     const clipOffset = Math.round(
-      (event.clientX - position.x) / 4 / scale.value,
+      (event.clientX - position.x - frameTrackButtonWidthPx) / 4 / scale.value,
     );
 
-    if (clipOffset + 500 > filmLength.value * 1000) {
+    if (clipOffset + MIN_ANIM_DURATION > filmLength.value * 1000) {
       DndAsset.notDropText = "Not enough room to hold item";
       canDrop.value = false;
       return;
