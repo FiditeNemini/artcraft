@@ -3,6 +3,7 @@ import { faFlask, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { useLocalize } from "hooks";
 import AIToolsRow from "./AIToolsRow";
 import { useLocation } from "react-router-dom";
+import { isVideoToolsEnabled } from "config/featureFlags";
 
 export default function AITools() {
   const { t } = useLocalize("LandingPage");
@@ -27,65 +28,52 @@ export default function AITools() {
   };
 
   let items: Item[] = [
-    {
-      to: "/style-video",
-      title: t("productVideoStyleTransferTitle"),
-      text: t("productVideoStyleTransferText"),
-      videoSrc: "/videos/ai-tools/vst_video.mp4",
-      videoPosterSrc: "/images/ai-tools/vst",
-      imgAlt: "Video Style Transfer",
-      badgeContent: {
-        type: "new",
-        icon: faSparkles,
-        label: "NEW",
-      },
-    },
-    {
-      to: "/ai-live-portrait",
-      title: t("productLivePortraitTitle"),
-      text: t("productLivePortraitText"),
-      videoSrc: "/videos/ai-tools/lp_video.mp4",
-      videoPosterSrc: "/images/ai-tools/live_portrait",
-      imgAlt: "Live Portrait",
-      badgeContent: {
-        type: "new",
-        icon: faSparkles,
-        label: "NEW",
-      },
-    },
-    {
-      to: "/face-animator",
-      title: t("productLipsyncTitle"),
-      text: t("productLipsyncText"),
-      videoSrc: "/videos/ai-tools/ls_video.mp4",
-      videoPosterSrc: "/images/ai-tools/lipsync",
-      imgAlt: "Lipsync",
-    },
-    // {
-    //   to: "/beta/2d-video-compositor",
-    //   title: "2D Video Compositor",
-    //   text: "Compose videos and images with AI",
-    //   videoSrc: "/videos/ai-tools/vcomp_video_2.mp4",
-    //   videoPosterSrc: "/images/ai-tools/2d_vid_com",
-    //   imgAlt: "Video Compositor",
-    //   videoPosition: "top",
-    // },
-    // {
-    //   to: "/beta/3d-video-compositor",
-    //   title: "3D Video Compositor",
-    //   text: "Build videos with AI 3D engine",
-    //   videoSrc: "/videos/ai-tools/vcomp_video.mp4",
-    //   videoPosterSrc: "/images/ai-tools/3d_vid_com",
-    //   imgAlt: "Video Compositor",
-    // },
-    {
-      to: "/webcam-acting",
-      title: "Webcam Acting",
-      text: "Act as your character through your camera",
-      videoSrc: "/videos/ai-tools/ca_video.mp4",
-      videoPosterSrc: "/images/ai-tools/webcam_acting",
-      imgAlt: "Video Compositor",
-    },
+    ...(isVideoToolsEnabled()
+      ? [
+          {
+            to: "/style-video",
+            title: t("productVideoStyleTransferTitle"),
+            text: t("productVideoStyleTransferText"),
+            videoSrc: "/videos/ai-tools/vst_video.mp4",
+            videoPosterSrc: "/images/ai-tools/vst",
+            imgAlt: "Video Style Transfer",
+            badgeContent: {
+              type: "new",
+              icon: faSparkles,
+              label: "NEW",
+            },
+          },
+          {
+            to: "/ai-live-portrait",
+            title: t("productLivePortraitTitle"),
+            text: t("productLivePortraitText"),
+            videoSrc: "/videos/ai-tools/lp_video.mp4",
+            videoPosterSrc: "/images/ai-tools/live_portrait",
+            imgAlt: "Live Portrait",
+            badgeContent: {
+              type: "new",
+              icon: faSparkles,
+              label: "NEW",
+            },
+          },
+          {
+            to: "/face-animator",
+            title: t("productLipsyncTitle"),
+            text: t("productLipsyncText"),
+            videoSrc: "/videos/ai-tools/ls_video.mp4",
+            videoPosterSrc: "/images/ai-tools/lipsync",
+            imgAlt: "Lipsync",
+          },
+          {
+            to: "/webcam-acting",
+            title: "Webcam Acting",
+            text: "Act as your character through your camera",
+            videoSrc: "/videos/ai-tools/ca_video.mp4",
+            videoPosterSrc: "/images/ai-tools/webcam_acting",
+            imgAlt: "Video Compositor",
+          },
+        ]
+      : []),
     {
       to: "/tts",
       title: t("productTtsTitle"),
@@ -125,32 +113,6 @@ export default function AITools() {
       text: "Zero-shot voice conversion",
       imgSrc: "/images/landing/select-seed-vc.webp",
       imgAlt: "Zero-shot Voice Conversion",
-    },
-    {
-      to: "/hallo2",
-      title: "Hallo2 Portrait Animation",
-      text: "High-res, long-duration and audio-driven",
-      imgSrc: "/images/landing/select-hallo2.webp",
-      imgAlt: "High-resolution, long-duration and audio-driven",
-    },
-    {
-      to: "/cogvideo",
-      title: "CogVideo Generation",
-      text: "Text and image to video generation",
-      imgSrc: "/images/landing/select-cogvideo.webp",
-      imgAlt: "Text and image to video generation",
-    },
-    {
-      to: "/board",
-      title: "Storyteller Board",
-      text: "Create visual stories on our intelligent canvas",
-      imgSrc: "/images/landing/select-board.webp",
-      imgAlt: "Create visual stories on our intelligent canvas",
-      badgeContent: {
-        type: "new",
-        icon: faSparkles,
-        label: "NEW",
-      },
     },
   ];
 

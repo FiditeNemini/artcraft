@@ -2,12 +2,19 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Panel } from "components/common";
 import "./AIFaceMirrorCTA.scss";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 
 interface Props {
   className?: string;
 }
 
 export default function AIFaceMirrorCTA({ className }: Props) {
+  const { isVideoToolsEnabled } = useFeatureFlags();
+
+  if (!isVideoToolsEnabled()) {
+    return null;
+  }
+
   return (
     <Panel className="cta-ai-face-mirror">
       <Link

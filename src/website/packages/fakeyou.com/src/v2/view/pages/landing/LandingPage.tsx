@@ -2,7 +2,7 @@ import React from "react";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container } from "components/common";
-// import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
+import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import "./LandingPage.scss";
 import {
@@ -12,6 +12,7 @@ import {
 import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding";
 import MentionsSection from "components/common/MentionsSection";
 import { useSession } from "hooks";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 
 export default function LandingPage() {
   PosthogClient.recordPageview();
@@ -29,18 +30,18 @@ export default function LandingPage() {
 
   const isLoggedIn = sessionWrapper.isLoggedIn();
 
+  const { isVideoToolsEnabled } = useFeatureFlags();
+
   return (
     <>
       {domain.website === Website.StorytellerAi && <PostlaunchLanding />}
       {domain.website === Website.FakeYou && (
         <>
           <Container type="panel">
-            <Dashboard {...{ experimental: true }} />
-
-            {/* FAKEYOU.COM */}
-            {/*              !isLoggedIn && (
-              <FakeYouLandingHeader {...{ experimental: true }} />
-            )*/}
+            {!isVideoToolsEnabled() && !sessionWrapper.isLoggedIn() && (
+              <FakeYouLandingHeader />
+            )}
+            <Dashboard />
           </Container>
           {!isLoggedIn && (
             <Container type="panel">

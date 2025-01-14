@@ -8,17 +8,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Panel } from "components/common";
 import { AITools } from "components/marketing";
 import { useLocalize, useSession } from "hooks";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 import React from "react";
 import { Link } from "react-router-dom";
 
-interface DashboardProps {
-  experimental?: boolean;
-}
-
-export default function Dashboard({ experimental }: DashboardProps) {
+export default function Dashboard() {
   const { sessionWrapper } = useSession();
   const { t } = useLocalize("LandingPage");
   const isLoggedIn = sessionWrapper.isLoggedIn();
+  const { isVideoToolsEnabled } = useFeatureFlags();
 
   let uploadModelSection = <></>;
 
@@ -67,16 +65,16 @@ export default function Dashboard({ experimental }: DashboardProps) {
   return (
     <Panel
       {...{
-        className: experimental ? "" : "section",
+        className: !isVideoToolsEnabled ? "" : "pt-5 pb-5",
       }}
       clear={true}
     >
       <h1
         {...{
-          className: `fw-bold mb-4${experimental ? " mt-4" : ""}`,
+          className: `fw-bold mb-4 ${!isVideoToolsEnabled ? " mt-4" : ""}`,
         }}
       >
-        {experimental
+        {!isVideoToolsEnabled
           ? "Explore our collection of AI tools"
           : t("productsTitle")}
       </h1>

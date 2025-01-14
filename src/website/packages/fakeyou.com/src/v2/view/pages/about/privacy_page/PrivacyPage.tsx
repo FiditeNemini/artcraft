@@ -6,7 +6,7 @@ import { GetWebsite } from "@storyteller/components/src/env/GetWebsite";
 
 interface Props {}
 
-function PrivacyPage(props: Props) {
+export default function PrivacyPage(props: Props) {
   PosthogClient.recordPageview();
   usePrefixedDocumentTitle("Privacy Statement");
   const domain = GetWebsite();
@@ -1215,5 +1215,3 @@ function PrivacyPage(props: Props) {
     </div>
   );
 }
-
-export { PrivacyPage };

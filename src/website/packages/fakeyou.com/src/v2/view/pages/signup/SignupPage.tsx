@@ -28,6 +28,7 @@ import { GOOGLE_AUTH_SIGN_IN_SCRIPT, InjectScript } from "common/InjectScript";
 import { Button } from "components/common";
 import SetUsernameModal from "./SetUsernameModal";
 import { useModal } from "hooks";
+import { isVideoToolsEnabled } from "config/featureFlags";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -429,119 +430,130 @@ export default function SignupPage() {
   return (
     <div className="overflow-hidden auth-page-left">
       <div className="row h-100 g-0">
-        <div className="col-12 col-lg-6 col-xl-7 bg-panel d-flex flex-column align-items-center justify-content-center order-2 order-lg-1 p-5 p-lg-0">
-          {domain.website === Website.StorytellerAi ? (
-            <>
-              <a href="https://storyteller.ai" style={{ marginBottom: "20px" }}>
-                <img
-                  src="/fakeyou/Storyteller-Logo-1.png"
-                  alt="Storyteller Logo"
-                  style={{ maxWidth: "280px" }}
-                />
-              </a>
-              <p className="fw-medium fs-5 text-center">
-                Check out what our new AI creation engine can make!
-              </p>
-              <div className="w-100 d-none d-lg-block">
-                <ScrollingSceneCarousel gradientColor="#262636" />
-              </div>
-              <div className="w-100 d-block d-lg-none">
-                <ScrollingSceneCarousel gradientColor="#262636" small={true} />
-              </div>
-            </>
-          ) : (
-            <>
-              <a href="https://fakeyou.com" style={{ marginBottom: "20px" }}>
-                <img
-                  src="/fakeyou/FakeYou-Logo-2.png"
-                  alt="FakeYou Logo"
-                  style={{ maxWidth: "200px" }}
-                />
-              </a>
-              <p className="fw-medium fs-5 text-center">
-                Sign up and use our AI video tools!
-              </p>
-              <div className="mt-5 mx-5 px-xl-5 w-100">
-                <div className="row g-5">
-                  <div className="col-12 col-lg-4">
-                    <div className="px-lg-3">
-                      <div
-                        style={{
-                          aspectRatio: "4/3",
-                          backgroundColor: "rgba(255, 255, 255, 0.06)",
-                          borderRadius: "0.5rem",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <video
-                          autoPlay
-                          playsInline
-                          muted
-                          loop
-                          className="object-fit-cover w-100 h-100"
-                        >
-                          <source src="/videos/ai-tools/vst_video.mp4" />
-                        </video>
+        {isVideoToolsEnabled() ? (
+          <>
+            <div className="col-12 col-lg-6 col-xl-7 bg-panel d-flex flex-column align-items-center justify-content-center order-2 order-lg-1 p-5 p-lg-0">
+              {domain.website === Website.StorytellerAi ? (
+                <>
+                  <a
+                    href="https://storyteller.ai"
+                    style={{ marginBottom: "20px" }}
+                  >
+                    <img
+                      src="/fakeyou/Storyteller-Logo-1.png"
+                      alt="Storyteller Logo"
+                      style={{ maxWidth: "280px" }}
+                    />
+                  </a>
+                  <p className="fw-medium fs-5 text-center">
+                    Check out what our new AI creation engine can make!
+                  </p>
+                  <div className="w-100 d-none d-lg-block">
+                    <ScrollingSceneCarousel gradientColor="#262636" />
+                  </div>
+                  <div className="w-100 d-block d-lg-none">
+                    <ScrollingSceneCarousel
+                      gradientColor="#262636"
+                      small={true}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <a
+                    href="https://fakeyou.com"
+                    style={{ marginBottom: "20px" }}
+                  >
+                    <img
+                      src="/fakeyou/FakeYou-Logo-2.png"
+                      alt="FakeYou Logo"
+                      style={{ maxWidth: "200px" }}
+                    />
+                  </a>
+                  <p className="fw-medium fs-5 text-center">
+                    Sign up and use our AI video tools!
+                  </p>
+                  <div className="mt-5 mx-5 px-xl-5 w-100">
+                    <div className="row g-5">
+                      <div className="col-12 col-lg-4">
+                        <div className="px-lg-3">
+                          <div
+                            style={{
+                              aspectRatio: "4/3",
+                              backgroundColor: "rgba(255, 255, 255, 0.06)",
+                              borderRadius: "0.5rem",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <video
+                              autoPlay
+                              playsInline
+                              muted
+                              loop
+                              className="object-fit-cover w-100 h-100"
+                            >
+                              <source src="/videos/ai-tools/vst_video.mp4" />
+                            </video>
+                          </div>
+                          <h4 className="fw-bold mt-3 text-center">
+                            Video Style Transfer
+                          </h4>
+                        </div>
                       </div>
-                      <h4 className="fw-bold mt-3 text-center">
-                        Video Style Transfer
-                      </h4>
+                      <div className="col-12 col-lg-4">
+                        <div className="px-lg-3">
+                          <div
+                            style={{
+                              aspectRatio: "4/3",
+                              backgroundColor: "rgba(255, 255, 255, 0.06)",
+                              borderRadius: "0.5rem",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <video
+                              autoPlay
+                              playsInline
+                              muted
+                              loop
+                              className="object-fit-cover w-100 h-100"
+                            >
+                              <source src="/videos/ai-tools/lp_video.mp4" />
+                            </video>
+                          </div>
+                          <h4 className="fw-bold mt-3 text-center">
+                            Live Portrait
+                          </h4>
+                        </div>
+                      </div>
+                      <div className="col-12 col-lg-4">
+                        <div className="px-lg-3">
+                          <div
+                            style={{
+                              aspectRatio: "4/3",
+                              backgroundColor: "rgba(255, 255, 255, 0.06)",
+                              borderRadius: "0.5rem",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <video
+                              autoPlay
+                              playsInline
+                              muted
+                              loop
+                              className="object-fit-cover w-100 h-100"
+                            >
+                              <source src="/videos/ai-tools/ls_video.mp4" />
+                            </video>
+                          </div>
+                          <h4 className="fw-bold mt-3 text-center">Lipsync</h4>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="col-12 col-lg-4">
-                    <div className="px-lg-3">
-                      <div
-                        style={{
-                          aspectRatio: "4/3",
-                          backgroundColor: "rgba(255, 255, 255, 0.06)",
-                          borderRadius: "0.5rem",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <video
-                          autoPlay
-                          playsInline
-                          muted
-                          loop
-                          className="object-fit-cover w-100 h-100"
-                        >
-                          <source src="/videos/ai-tools/lp_video.mp4" />
-                        </video>
-                      </div>
-                      <h4 className="fw-bold mt-3 text-center">
-                        Live Portrait
-                      </h4>
-                    </div>
-                  </div>
-                  <div className="col-12 col-lg-4">
-                    <div className="px-lg-3">
-                      <div
-                        style={{
-                          aspectRatio: "4/3",
-                          backgroundColor: "rgba(255, 255, 255, 0.06)",
-                          borderRadius: "0.5rem",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <video
-                          autoPlay
-                          playsInline
-                          muted
-                          loop
-                          className="object-fit-cover w-100 h-100"
-                        >
-                          <source src="/videos/ai-tools/ls_video.mp4" />
-                        </video>
-                      </div>
-                      <h4 className="fw-bold mt-3 text-center">Lipsync</h4>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+                </>
+              )}
 
-          {/* {!betaKeyRedirect && (
+              {/* {!betaKeyRedirect && (
             <p className="fs-7 mt-5">
               Interested? Join the
               <span
@@ -555,8 +567,16 @@ export default function SignupPage() {
               now!
             </p>
           )} */}
-        </div>
-        <div className="col-12 col-lg-6 col-xl-5 d-flex flex-column justify-content-center align-items-center align-items-lg-start order-lg-2 order-1 auth-page-right">
+            </div>
+          </>
+        ) : null}
+        <div
+          className={`col-12 d-flex flex-column justify-content-center align-items-center  order-lg-2 order-1 auth-page-right ${
+            isVideoToolsEnabled()
+              ? "col-lg-6 col-xl-5 align-items-lg-start"
+              : ""
+          }`}
+        >
           <h2 className="fw-bold mb-0 mt-5 mb-4">
             {betaKeyRedirect
               ? "Sign Up to Redeem Beta Key"

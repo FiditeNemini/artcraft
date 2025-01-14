@@ -8,7 +8,7 @@ import { GetWebsite } from "@storyteller/components/src/env/GetWebsite";
 
 interface Props {}
 
-function TermsPage(props: Props) {
+export default function TermsPage(props: Props) {
   PosthogClient.recordPageview();
 
   const domain = GetWebsite();
@@ -90,7 +90,7 @@ function TermsPage(props: Props) {
                 are user-submitted, but we'll be happy to remove content for any
                 reason for copyright holders, original speakers, voice actors,
                 et al. Please send us an email to{" "}
-                <code>copyright@storyteller.io</code> with details in order to
+                <code>copyright@storyteller.ai</code> with details in order to
                 request a takedown.
               </p>
             </div>
@@ -280,7 +280,7 @@ function TermsPage(props: Props) {
 
             <p>
               If you are unsatisfied with our services, please email us at{" "}
-              <code>support@storyteller.io</code>.
+              <code>support@storyteller.ai</code>.
             </p>
 
             <h3>7. SOFTWARE</h3>
@@ -1173,12 +1173,10 @@ function TermsPage(props: Props) {
             </p>
 
             <p>Learning Machines, Inc</p>
-            <p>support@storyteller.io</p>
+            <p>support@storyteller.ai</p>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-export { TermsPage };

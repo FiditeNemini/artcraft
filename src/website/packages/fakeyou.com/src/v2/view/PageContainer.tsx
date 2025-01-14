@@ -474,6 +474,14 @@ const routes = [
     component: lazy(() => import("./pages/text_to_image/TextToImagePage")),
   },
   {
+    path: "/terms",
+    component: lazy(() => import("./pages/about/terms_page/TermsPage")),
+  },
+  {
+    path: "/privacy",
+    component: lazy(() => import("./pages/about/privacy_page/PrivacyPage")),
+  },
+  {
     path: "/character/donald-trump",
     component: lazy(() => import("./pages/audio_gen/tts/NewTrumpTTS")),
   },

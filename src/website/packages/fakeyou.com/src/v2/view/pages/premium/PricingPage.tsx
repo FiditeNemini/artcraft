@@ -19,6 +19,7 @@ import { Badge, Container, Panel } from "components/common";
 import MentionsSection from "components/common/MentionsSection";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import { useSession } from "hooks";
+import { isVideoToolsEnabled } from "config/featureFlags";
 
 export default function PricingPage() {
   const history = useHistory();
@@ -281,48 +282,64 @@ export default function PricingPage() {
                     );
                   })}
 
-                  <li className="fw-semibold">{FYP.plus.lipsync.title}</li>
-                  {FYP.plus.lipsync.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                  {isVideoToolsEnabled() && (
+                    <>
+                      {(FYP.plus as any).lipsync && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.plus as any).lipsync.title}
+                          </li>
+                          {(FYP.plus as any).lipsync.features.map((e: any) => (
+                            <li key={e}>
+                              <FontAwesomeIcon
+                                icon={faCheck}
+                                className="text-red me-3"
+                              />
+                              {e}
+                            </li>
+                          ))}
+                        </>
+                      )}
 
-                  <li className="fw-semibold">
-                    {FYP.plus.style_transfer.title}
-                  </li>
-                  {FYP.plus.style_transfer.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                      {(FYP.plus as any).live_portrait && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.plus as any).live_portrait.title}
+                          </li>
+                          {(FYP.plus as any).live_portrait.features.map(
+                            (e: any) => (
+                              <li key={e}>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  className="text-red me-3"
+                                />
+                                {e}
+                              </li>
+                            )
+                          )}
+                        </>
+                      )}
 
-                  <li className="fw-semibold">
-                    {FYP.plus.live_portrait.title}
-                  </li>
-                  {FYP.plus.live_portrait.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                      {(FYP.plus as any).style_transfer && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.plus as any).style_transfer.title}
+                          </li>
+                          {(FYP.plus as any).style_transfer.features.map(
+                            (e: any) => (
+                              <li key={e}>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  className="text-red me-3"
+                                />
+                                {e}
+                              </li>
+                            )
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
                 </ul>
                 <hr className="my-4" />
                 <h6 className="text-center fw-normal opacity-50">
@@ -401,46 +418,64 @@ export default function PricingPage() {
                     );
                   })}
 
-                  <li className="fw-semibold">{FYP.pro.lipsync.title}</li>
-                  {FYP.pro.lipsync.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                  {isVideoToolsEnabled() && (
+                    <>
+                      {(FYP.pro as any).lipsync && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.pro as any).lipsync.title}
+                          </li>
+                          {(FYP.pro as any).lipsync.features.map((e: any) => (
+                            <li key={e}>
+                              <FontAwesomeIcon
+                                icon={faCheck}
+                                className="text-red me-3"
+                              />
+                              {e}
+                            </li>
+                          ))}
+                        </>
+                      )}
 
-                  <li className="fw-semibold">
-                    {FYP.pro.style_transfer.title}
-                  </li>
-                  {FYP.pro.style_transfer.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                      {(FYP.pro as any).live_portrait && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.pro as any).live_portrait.title}
+                          </li>
+                          {(FYP.pro as any).live_portrait.features.map(
+                            (e: any) => (
+                              <li key={e}>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  className="text-red me-3"
+                                />
+                                {e}
+                              </li>
+                            )
+                          )}
+                        </>
+                      )}
 
-                  <li className="fw-semibold">{FYP.pro.live_portrait.title}</li>
-                  {FYP.pro.live_portrait.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                      {(FYP.pro as any).style_transfer && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.pro as any).style_transfer.title}
+                          </li>
+                          {(FYP.pro as any).style_transfer.features.map(
+                            (e: any) => (
+                              <li key={e}>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  className="text-red me-3"
+                                />
+                                {e}
+                              </li>
+                            )
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
 
                   <li className="fw-semibold">{FYP.pro.storyteller.title}</li>
                   {FYP.pro.storyteller.features.map((e: any) => {
@@ -524,48 +559,64 @@ export default function PricingPage() {
                     );
                   })}
 
-                  <li className="fw-semibold">{FYP.elite.lipsync.title}</li>
-                  {FYP.elite.lipsync.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                  {isVideoToolsEnabled() && (
+                    <>
+                      {(FYP.elite as any).lipsync && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.elite as any).lipsync.title}
+                          </li>
+                          {(FYP.elite as any).lipsync.features.map((e: any) => (
+                            <li key={e}>
+                              <FontAwesomeIcon
+                                icon={faCheck}
+                                className="text-red me-3"
+                              />
+                              {e}
+                            </li>
+                          ))}
+                        </>
+                      )}
 
-                  <li className="fw-semibold">
-                    {FYP.elite.style_transfer.title}
-                  </li>
-                  {FYP.elite.style_transfer.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                      {(FYP.elite as any).live_portrait && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.elite as any).live_portrait.title}
+                          </li>
+                          {(FYP.elite as any).live_portrait.features.map(
+                            (e: any) => (
+                              <li key={e}>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  className="text-red me-3"
+                                />
+                                {e}
+                              </li>
+                            )
+                          )}
+                        </>
+                      )}
 
-                  <li className="fw-semibold">
-                    {FYP.elite.live_portrait.title}
-                  </li>
-                  {FYP.elite.live_portrait.features.map((e: any) => {
-                    return (
-                      <li key={e}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-red me-3"
-                        />
-                        {e}
-                      </li>
-                    );
-                  })}
+                      {(FYP.elite as any).style_transfer && (
+                        <>
+                          <li className="fw-semibold">
+                            {(FYP.elite as any).style_transfer.title}
+                          </li>
+                          {(FYP.elite as any).style_transfer.features.map(
+                            (e: any) => (
+                              <li key={e}>
+                                <FontAwesomeIcon
+                                  icon={faCheck}
+                                  className="text-red me-3"
+                                />
+                                {e}
+                              </li>
+                            )
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
 
                   <li className="fw-semibold">{FYP.elite.commercial.title}</li>
                   {FYP.elite.commercial.features.map((e: any) => {

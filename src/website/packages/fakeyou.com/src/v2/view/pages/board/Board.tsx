@@ -3,9 +3,16 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Button, Container, Panel } from "components/common";
 import { faArrowRight, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 
 export default function Board() {
   usePrefixedDocumentTitle("Storyteller Board");
+
+  const { isVideoToolsEnabled } = useFeatureFlags();
+
+  if (!isVideoToolsEnabled()) {
+    return null;
+  }
 
   return (
     <div>

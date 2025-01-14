@@ -20,6 +20,20 @@ import {
   GetWebsite,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
+import { isVideoToolsEnabled } from "config/featureFlags";
+import { IconDefinition } from "@fortawesome/free-brands-svg-icons";
+
+interface FooterItem {
+  link: string;
+  text: string;
+  icon: IconDefinition | null;
+}
+
+interface FooterSection {
+  title: string;
+  items: FooterItem[];
+  condition: boolean;
+}
 
 function FooterNav() {
   const {
@@ -65,33 +79,35 @@ function FooterNav() {
 
   const isOnStudioPage = window.location.pathname.includes("/studio");
 
-  const footerSections = [
+  const footerSections: FooterSection[] = [
     {
       title: "Create",
       items: [
-        {
-          link: "https://studio.storyteller.ai",
-          text: "Creation Engine",
-          icon: null,
-        },
+        ...(isVideoToolsEnabled()
+          ? [
+              {
+                link: "https://studio.storyteller.ai",
+                text: "Creation Engine",
+                icon: null,
+              },
+            ]
+          : []),
         { link: "/explore", text: "Explore Videos", icon: null },
         ...(domain.website === Website.FakeYou
           ? [{ link: "/tools", text: "AI Tools", icon: null }]
           : []),
-        // { link: "/upload-assets", text: "Upload Assets", icon: null },
       ],
       condition: true,
     },
     {
       title: "Community",
       items: [
-        { link: "/beta-key/list", text: "Share Beta Keys", icon: null },
-        { link: "/beta-key/redeem", text: "Redeem Beta Key", icon: null },
         {
           link: GetDiscordLink(),
           text: "Discord",
           icon: faDiscord,
         },
+
         // { link: "/forums", text: "Forums", icon: null },
       ],
       condition: true,
@@ -206,7 +222,7 @@ function FooterNav() {
                   }`}
                 >
                   <p className="fw-bold">{t(section.title)}</p>
-                  {section.items.map((item, itemIndex) => (
+                  {section.items.map((item: FooterItem, itemIndex: number) => (
                     <li key={itemIndex}>
                       <a href={item.link}>
                         {item.icon ? (

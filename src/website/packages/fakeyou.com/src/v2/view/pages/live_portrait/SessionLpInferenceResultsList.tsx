@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowTurnUp, faLips } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import { useHistory } from "react-router-dom";
+import { isVideoToolsEnabled } from "config/featureFlags";
 
 interface SessionLpInferenceResultsListProps {
   onJobTokens: (
@@ -249,18 +250,20 @@ export default function SessionLpInferenceResultsList({
                       />
                     </div>
 
-                    <Button
-                      icon={faLips}
-                      label={t("button.useWithLipsync")}
-                      small={true}
-                      variant={job.maybeResultToken ? "primary" : "action"}
-                      disabled={!job.maybeResultToken}
-                      onClick={e => {
-                        if (job.maybeResultToken !== null) {
-                          handleLipsyncCTA(e, job.maybeResultToken);
-                        }
-                      }}
-                    />
+                    {isVideoToolsEnabled() ? (
+                      <Button
+                        icon={faLips}
+                        label={t("button.useWithLipsync")}
+                        small={true}
+                        variant={job.maybeResultToken ? "primary" : "action"}
+                        disabled={!job.maybeResultToken}
+                        onClick={e => {
+                          if (job.maybeResultToken !== null) {
+                            handleLipsyncCTA(e, job.maybeResultToken);
+                          }
+                        }}
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>

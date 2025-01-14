@@ -30,6 +30,7 @@ import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 // import Tippy from "@tippyjs/react";
 import { isMobile } from "react-device-detect";
 import { LipsyncTokenMap } from "../pages/lipsync/LipsyncTokens";
+import { isVideoToolsEnabled } from "config/featureFlags";
 
 interface Props {
   mode?: "tts" | "lipsync";
@@ -285,7 +286,8 @@ function SessionTtsInferenceResultList(props: Props) {
                     />
                   </div>
 
-                  {job.maybeModelToken &&
+                  {isVideoToolsEnabled() &&
+                  job.maybeModelToken &&
                   LipsyncTokenMap[job.maybeModelToken] ? (
                     <div className="d-flex mt-2">
                       <Button

@@ -38,6 +38,7 @@ import {
 import PremiumLock from "components/PremiumLock";
 import HowToUseSection from "components/common/HowToUseSection";
 import FAQSection from "components/common/FAQSection";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -70,6 +71,12 @@ export default function StyleVideo() {
     });
 
   usePrefixedDocumentTitle("Style Video");
+
+  const { isVideoToolsEnabled } = useFeatureFlags();
+
+  if (!isVideoToolsEnabled()) {
+    return null;
+  }
 
   const onClick = async () => {
     if (
@@ -164,6 +171,7 @@ export default function StyleVideo() {
     setCurrentImages(updatedImages);
   };
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!modalOpen) {
       if (selectedStyleValues.length === 0) {
