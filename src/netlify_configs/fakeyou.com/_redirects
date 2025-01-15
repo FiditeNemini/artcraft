@@ -133,6 +133,7 @@
 # Well-known resources:
 /manifest.json           /website/manifest.json        200
 /robots.txt              /website/robots.txt           200
+/ads.txt                 /website/ads.txt              200
 
 # Favicons and Mobile Icons:
 /android-chrome-192x192.png   /website/android-chrome-192x192.png  200
