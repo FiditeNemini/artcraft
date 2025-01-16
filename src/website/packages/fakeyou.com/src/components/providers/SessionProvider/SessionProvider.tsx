@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
 import ModalLayer from "components/providers/ModalProvider/ModalLayer";
 import { ModalConfig, useModalState } from "hooks";
 import AccountModal from "components/layout/AccountModal";
@@ -85,10 +85,15 @@ export default function SessionProvider({ children }: SessionProviderProps) {
   const { appState, sessionSubscriptions, sessionWrapper, queryAppState } =
     useContext(AppStateContext);
 
-  const sessionResponse = sessionWrapper?.sessionStateResponse || {
-    logged_in: false,
-    user: null,
-  };
+  const sessionResponse = useMemo(
+    () =>
+      sessionWrapper?.sessionStateResponse || {
+        logged_in: false,
+        user: null,
+      },
+    [sessionWrapper?.sessionStateResponse]
+  );
+
   const { logged_in: loggedIn, user } = sessionResponse;
 
   const { close, killModal, modalOpen, modalState, onModalCloseEnd, open } =
@@ -136,6 +141,45 @@ export default function SessionProvider({ children }: SessionProviderProps) {
     canAccessStudio() ? content : <StyleVideoNotAvailable />;
 
   const modal = { close, open };
+
+  // Adsense logic for paid users
+  useEffect(() => {
+    const shouldShowAds = () => {
+      const isLoggedIn = !!user;
+      const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
+      const shouldShow = !isLoggedIn || !hasPaidFeatures;
+
+      // console.log("Ad Debug:", {
+      //   isLoggedIn,
+      //   hasPaidFeatures,
+      //   shouldShowAds: shouldShow,
+      //   user,
+      //   sessionSubscriptions,
+      // });
+
+      return shouldShow;
+    };
+
+    let timeoutId: NodeJS.Timeout;
+
+    // Only run if session is fully loaded
+    if (sessionResponse && appState.success && !shouldShowAds()) {
+      // @ts-ignore
+      window.removeAdsense?.();
+
+      // Remove the padding that was added for ads
+      timeoutId = setTimeout(() => {
+        document.body.style.paddingBottom = "0";
+        document.body.style.paddingTop = "0";
+      }, 150);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [sessionResponse, sessionSubscriptions, user, appState.success]);
 
   return (
     <SessionContext.Provider
