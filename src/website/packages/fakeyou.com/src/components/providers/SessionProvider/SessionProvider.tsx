@@ -12,6 +12,7 @@ import {
   AppStateContext,
   emptyAppState,
 } from "components/providers/AppStateProvider";
+import { isDevelopment } from "utils/environment";
 
 export interface AccountModalMessages {
   loginMessage?: string;
@@ -145,19 +146,11 @@ export default function SessionProvider({ children }: SessionProviderProps) {
   // Adsense logic for paid users
   useEffect(() => {
     const shouldShowAds = () => {
+      if (isDevelopment()) return false;
+
       const isLoggedIn = !!user;
       const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
-      const shouldShow = !isLoggedIn || !hasPaidFeatures;
-
-      // console.log("Ad Debug:", {
-      //   isLoggedIn,
-      //   hasPaidFeatures,
-      //   shouldShowAds: shouldShow,
-      //   user,
-      //   sessionSubscriptions,
-      // });
-
-      return shouldShow;
+      return !isLoggedIn || !hasPaidFeatures;
     };
 
     let timeoutId: NodeJS.Timeout;

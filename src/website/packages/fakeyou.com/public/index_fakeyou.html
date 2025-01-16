@@ -35,11 +35,22 @@
       gtag("js", new Date());
       gtag("config", "G-525G5MXFJG");
     </script>
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5350229982172647"
-      crossorigin="anonymous"
-    ></script>
+    <script>
+      // Only load AdSense if not in development or staging
+      if (
+        !window.location.hostname.includes("devproxy") &&
+        !window.location.hostname.includes("staging") &&
+        window.location.hostname !== "localhost" &&
+        !window.location.hostname.includes(".local")
+      ) {
+        const script = document.createElement("script");
+        script.async = true;
+        script.src =
+          "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5350229982172647";
+        script.crossOrigin = "anonymous";
+        document.head.appendChild(script);
+      }
+    </script>
     <script>
       window.removeAdsense = function () {
         const scripts = document.head.getElementsByTagName("script");
