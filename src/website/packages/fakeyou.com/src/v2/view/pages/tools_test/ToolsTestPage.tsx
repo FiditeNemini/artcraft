@@ -8,7 +8,7 @@ export default function ToolsTestPage() {
       <Panel clear={true}>
         <AdBanner
           dataAdSlot="7558376102"
-          dataAdFormat="auto"
+          dataAdFormat="horizontal"
           dataFullWidthResponsive={true}
         />
       </Panel>

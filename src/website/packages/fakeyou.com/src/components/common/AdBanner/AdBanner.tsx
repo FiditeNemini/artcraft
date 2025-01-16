@@ -73,8 +73,10 @@ export default function AdBanner({
       className={`adsbygoogle text-center ${className}`.trim()}
       style={{
         display: "block",
-        height: "100px",
+        minWidth: "400px",
+        maxWidth: "970px",
         width: "100%",
+        height: "90px",
         ...style,
       }}
       data-ad-client="ca-pub-5350229982172647"
