@@ -39,6 +39,7 @@ import PremiumLock from "components/PremiumLock";
 import HowToUseSection from "components/common/HowToUseSection";
 import FAQSection from "components/common/FAQSection";
 import { useFeatureFlags } from "hooks/useFeatureFlags";
+import Maintenance from "components/common/Maintenance";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
@@ -75,7 +76,12 @@ export default function StyleVideo() {
   const { isVideoToolsEnabled } = useFeatureFlags();
 
   if (!isVideoToolsEnabled()) {
-    return null;
+    return (
+      <Maintenance
+        title="Video Style Transfer is currently in maintenance mode"
+        description="We're working hard to bring you the best experience possible. Please check back soon!"
+      />
+    );
   }
 
   const onClick = async () => {

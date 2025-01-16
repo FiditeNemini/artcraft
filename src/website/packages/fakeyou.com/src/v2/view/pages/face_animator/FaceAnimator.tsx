@@ -29,8 +29,12 @@ import { Analytics } from "common/Analytics";
 import "./FaceAnimator.scss";
 import PremiumLock from "components/PremiumLock";
 import { AITools } from "components/marketing";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
+import Maintenance from "components/common/Maintenance";
 
 export default function FaceAnimator() {
+  const { isVideoToolsEnabled } = useFeatureFlags();
+
   const { mediaToken } = useParams<{ mediaToken: string }>();
   const { media: presetAudio } = useMedia({ mediaToken });
   const { t } = useLocalize("Lipsync");
@@ -213,6 +217,15 @@ export default function FaceAnimator() {
         return "Uknown failure";
     }
   };
+
+  if (!isVideoToolsEnabled()) {
+    return (
+      <Maintenance
+        title="Face Animator is currently in maintenance mode"
+        description="We're working hard to bring you the best experience possible. Please check back soon!"
+      />
+    );
+  }
 
   return (
     <>

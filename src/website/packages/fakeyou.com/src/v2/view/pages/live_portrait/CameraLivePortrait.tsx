@@ -51,6 +51,8 @@ import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentT
 import SourceEntityInput from "./SourceEntityInput";
 import { useHistory } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
+import Maintenance from "components/common/Maintenance";
 
 interface GeneratedVideo {
   sourceIndex: number;
@@ -87,6 +89,8 @@ const PRECOMPUTED_DRIVER_TOKENS: string[] = [
 ];
 
 export default function LivePortrait() {
+  const { isVideoToolsEnabled } = useFeatureFlags();
+
   useDocumentTitle("Live Portrait AI. Free Video Animation");
   const { enqueueInferenceJob } = useInferenceJobs();
   const { loggedIn, loggedInOrModal, sessionFetched, sessionSubscriptions } =
@@ -616,6 +620,15 @@ export default function LivePortrait() {
       )}
     </>
   );
+
+  if (!isVideoToolsEnabled()) {
+    return (
+      <Maintenance
+        title="Webcam Acting is currently in maintenance mode"
+        description="We're working hard to bring you the best experience possible. Please check back soon!"
+      />
+    );
+  }
 
   return (
     <>

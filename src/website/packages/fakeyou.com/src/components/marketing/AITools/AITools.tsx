@@ -202,25 +202,27 @@ export default function AITools() {
     items = items.filter(item => item.to !== "/seed-vc");
   }
 
-  if (currentPath.includes("/style-video")) {
-    items = [items[1], items[2], discordItem].filter(Boolean) as Item[];
-  }
+  if (isVideoToolsEnabled()) {
+    if (currentPath.includes("/style-video")) {
+      items = [items[1], items[2], discordItem].filter(Boolean) as Item[];
+    }
 
-  if (currentPath.includes("/face-animator")) {
-    items = [items[0], items[1], discordItem].filter(Boolean) as Item[];
-  }
+    if (currentPath.includes("/face-animator")) {
+      items = [items[0], items[1], discordItem].filter(Boolean) as Item[];
+    }
 
-  if (currentPath.includes("/webcam-acting")) {
-    items = [items[0], items[1], discordItem].filter(Boolean) as Item[];
-  }
+    if (currentPath.includes("/webcam-acting")) {
+      items = [items[0], items[1], discordItem].filter(Boolean) as Item[];
+    }
 
-  if (
-    currentPath.includes("/ai-live-portrait") ||
-    currentPath.includes("/ai-face-mirror") ||
-    currentPath.includes("/live-portrait") ||
-    currentPath.includes("/dev-lp")
-  ) {
-    items = [items[0], items[2], discordItem].filter(Boolean) as Item[];
+    if (
+      currentPath.includes("/ai-live-portrait") ||
+      currentPath.includes("/ai-face-mirror") ||
+      currentPath.includes("/live-portrait") ||
+      currentPath.includes("/dev-lp")
+    ) {
+      items = [items[0], items[2], discordItem].filter(Boolean) as Item[];
+    }
   }
 
   return <AIToolsRow {...{ items }} />;

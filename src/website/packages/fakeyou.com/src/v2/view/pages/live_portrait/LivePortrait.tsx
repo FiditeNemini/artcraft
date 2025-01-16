@@ -59,6 +59,8 @@ import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import PremiumLock from "components/PremiumLock";
 import HowToUseSection from "components/common/HowToUseSection";
 import FAQSection from "components/common/FAQSection";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
+import Maintenance from "components/common/Maintenance";
 
 interface GeneratedVideo {
   sourceIndex: number;
@@ -142,6 +144,7 @@ export default function LivePortrait() {
   const history = useHistory();
 
   const { t, language } = useLocalize("LivePortrait");
+  const { isVideoToolsEnabled } = useFeatureFlags();
 
   const precomputedVideos = useMemo(
     () => [
@@ -827,6 +830,15 @@ export default function LivePortrait() {
       console.error("No video source available for download");
     }
   };
+
+  if (!isVideoToolsEnabled()) {
+    return (
+      <Maintenance
+        title="Live Portrait is currently under maintenance"
+        description="We're working hard to bring you the best experience possible. Please check back soon!"
+      />
+    );
+  }
 
   const signupCTA = (
     <>
