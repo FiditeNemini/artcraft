@@ -282,6 +282,19 @@ export default function PricingPage() {
                     );
                   })}
 
+                  <li className="fw-semibold">{FYP.plus.ads.title}</li>
+                  {FYP.plus.ads.features.map((e: any) => {
+                    return (
+                      <li key={e}>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-red me-3"
+                        />
+                        {e}
+                      </li>
+                    );
+                  })}
+
                   {isVideoToolsEnabled() && (
                     <>
                       {(FYP.plus as any).lipsync && (
@@ -474,11 +487,26 @@ export default function PricingPage() {
                           )}
                         </>
                       )}
+
+                      <li className="fw-semibold">
+                        {FYP.pro.storyteller.title}
+                      </li>
+                      {FYP.pro.storyteller.features.map((e: any) => {
+                        return (
+                          <li key={e}>
+                            <FontAwesomeIcon
+                              icon={faCheck}
+                              className="text-red me-3"
+                            />
+                            {e}
+                          </li>
+                        );
+                      })}
                     </>
                   )}
 
-                  <li className="fw-semibold">{FYP.pro.storyteller.title}</li>
-                  {FYP.pro.storyteller.features.map((e: any) => {
+                  <li className="fw-semibold">{FYP.pro.ads.title}</li>
+                  {FYP.pro.ads.features.map((e: any) => {
                     return (
                       <li key={e}>
                         <FontAwesomeIcon
@@ -615,6 +643,21 @@ export default function PricingPage() {
                           )}
                         </>
                       )}
+
+                      <li className="fw-semibold">
+                        {FYP.elite.storyteller.title}
+                      </li>
+                      {FYP.elite.storyteller.features.map((e: any) => {
+                        return (
+                          <li key={e}>
+                            <FontAwesomeIcon
+                              icon={faCheck}
+                              className="text-red me-3"
+                            />
+                            {e}
+                          </li>
+                        );
+                      })}
                     </>
                   )}
 
@@ -630,8 +673,9 @@ export default function PricingPage() {
                       </li>
                     );
                   })}
-                  <li className="fw-semibold">{FYP.elite.storyteller.title}</li>
-                  {FYP.elite.storyteller.features.map((e: any) => {
+
+                  <li className="fw-semibold">{FYP.elite.ads.title}</li>
+                  {FYP.elite.ads.features.map((e: any) => {
                     return (
                       <li key={e}>
                         <FontAwesomeIcon

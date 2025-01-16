@@ -67,6 +67,11 @@ const FAKEYOU_PRICES = {
       title: "Voice to Voice",
       features: ["Up to 4 minutes of audio"],
     },
+    ads: {
+      title: "Advertisements",
+      features: ["Remove all ads"],
+    },
+
     // vcweb: {
     //   title: "VC Web",
     //   features: ["Up to 30 seconds audio", "Push to play"],
@@ -126,6 +131,10 @@ const FAKEYOU_PRICES = {
     vc: {
       title: "Voice to Voice",
       features: ["Up to 5 minutes of audio", "Upload private models"],
+    },
+    ads: {
+      title: "Advertisements",
+      features: ["Remove all ads"],
     },
     // channels: {
     //   title: "Video Channels",
@@ -215,6 +224,10 @@ const FAKEYOU_PRICES = {
         "Upload private models",
         "Share private models",
       ],
+    },
+    ads: {
+      title: "Advertisements",
+      features: ["Remove all ads"],
     },
     // channels: {
     //   title: "Video Channels",

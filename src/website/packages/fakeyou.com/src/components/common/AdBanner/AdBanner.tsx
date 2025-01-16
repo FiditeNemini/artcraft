@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { SessionContext } from "context";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 interface AdBannerProps {
   dataAdSlot: string;
@@ -9,7 +10,7 @@ interface AdBannerProps {
   fallbackContent?: React.ReactNode;
 }
 
-export default function AdBanner({
+export function AdBanner({
   dataAdSlot,
   dataAdFormat,
   dataFullWidthResponsive,
@@ -19,6 +20,7 @@ export default function AdBanner({
 }: AdBannerProps) {
   const adRef = useRef<HTMLModElement>(null);
   const [adFailed, setAdFailed] = useState(false);
+  const { user, sessionSubscriptions } = useContext(SessionContext);
 
   useEffect(() => {
     // Check if adsbygoogle is blocked or not loaded
@@ -48,21 +50,26 @@ export default function AdBanner({
     return () => clearTimeout(timeoutId);
   }, []);
 
+  if (user && sessionSubscriptions?.hasPaidFeatures()) {
+    return null;
+  }
+
   if (adFailed) {
     if (fallbackContent) {
       return <>{fallbackContent}</>;
     } else {
       return (
-        <div
-          className="text-center p-3 d-flex justify-content-center align-items-center"
-          style={{
-            height: "100px",
-            backgroundColor: "#ffffff08",
-            width: "100%",
-          }}
-        >
-          {<div className="opacity-75">Ad failed to load</div>}
-        </div>
+        // <div
+        //   className="text-center p-3 d-flex justify-content-center align-items-center"
+        //   style={{
+        //     height: "100px",
+        //     backgroundColor: "#ffffff08",
+        //     width: "100%",
+        //   }}
+        // >
+        //   {<div className="opacity-75">Ad failed to load</div>}
+        // </div>
+        null
       );
     }
   }
