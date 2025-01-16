@@ -55,7 +55,11 @@ export default function AdBanner({
       return (
         <div
           className="text-center p-3 d-flex justify-content-center align-items-center"
-          style={{ minHeight: "90px", backgroundColor: "#ffffff08" }}
+          style={{
+            height: "100px",
+            backgroundColor: "#ffffff08",
+            width: "100%",
+          }}
         >
           {<div className="opacity-75">Ad failed to load</div>}
         </div>
@@ -66,10 +70,11 @@ export default function AdBanner({
   return (
     <ins
       ref={adRef}
-      className={`adsbygoogle ${className}`}
+      className={`adsbygoogle text-center ${className}`.trim()}
       style={{
         display: "block",
-        minHeight: "90px",
+        height: "100px",
+        width: "100%",
         ...style,
       }}
       data-ad-client="ca-pub-5350229982172647"
