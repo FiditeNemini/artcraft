@@ -40,7 +40,7 @@ export const DragComponent = () => {
               left: currX + 1,
               zIndex: 10000,
               width: Math.max(dragItem.value.length ?? 0, MIN_ANIM_DURATION) * 4 * scale.value,
-              height: 80,
+              height: 60,
             }}
           />
           <div
