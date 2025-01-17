@@ -39,6 +39,10 @@ pub enum PublicInferenceJobType {
   #[deprecated(note = "Use VideoRender instead.")]
   ComfyUi,
 
+  /// Second gen studio
+  #[serde(rename = "studio_gen2")]
+  StudioGen2,
+
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
   #[serde(rename = "convert_fbx_gltf")]
   ConvertFbxToGltf,
@@ -102,6 +106,7 @@ impl PublicInferenceJobType {
       InferenceJobType::GptSovits => Self::GptSovits,
       InferenceJobType::F5TTS => Self::F5TTS,
       InferenceJobType::ComfyUi => Self::ComfyUi,
+      InferenceJobType::StudioGen2 => Self::StudioGen2,
       InferenceJobType::ConvertFbxToGltf => Self::ConvertFbxToGltf,
       InferenceJobType::MocapNet => Self::MocapNet,
       InferenceJobType::RvcV2 => Self::RvcV2,
@@ -127,6 +132,7 @@ impl PublicInferenceJobType {
       Self::GptSovits => InferenceJobType::GptSovits,
       Self::F5TTS => InferenceJobType::F5TTS,
       Self::ComfyUi => InferenceJobType::ComfyUi,
+      Self::StudioGen2 => InferenceJobType::StudioGen2,
       Self::ConvertFbxToGltf => InferenceJobType::ConvertFbxToGltf,
       Self::MocapNet => InferenceJobType::MocapNet,
       Self::RvcV2 => InferenceJobType::RvcV2,

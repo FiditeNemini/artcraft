@@ -1,4 +1,5 @@
 pub mod add_routes;
+pub mod add_studio_gen2_routes;
 pub mod beta_key_routes;
 pub mod job_routes;
 pub mod media_files_routes;

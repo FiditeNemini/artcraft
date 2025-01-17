@@ -36,6 +36,10 @@ pub enum InferenceJobType {
   #[deprecated(note = "Use VideoRender instead.")]
   ComfyUi,
 
+  /// Second gen studio
+  #[serde(rename = "studio_gen2")]
+  StudioGen2,
+
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
   #[serde(rename = "convert_fbx_gltf")]
   ConvertFbxToGltf,
@@ -103,6 +107,7 @@ impl InferenceJobType {
       Self::F5TTS => "f5_tts",
       Self::GptSovits => "gpt_sovits",
       Self::ComfyUi => "comfy_ui",
+      Self::StudioGen2 => "studio_gen2",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
       Self::MocapNet => "mocap_net",
       Self::RvcV2 => "rvc_v2",
@@ -126,6 +131,7 @@ impl InferenceJobType {
       "f5_tts" => Ok(Self::F5TTS),
       "gpt_sovits" => Ok(Self::GptSovits),
       "comfy_ui" => Ok(Self::ComfyUi),
+      "studio_gen2" => Ok(Self::StudioGen2),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
       "mocap_net" => Ok(Self::MocapNet),
       "rvc_v2" => Ok(Self::RvcV2),
@@ -152,6 +158,7 @@ impl InferenceJobType {
       Self::F5TTS,
       Self::GptSovits,
       Self::ComfyUi,
+      Self::StudioGen2,
       Self::ConvertFbxToGltf,
       Self::MocapNet,
       Self::RvcV2,
@@ -189,6 +196,7 @@ mod tests {
       assert_serialization(InferenceJobType::F5TTS, "f5_tts");
       assert_serialization(InferenceJobType::GptSovits, "gpt_sovits");
       assert_serialization(InferenceJobType::ComfyUi, "comfy_ui");
+      assert_serialization(InferenceJobType::StudioGen2, "studio_gen2");
       assert_serialization(InferenceJobType::ConvertFbxToGltf, "convert_fbx_gltf");
       assert_serialization(InferenceJobType::MocapNet, "mocap_net");
       assert_serialization(InferenceJobType::RvcV2, "rvc_v2");
@@ -211,6 +219,7 @@ mod tests {
       assert_eq!(InferenceJobType::F5TTS.to_str(), "f5_tts");
       assert_eq!(InferenceJobType::GptSovits.to_str(), "gpt_sovits");
       assert_eq!(InferenceJobType::ComfyUi.to_str(), "comfy_ui");
+      assert_eq!(InferenceJobType::StudioGen2.to_str(), "studio_gen2");
       assert_eq!(InferenceJobType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
       assert_eq!(InferenceJobType::MocapNet.to_str(), "mocap_net");
       assert_eq!(InferenceJobType::RvcV2.to_str(), "rvc_v2");
@@ -233,6 +242,7 @@ mod tests {
       assert_eq!(InferenceJobType::from_str("f5_tts").unwrap(), InferenceJobType::F5TTS);
       assert_eq!(InferenceJobType::from_str("gpt_sovits").unwrap(), InferenceJobType::GptSovits);
       assert_eq!(InferenceJobType::from_str("comfy_ui").unwrap(), InferenceJobType::ComfyUi);
+      assert_eq!(InferenceJobType::from_str("studio_gen2").unwrap(), InferenceJobType::StudioGen2);
       assert_eq!(InferenceJobType::from_str("convert_fbx_gltf").unwrap(), InferenceJobType::ConvertFbxToGltf);
       assert_eq!(InferenceJobType::from_str("mocap_net").unwrap(), InferenceJobType::MocapNet);
       assert_eq!(InferenceJobType::from_str("rvc_v2").unwrap(), InferenceJobType::RvcV2);
@@ -258,6 +268,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceJobType::F5TTS));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::GptSovits));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ComfyUi));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::StudioGen2));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ConvertFbxToGltf));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::MocapNet));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::RvcV2));

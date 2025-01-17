@@ -7,6 +7,7 @@ use crate::payloads::generic_inference_args::inner_payloads::live_portrait_paylo
 use crate::payloads::generic_inference_args::inner_payloads::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::inner_payloads::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
 use crate::payloads::generic_inference_args::inner_payloads::seed_vc_payload::SeedVcPayload;
+use crate::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use crate::payloads::generic_inference_args::inner_payloads::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::inner_payloads::videofilter_payload::RerenderArgs;
 use crate::payloads::generic_inference_args::inner_payloads::workflow_payload::WorkflowArgs;
@@ -147,6 +148,9 @@ pub enum PolymorphicInferenceArgs {
 
   /// ComfyUI (Short name to save space when serializing.)
   Cu(WorkflowArgs),
+
+  /// Studio Gen2 (Short name to save space when serializing.)
+  S2(StudioGen2Payload),
 
   /// ComfyUI (Short name to save space when serializing.)
   Lp(LivePortraitPayload),

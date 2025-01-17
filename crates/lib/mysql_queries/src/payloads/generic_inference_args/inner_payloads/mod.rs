@@ -5,6 +5,7 @@ pub mod lipsync_payload;
 pub mod live_portrait_payload;
 pub mod mocap_payload;
 pub mod render_engine_scene_to_video_payload;
+pub mod studio_gen2_payload;
 pub mod tts_payload;
 pub mod videofilter_payload;
 pub mod workflow_payload;

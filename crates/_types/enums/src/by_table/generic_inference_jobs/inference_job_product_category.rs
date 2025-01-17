@@ -63,6 +63,9 @@ pub enum InferenceJobProductCategory {
   /// Video: Studio
   VidStudio,
 
+  /// Video: Studio Gen 2
+  VidStudioGen2,
+
   /// Video: Style Transfer
   VidStyleTransfer,
 
@@ -122,6 +125,7 @@ impl InferenceJobProductCategory {
       Self::VidLivePortrait => "vid_live_portrait",
       Self::VidLivePortraitWebcam => "vid_live_portrait_webcam",
       Self::VidStudio => "vid_studio",
+      Self::VidStudioGen2 => "vid_studio_gen2",
       Self::VidStyleTransfer => "vid_style_transfer",
       Self::LipsyncFaceFusion => "lipsync_face_fusion",
       Self::LipsyncSadTalker => "lipsync_sad_talker",
@@ -149,6 +153,7 @@ impl InferenceJobProductCategory {
       "vid_live_portrait" => Ok(Self::VidLivePortrait),
       "vid_live_portrait_webcam" => Ok(Self::VidLivePortraitWebcam),
       "vid_studio" => Ok(Self::VidStudio),
+      "vid_studio_gen2" => Ok(Self::VidStudioGen2),
       "vid_style_transfer" => Ok(Self::VidStyleTransfer),
       "lipsync_face_fusion" => Ok(Self::LipsyncFaceFusion),
       "lipsync_sad_talker" => Ok(Self::LipsyncSadTalker),
@@ -179,6 +184,7 @@ impl InferenceJobProductCategory {
       Self::VidLivePortrait,
       Self::VidLivePortraitWebcam,
       Self::VidStudio,
+      Self::VidStudioGen2,
       Self::VidStyleTransfer,
       Self::LipsyncFaceFusion,
       Self::LipsyncSadTalker,
@@ -215,6 +221,7 @@ mod tests {
       assert_serialization(InferenceJobProductCategory::VidLivePortrait, "vid_live_portrait");
       assert_serialization(InferenceJobProductCategory::VidLivePortraitWebcam, "vid_live_portrait_webcam");
       assert_serialization(InferenceJobProductCategory::VidStudio, "vid_studio");
+      assert_serialization(InferenceJobProductCategory::VidStudioGen2, "vid_studio_gen2");
       assert_serialization(InferenceJobProductCategory::VidStyleTransfer, "vid_style_transfer");
       assert_serialization(InferenceJobProductCategory::LipsyncFaceFusion, "lipsync_face_fusion");
       assert_serialization(InferenceJobProductCategory::LipsyncSadTalker, "lipsync_sad_talker");
@@ -240,6 +247,7 @@ mod tests {
       assert_eq!(InferenceJobProductCategory::VidLivePortrait.to_str(), "vid_live_portrait");
       assert_eq!(InferenceJobProductCategory::VidLivePortraitWebcam.to_str(), "vid_live_portrait_webcam");
       assert_eq!(InferenceJobProductCategory::VidStudio.to_str(), "vid_studio");
+      assert_eq!(InferenceJobProductCategory::VidStudioGen2.to_str(), "vid_studio_gen2");
       assert_eq!(InferenceJobProductCategory::VidStyleTransfer.to_str(), "vid_style_transfer");
       assert_eq!(InferenceJobProductCategory::LipsyncFaceFusion.to_str(), "lipsync_face_fusion");
       assert_eq!(InferenceJobProductCategory::LipsyncSadTalker.to_str(), "lipsync_sad_talker");
@@ -265,6 +273,7 @@ mod tests {
       assert_eq!(InferenceJobProductCategory::from_str("vid_live_portrait").unwrap(), InferenceJobProductCategory::VidLivePortrait);
       assert_eq!(InferenceJobProductCategory::from_str("vid_live_portrait_webcam").unwrap(), InferenceJobProductCategory::VidLivePortraitWebcam);
       assert_eq!(InferenceJobProductCategory::from_str("vid_studio").unwrap(), InferenceJobProductCategory::VidStudio);
+      assert_eq!(InferenceJobProductCategory::from_str("vid_studio_gen2").unwrap(), InferenceJobProductCategory::VidStudioGen2);
       assert_eq!(InferenceJobProductCategory::from_str("vid_style_transfer").unwrap(), InferenceJobProductCategory::VidStyleTransfer);
       assert_eq!(InferenceJobProductCategory::from_str("lipsync_face_fusion").unwrap(), InferenceJobProductCategory::LipsyncFaceFusion);
       assert_eq!(InferenceJobProductCategory::from_str("lipsync_sad_talker").unwrap(), InferenceJobProductCategory::LipsyncSadTalker);
@@ -280,7 +289,7 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobProductCategory::all_variants();
-      assert_eq!(variants.len(), 20);
+      assert_eq!(variants.len(), 21);
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::DownloadGptSoVits));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::TtsGptSoVits));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::TtsStyleTts2));
@@ -293,6 +302,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::VidLivePortrait));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::VidLivePortraitWebcam));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::VidStudio));
+      assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::VidStudioGen2));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::VidStyleTransfer));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncFaceFusion));
       assert_eq!(variants.pop_first(), Some(InferenceJobProductCategory::LipsyncSadTalker));
