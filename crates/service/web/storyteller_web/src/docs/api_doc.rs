@@ -117,6 +117,7 @@ use crate::http_server::endpoints::media_files::upsert_upload::write_error::Medi
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::*;
 use crate::http_server::endpoints::model_download::enqueue_gptsovits_model_download_handler::*;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::*;
+use crate::http_server::endpoints::studio_gen2::enqueue_studio_gen2_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::stats::get_unified_queue_stats_handler::*;
@@ -206,6 +207,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_image_media_file_handler::upload_image_media_file_handler,
+    crate::http_server::endpoints::studio_gen2::enqueue_studio_gen2_handler::enqueue_studio_gen2_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::upload_new_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::upload_new_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_pmx::upload_pmx_media_file_handler::upload_pmx_media_file_handler,
@@ -418,6 +420,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EditUsernameResponse,
     EnqueueFaceFusionCropDimensions,
     EnqueueFaceFusionWorkflowError,
+    EnqueueStudioGen2Request,
+    EnqueueStudioGen2Response,
+    EnqueueStudioGen2Error,
     EnqueueFaceFusionWorkflowRequest,
     EnqueueFaceFusionWorkflowSuccessResponse,
     EnqueueFbxToGltfRequest,

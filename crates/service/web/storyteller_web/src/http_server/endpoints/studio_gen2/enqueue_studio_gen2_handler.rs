@@ -113,13 +113,13 @@ impl std::fmt::Display for EnqueueStudioGen2Error {
   tag = "Studio Gen2",
   path = "/v1/studio_gen2/enqueue",
   responses(
-    (status = 200, description = "Success", body = VstSuccessResponse),
+    (status = 200, description = "Success", body = EnqueueStudioGen2Response),
     (status = 400, description = "Bad input", body = EnqueueStudioGen2Error),
     (status = 401, description = "Not authorized", body = EnqueueStudioGen2Error),
     (status = 429, description = "Rate limited", body = EnqueueStudioGen2Error),
     (status = 500, description = "Server error", body = EnqueueStudioGen2Error)
   ),
-  params(("request" = VstRequest, description = "Payload for request"))
+  params(("request" = EnqueueStudioGen2Request, description = "Payload for request"))
 )]
 pub async fn enqueue_studio_gen2_handler(
   http_request: HttpRequest,
