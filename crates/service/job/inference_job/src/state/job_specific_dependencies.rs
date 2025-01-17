@@ -19,6 +19,7 @@ use crate::state::scoped_model_type_execution::ScopedModelTypeExecution;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
+use crate::job::job_types::studio_gen2::studio_gen2_dependencies::StudioGen2Dependencies;
 
 pub struct JobSpecificDependencies {
   pub maybe_rvc_v2_dependencies: Option<RvcV2Dependencies>,
@@ -32,6 +33,7 @@ pub struct JobSpecificDependencies {
   pub maybe_mocapnet_dependencies: Option<MocapNetDependencies>,
   pub maybe_styletts2_dependencies: Option<StyleTTS2Dependencies>,
   pub maybe_comfy_ui_dependencies: Option<ComfyDependencies>,
+  pub maybe_studio_gen2_dependencies: Option<StudioGen2Dependencies>,
   pub maybe_convert_fbx_to_gltf_dependencies: Option<FbxToGltfDependencies>,
   pub maybe_convert_bvh_to_workflow_dependencies: Option<RenderEngineSceneToVideoDependencies>,
   pub maybe_gpt_sovits_dependencies: Option<GptSovitsDependencies>,
@@ -56,6 +58,7 @@ impl JobSpecificDependencies {
     let mut maybe_mocapnet_dependencies = None;
     let mut maybe_styletts2_dependencies = None;
     let mut maybe_comfy_ui_dependencies = None;
+    let mut maybe_studio_gen2_dependencies = None;
     let mut maybe_convert_fbx_to_gltf_dependencies = None;
     let mut maybe_convert_bvh_to_workflow_dependencies = None;
     let mut maybe_gpt_sovits_dependencies = None;
@@ -70,6 +73,11 @@ impl JobSpecificDependencies {
     {
       print_with_space("Setting ComfyUI dependencies...");
       maybe_comfy_ui_dependencies = Some(ComfyDependencies::setup().await?);
+    }
+
+    if scoped_job_type_execution.can_run_job(InferenceJobType::StudioGen2) {
+      print_with_space("Setting Studio Gen2 dependencies...");
+      maybe_studio_gen2_dependencies = Some(StudioGen2Dependencies::setup()?);
     }
 
     if scoped_job_type_execution.can_run_job(InferenceJobType::GptSovits) {
@@ -169,6 +177,7 @@ impl JobSpecificDependencies {
       maybe_mocapnet_dependencies,
       maybe_styletts2_dependencies,
       maybe_comfy_ui_dependencies,
+      maybe_studio_gen2_dependencies,
       maybe_convert_fbx_to_gltf_dependencies,
       maybe_convert_bvh_to_workflow_dependencies,
       maybe_gpt_sovits_dependencies,

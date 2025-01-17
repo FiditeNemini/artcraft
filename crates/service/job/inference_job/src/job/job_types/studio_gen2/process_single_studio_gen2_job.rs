@@ -1,5 +1,7 @@
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadFileForStudioArgs};
+use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
 use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
 use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::process_live_portrait_job;
@@ -29,7 +31,7 @@ use filesys::file_deletion::safe_delete_possible_files_and_directories::safe_del
 use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
 use filesys::path_to_string::path_to_string;
 use log::{error, info, warn};
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::{Cu, S2};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
@@ -37,6 +39,7 @@ use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::{Duration, Instant};
+use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
@@ -56,42 +59,31 @@ pub async fn process_single_studio_gen2_job(
   // TODO(bt,2025-01-16): This is a stub for Studio Gen2
   // TODO(bt,2025-01-16): This is a stub for Studio Gen2
 
-
   let mut job_progress_reporter = deps
       .clients
       .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-  let comfy_deps = deps
+  let gen2_deps = deps
       .job
       .job_specific_dependencies
-      .maybe_comfy_ui_dependencies
+      .maybe_studio_gen2_dependencies
       .as_ref()
-      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("Missing ComfyUI dependencies".to_string())))?;
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("Missing Studio Gen2 dependencies".to_string())))?;
 
   // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
   // check for lack of maybe_json_modifications
 
   let job_args = check_and_validate_job(job)?;
 
-  // ==================== TEMP DIR ==================== //
-
-  let work_temp_dir = format!("temp_comfy_inference{}", job.id.0);
-
-  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-  let work_temp_dir = deps
-      .fs
-      .scoped_temp_dir_creator_for_work
-      .new_tempdir(&work_temp_dir)
-      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
-
   // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
 
-  // TODO: Replace all other paths with this
-  let comfy_dirs = ComfyDirs::new(&comfy_deps);
+  //// TODO: Replace all other paths with this
+  let work_paths = StudioGen2Dirs::new(&gen2_deps)?;
 
-  let root_comfy_path = comfy_deps.inference_command.mounts_directory.clone();
+  info!("Input path: {:?}", &work_paths.input_dir.path());
+  info!("Output path: {:?}", &work_paths.output_dir.path());
 
   let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
   let remote_cloud_file_client = match remote_cloud_file_client {
@@ -103,15 +95,6 @@ pub async fn process_single_studio_gen2_job(
     }
   };
 
-  // Download workflow to ComfyRunner
-  let workflow_dir = root_comfy_path.join("prompt");
-  // make folder if not exist
-  if !workflow_dir.exists() {
-    std::fs::create_dir_all(&workflow_dir).map_err(|err| ProcessSingleJobError::IoError(err))?;
-  }
-
-  let mut workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
-
   info!("Grabbing redis connection from pool");
 
   let redis_pool_dep = deps
@@ -120,9 +103,6 @@ pub async fn process_single_studio_gen2_job(
 
   let redis_pool = redis_pool_dep
       .ok_or_else(|| ProcessSingleJobError::Other(anyhow!("failed to get redis pool")))?;
-  // .map(|redis| redis.get())
-  // .transpose()
-  // .map_err(|err| ProcessSingleJobError::Other(anyhow!("redis pool error: {:?}", err)))?;
 
   info!("Grabbing mysql connection from pool");
 
@@ -133,215 +113,85 @@ pub async fn process_single_studio_gen2_job(
         ProcessSingleJobError::Other(anyhow!("Could not acquire DB pool: {:?}", e))
       })?;
 
-  // download workflow if not none
-  match job_args.workflow_source {
-    Some(workflow_token) => {
-      let retrieved_workflow_record =  get_weight_by_token_with_transactor(
-        workflow_token,
-        false,
-        Transactor::for_connection(&mut mysql_connection)
-      ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Workflow not found")))?;
-
-      let bucket_details = RemoteCloudBucketDetails {
-        object_hash: retrieved_workflow_record.public_bucket_hash,
-        prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
-        suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
-      };
-      remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
-      info!("Downloaded workflow to {:?}", workflow_path);
-    }
-    _ => { }
-  }
-
   let maybe_args = job.maybe_inference_args
       .as_ref()
       .map(|args| args.args.as_ref())
       .flatten();
 
   let poly_args = match maybe_args {
-    None => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
+    None => return Err(ProcessSingleJobError::Other(anyhow!("Job args not found"))),
     Some(args) => args,
   };
 
-  let comfy_args = match poly_args {
-    Cu(args) => args,
-    _ => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
+  let studio_args = match poly_args {
+    S2(args) => args,
+    _ => return Err(ProcessSingleJobError::Other(anyhow!("Studio Gen2 args not found"))),
   };
 
-  info!("Workflow args: {:?}", comfy_args);
+  info!("Studio args: {:?}", studio_args);
 
-  // ==================== WRITE WORKFLOW PROMPT ==================== //
 
-  workflow_path = write_workflow_prompt(WorkflowPromptArgs {
-    workflow_path: &workflow_path,
-    comfy_args: &comfy_args,
-    model_dependencies: &comfy_deps,
-    maybe_positive_prompt: comfy_args.positive_prompt.as_deref(),
-    maybe_negative_prompt: comfy_args.negative_prompt.as_deref(),
-  })?;
+  // ==================== DOWNLOAD IMAGE ==================== //
 
-  // ==================== QUERY AND DOWNLOAD FILES ==================== //
+  let image_file;
 
-  // Download Lora model if specified
-  let mut maybe_lora_path: Option<PathBuf> = None;
+  match studio_args.image_file.as_ref() {
+    None => return Err(ProcessSingleJobError::Other(anyhow!("image_file not set"))),
+    Some(media_token) => {
+      image_file = download_file_for_studio(DownloadFileForStudioArgs {
+        media_token,
+        input_paths: &work_paths,
+        remote_cloud_file_client: &remote_cloud_file_client,
+        filename_without_extension: "input_image",
+      }, Transactor::for_connection(&mut mysql_connection)).await?;
 
-  match job_args.maybe_lora_model {
-    Some(lora_model_weight_token) => {
-      let lora_dir = root_comfy_path.join("models").join("loras");
-      // make if not exist
-      if !lora_dir.exists() {
-        std::fs::create_dir_all(&lora_dir)
-            .map_err(|err| ProcessSingleJobError::IoError(err))?;
-      }
-
-      info!("Querying lora model by token: {:?} ...", &lora_model_weight_token);
-
-      let retrieved_lora_record =  get_weight_by_token_with_transactor(
-        lora_model_weight_token,
-        true,
-        Transactor::for_connection(&mut mysql_connection)
-      ).await?.ok_or_else(|| {
-        error!("Lora model not found: {:?}", lora_model_weight_token);
-        ProcessSingleJobError::Other(anyhow!("Lora model not found: {:?}", lora_model_weight_token))
-      })?;
-
-      let bucket_details = RemoteCloudBucketDetails {
-        object_hash: retrieved_lora_record.public_bucket_hash,
-        prefix: retrieved_lora_record.maybe_public_bucket_prefix.unwrap(),
-        suffix: retrieved_lora_record.maybe_public_bucket_extension.unwrap(),
-      };
-
-      let lora_filename = "lora.safetensors";
-      let lora_path = lora_dir.join(lora_filename).to_str().unwrap().to_string();
-      remote_cloud_file_client.download_file(bucket_details, lora_path.clone()).await?;
-      maybe_lora_path = Some(lora_path.parse().unwrap());
-      info!("Downloaded Lora model to {:?}", lora_path);
-      maybe_lora_path = Some(lora_path.parse().unwrap());
+      info!("Downloaded image to {:?}", &image_file.file_path);
     }
-    None => {}
   }
 
-  let input_dir = root_comfy_path.join("input");
+  // ==================== DOWNLOAD VIDEO ==================== //
 
-  if !input_dir.exists() {
-    std::fs::create_dir_all(&input_dir)
-        .map_err(|err| ProcessSingleJobError::IoError(err))?;
+  let video_file;
+
+  match studio_args.video_file.as_ref() {
+    None => return Err(ProcessSingleJobError::Other(anyhow!("video_file not set"))),
+    Some(media_token) => {
+      video_file = download_file_for_studio(DownloadFileForStudioArgs {
+        media_token,
+        input_paths: &work_paths,
+        remote_cloud_file_client: &remote_cloud_file_client,
+        filename_without_extension: "input_video",
+      }, Transactor::for_connection(&mut mysql_connection)).await?;
+
+      info!("Downloaded video to {:?}", &video_file.file_path);
+    }
   }
 
-  // Keep track of all the video files we generate
-  info!("Root comfy path: {:?}", &root_comfy_path);
-  info!("Job output path will be (fix this code! the job shouldn't set this path!): {:?}", &job_args.output_path);
+  //if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.original_download_path) {
+  //  info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
+  //}
 
-  // TODO(bt,2024-04-20): Clean up this mess.
+  //// ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
-  // ==================== DOWNLOAD GLOBAL IPA IMAGE (IF SET) ==================== //
+  //let expected_frame_count = preprocess_trim_and_resample_videos(ProcessTrimAndResampleVideoArgs {
+  //  comfy_args: studio_args,
+  //  comfy_deps: gen2_deps,
+  //  comfy_dirs: &work_paths,
+  //  videos: &mut videos,
+  //})?;
 
-  let mut global_ipa_image = None;
+  // ==================== RUN INFERENCE ==================== //
 
-  if let Some(ipa_media_token) = comfy_args.global_ip_adapter_token.as_ref() {
-    let results = download_global_ipa_image(DownloadGlobalIpaImageArgs {
-      ipa_media_token,
-      comfy_input_directory: &input_dir,
-      remote_cloud_file_client: &remote_cloud_file_client,
-    }, Transactor::for_connection(&mut mysql_connection)).await?;
-
-    info!("Downloaded global IPA image to {:?}", results.ipa_image_path);
-
-    global_ipa_image = Some(results);
-  }
-
-  // ==================== DOWNLOAD VIDEOS ==================== //
-
-  let mut videos = download_input_videos(DownloadInputVideoArgs {
-    job_args: &job_args,
-    comfy_dirs: &comfy_dirs,
-    mysql_connection: &mut mysql_connection,
-    remote_cloud_file_client: &remote_cloud_file_client,
-  }).await?;
-
-  info!("Downloaded video!");
-
-  videos.debug_print_video_paths();
-
-  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.original_download_path) {
-    info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
-  }
-
-  // ========================= TRIM AND PREPROCESS VIDEO ======================== //
-
-  let expected_frame_count = preprocess_trim_and_resample_videos(ProcessTrimAndResampleVideoArgs {
-    comfy_args,
-    comfy_deps,
-    comfy_dirs: &comfy_dirs,
-    videos: &mut videos,
-  })?;
-
-
-  // ========================= PREPROCESS AUDIO ======================== //
-
-  let mut lipsync_enabled = comfy_args.lipsync_enabled.unwrap_or(false);
-  if let Err(err) = preprocess_save_audio(ProcessSaveAudioArgs {
-    comfy_deps,
-    videos: &mut videos,
-  }) {
-    error!("Audio extraction failed: {:?}", err);
-
-    lipsync_enabled = false;
-  }
-
-  // ========================= CREATE OUTPUT DIR ======================== //
-
-  // make outputs dir if not exist
-  let output_dir = root_comfy_path.join("output");
-  if !output_dir.exists() {
-    std::fs::create_dir_all(&output_dir)
-        .map_err(|err| ProcessSingleJobError::IoError(err))?;
-  }
-
-  // ==================== RUN COMFY INFERENCE ==================== //
-
-  info!("Preparing for ComfyUI inference...");
+  info!("Preparing for studio inference...");
 
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let stderr_output_file = work_temp_dir.path().join("stderr.txt");
-  let stdout_output_file = work_temp_dir.path().join("stdout.txt");
-
-  let positive_prompt_file = work_temp_dir.path().join("positive_prompt.txt");
-  let negative_prompt_file = work_temp_dir.path().join("negative_prompt.txt");
-  let travel_prompt_file = work_temp_dir.path().join("travel_prompt.txt");
-  let preview_frames_dir = work_temp_dir.path().join("preview_frames");
-
-  let maybe_positive_prompt_filename = comfy_args.positive_prompt
-      .as_deref()
-      .map(|prompt| {
-        std::fs::write(&positive_prompt_file, prompt)
-            .map(|_| positive_prompt_file.as_path())
-            .map_err(|e| ProcessSingleJobError::IoError(e))
-      })
-      .transpose()?;
-
-  let maybe_negative_prompt_filename = comfy_args.negative_prompt
-      .as_deref()
-      .map(|prompt| {
-        std::fs::write(&negative_prompt_file, prompt)
-            .map(|_| negative_prompt_file.as_path())
-            .map_err(|e| ProcessSingleJobError::IoError(e))
-      })
-      .transpose()?;
-
-  let maybe_travel_prompt_filename = comfy_args.travel_prompt
-      .as_deref()
-      .map(|prompt| {
-        std::fs::write(&travel_prompt_file, prompt)
-            .map(|_| travel_prompt_file.as_path())
-            .map_err(|e| ProcessSingleJobError::IoError(e))
-      })
-      .transpose()?;
+  let stderr_output_file = work_paths.output_dir.path().join("stderr.txt");
+  let stdout_output_file = work_paths.output_dir.path().join("stdout.txt");
 
   let inference_details = InferenceDetails::NewPythonArgs {
-    maybe_style: comfy_args.style_name,
+    maybe_style: studio_args.style_name,
     maybe_positive_prompt_filename,
     maybe_negative_prompt_filename,
     maybe_travel_prompt_filename,
@@ -353,54 +203,9 @@ pub async fn process_single_studio_gen2_job(
   let previews_media_file_directory = MediaFileBucketDirectory::generate_new();
 
 
-  // let mysql_pool = deps.db.mysql_pool.clone();
   let (_cancel_tx, mut cancel_rx) = oneshot::channel();
-  // let mut interval = tokio::time::interval(Duration::from_millis(30_000));
-  // let job_token = job.inference_job_token.clone();
-  //
-  // let _cancellation_watcher = tokio::spawn(async move {
-  //     let mut connection = match mysql_pool.acquire().await {
-  //         Ok(connection) => connection,
-  //         Err(e) => {
-  //             error!("Error acquiring mysql connection: {:?}", e);
-  //             return
-  //         }
-  //     };
-  //     let mut fail_count = 0;
-  //     loop {
-  //         interval.tick().await;
-  //         let current_status = get_inference_job_status_from_connection(
-  //             &job_token,
-  //             &mut connection
-  //         ).await;
-  //         let current_status = match current_status {
-  //             Ok(status) => status,
-  //             Err(e) => {
-  //                 fail_count += 1;
-  //                 error!("Error #{fail_count} getting job status: {:?}", e);
-  //                 if fail_count > 3 {
-  //                     return;
-  //                 }
-  //                 tokio::time::sleep(Duration::from_secs(3)).await;
-  //                 continue
-  //             }
-  //         };
-  //         fail_count = 0;
-  //         match current_status {
-  //             Some(status) => {
-  //                 if status.status == JobStatusPlus::CancelledByUser {
-  //                     cancel_tx.send(()).unwrap();
-  //                     break
-  //                 }
-  //             }
-  //             None => {
-  //                 debug!("Job status not found. This has to be an error");
-  //             }
-  //         }
-  //     }
-  // });
-  //
-  let preview_frames_enabled = comfy_args.generate_fast_previews.unwrap_or(false);
+
+  let preview_frames_enabled = studio_args.generate_fast_previews.unwrap_or(false);
   let (preview_cancellation_tx, rx) = channel();
   let mut preview_processor = PreviewProcessor::new(
     job.inference_job_token.clone(),
@@ -417,24 +222,24 @@ pub async fn process_single_studio_gen2_job(
 
   info!("Running ComfyUI inference...");
 
-  let command_exit_status = comfy_deps
+  let command_exit_status = gen2_deps
       .inference_command
       .execute_inference(
         &mut cancel_rx,
         InferenceArgs {
-          generate_previews: comfy_args.generate_fast_previews.unwrap_or(false),
+          generate_previews: studio_args.generate_fast_previews.unwrap_or(false),
           preview_frames_directory: Some(preview_frames_dir.as_ref()),
           stderr_output_file: &stderr_output_file,
           stdout_output_file: &stdout_output_file,
           inference_details,
-          face_detailer_enabled: comfy_args.use_face_detailer.unwrap_or(false),
-          upscaler_enabled: comfy_args.use_upscaler.unwrap_or(false),
+          face_detailer_enabled: studio_args.use_face_detailer.unwrap_or(false),
+          upscaler_enabled: studio_args.use_upscaler.unwrap_or(false),
           lipsync_enabled,
-          disable_lcm: comfy_args.disable_lcm.unwrap_or(false),
-          use_cinematic: comfy_args.use_cinematic.unwrap_or(false),
-          use_cogvideo: comfy_args.use_cogvideo.unwrap_or(false),
-          maybe_strength: comfy_args.strength,
-          frame_skip: comfy_args.frame_skip,
+          disable_lcm: studio_args.disable_lcm.unwrap_or(false),
+          use_cinematic: studio_args.use_cinematic.unwrap_or(false),
+          use_cogvideo: studio_args.use_cogvideo.unwrap_or(false),
+          maybe_strength: studio_args.strength,
+          frame_skip: studio_args.frame_skip,
           global_ipa_image_filename: global_ipa_image
               .as_ref()
               .map(|image| path_to_string(&image.ipa_image_path)),
@@ -485,7 +290,7 @@ pub async fn process_single_studio_gen2_job(
     }
 
     safe_delete_all_input_videos(&videos);
-    safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
+    safe_recursively_delete_files(&work_paths.comfy_output_dir); // NB: Don't delete directory itself.
 
     // NB: Forcing generic type to `&Path` with turbofish
     safe_delete_possible_files_and_directories::<&Path>(&[
@@ -509,14 +314,14 @@ pub async fn process_single_studio_gen2_job(
   // ==================== COPY BACK AUDIO ==================== //
 
   post_process_restore_audio(PostProcessRestoreVideoArgs {
-    comfy_deps,
+    comfy_deps: gen2_deps,
     videos: &mut videos,
   });
 
   // ==================== OPTIONAL WATERMARK ==================== //
 
   post_process_add_watermark(PostProcessAddWatermarkArgs {
-    comfy_deps,
+    comfy_deps: gen2_deps,
     videos: &mut videos,
   });
 
@@ -534,8 +339,8 @@ pub async fn process_single_studio_gen2_job(
     job,
     deps: &deps,
     job_args: &job_args,
-    comfy_deps,
-    comfy_args,
+    comfy_deps: gen2_deps,
+    comfy_args: studio_args,
     videos: &videos,
     job_progress_reporter: &mut job_progress_reporter,
     inference_duration,
@@ -546,11 +351,11 @@ pub async fn process_single_studio_gen2_job(
     Err(err) => {
       error!("Error validating and saving results: {:?}", err);
       safe_delete_all_input_videos(&videos);
-      safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
+      safe_recursively_delete_files(&work_paths.comfy_output_dir); // NB: Don't delete directory itself.
 
       // NB: Forcing generic type to `&Path` with turbofish
       safe_delete_possible_files_and_directories::<&Path>(&[
-        Some(&comfy_dirs.comfy_output_dir),
+        Some(&work_paths.comfy_output_dir),
         Some(&negative_prompt_file),
         Some(&output_dir),
         Some(&preview_frames_dir),
@@ -570,7 +375,7 @@ pub async fn process_single_studio_gen2_job(
 
   // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
 
-  if let Some(sleep_millis) = comfy_args.sleep_millis {
+  if let Some(sleep_millis) = studio_args.sleep_millis {
     info!("Sleeping for millis: {sleep_millis}");
     thread::sleep(Duration::from_millis(sleep_millis));
   }
@@ -580,11 +385,11 @@ pub async fn process_single_studio_gen2_job(
   info!("Cleaning up temporary files...");
 
   safe_delete_all_input_videos(&videos);
-  safe_recursively_delete_files(&comfy_dirs.comfy_output_dir); // NB: Don't delete directory itself.
+  safe_recursively_delete_files(&work_paths.comfy_output_dir); // NB: Don't delete directory itself.
 
   // NB: Forcing generic type to `&Path` with turbofish
   safe_delete_possible_files_and_directories::<&Path>(&[
-    Some(&comfy_dirs.comfy_output_dir),
+    Some(&work_paths.comfy_output_dir),
     Some(&negative_prompt_file),
     Some(&output_dir),
     Some(&preview_frames_dir),
