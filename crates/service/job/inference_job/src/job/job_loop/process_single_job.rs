@@ -23,6 +23,7 @@ use crate::job::job_types::image_generation::process_single_ig_job::process_sing
 use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
 use crate::job::job_types::mocap::process_single_mc_job::process_single_mc_job;
 use crate::job::job_types::render_engine_scene::process_render_engine_scene::process_single_render_engine_scene_job;
+use crate::job::job_types::studio_gen2::process_single_studio_gen2_job::process_single_studio_gen2_job;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job::job_types::vc::rvc_v2::dispatch_rvc_v2_job::dispatch_rvc_v2_job;
@@ -273,6 +274,9 @@ async fn new_dispatch(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
   let job_success_result = match job.job_type {
+    InferenceJobType::StudioGen2 => {
+      process_single_studio_gen2_job(job_dependencies, job).await?
+    },
     InferenceJobType::VideoRender
     | InferenceJobType::LivePortrait
     | InferenceJobType::FaceFusion
