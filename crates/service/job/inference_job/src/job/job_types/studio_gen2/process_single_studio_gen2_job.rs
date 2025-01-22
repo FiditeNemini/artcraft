@@ -2,7 +2,6 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadFileForStudioArgs};
 use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
-use crate::job::job_types::workflow::comfy_ui_inference_command::{InferenceArgs, InferenceDetails};
 use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
 use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::process_live_portrait_job;
 use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
@@ -14,7 +13,6 @@ use crate::job::job_types::workflow::video_style_transfer::steps::post_process_a
 use crate::job::job_types::workflow::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
 use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
 use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_trim_and_resample_videos::{preprocess_trim_and_resample_videos, ProcessTrimAndResampleVideoArgs};
-use crate::job::job_types::workflow::video_style_transfer::steps::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
 use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
 use crate::job::job_types::workflow::video_style_transfer::util::process_preview_updates::PreviewProcessor;
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
@@ -36,14 +34,17 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
 use std::fs::read_to_string;
+use std::io::stdout;
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::{Duration, Instant};
 use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
+use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
-
+use crate::job::job_types::studio_gen2::stable_animator_command::InferenceArgs;
+use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
 // TODO(bt,2025-01-16): This is a stub for Studio Gen2
 // TODO(bt,2025-01-16): This is a stub for Studio Gen2
 // TODO(bt,2025-01-16): This is a stub for Studio Gen2
@@ -190,75 +191,38 @@ pub async fn process_single_studio_gen2_job(
   let stderr_output_file = work_paths.output_dir.path().join("stderr.txt");
   let stdout_output_file = work_paths.output_dir.path().join("stdout.txt");
 
-  let inference_details = InferenceDetails::NewPythonArgs {
-    maybe_style: studio_args.style_name,
-    maybe_positive_prompt_filename,
-    maybe_negative_prompt_filename,
-    maybe_travel_prompt_filename,
-  };
+  let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
+  create_dir_all_if_missing(&pose_frames_dir)?;
+
+  let video_output_path = work_paths.output_dir.path().join("output_video.mp4");
+
+  let video_frames_output_dir = work_paths.output_dir.path().join("final_frames");
+  create_dir_all_if_missing(&video_frames_output_dir)?;
+
+  info!("Running Studio Gen2 inference...");
 
   let inference_start_time = Instant::now();
 
-  let ephemeral_bucket_client = deps.buckets.auto_gc_bucket_client.clone();
-  let previews_media_file_directory = MediaFileBucketDirectory::generate_new();
-
-
-  let (_cancel_tx, mut cancel_rx) = oneshot::channel();
-
-  let preview_frames_enabled = studio_args.generate_fast_previews.unwrap_or(false);
-  let (preview_cancellation_tx, rx) = channel();
-  let mut preview_processor = PreviewProcessor::new(
-    job.inference_job_token.clone(),
-    redis_pool,
-    preview_frames_dir.clone(),
-    previews_media_file_directory,
-    expected_frame_count as u32,
-    rx,
-  );
-
-  tokio::spawn(async move {
-    preview_processor.start_processing(&ephemeral_bucket_client).await;;
-  });
-
-  info!("Running ComfyUI inference...");
-
   let command_exit_status = gen2_deps
-      .inference_command
+      .command
       .execute_inference(
-        &mut cancel_rx,
         InferenceArgs {
-          generate_previews: studio_args.generate_fast_previews.unwrap_or(false),
-          preview_frames_directory: Some(preview_frames_dir.as_ref()),
           stderr_output_file: &stderr_output_file,
           stdout_output_file: &stdout_output_file,
-          inference_details,
-          face_detailer_enabled: studio_args.use_face_detailer.unwrap_or(false),
-          upscaler_enabled: studio_args.use_upscaler.unwrap_or(false),
-          lipsync_enabled,
-          disable_lcm: studio_args.disable_lcm.unwrap_or(false),
-          use_cinematic: studio_args.use_cinematic.unwrap_or(false),
-          use_cogvideo: studio_args.use_cogvideo.unwrap_or(false),
-          maybe_strength: studio_args.strength,
-          frame_skip: studio_args.frame_skip,
-          global_ipa_image_filename: global_ipa_image
-              .as_ref()
-              .map(|image| path_to_string(&image.ipa_image_path)),
-          global_ipa_strength: None, // TODO: Expose a UI slider
-          depth_video_path: videos.maybe_depth.as_ref()
-              .map(|v| v.maybe_processed_path.as_deref())
-              .flatten(),
-          normal_video_path: videos.maybe_normal.as_ref()
-              .map(|v| v.maybe_processed_path.as_deref())
-              .flatten(),
-          outline_video_path: videos.maybe_outline.as_ref()
-              .map(|v| v.maybe_processed_path.as_deref())
-              .flatten(),
+          start_image_path: &image_file.file_path,
+          pre_pose_video_path: Some(video_file.file_path.as_ref()),
+          pose_images_dir: &pose_frames_dir,
+          frame_output_dir: &video_frames_output_dir,
+          video_output_path: &video_output_path,
+          pretrained_model_name_or_path: &gen2_deps.pretrained_model_name_or_path,
+          posenet_model_name_or_path: &gen2_deps.posenet_model_name_or_path,
+          face_encoder_model_name_or_path: &gen2_deps.face_encoder_model_name_or_path,
+          unet_model_name_or_path: &gen2_deps.unet_model_name_or_path,
         }).await;
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
 
   info!("Inference command exited with status: {:?}", command_exit_status);
-
   info!("Inference took duration to complete: {:?}", &inference_duration);
 
   // check stdout for success and check if file exists
@@ -270,17 +234,13 @@ pub async fn process_single_studio_gen2_job(
     info!("Captured stderr output: {}", contents);
   }
 
-  videos.debug_print_video_paths();
-
-  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.comfy_output_video_path) {
-    info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
-  }
-
-  let _ = preview_cancellation_tx.send(());
+  //if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.comfy_output_video_path) {
+  //  info!("Comfy output video dimensions: {}x{}", dimensions.width, dimensions.height);
+  //}
 
   // ==================== CHECK OUTPUT FILE ======================== //
 
-  if let Err(err) = check_file_exists(&videos.primary_video.comfy_output_video_path) {
+  if let Err(err) = check_file_exists(&video_output_path) {
     error!("Output file does not  exist: {:?}", err);
 
     error!("Inference failed: {:?}", command_exit_status);
@@ -289,47 +249,33 @@ pub async fn process_single_studio_gen2_job(
       warn!("Captured stderr output: {}", contents);
     }
 
-    safe_delete_all_input_videos(&videos);
-    safe_recursively_delete_files(&work_paths.comfy_output_dir); // NB: Don't delete directory itself.
-
     // NB: Forcing generic type to `&Path` with turbofish
     safe_delete_possible_files_and_directories::<&Path>(&[
-      Some(&negative_prompt_file),
-      Some(&output_dir),
-      Some(&positive_prompt_file),
-      Some(&preview_frames_dir),
-      Some(&stderr_output_file),
-      Some(&stdout_output_file),
-      Some(&travel_prompt_file),
-      Some(work_temp_dir.path()),
-      Some(workflow_path.as_ref()),
-      global_ipa_image.as_ref().map(|ipa| ipa.ipa_image_path.as_path()),
-      maybe_lora_path.as_deref(),
+      Some(work_paths.input_dir.path()),
+      Some(work_paths.output_dir.path()),
     ]);
 
     return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
-            &videos.primary_video.comfy_output_video_path)));
+            &video_output_path)));
   }
 
-  // ==================== COPY BACK AUDIO ==================== //
+  //// ==================== COPY BACK AUDIO ==================== //
 
-  post_process_restore_audio(PostProcessRestoreVideoArgs {
-    comfy_deps: gen2_deps,
-    videos: &mut videos,
-  });
+  //post_process_restore_audio(PostProcessRestoreVideoArgs {
+  //  comfy_deps: gen2_deps,
+  //  videos: &mut videos,
+  //});
 
-  // ==================== OPTIONAL WATERMARK ==================== //
+  //// ==================== OPTIONAL WATERMARK ==================== //
 
-  post_process_add_watermark(PostProcessAddWatermarkArgs {
-    comfy_deps: gen2_deps,
-    videos: &mut videos,
-  });
+  //post_process_add_watermark(PostProcessAddWatermarkArgs {
+  //  comfy_deps: gen2_deps,
+  //  videos: &mut videos,
+  //});
 
   // ==================== DEBUG ======================== //
 
-  videos.debug_print_video_paths();
-
-  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.get_final_video_to_upload()) {
+  if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&video_output_path) {
     info!("Final video upload dimensions: {}x{}", dimensions.width, dimensions.height);
   }
 
@@ -339,9 +285,9 @@ pub async fn process_single_studio_gen2_job(
     job,
     deps: &deps,
     job_args: &job_args,
-    comfy_deps: gen2_deps,
-    comfy_args: studio_args,
-    videos: &videos,
+    gen2_deps,
+    studio_args,
+    output_video_path: &video_output_path,
     job_progress_reporter: &mut job_progress_reporter,
     inference_duration,
   }).await;
@@ -350,23 +296,11 @@ pub async fn process_single_studio_gen2_job(
     Ok(token) => token,
     Err(err) => {
       error!("Error validating and saving results: {:?}", err);
-      safe_delete_all_input_videos(&videos);
-      safe_recursively_delete_files(&work_paths.comfy_output_dir); // NB: Don't delete directory itself.
 
       // NB: Forcing generic type to `&Path` with turbofish
       safe_delete_possible_files_and_directories::<&Path>(&[
-        Some(&work_paths.comfy_output_dir),
-        Some(&negative_prompt_file),
-        Some(&output_dir),
-        Some(&preview_frames_dir),
-        Some(&stderr_output_file),
-        Some(&stdout_output_file),
-        Some(&travel_prompt_file),
-        Some(&positive_prompt_file),
-        Some(work_temp_dir.path()),
-        Some(workflow_path.as_ref()),
-        global_ipa_image.as_ref().map(|ipa| ipa.ipa_image_path.as_path()),
-        maybe_lora_path.as_deref(),
+        Some(work_paths.input_dir.path()),
+        Some(work_paths.output_dir.path()),
       ]);
 
       return Err(err);
@@ -375,37 +309,24 @@ pub async fn process_single_studio_gen2_job(
 
   // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
 
-  if let Some(sleep_millis) = studio_args.sleep_millis {
+  if let Some(sleep_millis) = studio_args.after_job_debug_sleep_millis {
     info!("Sleeping for millis: {sleep_millis}");
-    thread::sleep(Duration::from_millis(sleep_millis));
+    tokio::time::sleep(Duration::from_millis(sleep_millis)).await;
   }
 
   // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
 
   info!("Cleaning up temporary files...");
 
-  safe_delete_all_input_videos(&videos);
-  safe_recursively_delete_files(&work_paths.comfy_output_dir); // NB: Don't delete directory itself.
-
   // NB: Forcing generic type to `&Path` with turbofish
   safe_delete_possible_files_and_directories::<&Path>(&[
-    Some(&work_paths.comfy_output_dir),
-    Some(&negative_prompt_file),
-    Some(&output_dir),
-    Some(&preview_frames_dir),
-    Some(&stderr_output_file),
-    Some(&stdout_output_file),
-    Some(&travel_prompt_file),
-    Some(&positive_prompt_file),
-    Some(work_temp_dir.path()),
-    Some(workflow_path.as_ref()),
-    global_ipa_image.as_ref().map(|ipa| ipa.ipa_image_path.as_path()),
-    maybe_lora_path.as_deref(),
+    Some(work_paths.input_dir.path()),
+    Some(work_paths.output_dir.path()),
   ]);
 
   // ==================== DONE ==================== //
 
-  info!("ComfyUI Done.");
+  info!("Studio Gen2 Done.");
 
   job_progress_reporter.log_status("done")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -421,39 +342,4 @@ pub async fn process_single_studio_gen2_job(
     }),
     inference_duration,
   })
-}
-
-fn safe_delete_all_input_videos(videos: &VideoPathing) {
-  safe_delete_primary_videos(&videos.primary_video);
-  if let Some(depth) = &videos.maybe_depth {
-    safe_delete_secondary_videos(depth);
-  }
-  if let Some(normal) = &videos.maybe_normal {
-    safe_delete_secondary_videos(normal);
-  }
-  if let Some(outline) = &videos.maybe_outline {
-    safe_delete_secondary_videos(outline);
-  }
-}
-
-fn safe_delete_primary_videos(video: &PrimaryInputVideoAndPaths) {
-  safe_delete_possible_files_and_directories::<&Path>(&[
-    Some(&video.comfy_input_video_path),
-    Some(&video.comfy_output_video_path),
-    Some(&video.original_download_path),
-    Some(&video.trimmed_wav_audio_path),
-    Some(video.get_final_video_to_upload()),
-    Some(video.get_non_watermarked_video_to_upload()),
-    Some(video.video_to_watermark()),
-    video.audio_restored_video_path.as_deref(),
-    video.maybe_trimmed_resampled_path.as_deref(),
-    video.watermarked_video_path.as_deref(),
-  ]);
-}
-
-fn safe_delete_secondary_videos(video: &SecondaryInputVideoAndPaths) {
-  safe_delete_possible_files_and_directories::<&Path>(&[
-    Some(&video.original_download_path),
-    video.maybe_processed_path.as_deref(),
-  ]);
 }

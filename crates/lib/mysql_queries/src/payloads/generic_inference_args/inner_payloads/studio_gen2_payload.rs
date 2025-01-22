@@ -1,5 +1,6 @@
-use enums::common::visibility::Visibility;
 use crate::payloads::generic_inference_args::common::watermark_type::WatermarkType;
+use enums::common::visibility::Visibility;
+use std::time::Duration;
 use tokens::tokens::media_files::MediaFileToken;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -21,4 +22,8 @@ pub struct StudioGen2Payload {
   #[serde(rename = "cv")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub creator_visibility: Option<Visibility>,
+
+  #[serde(rename = "sm")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub after_job_debug_sleep_millis: Option<u64>,
 }
