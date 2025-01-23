@@ -4,6 +4,7 @@ import { useLocalize } from "hooks";
 import React from "react";
 import LandingDemo from "./LandingDemo/FakeYouLandingDemo";
 import { Button, Panel } from "components/common";
+import RemoveAdsButton from "components/common/RemoveAdsButton";
 
 export default function FakeYouLandingHeader() {
   const { t } = useLocalize("LandingPage");
@@ -27,13 +28,14 @@ export default function FakeYouLandingHeader() {
               <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
                 {t("heroText")}
               </p>
-              <div className="d-flex justify-content-center justify-content-lg-start">
+              <div className="d-flex justify-content-center justify-content-lg-start gap-2 gap-lg-3">
                 <Button
                   label="Get Started Free"
                   to="/signup"
                   icon={faArrowRight}
                   iconFlip={true}
                 />
+                <RemoveAdsButton />
               </div>
             </Panel>
           </div>

@@ -1,5 +1,5 @@
-import { SessionContext } from "context";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useSession } from "hooks";
+import React, { useEffect, useRef, useState } from "react";
 
 interface AdBannerProps {
   dataAdSlot: string;
@@ -20,7 +20,7 @@ export function AdBanner({
 }: AdBannerProps) {
   const adRef = useRef<HTMLModElement>(null);
   const [adFailed, setAdFailed] = useState(false);
-  const { user, sessionSubscriptions } = useContext(SessionContext);
+  const { loggedIn, sessionSubscriptions } = useSession();
 
   useEffect(() => {
     // Check if adsbygoogle is blocked or not loaded
@@ -50,7 +50,7 @@ export function AdBanner({
     return () => clearTimeout(timeoutId);
   }, []);
 
-  if (user && sessionSubscriptions?.hasPaidFeatures()) {
+  if (loggedIn && sessionSubscriptions?.hasPaidFeatures()) {
     return null;
   }
 

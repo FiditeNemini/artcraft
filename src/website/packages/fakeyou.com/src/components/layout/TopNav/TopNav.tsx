@@ -38,6 +38,8 @@ import {
   GetWebsite,
   Website,
 } from "@storyteller/components/src/env/GetWebsite";
+import RemoveAdsButton from "components/common/RemoveAdsButton";
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 
 export default function TopNav() {
   const { queryAppState, sessionWrapper, user } = useSession();
@@ -48,6 +50,7 @@ export default function TopNav() {
   const [isFocused, setIsFocused] = useState(false);
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   const { t } = useLocalize("SideNav");
+  const { isVideoToolsEnabled } = useFeatureFlags();
   const {
     isOnLandingPage,
     isOnLoginPage,
@@ -338,7 +341,10 @@ export default function TopNav() {
         className={`position-fixed ${
           domain.titlePart !== "FakeYou"
             ? "topbar-bg-transparent"
-            : !loggedIn && isOnLandingPage && !isScrolled
+            : !loggedIn &&
+                isOnLandingPage &&
+                !isScrolled &&
+                mobileMenu === "d-none"
               ? "topbar-bg-dark"
               : ""
         }`.trim()}
@@ -436,6 +442,10 @@ export default function TopNav() {
               )}
 
             <div className="d-flex align-items-center gap-2">
+              {domain.website === Website.FakeYou && (
+                <RemoveAdsButton small={true} />
+              )}
+
               <div className="d-none d-lg-flex gap-2">
                 {(domain.website === Website.FakeYou ||
                   (sessionWrapper.isLoggedIn() &&
@@ -566,53 +576,57 @@ export default function TopNav() {
               </NavLink>
             </li>
 
-            <li className="sidebar-heading">{t("videoTitle")}</li>
+            {isVideoToolsEnabled() && (
+              <>
+                <li className="sidebar-heading">{t("videoTitle")}</li>
 
-            <li>
-              <NavLink
-                to="/style-video"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-                className="d-flex align-items-center"
-              >
-                <FontAwesomeIcon
-                  icon={faFilms}
-                  className="sidebar-heading-icon"
-                />
-                {t("videoStyleTransfer")}
-                {newBadge}
-              </NavLink>
-            </li>
+                <li>
+                  <NavLink
+                    to="/style-video"
+                    activeClassName="active-link"
+                    onClick={handleNavLinkClick}
+                    className="d-flex align-items-center"
+                  >
+                    <FontAwesomeIcon
+                      icon={faFilms}
+                      className="sidebar-heading-icon"
+                    />
+                    {t("videoStyleTransfer")}
+                    {newBadge}
+                  </NavLink>
+                </li>
 
-            <li>
-              <NavLink
-                to="/ai-live-portrait"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-                className="d-flex align-items-center"
-              >
-                <FontAwesomeIcon
-                  icon={faImageUser}
-                  className="sidebar-heading-icon"
-                />
-                Live Portrait
-                {newBadge}
-              </NavLink>
-            </li>
+                <li>
+                  <NavLink
+                    to="/ai-live-portrait"
+                    activeClassName="active-link"
+                    onClick={handleNavLinkClick}
+                    className="d-flex align-items-center"
+                  >
+                    <FontAwesomeIcon
+                      icon={faImageUser}
+                      className="sidebar-heading-icon"
+                    />
+                    Live Portrait
+                    {newBadge}
+                  </NavLink>
+                </li>
 
-            <li>
-              <NavLink
-                to="/face-animator"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faFaceViewfinder}
-                  className="sidebar-heading-icon"
-                />
-                {t("lipsync")}
-              </NavLink>
-            </li>
+                <li>
+                  <NavLink
+                    to="/face-animator"
+                    activeClassName="active-link"
+                    onClick={handleNavLinkClick}
+                  >
+                    <FontAwesomeIcon
+                      icon={faFaceViewfinder}
+                      className="sidebar-heading-icon"
+                    />
+                    {t("lipsync")}
+                  </NavLink>
+                </li>
+              </>
+            )}
 
             <li className="sidebar-heading">{t("speechTitle")}</li>
 
