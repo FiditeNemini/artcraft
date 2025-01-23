@@ -5,14 +5,21 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { get_media_url } from "~/Classes/ApiHelpers";
 import { MMDLoader } from "three/examples/jsm/loaders/MMDLoader.js";
 import { ClipUI } from "../../clips/clip_ui";
+import Ijson from "~/interfaces/Ijson";
 
-export class CharacterAnimationEngine {
+export class CharacterAnimationEngine implements Ijson {
   version: number;
   characterAnimations: Map<THREE.Object3D<THREE.Object3DEventMap>, ClipUI[]> = new Map();
   characterMixers = new Map<THREE.Object3D<THREE.Object3DEventMap>, THREE.AnimationMixer>();
 
   constructor(version: number) {
     this.version = version;
+  }
+
+  toJSON(): unknown {
+    // Return just an array of character object IDs
+    const characterIds = Array.from(this.characterAnimations.keys()).map((character) => character.uuid);
+    return { characters: characterIds };
   }
 
   /**
