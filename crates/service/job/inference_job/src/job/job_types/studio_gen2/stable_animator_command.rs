@@ -26,9 +26,11 @@ python inference_advanced.py \
 
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
+use std::process::Stdio;
 use std::time::Duration;
 use log::{debug, info, warn};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt};
+use tokio::process::Command;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::command_exit_status::CommandExitStatus;

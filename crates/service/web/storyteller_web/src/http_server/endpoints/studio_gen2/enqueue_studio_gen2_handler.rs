@@ -245,6 +245,7 @@ pub async fn enqueue_studio_gen2_handler(
     video_file: Some(request.video_file.clone()),
     creator_visibility: Some(set_visibility),
     watermark_type,
+    after_job_debug_sleep_millis: None,
   };
 
   info!("Creating ComfyUI job record...");
