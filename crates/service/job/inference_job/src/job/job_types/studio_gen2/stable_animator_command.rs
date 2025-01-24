@@ -282,10 +282,10 @@ impl StableAnimatorCommand {
           let res = c.kill().await;
           match res {
             Ok(_) => {
-              info!("Killed Comfy process");
+              info!("Killed Studio Gen2 process");
             }
             Err(e) => {
-              info!("Error killing Comfy process: {:?}, this might leak resources", e);
+              info!("Error killing Studio Gen2 process: {:?}, this might leak resources", e);
             }
           }
           status = Some(CommandExitStatus::Timeout);
@@ -330,7 +330,7 @@ impl StableAnimatorCommand {
           }
         }
         Ok(None) => {
-          debug!("ComfyUI process is still running");
+          debug!("Studio Gen2 process is still running");
         }
         Err(e) => {
           info!("Error attempting to wait: {:?}", e);
@@ -345,7 +345,6 @@ impl StableAnimatorCommand {
       tokio::time::sleep(Duration::from_secs(5)).await;
     }
 
-    return Ok(status.unwrap());
+    Ok(status.unwrap())
   }
 }
-
