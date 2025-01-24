@@ -4,7 +4,7 @@ set -euxo pipefail
 
 echo "Run build script"
 npm install
-npm build
+npm run build
 
 echo "Emit built files."
 find /
