@@ -4,7 +4,6 @@ use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file
 use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
 use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
 use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::process_live_portrait_job;
-use crate::job::job_types::workflow::video_style_transfer::extract_vst_workflow_payload_from_job::extract_vst_workflow_payload_from_job;
 use crate::job::job_types::workflow::video_style_transfer::process_video_style_transfer_job::process_video_style_transfer_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
 use crate::job::job_types::workflow::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
@@ -73,10 +72,9 @@ pub async fn process_single_studio_gen2_job(
       .as_ref()
       .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("Missing Studio Gen2 dependencies".to_string())))?;
 
-  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
-  // check for lack of maybe_json_modifications
-
-  let job_args = check_and_validate_job(job)?;
+//  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
+//
+//  let job_args = check_and_validate_job(job)?;
 
   // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
 
@@ -96,14 +94,14 @@ pub async fn process_single_studio_gen2_job(
     }
   };
 
-  info!("Grabbing redis connection from pool");
-
-  let redis_pool_dep = deps
-      .db
-      .maybe_keepalive_redis_pool.clone();
-
-  let redis_pool = redis_pool_dep
-      .ok_or_else(|| ProcessSingleJobError::Other(anyhow!("failed to get redis pool")))?;
+//  info!("Grabbing redis connection from pool");
+//
+//  let redis_pool_dep = deps
+//      .db
+//      .maybe_keepalive_redis_pool.clone();
+//
+//  let redis_pool = redis_pool_dep
+//      .ok_or_else(|| ProcessSingleJobError::Other(anyhow!("failed to get redis pool")))?;
 
   info!("Grabbing mysql connection from pool");
 
@@ -284,7 +282,6 @@ pub async fn process_single_studio_gen2_job(
   let result = validate_and_save_results(SaveResultsArgs {
     job,
     deps: &deps,
-    job_args: &job_args,
     gen2_deps,
     studio_args,
     output_video_path: &video_output_path,

@@ -86,7 +86,7 @@ impl StableAnimatorCommand {
   pub fn new_from_env() -> AnyhowResult<Self> {
     Ok(Self {
       root_code_directory: PathBuf::from("/home/bt/dev/storyteller/storyteller-ml/animation/StableAnimator"),
-      executable_or_command: ExecutableOrCommand::Executable(PathBuf::from("inference_advanced.py")),
+      executable_or_command: ExecutableOrCommand::Command("python inference_advanced.py".to_string()),
       maybe_virtual_env_activation_command: Some(String::from("source venv/bin/activate")),
       maybe_docker_options: None,
       maybe_execution_timeout: None,

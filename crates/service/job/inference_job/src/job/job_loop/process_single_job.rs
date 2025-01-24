@@ -257,6 +257,7 @@ async fn do_process_single_job(
 
 fn can_use_new_dispatch(job: &AvailableInferenceJob) -> bool {
   match job.job_type {
+    InferenceJobType::StudioGen2 => true,
     InferenceJobType::FaceFusion => true,
     InferenceJobType::F5TTS => true,
     InferenceJobType::GptSovits => true,

@@ -39,8 +39,6 @@ pub struct InsertArgs<'a> {
     pub is_on_prem: bool,
     pub worker_hostname: &'a str,
     pub worker_cluster: &'a str,
-
-    pub extra_file_modification_info: Option<&'a str>,
 }
 
 pub async fn insert_media_file_from_studio_gen2(args: InsertArgs<'_>) -> AnyhowResult<(MediaFileToken, u64)>
@@ -111,7 +109,6 @@ SET
   creator_ip_address = ?,
 
   creator_set_visibility = ?,
-  extra_file_modification_info = ?,
 
   maybe_creator_file_synthetic_id = ?,
   maybe_creator_category_synthetic_id = ?,
@@ -150,7 +147,6 @@ SET
       args.job.creator_ip_address,
 
       args.job.creator_set_visibility.to_str(),
-      args.extra_file_modification_info,
 
       maybe_creator_file_synthetic_id,
       maybe_creator_category_synthetic_id,

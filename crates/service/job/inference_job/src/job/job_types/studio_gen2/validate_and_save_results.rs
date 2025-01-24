@@ -54,9 +54,6 @@ pub struct SaveResultsArgs<'a> {
   pub inference_duration: Duration,
 
   pub studio_args : &'a StudioGen2Payload,
-
-  // TODO: Maybe remove these
-  pub job_args: &'a JobArgs<'a>,
 }
 
 pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<MediaFileToken, ProcessSingleJobError> {
@@ -162,10 +159,6 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
 
   // ==================== SAVE RECORDS ==================== //
 
-  // create a json detailing the args used to create the media
-  let args_json = serde_json::to_string(&args.job_args)
-      .map_err(|e| ProcessSingleJobError::Other(e.into()))?;
-
   info!("Saving Studio Gen2 result (media_files table record) ...");
 
   //// NB: We do this to avoid deep-frying the video.
@@ -210,7 +203,6 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     is_on_prem: args.deps.job.info.container.is_on_prem,
     worker_hostname: &args.deps.job.info.container.hostname,
     worker_cluster: &args.deps.job.info.container.cluster_name,
-    extra_file_modification_info: Some(&args_json),
   })
       .await
       .map_err(|e| {

@@ -26,6 +26,7 @@ mod tests {
     // UUID with the dashes
     assert!(validate_idempotency_token_format("bf12126a-2de0-4527-bbbf-156c4c45ae21").is_ok());
     assert!(validate_idempotency_token_format("220ace1b-db32-42c4-bb87-49176c85a907").is_ok());
+    assert!(validate_idempotency_token_format("e0704f17-ee75-4f7c-ae4c-a1fda56a50cd").is_ok());
 
     // UUID without the dashes
     assert!(validate_idempotency_token_format("220ace1bdb3242c4bb8749176c85a907").is_ok());
