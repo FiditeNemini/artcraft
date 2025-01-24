@@ -44,6 +44,7 @@ async fn main() -> AnyhowResult<()> {
     app_name: "es-update-job",
     default_logging_override: Some(DEFAULT_RUST_LOG),
     config_search_directories: &[".", "./config", "crates/service/job/es-update-job/config"],
+    ignore_legacy_dot_env_file: true,
   })?;
 
   info!("Hostname: {}", &container_environment.hostname);
