@@ -13,6 +13,7 @@ import { get_media_url } from "~/Classes/ApiHelpers";
 import { twMerge } from "tailwind-merge";
 import { ButtonIcon } from "~/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { CharacterPoseHelper } from "../../Editor/Engines/Helpers/CharacterPoseHelper";
 
 export enum CharacterFrameTarget {
   Start,
@@ -70,6 +71,10 @@ export default function CharacterFrameButton(
     // Fetch the image and set as button bg
     get_media_url(token)
       .then((url) => {
+        console.debug("Frame url: ", url)
+        // Handle the pose data
+        const poseHelper = new CharacterPoseHelper(editorEngine!);
+        poseHelper.extractPoseData(url);
         setMediaFile(url);
       })
       .catch((error) => {
