@@ -269,6 +269,10 @@ export class TimeLine {
       obj.userData["name"] = name;
       obj.name = name;
       obj.position.copy(pos);
+      obj.userData.isCharacter = true;
+      console.debug("Added character object")
+      console.debug("object:", obj)
+
       const object_uuid = obj.uuid;
 
       this.characters[object_uuid] = ClipGroup.CHARACTER; // TODO: Create a class to make the idea of a character.
