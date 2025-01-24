@@ -4,11 +4,13 @@ use std::time::Duration;
 
 use anyhow::anyhow;
 use anyhow::bail;
-use log::warn;
+use log::{error, warn};
 use log::{debug, info};
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
+use s3::error::S3Error;
 use s3::region::Region;
+use s3::request::ResponseData;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
@@ -143,7 +145,13 @@ impl BucketClient {
     let object_name = self.get_rooted_object_name(object_name);
     info!("Rooted filename for bucket: {}", object_name);
 
-    let response = self.bucket.put_object_with_content_type(&object_name, bytes, content_type).await?;
+    let response = self.bucket.put_object_with_content_type(&object_name, bytes, content_type).await;
+
+    if let Err(err) = &response {
+      error!("S3 Upload Error for bucket name {}: {:?}", &self.bucket.name, err);
+    }
+
+    let response = response?;
 
     let body_bytes = response.bytes();
     let code = response.status_code();

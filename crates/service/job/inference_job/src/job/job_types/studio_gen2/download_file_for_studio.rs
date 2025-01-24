@@ -52,7 +52,7 @@ pub async fn download_file_for_studio(
 
   let suffix = get_suffix(&input_media_file);
 
-  let filesystem_path = args.input_paths.input_dir
+  let filesystem_path = args.input_paths.input_dir.path()
       .join(format!("{}{}", args.filename_without_extension, suffix));
 
   info!("Downloading input file to {:?}", &filesystem_path);

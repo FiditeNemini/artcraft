@@ -24,12 +24,11 @@ python inference_advanced.py \
  --gradient_checkpointing
  */
 
-use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::time::Duration;
 use log::{debug, info, warn};
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt};
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::Command;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
@@ -40,7 +39,7 @@ use crate::util::get_filtered_env_vars::get_filtered_env_vars_hashmap;
 #[derive(Clone)]
 pub struct StableAnimatorCommand {
   /// Where the code lives
-  comfy_root_code_directory: PathBuf,
+  root_code_directory: PathBuf,
 
   /// A single executable script or a much larger bash command.
   executable_or_command: ExecutableOrCommand,
@@ -84,6 +83,16 @@ pub struct InferenceArgs<'s> {
 }
 
 impl StableAnimatorCommand {
+  pub fn new_from_env() -> AnyhowResult<Self> {
+    Ok(Self {
+      root_code_directory: PathBuf::from("/home/bt/dev/storyteller/storyteller-ml/animation/StableAnimator"),
+      executable_or_command: ExecutableOrCommand::Executable(PathBuf::from("inference_advanced.py")),
+      maybe_virtual_env_activation_command: Some(String::from("source venv/bin/activate")),
+      maybe_docker_options: None,
+      maybe_execution_timeout: None,
+    })
+  }
+
   pub async fn execute_inference<'a, 'b>(
     &'a self,
     args: InferenceArgs<'b>,
@@ -91,7 +100,7 @@ impl StableAnimatorCommand {
     info!("InferenceArgs: {:?}", &args);
 
     let mut command = String::new();
-    command.push_str(&format!("cd {}", path_to_string(&self.comfy_root_code_directory)));
+    command.push_str(&format!("cd {}", path_to_string(&self.root_code_directory)));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");

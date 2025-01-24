@@ -132,6 +132,7 @@ async fn main() -> AnyhowResult<()> {
     app_name: "storyteller-web",
     default_logging_override: Some(DEFAULT_RUST_LOG),
     config_search_directories: &[".", "./config", "crates/service/web/storyteller_web/config"],
+    ignore_legacy_dot_env_file: true,
   })?;
 
   let common_env = CommonEnv::read_from_env()?;

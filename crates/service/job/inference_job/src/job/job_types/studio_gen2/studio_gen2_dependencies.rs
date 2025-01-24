@@ -28,7 +28,7 @@ impl StudioGen2Dependencies {
       model_path: PathBuf::from("/tmp/model.pt"),
       input_directory: PathBuf::from("/tmp/input"),
       output_directory: PathBuf::from("/tmp/output"),
-      command: StableAnimatorCommand::new(),
+      command: StableAnimatorCommand::new_from_env()?,
 
       // TODO
       pretrained_model_name_or_path: Default::default(),

@@ -15,6 +15,11 @@ pub struct BootstrapArgs<'a, P: AsRef<Path>> {
 
   /// Where to look for env conf files.
   pub config_search_directories: &'a [P],
+
+  /// If true, ignore the root '.env' file.
+  /// TODO(bt,2025-01-23): Make this the default behavior, then remove reading from '.env' entirely,
+  ///  There are too many apps that share this file.
+  pub ignore_legacy_dot_env_file: bool,
 }
 
 /// Information about how the application is deployed.
@@ -45,7 +50,11 @@ pub struct ContainerEnvironment {
 const SERVER_ENVIRONMENT : &str = "SERVER_ENVIRONMENT";
 
 pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<ContainerEnvironment> {
-  easyenv::init_all_with_default_logging(args.default_logging_override);
+  if args.ignore_legacy_dot_env_file {
+    easyenv::init_env_logger(args.default_logging_override);
+  } else {
+    easyenv::init_all_with_default_logging(args.default_logging_override);
+  }
 
   info!("Bootstrapping application {}", &args.app_name);
 
