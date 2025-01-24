@@ -80,6 +80,9 @@ pub struct InferenceArgs<'s> {
   pub posenet_model_name_or_path: &'s Path,
   pub face_encoder_model_name_or_path: &'s Path,
   pub unet_model_name_or_path: &'s Path,
+
+  pub output_width: Option<u64>,
+  pub output_height: Option<u64>,
 }
 
 impl StableAnimatorCommand {
@@ -160,6 +163,29 @@ impl StableAnimatorCommand {
     command.push_str(" --unet_model_name_or_path ");
     command.push_str(&path_to_string(&args.unet_model_name_or_path));
     command.push_str(" ");
+
+    if let Some(width) = args.output_width {
+      command.push_str(" --width ");
+      command.push_str(&width.to_string());
+      command.push_str(" ");
+    }
+
+    if let Some(height) = args.output_height {
+      command.push_str(" --height ");
+      command.push_str(&height.to_string());
+      command.push_str(" ");
+    }
+
+    // TODO(bt,2025-01-24): These should maybe be set as defaults upstream. These are from an
+    //  inference shell script and are not the defaults in the python arg parser.
+    command.push_str(" --guidance_scale=3.0 ");
+    command.push_str(" --num_inference_steps=25 ");
+    command.push_str(" --tile_size=16 ");
+    command.push_str(" --overlap=4 ");
+    command.push_str(" --noise_aug_strength=0.02 ");
+    command.push_str(" --frames_overlap=4 ");
+    command.push_str(" --decode_chunk_size=4 ");
+    command.push_str(" --gradient_checkpointing ");;
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
       command = docker_options.to_command_string(&command);

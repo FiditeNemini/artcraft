@@ -26,4 +26,12 @@ pub struct StudioGen2Payload {
   #[serde(rename = "sm")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub after_job_debug_sleep_millis: Option<u64>,
+
+  #[serde(rename = "ow")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub output_width: Option<u64>,
+
+  #[serde(rename = "oh")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub output_height: Option<u64>,
 }

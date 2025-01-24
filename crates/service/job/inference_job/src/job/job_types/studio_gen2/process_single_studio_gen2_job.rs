@@ -216,6 +216,8 @@ pub async fn process_single_studio_gen2_job(
           posenet_model_name_or_path: &gen2_deps.posenet_model_name_or_path,
           face_encoder_model_name_or_path: &gen2_deps.face_encoder_model_name_or_path,
           unet_model_name_or_path: &gen2_deps.unet_model_name_or_path,
+          output_width: studio_args.output_width,
+          output_height: studio_args.output_height,
         }).await;
 
   let inference_duration = Instant::now().duration_since(inference_start_time);

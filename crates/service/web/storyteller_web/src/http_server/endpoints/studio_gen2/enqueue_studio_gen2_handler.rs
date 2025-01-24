@@ -62,6 +62,13 @@ pub struct EnqueueStudioGen2Request {
 
   /// Optional visibility setting override.
   pub creator_set_visibility: Option<Visibility>,
+
+  /// Sleep for debugging
+  pub debug_sleep_millis: Option<u64>,
+
+  // TODO
+  pub output_width: Option<u64>,
+  pub output_height: Option<u64>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -245,7 +252,9 @@ pub async fn enqueue_studio_gen2_handler(
     video_file: Some(request.video_file.clone()),
     creator_visibility: Some(set_visibility),
     watermark_type,
-    after_job_debug_sleep_millis: None,
+    after_job_debug_sleep_millis: request.debug_sleep_millis,
+    output_width: request.output_width,
+    output_height: request.output_height,
   };
 
   info!("Creating ComfyUI job record...");

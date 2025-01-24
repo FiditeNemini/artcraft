@@ -169,10 +169,10 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
   //    .primary_video.record.maybe_style_transfer_source_media_file_token.as_ref()
   //    .unwrap_or_else(|| &args.videos.primary_video.record.token);
 
-  let prompt_token = PromptToken::generate();
+  //let prompt_token = PromptToken::generate();
 
-  let product = MediaFileOriginProductCategory::StorytellerStudio;
-  let maybe_model_type = MediaFileOriginModelType::StorytellerStudio;
+  //let product = MediaFileOriginProductCategory::StorytellerStudio;
+  //let maybe_model_type = MediaFileOriginModelType::StorytellerStudio;
 
   //let product = match args.comfy_args.workflow_type {
   //  Some(WorkflowType::StorytellerStudio) => Some(MediaFileOriginProductCategory::StorytellerStudio),
@@ -196,7 +196,7 @@ pub async fn validate_and_save_results(args: SaveResultsArgs<'_>) -> Result<Medi
     maybe_scene_source_media_file_token: None,
     file_size_bytes,
     sha256_checksum: &file_checksum,
-    maybe_prompt_token: Some(&prompt_token),
+    maybe_prompt_token: None,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(PREFIX),
     maybe_public_bucket_extension: Some(&ext_suffix),
