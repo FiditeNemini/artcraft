@@ -41,6 +41,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
+use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_types::studio_gen2::stable_animator_command::InferenceArgs;
 use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
@@ -249,6 +250,8 @@ pub async fn process_single_studio_gen2_job(
       warn!("Captured stderr output: {}", contents);
     }
 
+    maybe_debug_sleep(studio_args).await;
+
     // NB: Forcing generic type to `&Path` with turbofish
     safe_delete_possible_files_and_directories::<&Path>(&[
       Some(work_paths.input_dir.path()),
@@ -296,6 +299,8 @@ pub async fn process_single_studio_gen2_job(
     Err(err) => {
       error!("Error validating and saving results: {:?}", err);
 
+      maybe_debug_sleep(studio_args).await;
+
       // NB: Forcing generic type to `&Path` with turbofish
       safe_delete_possible_files_and_directories::<&Path>(&[
         Some(work_paths.input_dir.path()),
@@ -306,14 +311,9 @@ pub async fn process_single_studio_gen2_job(
     }
   };
 
-  // ==================== (OPTIONAL) DEBUG SLEEP ==================== //
-
-  if let Some(sleep_millis) = studio_args.after_job_debug_sleep_millis {
-    info!("Sleeping for millis: {sleep_millis}");
-    tokio::time::sleep(Duration::from_millis(sleep_millis)).await;
-  }
-
   // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
+
+  maybe_debug_sleep(studio_args).await;
 
   info!("Cleaning up temporary files...");
 
@@ -341,4 +341,11 @@ pub async fn process_single_studio_gen2_job(
     }),
     inference_duration,
   })
+}
+
+async fn maybe_debug_sleep(args: &StudioGen2Payload) {
+  if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
+    info!("Debug sleeping for millis: {sleep_millis}");
+    tokio::time::sleep(Duration::from_millis(sleep_millis)).await;
+  }
 }
