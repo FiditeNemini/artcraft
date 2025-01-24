@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { UploaderStates, FilterEngineCategories } from "~/enums";
-import { MediaUploadApi, MediaFilesApi } from "~/Classes/ApiManager";
-import { getFileName } from "~/utilities";
+import { MediaUploadApi } from "~/Classes/ApiManager";
+import { UploaderStates } from "~/enums";
 import { UploaderState } from "~/models";
+import { getFileName } from "~/utilities";
 
 export const uploadImage = async ({
   title,
