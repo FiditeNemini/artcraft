@@ -54,6 +54,7 @@ async fn main() -> AnyhowResult<()> {
     app_name: "email-sender-job",
     default_logging_override: Some(DEFAULT_RUST_LOG),
     config_search_directories: &[".", "./config", "crates/service/job/email_sender_job/config"],
+    ignore_legacy_dot_env_file: false,
   })?;
 
   info!("Hostname: {}", &container_environment.hostname);
