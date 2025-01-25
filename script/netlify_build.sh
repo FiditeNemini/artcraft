@@ -7,7 +7,8 @@ npm install
 npm run build
 
 echo "Emit built files."
-find /build
+pwd
+find .
 
 # echo "Copy test files into dist"
 # cp -r test/* dist/
