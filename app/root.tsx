@@ -15,6 +15,7 @@ import {
 import normalizeCss from "./styles/normalize.css?url";
 import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
+import { Environment, Configs } from "./configs";
 
 // The following import prevents a Font Awesome icon server-side rendering bug,
 // where the icons flash from a very large icon down to a properly sized one:
@@ -59,19 +60,21 @@ export const links: LinksFunction = () => [
 
 // .env part 2 add to this
 export async function loader() {
+  const configs = new Configs(Environment.Production); // TODO: Env var config for environment
+
   const env = {
     // @ts-expect-error ProvessEnv is correct
-    BASE_API: process.env.BASE_API || "%BUILD_BASE_API%",
+    BASE_API: process.env.BASE_API || configs.baseApi || "%BUILD_BASE_API%",
     // @ts-expect-error ProvessEnv is correct
-    GOOGLE_API: process.env.GOOGLE_API || "%BUILD_GOOGLE_API%",
+    GOOGLE_API: process.env.GOOGLE_API || configs.googleApi || "%BUILD_GOOGLE_API%",
     // @ts-expect-error ProvessEnv is correct
-    FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
+    FUNNEL_API: process.env.FUNNEL_API || configs.funnelApi || "%BUILD_FUNNEL_API%",
     // @ts-expect-error ProvessEnv is correct
-    CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
+    CDN_API: process.env.CDN_API || configs.cdnApi || "%BUILD_CDN_API%",
     // @ts-expect-error ProvessEnv is correct
-    GRAVATAR_API: process.env.GRAVATAR_API || "%BUILD_GRAVATAR_API%",
+    GRAVATAR_API: process.env.GRAVATAR_API || configs.gravatarApi || "%BUILD_GRAVATAR_API%",
     // @ts-expect-error ProvessEnv is correct
-    DEPLOY_PRIME_URL: process.env.DEPLOY_PRIME_URL || "%DEPLOY_PRIME_URL%",
+    DEPLOY_PRIME_URL: process.env.DEPLOY_PRIME_URL || configs.deployPrimeUrl || "%DEPLOY_PRIME_URL%",
     REACT_APP_PUBLIC_POSTHOG_KEY:
       // @ts-expect-error ProvessEnv is correct
       process.env.REACT_APP_PUBLIC_POSTHOG_KEY ||
@@ -81,13 +84,13 @@ export async function loader() {
       process.env.REACT_APP_PUBLIC_POSTHOG_UI ||
       "%REACT_APP_PUBLIC_POSTHOG_UI%",
     // @ts-expect-error ProvessEnv is correct
-    CONTEXT: process.env.CONTEXT || "%CONTEXT%",
+    CONTEXT: process.env.CONTEXT || configs.deployContext || "%CONTEXT%",
     // @ts-expect-error ProvessEnv is correct
-    DEPLOY_CONTEXT: process.env.DEPLOY_CONTEXT || "%DEPLOY_CONTEXT%",
+    DEPLOY_CONTEXT: process.env.DEPLOY_CONTEXT || configs.deployContext || "%DEPLOY_CONTEXT%",
 
     // .env part 3
     // @ts-expect-error ProvessEnv is correct
-    UPLOAD_API_VIDEO: process.env.UPLOAD_API_VIDEO || "%UPLOAD_API_VIDEO%",
+    UPLOAD_API_VIDEO: process.env.UPLOAD_API_VIDEO || configs.uploadApiVideo || "%UPLOAD_API_VIDEO%",
   } as Record<string, string | boolean>;
   return { ENV: env };
 }
