@@ -13,6 +13,7 @@ pub fn add_storyteller_studio(cors: Cors, _is_production: bool) -> Cors {
         netlify_branch_domain_matches(origin, "pipeline-gottagofast.netlify.app")
       })
       .allowed_origin("http://localhost:5173")
+      .allowed_origin("https://animate.storyteller.ai") // NB: Gen2 Studio
 }
 
 #[cfg(test)]
