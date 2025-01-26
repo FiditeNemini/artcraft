@@ -6,9 +6,9 @@ echo "Run build script"
 npm install
 npm run build
 
-echo "Emit built files."
-pwd
-find .
+#echo "Emit built files."
+#pwd
+#find .
 
 # echo "Copy test files into dist"
 # cp -r test/* dist/
