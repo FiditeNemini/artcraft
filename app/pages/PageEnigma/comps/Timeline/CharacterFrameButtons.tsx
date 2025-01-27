@@ -66,6 +66,11 @@ export default function CharacterFrameButton(
       return;
     }
 
+    // TODO(brandon,2024-01-27): Please forgive me for this ugly hack. It's just 
+    // temporary to move to integration testing quickly. Setting the media token 
+    // to a global space so we can read from it when calling the inference API.
+    (window as any).firstFrameMediaToken = token;
+
     // TODO: Fetch the image and pass the token to the character engine
 
     // Fetch the image and set as button bg

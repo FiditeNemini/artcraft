@@ -11,7 +11,7 @@ import * as THREE from "three";
 import { getSceneSignals, addToast, startPollingActiveJobs } from "~/signals";
 import { v4 as uuidv4 } from "uuid";
 import { SceneGenereationMetaData as SceneGenerationMetaData } from "~/pages/PageEnigma/models/sceneGenerationMetadata";
-import { MediaUploadApi, VideoApi } from "~/Classes/ApiManager";
+import { MediaUploadApi, StudioGen2Api, VideoApi } from "~/Classes/ApiManager";
 import { globalIPAMediaToken } from "../signals";
 import { BufferType } from "./VideoProcessor/engine_buffer";
 
@@ -21,6 +21,9 @@ import { BufferType } from "./VideoProcessor/engine_buffer";
 // through this class.
 
 interface MediaTokens {
+  // NB(bt,2025-01-27): This media token was likely called "color" because we were originally 
+  // going to send a shaded "color" render, a depth map render, and an edge detect render to 
+  // the backend for inference.
   color: string;
 }
 
@@ -28,6 +31,7 @@ export class VideoGeneration {
   editor: Editor;
   mediaUploadAPI: MediaUploadApi;
   videoAPI: VideoApi;
+  studioGen2Api: StudioGen2Api;
 
   // For cached style Re-Generation
   private last_scene_check_sum: string;
@@ -40,6 +44,7 @@ export class VideoGeneration {
     this.editor = editor;
     this.mediaUploadAPI = new MediaUploadApi();
     this.videoAPI = new VideoApi();
+    this.studioGen2Api = new StudioGen2Api();
     this.last_scene_check_sum = "";
     this.last_media_tokens = { color: "" };
     this.last_position_of_preprocessing = false;
@@ -89,7 +94,9 @@ export class VideoGeneration {
       }
 
       mediaTokens.color = video_upload_response.data;
-      console.log(`https://storyteller.ai/media_files/${mediaTokens.color}`);
+
+      console.log(`Studio recording: https://storyteller.ai/media/${mediaTokens.color}`);
+
     } finally {
       await this.editor.engineFrameBuffers.clearBuffer(BufferType.COLOR);
     }
@@ -291,6 +298,7 @@ export class VideoGeneration {
       return;
     }
 
+    // TODO(bt):
     console.log(`Immutable Snapshot Token: ${immutable_media_token}`);
 
     await this.editor.updateLoad({
@@ -320,7 +328,17 @@ export class VideoGeneration {
     // this is so that its a check point just encase enqueue fails, if it does we can still restylize
     this.last_media_tokens = media_tokens;
 
-    await this.handleEnqueue(media_tokens, ipa_image_token ?? "");
+    // Legacy studio:
+    //await this.handleEnqueue(media_tokens, ipa_image_token ?? "");
+
+    // NB(bt,2025-01-27): We're using a hack to set the first frame (in CharacterFrameButton)
+    const firstFrameMediaToken = (window as any).firstFrameMdiaToken;
+    const videoMediaToken = media_tokens.color;
+
+    console.log(`Enqueue Studio Gen2 Render; Video: ${videoMediaToken} Image: ${firstFrameMediaToken}`);
+
+    await this.handleEnqueueStudioGen2(videoMediaToken, firstFrameMediaToken); 
+
     await this.EndLoadingState();
   }
 
@@ -400,6 +418,27 @@ export class VideoGeneration {
 
     this.handleSuccess("Done Check Your Movies Tab On Profile.", 3000);
   }
+
+  async handleEnqueueStudioGen2(videoMediaToken: string, firstFrameImageToken: string) {
+    const response = await this.studioGen2Api.EnqueueStudioGen2({
+      enqueueVideo: {
+        uuid_idempotency_token: uuidv4(),
+        image_file: firstFrameImageToken,
+        video_file: videoMediaToken,
+        creator_set_visibility: Visibility.Public,
+      },
+    });
+
+    if (response.success) {
+      startPollingActiveJobs();
+    } else {
+      await this.handleError("Failed To Process Animation Try Again", 3000);
+      return;
+    }
+
+    this.handleSuccess("Done Check Your Movies Tab On Profile.", 3000);
+  }
+
 
   async handleSuccess(message: string, timeout: number) {
     addToast(ToastTypes.SUCCESS, message, timeout);

@@ -11,6 +11,7 @@ export * from "./MediaUploadApi";
 export * from "./MiscApi";
 export * from "./ModerationApi";
 export * from "./PromptsApi";
+export * from "./StudioGen2Api";
 export * from "./TtsApi";
 export * from "./UserBookmarksApi";
 export * from "./UsersApi";
