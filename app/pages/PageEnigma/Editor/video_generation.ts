@@ -332,7 +332,7 @@ export class VideoGeneration {
     //await this.handleEnqueue(media_tokens, ipa_image_token ?? "");
 
     // NB(bt,2025-01-27): We're using a hack to set the first frame (in CharacterFrameButton)
-    const firstFrameMediaToken = (window as any).firstFrameMdiaToken;
+    const firstFrameMediaToken = (window as any).firstFrameMediaToken;
     const videoMediaToken = media_tokens.color;
 
     console.log(`Enqueue Studio Gen2 Render; Video: ${videoMediaToken} Image: ${firstFrameMediaToken}`);
