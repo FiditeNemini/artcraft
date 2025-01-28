@@ -187,11 +187,11 @@ export default function AITools() {
   }
 
   if (currentPath.includes("/tts")) {
-    items = [items[0], items[1], items[2], items[3], items[4], items[5]];
+    items = [items[0], items[1], items[2], items[3], items[4]];
   }
 
   if (currentPath.includes("/voice-conversion")) {
-    items = [items[0], items[1], items[2], items[3], items[4], items[5]];
+    items = [items[0], items[1], items[2], items[3], items[4]];
   }
 
   if (currentPath.includes("/f5-tts")) {
