@@ -63,12 +63,14 @@ export default function CharacterFrameButton(
 
   const handleFrameSet = useCallback((token?: string) => {
     if (!token) {
+      console.error("No image media file token to set as first frame");
       return;
     }
 
     // TODO(brandon,2024-01-27): Please forgive me for this ugly hack. It's just 
     // temporary to move to integration testing quickly. Setting the media token 
     // to a global space so we can read from it when calling the inference API.
+    console.log(`Setting image media file token as first frame token: ${token}`);
     (window as any).firstFrameMediaToken = token;
 
     // TODO: Fetch the image and pass the token to the character engine
