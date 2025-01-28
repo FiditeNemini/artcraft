@@ -23,32 +23,28 @@ function do_print_children(obj: THREE.Object3D<THREE.Object3DEventMap>, level: n
   }
 }
 
-export function deformBody(obj: THREE.Object3D<THREE.Object3DEventMap>) {
+function rotateChildBone(obj: THREE.Object3D<THREE.Object3DEventMap>, name: string, x: number, y: number, z: number) {
+  // https://discourse.threejs.org/t/solved-how-to-rotate-arm-of-skinned-and-rigged-character/5572
+  // https://jsfiddle.net/bdmrg4oc/1/
+  const child = obj.getObjectByName(name);
+  if (!!!child) {
+    return;
+  }
+  child.rotation.x = x;
+  child.rotation.y = y;
+  child.rotation.z = z;
+}
+
+export function testDeformBody(obj: THREE.Object3D<THREE.Object3DEventMap>) {
   if (!DEBUG_ENABLED) {
     return;
   }
-
-  // https://discourse.threejs.org/t/solved-how-to-rotate-arm-of-skinned-and-rigged-character/5572
-  // https://jsfiddle.net/bdmrg4oc/1/
-  const leg = obj.getObjectByName("mixamorigLeftLeg")
-  if (!leg) {
-    return;
-  }
-  console.log('leg', leg);
-
-  leg.rotation.x = 1;
-  leg.rotation.y = 2;
-
-  const arm = obj.getObjectByName("mixamorigRightArm")
-  if (!arm) {
-    return;
-  }
-  console.log('arm', arm);
-
-  arm.rotation.x = 1;
-  arm.rotation.y = 2;
+  rotateChildBone(obj, "mixamorigLeftLeg", 1, 2, 0);
+  rotateChildBone(obj, "mixamorigRightArm", 0, 1, 2);
+  rotateChildBone(obj, "mixamorigLeftShoulder", 2, 0, 2);
+  rotateChildBone(obj, "mixamorigHead", 1, 1, 1);
 }
 
 
-export function globalExperiment() {
+export function testGlobalExperiment() {
 }

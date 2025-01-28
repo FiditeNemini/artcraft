@@ -24,7 +24,7 @@ import { Vector3 } from "three";
 
 import { filmLength, outlinerState } from "../signals";
 import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
-import { deformBody, print_children } from "./debug";
+import { print_children, testDeformBody } from "./debug";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -284,7 +284,7 @@ export class TimeLine {
       if (!!lastRig && lastRig.name.includes("gamerig")) {
         (window as any).lastRig = lastRig;
         print_children(lastRig);
-        deformBody(lastRig);
+        testDeformBody(lastRig);
       }
 
       const object_uuid = obj.uuid;
