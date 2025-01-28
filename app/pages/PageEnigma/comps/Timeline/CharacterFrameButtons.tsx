@@ -14,6 +14,10 @@ import { twMerge } from "tailwind-merge";
 import { ButtonIcon } from "~/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CharacterPoseHelper } from "../../Editor/Engines/Helpers/CharacterPoseHelper";
+import { testGlobalExperiment } from "../../Editor/debug";
+
+// TODO(bt,2025-01-28): This is just a temporary flag
+const TODO_REMOVE_RUN_POSE_CALCULATION = false;
 
 export enum CharacterFrameTarget {
   Start,
@@ -79,10 +83,24 @@ export default function CharacterFrameButton(
     get_media_url(token)
       .then((url) => {
         console.debug("Frame url: ", url)
+        
         // Handle the pose data
-        const poseHelper = new CharacterPoseHelper(editorEngine!);
-        poseHelper.extractPoseData(url);
+        if (TODO_REMOVE_RUN_POSE_CALCULATION) {
+          const poseHelper = new CharacterPoseHelper(editorEngine!);
+          poseHelper.extractPoseData(url);
+        }
+
         setMediaFile(url);
+
+        // TODO(brandon,2024-01-27): Please forgive me for this ugly hack. It's just 
+        // temporary to move to integration testing quickly. Setting the media token 
+        // to a global space so we can read from it when calling the inference API.
+        (window as any).firstFrameMediaUrl = url;
+
+        // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
+        // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
+        // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
+        testGlobalExperiment();
       })
       .catch((error) => {
         console.error("Error fetching media file", error);

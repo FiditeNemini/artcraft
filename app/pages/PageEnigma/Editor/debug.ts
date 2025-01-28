@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as Kalidokit from "kalidokit";
 
 // TODO(bt,2025-01-28): I don't understand this codebase well yet, and I'm trying to apply bone rotations.
 // This is a simple set of experiments for me to come up to speed with Threejs, our code, and the theoretical 
@@ -47,4 +48,19 @@ export function testDeformBody(obj: THREE.Object3D<THREE.Object3DEventMap>) {
 
 
 export function testGlobalExperiment() {
+  const firstFrameUrl : string | undefined = (window as any).firstFrameMediaUrl;
+  const characterRig : THREE.Object3D<THREE.Object3DEventMap> | undefined = (window as any).lastCharacter;
+  if (!!!firstFrameUrl || !!!characterRig) {
+    return;
+  }
+  doTest(firstFrameUrl, characterRig);
+}
+
+function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.Object3DEventMap>) {
+
+
+  rotateChildBone(characterRig, "mixamorigLeftLeg", 1, 2, 0);
+  rotateChildBone(characterRig, "mixamorigRightArm", 0, 1, 2);
+  rotateChildBone(characterRig, "mixamorigLeftShoulder", 2, 0, 2);
+  rotateChildBone(characterRig, "mixamorigHead", 1, 1, 1);
 }
