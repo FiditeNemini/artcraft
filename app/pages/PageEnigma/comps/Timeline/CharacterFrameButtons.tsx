@@ -81,9 +81,9 @@ export default function CharacterFrameButton(
 
     // Fetch the image and set as button bg
     get_media_url(token)
-      .then((url) => {
+      .then(async (url) => {
         console.debug("Frame url: ", url)
-        
+
         // Handle the pose data
         if (TODO_REMOVE_RUN_POSE_CALCULATION) {
           const poseHelper = new CharacterPoseHelper(editorEngine!);
@@ -100,7 +100,7 @@ export default function CharacterFrameButton(
         // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
         // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
         // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
-        testGlobalExperiment();
+        await testGlobalExperiment();
       })
       .catch((error) => {
         console.error("Error fetching media file", error);

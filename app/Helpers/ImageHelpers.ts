@@ -10,3 +10,10 @@ export async function loadImageFromUrl(url: string) {
   img.src = url;
   return loadImage(img);
 }
+
+export async function loadImageFromAnonymousOriginUrl(url: string) {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = url;
+  return loadImage(img);
+}
