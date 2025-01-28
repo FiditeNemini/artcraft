@@ -24,6 +24,7 @@ import { Vector3 } from "three";
 
 import { filmLength, outlinerState } from "../signals";
 import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
+import { deformBody, print_children } from "./debug";
 
 export class TimeLine {
   editorEngine: Editor;
@@ -277,6 +278,14 @@ export class TimeLine {
 
       // TODO(bt,2025-01-28): Hack for debugging only. Remove soon.
       (window as any).lastCharacter = obj;
+
+      // TODO(bt,2025-01-28): Hack for debugging only. Remove soon.
+      const lastRig = obj.children[0];
+      if (!!lastRig && lastRig.name.includes("gamerig")) {
+        (window as any).lastRig = lastRig;
+        print_children(lastRig);
+        deformBody(lastRig);
+      }
 
       const object_uuid = obj.uuid;
 
