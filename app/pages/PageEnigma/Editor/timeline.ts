@@ -270,8 +270,7 @@ export class TimeLine {
       obj.name = name;
       obj.position.copy(pos);
       obj.userData.isCharacter = true;
-      console.debug("Added character object")
-      console.debug("object:", obj)
+      console.debug("Added character object to timeline; object: ", obj);
 
       const object_uuid = obj.uuid;
 
