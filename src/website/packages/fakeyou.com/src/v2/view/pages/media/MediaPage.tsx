@@ -57,7 +57,7 @@ import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
 import { AITools } from "components/marketing";
 import { useSession } from "hooks";
 import { LipsyncTokenMap } from "../lipsync/LipsyncTokens";
-import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+// import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
 export default function MediaPage({
   animationType,
@@ -1001,9 +1001,9 @@ export default function MediaPage({
       </div>
 
       <Container type="panel" className="pt-5 mt-5">
-        <Panel clear={true}>
+        {/* <Panel clear={true}>
           <FeaturedVideos />
-        </Panel>
+        </Panel> */}
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />

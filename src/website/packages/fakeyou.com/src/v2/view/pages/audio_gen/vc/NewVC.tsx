@@ -44,7 +44,7 @@ import VCPitchShiftComponent from "./VCPitchShiftComponent";
 import VCPitchEstimateMethodComponent from "./VCPitchEstimateMethodComponent";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
-import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+// import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 import HowToUseSection from "components/common/HowToUseSection";
 import FAQSection from "components/common/FAQSection";
 
@@ -472,9 +472,9 @@ export default function NewVC() {
       <FAQSection faqItems={faqItems} />
 
       <Container type="panel" className="pt-5 mt-5">
-        <Panel clear={true}>
+        {/* <Panel clear={true}>
           <FeaturedVideos />
-        </Panel>
+        </Panel> */}
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />

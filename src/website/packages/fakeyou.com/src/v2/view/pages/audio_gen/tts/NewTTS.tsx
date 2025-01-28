@@ -43,7 +43,7 @@ import VoicePickerPreview from "../VoicePickerPreview";
 import { getLocalStorageItem, setLocalStorageItem } from "utils/localStorage";
 import ExploreVoices from "../ExploreVoices";
 import { featuredTtsVoiceTokens } from "./FeaturedTTSVoiceTokens";
-import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+// import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 import HowToUseSection from "components/common/HowToUseSection";
 import FAQSection from "components/common/FAQSection";
 
@@ -368,9 +368,9 @@ export default function NewTTS() {
       <FAQSection faqItems={faqItems} />
 
       <Container type="panel" className="pt-5 mt-5">
-        <Panel clear={true}>
+        {/* <Panel clear={true}>
           <FeaturedVideos />
-        </Panel>
+        </Panel> */}
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our video AI tools</h2>
           <AITools />

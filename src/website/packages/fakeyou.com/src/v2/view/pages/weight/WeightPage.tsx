@@ -46,7 +46,7 @@ import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_ite
 import { useCanonicalLink } from "@storyteller/components/src/hooks/UseCanonicalLink";
 import { AITools } from "components/marketing";
 import Stat from "components/common/Stat/Stat";
-import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
+// import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 import {
   LanguageLabels,
   LanguageTag,
@@ -697,9 +697,9 @@ export default function WeightPage() {
       </div>
 
       <Container type="panel" className="pt-5 mt-5">
-        <Panel clear={true}>
+        {/* <Panel clear={true}>
           <FeaturedVideos />
-        </Panel>
+        </Panel> */}
         <Panel clear={true}>
           <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
