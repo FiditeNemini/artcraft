@@ -259,6 +259,8 @@ export class TimeLine {
     const pos = this.getPos();
     const new_data = { ...data };
 
+    console.debug('Adding to engine scene manager: ', media_id, name, pos);
+
     const obj = await this.editorEngine.sceneManager?.create(
       media_id,
       name,
@@ -270,7 +272,11 @@ export class TimeLine {
       obj.name = name;
       obj.position.copy(pos);
       obj.userData.isCharacter = true;
+
       console.debug("Added character object to timeline; object: ", obj);
+
+      // TODO(bt,2025-01-28): Hack for debugging only. Remove soon.
+      (window as any).lastCharacter = obj;
 
       const object_uuid = obj.uuid;
 

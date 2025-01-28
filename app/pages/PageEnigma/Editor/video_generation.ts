@@ -298,7 +298,6 @@ export class VideoGeneration {
       return;
     }
 
-    // TODO(bt):
     console.log(`Immutable Snapshot Token: ${immutable_media_token}`);
 
     await this.editor.updateLoad({
