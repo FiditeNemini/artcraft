@@ -68,7 +68,7 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
   //const poseHelper = new CharacterPoseHelper(editorEngine!);
   //const pose = poseHelper.extractPoseData(firstFrameUrl);
 
-  /*const image = await loadImageFromAnonymousOriginUrl(firstFrameUrl);
+  const image = await loadImageFromAnonymousOriginUrl(firstFrameUrl);
   console.debug("Loaded image for inference", image, image.width, image.height);
 
   const solutions = await solveForImage(image);
@@ -76,10 +76,10 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
   console.log('mediapipe solution', solutions);
 
   // TODO
-  const poseWorld3DArray : any = undefined;
-  const poseLandmarkArray : any = undefined;
+  const poseWorld3DArray : any = solutions.worldLandmarks;
+  const poseLandmarkArray : any = solutions.landmarks;
 
-  let solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
+  /*let solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
     runtime:'mediapipe', // default is 'mediapipe'
     //video: HTMLVideoElement,// specify an html video or manually set image size
     imageSize:{
