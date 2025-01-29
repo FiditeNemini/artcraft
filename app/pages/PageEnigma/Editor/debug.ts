@@ -1,5 +1,11 @@
 import * as THREE from "three";
+
 //import * as Kalidokit from "kalidokit";
+import * as Kalidokit from "kalidokit"
+import { TFace } from "kalidokit";
+//import { Pose } from "kalidokit";
+//const Kalidokit = require('kalidokit');
+
 import { FilesetResolver, PoseLandmarker, PoseLandmarkerResult } from "@mediapipe/tasks-vision"
 import { CharacterPoseHelper } from "./Engines/Helpers/CharacterPoseHelper";
 import { loadImageFromAnonymousOriginUrl } from "~/Helpers/ImageHelpers";
@@ -79,14 +85,14 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
   const poseWorld3DArray : any = solutions.worldLandmarks;
   const poseLandmarkArray : any = solutions.landmarks;
 
-  /*let solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
+  let solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
     runtime:'mediapipe', // default is 'mediapipe'
     //video: HTMLVideoElement,// specify an html video or manually set image size
     imageSize:{
         width: 640,
         height: 480,
     }
-  });*/
+  });
 
   console.log('kalidokit solution', solution);
 }
