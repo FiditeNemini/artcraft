@@ -1,125 +1,198 @@
 import * as THREE from "three";
 
 //import * as Kalidokit from "kalidokit";
-import * as Kalidokit from "kalidokit"
-import { TFace } from "kalidokit";
+import * as Kalidokit from "kalidokit";
+import {
+  Vector,
+  Utils,
+  Hand,
+  Face,
+  Pose,
+  HandKeys,
+  Side,
+  THand,
+  TFace,
+  TPose,
+} from "kalidokit";
 //import { Pose } from "kalidokit";
 //const Kalidokit = require('kalidokit');
 
-import { FilesetResolver, PoseLandmarker, PoseLandmarkerResult, HolisticLandmarker, HolisticLandmarkerResult } from "@mediapipe/tasks-vision"
+import {
+  FilesetResolver,
+  PoseLandmarker,
+  PoseLandmarkerResult,
+  HolisticLandmarker,
+  HolisticLandmarkerResult,
+} from "@mediapipe/tasks-vision";
 import { CharacterPoseHelper } from "./Engines/Helpers/CharacterPoseHelper";
 import { loadImageFromAnonymousOriginUrl } from "~/Helpers/ImageHelpers";
+const leftHandBones = [
+  "LeftRingProximal",
+  "LeftRingIntermediate",
+  "LeftRingDistal",
+  "LeftIndexProximal",
+  "LeftIndexIntermediate",
+  "LeftIndexDistal",
+  "LeftMiddleProximal",
+  "LeftMiddleIntermediate",
+  "LeftMiddleDistal",
+  "LeftThumbProximal",
+  "LeftThumbDistal",
+  "LeftLittleProximal",
+  "LeftLittleIntermediate",
+  "LeftLittleDistal",
+];
 
+const rightHandBones = [
+  "RightRingProximal",
+  "RightRingIntermediate",
+  "RightRingDistal",
+  "RightIndexProximal",
+  "RightIndexIntermediate",
+  "RightIndexDistal",
+  "RightMiddleProximal",
+  "RightMiddleIntermediate",
+  "RightMiddleDistal",
+  "RightThumbProximal",
+  "RightThumbDistal",
+  "RightLittleProximal",
+  "RightLittleIntermediate",
+  "RightLittleDistal",
+];
+
+const leftHandMixamoBonesMap: { [key: string]: string } = {
+  LeftRingProximal: "mixamorigLeftHandRing1",
+  LeftRingIntermediate: "mixamorigLeftHandRing2",
+  LeftRingDistal: "mixamorigLeftHandRing3",
+  LeftIndexProximal: "mixamorigLeftHandIndex1",
+  LeftIndexIntermediate: "mixamorigLeftHandIndex2",
+  LeftIndexDistal: "mixamorigLeftHandIndex3",
+  LeftMiddleProximal: "mixamorigLeftHandMiddle1",
+  LeftMiddleIntermediate: "mixamorigLeftHandMiddle2",
+  LeftMiddleDistal: "mixamorigLeftHandMiddle3",
+  LeftThumbProximal: "mixamorigLeftHandThumb1",
+  LeftThumbDistal: "mixamorigLeftHandThumb3",
+  LeftLittleProximal: "mixamorigLeftHandPinky1",
+  LeftLittleIntermediate: "mixamorigLeftHandPinky2",
+  LeftLittleDistal: "mixamorigLeftHandPinky3",
+};
 //import '@mediapipe/holistic/holistic';
 //import '@mediapipe/camera_utils/camera_utils';
 
 // TODO(bt,2025-01-28): I don't understand this codebase well yet, and I'm trying to apply bone rotations.
-// This is a simple set of experiments for me to come up to speed with Threejs, our code, and the theoretical 
+// This is a simple set of experiments for me to come up to speed with Threejs, our code, and the theoretical
 // task at hand. IF THIS CODE IS PRESENT IN THE FUTURE IT SHOULD BE REMOVED AS IT SERVES NO OTHER PURPOSE.
 
 const DEBUG_ENABLED = true;
 const DEBUG_PRINT_ENABLED = true;
 
 // NB: From James Bond image.
-const EXAMPLE_POSE : any = {
-  "RightUpperArm": {
-      "x": -0.4230379402555594,
-      "y": 1.7737168782435317,
-      "z": -1.0277683620346483
+const EXAMPLE_POSE: any = {
+  RightUpperArm: {
+    x: -0.4230379402555594,
+    y: 1.7737168782435317,
+    z: -1.0277683620346483,
   },
-  "RightLowerArm": {
-      "x": -0.3,
-      "y": 0.9865853333958371,
-      "z": 0.3779985683628639
+  RightLowerArm: {
+    x: -0.3,
+    y: 0.9865853333958371,
+    z: 0.3779985683628639,
   },
-  "LeftUpperArm": {
-      "x": 0.005554997408462992,
-      "y": -1.4626850489681587,
-      "z": 1.1226644661733884
+  LeftUpperArm: {
+    x: 0.005554997408462992,
+    y: -1.4626850489681587,
+    z: 1.1226644661733884,
   },
-  "LeftLowerArm": {
-      "x": -0.015415961257577574,
-      "y": -0.3543613298595948,
-      "z": 0
+  LeftLowerArm: {
+    x: -0.015415961257577574,
+    y: -0.3543613298595948,
+    z: 0,
   },
-  "RightHand": {
-      "x": -0.42668629235907013,
-      "y": -0.47942290499788864,
-      "z": 0.5513363407475719
+  RightHand: {
+    x: -0.42668629235907013,
+    y: -0.47942290499788864,
+    z: 0.5513363407475719,
   },
-  "LeftHand": {
-      "x": 0.1791247835953645,
-      "y": 0.6,
-      "z": 0.9815028962744002
+  LeftHand: {
+    x: 0.1791247835953645,
+    y: 0.6,
+    z: 0.9815028962744002,
   },
 
-  "RightUpperLeg": {
-      "x": 0.48739810481744406,
-      "y": 0.5335122086099788,
-      "z": -0.26540331612091095,
-      "rotationOrder": "XYZ"
+  RightUpperLeg: {
+    x: 0.48739810481744406,
+    y: 0.5335122086099788,
+    z: -0.26540331612091095,
+    rotationOrder: "XYZ",
   },
-  "RightLowerLeg": {
-      "x": -1.987357750417811,
-      "y": 0,
-      "z": 0,
-      "rotationOrder": "XYZ"
+  RightLowerLeg: {
+    x: -1.987357750417811,
+    y: 0,
+    z: 0,
+    rotationOrder: "XYZ",
   },
-  "LeftUpperLeg": {
-      "x": 0.5327440321782165,
-      "y": 0.40825017329318186,
-      "z": -0.31162463497702436,
-      "rotationOrder": "XYZ"
+  LeftUpperLeg: {
+    x: 0.5327440321782165,
+    y: 0.40825017329318186,
+    z: -0.31162463497702436,
+    rotationOrder: "XYZ",
   },
-  "LeftLowerLeg": {
-      "x": -1.7621100159383252,
-      "y": 0,
-      "z": 0,
-      "rotationOrder": "XYZ"
+  LeftLowerLeg: {
+    x: -1.7621100159383252,
+    y: 0,
+    z: 0,
+    rotationOrder: "XYZ",
   },
-  "Hips": {
-      "position": {
-          "x": 0.009826546907424905,
-          "y": 0,
-          "z": -0.4867018217668233
-      },
-      "worldPosition": {
-          "x": -0.00453158195232334,
-          "y": 0,
-          "z": -0.4611571078848962
-      },
-      "rotation": {
-          "x": 0,
-          "y": 0.2743397512486982,
-          "z": 0.0003709216445107318
-      }
+  Hips: {
+    position: {
+      x: 0.009826546907424905,
+      y: 0,
+      z: -0.4867018217668233,
+    },
+    worldPosition: {
+      x: -0.00453158195232334,
+      y: 0,
+      z: -0.4611571078848962,
+    },
+    rotation: {
+      x: 0,
+      y: 0.2743397512486982,
+      z: 0.0003709216445107318,
+    },
   },
-  "Spine": {
-      "x": 0,
-      "y": 0.2714237930344275,
-      "z": 0.07454435135366712
-  }
+  Spine: {
+    x: 0,
+    y: 0.2714237930344275,
+    z: 0.07454435135366712,
+  },
 };
 
 export function print_children(obj: THREE.Object3D<THREE.Object3DEventMap>) {
-  if(DEBUG_PRINT_ENABLED) { 
+  if (DEBUG_PRINT_ENABLED) {
     do_print_children(obj);
   }
 }
 
-function do_print_children(obj: THREE.Object3D<THREE.Object3DEventMap>, level: number = 0) {
+function do_print_children(
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  level: number = 0,
+) {
   const space = "  ".repeat(level);
   console.log(`${space} - ${obj.name}`);
 
-  for(let i in obj.children) {
+  for (let i in obj.children) {
     let child = obj.children[i];
     do_print_children(child, level + 1);
   }
 }
 
-function rotateChildBone(obj: THREE.Object3D<THREE.Object3DEventMap>, name: string, x: number, y: number, z: number) {
-  // https://discourse.threejs.org/t/solved-how-to-rotate-arm-of-skinned-and-rigged-character/5572
-  // https://jsfiddle.net/bdmrg4oc/1/
+function rotateChildBone(
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  name: string,
+  x: number,
+  y: number,
+  z: number,
+) {
   const child = obj.getObjectByName(name);
   if (!!!child) {
     return;
@@ -129,59 +202,398 @@ function rotateChildBone(obj: THREE.Object3D<THREE.Object3DEventMap>, name: stri
   child.rotation.z = z;
 }
 
-function mapRotation(obj: THREE.Object3D<THREE.Object3DEventMap>, sourceName: string, destinationName: string) {
+function mapRotation(
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  sourceName: string,
+  destinationName: string,
+  rotation = { x: 0, y: 0, z: 0 },
+) {
   const sourceRotation = EXAMPLE_POSE[sourceName];
   if (!!!sourceRotation) {
-    console.error(`No rotation named ${sourceName}`)
+    console.error(`No rotation named ${sourceName}`);
     return;
   }
-  rotateChildBone(obj, destinationName, sourceRotation.x, sourceRotation.y, sourceRotation.z);
+  rotateChildBone(
+    obj,
+    destinationName,
+    sourceRotation.x,
+    sourceRotation.y,
+    sourceRotation.z,
+  );
 }
 
-function mapRotationFrom(obj: THREE.Object3D<THREE.Object3DEventMap>, source: any, sourceName: string, destinationName: string) {
+function mapRotationFrom(
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  source: any,
+  sourceName: string,
+  destinationName: string,
+) {
   const sourceRotation = source[sourceName];
   if (!!!sourceRotation) {
-    console.error(`No rotation named ${sourceName}`)
+    console.error(`No rotation named ${sourceName}`);
     return;
   }
-  rotateChildBone(obj, destinationName, sourceRotation.x, sourceRotation.y, sourceRotation.z);
+  rotateChildBone(
+    obj,
+    destinationName,
+    sourceRotation.x,
+    sourceRotation.y,
+    sourceRotation.z,
+  );
+}
+
+const rigLeftHand = (
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  riggedLeftHand: THand<"Left">,
+  riggedPose: TPose,
+) => {
+  mapRotation(obj, "LeftHand", "mixamorigLeftHand");
+
+  // const leftHandKeys: HandKeys<"Left"> = ;
+
+  for (const name of leftHandBones) {
+    mapRotation(
+      obj,
+      name,
+      leftHandMixamoBonesMap[name],
+      riggedLeftHand[name as HandKeys<"Left">] as Vector,
+    );
+  }
+};
+
+const rigRotation = (
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  name: string,
+  rotation = { x: 0, y: 0, z: 0 },
+  dampener = 1,
+  lerpAmount = 0.3,
+) => {
+  if (!obj) {
+    return;
+  }
+  const child = obj.getObjectByName(name);
+  if (!!!child) {
+    return;
+  }
+
+  let euler = new THREE.Euler(
+    rotation.x * dampener,
+    rotation.y * dampener,
+    rotation.z * dampener,
+    "XYZ",
+  );
+  let quaternion = new THREE.Quaternion().setFromEuler(euler);
+  child.quaternion.slerp(quaternion, lerpAmount); // interpolate
+};
+
+// Animate Position Helper Function
+const rigPosition = (
+  obj: THREE.Object3D<THREE.Object3DEventMap>,
+  name: string,
+  position = { x: 0, y: 0, z: 0 },
+  dampener = 1,
+  lerpAmount = 0.3,
+) => {
+  if (!obj) {
+    return;
+  }
+  const child = obj.getObjectByName(name);
+  if (!!!child) {
+    return;
+  }
+
+  let vector = new THREE.Vector3(
+    position.x * dampener,
+    position.y * dampener,
+    position.z * dampener,
+  );
+  // child.apply = child.position.lerp(vector, lerpAmount); // interpolate
+};
+
+import * as THREE from "three";
+
+// Define the structure of the Kalidokit pose
+interface PoseRotation {
+  x: number;
+  y: number;
+  z: number;
+}
+
+interface PosePosition {
+  x: number;
+  y: number;
+  z: number;
+}
+
+interface HipsPose {
+  position: PosePosition;
+  worldPosition: PosePosition;
+  rotation: PoseRotation;
+}
+
+interface KalidokitPose {
+  RightUpperArm: PoseRotation;
+  RightLowerArm: PoseRotation;
+  LeftUpperArm: PoseRotation;
+  LeftLowerArm: PoseRotation;
+  RightHand: PoseRotation;
+  LeftHand: PoseRotation;
+  RightUpperLeg: PoseRotation;
+  RightLowerLeg: PoseRotation;
+  LeftUpperLeg: PoseRotation;
+  LeftLowerLeg: PoseRotation;
+  Hips: HipsPose;
+  Spine: PoseRotation;
+}
+
+// Define the mapping from Kalidokit bones to Mixamo bones
+const BONE_MAPPING: Record<string, string[]> = {
+  // Spine & Hips
+  Spine: ["mixamorigSpine", "mixamorigSpine1", "mixamorigSpine2"],
+  // Hips: ["mixamorigHips"],
+
+  // Arms
+  RightUpperArm: ["mixamorigRightArm"],
+  RightLowerArm: ["mixamorigRightForeArm"],
+  LeftUpperArm: ["mixamorigLeftArm"],
+  LeftLowerArm: ["mixamorigLeftForeArm"],
+
+  // Legs
+  RightUpperLeg: ["mixamorigRightUpLeg"],
+  RightLowerLeg: ["mixamorigRightLeg"],
+  LeftUpperLeg: ["mixamorigLeftUpLeg"],
+  LeftLowerLeg: ["mixamorigLeftLeg"],
+
+  // Hands
+  RightHand: ["mixamorigRightHand"],
+  LeftHand: ["mixamorigLeftHand"],
+};
+
+function findSkinnedMesh(object: THREE.Object3D): THREE.SkinnedMesh | null {
+  let skinnedMesh: THREE.SkinnedMesh | null = null;
+
+  object.traverse((child) => {
+    if (child instanceof THREE.SkinnedMesh) {
+      skinnedMesh = child;
+    }
+  });
+
+  return skinnedMesh;
+}
+
+function rigBoneRotation(
+  bones: THREE.Bone[],
+  boneName: string,
+  rotation: PoseRotation,
+  dampener: number = 1,
+  lerpAmount: number = 0.3,
+) {
+  const bone = bones.find((b) => b.name === boneName);
+  if (!bone) return;
+
+  const euler = new THREE.Euler(
+    rotation.x * dampener,
+    rotation.y * dampener,
+    rotation.z * dampener,
+    "XYZ",
+  );
+
+  const quaternion = new THREE.Quaternion().setFromEuler(euler);
+
+  bone.quaternion.premultiply(quaternion);
+  bone.updateMatrixWorld(true);
+}
+
+//TODO(kasisnu, 29/01/25): This might be useful for hips or other bones later, not sure as of writing
+function rigBonePosition(
+  bones: THREE.Bone[],
+  boneName: string,
+  position: PosePosition,
+  dampener: number = 1,
+  lerpAmount: number = 0.3,
+) {
+  const bone = bones.find((b) => b.name === boneName);
+  if (!bone) return;
+
+  const vector = new THREE.Vector3(
+    position.x * dampener,
+    position.y * dampener,
+    position.z * dampener,
+  );
+
+  bone.position.lerp(vector, lerpAmount); // Smooth transition
+}
+
+function findBoneRecursive(
+  rootBone: THREE.Bone,
+  name: string,
+): THREE.Bone | null {
+  if (rootBone.name === name) return rootBone;
+
+  for (const child of rootBone.children) {
+    const foundBone = findBoneRecursive(child as THREE.Bone, name);
+    if (foundBone) return foundBone;
+  }
+  return null;
+}
+function getBoneUpdateOrder(
+  rootBone: THREE.Bone,
+  order: string[] = [],
+): string[] {
+  order.push(rootBone.name);
+  for (const child of rootBone.children) {
+    getBoneUpdateOrder(child as THREE.Bone, order);
+  }
+  return order;
+}
+
+function applyPoseToMixamo(
+  character: THREE.Object3D,
+  kalidokitPose: KalidokitPose,
+) {
+  const skinnedMesh = findSkinnedMesh(character);
+  if (!skinnedMesh) {
+    return;
+  }
+  const bones = skinnedMesh.skeleton.bones;
+  if (!bones) {
+    return;
+  }
+
+  const rootBone = bones[0];
+  const boneUpdateOrder = getBoneUpdateOrder(rootBone);
+  console.log("Bone Update Order:", boneUpdateOrder);
+
+  const missingBones: string[] = [];
+  const missingKalidokitBones: string[] = [];
+
+  for (const boneName of boneUpdateOrder) {
+    const kalidokitBone = Object.keys(BONE_MAPPING).find((key) =>
+      BONE_MAPPING[key as keyof typeof BONE_MAPPING].includes(boneName),
+    ) as keyof KalidokitPose | undefined;
+
+    if (!kalidokitBone) {
+      missingKalidokitBones.push(boneName);
+      continue;
+    }
+
+    const bone = findBoneRecursive(rootBone, boneName);
+    if (!bone) {
+      missingBones.push(boneName);
+      continue;
+    }
+
+    const poseRotation =
+      kalidokitBone === "Hips"
+        ? kalidokitPose.Hips.rotation // Only use rotation for hips
+        : kalidokitPose[kalidokitBone as keyof Omit<KalidokitPose, "Hips">];
+
+    if (poseRotation && typeof poseRotation === "object") {
+      rigBoneRotation(bones, boneName, poseRotation);
+    }
+  }
+
+  // Log missing bones if any
+  if (missingBones.length > 0) {
+    console.warn("⚠️ Missing Mixamo Bones:", missingBones);
+  } else {
+    console.log("All Mixamo bones found and mapped correctly!");
+  }
+
+  if (missingKalidokitBones.length > 0) {
+    console.warn("⚠️ Missing Kalidokit Bones:", missingKalidokitBones);
+    console.warn(
+      "Available Kalidokit Bones:",
+      boneUpdateOrder
+        .map((b) => b)
+        .filter((b) => !missingKalidokitBones.includes(b)),
+    );
+  } else {
+    console.log("All Kalidokit bones found and mapped correctly!");
+  }
+
+  skinnedMesh.skeleton.update();
+  skinnedMesh.updateMatrixWorld(true);
 }
 
 export function testDeformBody(obj: THREE.Object3D<THREE.Object3DEventMap>) {
   if (!DEBUG_ENABLED) {
     return;
   }
-  mapRotation(obj, "Spine", "mixamorigSpine");
 
-  //mapRotation(obj, "RightUpperArm", "mixamorigRightArm");
-  mapRotation(obj, "RightHand", "mixamorigRightHand");
-  mapRotation(obj, "LeftHand", "mixamorigLeftHand");
+  applyPoseToMixamo(obj, EXAMPLE_POSE);
 
-  //mapRotation(obj, "RightUpperArm", "mixamorigRightShoulder");
-  mapRotation(obj, "RightUpperArm", "mixamorigRightArm");
-  //mapRotation(obj, "LeftUpperArm", "mixamorigLeftShoulder");
-  mapRotation(obj, "LeftUpperArm", "mixamorigLeftArm");
+  // rigRotation(obj, "Hips", EXAMPLE_POSE.Hips, 0.7);
+  // rigPosition(obj, "Hips", EXAMPLE_POSE.Hips.position, 0.7);
+  // rigPosition(
+  //   obj,
+  //   "Hips",
+  //   {
+  //     x: EXAMPLE_POSE.Hips.position.x, // Reverse direction
+  //     y: EXAMPLE_POSE.Hips.position.y + 1, // Add a bit of height
+  //     z: -EXAMPLE_POSE.Hips.position.z, // Reverse direction
+  //   },
+  //   1,
+  //   0.07,
+  // );
 
-  mapRotation(obj, "RightLowerArm", "mixamorigRightForeArm");
-  mapRotation(obj, "LeftLowerArm", "mixamorigLeftForeArm");
+  // rigRotation(obj, "Chest", EXAMPLE_POSE.Spine, 0.25, 0.3);
+  // rigRotation(obj, "Spine", EXAMPLE_POSE.Spine, 0.45, 0.3);
+  // rigRotation(obj, "Chest", EXAMPLE_POSE.Spine, 0.25, 0.3);
+  // rigPosition(obj, "Chest", EXAMPLE_POSE.Spine, 0.7);
+  // rigRotation(obj, "Spine", EXAMPLE_POSE.Spine, 0.45, 0.3);
+  // rigPosition(obj, "Spine", EXAMPLE_POSE.Spine, 0.7);
+
+  // rigRotation(obj, "RightUpperArm", EXAMPLE_POSE.RightUpperArm, 1, 0.3);
+  // rigPosition(obj, "RightUpperArm", EXAMPLE_POSE.RightUpperArm, 0.7);
+  // rigRotation(obj, "RightLowerArm", EXAMPLE_POSE.RightLowerArm, 1, 0.3);
+  // rigPosition(obj, "RightLowerArm", EXAMPLE_POSE.RightLowerArm, 0.7);
+  // rigRotation(obj, "LeftUpperArm", EXAMPLE_POSE.LeftUpperArm, 1, 0.3);
+  // rigPosition(obj, "LeftUpperArm", EXAMPLE_POSE.LeftUpperArm, 0.7);
+  // rigRotation(obj, "LeftLowerArm", EXAMPLE_POSE.LeftLowerArm, 1, 0.3);
+  // rigPosition(obj, "LeftLowerArm", EXAMPLE_POSE.LeftLowerArm, 0.7);
+
+  // rigRotation(obj, "LeftUpperLeg", EXAMPLE_POSE.LeftUpperLeg, 1, 0.3);
+  // rigRotation(obj, "LeftLowerLeg", EXAMPLE_POSE.LeftLowerLeg, 1, 0.3);
+  // rigRotation(obj, "RightUpperLeg", EXAMPLE_POSE.RightUpperLeg, 1, 0.3);
+  // rigRotation(obj, "RightLowerLeg", EXAMPLE_POSE.RightLowerLeg, 1, 0.3);
+  // // mapRotation(obj, "Hips", "mixamorigHips");
+  // // mapRotation(obj, "Chest", "mixamorigSpine1");
+  // mapRotation(obj, "Spine", "mixamorigSpine");
+
+  // mapRotation(obj, "RightUpperArm", "mixamorigRightArm");
+  // mapRotation(obj, "RightHand", "mixamorigRightHand");
+  // mapRotation(obj, "LeftHand", "mixamorigLeftHand");
+  // // rigLeftHand(obj, EXAMPLE_POSE.LeftHand, EXAMPLE_POSE);
+
+  // mapRotation(obj, "RightUpperArm", "mixamorigRightShoulder");
+  // mapRotation(obj, "RightUpperArm", "mixamorigRightArm");
+  // mapRotation(obj, "LeftUpperArm", "mixamorigLeftShoulder");
+  // mapRotation(obj, "LeftUpperArm", "mixamorigLeftArm");
+
+  // mapRotation(obj, "RightLowerArm", "mixamorigRightForeArm");
+  // mapRotation(obj, "LeftLowerArm", "mixamorigLeftForeArm");
 
   //obj.rotation.x = EXAMPLE_POSE.Hips.rotation.x;
   //obj.rotation.y = EXAMPLE_POSE.Hips.rotation.y;
   //obj.rotation.z = EXAMPLE_POSE.Hips.rotation.z;
-
 }
 
-
 export async function testGlobalExperiment() {
-  const firstFrameUrl : string | undefined = (window as any).firstFrameMediaUrl;
-  const characterRig : THREE.Object3D<THREE.Object3DEventMap> | undefined = (window as any).lastCharacter;
+  const firstFrameUrl: string | undefined = (window as any).firstFrameMediaUrl;
+  const characterRig: THREE.Object3D<THREE.Object3DEventMap> | undefined = (
+    window as any
+  ).lastCharacter;
   if (!!!firstFrameUrl || !!!characterRig) {
     return;
   }
   doTest(firstFrameUrl, characterRig);
 }
 
-async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.Object3DEventMap>) {
+async function doTest(
+  firstFrameUrl: string,
+  characterRig: THREE.Object3D<THREE.Object3DEventMap>,
+) {
   //rotateChildBone(characterRig, "mixamorigLeftLeg", 1, 2, 0);
   //rotateChildBone(characterRig, "mixamorigRightArm", 0, 1, 2);
   //rotateChildBone(characterRig, "mixamorigLeftShoulder", 2, 0, 2);
@@ -203,33 +615,46 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
 
   const solutions = await solveForImage(image);
 
-  console.log('mediapipe solution', solutions);
+  console.log("mediapipe solution", solutions);
   (window as any).solutions = solutions;
 
-  const poseWorld3DArray : any = solutions.worldLandmarks[0];
-  const poseLandmarkArray : any = solutions.landmarks[0];
+  const poseWorld3DArray: any = solutions.worldLandmarks[0];
+  const poseLandmarkArray: any = solutions.landmarks[0];
 
   let solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
-    runtime:'mediapipe', // default is 'mediapipe'
+    runtime: "mediapipe", // default is 'mediapipe'
     //video: HTMLVideoElement,// specify an html video or manually set image size
-    imageSize:{
-        width: image.width,
-        height: image.height,
-    }
+    imageSize: {
+      width: image.width,
+      height: image.height,
+    },
   });
 
-  console.log('kalidokit pose solution', solution);
+  console.log("kalidokit pose solution", solution);
 
-  mapRotationFrom(characterRig, solution, "Spine", "mixamorigSpine");
+  // Apply the pose to the character rig
+  applyPoseToMixamo(characterRig, solution as KalidokitPose);
 
-  mapRotationFrom(characterRig, solution, "RightHand", "mixamorigRightHand");
-  mapRotationFrom(characterRig, solution, "LeftHand", "mixamorigLeftHand");
+  // mapRotationFrom(characterRig, solution, "Spine", "mixamorigSpine");
 
-  mapRotationFrom(characterRig, solution, "RightUpperArm", "mixamorigRightArm");
-  mapRotationFrom(characterRig, solution, "LeftUpperArm", "mixamorigLeftArm");
+  // mapRotationFrom(characterRig, solution, "RightHand", "mixamorigRightHand");
+  // mapRotationFrom(characterRig, solution, "LeftHand", "mixamorigLeftHand");
 
-  mapRotationFrom(characterRig, solution, "RightLowerArm", "mixamorigRightForeArm");
-  mapRotationFrom(characterRig, solution, "LeftLowerArm", "mixamorigLeftForeArm");
+  // mapRotationFrom(characterRig, solution, "RightUpperArm", "mixamorigRightArm");
+  // mapRotationFrom(characterRig, solution, "LeftUpperArm", "mixamorigLeftArm");
+
+  // mapRotationFrom(
+  //   characterRig,
+  //   solution,
+  //   "RightLowerArm",
+  //   "mixamorigRightForeArm",
+  // );
+  // mapRotationFrom(
+  //   characterRig,
+  //   solution,
+  //   "LeftLowerArm",
+  //   "mixamorigLeftForeArm",
+  // );
 
   // NB: Holistic not yet working
   //let faceSolution = Kalidokit.Face.solve(holisticLandmarks.faceLandmarks[0], {
@@ -245,44 +670,54 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
   //mapRotationFrom(characterRig, faceSolution, "head", "mixamorigHead");
 }
 
-
-async function solveForImageUrl(imageUrl: string) : Promise<PoseLandmarkerResult> {
+async function solveForImageUrl(
+  imageUrl: string,
+): Promise<PoseLandmarkerResult> {
   const image = await loadImageFromAnonymousOriginUrl(imageUrl);
   console.debug("Loaded image for inference", image, image.width, image.height);
   return solveForImage(image);
 }
 
-async function solveForImage(image: HTMLImageElement) : Promise<PoseLandmarkerResult> {
+async function solveForImage(
+  image: HTMLImageElement,
+): Promise<PoseLandmarkerResult> {
   //const image : string = await loadImageFromAnonymousOriginUrl(imageUrl);
   //console.debug("Loaded image for inference", image, image.width, image.height);
 
   // TODO: Cache this.
   const filesetResolver = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm",
   );
-  
+
   const numPoses = 1;
   const runningMode = "IMAGE";
 
-  const poseLandmarker = await PoseLandmarker.createFromOptions(filesetResolver, {
-    baseOptions: {
-      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
-      delegate: "GPU"
-    },
-    runningMode: runningMode,
-    numPoses: numPoses
-  });
+  const poseLandmarker = await PoseLandmarker.createFromOptions(
+    filesetResolver,
+    {
+      baseOptions: {
+        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task`,
 
-  const poseResults = poseLandmarker.detect(image)
+        // modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
+        delegate: "GPU",
+      },
+      runningMode: runningMode,
+      numPoses: numPoses,
+    },
+  );
+
+  const poseResults = poseLandmarker.detect(image);
   console.debug("Pose results: ", poseResults);
 
   return poseResults;
 }
 
-async function solveHolisticForImage(image: HTMLImageElement) : Promise<HolisticLandmarkerResult> {
+async function solveHolisticForImage(
+  image: HTMLImageElement,
+): Promise<HolisticLandmarkerResult> {
   // TODO: Cache this.
   const filesetResolver = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm",
   );
 
   //let holistic = new Holistic({locateFile: (file) => {
@@ -309,13 +744,17 @@ async function solveHolisticForImage(image: HTMLImageElement) : Promise<Holistic
   //const holisticLandmarker = await HolisticLandmarker.createFromModelPath(filesetResolver,
   //  "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/hand_landmark.task"
   //);
-  const holisticLandmarker = await HolisticLandmarker.createFromOptions(filesetResolver, {
-    baseOptions: {
-      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/hand_landmark.task",
-      delegate: "CPU", // GPU does not work (?) https://github.com/google-ai-edge/mediapipe/issues/5166
+  const holisticLandmarker = await HolisticLandmarker.createFromOptions(
+    filesetResolver,
+    {
+      baseOptions: {
+        modelAssetPath:
+          "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/hand_landmark.task",
+        delegate: "CPU", // GPU does not work (?) https://github.com/google-ai-edge/mediapipe/issues/5166
+      },
+      runningMode: "IMAGE",
     },
-    runningMode: "IMAGE",
-  });
+  );
 
   const landmarks = holisticLandmarker.detect(image);
 
