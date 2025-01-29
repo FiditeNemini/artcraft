@@ -6,9 +6,12 @@ import { TFace } from "kalidokit";
 //import { Pose } from "kalidokit";
 //const Kalidokit = require('kalidokit');
 
-import { FilesetResolver, PoseLandmarker, PoseLandmarkerResult } from "@mediapipe/tasks-vision"
+import { FilesetResolver, PoseLandmarker, PoseLandmarkerResult, HolisticLandmarker, HolisticLandmarkerResult } from "@mediapipe/tasks-vision"
 import { CharacterPoseHelper } from "./Engines/Helpers/CharacterPoseHelper";
 import { loadImageFromAnonymousOriginUrl } from "~/Helpers/ImageHelpers";
+
+//import '@mediapipe/holistic/holistic';
+//import '@mediapipe/camera_utils/camera_utils';
 
 // TODO(bt,2025-01-28): I don't understand this codebase well yet, and I'm trying to apply bone rotations.
 // This is a simple set of experiments for me to come up to speed with Threejs, our code, and the theoretical 
@@ -190,12 +193,19 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
   const image = await loadImageFromAnonymousOriginUrl(firstFrameUrl);
   console.debug("Loaded image for inference", image, image.width, image.height);
 
+  // Solve Holistic (NB: Not yet working)
+  //const holisticLandmarks = await solveHolisticForImage(image);
+  //(window as any).holisticLandmarks = holisticLandmarks;
+  //const poseWorld3DArray : any = holisticLandmarks.poseWorldLandmarks[0];
+  //const poseLandmarkArray : any = holisticLandmarks.poseLandmarks[0];
+
+  // Solve Pose
+
   const solutions = await solveForImage(image);
 
   console.log('mediapipe solution', solutions);
   (window as any).solutions = solutions;
 
-  // TODO
   const poseWorld3DArray : any = solutions.worldLandmarks[0];
   const poseLandmarkArray : any = solutions.landmarks[0];
 
@@ -208,7 +218,7 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
     }
   });
 
-  console.log('kalidokit solution', solution);
+  console.log('kalidokit pose solution', solution);
 
   mapRotationFrom(characterRig, solution, "Spine", "mixamorigSpine");
 
@@ -220,6 +230,19 @@ async function doTest(firstFrameUrl: string, characterRig: THREE.Object3D<THREE.
 
   mapRotationFrom(characterRig, solution, "RightLowerArm", "mixamorigRightForeArm");
   mapRotationFrom(characterRig, solution, "LeftLowerArm", "mixamorigLeftForeArm");
+
+  // NB: Holistic not yet working
+  //let faceSolution = Kalidokit.Face.solve(holisticLandmarks.faceLandmarks[0], {
+  //  runtime: 'mediapipe',
+  //  imageSize:{
+  //      width: image.width,
+  //      height: image.height,
+  //  }
+  //});
+
+  //console.log('kalidokit face solution', faceSolution);
+
+  //mapRotationFrom(characterRig, faceSolution, "head", "mixamorigHead");
 }
 
 
@@ -254,4 +277,49 @@ async function solveForImage(image: HTMLImageElement) : Promise<PoseLandmarkerRe
   console.debug("Pose results: ", poseResults);
 
   return poseResults;
+}
+
+async function solveHolisticForImage(image: HTMLImageElement) : Promise<HolisticLandmarkerResult> {
+  // TODO: Cache this.
+  const filesetResolver = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+  );
+
+  //let holistic = new Holistic({locateFile: (file) => {
+  //  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1633559476/${file}`;
+  //}});
+
+  //holistic.onResults(results=>{
+  //  // do something with prediction results
+  //  // landmark names may change depending on TFJS/Mediapipe model version
+  //  let facelm = results.faceLandmarks;
+  //  let poselm = results.poseLandmarks;
+  //  let poselm3D = results.ea;
+  //  let rightHandlm = results.rightHandLandmarks;
+  //  let leftHandlm = results.leftHandLandmarks;
+
+  //  let faceRig = Kalidokit.Face.solve(facelm,{runtime:'mediapipe',video:HTMLVideoElement})
+  //  let poseRig = Kalidokit.Pose.solve(poselm3d,poselm,{runtime:'mediapipe',video:HTMLVideoElement})
+  //  let rightHandRig = Kalidokit.Hand.solve(rightHandlm,"Right")
+  //  let leftHandRig = Kalidokit.Hand.solve(leftHandlm,"Left")
+
+  //  };
+  //});
+
+  //const holisticLandmarker = await HolisticLandmarker.createFromModelPath(filesetResolver,
+  //  "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/hand_landmark.task"
+  //);
+  const holisticLandmarker = await HolisticLandmarker.createFromOptions(filesetResolver, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/hand_landmark.task",
+      delegate: "CPU", // GPU does not work (?) https://github.com/google-ai-edge/mediapipe/issues/5166
+    },
+    runningMode: "IMAGE",
+  });
+
+  const landmarks = holisticLandmarker.detect(image);
+
+  console.debug("Holistic landmark results: ", landmarks);
+
+  return landmarks;
 }
