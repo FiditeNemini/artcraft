@@ -311,6 +311,7 @@ const rigPosition = (
 };
 
 import * as THREE from "three";
+import { CachedPoseLandmarker } from "../pose/CachedPoseLandmarker";
 
 // Define the structure of the Kalidokit pose
 interface PoseRotation {
@@ -613,7 +614,7 @@ async function doTest(
 
   // Solve Pose
 
-  const solutions = await solveForImage(image);
+  const solutions = (await CachedPoseLandmarker.getInstance()).detectForImage(image);
 
   console.log("mediapipe solution", solutions);
   (window as any).solutions = solutions;
@@ -668,48 +669,6 @@ async function doTest(
   //console.log('kalidokit face solution', faceSolution);
 
   //mapRotationFrom(characterRig, faceSolution, "head", "mixamorigHead");
-}
-
-async function solveForImageUrl(
-  imageUrl: string,
-): Promise<PoseLandmarkerResult> {
-  const image = await loadImageFromAnonymousOriginUrl(imageUrl);
-  console.debug("Loaded image for inference", image, image.width, image.height);
-  return solveForImage(image);
-}
-
-async function solveForImage(
-  image: HTMLImageElement,
-): Promise<PoseLandmarkerResult> {
-  //const image : string = await loadImageFromAnonymousOriginUrl(imageUrl);
-  //console.debug("Loaded image for inference", image, image.width, image.height);
-
-  // TODO: Cache this.
-  const filesetResolver = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm",
-  );
-
-  const numPoses = 1;
-  const runningMode = "IMAGE";
-
-  const poseLandmarker = await PoseLandmarker.createFromOptions(
-    filesetResolver,
-    {
-      baseOptions: {
-        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task`,
-
-        // modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
-        delegate: "GPU",
-      },
-      runningMode: runningMode,
-      numPoses: numPoses,
-    },
-  );
-
-  const poseResults = poseLandmarker.detect(image);
-  console.debug("Pose results: ", poseResults);
-
-  return poseResults;
 }
 
 async function solveHolisticForImage(
