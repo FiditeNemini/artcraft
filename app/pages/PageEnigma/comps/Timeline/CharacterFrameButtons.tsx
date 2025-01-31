@@ -1,7 +1,7 @@
 import { faImage, faTrashCan } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIconStack } from "~/components/reusable/ButtonIconStack";
 import { frameTrackButtonWidthPx } from "../../signals";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { EngineContext } from "../../contexts/EngineContext";
 import { CHARACTER_FRAME_FILE_TYPE } from "~/enums";
 import { UploadModalMedia } from "~/components/reusable/UploadModalMedia";
@@ -60,6 +60,16 @@ export default function CharacterFrameButton(
     setIsUploadModalOpen(false);
   }, [setIsUploadModalOpen]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleTest = () => {
+    async function test() {
+      const poseHelper = new CharacterPoseHelper(editorEngine!);
+      const poseData = await poseHelper.extractPoseData("https://cdn-2.fakeyou.com/media/y/6/q/s/v/y6qsvxh66qw9bq8a48619t5pg9sdeyzx/image_y6qsvxh66qw9bq8a48619t5pg9sdeyzx.png")
+      // poseHelper.applyPoseDataToCharacter(characterId, poseData);
+      poseHelper.testRun(characterId, poseData);
+    }
+    test();
+  };
 
   const handleFrameSet = useCallback((token?: string) => {
     if (!token) {
@@ -72,9 +82,9 @@ export default function CharacterFrameButton(
     get_media_url(token)
       .then((url) => {
         console.debug("Frame url: ", url)
+
         // Handle the pose data
-        const poseHelper = new CharacterPoseHelper(editorEngine!);
-        poseHelper.extractPoseData(url);
+        handleTest();
         setMediaFile(url);
       })
       .catch((error) => {
@@ -84,7 +94,7 @@ export default function CharacterFrameButton(
         unlockButton();
       })
 
-  }, [unlockButton, setMediaFile]);
+  }, [unlockButton, setMediaFile, handleTest]);
 
   const handleDeleteFrame = useCallback(() => {
     setMediaFile(undefined);
@@ -96,7 +106,7 @@ export default function CharacterFrameButton(
     return (
       <>
         <div className={className} style={{ minWidth: frameTrackButtonWidthPx, width: frameTrackButtonWidthPx }}>
-          <ButtonIconStack icon={faImage} additionalStyle="bg-character-frame" text={CharacterFrameStrings[target]} onClick={handleFrameClick} />
+          <ButtonIconStack icon={faImage} additionalStyle="bg-character-frame" text={CharacterFrameStrings[target]} onClick={handleTest} />
         </div>
         <UploadImageMediaModal
           isOpen={isUploadModalOpen}
