@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { CachedPoseLandmarker } from "../pose/CachedPoseLandmarker";
 
 //import * as Kalidokit from "kalidokit";
 import * as Kalidokit from "kalidokit";
@@ -86,8 +87,85 @@ const leftHandMixamoBonesMap: { [key: string]: string } = {
 const DEBUG_ENABLED = true;
 const DEBUG_PRINT_ENABLED = true;
 
+type EulerOrder = "XYZ" | "YZX" | "ZXY" | "XZY" | "YXZ" | "ZYX";
+
+type TransformOperation = `-${string}` | string; // Allows "-x", "x", etc.
+type TransformOperations = { 
+    fx: TransformOperation;
+    fy: TransformOperation;
+    fz: TransformOperation;
+};
+
+var mixamorigTransformations: { 
+    [key: string]: { 
+        name: string;
+        order: EulerOrder;
+        func: TransformOperations;
+    } 
+} = {
+    "Hips": {
+        "name": "mixamorigHips",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "Neck": {
+        "name": "mixamorigNeck",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "Chest": {
+        "name": "mixamorigSpine2",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "Spine": {
+        "name": "mixamorigSpine",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "RightUpperArm": {
+        "name": "mixamorigRightArm",
+        "order": "ZXY",
+        "func": { "fx": "-z", "fy": "x", "fz": "-y" }
+    },
+    "RightLowerArm": {
+        "name": "mixamorigRightForeArm",
+        "order": "ZXY",
+        "func": { "fx": "-z", "fy": "x", "fz": "-y" }
+    },
+    "LeftUpperArm": {
+        "name": "mixamorigLeftArm",
+        "order": "ZXY",
+        "func": { "fx": "z", "fy": "-x", "fz": "-y" }
+    },
+    "LeftLowerArm": {
+        "name": "mixamorigLeftForeArm",
+        "order": "ZXY",
+        "func": { "fx": "z", "fy": "-x", "fz": "-y" }
+    },
+    "LeftUpperLeg": {
+        "name": "mixamorigLeftUpLeg",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "LeftLowerLeg": {
+        "name": "mixamorigLeftLeg",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "RightUpperLeg": {
+        "name": "mixamorigRightUpLeg",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    },
+    "RightLowerLeg": {
+        "name": "mixamorigRightLeg",
+        "order": "XYZ",
+        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+    }
+};
 // NB: From James Bond image.
-const EXAMPLE_POSE: any = {
+const EXAMPLE_POSE: KalidokitPose = {
   RightUpperArm: {
     x: -0.4230379402555594,
     y: 1.7737168782435317,
@@ -208,18 +286,29 @@ function mapRotation(
   destinationName: string,
   rotation = { x: 0, y: 0, z: 0 },
 ) {
-  const sourceRotation = EXAMPLE_POSE[sourceName];
+  const sourceRotation = EXAMPLE_POSE[sourceName as keyof typeof EXAMPLE_POSE];
   if (!!!sourceRotation) {
     console.error(`No rotation named ${sourceName}`);
     return;
   }
-  rotateChildBone(
-    obj,
-    destinationName,
-    sourceRotation.x,
-    sourceRotation.y,
-    sourceRotation.z,
-  );
+  // if sourceRotation is a HipsPose, we need to use the rotation property
+  if (typeof sourceRotation === "object" && "rotation" in sourceRotation) {
+    rotateChildBone(
+      obj,
+      destinationName,
+      sourceRotation.rotation.x,
+      sourceRotation.rotation.y,
+      sourceRotation.rotation.z,
+    );
+  } else {
+    rotateChildBone(
+      obj,
+      destinationName,
+      sourceRotation.x,
+      sourceRotation.y,
+      sourceRotation.z,
+    );
+  }
 }
 
 function mapRotationFrom(
@@ -242,82 +331,13 @@ function mapRotationFrom(
   );
 }
 
-const rigLeftHand = (
-  obj: THREE.Object3D<THREE.Object3DEventMap>,
-  riggedLeftHand: THand<"Left">,
-  riggedPose: TPose,
-) => {
-  mapRotation(obj, "LeftHand", "mixamorigLeftHand");
-
-  // const leftHandKeys: HandKeys<"Left"> = ;
-
-  for (const name of leftHandBones) {
-    mapRotation(
-      obj,
-      name,
-      leftHandMixamoBonesMap[name],
-      riggedLeftHand[name as HandKeys<"Left">] as Vector,
-    );
-  }
-};
-
-const rigRotation = (
-  obj: THREE.Object3D<THREE.Object3DEventMap>,
-  name: string,
-  rotation = { x: 0, y: 0, z: 0 },
-  dampener = 1,
-  lerpAmount = 0.3,
-) => {
-  if (!obj) {
-    return;
-  }
-  const child = obj.getObjectByName(name);
-  if (!!!child) {
-    return;
-  }
-
-  let euler = new THREE.Euler(
-    rotation.x * dampener,
-    rotation.y * dampener,
-    rotation.z * dampener,
-    "XYZ",
-  );
-  let quaternion = new THREE.Quaternion().setFromEuler(euler);
-  child.quaternion.slerp(quaternion, lerpAmount); // interpolate
-};
-
-// Animate Position Helper Function
-const rigPosition = (
-  obj: THREE.Object3D<THREE.Object3DEventMap>,
-  name: string,
-  position = { x: 0, y: 0, z: 0 },
-  dampener = 1,
-  lerpAmount = 0.3,
-) => {
-  if (!obj) {
-    return;
-  }
-  const child = obj.getObjectByName(name);
-  if (!!!child) {
-    return;
-  }
-
-  let vector = new THREE.Vector3(
-    position.x * dampener,
-    position.y * dampener,
-    position.z * dampener,
-  );
-  // child.apply = child.position.lerp(vector, lerpAmount); // interpolate
-};
-
-import * as THREE from "three";
-import { CachedPoseLandmarker } from "../pose/CachedPoseLandmarker";
 
 // Define the structure of the Kalidokit pose
 interface PoseRotation {
   x: number;
   y: number;
   z: number;
+  rotationOrder?: EulerOrder;
 }
 
 interface PosePosition {
@@ -382,48 +402,64 @@ function findSkinnedMesh(object: THREE.Object3D): THREE.SkinnedMesh | null {
   return skinnedMesh;
 }
 
+// Add helper function to apply the transformation
+function applyTransform(operation: TransformOperation, value: number): number {
+    if (operation.startsWith('-')) {
+        return -value;
+    }
+    return value;
+}
+
+// Update rigBoneRotation to use the new type-safe transform
 function rigBoneRotation(
-  bones: THREE.Bone[],
-  boneName: string,
-  rotation: PoseRotation,
-  dampener: number = 1,
-  lerpAmount: number = 0.3,
+    bone: THREE.Bone,
+    boneName: string,
+    rotation: PoseRotation,
+    dampener: number = 1,
+    lerpAmount: number = 0.3,
 ) {
-  const bone = bones.find((b) => b.name === boneName);
-  if (!bone) return;
+    const transformation = mixamorigTransformations[boneName];
+    if (!transformation) {
+        console.error(`No transformation named ${boneName}`);
+        return;
+    }
 
-  const euler = new THREE.Euler(
-    rotation.x * dampener,
-    rotation.y * dampener,
-    rotation.z * dampener,
-    "XYZ",
-  );
+    console.log("Rigging bone", boneName, rotation);
 
-  const quaternion = new THREE.Quaternion().setFromEuler(euler);
+    const oldRotation = bone.rotation.clone();
 
-  bone.quaternion.premultiply(quaternion);
-  bone.updateMatrixWorld(true);
+    const transformOperations = transformation.func;
+    const order = transformation.order;
+    
+    // Map the rotations according to the transformation functions
+    // For example, if fx is "-z", we map rotation.z with a negative sign
+    const mappedRotations = {
+        x: applyTransform(transformOperations.fx, rotation[transformOperations.fx.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
+        y: applyTransform(transformOperations.fy, rotation[transformOperations.fy.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
+        z: applyTransform(transformOperations.fz, rotation[transformOperations.fz.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
+    };
+
+    const euler = new THREE.Euler(
+        mappedRotations.x,
+        mappedRotations.y,
+        mappedRotations.z,
+        order
+    );
+
+    const quaternion = new THREE.Quaternion().setFromEuler(euler);
+
+    bone.quaternion.premultiply(quaternion);
+
+    const newRotation = bone.rotation.clone();
+
+    // log the bone name if the rotation didn't change
+    if (oldRotation.x === newRotation.x && oldRotation.y === newRotation.y && oldRotation.z === newRotation.z) {
+        console.log(`Rotation didn't change for bone ${boneName}`);
+    }
+
+    bone.updateMatrixWorld(true);
 }
 
-//TODO(kasisnu, 29/01/25): This might be useful for hips or other bones later, not sure as of writing
-function rigBonePosition(
-  bones: THREE.Bone[],
-  boneName: string,
-  position: PosePosition,
-  dampener: number = 1,
-  lerpAmount: number = 0.3,
-) {
-  const bone = bones.find((b) => b.name === boneName);
-  if (!bone) return;
-
-  const vector = new THREE.Vector3(
-    position.x * dampener,
-    position.y * dampener,
-    position.z * dampener,
-  );
-
-  bone.position.lerp(vector, lerpAmount); // Smooth transition
-}
 
 function findBoneRecursive(
   rootBone: THREE.Bone,
@@ -463,34 +499,29 @@ function applyPoseToMixamo(
 
   const rootBone = bones[0];
   const boneUpdateOrder = getBoneUpdateOrder(rootBone);
-  console.log("Bone Update Order:", boneUpdateOrder);
 
   const missingBones: string[] = [];
-  const missingKalidokitBones: string[] = [];
+  const bonesTransformed: string[] = [];
 
-  for (const boneName of boneUpdateOrder) {
-    const kalidokitBone = Object.keys(BONE_MAPPING).find((key) =>
-      BONE_MAPPING[key as keyof typeof BONE_MAPPING].includes(boneName),
-    ) as keyof KalidokitPose | undefined;
-
-    if (!kalidokitBone) {
-      missingKalidokitBones.push(boneName);
-      continue;
-    }
-
-    const bone = findBoneRecursive(rootBone, boneName);
+  // Use mixamorigTransformations keys instead of BONE_MAPPING
+  for (const kalidokitBone of Object.keys(mixamorigTransformations)) {
+    console.log("Rigging bone", kalidokitBone);
+    const mixamoBoneName = mixamorigTransformations[kalidokitBone].name;
+    const bone = findBoneRecursive(rootBone, mixamoBoneName);
+    
     if (!bone) {
-      missingBones.push(boneName);
+      missingBones.push(mixamoBoneName);
       continue;
     }
 
     const poseRotation =
       kalidokitBone === "Hips"
-        ? kalidokitPose.Hips.rotation // Only use rotation for hips
+        ? kalidokitPose.Hips.rotation
         : kalidokitPose[kalidokitBone as keyof Omit<KalidokitPose, "Hips">];
 
     if (poseRotation && typeof poseRotation === "object") {
-      rigBoneRotation(bones, boneName, poseRotation);
+      rigBoneRotation(bone, kalidokitBone, poseRotation);
+      bonesTransformed.push(kalidokitBone);
     }
   }
 
@@ -501,17 +532,10 @@ function applyPoseToMixamo(
     console.log("All Mixamo bones found and mapped correctly!");
   }
 
-  if (missingKalidokitBones.length > 0) {
-    console.warn("⚠️ Missing Kalidokit Bones:", missingKalidokitBones);
-    console.warn(
-      "Available Kalidokit Bones:",
-      boneUpdateOrder
-        .map((b) => b)
-        .filter((b) => !missingKalidokitBones.includes(b)),
-    );
-  } else {
-    console.log("All Kalidokit bones found and mapped correctly!");
-  }
+  console.log("Bones transformed:", bonesTransformed);
+  console.log("Bone update order:", boneUpdateOrder);
+  console.log("Missing bones:", missingBones);
+  console.log("Bones not transformed:", boneUpdateOrder.filter(bone => !bonesTransformed.includes(bone)));
 
   skinnedMesh.skeleton.update();
   skinnedMesh.updateMatrixWorld(true);
@@ -523,61 +547,6 @@ export function testDeformBody(obj: THREE.Object3D<THREE.Object3DEventMap>) {
   }
 
   applyPoseToMixamo(obj, EXAMPLE_POSE);
-
-  // rigRotation(obj, "Hips", EXAMPLE_POSE.Hips, 0.7);
-  // rigPosition(obj, "Hips", EXAMPLE_POSE.Hips.position, 0.7);
-  // rigPosition(
-  //   obj,
-  //   "Hips",
-  //   {
-  //     x: EXAMPLE_POSE.Hips.position.x, // Reverse direction
-  //     y: EXAMPLE_POSE.Hips.position.y + 1, // Add a bit of height
-  //     z: -EXAMPLE_POSE.Hips.position.z, // Reverse direction
-  //   },
-  //   1,
-  //   0.07,
-  // );
-
-  // rigRotation(obj, "Chest", EXAMPLE_POSE.Spine, 0.25, 0.3);
-  // rigRotation(obj, "Spine", EXAMPLE_POSE.Spine, 0.45, 0.3);
-  // rigRotation(obj, "Chest", EXAMPLE_POSE.Spine, 0.25, 0.3);
-  // rigPosition(obj, "Chest", EXAMPLE_POSE.Spine, 0.7);
-  // rigRotation(obj, "Spine", EXAMPLE_POSE.Spine, 0.45, 0.3);
-  // rigPosition(obj, "Spine", EXAMPLE_POSE.Spine, 0.7);
-
-  // rigRotation(obj, "RightUpperArm", EXAMPLE_POSE.RightUpperArm, 1, 0.3);
-  // rigPosition(obj, "RightUpperArm", EXAMPLE_POSE.RightUpperArm, 0.7);
-  // rigRotation(obj, "RightLowerArm", EXAMPLE_POSE.RightLowerArm, 1, 0.3);
-  // rigPosition(obj, "RightLowerArm", EXAMPLE_POSE.RightLowerArm, 0.7);
-  // rigRotation(obj, "LeftUpperArm", EXAMPLE_POSE.LeftUpperArm, 1, 0.3);
-  // rigPosition(obj, "LeftUpperArm", EXAMPLE_POSE.LeftUpperArm, 0.7);
-  // rigRotation(obj, "LeftLowerArm", EXAMPLE_POSE.LeftLowerArm, 1, 0.3);
-  // rigPosition(obj, "LeftLowerArm", EXAMPLE_POSE.LeftLowerArm, 0.7);
-
-  // rigRotation(obj, "LeftUpperLeg", EXAMPLE_POSE.LeftUpperLeg, 1, 0.3);
-  // rigRotation(obj, "LeftLowerLeg", EXAMPLE_POSE.LeftLowerLeg, 1, 0.3);
-  // rigRotation(obj, "RightUpperLeg", EXAMPLE_POSE.RightUpperLeg, 1, 0.3);
-  // rigRotation(obj, "RightLowerLeg", EXAMPLE_POSE.RightLowerLeg, 1, 0.3);
-  // // mapRotation(obj, "Hips", "mixamorigHips");
-  // // mapRotation(obj, "Chest", "mixamorigSpine1");
-  // mapRotation(obj, "Spine", "mixamorigSpine");
-
-  // mapRotation(obj, "RightUpperArm", "mixamorigRightArm");
-  // mapRotation(obj, "RightHand", "mixamorigRightHand");
-  // mapRotation(obj, "LeftHand", "mixamorigLeftHand");
-  // // rigLeftHand(obj, EXAMPLE_POSE.LeftHand, EXAMPLE_POSE);
-
-  // mapRotation(obj, "RightUpperArm", "mixamorigRightShoulder");
-  // mapRotation(obj, "RightUpperArm", "mixamorigRightArm");
-  // mapRotation(obj, "LeftUpperArm", "mixamorigLeftShoulder");
-  // mapRotation(obj, "LeftUpperArm", "mixamorigLeftArm");
-
-  // mapRotation(obj, "RightLowerArm", "mixamorigRightForeArm");
-  // mapRotation(obj, "LeftLowerArm", "mixamorigLeftForeArm");
-
-  //obj.rotation.x = EXAMPLE_POSE.Hips.rotation.x;
-  //obj.rotation.y = EXAMPLE_POSE.Hips.rotation.y;
-  //obj.rotation.z = EXAMPLE_POSE.Hips.rotation.z;
 }
 
 export async function testGlobalExperiment() {
