@@ -21,6 +21,12 @@ pub fn get_scoped_media_classes(
     return None;
   }
 
+  if classes.len() == 1 && classes.contains(&MediaFileClass::Unknown) {
+    // NB(bt,2025-01-31): The frontend started passing simply "unknown" to the API in development
+    // for some reason. Not sure why. There's no product reason for this to be a filter.
+    return None;
+  }
+
   Some(classes)
 }
 
@@ -34,23 +40,29 @@ mod test {
 
   #[test]
   fn none() {
-    assert_eq!(get_scoped_media_classes(None), None)
+    assert_eq!(get_scoped_media_classes(None), None);
   }
 
   #[test]
   fn empty() {
-    assert_eq!(get_scoped_media_classes(Some("")), None)
+    assert_eq!(get_scoped_media_classes(Some("")), None);
+  }
+
+  #[test]
+  fn not_just_unknown() {
+    assert_eq!(get_scoped_media_classes(Some("unknown")), None);
+    assert_eq!(get_scoped_media_classes(Some("unknown,,")), None);
   }
 
   #[test]
   fn garbage() {
-    assert_eq!(get_scoped_media_classes(Some("foo,bar,baz")), None)
+    assert_eq!(get_scoped_media_classes(Some("foo,bar,baz")), None);
   }
 
   #[test]
   fn valid_scope() {
     assert_eq!(
       get_scoped_media_classes(Some("image,video")),
-      Some(HashSet::from([MediaFileClass::Image, MediaFileClass::Video])))
+      Some(HashSet::from([MediaFileClass::Image, MediaFileClass::Video])));
   }
 }

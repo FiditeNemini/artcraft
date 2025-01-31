@@ -1,7 +1,9 @@
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadFileForStudioArgs};
+use crate::job::job_types::studio_gen2::stable_animator_command::InferenceArgs;
 use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
+use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
 use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
 use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::process_live_portrait_job;
 use crate::job::job_types::workflow::video_style_transfer::process_video_style_transfer_job::process_video_style_transfer_job;
@@ -24,11 +26,15 @@ use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFi
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
+use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_deletion::safe_delete_possible_files_and_directories::safe_delete_possible_files_and_directories;
 use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
 use filesys::path_to_string::path_to_string;
+use images::image::io::Reader;
+use images::resize_preserving_aspect::resize_preserving_aspect;
 use log::{error, info, warn};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::{Cu, S2};
+use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
@@ -40,27 +46,12 @@ use std::time::{Duration, Instant};
 use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
-use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
-use images::image::io::Reader;
-use images::resize_preserving_aspect::resize_preserving_aspect;
-use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
-use crate::job::job_types::studio_gen2::stable_animator_command::InferenceArgs;
-use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
-// TODO(bt,2025-01-16): This is a stub for Studio Gen2
-// TODO(bt,2025-01-16): This is a stub for Studio Gen2
-// TODO(bt,2025-01-16): This is a stub for Studio Gen2
-// TODO(bt,2025-01-16): This is a stub for Studio Gen2
 
 pub async fn process_single_studio_gen2_job(
   deps: &JobDependencies,
   job: &AvailableInferenceJob
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
-
-  // TODO(bt,2025-01-16): This is a stub for Studio Gen2
-  // TODO(bt,2025-01-16): This is a stub for Studio Gen2
-  // TODO(bt,2025-01-16): This is a stub for Studio Gen2
-  // TODO(bt,2025-01-16): This is a stub for Studio Gen2
 
   let mut job_progress_reporter = deps
       .clients
