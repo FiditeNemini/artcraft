@@ -48,9 +48,7 @@ export class StoryTellerProxyScene {
     proxyObject3D.specular = child.userData["specular"];
     proxyObject3D.locked = child.userData["locked"];
     proxyObject3D.visible = child.visible;
-    if (child.userData["media_file_type"] !== undefined) {
-      proxyObject3D.media_file_type = child.userData["media_file_type"];
-    }
+    proxyObject3D.userData = child.userData;
     const json_data = await proxyObject3D.toJSON();
     return json_data;
   }
@@ -98,6 +96,7 @@ export class StoryTellerProxyScene {
       for (const pchild of this.scene.scene.children) {
         if (this.version >= 1.0) {
           if (pchild.userData["media_id"] != undefined) {
+            console.debug("Object JSON:", pchild.toJSON())
             results.push(await this.getChildren(pchild));
           }
         } else {
@@ -108,6 +107,7 @@ export class StoryTellerProxyScene {
     } else {
       console.log("Scene doesn't exist needs to be assigned");
     }
+    console.debug("Scene saved.", results);
     return results;
   }
 

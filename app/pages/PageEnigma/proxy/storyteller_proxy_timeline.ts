@@ -10,6 +10,8 @@ import EmotionEngine from "../Editor/Engines/emotion_engine";
 import LipSyncEngine from "../Editor/Engines/lip_sync_engine";
 import { TimeLine } from "../Editor/timeline";
 import TransformEngine from "../Editor/Engines/transform_engine";
+import Ijson from "~/interfaces/Ijson";
+import { ClipGroup, ClipType } from "~/enums";
 
 export class StoryTellerProxyTimeline {
   timeline: TimeLine;
@@ -36,7 +38,7 @@ export class StoryTellerProxyTimeline {
     this.emotion_engine = emotion_engine;
   }
 
-  private async getItemsToJson(items: unknown[]): Promise<unknown[]> {
+  private async getItemsToJson(items: Ijson[]): Promise<unknown[]> {
     const timeline_items_data: unknown[] = [];
     items.forEach((element) => { timeline_items_data.push(element.toJSON()); });
 
@@ -44,11 +46,11 @@ export class StoryTellerProxyTimeline {
   }
 
   private async getItemsDict(items: {
-    [key: string]: any;
-  }): Promise<{ [key: string]: any }> {
-    const timeline_items_data: { [key: string]: any } = {};
+    [key: string]: Ijson;
+  }): Promise<{ [key: string]: unknown }> {
+    const timeline_items_data: { [key: string]: unknown } = {};
     for (const key in items) {
-      if (items.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(items, key)) {
         const element = items[key];
         timeline_items_data[key] = element.toJSON();
       }
@@ -60,7 +62,7 @@ export class StoryTellerProxyTimeline {
     const timeline_json = {
       timeline: await this.getItemsToJson(this.timeline.timeline_items),
       transform: await this.getItemsDict(this.transform_engine.clips),
-      animation: await this.getItemsDict(this.animation_engine.clips),
+      animation: this.animation_engine.toJSON(),
       audio: await this.getItemsDict(this.audio_engine.clips),
       lipsync: await this.getItemsDict(this.lipsync_engine.clips),
       emotion: await this.getItemsDict(this.emotion_engine.clips),
@@ -131,27 +133,6 @@ export class StoryTellerProxyTimeline {
     return timeline_items_data;
   }
 
-  private async loadAnimationClips(items: {
-    [key: string]: any;
-  }): Promise<{ [key: string]: any }> {
-    const timeline_items_data: { [key: string]: any } = {};
-    for (const key in items) {
-      if (items.hasOwnProperty(key)) {
-        const element = items[key];
-        timeline_items_data[key] = new AnimationClip(
-          element.version,
-          element.media_id,
-          "remote",
-          element.object_uuid,
-          element.speed,
-          element.length,
-          element.clip_name,
-        );
-      }
-    }
-    return timeline_items_data;
-  }
-
   private async loadLipsyncClips(items: {
     [key: string]: any;
   }): Promise<{ [key: string]: any }> {
@@ -196,14 +177,21 @@ export class StoryTellerProxyTimeline {
     this.lipsync_engine.clips = await this.loadLipsyncClips(
       timeline["lipsync"],
     );
-    this.animation_engine.clips = await this.loadAnimationClips(
-      timeline["animation"],
-    );
     this.emotion_engine.clips = await this.loadEmotionClips(
       timeline["emotion"],
     );
 
-    console.log(this.timeline.timeline_items);
+    // Add characters and their animations
+    const animationClips = this.timeline.timeline_items.filter((clip) => { clip.group === ClipGroup.CHARACTER && clip.type === ClipType.ANIMATION })
+    animationClips.forEach((clip) => {
+      const characterObject = this.timeline.scene.get_object_by_uuid(clip.object_uuid);
+
+      if (!characterObject) {
+        return
+      }
+
+      this.animation_engine.addCharacterAnimationMedia(characterObject, clip.media_id, clip);
+    });
 
     this.timeline.updateUI();
   }

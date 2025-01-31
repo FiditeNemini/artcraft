@@ -181,6 +181,7 @@ export class SaveManager {
 
     this.editor.generating_preview = false; // FIX THIS LATER WITH VICCCCCCCCCCCCCCCTORRRRRRRR
 
+    console.debug("Save Scene Result: ", result);
     return result; // if this is an empty string it is an error. need to migrate to api manager.
   }
 
@@ -260,8 +261,9 @@ export class SaveManager {
       this.editor.lipsync_engine,
       this.editor.emotion_engine,
     );
+    console.debug("Loading Timeline", scene_json["timeline"]);
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
-    
+
     this.editor.timeline.checkEditorCanPlay();
 
     hideEditorLoader();
