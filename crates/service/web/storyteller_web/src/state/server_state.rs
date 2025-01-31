@@ -50,8 +50,12 @@ pub struct ServerState {
 
   pub hostname: String,
 
+  #[deprecated(note = "Use `server_environment` instead")]
   /// Knowing if we're in production will allow us to turn off development-only functionalities.
-  pub server_environment: ServerEnvironment,
+  pub server_environment_old: ServerEnvironment,
+
+  /// Knowing if we're in production will allow us to turn off development-only functionalities.
+  pub server_environment: server_environment::ServerEnvironment,
 
   /// Feature flags will allow us to restart the service with different conditions embedded in the code.
   pub flags: StaticFeatureFlags,

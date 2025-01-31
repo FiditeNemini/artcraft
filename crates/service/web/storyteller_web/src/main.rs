@@ -388,6 +388,11 @@ async fn main() -> AnyhowResult<()> {
     "noreply@storyteller.ai".to_string(),
     "FakeYouHanashi1".to_string())?;
 
+  let server_environment_typed = match server_environment {
+    ServerEnvironment::Production => server_environment::ServerEnvironment::Production,
+    ServerEnvironment::Development => server_environment::ServerEnvironment::Development,
+  };
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -405,7 +410,8 @@ async fn main() -> AnyhowResult<()> {
       client: stripe_client,
     },
     hostname: server_hostname,
-    server_environment,
+    server_environment_old: server_environment,
+    server_environment: server_environment_typed,
     flags: service_feature_flags,
     third_party_url_redirector,
     health_check_status,
@@ -562,7 +568,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let hostname = server_state.hostname.clone();
 
   // TODO(bt,2023-11-12): Remove the old type.
-  let old_server_environment = server_state.server_environment;
+  let old_server_environment = server_state.server_environment_old;
   let new_server_environment = match old_server_environment {
     ServerEnvironment::Development => server_environment::ServerEnvironment::Development,
     ServerEnvironment::Production => server_environment::ServerEnvironment::Production,

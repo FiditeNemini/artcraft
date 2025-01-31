@@ -152,7 +152,7 @@ pub async fn enqueue_infer_seed_vc_handler(
 
   // TODO: Plan should handle "first anonymous use" and "investor" cases.
   let plan = get_correct_plan_for_session(
-    server_state.server_environment,
+    server_state.server_environment_old,
     maybe_user_session.as_ref());
 
   priority_level = plan.tts_base_priority_level();

@@ -142,8 +142,8 @@ pub async fn enqueue_tts_request(
 
     // Plan should handle "first anonymous use" and "investor" cases.
     let plan = get_correct_plan_for_session(
-        server_state.server_environment,
-        maybe_user_session.as_ref()
+      server_state.server_environment_old,
+      maybe_user_session.as_ref()
     );
 
     // Separate priority for animation.
