@@ -32,8 +32,8 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
-use std::fs::read_to_string;
-use std::io::stdout;
+use std::fs::{read_to_string, File};
+use std::io::{stdout, BufReader};
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -41,6 +41,8 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
+use images::image::io::Reader;
+use images::resize_preserving_aspect::resize_preserving_aspect;
 use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_types::studio_gen2::stable_animator_command::InferenceArgs;
@@ -133,37 +135,37 @@ pub async fn process_single_studio_gen2_job(
 
   // ==================== DOWNLOAD IMAGE ==================== //
 
-  let image_file;
+  let unaltered_image_file;
 
   match studio_args.image_file.as_ref() {
     None => return Err(ProcessSingleJobError::Other(anyhow!("image_file not set"))),
     Some(media_token) => {
-      image_file = download_file_for_studio(DownloadFileForStudioArgs {
+      unaltered_image_file = download_file_for_studio(DownloadFileForStudioArgs {
         media_token,
         input_paths: &work_paths,
         remote_cloud_file_client: &remote_cloud_file_client,
         filename_without_extension: "input_image",
       }, Transactor::for_connection(&mut mysql_connection)).await?;
 
-      info!("Downloaded image to {:?}", &image_file.file_path);
+      info!("Downloaded image to {:?}", &unaltered_image_file.file_path);
     }
   }
 
   // ==================== DOWNLOAD VIDEO ==================== //
 
-  let video_file;
+  let unaltered_video_file;
 
   match studio_args.video_file.as_ref() {
     None => return Err(ProcessSingleJobError::Other(anyhow!("video_file not set"))),
     Some(media_token) => {
-      video_file = download_file_for_studio(DownloadFileForStudioArgs {
+      unaltered_video_file = download_file_for_studio(DownloadFileForStudioArgs {
         media_token,
         input_paths: &work_paths,
         remote_cloud_file_client: &remote_cloud_file_client,
         filename_without_extension: "input_video",
       }, Transactor::for_connection(&mut mysql_connection)).await?;
 
-      info!("Downloaded video to {:?}", &video_file.file_path);
+      info!("Downloaded video to {:?}", &unaltered_video_file.file_path);
     }
   }
 
@@ -171,7 +173,7 @@ pub async fn process_single_studio_gen2_job(
   //  info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
   //}
 
-  //// ========================= TRIM AND PREPROCESS VIDEO ======================== //
+  // ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
   //let expected_frame_count = preprocess_trim_and_resample_videos(ProcessTrimAndResampleVideoArgs {
   //  comfy_args: studio_args,
@@ -179,6 +181,52 @@ pub async fn process_single_studio_gen2_job(
   //  comfy_dirs: &work_paths,
   //  videos: &mut videos,
   //})?;
+
+  // Resize image
+
+  const MAX_LARGE_DIMENSION : u32 = 1024;
+  const MAX_SMALL_DIMENSION : u32 = 576;
+  const MAX_SQUARE_DIMENSION : u32 = 512;
+
+  let mut resized_image_path = unaltered_image_file.file_path.clone();
+
+  {
+    // NB(bt,2025-01-31): Using non-tokio blocking reads for now due to better compatability
+    // with image processing libraries. We can update this in the future.
+    let file = File::open(&unaltered_image_file.file_path)?;
+    let reader = BufReader::new(file);
+
+    let reader = Reader::new(reader)
+        .with_guessed_format()?;
+
+    let image = reader.decode()
+        .map_err(|err| ProcessSingleJobError::Other(anyhow!("Could not decode image: {:?}", err)))?;
+
+    info!("Original image is {}x{}", image.width(), image.height());
+
+    let width_bounds;
+    let height_bounds;
+
+    if image.width() > image.height() {
+      width_bounds = MAX_LARGE_DIMENSION;
+      height_bounds = MAX_SMALL_DIMENSION;
+    } else if image.height() > image.width() {
+      width_bounds = MAX_SMALL_DIMENSION;
+      height_bounds = MAX_LARGE_DIMENSION;
+    } else {
+      width_bounds = MAX_SQUARE_DIMENSION;
+      height_bounds = MAX_SQUARE_DIMENSION;
+    }
+
+    let resized_image = resize_preserving_aspect(&image, width_bounds, height_bounds, false);
+
+    info!("Resized image to {}x{}", resized_image.width(), resized_image.height());
+
+    resized_image_path = work_paths.output_dir.path().join("resized_image.png");
+
+    resized_image.save(&resized_image_path)
+        .map_err(|err| anyhow!("Could not save resized image to {:?}: {:?}", &resized_image_path, err))?;
+  }
 
   // ==================== RUN INFERENCE ==================== //
 
@@ -208,8 +256,8 @@ pub async fn process_single_studio_gen2_job(
         InferenceArgs {
           stderr_output_file: &stderr_output_file,
           stdout_output_file: &stdout_output_file,
-          start_image_path: &image_file.file_path,
-          pre_pose_video_path: Some(video_file.file_path.as_ref()),
+          start_image_path: &unaltered_image_file.file_path,
+          pre_pose_video_path: Some(unaltered_video_file.file_path.as_ref()),
           pose_images_dir: &pose_frames_dir,
           frame_output_dir: &video_frames_output_dir,
           video_output_path: &video_output_path,
