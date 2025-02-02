@@ -34,4 +34,8 @@ pub struct StudioGen2Payload {
   #[serde(rename = "oh")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub output_height: Option<u64>,
+
+  #[serde(rename = "fp")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub fps: Option<u64>,
 }

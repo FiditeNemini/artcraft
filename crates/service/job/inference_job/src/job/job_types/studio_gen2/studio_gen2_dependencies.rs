@@ -2,6 +2,7 @@ use crate::job::job_types::studio_gen2::stable_animator_command::StableAnimatorC
 use crate::state::common::watermark_configs::WatermarkConfigs;
 use errors::AnyhowResult;
 use std::path::{Path, PathBuf};
+use crate::util::common_commands::ffmpeg::runner::ffmpeg_command_runner::FfmpegCommandRunner;
 
 pub struct StudioGen2Dependencies {
   /// Watermarks added to videos (or perhaps images in the future)
@@ -16,6 +17,8 @@ pub struct StudioGen2Dependencies {
   pub posenet_model_name_or_path: PathBuf,
   pub face_encoder_model_name_or_path: PathBuf,
   pub unet_model_name_or_path: PathBuf,
+
+  pub ffmpeg: FfmpegCommandRunner,
 }
 
 impl StudioGen2Dependencies {
@@ -32,6 +35,8 @@ impl StudioGen2Dependencies {
       posenet_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_POSENET_MODEL_PATH")?,
       face_encoder_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_FACE_ENCODER_MODEL_PATH")?,
       unet_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_UNET_MODEL_PATH")?,
+
+      ffmpeg: FfmpegCommandRunner::from_env()?,
     })
   }
 }

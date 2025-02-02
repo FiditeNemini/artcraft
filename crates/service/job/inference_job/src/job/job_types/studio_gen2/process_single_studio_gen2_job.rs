@@ -46,7 +46,10 @@ use std::time::{Duration, Instant};
 use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
+use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_args::FfmpegResampleFpsArgs;
 
 pub async fn process_single_studio_gen2_job(
   deps: &JobDependencies,
@@ -166,14 +169,31 @@ pub async fn process_single_studio_gen2_job(
 
   // ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
-  //let expected_frame_count = preprocess_trim_and_resample_videos(ProcessTrimAndResampleVideoArgs {
-  //  comfy_args: studio_args,
-  //  comfy_deps: gen2_deps,
-  //  comfy_dirs: &work_paths,
-  //  videos: &mut videos,
-  //})?;
+  const RESAMPLE_FRAME_RATE : u64 = 30; // TODO(bt,2025-02-02): Upstream we produce 60fps out of studio. We should do 24fps
 
-  // Resize image
+  let mut resampled_video_path = unaltered_video_file.file_path.clone();
+
+  {
+    resampled_video_path = work_paths.output_dir.path().join("resampled_video.mp4");
+
+    let command_exit_status = gen2_deps.ffmpeg
+      .run_with_subprocess(RunAsSubprocessArgs {
+        args: Box::new(&FfmpegResampleFpsArgs {
+          input_video_file: &unaltered_video_file.file_path,
+          output_video_file: &resampled_video_path,
+          fps: studio_args.fps.unwrap_or(RESAMPLE_FRAME_RATE) as usize,
+        }),
+        stderr: StreamRedirection::None,
+        stdout: StreamRedirection::None,
+      });
+
+    if !command_exit_status.is_success() {
+      error!("Resample video failed: {:?} ; we'll revert to the original.", command_exit_status);
+      resampled_video_path = unaltered_video_file.file_path.clone();
+    }
+  }
+
+  // ========================= RESIZE IMAGE ======================== //
 
   const MAX_LARGE_DIMENSION : u32 = 1024;
   const MAX_SMALL_DIMENSION : u32 = 576;
@@ -247,8 +267,8 @@ pub async fn process_single_studio_gen2_job(
         InferenceArgs {
           stderr_output_file: &stderr_output_file,
           stdout_output_file: &stdout_output_file,
-          start_image_path: &unaltered_image_file.file_path,
-          pre_pose_video_path: Some(unaltered_video_file.file_path.as_ref()),
+          start_image_path: &resized_image_path,
+          pre_pose_video_path: Some(resampled_video_path.as_ref()),
           pose_images_dir: &pose_frames_dir,
           frame_output_dir: &video_frames_output_dir,
           video_output_path: &video_output_path,
@@ -258,6 +278,7 @@ pub async fn process_single_studio_gen2_job(
           unet_model_name_or_path: &gen2_deps.unet_model_name_or_path,
           output_width: studio_args.output_width,
           output_height: studio_args.output_height,
+          output_fps: studio_args.fps,
         }).await;
 
   let inference_duration = Instant::now().duration_since(inference_start_time);

@@ -83,6 +83,7 @@ pub struct InferenceArgs<'s> {
 
   pub output_width: Option<u64>,
   pub output_height: Option<u64>,
+  pub output_fps: Option<u64>,
 }
 
 impl StableAnimatorCommand {
@@ -175,6 +176,12 @@ impl StableAnimatorCommand {
     if let Some(height) = args.output_height {
       command.push_str(" --height ");
       command.push_str(&height.to_string());
+      command.push_str(" ");
+    }
+
+    if let Some(fps) = args.output_fps {
+      command.push_str(" --fps ");
+      command.push_str(&fps.to_string());
       command.push_str(" ");
     }
 
