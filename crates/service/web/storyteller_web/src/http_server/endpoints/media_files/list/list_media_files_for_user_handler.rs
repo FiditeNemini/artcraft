@@ -340,7 +340,8 @@ pub async fn list_media_files_for_user_handler(
           maybe_origin_model_type: record.maybe_origin_model_type
               .map(|t| PublicMediaFileModelType::from_enum(t)),
           maybe_origin_model_token: record.maybe_origin_model_token,
-          media_links: MediaLinks::from_media_path(media_domain, &public_bucket_path),
+          media_links: MediaLinks::from_media_path_and_env(
+            media_domain, server_state.server_environment, &public_bucket_path),
           public_bucket_path: public_bucket_path
               .get_full_object_path_str()
               .to_string(),

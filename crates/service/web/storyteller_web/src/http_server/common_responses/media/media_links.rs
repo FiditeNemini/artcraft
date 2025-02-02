@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use crate::http_server::common_responses::media::media_domain::MediaDomain;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use server_environment::ServerEnvironment;
-use crate::http_server::common_responses::media::cdn_link::new_cdn_url;
+use crate::http_server::common_responses::media::cdn_link::{get_cdn_host, new_cdn_url};
 
 // TODO(bt,2024-09-05): Worth reducing the quality at all?
 const QUALITY : u8 = 95;
@@ -77,7 +77,7 @@ impl MediaLinks {
     cdn_url.set_path(rooted_path);
     MediaLinks {
       cdn_url,
-      maybe_thumbnail_template: thumbnail_template(domain, rooted_path),
+      maybe_thumbnail_template: thumbnail_template(domain, server_environment, rooted_path),
       maybe_video_previews: VideoPreviews::from_rooted_path(domain, rooted_path),
     }
   }
@@ -118,14 +118,20 @@ fn video_preview(media_domain: MediaDomain, rooted_path: &str, thumbnail_type: P
 }
 
 /// Returns a thumbnail template for image
-fn thumbnail_template(media_domain: MediaDomain, rooted_path: &str) -> Option<String> {
+fn thumbnail_template(media_domain: MediaDomain, server_environment: ServerEnvironment, rooted_path: &str) -> Option<String> {
   if !rooted_path.ends_with(".jpg")
       && !rooted_path.ends_with(".png")
       && !rooted_path.ends_with(".gif") {
     return None;
   }
-  let host = media_domain.cdn_url_str();
-  Some(format!("{host}/cdn-cgi/image/width={{WIDTH}},quality={QUALITY}{rooted_path}"))
+  
+  let host = get_cdn_host(media_domain, server_environment);
+
+  // NB(bt,2025-02-01): Development doesn't currently support thumbnails, so serve the full image.
+  match server_environment {
+    ServerEnvironment::Development => Some(format!("{host}{rooted_path}")), // NB(bt,2025-02-01): No thumbnails in development.
+    ServerEnvironment::Production => Some(format!("{host}/cdn-cgi/image/width={{WIDTH}},quality={QUALITY}{rooted_path}"))
+  }
 }
 
 /// Returns a thumbnail template for video

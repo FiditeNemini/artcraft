@@ -6,8 +6,8 @@ use url::Url;
 const FAKEYOU_CDN_STR: &str = "https://cdn-2.fakeyou.com";
 const STORYTELLER_CDN_STR: &str = "https://cdn-2.fakeyou.com"; // TODO(bt,2025-01-31): This doesn't work
 
-const FAKEYOU_DEVELOPMENT_CDN_STR: &str = "https://pub-c8a4a5bdbdb048f286b77bdf9f786ff2.r2.dev/";
-const STORYTELLER_DEVELOPMENT_CDN_STR: &str = "https://pub-c8a4a5bdbdb048f286b77bdf9f786ff2.r2.dev/";
+const FAKEYOU_DEVELOPMENT_CDN_STR: &str = "https://pub-c8a4a5bdbdb048f286b77bdf9f786ff2.r2.dev";
+const STORYTELLER_DEVELOPMENT_CDN_STR: &str = "https://pub-c8a4a5bdbdb048f286b77bdf9f786ff2.r2.dev";
 
 
 const FAKEYOU_CDN: Lazy<Url> = Lazy::new(|| Url::parse(FAKEYOU_CDN_STR)
