@@ -1,7 +1,7 @@
 use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
 use actix_web::http::header::HOST;
 use actix_web::HttpRequest;
-use log::{info, warn};
+use log::{debug, warn};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum DomainBranding {
@@ -26,7 +26,7 @@ pub fn get_request_domain_branding(http_request: &HttpRequest) -> Option<DomainB
   match maybe_origin {
     Ok(Some(uri)) => {
       if let Some(branding) = match_possible_hostname(uri.host()) {
-        info!("Origin header: {:?} Branding for hostname: {:?}", uri, branding);
+        debug!("Origin header: {:?} Branding for hostname: {:?}", uri, branding);
         return Some(branding);
       }
     }
@@ -46,7 +46,7 @@ pub fn get_request_domain_branding(http_request: &HttpRequest) -> Option<DomainB
       .flatten();
 
   if let Some(branding) = match_possible_hostname(maybe_host_header) {
-    info!("Host header: {:?} Branding for hostname: {:?}", maybe_host_header, branding);
+    debug!("Host header: {:?} Branding for hostname: {:?}", maybe_host_header, branding);
     return Some(branding);
   }
 

@@ -88,9 +88,11 @@ pub struct InferenceArgs<'s> {
 impl StableAnimatorCommand {
   pub fn new_from_env() -> AnyhowResult<Self> {
     Ok(Self {
-      root_code_directory: PathBuf::from("/model_code"),
+      root_code_directory: easyenv::get_env_pathbuf_or_default("STABLE_ANIMATOR_ROOT_CODE_DIRECTORY", PathBuf::from("/model_code")),
       executable_or_command: ExecutableOrCommand::Command("python inference_advanced.py".to_string()),
-      maybe_virtual_env_activation_command: Some(String::from("source /python_install/python/bin/activate")),
+      // TODO(bt,2025-02-02): The default should be None, not Some(str).
+      maybe_virtual_env_activation_command: Some(easyenv::get_env_string_or_default(
+        "STABLE_ANIMATOR_VENV_ACTIVATION_COMMAND", "source /python_install/python/bin/activate")),
       maybe_docker_options: None,
       maybe_execution_timeout: None,
     })

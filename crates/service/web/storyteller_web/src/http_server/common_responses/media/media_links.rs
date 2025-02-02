@@ -124,7 +124,7 @@ fn thumbnail_template(media_domain: MediaDomain, server_environment: ServerEnvir
       && !rooted_path.ends_with(".gif") {
     return None;
   }
-  
+
   let host = get_cdn_host(media_domain, server_environment);
 
   // NB(bt,2025-02-01): Development doesn't currently support thumbnails, so serve the full image.
