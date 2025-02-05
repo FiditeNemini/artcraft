@@ -213,7 +213,7 @@ class Editor {
     // life cycle fix
 
     // Version and name.
-    this.version = 1.1;
+    this.version = 1.2;
     // Clock, scene and camera essentials.
     // global names
     this.camera_name = "::CAM::";
