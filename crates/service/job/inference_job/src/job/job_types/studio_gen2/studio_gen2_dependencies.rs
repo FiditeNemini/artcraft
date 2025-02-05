@@ -1,8 +1,8 @@
-use crate::job::job_types::studio_gen2::stable_animator::stable_animator_command::StableAnimatorCommand;
+use crate::job::job_types::studio_gen2::stable_animator::stable_animator_dependencies::StableAnimatorDependencies;
 use crate::state::common::watermark_configs::WatermarkConfigs;
-use errors::AnyhowResult;
-use std::path::{Path, PathBuf};
 use crate::util::common_commands::ffmpeg::runner::ffmpeg_command_runner::FfmpegCommandRunner;
+use errors::AnyhowResult;
+use std::path::PathBuf;
 
 pub struct StudioGen2Dependencies {
   /// Watermarks added to videos (or perhaps images in the future)
@@ -11,30 +11,28 @@ pub struct StudioGen2Dependencies {
   pub input_directory: PathBuf,
   pub output_directory: PathBuf,
 
-  pub command: StableAnimatorCommand,
-
-  pub pretrained_model_name_or_path: PathBuf,
-  pub posenet_model_name_or_path: PathBuf,
-  pub face_encoder_model_name_or_path: PathBuf,
-  pub unet_model_name_or_path: PathBuf,
+  pub stable_animator: Option<StableAnimatorDependencies>,
 
   pub ffmpeg: FfmpegCommandRunner,
 }
 
 impl StudioGen2Dependencies {
   pub fn setup() -> AnyhowResult<Self> {
+
+    let stable_animator =
+        match easyenv::get_env_bool_optional("STABLE_ANIMATOR_ENABLED") {
+          Ok(true) => Some(StableAnimatorDependencies::setup()?),
+          _ => None,
+        };
+
     Ok(Self {
       watermarks: WatermarkConfigs::from_env()?,
 
-      // TODO
+      // TODO: Configurability of input/output dirs
       input_directory: PathBuf::from("/tmp/input"),
       output_directory: PathBuf::from("/tmp/output"),
-      command: StableAnimatorCommand::new_from_env()?,
 
-      pretrained_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_PRETRAINED_MODEL_PATH")?,
-      posenet_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_POSENET_MODEL_PATH")?,
-      face_encoder_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_FACE_ENCODER_MODEL_PATH")?,
-      unet_model_name_or_path: easyenv::get_env_pathbuf_required("STABLE_ANIMATOR_UNET_MODEL_PATH")?,
+      stable_animator,
 
       ffmpeg: FfmpegCommandRunner::from_env()?,
     })

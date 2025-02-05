@@ -262,7 +262,7 @@ pub async fn process_single_studio_gen2_job(
   let inference_start_time = Instant::now();
 
   let command_exit_status = gen2_deps
-      .command
+      .stable_animator_command
       .execute_inference(
         InferenceArgs {
           stderr_output_file: &stderr_output_file,
