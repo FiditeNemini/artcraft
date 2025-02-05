@@ -1,61 +1,46 @@
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::studio_gen2::animate_x::animate_x_dependencies::AnimateXDependencies;
 use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadFileForStudioArgs};
 use crate::job::job_types::studio_gen2::stable_animator::stable_animator_command::InferenceArgs;
+use crate::job::job_types::studio_gen2::stable_animator::stable_animator_dependencies::StableAnimatorDependencies;
 use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
 use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
-use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
-use crate::job::job_types::workflow::live_portrait::process_live_portrait_job::process_live_portrait_job;
-use crate::job::job_types::workflow::video_style_transfer::process_video_style_transfer_job::process_video_style_transfer_job;
-use crate::job::job_types::workflow::video_style_transfer::steps::check_and_validate_job::check_and_validate_job;
-use crate::job::job_types::workflow::video_style_transfer::steps::download_global_ipa_image::{download_global_ipa_image, DownloadGlobalIpaImageArgs};
-use crate::job::job_types::workflow::video_style_transfer::steps::download_input_videos::{download_input_videos, DownloadInputVideoArgs};
-use crate::job::job_types::workflow::video_style_transfer::steps::post_process_add_watermark::{post_process_add_watermark, PostProcessAddWatermarkArgs};
-use crate::job::job_types::workflow::video_style_transfer::steps::post_process_restore_audio::{post_process_restore_audio, PostProcessRestoreVideoArgs};
-use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_save_audio::{preprocess_save_audio, ProcessSaveAudioArgs};
-use crate::job::job_types::workflow::video_style_transfer::steps::preprocess_trim_and_resample_videos::{preprocess_trim_and_resample_videos, ProcessTrimAndResampleVideoArgs};
-use crate::job::job_types::workflow::video_style_transfer::util::comfy_dirs::ComfyDirs;
-use crate::job::job_types::workflow::video_style_transfer::util::process_preview_updates::PreviewProcessor;
-use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
-use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_prompt::{write_workflow_prompt, WorkflowPromptArgs};
 use crate::state::job_dependencies::JobDependencies;
-use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_args::FfmpegResampleFpsArgs;
 use anyhow::anyhow;
-use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-use bucket_paths::legacy::typified_paths::public::media_files::bucket_directory::MediaFileBucketDirectory;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_deletion::safe_delete_possible_files_and_directories::safe_delete_possible_files_and_directories;
-use filesys::file_deletion::safe_recursively_delete_files::safe_recursively_delete_files;
-use filesys::path_to_string::path_to_string;
 use images::image::io::Reader;
 use images::resize_preserving_aspect::resize_preserving_aspect;
 use log::{error, info, warn};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::{Cu, S2};
 use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token_with_transactor;
 use mysql_queries::utils::transactor::Transactor;
 use std::fs::{read_to_string, File};
-use std::io::{stdout, BufReader};
-use std::path::{Path, PathBuf};
-use std::thread;
+use std::io::BufReader;
+use std::path::Path;
 use std::time::{Duration, Instant};
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
-use tokens::tokens::media_files::MediaFileToken;
-use tokio::sync::oneshot;
-use tokio::sync::oneshot::channel;
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+
+enum StudioJobType<'a> {
+  None,
+  AnimateX(&'a AnimateXDependencies),
+  StableAnimator(&'a StableAnimatorDependencies),
+}
 
 pub async fn process_single_studio_gen2_job(
   deps: &JobDependencies,
   job: &AvailableInferenceJob
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
+  let mut studio_job_type = StudioJobType::None;
+  
   let mut job_progress_reporter = deps
       .clients
       .job_progress_reporter
@@ -72,6 +57,12 @@ pub async fn process_single_studio_gen2_job(
 //  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
 //
 //  let job_args = check_and_validate_job(job)?;
+  
+  if let Some(deps) = gen2_deps.stable_animator.as_ref() {
+    studio_job_type = StudioJobType::StableAnimator(deps);
+  } else if let Some(deps) = gen2_deps.animate_x.as_ref() {
+    studio_job_type = StudioJobType::AnimateX(deps);
+  }
 
   // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
 
@@ -248,43 +239,61 @@ pub async fn process_single_studio_gen2_job(
 
   let stderr_output_file = work_paths.output_dir.path().join("stderr.txt");
   let stdout_output_file = work_paths.output_dir.path().join("stdout.txt");
-
-  let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
-  create_dir_all_if_missing(&pose_frames_dir)?;
-
+  
   let video_output_path = work_paths.output_dir.path().join("output_video.mp4");
 
-  let video_frames_output_dir = work_paths.output_dir.path().join("final_frames");
-  create_dir_all_if_missing(&video_frames_output_dir)?;
+  let inference_duration;
+  
+  match studio_job_type {
+    StudioJobType::None => {
+      return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set")));
+    }
+    StudioJobType::AnimateX(deps) => {
+      info!("Running Studio Gen2 inference (Animate-X)...");
+      
+      let inference_start_time = Instant::now();
+      
+      // TODO
+      
+      inference_duration = Instant::now().duration_since(inference_start_time);
+    }
+    StudioJobType::StableAnimator(deps) => {
+      let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
+      create_dir_all_if_missing(&pose_frames_dir)?;
 
-  info!("Running Studio Gen2 inference...");
+      let video_frames_output_dir = work_paths.output_dir.path().join("final_frames");
+      create_dir_all_if_missing(&video_frames_output_dir)?;
 
-  let inference_start_time = Instant::now();
+      info!("Running Studio Gen2 inference (Stable Animator)...");
 
-  let command_exit_status = gen2_deps
-      .stable_animator_command
-      .execute_inference(
-        InferenceArgs {
-          stderr_output_file: &stderr_output_file,
-          stdout_output_file: &stdout_output_file,
-          start_image_path: &resized_image_path,
-          pre_pose_video_path: Some(resampled_video_path.as_ref()),
-          pose_images_dir: &pose_frames_dir,
-          frame_output_dir: &video_frames_output_dir,
-          video_output_path: &video_output_path,
-          pretrained_model_name_or_path: &gen2_deps.pretrained_model_name_or_path,
-          posenet_model_name_or_path: &gen2_deps.posenet_model_name_or_path,
-          face_encoder_model_name_or_path: &gen2_deps.face_encoder_model_name_or_path,
-          unet_model_name_or_path: &gen2_deps.unet_model_name_or_path,
-          output_width: studio_args.output_width,
-          output_height: studio_args.output_height,
-          output_fps: studio_args.fps,
-        }).await;
+      let inference_start_time = Instant::now();
 
-  let inference_duration = Instant::now().duration_since(inference_start_time);
+      let command_exit_status = deps
+          .command
+          .execute_inference(
+            InferenceArgs {
+              stderr_output_file: &stderr_output_file,
+              stdout_output_file: &stdout_output_file,
+              start_image_path: &resized_image_path,
+              pre_pose_video_path: Some(resampled_video_path.as_ref()),
+              pose_images_dir: &pose_frames_dir,
+              frame_output_dir: &video_frames_output_dir,
+              video_output_path: &video_output_path,
+              pretrained_model_name_or_path: &deps.pretrained_model_name_or_path,
+              posenet_model_name_or_path: &deps.posenet_model_name_or_path,
+              face_encoder_model_name_or_path: &deps.face_encoder_model_name_or_path,
+              unet_model_name_or_path: &deps.unet_model_name_or_path,
+              output_width: studio_args.output_width,
+              output_height: studio_args.output_height,
+              output_fps: studio_args.fps,
+            }).await;
 
-  info!("Inference command exited with status: {:?}", command_exit_status);
-  info!("Inference took duration to complete: {:?}", &inference_duration);
+      inference_duration = Instant::now().duration_since(inference_start_time);
+
+      info!("Inference command exited with status: {:?}", command_exit_status);
+      info!("Inference took duration to complete: {:?}", &inference_duration);
+    }
+  }
 
   // check stdout for success and check if file exists
   if let Ok(contents) = read_to_string(&stdout_output_file) {
@@ -304,7 +313,7 @@ pub async fn process_single_studio_gen2_job(
   if let Err(err) = check_file_exists(&video_output_path) {
     error!("Output file does not  exist: {:?}", err);
 
-    error!("Inference failed: {:?}", command_exit_status);
+    //error!("Inference failed: {:?}", command_exit_status);
 
     if let Ok(contents) = read_to_string(&stderr_output_file) {
       warn!("Captured stderr output: {}", contents);
