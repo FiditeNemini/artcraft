@@ -38,4 +38,12 @@ pub struct StudioGen2Payload {
   #[serde(rename = "fp")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub fps: Option<u64>,
+
+  #[serde(rename = "mf")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub max_frames: Option<u64>,
+
+  #[serde(rename = "rnd")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub rounds: Option<u64>,
 }

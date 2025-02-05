@@ -1,4 +1,4 @@
-use crate::job::job_types::studio_gen2::stable_animator_command::StableAnimatorCommand;
+use crate::job::job_types::studio_gen2::stable_animator::stable_animator_command::StableAnimatorCommand;
 use crate::state::common::watermark_configs::WatermarkConfigs;
 use errors::AnyhowResult;
 use std::path::{Path, PathBuf};

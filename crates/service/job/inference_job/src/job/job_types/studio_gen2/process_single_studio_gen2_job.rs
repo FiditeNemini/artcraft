@@ -1,7 +1,7 @@
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadFileForStudioArgs};
-use crate::job::job_types::studio_gen2::stable_animator_command::InferenceArgs;
+use crate::job::job_types::studio_gen2::stable_animator::stable_animator_command::InferenceArgs;
 use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
 use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
 use crate::job::job_types::workflow::face_fusion::process_face_fusion_job::process_face_fusion_job;
@@ -19,6 +19,8 @@ use crate::job::job_types::workflow::video_style_transfer::util::process_preview
 use crate::job::job_types::workflow::video_style_transfer::util::video_pathing::{PrimaryInputVideoAndPaths, SecondaryInputVideoAndPaths, VideoPathing};
 use crate::job::job_types::workflow::video_style_transfer::util::write_workflow_prompt::{write_workflow_prompt, WorkflowPromptArgs};
 use crate::state::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_args::FfmpegResampleFpsArgs;
 use anyhow::anyhow;
 use bucket_paths::legacy::remote_file_manager_paths::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_directory::MediaFileBucketDirectory;
@@ -43,13 +45,11 @@ use std::io::{stdout, BufReader};
 use std::path::{Path, PathBuf};
 use std::thread;
 use std::time::{Duration, Instant};
+use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use tokens::tokens::media_files::MediaFileToken;
 use tokio::sync::oneshot;
 use tokio::sync::oneshot::channel;
-use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
-use crate::util::common_commands::ffmpeg::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
-use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_args::FfmpegResampleFpsArgs;
 
 pub async fn process_single_studio_gen2_job(
   deps: &JobDependencies,

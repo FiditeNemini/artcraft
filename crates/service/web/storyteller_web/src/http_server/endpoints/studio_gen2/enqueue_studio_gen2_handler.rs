@@ -70,6 +70,10 @@ pub struct EnqueueStudioGen2Request {
   pub output_width: Option<u64>,
   pub output_height: Option<u64>,
   pub fps: Option<u64>,
+
+  // TODO
+  pub max_frames: Option<u64>,
+  pub rounds: Option<u64>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -257,6 +261,8 @@ pub async fn enqueue_studio_gen2_handler(
     output_width: request.output_width,
     output_height: request.output_height,
     fps: request.fps,
+    max_frames: request.max_frames,
+    rounds: request.rounds,
   };
 
   info!("Creating ComfyUI job record...");
