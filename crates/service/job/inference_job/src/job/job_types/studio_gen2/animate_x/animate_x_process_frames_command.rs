@@ -1,13 +1,3 @@
-/*
-        parser = argparse.ArgumentParser(description="Simple example of a training script.")
-        parser.add_argument("--source_video_paths", type=str, default="data/videos",)
-        parser.add_argument("--saved_pose_dir", type=str, default="data/saved_pkl",)
-        parser.add_argument("--saved_pose", type=str, default="data/saved_pose",)
-        parser.add_argument("--saved_frame_dir", type=str, default="data/saved_frames",)
-        parser.add_argument("--model_directory", type=str, default="checkpoints",)
-        args = parser.parse_args()
- */
-
 use crate::util::get_filtered_env_vars::get_filtered_env_vars_hashmap;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
@@ -55,9 +45,15 @@ pub struct ProcessFramesArgs<'s> {
   pub model_directory: &'s Path,
 
   pub source_video_path: &'s Path,
-  pub saved_pose_dir: &'s Path,
-  pub saved_pose: &'s Path,
-  pub saved_frame_dir: &'s Path,
+  
+  /// --saved_pose_dir, which denotes where the pkl files are stored. This can also be a file path.
+  pub saved_pose_pkl_file_or_dir: &'s Path,
+  
+  /// --saved_pose, which is where the pose prediction frames are emitted
+  pub saved_pose_frames_dir: &'s Path,
+  
+  /// --saved_frame_dir, which is where original frames from the video are emitted. Not sure why the model needs this.
+  pub saved_original_frames_dir: &'s Path,
 }
 
 impl AnimateXProcessFramesCommand {
@@ -107,15 +103,15 @@ impl AnimateXProcessFramesCommand {
     command.push_str(" ");
 
     command.push_str(" --saved_pose_dir ");
-    command.push_str(&path_to_string(&args.saved_pose_dir));
+    command.push_str(&path_to_string(&args.saved_pose_pkl_file_or_dir));
     command.push_str(" ");
 
     command.push_str(" --saved_pose ");
-    command.push_str(&path_to_string(&args.saved_pose));
+    command.push_str(&path_to_string(&args.saved_pose_frames_dir));
     command.push_str(" ");
 
     command.push_str(" --saved_frame_dir ");
-    command.push_str(&path_to_string(&args.saved_frame_dir));
+    command.push_str(&path_to_string(&args.saved_original_frames_dir));
     command.push_str(" ");
 
     command.push_str(" --model_directory ");

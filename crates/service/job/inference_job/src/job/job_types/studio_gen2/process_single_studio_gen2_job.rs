@@ -27,8 +27,9 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+use crate::job::job_types::studio_gen2::animate_x::animate_x_process_frames_command::{AnimateXProcessFramesCommand, ProcessFramesArgs};
 
-enum StudioJobType<'a> {
+enum StudioModelPipeline<'a> {
   None,
   AnimateX(&'a AnimateXDependencies),
   StableAnimator(&'a StableAnimatorDependencies),
@@ -39,8 +40,6 @@ pub async fn process_single_studio_gen2_job(
   job: &AvailableInferenceJob
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
-  let mut studio_job_type = StudioJobType::None;
-  
   let mut job_progress_reporter = deps
       .clients
       .job_progress_reporter
@@ -58,10 +57,12 @@ pub async fn process_single_studio_gen2_job(
 //
 //  let job_args = check_and_validate_job(job)?;
   
+  let mut studio_job_type = StudioModelPipeline::None;
+
   if let Some(deps) = gen2_deps.stable_animator.as_ref() {
-    studio_job_type = StudioJobType::StableAnimator(deps);
+    studio_job_type = StudioModelPipeline::StableAnimator(deps);
   } else if let Some(deps) = gen2_deps.animate_x.as_ref() {
-    studio_job_type = StudioJobType::AnimateX(deps);
+    studio_job_type = StudioModelPipeline::AnimateX(deps);
   }
 
   // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
@@ -245,19 +246,40 @@ pub async fn process_single_studio_gen2_job(
   let inference_duration;
   
   match studio_job_type {
-    StudioJobType::None => {
+    StudioModelPipeline::None => {
       return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set")));
     }
-    StudioJobType::AnimateX(deps) => {
+    StudioModelPipeline::AnimateX(deps) => {
       info!("Running Studio Gen2 inference (Animate-X)...");
+
+      let pose_pkl_file= work_paths.output_dir.path().join("pose_data.pkl");
+      
+      let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
+      create_dir_all_if_missing(&pose_frames_dir)?;
+
+      let original_frames_dir = work_paths.output_dir.path().join("original_frames");
+      create_dir_all_if_missing(&original_frames_dir)?;
       
       let inference_start_time = Instant::now();
+
+      let command_exit_status = deps
+          .process_frames_command
+          .execute_inference(ProcessFramesArgs {
+            stderr_output_file: &stderr_output_file,
+            stdout_output_file: &stdout_output_file,
+            model_directory: &deps.model_directory_path,
+            source_video_path: &resampled_video_path,
+            saved_pose_pkl_file_or_dir: &pose_pkl_file,
+            saved_pose_frames_dir: &pose_frames_dir,
+            saved_original_frames_dir: &original_frames_dir,
+          }).await;
+      
       
       // TODO
       
       inference_duration = Instant::now().duration_since(inference_start_time);
     }
-    StudioJobType::StableAnimator(deps) => {
+    StudioModelPipeline::StableAnimator(deps) => {
       let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
       create_dir_all_if_missing(&pose_frames_dir)?;
 

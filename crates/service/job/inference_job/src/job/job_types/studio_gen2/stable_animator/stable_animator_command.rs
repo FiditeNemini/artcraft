@@ -1,29 +1,3 @@
-/*
-python inference_advanced.py \
- --start_image_path="${STARTING_IMAGE}" \
- --frame_output_dir="${OUTPUT_DIR}" \
- --pose_images_dir="/tmp/pose" \
- --pre_pose_video_path="inference/zeihan_trimmed.mp4" \
-
- --video_output_path="out.mp4" \
-
- --pretrained_model_name_or_path="checkpoints/stable-video-diffusion-img2vid-xt" \
- --posenet_model_name_or_path="checkpoints/Animation/pose_net.pth" \
- --face_encoder_model_name_or_path="checkpoints/Animation/face_encoder.pth" \
- --unet_model_name_or_path="checkpoints/Animation/unet.pth" \
-
- --width=1024 \
- --height=576 \
- --guidance_scale=3.0 \
- --num_inference_steps=25 \
- --tile_size=16 \
- --overlap=4 \
- --noise_aug_strength=0.02 \
- --frames_overlap=4 \
- --decode_chunk_size=4 \
- --gradient_checkpointing
- */
-
 use crate::util::get_filtered_env_vars::get_filtered_env_vars_hashmap;
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
