@@ -94,13 +94,6 @@ export default function CharacterFrameButton(
       .then(async (url) => {
         console.debug("Frame url: ", url)
 
-        // Handle the pose data
-        if (TODO_REMOVE_RUN_POSE_CALCULATION) {
-          const poseHelper = new CharacterPoseHelper(editorEngine!);
-          poseHelper.extractPoseData(url);
-        }
-
-        handleTest();
         setMediaFile(url);
 
         // TODO(brandon,2024-01-27): Please forgive me for this ugly hack. It's just 
@@ -111,7 +104,7 @@ export default function CharacterFrameButton(
         // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
         // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
         // TODO(brandon,2024-01-27): TEMPORARY EXPERIMENT. REMOVE ME.
-        await testGlobalExperiment();
+        // await testGlobalExperiment();
       })
       .catch((error) => {
         console.error("Error fetching media file", error);
@@ -120,7 +113,7 @@ export default function CharacterFrameButton(
         unlockButton();
       })
 
-  }, [unlockButton, setMediaFile, handleTest]);
+  }, [unlockButton, setMediaFile]);
 
   const handleDeleteFrame = useCallback(() => {
     setMediaFile(undefined);

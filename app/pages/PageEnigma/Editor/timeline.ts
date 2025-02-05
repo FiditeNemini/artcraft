@@ -284,7 +284,7 @@ export class TimeLine {
       if (!!lastRig && lastRig.name.includes("gamerig")) {
         (window as any).lastRig = lastRig;
         print_children(lastRig);
-        testDeformBody(lastRig);
+        // testDeformBody(lastRig);
       }
 
       // Add a skeleton helper to the character

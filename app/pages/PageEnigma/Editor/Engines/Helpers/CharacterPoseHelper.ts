@@ -1,8 +1,11 @@
+import { FilesetResolver, HandLandmarker, HandLandmarkerResult, NormalizedLandmark, PoseLandmarker, PoseLandmarkerResult } from "@mediapipe/tasks-vision";
+import * as Kalidokit from "kalidokit";
+import { Box3, Box3Helper, Euler, EulerOrder, Object3D, Object3DEventMap, SkeletonHelper, Vector3 } from "three";
+import { EulerRotation, XYZ } from "vendor/kalidokit/dist";
 import { loadImage } from "~/Helpers/ImageHelpers";
 import { EditorExpandedI } from "~/pages/PageEnigma/contexts/EngineContext";
-import { FilesetResolver, HandLandmarker, HandLandmarkerResult, PoseLandmarker, PoseLandmarkerResult } from "@mediapipe/tasks-vision"
+import { HandMixamoBonesMap, mixamorigTransformations } from "../../debug";
 import { MixamoInterpolationBoneNames, MixamoPoseMap } from "../Mappers/MixamoPoseMapper";
-import { AxesHelper, Bone, Box3, Box3Helper, BufferGeometry, Euler, Matrix4, Object3D, Object3DEventMap, Quaternion, SkeletonHelper, Vector3 } from "three";
 
 // TODO: Currently the class uses the scene to use as a detachment parent
 // Maybe this would cause problems in the future
@@ -220,144 +223,213 @@ export class CharacterPoseHelper {
     // this.updateBoneRotations(character);
   }
 
-  updateBoneRotations(character: Object3D<Object3DEventMap>) {
-    const skeletonHelper = new SkeletonHelper(character);
-    const rootBone = skeletonHelper.bones[0];
-    const queue = [rootBone];
-    const scene = this.editor.timeline.scene;
+  rigRotation(boneName: string, rotation: EulerRotation = { x: 0, y: 0, z: 0 }, skeleton: SkeletonHelper) {
+    // Find the corresponding bone via bone name and mapping
+    const skeletalBoneMap = mixamorigTransformations[boneName];
+    const bone = skeleton.bones.find((bone) => bone.name === skeletalBoneMap.name);
 
-    const fromBone = skeletonHelper.bones.find((bone) => bone.name === "mixamorigLeftArm")!;
-    const toBone = skeletonHelper.bones.find((bone) => bone.name === "mixamorigLeftForeArm")!;
-    const fromHelper = new AxesHelper(10);
-    const toHelper = new AxesHelper(10);
-    fromHelper.material.transparent = true;
-    fromHelper.material.depthTest = false;
-    fromBone.add(fromHelper);
-    toBone.add(toHelper);
-
-    console.debug("Before rotations: ", fromBone, toBone);
-    this.updateBoneRotationEuler(fromBone, toBone);
-    console.debug("After rotations: ", fromBone, toBone);
-  }
-
-  updateBoneRotationEuler(bone: Bone, childBone: Bone) {
-    // Get world positions
-    const boneWorldPos = new Vector3();
-    const childWorldPos = new Vector3();
-    bone.getWorldPosition(boneWorldPos);
-    childBone.getWorldPosition(childWorldPos);
-
-    // Compute the new direction the bone should point to
-    const targetDirection = new Vector3().subVectors(childWorldPos, boneWorldPos).normalize();
-    console.debug("Target direction: ", targetDirection);
-
-    // Convert world direction to local space (relative to bone)
-    const parentMatrix = new Matrix4();
-    if (bone.parent) {
-      bone.parent.updateMatrixWorld(true);
-      parentMatrix.copy(bone.matrixWorld).invert(); // Convert to local space
+    if (!bone) {
+      console.error("Bone not found with name: ", skeletalBoneMap.name);
+      return;
     }
-    targetDirection.applyMatrix4(parentMatrix);
-    console.debug("Target direction local: ", targetDirection);
 
-    // Compute Euler angles from the target direction
-    const eulerRotation = new Euler();
-    eulerRotation.setFromVector3(targetDirection);
+    const bindingFunc = skeletalBoneMap.func;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const x = rotation.x;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const y = rotation.y;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const z = rotation.z;
+    const evalX = eval(bindingFunc.fx);
+    const evalY = eval(bindingFunc.fy);
+    const evalZ = eval(bindingFunc.fz);
 
-    // Apply rotation
-    bone.rotation.copy(eulerRotation);
-    bone.updateMatrixWorld(true);
+    const order = skeletalBoneMap.order.toUpperCase();
+    const euler = new Euler(
+      bone.rotation.x + evalX,
+      bone.rotation.y + evalY,
+      bone.rotation.z + evalZ,
+      (order || rotation.rotationOrder?.toUpperCase() || "XYZ") as EulerOrder
+    );
+
+    // Apply rotation to bone
+    bone.quaternion.setFromEuler(euler);
   }
 
-  getAlignmentMap(character: Object3D<Object3DEventMap>, poseData: { hands: HandLandmarkerResult, pose: PoseLandmarkerResult }) {
-    const alignmentMap: Record<string, Vector3> = {};
+  rigPosition(boneName: string, position: XYZ, skeleton: SkeletonHelper) {
+    // Find the corresponding bone via bone name and mapping
+    const skeletalBoneMap = mixamorigTransformations[boneName];
+    const bone = skeleton.bones.find((bone) => bone.name === skeletalBoneMap.name);
 
-    character.traverse((child) => {
-      if (child.type !== "Bone") {
-        return;
-      }
+    if (!bone) {
+      console.error("Bone not found with name: ", skeletalBoneMap.name);
+      return;
+    }
 
-      if (!MixamoPoseMap[child.name]) {
-        return;
-      }
-
-      const mapIndex = MixamoPoseMap[child.name];
-      const targetCoordinates = poseData.pose.worldLandmarks[0][mapIndex];
-      const targetWorldCoordinates = new Vector3(
-        targetCoordinates.x, -targetCoordinates.y, -targetCoordinates.z
-      );
-
-      alignmentMap[child.name] = targetWorldCoordinates;
-    });
-
-    return alignmentMap;
+    bone.position.set(position.x, position.y * 1.2, -position.z);
   }
 
-  alignCharacterToPose(bones: Bone[], targetPositions: Record<string, Vector3>) {
-    const tempVec1 = new Vector3();
-    const tempVec2 = new Vector3();
-    const quat = new Quaternion();
+  rigHandRotation(boneName: string, rotation: EulerRotation = { x: 0, y: 0, z: 0 }, skeleton: SkeletonHelper) {
+    // Find the corresponding bone via bone name and mapping
+    const skeletalBoneName = HandMixamoBonesMap[boneName];
+    const bone = skeleton.bones.find((bone) => bone.name === skeletalBoneName);
 
-    bones.forEach(bone => {
-      if (!targetPositions[bone.name]) return;  // Skip if no target is given
+    if (!bone) {
+      console.error("Bone not found with name: ", skeletalBoneName);
+      return;
+    }
 
-      const targetPos = targetPositions[bone.name];
+    const order = "XYZ";
+    const euler = new Euler(
+      bone.rotation.x + rotation.x,
+      bone.rotation.y - rotation.y,
+      bone.rotation.z - rotation.z,
+      order
+    );
 
-      // Get current world position
-      const currentPos = bone.getWorldPosition(new Vector3());
-
-      // Compute position offset (not always needed for Mixamo rigs)
-      const positionOffset = tempVec1.subVectors(targetPos, currentPos);
-      bone.position.add(positionOffset); // Only apply if necessary
-
-      if (bone.parent && bone.parent.type === "Bone") {
-        // Compute world-space bone direction before and after transformation
-        const childPos = bone.getWorldPosition(new Vector3());
-        const parentPos = bone.parent.getWorldPosition(new Vector3());
-        const parentQuat = bone.parent.getWorldQuaternion(new Quaternion());
-
-        // Compute direction vectors
-        tempVec1.subVectors(childPos, parentPos).normalize(); // Current direction
-        tempVec2.subVectors(targetPos, parentPos).normalize(); // Target direction
-
-        // Compute rotation needed to align current direction to target direction
-        quat.setFromUnitVectors(tempVec1, tempVec2);
-
-        // Convert world-space rotation to local-space
-        const inverseParentQuat = parentQuat.clone().invert();
-        quat.premultiply(inverseParentQuat);
-
-        bone.quaternion.premultiply(quat);
-      }
-    });
+    // Apply rotation to bone
+    bone.quaternion.setFromEuler(euler);
   }
+
+  getHandedLandmarks(handLandmarks: HandLandmarkerResult) {
+    if (handLandmarks.handedness.length < 2) {
+      console.error("Not enough hands detected");
+      return undefined;
+    }
+
+    // TODO: Use handedness score value to sort by confidence
+    // For now assume the top confidence is first result in handedness 
+    const topHandedness = handLandmarks.handedness[0][0];
+
+    let leftHandIndex = 0, rightHandIndex = 1;
+    if (topHandedness.categoryName === "Right") {
+      rightHandIndex = topHandedness.index;
+      leftHandIndex = 1 - rightHandIndex;
+    } else {
+      leftHandIndex = topHandedness.index;
+      rightHandIndex = 1 - leftHandIndex;
+    }
+
+    return {
+      leftHand: handLandmarks.landmarks[leftHandIndex],
+      rightHand: handLandmarks.landmarks[rightHandIndex]
+    }
+  }
+
 
   testRun(characterId: string, poseData: { hands: HandLandmarkerResult, pose: PoseLandmarkerResult }) {
     const scene = this.editor.timeline.scene;
-    const character = scene.get_object_by_uuid(characterId);
-    if (!character) {
-      console.error("Character not found with id: ", characterId);
-      return;
+    const character = scene.get_object_by_uuid(characterId)!;
+
+    const kkitPoseData = Kalidokit.Pose.solve(poseData.pose.worldLandmarks[0], poseData.pose.landmarks[0], {
+      runtime: "mediapipe"
+    })!;
+
+    const handLandmarks = this.getHandedLandmarks(poseData.hands);
+    if (!handLandmarks) {
+      console.error("Hand landmarks not found");
     }
-    const alignmentMap = this.getAlignmentMap(character, poseData);
-    const sortedBones = this.getSortedBoneArray(character);
-    this.alignCharacterToPose(sortedBones, alignmentMap);
+
+    const skeleton = new SkeletonHelper(character);
+
+    // Rig the bones according to our new data
+    // Hips move first - we must do it hierarchically 
+    this.rigRotation("Hips", {
+      x: kkitPoseData.Hips.rotation!.x,
+      y: kkitPoseData.Hips.rotation!.y,
+      z: kkitPoseData.Hips.rotation!.z,
+    }, skeleton);
+
+    this.rigPosition("Hips", {
+      x: kkitPoseData.Hips.position!.x,
+      y: kkitPoseData.Hips.position!.y,
+      z: kkitPoseData.Hips.position!.z,
+    }, skeleton);
+
+    this.rigRotation("Spine", kkitPoseData.Spine, skeleton);
+
+    this.rigRotation("RightUpperArm", kkitPoseData.RightUpperArm, skeleton);
+    this.rigRotation("RightLowerArm", kkitPoseData.RightLowerArm, skeleton);
+    this.rigRotation("LeftUpperArm", kkitPoseData.LeftUpperArm, skeleton);
+    this.rigRotation("LeftLowerArm", kkitPoseData.LeftLowerArm, skeleton);
+
+    this.rigRotation("RightUpperLeg", kkitPoseData.RightUpperLeg, skeleton);
+    this.rigRotation("RightLowerLeg", kkitPoseData.RightLowerLeg, skeleton);
+    this.rigRotation("LeftUpperLeg", kkitPoseData.LeftUpperLeg, skeleton);
+    this.rigRotation("LeftLowerLeg", kkitPoseData.LeftLowerLeg, skeleton);
+
+    if (handLandmarks) {
+      this.applyHandData(handLandmarks, skeleton, kkitPoseData);
+    }
   }
 
-  getSortedBoneArray(character: Object3D<Object3DEventMap>) {
-    function getBoneHierarchyDepth(bone: Bone, root: Bone): number {
-      let depth = 0;
-      while (bone !== root && bone.parent) {
-        bone = bone.parent as Bone;
-        depth++;
-      }
-      return depth;
+  applyHandData(handLandmarks: { leftHand: NormalizedLandmark[], rightHand: NormalizedLandmark[] }, skeleton: SkeletonHelper, kkitPoseData: Kalidokit.TPose) {
+    const kkitLeftHandData = Kalidokit.Hand.solve(handLandmarks.leftHand, "Left");
+    const kkitRightHandData = Kalidokit.Hand.solve(handLandmarks.rightHand, "Right");
+
+    console.debug("Left hand data: ", kkitLeftHandData);
+    console.debug("Right hand data: ", kkitRightHandData);
+
+    if (!kkitLeftHandData || !kkitRightHandData) {
+      console.error("One of more hand data not found");
+      return;
     }
 
-    const skeletonHelper = new SkeletonHelper(character);
-    const rootBone = skeletonHelper.bones.find((bone) => bone.name === "mixamorigHips")!;
-    skeletonHelper.bones.sort((a, b) => getBoneHierarchyDepth(a, rootBone) - getBoneHierarchyDepth(b, rootBone));
-    return skeletonHelper.bones;
+    // Rig the hands
+    // Left hand
+    this.rigHandRotation("LeftWrist", {
+      x: kkitPoseData.LeftHand!.x,
+      y: kkitPoseData.LeftHand!.y,
+      z: kkitPoseData.LeftHand!.z,
+    }, skeleton);
+    // Left thumb
+    this.rigHandRotation("LeftThumbProximal", kkitLeftHandData?.LeftThumbProximal, skeleton);
+    this.rigHandRotation("LeftThumbIntermediate", kkitLeftHandData?.LeftThumbIntermediate, skeleton);
+    this.rigHandRotation("LeftThumbDistal", kkitLeftHandData?.LeftThumbDistal, skeleton);
+    // Left index
+    this.rigHandRotation("LeftIndexProximal", kkitLeftHandData?.LeftIndexProximal, skeleton);
+    this.rigHandRotation("LeftIndexIntermediate", kkitLeftHandData?.LeftIndexIntermediate, skeleton);
+    this.rigHandRotation("LeftIndexDistal", kkitLeftHandData?.LeftIndexDistal, skeleton);
+    // Left middle
+    this.rigHandRotation("LeftMiddleProximal", kkitLeftHandData?.LeftMiddleProximal, skeleton);
+    this.rigHandRotation("LeftMiddleIntermediate", kkitLeftHandData?.LeftMiddleIntermediate, skeleton);
+    this.rigHandRotation("LeftMiddleDistal", kkitLeftHandData?.LeftMiddleDistal, skeleton);
+    // Left ring
+    this.rigHandRotation("LeftRingProximal", kkitLeftHandData?.LeftRingProximal, skeleton);
+    this.rigHandRotation("LeftRingIntermediate", kkitLeftHandData?.LeftRingIntermediate, skeleton);
+    this.rigHandRotation("LeftRingDistal", kkitLeftHandData?.LeftRingDistal, skeleton);
+    // Left little/pinky
+    this.rigHandRotation("LeftLittleProximal", kkitLeftHandData?.LeftLittleProximal, skeleton);
+    this.rigHandRotation("LeftLittleIntermediate", kkitLeftHandData?.LeftLittleIntermediate, skeleton);
+    this.rigHandRotation("LeftLittleDistal", kkitLeftHandData?.LeftLittleDistal, skeleton);
+
+
+    // Right hand
+    this.rigHandRotation("RightWrist", {
+      x: kkitPoseData.RightHand!.x,
+      y: kkitPoseData.RightHand!.y,
+      z: kkitPoseData.RightHand!.z,
+    }, skeleton);
+    // Right thumb
+    this.rigHandRotation("RightThumbProximal", kkitRightHandData?.RightThumbProximal, skeleton);
+    this.rigHandRotation("RightThumbIntermediate", kkitRightHandData?.RightThumbIntermediate, skeleton);
+    this.rigHandRotation("RightThumbDistal", kkitRightHandData?.RightThumbDistal, skeleton);
+    // Right index
+    this.rigHandRotation("RightIndexProximal", kkitRightHandData?.RightIndexProximal, skeleton);
+    this.rigHandRotation("RightIndexIntermediate", kkitRightHandData?.RightIndexIntermediate, skeleton);
+    this.rigHandRotation("RightIndexDistal", kkitRightHandData?.RightIndexDistal, skeleton);
+    // Right middle
+    this.rigHandRotation("RightMiddleProximal", kkitRightHandData?.RightMiddleProximal, skeleton);
+    this.rigHandRotation("RightMiddleIntermediate", kkitRightHandData?.RightMiddleIntermediate, skeleton);
+    this.rigHandRotation("RightMiddleDistal", kkitRightHandData?.RightMiddleDistal, skeleton);
+    // Right ring
+    this.rigHandRotation("RightRingProximal", kkitRightHandData?.RightRingProximal, skeleton);
+    this.rigHandRotation("RightRingIntermediate", kkitRightHandData?.RightRingIntermediate, skeleton);
+    this.rigHandRotation("RightRingDistal", kkitRightHandData?.RightRingDistal, skeleton);
+    // Right little/pinky
+    this.rigHandRotation("RightLittleProximal", kkitRightHandData?.RightLittleProximal, skeleton);
+    this.rigHandRotation("RightLittleIntermediate", kkitRightHandData?.RightLittleIntermediate, skeleton);
+    this.rigHandRotation("RightLittleDistal", kkitRightHandData?.RightLittleDistal, skeleton);
   }
 
 }

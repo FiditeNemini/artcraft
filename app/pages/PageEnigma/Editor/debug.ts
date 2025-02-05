@@ -43,7 +43,6 @@ const leftHandBones = [
   "LeftLittleIntermediate",
   "LeftLittleDistal",
 ];
-
 const rightHandBones = [
   "RightRingProximal",
   "RightRingIntermediate",
@@ -61,7 +60,7 @@ const rightHandBones = [
   "RightLittleDistal",
 ];
 
-const leftHandMixamoBonesMap: { [key: string]: string } = {
+export const HandMixamoBonesMap: { [key: string]: string } = {
   LeftRingProximal: "mixamorigLeftHandRing1",
   LeftRingIntermediate: "mixamorigLeftHandRing2",
   LeftRingDistal: "mixamorigLeftHandRing3",
@@ -72,13 +71,29 @@ const leftHandMixamoBonesMap: { [key: string]: string } = {
   LeftMiddleIntermediate: "mixamorigLeftHandMiddle2",
   LeftMiddleDistal: "mixamorigLeftHandMiddle3",
   LeftThumbProximal: "mixamorigLeftHandThumb1",
+  LeftThumbIntermediate: "mixamorigLeftHandThumb2",
   LeftThumbDistal: "mixamorigLeftHandThumb3",
   LeftLittleProximal: "mixamorigLeftHandPinky1",
   LeftLittleIntermediate: "mixamorigLeftHandPinky2",
   LeftLittleDistal: "mixamorigLeftHandPinky3",
+  LeftWrist: "mixamorigLeftHand",
+  RightRingProximal: "mixamorigRightHandRing1",
+  RightRingIntermediate: "mixamorigRightHandRing2",
+  RightRingDistal: "mixamorigRightHandRing3",
+  RightIndexProximal: "mixamorigRightHandIndex1",
+  RightIndexIntermediate: "mixamorigRightHandIndex2",
+  RightIndexDistal: "mixamorigRightHandIndex3",
+  RightMiddleProximal: "mixamorigRightHandMiddle1",
+  RightMiddleIntermediate: "mixamorigRightHandMiddle2",
+  RightMiddleDistal: "mixamorigRightHandMiddle3",
+  RightThumbProximal: "mixamorigRightHandThumb1",
+  RightThumbIntermediate: "mixamorigRightHandThumb2",
+  RightThumbDistal: "mixamorigRightHandThumb3",
+  RightLittleProximal: "mixamorigRightHandPinky1",
+  RightLittleIntermediate: "mixamorigRightHandPinky2",
+  RightLittleDistal: "mixamorigRightHandPinky3",
+  RightWrist: "mixamorigRightHand",
 };
-//import '@mediapipe/holistic/holistic';
-//import '@mediapipe/camera_utils/camera_utils';
 
 // TODO(bt,2025-01-28): I don't understand this codebase well yet, and I'm trying to apply bone rotations.
 // This is a simple set of experiments for me to come up to speed with Threejs, our code, and the theoretical
@@ -90,79 +105,79 @@ const DEBUG_PRINT_ENABLED = true;
 type EulerOrder = "XYZ" | "YZX" | "ZXY" | "XZY" | "YXZ" | "ZYX";
 
 type TransformOperation = `-${string}` | string; // Allows "-x", "x", etc.
-type TransformOperations = { 
-    fx: TransformOperation;
-    fy: TransformOperation;
-    fz: TransformOperation;
+type TransformOperations = {
+  fx: TransformOperation;
+  fy: TransformOperation;
+  fz: TransformOperation;
 };
 
-var mixamorigTransformations: { 
-    [key: string]: { 
-        name: string;
-        order: EulerOrder;
-        func: TransformOperations;
-    } 
+export const mixamorigTransformations: {
+  [key: string]: {
+    name: string;
+    order: EulerOrder;
+    func: TransformOperations;
+  }
 } = {
-    "Hips": {
-        "name": "mixamorigHips",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "Neck": {
-        "name": "mixamorigNeck",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "Chest": {
-        "name": "mixamorigSpine2",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "Spine": {
-        "name": "mixamorigSpine",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "RightUpperArm": {
-        "name": "mixamorigRightArm",
-        "order": "ZXY",
-        "func": { "fx": "-z", "fy": "x", "fz": "-y" }
-    },
-    "RightLowerArm": {
-        "name": "mixamorigRightForeArm",
-        "order": "ZXY",
-        "func": { "fx": "-z", "fy": "x", "fz": "-y" }
-    },
-    "LeftUpperArm": {
-        "name": "mixamorigLeftArm",
-        "order": "ZXY",
-        "func": { "fx": "z", "fy": "-x", "fz": "-y" }
-    },
-    "LeftLowerArm": {
-        "name": "mixamorigLeftForeArm",
-        "order": "ZXY",
-        "func": { "fx": "z", "fy": "-x", "fz": "-y" }
-    },
-    "LeftUpperLeg": {
-        "name": "mixamorigLeftUpLeg",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "LeftLowerLeg": {
-        "name": "mixamorigLeftLeg",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "RightUpperLeg": {
-        "name": "mixamorigRightUpLeg",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    },
-    "RightLowerLeg": {
-        "name": "mixamorigRightLeg",
-        "order": "XYZ",
-        "func": { "fx": "-x", "fy": "y", "fz": "-z" }
-    }
+  "Hips": {
+    "name": "mixamorigHips",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "Neck": {
+    "name": "mixamorigNeck",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "Chest": {
+    "name": "mixamorigSpine2",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "Spine": {
+    "name": "mixamorigSpine",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "RightUpperArm": {
+    "name": "mixamorigRightArm",
+    "order": "ZXY",
+    "func": { "fx": "-z", "fy": "x", "fz": "-y" }
+  },
+  "RightLowerArm": {
+    "name": "mixamorigRightForeArm",
+    "order": "ZXY",
+    "func": { "fx": "-z", "fy": "x", "fz": "-y" }
+  },
+  "LeftUpperArm": {
+    "name": "mixamorigLeftArm",
+    "order": "ZXY",
+    "func": { "fx": "z", "fy": "-x", "fz": "-y" }
+  },
+  "LeftLowerArm": {
+    "name": "mixamorigLeftForeArm",
+    "order": "ZXY",
+    "func": { "fx": "z", "fy": "-x", "fz": "-y" }
+  },
+  "LeftUpperLeg": {
+    "name": "mixamorigLeftUpLeg",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "LeftLowerLeg": {
+    "name": "mixamorigLeftLeg",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "RightUpperLeg": {
+    "name": "mixamorigRightUpLeg",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  },
+  "RightLowerLeg": {
+    "name": "mixamorigRightLeg",
+    "order": "XYZ",
+    "func": { "fx": "-x", "fy": "y", "fz": "-z" }
+  }
 };
 // NB: From James Bond image.
 const EXAMPLE_POSE: KalidokitPose = {
@@ -258,8 +273,8 @@ function do_print_children(
   const space = "  ".repeat(level);
   console.log(`${space} - ${obj.name}`);
 
-  for (let i in obj.children) {
-    let child = obj.children[i];
+  for (const i in obj.children) {
+    const child = obj.children[i];
     do_print_children(child, level + 1);
   }
 }
@@ -272,7 +287,7 @@ function rotateChildBone(
   z: number,
 ) {
   const child = obj.getObjectByName(name);
-  if (!!!child) {
+  if (!child) {
     return;
   }
   child.rotation.x = x;
@@ -287,7 +302,7 @@ function mapRotation(
   rotation = { x: 0, y: 0, z: 0 },
 ) {
   const sourceRotation = EXAMPLE_POSE[sourceName as keyof typeof EXAMPLE_POSE];
-  if (!!!sourceRotation) {
+  if (!sourceRotation) {
     console.error(`No rotation named ${sourceName}`);
     return;
   }
@@ -318,7 +333,7 @@ function mapRotationFrom(
   destinationName: string,
 ) {
   const sourceRotation = source[sourceName];
-  if (!!!sourceRotation) {
+  if (!sourceRotation) {
     console.error(`No rotation named ${sourceName}`);
     return;
   }
@@ -404,60 +419,60 @@ function findSkinnedMesh(object: THREE.Object3D): THREE.SkinnedMesh | null {
 
 // Add helper function to apply the transformation
 function applyTransform(operation: TransformOperation, value: number): number {
-    if (operation.startsWith('-')) {
-        return -value;
-    }
-    return value;
+  if (operation.startsWith('-')) {
+    return -value;
+  }
+  return value;
 }
 
 // Update rigBoneRotation to use the new type-safe transform
 function rigBoneRotation(
-    bone: THREE.Bone,
-    boneName: string,
-    rotation: PoseRotation,
-    dampener: number = 1,
-    lerpAmount: number = 0.3,
+  bone: THREE.Bone,
+  boneName: string,
+  rotation: PoseRotation,
+  dampener: number = 1,
+  lerpAmount: number = 0.3,
 ) {
-    const transformation = mixamorigTransformations[boneName];
-    if (!transformation) {
-        console.error(`No transformation named ${boneName}`);
-        return;
-    }
+  const transformation = mixamorigTransformations[boneName];
+  if (!transformation) {
+    console.error(`No transformation named ${boneName}`);
+    return;
+  }
 
-    console.log("Rigging bone", boneName, rotation);
+  console.log("Rigging bone", boneName, rotation);
 
-    const oldRotation = bone.rotation.clone();
+  const oldRotation = bone.rotation.clone();
 
-    const transformOperations = transformation.func;
-    const order = transformation.order;
-    
-    // Map the rotations according to the transformation functions
-    // For example, if fx is "-z", we map rotation.z with a negative sign
-    const mappedRotations = {
-        x: applyTransform(transformOperations.fx, rotation[transformOperations.fx.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
-        y: applyTransform(transformOperations.fy, rotation[transformOperations.fy.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
-        z: applyTransform(transformOperations.fz, rotation[transformOperations.fz.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
-    };
+  const transformOperations = transformation.func;
+  const order = transformation.order;
 
-    const euler = new THREE.Euler(
-        mappedRotations.x,
-        mappedRotations.y,
-        mappedRotations.z,
-        order
-    );
+  // Map the rotations according to the transformation functions
+  // For example, if fx is "-z", we map rotation.z with a negative sign
+  const mappedRotations = {
+    x: applyTransform(transformOperations.fx, rotation[transformOperations.fx.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
+    y: applyTransform(transformOperations.fy, rotation[transformOperations.fy.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
+    z: applyTransform(transformOperations.fz, rotation[transformOperations.fz.replace('-', '') as 'x' | 'y' | 'z'] * dampener),
+  };
 
-    const quaternion = new THREE.Quaternion().setFromEuler(euler);
+  const euler = new THREE.Euler(
+    mappedRotations.x,
+    mappedRotations.y,
+    mappedRotations.z,
+    order
+  );
 
-    bone.quaternion.premultiply(quaternion);
+  const quaternion = new THREE.Quaternion().setFromEuler(euler);
 
-    const newRotation = bone.rotation.clone();
+  bone.quaternion.premultiply(quaternion);
 
-    // log the bone name if the rotation didn't change
-    if (oldRotation.x === newRotation.x && oldRotation.y === newRotation.y && oldRotation.z === newRotation.z) {
-        console.log(`Rotation didn't change for bone ${boneName}`);
-    }
+  const newRotation = bone.rotation.clone();
 
-    bone.updateMatrixWorld(true);
+  // log the bone name if the rotation didn't change
+  if (oldRotation.x === newRotation.x && oldRotation.y === newRotation.y && oldRotation.z === newRotation.z) {
+    console.log(`Rotation didn't change for bone ${boneName}`);
+  }
+
+  bone.updateMatrixWorld(true);
 }
 
 
@@ -508,7 +523,7 @@ function applyPoseToMixamo(
     console.log("Rigging bone", kalidokitBone);
     const mixamoBoneName = mixamorigTransformations[kalidokitBone].name;
     const bone = findBoneRecursive(rootBone, mixamoBoneName);
-    
+
     if (!bone) {
       missingBones.push(mixamoBoneName);
       continue;
@@ -554,7 +569,7 @@ export async function testGlobalExperiment() {
   const characterRig: THREE.Object3D<THREE.Object3DEventMap> | undefined = (
     window as any
   ).lastCharacter;
-  if (!!!firstFrameUrl || !!!characterRig) {
+  if (!firstFrameUrl || !characterRig) {
     return;
   }
   doTest(firstFrameUrl, characterRig);
@@ -591,7 +606,7 @@ async function doTest(
   const poseWorld3DArray: any = solutions.worldLandmarks[0];
   const poseLandmarkArray: any = solutions.landmarks[0];
 
-  let solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
+  const solution = Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
     runtime: "mediapipe", // default is 'mediapipe'
     //video: HTMLVideoElement,// specify an html video or manually set image size
     imageSize: {
