@@ -52,6 +52,14 @@ impl ServerEnvironment {
       ServerEnvironment::Production => true,
     }
   }
+
+  /// Reports whether the software is running in development.
+  pub fn is_development(&self) -> bool {
+    match self {
+      ServerEnvironment::Development => true,
+      ServerEnvironment::Production => false,
+    }
+  }
 }
 
 #[cfg(test)]
@@ -86,5 +94,11 @@ mod tests {
   fn test_is_deployed_in_production() {
     assert_eq!(true, ServerEnvironment::Production.is_deployed_in_production());
     assert_eq!(false, ServerEnvironment::Development.is_deployed_in_production());
+  }
+
+  #[test]
+  fn test_is_development() {
+    assert_eq!(false, ServerEnvironment::Production.is_development());
+    assert_eq!(true, ServerEnvironment::Development.is_development());
   }
 }

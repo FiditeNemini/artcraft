@@ -250,7 +250,7 @@ pub async fn process_single_studio_gen2_job(
       return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set")));
     }
     StudioModelPipeline::AnimateX(deps) => {
-      info!("Running Studio Gen2 inference (Animate-X)...");
+      info!("Running Studio Gen2 pose frame generation (Animate-X)...");
 
       let pose_pkl_file= work_paths.output_dir.path().join("pose_data.pkl");
       
@@ -273,7 +273,8 @@ pub async fn process_single_studio_gen2_job(
             saved_pose_frames_dir: &pose_frames_dir,
             saved_original_frames_dir: &original_frames_dir,
           }).await;
-      
+
+      info!("Running Studio Gen2 inference (Animate-X)...");
       
       // TODO
       

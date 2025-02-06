@@ -24,6 +24,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use mysql_queries::payloads::generic_inference_args::inner_payloads::workflow_payload::{WorkflowArgs, WorkflowType};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
+use mysql_queries::queries::generic_inference::web::kill_jobs_in_development::kill_jobs_in_development;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use primitives::lazy_any_option_true::lazy_any_option_true;
 use primitives::str_to_bool::str_to_bool;
@@ -65,6 +66,9 @@ pub struct EnqueueStudioGen2Request {
 
   /// Sleep for debugging
   pub debug_sleep_millis: Option<u64>,
+
+  /// Kill old jobs (only in development)
+  pub debug_kill_old_jobs: Option<bool>,
 
   // TODO
   pub output_width: Option<u64>,
@@ -250,6 +254,16 @@ pub async fn enqueue_studio_gen2_handler(
     watermark_type = None;
   } else {
     watermark_type = Some(WatermarkType::Storyteller); // Studio is only on Storyteller.
+  }
+
+  if request.debug_kill_old_jobs.unwrap_or(false)
+      && server_state.server_environment.is_development()
+  {
+    info!("Killing old jobs before inserting new job (DEVELOPMENT MODE ONLY!)");
+    let result = kill_jobs_in_development(&server_state.mysql_pool).await;
+    if let Err(err) = result {
+      warn!("Error killing old jobs: {:?}", err);
+    }
   }
 
   let inference_args = StudioGen2Payload {

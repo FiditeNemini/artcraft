@@ -98,7 +98,7 @@ impl AnimateXProcessFramesCommand {
     // TODO: Build command
 
     // NB: arg is "paths" not "path"
-    command.push_str(" --source_video_paths");
+    command.push_str(" --source_video_paths ");
     command.push_str(&path_to_string(&args.source_video_path));
     command.push_str(" ");
 
