@@ -10,8 +10,22 @@ use subprocess_common::docker_options::DockerOptions;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::Command;
 
+/*
+python inference_cli.py \
+    --cfg configs/Animate_X_infer.yaml \
+    --image_file data_test_copy/images/man.png \
+    --pose_directory data_test_copy/saved_pose/dance_2 \
+    --frame_directory data_test_copy/saved_frames/dance_2 \
+    --pickle_data_file data_test_copy/saved_pkl/dance_2.pkl \
+    --model_checkpoints_directory checkpoints \
+    --generate_comparison_video \
+    --max_frames 4 \
+    --height 768 \
+    --width 512
+ */
+
 #[derive(Clone)]
-pub struct AnimateXProcessFramesCommand {
+pub struct AnimateXInferenceCommand {
   /// Where the code lives
   root_code_directory: PathBuf,
 
@@ -38,29 +52,33 @@ pub enum ExecutableOrCommand {
 }
 
 #[derive(Debug)]
-pub struct ProcessFramesArgs<'s> {
+pub struct AnimateXInferenceArgs<'s> {
   pub stderr_output_file: &'s Path,
   pub stdout_output_file: &'s Path,
 
   pub model_directory: &'s Path,
 
-  pub source_video_path: &'s Path,
-  
-  /// --saved_pose_dir, which denotes where the pkl files are stored (as pose.pkl within this directory).
-  pub saved_pose_pkl_dir: &'s Path,
-  
-  /// --saved_pose, which is where the pose prediction frames are emitted
+  pub image_file: &'s Path,
+
   pub saved_pose_frames_dir: &'s Path,
   
-  /// --saved_frame_dir, which is where original frames from the video are emitted. Not sure why the model needs this.
   pub saved_original_frames_dir: &'s Path,
+
+  pub saved_pose_pkl_file: &'s Path,
+
+  pub width: Option<u64>,
+  
+  pub height: Option<u64>,
+  
+  pub max_frames: Option<u64>,
+
 }
 
-impl AnimateXProcessFramesCommand {
+impl AnimateXInferenceCommand {
   pub fn new_from_env() -> AnyhowResult<Self> {
     Ok(Self {
       root_code_directory: easyenv::get_env_pathbuf_or_default("ANIMATE_X_ROOT_CODE_DIRECTORY", PathBuf::from("/model_code")),
-      executable_or_command: ExecutableOrCommand::Command("python process_data.py".to_string()),
+      executable_or_command: ExecutableOrCommand::Command("python inference_cli.py".to_string()),
       maybe_virtual_env_activation_command: easyenv::get_env_string_optional("ANIMATE_X_VENV_ACTIVATION_COMMAND"),
       maybe_docker_options: None,
       maybe_execution_timeout: None,
@@ -69,7 +87,7 @@ impl AnimateXProcessFramesCommand {
 
   pub async fn execute_inference<'a, 'b>(
     &'a self,
-    args: ProcessFramesArgs<'b>,
+    args: AnimateXInferenceArgs<'b>,
   ) -> AnyhowResult<CommandExitStatus> {
     info!("InferenceArgs: {:?}", &args);
 
@@ -95,26 +113,46 @@ impl AnimateXProcessFramesCommand {
       }
     }
 
-    // NB: arg is "paths" not "path"
-    command.push_str(" --source_video_paths ");
-    command.push_str(&path_to_string(&args.source_video_path));
+    // NB: Hardcoded for now
+    command.push_str(" --cfg configs/Animate_X_infer.yaml ");
+
+    command.push_str(" --model_checkpoints_directory ");
+    command.push_str(&path_to_string(&args.model_directory));
+    command.push_str(" ");
+    
+    command.push_str(" --image_file ");
+    command.push_str(&path_to_string(&args.image_file));
     command.push_str(" ");
 
-    command.push_str(" --saved_pose_dir ");
-    command.push_str(&path_to_string(&args.saved_pose_pkl_dir));
-    command.push_str(" ");
-
-    command.push_str(" --saved_pose ");
+    command.push_str(" --pose_directory ");
     command.push_str(&path_to_string(&args.saved_pose_frames_dir));
     command.push_str(" ");
 
-    command.push_str(" --saved_frame_dir ");
+    command.push_str(" --frame_directory ");
     command.push_str(&path_to_string(&args.saved_original_frames_dir));
     command.push_str(" ");
 
-    command.push_str(" --model_directory ");
-    command.push_str(&path_to_string(&args.model_directory));
+    command.push_str(" --pickle_data_file ");
+    command.push_str(&path_to_string(&args.saved_pose_pkl_file));
     command.push_str(" ");
+
+    if let Some(width) = args.width {
+      command.push_str(" --width ");
+      command.push_str(&width.to_string());
+      command.push_str(" ");
+    }
+
+    if let Some(height) = args.height {
+      command.push_str(" --height ");
+      command.push_str(&height.to_string());
+      command.push_str(" ");
+    }
+
+    if let Some(max_frames) = args.max_frames {
+      command.push_str(" --max_frames ");
+      command.push_str(&max_frames.to_string());
+      command.push_str(" ");
+    }
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
       command = docker_options.to_command_string(&command);

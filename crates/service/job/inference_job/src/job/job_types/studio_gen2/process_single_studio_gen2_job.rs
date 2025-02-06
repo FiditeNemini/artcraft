@@ -27,6 +27,7 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+use crate::job::job_types::studio_gen2::animate_x::animate_x_inference_command::AnimateXInferenceArgs;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_process_frames_command::{AnimateXProcessFramesCommand, ProcessFramesArgs};
 
 enum StudioModelPipeline<'a> {
@@ -252,7 +253,10 @@ pub async fn process_single_studio_gen2_job(
     StudioModelPipeline::AnimateX(deps) => {
       info!("Running Studio Gen2 pose frame generation (Animate-X)...");
 
-      let pose_pkl_file= work_paths.output_dir.path().join("pose_data.pkl");
+      let pose_pkl_dir= work_paths.output_dir.path().join("pose_pickle_data");
+      create_dir_all_if_missing(&pose_pkl_dir)?;
+
+      let pose_pkl_file = pose_pkl_dir.join("pose.pkl");
       
       let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
       create_dir_all_if_missing(&pose_frames_dir)?;
@@ -269,14 +273,27 @@ pub async fn process_single_studio_gen2_job(
             stdout_output_file: &stdout_output_file,
             model_directory: &deps.model_directory_path,
             source_video_path: &resampled_video_path,
-            saved_pose_pkl_file_or_dir: &pose_pkl_file,
+            saved_pose_pkl_dir: &pose_pkl_dir,
             saved_pose_frames_dir: &pose_frames_dir,
             saved_original_frames_dir: &original_frames_dir,
           }).await;
 
       info!("Running Studio Gen2 inference (Animate-X)...");
       
-      // TODO
+      let command_exit_status = deps
+          .inference_command
+          .execute_inference(AnimateXInferenceArgs {
+            stderr_output_file: &stderr_output_file,
+            stdout_output_file: &stdout_output_file,
+            model_directory: &deps.model_directory_path,
+            image_file: &resized_image_path,
+            saved_pose_pkl_file: &pose_pkl_file,
+            saved_pose_frames_dir: &pose_frames_dir,
+            saved_original_frames_dir: &original_frames_dir,
+            width: studio_args.output_width,
+            height: studio_args.output_height,
+            max_frames: studio_args.max_frames,
+          }).await;
       
       inference_duration = Instant::now().duration_since(inference_start_time);
     }
