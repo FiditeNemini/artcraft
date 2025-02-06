@@ -29,6 +29,7 @@ use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_inference_command::AnimateXInferenceArgs;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_process_frames_command::{AnimateXProcessFramesCommand, ProcessFramesArgs};
+use crate::job::job_types::studio_gen2::resize_image_for_studio::{resize_image_for_studio, ImageResizeType};
 
 enum StudioModelPipeline<'a> {
   None,
@@ -54,9 +55,8 @@ pub async fn process_single_studio_gen2_job(
       .as_ref()
       .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("Missing Studio Gen2 dependencies".to_string())))?;
 
-//  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
-//
-//  let job_args = check_and_validate_job(job)?;
+
+  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
 
   let mut studio_job_type = StudioModelPipeline::None;
 
@@ -66,32 +66,14 @@ pub async fn process_single_studio_gen2_job(
     studio_job_type = StudioModelPipeline::AnimateX(deps);
   }
 
-  // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
-
-  //// TODO: Replace all other paths with this
   let work_paths = StudioGen2Dirs::new(&gen2_deps)?;
 
   info!("Input path: {:?}", &work_paths.input_dir.path());
   info!("Output path: {:?}", &work_paths.output_dir.path());
 
-  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
-  let remote_cloud_file_client = match remote_cloud_file_client {
-    Ok(res) => {
-      res
-    }
-    Err(_) => {
-      return Err(ProcessSingleJobError::from(anyhow!("failed to get remote cloud file client")));
-    }
-  };
-
-//  info!("Grabbing redis connection from pool");
-//
-//  let redis_pool_dep = deps
-//      .db
-//      .maybe_keepalive_redis_pool.clone();
-//
-//  let redis_pool = redis_pool_dep
-//      .ok_or_else(|| ProcessSingleJobError::Other(anyhow!("failed to get redis pool")))?;
+  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client()
+      .await
+      .map_err(|e| ProcessSingleJobError::Other(anyhow!("failed to get remote cloud file client: {:?}", e)))?;
 
   info!("Grabbing mysql connection from pool");
 
@@ -102,20 +84,15 @@ pub async fn process_single_studio_gen2_job(
         ProcessSingleJobError::Other(anyhow!("Could not acquire DB pool: {:?}", e))
       })?;
 
-  let maybe_args = job.maybe_inference_args
+  let studio_args = job.maybe_inference_args
       .as_ref()
       .map(|args| args.args.as_ref())
-      .flatten();
-
-  let poly_args = match maybe_args {
-    None => return Err(ProcessSingleJobError::Other(anyhow!("Job args not found"))),
-    Some(args) => args,
-  };
-
-  let studio_args = match poly_args {
-    S2(args) => args,
-    _ => return Err(ProcessSingleJobError::Other(anyhow!("Studio Gen2 args not found"))),
-  };
+      .flatten()
+      .ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Job args not found")))
+      .map(|poly_args| match poly_args {
+        S2(args) => Ok(args),
+        _ => return Err(ProcessSingleJobError::Other(anyhow!("Studio Gen2 args not found"))),
+      })??;
 
   info!("Studio args: {:?}", studio_args);
 
@@ -190,59 +167,15 @@ pub async fn process_single_studio_gen2_job(
 
   // ========================= RESIZE IMAGE ======================== //
 
-  // Animate Diffusion 
-  
-  //     "output_width": 576,
-  //     "output_height": 1024,
+  let resized_image_path = work_paths.output_dir.path().join("resized_image.png");
 
-  // versus Animate-X
+  let image_resize_type = match studio_job_type {
+    StudioModelPipeline::None => return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set"))),
+    StudioModelPipeline::AnimateX(_) => ImageResizeType::AnimateX,
+    StudioModelPipeline::StableAnimator(_) => ImageResizeType::StableAnimator,
+  };
 
-  //    --height 768 \
-  //     --width 512
-
-  const MAX_LARGE_DIMENSION : u32 = 768; //1024;
-  const MAX_SMALL_DIMENSION : u32 = 512; // 576;
-  const MAX_SQUARE_DIMENSION : u32 = 512;
-
-  let mut resized_image_path = unaltered_image_file.file_path.clone();
-
-  {
-    // NB(bt,2025-01-31): Using non-tokio blocking reads for now due to better compatability
-    // with image processing libraries. We can update this in the future.
-    let file = File::open(&unaltered_image_file.file_path)?;
-    let reader = BufReader::new(file);
-
-    let reader = Reader::new(reader)
-        .with_guessed_format()?;
-
-    let image = reader.decode()
-        .map_err(|err| ProcessSingleJobError::Other(anyhow!("Could not decode image: {:?}", err)))?;
-
-    info!("Original image is {}x{}", image.width(), image.height());
-
-    let width_bounds;
-    let height_bounds;
-
-    if image.width() > image.height() {
-      width_bounds = MAX_LARGE_DIMENSION;
-      height_bounds = MAX_SMALL_DIMENSION;
-    } else if image.height() > image.width() {
-      width_bounds = MAX_SMALL_DIMENSION;
-      height_bounds = MAX_LARGE_DIMENSION;
-    } else {
-      width_bounds = MAX_SQUARE_DIMENSION;
-      height_bounds = MAX_SQUARE_DIMENSION;
-    }
-
-    let resized_image = resize_preserving_aspect(&image, width_bounds, height_bounds, false);
-
-    info!("Resized image to {}x{}", resized_image.width(), resized_image.height());
-
-    resized_image_path = work_paths.output_dir.path().join("resized_image.png");
-
-    resized_image.save(&resized_image_path)
-        .map_err(|err| anyhow!("Could not save resized image to {:?}: {:?}", &resized_image_path, err))?;
-  }
+  let dimensions = resize_image_for_studio(&resized_image_path, &unaltered_image_file.file_path, image_resize_type)?;
 
   // ==================== RUN INFERENCE ==================== //
 
@@ -302,8 +235,8 @@ pub async fn process_single_studio_gen2_job(
             saved_pose_pkl_file: &pose_pkl_file,
             saved_pose_frames_dir: &pose_frames_dir,
             saved_original_frames_dir: &original_frames_dir,
-            width: studio_args.output_width,
-            height: studio_args.output_height,
+            width: Some(dimensions.width as u64),
+            height: Some(dimensions.height as u64),
             max_frames: studio_args.max_frames,
             result_filename: &video_output_path,
           }).await;

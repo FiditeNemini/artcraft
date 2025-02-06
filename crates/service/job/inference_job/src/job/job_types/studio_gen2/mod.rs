@@ -5,3 +5,4 @@ pub mod stable_animator;
 pub mod studio_gen2_dependencies;
 pub mod studio_gen2_dirs;
 pub mod validate_and_save_results;
+mod resize_image_for_studio;
