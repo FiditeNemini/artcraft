@@ -57,7 +57,7 @@ pub async fn process_single_studio_gen2_job(
 //  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
 //
 //  let job_args = check_and_validate_job(job)?;
-  
+
   let mut studio_job_type = StudioModelPipeline::None;
 
   if let Some(deps) = gen2_deps.stable_animator.as_ref() {
@@ -166,6 +166,7 @@ pub async fn process_single_studio_gen2_job(
 
   let mut resampled_video_path = unaltered_video_file.file_path.clone();
 
+  /*
   {
     resampled_video_path = work_paths.output_dir.path().join("resampled_video.mp4");
 
@@ -185,11 +186,22 @@ pub async fn process_single_studio_gen2_job(
       resampled_video_path = unaltered_video_file.file_path.clone();
     }
   }
+  */
 
   // ========================= RESIZE IMAGE ======================== //
 
-  const MAX_LARGE_DIMENSION : u32 = 1024;
-  const MAX_SMALL_DIMENSION : u32 = 576;
+  // Animate Diffusion 
+  
+  //     "output_width": 576,
+  //     "output_height": 1024,
+
+  // versus Animate-X
+
+  //    --height 768 \
+  //     --width 512
+
+  const MAX_LARGE_DIMENSION : u32 = 768; //1024;
+  const MAX_SMALL_DIMENSION : u32 = 512; // 576;
   const MAX_SQUARE_DIMENSION : u32 = 512;
 
   let mut resized_image_path = unaltered_image_file.file_path.clone();
@@ -241,11 +253,11 @@ pub async fn process_single_studio_gen2_job(
 
   let stderr_output_file = work_paths.output_dir.path().join("stderr.txt");
   let stdout_output_file = work_paths.output_dir.path().join("stdout.txt");
-  
+
   let video_output_path = work_paths.output_dir.path().join("output_video.mp4");
 
   let inference_duration;
-  
+
   match studio_job_type {
     StudioModelPipeline::None => {
       return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set")));
@@ -257,13 +269,13 @@ pub async fn process_single_studio_gen2_job(
       create_dir_all_if_missing(&pose_pkl_dir)?;
 
       let pose_pkl_file = pose_pkl_dir.join("pose.pkl");
-      
+
       let pose_frames_dir = work_paths.output_dir.path().join("pose_frames");
       create_dir_all_if_missing(&pose_frames_dir)?;
 
       let original_frames_dir = work_paths.output_dir.path().join("original_frames");
       create_dir_all_if_missing(&original_frames_dir)?;
-      
+
       let inference_start_time = Instant::now();
 
       let command_exit_status = deps
@@ -279,7 +291,7 @@ pub async fn process_single_studio_gen2_job(
           }).await;
 
       info!("Running Studio Gen2 inference (Animate-X)...");
-      
+
       let command_exit_status = deps
           .inference_command
           .execute_inference(AnimateXInferenceArgs {
@@ -293,8 +305,9 @@ pub async fn process_single_studio_gen2_job(
             width: studio_args.output_width,
             height: studio_args.output_height,
             max_frames: studio_args.max_frames,
+            result_filename: &video_output_path,
           }).await;
-      
+
       inference_duration = Instant::now().duration_since(inference_start_time);
     }
     StudioModelPipeline::StableAnimator(deps) => {

@@ -57,6 +57,8 @@ pub struct AnimateXInferenceArgs<'s> {
   pub stdout_output_file: &'s Path,
 
   pub model_directory: &'s Path,
+  
+  pub result_filename: &'s Path,
 
   pub image_file: &'s Path,
 
@@ -153,6 +155,10 @@ impl AnimateXInferenceCommand {
       command.push_str(&max_frames.to_string());
       command.push_str(" ");
     }
+
+    command.push_str(" --result_filename ");
+    command.push_str(&path_to_string(&args.result_filename));
+    command.push_str(" ");
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
       command = docker_options.to_command_string(&command);
