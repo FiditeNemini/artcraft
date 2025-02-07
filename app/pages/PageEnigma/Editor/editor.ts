@@ -1155,13 +1155,6 @@ class Editor {
     this.last_scrub = this.timeline.scrubber_frame_position;
 
     this.stats.update();
-
-    setTimeout(
-      () => {
-        requestAnimationFrame(this.updateLoop.bind(this));
-      },
-      1000 / (this.cap_fps * 2),
-    ); // Get the most FPS we can out of the renderer.
   }
 
   // Basicly Unity 3D's update loop.
