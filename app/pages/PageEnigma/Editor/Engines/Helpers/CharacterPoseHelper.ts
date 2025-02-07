@@ -1,6 +1,6 @@
 import { FilesetResolver, HandLandmarker, HandLandmarkerResult, NormalizedLandmark, PoseLandmarker, PoseLandmarkerResult } from "@mediapipe/tasks-vision";
 import * as Kalidokit from "kalidokit";
-import { Box3, Box3Helper, Euler, EulerOrder, Object3D, Object3DEventMap, SkeletonHelper, Vector3 } from "three";
+import { Box3, Box3Helper, Euler, EulerOrder, KeyframeTrack, Object3D, Object3DEventMap, QuaternionKeyframeTrack, SkeletonHelper, Vector3 } from "three";
 import { EulerRotation, XYZ } from "vendor/kalidokit/dist";
 import { loadImage } from "~/Helpers/ImageHelpers";
 import { EditorExpandedI } from "~/pages/PageEnigma/contexts/EngineContext";
@@ -74,155 +74,6 @@ export class CharacterPoseHelper {
     return { hands: handResults, pose: poseResults };
   }
 
-  applyPoseDataToCharacter(characterId: string, poseData: { hands: HandLandmarkerResult, pose: PoseLandmarkerResult }) {
-    // Apply the pose data to the character
-    const scene = this.editor.timeline.scene;
-    const character = scene.get_object_by_uuid(characterId);
-    if (!character) {
-      console.error("Character not found with id: ", characterId);
-      return;
-    }
-
-    // Apply the pose data to the character
-    //
-    // Get character dimensions with a bounding box (unreliable but works for now)
-    const characterBox = new Box3().setFromObject(character);
-
-    // Add a box helper to the scene
-    const boxHelper = new Box3Helper(characterBox, 0xfff000);
-    scene.scene.add(boxHelper);
-
-    // Get the original hip position
-    const hipPos = new Vector3();
-    const hipBone = character.children[0].children.find((child) => child.name === "mixamorigHips")!;
-    hipBone.getWorldPosition(hipPos);
-
-    // Test only the rotation without pose application for now
-    // TODO: Remove
-    this.updateBoneRotations(character);
-    return;
-
-    // We'll do a triple pass, one that'll gather the bone data
-    // and another that'll update the main mapped bones and then finally interpolate the extra bones
-    //
-    // First pass: Build a list of bones to update
-    const mappedBones: Record<string, Object3D<Object3DEventMap>> = {};
-    const interpolationBones: Record<string, Object3D<Object3DEventMap>> = {};
-    character.traverse((child) => {
-      if (child.type !== "Bone") {
-        return;
-      }
-
-      if (MixamoPoseMap[child.name] !== undefined) {
-        console.debug("Mapped bone found:", child.name);
-        mappedBones[child.name] = child;
-      } else {
-        // console.debug("Interpolation bone found:", child.name);
-        interpolationBones[child.name] = child;
-      }
-    });
-
-    // Second pass: Update the mapped bones
-    const scale = 1.1;
-    Object.values(mappedBones).forEach((bone) => {
-      const mapIndex = MixamoPoseMap[bone.name];
-      const poseCoordinates = poseData.pose.worldLandmarks[0][mapIndex];
-      const parent = bone.parent!;
-
-      // Detach child from parent
-      scene.scene.attach(bone);
-
-      bone.position.set(poseCoordinates.x * scale, -poseCoordinates.y * scale, -poseCoordinates.z * scale);
-      bone.position.add(hipPos); // Pose data world coordinates are centered at center of hips (left and right)
-
-      // Reattach child to its parent
-      parent.attach(bone);
-    });
-
-    // Third pass: Interpolate the extra bones
-    if (interpolationBones[MixamoInterpolationBoneNames.DefLeftThigh]) {
-      // Left thigh is lipo'd between left upper leg and knee
-      const leftThigh = interpolationBones[MixamoInterpolationBoneNames.DefLeftThigh];
-      const leftUpperLeg = mappedBones["mixamorigLeftUpLeg"];
-      const leftKnee = mappedBones["mixamorigLeftLeg"];
-      const parent = leftThigh.parent!;
-
-      // Detach child from parent
-      scene.scene.attach(leftThigh);
-
-      // Calculate the lipo position
-      const leftUpperLegPos = new Vector3();
-      const leftKneePos = new Vector3();
-      leftUpperLeg.getWorldPosition(leftUpperLegPos);
-      console.debug("Left upper leg pos: ", leftUpperLegPos);
-      leftKnee.getWorldPosition(leftKneePos);
-      console.debug("Left knee pos: ", leftKneePos);
-      const leftThighPos = new Vector3();
-      leftThighPos.lerpVectors(leftUpperLegPos, leftKneePos, 0.6);
-      console.debug("Left thigh pos: ", leftThighPos);
-      leftThigh.position.set(leftThighPos.x, leftThighPos.y, leftThighPos.z);
-
-      // Reattach child to its parent
-      parent.attach(leftThigh);
-    }
-
-    if (interpolationBones[MixamoInterpolationBoneNames.DefRightUpperArm]) {
-      // Right upper arm is lipo'd between shoulder and elbow
-      const rightUpperArm = interpolationBones[MixamoInterpolationBoneNames.DefRightUpperArm];
-      const rightShoulder = mappedBones["mixamorigRightArm"];
-      const rightElbow = mappedBones["mixamorigRightForeArm"];
-      const parent = rightUpperArm.parent!;
-
-      // Detach child from parent
-      scene.scene.attach(rightUpperArm);
-
-      // Calculate the lipo position
-      const rightShoulderPos = new Vector3();
-      const rightElbowPos = new Vector3();
-      rightShoulder.getWorldPosition(rightShoulderPos);
-      console.debug("Right shoulder pos: ", rightShoulderPos);
-      rightElbow.getWorldPosition(rightElbowPos);
-      console.debug("Right elbow pos: ", rightElbowPos);
-      const rightUpperArmPos = new Vector3();
-      rightUpperArmPos.lerpVectors(rightShoulderPos, rightElbowPos, 0.5);
-      console.debug("Right upper arm pos: ", rightUpperArmPos);
-      rightUpperArm.position.set(rightUpperArmPos.x, rightUpperArmPos.y, rightUpperArmPos.z);
-
-      // Reattach child to its parent
-      parent.attach(rightUpperArm);
-    }
-
-    if (interpolationBones[MixamoInterpolationBoneNames.DefLeftUpperArm]) {
-      // Left upper arm is lipo'd between shoulder and elbow
-      const leftUpperArm = interpolationBones[MixamoInterpolationBoneNames.DefLeftUpperArm];
-      console.log("Left def arm position:", leftUpperArm.position);
-      const leftShoulder = mappedBones["mixamorigLeftArm"];
-      const leftElbow = mappedBones["mixamorigLeftForeArm"];
-      const parent = leftUpperArm.parent!;
-
-      // Detach child from parent
-      scene.scene.attach(leftUpperArm);
-
-      // Calculate the lipo position
-      const leftShoulderPos = new Vector3();
-      const leftElbowPos = new Vector3();
-      leftShoulder.getWorldPosition(leftShoulderPos);
-      console.debug("Left shoulder pos: ", leftShoulderPos);
-      leftElbow.getWorldPosition(leftElbowPos);
-      console.debug("Left elbow pos: ", leftElbowPos);
-      const leftUpperArmPos = new Vector3();
-      leftUpperArmPos.lerpVectors(leftShoulderPos, leftElbowPos, 0.5);
-      console.debug("Left upper arm pos: ", leftUpperArmPos);
-      leftUpperArm.position.set(leftUpperArmPos.x, leftUpperArmPos.y, leftUpperArmPos.z);
-
-      // Reattach child to its parent
-      parent.attach(leftUpperArm);
-      console.log("Left def arm position:", leftUpperArm.position);
-    }
-
-    // this.updateBoneRotations(character);
-  }
-
   rigRotation(boneName: string, rotation: EulerRotation = { x: 0, y: 0, z: 0 }, skeleton: SkeletonHelper) {
     // Find the corresponding bone via bone name and mapping
     const skeletalBoneMap = mixamorigTransformations[boneName];
@@ -245,6 +96,7 @@ export class CharacterPoseHelper {
     const evalZ = eval(bindingFunc.fz);
 
     const order = skeletalBoneMap.order.toUpperCase();
+    bone.updateMatrix();
     const euler = new Euler(
       bone.rotation.x + evalX,
       bone.rotation.y + evalY,
@@ -253,7 +105,9 @@ export class CharacterPoseHelper {
     );
 
     // Apply rotation to bone
-    bone.quaternion.setFromEuler(euler);
+    const newQuat = bone.quaternion.clone();
+    newQuat.setFromEuler(euler);
+    return [skeletalBoneMap.name, newQuat];
   }
 
   rigPosition(boneName: string, position: XYZ, skeleton: SkeletonHelper) {
@@ -266,7 +120,7 @@ export class CharacterPoseHelper {
       return;
     }
 
-    bone.position.set(position.x, position.y * 1.2, -position.z);
+    return [skeletalBoneMap.name, new Vector3(position.x, position.y * 1.2, -position.z)];
   }
 
   rigHandRotation(boneName: string, rotation: EulerRotation = { x: 0, y: 0, z: 0 }, skeleton: SkeletonHelper) {
@@ -282,13 +136,15 @@ export class CharacterPoseHelper {
     const order = "XYZ";
     const euler = new Euler(
       bone.rotation.x + rotation.x,
-      bone.rotation.y - rotation.y,
-      bone.rotation.z - rotation.z,
+      bone.rotation.y + rotation.y,
+      bone.rotation.z + rotation.z,
       order
     );
 
     // Apply rotation to bone
-    bone.quaternion.setFromEuler(euler);
+    const newQuat = bone.quaternion.clone();
+    newQuat.setFromEuler(euler);
+    return [skeletalBoneName, newQuat];
   }
 
   getHandedLandmarks(handLandmarks: HandLandmarkerResult) {
@@ -317,10 +173,7 @@ export class CharacterPoseHelper {
   }
 
 
-  testRun(characterId: string, poseData: { hands: HandLandmarkerResult, pose: PoseLandmarkerResult }) {
-    const scene = this.editor.timeline.scene;
-    const character = scene.get_object_by_uuid(characterId)!;
-
+  inflatePoseDataToTracks(character: Object3D<Object3DEventMap>, poseData: { hands: HandLandmarkerResult, pose: PoseLandmarkerResult }) {
     const kkitPoseData = Kalidokit.Pose.solve(poseData.pose.worldLandmarks[0], poseData.pose.landmarks[0], {
       runtime: "mediapipe"
     })!;
@@ -332,38 +185,69 @@ export class CharacterPoseHelper {
 
     const skeleton = new SkeletonHelper(character);
 
-    // Rig the bones according to our new data
-    // Hips move first - we must do it hierarchically 
-    this.rigRotation("Hips", {
+    const tracks: KeyframeTrack[] = [];
+    this.compilePoseData(tracks, skeleton, kkitPoseData);
+
+    if (handLandmarks) {
+      this.compileHandData(tracks, handLandmarks, skeleton, kkitPoseData);
+    }
+
+    return tracks;
+  }
+
+  compileRotation(tracks: Array<KeyframeTrack>, boneName: string, rotation: EulerRotation = { x: 0, y: 0, z: 0 }, skeleton: SkeletonHelper) {
+    const mappedRotation = this.rigRotation(boneName, rotation, skeleton);
+    if (!mappedRotation) {
+      console.error("Bone not found for rotation: ", boneName);
+      return;
+    }
+
+    const [bone, quaternion] = mappedRotation;
+    const track = new QuaternionKeyframeTrack(`${bone}.quaternion`, [0], [quaternion.x, quaternion.y, quaternion.z, quaternion.w]);
+    tracks.push(track);
+  }
+
+  compileHandRotation(tracks: Array<KeyframeTrack>, boneName: string, rotation: EulerRotation = { x: 0, y: 0, z: 0 }, skeleton: SkeletonHelper) {
+    const mappedRotation = this.rigHandRotation(boneName, rotation, skeleton);
+    if (!mappedRotation) {
+      console.error("Bone not found for rotation: ", boneName);
+      return;
+    }
+
+    const [bone, quaternion] = mappedRotation;
+    const track = new QuaternionKeyframeTrack(`${bone}.quaternion`, [0], [quaternion.x, quaternion.y, quaternion.z, quaternion.w]);
+    tracks.push(track);
+  }
+
+  compilePoseData(tracks: KeyframeTrack[], skeleton: SkeletonHelper, kkitPoseData: Kalidokit.TPose) {
+    this.compileRotation(tracks, "Hips", {
       x: kkitPoseData.Hips.rotation!.x,
       y: kkitPoseData.Hips.rotation!.y,
       z: kkitPoseData.Hips.rotation!.z,
     }, skeleton);
 
-    this.rigPosition("Hips", {
-      x: kkitPoseData.Hips.position!.x,
-      y: kkitPoseData.Hips.position!.y,
-      z: kkitPoseData.Hips.position!.z,
-    }, skeleton);
+    // Let the rotation happen where the object already is.
+    // To change this behaviour, uncomment this code to move the hip too (it's the origin)
+    // this.rigPosition("Hips", {
+    //   x: kkitPoseData.Hips.position!.x,
+    //   y: kkitPoseData.Hips.position!.y,
+    //   z: kkitPoseData.Hips.position!.z,
+    // }, skeleton);
 
-    this.rigRotation("Spine", kkitPoseData.Spine, skeleton);
+    this.compileRotation(tracks, "Spine", kkitPoseData.Spine, skeleton);
 
-    this.rigRotation("RightUpperArm", kkitPoseData.RightUpperArm, skeleton);
-    this.rigRotation("RightLowerArm", kkitPoseData.RightLowerArm, skeleton);
-    this.rigRotation("LeftUpperArm", kkitPoseData.LeftUpperArm, skeleton);
-    this.rigRotation("LeftLowerArm", kkitPoseData.LeftLowerArm, skeleton);
+    this.compileRotation(tracks, "RightUpperArm", kkitPoseData.RightUpperArm, skeleton);
+    this.compileRotation(tracks, "RightLowerArm", kkitPoseData.RightLowerArm, skeleton);
+    this.compileRotation(tracks, "LeftUpperArm", kkitPoseData.LeftUpperArm, skeleton);
+    this.compileRotation(tracks, "LeftLowerArm", kkitPoseData.LeftLowerArm, skeleton);
 
-    this.rigRotation("RightUpperLeg", kkitPoseData.RightUpperLeg, skeleton);
-    this.rigRotation("RightLowerLeg", kkitPoseData.RightLowerLeg, skeleton);
-    this.rigRotation("LeftUpperLeg", kkitPoseData.LeftUpperLeg, skeleton);
-    this.rigRotation("LeftLowerLeg", kkitPoseData.LeftLowerLeg, skeleton);
-
-    if (handLandmarks) {
-      this.applyHandData(handLandmarks, skeleton, kkitPoseData);
-    }
+    this.compileRotation(tracks, "RightUpperLeg", kkitPoseData.RightUpperLeg, skeleton);
+    this.compileRotation(tracks, "RightLowerLeg", kkitPoseData.RightLowerLeg, skeleton);
+    this.compileRotation(tracks, "LeftUpperLeg", kkitPoseData.LeftUpperLeg, skeleton);
+    this.compileRotation(tracks, "LeftLowerLeg", kkitPoseData.LeftLowerLeg, skeleton);
   }
 
-  applyHandData(handLandmarks: { leftHand: NormalizedLandmark[], rightHand: NormalizedLandmark[] }, skeleton: SkeletonHelper, kkitPoseData: Kalidokit.TPose) {
+  compileHandData(tracks: KeyframeTrack[], handLandmarks: { leftHand: NormalizedLandmark[], rightHand: NormalizedLandmark[] }, skeleton: SkeletonHelper, kkitPoseData: Kalidokit.TPose) {
     const kkitLeftHandData = Kalidokit.Hand.solve(handLandmarks.leftHand, "Left");
     const kkitRightHandData = Kalidokit.Hand.solve(handLandmarks.rightHand, "Right");
 
@@ -377,59 +261,59 @@ export class CharacterPoseHelper {
 
     // Rig the hands
     // Left hand
-    this.rigHandRotation("LeftWrist", {
+    this.compileHandRotation(tracks, "LeftWrist", {
       x: kkitPoseData.LeftHand!.x,
       y: kkitPoseData.LeftHand!.y,
       z: kkitPoseData.LeftHand!.z,
     }, skeleton);
     // Left thumb
-    this.rigHandRotation("LeftThumbProximal", kkitLeftHandData?.LeftThumbProximal, skeleton);
-    this.rigHandRotation("LeftThumbIntermediate", kkitLeftHandData?.LeftThumbIntermediate, skeleton);
-    this.rigHandRotation("LeftThumbDistal", kkitLeftHandData?.LeftThumbDistal, skeleton);
+    this.compileHandRotation(tracks, "LeftThumbProximal", kkitLeftHandData?.LeftThumbProximal, skeleton);
+    this.compileHandRotation(tracks, "LeftThumbIntermediate", kkitLeftHandData?.LeftThumbIntermediate, skeleton);
+    this.compileHandRotation(tracks, "LeftThumbDistal", kkitLeftHandData?.LeftThumbDistal, skeleton);
     // Left index
-    this.rigHandRotation("LeftIndexProximal", kkitLeftHandData?.LeftIndexProximal, skeleton);
-    this.rigHandRotation("LeftIndexIntermediate", kkitLeftHandData?.LeftIndexIntermediate, skeleton);
-    this.rigHandRotation("LeftIndexDistal", kkitLeftHandData?.LeftIndexDistal, skeleton);
+    this.compileHandRotation(tracks, "LeftIndexProximal", kkitLeftHandData?.LeftIndexProximal, skeleton);
+    this.compileHandRotation(tracks, "LeftIndexIntermediate", kkitLeftHandData?.LeftIndexIntermediate, skeleton);
+    this.compileHandRotation(tracks, "LeftIndexDistal", kkitLeftHandData?.LeftIndexDistal, skeleton);
     // Left middle
-    this.rigHandRotation("LeftMiddleProximal", kkitLeftHandData?.LeftMiddleProximal, skeleton);
-    this.rigHandRotation("LeftMiddleIntermediate", kkitLeftHandData?.LeftMiddleIntermediate, skeleton);
-    this.rigHandRotation("LeftMiddleDistal", kkitLeftHandData?.LeftMiddleDistal, skeleton);
+    this.compileHandRotation(tracks, "LeftMiddleProximal", kkitLeftHandData?.LeftMiddleProximal, skeleton);
+    this.compileHandRotation(tracks, "LeftMiddleIntermediate", kkitLeftHandData?.LeftMiddleIntermediate, skeleton);
+    this.compileHandRotation(tracks, "LeftMiddleDistal", kkitLeftHandData?.LeftMiddleDistal, skeleton);
     // Left ring
-    this.rigHandRotation("LeftRingProximal", kkitLeftHandData?.LeftRingProximal, skeleton);
-    this.rigHandRotation("LeftRingIntermediate", kkitLeftHandData?.LeftRingIntermediate, skeleton);
-    this.rigHandRotation("LeftRingDistal", kkitLeftHandData?.LeftRingDistal, skeleton);
+    this.compileHandRotation(tracks, "LeftRingProximal", kkitLeftHandData?.LeftRingProximal, skeleton);
+    this.compileHandRotation(tracks, "LeftRingIntermediate", kkitLeftHandData?.LeftRingIntermediate, skeleton);
+    this.compileHandRotation(tracks, "LeftRingDistal", kkitLeftHandData?.LeftRingDistal, skeleton);
     // Left little/pinky
-    this.rigHandRotation("LeftLittleProximal", kkitLeftHandData?.LeftLittleProximal, skeleton);
-    this.rigHandRotation("LeftLittleIntermediate", kkitLeftHandData?.LeftLittleIntermediate, skeleton);
-    this.rigHandRotation("LeftLittleDistal", kkitLeftHandData?.LeftLittleDistal, skeleton);
+    this.compileHandRotation(tracks, "LeftLittleProximal", kkitLeftHandData?.LeftLittleProximal, skeleton);
+    this.compileHandRotation(tracks, "LeftLittleIntermediate", kkitLeftHandData?.LeftLittleIntermediate, skeleton);
+    this.compileHandRotation(tracks, "LeftLittleDistal", kkitLeftHandData?.LeftLittleDistal, skeleton);
 
 
     // Right hand
-    this.rigHandRotation("RightWrist", {
+    this.compileHandRotation(tracks, "RightWrist", {
       x: kkitPoseData.RightHand!.x,
       y: kkitPoseData.RightHand!.y,
       z: kkitPoseData.RightHand!.z,
     }, skeleton);
     // Right thumb
-    this.rigHandRotation("RightThumbProximal", kkitRightHandData?.RightThumbProximal, skeleton);
-    this.rigHandRotation("RightThumbIntermediate", kkitRightHandData?.RightThumbIntermediate, skeleton);
-    this.rigHandRotation("RightThumbDistal", kkitRightHandData?.RightThumbDistal, skeleton);
+    this.compileHandRotation(tracks, "RightThumbProximal", kkitRightHandData?.RightThumbProximal, skeleton);
+    this.compileHandRotation(tracks, "RightThumbIntermediate", kkitRightHandData?.RightThumbIntermediate, skeleton);
+    this.compileHandRotation(tracks, "RightThumbDistal", kkitRightHandData?.RightThumbDistal, skeleton);
     // Right index
-    this.rigHandRotation("RightIndexProximal", kkitRightHandData?.RightIndexProximal, skeleton);
-    this.rigHandRotation("RightIndexIntermediate", kkitRightHandData?.RightIndexIntermediate, skeleton);
-    this.rigHandRotation("RightIndexDistal", kkitRightHandData?.RightIndexDistal, skeleton);
+    this.compileHandRotation(tracks, "RightIndexProximal", kkitRightHandData?.RightIndexProximal, skeleton);
+    this.compileHandRotation(tracks, "RightIndexIntermediate", kkitRightHandData?.RightIndexIntermediate, skeleton);
+    this.compileHandRotation(tracks, "RightIndexDistal", kkitRightHandData?.RightIndexDistal, skeleton);
     // Right middle
-    this.rigHandRotation("RightMiddleProximal", kkitRightHandData?.RightMiddleProximal, skeleton);
-    this.rigHandRotation("RightMiddleIntermediate", kkitRightHandData?.RightMiddleIntermediate, skeleton);
-    this.rigHandRotation("RightMiddleDistal", kkitRightHandData?.RightMiddleDistal, skeleton);
+    this.compileHandRotation(tracks, "RightMiddleProximal", kkitRightHandData?.RightMiddleProximal, skeleton);
+    this.compileHandRotation(tracks, "RightMiddleIntermediate", kkitRightHandData?.RightMiddleIntermediate, skeleton);
+    this.compileHandRotation(tracks, "RightMiddleDistal", kkitRightHandData?.RightMiddleDistal, skeleton);
     // Right ring
-    this.rigHandRotation("RightRingProximal", kkitRightHandData?.RightRingProximal, skeleton);
-    this.rigHandRotation("RightRingIntermediate", kkitRightHandData?.RightRingIntermediate, skeleton);
-    this.rigHandRotation("RightRingDistal", kkitRightHandData?.RightRingDistal, skeleton);
+    this.compileHandRotation(tracks, "RightRingProximal", kkitRightHandData?.RightRingProximal, skeleton);
+    this.compileHandRotation(tracks, "RightRingIntermediate", kkitRightHandData?.RightRingIntermediate, skeleton);
+    this.compileHandRotation(tracks, "RightRingDistal", kkitRightHandData?.RightRingDistal, skeleton);
     // Right little/pinky
-    this.rigHandRotation("RightLittleProximal", kkitRightHandData?.RightLittleProximal, skeleton);
-    this.rigHandRotation("RightLittleIntermediate", kkitRightHandData?.RightLittleIntermediate, skeleton);
-    this.rigHandRotation("RightLittleDistal", kkitRightHandData?.RightLittleDistal, skeleton);
+    this.compileHandRotation(tracks, "RightLittleProximal", kkitRightHandData?.RightLittleProximal, skeleton);
+    this.compileHandRotation(tracks, "RightLittleIntermediate", kkitRightHandData?.RightLittleIntermediate, skeleton);
+    this.compileHandRotation(tracks, "RightLittleDistal", kkitRightHandData?.RightLittleDistal, skeleton);
   }
 
 }

@@ -65,14 +65,14 @@ export default function CharacterFrameButton(
   }, [setIsUploadModalOpen]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleTest = (url = "https://cdn-2.fakeyou.com/media/y/6/q/s/v/y6qsvxh66qw9bq8a48619t5pg9sdeyzx/image_y6qsvxh66qw9bq8a48619t5pg9sdeyzx.png") => {
-    async function test() {
-      const poseHelper = new CharacterPoseHelper(editorEngine!);
-      const poseData = await poseHelper.extractPoseData(url)
-      // poseHelper.applyPoseDataToCharacter(characterId, poseData);
-      poseHelper.testRun(characterId, poseData);
-    }
-    test();
+  const applyPoseFromUrl = (url = "https://cdn-2.fakeyou.com/media/1/g/b/n/a/1gbnawabpjak164p6t7r6jskqrh1exkh/image_1gbnawabpjak164p6t7r6jskqrh1exkh.png") => {
+    const poseHelper = new CharacterPoseHelper(editorEngine!);
+    const character = editorEngine!.timeline.scene.get_object_by_uuid(characterId)!;
+    const currentTime = editorEngine!.timeline.current_time;
+    const maxTime = editorEngine!.timeline.timeline_limit;
+    editorEngine?.animation_engine.createStartFrameAnimation(
+      character, poseHelper, url, currentTime, maxTime
+    );
   };
 
   const handleFrameSet = useCallback((token?: string) => {
@@ -94,7 +94,7 @@ export default function CharacterFrameButton(
       .then(async (url) => {
         console.debug("Frame url: ", url)
 
-        handleTest(url);
+        applyPoseFromUrl(url);
         setMediaFile(url);
 
         // TODO(brandon,2024-01-27): Please forgive me for this ugly hack. It's just 
@@ -114,12 +114,19 @@ export default function CharacterFrameButton(
         unlockButton();
       })
 
-  }, [unlockButton, setMediaFile, handleTest]);
+  }, [applyPoseFromUrl, unlockButton]);
 
   const handleDeleteFrame = useCallback(() => {
+    const character = editorEngine!.timeline.scene.get_object_by_uuid(characterId)!;
+    editorEngine!.animation_engine.clearStartFrame(
+      character,
+      editorEngine!.timeline.current_time,
+      editorEngine!.timeline.timeline_limit
+    );
+
     setMediaFile(undefined);
     unlockButton();
-  }, [unlockButton, setMediaFile]);
+  }, [unlockButton, setMediaFile, characterId, editorEngine]);
 
 
   if (!mediaFile) {

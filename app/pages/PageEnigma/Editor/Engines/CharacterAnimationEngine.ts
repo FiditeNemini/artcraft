@@ -6,6 +6,9 @@ import { get_media_url } from "~/Classes/ApiHelpers";
 import { MMDLoader } from "three/examples/jsm/loaders/MMDLoader.js";
 import { ClipUI } from "../../clips/clip_ui";
 import Ijson from "~/interfaces/Ijson";
+import { CharacterPoseHelper } from "./Helpers/CharacterPoseHelper";
+
+export const START_FRAME_LABEL = "CharacterStartFrameLabel";
 
 export class CharacterAnimationEngine implements Ijson {
   version: number;
@@ -76,31 +79,25 @@ export class CharacterAnimationEngine implements Ijson {
   }
 
   #interpolateClips(character: THREE.Object3D, timestamp: number, maxTime: number) {
-    const clips = this.characterAnimations.get(character)!;
-
-    // The timestamp isn't inside any clip, we're in interpolation land
-    // If there's no clips to interpolate between, we're done
-    if (clips.length <= 0) {
-      return;
-    }
+    const clips = this.characterAnimations.get(character);
 
     const mixer = this.getMixer(character);
 
     // Find the two clips we're interpolating between
-    // TODO: Binary search? We won't need it because the amount of clips is too low
     let prevClip: ClipUI | null = null;
     let nextClip: ClipUI | null = null;
-    const lastClip = clips[clips.length - 1];
+    const firstClip = clips ? clips[0] : null;
+    const lastClip = clips ? clips[clips.length - 1] : null;
 
     // If we're before the first clip, interpolate it in from base pose
     // TODO: Replace with starting frame
-    if (clips[0].offset > timestamp) {
+    if (firstClip && firstClip.offset > timestamp) {
       prevClip = null;
-      nextClip = clips[0];
-    } else if (lastClip.offset + lastClip.length < timestamp) { // After last clip, interpolate it out
+      nextClip = firstClip;
+    } else if (lastClip && (lastClip.offset + lastClip.length) < timestamp) { // After last clip, interpolate it out
       prevClip = lastClip;
       nextClip = null;
-    } else {
+    } else if (clips) {
       let prevClipIndex = 0;
 
       // Loop until the next clip is after the timestamp
@@ -112,8 +109,18 @@ export class CharacterAnimationEngine implements Ijson {
       nextClip = clips[prevClipIndex + 1];
     }
 
-    const prevAction = prevClip ? mixer.clipAction(this.getCharacterAnimationTrack(character, prevClip!.media_id)!) : null;
-    const nextAction = nextClip ? mixer.clipAction(this.getCharacterAnimationTrack(character, nextClip!.media_id)!) : null;
+    // If the clips exist, fetch their actions. If not, evaluation is either at the start or the end.
+    // If evalution is on either sides, check the start/end frame tracks
+    // Otherwise just mark it null
+    const prevAnimationTrack = prevClip ?
+      this.getCharacterAnimationTrack(character, prevClip.media_id) :
+      this.getCharacterAnimationTrack(character, START_FRAME_LABEL);
+
+    // TODO: Replace with ending frame
+    const nextAnimationTrack = nextClip ? this.getCharacterAnimationTrack(character, nextClip.media_id) : null;
+
+    const prevAction = prevAnimationTrack ? mixer.clipAction(prevAnimationTrack) : null;
+    const nextAction = nextAnimationTrack ? mixer.clipAction(nextAnimationTrack) : null;
 
     // Calculate the progress of timestamp from end of prev action to start of next action
     const left = (prevClip?.offset ?? 0) + (prevClip?.length ?? 0);
@@ -142,23 +149,20 @@ export class CharacterAnimationEngine implements Ijson {
     // The clip time would still be relative to the previous clip 
     const clipTime = timestamp - (prevClip?.offset ?? 0);
     mixer.setTime(clipTime / 1000);
-    console.log("Prev action status")
-    console.log(prevAction);
   }
 
   evaluateCharacter(character: THREE.Object3D, timestamp: number, maxTime: number) {
     const mixer = this.getMixer(character);
-    const clips = this.characterAnimations.get(character)!;
+    const clips = this.characterAnimations.get(character);
 
     // Find the clip we're in right now
-    const currentClip = clips.find((clip) => {
+    const currentClip = clips?.find((clip) => {
       return clip.offset <= timestamp && clip.offset + clip.length >= timestamp;
-    })
+    });
 
     // If timestamp not in any clip, do nothing.
     // If timestamp in clip, set mixer to the timestamp inside the clip
     if (!currentClip) {
-      console.log("INTERPOLATING CLIPS")
       // Let the interpolation function handle this actions
       this.#interpolateClips(character, timestamp, maxTime)
       return;
@@ -183,8 +187,6 @@ export class CharacterAnimationEngine implements Ijson {
     animationAction.play();
 
     mixer.setTime(clipTime / 1000);
-    console.log("Action status")
-    console.log(animationAction);
   }
 
   getCharacterAnimationTrack(character: THREE.Object3D, mediaId: string) {
@@ -200,7 +202,10 @@ export class CharacterAnimationEngine implements Ijson {
 
   stopCharacter(character: THREE.Object3D) {
     const mixer = this.characterMixers.get(character);
+    console.debug("Stopping all actions for character", character);
+    console.debug(mixer);
     mixer?.stopAllAction();
+    console.debug(mixer);
   }
 
   stop() {
@@ -270,5 +275,35 @@ export class CharacterAnimationEngine implements Ijson {
     this.stopCharacter(character);
   }
 
+  clearStartFrame(character: THREE.Object3D, resetTime?: number, maxTime = 1) {
+    // Stop all character animations
+    this.stopCharacter(character);
 
+    // Check the animations and remove any labelled START_FRAME_LABEL
+    character.animations = character.animations.filter((clip) => clip.name !== START_FRAME_LABEL);
+
+    // If resetTime is passed, evaluate the character to that time
+    if (resetTime) {
+      this.evaluateCharacter(character, resetTime, maxTime);
+    }
+  }
+
+  /** resetTime: The time to reset the character to. This should ideally be the current timeline time. */
+  async createStartFrameAnimation(character: THREE.Object3D, poseHelper: CharacterPoseHelper, url: string, resetTime: number = 0, maxTime: number = 1) {
+    // Clear any existing start frame
+    // This will also reset the animation to default pose
+    this.clearStartFrame(character);
+
+    // We must create the track data now after resetting to default
+    const poseData = await poseHelper.extractPoseData(url);
+    const tracks = poseHelper.inflatePoseDataToTracks(character, poseData);
+
+    // Create the animation track from the rotation values and hip position
+    // then add it to the character
+    const startFrameClip = new THREE.AnimationClip(START_FRAME_LABEL, 0, tracks);
+    character.animations.push(startFrameClip);
+
+    // Reset the character evaluation to what was passed in
+    this.evaluateCharacter(character, resetTime, maxTime);
+  }
 }
