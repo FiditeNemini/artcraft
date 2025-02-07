@@ -77,7 +77,7 @@ export class TimeLine {
     this.timeline_items = [];
     this.characters = {};
     this.absolute_end = 60 * 12;
-    this.timeline_limit = 0; // 5 seconds
+    this.timeline_limit = this.getTimelineEnd();
     this.camera = camera;
     this.mouse = mouse;
 
@@ -939,6 +939,7 @@ export class TimeLine {
     this.is_playing = false;
     console.log(`Stop - Stopping Timeline`);
     this.current_time = 0;
+    this.update();
     this.pushEvent(fromEngineActions.UPDATE_TIME, {
       currentTime: this.current_time,
     });
