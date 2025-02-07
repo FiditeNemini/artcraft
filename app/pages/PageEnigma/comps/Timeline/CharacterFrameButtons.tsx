@@ -65,10 +65,10 @@ export default function CharacterFrameButton(
   }, [setIsUploadModalOpen]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleTest = () => {
+  const handleTest = (url = "https://cdn-2.fakeyou.com/media/y/6/q/s/v/y6qsvxh66qw9bq8a48619t5pg9sdeyzx/image_y6qsvxh66qw9bq8a48619t5pg9sdeyzx.png") => {
     async function test() {
       const poseHelper = new CharacterPoseHelper(editorEngine!);
-      const poseData = await poseHelper.extractPoseData("https://cdn-2.fakeyou.com/media/y/6/q/s/v/y6qsvxh66qw9bq8a48619t5pg9sdeyzx/image_y6qsvxh66qw9bq8a48619t5pg9sdeyzx.png")
+      const poseData = await poseHelper.extractPoseData(url)
       // poseHelper.applyPoseDataToCharacter(characterId, poseData);
       poseHelper.testRun(characterId, poseData);
     }
@@ -94,6 +94,7 @@ export default function CharacterFrameButton(
       .then(async (url) => {
         console.debug("Frame url: ", url)
 
+        handleTest(url);
         setMediaFile(url);
 
         // TODO(brandon,2024-01-27): Please forgive me for this ugly hack. It's just 
@@ -113,7 +114,7 @@ export default function CharacterFrameButton(
         unlockButton();
       })
 
-  }, [unlockButton, setMediaFile]);
+  }, [unlockButton, setMediaFile, handleTest]);
 
   const handleDeleteFrame = useCallback(() => {
     setMediaFile(undefined);
@@ -125,7 +126,7 @@ export default function CharacterFrameButton(
     return (
       <>
         <div className={className} style={{ minWidth: frameTrackButtonWidthPx, width: frameTrackButtonWidthPx }}>
-          <ButtonIconStack icon={faImage} additionalStyle="bg-character-frame" text={CharacterFrameStrings[target]} onClick={handleTest} />
+          <ButtonIconStack icon={faImage} additionalStyle="bg-character-frame" text={CharacterFrameStrings[target]} onClick={handleFrameClick} />
         </div>
         <UploadImageMediaModal
           isOpen={isUploadModalOpen}
