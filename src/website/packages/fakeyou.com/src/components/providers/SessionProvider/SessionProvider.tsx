@@ -14,6 +14,13 @@ import {
 } from "components/providers/AppStateProvider";
 import { isDevelopment } from "utils/environment";
 
+declare global {
+  interface Window {
+    removeAdsense?: () => void;
+    adsbygoogle?: any[];
+  }
+}
+
 export interface AccountModalMessages {
   loginMessage?: string;
   signupMessage?: string;
@@ -147,24 +154,32 @@ export default function SessionProvider({ children }: SessionProviderProps) {
   useEffect(() => {
     const shouldShowAds = () => {
       if (isDevelopment()) return false;
-
       const isLoggedIn = !!user;
-      const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
+      const hasPaidFeatures =
+        sessionSubscriptions?.hasPaidFeatures?.() ?? false;
       return !isLoggedIn || !hasPaidFeatures;
     };
 
     let timeoutId: NodeJS.Timeout;
 
-    // Only run if session is fully loaded
-    if (sessionResponse && appState.success && !shouldShowAds()) {
-      // @ts-ignore
-      window.removeAdsense?.();
+    try {
+      // Only run if session is fully loaded
+      if (sessionResponse && appState.success && !shouldShowAds()) {
+        // Safely remove adsense script and ads
+        if (typeof window !== "undefined" && window?.removeAdsense) {
+          window.removeAdsense();
+        }
 
-      // Remove the padding that was added for ads
-      timeoutId = setTimeout(() => {
-        document.body.style.paddingBottom = "0";
-        document.body.style.paddingTop = "0";
-      }, 150);
+        // Remove the padding that was added for ads
+        timeoutId = setTimeout(() => {
+          if (document?.body) {
+            document.body.style.paddingBottom = "0";
+            document.body.style.paddingTop = "0";
+          }
+        }, 150);
+      }
+    } catch (error) {
+      console.error("Error in ads effect:", error);
     }
 
     return () => {

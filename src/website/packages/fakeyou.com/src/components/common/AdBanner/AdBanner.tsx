@@ -22,19 +22,32 @@ export function AdBanner({
 }: AdBannerProps) {
   const adRef = useRef<HTMLModElement>(null);
   const [adFailed, setAdFailed] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const { loggedIn, sessionSubscriptions } = useSession();
   const hasPremium = loggedIn && sessionSubscriptions?.hasPaidFeatures();
 
   useEffect(() => {
-    if (hasPremium) {
-      // Disable auto ads for premium users
-      (window as any).adsbygoogle = [];
-      document.querySelectorAll("ins.adsbygoogle").forEach(ad => {
-        ad.remove();
-      });
-      // Remove padding added by auto ads
-      document.body.style.paddingBottom = "0";
+    setMounted(true);
+    return () => {
+      setMounted(false);
+      // Clean up ad element before unmounting
+      if (adRef.current) {
+        try {
+          const parent = adRef.current.parentNode;
+          if (parent) {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            parent.removeChild(adRef.current);
+          }
+        } catch (error) {
+          console.error("Error cleaning up ad:", error);
+        }
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || hasPremium) {
       return;
     }
 
@@ -54,16 +67,21 @@ export function AdBanner({
     }, 2000);
 
     try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {}
-      );
+      // Only push new ad if adsbygoogle exists and component is mounted
+      if ((window as any).adsbygoogle && mounted) {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
+          {}
+        );
+      }
     } catch (err) {
       console.error("Error loading ad:", err);
       setAdFailed(true);
     }
 
-    return () => clearTimeout(timeoutId);
-  }, [hasPremium]);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [hasPremium, mounted]);
 
   if (hasPremium) {
     return null;
@@ -72,24 +90,22 @@ export function AdBanner({
   if (adFailed) {
     if (fallbackContent) {
       return <>{fallbackContent}</>;
-    } else {
-      return (
-        // <div
-        //   className="text-center p-3 d-flex justify-content-center align-items-center"
-        //   style={{
-        //     height: "100px",
-        //     backgroundColor: "#ffffff08",
-        //     width: "100%",
-        //   }}
-        // >
-        //   {<div className="opacity-75">Ad failed to load</div>}
-        // </div>
-        null
-      );
     }
+    return (
+      <div
+        className="text-center p-3 d-flex justify-content-center align-items-center"
+        style={{
+          height: "100px",
+          backgroundColor: "#ffffff08",
+          width: "100%",
+        }}
+      >
+        <div className="opacity-75">Ad failed to load</div>
+      </div>
+    );
   }
 
-  return (
+  return mounted ? (
     <ins
       ref={adRef}
       className={`adsbygoogle text-center ${className}`.trim()}
@@ -106,5 +122,5 @@ export function AdBanner({
       data-ad-format={dataAdFormat}
       data-full-width-responsive={dataFullWidthResponsive.toString()}
     />
-  );
+  ) : null;
 }

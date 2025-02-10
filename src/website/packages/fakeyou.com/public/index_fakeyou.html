@@ -51,22 +51,32 @@
         document.head.appendChild(script);
       }
     </script>
-    <!-- <script>
+    <script>
       window.removeAdsense = function () {
-        const scripts = document.head.getElementsByTagName("script");
-        for (let script of scripts) {
-          if (script.src.includes("adsbygoogle")) {
-            script.remove();
-          }
-        }
+        try {
+          // Remove adsense script
+          const scripts = document.head.getElementsByTagName("script");
+          Array.from(scripts).forEach(script => {
+            if (script.src && script.src.includes("adsbygoogle")) {
+              script.remove();
+            }
+          });
 
-        const adElements = document.getElementsByClassName("adsbygoogle");
-        while (adElements.length > 0) {
-          adElements[0].remove();
+          // Remove ad elements
+          const adElements = document.getElementsByClassName("adsbygoogle");
+          Array.from(adElements).forEach(ad => {
+            if (ad && ad.parentNode) {
+              ad.parentNode.removeChild(ad);
+            }
+          });
+
+          // Clear adsbygoogle array
+          window.adsbygoogle = undefined;
+        } catch (error) {
+          console.error("Error removing adsense:", error);
         }
-        window.adsbygoogle = undefined;
       };
-    </script> -->
+    </script>
     <link
       rel="preload"
       as="image"
