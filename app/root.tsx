@@ -27,6 +27,7 @@ import EnvironmentVariables from "~/Classes/EnvironmentVariables";
 import { pageHeight, pageWidth } from "~/signals";
 
 import { showWizard } from "~/pages/PageEnigma/Wizard/signals/wizard";
+import { BuildEnvironmentType, GetBuildEnvironment } from "./BuildEnvironment";
 
 config.autoAddCss = false; /* eslint-disable import/first */
 
@@ -60,7 +61,16 @@ export const links: LinksFunction = () => [
 
 // .env part 2 add to this
 export async function loader() {
-  const configs = new Configs(Environment.Production); // TODO: Env var config for environment
+  const environmentType = GetBuildEnvironment().getBuildEnvironmentType();
+  const configs = new Configs(environmentType);
+
+  let uploadApiVideo = "https://upload.storyteller.ai";
+
+  switch (environmentType) {
+    case BuildEnvironmentType.Dev:
+      uploadApiVideo = "http://localhost:12345";
+      break;
+  }
 
   const env = {
     // @ts-expect-error ProvessEnv is correct
@@ -89,8 +99,8 @@ export async function loader() {
     DEPLOY_CONTEXT: process.env.DEPLOY_CONTEXT || configs.deployContext || "%DEPLOY_CONTEXT%",
 
     // .env part 3
-    // @ts-expect-error ProvessEnv is correct
-    UPLOAD_API_VIDEO: process.env.UPLOAD_API_VIDEO || configs.uploadApiVideo || "%UPLOAD_API_VIDEO%",
+    //UPLOAD_API_VIDEO: process.env.UPLOAD_API_VIDEO || configs.uploadApiVideo || "%UPLOAD_API_VIDEO%",
+    UPLOAD_API_VIDEO: uploadApiVideo,
   } as Record<string, string | boolean>;
   return { ENV: env };
 }

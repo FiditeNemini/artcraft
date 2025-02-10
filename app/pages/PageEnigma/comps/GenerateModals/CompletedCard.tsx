@@ -8,6 +8,7 @@ import environmentVariables from "~/Classes/EnvironmentVariables";
 import { useSignals } from "@preact/signals-react/runtime";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
 import { styleList } from "~/pages/PageEnigma/styleList";
+import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 
 export function getStyleName(typeInput: string) {
   const foundStyle = styleList.find((style) => {
@@ -26,7 +27,8 @@ export function CompletedCard({ movie, setMovieId }: Props) {
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
   //const downloadLink = `${environmentVariables.values.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
-  const downloadLink = `https://cdn-2.fakeyou.com${movie.public_bucket_path}`;
+  const cdnOrigin = GetCdnOrigin();
+  const downloadLink = `https://${cdnOrigin}${movie.public_bucket_path}`;
 
   const imageUrl = bucketConfig.current.getCdnUrl(
     movie.public_bucket_path + "-thumb.gif",

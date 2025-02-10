@@ -1,4 +1,5 @@
 import environmentVariables from "~/Classes/EnvironmentVariables";
+import { GetCdnOrigin } from "./GetCdnOrigin";
 
 class BucketConfig {
   isLocalDev: boolean;
@@ -20,7 +21,7 @@ class BucketConfig {
     }
     //const media_api_base_url = environmentVariables.values.GOOGLE_API;
     //return `${media_api_base_url}/${bucket}${path}`;
-    const media_api_base_url = 'https://cdn-2.fakeyou.com';
+    const media_api_base_url = GetCdnOrigin();
     return `${media_api_base_url}/${path}`;
   }
 

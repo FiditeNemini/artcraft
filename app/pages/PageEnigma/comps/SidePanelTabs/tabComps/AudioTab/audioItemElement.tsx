@@ -8,6 +8,7 @@ import { cancelNewFromAudioItem, updateAudioItemLength } from "~/signals";
 import { updateDemoAudioItemLength } from "~/pages/PageEnigma/signals";
 
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
+import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
   //const bucket = "vocodes-public";
@@ -16,7 +17,8 @@ function getGcsUrl(bucketRelativePath: string | undefined | null): string {
     path = "/" + path;
   }
   //return `https://storage.googleapis.com/${bucket}${path}`;
-  return `https://cdn-2.fakeyou.com/${path}`;
+  const cdnOrigin = GetCdnOrigin();
+  return `https://${cdnOrigin}/${path}`;
 }
 
 interface Props {

@@ -1,6 +1,9 @@
 
 // This file fixes some of the old Netlify/Environment variable cruft that was introduced.
 // Rather than having 11+ env vars that live in Netlify's stupid UI, we should switch on 
+
+import { BuildEnvironmentType } from "./BuildEnvironment";
+
 // one environment var and use centralized and versioned configs. 
 export enum Environment {
     Dev,
@@ -38,26 +41,31 @@ export class Configs {
     // ??? Something seems to be locked behind this flag in production
     readonly premiumLock: boolean = true;
 
-    readonly uploadApiVideo = "https://upload.storyteller.ai";
+    readonly uploadApiVideo : string = "https://upload.storyteller.ai";
 
     // Why does this have almost the same name? Gross!
-    readonly uploadVideoApi = "https://api.storyteller.ai/v1/media_files/upload/new_video";
+    readonly uploadVideoApi : string = "https://api.storyteller.ai/v1/media_files/upload/new_video";
 
-    constructor(environment: Environment) {
+    constructor(environment: BuildEnvironmentType) {
         switch (environment) {
-            case Environment.Dev:
+            case BuildEnvironmentType.Dev:
+                this.deployContext = "DEVELOPMENT";
+                this.uploadApiVideo = "http://localhost:12345";
+                break;
+            case BuildEnvironmentType.DevProxy:
                 this.deployContext = "DEVELOPMENT";
                 break;
-            case Environment.DevProxy:
-                this.deployContext = "DEVELOPMENT";
-                break;
-            case Environment.Staging:
+            case BuildEnvironmentType.Staging:
                 this.deployContext = "STAGING";
                 break;
-            case Environment.Production:
+            case BuildEnvironmentType.Production:
                 this.deployContext = "PRODUCTION";
                 this.premiumLock = false;
                 break;
         }
+
+        console.debug(`Build environment type: ${environment}`);
+        console.debug(`Deploy context: ${this.deployContext}`);
+        console.debug(`Upload API: ${this.uploadApiVideo}`);
     }
 }

@@ -1,3 +1,4 @@
+import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 import environmentVariables from "./EnvironmentVariables";
 
 export async function get_media_url(mediaId: string) {
@@ -10,7 +11,8 @@ export async function get_media_url(mediaId: string) {
   const bucketPath = json["media_file"]["public_bucket_path"];
 
   //const media_api_base_url = environmentVariables.values.GOOGLE_API;
-  const media_api_base_url = "https://cdn-2.fakeyou.com";
+  const media_api_base_url = GetCdnOrigin();
+
   //const media_base_url = `${media_api_base_url}/vocodes-public`;
   //const media_url = `${media_base_url}${bucketPath}`;
   const media_url = `${media_api_base_url}${bucketPath}`;

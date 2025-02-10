@@ -1,11 +1,14 @@
 import { signal } from "@preact/signals-core";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { AssetType } from "~/enums";
+import { GetFrontendEnvironment } from "~/Classes/GetFrontendEnvironment";
 
 export const demoCharacterItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "m_gff67btr810vg3ng9szj85zskztcgy",
+    media_id: GetFrontendEnvironment().getIsLocalDev() ? 
+      "m_8dvne30awgsyrb45xvha9f23gtgg8w" : // Local development
+      "m_gff67btr810vg3ng9szj85zskztcgy", // Production
     type: AssetType.CHARACTER,
     name: "Story Girl",
     thumbnail: "/resources/characters/img13.png",

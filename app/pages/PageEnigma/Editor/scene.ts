@@ -13,6 +13,8 @@ import { ChromaKeyMaterial } from "./chromakey";
 import { TimeLine } from "./timeline";
 import { ClipGroup, ClipType } from "~/enums";
 import { ClipUI } from "../clips/clip_ui";
+import { GetCdnOrigin } from "~/api/GetCdnOrigin";
+import { GetFrontendEnvironment } from "~/Classes/GetFrontendEnvironment";
 
 class Scene {
   name: string;
@@ -353,7 +355,12 @@ class Scene {
 
   async _create_camera_obj() {
     const camera_position = new THREE.Vector3(0, 0.6, 1.5);
-    const camera_id = "m_cxh4asqhapdz10j880755dg4yevshb";
+
+    // TODO(bt,2025-02-10): Make the local dev assets more configurable or seedable.
+    const camera_id = GetFrontendEnvironment().getIsLocalDev() ? 
+      "m_4djqzq89mbn6sdbbqm25ks6drhr55k" :  // Local development
+      "m_cxh4asqhapdz10j880755dg4yevshb"; // Production
+
     const camera_obj = await this.loadGlbWithPlaceholder(
       camera_id,
       "Camera",
@@ -397,7 +404,7 @@ class Scene {
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
     //const media_base_url = `${media_api_base_url}/vocodes-public`;
-    const media_base_url = "https://cdn-2.fakeyou.com";
+    const media_base_url = GetCdnOrigin();
     const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }

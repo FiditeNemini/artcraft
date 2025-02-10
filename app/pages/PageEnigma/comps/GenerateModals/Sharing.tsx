@@ -14,6 +14,7 @@ import { generateMovieId, viewMyMovies } from "~/pages/PageEnigma/signals";
 import dayjs from "dayjs";
 import environmentVariables from "~/Classes/EnvironmentVariables";
 import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
+import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 
 interface Props {
   mediaFile: MediaFile;
@@ -31,7 +32,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   // TODO: ApiManager should provide all endpoints
   //const media_api_base_url = environmentVariables.values.GOOGLE_API;
   //const downloadLink = `${media_api_base_url}/vocodes-public${mediaFile?.public_bucket_path}`;
-  const media_api_base_url = 'https://cdn-2.fakeyou.com';
+  const media_api_base_url = GetCdnOrigin();
   const downloadLink = `${media_api_base_url}${mediaFile?.public_bucket_path}`;
 
   const handleCopyLink = () => {
