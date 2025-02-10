@@ -574,7 +574,7 @@ export default function WeightPage() {
           </div>
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
-              <AdHorizontal format="square" />
+              <AdHorizontal format="square" tall={true} />
 
               {callToAction() && (
                 <div className="d-flex gap-2 flex-wrap">{callToAction()}</div>

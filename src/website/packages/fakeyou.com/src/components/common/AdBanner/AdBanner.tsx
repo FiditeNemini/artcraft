@@ -24,8 +24,20 @@ export function AdBanner({
   const [adFailed, setAdFailed] = useState(false);
 
   const { loggedIn, sessionSubscriptions } = useSession();
+  const hasPremium = loggedIn && sessionSubscriptions?.hasPaidFeatures();
 
   useEffect(() => {
+    if (hasPremium) {
+      // Disable auto ads for premium users
+      (window as any).adsbygoogle = [];
+      document.querySelectorAll("ins.adsbygoogle").forEach(ad => {
+        ad.remove();
+      });
+      // Remove padding added by auto ads
+      document.body.style.paddingBottom = "0";
+      return;
+    }
+
     // Check if adsbygoogle is blocked or not loaded
     if (typeof window === "undefined" || !(window as any).adsbygoogle) {
       setAdFailed(true);
@@ -51,9 +63,9 @@ export function AdBanner({
     }
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [hasPremium]);
 
-  if (loggedIn && sessionSubscriptions?.hasPaidFeatures()) {
+  if (hasPremium) {
     return null;
   }
 
@@ -62,17 +74,17 @@ export function AdBanner({
       return <>{fallbackContent}</>;
     } else {
       return (
-        <div
-          className="text-center p-3 d-flex justify-content-center align-items-center"
-          style={{
-            height: "100px",
-            backgroundColor: "#ffffff08",
-            width: "100%",
-          }}
-        >
-          {<div className="opacity-75">Ad failed to load</div>}
-        </div>
-        // null
+        // <div
+        //   className="text-center p-3 d-flex justify-content-center align-items-center"
+        //   style={{
+        //     height: "100px",
+        //     backgroundColor: "#ffffff08",
+        //     width: "100%",
+        //   }}
+        // >
+        //   {<div className="opacity-75">Ad failed to load</div>}
+        // </div>
+        null
       );
     }
   }
@@ -86,7 +98,7 @@ export function AdBanner({
         minWidth: "400px",
         maxWidth: "1200px",
         width: "100%",
-        height: tall ? "280px" : "90px",
+        height: tall ? "auto" : "90px",
         ...style,
       }}
       data-ad-client="ca-pub-5350229982172647"
