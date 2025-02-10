@@ -92,16 +92,17 @@ export function AdBanner({
       return <>{fallbackContent}</>;
     }
     return (
-      <div
-        className="text-center p-3 d-flex justify-content-center align-items-center"
-        style={{
-          height: "100px",
-          backgroundColor: "#ffffff08",
-          width: "100%",
-        }}
-      >
-        <div className="opacity-75">Ad failed to load</div>
-      </div>
+      // <div
+      //   className="text-center p-3 d-flex justify-content-center align-items-center"
+      //   style={{
+      //     height: "100px",
+      //     backgroundColor: "#ffffff08",
+      //     width: "100%",
+      //   }}
+      // >
+      //   <div className="opacity-75">Ad failed to load</div>
+      // </div>
+      null
     );
   }
 
