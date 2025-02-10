@@ -57,6 +57,7 @@ import { GetWebsiteLink } from "@storyteller/components/src/env/GetWebsiteLink";
 import { AITools } from "components/marketing";
 import { useSession } from "hooks";
 import { LipsyncTokenMap } from "../lipsync/LipsyncTokens";
+import { AdHorizontal } from "components/common/AdBanner/AdHorizontal";
 // import { FeaturedVideos } from "components/marketing/AITools/FeaturedVideos";
 
 export default function MediaPage({
@@ -661,6 +662,8 @@ export default function MediaPage({
           </div>
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
+              <AdHorizontal format="square" />
+
               <div className="d-flex gap-2 flex-wrap">
                 {mediaFile?.media_type === MediaFileType.Audio &&
                 mediaFile?.maybe_model_weight_info?.weight_token &&
@@ -1001,11 +1004,7 @@ export default function MediaPage({
       </div>
 
       <Container type="panel" className="pt-5 mt-5">
-        {/* <Panel clear={true}>
-          <FeaturedVideos />
-        </Panel> */}
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
         </Panel>
       </Container>

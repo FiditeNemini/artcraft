@@ -609,9 +609,9 @@ function TtsModelListPage(props: Props) {
       </Container>
 
       <Container type="panel" className="pt-5 mt-5">
-        <h2 className="fw-bold mb-3">Try our other AI tools</h2>
-        <AITools />
-        {/*<StorytellerStudioCTA />*/}
+        <Panel clear={true}>
+          <AITools />
+        </Panel>
       </Container>
     </>
   );

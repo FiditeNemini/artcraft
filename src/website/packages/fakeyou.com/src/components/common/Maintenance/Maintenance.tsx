@@ -49,7 +49,6 @@ export default function Maintenance({
       </Container>
 
       <Panel clear={true} className="mt-5">
-        <h2 className="fw-bold mb-3">Try our other AI tools</h2>
         <AITools />
       </Panel>
     </Container>

@@ -13,7 +13,6 @@ import PostlaunchLanding from "./storyteller/PostlaunchLanding/PostlaunchLanding
 import MentionsSection from "components/common/MentionsSection";
 import { useSession } from "hooks";
 import { useFeatureFlags } from "hooks/useFeatureFlags";
-import { AdHorizontal } from "components/common/AdBanner";
 
 export default function LandingPage() {
   PosthogClient.recordPageview();
@@ -42,8 +41,6 @@ export default function LandingPage() {
             {!isVideoToolsEnabled() && !sessionWrapper.isLoggedIn() && (
               <FakeYouLandingHeader />
             )}
-
-            <AdHorizontal />
 
             <Dashboard />
           </Container>

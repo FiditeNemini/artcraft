@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Panel } from "components/common";
 import "./FAQSection.scss";
 import { Helmet } from "react-helmet-async";
+import { AdHorizontal } from "../AdBanner";
 
 interface FAQItem {
   question: string;
@@ -40,6 +41,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({
         </script>
       </Helmet>
       <Container type="panel" className={className}>
+        <AdHorizontal format="horizontal" className="mb-5" />
         <Panel padding={true} className="p-4 faq-section">
           <h2 className="fw-bold mb-5">{title}</h2>
           <section aria-label="FAQ Section">

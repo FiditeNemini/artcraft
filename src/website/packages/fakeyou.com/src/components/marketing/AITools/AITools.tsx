@@ -4,6 +4,7 @@ import { useLocalize } from "hooks";
 import AIToolsRow from "./AIToolsRow";
 import { useLocation } from "react-router-dom";
 import { isVideoToolsEnabled } from "config/featureFlags";
+import { AdHorizontal } from "components/common/AdBanner";
 
 export default function AITools() {
   const { t } = useLocalize("LandingPage");
@@ -225,5 +226,13 @@ export default function AITools() {
     }
   }
 
-  return <AIToolsRow {...{ items }} />;
+  return (
+    <>
+      <AdHorizontal format="horizontal" />
+      <h1 className="fw-bold mt-4 mb-3">
+        {currentPath === "/" ? "AI Tools" : "Try other AI Tools"}
+      </h1>
+      <AIToolsRow {...{ items }} />
+    </>
+  );
 }

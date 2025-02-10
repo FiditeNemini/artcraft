@@ -52,6 +52,7 @@ import {
   LanguageTag,
 } from "@storyteller/components/src/api/Languages";
 import "./WeightTags.scss";
+import { AdHorizontal } from "components/common/AdBanner";
 
 export default function WeightPage() {
   const { canEditTtsModel, canBanUsers, user } = useSession();
@@ -573,7 +574,11 @@ export default function WeightPage() {
           </div>
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
-              <div className="d-flex gap-2 flex-wrap">{callToAction()}</div>
+              <AdHorizontal format="square" />
+
+              {callToAction() && (
+                <div className="d-flex gap-2 flex-wrap">{callToAction()}</div>
+              )}
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">
@@ -697,11 +702,7 @@ export default function WeightPage() {
       </div>
 
       <Container type="panel" className="pt-5 mt-5">
-        {/* <Panel clear={true}>
-          <FeaturedVideos />
-        </Panel> */}
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
         </Panel>
       </Container>

@@ -22,6 +22,7 @@ import {
 } from "@storyteller/components/src/env/GetWebsite";
 import { isVideoToolsEnabled } from "config/featureFlags";
 import { IconDefinition } from "@fortawesome/free-brands-svg-icons";
+import { AdHorizontal } from "components/common/AdBanner";
 
 interface FooterItem {
   link: string;
@@ -152,6 +153,10 @@ function FooterNav() {
 
   return (
     <>
+      <Container type="panel" className="pt-5 mt-5">
+        <AdHorizontal tall={true} />
+      </Container>
+
       {!isOnStudioPage && (
         <footer id="footer">
           <Container type="panel" className="py-5">

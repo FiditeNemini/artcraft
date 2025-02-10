@@ -235,7 +235,6 @@ export default function SeedVC() {
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
         </Panel>
       </Container>

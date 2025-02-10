@@ -372,7 +372,6 @@ export default function NewTTS() {
           <FeaturedVideos />
         </Panel> */}
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our video AI tools</h2>
           <AITools />
         </Panel>
         {/* <MentionsSection /> */}

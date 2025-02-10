@@ -472,15 +472,9 @@ export default function NewVC() {
       <FAQSection faqItems={faqItems} />
 
       <Container type="panel" className="pt-5 mt-5">
-        {/* <Panel clear={true}>
-          <FeaturedVideos />
-        </Panel> */}
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
         </Panel>
-        {/* <MentionsSection /> */}
-        {/* <StorytellerStudioCTA /> */}
       </Container>
     </>
   );

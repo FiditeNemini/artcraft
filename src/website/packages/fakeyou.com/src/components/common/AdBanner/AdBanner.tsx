@@ -8,6 +8,7 @@ interface AdBannerProps {
   className?: string;
   style?: React.CSSProperties;
   fallbackContent?: React.ReactNode;
+  tall?: boolean;
 }
 
 export function AdBanner({
@@ -17,9 +18,11 @@ export function AdBanner({
   className = "",
   style = {},
   fallbackContent,
+  tall = false,
 }: AdBannerProps) {
   const adRef = useRef<HTMLModElement>(null);
   const [adFailed, setAdFailed] = useState(false);
+
   const { loggedIn, sessionSubscriptions } = useSession();
 
   useEffect(() => {
@@ -59,17 +62,17 @@ export function AdBanner({
       return <>{fallbackContent}</>;
     } else {
       return (
-        // <div
-        //   className="text-center p-3 d-flex justify-content-center align-items-center"
-        //   style={{
-        //     height: "100px",
-        //     backgroundColor: "#ffffff08",
-        //     width: "100%",
-        //   }}
-        // >
-        //   {<div className="opacity-75">Ad failed to load</div>}
-        // </div>
-        null
+        <div
+          className="text-center p-3 d-flex justify-content-center align-items-center"
+          style={{
+            height: "100px",
+            backgroundColor: "#ffffff08",
+            width: "100%",
+          }}
+        >
+          {<div className="opacity-75">Ad failed to load</div>}
+        </div>
+        // null
       );
     }
   }
@@ -81,9 +84,9 @@ export function AdBanner({
       style={{
         display: "block",
         minWidth: "400px",
-        maxWidth: "970px",
+        maxWidth: "1200px",
         width: "100%",
-        height: "90px",
+        height: tall ? "280px" : "90px",
         ...style,
       }}
       data-ad-client="ca-pub-5350229982172647"

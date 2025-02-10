@@ -289,7 +289,7 @@ export default function F5TTS() {
               <p>
                 F5-TTS is an AI-driven text-to-speech tool that transforms
                 written text into lifelike speech. With real-time processing,
-                it’s great for generating dynamic audio content, whether it's
+                it's great for generating dynamic audio content, whether it's
                 for voice-overs, digital storytelling, or any other project that
                 requires high-quality spoken output.
               </p>
@@ -333,7 +333,6 @@ export default function F5TTS() {
 
       <Container type="panel" className="pt-5 mt-5">
         <Panel clear={true}>
-          <h2 className="fw-bold mb-3">Try our other AI tools</h2>
           <AITools />
         </Panel>
       </Container>

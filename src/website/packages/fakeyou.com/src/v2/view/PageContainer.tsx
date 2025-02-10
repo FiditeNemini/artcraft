@@ -1,10 +1,11 @@
 import React, { lazy, Suspense } from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, useLocation } from "react-router-dom";
 import ProfileSidePanel from "components/layout/ProfileSidePanel/ProfileSidePanel";
 import TopNav from "components/layout/TopNav/TopNav";
 import ScrollToTop from "./_common/ScrollToTop";
 import { Spinner } from "components/common";
 import LandingPage from "./pages/landing/LandingPage";
+import { AdHorizontal } from "components/common/AdBanner";
 
 const routes = [
   {
@@ -593,12 +594,17 @@ const routes = [
 );
 
 export default function PageContainer() {
+  const location = useLocation();
+
+  const hideAdPaths = ["/login", "/signup"];
+  const shouldShowAd = !hideAdPaths.includes(location.pathname);
+
   return (
     <>
       <ScrollToTop />
       <div id="wrapper" className="no-padding">
         <TopNav />
-
+        {shouldShowAd && <AdHorizontal container={true} />}
         <ProfileSidePanel />
         <Switch>{routes}</Switch>
       </div>

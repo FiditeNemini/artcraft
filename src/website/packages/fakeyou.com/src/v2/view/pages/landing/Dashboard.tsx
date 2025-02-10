@@ -7,14 +7,13 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Panel } from "components/common";
 import { AITools } from "components/marketing";
-import { useLocalize, useSession } from "hooks";
+import { useSession } from "hooks";
 import { useFeatureFlags } from "hooks/useFeatureFlags";
 import React from "react";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const { sessionWrapper } = useSession();
-  const { t } = useLocalize("LandingPage");
   const isLoggedIn = sessionWrapper.isLoggedIn();
   const { isVideoToolsEnabled } = useFeatureFlags();
 
@@ -69,16 +68,6 @@ export default function Dashboard() {
       }}
       clear={true}
     >
-      <h1
-        {...{
-          className: `fw-bold mb-4 ${!isVideoToolsEnabled ? " mt-4" : ""}`,
-        }}
-      >
-        {!isVideoToolsEnabled
-          ? "Explore our collection of AI tools"
-          : t("productsTitle")}
-      </h1>
-
       <AITools />
 
       {uploadModelSection}

@@ -3,6 +3,7 @@ import { Container } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "./HowToUseSection.scss";
+import { AdHorizontal } from "../AdBanner";
 
 interface StepItem {
   icon: IconDefinition;
@@ -23,6 +24,7 @@ const HowToUseSection: React.FC<HowToUseSectionProps> = ({
 }) => {
   return (
     <Container type="panel" className={className}>
+      <AdHorizontal format="horizontal" className="mt-5" />
       <div className="how-to-use-section p-4">
         <h2 className="fw-bold mb-5">{title}</h2>
         <div className="row g-5">

@@ -705,7 +705,6 @@ export default function TtsModelViewPage() {
           </p>
         </div>
 
-        <h3>Or checkout our collection of AI tools</h3>
         <AITools />
       </div>
     );
