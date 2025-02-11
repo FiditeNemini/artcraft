@@ -147,7 +147,7 @@ pub async fn process_single_studio_gen2_job(
 
   // TODO REPLACE
   let unaltered_video_path = unaltered_video_file.file_path.clone();
-  let output_video_path = work_paths.output_dir.path().join("resampled_input.mp4");
+  let resample_output_video_path = work_paths.output_dir.path().join("resampled_input.mp4");
 
   let maybe_duration_and_fps
       = (studio_args.trim_duration_millis, studio_args.fps);
@@ -156,31 +156,34 @@ pub async fn process_single_studio_gen2_job(
       match maybe_duration_and_fps {
         (Some(duration_millis), Some(fps)) => Some(Box::new(FfmpegResampleFpsAndDurationArgs {
           input_video_file: &unaltered_video_path,
-          output_video_file: &output_video_path,
+          output_video_file: &resample_output_video_path,
           fps: fps as usize,
           trim_to_duration: Duration::from_millis(duration_millis),
         })),
         (Some(duration_millis), None) => Some(Box::new(FfmpegResampleDurationArgs {
           input_video_file: &unaltered_video_path,
-          output_video_file: &output_video_path,
+          output_video_file: &resample_output_video_path,
           trim_to_duration: Duration::from_millis(duration_millis),
         })),
         (None, Some(fps)) => Some(Box::new(FfmpegResampleFpsArgs {
           input_video_file: &unaltered_video_path,
-          output_video_file: &output_video_path,
+          output_video_file: &resample_output_video_path,
           fps: fps as usize,
         })),
         (None, None) => None,
       };
 
-  let mut resampled_video_path = output_video_path.clone();
+  let inference_input_video_path;
 
   match maybe_ffmpeg_args.as_deref() {
     None => {
       // No new resampled file.
-      resampled_video_path = unaltered_video_file.file_path.clone();
+      inference_input_video_path = unaltered_video_file.file_path.clone();
+      info!("Not resampling video file. Will use the following as input: {:?}", &inference_input_video_path);
     }
     Some(ffmpeg_args) => {
+      info!("Resampling video file. Will use the following args to ffmpeg: {:?}", &ffmpeg_args.to_command_string());
+      
       let command_exit_status = gen2_deps.ffmpeg
           .run_with_subprocess(RunAsSubprocessArgs {
             args: Box::new(ffmpeg_args),
@@ -189,23 +192,38 @@ pub async fn process_single_studio_gen2_job(
           });
 
       if !command_exit_status.is_success() {
+        inference_input_video_path = unaltered_video_file.file_path.clone();
         error!("Resample video failed: {:?} ; we'll revert to the original.", command_exit_status);
-        resampled_video_path = unaltered_video_file.file_path.clone();
+      } else {
+        inference_input_video_path = resample_output_video_path.clone();
+        info!("Video resample successful. Will use the following as input: {:?}", &inference_input_video_path);
       }
     }
   }
 
   // ========================= RESIZE IMAGE ======================== //
 
-  let resized_image_path = work_paths.output_dir.path().join("resized_image.png");
+  let skip_image_resize = studio_args.skip_image_resize.unwrap_or(false);
+  
+  let mut inference_input_image_path = unaltered_image_file.file_path.clone();
+  let mut maybe_dimensions = None;
+  
+  if !skip_image_resize {
+    info!("Resizing input image...");
+    
+    let resized_image_path = work_paths.output_dir.path().join("resized_image.png");
 
-  let image_resize_type = match studio_job_type {
-    StudioModelPipeline::None => return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set"))),
-    StudioModelPipeline::AnimateX(_) => ImageResizeType::AnimateX,
-    StudioModelPipeline::StableAnimator(_) => ImageResizeType::StableAnimator,
-  };
+    let image_resize_type = match studio_job_type {
+      StudioModelPipeline::None => return Err(ProcessSingleJobError::Other(anyhow!("Studio job type not set"))),
+      StudioModelPipeline::AnimateX(_) => ImageResizeType::AnimateX,
+      StudioModelPipeline::StableAnimator(_) => ImageResizeType::StableAnimator,
+    };
 
-  let dimensions = resize_image_for_studio(&unaltered_image_file.file_path, &resized_image_path, image_resize_type)?;
+    let dimensions = resize_image_for_studio(&unaltered_image_file.file_path, &resized_image_path, image_resize_type)?;
+
+    inference_input_image_path = resized_image_path;
+    maybe_dimensions = Some(dimensions);
+  }
 
   // ==================== RUN INFERENCE ==================== //
 
@@ -247,7 +265,7 @@ pub async fn process_single_studio_gen2_job(
             stderr_output_file: &stderr_output_file,
             stdout_output_file: &stdout_output_file,
             model_directory: &deps.model_directory_path,
-            source_video_path: &resampled_video_path,
+            source_video_path: &inference_input_video_path,
             saved_pose_pkl_dir: &pose_pkl_dir,
             saved_pose_frames_dir: &pose_frames_dir,
             saved_original_frames_dir: &original_frames_dir,
@@ -261,12 +279,12 @@ pub async fn process_single_studio_gen2_job(
             stderr_output_file: &stderr_output_file,
             stdout_output_file: &stdout_output_file,
             model_directory: &deps.model_directory_path,
-            image_file: &resized_image_path,
+            image_file: &inference_input_image_path,
             saved_pose_pkl_file: &pose_pkl_file,
             saved_pose_frames_dir: &pose_frames_dir,
             saved_original_frames_dir: &original_frames_dir,
-            width: Some(dimensions.width as u64),
-            height: Some(dimensions.height as u64),
+            width: maybe_dimensions.as_ref().map(|m| m.width as u64),
+            height: maybe_dimensions.as_ref().map(|m| m.height as u64),
             max_frames: studio_args.max_frames,
             result_filename: &video_output_path,
           }).await;
@@ -290,8 +308,8 @@ pub async fn process_single_studio_gen2_job(
             InferenceArgs {
               stderr_output_file: &stderr_output_file,
               stdout_output_file: &stdout_output_file,
-              start_image_path: &resized_image_path,
-              pre_pose_video_path: Some(resampled_video_path.as_ref()),
+              start_image_path: &inference_input_image_path,
+              pre_pose_video_path: Some(inference_input_video_path.as_ref()),
               pose_images_dir: &pose_frames_dir,
               frame_output_dir: &video_frames_output_dir,
               video_output_path: &video_output_path,
@@ -428,27 +446,18 @@ pub async fn process_single_studio_gen2_job(
   })
 }
 
-// https://tokio.rs/tokio/topics/shutdown
-// https://tokio.rs/tokio/tutorial/select
 async fn maybe_debug_sleep(args: &StudioGen2Payload) {
   if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
     info!("Debug sleeping for millis: {sleep_millis}");
-
+    // We wait for the specified timeout. If a SIGTERM is received during this time, 
+    // we'll panic and exit the program.
+    // https://tokio.rs/tokio/tutorial/select
+    // https://tokio.rs/tokio/topics/shutdown
     tokio::select! {
       _ = tokio::signal::ctrl_c() => {
         panic!("Ctrl-C signal received, shutting down.");
       },
       _ = tokio::time::sleep(Duration::from_millis(sleep_millis)) => {},
     }
-
-    //match tokio::signal::ctrl_c().await {
-    //  Ok(()) => {
-    //    tokio::time::sleep(Duration::from_millis(sleep_millis)).await;
-    //  },
-    //  Err(err) => {
-    //    eprintln!("Unable to listen for shutdown signal: {}", err);
-    //    // we also shut down in case of error
-    //  },
-    //}
   }
 }

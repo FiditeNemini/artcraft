@@ -50,4 +50,8 @@ pub struct StudioGen2Payload {
   #[serde(rename = "td")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub trim_duration_millis: Option<u64>,
+  
+  #[serde(rename = "ski")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub skip_image_resize: Option<bool>,
 }

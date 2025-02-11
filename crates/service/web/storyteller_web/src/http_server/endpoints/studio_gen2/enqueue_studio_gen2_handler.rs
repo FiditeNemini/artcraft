@@ -81,6 +81,7 @@ pub struct EnqueueStudioGen2Request {
   // TODO
   pub max_frames: Option<u64>,
   pub rounds: Option<u64>,
+  pub skip_image_resize: Option<bool>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -281,6 +282,7 @@ pub async fn enqueue_studio_gen2_handler(
     max_frames: request.max_frames,
     rounds: request.rounds,
     trim_duration_millis: request.trim_duration_millis,
+    skip_image_resize: request.skip_image_resize,
   };
 
   info!("Creating ComfyUI job record...");
