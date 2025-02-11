@@ -82,6 +82,12 @@ pub struct EnqueueStudioGen2Request {
   pub max_frames: Option<u64>,
   pub rounds: Option<u64>,
   pub skip_image_resize: Option<bool>,
+  
+  /// Model image tensor width (we do not resize images to this!)
+  pub tensor_image_width: Option<u64>,
+  
+  /// Model image tensor height (we do not resize images to this!)
+  pub tensor_image_height: Option<u64>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -283,6 +289,8 @@ pub async fn enqueue_studio_gen2_handler(
     rounds: request.rounds,
     trim_duration_millis: request.trim_duration_millis,
     skip_image_resize: request.skip_image_resize,
+    tensor_image_width: request.tensor_image_width,
+    tensor_image_height: request.tensor_image_height,
   };
 
   info!("Creating ComfyUI job record...");

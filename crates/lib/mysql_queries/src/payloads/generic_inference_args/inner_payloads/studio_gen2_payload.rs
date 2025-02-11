@@ -54,4 +54,12 @@ pub struct StudioGen2Payload {
   #[serde(rename = "ski")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub skip_image_resize: Option<bool>,
+  
+  #[serde(rename = "tw")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub tensor_image_width: Option<u64>,
+  
+  #[serde(rename = "th")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub tensor_image_height: Option<u64>,
 }

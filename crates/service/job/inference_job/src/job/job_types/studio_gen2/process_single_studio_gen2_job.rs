@@ -2,7 +2,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_dependencies::AnimateXDependencies;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_inference_command::AnimateXInferenceArgs;
-use crate::job::job_types::studio_gen2::animate_x::animate_x_process_frames_command::{AnimateXProcessFramesCommand, ProcessFramesArgs};
+use crate::job::job_types::studio_gen2::animate_x::animate_x_process_frames_command::ProcessFramesArgs;
 use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadDetails, DownloadFileForStudioArgs};
 use crate::job::job_types::studio_gen2::resize_image_for_studio::{resize_image_for_studio, ImageResizeType};
 use crate::job::job_types::studio_gen2::stable_animator::stable_animator_command::InferenceArgs;
@@ -10,31 +10,27 @@ use crate::job::job_types::studio_gen2::stable_animator::stable_animator_depende
 use crate::job::job_types::studio_gen2::studio_gen2_dirs::StudioGen2Dirs;
 use crate::job::job_types::studio_gen2::validate_and_save_results::{validate_and_save_results, SaveResultsArgs};
 use crate::state::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg::ffmpeg_resample_duration::FfmpegResampleDurationArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_and_duration::FfmpegResampleFpsAndDurationArgs;
 use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_args::FfmpegResampleFpsArgs;
 use anyhow::anyhow;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_deletion::safe_delete_possible_files_and_directories::safe_delete_possible_files_and_directories;
-use images::image::io::Reader;
-use images::resize_preserving_aspect::resize_preserving_aspect;
 use log::{error, info, warn};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::{Cu, S2};
 use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::utils::transactor::Transactor;
-use std::fs::{read_to_string, File};
-use std::io::BufReader;
-use std::ops::Deref;
+use std::fs::read_to_string;
 use std::path::Path;
 use std::time::{Duration, Instant};
-use enums::by_table::media_files::media_file_type::MediaFileType;
 use subprocess_common::command_runner::command_args::CommandArgs;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
-use crate::util::common_commands::ffmpeg::ffmpeg_resample_duration::FfmpegResampleDurationArgs;
-use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_and_duration::FfmpegResampleFpsAndDurationArgs;
 
 enum StudioModelPipeline<'a> {
   None,
@@ -288,8 +284,10 @@ pub async fn process_single_studio_gen2_job(
             saved_pose_pkl_file: &pose_pkl_file,
             saved_pose_frames_dir: &pose_frames_dir,
             saved_original_frames_dir: &original_frames_dir,
-            width: maybe_dimensions.as_ref().map(|m| m.width as u64),
-            height: maybe_dimensions.as_ref().map(|m| m.height as u64),
+            width: studio_args.tensor_image_width,
+            height: studio_args.tensor_image_height,
+            //width: maybe_dimensions.as_ref().map(|m| m.width as u64),
+            //height: maybe_dimensions.as_ref().map(|m| m.height as u64),
             max_frames: studio_args.max_frames,
             result_filename: &video_output_path,
           }).await;
