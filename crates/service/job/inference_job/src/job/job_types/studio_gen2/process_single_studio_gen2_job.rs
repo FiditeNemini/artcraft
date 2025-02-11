@@ -25,9 +25,12 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 use mysql_queries::payloads::generic_inference_args::inner_payloads::studio_gen2_payload::StudioGen2Payload;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::utils::transactor::Transactor;
+use mysql_queries::queries::generic_inference::job::count_untried_jobs_of_type::count_untried_jobs_of_type;
+use mysql_queries::queries::generic_inference::job::count_untried_jobs_of_type::CountUntriedJobsOfTypeArgs;
 use std::fs::read_to_string;
 use std::path::Path;
 use std::time::{Duration, Instant};
+use sqlx::MySqlPool;
 use subprocess_common::command_runner::command_args::CommandArgs;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
@@ -419,9 +422,11 @@ pub async fn process_single_studio_gen2_job(
   };
 
   // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
+  
+  info!("Inference took duration to complete: {:?}", &inference_duration);
 
   print_work_dirs(&work_paths);
-  maybe_debug_sleep(studio_args).await;
+  maybe_debug_sleep_polling_jobs(studio_args, &deps.db.mysql_pool).await;
 
   info!("Cleaning up temporary files...");
 
@@ -463,6 +468,38 @@ async fn maybe_debug_sleep(args: &StudioGen2Payload) {
         panic!("Ctrl-C signal received, shutting down.");
       },
       _ = tokio::time::sleep(Duration::from_millis(sleep_millis)) => {},
+    }
+  }
+}
+
+async fn maybe_debug_sleep_polling_jobs(args: &StudioGen2Payload, mysql_pool: &MySqlPool) {
+  if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
+    info!("Debug sleeping for millis: {sleep_millis}");
+    // We wait for the specified timeout. If a SIGTERM is received during this time,
+    // we'll panic and exit the program.
+    // https://tokio.rs/tokio/tutorial/select
+    // https://tokio.rs/tokio/topics/shutdown
+    tokio::select! {
+      _ = tokio::signal::ctrl_c() => {
+        panic!("Ctrl-C signal received, shutting down.");
+      },
+      _ = {
+        let wait_until = Instant::now().checked_add(Duration::from_millis(sleep_millis));
+        while wait_until.gt(Instant::now()) {
+          let result  = count_untried_jobs_of_type(CountUntriedJobsOfTypeArgs {
+            maybe_scope_by_job_type: None,
+            maybe_scope_by_model_type: None,
+            maybe_scope_by_job_category: None,
+            mysql_pool: mysql_pool,
+          }).await;
+          
+          if let Ok(res) = result {
+            if res.job_count > 0 {
+              return;
+            }
+          }
+        }
+      },
     }
   }
 }
