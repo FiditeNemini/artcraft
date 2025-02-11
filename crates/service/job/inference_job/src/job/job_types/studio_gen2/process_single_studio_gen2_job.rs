@@ -147,20 +147,20 @@ pub async fn process_single_studio_gen2_job(
 
   // TODO REPLACE
   let unaltered_video_path = unaltered_video_file.file_path.clone();
-  let output_video_path = unaltered_video_path.clone();
-  
-  let maybe_duration_and_fps 
+  let output_video_path = work_paths.output_dir.path().join("resampled_input.mp4");
+
+  let maybe_duration_and_fps
       = (studio_args.trim_duration_millis, studio_args.fps);
-  
-  let maybe_ffmpeg_args : Option<Box<dyn CommandArgs>> = 
+
+  let maybe_ffmpeg_args : Option<Box<dyn CommandArgs>> =
       match maybe_duration_and_fps {
-        (Some(duration_millis), Some(fps)) => Some(Box::new(FfmpegResampleFpsAndDurationArgs { 
+        (Some(duration_millis), Some(fps)) => Some(Box::new(FfmpegResampleFpsAndDurationArgs {
           input_video_file: &unaltered_video_path,
           output_video_file: &output_video_path,
           fps: fps as usize,
           trim_to_duration: Duration::from_millis(duration_millis),
         })),
-        (Some(duration_millis), None) => Some(Box::new(FfmpegResampleDurationArgs { 
+        (Some(duration_millis), None) => Some(Box::new(FfmpegResampleDurationArgs {
           input_video_file: &unaltered_video_path,
           output_video_file: &output_video_path,
           trim_to_duration: Duration::from_millis(duration_millis),
@@ -428,9 +428,27 @@ pub async fn process_single_studio_gen2_job(
   })
 }
 
+// https://tokio.rs/tokio/topics/shutdown
+// https://tokio.rs/tokio/tutorial/select
 async fn maybe_debug_sleep(args: &StudioGen2Payload) {
   if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
     info!("Debug sleeping for millis: {sleep_millis}");
-    tokio::time::sleep(Duration::from_millis(sleep_millis)).await;
+
+    tokio::select! {
+      _ = tokio::signal::ctrl_c() => {
+        panic!("Ctrl-C signal received, shutting down.");
+      },
+      _ = tokio::time::sleep(Duration::from_millis(sleep_millis)) => {},
+    }
+
+    //match tokio::signal::ctrl_c().await {
+    //  Ok(()) => {
+    //    tokio::time::sleep(Duration::from_millis(sleep_millis)).await;
+    //  },
+    //  Err(err) => {
+    //    eprintln!("Unable to listen for shutdown signal: {}", err);
+    //    // we also shut down in case of error
+    //  },
+    //}
   }
 }
