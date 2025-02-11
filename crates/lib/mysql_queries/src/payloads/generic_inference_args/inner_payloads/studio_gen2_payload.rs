@@ -46,4 +46,8 @@ pub struct StudioGen2Payload {
   #[serde(rename = "rnd")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub rounds: Option<u64>,
+  
+  #[serde(rename = "td")]
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub trim_duration_millis: Option<u64>,
 }

@@ -76,6 +76,9 @@ pub struct EnqueueStudioGen2Request {
   pub fps: Option<u64>,
 
   // TODO
+  pub trim_duration_millis: Option<u64>,
+
+  // TODO
   pub max_frames: Option<u64>,
   pub rounds: Option<u64>,
 }
@@ -277,6 +280,7 @@ pub async fn enqueue_studio_gen2_handler(
     fps: request.fps,
     max_frames: request.max_frames,
     rounds: request.rounds,
+    trim_duration_millis: request.trim_duration_millis,
   };
 
   info!("Creating ComfyUI job record...");

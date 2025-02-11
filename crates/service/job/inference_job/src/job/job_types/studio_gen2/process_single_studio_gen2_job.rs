@@ -26,10 +26,14 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::utils::transactor::Transactor;
 use std::fs::{read_to_string, File};
 use std::io::BufReader;
+use std::ops::Deref;
 use std::path::Path;
 use std::time::{Duration, Instant};
+use subprocess_common::command_runner::command_args::CommandArgs;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
+use crate::util::common_commands::ffmpeg::ffmpeg_resample_duration::FfmpegResampleDurationArgs;
+use crate::util::common_commands::ffmpeg::ffmpeg_resample_fps_and_duration::FfmpegResampleFpsAndDurationArgs;
 
 enum StudioModelPipeline<'a> {
   None,
@@ -139,31 +143,57 @@ pub async fn process_single_studio_gen2_job(
 
   // ========================= TRIM AND PREPROCESS VIDEO ======================== //
 
-  const RESAMPLE_FRAME_RATE : u64 = 30; // TODO(bt,2025-02-02): Upstream we produce 60fps out of studio. We should do 24fps
+  //const RESAMPLE_FRAME_RATE : u64 = 30; // TODO(bt,2025-02-02): Upstream we produce 60fps out of studio. We should do 24fps
 
-  let mut resampled_video_path = unaltered_video_file.file_path.clone();
+  // TODO REPLACE
+  let unaltered_video_path = unaltered_video_file.file_path.clone();
+  let output_video_path = unaltered_video_path.clone();
+  
+  let maybe_duration_and_fps 
+      = (studio_args.trim_duration_millis, studio_args.fps);
+  
+  let maybe_ffmpeg_args : Option<Box<dyn CommandArgs>> = 
+      match maybe_duration_and_fps {
+        (Some(duration_millis), Some(fps)) => Some(Box::new(FfmpegResampleFpsAndDurationArgs { 
+          input_video_file: &unaltered_video_path,
+          output_video_file: &output_video_path,
+          fps: fps as usize,
+          trim_to_duration: Duration::from_millis(duration_millis),
+        })),
+        (Some(duration_millis), None) => Some(Box::new(FfmpegResampleDurationArgs { 
+          input_video_file: &unaltered_video_path,
+          output_video_file: &output_video_path,
+          trim_to_duration: Duration::from_millis(duration_millis),
+        })),
+        (None, Some(fps)) => Some(Box::new(FfmpegResampleFpsArgs {
+          input_video_file: &unaltered_video_path,
+          output_video_file: &output_video_path,
+          fps: fps as usize,
+        })),
+        (None, None) => None,
+      };
 
-  /*
-  {
-    resampled_video_path = work_paths.output_dir.path().join("resampled_video.mp4");
+  let mut resampled_video_path = output_video_path.clone();
 
-    let command_exit_status = gen2_deps.ffmpeg
-      .run_with_subprocess(RunAsSubprocessArgs {
-        args: Box::new(&FfmpegResampleFpsArgs {
-          input_video_file: &unaltered_video_file.file_path,
-          output_video_file: &resampled_video_path,
-          fps: studio_args.fps.unwrap_or(RESAMPLE_FRAME_RATE) as usize,
-        }),
-        stderr: StreamRedirection::None,
-        stdout: StreamRedirection::None,
-      });
-
-    if !command_exit_status.is_success() {
-      error!("Resample video failed: {:?} ; we'll revert to the original.", command_exit_status);
+  match maybe_ffmpeg_args.as_deref() {
+    None => {
+      // No new resampled file.
       resampled_video_path = unaltered_video_file.file_path.clone();
     }
+    Some(ffmpeg_args) => {
+      let command_exit_status = gen2_deps.ffmpeg
+          .run_with_subprocess(RunAsSubprocessArgs {
+            args: Box::new(ffmpeg_args),
+            stderr: StreamRedirection::None,
+            stdout: StreamRedirection::None,
+          });
+
+      if !command_exit_status.is_success() {
+        error!("Resample video failed: {:?} ; we'll revert to the original.", command_exit_status);
+        resampled_video_path = unaltered_video_file.file_path.clone();
+      }
+    }
   }
-  */
 
   // ========================= RESIZE IMAGE ======================== //
 
