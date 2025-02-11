@@ -3,7 +3,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_dependencies::AnimateXDependencies;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_inference_command::AnimateXInferenceArgs;
 use crate::job::job_types::studio_gen2::animate_x::animate_x_process_frames_command::{AnimateXProcessFramesCommand, ProcessFramesArgs};
-use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadFileForStudioArgs};
+use crate::job::job_types::studio_gen2::download_file_for_studio::{download_file_for_studio, DownloadDetails, DownloadFileForStudioArgs};
 use crate::job::job_types::studio_gen2::resize_image_for_studio::{resize_image_for_studio, ImageResizeType};
 use crate::job::job_types::studio_gen2::stable_animator::stable_animator_command::InferenceArgs;
 use crate::job::job_types::studio_gen2::stable_animator::stable_animator_dependencies::StableAnimatorDependencies;
@@ -29,6 +29,7 @@ use std::io::BufReader;
 use std::ops::Deref;
 use std::path::Path;
 use std::time::{Duration, Instant};
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use subprocess_common::command_runner::command_args::CommandArgs;
 use subprocess_common::command_runner::command_runner_args::{RunAsSubprocessArgs, StreamRedirection};
 use videos::ffprobe_get_dimensions::ffprobe_get_dimensions;
@@ -118,6 +119,8 @@ pub async fn process_single_studio_gen2_job(
       info!("Downloaded image to {:?}", &unaltered_image_file.file_path);
     }
   }
+  
+  assert_file_is_image(&unaltered_image_file)?;
 
   // ==================== DOWNLOAD VIDEO ==================== //
 
@@ -136,6 +139,8 @@ pub async fn process_single_studio_gen2_job(
       info!("Downloaded video to {:?}", &unaltered_video_file.file_path);
     }
   }
+  
+  assert_file_is_video(&unaltered_video_file)?;
 
   //if let Ok(Some(dimensions)) = ffprobe_get_dimensions(&videos.primary_video.original_download_path) {
   //  info!("Download video dimensions: {}x{}", dimensions.width, dimensions.height);
@@ -183,7 +188,7 @@ pub async fn process_single_studio_gen2_job(
     }
     Some(ffmpeg_args) => {
       info!("Resampling video file. Will use the following args to ffmpeg: {:?}", &ffmpeg_args.to_command_string());
-      
+
       let command_exit_status = gen2_deps.ffmpeg
           .run_with_subprocess(RunAsSubprocessArgs {
             args: Box::new(ffmpeg_args),
@@ -204,13 +209,13 @@ pub async fn process_single_studio_gen2_job(
   // ========================= RESIZE IMAGE ======================== //
 
   let skip_image_resize = studio_args.skip_image_resize.unwrap_or(false);
-  
+
   let mut inference_input_image_path = unaltered_image_file.file_path.clone();
   let mut maybe_dimensions = None;
-  
+
   if !skip_image_resize {
     info!("Resizing input image...");
-    
+
     let resized_image_path = work_paths.output_dir.path().join("resized_image.png");
 
     let image_resize_type = match studio_job_type {
@@ -401,7 +406,8 @@ pub async fn process_single_studio_gen2_job(
     Ok(token) => token,
     Err(err) => {
       error!("Error validating and saving results: {:?}", err);
-
+      
+      print_work_dirs(&work_paths);
       maybe_debug_sleep(studio_args).await;
 
       // NB: Forcing generic type to `&Path` with turbofish
@@ -416,6 +422,7 @@ pub async fn process_single_studio_gen2_job(
 
   // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
 
+  print_work_dirs(&work_paths);
   maybe_debug_sleep(studio_args).await;
 
   info!("Cleaning up temporary files...");
@@ -449,7 +456,7 @@ pub async fn process_single_studio_gen2_job(
 async fn maybe_debug_sleep(args: &StudioGen2Payload) {
   if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
     info!("Debug sleeping for millis: {sleep_millis}");
-    // We wait for the specified timeout. If a SIGTERM is received during this time, 
+    // We wait for the specified timeout. If a SIGTERM is received during this time,
     // we'll panic and exit the program.
     // https://tokio.rs/tokio/tutorial/select
     // https://tokio.rs/tokio/topics/shutdown
@@ -459,5 +466,32 @@ async fn maybe_debug_sleep(args: &StudioGen2Payload) {
       },
       _ = tokio::time::sleep(Duration::from_millis(sleep_millis)) => {},
     }
+  }
+}
+
+fn print_work_dirs(work_dirs: &StudioGen2Dirs) {
+  info!("Temp input directory: {:?}", work_dirs.input_dir.path());
+  info!("Temp output directory: {:?}", work_dirs.input_dir.path());
+}
+
+fn assert_file_is_image(file: &DownloadDetails) -> Result<(), ProcessSingleJobError> {
+  match file.media_file.media_type {
+    MediaFileType::Image |
+    MediaFileType::Jpg |
+    MediaFileType::Png |
+    MediaFileType::Gif => Ok(()),
+    _ => Err(ProcessSingleJobError::Other(anyhow!(
+      "Wrong file type for image: {:?} and token: {:?}", 
+      file.media_file.media_type, file.media_file.token)))
+  }
+}
+
+fn assert_file_is_video(file: &DownloadDetails) -> Result<(), ProcessSingleJobError> {
+  match file.media_file.media_type {
+    MediaFileType::Video |
+    MediaFileType::Mp4 => Ok(()),
+    _ => Err(ProcessSingleJobError::Other(anyhow!(
+      "Wrong file type for video: {:?} and token: {:?}", 
+      file.media_file.media_type, file.media_file.token)))
   }
 }
