@@ -2,6 +2,8 @@
 resolver = "2"
 
 members = [
+  "src-tauri",
+
   # Types: common strongly-typed tokens, ids, payloads, etc.
   "crates/_types/composite_identifiers",
   "crates/_types/enums",
