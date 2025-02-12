@@ -426,7 +426,7 @@ pub async fn process_single_studio_gen2_job(
   info!("Inference took duration to complete: {:?}", &inference_duration);
 
   print_work_dirs(&work_paths);
-  maybe_debug_sleep_polling_jobs(studio_args, &deps.db.mysql_pool).await;
+  maybe_debug_sleep(studio_args).await;
 
   info!("Cleaning up temporary files...");
 
@@ -472,37 +472,39 @@ async fn maybe_debug_sleep(args: &StudioGen2Payload) {
   }
 }
 
-async fn maybe_debug_sleep_polling_jobs(args: &StudioGen2Payload, mysql_pool: &MySqlPool) {
-  if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
-    info!("Debug sleeping for millis: {sleep_millis}");
-    // We wait for the specified timeout. If a SIGTERM is received during this time,
-    // we'll panic and exit the program.
-    // https://tokio.rs/tokio/tutorial/select
-    // https://tokio.rs/tokio/topics/shutdown
-    tokio::select! {
-      _ = tokio::signal::ctrl_c() => {
-        panic!("Ctrl-C signal received, shutting down.");
-      },
-      _ = {
-        let wait_until = Instant::now().checked_add(Duration::from_millis(sleep_millis));
-        while wait_until.gt(Instant::now()) {
-          let result  = count_untried_jobs_of_type(CountUntriedJobsOfTypeArgs {
-            maybe_scope_by_job_type: None,
-            maybe_scope_by_model_type: None,
-            maybe_scope_by_job_category: None,
-            mysql_pool: mysql_pool,
-          }).await;
-          
-          if let Ok(res) = result {
-            if res.job_count > 0 {
-              return;
-            }
-          }
-        }
-      },
-    }
-  }
-}
+//async fn maybe_debug_sleep_polling_jobs(args: &StudioGen2Payload, mysql_pool: &MySqlPool) {
+//  if let Some(sleep_millis) = args.after_job_debug_sleep_millis {
+//    info!("Debug sleeping for millis: {sleep_millis}");
+//    // We wait for the specified timeout. If a SIGTERM is received during this time,
+//    // we'll panic and exit the program.
+//    // https://tokio.rs/tokio/tutorial/select
+//    // https://tokio.rs/tokio/topics/shutdown
+//    tokio::select! {
+//      _ = tokio::signal::ctrl_c() => {
+//        panic!("Ctrl-C signal received, shutting down.");
+//      },
+//      _ = {
+//        let wait_until = Instant::now().checked_add(Duration::from_millis(sleep_millis));
+//        while wait_until.gt(Instant::now()) {
+//          let result  = count_untried_jobs_of_type(CountUntriedJobsOfTypeArgs {
+//            maybe_scope_by_job_type: None,
+//            maybe_scope_by_model_type: None,
+//            maybe_scope_by_job_category: None,
+//            mysql_pool: mysql_pool,
+//          }).await;
+//          
+//          if let Ok(res) = result {
+//            if res.job_count > 0 {
+//              return;
+//            }
+//          }
+//        }
+//        
+//        tokio::time::sleep(Duration::from_millis(1000)).await
+//      },
+//    }
+//  }
+//}
 
 fn print_work_dirs(work_dirs: &StudioGen2Dirs) {
   info!("Temp input directory: {:?}", work_dirs.input_dir.path());
