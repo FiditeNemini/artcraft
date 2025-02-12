@@ -1,0 +1,2 @@
+export { VideoPlayerQuickTrim } from  './VideoPlayerQuickTrim'
+

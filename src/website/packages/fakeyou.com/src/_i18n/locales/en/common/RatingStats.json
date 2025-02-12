@@ -1,0 +1,10 @@
+{
+  "voice": {
+    "notRated": "Voice Not Yet Rated",
+    "rating": "Rating",
+    "score5": "Voice Sounds Great",
+    "score4": "Voice Sounds Good",
+    "score3": "Voice Sounds Okay",
+    "score2": "Voice Sounds Meh"
+  }
+}

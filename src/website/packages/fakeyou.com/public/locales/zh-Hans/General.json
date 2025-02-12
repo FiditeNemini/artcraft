@@ -1,0 +1,18 @@
+{
+  "button": {
+    "tooltip": {
+      "revert": "恢复默认值"
+    }
+  },
+  "input": {
+    "placeholder": {
+      "randomSeed": "自动生成"
+    }
+  },
+  "segButton": {
+    "label": {
+      "customSeed": "风俗",
+      "randomSeed": "随机的"
+    }
+  }
+}

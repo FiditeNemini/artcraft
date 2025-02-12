@@ -1,0 +1,18 @@
+{
+  "button": {
+    "tooltip": {
+      "revert": "Kembalikan ke Nilai Default"
+    }
+  },
+  "input": {
+    "placeholder": {
+      "randomSeed": "Dihasilkan Secara Otomatis"
+    }
+  },
+  "segButton": {
+    "label": {
+      "customSeed": "Kebiasaan",
+      "randomSeed": "Acak"
+    }
+  }
+}

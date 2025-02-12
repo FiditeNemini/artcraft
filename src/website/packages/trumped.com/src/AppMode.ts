@@ -1,0 +1,10 @@
+enum Mode {
+  SPEAK_MODE,
+  USAGE_MODE,
+  NEWS_MODE,
+  HISTORY_MODE,
+  HELP_WANTED_MODE,
+  TERMS_MODE,
+}
+
+export { Mode };

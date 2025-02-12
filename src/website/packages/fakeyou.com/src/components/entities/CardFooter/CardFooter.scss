@@ -1,0 +1,10 @@
+.fy-card-footer {
+	width: 100%;
+	display: flex;
+
+	.fy-card-footer-toggles {
+		margin-left: auto;
+		display: flex;
+		gap: .5rem;
+	}
+}
