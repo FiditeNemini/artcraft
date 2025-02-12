@@ -1,0 +1,29 @@
+[package]
+name = "config"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "config"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+# TODO: Remove these dependencies.
+#  These were introduced in refactoring. Config should have few, if any, dependencies.
+[dependencies]
+# Internal
+easyenv = { path = "../../../lib/easyenv" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# External
+anyhow = "1.0.86"
+url = "2.4.1"

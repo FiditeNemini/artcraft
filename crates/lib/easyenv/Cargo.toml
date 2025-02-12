@@ -1,0 +1,31 @@
+[package]
+name = "easyenv"
+edition = "2018"
+version = "0.1.0"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "easyenv"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+storyteller_root = { path = "../storyteller_root" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+dotenv = "0.15.0"
+env_logger = "0.11.3"
+log = "0.4.14"
+
+[dev-dependencies]
+# None yet

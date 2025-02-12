@@ -1,0 +1,48 @@
+[package]
+name = "db-backfill"
+publish = false
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[[bin]]
+name = "db-backfill"
+path = "src/main.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# Internal
+datetimes = { path = "../../../lib/data/datetimes" }
+easyenv = { path = "../../../lib/easyenv" }
+enums = { path = "../../../_types/enums" }
+errors = { path = "../../../lib/errors" }
+mysql_queries = { path = "../../../lib/mysql_queries" }
+tokens = { path = "../../../_types/tokens" }
+
+# External
+anyhow = "1.0.86"
+chrono = { version = "0.4.22", features = ["serde"] }
+clap = "4.4.8"
+dotenv = "0.15.0"
+log = "0.4.14"
+
+# Bigger pieces
+futures = { version = "0.3.17", features = ["thread-pool"] }
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
+tokio = { version = "1.38.0", features = ["macros"] }
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.108"
+
+[dev-dependencies]
+# None yet

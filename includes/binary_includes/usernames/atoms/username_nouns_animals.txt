@@ -1,0 +1,36 @@
+# From: https://github.com/jneidel/animal-names
+# https://github.com/jneidel/animal-names/blob/master/animals-common.txt
+# This has been trimmed to remove potentially negative, offensive, uncool, or otherwise bad choices
+
+alligator
+alpaca
+badger
+cat
+cheetah
+cobra
+coyote
+crocodile
+dragon
+eagle
+falcon
+fox
+gecko
+giraffe
+hawk
+hedgehog
+jaguar
+kangaroo
+koala
+leopard
+lion
+llama
+penguin
+puma
+rabbit
+raccoon
+shark
+tiger
+wallaby
+wolf
+wombat
+zebra

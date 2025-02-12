@@ -1,0 +1,1 @@
+pub mod public_inference_job_type;

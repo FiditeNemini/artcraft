@@ -1,0 +1,2 @@
+pub mod get_w2l_template_upload_job_status;
+pub mod insert_w2l_template_upload_job;

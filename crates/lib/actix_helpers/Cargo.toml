@@ -1,0 +1,45 @@
+[package]
+name = "actix_helpers"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "errors" crate is name-squatted, so we're fine to use this internally.
+name = "actix_helpers"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+errors = { path = "../../lib/errors" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# Actix
+actix-http = "3.7.0"
+actix-rt = "2.10.0"
+actix-service = "2.0.2"
+actix-utils = "3.0.1"
+actix-web = "4.7.0"
+
+# IPv4 and v6 CIDRs (crate has few dependencies)
+cidr-utils = "0.5.11"
+num-traits = "0.2.17" # for cidr-utils
+
+# Futures
+futures-util = "0.3.29"
+
+# Serialization
+serde = "1.0.125"
+serde_json = "1.0.108"
+
+[dev-dependencies]
+# None yet

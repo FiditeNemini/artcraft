@@ -1,0 +1,35 @@
+[package]
+name = "db-backup"
+publish = false
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[[bin]]
+name = "db-backup"
+path = "src/main.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+easyenv = { path = "../../../lib/easyenv" }
+errors = { path = "../../../lib/errors" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# External
+anyhow = "1.0.86"
+# TODO/NB: Commenting out clap4 as it prevents windows builds
+# NB: clap4 = { package = "clap", version = "4.0" }
+dotenv = "0.15.0"
+log = "0.4.14"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"

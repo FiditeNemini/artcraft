@@ -1,0 +1,31 @@
+[package]
+name = "idempotency"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "idempotency"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+# errors = { path = "../../lib/errors" }
+# (None yet)
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+uuid = { version = "1.8.0", features = ["v4"] }
+
+[dev-dependencies]
+# None yet
+# (None yet)

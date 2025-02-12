@@ -1,0 +1,36 @@
+[package]
+name = "redis_schema"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "redis_schema"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+enums = { path = "../../_types/enums" }
+errors = { path = "../errors" }
+tokens = { path = "../../_types/tokens" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+chrono = { version = "0.4.22", features = ["serde"] }
+
+# Redis
+r2d2_redis = "0.14.0"
+url = "2.5.1"
+serde = { version = "1.0.203", features = ["derive"] }
+
+[dev-dependencies]
+# None yet

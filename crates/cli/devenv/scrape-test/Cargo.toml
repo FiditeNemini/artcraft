@@ -1,0 +1,29 @@
+[package]
+name = "scrape-test"
+publish = false
+edition = "2021"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[[bin]]
+name = "scrape-test"
+path = "src/main.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+
+# Internal
+errors = { path = "../../../lib/errors" }
+web_scrapers = { path = "../../../lib/web_scrapers" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# External
+clap = "4.4.8"
+tokio = { version = "1.38.0", features = ["macros"] }

@@ -1,0 +1,32 @@
+[package]
+name = "cookies"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "cookies" crate is version 0.0.1 from 10 years ago!
+name = "cookies"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+errors = { path = "../errors" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+hmac = "0.10.1" # jwt signing
+jwt = "0.13.0"
+sha2 = "0.9.9" # hmac signing
+
+[dev-dependencies]
+# None yet

@@ -1,0 +1,34 @@
+# This crate is simply meant to collect common shared legacy "jobs" components
+# It's an artifact of refactoring and maybe should mostly disappear.
+
+[package]
+name = "jobs_common"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "jobs_common"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+
+# Internal
+errors = { path = "../errors" }
+redis_common = { path = "../redis_common" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+anyhow = "1.0.86"
+chrono = { version = "0.4.22", features = ["serde"] }
+log = "0.4.14"
+r2d2_redis = "0.14.0"

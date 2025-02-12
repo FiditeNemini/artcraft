@@ -1,0 +1,103 @@
+[package]
+name = "inference-job"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "inference-job"
+path = "src/main.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+
+# Internal
+actix_helpers = { path = "../../../lib/actix_helpers" }
+bootstrap = { path = "../../../lib/bootstrap" }
+bucket_paths = { path = "../../../lib/bucket_paths" }
+cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+collections = { path = "../../../lib/data/collections" }
+composite_identifiers = { path = "../../../_types/composite_identifiers" }
+concurrency = { path = "../../../lib/concurrency" }
+config = { path = "../../../lib/deprecated/config" }
+crockford = { path = "../../../lib/data/crockford" }
+easyenv = { path = "../../../lib/easyenv" }
+enums = { path = "../../../_types/enums" }
+errors = { path = "../../../lib/errors" }
+filesys = { path = "../../../lib/files/filesys" }
+google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
+hashing = { path = "../../../lib/files/hashing" }
+images = { path = "../../../lib/files/images" }
+jobs_common = { path = "../../../lib/jobs_common" }
+media = { path = "../../../lib/files/media" }
+memory_caching = { path = "../../../lib/caching/memory_caching" }
+migration = { path = "../../../lib/migration" }
+mimetypes = { path = "../../../lib/files/mimetypes" }
+mysql_queries = { path = "../../../lib/mysql_queries" }
+primitives = { path = "../../../lib/data/primitives" }
+redis_common = { path = "../../../lib/redis_common" }
+redis_schema = { path = "../../../lib/redis_schema" }
+subprocess_common = { path = "../../../lib/subprocess_common" }
+thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}
+tokens = { path = "../../../_types/tokens" }
+tts_common = { path = "../../../lib/tts_common" }
+videos = { path = "../../../lib/files/videos" }
+
+# External
+anyhow = "1.0.86"
+chrono = { version = "0.4.22", features = ["serde"] }
+dotenv = "0.15.0"
+hostname = "0.4.0"
+lfu = "0.2.5"
+log = "0.4.14"
+once_cell = "1.18.0"
+subprocess = "0.2.9"
+tempdir = "0.3.7"
+
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
+
+# Redis
+r2d2_redis = "0.14.0"
+
+# Runtime
+# NB: We switched to Tokio from `async-std` for broader ecosystem support.
+tokio = { version = "1.40.0", features = ["macros", "sync"] }
+tokio-util = "0.7.12"
+tokio-stream = "0.1.16"
+
+# HTTP Client
+reqwest = { version = "0.12.4", features = ["blocking"] }
+
+# HTTP Server
+actix-web = "4.7.0"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.108"
+
+# Async traits
+# NB: note: `async` trait functions are not currently supported
+# The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
+# include support for async fn in traits.
+async-trait = "0.1.58"
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+time = "0.3.30"
+mime = "0.3.17"
+rand = { version = "0.8.5", features = [] }
+jsonpath_lib = "0.3.0"
+walkdir = "2.4.0"
+opentelemetry = {version = "0.23.0", features = ["metrics"]}
+opentelemetry-otlp = { version = "0.16.0", features = ["metrics"] }
+opentelemetry_sdk = { version = "0.23.0", features = ["metrics", "rt-tokio"] }
+zip = "2.1.3"
+url = "2.5.1"
+
+[dev-dependencies]
+testing = { path = "../../../lib/testing" }

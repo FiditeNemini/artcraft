@@ -1,0 +1,21 @@
+[package]
+publish = false
+name = "component_subsystem_inference_workloads"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[lib]
+name = "component_subsystem_inference_workloads"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

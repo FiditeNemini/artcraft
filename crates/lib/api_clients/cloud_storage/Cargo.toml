@@ -1,0 +1,44 @@
+[package]
+name = "cloud_storage"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "cloud_storage"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# Internal
+bucket_paths = { path = "../../../lib/bucket_paths" }
+crockford = { path = "../../../lib/data/crockford" }
+easyenv = { path = "../../../lib/easyenv" }
+errors = { path = "../../../lib/errors" }
+filesys = { path = "../../../lib/files/filesys" }
+hashing = { path = "../../../lib/files/hashing" }
+mimetypes = { path = "../../../lib/files/mimetypes" }
+storyteller_root = { path = "../../../lib/storyteller_root" }
+
+# External
+anyhow = "1.0.86"
+log = "0.4.14"
+env_logger = "0.11.3"
+async-trait = "0.1.75"
+# The "never-encode-slash" feature seems to have been removed:
+# https://github.com/durch/rust-s3/pull/254
+rust-s3 = { version = "0.36.0-beta.2" }
+
+# Runtime
+# NB: We switched to Tokio from `async-std` for broader ecosystem support.
+tokio = { version = "1.38.0", features = ["macros"] }
+

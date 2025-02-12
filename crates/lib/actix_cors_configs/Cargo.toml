@@ -1,0 +1,38 @@
+[package]
+name = "actix_cors_configs"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "errors" crate is name-squatted, so we're fine to use this internally.
+name = "actix_cors_configs"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+# Internal
+#errors = { path = "../../lib/errors" }
+reusable_types = { path = "../../_types/reusable_types" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+log = "0.4.14"
+
+# Actix
+actix-cors = "0.6.4"
+actix-http = "3.7.0"
+actix-web = "4.7.0"
+url = { version = "2.5.0", features = [] }
+
+[dev-dependencies]
+actix-rt = "2.10.0"
+speculoos = "0.11.0" # Fluent assertions

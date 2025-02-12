@@ -1,0 +1,55 @@
+[package]
+name = "mysql_queries"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "mysql_queries"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+
+# Internal
+bucket_paths = { path = "../bucket_paths" }
+composite_identifiers = { path = "../../_types/composite_identifiers" }
+enums = { path = "../../_types/enums" }
+errors = { path = "../errors" }
+idempotency = { path = "../idempotency" }
+primitives = { path = "../data/primitives" }
+reusable_types = { path = "../../_types/reusable_types" }
+tokens = { path = "../../_types/tokens" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+anyhow = "1.0.86"
+chrono = { version = "0.4.22", features = ["serde"] }
+log = "0.4.14"
+
+# Needed to safety check some queries we can't use escaping for
+once_cell = "1.18.0"
+regex = "1.5.4"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.108"
+serial_test = "3.0.0"
+
+# BigNum
+num-traits = "0.2.19"
+
+tokio = { version = "1.38.0", features = ["full"] }
+rand = "0.8"
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono", "bigdecimal" ] }
+
+

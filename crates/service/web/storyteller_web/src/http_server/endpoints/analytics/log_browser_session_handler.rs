@@ -1,0 +1,151 @@
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::{web, HttpRequest, HttpResponse};
+use log::warn;
+use utoipa::ToSchema;
+
+use crockford::crockford_entropy_lower;
+use enums::by_table::beta_keys::beta_key_product::BetaKeyProduct;
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::beta_keys::insert_batch_beta_keys::{insert_batch_beta_keys, InsertBatchArgs};
+use mysql_queries::queries::browser_session_logs::upsert_browser_session_log::{upsert_browser_session_log, UpsertBrowserSessionLogArgs};
+use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
+use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use tokens::tokens::browser_session_logs::BrowserSessionLogToken;
+
+use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::EditUserFeatureFlagsError;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::user_session::require_moderator::{require_moderator, RequireModeratorError};
+use crate::http_server::web_utils::user_session::require_user_session::RequireUserSessionError;
+use crate::state::server_state::ServerState;
+
+#[derive(Deserialize, ToSchema)]
+pub struct LogBrowserSessionRequest {
+  /// Make the first request to this endpoint without a token.
+  /// The server will give you a token to use for every subsequent call.
+  /// Using this, we can calculate how sticky product usage is.
+  maybe_log_token: Option<BrowserSessionLogToken>,
+
+  /// OPTIONAL: Optionally include an up to 32-character identifier of what
+  /// action the user was last performing.
+  maybe_last_action: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct LogBrowserSessionSuccessResponse {
+  pub success: bool,
+
+  /// Store and use this token in subsequent requests.
+  /// If the user closes the browser, do not save it in session storage.
+  /// You can get a new token with each browser session.
+  pub log_token: BrowserSessionLogToken,
+}
+
+#[derive(Debug, ToSchema)]
+pub enum LogBrowserSessionError {
+  BadInput(String),
+  NotAuthorized,
+  ServerError,
+}
+
+impl ResponseError for LogBrowserSessionError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      LogBrowserSessionError::BadInput(_) => StatusCode::BAD_REQUEST,
+      LogBrowserSessionError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      LogBrowserSessionError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    let error_reason = match self {
+      LogBrowserSessionError::BadInput(reason) => reason.to_string(),
+      LogBrowserSessionError::NotAuthorized => "unauthorized".to_string(),
+      LogBrowserSessionError::ServerError => "server error".to_string(),
+    };
+
+    to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for LogBrowserSessionError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+/// Log a browser session (so we can calculate duration, etc.)
+#[utoipa::path(
+  post,
+  tag = "Analytics",
+  path = "/v1/analytics/log_session",
+  responses(
+    (status = 200, description = "Success", body = LogBrowserSessionSuccessResponse),
+    (status = 400, description = "Bad input", body = LogBrowserSessionError),
+    (status = 401, description = "Not authorized", body = LogBrowserSessionError),
+    (status = 500, description = "Server error", body = LogBrowserSessionError),
+  ),
+  params(
+    ("request" = LogBrowserSessionRequest, description = "Payload for Request"),
+  )
+)]
+pub async fn log_browser_session_handler(
+  http_request: HttpRequest,
+  request: web::Json<LogBrowserSessionRequest>,
+  server_state: web::Data<Arc<ServerState>>,
+) -> Result<HttpResponse, LogBrowserSessionError>
+{
+  let mut mysql_connection = server_state.mysql_pool
+      .acquire()
+      .await
+      .map_err(|err| {
+        warn!("MySql pool error: {:?}", err);
+        LogBrowserSessionError::ServerError
+      })?;
+
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        LogBrowserSessionError::ServerError
+      })?;
+
+  let maybe_avt_token = server_state
+      .avt_cookie_manager
+      .get_avt_token_from_request(&http_request);
+
+  let ip_address = get_request_ip(&http_request);
+
+  let token = upsert_browser_session_log(UpsertBrowserSessionLogArgs {
+    maybe_log_token: request.maybe_log_token.as_ref(),
+    ip_address: &ip_address,
+    maybe_user_token: maybe_user_session.as_ref().map(|s| &s.user_token),
+    maybe_visitor_token: maybe_avt_token.as_ref(),
+    maybe_last_action: request.maybe_last_action.as_deref(),
+    mysql_pool: &server_state.mysql_pool,
+  }).await.map_err(|err| {
+    warn!("Error inserting beta keys: {:?}", err);
+    LogBrowserSessionError::ServerError
+  })?;
+
+  let response = LogBrowserSessionSuccessResponse {
+    success: true,
+    log_token: token,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|_e| LogBrowserSessionError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
+

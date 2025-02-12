@@ -1,0 +1,103 @@
+[workspace]
+resolver = "2"
+
+members = [
+  # Types: common strongly-typed tokens, ids, payloads, etc.
+  "crates/_types/composite_identifiers",
+  "crates/_types/enums",
+  "crates/_types/enums_public",
+  "crates/_types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
+  "crates/_types/tokens",
+
+  # CLI tools for operations, etc.
+  "crates/cli/devenv/dev-database-seed",
+  "crates/cli/devenv/dev-upload-media-file",
+  "crates/cli/devenv/scrape-test",
+  "crates/cli/production/db-backfill",
+  "crates/cli/production/db-backup",
+  "crates/cli/production/db-cleanup",
+  "crates/cli/production/elasticsearch-cli",
+  "crates/cli/production/kubectl-pod-cleanup",
+  "crates/cli/production/lru-delete-models",
+  "crates/cli/production/migration-tool",
+
+  # Shared libraries
+  "crates/lib/actix_cors_configs",
+  "crates/lib/actix_helpers",
+  "crates/lib/api_clients/cloud_storage",
+  "crates/lib/api_clients/google_drive_common",
+  "crates/lib/api_clients/google_sign_in",
+  "crates/lib/api_clients/thumbnail_generator",
+  "crates/lib/bootstrap",
+  "crates/lib/bucket_paths",
+  "crates/lib/caching/memory_caching",
+  "crates/lib/caching/redis_caching",
+  "crates/lib/concurrency",
+  "crates/lib/cookies",
+  "crates/lib/data/collections",
+  "crates/lib/data/crockford",
+  "crates/lib/data/datetimes",
+  "crates/lib/data/primitives",
+  "crates/lib/deprecated/config", # TODO(bt, 2023-02-13): Deprecate or repurpose
+  "crates/lib/deprecated/http_server_common", # TODO(bt, 2023-03-20): Move useful pieces to actix_helpers
+  "crates/lib/dimensions",
+  "crates/lib/easyenv", # NB: Vendored version of https://github.com/echelon/easyenv.rs that we'll improve.
+  "crates/lib/elasticsearch_schema",
+  "crates/lib/email_sender",
+  "crates/lib/errors",
+  "crates/lib/files/archives",
+  "crates/lib/files/filesys",
+  "crates/lib/files/hashing",
+  "crates/lib/files/images",
+  "crates/lib/files/media",
+  "crates/lib/files/mimetypes",
+  "crates/lib/files/videos",
+  "crates/lib/idempotency",
+  "crates/lib/jobs_common",
+  "crates/lib/logging",
+  "crates/lib/markdown",
+  "crates/lib/migration",
+  "crates/lib/mysql_queries",
+  "crates/lib/password",
+  "crates/lib/prompt_engineering",
+  "crates/lib/redis_common",
+  "crates/lib/redis_schema",
+  "crates/lib/server_environment",
+  "crates/lib/sqlx_mysql_helpers",
+  "crates/lib/storyteller_root",
+  "crates/lib/subprocess_common",
+  "crates/lib/testing",
+  "crates/lib/tts_common",
+  "crates/lib/url_config",
+  "crates/lib/user_input_common",
+  "crates/lib/web_scrapers",
+  #"crates/lib/api_clients/fakeyou_client",
+  #"crates/lib/sqlite_queries",
+
+  # Services: API servers, jobs, workers, etc.
+  "crates/service/job/analytics_job",
+  "crates/service/job/download_job",
+  "crates/service/job/email_sender_job",
+  "crates/service/job/es-update-job",
+  "crates/service/job/inference_job",
+  "crates/service/job/tts_download_job",
+  "crates/service/job/tts_inference_job",
+  "crates/service/job/w2l_download_job",
+  "crates/service/job/w2l_inference_job",
+  "crates/service/web/dummy_service",
+  "crates/service/web/storyteller_web",
+
+  # Service Plugins: complete subsystems that can be plugged into services (users, billing, etc.)
+  "crates/service/plugins/billing",
+  "crates/service/plugins/inference_workloads",
+  "crates/service/plugins/user_traits_component",
+
+  # Vendored code
+  "crates/vendor/limitation",
+  # NB(bt,2023-12-12): Newrelic keeps breaking with upgrades. Kill for now.
+  #"crates/vendor/newrelic-telemetry-sdk-rust", 
+
+  # cargo-hakari workspace hack (compilation speedup hack)
+  # see usage: https://crates.io/crates/cargo-hakari
+  "crates/my-workspace-hack",
+]

@@ -1,0 +1,30 @@
+[package]
+publish = false
+name = "user_traits_component"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[lib]
+name = "user_traits_component"
+path = "src/lib.rs"
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["my-workspace-hack"]
+
+[dependencies]
+
+# Internal
+#errors = { path = "../../../lib/errors" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# Web
+actix-web = "4.7.0"
+
+[dev-dependencies]
+mockall = "0.12.1"
