@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "identifier": "com.tauri.dev",
   "build": {
-    "frontendDist": "../../frontend/storyteller-animator",
-    "devUrl": "http://localhost:5173",
+    "frontendDist": "../../frontend/realtime",
+    "devUrl": "http://localhost:5741",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
