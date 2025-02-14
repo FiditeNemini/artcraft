@@ -79,9 +79,6 @@ export const ToolbarMain = ({
               <ToolbarButton icon={faImage} buttonProps={buttonProps.ADD_IMAGE}>
                 Add Image
               </ToolbarButton>
-              <ToolbarButton icon={faFilm} buttonProps={buttonProps.ADD_VIDEO}>
-                Add Video
-              </ToolbarButton>
             </PopoverPanel>
           </Popover>
           <ToolbarButton

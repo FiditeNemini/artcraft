@@ -21,6 +21,7 @@ export class RealTimeDrawEngine {
   private imageNodes: (ImageNode | TextNode)[];
 
   private offScreenCanvas: OffscreenCanvas;
+  private outputBitmap: ImageBitmap | undefined;
 
   // private frames: ImageBitmap[];
 
@@ -436,6 +437,30 @@ export class RealTimeDrawEngine {
     });
   }
 
+  public async saveOutput() {
+    if (!this.outputBitmap) {
+      console.error("No output bitmap available to save");
+      return;
+    }
+
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = this.outputBitmap.width;
+      canvas.height = this.outputBitmap.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Failed to get 2D context");
+
+      ctx.drawImage(this.outputBitmap, 0, 0);
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b!), "image/png");
+      });
+
+      await FileUtilities.blobToFileJpeg(blob, "output");
+    } catch (error) {
+      console.error("Error saving output:", error);
+    }
+  }
+
   public async render() {
     // only pick nodes that intersect with the canvas on screen bounds to freeze.
     this.mediaLayerRef.draw();
@@ -456,24 +481,35 @@ export class RealTimeDrawEngine {
       test: false,
     })) as ImageBitmap;
 
+    // Test code
+    if (false) {
+      this.outputBitmap = bitmap;
+      this.previewCanvas.image(bitmap);
+      this.isProcessing = false;
+      return
+    } 
+
     try {
       const base64Bitmap = await this.imageBitmapToBase64(bitmap);
-      console.log("Sending to server");
+
       const base64BitmapResponse = await invoke("infer_image", {
         image: base64Bitmap,
         prompt:this.currentPrompt,
         strength:this.currentStrength,
       });
-      console.log("RESPONSE IS");
+
       console.log(base64BitmapResponse);
       const decoded = await this.base64ToImageBitmap(
         base64BitmapResponse as string,
       );
+
+      this.outputBitmap = decoded;
       this.previewCanvas.image(decoded);
     } catch (error) {
       console.error("Error during image processing:", error);
     } finally {
       this.isProcessing = false;
     }
+
   }
 }

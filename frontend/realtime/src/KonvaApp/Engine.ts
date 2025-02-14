@@ -1,7 +1,5 @@
 import Konva from "konva";
 
-import { RenderEngine } from "./RenderingPrimitives/RenderEngine";
-import { ResponseType } from "./WorkerPrimitives/SharedWorkerBase";
 
 import { uiAccess, uiEvents } from "~/signals";
 
@@ -20,19 +18,13 @@ import {
 import { ImageNode, VideoNode, TextNode } from "./Nodes";
 import { EngineOptions, TextNodeData, VideoNodeData } from "./types";
 
-import { SharedWorkerResponse } from "./WorkerPrimitives/SharedWorkerBase";
-import {
-  DiffusionSharedWorkerProgressData,
-  DiffusionSharedWorkerResponseData,
-} from "./SharedWorkers/Diffusion/DiffusionSharedWorker";
-
 import { AppModes, VideoResolutions } from "./constants";
 import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 import { ToolbarNodeButtonNames } from "~/components/features/ToolbarNode/enums";
 import { NavigateFunction } from "react-router-dom";
 import { LoadingVideosProvider } from "./EngineUtitlities/LoadingVideosProvider";
-import { MediaFile } from "~/Classes/ApiManager/models/MediaFile";
+
 import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandler/VideoExtractionHandler";
 import { RealTimeDrawEngine } from "./RenderingPrimitives/RealTimeDrawEngine";
 
@@ -367,9 +359,12 @@ export class Engine {
     // Listen to Toolbar Main
     uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
     uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
+    
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
-      this.sceneManager.saveScene();
+      await this.realTimeDrawEngine.saveOutput();
+
     });
+
     uiEvents.toolbarMain.PREVIEW.onClick(async () => {
       console.log("Toolbar Main >> Preview");
       this.setAppMode(AppModes.PREVIEW);

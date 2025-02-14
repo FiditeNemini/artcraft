@@ -84,14 +84,7 @@ export const ToolbarMain = ({
               </ToolbarButton>
             </PopoverPanel>
           </Popover>
-          <ToolbarButton
-            icon={faMagicWandSparkles}
-            buttonProps={{
-              ...buttonProps.AI_STYLIZE,
-              prominent: true,
-            }}
-            tooltip="AI Stylize"
-          />
+
         </div>
         <div className="flex items-center gap-2 pl-2">
           <ToolbarButton

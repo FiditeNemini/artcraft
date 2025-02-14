@@ -11,8 +11,6 @@ export const ButtonPreviewAndRender = ({
 }) => {
   return (
     <div className="flex">
-      <ButtonPreview {...buttonPreviewProps} />
-      <ButtonRender {...buttonRenderProps} />
     </div>
   );
 };
