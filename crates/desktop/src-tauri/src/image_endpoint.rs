@@ -6,6 +6,8 @@ use image::ImageReader;
 
 #[tauri::command]
 pub fn infer_image(image: &str) -> Result<String, String> {
+  println!("infer_image called; processing image...");
+  
   let bytes = BASE64_URL_SAFE.decode(image)
     .map_err(|err| format!("Base64 decode error: {}", err))?;
 
