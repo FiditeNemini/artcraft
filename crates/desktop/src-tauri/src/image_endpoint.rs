@@ -7,8 +7,8 @@ use image::ImageReader;
 #[tauri::command]
 pub fn infer_image(image: &str) -> Result<String, String> {
   println!("infer_image called; processing image...");
-  
-  let bytes = BASE64_URL_SAFE.decode(image)
+
+  let bytes = BASE64_STANDARD.decode(image)
     .map_err(|err| format!("Base64 decode error: {}", err))?;
 
   let image = ImageReader::new(Cursor::new(bytes))
@@ -26,7 +26,7 @@ pub fn infer_image(image: &str) -> Result<String, String> {
   rotated_image.write_with_encoder(encoder)
     .map_err(|err| format!("Image encoding error: {}", err))?;
 
-  let encoded = BASE64_URL_SAFE.encode(&buffer);
+  let encoded = BASE64_STANDARD.encode(&buffer);
   
   println!("Encoded: {:?}", encoded.split_at(10).0);
   
