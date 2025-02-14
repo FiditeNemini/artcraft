@@ -3,7 +3,9 @@ import { Container } from "konva/lib/Container";
 import { Shape } from "konva/lib/Shape";
 import { Group } from "konva/lib/Group";
 
+
 import { invoke } from "@tauri-apps/api/core";
+
 
 import { FileUtilities } from "../FileUtilities/FileUtilities";
 import { ImageNode, VideoNode, TextNode } from "../Nodes";
@@ -266,6 +268,7 @@ export class RealTimeDrawEngine {
     });
     return canvas;
   }
+
   public isProcessing = false;
   private handleNodeDragEnd = async () => {
     // Clean up any existing state
@@ -375,6 +378,8 @@ export class RealTimeDrawEngine {
       throw error;
     }
   }
+
+
 
   private async imageBitmapToBase64(imageBitmap: ImageBitmap): Promise<string> {
     // Create a temporary canvas

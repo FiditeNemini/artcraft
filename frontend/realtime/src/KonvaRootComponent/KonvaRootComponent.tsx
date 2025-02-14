@@ -23,6 +23,8 @@ import { useLayoutContext } from "./contextSignals/layout";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 import { useNavigate } from "react-router-dom";
 import { SignaledMagicBox } from "./SignaledMagicBox";
+import { SignaledPromptSlider } from "./SignaledPromptSlider";
+import { SignaledPromptText } from "./SignaledPromptText";
 
 export const KonvaRootComponent = ({
   className,
@@ -54,13 +56,15 @@ export const KonvaRootComponent = ({
       <KonvaCanvasContainer
         ref={konvaContainerCallbackRef}
         className={className}
-        // retreive the classNames from the parent for sizing/styling
+      // retreive the classNames from the parent for sizing/styling
       />
       <SignaledMagicBox />
       <SignaledCanvasDragDropFiles
         openAddImage={appUiContext.openAddImage}
         openAddVideo={appUiContext.openAddVideo}
       />
+      <SignaledPromptSlider />
+      <SignaledPromptText />
       <SignaledToolbarMain
         layoutSignal={layoutContext.signal}
         appUiContext={appUiContext}
