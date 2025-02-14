@@ -43,6 +43,10 @@ export class RealTimeDrawEngine {
   public videoLoadingCanvas: VideoNode | undefined;
 
   public fps: number = 24;
+
+  public currentPrompt: string;
+  public currentStrength: number;
+
   constructor({
     width,
     height,
@@ -54,7 +58,6 @@ export class RealTimeDrawEngine {
     height: number;
     bgLayerRef: Konva.Layer;
     mediaLayerRef: Konva.Layer;
-    previewLayerRef: Konva.Layer;
     offScreenCanvas: OffscreenCanvas;
   }) {
     this.videoLoadingCanvas = undefined;
@@ -81,13 +84,14 @@ export class RealTimeDrawEngine {
     // this is the whole canvas
     this.mediaLayerRef = mediaLayerRef;
 
-    // this.previewLayerRef = previewLayerRef;
     // Set background layer to red and media layer to green for visibility
 
     this.port = undefined;
 
     this.fps = 24;
-
+    
+    this.currentPrompt = "";
+    this.currentStrength = 100;
     // This is captures a subset of the medialayer ref
     this.captureCanvas = new Konva.Rect({
       name: "CaptureCanvas",
@@ -160,7 +164,7 @@ export class RealTimeDrawEngine {
     const oldPositionY = this.positionY;
 
     // recompute the position
-    const padBetweenCaptureAndPreview = 10;
+    const padBetweenCaptureAndPreview = 2;
     this.positionX =
       window.innerWidth / 2 -
       this.width / 2 -
@@ -457,6 +461,8 @@ export class RealTimeDrawEngine {
       console.log("Sending to server");
       const base64BitmapResponse = await invoke("infer_image", {
         image: base64Bitmap,
+        prompt:this.currentPrompt,
+        strength:this.currentStrength,
       });
       console.log("RESPONSE IS");
       console.log(base64BitmapResponse);

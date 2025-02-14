@@ -13,17 +13,18 @@ export const SignaledPromptText = ({
     }
     textAreaRef.current.focus();
   }, []);
+  
   useEffect(() => {
     focusOnTextArea();
   }, []);
 
   const TextAreaStates = {
     style: {
-      width: "500px",
-      height: "240px",
+      width: "530px",
+      height: "200px",
     },
-    placeholder: "...",
-    label: "Prompt Text",
+    placeholder: "",
+    label: "",
     resize: "none" as ResizeType,
   };
 

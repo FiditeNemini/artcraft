@@ -61,7 +61,6 @@ export class Engine {
   private nodeIsolationLayer: Konva.Layer;
   private uiLayer: Konva.Layer;
   private previewLayer: Konva.Layer;
-  private renderEngine: RenderEngine;
   private offScreenCanvas: OffscreenCanvas;
   private realTimeDrawEngine: RealTimeDrawEngine;
   private nodesManager: NodesManager;
@@ -126,10 +125,7 @@ export class Engine {
       height: VideoResolutions.SQUARE_1024.height,
       mediaLayerRef: this.mediaLayer,
       bgLayerRef: this.bgLayer,
-      offScreenCanvas: this.offScreenCanvas,
-      previewLayerRef: this.previewLayer,
-      onRenderingSystemMessageRecieved:
-        this.onRenderingSystemReceived.bind(this),
+      offScreenCanvas: this.offScreenCanvas
     });
 
     // Collection of all Nodes
@@ -191,77 +187,7 @@ export class Engine {
     this.setAppMode(AppModes.SELECT);
   }
 
-  // TODO write code to show error and retry.
 
-  onRenderingSystemReceived(
-    response: SharedWorkerResponse<
-      DiffusionSharedWorkerResponseData | MediaFile,
-      DiffusionSharedWorkerProgressData
-    >,
-  ) {
-    if (!response.data) {
-      // throw error to retry
-      uiAccess.dialogError.show({
-        title: "Generation Error",
-        message: response.data?.toString(),
-      });
-      uiAccess.toolbarMain.loadingBar.hide();
-      this.setAppMode(AppModes.SELECT);
-      return;
-    }
-
-    if (response.responseType === ResponseType.error) {
-      console.log("Error Data?");
-      console.log(response.data, response);
-      uiAccess.dialogError.show({
-        title: "Generation Error Try again.",
-        message: response.data?.toString(),
-      });
-      uiAccess.toolbarMain.loadingBar.hide();
-      this.setAppMode(AppModes.SELECT);
-      return;
-    }
-
-    if (response.responseType === ResponseType.result) {
-      console.log(response.data);
-      const data = response.data;
-      // create video node here.
-      // choose it to be the size of the rendering output, this case its mobile. (1560, 400)
-      if (typeof data === "string" || data === undefined) {
-        return;
-      }
-      if ("videoUrl" in data) {
-        console.log("Engine got stylized video: " + data.videoUrl);
-        this.addVideo({ mediaFileUrl: data.videoUrl });
-      } else if ("media_links" in data) {
-        console.log("Engine got rendered video: " + data.media_links.cdn_url);
-        downloadURI(data.media_links.cdn_url, "Download Video");
-      }
-
-      // hide the loader
-      //this.realTimeDrawEngine.videoLoadingCanvas.kNode.hide();
-      uiAccess.toolbarMain.loadingBar.hide();
-      this.setAppMode(AppModes.SELECT);
-      return;
-    }
-
-    if (response.responseType === ResponseType.progress) {
-      const data = response.data as DiffusionSharedWorkerProgressData;
-      // TODO wil fix this ?!?! parameter issue
-      //this.realTimeDrawEngine.videoLoadingCanvas.kNode.show();
-      uiAccess.toolbarMain.loadingBar.update({
-        message: "Rendering Frames...",
-        progress: data.progress * 100,
-        isShowing: true,
-      });
-
-      // console.log(response);
-      // if (response.data.zipBlob) {
-      //   FileUtilities.downloadBlobZip(response.data.zipBlob);
-      // }
-      return;
-    }
-  }
 
   private setAppMode(newAppMode: AppModes) {
     this.appMode = newAppMode;
@@ -472,10 +398,7 @@ export class Engine {
       this.addImage(image);
     });
 
-    uiEvents.onGetStagedVideo((videoData) => {
-      console.log("Engine got user video: " + videoData.mediaFileUrl);
-      this.addVideo(videoData);
-    });
+  
     uiEvents.onAddTextToEngine((textdata) => {
       this.addText(textdata);
     });
@@ -506,20 +429,13 @@ export class Engine {
         }
       }
     });
-    uiEvents.aiStylize.onRequest(async (data) => {
-      console.log("Engine heard AI Stylize request: ", data);
+    
+    uiEvents.promptEvents.onPromptStrengthChanged((strength) => {
+      this.realTimeDrawEngine.currentStrength = strength;
+    });
 
-      try {
-        this.setAppMode(AppModes.RENDERING);
-        //await this.realTimeDrawEngine.startProcessing(data);
-      } catch (error) {
-        // throw error to retry
-        uiAccess.dialogError.show({
-          title: "Generation Error",
-          message: error?.toString() || "Unknown Error",
-        });
-        this.setAppMode(AppModes.SELECT);
-      }
+    uiEvents.promptEvents.onPromptTextChanged((prompt) => {
+      this.realTimeDrawEngine.currentPrompt = prompt;
     });
   }
 

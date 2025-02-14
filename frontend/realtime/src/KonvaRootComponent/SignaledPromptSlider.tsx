@@ -15,7 +15,7 @@ export const SignaledPromptSlider = () => {
     })
 
     return (
-        <div className="fixed bottom-96 left-1/2 -translate-x-1/2 h-4 w-48">
+        <div className="fixed bottom-80 left-1/2 -translate-x-1/2 h-4 w-96">
             <Slider min={0} max={100} value={sliderValue} onChange={onSliderValueChanged} step={1} />
         </div>
     )

@@ -58,7 +58,7 @@ export const KonvaRootComponent = ({
         className={className}
       // retreive the classNames from the parent for sizing/styling
       />
-      <SignaledMagicBox />
+      {/* <SignaledMagicBox /> */}
       <SignaledCanvasDragDropFiles
         openAddImage={appUiContext.openAddImage}
         openAddVideo={appUiContext.openAddVideo}
@@ -69,7 +69,7 @@ export const KonvaRootComponent = ({
         layoutSignal={layoutContext.signal}
         appUiContext={appUiContext}
       />
-      <SignaledToolbarVideoExtraction />
+      {/* <SignaledToolbarVideoExtraction /> */}
       <SignaledDialogs
         appUiSignal={appUiContext.signal}
         resetAll={appUiContext.resetAll}
@@ -77,7 +77,7 @@ export const KonvaRootComponent = ({
 
       <ContextualLoadingBar />
       <ContextualToolbarNode />
-      <ContextualButtonRetry />
+      {/* <ContextualButtonRetry /> */}
     </>
   );
 };
