@@ -2,10 +2,10 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
-use crate::ml::infer_clip_text_embeddings::infer_clip_text_embeddings;
 use crate::ml::model_cache::ModelCache;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
+use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
 use crate::state::app_config::AppConfig;
 use anyhow::{Error as E, Result};
 use candle_core::{DType, IndexOp, D};
@@ -14,11 +14,7 @@ use image::DynamicImage;
 use log::info;
 use rand::Rng;
 
-// TODO: Clean up
 
-// Note for Kasisnu: I'm going to start using lifetimes as long as that doesn't slow your velocity
-// Basically the args o this telescopic args struct are guaranteed to live as long as the struct
-// itself with the 'a lifetime.
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
     pub prompt: String,
@@ -29,16 +25,18 @@ pub struct Args<'a> {
     pub prompt_cache: &'a PromptCache,
 }
 
-pub fn run(args: Args<'_>) -> Result<RgbImage> {
+pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     println!("Starting image generation with the following configuration:");
     println!("  Model: {:?}", args.configs.sd_version);
     println!("  Prompt: {}", args.prompt);
     println!("  Steps: {}", args.configs.scheduler_steps);
     println!("  Device: {:?}", args.configs.device);
 
-
     println!("Model dimensions: {}x{}", args.configs.sd_config.width, args.configs.sd_config.height);
 
+    // TODO(bt,2025-02-18): The scheduler is `EulerAncestralDiscreteScheduler`, but we may want to port an LCM scheduler.
+    //  This is a target for performance improvement
+    //  See: https://github.com/huggingface/candle/issues/1331
     println!("Building scheduler...");
     let mut scheduler = args.configs.sd_config.build_scheduler(
         args.configs.scheduler_steps)?;
@@ -88,7 +86,8 @@ pub fn run(args: Args<'_>) -> Result<RgbImage> {
 
     let init_latent_dist : DiagonalGaussianDistribution = args.model_cache.vae_encode(&input_image)?;
 
-    // TODO(bt,2025-02-18): This takes a little bit to generate.
+    // TODO(bt,2025-02-18): This takes a little bit to generate the sample.
+    //  This is a target for performance improvement
     println!("Generating latents from input image...");
     let latents = (init_latent_dist.sample()? * vae_scale)?;
     
@@ -158,6 +157,7 @@ pub fn run(args: Args<'_>) -> Result<RgbImage> {
     let image = ((image / 2.)? + 0.5)?;
     
     // TODO(bt,2025-08-18): This normalization is slow.
+    //  This is a target for performance improvement
     println!("Normalized image values");
     let image = (image.clamp(0f32, 1.)? * 255.)?;
 
