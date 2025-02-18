@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
-  "productName": "Storyteller Desktop App",
+  "productName": "Realtime Desktop App",
   "version": "0.1.0",
   "identifier": "com.unique.value.thing.why",
   "build": {
@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "Storyteller Desktop App Title Goes Here",
-        "width": 800,
-        "height": 600,
+        "title": "Realtime Desktop App Title Goes Here",
+        "width": 1200,
+        "height": 800,
         "resizable": true,
         "fullscreen": false
       }

@@ -18,6 +18,7 @@ const PROMPT: &str = "A beautiful landscape with mountains and a lake";
 #[tauri::command]
 pub fn infer_image(
   image: &str,
+  prompt: Option<String>,
   model_config: State<AppConfig>,
   model_cache: State<ModelCache>,
   prompt_cache: State<PromptCache>,
@@ -26,17 +27,9 @@ pub fn infer_image(
   let bytes = BASE64_STANDARD.decode(image)
     .map_err(|err| format!("Base64 decode error: {}", err))?;
   
-  let prompt_file = PathBuf::from("prompt.txt").canonicalize()
-    .unwrap_or_else(|_| PathBuf::from("prompt.txt"));
+  let prompt = get_prompt(prompt);
   
-  let prompt = std::fs::read_to_string(&prompt_file)
-    .map_err(|err| format!("Failed to read prompt file: {}", err))
-    .unwrap_or_else(|_| {
-      error!("Failed to read prompt file: {:?}", prompt_file);
-      PROMPT.to_string()
-    })
-    .trim()
-    .to_string();
+  info!("Prompt: {}", prompt);
 
   let image = ImageReader::new(Cursor::new(bytes))
     .with_guessed_format()
@@ -89,4 +82,25 @@ fn do_infer_image(
     },
     Err(e) => Err(format!("Failed to generate image: {}", e)),
   }
+}
+
+fn get_prompt(user_prompt: Option<String>) -> String {
+  let user_prompt = user_prompt.map(|prompt| prompt.trim().to_string())
+    .filter(|prompt| !prompt.is_empty());
+  
+  if let Some(prompt) = user_prompt {
+    return prompt;
+  }
+
+  let prompt_file = PathBuf::from("prompt.txt").canonicalize()
+    .unwrap_or_else(|_| PathBuf::from("prompt.txt"));
+
+  std::fs::read_to_string(&prompt_file)
+    .map_err(|err| format!("Failed to read prompt file: {}", err))
+    .unwrap_or_else(|_| {
+      error!("Failed to read prompt file: {:?}", prompt_file);
+      PROMPT.to_string()
+    })
+    .trim()
+    .to_string()
 }
