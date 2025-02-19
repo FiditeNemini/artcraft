@@ -14,12 +14,15 @@ use tauri::State;
 const PROMPT_FILENAME : &str = "prompt.txt";
 const PROMPT: &str = "A beautiful landscape with mountains and a lake";
 
+const NEGATIVE_PROMPT: &str = "bad quality, bad faces, poor quality, blurry faces, watermark";
+
 /// This handler takes an image (as a base64 encoded string) and a prompt and returns
 /// an image (as a base64-encoded string).
 #[tauri::command]
 pub fn infer_image(
   image: &str,
   prompt: Option<String>,
+  strength: Option<u8>,
   model_config: State<AppConfig>,
   model_cache: State<ModelCache>,
   prompt_cache: State<PromptCache>,
@@ -32,7 +35,7 @@ pub fn infer_image(
   let image = hydrate_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
 
-  let result = do_infer_image(&prompt, image, &model_config, &model_cache, prompt_cache);
+  let result = do_infer_image(&prompt, image, strength, &model_config, &model_cache, prompt_cache);
   
   if let Err(err) = result.as_deref() {
     error!("There was an error: {:?}", err);
@@ -44,6 +47,7 @@ pub fn infer_image(
 fn do_infer_image(
   prompt: &str,
   image: DynamicImage,
+  strength: Option<u8>,
   config: &AppConfig,
   model_cache: &ModelCache,
   prompt_cache: State<PromptCache>,
@@ -53,12 +57,13 @@ fn do_infer_image(
   let args = Args {
     image: &image,
     prompt: prompt.to_string(),
-    uncond_prompt: "".to_string(),
+    uncond_prompt: NEGATIVE_PROMPT.to_string(),
     //guidance_scale: Some(0.0),
     guidance_scale: None,
     model_cache,
     configs: config,
     prompt_cache: &prompt_cache,
+    strength: strength,
   };
 
   match stable_diffusion_pipeline(args) {

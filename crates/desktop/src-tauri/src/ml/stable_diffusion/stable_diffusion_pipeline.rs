@@ -23,6 +23,7 @@ pub struct Args<'a> {
     pub configs: &'a AppConfig,
     pub model_cache: &'a ModelCache,
     pub prompt_cache: &'a PromptCache,
+    pub strength: Option<u8>,
 }
 
 pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
@@ -96,7 +97,11 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     println!("Initial latents shape: {:?}", latents.shape());
 
     println!("Calculating start step for diffusion process...");
-    let img2img_strength = 0.75f64;
+    
+    let img2img_strength = match args.strength {
+        None => 0.75f64,
+        Some(strength) => (strength as f64) / 100.0f64,
+    };
 
     let t_start = {
         let start = args.configs.scheduler_steps - (args.configs.scheduler_steps as f64 * img2img_strength) as usize;
