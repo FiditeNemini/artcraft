@@ -2,6 +2,7 @@ import Konva from "konva";
 
 
 import { uiAccess, uiEvents } from "~/signals";
+import { ShapeNode } from "./Nodes";
 
 import { UndoStackManager } from "./UndoRedo";
 import { CommandManager, MatteBox, SceneManager } from "./EngineUtitlities";
@@ -26,7 +27,7 @@ import { NavigateFunction } from "react-router-dom";
 import { LoadingVideosProvider } from "./EngineUtitlities/LoadingVideosProvider";
 
 import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandler/VideoExtractionHandler";
-import { RealTimeDrawEngine } from "./RenderingPrimitives/RealTimeDrawEngine";
+import { RealTimeDrawEngine, ShapeType } from "./RenderingPrimitives/RealTimeDrawEngine";
 
 // for testing loading files from system
 // import { FileUtilities } from "./FileUtilities/FileUtilities";
@@ -393,6 +394,10 @@ export class Engine {
       this.addImage(image);
     });
 
+    
+    this.addShape(ShapeType.Circle,100);
+    this.addShape(ShapeType.Square,100);
+    this.addShape(ShapeType.Triangle,100);
   
     uiEvents.onAddTextToEngine((textdata) => {
       this.addText(textdata);
@@ -523,6 +528,20 @@ export class Engine {
       canvasSize: this.realTimeDrawEngine.captureCanvas.size(),
     });
     this.commandManager.createNode(textNode);
+  }
+
+  public addShape(type: ShapeType, size: number, color?: string) {
+    const shapeNode = new ShapeNode({
+      canvasPosition: this.realTimeDrawEngine.captureCanvas.position(),
+      canvasSize: this.realTimeDrawEngine.captureCanvas.size(),
+      shapeType: type,
+      size: size,
+      color: color,
+      mediaLayerRef: this.mediaLayer,
+      selectionManagerRef: this.selectionManager
+    });
+    this.realTimeDrawEngine.addNodes(shapeNode);
+    this.commandManager.createNode(shapeNode);
   }
 
   public addImage(imageFile: File) {

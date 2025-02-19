@@ -3,22 +3,24 @@ import { Container } from "konva/lib/Container";
 import { Shape } from "konva/lib/Shape";
 import { Group } from "konva/lib/Group";
 
-
 import { invoke } from "@tauri-apps/api/core";
 
-
 import { FileUtilities } from "../FileUtilities/FileUtilities";
-import { ImageNode, VideoNode, TextNode } from "../Nodes";
+import { ImageNode, VideoNode, TextNode, ShapeNode } from "../Nodes";
 import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
 import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
-
+export enum ShapeType {
+  Square = "square",
+  Triangle = "triangle", 
+  Circle = "circle"
+}
 export class RealTimeDrawEngine {
   private videoNodes: VideoNode[];
-  private imageNodes: (ImageNode | TextNode)[];
+  private imageNodes: (ImageNode | TextNode | ShapeNode)[];
 
   private offScreenCanvas: OffscreenCanvas;
   private outputBitmap: ImageBitmap | undefined;
@@ -90,7 +92,7 @@ export class RealTimeDrawEngine {
     this.port = undefined;
 
     this.fps = 24;
-    
+
     this.currentPrompt = "";
     this.currentStrength = 100;
     // This is captures a subset of the medialayer ref
@@ -100,25 +102,11 @@ export class RealTimeDrawEngine {
       y: this.positionY,
       width: this.width,
       height: this.height,
-      fill: "white",
+      fill: "blue",
       stroke: "black",
       strokeWidth: 1,
       draggable: false,
     });
-
-    // Add preview canvas with same dimensions but different style
-    // this.previewCanvas = new Konva.Rect({
-    //   name: "PreviewCanvas",
-    //   x: this.positionX,
-    //   y: this.positionY,
-    //   width: this.width,
-    //   height: this.height,
-    //   fill: "white",
-    //   stroke: "blue",
-    //   strokeWidth: 1,
-    //   dash: [5, 5],
-    //   draggable: false,
-    // });
 
     this.previewCanvas = new Konva.Image({
       name: "PreviewCanvas",
@@ -127,16 +115,16 @@ export class RealTimeDrawEngine {
       width: this.width,
       height: this.height,
       image: undefined,
-      stroke: "blue",
+      stroke: "black",
       strokeWidth: 1,
-      dash: [5, 5],
       draggable: false,
+      fill: "red",
     });
 
     this.bgLayerRef.add(this.captureCanvas);
     this.bgLayerRef.add(this.previewCanvas);
     // send back
-    this.captureCanvas.setZIndex(0);
+    this.captureCanvas.setZIndex(1);
     this.previewCanvas.setZIndex(0);
 
     //this.debug();
@@ -284,11 +272,10 @@ export class RealTimeDrawEngine {
     this.isProcessing = true;
     await this.render();
   };
+  
   public addNodes(node: MediaNode) {
-    if (node instanceof VideoNode) {
-      this.videoNodes.push(node);
-      node.kNode.on("dragend", this.handleNodeDragEnd);
-    } else if (node instanceof ImageNode || node instanceof TextNode) {
+   
+    if (node instanceof ImageNode || node instanceof TextNode || node instanceof ShapeNode) {
       this.imageNodes.push(node);
       node.kNode.on("dragend", this.handleNodeDragEnd);
     }
@@ -383,8 +370,6 @@ export class RealTimeDrawEngine {
       throw error;
     }
   }
-
-
 
   private async imageBitmapToBase64(imageBitmap: ImageBitmap): Promise<string> {
     // Create a temporary canvas
@@ -486,16 +471,16 @@ export class RealTimeDrawEngine {
       this.outputBitmap = bitmap;
       this.previewCanvas.image(bitmap);
       this.isProcessing = false;
-      return
-    } 
+      return;
+    }
 
     try {
       const base64Bitmap = await this.imageBitmapToBase64(bitmap);
 
       const base64BitmapResponse = await invoke("infer_image", {
         image: base64Bitmap,
-        prompt:this.currentPrompt,
-        strength:this.currentStrength,
+        prompt: this.currentPrompt,
+        strength: this.currentStrength,
       });
 
       console.log(base64BitmapResponse);
@@ -510,6 +495,5 @@ export class RealTimeDrawEngine {
     } finally {
       this.isProcessing = false;
     }
-
   }
 }
