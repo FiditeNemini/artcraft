@@ -5,24 +5,23 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+    <nav className="fixed top-0 z-50 w-full bg-[rgba(16,16,20,0.7)] backdrop-blur-3xl">
+      <div className="mx-auto max-w-[1920px] px-4 sm:px-24 lg:px-32">
+        <div className="flex h-[72px] items-center justify-between">
           <a href="/" className="flex items-center">
             <img
-              src="/brand/Storyteller-Logo-Black.png"
-              alt="Storyteller Board"
-              className="h-9"
+              src="/brand/mira-logo.png"
+              alt="Mira Realtime AI Editor"
+              className="h-[34px] pb-1"
             />
           </a>
           <div className="flex items-center space-x-5">
-            <a
-              href="/login"
-              className="font-medium !text-gray-600 hover:!text-gray-900"
+            <Button
+              className="bg-[#2D81FF] hover:bg-[#438AF6]"
+              onClick={() => navigate("/download")}
             >
-              Login
-            </a>
-            <Button onClick={() => navigate("/signup")}>Sign Up</Button>
+              Download
+            </Button>
           </div>
         </div>
       </div>

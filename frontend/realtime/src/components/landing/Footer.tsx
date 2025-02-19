@@ -9,18 +9,18 @@ const Footer = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="border-t border-gray-100 bg-gray-50">
+    <footer className="relative z-10 bg-[#18181C]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center space-y-10 text-center">
           <img
-            src="/brand/Storyteller-Logo-Black.png"
-            alt="Storyteller Board"
-            className="h-9"
+            src="/brand/mira-logo.png"
+            alt="Mira Realtime AI Editor"
+            className="h-[34px] pb-1"
           />
 
           <Button
             onClick={() => navigate("/signup")}
-            className="group rounded-xl px-8 py-4 text-lg"
+            className="text-md group rounded-xl bg-[#2D81FF] px-8 py-4 hover:bg-[#438AF6]"
           >
             <span className="relative flex items-center">
               Start Creating for Free
