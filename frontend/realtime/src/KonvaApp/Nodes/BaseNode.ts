@@ -29,7 +29,7 @@ export abstract class BaseNode {
   }: {
     selectionManagerRef: SelectionManager;
     mediaLayerRef: Konva.Layer;
-    kNode: Konva.Image | Konva.Group;
+    kNode: Konva.Image | Konva.Group | Konva.Shape;
   }) {
     // console.log("Node constructed");
     // this.uuid = uuidv4();

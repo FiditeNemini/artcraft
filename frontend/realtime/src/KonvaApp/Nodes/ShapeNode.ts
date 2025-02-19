@@ -6,11 +6,11 @@ import { NodeType } from "./constants";
 import { NodeUtilities } from "./NodeUtilities";
 
 export enum ShapeType {
-    CIRCLE = "circle",
-    SQUARE = "square", 
-    TRIANGLE = "triangle"
-  }
-  
+  CIRCLE = "circle",
+  SQUARE = "square",
+  TRIANGLE = "triangle",
+}
+
 interface ShapeNodeConstructor {
   canvasPosition: Position;
   canvasSize: Size;
@@ -37,68 +37,72 @@ export class ShapeNode extends BaseNode {
     mediaLayerRef,
     selectionManagerRef,
   }: ShapeNodeConstructor) {
-    
+    // Create the actual shape inside the group
     const transform = NodeUtilities.getInitialTransform({
       existingTransform,
       canvasPosition,
       canvasSize,
     });
-
-    // Create group to satisfy BaseNode type requirements
-    const group = new Konva.Group({
-      ...transform,
-      draggable: true,
-    });
-
-    super({
-      selectionManagerRef: selectionManagerRef,
-      mediaLayerRef: mediaLayerRef,
-      kNode: group
-    });
-
-    this.kNode = group;
-    this.shapeType = shapeType;
-
-    // Create the actual shape inside the group
+    let shape = null;
     switch (shapeType) {
       case ShapeType.CIRCLE:
-        this.shape = new Konva.Circle({
+        shape = new Konva.Circle({
           radius: 50,
           fill: color,
-          strokeScaleEnabled: false
+          ...transform,
+          strokeScaleEnabled: false,
+          draggable: true,
         });
         break;
 
       case ShapeType.SQUARE:
-        this.shape = new Konva.Rect({
+        shape = new Konva.Rect({
           width: 100,
           height: 100,
+          ...transform,
           fill: color,
-          strokeScaleEnabled: false
+          strokeScaleEnabled: false,
+          draggable: true,
         });
         break;
 
       case ShapeType.TRIANGLE:
-        this.shape = new Konva.RegularPolygon({
+        shape = new Konva.RegularPolygon({
           sides: 3,
           radius: 50,
+          ...transform,
           fill: color,
-          strokeScaleEnabled: false
+          strokeScaleEnabled: false,
+          draggable: true,
         });
         break;
 
       default:
-        throw new Error('Invalid shape type');
+        throw new Error("Invalid shape type");
     }
+
+    // Create group to satisfy BaseNode type requirements
+    // const group = new Konva.Group({
+    //   ...transform,
+    //   draggable: true,
+    // });
+
+    super({
+      selectionManagerRef: selectionManagerRef,
+      mediaLayerRef: mediaLayerRef,
+      kNode: shape,
+    });
+
+    this.kNode = shape;
+    this.shapeType = shapeType;
 
     // Add shape to group
     const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
-        canvasOffset: canvasPosition,
-        componentSize: canvasSize,
-        maxSize: canvasSize,
-      });
+      canvasOffset: canvasPosition,
+      componentSize: canvasSize,
+      maxSize: canvasSize,
+    });
     this.kNode.setPosition(centerPosition);
-    this.kNode.add(this.shape);
     this.mediaLayerRef.add(this.kNode);
     this.listenToBaseKNode();
     this.mediaLayerRef.draw();
@@ -119,7 +123,7 @@ export class ShapeNode extends BaseNode {
           y: this.kNode.scaleY(),
         },
         zIndex: this.kNode.getZIndex(),
-      }
+      },
     };
     return data;
   }
