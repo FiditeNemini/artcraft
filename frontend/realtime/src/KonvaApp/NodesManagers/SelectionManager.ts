@@ -4,7 +4,7 @@ import { MediaNode, Position, Transformation } from "../types";
 import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
 import { LoadingBarStatus } from "~/components/ui";
-import { ImageNode, TextNode, VideoNode } from "../Nodes";
+import { ImageNode, ShapeNode, TextNode, VideoNode } from "../Nodes";
 import {
   calculateContextualsPosition,
   getImageNodeButtonStates,
@@ -271,7 +271,7 @@ export class SelectionManager {
       return; // no node
     }
     if (this.selectedNodes.size === 1) {
-      if (node instanceof ImageNode) {
+      if (node instanceof ImageNode || node instanceof ShapeNode) {
         showOrUpdate({
           locked: node.isLocked(),
           buttonStates: getImageNodeButtonStates({ locked: node.isLocked() }),
@@ -316,7 +316,7 @@ export class SelectionManager {
       this.hideContextComponents();
       return; // no nodes
     }
-
+  
     // console.log("SelectionManager > updateContextComponents for node:", node);
     const coord = calculateContextualsPosition(
       this.nodeTransformerRef.getKonvaNode(),
