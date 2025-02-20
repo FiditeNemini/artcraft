@@ -24,8 +24,6 @@ interface ShapeNodeConstructor {
 
 export class ShapeNode extends BaseNode {
   public kNode: Konva.Group;
-  private shapeType: ShapeType;
-  private shape: Konva.Shape;
 
   constructor({
     canvasPosition,
@@ -48,8 +46,8 @@ export class ShapeNode extends BaseNode {
       case ShapeType.CIRCLE:
         shape = new Konva.Circle({
           radius: 50,
-          fill: color,
           ...transform,
+          fill: color,
           strokeScaleEnabled: false,
           draggable: true,
         });
@@ -80,12 +78,6 @@ export class ShapeNode extends BaseNode {
       default:
         throw new Error("Invalid shape type");
     }
-
-    // Create group to satisfy BaseNode type requirements
-    // const group = new Konva.Group({
-    //   ...transform,
-    //   draggable: true,
-    // });
 
     super({
       selectionManagerRef: selectionManagerRef,

@@ -28,7 +28,7 @@ export class RealTimeDrawEngine {
   // private frames: ImageBitmap[];
 
   // capturing composite within window
-  private bgLayerRef: Konva.Layer;
+
   private mediaLayerRef: Konva.Layer;
 
   private height: number;
@@ -53,13 +53,11 @@ export class RealTimeDrawEngine {
   constructor({
     width,
     height,
-    bgLayerRef,
     mediaLayerRef,
     offScreenCanvas,
   }: {
     width: number;
     height: number;
-    bgLayerRef: Konva.Layer;
     mediaLayerRef: Konva.Layer;
     offScreenCanvas: OffscreenCanvas;
   }) {
@@ -82,7 +80,6 @@ export class RealTimeDrawEngine {
     this.offScreenCanvas.width = this.width;
     this.offScreenCanvas.height = this.height;
 
-    this.bgLayerRef = bgLayerRef;
 
     // this is the whole canvas
     this.mediaLayerRef = mediaLayerRef;
@@ -118,16 +115,14 @@ export class RealTimeDrawEngine {
       stroke: "black",
       strokeWidth: 1,
       draggable: false,
-      fill: "red",
+      fill: "blue",
     });
 
-    this.bgLayerRef.add(this.captureCanvas);
-    this.bgLayerRef.add(this.previewCanvas);
+    this.mediaLayerRef.add(this.captureCanvas);
+    this.mediaLayerRef.add(this.previewCanvas);
     // send back
-    this.captureCanvas.setZIndex(1);
-    this.previewCanvas.setZIndex(0);
-
-    //this.debug();
+    this.captureCanvas.setZIndex(0);
+    this.previewCanvas.setZIndex(1);
   }
 
   async updateCaptureCanvas(
@@ -276,7 +271,9 @@ export class RealTimeDrawEngine {
   public addNodes(node: MediaNode) {
    
     if (node instanceof ImageNode || node instanceof TextNode || node instanceof ShapeNode) {
+      console.debug("Adding node:", node);
       this.imageNodes.push(node);
+      console.log(this.imageNodes)
       node.kNode.on("dragend", this.handleNodeDragEnd);
     }
   }
@@ -447,7 +444,7 @@ export class RealTimeDrawEngine {
   }
 
   public async render() {
-    // only pick nodes that intersect with the canvas on screen bounds to freeze.
+    // only pick nodes that intersect wi th the canvas on screen bounds to freeze.
     this.mediaLayerRef.draw();
 
     console.log(
@@ -467,7 +464,7 @@ export class RealTimeDrawEngine {
     })) as ImageBitmap;
 
     // Test code
-    if (false) {
+    if (true) {
       this.outputBitmap = bitmap;
       this.previewCanvas.image(bitmap);
       this.isProcessing = false;

@@ -98,6 +98,7 @@ export class Engine {
     this.stage.add(this.nodeIsolationLayer);
     this.stage.add(this.uiLayer);
 
+
     // Konva Transformer
     this.nodeTransformer = new NodeTransformer();
     this.uiLayer.add(this.nodeTransformer.getKonvaNode());
@@ -178,6 +179,12 @@ export class Engine {
     // hence, lastly, setup these events
     this.setupEventSystem();
     this.setAppMode(AppModes.SELECT);
+
+
+    console.log("HELLO")    
+    this.addShape(ShapeType.Circle,100);
+    // this.addShape(ShapeType.Square,100);
+    // this.addShape(ShapeType.Triangle,100);
   }
 
 
@@ -394,10 +401,7 @@ export class Engine {
       this.addImage(image);
     });
 
-    
-    this.addShape(ShapeType.Circle,100);
-    this.addShape(ShapeType.Square,100);
-    this.addShape(ShapeType.Triangle,100);
+  
   
     uiEvents.onAddTextToEngine((textdata) => {
       this.addText(textdata);
@@ -540,8 +544,10 @@ export class Engine {
       mediaLayerRef: this.mediaLayer,
       selectionManagerRef: this.selectionManager
     });
-    this.realTimeDrawEngine.addNodes(shapeNode);
+    shapeNode.kNode.zIndex(1); // Replace desiredZIndex with a number
+   
     this.commandManager.createNode(shapeNode);
+    //this.realTimeDrawEngine.addNodes(shapeNode);
   }
 
   public addImage(imageFile: File) {
@@ -552,9 +558,9 @@ export class Engine {
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
     });
-
+    imageNode.kNode.zIndex(1);
     this.commandManager.createNode(imageNode);
-    this.realTimeDrawEngine.addNodes(imageNode);
+    //this.realTimeDrawEngine.addNodes(imageNode);
   }
 
   public addVideo(
