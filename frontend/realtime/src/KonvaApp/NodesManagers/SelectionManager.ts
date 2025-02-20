@@ -275,6 +275,7 @@ export class SelectionManager {
         showOrUpdate({
           locked: node.isLocked(),
           buttonStates: getImageNodeButtonStates({ locked: node.isLocked() }),
+          color: node.getNodeData({ x: 0, y: 0 })?.textNodeData?.color ?? "#000000",
         });
       }
       if (node instanceof TextNode) {
@@ -282,7 +283,7 @@ export class SelectionManager {
           // TODO: Add ID to identify/mutate the color?
           locked: node.isLocked(),
           buttonStates: getTextNodeButtonStates({ locked: node.isLocked() }),
-          color: node.getNodeData({ x: 0, y: 0 }).textNodeData?.color ?? "#000000",
+        
         });
       }
       if (node instanceof VideoNode) {
