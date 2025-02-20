@@ -12,6 +12,7 @@ import { LayoutSignalType } from "./contextSignals/layout";
 import { AppUiContextInterface } from "./contextSignals/appUi";
 import { twMerge } from "tailwind-merge";
 import { paperWrapperStyles } from "~/components/styles";
+import { dispatchUiEvents } from "~/signals";
 
 export const SignaledToolbarMain = ({
   // layoutSignal,
@@ -43,6 +44,12 @@ export const SignaledToolbarMain = ({
         return () => appUiContext.openAddImage();
       case ToolbarMainButtonNames.ADD_VIDEO:
         return () => appUiContext.openAddVideo();
+      case ToolbarMainButtonNames.ADD_CIRCLE:
+        return () => dispatchUiEvents.addShapeToEngine({ shape: "circle" });
+      case ToolbarMainButtonNames.ADD_TRIANGLE:
+        return () => dispatchUiEvents.addShapeToEngine({ shape: "triangle" });
+      case ToolbarMainButtonNames.ADD_SQUARE:
+        return () => dispatchUiEvents.addShapeToEngine({ shape: "square" });
       default:
         return dispatchers[buttonName];
     }
