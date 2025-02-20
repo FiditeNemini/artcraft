@@ -44,17 +44,41 @@ export class ShapeNode extends BaseNode {
     let shape = null;
     switch (shapeType) {
       case ShapeType.CIRCLE:
-        shape = new Konva.Circle({
+        const circleShape = new Konva.Circle({
           radius: 50,
           ...transform,
           fill: color,
           strokeScaleEnabled: false,
           draggable: true,
         });
+
+        // Convert circle to image
+        const dataURL = circleShape.toDataURL();
+        const imageObj = new Image();
+        imageObj.src = dataURL;
+
+        shape = new Konva.Image({
+          image: imageObj,
+          x: circleShape.x(),
+          y: circleShape.y(),
+          width: circleShape.width(),
+          height: circleShape.height(),
+          ...transform,
+          fill: 'transparent',
+          strokeScaleEnabled: false,
+          draggable: true,
+        });
+
+        imageObj.onload = () => {
+          this.mediaLayerRef.draw();
+        };
+
+        // Clean up the temporary circle
+        circleShape.destroy();
         break;
 
       case ShapeType.SQUARE:
-        shape = new Konva.Rect({
+        const squareShape = new Konva.Rect({
           width: 100,
           height: 100,
           ...transform,
@@ -62,10 +86,34 @@ export class ShapeNode extends BaseNode {
           strokeScaleEnabled: false,
           draggable: true,
         });
+
+        // Convert square to image
+        const squareDataURL = squareShape.toDataURL();
+        const squareImageObj = new Image();
+        squareImageObj.src = squareDataURL;
+
+        shape = new Konva.Image({
+          image: squareImageObj,
+          x: squareShape.x(),
+          y: squareShape.y(),
+          width: squareShape.width(),
+          height: squareShape.height(),
+          ...transform,
+          fill: 'transparent',
+          strokeScaleEnabled: false,
+          draggable: true,
+        });
+
+        squareImageObj.onload = () => {
+          this.mediaLayerRef.draw();
+        };
+
+        // Clean up the temporary square
+        squareShape.destroy();
         break;
 
       case ShapeType.TRIANGLE:
-        shape = new Konva.RegularPolygon({
+        const triangleShape = new Konva.RegularPolygon({
           sides: 3,
           radius: 50,
           ...transform,
@@ -73,6 +121,30 @@ export class ShapeNode extends BaseNode {
           strokeScaleEnabled: false,
           draggable: true,
         });
+
+        // Convert triangle to image
+        const triangleDataURL = triangleShape.toDataURL();
+        const triangleImageObj = new Image();
+        triangleImageObj.src = triangleDataURL;
+
+        shape = new Konva.Image({
+          image: triangleImageObj,
+          x: triangleShape.x(),
+          y: triangleShape.y(),
+          width: triangleShape.width(),
+          height: triangleShape.height(),
+          ...transform,
+          fill: 'transparent',
+          strokeScaleEnabled: false,
+          draggable: true,
+        });
+
+        triangleImageObj.onload = () => {
+          this.mediaLayerRef.draw();
+        };
+
+        // Clean up the temporary triangle
+        triangleShape.destroy();
         break;
 
       default:

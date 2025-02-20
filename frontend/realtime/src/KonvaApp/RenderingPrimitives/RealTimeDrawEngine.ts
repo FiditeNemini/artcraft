@@ -99,7 +99,7 @@ export class RealTimeDrawEngine {
       y: this.positionY,
       width: this.width,
       height: this.height,
-      fill: "blue",
+      fill: "white",
       stroke: "black",
       strokeWidth: 1,
       draggable: false,
@@ -115,7 +115,7 @@ export class RealTimeDrawEngine {
       stroke: "black",
       strokeWidth: 1,
       draggable: false,
-      fill: "blue",
+      fill: "white",
     });
 
     this.mediaLayerRef.add(this.captureCanvas);
@@ -309,6 +309,7 @@ export class RealTimeDrawEngine {
     try {
       const box = config.layerOfInterest.getClientRect();
       const stage = config.layerOfInterest.getStage();
+      
 
       const x = config.x !== undefined ? config.x : Math.floor(box.x);
       const y = config.y !== undefined ? config.y : Math.floor(box.y);
@@ -446,7 +447,9 @@ export class RealTimeDrawEngine {
   public async render() {
     // only pick nodes that intersect wi th the canvas on screen bounds to freeze.
     this.mediaLayerRef.draw();
-
+    // Output all nodes in mediaLayerRef
+    const nodes = this.mediaLayerRef.getChildren();
+    console.log("All nodes in mediaLayer:", nodes);
     console.log(
       `context: x:${this.positionX} y:${this.positionY} ${this.width} x ${this.height}`,
     );

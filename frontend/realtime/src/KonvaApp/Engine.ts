@@ -180,11 +180,10 @@ export class Engine {
     this.setupEventSystem();
     this.setAppMode(AppModes.SELECT);
 
-
-    console.log("HELLO")    
+  
     this.addShape(ShapeType.Circle,100);
-    // this.addShape(ShapeType.Square,100);
-    // this.addShape(ShapeType.Triangle,100);
+    this.addShape(ShapeType.Square,100);
+    this.addShape(ShapeType.Triangle,100);
   }
 
 
