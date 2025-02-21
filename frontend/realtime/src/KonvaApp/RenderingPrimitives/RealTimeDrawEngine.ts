@@ -76,7 +76,6 @@ export class RealTimeDrawEngine {
     this.offScreenCanvas.width = this.width;
     this.offScreenCanvas.height = this.height;
 
-
     // this is the whole canvas
     this.mediaLayerRef = mediaLayerRef;
 
@@ -119,7 +118,60 @@ export class RealTimeDrawEngine {
     // send back
     this.captureCanvas.setZIndex(0);
     this.previewCanvas.setZIndex(1);
+    // Add mouse events for preview canvas copying
+    this.previewCopyListener();
   }
+
+  public previewCopyListener() {
+    this.previewCanvas.on('mousedown touchstart', () => {
+      if (!this.outputBitmap) {
+        console.log("No preview image to copy"); 
+        return;
+      }
+
+      // Create draggable preview copy
+      const previewCopy = new Konva.Image({
+        x: this.previewCanvas.x(),
+        y: this.previewCanvas.y(),
+        width: this.width,
+        height: this.height,
+        image: this.outputBitmap,
+        draggable: true,
+        listening: true
+      });
+
+      this.mediaLayerRef.add(previewCopy);
+      previewCopy.moveToTop();
+      this.mediaLayerRef.draw();
+
+      // Start dragging immediately
+      previewCopy.startDrag();
+
+      // Handle drag events
+      previewCopy.on('dragmove', () => {
+        this.mediaLayerRef.draw();
+      });
+
+      previewCopy.on('dragend', () => {
+        const previewBox = previewCopy.getClientRect();
+        const captureBox = this.captureCanvas.getClientRect();
+        
+        if (Konva.Util.haveIntersection(previewBox, captureBox)) {
+          // Snap to capture canvas position
+          previewCopy.position({
+            x: this.captureCanvas.x(),
+            y: this.captureCanvas.y()
+          });
+          this.mediaLayerRef.batchDraw();
+        } else {
+          // Remove if dropped outside capture area
+          previewCopy.destroy();
+          this.mediaLayerRef.batchDraw();
+        }
+      });
+    });
+  }
+
   public findImageNodeById(id: string): (ImageNode | TextNode | ShapeNode | undefined) {
     return this.imageNodes.find(node => {
       if (node.kNode) {
