@@ -119,7 +119,8 @@ export class RealTimeDrawEngine {
     this.captureCanvas.setZIndex(0);
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
-    this.previewCopyListener();
+    //this.previewCopyListener();
+
   }
 
   public previewCopyListener() {
@@ -128,6 +129,16 @@ export class RealTimeDrawEngine {
         console.log("No preview image to copy"); 
         return;
       }
+      
+      // TODO create it as a node.
+      
+      // const imageNode = new ImageNode({
+      //   mediaLayerRef: this.mediaLayer,
+      //   canvasPosition: this.renderEngine.captureCanvas.position(),
+      //   canvasSize: this.renderEngine.captureCanvas.size(),
+      //   imageFile: imageFile,
+      //   selectionManagerRef: this.selectionManager,
+      // });
 
       // Create draggable preview copy
       const previewCopy = new Konva.Image({
