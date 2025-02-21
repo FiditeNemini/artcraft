@@ -6,18 +6,14 @@ import { Group } from "konva/lib/Group";
 import { invoke } from "@tauri-apps/api/core";
 
 import { FileUtilities } from "../FileUtilities/FileUtilities";
-import { ImageNode, VideoNode, TextNode, ShapeNode } from "../Nodes";
+import { ImageNode, VideoNode, TextNode, ShapeNode, ShapeType } from "../Nodes";
 import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
 import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
-export enum ShapeType {
-  Square = "square",
-  Triangle = "triangle", 
-  Circle = "circle"
-}
+
 export class RealTimeDrawEngine {
   private videoNodes: VideoNode[];
   private imageNodes: (ImageNode | TextNode | ShapeNode)[];
@@ -124,7 +120,14 @@ export class RealTimeDrawEngine {
     this.captureCanvas.setZIndex(0);
     this.previewCanvas.setZIndex(1);
   }
-
+  public findImageNodeById(id: string): (ImageNode | TextNode | ShapeNode | undefined) {
+    return this.imageNodes.find(node => {
+      if (node.kNode) {
+        return node.kNode.id() === id;
+      }
+      return false;
+    });
+  }
   async updateCaptureCanvas(
     width: number | undefined,
     height: number | undefined,

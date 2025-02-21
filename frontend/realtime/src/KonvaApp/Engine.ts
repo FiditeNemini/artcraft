@@ -27,9 +27,9 @@ import { NavigateFunction } from "react-router-dom";
 import { LoadingVideosProvider } from "./EngineUtitlities/LoadingVideosProvider";
 
 import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandler/VideoExtractionHandler";
-import { RealTimeDrawEngine, ShapeType } from "./RenderingPrimitives/RealTimeDrawEngine";
+import { RealTimeDrawEngine } from "./RenderingPrimitives/RealTimeDrawEngine";
 import { NodeColor } from "~/signals/uiEvents/toolbarNode";
-
+import { ShapeType } from "./Nodes";
 // for testing loading files from system
 // import { FileUtilities } from "./FileUtilities/FileUtilities";
 
@@ -443,18 +443,27 @@ export class Engine {
     uiEvents.onAddShapeToEngine((shapeData) => {
       switch (shapeData.shape) {
         case "circle":
-          this.addShape(ShapeType.Circle, 100);
+          this.addShape(ShapeType.CIRCLE, 100);
           break;
         case "square":
-          this.addShape(ShapeType.Square, 100);
+          this.addShape(ShapeType.SQUARE, 100);
           break;
         case "triangle":
-          this.addShape(ShapeType.Triangle, 100);
+          this.addShape(ShapeType.TRIANGLE, 100);
           break;
       }
     });
 
     uiEvents.toolbarNode.color.onConfirmChanged((nodeColor) => {
+      console.log("Color change event triggered with:", nodeColor);
+      if (!nodeColor) {
+        console.warn("nodeColor is undefined or null");
+        return;
+      }
+      if (!nodeColor.kNodeId) {
+        console.warn("nodeColor.kNodeId is undefined or null");
+        return;
+      }
       this.changeNodeColor(nodeColor);
     })
   }
@@ -540,12 +549,37 @@ export class Engine {
   }
 
   private changeNodeColor(nodeColor: NodeColor) {
+    console.log('Changing node color:', nodeColor);
     // Find the node that is selected with the id
     const idSelector = '#' + nodeColor.kNodeId;
     const selectedNode = this.mediaLayer.findOne(idSelector);
-
+    console.log('Selected node:', selectedNode);
+    console.log('ID selector:', idSelector);
+    console.log('Media layer:', this.mediaLayer);
     // TODO: Change the color of the node
     // Turns out shapes are image nodes... how do we change the image's fill??
+    if (selectedNode) {
+      // Get the shape node from the real time drawing engine's image nodes
+      const shapeNode = this.realTimeDrawEngine.findImageNodeById(nodeColor.kNodeId);
+      if (shapeNode && shapeNode instanceof ShapeNode) {
+        // Create new shape node with updated color
+        const newShapeNode = new ShapeNode({
+          canvasPosition: this.realTimeDrawEngine.captureCanvas.position(),
+          canvasSize: this.realTimeDrawEngine.captureCanvas.size(), 
+          shapeType: shapeNode.shapeType,
+          size: shapeNode.size,
+          color: nodeColor.color,
+          mediaLayerRef: this.mediaLayer,
+          selectionManagerRef: this.selectionManager
+        });
+        newShapeNode.kNode.position(shapeNode.kNode.position());
+        newShapeNode.kNode.zIndex(shapeNode.kNode.zIndex());
+        
+        // Remove old node and add new one
+        shapeNode.kNode.destroy();
+        this.commandManager.createNode(newShapeNode);
+      }
+    }
   }
 
   public addText(textNodeData: TextNodeData) {

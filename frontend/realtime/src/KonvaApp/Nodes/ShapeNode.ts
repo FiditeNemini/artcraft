@@ -1,7 +1,6 @@
 import Konva from "konva";
 import { SelectionManager } from "../NodesManagers";
 import { Position, Size, NodeData, TransformationData } from "../types";
-import { BaseNode } from "./BaseNode";
 import { NodeType } from "./constants";
 import { NodeUtilities } from "./NodeUtilities";
 import { NetworkedNode } from "./NetworkedNode";
@@ -24,6 +23,13 @@ interface ShapeNodeConstructor {
 }
 
 export class ShapeNode extends NetworkedNode {
+  
+  retry(): void {
+    throw new Error("Method not implemented.");
+  }
+
+  public shapeType: ShapeType;
+  public size: number;
 
   constructor({
     canvasPosition,
@@ -158,6 +164,9 @@ export class ShapeNode extends NetworkedNode {
       mediaLayerRef: mediaLayerRef,
       kNode: shape,
     });
+
+    this.shapeType = shapeType;
+    this.size = size;
 
     // Add shape to group
     const centerPosition = NodeUtilities.positionNodeOnCanvasCenter({
