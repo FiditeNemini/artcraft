@@ -7,6 +7,8 @@ export enum ToolbarMainButtonNames {
   ADD_CIRCLE = "ADD_CIRCLE",
   ADD_TRIANGLE = "ADD_TRIANGLE",
   ADD_SQUARE = "ADD_SQUARE",
+  PAINT = "PAINT",
+  ERASER = "ERASER",
   AI_STYLIZE = "AI_STYLIZE",
   UNDO = "UNDO",
   REDO = "REDO",

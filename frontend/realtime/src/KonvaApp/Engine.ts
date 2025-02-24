@@ -1,6 +1,5 @@
 import Konva from "konva";
 
-
 import { uiAccess, uiEvents } from "~/signals";
 import { ShapeNode } from "./Nodes";
 
@@ -99,7 +98,6 @@ export class Engine {
     this.stage.add(this.nodeIsolationLayer);
     this.stage.add(this.uiLayer);
 
-
     // Konva Transformer
     this.nodeTransformer = new NodeTransformer();
     this.uiLayer.add(this.nodeTransformer.getKonvaNode());
@@ -120,7 +118,7 @@ export class Engine {
       height: VideoResolutions.SQUARE_1024.height,
       mediaLayerRef: this.mediaLayer,
       bgLayerRef: this.bgLayer,
-      offScreenCanvas: this.offScreenCanvas
+      offScreenCanvas: this.offScreenCanvas,
     });
 
     // Collection of all Nodes
@@ -180,12 +178,7 @@ export class Engine {
     // hence, lastly, setup these events
     this.setupEventSystem();
     this.setAppMode(AppModes.SELECT);
-
-
-
   }
-
-
 
   private setAppMode(newAppMode: AppModes) {
     this.appMode = newAppMode;
@@ -368,7 +361,18 @@ export class Engine {
 
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
       await this.realTimeDrawEngine.saveOutput();
+    });
 
+    uiEvents.toolbarMain.SELECT.onClick(() => {
+      console.log("Toolbar Main >> Select");
+    });
+
+    uiEvents.toolbarMain.PAINT.onClick(() => {
+      console.log("Toolbar Main >> Paint");
+    });
+
+    uiEvents.toolbarMain.ERASER.onClick(() => {
+      console.log("Toolbar Main >> Eraser");
     });
 
     uiEvents.toolbarMain.PREVIEW.onClick(async () => {
@@ -398,8 +402,6 @@ export class Engine {
     uiEvents.onGetStagedImage((image) => {
       this.addImage(image);
     });
-
-
 
     uiEvents.onAddTextToEngine((textdata) => {
       this.addText(textdata);
@@ -465,7 +467,7 @@ export class Engine {
         return;
       }
       this.changeNodeColor(nodeColor);
-    })
+    });
   }
 
   disableAllButtons() {
@@ -501,7 +503,7 @@ export class Engine {
   }
 
   // Sandbox is quickly a way to test your idea.
-  public async sandbox() { }
+  public async sandbox() {}
 
   public onMessage(event: MessageEvent) {
     console.log("Message From Shared Worker");
@@ -529,9 +531,9 @@ export class Engine {
       x: 10,
       y: 80,
       text: "",
-      fontSize: 24,
+      fontSize: 18,
       fontFamily: "Source Sans 3",
-      fill: "black",
+      fill: "white",
     });
     const anim = new Konva.Animation((frame) => {
       if (frame && import.meta.env.DEV) {
@@ -549,28 +551,30 @@ export class Engine {
   }
 
   private changeNodeColor(nodeColor: NodeColor) {
-    console.log('Changing node color:', nodeColor);
+    console.log("Changing node color:", nodeColor);
     // Find the node that is selected with the id
-    const idSelector = '#' + nodeColor.kNodeId;
+    const idSelector = "#" + nodeColor.kNodeId;
     const selectedNode = this.mediaLayer.findOne(idSelector);
-    console.log('Selected node:', selectedNode);
-    console.log('ID selector:', idSelector);
-    console.log('Media layer:', this.mediaLayer);
+    console.log("Selected node:", selectedNode);
+    console.log("ID selector:", idSelector);
+    console.log("Media layer:", this.mediaLayer);
     // TODO: Change the color of the node
     // Turns out shapes are image nodes... how do we change the image's fill??
     if (selectedNode) {
       // Get the shape node from the real time drawing engine's image nodes
-      const shapeNode = this.realTimeDrawEngine.findImageNodeById(nodeColor.kNodeId);
+      const shapeNode = this.realTimeDrawEngine.findImageNodeById(
+        nodeColor.kNodeId,
+      );
       if (shapeNode && shapeNode instanceof ShapeNode) {
         // Create new shape node with updated color
         const newShapeNode = new ShapeNode({
           canvasPosition: this.realTimeDrawEngine.captureCanvas.position(),
-          canvasSize: this.realTimeDrawEngine.captureCanvas.size(), 
+          canvasSize: this.realTimeDrawEngine.captureCanvas.size(),
           shapeType: shapeNode.shapeType,
           size: shapeNode.size,
           color: nodeColor.color,
           mediaLayerRef: this.mediaLayer,
-          selectionManagerRef: this.selectionManager
+          selectionManagerRef: this.selectionManager,
         });
         newShapeNode.kNode.position(shapeNode.kNode.position());
         newShapeNode.kNode.zIndex(shapeNode.kNode.zIndex());
@@ -601,14 +605,20 @@ export class Engine {
       size: size,
       color: color,
       mediaLayerRef: this.mediaLayer,
-      selectionManagerRef: this.selectionManager
+      selectionManagerRef: this.selectionManager,
+      loaded: async () => {
+        await this.realTimeDrawEngine.render();
+    },
     });
     shapeNode.kNode.zIndex(1); // Replace desiredZIndex with a number
 
     this.commandManager.createNode(shapeNode);
+
+
     console.debug("Added shapenode:", shapeNode);
     console.debug("Added node's ID:", shapeNode.kNode._id);
-    //this.realTimeDrawEngine.addNodes(shapeNode);
+
+    this.realTimeDrawEngine.addNodes(shapeNode);
   }
 
   public addImage(imageFile: File) {
@@ -618,10 +628,14 @@ export class Engine {
       canvasSize: this.realTimeDrawEngine.captureCanvas.size(),
       imageFile: imageFile,
       selectionManagerRef: this.selectionManager,
+      loaded: async () => {
+        await this.realTimeDrawEngine.render();
+      },
     });
     imageNode.kNode.zIndex(1);
     this.commandManager.createNode(imageNode);
-    //this.realTimeDrawEngine.addNodes(imageNode);
+
+    this.realTimeDrawEngine.addNodes(imageNode);
   }
 
   public addVideo(
@@ -665,7 +679,7 @@ export class Engine {
           if (
             longestVideoNode === undefined ||
             node.videoComponent.duration >
-            longestVideoNode.videoComponent.duration
+              longestVideoNode.videoComponent.duration
           ) {
             longestVideoNode = node;
           }

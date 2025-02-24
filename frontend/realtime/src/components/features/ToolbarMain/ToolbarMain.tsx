@@ -1,29 +1,30 @@
-import { Fragment, MouseEventHandler } from "react";
-import { twMerge } from "tailwind-merge";
-import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRotateLeft,
   faArrowRotateRight,
   faCircle,
+  faEraser,
   faFilePlus,
-  faFilm,
-  faFloppyDisk,
   faImage,
   faLocationArrow,
-  faMagicWandSparkles,
+  faPaintbrush,
   faShapes,
   faSquare,
   faText,
   faTriangle,
 } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import { Fragment, MouseEventHandler } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { ToolbarButton } from "../ToolbarButton";
 
 // style and constants
 import { paperWrapperStyles, toolTipStyles } from "~/components/styles";
 import { ToolbarMainButtonNames } from "./enum";
-import { ButtonPreviewAndRender } from "./ButtonPreviewAndRender";
+import { dispatchUiEvents, uiEvents } from "~/signals/uiEvents";
+import { paintColor } from "~/signals/uiEvents/toolbarMain/paintMode";
+import { ColorPicker } from "~/components/ui/TextEditor/ColorPicker";
 
 export const ToolbarMain = ({
   disabled = false,
@@ -42,13 +43,14 @@ export const ToolbarMain = ({
     <>
       <div
         className={twMerge(
-          "flex w-fit items-center divide-x divide-ui-border",
+          "flex h-fit flex-col items-center gap-y-2",
           paperWrapperStyles,
+          "glass",
           disabled &&
-          "pointer-events-none cursor-default bg-ui-border shadow-md",
+            "pointer-events-none cursor-default bg-ui-border shadow-md",
         )}
       >
-        <div className="flex items-center gap-2 pr-2">
+        <div className="flex flex-col items-center gap-2">
           <ToolbarButton
             icon={faLocationArrow}
             iconProps={{ className: "fa-flip-horizontal" }}
@@ -62,62 +64,135 @@ export const ToolbarMain = ({
           />
 
           <Popover className="relative">
-            <PopoverButton as={Fragment}>
-              <button
-                data-tooltip="Add Shapes"
-                className={twMerge(
-                  "size-10 rounded-lg p-2 hover:bg-gray-200/50",
-                  toolTipStyles,
-                )}
-              >
-                <FontAwesomeIcon icon={faShapes} />
-              </button>
-            </PopoverButton>
-            <PopoverPanel
-              anchor="bottom"
-              className={twMerge(
-                // "absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2",
-                "flex flex-col [--anchor-gap:16px]",
-                paperWrapperStyles,
-              )}
-            >
-              <ToolbarButton icon={faSquare} buttonProps={buttonProps.ADD_SQUARE} />
-              <ToolbarButton icon={faCircle} buttonProps={buttonProps.ADD_CIRCLE} />
-              <ToolbarButton icon={faTriangle} buttonProps={buttonProps.ADD_TRIANGLE} />
-            </PopoverPanel>
+            {({ close }) => (
+              <>
+                <PopoverButton as={Fragment}>
+                  <button
+                    data-tooltip="Add Shapes"
+                    className={twMerge(
+                      "size-10 rounded-lg border-2 border-transparent text-white/80 transition-all duration-100 hover:bg-white/15",
+                      toolTipStyles.base,
+                      toolTipStyles.right,
+                    )}
+                  >
+                    <FontAwesomeIcon icon={faShapes} />
+                  </button>
+                </PopoverButton>
+                <PopoverPanel
+                  anchor="right"
+                  className={twMerge(
+                    "flex flex-row [--anchor-gap:12px]",
+                    paperWrapperStyles,
+                  )}
+                >
+                  <ToolbarButton
+                    icon={faSquare}
+                    buttonProps={{
+                      ...buttonProps.ADD_SQUARE,
+                      onClick: (e) => {
+                        buttonProps.ADD_SQUARE.onClick?.(e);
+                        close();
+                      },
+                    }}
+                  />
+                  <ToolbarButton
+                    icon={faCircle}
+                    buttonProps={{
+                      ...buttonProps.ADD_CIRCLE,
+                      onClick: (e) => {
+                        buttonProps.ADD_CIRCLE.onClick?.(e);
+                        close();
+                      },
+                    }}
+                  />
+                  <ToolbarButton
+                    icon={faTriangle}
+                    buttonProps={{
+                      ...buttonProps.ADD_TRIANGLE,
+                      onClick: (e) => {
+                        buttonProps.ADD_TRIANGLE.onClick?.(e);
+                        close();
+                      },
+                    }}
+                  />
+                </PopoverPanel>
+              </>
+            )}
           </Popover>
 
           <Popover className="relative">
             <PopoverButton as={Fragment}>
               <button
-                data-tooltip="Add..."
+                data-tooltip="Add Media"
                 className={twMerge(
-                  "size-10 rounded-lg p-2 hover:bg-gray-200/50",
-                  toolTipStyles,
+                  "size-10 rounded-lg border-2 border-transparent text-white/80 transition-all duration-100 hover:bg-white/15",
+                  toolTipStyles.base,
+                  toolTipStyles.right,
                 )}
               >
                 <FontAwesomeIcon icon={faFilePlus} />
               </button>
             </PopoverButton>
             <PopoverPanel
-              anchor="bottom"
+              anchor="right"
               className={twMerge(
                 // "absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2",
-                "flex flex-col [--anchor-gap:16px]",
+                "flex [--anchor-gap:12px]",
                 paperWrapperStyles,
               )}
             >
               <ToolbarButton icon={faImage} buttonProps={buttonProps.ADD_IMAGE}>
-                Add Image
+                <span className="text-[16px]">Add Image</span>
               </ToolbarButton>
               {/* <ToolbarButton icon={faFilm} buttonProps={buttonProps.ADD_VIDEO}>
                 Add Video
               </ToolbarButton> */}
             </PopoverPanel>
           </Popover>
-
         </div>
-        <div className="flex items-center gap-2 pl-2">
+
+        <hr className="w-full border-t border-white/15" />
+
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2">
+            {buttonProps.PAINT.active ? (
+              <div className="relative">
+                <ColorPicker
+                  color={paintColor.value}
+                  onChange={dispatchUiEvents.toolbarMain.setPaintColor}
+                  faIcon={faPaintbrush}
+                  borderStyle="border-2  bg-primary/30 border-2 border-primary hover:bg-primary/30 text-white"
+                  showBar={false}
+                  staticIconColor="white"
+                  streamChanges
+                  defaultOpen={true}
+                  anchor="right"
+                  anchorGap={12}
+                  closeOnMouseLeave={true}
+                />
+                <div
+                  className="pointer-events-none absolute -bottom-1.5 -right-1.5 h-[18px] w-[18px] rounded-full border border-gray-400"
+                  style={{ backgroundColor: paintColor.value }}
+                />
+              </div>
+            ) : (
+              <ToolbarButton
+                icon={faPaintbrush}
+                buttonProps={buttonProps.PAINT}
+                tooltip="Paint Brush"
+              />
+            )}
+            <ToolbarButton
+              icon={faEraser}
+              buttonProps={buttonProps.ERASER}
+              tooltip="Eraser"
+            />
+          </div>
+        </div>
+
+        <hr className="w-full border-t border-white/15" />
+
+        <div className="flex flex-col items-center gap-2">
           <ToolbarButton
             icon={faArrowRotateLeft}
             buttonProps={buttonProps.UNDO}
@@ -128,15 +203,11 @@ export const ToolbarMain = ({
             buttonProps={buttonProps.REDO}
             tooltip="Redo"
           />
-          <ToolbarButton
+          {/* <ToolbarButton
             icon={faFloppyDisk}
             buttonProps={buttonProps.SAVE}
             tooltip="Save"
-          />
-          <ButtonPreviewAndRender
-            buttonPreviewProps={buttonProps.PREVIEW}
-            buttonRenderProps={buttonProps.DOWNLOAD}
-          />
+          /> */}
         </div>
       </div>
     </>

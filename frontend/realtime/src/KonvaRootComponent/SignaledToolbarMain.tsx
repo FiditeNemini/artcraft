@@ -50,6 +50,13 @@ export const SignaledToolbarMain = ({
         return () => dispatchUiEvents.addShapeToEngine({ shape: "triangle" });
       case ToolbarMainButtonNames.ADD_SQUARE:
         return () => dispatchUiEvents.addShapeToEngine({ shape: "square" });
+      case ToolbarMainButtonNames.SELECT:
+      case ToolbarMainButtonNames.ERASER:
+      case ToolbarMainButtonNames.PAINT:
+        return (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+          toolbarMain.setMode(buttonName);
+          dispatchers[buttonName](e);
+        };
       default:
         return dispatchers[buttonName];
     }
@@ -76,7 +83,7 @@ export const SignaledToolbarMain = ({
     dispatchers.loadingBarRetry(e);
   };
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2">
+    <div className="fixed left-4 top-1/2 -translate-y-1/2">
       <Transition
         as="div"
         className={twMerge(
