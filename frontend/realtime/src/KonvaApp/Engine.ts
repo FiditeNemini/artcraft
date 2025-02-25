@@ -2,6 +2,7 @@ import Konva from "konva";
 
 import { uiAccess, uiEvents } from "~/signals";
 import { ShapeNode } from "./Nodes";
+import { PaintNode } from "./Nodes/PaintNode";
 
 import { UndoStackManager } from "./UndoRedo";
 import { CommandManager, MatteBox, SceneManager } from "./EngineUtitlities";
@@ -110,16 +111,7 @@ export class Engine {
     });
 
     // core layer for all the work done.
-
     this.offScreenCanvas = new OffscreenCanvas(0, 0);
-
-    this.realTimeDrawEngine = new RealTimeDrawEngine({
-      width: VideoResolutions.SQUARE_1024.width,
-      height: VideoResolutions.SQUARE_1024.height,
-      mediaLayerRef: this.mediaLayer,
-      bgLayerRef: this.bgLayer,
-      offScreenCanvas: this.offScreenCanvas,
-    });
 
     // Collection of all Nodes
     this.nodesManager = new NodesManager();
@@ -128,6 +120,18 @@ export class Engine {
       nodeTransformerRef: this.nodeTransformer,
       mediaLayerRef: this.mediaLayer,
     });
+
+    this.realTimeDrawEngine = new RealTimeDrawEngine({
+      width: VideoResolutions.SQUARE_1024.width,
+      height: VideoResolutions.SQUARE_1024.height,
+      mediaLayerRef: this.mediaLayer,
+      offScreenCanvas: this.offScreenCanvas,
+      onDraw:async (canvas, lineBounds)  => {
+        await this.addPaintNode(canvas, lineBounds);
+        
+      },
+    });
+
     // Selector Square to select Nodes
     this.selectorSquare = new SelectorSquare({
       captureCanvasRef: this.realTimeDrawEngine.captureCanvas,
@@ -177,14 +181,31 @@ export class Engine {
     // some of the managers has events
     // hence, lastly, setup these events
     this.setupEventSystem();
-    this.setAppMode(AppModes.SELECT);
+    this.setAppMode(this.appMode);
   }
 
   private setAppMode(newAppMode: AppModes) {
     this.appMode = newAppMode;
     switch (this.appMode) {
+      case AppModes.PAINT: {
+        console.log("APPMODE: PAINT");
+        this.selectorSquare.disable(); // this breaks the paint if you use it in the wrong spot
+        this.selectionManager.disable(); // this prevents selection.
+        this.realTimeDrawEngine.enablePaintMode();
+        this.realTimeDrawEngine.disableDragging();
+
+        uiAccess.toolbarMain.enable();
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
+          active: false,  
+        });
+        this.matteBox.disable();
+        return;
+      }
       case AppModes.SELECT: {
         console.log("APPMODE: SELECT");
+        this.realTimeDrawEngine.disablePaintMode();
+        this.realTimeDrawEngine.enableDragging();
+
         this.selectorSquare.enable();
         this.selectionManager.enable();
         uiAccess.toolbarMain.enable();
@@ -358,21 +379,24 @@ export class Engine {
     // Listen to Toolbar Main
     uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
     uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
-
+ 
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
       await this.realTimeDrawEngine.saveOutput();
     });
 
     uiEvents.toolbarMain.SELECT.onClick(() => {
       console.log("Toolbar Main >> Select");
+      this.setAppMode(AppModes.SELECT)
     });
 
     uiEvents.toolbarMain.PAINT.onClick(() => {
       console.log("Toolbar Main >> Paint");
+      this.setAppMode(AppModes.PAINT)
     });
 
     uiEvents.toolbarMain.ERASER.onClick(() => {
       console.log("Toolbar Main >> Eraser");
+      
     });
 
     uiEvents.toolbarMain.PREVIEW.onClick(async () => {
@@ -443,6 +467,7 @@ export class Engine {
     });
 
     uiEvents.onAddShapeToEngine((shapeData) => {
+      this.setAppMode(AppModes.SELECT);
       switch (shapeData.shape) {
         case "circle":
           this.addShape(ShapeType.CIRCLE, 100);
@@ -467,6 +492,9 @@ export class Engine {
         return;
       }
       this.changeNodeColor(nodeColor);
+    });
+    uiEvents.toolbarMain.onPaintColorChanged((color)=> {
+      this.realTimeDrawEngine.paintColor = color;
     });
   }
 
@@ -575,6 +603,9 @@ export class Engine {
           color: nodeColor.color,
           mediaLayerRef: this.mediaLayer,
           selectionManagerRef: this.selectionManager,
+          loaded: async ()=> {
+            this.realTimeDrawEngine.render();
+          }
         });
         newShapeNode.kNode.position(shapeNode.kNode.position());
         newShapeNode.kNode.zIndex(shapeNode.kNode.zIndex());
@@ -618,7 +649,6 @@ export class Engine {
     console.debug("Added shapenode:", shapeNode);
     console.debug("Added node's ID:", shapeNode.kNode._id);
 
-    this.realTimeDrawEngine.addNodes(shapeNode);
   }
 
   public addImage(imageFile: File) {
@@ -635,8 +665,22 @@ export class Engine {
     imageNode.kNode.zIndex(1);
     this.commandManager.createNode(imageNode);
 
-    this.realTimeDrawEngine.addNodes(imageNode);
   }
+  public addPaintNode(canvas: HTMLCanvasElement,lineBounds:{
+    width: number;
+    height: number;
+    x: number;
+    y: number;}) {
+      var node = new PaintNode({
+        canvasElement:canvas,
+        lineBounds:lineBounds,
+        mediaLayerRef: this.mediaLayer,
+        selectionManagerRef: this.selectionManager,
+        loaded: async () => {
+         await this.realTimeDrawEngine.render()
+        }})
+      this.commandManager.createNode(node);
+    }
 
   public addVideo(
     videNodeData: Partial<VideoNodeData> & { mediaFileUrl: string },

@@ -20,14 +20,15 @@ import {
   NodeTransformer,
   SelectionManager,
 } from "../NodesManagers";
-import { RenderEngine } from "../RenderingPrimitives/RenderEngine";
+import { RealTimeDrawEngine } from "../RenderingPrimitives/RealTimeDrawEngine";
+import { PaintNode } from "../Nodes/PaintNode";
 
 interface EngineReferences {
   mediaLayerRef: Konva.Layer;
   nodesManagerRef: NodesManager;
   nodeTransformerRef: NodeTransformer;
   selectionManagerRef: SelectionManager;
-  renderEngineRef: RenderEngine;
+  renderEngineRef: RealTimeDrawEngine;
   undoStackManagerRef: UndoStackManager;
 }
 
@@ -36,7 +37,7 @@ export class CommandManager {
   private nodesManagerRef: NodesManager;
   private nodeTransformerRef: NodeTransformer;
   private selectionManagerRef: SelectionManager;
-  private renderEngineRef: RenderEngine;
+  private renderEngineRef: RealTimeDrawEngine;
   private undoStackManagerRef: UndoStackManager;
 
   constructor(engineRefs: EngineReferences) {
@@ -48,7 +49,8 @@ export class CommandManager {
     this.undoStackManagerRef = engineRefs.undoStackManagerRef;
   }
 
-  createNode(node: VideoNode | ImageNode | TextNode | ShapeNode) {
+  createNode(node: MediaNode) {
+
     const command = new CreateCommand({
       nodes: new Set<MediaNode>([node]),
       mediaLayerRef: this.mediaLayerRef,
@@ -62,6 +64,7 @@ export class CommandManager {
     // Set the kNode's manual id to same as kNode's internal _id
     // This helps identify the kNode in the Konva layer with find
     node.kNode.id(node.kNode._id.toString());
+    this.renderEngineRef.render();
   }
   deleteNodes() {
     const nodes = this.selectionManagerRef.getSelectedNodes();
@@ -74,6 +77,7 @@ export class CommandManager {
       renderEngineRef: this.renderEngineRef,
     });
     this.undoStackManagerRef.executeCommand(command);
+    this.renderEngineRef.render();
   }
   toggleLockNodes() {
     const nodes = this.selectionManagerRef.getSelectedNodes();
@@ -101,6 +105,7 @@ export class CommandManager {
       mediaLayerRef: this.mediaLayerRef,
     });
     this.undoStackManagerRef.executeCommand(command);
+    this.renderEngineRef.render();
   }
   moveNodesDown() {
     const command = new MoveLayerDown({
@@ -109,6 +114,7 @@ export class CommandManager {
       mediaLayerRef: this.mediaLayerRef,
     });
     this.undoStackManagerRef.executeCommand(command);
+    this.renderEngineRef.render();
   }
   translateNodes(props: {
     nodes: Set<MediaNode>;
@@ -120,6 +126,7 @@ export class CommandManager {
       layerRef: this.mediaLayerRef,
     });
     this.undoStackManagerRef.pushCommand(command);
+
   }
   transformNodes(props: {
     nodes: Set<MediaNode>;
@@ -131,6 +138,7 @@ export class CommandManager {
       layerRef: this.mediaLayerRef,
     });
     this.undoStackManagerRef.pushCommand(command);
+    this.renderEngineRef.render();
   }
   addChromaKey(props: { videoNode: VideoNode; newChromaColor: RGBColor }) {
     const command = new AddChromaKey(props);
