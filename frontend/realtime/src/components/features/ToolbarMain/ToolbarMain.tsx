@@ -25,6 +25,8 @@ import { ToolbarMainButtonNames } from "./enum";
 import { dispatchUiEvents, uiEvents } from "~/signals/uiEvents";
 import { paintColor } from "~/signals/uiEvents/toolbarMain/paintMode";
 import { ColorPicker } from "~/components/ui/TextEditor/ColorPicker";
+import { PaintModeMenu } from "~/components/ui/ToolbarMain/PaintModeMenu";
+import { EraseModeMenu } from "~/components/ui/ToolbarMain/EraseModeMenu";
 
 export const ToolbarMain = ({
   disabled = false,
@@ -47,7 +49,7 @@ export const ToolbarMain = ({
           paperWrapperStyles,
           "glass",
           disabled &&
-            "pointer-events-none cursor-default bg-ui-border shadow-md",
+          "pointer-events-none cursor-default bg-ui-border shadow-md",
         )}
       >
         <div className="flex flex-col items-center gap-2">
@@ -155,9 +157,10 @@ export const ToolbarMain = ({
 
         <div className="flex flex-col items-center gap-2">
           <div className="flex flex-col items-center gap-2">
+            { /* Conditionally show paint menu on mode selection */}
             {buttonProps.PAINT.active ? (
               <div className="relative">
-                <ColorPicker
+                <PaintModeMenu
                   color={paintColor.value}
                   onChange={dispatchUiEvents.toolbarMain.setPaintColor}
                   faIcon={faPaintbrush}
@@ -182,11 +185,25 @@ export const ToolbarMain = ({
                 tooltip="Paint Brush"
               />
             )}
-            <ToolbarButton
-              icon={faEraser}
-              buttonProps={buttonProps.ERASER}
-              tooltip="Eraser"
-            />
+
+            { /* Conditionally show eraser menu on mode selection */}
+            {buttonProps.ERASER.active ? (
+              <EraseModeMenu
+                faIcon={faEraser}
+                borderStyle="border-2  bg-primary/30 border-2 border-primary hover:bg-primary/30 text-white"
+                defaultOpen={true}
+                anchor="right"
+                anchorGap={12}
+                closeOnMouseLeave={true}
+              />
+            )
+              : (
+                <ToolbarButton
+                  icon={faEraser}
+                  buttonProps={buttonProps.ERASER}
+                  tooltip="Eraser"
+                />
+              )}
           </div>
         </div>
 
