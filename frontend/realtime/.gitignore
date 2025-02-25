@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 backup
-
+.venv
 # Editor directories and files
 ~
 .vscode
