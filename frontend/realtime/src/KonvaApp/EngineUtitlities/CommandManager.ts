@@ -50,7 +50,6 @@ export class CommandManager {
   }
 
   createNode(node: MediaNode) {
-
     const command = new CreateCommand({
       nodes: new Set<MediaNode>([node]),
       mediaLayerRef: this.mediaLayerRef,
@@ -126,7 +125,7 @@ export class CommandManager {
       layerRef: this.mediaLayerRef,
     });
     this.undoStackManagerRef.pushCommand(command);
-
+    this.renderEngineRef.render();
   }
   transformNodes(props: {
     nodes: Set<MediaNode>;

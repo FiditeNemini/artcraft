@@ -142,7 +142,9 @@ export class Engine {
     this.uiLayer.add(this.selectorSquare.getKonvaNode());
 
     //Collection of commands for undo-redo
-    this.undoStackManager = new UndoStackManager();
+    this.undoStackManager = new UndoStackManager(() => {
+      this.realTimeDrawEngine.render();
+    });
     this.commandManager = new CommandManager({
       mediaLayerRef: this.mediaLayer,
       nodesManagerRef: this.nodesManager,
@@ -376,8 +378,13 @@ export class Engine {
     );
 
     // Listen to Toolbar Main
-    uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
-    uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
+    uiEvents.toolbarMain.UNDO.onClick(() => {
+      this.undoStackManager.undo();
+    });
+    uiEvents.toolbarMain.REDO.onClick(() => {
+      this.undoStackManager.redo();
+      this.realTimeDrawEngine.render();
+    });
 
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
       await this.realTimeDrawEngine.saveOutput();

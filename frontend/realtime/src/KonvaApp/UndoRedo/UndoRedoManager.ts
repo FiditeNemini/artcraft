@@ -5,6 +5,11 @@ export class UndoStackManager {
   private undoStack: ICommand[] = [];
   private redoStack: ICommand[] = [];
   private readonly STACK_LIMIT = 20;
+  private onCommandExecuted: () => void;
+
+  constructor(onCommandExecuted: () => void) {
+    this.onCommandExecuted = onCommandExecuted;
+  }
 
   setDisabled(newState: boolean) {
     this.disabled = newState;
@@ -50,6 +55,7 @@ export class UndoStackManager {
       }
       console.log("undo:", this.undoStack);
     }
+    this.onCommandExecuted();
   }
 
   redo() {
@@ -68,5 +74,6 @@ export class UndoStackManager {
 
       console.log("Redo:", this.redoStack);
     }
+    this.onCommandExecuted();
   }
 }

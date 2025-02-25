@@ -57,11 +57,15 @@ export class RealTimeDrawEngine {
   public paintBrushSize: number = 5;
   public isPaintMode: boolean = false;
 
-  private onDrawCallback?: (canvas: HTMLCanvasElement,lineBounds:{
-    width: number;
-    height: number;
-    x: number;
-    y: number;}) => void;
+  private onDrawCallback?: (
+    canvas: HTMLCanvasElement,
+    lineBounds: {
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    },
+  ) => void;
 
   constructor({
     width,
@@ -74,16 +78,20 @@ export class RealTimeDrawEngine {
     height: number;
     mediaLayerRef: Konva.Layer;
     offScreenCanvas: OffscreenCanvas;
-    onDraw?: (canvas: HTMLCanvasElement,lineBounds:{
-      width: number;
-      height: number;
-      x: number;
-      y: number;}) => void;
+    onDraw?: (
+      canvas: HTMLCanvasElement,
+      lineBounds: {
+        width: number;
+        height: number;
+        x: number;
+        y: number;
+      },
+    ) => void;
   }) {
     this.videoLoadingCanvas = undefined;
     this.videoNodes = [];
     this.imageNodes = [];
-    this.onDrawCallback = onDraw
+    this.onDrawCallback = onDraw;
 
     // TODO: Make this dynamic and update this on change of canvas.
 
@@ -93,8 +101,7 @@ export class RealTimeDrawEngine {
     this.positionX = window.innerWidth / 2 - this.width / 2 - this.width;
     this.positionY = window.innerHeight / 2 - this.height / 2;
 
-    this.positionPreviewX =
-      window.innerWidth / 2 - this.width / 2 + this.width;
+    this.positionPreviewX = window.innerWidth / 2 - this.width / 2 + this.width;
     this.positionPreviewY = window.innerHeight / 2 - this.height / 2;
 
     this.offScreenCanvas = offScreenCanvas;
@@ -108,7 +115,7 @@ export class RealTimeDrawEngine {
     this.drawingsLayer = new Konva.Layer({
       clearBeforeDraw: true, // Ensures transparent background
     });
-    this.mediaLayerRef.getStage()?.add(this.drawingsLayer);// to od pass in stage
+    this.mediaLayerRef.getStage()?.add(this.drawingsLayer); // to od pass in stage
 
     // Set background layer to red and media layer to green for visibility
 
@@ -151,7 +158,6 @@ export class RealTimeDrawEngine {
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
     //this.previewCopyListener();
-
   }
 
   private isEnabled: boolean = false;
@@ -221,7 +227,7 @@ export class RealTimeDrawEngine {
       // Get the line canvas with transparent background
       // Get the bounding box of the line
       const lineBounds = lineToConvert.getClientRect();
-      
+
       // Create canvas with just enough size to contain the line
       const lineCanvas = tempLayer.toCanvas({
         x: lineBounds.x,
@@ -294,7 +300,7 @@ export class RealTimeDrawEngine {
   public enableDragging() {
     // Enable dragging for all nodes in media layer
     this.imageNodes?.forEach((node) => {
-      node.kNode.draggable(true); 
+      node.kNode.draggable(true);
       node.kNode.listening(true);
     });
     this.mediaLayerRef.batchDraw();
@@ -376,8 +382,10 @@ export class RealTimeDrawEngine {
     });
   }
 
-  public findImageNodeById(id: string): (ImageNode | TextNode | ShapeNode | PaintNode | undefined) {
-    return this.imageNodes.find(node => {
+  public findImageNodeById(
+    id: string,
+  ): ImageNode | TextNode | ShapeNode | PaintNode | undefined {
+    return this.imageNodes.find((node) => {
       if (node.kNode) {
         return node.kNode.id() === id;
       }
@@ -520,24 +528,25 @@ export class RealTimeDrawEngine {
   private handleNodeDragEnd = async () => {
     // Clean up any existing state
     if (this.isProcessing) {
-      console.log("isProcessing Returning")
+      console.log("isProcessing Returning");
       return;
     }
     console.log("Node drag ended");
     this.isProcessing = true;
     await this.render();
   };
-  
+
   public async addNodes(node: MediaNode) {
-    if (node instanceof ImageNode || 
-      node instanceof TextNode || 
-      node instanceof ShapeNode || 
-      node instanceof PaintNode) 
-      {
+    if (
+      node instanceof ImageNode ||
+      node instanceof TextNode ||
+      node instanceof ShapeNode ||
+      node instanceof PaintNode
+    ) {
       console.debug("Adding node:", node);
       this.imageNodes.push(node);
-      console.log(this.imageNodes)
-      node.kNode.on("dragend", this.handleNodeDragEnd);
+      console.log(this.imageNodes);
+      //node.kNode.on("dragend", this.handleNodeDragEnd);
     }
 
     // ensure the layer doesn't move if added while painting.
@@ -555,7 +564,12 @@ export class RealTimeDrawEngine {
         node.kNode.off("dragend", this.handleNodeDragEnd);
         this.videoNodes.splice(index, 1);
       }
-    } else if (node instanceof ImageNode || node instanceof TextNode || node instanceof ShapeNode || node instanceof PaintNode) {
+    } else if (
+      node instanceof ImageNode ||
+      node instanceof TextNode ||
+      node instanceof ShapeNode ||
+      node instanceof PaintNode
+    ) {
       const index = this.imageNodes.indexOf(node);
       if (index > -1) {
         node.kNode.off("dragend", this.handleNodeDragEnd);
@@ -579,7 +593,6 @@ export class RealTimeDrawEngine {
     try {
       const box = config.layerOfInterest.getClientRect();
       const stage = config.layerOfInterest.getStage();
-      
 
       const x = config.x !== undefined ? config.x : Math.floor(box.x);
       const y = config.y !== undefined ? config.y : Math.floor(box.y);
@@ -716,7 +729,7 @@ export class RealTimeDrawEngine {
 
   public async render() {
     // only pick nodes that intersect wi th the canvas on screen bounds to freeze.
-    
+
     this.mediaLayerRef.draw();
     // Output all nodes in mediaLayerRef
     const nodes = this.mediaLayerRef.getChildren();
@@ -738,33 +751,33 @@ export class RealTimeDrawEngine {
     })) as ImageBitmap;
 
     // Test code
-    // if (true) {
-    //   this.outputBitmap = bitmap;
-    //   this.previewCanvas.image(bitmap);
-    //   this.isProcessing = false;
-    //   return;
-    // }
-
-    try {
-      const base64Bitmap = await this.imageBitmapToBase64(bitmap);
-
-      const base64BitmapResponse = await invoke("infer_image", {
-        image: base64Bitmap,
-        prompt: this.currentPrompt,
-        strength: this.currentStrength,
-      });
-
-      console.log(base64BitmapResponse);
-      const decoded = await this.base64ToImageBitmap(
-        base64BitmapResponse as string,
-      );
-
-      this.outputBitmap = decoded;
-      this.previewCanvas.image(decoded);
-    } catch (error) {
-      console.error("Error during image processing:", error);
-    } finally {
+    if (true) {
+      this.outputBitmap = bitmap;
+      this.previewCanvas.image(bitmap);
       this.isProcessing = false;
+      return;
     }
+
+    //   try {
+    //     const base64Bitmap = await this.imageBitmapToBase64(bitmap);
+
+    //     const base64BitmapResponse = await invoke("infer_image", {
+    //       image: base64Bitmap,
+    //       prompt: this.currentPrompt,
+    //       strength: this.currentStrength,
+    //     });
+
+    //     console.log(base64BitmapResponse);
+    //     const decoded = await this.base64ToImageBitmap(
+    //       base64BitmapResponse as string,
+    //     );
+
+    //     this.outputBitmap = decoded;
+    //     this.previewCanvas.image(decoded);
+    //   } catch (error) {
+    //     console.error("Error during image processing:", error);
+    //   } finally {
+    //     this.isProcessing = false;
+    //   }
   }
 }
