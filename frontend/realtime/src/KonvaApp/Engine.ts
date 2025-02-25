@@ -126,9 +126,8 @@ export class Engine {
       height: VideoResolutions.SQUARE_1024.height,
       mediaLayerRef: this.mediaLayer,
       offScreenCanvas: this.offScreenCanvas,
-      onDraw:async (canvas, lineBounds)  => {
+      onDraw: async (canvas, lineBounds) => {
         await this.addPaintNode(canvas, lineBounds);
-        
       },
     });
 
@@ -196,7 +195,7 @@ export class Engine {
 
         uiAccess.toolbarMain.enable();
         uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
-          active: false,  
+          active: false,
         });
         this.matteBox.disable();
         return;
@@ -379,24 +378,23 @@ export class Engine {
     // Listen to Toolbar Main
     uiEvents.toolbarMain.UNDO.onClick(() => this.undoStackManager.undo());
     uiEvents.toolbarMain.REDO.onClick(() => this.undoStackManager.redo());
- 
+
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
       await this.realTimeDrawEngine.saveOutput();
     });
 
     uiEvents.toolbarMain.SELECT.onClick(() => {
       console.log("Toolbar Main >> Select");
-      this.setAppMode(AppModes.SELECT)
+      this.setAppMode(AppModes.SELECT);
     });
 
     uiEvents.toolbarMain.PAINT.onClick(() => {
       console.log("Toolbar Main >> Paint");
-      this.setAppMode(AppModes.PAINT)
+      this.setAppMode(AppModes.PAINT);
     });
 
     uiEvents.toolbarMain.ERASER.onClick(() => {
       console.log("Toolbar Main >> Eraser");
-      
     });
 
     uiEvents.toolbarMain.PREVIEW.onClick(async () => {
@@ -467,7 +465,6 @@ export class Engine {
     });
 
     uiEvents.onAddShapeToEngine((shapeData) => {
-      this.setAppMode(AppModes.SELECT);
       switch (shapeData.shape) {
         case "circle":
           this.addShape(ShapeType.CIRCLE, 100);
@@ -493,7 +490,7 @@ export class Engine {
       }
       this.changeNodeColor(nodeColor);
     });
-    uiEvents.toolbarMain.onPaintColorChanged((color)=> {
+    uiEvents.toolbarMain.onPaintColorChanged((color) => {
       this.realTimeDrawEngine.paintColor = color;
     });
   }
@@ -603,13 +600,13 @@ export class Engine {
           color: nodeColor.color,
           mediaLayerRef: this.mediaLayer,
           selectionManagerRef: this.selectionManager,
-          loaded: async ()=> {
+          loaded: async () => {
             this.realTimeDrawEngine.render();
-          }
+          },
         });
         newShapeNode.kNode.position(shapeNode.kNode.position());
         newShapeNode.kNode.zIndex(shapeNode.kNode.zIndex());
-        
+
         // Remove old node and add new one
         shapeNode.kNode.destroy();
         this.commandManager.createNode(newShapeNode);
@@ -639,16 +636,14 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
       loaded: async () => {
         await this.realTimeDrawEngine.render();
-    },
+      },
     });
     shapeNode.kNode.zIndex(1); // Replace desiredZIndex with a number
 
     this.commandManager.createNode(shapeNode);
 
-
     console.debug("Added shapenode:", shapeNode);
     console.debug("Added node's ID:", shapeNode.kNode._id);
-
   }
 
   public addImage(imageFile: File) {
@@ -664,23 +659,27 @@ export class Engine {
     });
     imageNode.kNode.zIndex(1);
     this.commandManager.createNode(imageNode);
-
   }
-  public addPaintNode(canvas: HTMLCanvasElement,lineBounds:{
-    width: number;
-    height: number;
-    x: number;
-    y: number;}) {
-      var node = new PaintNode({
-        canvasElement:canvas,
-        lineBounds:lineBounds,
-        mediaLayerRef: this.mediaLayer,
-        selectionManagerRef: this.selectionManager,
-        loaded: async () => {
-         await this.realTimeDrawEngine.render()
-        }})
-      this.commandManager.createNode(node);
-    }
+  public addPaintNode(
+    canvas: HTMLCanvasElement,
+    lineBounds: {
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    },
+  ) {
+    var node = new PaintNode({
+      canvasElement: canvas,
+      lineBounds: lineBounds,
+      mediaLayerRef: this.mediaLayer,
+      selectionManagerRef: this.selectionManager,
+      loaded: async () => {
+        await this.realTimeDrawEngine.render();
+      },
+    });
+    this.commandManager.createNode(node);
+  }
 
   public addVideo(
     videNodeData: Partial<VideoNodeData> & { mediaFileUrl: string },
