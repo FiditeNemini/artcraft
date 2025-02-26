@@ -75,7 +75,7 @@ export const KonvaRootComponent = ({
         resetAll={appUiContext.resetAll}
       />
 
-      <ContextualLoadingBar />
+      {/* <ContextualLoadingBar /> */}
       <ContextualToolbarNode />
       {/* <ContextualButtonRetry /> */}
     </>

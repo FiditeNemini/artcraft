@@ -26,7 +26,7 @@ export const Sandbox = () => {
       </div>
 
       <ContextualToolbarNode />
-      <ContextualLoadingBar />
+      {/* <ContextualLoadingBar /> */}
       <ContextualButtonRetry />
     </div>
   );
