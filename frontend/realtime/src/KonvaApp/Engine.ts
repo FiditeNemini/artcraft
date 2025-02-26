@@ -652,7 +652,18 @@ export class Engine {
     console.debug("Added shapenode:", shapeNode);
     console.debug("Added node's ID:", shapeNode.kNode._id);
   }
-
+  public addPreviewCopy(image: Image.Konva) {
+    // Start of Selection
+    const copyNode = new PreviewCopyNode({
+      image: previewCopy,
+      mediaLayerRef: this.mediaLayerRef,
+      selectionManagerRef: this.selectionManagerRef,
+      loaded: async () => {
+        this.drawingsLayer.draw();
+      },
+    });
+    this.commandManager.createNode(imageNode);
+  }
   public addImage(imageFile: File) {
     const imageNode = new ImageNode({
       mediaLayerRef: this.mediaLayer,

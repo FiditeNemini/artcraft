@@ -10,7 +10,13 @@ from typing import Dict, Any, Optional, Tuple, Callable, List
 import torch
 import websockets
 from PIL import Image
-from diffusers import AutoPipelineForImage2Image, LCMScheduler, UNet2DConditionModel
+from diffusers import (
+    StableDiffusionXLPipeline,
+    StableDiffusionXLImg2ImgPipeline,
+    AutoPipelineForImage2Image,
+    LCMScheduler,
+    UNet2DConditionModel,
+)
 from tqdm import tqdm
 from huggingface_hub import HfApi, hf_hub_download
 
@@ -93,6 +99,7 @@ async def load_model(sdxl_checkpoint_path: pathlib.Path, progress_callback: Opti
             "latent-consistency/lcm-sdxl",
             torch_dtype=torch.float16,
             variant="fp16",
+            use_safetensors=True,
         )
         
         if progress_callback:
@@ -102,10 +109,11 @@ async def load_model(sdxl_checkpoint_path: pathlib.Path, progress_callback: Opti
         
         # Load the base model using the checkpoint path
         pipe = AutoPipelineForImage2Image.from_pretrained(
-            sdxl_checkpoint_path,
+            "stabilityai/stable-diffusion-xl-base-1.0",
             unet=unet,
             torch_dtype=torch.float16,
             variant="fp16",
+           use_safetensors=True
         ).to("cuda")
         
         if progress_callback:
@@ -121,7 +129,7 @@ async def load_model(sdxl_checkpoint_path: pathlib.Path, progress_callback: Opti
             await progress_callback(85, 100)
         
         # Load the default LCM adapter
-        pipe.load_lora_weights("latent-consistency/lcm-lora-sdxl", adapter_name="lcm")
+        pipe.load_lora_weights("latent-consistency/lcm-lora-sdxl", adapter_name="lcm",from_safetensors=True)
         
         if progress_callback:
             await progress_callback(100, 100)
@@ -228,36 +236,80 @@ async def handle_client(websocket):
         async for message in websocket:
             try:
                 data = json.loads(message)
-                logger.info(f"Received message: {data.keys()}")
+                logger.info(f"Received message type: {data.get('type', 'unknown')}")
+                logger.info(f"Full payload: {json.dumps(data, indent=2)}")
                 
                 # Check message type
                 message_type = data.get('type', '')
                 
                 # Handle setup request - initializes the model and settings
                 if message_type == 'setup':
-                    setup_data = data.get('setup', {})
+                    logger.info("Processing setup message")
+                    model_data = data.get('model', {})
+                    lora_data = data.get('lora')
+                    device = data.get('device', 'cuda')
                     
-                    # Extract setup parameters
-                    sdxl_checkpoint_path = pathlib.Path(setup_data.get('sdxl_checkpoint_path', ''))
-                    lora_path = pathlib.Path(setup_data.get('lora_path', '')) if setup_data.get('lora_path') else None
+                    logger.info(f"Model data: {json.dumps(model_data, indent=2)}")
+                    logger.info(f"LoRA data: {json.dumps(lora_data, indent=2) if lora_data else 'None'}")
+                    logger.info(f"Device: {device}")
+                    
+                    # Extract setup parameters with detailed logging
+                    model_path = model_data.get('path', '')
+                    logger.info(f"Raw model path from message: '{model_path}'")
+                    
+                    # Check if the path is valid
+                    if not model_path:
+                        logger.error("Model path is empty")
+                        await websocket.send(json.dumps({
+                            'type': 'setup_response',
+                            'success': False,
+                            'error': 'Model path is required'
+                        }))
+                        continue
+                    
+                    # Convert to Path object
+                    sdxl_checkpoint_path = pathlib.Path(model_path)
+                    logger.info(f"Converted to pathlib.Path: '{sdxl_checkpoint_path}'")
+                    logger.info(f"Path is absolute: {sdxl_checkpoint_path.is_absolute()}")
+                    logger.info(f"Path exists check: {sdxl_checkpoint_path.exists()}")
+                    
+                    # If the path exists as a file
+                    if sdxl_checkpoint_path.is_file():
+                        logger.info(f"Path is a file: Yes")
+                        logger.info(f"File size: {sdxl_checkpoint_path.stat().st_size / (1024*1024):.2f} MB")
+                    else:
+                        logger.info(f"Path is a file: No")
                     
                     # Store current settings
                     current_settings = {
                         'sdxl_checkpoint_path': str(sdxl_checkpoint_path),
-                        'lora_path': str(lora_path) if lora_path else None,
-                        # Add other settings as needed
+                        'lora_path': str(lora_data['path']) if lora_data else None,
+                        'lora_alpha': float(lora_data['alpha']) if lora_data else 1.0,
+                        'device': device
                     }
+                    logger.info(f"Current settings: {json.dumps(current_settings, indent=2)}")
                     
                     # Validate required parameters
                     if not sdxl_checkpoint_path.exists():
-                        await websocket.send(json.dumps({
-                            'type': 'setup_response',
-                            'success': False,
-                            'error': f'SDXL checkpoint path does not exist: {sdxl_checkpoint_path}'
-                        }))
-                        continue
+                        logger.error(f"Path does not exist: {sdxl_checkpoint_path}")
+                        # Try alternative path format
+                        alt_path = pathlib.Path(model_path.replace('\\', '/'))
+                        logger.info(f"Trying alternative path format: {alt_path}")
+                        logger.info(f"Alternative path exists check: {alt_path.exists()}")
+                        
+                        if alt_path.exists():
+                            logger.info("Using alternative path format")
+                            sdxl_checkpoint_path = alt_path
+                        else:
+                            await websocket.send(json.dumps({
+                                'type': 'setup_response',
+                                'success': False,
+                                'error': f'SDXL checkpoint path does not exist: {sdxl_checkpoint_path}'
+                            }))
+                            continue
                     
                     # Load the model with progress reporting
+                    logger.info(f"Loading model from: {sdxl_checkpoint_path}")
                     pipe, success = await load_model(sdxl_checkpoint_path, progress_callback)
                     
                     if not success:
@@ -270,13 +322,13 @@ async def handle_client(websocket):
                     
                     # Load LoRA if specified
                     lora_success = True
-                    if lora_path and lora_path.exists():
-                        lora_success = await load_lora(pipe, lora_path, progress_callback=progress_callback)
+                    if lora_data and lora_data['path'] and pathlib.Path(lora_data['path']).exists():
+                        lora_success = await load_lora(pipe, pathlib.Path(lora_data['path']), progress_callback=progress_callback)
                         if not lora_success:
                             await websocket.send(json.dumps({
                                 'type': 'setup_response',
                                 'success': False,
-                                'error': f'Failed to load LoRA from {lora_path}'
+                                'error': f'Failed to load LoRA from {pathlib.Path(lora_data["path"])}'
                             }))
                             continue
                     

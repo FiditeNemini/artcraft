@@ -73,6 +73,8 @@ export class RealTimeDrawEngine {
     },
   ) => void;
 
+  private onPreviewCopyCallback?: (previewCopy: Konva.Image) => void; // New Callback
+
   private serverSocket: WebSocket | null = null;
 
   constructor({
@@ -81,6 +83,7 @@ export class RealTimeDrawEngine {
     mediaLayerRef,
     offScreenCanvas,
     onDraw,
+    onPreviewCopy, // New Parameter
   }: {
     width: number;
     height: number;
@@ -95,11 +98,13 @@ export class RealTimeDrawEngine {
         y: number;
       },
     ) => void;
+    onPreviewCopy?: (previewCopy: Konva.Image) => void; // New Parameter
   }) {
     this.videoLoadingCanvas = undefined;
     this.videoNodes = [];
     this.imageNodes = [];
     this.onDrawCallback = onDraw;
+    this.onPreviewCopyCallback = onPreviewCopy; // Assign Callback
 
     // TODO: Make this dynamic and update this on change of canvas.
 
@@ -165,7 +170,7 @@ export class RealTimeDrawEngine {
     this.captureCanvas.setZIndex(0);
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
-    //this.previewCopyListener();
+    this.previewCopyListener();
 
     //this.startServer();
   }
@@ -203,7 +208,7 @@ export class RealTimeDrawEngine {
     socket.onmessage = (event) => {
       try {
         const response: ServerResponse = JSON.parse(event.data);
-
+        console.log("Server response:", response);
         // Handle model loading progress updates
         if (response.type === "progress") {
           console.log(`Loading progress: ${response.percent}%`);
@@ -426,16 +431,6 @@ export class RealTimeDrawEngine {
         return;
       }
 
-      // TODO create it as a node.
-
-      // const imageNode = new ImageNode({
-      //   mediaLayerRef: this.mediaLayer,
-      //   canvasPosition: this.renderEngine.captureCanvas.position(),
-      //   canvasSize: this.renderEngine.captureCanvas.size(),
-      //   imageFile: imageFile,
-      //   selectionManagerRef: this.selectionManager,
-      // });
-
       // Create draggable preview copy
       const previewCopy = new Konva.Image({
         x: this.previewCanvas.x(),
@@ -447,15 +442,20 @@ export class RealTimeDrawEngine {
         listening: true,
       });
 
-      this.drawingsLayer.add(previewCopy); // Add to drawingsLayer instead of mediaLayerRef
-      this.drawingsLayer.batchDraw();
+      // this.drawingsLayer.add(previewCopy); // Add to drawingsLayer instead of mediaLayerRef
+      // this.drawingsLayer.batchDraw();
+
+      // Invoke the callback with the preview copy
+      if (this.onPreviewCopyCallback) {
+        this.onPreviewCopyCallback(previewCopy);
+      }
 
       // Start dragging immediately
       previewCopy.startDrag();
 
       // Handle drag events
       previewCopy.on("dragmove", () => {
-        this.drawingsLayer.draw();
+        // this.drawingsLayer.draw();
       });
 
       previewCopy.on("dragend", () => {
@@ -468,11 +468,11 @@ export class RealTimeDrawEngine {
             x: this.captureCanvas.x(),
             y: this.captureCanvas.y(),
           });
-          this.drawingsLayer.batchDraw();
+          //this.drawingsLayer.batchDraw();
         } else {
           // Remove if dropped outside capture area
-          previewCopy.destroy();
-          this.drawingsLayer.batchDraw();
+          //previewCopy.destroy();
+          //this.drawingsLayer.batchDraw();
         }
       });
     });
