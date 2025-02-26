@@ -33,6 +33,7 @@ export const SignaledPromptText = ({}) => {
         onChange={onTextChanged}
         value={textContent}
         spellCheck={false}
+        forceBlurOnOutsideClick={true}
       />
     </div>
   );
