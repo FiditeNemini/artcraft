@@ -15,8 +15,8 @@ interface SliderProps {
   tooltipContent?: ReactNode;
   suffix?: string;
   innerLabel?: string;
-  showDecrement?: boolean,
-  showIncrement?: boolean,
+  showDecrement?: boolean;
+  showIncrement?: boolean;
 }
 
 export const Slider = ({
@@ -31,7 +31,7 @@ export const Slider = ({
   suffix,
   innerLabel,
   showDecrement,
-  showIncrement
+  showIncrement,
 }: SliderProps) => {
   const [localValue, setLocalValue] = useState(value);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -47,7 +47,7 @@ export const Slider = ({
     const clampedValue = Math.min(Math.max(roundedValue, min), max);
     setLocalValue(clampedValue);
     onChange(clampedValue);
-  }
+  };
 
   const updatePosition = (x: number) => {
     if (!sliderRef.current) return;
@@ -93,11 +93,11 @@ export const Slider = ({
 
   const handleDecrement = () => {
     setClampedValue(localValue - step);
-  }
+  };
 
   const handleIncrement = () => {
     setClampedValue(localValue + step);
-  }
+  };
 
   const percentage = ((localValue - min) / (max - min)) * 100;
   const displayValue =
@@ -109,7 +109,7 @@ export const Slider = ({
       {showDecrement && (
         <Button
           icon={faMinus}
-          className="size-6 text-white/80 bg-transparent rounded-full hover:bg-white/10 focus-visible:outline-primary active:bg-primary/30 my-auto mr-1"
+          className="my-auto mr-1 size-6 rounded-full bg-transparent text-white/80 hover:bg-white/10 focus-visible:outline-primary active:bg-primary/30"
           onClick={handleDecrement}
         />
       )}
@@ -125,7 +125,7 @@ export const Slider = ({
       >
         <div
           className={twMerge(
-            "absolute h-7 bg-primary/30 transition-colors duration-300 group-hover:bg-primary/50",
+            "absolute h-full bg-primary/30 transition-colors duration-300 group-hover:bg-primary/50",
             isDragging && "!bg-primary/50",
           )}
           style={{ width: `${percentage}%` }}
@@ -142,7 +142,7 @@ export const Slider = ({
           )}
           <div
             className={twMerge(
-              "absolute right-0 top-1/2 mr-1.5 h-3.5 w-0.5 -translate-y-1/2",
+              "absolute right-0 top-1/2 mr-1 h-4 w-0.5 -translate-y-1/2 rounded-full",
               isDragging ? "bg-white" : "bg-white/50",
             )}
             onMouseDown={handleMouseDown}
@@ -155,7 +155,7 @@ export const Slider = ({
       {showIncrement && (
         <Button
           icon={faPlus}
-          className="size-6 text-white/80 bg-transparent rounded-full hover:bg-white/10 focus-visible:outline-primary active:bg-primary/30 my-auto ml-1"
+          className="my-auto ml-1 size-6 rounded-full bg-transparent text-white/80 hover:bg-white/10 focus-visible:outline-primary active:bg-primary/30"
           onClick={handleIncrement}
         />
       )}
