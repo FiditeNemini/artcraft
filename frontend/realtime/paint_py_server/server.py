@@ -206,7 +206,7 @@ def generate_image(
         logger.error(f"Error generating image: {e}")
         return None
 
-async def handle_client(websocket, path):
+async def handle_client(websocket):
     """Handle a client connection."""
     global connected, pipe, model_initialized, current_settings
     

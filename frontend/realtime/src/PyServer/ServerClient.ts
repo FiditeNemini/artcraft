@@ -11,7 +11,7 @@ import {
   createUpdateSettingsRequest,
   createGenerateRequest,
   createStatusRequest,
-} from "../types/ServerTypes";
+} from "./ServerTypes";
 
 /**
  * ServerClient provides a typed interface for communicating with the Python WebSocket server

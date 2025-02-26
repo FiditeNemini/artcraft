@@ -15,6 +15,12 @@ import { Image } from "@tauri-apps/api/image";
 
 import { PaintNode } from "../Nodes/PaintNode";
 
+import {
+  ServerSetupPayload,
+  ServerSettingsPayload,
+  ServerResponse,
+} from "../types/ServerTypes";
+
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 
 export class RealTimeDrawEngine {
@@ -66,6 +72,8 @@ export class RealTimeDrawEngine {
       y: number;
     },
   ) => void;
+
+  private serverSocket: WebSocket | null = null;
 
   constructor({
     width,
@@ -158,10 +166,98 @@ export class RealTimeDrawEngine {
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
     //this.previewCopyListener();
+
+    //this.startServer();
   }
 
   private isEnabled: boolean = false;
   private cleanupFunction: (() => void) | null = null;
+
+  // this starts the python server
+  public startServer() {
+    // Create WebSocket connection
+    const socket = new WebSocket("ws://localhost:8765");
+
+    // Setup event handlers
+    socket.onopen = () => {
+      console.log("Connected to inference server");
+      // Send initial setup payload to load models
+      const setupPayload: ServerSetupPayload = {
+        type: "setup",
+        model: {
+          name: "stabilityai/sdxl-turbo",
+          path: "F:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI/models/checkpoints/ponyDiffusionV6XL_v6StartWithThisOne.safetensors",
+          precision: "fp16",
+        },
+        lora: {
+          path: "F:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI/models/loras/LCM_LoRA_Weights_SDXL.safetensors",
+          alpha: 0.75,
+        },
+        device: "cuda",
+      };
+
+      socket.send(JSON.stringify(setupPayload));
+    };
+
+    // Handle incoming messages from server
+    socket.onmessage = (event) => {
+      try {
+        const response: ServerResponse = JSON.parse(event.data);
+
+        // Handle model loading progress updates
+        if (response.type === "progress") {
+          console.log(`Loading progress: ${response.percent}%`);
+          // You might want to update UI with loading progress here
+        }
+        // Handle successful model load
+        else if (
+          response.type === "success" &&
+          response.status === "model_loaded"
+        ) {
+          console.log("Model loaded successfully");
+          // Enable UI elements that depend on model being loaded
+        }
+        // Handle image generation results
+        else if (
+          response.type === "success" &&
+          response.status === "generation_complete"
+        ) {
+          if (response.image) {
+            // Convert base64 image to ImageBitmap for preview
+            this.base64ToImageBitmap(response.image).then((bitmap) => {
+              this.outputBitmap = bitmap;
+              this.previewCanvas.image(bitmap);
+              this.mediaLayerRef.draw();
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing server response:", error);
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = () => {
+      console.log("Disconnected from inference server");
+    };
+
+    // Store socket reference for later use
+    this.serverSocket = socket;
+  }
+
+  // Add method to update model settings
+  public updateServerSettings(settings: ServerSettingsPayload) {
+    if (this.serverSocket && this.serverSocket.readyState === WebSocket.OPEN) {
+      this.serverSocket.send(JSON.stringify(settings));
+    } else {
+      console.error(
+        "Cannot update settings: Server connection not established",
+      );
+    }
+  }
 
   public paintMode() {
     let isDrawing = false;
