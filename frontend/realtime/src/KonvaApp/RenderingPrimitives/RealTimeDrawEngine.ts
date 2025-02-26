@@ -170,7 +170,7 @@ export class RealTimeDrawEngine {
     this.captureCanvas.setZIndex(0);
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
-    this.previewCopyListener();
+    //this.previewCopyListener();
 
     //this.startServer();
   }

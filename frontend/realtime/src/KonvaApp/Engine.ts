@@ -3,7 +3,7 @@ import Konva from "konva";
 import { uiAccess, uiEvents } from "~/signals";
 import { ShapeNode } from "./Nodes";
 import { PaintNode } from "./Nodes/PaintNode";
-
+import { PreviewCopyNode } from "./Nodes/PreviewCopy";
 import { UndoStackManager } from "./UndoRedo";
 import { CommandManager, MatteBox, SceneManager } from "./EngineUtitlities";
 import {
@@ -128,6 +128,9 @@ export class Engine {
       offScreenCanvas: this.offScreenCanvas,
       onDraw: async (canvas, lineBounds) => {
         await this.addPaintNode(canvas, lineBounds);
+      },
+      onPreviewCopy: async (image) => {
+        await this.addPreviewCopy(image);
       },
     });
 
@@ -655,14 +658,14 @@ export class Engine {
   public addPreviewCopy(image: Image.Konva) {
     // Start of Selection
     const copyNode = new PreviewCopyNode({
-      image: previewCopy,
-      mediaLayerRef: this.mediaLayerRef,
-      selectionManagerRef: this.selectionManagerRef,
+      image: image,
+      mediaLayerRef: this.mediaLayer,
+      selectionManagerRef: this.selectionManager,
       loaded: async () => {
-        this.drawingsLayer.draw();
+        this.realTimeDrawEngine.render();
       },
     });
-    this.commandManager.createNode(imageNode);
+    this.commandManager.createNode(copyNode);
   }
   public addImage(imageFile: File) {
     const imageNode = new ImageNode({
