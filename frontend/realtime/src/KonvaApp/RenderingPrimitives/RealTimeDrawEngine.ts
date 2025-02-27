@@ -60,8 +60,7 @@ export class RealTimeDrawEngine {
   // paint Brush Size
   // has to exit out of paint mode when shape or image are used.
   public paintColor: string = "#000000";
-  public paintBrushSize: number = 5;
-  public isPaintMode: boolean = false;
+  private brushSize: number = 5;  // Default brush size
 
   private onDrawCallback?: (
     canvas: HTMLCanvasElement,
@@ -281,7 +280,7 @@ export class RealTimeDrawEngine {
       currentLine = new Konva.Line({
         points: [relativeX, relativeY],
         stroke: this.paintColor,
-        strokeWidth: 5,
+        strokeWidth: this.brushSize * 5,
         lineCap: "round",
         lineJoin: "round",
         x: this.captureCanvas.x(),
@@ -900,5 +899,14 @@ export class RealTimeDrawEngine {
     } finally {
       this.isProcessing = false;
     }
+  }
+
+  // Add getter/setter for brush size
+  public set paintBrushSize(size: number) {
+    this.brushSize = size;
+  }
+
+  public get paintBrushSize(): number {
+    return this.brushSize;
   }
 }

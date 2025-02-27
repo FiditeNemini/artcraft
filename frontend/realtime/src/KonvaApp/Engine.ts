@@ -503,6 +503,10 @@ export class Engine {
     uiEvents.toolbarMain.onPaintColorChanged((color) => {
       this.realTimeDrawEngine.paintColor = color;
     });
+
+    uiEvents.toolbarMain.onEraseBrushSizeChanged((size: number) => {
+      this.realTimeDrawEngine.paintBrushSize = size;
+    });
   }
 
   disableAllButtons() {
