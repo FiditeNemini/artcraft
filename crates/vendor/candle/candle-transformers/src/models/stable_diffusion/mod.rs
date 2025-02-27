@@ -41,6 +41,7 @@ pub mod attention;
 pub mod clip;
 pub mod ddim;
 pub mod ddpm;
+pub mod lcm;
 pub mod embeddings;
 pub mod euler_ancestral_discrete;
 pub mod resnet;
@@ -52,8 +53,9 @@ pub mod utils;
 pub mod vae;
 
 use std::sync::Arc;
+use std::collections::HashMap;
 
-use candle::{DType, Device, Result};
+use candle::{DType, Device, Result, Tensor};
 use candle_nn as nn;
 
 use self::schedulers::{Scheduler, SchedulerConfig};
@@ -493,6 +495,28 @@ impl StableDiffusionConfig {
 
     pub fn build_scheduler(&self, n_steps: usize) -> Result<Box<dyn Scheduler>> {
         self.scheduler.build(n_steps)
+    }
+
+    fn unet_config(&self, in_channels: usize) -> Result<unet_2d::UNet2DConditionModelConfig> {
+        Ok(self.unet.clone())
+    }
+
+    pub fn build_unet_with_weights(
+        &self,
+        weights: HashMap<String, Tensor>,
+        device: &Device,
+        in_channels: usize,
+        use_flash_attn: bool,
+        dtype: DType,
+    ) -> Result<unet_2d::UNet2DConditionModel> {
+        let config = self.unet.clone();
+        unet_2d::UNet2DConditionModel::new(
+            nn::VarBuilder::from_tensors(weights, dtype, device),
+            in_channels,
+            4,
+            use_flash_attn,
+            config,
+        )
     }
 }
 

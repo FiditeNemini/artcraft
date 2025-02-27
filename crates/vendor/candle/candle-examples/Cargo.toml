@@ -122,3 +122,7 @@ required-features = ["onnx"]
 [[example]]
 name = "colpali"
 required-features = ["pdf2image"]
+
+[[example]]
+name = "lcm_debug_test"
+path = "examples/lcm/debug_test.rs"
