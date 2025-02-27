@@ -170,7 +170,7 @@ export class RealTimeDrawEngine {
     this.captureCanvas.setZIndex(0);
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
-    //this.previewCopyListener();
+    this.previewCopyListener();
 
     //this.startServer();
   }
@@ -425,57 +425,82 @@ export class RealTimeDrawEngine {
   }
 
   public previewCopyListener() {
-    this.previewCanvas.on("mousedown touchstart", () => {
-      if (!this.outputBitmap) {
-        console.log("No preview image to copy");
-        return;
-      }
-
-      // Create draggable preview copy
-      const previewCopy = new Konva.Image({
-        x: this.previewCanvas.x(),
-        y: this.previewCanvas.y(),
-        width: this.width,
-        height: this.height,
-        image: this.outputBitmap,
-        draggable: true,
-        listening: true,
-      });
-
-      // this.drawingsLayer.add(previewCopy); // Add to drawingsLayer instead of mediaLayerRef
-      // this.drawingsLayer.batchDraw();
-
-      // Invoke the callback with the preview copy
-      if (this.onPreviewCopyCallback) {
-        this.onPreviewCopyCallback(previewCopy);
-      }
-
-      // Start dragging immediately
-      previewCopy.startDrag();
-
-      // Handle drag events
-      previewCopy.on("dragmove", () => {
-        // this.drawingsLayer.draw();
-      });
-
-      previewCopy.on("dragend", () => {
-        const previewBox = previewCopy.getClientRect();
-        const captureBox = this.captureCanvas.getClientRect();
-
-        if (Konva.Util.haveIntersection(previewBox, captureBox)) {
-          // Snap to capture canvas position
-          previewCopy.position({
-            x: this.captureCanvas.x(),
-            y: this.captureCanvas.y(),
+        // Start of Selection
+        this.previewCanvas.on("mousedown touchstart", () => {
+          if (!this.outputBitmap) {
+            console.log("No preview image to copy");
+            return;
+          }
+    
+          // Create draggable preview copy
+          const previewCopy = new Konva.Image({
+            x: this.previewCanvas.x(),
+            y: this.previewCanvas.y(),
+            width: this.width,
+            height: this.height,
+            image: this.outputBitmap,
+            draggable: true,
+            listening: true,
           });
-          //this.drawingsLayer.batchDraw();
-        } else {
-          // Remove if dropped outside capture area
-          //previewCopy.destroy();
-          //this.drawingsLayer.batchDraw();
-        }
-      });
-    });
+    
+          if (this.onPreviewCopyCallback) {
+            this.onPreviewCopyCallback(previewCopy);
+          }
+          previewCopy.startDrag();
+          previewCopy.on("dragend", (e: Konva.KonvaEventObject<DragEvent>) => {
+            const previewBox = previewCopy.getClientRect();
+            const captureBox = this.captureCanvas.getClientRect();
+    
+            if (Konva.Util.haveIntersection(previewBox, captureBox)) {
+              // Snap to capture canvas position
+              previewCopy.position({
+                x: this.captureCanvas.x(),
+                y: this.captureCanvas.y(),
+              });
+              e.target.off('dragend');
+              previewCopy.setZIndex(1); // send back after drop.
+            } else {
+                // Start Generation Here
+                previewCopy.destroy();
+                this.mediaLayerRef.batchDraw();
+            }
+          });
+          
+          // Start Generation Here
+          const stage = this.mediaLayerRef.getStage();
+          const layer = this.mediaLayerRef; // Use the existing media layer
+
+          // Create centered text
+              // Start of Selection
+              const centeredText = new Konva.Text({
+                text: 'Hold and Drag Over, To Copy',
+                fontSize: 24,
+                fontFamily: 'Arial',
+                fill: 'black',
+                x: this.captureCanvas.x() + this.captureCanvas.width() / 2,
+                y: this.captureCanvas.y() + this.captureCanvas.height() / 2,
+                id: 'copyText',
+                listening: false,
+              });
+              // Calculate and set offsets based on text size to center it
+              centeredText.offsetX(centeredText.width() / 2);
+              centeredText.offsetY(centeredText.height() / 2);
+
+          layer.add(centeredText);
+          centeredText.moveToTop();
+          layer.batchDraw();
+    
+          // Remove text on mouseup/touchend
+          const removeText = () => {
+            const text = layer.findOne('#copyText');
+            if (text) {
+              text.destroy();
+              layer.batchDraw();
+            }
+            stage.off("mouseup touchend", removeText);
+          };
+          stage.on("mouseup touchend", removeText);
+        });
   }
 
   public findImageNodeById(
