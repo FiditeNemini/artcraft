@@ -6,7 +6,7 @@ import { Group } from "konva/lib/Group";
 import { invoke } from "@tauri-apps/api/core";
 
 import { FileUtilities } from "../FileUtilities/FileUtilities";
-import { ImageNode, VideoNode, TextNode, ShapeNode } from "../Nodes";
+import { ImageNode, VideoNode, TextNode, ShapeNode, ShapeType } from "../Nodes";
 import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
@@ -87,6 +87,9 @@ export class RealTimeDrawEngine {
   private client: WebSocketClient | null = null;
   private isConnected: boolean = false;
 
+
+  private backgroundNode: ShapeNode | null = null;
+  public backgroundColor: string = "#d2d2d2"
   constructor({
     width,
     height,
@@ -156,7 +159,7 @@ export class RealTimeDrawEngine {
       y: this.positionY,
       width: this.width,
       height: this.height,
-      fill: "white",
+      fill: this.backgroundColor,
       stroke: "black",
       strokeWidth: 1,
       draggable: false,
@@ -921,5 +924,11 @@ export class RealTimeDrawEngine {
       this.client.ws.close();
     }
     await this.startServer();
+  }
+
+  // Add method to create or update background
+  public updateBackground(color: string) {
+      this.captureCanvas.fill(color);
+      this.mediaLayerRef.batchDraw();
   }
 }

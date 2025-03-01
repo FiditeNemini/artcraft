@@ -30,8 +30,7 @@ import { VideoExtractionHandler } from "./EngineUtitlities/VideoExtractionHandle
 import { RealTimeDrawEngine } from "./RenderingPrimitives/RealTimeDrawEngine";
 import { NodeColor } from "~/signals/uiEvents/toolbarNode";
 import { ShapeType } from "./Nodes";
-// for testing loading files from system
-// import { FileUtilities } from "./FileUtilities/FileUtilities";
+
 
 export interface RenderingOptions {
   artstyle: string;
@@ -64,6 +63,7 @@ export class Engine {
   private selectorSquare: SelectorSquare;
   private loadingVideosProvider: LoadingVideosProvider;
   private matteBox: MatteBox;
+  private backgroundNode: ShapeNode | null = null;
 
   private sceneManager: SceneManager;
   private undoStackManager: UndoStackManager;
@@ -308,66 +308,9 @@ export class Engine {
         });
       }
     });
-    uiEvents.toolbarNode.CRHOMA.onClick(() => {
-      const nodes = this.selectionManager.getSelectedNodes();
-      if (nodes.size > 1) {
-        uiAccess.dialogError.show({
-          title: "Error: Background Removal",
-          message:
-            "Please do not select more than 1 item for the Background Removal feature, we can only apply Background Removal to 1 item at a time",
-        });
-        return;
-      }
-      const node = nodes.values().next().value;
-      try {
-        if (node instanceof VideoNode) {
-          const nodeChromaProps = node.getChroma();
-          uiAccess.dialogChromakey.show({
-            isChromakeyEnabled: nodeChromaProps.isChromakeyEnabled,
-            chromakeyColor: nodeChromaProps.chromakeyColor,
-          });
-        } else {
-          throw new Error();
-        }
-      } catch {
-        uiAccess.dialogError.show({
-          title: "Error: Background Removal",
-          message: "This item is not compatible is Background Removal",
-        });
-      }
-    });
+   
 
-    uiEvents.toolbarNode.SEGMENTATION.onClick(async () => {
-      if (this.segmentationButtonCanBePressed == false) {
-        console.log("VideoExtraction Button DEBOUNCED ");
-        return;
-      }
-      console.log("VideoExtraction Button Clicked ACCEPTED");
-
-      // Gating for an appropriate selection
-      const nodes = this.selectionManager.getSelectedNodes();
-      if (nodes.size > 1) {
-        // display error that segmentation cannot be done on more than 1 at a time.
-        uiAccess.dialogError.show({
-          title: "Error: Video Extraction",
-          message: "Video Extraction cannot be done on more than 1 item",
-        });
-        return;
-      }
-      const element = nodes.values().next().value;
-      if (element instanceof VideoNode !== true) {
-        uiAccess.dialogError.show({
-          title: "Error: Video Extraction",
-          message:
-            "Extraction is only available for Videos, it is not avaliable for other Assets yet",
-        });
-        this.selectionManager.clearSelection();
-      }
-      // Gating done
-
-      //cast medianode to videonode
-      this.videoExtractionHandler.startVideoExtraction(element as VideoNode);
-    });
+  
     uiEvents.toolbarNode.DELETE.onClick(() =>
       this.commandManager.deleteNodes(),
     );
@@ -437,33 +380,7 @@ export class Engine {
       this.addText(textdata);
     });
 
-    uiEvents.onChromakeyRequest((chromakeyProps) => {
-      const node = this.selectionManager
-        .getSelectedNodes()
-        .values()
-        .next().value;
-      if (!node) {
-        console.log("Node was not returned.");
-        return;
-      }
-      if (node instanceof VideoNode) {
-        if (chromakeyProps.isChromakeyEnabled) {
-          this.commandManager.addChromaKey({
-            videoNode: node,
-            newChromaColor: chromakeyProps.chromakeyColor ?? {
-              red: 120,
-              green: 150,
-              blue: 120,
-            },
-          });
-        } else {
-          this.commandManager.removeChromaKey({
-            videoNode: node,
-          });
-        }
-      }
-    });
-
+   
     let renderTimeout: NodeJS.Timeout;
 
     uiEvents.promptEvents.onPromptStrengthChanged(async (strength) => {
@@ -494,6 +411,11 @@ export class Engine {
           this.addShape(ShapeType.TRIANGLE, 100);
           break;
       }
+    });
+
+
+    uiEvents.toolbarMain.onBgColorChanged((data)=>{
+      this.realTimeDrawEngine.updateBackground(data);
     });
 
     uiEvents.toolbarNode.color.onConfirmChanged((nodeColor) => {
