@@ -140,7 +140,9 @@ async def generate_image(
         torch.cuda.empty_cache()
         
         image_stream = io.BytesIO(base64.b64decode(request.image))
+      
         init_image = Image.open(image_stream).convert('RGB')
+        init_image = init_image.resize((request.width, request.height))  # width, height
         init_image = transform(init_image).to('cuda')
         init_image = init_image.unsqueeze(0)
 

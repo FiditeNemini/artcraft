@@ -250,9 +250,39 @@ export class RealTimeDrawEngine {
     await this.client.loadModel(settings);
   }
 
+  private updateCursor(stage: Konva.Stage) {
+    // Create cursor canvas
+    const cursorCanvas = document.createElement('canvas');
+    const size = this.brushSize * 5; // Match the brush size used in drawing
+    cursorCanvas.width = size * 2;  // Double size for padding
+    cursorCanvas.height = size * 2;
+    
+    const ctx = cursorCanvas.getContext('2d');
+    if (!ctx) return;
+
+    // Draw the circle
+    ctx.beginPath();
+    ctx.arc(size, size, size/2, 0, Math.PI * 2);
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Convert to data URL
+    const cursorUrl = cursorCanvas.toDataURL();
+    
+    // Apply custom cursor
+    stage.container().style.cursor = `url(${cursorUrl}) ${size} ${size}, auto`;
+  }
+
   public paintMode() {
     let isDrawing = false;
     let currentLine: Konva.Line | null = null;
+
+    const stage = this.mediaLayerRef.getStage();
+    if (!stage) return;
+
+    // Initialize cursor
+    this.updateCursor(stage);
 
     const startDrawing = (pos: { x: number; y: number }) => {
       if (!this.isEnabled) return;
@@ -347,9 +377,6 @@ export class RealTimeDrawEngine {
     };
 
     // Add event listeners
-    const stage = this.mediaLayerRef.getStage();
-    if (!stage) return;
-
     stage.on("mousedown touchstart", (e) => {
       const pos = stage.getPointerPosition();
       if (pos && isWithinCaptureCanvas(pos)) {
@@ -383,6 +410,11 @@ export class RealTimeDrawEngine {
     if (!this.cleanupFunction) {
       this.paintMode();
     }
+    // Update cursor when enabling paint mode
+    const stage = this.mediaLayerRef.getStage();
+    if (stage) {
+      this.updateCursor(stage);
+    }
   }
 
   public enableDragging() {
@@ -412,6 +444,11 @@ export class RealTimeDrawEngine {
     if (this.cleanupFunction) {
       this.cleanupFunction();
       this.cleanupFunction = null;
+    }
+    // Reset cursor when disabling paint mode
+    const stage = this.mediaLayerRef.getStage();
+    if (stage) {
+      stage.container().style.cursor = 'default';
     }
   }
 
@@ -876,7 +913,7 @@ export class RealTimeDrawEngine {
         prompt: this.currentPrompt,
         strength: this.currentStrength,
         guidance_scale: 2,
-        num_inference_steps: 2,
+        num_inference_steps: 4,
         height: 1024,
         width: 1024,
         lora_strength: 1.0,
@@ -910,6 +947,10 @@ export class RealTimeDrawEngine {
   // Add getter/setter for brush size
   public set paintBrushSize(size: number) {
     this.brushSize = size;
+    const stage = this.mediaLayerRef.getStage();
+    if (stage && this.isEnabled) {
+      this.updateCursor(stage);
+    }
   }
 
   public get paintBrushSize(): number {
