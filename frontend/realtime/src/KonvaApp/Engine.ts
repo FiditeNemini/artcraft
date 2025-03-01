@@ -464,14 +464,22 @@ export class Engine {
       }
     });
 
+    let renderTimeout: NodeJS.Timeout;
+
     uiEvents.promptEvents.onPromptStrengthChanged(async (strength) => {
       this.realTimeDrawEngine.currentStrength = strength / 100.0;
-      // this.realTimeDrawEngine.render();
+      clearTimeout(renderTimeout);
+      renderTimeout = setTimeout(async () => {
+        await this.realTimeDrawEngine.render();
+      }, 1000);
     });
 
     uiEvents.promptEvents.onPromptTextChanged(async (prompt) => {
       this.realTimeDrawEngine.currentPrompt = prompt;
-      // this.realTimeDrawEngine.render();
+      clearTimeout(renderTimeout);
+      renderTimeout = setTimeout(async () => {
+        await this.realTimeDrawEngine.render();
+      }, 1000);
     });
 
     uiEvents.onAddShapeToEngine((shapeData) => {
