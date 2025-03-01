@@ -19,6 +19,9 @@ export interface GenerateRequest {
   strength?: number;
   guidance_scale?: number;
   num_inference_steps?: number;
+  height:number;
+  width:number;
+  lora_strength:number;
 }
 
 export interface GenerateResponse {

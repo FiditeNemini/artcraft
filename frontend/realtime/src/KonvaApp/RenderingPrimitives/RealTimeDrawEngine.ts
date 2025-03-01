@@ -875,8 +875,11 @@ export class RealTimeDrawEngine {
         image: base64Bitmap,
         prompt: this.currentPrompt,
         strength: this.currentStrength,
-        guidance_scale: 2.0,
-        num_inference_steps: 4,
+        guidance_scale: 2,
+        num_inference_steps: 2,
+        height: 1024,
+        width: 1024,
+        lora_strength: 1.0,
       });
       return;
     }

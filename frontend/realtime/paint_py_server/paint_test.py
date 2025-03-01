@@ -28,6 +28,7 @@ from diffusers import (
 )
 import torch
 import torchvision.transforms as transforms
+import gc
 
 transform = transforms.Compose([
     transforms.ToTensor(),  # This converts PIL Image to tensor and scales to [0, 1]
@@ -57,6 +58,9 @@ class GenerateRequest:
     strength: float = 0.6
     guidance_scale: float = 2.0
     num_inference_steps: int = 4
+    height: int = 1024
+    width: int = 1024
+    lora_strength: float = 1.0
 
 @dataclass_json
 @dataclass
@@ -102,8 +106,7 @@ async def load_model(model_path: str, lora_path: str = None) -> StableDiffusionX
         pipe = StableDiffusionXLPipeline.from_single_file(
             model_path,
             torch_dtype=torch.float16,
-            use_safetensors=True,
-            height=1024, width=1024,
+            use_safetensors=True
         ).to("cuda")
         
         # Convert to img2img pipeline
@@ -133,35 +136,35 @@ async def generate_image(
 ) -> str:
     """Generate image and return base64 string."""
     try:
-
+        # Clear CUDA cache before processing
+        torch.cuda.empty_cache()
+        
         image_stream = io.BytesIO(base64.b64decode(request.image))
-
         init_image = Image.open(image_stream).convert('RGB')
-        init_image = transform(init_image)  # Now it's a torch tensor
-
-        # If you need it on GPU
-        init_image = init_image.to('cuda')  # Shape will be [3, H, W]
-
-        # If you need to match SDXL's expected format (batch dimension)
-        init_image = init_image.unsqueeze(0)  # Shape will be [1, 3, H, W]
-        prompt = "safe_pos, 1girl, solo, solo focus, 8k, masterpiece, hires, absurdres, splash art, gradient, looking at viewer, medium breasts, vibrant yellow hair, purple hair tips, (shoulder freckles:1.2), nude, athletic, confident, hand on waist, extremely long hair, dancing, delicate gold jewelry, thin gold bangles, belly button chain, action shot,, head tilt, hair censor, spotlight, tottotonero"
-        if len(request.prompt) == 0:
-            request.prompt = prompt
+        init_image = transform(init_image).to('cuda')
+        init_image = init_image.unsqueeze(0)
 
         # Generate image
-        output_image = pipe(
-            request.prompt,
-            image=init_image,
-            num_inference_steps=request.num_inference_steps,
-            guidance_scale=request.guidance_scale,
-            strength=request.strength,
-            generator=torch.manual_seed(0)
-        ).images[0]
-        
+        with torch.inference_mode():
+            output_image = pipe(
+                request.prompt,
+                image=init_image,
+                num_inference_steps=request.num_inference_steps,
+                guidance_scale=request.guidance_scale,
+                strength=request.strength,
+                generator=torch.manual_seed(0),
+                height=request.height, width=request.width,
+            ).images[0]
+
+        # Clean up CUDA tensors
+        del init_image
+        torch.cuda.empty_cache()
+        gc.collect()
+
         # Convert to base64
         buffered = BytesIO()
         output_image.save(buffered, format="PNG")
-        buffered.seek(0) 
+        buffered.seek(0)
         img_str = base64.b64encode(buffered.getvalue()).decode()
         
         return f"data:image/png;base64,{img_str}"
@@ -173,36 +176,78 @@ async def handle_client(websocket):
     pipe = None
     try:
         async for message in websocket:
-            data = json.loads(message)
-            command = data.get("command")
+            try:
+                # Clear memory before processing new request
+                torch.cuda.empty_cache()
+                gc.collect()
 
-            if command == "load_model":
-                await send_progress(websocket, "Loading model...", 0.0)
-                request = LoadModelRequest.from_json(message)
+                data = json.loads(message)
+                command = data.get("command")
+
+                if command == "load_model":
+                    await send_progress(websocket, "Loading model...", 0.0)
+                    request = LoadModelRequest.from_json(message)
+                    
+                    if pipe is not None:
+                        # Clean up existing model
+                        del pipe
+                        torch.cuda.empty_cache()
+                        gc.collect()
+                    
+                    pipe = await load_model(request.model_path, request.lora_path)
+                    await send_progress(websocket, "Model loaded successfully", 1.0)
+
+                elif command == "generate":
+                    if not pipe:
+                        raise Exception("Model not loaded. Please load model first.")
+                    
+                    await send_progress(websocket, "Generating image...", 0.0)
+                    request = GenerateRequest.from_json(message)
+                    
+                    # Use a timeout for generation to prevent hanging
+                    try:
+                        result = await asyncio.wait_for(
+                            generate_image(pipe=pipe, request=request),
+                            timeout=10.0  # 30 second timeout
+                        )
+                        response = GenerateResponse(image=result)
+                        await websocket.send(response.to_json())
+                    except asyncio.TimeoutError:
+                        # Force cleanup if generation times out
+                        torch.cuda.empty_cache()
+                        gc.collect()
+                        raise Exception("Generation timed out")
+                    
+                else:
+                    raise Exception(f"Unknown command: {command}")
                 
-                pipe = await load_model(request.model_path, request.lora_path)
-                await send_progress(websocket, "Model loaded successfully", 1.0)
-            elif command == "generate":
-                if not pipe:
-                    raise Exception("Model not loaded. Please load model first.")
+            except Exception as e:
+                await send_progress(websocket, "Error processing request", 0.0, str(e))
+                # Clean up after error
+                torch.cuda.empty_cache()
+                gc.collect()
                 
-                await send_progress(websocket, "Generating image...", 0.0)
-                request = GenerateRequest.from_json(message)
-                
-                result = await generate_image(pipe=pipe, request=request)
-                
-                response = GenerateResponse(image=result)
-                await websocket.send(response.to_json())
-            
-            else:
-                raise Exception(f"Unknown command: {command}")
-                
+    except websockets.exceptions.ConnectionClosed:
+        print("Client connection closed")
     except Exception as e:
-        await send_progress(websocket, "Error", 0.0, str(e))
+        await send_progress(websocket, "Fatal error", 0.0, str(e))
+    finally:
+        # Clean up resources when client disconnects
+        if pipe is not None:
+            del pipe
+        torch.cuda.empty_cache()
+        gc.collect()
 
 async def server():
     """Start WebSocket server."""
-    async with websockets.serve(handle_client, "localhost", 8765,max_size=None):
+    async with websockets.serve(
+        handle_client,
+        "localhost",
+        8765,
+        max_size=None,
+        ping_interval=None,  # Disable ping/pong to prevent timeouts
+        max_queue=10  # Limit pending connections
+    ):
         print("Server started on ws://localhost:8765")
         await asyncio.Future()  # run forever
 
