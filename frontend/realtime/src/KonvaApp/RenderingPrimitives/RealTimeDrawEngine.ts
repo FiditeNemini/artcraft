@@ -6,7 +6,7 @@ import { Group } from "konva/lib/Group";
 import { invoke } from "@tauri-apps/api/core";
 
 import { FileUtilities } from "../FileUtilities/FileUtilities";
-import { ImageNode, VideoNode, TextNode, ShapeNode, ShapeType } from "../Nodes";
+import { ImageNode, VideoNode, TextNode, ShapeNode } from "../Nodes";
 import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
@@ -15,13 +15,23 @@ import { Image } from "@tauri-apps/api/image";
 
 import { PaintNode } from "../Nodes/PaintNode";
 
-import {
-  ServerSetupPayload,
-  ServerSettingsPayload,
-  ServerResponse,
-} from "../types/ServerTypes";
+import { WebSocketClient } from "../../PyServer/DrawServer";
+import { PreviewCopyNode } from "../Nodes/PreviewCopy";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
+
+interface ServerSettings {
+  model_path: string;
+  lora_path?: string;
+}
+
+interface GenerateImageParams {
+  image: string;
+  prompt: string;
+  strength?: number;
+  guidance_scale?: number;
+  num_inference_steps?: number;
+}
 
 export class RealTimeDrawEngine {
   private videoNodes: VideoNode[];
@@ -60,7 +70,7 @@ export class RealTimeDrawEngine {
   // paint Brush Size
   // has to exit out of paint mode when shape or image are used.
   public paintColor: string = "#000000";
-  private brushSize: number = 5;  // Default brush size
+  private brushSize: number = 5; // Default brush size
 
   private onDrawCallback?: (
     canvas: HTMLCanvasElement,
@@ -74,7 +84,8 @@ export class RealTimeDrawEngine {
 
   private onPreviewCopyCallback?: (previewCopy: Konva.Image) => void; // New Callback
 
-  private serverSocket: WebSocket | null = null;
+  private client: WebSocketClient | null = null;
+  private isConnected: boolean = false;
 
   constructor({
     width,
@@ -127,6 +138,7 @@ export class RealTimeDrawEngine {
     this.drawingsLayer = new Konva.Layer({
       clearBeforeDraw: true, // Ensures transparent background
     });
+ 
     this.mediaLayerRef.getStage()?.add(this.drawingsLayer); // to od pass in stage
 
     // Set background layer to red and media layer to green for visibility
@@ -136,7 +148,7 @@ export class RealTimeDrawEngine {
     this.fps = 24;
 
     this.currentPrompt = "";
-    this.currentStrength = 100;
+    this.currentStrength = 1;
     // This is captures a subset of the medialayer ref
     this.captureCanvas = new Konva.Rect({
       name: "CaptureCanvas",
@@ -171,96 +183,68 @@ export class RealTimeDrawEngine {
     // Add mouse events for preview canvas copying
     this.previewCopyListener();
 
-    //this.startServer();
+    this.startServer();
   }
 
   private isEnabled: boolean = false;
   private cleanupFunction: (() => void) | null = null;
 
   // this starts the python server
-  public startServer() {
-    // Create WebSocket connection
-    const socket = new WebSocket("ws://localhost:8765");
+  public async startServer() {
+    try {
+      this.client = new WebSocketClient("ws://localhost:8765");
 
-    // Setup event handlers
-    socket.onopen = () => {
-      console.log("Connected to inference server");
-      // Send initial setup payload to load models
-      const setupPayload: ServerSetupPayload = {
-        type: "setup",
-        model: {
-          name: "stabilityai/sdxl-turbo",
-          path: "F:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI/models/checkpoints/ponyDiffusionV6XL_v6StartWithThisOne.safetensors",
-          precision: "fp16",
-        },
-        lora: {
-          path: "F:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI/models/loras/LCM_LoRA_Weights_SDXL.safetensors",
-          alpha: 0.75,
-        },
-        device: "cuda",
-      };
-
-      socket.send(JSON.stringify(setupPayload));
-    };
-
-    // Handle incoming messages from server
-    socket.onmessage = (event) => {
-      try {
-        const response: ServerResponse = JSON.parse(event.data);
-        console.log("Server response:", response);
-        // Handle model loading progress updates
-        if (response.type === "progress") {
-          console.log(`Loading progress: ${response.percent}%`);
-          // You might want to update UI with loading progress here
+      // Set up message handlers
+      this.client.onProgress((progress) => {
+        console.log(
+          `Progress: ${progress.message} (${progress.progress * 100}%)`,
+        );
+        if (progress.error) {
+          console.error("Error:", progress.error);
         }
-        // Handle successful model load
-        else if (
-          response.type === "success" &&
-          response.status === "model_loaded"
-        ) {
-          console.log("Model loaded successfully");
-          // Enable UI elements that depend on model being loaded
+      });
+
+      this.client.onResult(async (response) => {
+        try {
+          // Convert the base64 image to ImageBitmap and update the preview
+          const bitmap = await this.base64ToImageBitmap(response.image);
+          this.outputBitmap = bitmap;
+          this.previewCanvas.image(bitmap);
+          this.mediaLayerRef.batchDraw();
+        } catch (error) {
+          console.error("Error processing result image:", error);
+        } finally {
+          this.isProcessing = false;
         }
-        // Handle image generation results
-        else if (
-          response.type === "success" &&
-          response.status === "generation_complete"
-        ) {
-          if (response.image) {
-            // Convert base64 image to ImageBitmap for preview
-            this.base64ToImageBitmap(response.image).then((bitmap) => {
-              this.outputBitmap = bitmap;
-              this.previewCanvas.image(bitmap);
-              this.mediaLayerRef.draw();
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error parsing server response:", error);
-      }
-    };
+      });
 
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+      // Wait for connection to be established
+      await new Promise<void>((resolve, reject) => {
+        if (!this.client) return reject("Client not initialized");
 
-    socket.onclose = () => {
-      console.log("Disconnected from inference server");
-    };
+        this.client.ws.onopen = () => {
+          this.isConnected = true;
+          resolve();
+        };
+        this.client.ws.onerror = (error) => reject(error);
+      });
 
-    // Store socket reference for later use
-    this.serverSocket = socket;
+      // Load initial model
+      await this.loadModel({
+        model_path: "C:/Users/Tensor/Downloads/animagineXL40_v4Opt.safetensors",
+        lora_path: "C:/Users/Tensor/Downloads/anyu_all.safetensors",
+      });
+    } catch (error) {
+      console.error("Failed to start server:", error);
+      this.isConnected = false;
+    }
   }
 
-  // Add method to update model settings
-  public updateServerSettings(settings: ServerSettingsPayload) {
-    if (this.serverSocket && this.serverSocket.readyState === WebSocket.OPEN) {
-      this.serverSocket.send(JSON.stringify(settings));
-    } else {
-      console.error(
-        "Cannot update settings: Server connection not established",
-      );
+  private async loadModel(settings: ServerSettings) {
+    if (!this.client || !this.isConnected) {
+      throw new Error("Server not connected");
     }
+    await this.client.loadModel(settings);
   }
 
   public paintMode() {
@@ -287,7 +271,7 @@ export class RealTimeDrawEngine {
         y: this.captureCanvas.y(),
         draggable: false,
       });
-
+      this.drawingsLayer.moveToTop();
       this.drawingsLayer.add(currentLine); // Add to drawingsLayer
       isDrawing = true;
     };
@@ -392,6 +376,7 @@ export class RealTimeDrawEngine {
 
   public enablePaintMode() {
     this.isEnabled = true;
+    this.disableDragging();
     if (!this.cleanupFunction) {
       this.paintMode();
     }
@@ -400,9 +385,12 @@ export class RealTimeDrawEngine {
   public enableDragging() {
     // Enable dragging for all nodes in media layer
     this.imageNodes?.forEach((node) => {
+      console.log("Image Nodes Enable");
+      console.log(node);
       node.kNode.draggable(true);
       node.kNode.listening(true);
     });
+
     this.mediaLayerRef.batchDraw();
   }
 
@@ -417,6 +405,7 @@ export class RealTimeDrawEngine {
 
   public disablePaintMode() {
     this.isEnabled = false;
+    this.enableDragging();
     if (this.cleanupFunction) {
       this.cleanupFunction();
       this.cleanupFunction = null;
@@ -424,82 +413,82 @@ export class RealTimeDrawEngine {
   }
 
   public previewCopyListener() {
-        // Start of Selection
-        this.previewCanvas.on("mousedown touchstart", () => {
-          if (!this.outputBitmap) {
-            console.log("No preview image to copy");
-            return;
-          }
-    
-          // Create draggable preview copy
-          const previewCopy = new Konva.Image({
-            x: this.previewCanvas.x(),
-            y: this.previewCanvas.y(),
-            width: this.width,
-            height: this.height,
-            image: this.outputBitmap,
-            draggable: true,
-            listening: true,
+    // Start of Selection
+    this.previewCanvas.on("mousedown touchstart", () => {
+      if (!this.outputBitmap) {
+        console.log("No preview image to copy");
+        return;
+      }
+
+      // Create draggable preview copy
+      const previewCopy = new Konva.Image({
+        x: this.previewCanvas.x(),
+        y: this.previewCanvas.y(),
+        width: this.width,
+        height: this.height,
+        image: this.outputBitmap,
+        draggable: true,
+        listening: true,
+      });
+
+      if (this.onPreviewCopyCallback) {
+        this.onPreviewCopyCallback(previewCopy);
+      }
+      previewCopy.startDrag();
+      previewCopy.on("dragend", (e: Konva.KonvaEventObject<DragEvent>) => {
+        const previewBox = previewCopy.getClientRect();
+        const captureBox = this.captureCanvas.getClientRect();
+
+        if (Konva.Util.haveIntersection(previewBox, captureBox)) {
+          // Snap to capture canvas position
+          previewCopy.position({
+            x: this.captureCanvas.x(),
+            y: this.captureCanvas.y(),
           });
-    
-          if (this.onPreviewCopyCallback) {
-            this.onPreviewCopyCallback(previewCopy);
-          }
-          previewCopy.startDrag();
-          previewCopy.on("dragend", (e: Konva.KonvaEventObject<DragEvent>) => {
-            const previewBox = previewCopy.getClientRect();
-            const captureBox = this.captureCanvas.getClientRect();
-    
-            if (Konva.Util.haveIntersection(previewBox, captureBox)) {
-              // Snap to capture canvas position
-              previewCopy.position({
-                x: this.captureCanvas.x(),
-                y: this.captureCanvas.y(),
-              });
-              e.target.off('dragend');
-              previewCopy.setZIndex(1); // send back after drop.
-            } else {
-                // Start Generation Here
-                previewCopy.destroy();
-                this.mediaLayerRef.batchDraw();
-            }
-          });
-          
+
+          e.target.off("dragend");
+        } else {
           // Start Generation Here
-          const stage = this.mediaLayerRef.getStage();
-          const layer = this.mediaLayerRef; // Use the existing media layer
+          previewCopy.destroy();
+          this.mediaLayerRef.batchDraw();
+        }
+      });
 
-          // Create centered text
-              // Start of Selection
-              const centeredText = new Konva.Text({
-                text: 'Hold and Drag Over, To Copy',
-                fontSize: 24,
-                fontFamily: 'Arial',
-                fill: 'black',
-                x: this.captureCanvas.x() + this.captureCanvas.width() / 2,
-                y: this.captureCanvas.y() + this.captureCanvas.height() / 2,
-                id: 'copyText',
-                listening: false,
-              });
-              // Calculate and set offsets based on text size to center it
-              centeredText.offsetX(centeredText.width() / 2);
-              centeredText.offsetY(centeredText.height() / 2);
+      // Start Generation Here
+      const stage = this.mediaLayerRef.getStage();
+      const layer = this.mediaLayerRef; // Use the existing media layer
 
-          layer.add(centeredText);
-          centeredText.moveToTop();
+      // Create centered text
+      // Start of Selection
+      const centeredText = new Konva.Text({
+        text: "Hold and Drag Over, To Copy",
+        fontSize: 24,
+        fontFamily: "Arial",
+        fill: "black",
+        x: this.captureCanvas.x() + this.captureCanvas.width() / 2,
+        y: this.captureCanvas.y() + this.captureCanvas.height() / 2,
+        id: "copyText",
+        listening: false,
+      });
+      // Calculate and set offsets based on text size to center it
+      centeredText.offsetX(centeredText.width() / 2);
+      centeredText.offsetY(centeredText.height() / 2);
+
+      layer.add(centeredText);
+      centeredText.moveToTop();
+      layer.batchDraw();
+
+      // Remove text on mouseup/touchend
+      const removeText = () => {
+        const text = layer.findOne("#copyText");
+        if (text) {
+          text.destroy();
           layer.batchDraw();
-    
-          // Remove text on mouseup/touchend
-          const removeText = () => {
-            const text = layer.findOne('#copyText');
-            if (text) {
-              text.destroy();
-              layer.batchDraw();
-            }
-            stage.off("mouseup touchend", removeText);
-          };
-          stage.on("mouseup touchend", removeText);
-        });
+        }
+        stage.off("mouseup touchend", removeText);
+      };
+      stage.on("mouseup touchend", removeText);
+    });
   }
 
   public findImageNodeById(
@@ -647,12 +636,7 @@ export class RealTimeDrawEngine {
   public isProcessing = false;
   private handleNodeDragEnd = async () => {
     // Clean up any existing state
-    if (this.isProcessing) {
-      console.log("isProcessing Returning");
-      return;
-    }
-    console.log("Node drag ended");
-    this.isProcessing = true;
+
     await this.render();
   };
 
@@ -661,19 +645,20 @@ export class RealTimeDrawEngine {
       node instanceof ImageNode ||
       node instanceof TextNode ||
       node instanceof ShapeNode ||
-      node instanceof PaintNode
+      node instanceof PaintNode ||
+      node instanceof PreviewCopyNode
     ) {
       console.debug("Adding node:", node);
       this.imageNodes.push(node);
       console.log(this.imageNodes);
-      //node.kNode.on("dragend", this.handleNodeDragEnd);
     }
 
     // ensure the layer doesn't move if added while painting.
     if (this.isEnabled) {
       this.disableDragging();
     }
-
+    // ensure this goes to the top.
+    this.previewCanvas.moveToTop();
     await this.render();
   }
 
@@ -688,7 +673,8 @@ export class RealTimeDrawEngine {
       node instanceof ImageNode ||
       node instanceof TextNode ||
       node instanceof ShapeNode ||
-      node instanceof PaintNode
+      node instanceof PaintNode ||
+      node instanceof PreviewCopyNode
     ) {
       const index = this.imageNodes.indexOf(node);
       if (index > -1) {
@@ -849,6 +835,12 @@ export class RealTimeDrawEngine {
 
   public async render() {
     // only pick nodes that intersect wi th the canvas on screen bounds to freeze.
+    if (this.isProcessing) {
+      console.log("isProcessing Returning");
+      return;
+    }
+    console.log("Calling Render");
+    this.isProcessing = true;
 
     this.mediaLayerRef.draw();
     // Output all nodes in mediaLayerRef
@@ -872,9 +864,17 @@ export class RealTimeDrawEngine {
 
     // Test code
     if (true) {
-      this.outputBitmap = bitmap;
-      this.previewCanvas.image(bitmap);
-      this.isProcessing = false;
+      //this.outputBitmap = bitmap;
+      //this.previewCanvas.image(bitmap);
+      const base64Bitmap = await this.imageBitmapToBase64(bitmap);
+      console.log(this.currentStrength);
+      await this.client?.generateImage({
+        image: base64Bitmap,
+        prompt: this.currentPrompt,
+        strength: this.currentStrength,
+        guidance_scale: 2.0,
+        num_inference_steps: 4,
+      });
       return;
     }
 
@@ -908,5 +908,18 @@ export class RealTimeDrawEngine {
 
   public get paintBrushSize(): number {
     return this.brushSize;
+  }
+
+  // Add method to check connection status
+  public isServerConnected(): boolean {
+    return this.isConnected && this.client !== null;
+  }
+
+  // Add method to reconnect if needed
+  public async reconnect() {
+    if (this.client) {
+      this.client.ws.close();
+    }
+    await this.startServer();
   }
 }

@@ -196,7 +196,6 @@ export class Engine {
         this.selectorSquare.disable(); // this breaks the paint if you use it in the wrong spot
         this.selectionManager.disable(); // this prevents selection.
         this.realTimeDrawEngine.enablePaintMode();
-        this.realTimeDrawEngine.disableDragging();
 
         uiAccess.toolbarMain.enable();
         uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
@@ -208,7 +207,6 @@ export class Engine {
       case AppModes.SELECT: {
         console.log("APPMODE: SELECT");
         this.realTimeDrawEngine.disablePaintMode();
-        this.realTimeDrawEngine.enableDragging();
 
         this.selectorSquare.enable();
         this.selectionManager.enable();
@@ -466,12 +464,14 @@ export class Engine {
       }
     });
 
-    uiEvents.promptEvents.onPromptStrengthChanged((strength) => {
-      this.realTimeDrawEngine.currentStrength = strength;
+    uiEvents.promptEvents.onPromptStrengthChanged(async (strength) => {
+      this.realTimeDrawEngine.currentStrength = strength / 100.0;
+      // this.realTimeDrawEngine.render();
     });
 
-    uiEvents.promptEvents.onPromptTextChanged((prompt) => {
+    uiEvents.promptEvents.onPromptTextChanged(async (prompt) => {
       this.realTimeDrawEngine.currentPrompt = prompt;
+      // this.realTimeDrawEngine.render();
     });
 
     uiEvents.onAddShapeToEngine((shapeData) => {
@@ -652,7 +652,6 @@ export class Engine {
         await this.realTimeDrawEngine.render();
       },
     });
-    shapeNode.kNode.zIndex(1); // Replace desiredZIndex with a number
 
     this.commandManager.createNode(shapeNode);
 
@@ -682,7 +681,7 @@ export class Engine {
         await this.realTimeDrawEngine.render();
       },
     });
-    imageNode.kNode.zIndex(1);
+
     this.commandManager.createNode(imageNode);
   }
   public addPaintNode(
