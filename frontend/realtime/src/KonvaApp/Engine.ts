@@ -201,6 +201,9 @@ export class Engine {
         uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
           active: false,
         });
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.PAINT, {
+          active: true,
+        });
         this.matteBox.disable();
         return;
       }
@@ -213,6 +216,9 @@ export class Engine {
         uiAccess.toolbarMain.enable();
         uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.SELECT, {
           active: true,
+        });
+        uiAccess.toolbarMain.changeButtonState(ToolbarMainButtonNames.PAINT, {
+          active: false,
         });
         this.matteBox.disable();
         document.body.style.cursor = "default";
@@ -570,6 +576,7 @@ export class Engine {
   }
 
   public addShape(type: ShapeType, size: number, color?: string) {
+
     const shapeNode = new ShapeNode({
       canvasPosition: this.realTimeDrawEngine.captureCanvas.position(),
       canvasSize: this.realTimeDrawEngine.captureCanvas.size(),
@@ -580,6 +587,7 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
       loaded: async () => {
         await this.realTimeDrawEngine.render();
+        this.setAppMode(AppModes.SELECT);
       },
     });
 
@@ -596,6 +604,7 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
       loaded: async () => {
         this.realTimeDrawEngine.render();
+        this.setAppMode(AppModes.SELECT);
       },
     });
     this.commandManager.createNode(copyNode);
@@ -609,6 +618,7 @@ export class Engine {
       selectionManagerRef: this.selectionManager,
       loaded: async () => {
         await this.realTimeDrawEngine.render();
+        this.setAppMode(AppModes.SELECT);
       },
     });
 
