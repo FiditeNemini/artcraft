@@ -475,6 +475,7 @@ export class RealTimeDrawEngine {
         this.onPreviewCopyCallback(previewCopy);
       }
       previewCopy.startDrag();
+      previewCopy.moveToTop();
       previewCopy.on("dragend", (e: Konva.KonvaEventObject<DragEvent>) => {
         const previewBox = previewCopy.getClientRect();
         const captureBox = this.captureCanvas.getClientRect();
