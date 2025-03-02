@@ -946,7 +946,7 @@ export class RealTimeDrawEngine {
 
   // Add getter/setter for brush size
   public set paintBrushSize(size: number) {
-    this.brushSize = size;
+    this.brushSize =  size * 7.5;
     const stage = this.mediaLayerRef.getStage();
     if (stage && this.isEnabled) {
       this.updateCursor(stage);

@@ -15,7 +15,7 @@ import io
 import torch
 from diffusers import AutoPipelineForImage2Image, LCMScheduler
 from diffusers.utils import make_image_grid, load_image
-
+from sd_embed.embedding_funcs import get_weighted_text_embeddings_sdxl
 import torch
 import websockets
 from PIL import Image
@@ -146,10 +146,24 @@ async def generate_image(
         init_image = transform(init_image).to('cuda')
         init_image = init_image.unsqueeze(0)
 
+        (
+            prompt_embeds
+            , prompt_neg_embeds
+            , pooled_prompt_embeds
+            , negative_pooled_prompt_embeds
+        ) = get_weighted_text_embeddings_sdxl(
+            pipe, 
+            prompt = request.prompt, 
+            neg_prompt = "bad quality, poorly Rendered face, poorly drawn face, poorly facial details, poorly drawn hands, poorly rendered hands, low resolution, Images cut out at the top, left, right, bottom, bad composition, mutated body parts, blurry image, disfigured, oversaturated, bad anatomy, deformed body features"
+        )
+        
         # Generate image
         with torch.inference_mode():
             output_image = pipe(
-                request.prompt,
+                prompt_embeds = prompt_embeds, 
+                negative_prompt_embeds = prompt_neg_embeds, 
+                pooled_prompt_embeds = pooled_prompt_embeds, 
+                negative_pooled_prompt_embeds = negative_pooled_prompt_embeds,
                 image=init_image,
                 num_inference_steps=request.num_inference_steps,
                 guidance_scale=request.guidance_scale,
@@ -159,7 +173,7 @@ async def generate_image(
             ).images[0]
 
         # Clean up CUDA tensors
-        del init_image
+        del init_image, prompt_embeds, prompt_neg_embeds,pooled_prompt_embeds, negative_pooled_prompt_embeds
         torch.cuda.empty_cache()
         gc.collect()
 
