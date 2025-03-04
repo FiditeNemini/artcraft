@@ -1,4 +1,4 @@
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
@@ -10,11 +10,13 @@ use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_emb
 use crate::state::app_config::AppConfig;
 use anyhow::{anyhow, Error as E, Result};
 use candle_core::{DType, IndexOp, Tensor, D};
-use candle_transformers::models::stable_diffusion::vae::DiagonalGaussianDistribution;
+use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
 use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
+use crate::events::notification_event::NotificationEvent;
+use crate::ml::models::unet_model::UNetModel;
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
@@ -29,28 +31,40 @@ pub struct Args<'a> {
 }
 
 pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
+    let Args { 
+        prompt, 
+        uncond_prompt, 
+        cfg_scale, 
+        i2i_strength, 
+        configs, 
+        model_cache, 
+        prompt_cache, 
+        app, 
+        image,  
+    } = args;
+    
     println!("Starting image generation with the following configuration:");
-    println!("  Model: {:?}", args.configs.sd_version);
-    println!("  Prompt: {}", args.prompt);
-    println!("  Steps: {}", args.configs.scheduler_steps);
-    println!("  Device: {:?}", args.configs.device);
+    println!("  Model: {:?}", configs.sd_version);
+    println!("  Prompt: {}", prompt);
+    println!("  Steps: {}", configs.scheduler_steps);
+    println!("  Device: {:?}", configs.device);
 
-    println!("Model dimensions: {}x{}", args.configs.sd_config.width, args.configs.sd_config.height);
+    println!("Model dimensions: {}x{}", configs.sd_config.width, configs.sd_config.height);
 
     // TODO(bt,2025-02-18): The scheduler is `EulerAncestralDiscreteScheduler`, but we may want to port an LCM scheduler.
     //  This is a target for performance improvement
     //  See: https://github.com/huggingface/candle/issues/1331
-    let mut scheduler = args.configs.sd_config.build_scheduler(
-        args.configs.scheduler_steps)?;
+    let mut scheduler = configs.sd_config.build_scheduler(
+        configs.scheduler_steps)?;
 
-    let seed = args.configs.seed.unwrap_or_else(|| rand::thread_rng().gen());
-    args.configs.device.set_seed(seed)?;
+    let seed = configs.seed.unwrap_or_else(|| rand::thread_rng().gen());
+    configs.device.set_seed(seed)?;
 
-    println!("Using seed: {}", seed);
+    info!("Using seed: {}", seed);
 
-    let guidance_scale = match args.cfg_scale {
+    let guidance_scale = match cfg_scale {
         Some(guidance_scale) => guidance_scale,
-        None => match args.configs.sd_version {
+        None => match configs.sd_version {
             StableDiffusionVersion::V1_5
             | StableDiffusionVersion::V2_1
             | StableDiffusionVersion::Xl => 7.5,
@@ -61,31 +75,30 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
     let use_guide_scale = guidance_scale > 1.0;
 
-    println!("Using guide scale: {}", use_guide_scale);
+    info!("Using guide scale: {}", use_guide_scale);
 
     info!("Checking if prompt is cached");
-    let maybe_cached = args.prompt_cache.get_copy(&args.prompt)?;
+    let maybe_cached = prompt_cache.get_copy(&prompt)?;
 
     let mut text_embeddings = if let Some(tensor) = maybe_cached {
         tensor
     } else {
-        args.app.emit("event", "loading model");
         
         info!("Prompt is NOT cached! Calculating embedding...");
         let tensor = infer_clip_text_embeddings(
-            &args.prompt,
-            &args.uncond_prompt,
+            &prompt,
+            &uncond_prompt,
             None, // tokenizer
             None, // clip_weights
             None, // clip2_weights
-            args.configs.sd_version,
-            &args.configs.sd_config,
+            configs.sd_version,
+            &configs.sd_config,
             false, // use_f16
-            &args.configs.device,
-            args.configs.dtype,
+            &configs.device,
+            configs.dtype,
             use_guide_scale,
         )?;
-        args.prompt_cache.store_copy(&args.prompt, &tensor)?;
+        prompt_cache.store_copy(&prompt, &tensor)?;
         tensor
     };
 
@@ -94,36 +107,118 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     println!("Loading input image into tensor...");
 
     let input_image = dynamic_image_to_tensor(
-        args.image,
-        &args.configs.device,
-        args.configs.dtype)?;
+        image,
+        &configs.device,
+        configs.dtype)?;
 
     println!("Reference image shape: {:?}", input_image.shape());
 
-    let vae_scale = get_vae_scale(args.configs.sd_version);
+    let vae_scale = get_vae_scale(configs.sd_version);
 
-    let init_latent_dist : DiagonalGaussianDistribution = args.model_cache.vae_encode(&input_image)?;
+    let maybe_vae = model_cache.get_vae()?;
+    
+    let vae = match maybe_vae {
+        Some(vae) => vae,
+        None => {
+            info!("No vae found in cache; loading...");
+            
+            let repo = configs.sd_version.repo();
+
+            println!("Building VAE model from : {:?} ... (3)", repo);
+
+            let vae_file = configs.hf_api.model(repo.to_string())
+              .get("vae/diffusion_pytorch_model.safetensors")?;
+
+            println!("Building VAE model from file {:?}...", &vae_file);
+
+            let mut notify_download_complete = false;
+            if !vae_file.exists() {
+                notify_download_complete = true;
+                app.emit("notification", NotificationEvent::ModelDownloadStarted {
+                    model_name: repo,
+                })?;
+            }
+            
+            let vae = configs
+              .sd_config
+              .build_vae(vae_file, &configs.device, configs.dtype)?;
+
+            let vae = Arc::new(vae);
+            
+            model_cache.set_vae(vae.clone())?;
+            
+            if notify_download_complete {
+                app.emit("notification", NotificationEvent::ModelDownloadComplete {
+                    model_name: repo,
+                })?;
+            }
+            
+            vae
+        }
+    };
+
+    let maybe_unet = model_cache.get_unet()?;
+
+    let unet = match maybe_unet {
+        Some(unet) => unet,
+        None => {
+            info!("No unet found in cache; loading...");
+
+            let repo = configs.sd_version.repo();
+
+            info!("Downloading UNET model files from: {} ...", repo);
+
+            let unet_file = configs.hf_api.model(repo.to_string())
+              .get("unet/diffusion_pytorch_model.safetensors")
+              .map_err(|err| anyhow!("error fetching model: {:?}", err))?;
+
+            let mut notify_download_complete = false;
+            if !unet_file.exists() {
+                notify_download_complete = true;
+                app.emit("notification", NotificationEvent::ModelDownloadStarted {
+                    model_name: repo,
+                })?;
+            }
+
+            let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
+              .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
+            
+            let unet = Arc::new(unet);
+
+            model_cache.set_unet(unet.clone())?;
+
+            if notify_download_complete {
+                app.emit("notification", NotificationEvent::ModelDownloadComplete {
+                    model_name: repo,
+                })?;
+            }
+
+            unet
+        }
+    };
+
+    let init_latent_dist : DiagonalGaussianDistribution = vae.encode(&input_image)?;
 
     // TODO(bt,2025-02-18): This takes a little bit to generate the sample.
     //  This is a target for performance improvement
     println!("Generating latents from input image...");
     let latents = (init_latent_dist.sample()? * vae_scale)?;
     
-    //.to_device(&args.configs.device)?;
+    //.to_device(&configs.device)?;
     
     println!("Initial latents shape: {:?}", latents.shape());
 
     println!("Calculating start step for diffusion process...");
 
-    let img2img_strength = match args.i2i_strength {
+    let img2img_strength = match i2i_strength {
         None => 0.75f64,
         Some(strength) => (strength as f64) / 100.0f64,
     };
 
     let t_start = {
-        let start = args.configs.scheduler_steps - (args.configs.scheduler_steps as f64 * img2img_strength) as usize;
+        let start = configs.scheduler_steps - (configs.scheduler_steps as f64 * img2img_strength) as usize;
 
-        println!("Starting from step {} of {} (strength: {})", start, args.configs.scheduler_steps, img2img_strength);
+        println!("Starting from step {} of {} (strength: {})", start, configs.scheduler_steps, img2img_strength);
         start
     };
 
@@ -162,7 +257,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
         let latent_model_input = scheduler.scale_model_input(latent_model_input, timestep)?;
 
-        let mut noise_pred = match args.model_cache.unet_inference(&latent_model_input, timestep as f64, &text_embeddings) {
+        let mut noise_pred = match unet.inference(&latent_model_input, timestep as f64, &text_embeddings) {
             Ok(pred) => pred,
             Err(e) => {
                 println!("UNet inference failed with error: {}", e);
@@ -180,7 +275,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     }
 
     println!("Diffusion process completed, decoding image...");
-    let image = args.model_cache.vae_decode(&(latents / vae_scale)?)?;
+    let image = vae.decode(&(latents / vae_scale)?)?;
     
     println!("VAE decode completed");
 
