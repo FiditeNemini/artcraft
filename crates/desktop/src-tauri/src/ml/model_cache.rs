@@ -1,12 +1,11 @@
-use crate::ml::models::unet_model::UNetModel;
 use crate::ml::model_file::StableDiffusionVersion;
+use crate::ml::models::unet_model::UNetModel;
 use anyhow::anyhow;
 use candle_core::{DType, Device, Tensor};
+use candle_transformers::models::stable_diffusion::vae::AutoEncoderKL;
 use candle_transformers::models::stable_diffusion::StableDiffusionConfig;
 use hf_hub::api::sync::Api;
 use std::sync::{Arc, RwLock};
-use candle_transformers::models::stable_diffusion::vae::DiagonalGaussianDistribution;
-use crate::ml::models::lazy_load_vae_model::LazyLoadVaeModel;
 // TODO: This data structure is gross. Generalize the locking and loading semantics for reuse.
 
 // Simple registry for now. We can build complex machinery that aids in 
@@ -20,7 +19,7 @@ pub struct ModelCache {
   sd_version: StableDiffusionVersion,
   
   unet: Arc<RwLock<Option<UNetModel>>>,
-  lazy_vae: LazyLoadVaeModel,
+  vae: RwLock<Option<Arc<AutoEncoderKL>>>,
 }
 
 impl ModelCache {
@@ -37,24 +36,29 @@ impl ModelCache {
       dtype,
       hf_api: api.clone(),
       unet: Arc::new(RwLock::new(None)),
-      lazy_vae: LazyLoadVaeModel::new(
-        &sd_config,
-        &sd_version,
-        &api,
-        &device,
-        dtype,
-      )?,
+      vae: RwLock::new(None),
       sd_config,
       sd_version,
     })
   }
-
-  pub fn vae_encode(&self, xs: &Tensor) -> anyhow::Result<DiagonalGaussianDistribution> {
-    self.lazy_vae.encode(xs)
+  
+  pub fn set_vae(&self, vae: Arc<AutoEncoderKL>) -> anyhow::Result<()> {
+    match self.vae.write() {
+      Err(err) => Err(anyhow!("{}", err)),
+      Ok(mut lock) => {
+        *lock = Some(vae);
+        Ok(())
+      }
+    }
   }
 
-  pub fn vae_decode(&self, xs: &Tensor) -> anyhow::Result<Tensor> {
-    self.lazy_vae.decode(xs)
+  pub fn get_vae(&self) -> anyhow::Result<Option<Arc<AutoEncoderKL>>> {
+    match self.vae.read() {
+      Err(err) => Err(anyhow!("{}", err)),
+      Ok(ref lock) => {
+        Ok(lock.as_ref().map(|v|v.clone()))
+      }
+    }
   }
   
   pub fn unet_inference(&self, latent_model_input: &Tensor, timestep: f64, text_embeddings: &Tensor) -> anyhow::Result<Tensor> {

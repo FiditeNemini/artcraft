@@ -16,6 +16,9 @@ const PROMPT: &str = "A beautiful landscape with mountains and a lake";
 
 const NEGATIVE_PROMPT: &str = "bad quality, bad faces, poor quality, blurry faces, watermark";
 
+// TODO: Mark async https://github.com/tauri-apps/tauri/discussions/7737
+
+
 /// This handler takes an image (as a base64 encoded string) and a prompt and returns
 /// an image (as a base64-encoded string).
 #[tauri::command]

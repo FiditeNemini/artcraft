@@ -1,4 +1,4 @@
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
@@ -10,7 +10,7 @@ use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_emb
 use crate::state::app_config::AppConfig;
 use anyhow::{anyhow, Error as E, Result};
 use candle_core::{DType, IndexOp, Tensor, D};
-use candle_transformers::models::stable_diffusion::vae::DiagonalGaussianDistribution;
+use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
 use image::DynamicImage;
 use log::info;
 use rand::Rng;
@@ -46,7 +46,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     let seed = args.configs.seed.unwrap_or_else(|| rand::thread_rng().gen());
     args.configs.device.set_seed(seed)?;
 
-    println!("Using seed: {}", seed);
+    info!("Using seed: {}", seed);
 
     let guidance_scale = match args.cfg_scale {
         Some(guidance_scale) => guidance_scale,
@@ -61,7 +61,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
     let use_guide_scale = guidance_scale > 1.0;
 
-    println!("Using guide scale: {}", use_guide_scale);
+    info!("Using guide scale: {}", use_guide_scale);
 
     info!("Checking if prompt is cached");
     let maybe_cached = args.prompt_cache.get_copy(&args.prompt)?;
@@ -102,7 +102,35 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
     let vae_scale = get_vae_scale(args.configs.sd_version);
 
-    let init_latent_dist : DiagonalGaussianDistribution = args.model_cache.vae_encode(&input_image)?;
+    let maybe_vae = args.model_cache.get_vae()?;
+    
+    let vae = match maybe_vae {
+        Some(vae) => vae,
+        None => {
+            info!("No vae found in cache; loading...");
+            
+            let repo = args.configs.sd_version.repo();
+
+            println!("Building VAE model from : {:?} ... (3)", repo);
+
+            let vae_file = args.configs.hf_api.model(repo.to_string())
+              .get("vae/diffusion_pytorch_model.safetensors")?;
+
+            println!("Building VAE model from file {:?}...", &vae_file);
+            
+            let vae = args.configs
+              .sd_config
+              .build_vae(vae_file, &args.configs.device, args.configs.dtype)?;
+
+            let vae = Arc::new(vae);
+            
+            args.model_cache.set_vae(vae.clone())?;
+            
+            vae
+        }
+    };
+
+    let init_latent_dist : DiagonalGaussianDistribution = vae.encode(&input_image)?;
 
     // TODO(bt,2025-02-18): This takes a little bit to generate the sample.
     //  This is a target for performance improvement
@@ -180,7 +208,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     }
 
     println!("Diffusion process completed, decoding image...");
-    let image = args.model_cache.vae_decode(&(latents / vae_scale)?)?;
+    let image = vae.decode(&(latents / vae_scale)?)?;
     
     println!("VAE decode completed");
 
