@@ -15,6 +15,7 @@ use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
+use crate::events::notification_event::NotificationEvent;
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
@@ -81,7 +82,6 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     let mut text_embeddings = if let Some(tensor) = maybe_cached {
         tensor
     } else {
-        app.emit("event", "loading model");
         
         info!("Prompt is NOT cached! Calculating embedding...");
         let tensor = infer_clip_text_embeddings(
@@ -129,6 +129,14 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
               .get("vae/diffusion_pytorch_model.safetensors")?;
 
             println!("Building VAE model from file {:?}...", &vae_file);
+
+            let mut notify_download_complete = false;
+            if !vae_file.exists() {
+                notify_download_complete = true;
+                app.emit("notification", NotificationEvent::ModelDownloadStarted {
+                    model_name: repo,
+                })?;
+            }
             
             let vae = configs
               .sd_config
@@ -137,6 +145,12 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             let vae = Arc::new(vae);
             
             model_cache.set_vae(vae.clone())?;
+            
+            if notify_download_complete {
+                app.emit("notification", NotificationEvent::ModelDownloadComplete {
+                    model_name: repo,
+                })?;
+            }
             
             vae
         }

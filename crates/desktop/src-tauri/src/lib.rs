@@ -1,4 +1,5 @@
 pub mod endpoints;
+pub mod events;
 pub mod ml;
 pub mod state;
 
