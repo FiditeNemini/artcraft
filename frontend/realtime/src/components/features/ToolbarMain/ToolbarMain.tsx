@@ -196,7 +196,7 @@ export const ToolbarMain = ({
             )}
 
             {/* Conditionally show eraser menu on mode selection */}
-            {buttonProps.ERASER.active ? (
+            {/* {buttonProps.ERASER.active ? (
               <EraseModeMenu
                 faIcon={faEraser}
                 borderStyle="border-2  bg-primary/30 border-2 border-primary hover:bg-primary/30 text-white"
@@ -211,7 +211,7 @@ export const ToolbarMain = ({
                 buttonProps={buttonProps.ERASER}
                 tooltip="Eraser"
               />
-            )}
+            )} */}
           </div>
         </div>
 
