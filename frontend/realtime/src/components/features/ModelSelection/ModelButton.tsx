@@ -82,11 +82,12 @@ export const ModelButton = ({
         onClose={() => setIsOpen(false)}
         className="max-w-3xl"
       >
-        {type === "model" ? (
+        {<ModelSelectionDialog onClose={() => setIsOpen(false)} />}
+        {/* {type === "model" ? (
           <ModelSelectionDialog onClose={() => setIsOpen(false)} />
-        ) : (
+        ):(
           <LoraSelectionDialog onClose={() => setIsOpen(false)} />
-        )}
+        )} */}
       </BaseDialog>
     </>
   );

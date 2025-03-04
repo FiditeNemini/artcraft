@@ -20,10 +20,23 @@ import { PreviewCopyNode } from "../Nodes/PreviewCopy";
 
 // https://www.aiseesoft.com/resource/phone-aspect-ratio-screen-resolution.html#:~:text=16%3A9%20Aspect%20Ratio
 
+import {
+  isLoadingVisible,
+  loadingProgress,
+} from "~/signals/uiEvents/loadingIndicator";
+
+import { listen } from "@tauri-apps/api/event";
+
 interface ServerSettings {
   model_path: string;
   lora_path?: string;
 }
+
+type TauriMessage = {
+  message: string;
+  progress: number;
+  type: string;
+};
 
 interface GenerateImageParams {
   image: string;
@@ -87,9 +100,8 @@ export class RealTimeDrawEngine {
   private client: WebSocketClient | null = null;
   private isConnected: boolean = false;
 
-
   private backgroundNode: ShapeNode | null = null;
-  public backgroundColor: string = "#d2d2d2"
+  public backgroundColor: string = "#d2d2d2";
   constructor({
     width,
     height,
@@ -141,7 +153,7 @@ export class RealTimeDrawEngine {
     this.drawingsLayer = new Konva.Layer({
       clearBeforeDraw: true, // Ensures transparent background
     });
- 
+
     this.mediaLayerRef.getStage()?.add(this.drawingsLayer); // to od pass in stage
 
     // Set background layer to red and media layer to green for visibility
@@ -186,7 +198,21 @@ export class RealTimeDrawEngine {
     // Add mouse events for preview canvas copying
     this.previewCopyListener();
 
-    this.startServer();
+    //this.startServer();
+    // isLoadingVisible.value = true;
+    // const fakeTimer = setInterval(() => {
+    //   loadingProgress.value += 1;
+    //   if (loadingProgress.value >= 100) {
+    //     clearInterval(fakeTimer);
+    //     isLoadingVisible.value = false;
+    //   }
+    // }, 1000);
+  }
+
+  public listenToTauri() {
+    listen<TauriMessage>("progress", (event) => {
+      console.log(event);
+    });
   }
 
   private isEnabled: boolean = false;
@@ -252,24 +278,24 @@ export class RealTimeDrawEngine {
 
   private updateCursor(stage: Konva.Stage) {
     // Create cursor canvas
-    const cursorCanvas = document.createElement('canvas');
+    const cursorCanvas = document.createElement("canvas");
     const size = this.brushSize * 5; // Match the brush size used in drawing
-    cursorCanvas.width = size * 2;  // Double size for padding
+    cursorCanvas.width = size * 2; // Double size for padding
     cursorCanvas.height = size * 2;
-    
-    const ctx = cursorCanvas.getContext('2d');
+
+    const ctx = cursorCanvas.getContext("2d");
     if (!ctx) return;
 
     // Draw the circle
     ctx.beginPath();
-    ctx.arc(size, size, size/2, 0, Math.PI * 2);
-    ctx.strokeStyle = 'black';
+    ctx.arc(size, size, size / 2, 0, Math.PI * 2);
+    ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
     ctx.stroke();
 
     // Convert to data URL
     const cursorUrl = cursorCanvas.toDataURL();
-    
+
     // Apply custom cursor
     stage.container().style.cursor = `url(${cursorUrl}) ${size} ${size}, auto`;
   }
@@ -448,7 +474,7 @@ export class RealTimeDrawEngine {
     // Reset cursor when disabling paint mode
     const stage = this.mediaLayerRef.getStage();
     if (stage) {
-      stage.container().style.cursor = 'default';
+      stage.container().style.cursor = "default";
     }
   }
 
@@ -904,7 +930,7 @@ export class RealTimeDrawEngine {
     })) as ImageBitmap;
 
     // Test code
-    if (true) {
+    if (false) {
       //this.outputBitmap = bitmap;
       //this.previewCanvas.image(bitmap);
       const base64Bitmap = await this.imageBitmapToBase64(bitmap);
@@ -928,7 +954,7 @@ export class RealTimeDrawEngine {
       const base64BitmapResponse = await invoke("infer_image", {
         image: base64Bitmap,
         prompt: this.currentPrompt,
-        strength: this.currentStrength,
+        strength: this.currentStrength * 100,
       });
 
       console.log(base64BitmapResponse);
@@ -947,7 +973,7 @@ export class RealTimeDrawEngine {
 
   // Add getter/setter for brush size
   public set paintBrushSize(size: number) {
-    this.brushSize =  size * 7.5;
+    this.brushSize = size * 7.5;
     const stage = this.mediaLayerRef.getStage();
     if (stage && this.isEnabled) {
       this.updateCursor(stage);
@@ -973,7 +999,7 @@ export class RealTimeDrawEngine {
 
   // Add method to create or update background
   public updateBackground(color: string) {
-      this.captureCanvas.fill(color);
-      this.mediaLayerRef.batchDraw();
+    this.captureCanvas.fill(color);
+    this.mediaLayerRef.batchDraw();
   }
 }

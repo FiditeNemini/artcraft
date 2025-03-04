@@ -33,13 +33,13 @@ export const SignaledModelButtons = () => {
         type="model"
       />
 
-      <ModelButton
+      {/* <ModelButton
         iconSrc={loraIconSrc}
         iconAlt={selectedLoraData?.name || "LoRA"}
         label={selectedLoraData?.name || "Detailed Tweaker"}
         subtitle="LoRA"
         type="lora"
-      />
+      /> */}
     </div>
   );
 };
