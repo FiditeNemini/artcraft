@@ -31,6 +31,7 @@ pub fn infer_image(
   let prompt = get_prompt_or_fallback(prompt);
 
   info!("Prompt: {}", prompt);
+  info!("Strength: {:?}", strength);
 
   let image = hydrate_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
