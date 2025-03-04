@@ -16,6 +16,7 @@ use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
 use crate::events::notification_event::NotificationEvent;
+use crate::ml::models::unet_model::UNetModel;
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
@@ -156,6 +157,46 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
         }
     };
 
+    let maybe_unet = model_cache.get_unet()?;
+
+    let unet = match maybe_unet {
+        Some(unet) => unet,
+        None => {
+            info!("No unet found in cache; loading...");
+
+            let repo = configs.sd_version.repo();
+
+            info!("Downloading UNET model files from: {} ...", repo);
+
+            let unet_file = configs.hf_api.model(repo.to_string())
+              .get("unet/diffusion_pytorch_model.safetensors")
+              .map_err(|err| anyhow!("error fetching model: {:?}", err))?;
+
+            let mut notify_download_complete = false;
+            if !unet_file.exists() {
+                notify_download_complete = true;
+                app.emit("notification", NotificationEvent::ModelDownloadStarted {
+                    model_name: repo,
+                })?;
+            }
+
+            let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
+              .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
+            
+            let unet = Arc::new(unet);
+
+            model_cache.set_unet(unet.clone())?;
+
+            if notify_download_complete {
+                app.emit("notification", NotificationEvent::ModelDownloadComplete {
+                    model_name: repo,
+                })?;
+            }
+
+            unet
+        }
+    };
+
     let init_latent_dist : DiagonalGaussianDistribution = vae.encode(&input_image)?;
 
     // TODO(bt,2025-02-18): This takes a little bit to generate the sample.
@@ -216,7 +257,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
         let latent_model_input = scheduler.scale_model_input(latent_model_input, timestep)?;
 
-        let mut noise_pred = match model_cache.unet_inference(&latent_model_input, timestep as f64, &text_embeddings) {
+        let mut noise_pred = match unet.inference(&latent_model_input, timestep as f64, &text_embeddings) {
             Ok(pred) => pred,
             Err(e) => {
                 println!("UNet inference failed with error: {}", e);

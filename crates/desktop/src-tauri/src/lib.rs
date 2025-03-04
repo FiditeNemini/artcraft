@@ -25,12 +25,7 @@ pub fn run() {
 
   println!("Creating model cache...");
   
-  let model_cache = ModelCache::new(
-    config.device.clone(),
-    config.dtype,
-    config.sd_version.clone(),
-    config.sd_config.clone()
-  ).expect("Model cache should create");
+  let model_cache = ModelCache::new();
 
   println!("Initializing backend runtime...");
 
