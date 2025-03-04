@@ -15,7 +15,7 @@ use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
-use crate::events::notification_event::NotificationEvent;
+use crate::events::notification_event::{ModelType, NotificationEvent};
 use crate::ml::models::unet_model::UNetModel;
 
 pub struct Args<'a> {
@@ -136,6 +136,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
                     model_name: repo,
+                    model_type: ModelType::Vae,
                 })?;
             }
             
@@ -150,6 +151,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             if notify_download_complete {
                 app.emit("notification", NotificationEvent::ModelDownloadComplete {
                     model_name: repo,
+                    model_type: ModelType::Vae,
                 })?;
             }
             
@@ -177,6 +179,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
                     model_name: repo,
+                    model_type: ModelType::Unet,
                 })?;
             }
 
@@ -190,6 +193,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             if notify_download_complete {
                 app.emit("notification", NotificationEvent::ModelDownloadComplete {
                     model_name: repo,
+                    model_type: ModelType::Unet,
                 })?;
             }
 
