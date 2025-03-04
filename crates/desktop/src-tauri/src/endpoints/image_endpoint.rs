@@ -22,13 +22,13 @@ const NEGATIVE_PROMPT: &str = "bad quality, bad faces, poor quality, blurry face
 /// This handler takes an image (as a base64 encoded string) and a prompt and returns
 /// an image (as a base64-encoded string).
 #[tauri::command]
-pub fn infer_image(
+pub async fn infer_image(
   image: &str,
   prompt: Option<String>,
   strength: Option<u8>,
-  model_config: State<AppConfig>,
-  model_cache: State<ModelCache>,
-  prompt_cache: State<PromptCache>,
+  model_config: State<'_, AppConfig>,
+  model_cache: State<'_, ModelCache>,
+  prompt_cache: State<'_, PromptCache>,
   app: AppHandle,
 ) -> Result<String, String> {
 
