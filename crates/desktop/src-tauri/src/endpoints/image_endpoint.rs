@@ -9,7 +9,7 @@ use image::{DynamicImage, ImageFormat, ImageReader};
 use log::{error, info};
 use std::io::Cursor;
 use std::path::PathBuf;
-use tauri::State;
+use tauri::{AppHandle, State};
 
 const PROMPT_FILENAME : &str = "prompt.txt";
 const PROMPT: &str = "A beautiful landscape with mountains and a lake";
@@ -26,6 +26,7 @@ pub fn infer_image(
   model_config: State<AppConfig>,
   model_cache: State<ModelCache>,
   prompt_cache: State<PromptCache>,
+  app: AppHandle,
 ) -> Result<String, String> {
 
   let prompt = get_prompt_or_fallback(prompt);
@@ -36,7 +37,7 @@ pub fn infer_image(
   let image = hydrate_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
 
-  let result = do_infer_image(&prompt, image, strength, &model_config, &model_cache, prompt_cache);
+  let result = do_infer_image(&prompt, image, strength, &model_config, &model_cache, prompt_cache, app);
   
   if let Err(err) = result.as_deref() {
     error!("There was an error: {:?}", err);
@@ -52,6 +53,7 @@ fn do_infer_image(
   config: &AppConfig,
   model_cache: &ModelCache,
   prompt_cache: State<PromptCache>,
+  app: AppHandle,
 ) -> Result<String, String> {
   println!("infer_image called; generating image with SDXL Turbo...");
   
@@ -65,6 +67,7 @@ fn do_infer_image(
     prompt_cache: &prompt_cache,
     i2i_strength: strength,
     cfg_scale: config.cfg_scale,
+    app: &app,
   };
 
   match stable_diffusion_pipeline(args) {

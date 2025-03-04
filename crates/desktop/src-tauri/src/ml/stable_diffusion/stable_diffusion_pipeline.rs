@@ -14,6 +14,7 @@ use candle_transformers::models::stable_diffusion::vae::DiagonalGaussianDistribu
 use image::DynamicImage;
 use log::info;
 use rand::Rng;
+use tauri::{AppHandle, Emitter};
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
@@ -24,6 +25,7 @@ pub struct Args<'a> {
     pub configs: &'a AppConfig,
     pub model_cache: &'a ModelCache,
     pub prompt_cache: &'a PromptCache,
+    pub app: &'a AppHandle,
 }
 
 pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
@@ -67,6 +69,8 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
     let mut text_embeddings = if let Some(tensor) = maybe_cached {
         tensor
     } else {
+        args.app.emit("event", "loading model");
+        
         info!("Prompt is NOT cached! Calculating embedding...");
         let tensor = infer_clip_text_embeddings(
             &args.prompt,
