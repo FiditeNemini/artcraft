@@ -6,6 +6,21 @@
   :root {
     @apply select-none bg-ui-background font-sans text-white;
   }
+
+  /* Remove all focus styles */
+  button {
+    @apply outline-none ring-0;
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  button:focus {
+    @apply outline-none ring-0;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   .pegboard {
     background-image: radial-gradient(#ffffff25 1px, transparent 0);
     background-color: #1b1b1f;
