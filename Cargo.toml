@@ -98,6 +98,7 @@ members = [
   # Vendored code
   "crates/vendor/candle/candle-core",
   "crates/vendor/candle/candle-datasets",
+  "crates/vendor/candle/candle-examples",
   "crates/vendor/candle/candle-flash-attn",
   "crates/vendor/candle/candle-kernels",
   "crates/vendor/candle/candle-metal-kernels",
