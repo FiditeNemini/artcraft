@@ -51,7 +51,7 @@ export const Button = ({
     "text-[15px] font-semibold rounded-lg px-3 py-2 shadow-sm",
     "flex gap-2 items-center justify-center",
     "transition-all duration-150",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+    "focus-visible:ring-0 focus-visible:ring-offset-0",
     getVariantClassNames(propsVariant),
     propsClassName,
     disabledClass,
