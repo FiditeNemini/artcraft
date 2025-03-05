@@ -4,6 +4,7 @@ import { Shape } from "konva/lib/Shape";
 import { Group } from "konva/lib/Group";
 
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from '@tauri-apps/api/event';
 
 import { FileUtilities } from "../FileUtilities/FileUtilities";
 import { ImageNode, VideoNode, TextNode, ShapeNode, ShapeType } from "../Nodes";
@@ -25,18 +26,11 @@ import {
   loadingProgress,
 } from "~/signals/uiEvents/loadingIndicator";
 
-import { listen } from "@tauri-apps/api/event";
-
 interface ServerSettings {
   model_path: string;
   lora_path?: string;
 }
 
-type TauriMessage = {
-  message: string;
-  progress: number;
-  type: string;
-};
 
 interface GenerateImageParams {
   image: string;
@@ -207,12 +201,52 @@ export class RealTimeDrawEngine {
     //     isLoadingVisible.value = false;
     //   }
     // }, 1000);
+
+    this.listenToServerEvents();
   }
 
-  public listenToTauri() {
-    listen<TauriMessage>("progress", (event) => {
+  public async listenToServerEvents() {
+    listen("notification", (event) => {
       console.log(event);
+      // Handle model download events
+      const payload = event.payload as any;
+      
+      // Model download started
+      if (payload.model_download_started) {
+        const modelInfo = payload.model_download_started;
+        console.log(`Model download started: ${modelInfo.model_name} (${modelInfo.model_type})`);
+        
+        // Set up loading indicator
+        isLoadingVisible.value = true;
+        loadingProgress.value = 0;
+        
+        // Create fake progress updates
+        const downloadTimer = setInterval(() => {
+          loadingProgress.value += 2;
+          // Cap at 95% until we get the completed event
+          if (loadingProgress.value >= 95) {
+            loadingProgress.value = 95;
+            clearInterval(downloadTimer);
+          }
+        }, 500);
+      }
+      
+      // Model download completed
+      if (payload.model_download_complete) {
+        const modelInfo = payload.model_download_complete;
+        console.log(`Model download completed: ${modelInfo.model_name} (${modelInfo.model_type})`);
+        
+        // Complete the loading progress
+        loadingProgress.value = 100;
+        
+        // Hide loading indicator after a short delay
+        setTimeout(() => {
+          isLoadingVisible.value = false;
+        }, 1000);
+      }
+  
     });
+    
   }
 
   private isEnabled: boolean = false;
@@ -957,7 +991,7 @@ export class RealTimeDrawEngine {
         strength: this.currentStrength * 100,
       });
 
-      console.log(base64BitmapResponse);
+      //console.log(base64BitmapResponse);
       const decoded = await this.base64ToImageBitmap(
         base64BitmapResponse as string,
       );
