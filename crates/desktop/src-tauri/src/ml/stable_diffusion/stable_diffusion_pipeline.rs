@@ -132,7 +132,8 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             println!("Building VAE model from file {:?}...", &vae_file);
 
             let mut notify_download_complete = false;
-            if !vae_file.exists() {
+            //if !vae_file.exists() {
+            if true {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
                     model_name: repo,
@@ -175,7 +176,8 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
               .map_err(|err| anyhow!("error fetching model: {:?}", err))?;
 
             let mut notify_download_complete = false;
-            if !unet_file.exists() {
+            //if !unet_file.exists() {
+            if true {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
                     model_name: repo,
