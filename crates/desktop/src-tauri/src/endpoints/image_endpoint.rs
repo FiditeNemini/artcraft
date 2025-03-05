@@ -10,6 +10,7 @@ use log::{error, info};
 use std::io::Cursor;
 use std::path::PathBuf;
 use tauri::{AppHandle, State};
+use crate::ml::downloads::download_all_models::download_all_models;
 
 const PROMPT_FILENAME : &str = "prompt.txt";
 const PROMPT: &str = "A beautiful landscape with mountains and a lake";
@@ -40,7 +41,14 @@ pub async fn infer_image(
   let image = hydrate_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
 
-  let result = do_infer_image(&prompt, image, strength, &model_config, &model_cache, prompt_cache, app);
+  // TODO(bt): Move this to another endpoint
+  download_all_models().await
+    .map_err(|err| {
+      error!("couldn't download models: {:?}", err);
+      "Couldn't download models".to_string()
+    })?;
+
+  let result = do_infer_image(&prompt, image, strength, &model_config, &model_cache, prompt_cache, app).await;
   
   if let Err(err) = result.as_deref() {
     error!("There was an error: {:?}", err);
@@ -49,22 +57,20 @@ pub async fn infer_image(
   result
 }
 
-fn do_infer_image(
+async fn do_infer_image(
   prompt: &str,
   image: DynamicImage,
   strength: Option<u8>,
   config: &AppConfig,
   model_cache: &ModelCache,
-  prompt_cache: State<PromptCache>,
+  prompt_cache: State<'_, PromptCache>,
   app: AppHandle,
 ) -> Result<String, String> {
-  println!("infer_image called; generating image with SDXL Turbo...");
-  
+
   let args = Args {
     image: &image,
     prompt: prompt.to_string(),
     uncond_prompt: NEGATIVE_PROMPT.to_string(),
-    //guidance_scale: Some(0.0),
     model_cache,
     configs: config,
     prompt_cache: &prompt_cache,

@@ -1,9 +1,12 @@
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
+use crate::events::notification_event::{ModelType, NotificationEvent};
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
 use crate::ml::model_file::StableDiffusionVersion;
+use crate::ml::model_registry::ModelRegistry;
+use crate::ml::models::unet_model::UNetModel;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
@@ -15,8 +18,6 @@ use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
-use crate::events::notification_event::{ModelType, NotificationEvent};
-use crate::ml::models::unet_model::UNetModel;
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
