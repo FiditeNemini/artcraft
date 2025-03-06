@@ -123,9 +123,11 @@ fn do_infer_clip_text_embeddings(
     ModelFile::Clip2
   };
   let clip_weights = if first {
-    clip_weights_file.get(clip_weights, sd_version, use_f16)?
+    //clip_weights_file.get(clip_weights, sd_version, use_f16)?
+    ModelRegistry::SdxlTurboClipEncoder.get_filename()
   } else {
-    clip_weights_file.get(clip2_weights, sd_version, use_f16)?
+    //clip_weights_file.get(clip2_weights, sd_version, use_f16)?
+    ModelRegistry::SdxlTurboClipEncoder2.get_filename()
   };
   let clip_config = if first {
     &sd_config.clip
