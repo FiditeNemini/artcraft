@@ -168,23 +168,17 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
         None => {
             info!("No unet found in cache; loading...");
 
-            let repo = configs.sd_version.repo();
-
-            info!("Downloading UNET model files from: {} ...", repo);
-
-            let unet_file = configs.hf_api.model(repo.to_string())
-              .get("unet/diffusion_pytorch_model.safetensors")
-              .map_err(|err| anyhow!("error fetching model: {:?}", err))?;
-
             let mut notify_download_complete = false;
             //if !unet_file.exists() {
             if true {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
-                    model_name: repo,
+                    model_name: "sdxl-turbo-unet",
                     model_type: ModelType::Unet,
                 })?;
             }
+            
+            let unet_file = ModelRegistry::SdxlTurboUnet.get_filename();
 
             let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
               .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
@@ -195,7 +189,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
             if notify_download_complete {
                 app.emit("notification", NotificationEvent::ModelDownloadComplete {
-                    model_name: repo,
+                    model_name: "sdxl-turbo-unet",
                     model_type: ModelType::Unet,
                 })?;
             }
