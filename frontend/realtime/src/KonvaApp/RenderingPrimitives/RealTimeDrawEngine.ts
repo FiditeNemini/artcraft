@@ -12,7 +12,7 @@ import { MediaNode } from "../types";
 
 import { RenderTask } from "./RenderTask";
 import { OffScreenSceneCanvas } from "./OffScreenSceneCanvas";
-import { Image } from "@tauri-apps/api/image";
+
 
 import { PaintNode } from "../Nodes/PaintNode";
 
@@ -62,9 +62,13 @@ export class RealTimeDrawEngine {
   private positionPreviewY: number;
 
   private port: MessagePort | undefined;
-
   public captureCanvas: Konva.Rect;
+  public backgroundRasterRect: Konva.Image;
+  
+
   public previewCanvas: Konva.Image;
+  
+
 
   public videoLoadingCanvas: VideoNode | undefined;
 
@@ -94,7 +98,8 @@ export class RealTimeDrawEngine {
   private client: WebSocketClient | null = null;
   private isConnected: boolean = false;
 
-  private backgroundNode: ShapeNode | null = null;
+
+
   public backgroundColor: string = "#d2d2d2";
   constructor({
     width,
@@ -184,25 +189,32 @@ export class RealTimeDrawEngine {
       fill: "white",
     });
 
+    this.backgroundRasterRect = new Konva.Image({
+      name: "backgroundRasterRect",
+      x: this.positionX,
+      y: this.positionY,
+      width: this.width,
+      height: this.height,
+      fill: this.backgroundColor,
+      image: undefined,
+      stroke: "black",
+      strokeWidth: 1,
+      draggable: false,
+    });
+ 
+
     this.mediaLayerRef.add(this.captureCanvas);
+    this.mediaLayerRef.add(this.backgroundRasterRect);
     this.mediaLayerRef.add(this.previewCanvas);
     // send back
     this.captureCanvas.setZIndex(0);
+    this.backgroundRasterRect.setZIndex(0);
     this.previewCanvas.setZIndex(1);
     // Add mouse events for preview canvas copying
     this.previewCopyListener();
-
-    //this.startServer();
-    // isLoadingVisible.value = true;
-    // const fakeTimer = setInterval(() => {
-    //   loadingProgress.value += 1;
-    //   if (loadingProgress.value >= 100) {
-    //     clearInterval(fakeTimer);
-    //     isLoadingVisible.value = false;
-    //   }
-    // }, 1000);
-
-    this.listenToServerEvents();
+    
+    //this.listenToServerEvents();
+   
   }
 
   public async listenToServerEvents() {
@@ -965,8 +977,8 @@ export class RealTimeDrawEngine {
 
     // Test code
     if (false) {
-      //this.outputBitmap = bitmap;
-      //this.previewCanvas.image(bitmap);
+      this.outputBitmap = bitmap;
+      this.previewCanvas.image(bitmap);
       const base64Bitmap = await this.imageBitmapToBase64(bitmap);
       console.log(this.currentStrength);
       await this.client?.generateImage({
@@ -979,6 +991,7 @@ export class RealTimeDrawEngine {
         width: 1024,
         lora_strength: 1.0,
       });
+      this.isProcessing = false
       return;
     }
 
@@ -1034,6 +1047,19 @@ export class RealTimeDrawEngine {
   // Add method to create or update background
   public updateBackground(color: string) {
     this.captureCanvas.fill(color);
-    this.mediaLayerRef.batchDraw();
+
+    const captureCanvasImage = this.captureCanvas.toDataURL();
+    const imageSource = new Image();
+    imageSource.src = captureCanvasImage;
+
+    imageSource.onload = () => {      
+      this.backgroundRasterRect.fill(color);
+      this.backgroundRasterRect.image(imageSource)
+
+      this.mediaLayerRef.batchDraw();
+      this.render();
+    };
+
+
   }
 }
