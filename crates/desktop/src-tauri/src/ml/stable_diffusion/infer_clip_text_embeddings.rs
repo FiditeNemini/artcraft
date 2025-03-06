@@ -87,7 +87,7 @@ fn do_infer_clip_text_embeddings(
   
   info!("Loading clip from download");
   //let tokenizer = tokenizer_file.get(tokenizer, sd_version, use_f16)?;
-  let tokenizer = PathBuf::from(ModelRegistry::Clip.get_filename());
+  let tokenizer = PathBuf::from(ModelRegistry::ClipJson.get_filename());
   
   info!("Tokenizer path: {:?}", tokenizer);
   
