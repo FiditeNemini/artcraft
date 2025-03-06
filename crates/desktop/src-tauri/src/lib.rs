@@ -6,6 +6,7 @@ pub mod state;
 use crate::ml::model_cache::ModelCache;
 use crate::ml::prompt_cache::PromptCache;
 use crate::state::app_config::AppConfig;
+use endpoints::download_models::download_models;
 use endpoints::image_endpoint::infer_image;
 use endpoints::test_counter::test_counter;
 use tauri_plugin_log::Target;
@@ -50,6 +51,7 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       test_counter, 
       infer_image,
+      download_models,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

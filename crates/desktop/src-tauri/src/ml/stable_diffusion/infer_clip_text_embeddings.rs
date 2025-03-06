@@ -3,6 +3,7 @@ extern crate accelerate_src;
 #[cfg(feature = "mkl")]
 extern crate intel_mkl_src;
 
+use std::path::PathBuf;
 use candle_transformers::models::stable_diffusion;
 
 use crate::ml::model_file::{ModelFile, StableDiffusionVersion};
@@ -10,6 +11,7 @@ use anyhow::Error as E;
 use candle_core::{DType, Device, Module, Tensor, D};
 use log::info;
 use tokenizers::Tokenizer;
+use crate::ml::model_registry::ModelRegistry;
 
 #[allow(clippy::too_many_arguments)]
 pub fn infer_clip_text_embeddings(
@@ -76,12 +78,21 @@ fn do_infer_clip_text_embeddings(
   ) -> anyhow::Result<Tensor> {
   
   let tokenizer_file = if first {
+    info!("ModelFile::Tokenizer");
     ModelFile::Tokenizer
   } else {
+    info!("ModelFile::Tokenizer2");
     ModelFile::Tokenizer2
   };
-  let tokenizer = tokenizer_file.get(tokenizer, sd_version, use_f16)?;
+  
+  info!("Loading clip from download");
+  //let tokenizer = tokenizer_file.get(tokenizer, sd_version, use_f16)?;
+  let tokenizer = PathBuf::from(ModelRegistry::ClipJson.get_filename());
+  
+  info!("Tokenizer path: {:?}", tokenizer);
+  
   let tokenizer = Tokenizer::from_file(tokenizer).map_err(E::msg)?;
+  
   let pad_id = match &sd_config.clip.pad_with {
     Some(padding) => *tokenizer.get_vocab(true).get(padding.as_str()).unwrap(),
     None => *tokenizer.get_vocab(true).get("<|endoftext|>").unwrap(),

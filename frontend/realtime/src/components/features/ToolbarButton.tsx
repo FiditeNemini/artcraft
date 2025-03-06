@@ -58,6 +58,12 @@ export const ToolbarButton = ({
       className={mergedButtonClasses}
       disabled={disabled}
       autoFocus={false}
+      tabIndex={-1}
+      style={{
+        outline: "none",
+        boxShadow: "none",
+        WebkitTapHighlightColor: "transparent",
+      }}
       {...restButtonProps}
       onClick={(e) => {
         e.preventDefault();

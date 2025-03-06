@@ -28,17 +28,17 @@ export const Button = ({
   function getVariantClassNames(variant: string) {
     switch (variant) {
       case "tertiary": {
-        return "bg-tertiary hover:bg-tertiary-400 text-white focus-visible:outline-tertiary-600";
+        return "bg-tertiary hover:bg-tertiary-400 text-white";
       }
       case "secondary": {
-        return "bg-ui-controls hover:bg-ui-controls/80 text-white focus-visible:outline-secondary";
+        return "bg-ui-controls hover:bg-ui-controls/80 text-white";
       }
       case "action": {
-        return " bg-action hover:bg-action-500 text-white focus-visible:outline-action";
+        return "bg-action hover:bg-action-500 text-white";
       }
       case "primary":
       default: {
-        return "bg-primary hover:bg-primary-600 text-white focus-visible:outline-primary-600";
+        return "bg-primary hover:bg-primary-600 text-white";
       }
     }
   }
@@ -51,7 +51,6 @@ export const Button = ({
     "text-[15px] font-semibold rounded-lg px-3 py-2 shadow-sm",
     "flex gap-2 items-center justify-center",
     "transition-all duration-150",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
     getVariantClassNames(propsVariant),
     propsClassName,
     disabledClass,

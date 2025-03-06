@@ -6,6 +6,21 @@
   :root {
     @apply select-none bg-ui-background font-sans text-white;
   }
+
+  /* Remove all focus styles */
+  button {
+    @apply outline-none ring-0;
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  button:focus {
+    @apply outline-none ring-0;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   .pegboard {
     background-image: radial-gradient(#ffffff25 1px, transparent 0);
     background-color: #1b1b1f;
@@ -186,4 +201,31 @@
   100% {
     background-position: -200% 0;
   }
+}
+
+.react-colorful__saturation {
+  margin: 16px 0;
+  border-radius: 10px !important;
+  border-bottom: none !important;
+}
+
+.react-colorful__saturation-pointer {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.react-colorful__hue,
+.react-colorful__alpha {
+  height: 20px !important;
+  border-radius: 50px !important;
+}
+
+.react-colorful__hue {
+  margin-bottom: 12px;
+}
+
+.react-colorful__hue-pointer,
+.react-colorful__alpha-pointer {
+  width: 20px !important;
+  height: 20px !important;
 }
