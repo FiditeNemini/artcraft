@@ -15,7 +15,7 @@ interface ShapeNodeConstructor {
   canvasPosition: Position;
   canvasSize: Size;
   shapeType: ShapeType;
-  size: number;
+  size: Size;
   color?: string; // Hex color string
   transform?: TransformationData;
   mediaLayerRef: Konva.Layer;
@@ -29,7 +29,7 @@ export class ShapeNode extends NetworkedNode {
   }
 
   public shapeType: ShapeType;
-  public size: number;
+  public size: Size;
   public color: string;
 
   constructor({
@@ -46,6 +46,7 @@ export class ShapeNode extends NetworkedNode {
     // Create the actual shape inside the group
     const transform = NodeUtilities.getInitialTransform({
       existingTransform,
+      mediaFileSize: size,
       canvasPosition,
       canvasSize,
     });
@@ -54,110 +55,48 @@ export class ShapeNode extends NetworkedNode {
 
     switch (shapeType) {
       case ShapeType.CIRCLE:
-        const circleShape = new Konva.Circle({
-          radius: 50,
+        shape = new Konva.Ellipse({
+          x: size.width,
+          y: size.height,
+          radiusX: size.width,
+          radiusY: size.height,
           ...transform,
           fill: color,
           strokeScaleEnabled: false,
           draggable: true,
         });
-
-        // Convert circle to image
-        const dataURL = circleShape.toDataURL();
-        const imageObj = new Image();
-        imageObj.src = dataURL;
-
-        shape = new Konva.Image({
-          image: imageObj,
-          x: circleShape.x(),
-          y: circleShape.y(),
-          width: circleShape.width(),
-          height: circleShape.height(),
-          ...transform,
-          fill: "transparent",
-          strokeScaleEnabled: false,
-          draggable: true,
-        });
-
-        imageObj.onload = () => {
-          this.mediaLayerRef.draw();
-          loaded();
-        };
-
-        // Clean up the temporary circle
-        circleShape.destroy();
         break;
 
       case ShapeType.SQUARE:
-        const squareShape = new Konva.Rect({
-          width: 100,
-          height: 100,
+        shape = new Konva.Rect({
+          width: size.width,
+          height: size.height,
           ...transform,
           fill: color,
           strokeScaleEnabled: false,
           draggable: true,
         });
-
-        // Convert square to image
-        const squareDataURL = squareShape.toDataURL();
-        const squareImageObj = new Image();
-        squareImageObj.src = squareDataURL;
-
-        shape = new Konva.Image({
-          image: squareImageObj,
-          x: squareShape.x(),
-          y: squareShape.y(),
-          width: squareShape.width(),
-          height: squareShape.height(),
-          ...transform,
-          fill: "transparent",
-          strokeScaleEnabled: false,
-          draggable: true,
-        });
-
-        squareImageObj.onload = () => {
-          this.mediaLayerRef.draw();
-          loaded();
-        };
-
-        // Clean up the temporary square
-        squareShape.destroy();
         break;
 
       case ShapeType.TRIANGLE:
-        const triangleShape = new Konva.RegularPolygon({
-          sides: 3,
-          radius: 50,
+        shape = new Konva.Shape({
+          x: 0,
+          y: 0,
+          width: size.width,
+          height: size.height,
           ...transform,
           fill: color,
           strokeScaleEnabled: false,
           draggable: true,
+          sceneFunc: (context, shape) => {
+            context.beginPath();
+            context.moveTo(shape.width() / 2, 0);
+            context.lineTo(shape.width(), shape.height());
+            context.lineTo(0, shape.height());
+            context.closePath();
+            context.fillStrokeShape(shape);
+          }
         });
-
-        // Convert triangle to image
-        const triangleDataURL = triangleShape.toDataURL();
-        const triangleImageObj = new Image();
-        triangleImageObj.src = triangleDataURL;
-
-        shape = new Konva.Image({
-          image: triangleImageObj,
-          x: triangleShape.x(),
-          y: triangleShape.y(),
-          width: triangleShape.width(),
-          height: triangleShape.height(),
-          ...transform,
-          fill: "transparent",
-          strokeScaleEnabled: false,
-          draggable: true,
-        });
-
-        triangleImageObj.onload = () => {
-          this.mediaLayerRef.draw();
-          loaded();
-        };
-
-        // Clean up the temporary triangle
-        triangleShape.destroy();
         break;
 
       default:
