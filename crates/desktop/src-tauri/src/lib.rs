@@ -27,6 +27,8 @@ pub fn run() {
   println!("Creating model cache...");
   
   let model_cache = ModelCache::new();
+  
+  let app_data_root = config.app_data_root.clone();
 
   println!("Initializing backend runtime...");
 
@@ -48,6 +50,7 @@ pub fn run() {
     .manage(config)
     .manage(prompt_cache)
     .manage(model_cache)
+    .manage(app_data_root)
     .invoke_handler(tauri::generate_handler![
       test_counter, 
       infer_image,

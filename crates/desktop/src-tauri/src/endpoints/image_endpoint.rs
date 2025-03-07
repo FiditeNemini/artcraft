@@ -1,3 +1,4 @@
+use crate::ml::downloads::download_all_models::download_all_models;
 use crate::ml::model_cache::ModelCache;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args};
@@ -10,7 +11,7 @@ use log::{error, info};
 use std::io::Cursor;
 use std::path::PathBuf;
 use tauri::{AppHandle, State};
-use crate::ml::downloads::download_all_models::download_all_models;
+use crate::state::app_dir::AppDataRoot;
 
 const PROMPT_FILENAME : &str = "prompt.txt";
 const PROMPT: &str = "A beautiful landscape with mountains and a lake";
@@ -30,6 +31,7 @@ pub async fn infer_image(
   model_config: State<'_, AppConfig>,
   model_cache: State<'_, ModelCache>,
   prompt_cache: State<'_, PromptCache>,
+  app_data_root: State<'_, AppDataRoot>,
   app: AppHandle,
 ) -> Result<String, String> {
 
@@ -42,13 +44,22 @@ pub async fn infer_image(
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
 
   // TODO(bt): Move this to another endpoint
-  download_all_models().await
+  download_all_models(&app_data_root).await
     .map_err(|err| {
       error!("couldn't download models: {:?}", err);
       "Couldn't download models".to_string()
     })?;
 
-  let result = do_infer_image(&prompt, image, strength, &model_config, &model_cache, prompt_cache, app).await;
+  let result = do_infer_image(
+    &prompt, 
+    image, 
+    strength, 
+    &model_config, 
+    &model_cache, 
+    prompt_cache, 
+    app, 
+    &app_data_root
+  ).await;
   
   if let Err(err) = result.as_deref() {
     error!("There was an error: {:?}", err);
@@ -65,6 +76,7 @@ async fn do_infer_image(
   model_cache: &ModelCache,
   prompt_cache: State<'_, PromptCache>,
   app: AppHandle,
+  app_data_root: &AppDataRoot,
 ) -> Result<String, String> {
 
   let args = Args {
@@ -77,6 +89,7 @@ async fn do_infer_image(
     i2i_strength: strength,
     cfg_scale: config.cfg_scale,
     app: &app,
+    app_data_root,
   };
 
   match lcm_pipeline(args) {

@@ -1,6 +1,8 @@
+use std::path::PathBuf;
+use crate::state::app_dir::AppWeightsDir;
 
 #[derive(Copy, Clone, Debug)]
-pub enum ModelRegistry {
+pub enum ModelType {
   ClipJson,
   SdxlTurboUnet,
   SdxlTurboVae,
@@ -8,7 +10,7 @@ pub enum ModelRegistry {
   SdxlTurboClipEncoder2,
 }
 
-impl ModelRegistry {
+impl ModelType {
   pub fn get_hf_id(&self) -> Option<&'static str> {
     match self {
       Self::ClipJson => Some("laion/CLIP-ViT-bigG-14-laion2B-39B-b160k"),
@@ -37,5 +39,9 @@ impl ModelRegistry {
       Self::SdxlTurboClipEncoder => "clip_text_encoder.safetensors",
       Self::SdxlTurboClipEncoder2 => "clip_text_encoder_2.safetensors",
     }
+  }
+  
+  pub fn get_path(&self, weights_dir: &AppWeightsDir) -> PathBuf {
+    weights_dir.model_path(self)
   }
 }

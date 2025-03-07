@@ -1,6 +1,7 @@
 use crate::state::os_platform::OsPlatform;
 use expanduser::expanduser;
 use std::path::{Path, PathBuf};
+use crate::ml::model_type::ModelType;
 
 const ASSETS_SUBDIRECTORY : &str = "assets";
 const WEIGHTS_SUBDIRECTORY : &str = "weights";
@@ -114,5 +115,9 @@ impl AppWeightsDir {
 
   pub fn path(&self) -> &Path {
     &self.path
+  }
+  
+  pub fn model_path(&self, model_registry: &ModelType) -> PathBuf {
+    self.path.join(model_registry.get_filename())
   }
 }

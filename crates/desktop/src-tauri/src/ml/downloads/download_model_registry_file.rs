@@ -1,16 +1,21 @@
-use crate::ml::model_registry::ModelRegistry;
+use crate::ml::model_type::ModelType;
+use crate::state::app_dir::AppWeightsDir;
 use log::info;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 
-pub async fn download_model_registry_file(model_type: ModelRegistry) -> anyhow::Result<PathBuf> {
-  let path = PathBuf::from(model_type.get_filename());
+pub async fn download_model_registry_file(
+  model_type: ModelType,
+  weights_dir: &AppWeightsDir,
+) -> anyhow::Result<PathBuf> {
+  
+  let path = weights_dir.model_path(&model_type);
 
   if path.exists() {
     return Ok(path);
   }
 
-  info!("downloading model: {:?}", model_type);
+  info!("downloading model: {:?} to {:?}", model_type, path);
 
   let body = reqwest::get(model_type.get_download_url())
     .await?

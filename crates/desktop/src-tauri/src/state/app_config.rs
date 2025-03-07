@@ -1,14 +1,14 @@
-use std::path::PathBuf;
-use expanduser::expanduser;
 use crate::ml::model_file::StableDiffusionVersion;
+use crate::state::app_dir::AppDataRoot;
+use crate::state::os_platform::OsPlatform;
 use crate::state::yaml_config::YamlConfig;
 use candle_core::{DType, Device};
 use candle_transformers::models::stable_diffusion::StableDiffusionConfig;
+use expanduser::expanduser;
 use filesys::recursively_find_file_by_name::recursively_find_file_by_name;
 use hf_hub::api::sync::Api;
 use log::info;
-use crate::state::app_dir::AppDataRoot;
-use crate::state::os_platform::OsPlatform;
+use std::path::PathBuf;
 
 const DEFAULT_SD_IMAGE_WIDTH: usize = 512;
 const DEFAULT_SD_IMAGE_HEIGHT: usize = 512;
@@ -86,7 +86,7 @@ impl AppConfig {
       }
     };
       
-    info!("Using data root: {}", data_root_path);
+    println!("Using data root: {}", data_root_path);
 
     let app_data_root = AppDataRoot::create_existing(data_root_path)?;
     

@@ -4,5 +4,5 @@ pub mod model_file;
 pub mod models;
 pub mod prompt_cache;
 pub mod stable_diffusion;
-pub mod model_registry;
+pub mod model_type;
 pub mod downloads;

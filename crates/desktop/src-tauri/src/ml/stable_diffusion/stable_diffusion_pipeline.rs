@@ -1,11 +1,11 @@
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use crate::events::notification_event::{ModelType, NotificationEvent};
+use crate::events::notification_event::{NotificationModelType, NotificationEvent};
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
 use crate::ml::model_file::StableDiffusionVersion;
-use crate::ml::model_registry::ModelRegistry;
+use crate::ml::model_type::ModelType;
 use crate::ml::models::unet_model::UNetModel;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
@@ -18,6 +18,7 @@ use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
+use crate::state::app_dir::AppDataRoot;
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
@@ -28,6 +29,7 @@ pub struct Args<'a> {
     pub configs: &'a AppConfig,
     pub model_cache: &'a ModelCache,
     pub prompt_cache: &'a PromptCache,
+    pub app_data_root: &'a AppDataRoot,
     pub app: &'a AppHandle,
 }
 
@@ -41,8 +43,11 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
         model_cache, 
         prompt_cache, 
         app, 
-        image,  
+        image,
+        app_data_root,
     } = args;
+    
+    let weights_dir = app_data_root.weights_dir();
     
     println!("Starting image generation with the following configuration:");
     println!("  Model: {:?}", configs.sd_version);
@@ -98,6 +103,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             &configs.device,
             configs.dtype,
             use_guide_scale,
+            weights_dir,
         )?;
         prompt_cache.store_copy(&prompt, &tensor)?;
         tensor
@@ -129,11 +135,11 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
                     model_name: "sdxl-turbo-vae",
-                    model_type: ModelType::Vae,
+                    model_type: NotificationModelType::Vae,
                 })?;
             }
             
-            let vae_file = ModelRegistry::SdxlTurboVae.get_filename();
+            let vae_file = weights_dir.model_path(&ModelType::SdxlTurboVae);
             
             let vae = configs
               .sd_config
@@ -146,7 +152,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             if notify_download_complete {
                 app.emit("notification", NotificationEvent::ModelDownloadComplete {
                     model_name: "sdxl-turbo-vae",
-                    model_type: ModelType::Vae,
+                    model_type: NotificationModelType::Vae,
                 })?;
             }
             
@@ -167,11 +173,11 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
                     model_name: "sdxl-turbo-unet",
-                    model_type: ModelType::Unet,
+                    model_type: NotificationModelType::Unet,
                 })?;
             }
             
-            let unet_file = ModelRegistry::SdxlTurboUnet.get_filename();
+            let unet_file = weights_dir.model_path(&ModelType::SdxlTurboUnet);
 
             let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
               .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
@@ -183,7 +189,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             if notify_download_complete {
                 app.emit("notification", NotificationEvent::ModelDownloadComplete {
                     model_name: "sdxl-turbo-unet",
-                    model_type: ModelType::Unet,
+                    model_type: NotificationModelType::Unet,
                 })?;
             }
 

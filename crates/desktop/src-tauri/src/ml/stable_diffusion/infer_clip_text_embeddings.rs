@@ -11,7 +11,8 @@ use anyhow::Error as E;
 use candle_core::{DType, Device, Module, Tensor, D};
 use log::info;
 use tokenizers::Tokenizer;
-use crate::ml::model_registry::ModelRegistry;
+use crate::ml::model_type::ModelType;
+use crate::state::app_dir::AppWeightsDir;
 
 #[allow(clippy::too_many_arguments)]
 pub fn infer_clip_text_embeddings(
@@ -26,6 +27,7 @@ pub fn infer_clip_text_embeddings(
   device: &Device,
   dtype: DType,
   use_guide_scale: bool,
+  weights_dir: &AppWeightsDir,
 ) -> anyhow::Result<Tensor> {
   info!("Preparing text embeddings...");
 
@@ -52,6 +54,7 @@ pub fn infer_clip_text_embeddings(
         dtype,
         use_guide_scale,
         *first,
+        weights_dir,
       )
     })
     .collect::<anyhow::Result<Vec<_>>>()?;
@@ -75,6 +78,7 @@ fn do_infer_clip_text_embeddings(
     dtype: DType,
     use_guide_scale: bool,
     first: bool,
+    weights_dir: &AppWeightsDir,
   ) -> anyhow::Result<Tensor> {
   
   let tokenizer_file = if first {
@@ -87,7 +91,7 @@ fn do_infer_clip_text_embeddings(
   
   info!("Loading clip from download");
   //let tokenizer = tokenizer_file.get(tokenizer, sd_version, use_f16)?;
-  let tokenizer = PathBuf::from(ModelRegistry::ClipJson.get_filename());
+  let tokenizer = weights_dir.model_path(&ModelType::ClipJson);
   
   info!("Tokenizer path: {:?}", tokenizer);
   
@@ -124,10 +128,10 @@ fn do_infer_clip_text_embeddings(
   };
   let clip_weights = if first {
     //clip_weights_file.get(clip_weights, sd_version, use_f16)?
-    ModelRegistry::SdxlTurboClipEncoder.get_filename()
+    weights_dir.model_path(&ModelType::SdxlTurboClipEncoder)
   } else {
     //clip_weights_file.get(clip2_weights, sd_version, use_f16)?
-    ModelRegistry::SdxlTurboClipEncoder2.get_filename()
+    weights_dir.model_path(&ModelType::SdxlTurboClipEncoder2)
   };
   let clip_config = if first {
     &sd_config.clip
