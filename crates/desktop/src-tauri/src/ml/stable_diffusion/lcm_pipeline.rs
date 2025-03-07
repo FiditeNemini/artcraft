@@ -124,24 +124,17 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
         None => {
             info!("No vae found in cache; loading...");
             
-            let repo = configs.sd_version.repo();
-
-            println!("Building VAE model from : {:?} ... (3)", repo);
-
-            let vae_file = configs.hf_api.model(repo.to_string())
-              .get("vae/diffusion_pytorch_model.safetensors")?;
-
-            println!("Building VAE model from file {:?}...", &vae_file);
-
             let mut notify_download_complete = false;
             //if !vae_file.exists() {
             if true {
                 notify_download_complete = true;
                 app.emit("notification", NotificationEvent::ModelDownloadStarted {
-                    model_name: repo,
+                    model_name: "sdxl-turbo-vae",
                     model_type: ModelType::Vae,
                 })?;
             }
+
+            let vae_file = ModelRegistry::SdxlTurboVae.get_filename();
             
             let vae = configs
               .sd_config
@@ -153,7 +146,7 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
             
             if notify_download_complete {
                 app.emit("notification", NotificationEvent::ModelDownloadComplete {
-                    model_name: repo,
+                    model_name: "sdxl-turbo-vae",
                     model_type: ModelType::Vae,
                 })?;
             }
