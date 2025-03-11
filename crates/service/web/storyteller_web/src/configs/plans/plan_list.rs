@@ -118,24 +118,40 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
 
 /// All paid-for production premium plans in the system.
 pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
-    let mut plans = HashSet::new();
+  let mut plans = HashSet::new();
 
-    // ========== All-locale plans ==========
+  // ========== All-locale plans ==========
 
-    plans.insert(PlanBuilder::new("fakeyou_plus")
-        .plan_category(PlanCategory::Paid)
-        .stripe_product_id("prod_MoLv23HrxPiY7D")
-        .stripe_price_id("price_1M4jDCEU5se17MekOaJ92HYX")
-        .cost_per_month_dollars(7)
-        .tts_base_priority_level(20)
-        .tts_max_character_length(2048)
-        .tts_max_duration_seconds(30)
-        .web_vc_base_priority_level(20)
-        .web_vc_requires_frontend_keepalive(false)
-        .lipsync_requires_frontend_keepalive(false)
-        .build());
+  // Old "plus" price
+  plans.insert(PlanBuilder::new("fakeyou_plus")
+      .plan_category(PlanCategory::Paid)
+      .stripe_product_id("prod_MoLv23HrxPiY7D")
+      .stripe_price_id("price_1M4jDCEU5se17MekOaJ92HYX")
+      .cost_per_month_dollars(7)
+      .tts_base_priority_level(20)
+      .tts_max_character_length(2048)
+      .tts_max_duration_seconds(30)
+      .web_vc_base_priority_level(20)
+      .web_vc_requires_frontend_keepalive(false)
+      .lipsync_requires_frontend_keepalive(false)
+      .build());
 
-    plans.insert(PlanBuilder::new("fakeyou_pro")
+  // New "plus" price
+  plans.insert(PlanBuilder::new("fakeyou_plus_plan")
+      .plan_category(PlanCategory::Paid)
+      .stripe_product_id("prod_RvC5qUgLTSLGSD")
+      .stripe_price_id("price_1R1Lh8EU5se17MekaUNtWc59")
+      .cost_per_month_dollars(12)
+      .tts_base_priority_level(20)
+      .tts_max_character_length(2048)
+      .tts_max_duration_seconds(30)
+      .web_vc_base_priority_level(20)
+      .web_vc_requires_frontend_keepalive(false)
+      .lipsync_requires_frontend_keepalive(false)
+      .build());
+
+  // Old "pro" price
+  plans.insert(PlanBuilder::new("fakeyou_pro")
         .plan_category(PlanCategory::Paid)
         .stripe_product_id("prod_MoLw8nA6eFxHzc")
         .stripe_price_id("price_1M4jEQEU5se17MeksNfA0EKm")
@@ -149,7 +165,23 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .can_remove_visual_watermarks(true)
         .build());
 
-    plans.insert(PlanBuilder::new("fakeyou_elite")
+  // New "pro" price
+  plans.insert(PlanBuilder::new("fakeyou_pro_plan")
+      .plan_category(PlanCategory::Paid)
+      .stripe_product_id("prod_RvC6nB9rw6yAsI")
+      .stripe_price_id("price_1R1LhzEU5se17Mek3JLwN3Gg")
+      .cost_per_month_dollars(25)
+      .tts_base_priority_level(30)
+      .tts_max_character_length(3072)
+      .tts_max_duration_seconds(60 * 2)
+      .web_vc_base_priority_level(30)
+      .web_vc_requires_frontend_keepalive(false)
+      .lipsync_requires_frontend_keepalive(false)
+      .can_remove_visual_watermarks(true)
+      .build());
+
+  // Old "elite" price
+  plans.insert(PlanBuilder::new("fakeyou_elite")
         .plan_category(PlanCategory::Paid)
         .stripe_product_id("prod_MoLxQmLA4R24fv")
         .stripe_price_id("price_1M4jFREU5se17Mekc8pQaSKB")
@@ -162,6 +194,21 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .lipsync_requires_frontend_keepalive(false)
         .can_remove_visual_watermarks(true)
         .build());
+
+  // New "elite" price
+  plans.insert(PlanBuilder::new("fakeyou_elite_plan")
+      .plan_category(PlanCategory::Paid)
+      .stripe_product_id("prod_RvC6i84YiAYStd")
+      .stripe_price_id("price_1R1LiQEU5se17MekiJdBcsHQ")
+      .cost_per_month_dollars(40)
+      .tts_base_priority_level(40)
+      .tts_max_character_length(4096)
+      .tts_max_duration_seconds(60 * 5)
+      .web_vc_base_priority_level(40)
+      .web_vc_requires_frontend_keepalive(false)
+      .lipsync_requires_frontend_keepalive(false)
+      .can_remove_visual_watermarks(true)
+      .build());
 
     // ========== Spanish plans ==========
 
@@ -293,7 +340,7 @@ mod test {
     // making ourselves check twice when we make additions, removals, or other changes.
     #[test]
     fn test_number_of_plans_is_expected() {
-        assert_eq!(11, ALL_PLANS_BY_SLUG.len());
+        assert_eq!(14, ALL_PLANS_BY_SLUG.len());
     }
 
     #[test]
@@ -303,7 +350,7 @@ mod test {
             .filter(|plan| !plan.is_synthetic_plan()) // NB: Synthetic plans are production!
             .collect::<Vec<&Plan>>();
 
-        let expected = 4;
+        let expected = 7;
 
         assert_eq!(expected, production_plans.len());
         assert_eq!(expected, PRODUCTION_PREMIUM_PLANS.len());
@@ -346,6 +393,9 @@ mod test {
             "prod_MoLw8nA6eFxHzc".to_string(), // NB: Production
             "prod_MoLxQmLA4R24fv".to_string(), // NB: Production
             "prod_MoLyt8qMDmscjr".to_string(), // NB: Production
+            "prod_RvC5qUgLTSLGSD".to_string(), // NB: Production - new "plus" product
+            "prod_RvC6nB9rw6yAsI".to_string(), // NB: Production - new "pro" product
+            "prod_RvC6i84YiAYStd".to_string(), // NB: Production - new "elite" product
         ];
 
         assert_that(&product_ids).contains_all_of(&expected_product_ids.iter());
@@ -366,6 +416,9 @@ mod test {
             "price_1M4jEQEU5se17MeksNfA0EKm".to_string(), // NB: Production
             "price_1M4jFREU5se17Mekc8pQaSKB".to_string(), // NB: Production
             "price_1M4jGPEU5se17Mek2FiztNE5".to_string(), // NB: Production
+            "price_1R1Lh8EU5se17MekaUNtWc59".to_string(), // NB: Production - new "plus" price
+            "price_1R1LhzEU5se17Mek3JLwN3Gg".to_string(), // NB: Production - new "pro" price
+            "price_1R1LiQEU5se17MekiJdBcsHQ".to_string(), // NB: Production - new "elite" price
         ];
 
         assert_that(&price_ids).contains_all_of(&expected_price_ids.iter());
