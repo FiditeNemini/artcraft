@@ -4,7 +4,6 @@ use crate::state::os_platform::OsPlatform;
 use crate::state::yaml_config::YamlConfig;
 use candle_core::{DType, Device};
 use candle_transformers::models::stable_diffusion::StableDiffusionConfig;
-use expanduser::expanduser;
 use filesys::recursively_find_file_by_name::recursively_find_file_by_name;
 use hf_hub::api::sync::Api;
 use log::info;

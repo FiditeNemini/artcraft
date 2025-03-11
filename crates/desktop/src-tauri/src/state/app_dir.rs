@@ -1,9 +1,9 @@
+use crate::ml::model_type::ModelType;
+use crate::state::expanduser::expanduser;
 use crate::state::os_platform::OsPlatform;
-use expanduser::expanduser;
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 use tempfile::{Builder, NamedTempFile};
-use crate::ml::model_type::ModelType;
 
 const ASSETS_SUBDIRECTORY : &str = "assets";
 const WEIGHTS_SUBDIRECTORY : &str = "weights";
