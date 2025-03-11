@@ -6,6 +6,8 @@ use serde::Serialize;
 pub enum NotificationModelType {
   Unet,
   Vae,
+  Json,
+  ClipEncoder,
 }
 
 #[derive(Clone, Serialize)]
@@ -14,6 +16,12 @@ pub enum NotificationEvent<'a> {
   ModelDownloadStarted {
     model_name: &'a str, 
     model_type: NotificationModelType,
+  },
+  ModelDownloadProgress {
+    model_name: &'a str,
+    model_type: NotificationModelType,
+    currently_downloaded_bytes: usize,
+    total_file_bytes: usize,
   },
   ModelDownloadComplete {
     model_name: &'a str,
