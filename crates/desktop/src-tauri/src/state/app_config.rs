@@ -15,8 +15,6 @@ const DEFAULT_SD_IMAGE_HEIGHT: usize = 1024;
 const DEFAULT_SD_NUMERIC_DATATYPE: DType = DType::F32;
 const SD_VERSION: StableDiffusionVersion = StableDiffusionVersion::V1_5;
 
-const DEFAULT_DATA_DIR_UNIX : &str = "~/artcraft";
-
 /// A central place to configure app-wide details.
 pub struct AppConfig {
   /// We only support one device type currently, and we can't multiplex 
@@ -78,24 +76,21 @@ impl AppConfig {
     
     let os_platform = OsPlatform::get();
 
-    let default_data_path = match os_platform {
+    let default_data_root = match os_platform {
       OsPlatform::Linux => yaml_configs.linux_default_data_path.as_deref(),
       OsPlatform::MacOs => yaml_configs.mac_default_data_path.as_deref(),
       OsPlatform::Windows => yaml_configs.windows_default_data_path.as_deref(),
     };
     
-    let data_root_path = match default_data_path {
-      Some(default_data_path) => default_data_path.to_string(),
-      None => match os_platform { 
-        OsPlatform::Linux | OsPlatform::MacOs => DEFAULT_DATA_DIR_UNIX.to_string(),
-        OsPlatform::Windows => ".".to_string(),
-      }
-    };
-      
-    println!("Using data root: {}", data_root_path);
+    println!("Possible user-defined data root: {:?}", default_data_root);
 
-    let app_data_root = AppDataRoot::create_existing(data_root_path)?;
-    
+    let app_data_root = match default_data_root {
+      None => AppDataRoot::create_default()?,
+      Some(path) => AppDataRoot::create_existing(path)?,
+    };
+
+    println!("App data root: {:?}", app_data_root.path());
+
     Ok(Self {
       device,
       dtype: DEFAULT_SD_NUMERIC_DATATYPE,

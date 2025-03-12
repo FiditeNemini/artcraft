@@ -1,10 +1,12 @@
 use crate::ml::model_type::ModelType;
 use crate::state::expanduser::expanduser;
 use crate::state::os_platform::OsPlatform;
+use anyhow::anyhow;
+use directories::UserDirs;
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 use tempfile::{Builder, NamedTempFile};
-
+const DEFAULT_DATA_DIR : &str = "artcraft";
 const ASSETS_SUBDIRECTORY : &str = "assets";
 const WEIGHTS_SUBDIRECTORY : &str = "weights";
 
@@ -35,6 +37,11 @@ pub struct TemporaryDir {
 }
 
 impl AppDataRoot {
+  pub fn create_default() -> anyhow::Result<Self> {
+    let directory = get_default_data_dir()?;
+    Self::create_existing(directory)
+  }
+
   pub fn create_existing<P: AsRef<Path>>(dir: P) -> anyhow::Result<Self> {
     let mut dir = dir.as_ref().to_path_buf();
     
@@ -168,4 +175,12 @@ impl TemporaryDir {
       .tempfile_in(&self.path)?;
     Ok(tempfile)
   }
+}
+
+// eg. /home/bob/artcraft, /Users/bob/artcraft, or C:\Users\Alice\artcraft
+fn get_default_data_dir() -> anyhow::Result<PathBuf> {
+  Ok(UserDirs::new()
+      .ok_or_else(|| anyhow!("could not determine user home directory"))?
+      .home_dir()
+      .join(DEFAULT_DATA_DIR))
 }
