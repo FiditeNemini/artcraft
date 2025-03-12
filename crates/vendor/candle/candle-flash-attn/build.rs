@@ -102,7 +102,12 @@ fn main() -> Result<()> {
     println!("cargo:rustc-link-search={}", build_dir.display());
     println!("cargo:rustc-link-lib=flashattention");
     println!("cargo:rustc-link-lib=dylib=cudart");
-    println!("cargo:rustc-link-lib=dylib=stdc++");
+
+
+    // TODO(bt,2025-03-12): Fix builds on windows
+    //println!("cargo:rustc-link-lib=dylib=stdc++");
+
+
 
     Ok(())
 }
