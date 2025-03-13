@@ -1,28 +1,30 @@
+use std::path::PathBuf;
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use crate::events::notification_event::{NotificationModelType, NotificationEvent};
-use crate::ml::model_file::{ModelFile, StableDiffusionVersion};
+use crate::events::notification_event::{NotificationEvent, NotificationModelType};
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
+use crate::ml::model_file::{ModelFile, StableDiffusionVersion};
+use crate::ml::model_type::ModelType;
 use crate::ml::models::unet_model::UNetModel;
 use crate::ml::prompt_cache::PromptCache;
-use candle_nn::VarBuilder;
-use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModel;
-use candle_transformers::models::stable_diffusion::unet_2d::BlockConfig;
-use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModelConfig;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
 use crate::state::app_config::AppConfig;
+use crate::state::app_dir::AppDataRoot;
 use anyhow::{anyhow, Error as E, Result};
 use candle_core::{DType, IndexOp, Tensor, D};
-use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
+use candle_nn::VarBuilder;
 use candle_transformers::models::stable_diffusion::lcm::LCMScheduler;
+use candle_transformers::models::stable_diffusion::unet_2d::BlockConfig;
+use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModel;
+use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModelConfig;
+use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
 use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
-use crate::state::app_dir::AppDataRoot;
 
 pub struct Args<'a> {
   pub image: &'a DynamicImage,
@@ -46,13 +48,13 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
   let img2img_strength = args.i2i_strength.unwrap_or(75) as f64 / 100.0;
   let use_f16 = true;
 
-  println!("Starting image generation with the following configuration:");
-  println!("  Model: {:?}", configs.sd_version);
-  println!("  Prompt: {}", prompt);
-  println!("  Steps: {}", configs.scheduler_steps);
-  println!("  Device: {:?}", configs.device);
+  //println!("Starting image generation with the following configuration:");
+  //println!("  Model: {:?}", configs.sd_version);
+  //println!("  Prompt: {}", prompt);
+  //println!("  Steps: {}", configs.scheduler_steps);
+  //println!("  Device: {:?}", configs.device);
 
-  println!("Model dimensions: {}x{}", configs.sd_config.width, configs.sd_config.height);
+  //println!("Model dimensions: {}x{}", configs.sd_config.width, configs.sd_config.height);
 
   // Use LCM Scheduler instead of Euler Ancestral for better speed and quality
   let mut scheduler = LCMScheduler::new(configs.scheduler_steps, img2img_strength, candle_transformers::models::stable_diffusion::lcm::LCMSchedulerConfig::default())?;
@@ -60,7 +62,7 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
   let seed = configs.seed.unwrap_or_else(|| rand::thread_rng().gen());
   configs.device.set_seed(seed)?;
 
-  info!("Using seed: {}", seed);
+  //info!("Using seed: {}", seed);
 
   let guidance_scale = match cfg_scale {
     Some(guidance_scale) => guidance_scale,
@@ -74,18 +76,28 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
   // let use_guide_scale = guidance_scale > 1.0;
   let use_guide_scale = false;
 
-  info!("Using guide scale: {}", use_guide_scale);
+  //info!("Using guide scale: {}", use_guide_scale);
 
-  info!("Checking if prompt is cached");
+  //info!("Checking if prompt is cached");
   let maybe_cached = prompt_cache.get_copy(&prompt)?;
 
   let mut text_embeddings = if let Some(tensor) = maybe_cached {
     tensor
   } else {
-    println!("Loading clip weights for {:?} with model {:?}", configs.sd_version, configs.sd_version.repo());
-    let api = configs.hf_api.clone();
-    let clip_path = api.model(configs.sd_version.repo().to_string()).get(if use_f16 { "text_encoder/model.fp16.safetensors" } else { "text_encoder/model.safetensors" })?;
-    let clip_weights = Some(clip_path.to_string_lossy().to_string());
+    info!("Loading clip weights...");
+    //println!("Loading clip weights for {:?} with model {:?}", configs.sd_version, configs.sd_version.repo());
+    //let api = configs.hf_api.clone();
+
+    //let clip_path = api.model(configs.sd_version.repo().to_string()).get(if use_f16 { "text_encoder/model.fp16.safetensors" } else { "text_encoder/model.safetensors" })?;
+
+    //println!(">>>> CLIP REPO = {:?}", configs.sd_version.repo());
+    //println!(">>>> CLIP PATH = {:?}", clip_path);
+    //println!(">>>> USE_FP16 = {:?}", use_f16);
+    //let clip_weights = Some(clip_path.to_string_lossy().to_string());
+
+    let clip_weights = weights_dir.model_path(&ModelType::LykonDreamshaper7TextEncoderFp16);
+    let clip_weights = Some(clip_weights.to_string_lossy().to_string());
+
     info!("Prompt is NOT cached! Calculating embedding...");
     let tensor = infer_clip_text_embeddings(
       &prompt,
@@ -117,30 +129,27 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
   let maybe_vae = model_cache.get_vae()?;
 
-  let repo = configs.sd_version.repo();
+  let vae = match maybe_vae {
+    Some(vae) => vae,
+    None => {
+      //let repo = configs.sd_version.repo();
+      //println!(">>>>> VAE REPO = {:?}", repo);
+      //println!("Building VAE model from : {:?} ... (3)", repo);
+      //let vae_file = configs.hf_api.model(repo.to_string()).get("vae/diffusion_pytorch_model.safetensors")?;
 
-  println!("Building VAE model from : {:?} ... (3)", repo);
+      let vae_file = weights_dir.model_path(&ModelType::LykonDreamshaper7Vae);
 
-  let vae_file = configs.hf_api.model(repo.to_string()).get("vae/diffusion_pytorch_model.safetensors")?;
+      println!("Building VAE model from file {:?}...", &vae_file);
 
-  println!("Building VAE model from file {:?}...", &vae_file);
+      let vae = configs.sd_config.build_vae(vae_file, &configs.device, configs.dtype)?;
 
-  let mut notify_download_complete = false;
-  //if !vae_file.exists() {
-  if true {
-    notify_download_complete = true;
-    app.emit("notification", NotificationEvent::ModelDownloadStarted { model_name: repo, model_type: NotificationModelType::Vae })?;
-  }
+      let vae = Arc::new(vae);
 
-  let vae = configs.sd_config.build_vae(vae_file, &configs.device, configs.dtype)?;
+      model_cache.set_vae(vae.clone())?;
 
-  let vae = Arc::new(vae);
-
-  model_cache.set_vae(vae.clone())?;
-
-  if notify_download_complete {
-    app.emit("notification", NotificationEvent::ModelDownloadComplete { model_name: repo, model_type: NotificationModelType::Vae })?;
-  }
+      vae
+    }
+  };
 
   let maybe_unet = model_cache.get_unet()?;
 
@@ -149,38 +158,12 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
     None => {
       info!("No unet found in cache; loading...");
 
-      let mut notify_download_complete = false;
-      //if !unet_file.exists() {
-      // if true {
-      //     notify_download_complete = true;
-      //     app.emit("notification", NotificationEvent::ModelDownloadStarted {
-      //         model_name: "sdxl-turbo-unet",
-      //         model_type: ModelType::Unet,
-      //     })?;
-      // }
-      let unet_weights = {
-        let lcm_model_repo = "SimianLuo/LCM_Dreamshaper_v7"; // LCM UNet
-        let unet_path = configs.hf_api.model(lcm_model_repo.to_string()).get(if use_f16 {
-          if lcm_model_repo == "SimianLuo/LCM_Dreamshaper_v7" {
-            "unet/diffusion_pytorch_model.safetensors"
-          } else {
-            "unet/diffusion_pytorch_model.fp16.safetensors"
-          }
-        } else {
-          "unet/diffusion_pytorch_model.safetensors"
-        })?;
-        Some(unet_path.to_string_lossy().to_string())
-      };
+      let unet_weights = weights_dir.model_path(&ModelType::SimianLuoLcmDreamshaperV7Unet);
 
-      let unet_weights = ModelFile::UnetLcm.get(unet_weights, configs.sd_version, use_f16)?;
       let in_channels = match configs.sd_version {
         StableDiffusionVersion::XlInpaint | StableDiffusionVersion::V2Inpaint | StableDiffusionVersion::V1_5Inpaint => 9,
         _ => 4,
       };
-      println!("Loading UNet weights from: SimianLuo/LCM_Dreamshaper_v7/unet");
-
-      // Ensure we're loading the correct UNet configuration
-      println!("Building UNet for LCM (SimianLuo/LCM_Dreamshaper_v7)");
 
       // For LCM models, ensure that:
       // 1. We're using the correct prediction type (epsilon)
@@ -194,7 +177,12 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
         center_input_sample: false,
         flip_sin_to_cos: true,
         freq_shift: 0.0,
-        blocks: vec![BlockConfig { out_channels: 320, use_cross_attn: Some(1), attention_head_dim: 8 }, BlockConfig { out_channels: 640, use_cross_attn: Some(1), attention_head_dim: 8 }, BlockConfig { out_channels: 1280, use_cross_attn: Some(1), attention_head_dim: 8 }, BlockConfig { out_channels: 1280, use_cross_attn: None, attention_head_dim: 8 }],
+        blocks: vec![
+          BlockConfig { out_channels: 320, use_cross_attn: Some(1), attention_head_dim: 8 },
+          BlockConfig { out_channels: 640, use_cross_attn: Some(1), attention_head_dim: 8 },
+          BlockConfig { out_channels: 1280, use_cross_attn: Some(1), attention_head_dim: 8 },
+          BlockConfig { out_channels: 1280, use_cross_attn: None, attention_head_dim: 8 }
+        ],
         layers_per_block: 2,
         downsample_padding: 1,
         mid_block_scale_factor: 1.0,
@@ -213,18 +201,9 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
       let unet = UNetModel::new_with_inner(unet);
 
-      // let unet_file = ModelRegistry::SdxlTurboUnet.get_filename();
-
-      // let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
-      //   .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
-
       let unet = Arc::new(unet);
 
       model_cache.set_unet(unet.clone())?;
-
-      if notify_download_complete {
-        app.emit("notification", NotificationEvent::ModelDownloadComplete { model_name: "sdxl-turbo-unet", model_type: NotificationModelType::Unet })?;
-      }
 
       unet
     },
