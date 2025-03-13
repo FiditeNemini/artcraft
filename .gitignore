@@ -66,3 +66,6 @@ scraps/
 # These should be built by the platform
 windows/sqlite/sqlite3.exp
 windows/sqlite/sqlite3.lib
+
+# ArtCraft Windows DLLs
+crates/desktop/src-tauri/*.dll
