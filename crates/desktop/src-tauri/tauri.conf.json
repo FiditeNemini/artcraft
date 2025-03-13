@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "ArtCraft",
-        "width": 1200,
-        "height": 800,
+        "width": 2400,
+        "height": 1300,
         "resizable": true,
         "fullscreen": false
       }
