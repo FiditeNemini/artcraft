@@ -55,7 +55,7 @@ export const TabSelector: React.FC<TabSelectorProps> = ({
       <TabList className="glass relative inline-flex min-w-fit overflow-x-auto rounded-lg p-1 shadow-lg">
         {/* Animated indicator */}
         <div
-          className="absolute top-1 z-10 h-[calc(100%-8px)] rounded-md border-2 border-primary bg-primary/30 transition-all duration-300 ease-in-out"
+          className="absolute top-1 z-10 h-[calc(100%-8px)] rounded-md border-2 border-primary bg-primary/30 transition-all duration-200 ease-in-out"
           style={{
             left: indicatorStyle.left,
             width: indicatorStyle.width,
@@ -68,7 +68,7 @@ export const TabSelector: React.FC<TabSelectorProps> = ({
             ref={(el) => (tabsRef.current[index] = el)}
             className={({ selected }) =>
               twMerge(
-                "relative z-20 mx-0.5 min-w-max rounded-md border-2 border-transparent px-4 py-1 text-center font-semibold transition-all duration-300 ease-in-out",
+                "relative z-20 mx-0.5 min-w-max rounded-md border-2 border-transparent px-4 py-0.5 text-center font-semibold transition-all duration-200 ease-in-out",
                 selected ? "text-white" : "text-gray-300 hover:text-white",
               )
             }
