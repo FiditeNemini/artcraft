@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use tauri::{AppHandle, State};
 
 const PROMPT_FILENAME : &str = "prompt.txt";
-const PROMPT: &str = "green goblin, blood dripping from lips, detailed, photorealistic, 8k";
+const PROMPT: &str = "shiba inu, cute dog, detailed, walking in a wooded forest, photorealistic, 8k";
 
 const NEGATIVE_PROMPT: &str = "bad quality, bad faces, poor quality, blurry faces, watermark";
 
@@ -95,6 +95,8 @@ async fn do_infer_image(
         .map_err(|err| format!("failure to encode image: {:?}", err))?;
 
       let bytes = BASE64_STANDARD.encode(bytes);
+
+      info!("inference successful, image converted to base64, serving back to browser...");
 
       Ok(bytes)
     },
