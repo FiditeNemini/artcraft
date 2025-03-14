@@ -6,7 +6,6 @@ use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
 use crate::ml::model_file::{ModelFile, StableDiffusionVersion};
-use crate::ml::models::unet_model::UNetModel;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
@@ -172,8 +171,6 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
       let unet = UNet2DConditionModel::new(vs_unet, in_channels, 4, use_flash_attn, unet_config)?;
 
-      let unet = UNetModel::new_with_inner(unet);
-
       let unet = Arc::new(unet);
 
       model_cache.set_unet(unet.clone())?;
@@ -208,11 +205,6 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
   let noise = init_latents.randn_like(0f64, 1f64)?;
   let latents = scheduler.add_noise(&init_latents, noise, t_start)?;
 
-  println!("Latents initialized successfully");
-  println!("Initial noise shape: {:?}", latents.shape());
-
-  println!("Starting diffusion process...");
-
   let mut latents = latents;
   let timesteps: Vec<_> = scheduler.timesteps().iter().copied().collect();
 
@@ -224,7 +216,7 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
     let latent_model_input = scheduler.scale_model_input(latent_model_input, timestep);
 
     // Use the guidance scale embedding in the UNet inference with the proper method name
-    let mut noise_pred = match unet.forward_with_guidance(&latent_model_input, timestep as f64, &text_embeddings, &guidance_scale_embedding) {
+    let mut noise_pred = match unet.forward_with_guidance(&latent_model_input, timestep as f64, &text_embeddings, Some(&guidance_scale_embedding)) {
       Ok(pred) => pred,
       Err(e) => {
         println!("UNet inference failed with error: {}", e);

@@ -5,7 +5,6 @@ use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
 use crate::ml::model_file::StableDiffusionVersion;
-use crate::ml::models::unet_model::UNetModel;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
@@ -150,11 +149,11 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
         None => {
             info!("No unet found in cache; loading...");
 
-            let unet_file = weights_dir.weight_path(&SDXL_TURBO_UNET);
+            let unet_weights_file = weights_dir.weight_path(&SDXL_TURBO_UNET);
 
-            let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
+            let unet = configs.sd_config.build_unet(unet_weights_file, &configs.device, 4, true, configs.dtype)
               .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
-            
+
             let unet = Arc::new(unet);
 
             model_cache.set_unet(unet.clone())?;
@@ -223,7 +222,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
 
         let latent_model_input = scheduler.scale_model_input(latent_model_input, timestep)?;
 
-        let mut noise_pred = match unet.inference(&latent_model_input, timestep as f64, &text_embeddings) {
+        let mut noise_pred = match unet.forward(&latent_model_input, timestep as f64, &text_embeddings) {
             Ok(pred) => pred,
             Err(e) => {
                 println!("UNet inference failed with error: {}", e);
