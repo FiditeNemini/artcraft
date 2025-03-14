@@ -1,16 +1,17 @@
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use crate::events::notification_event::{NotificationModelType, NotificationEvent};
+use crate::events::notification_event::{NotificationEvent, NotificationModelType};
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
 use crate::ml::model_file::StableDiffusionVersion;
-use crate::ml::model_type::ModelType;
 use crate::ml::models::unet_model::UNetModel;
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
+use crate::ml::weights_registry::weights::{SDXL_TURBO_UNET, SDXL_TURBO_VAE};
 use crate::state::app_config::AppConfig;
+use crate::state::app_dir::AppDataRoot;
 use anyhow::{anyhow, Error as E, Result};
 use candle_core::{DType, IndexOp, Tensor, D};
 use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
@@ -18,7 +19,6 @@ use image::DynamicImage;
 use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
-use crate::state::app_dir::AppDataRoot;
 
 pub struct Args<'a> {
     pub image: &'a DynamicImage,
@@ -129,17 +129,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
         None => {
             info!("No vae found in cache; loading...");
             
-            let mut notify_download_complete = false;
-            //if !vae_file.exists() {
-            if true {
-                notify_download_complete = true;
-                app.emit("notification", NotificationEvent::ModelDownloadStarted {
-                    model_name: "sdxl-turbo-vae",
-                    model_type: NotificationModelType::Vae,
-                })?;
-            }
-            
-            let vae_file = weights_dir.model_path(&ModelType::SdxlTurboVae);
+            let vae_file = weights_dir.weight_path(&SDXL_TURBO_VAE);
             
             let vae = configs
               .sd_config
@@ -148,14 +138,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             let vae = Arc::new(vae);
             
             model_cache.set_vae(vae.clone())?;
-            
-            if notify_download_complete {
-                app.emit("notification", NotificationEvent::ModelDownloadComplete {
-                    model_name: "sdxl-turbo-vae",
-                    model_type: NotificationModelType::Vae,
-                })?;
-            }
-            
+
             vae
         }
     };
@@ -167,17 +150,7 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
         None => {
             info!("No unet found in cache; loading...");
 
-            let mut notify_download_complete = false;
-            //if !unet_file.exists() {
-            if true {
-                notify_download_complete = true;
-                app.emit("notification", NotificationEvent::ModelDownloadStarted {
-                    model_name: "sdxl-turbo-unet",
-                    model_type: NotificationModelType::Unet,
-                })?;
-            }
-            
-            let unet_file = weights_dir.model_path(&ModelType::SdxlTurboUnet);
+            let unet_file = weights_dir.weight_path(&SDXL_TURBO_UNET);
 
             let unet = UNetModel::new(&configs.sd_config, unet_file, &configs.device, configs.dtype)
               .map_err(|err| anyhow!("error initializing unet model: {:?}", err))?;
@@ -185,13 +158,6 @@ pub fn stable_diffusion_pipeline(args: Args<'_>) -> Result<RgbImage> {
             let unet = Arc::new(unet);
 
             model_cache.set_unet(unet.clone())?;
-
-            if notify_download_complete {
-                app.emit("notification", NotificationEvent::ModelDownloadComplete {
-                    model_name: "sdxl-turbo-unet",
-                    model_type: NotificationModelType::Unet,
-                })?;
-            }
 
             unet
         }
