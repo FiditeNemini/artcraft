@@ -19,8 +19,6 @@ const NEGATIVE_PROMPT: &str = "bad quality, bad faces, poor quality, blurry face
 
 const RANDOM_SEED: u32 = 42;
 
-// TODO: Mark async https://github.com/tauri-apps/tauri/discussions/7737
-
 
 /// This handler takes an image (as a base64 encoded string) and a prompt and returns
 /// an image (as a base64-encoded string).
@@ -38,8 +36,7 @@ pub async fn infer_image(
 
   let prompt = get_prompt_or_fallback(prompt);
 
-  info!("Prompt: {}", prompt);
-  info!("Strength: {:?}", strength);
+  info!("Strength: {:?}; Prompt: {}", strength, prompt);
 
   let image = hydrate_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
@@ -96,7 +93,7 @@ async fn do_infer_image(
 
       let bytes = BASE64_STANDARD.encode(bytes);
 
-      info!("inference successful, image converted to base64, serving back to browser...");
+      info!("Inference successful; image converted to base64, serving back to browser...");
 
       Ok(bytes)
     },
