@@ -22,6 +22,7 @@ tauri-build = { version = "2.0.4", features = [] }
 # Internal
 filesys = { path = "../../lib/files/filesys" }
 memory_caching = { path = "../../lib/caching/memory_caching" }
+primitives = { path = "../../lib/data/primitives" }
 
 # Bypass cudarc issues on Windows https://github.com/coreylowman/cudarc/issues/332
 cudarc = "0.13.7"
@@ -71,6 +72,7 @@ cuda = [
 [dev-dependencies]
 libloading = "0.8.6"
 serial_test = "3.2.0"
+assertor = "0.0.3"
 
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.

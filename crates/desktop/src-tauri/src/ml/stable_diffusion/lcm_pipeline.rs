@@ -9,6 +9,7 @@ use crate::ml::model_file::{ModelFile, StableDiffusionVersion};
 use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::infer_clip_text_embeddings;
+use crate::ml::stable_diffusion::remap_lcm_strength_range::remap_lcm_strength_range;
 use crate::ml::weights_registry::weights::{LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 use crate::state::app_config::AppConfig;
 use crate::state::app_dir::AppDataRoot;
@@ -25,12 +26,14 @@ use log::info;
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
 
+const DEFAULT_STRENGTH : f64 = 75.0;
+
 pub struct Args<'a> {
   pub image: &'a DynamicImage,
   pub prompt: String,
   pub uncond_prompt: String,
   pub cfg_scale: Option<f64>,
-  pub i2i_strength: Option<u8>,
+  pub i2i_strength: Option<f64>,
   pub configs: &'a AppConfig,
   pub model_cache: &'a ModelCache,
   pub prompt_cache: &'a PromptCache,
@@ -43,8 +46,13 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
   let Args { prompt, uncond_prompt, cfg_scale, i2i_strength, configs, model_cache, prompt_cache, app, image, app_data_root, use_flash_attn } = args;
 
   let weights_dir = app_data_root.weights_dir();
+  
+  let img2img_strength = args.i2i_strength
+    .map(|s| remap_lcm_strength_range(s))
+    .unwrap_or(DEFAULT_STRENGTH);
+  
+  let img2img_strength = img2img_strength / 100.0;
 
-  let img2img_strength = args.i2i_strength.unwrap_or(75) as f64 / 100.0;
   let use_f16 = true;
 
   // Use LCM Scheduler instead of Euler Ancestral for better speed and quality
@@ -180,12 +188,6 @@ pub fn lcm_pipeline(args: Args<'_>) -> Result<RgbImage> {
   };
 
   let init_latent_dist: DiagonalGaussianDistribution = vae.encode(&input_image)?;
-
-  // Parse and calculate the img2img strength
-  let img2img_strength = match i2i_strength {
-    None => 0.75f64,
-    Some(strength) => (strength as f64) / 100.0f64,
-  };
 
   // Create LCM guidance scale embeddings
   let embedding_dim = 1280;

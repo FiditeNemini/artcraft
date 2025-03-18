@@ -658,6 +658,7 @@ name = "app"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "assertor",
  "base64 0.22.1",
  "bytes 1.10.0",
  "candle-core",
@@ -676,6 +677,7 @@ dependencies = [
  "log",
  "memory_caching",
  "once_cell",
+ "primitives",
  "rand 0.8.5",
  "reqwest 0.12.12",
  "serde",
@@ -855,6 +857,15 @@ name = "assert_float_eq"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "10d2119f741b79fe9907f5396d19bffcb46568cfcc315e78677d731972ac7085"
+
+[[package]]
+name = "assertor"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b02f2af4042fbbed4d5732c517666629512c574c8e2edb5cfe2cf8a86564d52"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "async-channel"
@@ -8381,6 +8392,7 @@ dependencies = [
 name = "primitives"
 version = "0.0.1"
 dependencies = [
+ "assertor",
  "my-workspace-hack",
  "testing",
 ]

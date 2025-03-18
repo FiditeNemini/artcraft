@@ -32,3 +32,4 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
 testing = { path = "../../testing" }
+assertor = "0.0.3"
