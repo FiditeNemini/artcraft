@@ -26,7 +26,8 @@ const RANDOM_SEED: u32 = 42;
 pub async fn infer_image(
   image: &str,
   prompt: Option<String>,
-  strength: Option<u8>,
+  // NB: `strength` is supposed to be a u8 in range 0-100, but Javascript keeps sending us floats (eg. 14.000008)
+  strength: Option<f64>,
   model_config: State<'_, AppConfig>,
   model_cache: State<'_, ModelCache>,
   prompt_cache: State<'_, PromptCache>,
@@ -40,6 +41,8 @@ pub async fn infer_image(
 
   let image = hydrate_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
+  
+  let strength = strength.map(|s| float_to_u8(s));
 
   let result = do_infer_image(
     &prompt, 
@@ -134,4 +137,17 @@ fn hydrate_base64_image(base64_image: &str) -> anyhow::Result<DynamicImage> {
   let image = image.resize(512, 512, FilterType::CatmullRom);
 
   Ok(image)
+}
+
+fn float_to_u8(value: f64) -> u8 {
+  const MAX : f64 = u8::MAX as f64;
+  const MIN : f64 = 0f64;
+  let value = value.round();
+  if value >= MAX {
+    u8::MAX
+  } else if value <= MIN {
+    0
+  } else {
+    value as u8
+  }
 }
