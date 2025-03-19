@@ -3,12 +3,11 @@ use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args};
 use crate::state::app_config::AppConfig;
 use crate::state::app_dir::AppDataRoot;
-use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine};
-use bytes::BytesMut;
+use crate::utils::image::decode_base64_image::decode_base64_image;
+use crate::utils::image::encode_rgb_image_base64_png::encode_rgb_image_base64_png;
 use image::imageops::FilterType;
-use image::{DynamicImage, ImageFormat, ImageReader};
+use image::{DynamicImage, RgbImage};
 use log::{error, info};
-use std::io::Cursor;
 use std::path::PathBuf;
 use tauri::{AppHandle, State};
 
@@ -38,9 +37,12 @@ pub async fn infer_image(
 
   info!("Strength: {:?}; Prompt: {}", strength, prompt);
 
-  let image = hydrate_base64_image(image)
+  let image = decode_base64_image(image)
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
   
+  // TODO(bt,2025-02-17): Running out of vram with full image buffer size
+  let image = image.resize(512, 512, FilterType::CatmullRom);
+
   let result = do_infer_image(
     &prompt, 
     image, 
@@ -52,11 +54,20 @@ pub async fn infer_image(
     &app_data_root
   ).await;
   
-  if let Err(err) = result.as_deref() {
-    error!("There was an error: {:?}", err);
-  }
-  
-  result
+  let image = match result {
+    Ok(image) => image,
+    Err(err) => {
+      error!("There was an error generating the image: {:?}", err);
+      return Err(format!("There was an error generating the image: {}", err));
+    }
+  };
+
+  let bytes = encode_rgb_image_base64_png(image)
+    .map_err(|err| format!("failure to encode image: {:?}", err))?;
+
+  info!("Inference successful; image converted to base64, serving back to browser...");
+
+  Ok(bytes)
 }
 
 async fn do_infer_image(
@@ -68,7 +79,7 @@ async fn do_infer_image(
   prompt_cache: State<'_, PromptCache>,
   app: AppHandle,
   app_data_root: &AppDataRoot,
-) -> Result<String, String> {
+) -> Result<RgbImage, String> {
 
   let args = Args {
     image: &image,
@@ -84,21 +95,10 @@ async fn do_infer_image(
     use_flash_attn: true,
   };
 
-  match lcm_pipeline(args) {
-    Ok(image) => {
-      let mut bytes = Vec::with_capacity(1024*1024);
-      
-      image.write_to(&mut Cursor::new(&mut bytes), ImageFormat::Png)
-        .map_err(|err| format!("failure to encode image: {:?}", err))?;
+  let image = lcm_pipeline(args)
+    .map_err(|err| format!("failure to encode image: {:?}", err))?;
 
-      let bytes = BASE64_STANDARD.encode(bytes);
-
-      info!("Inference successful; image converted to base64, serving back to browser...");
-
-      Ok(bytes)
-    },
-    Err(e) => Err(format!("Failed to generate image: {}", e)),
-  }
+  Ok(image)
 }
 
 fn get_prompt_or_fallback(user_prompt: Option<String>) -> String {
@@ -121,30 +121,4 @@ fn get_prompt_or_fallback(user_prompt: Option<String>) -> String {
     })
     .trim()
     .to_string()
-}
-
-fn hydrate_base64_image(base64_image: &str) -> anyhow::Result<DynamicImage> {
-  let bytes = BASE64_STANDARD.decode(base64_image)?;
-
-  let image = ImageReader::new(Cursor::new(bytes))
-    .with_guessed_format()?
-    .decode()?;
-
-  // TODO(bt,2025-02-17): Running out of vram with full image buffer size
-  let image = image.resize(512, 512, FilterType::CatmullRom);
-
-  Ok(image)
-}
-
-fn float_to_u8(value: f64) -> u8 {
-  const MAX : f64 = u8::MAX as f64;
-  const MIN : f64 = 0f64;
-  let value = value.round();
-  if value >= MAX {
-    u8::MAX
-  } else if value <= MIN {
-    0
-  } else {
-    value as u8
-  }
 }

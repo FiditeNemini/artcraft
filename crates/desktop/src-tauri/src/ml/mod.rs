@@ -1,3 +1,4 @@
+pub mod background_removal;
 pub mod image;
 pub mod model_cache;
 pub mod model_file;
