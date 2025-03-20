@@ -10,6 +10,7 @@ use log::{error, info};
 use ndarray::{Array, CowArray};
 use ort::Value;
 use tauri::{AppHandle, State};
+use crate::ml::weights_registry::weights::{DIS_MEDIUM_ONNX, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 
 /// This handler removes the background from an image.
 #[tauri::command]
@@ -28,7 +29,7 @@ pub async fn remove_background(
   // sudo apt-get install libcudnn8-dev libcudnn8
   // update-alternatives: warning: forcing reinstallation of alternative /usr/include/x86_64-linux-gnu/cudnn_v9.h because link group libcudnn is broken
   // update-alternatives: using /usr/include/x86_64-linux-gnu/cudnn_v8.h to provide /usr/include/cudnn.h (libcudnn) in manual mode
-  let model_path = app_data_root.weights_dir().path().join("medium.onnx"); // TODO
+  let model_path = app_data_root.weights_dir().weight_path(&DIS_MEDIUM_ONNX);
   let session = onnx_session(model_path.to_str().unwrap()) // TODO
     .map_err(|err| format!("failure to start onnx session: {:?}", err))?;
 
