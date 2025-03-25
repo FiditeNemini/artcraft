@@ -70,13 +70,6 @@ assertor = "0.0.3"
 #default  = []
 #ml_models = ["dep:ml_models"]
 
-[target.'cfg(not(target_os = "macos"))'.features]
-default  = ["ml_models"]
-#ml_models = ["dep:ml_models"]
-
-[features]
-ml_models = []
-
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.
 

@@ -1,6 +1,6 @@
 //! Adapted from https://github.com/dnanhkhoa/rust-background-removal
 
-#[cfg(feature = "ml_models")]
+#[cfg(not(target_os = "macos"))]
 use {
   ml_models::ml::background_removal::onnx_session::onnx_session,
   ml_models::ml::background_removal::remove_image_background::remove_image_background,
@@ -27,7 +27,7 @@ pub async fn remove_background(
   let mut image = decode_base64_image(image)
       .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
 
-  #[cfg(feature = "ml_models")]
+  #[cfg(not(target_os = "macos"))]
   {
     image = remove_background_impl(&app_data_root, image).await?;
   }
@@ -38,7 +38,7 @@ pub async fn remove_background(
   Ok(image)
 }
 
-#[cfg(feature = "ml_models")]
+#[cfg(not(target_os = "macos"))]
 async fn remove_background_impl(app_data_root: &AppDataRoot, image: DynamicImage) -> Result<DynamicImage, String> {
   let model_path = app_data_root.weights_dir().weight_path(&DIS_MEDIUM_ONNX);
 

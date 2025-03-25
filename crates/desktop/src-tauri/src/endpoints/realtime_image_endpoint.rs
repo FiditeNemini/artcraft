@@ -1,4 +1,4 @@
-#[cfg(feature = "ml_models")]
+#[cfg(not(target_os = "macos"))]
 use {
   ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args},
 };
@@ -51,7 +51,7 @@ pub async fn infer_image(
   // TODO(bt,2025-02-17): Running out of vram with full image buffer size
   let mut image = image.resize(512, 512, FilterType::CatmullRom);
 
-  #[cfg(feature = "ml_models")]
+  #[cfg(not(target_os = "macos"))]
   {
     let result = infer_image_impl(
       &prompt,
@@ -80,7 +80,7 @@ pub async fn infer_image(
   Ok(bytes)
 }
 
-#[cfg(feature = "ml_models")]
+#[cfg(not(target_os = "macos"))]
 async fn infer_image_impl(
   prompt: &str,
   image: DynamicImage,

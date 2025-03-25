@@ -1,4 +1,4 @@
-#[cfg(feature = "ml_models")]
+#[cfg(not(target_os = "macos"))]
 use {
   ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args},
 };
@@ -47,7 +47,7 @@ pub async fn text_to_image(
 
   let mut image = IMAGE.resize(512, 512, FilterType::CatmullRom);
 
-  #[cfg(feature = "ml_models")]
+  #[cfg(not(target_os = "macos"))]
   {
     let result = text_to_image_impl(
       &prompt,
@@ -77,7 +77,7 @@ pub async fn text_to_image(
   Ok(bytes)
 }
 
-#[cfg(feature = "ml_models")]
+#[cfg(not(target_os = "macos"))]
 async fn text_to_image_impl(
   prompt: &str,
   image: DynamicImage,
