@@ -1,6 +1,9 @@
 use super::schedulers::{betas_for_alpha_bar, BetaSchedule, PredictionType};
 use candle::{DType, Device, IndexOp, Result, Tensor};
+use log::debug;
+
 const FINAL_ALPHA_CUMPROD: f64 = 0.9991499781608582;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LCMVarianceType {
     FixedSmall,
@@ -87,7 +90,7 @@ impl LCMScheduler {
         let timesteps = LCMScheduler::get_timesteps_for_steps(inference_steps, strength);
         let step_ratio = config.train_timesteps / inference_steps;
 
-        println!("Using LCM timesteps: {:?}", timesteps);
+        debug!("Using LCM timesteps: {:?}", timesteps);
 
         Ok(Self {
             alphas_cumprod,
@@ -143,11 +146,11 @@ impl LCMScheduler {
         let scaled_timestep_squared = scaled_timestep.powi(2);
         let denominator = scaled_timestep_squared + sigma_squared;
 
-        println!(
+        debug!(
             "Boundary condition for timestep {}, scaled timestep {}",
             timestep, scaled_timestep
         );
-        println!(
+        debug!(
             "  Intermediate values: sigma_data^2: {:.20}, scaled_timestep^2: {:.20}, denominator: {:.20}",
             sigma_squared, scaled_timestep_squared, denominator
         );
@@ -155,7 +158,7 @@ impl LCMScheduler {
         let c_skip = sigma_squared / denominator;
         let c_out = scaled_timestep / (scaled_timestep_squared + sigma_squared).sqrt();
 
-        println!(
+        debug!(
             "  Final computed values: c_skip: {:.20}, c_out: {:.20}",
             c_skip, c_out
         );
@@ -172,14 +175,14 @@ impl LCMScheduler {
     ) -> Result<Tensor> {
         // Scale by exactly 1000.0 to match diffusers
         let w = guidance_scale * 1000.0;
-        println!(
+        debug!(
             "Creating guidance embedding with dim={}, scaled value={}",
             embedding_dim, w
         );
 
         // Calculate the half dimension
         let half_dim = embedding_dim / 2;
-        println!("Half dimension: {}", half_dim);
+        debug!("Half dimension: {}", half_dim);
 
         let log_10000 = (10000.0f32).ln();
         let freq_factor = log_10000 / ((half_dim - 1) as f32); // pre-compute division
@@ -191,7 +194,7 @@ impl LCMScheduler {
             freqs.push(freq);
         }
 
-        println!(
+        debug!(
             "First few frequencies: {:?}",
             &freqs.iter().take(5).collect::<Vec<_>>()
         );
@@ -204,39 +207,39 @@ impl LCMScheduler {
             emb_data.push(w_val * freq);
         }
 
-        println!(
+        debug!(
             "First few scaled frequencies: {:?}",
             &emb_data.iter().take(5).collect::<Vec<_>>()
         );
 
         // Create the embedding tensor
         let emb = Tensor::new(emb_data.as_slice(), device)?.to_dtype(dtype)?;
-        println!("Embedding tensor shape: {:?}", emb.shape());
+        debug!("Embedding tensor shape: {:?}", emb.shape());
 
         // Reshape for correct sin/cos application
         let emb = emb.reshape((1, half_dim))?;
-        println!("Reshaped embedding tensor: {:?}", emb.shape());
+        debug!("Reshaped embedding tensor: {:?}", emb.shape());
 
         // Compute sin and cos components
         let sin_emb = emb.sin()?;
-        println!("Sin embedding shape: {:?}", sin_emb.shape());
+        debug!("Sin embedding shape: {:?}", sin_emb.shape());
         let cos_emb = emb.cos()?;
-        println!("Cos embedding shape: {:?}", cos_emb.shape());
+        debug!("Cos embedding shape: {:?}", cos_emb.shape());
 
         // Concatenate sin and cos (along dimension 1)
         let result = Tensor::cat(&[sin_emb, cos_emb], 1)?;
-        println!("After concatenation shape: {:?}", result.shape());
+        debug!("After concatenation shape: {:?}", result.shape());
 
         // If odd dimension, pad with zero
         let result = if embedding_dim % 2 == 1 {
-            println!("Adding zero padding for odd dimension");
+            debug!("Adding zero padding for odd dimension");
             let zero = Tensor::zeros((1, 1), dtype, device)?;
             Tensor::cat(&[result, zero], 1)?
         } else {
             result
         };
 
-        println!("Final guidance embedding shape: {:?}", result.shape());
+        debug!("Final guidance embedding shape: {:?}", result.shape());
 
         Ok(result)
     }
@@ -288,12 +291,12 @@ impl LCMScheduler {
                 };
 
                 let timesteps = linspace.iter().map(|&f| f as usize).rev().collect();
-                println!("timesteps: {:?}", timesteps);
+                debug!("timesteps: {:?}", timesteps);
                 timesteps
             }
         };
 
-        println!("all_timesteps: {:?}", all_timesteps);
+        debug!("all_timesteps: {:?}", all_timesteps);
 
         // Compute `t_start` based on `strength`
         let num_train_timesteps = 1000;
@@ -303,7 +306,7 @@ impl LCMScheduler {
             .position(|&t| t <= init_timestep)
             .unwrap_or(0);
 
-        println!(
+        debug!(
             "get_timesteps: t_start: {} init_timestep: {} strength: {}",
             t_start, init_timestep, strength
         );
@@ -327,7 +330,7 @@ impl LCMScheduler {
             0
         };
 
-        println!(
+        debug!(
             "LCM step: timestep={}, prev_timestep={}, step_index={}",
             timestep, prev_timestep, step_index
         );
@@ -357,15 +360,15 @@ impl LCMScheduler {
         let denoised = ((c_out * pred_original_sample )? + (c_skip * sample)?)?;
 
         let pred_prev_sample = if step_index != self.timesteps.len() - 1 {
-            println!("Adding noise at intermediate step {}", timestep);
+            debug!("Adding noise at intermediate step {}", timestep);
             let noise = Tensor::randn_like(&denoised, 0.0, 1.0)?;
             ((alpha_prod_t_prev.sqrt() * denoised)? + (beta_prod_t_prev.sqrt() * noise)?)?
         } else {
-            println!("No noise for final timestep {}", timestep);
+            debug!("No noise for final timestep {}", timestep);
             denoised
         };
 
-        println!(
+        debug!(
             "Denoised sample shape: {:?}, first few values: {}",
             pred_prev_sample.shape(),
             pred_prev_sample
@@ -388,7 +391,7 @@ impl LCMScheduler {
     //         self.timesteps[step_index + 1]
     //     };
 
-    //     println!(
+    //     debug!(
     //         "LCM step: timestep={}, prev_timestep={}",
     //         timestep, prev_timestep
     //     );
@@ -401,7 +404,7 @@ impl LCMScheduler {
     //         self.alphas_cumprod[prev_timestep]
     //     };
 
-    //     println!(
+    //     debug!(
     //         "LCM scheduler step: timestep={}, step_index={}, sigma={}",
     //         timestep,
     //         step_index,
@@ -433,13 +436,13 @@ impl LCMScheduler {
     //         pred_original_sample = pred_original_sample.clamp(-1f32, 1f32)?;
     //     }
 
-    //     println!("boundary: Pred original sample first few values: {}",
+    //     debug!("boundary: Pred original sample first few values: {}",
     //              pred_original_sample.i(0)?.i(0)?.narrow(0, 0, 5)?.narrow(1, 0, 5)?);
 
     //     // Denoise model output using boundary conditions
     //     let denoised = ((pred_original_sample * c_out)? + (sample * c_skip)?)?;
 
-    //     println!("boundary: Denoised first few values: {}",
+    //     debug!("boundary: Denoised first few values: {}",
     //              denoised.i(0)?.i(0)?.narrow(0, 0, 5)?.narrow(1, 0, 5)?);
 
     //     // LCM doesn't add noise during inference
@@ -452,11 +455,11 @@ impl LCMScheduler {
 
     //     // let pred_prev_sample = pred_prev_sample.clamp(-1f32, 1f32)?;
 
-    //     println!(
+    //     debug!(
     //         "LCM scheduler pred_original shape: {:?}",
     //         pred_prev_sample.shape()
     //     );
-    //     println!(
+    //     debug!(
     //         "LCM scheduler pred_original first few values: {}",
     //         pred_prev_sample
     //             .i(0)?
@@ -469,7 +472,7 @@ impl LCMScheduler {
     // }
 
     pub fn add_noise(&self, original: &Tensor, noise: Tensor, timestep: usize) -> Result<Tensor> {
-        println!("Adding noise at timestep {}", timestep);
+        debug!("Adding noise at timestep {}", timestep);
         let timestep = if timestep >= self.alphas_cumprod.len() {
             self.alphas_cumprod.len() - 1 // Ensure valid range
         } else {
@@ -491,7 +494,7 @@ impl LCMScheduler {
     //     let alpha_cumprod = self.alphas_cumprod[timestep];
 
     //     // Print the alpha value to debug
-    //     println!(
+    //     debug!(
     //         "Adding noise with timestep={}, alpha={}, sqrt(alpha)={}",
     //         timestep,
     //         alpha_cumprod,
