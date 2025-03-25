@@ -1,23 +1,18 @@
 #[cfg(not(target_os = "macos"))]
-use {
-  ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args},
-};
+use ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args};
 
 use crate::state::app_config::AppConfig;
 use crate::state::app_dir::AppDataRoot;
 use crate::stubs::model_cache::ModelCache;
 use crate::stubs::prompt_cache::PromptCache;
-use crate::utils::image::decode_base64_image::decode_base64_image;
 use crate::utils::image::encode_dynamic_image_base64_png::encode_dynamic_image_base64_png;
-use crate::utils::image::encode_rgb_image_base64_png::encode_rgb_image_base64_png;
 use image::imageops::FilterType;
 use image::{DynamicImage, ImageReader, RgbImage};
 use log::{error, info};
-use ml_weights_registry::weights_registry::weights::{CLIP_JSON, LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SDXL_TURBO_CLIP_TEXT_ENCODER, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
+use ml_weights_registry::weights_registry::weights::{CLIP_JSON, LYKON_DEAMSHAPER_7_VAE, SDXL_TURBO_CLIP_TEXT_ENCODER, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 
 use once_cell::sync::Lazy;
 use std::io::Cursor;
-use std::path::PathBuf;
 use tauri::{AppHandle, State};
 
 const RANDOM_SEED: u32 = 42;

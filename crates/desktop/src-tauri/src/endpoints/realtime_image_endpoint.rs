@@ -1,7 +1,5 @@
 #[cfg(not(target_os = "macos"))]
-use {
-  ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args},
-};
+use ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args};
 
 use crate::state::app_config::AppConfig;
 use crate::state::app_dir::AppDataRoot;
