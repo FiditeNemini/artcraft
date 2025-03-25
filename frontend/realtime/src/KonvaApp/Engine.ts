@@ -628,9 +628,6 @@ export class Engine {
     });
 
     this.commandManager.createNode(shapeNode);
-
-    console.debug("Added shapenode:", shapeNode);
-    console.debug("Added node's ID:", shapeNode.kNode._id);
   }
   public addPreviewCopy(image: Image.Konva) {
     // Start of Selection

@@ -37,22 +37,13 @@ export function getImageNodeButtonStates(
   const ButtonNames = ToolbarNodeButtonNames;
   return Object.values(ButtonNames).reduce(
     (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates.TRANSFORM = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-
       switch (buttonName) {
         case ButtonNames.AI_STYLIZE:
         case ButtonNames.SEGMENTATION:
         case ButtonNames.DOWNLOAD:
         case ButtonNames.CHROMA:
         case ButtonNames.COLOR:
+        case ButtonNames.TRANSFORM:
           // hidden buttons
           buttonStates[buttonName] = {
             disabled: true,
@@ -81,22 +72,13 @@ export function getPreviewCopyNodeButtonStates(
     const ButtonNames = ToolbarNodeButtonNames;
     return Object.values(ButtonNames).reduce(
         (buttonStates, buttonName) => {
-            // transform button depends on locked state
-            if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-                buttonStates.TRANSFORM = {
-                    disabled: props.locked === "unknown" || props.locked === true,
-                    hidden: false,
-                    active: true,
-                };
-                return buttonStates;
-            }
-
             switch (buttonName) {
                 case ButtonNames.AI_STYLIZE:
                 case ButtonNames.SEGMENTATION:
                 case ButtonNames.DOWNLOAD:
                 case ButtonNames.CHROMA:
                 case ButtonNames.COLOR:
+                case ButtonNames.TRANSFORM:
                     // hidden buttons
                     buttonStates[buttonName] = {
                         disabled: true,
@@ -124,22 +106,13 @@ export function getTextNodeButtonStates(
   const ButtonNames = ToolbarNodeButtonNames;
   return Object.values(ButtonNames).reduce(
     (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates[buttonName] = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-
       switch (buttonName) {
         case ButtonNames.AI_STYLIZE:
         case ButtonNames.SEGMENTATION:
         case ButtonNames.DOWNLOAD:
         case ButtonNames.CHROMA:
         case ButtonNames.REMOVE_BACKGROUND:
+        case ButtonNames.TRANSFORM:
           // hidden buttons
           buttonStates[buttonName] = {
             disabled: true,
@@ -167,19 +140,11 @@ export function getVideoNodeButtonStates(
   const ButtonNames = ToolbarNodeButtonNames;
   return Object.values(ButtonNames).reduce(
     (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates.TRANSFORM = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
       switch (buttonName) {
         case ButtonNames.AI_STYLIZE:
         case ButtonNames.COLOR:
         case ButtonNames.REMOVE_BACKGROUND:
+        case ButtonNames.TRANSFORM:
           // soon to come feature is disabled
           buttonStates[buttonName] = {
               disabled: true,
@@ -207,22 +172,13 @@ export function getShapeNodeButtonStates(
   const ButtonNames = ToolbarNodeButtonNames;
   return Object.values(ButtonNames).reduce(
     (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates.TRANSFORM = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-
       switch (buttonName) {
         case ButtonNames.AI_STYLIZE:
         case ButtonNames.SEGMENTATION:
         case ButtonNames.DOWNLOAD:
         case ButtonNames.CHROMA:
         case ButtonNames.REMOVE_BACKGROUND:
+        case ButtonNames.TRANSFORM:
           // hidden buttons
           buttonStates[buttonName] = {
               disabled: true,
@@ -250,16 +206,6 @@ export function getMultiSelectButtonStates(
   const ButtonNames = ToolbarNodeButtonNames;
   return Object.values(ButtonNames).reduce(
     (buttonStates, buttonName) => {
-      // transform button depends on locked state
-      if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
-        buttonStates[buttonName] = {
-          disabled: props.locked === "unknown" || props.locked === true,
-          hidden: false,
-          active: true,
-        };
-        return buttonStates;
-      }
-
       switch (buttonName) {
         case ButtonNames.AI_STYLIZE:
         case ButtonNames.SEGMENTATION:
@@ -267,6 +213,7 @@ export function getMultiSelectButtonStates(
         case ButtonNames.CHROMA:
         case ButtonNames.COLOR:
         case ButtonNames.REMOVE_BACKGROUND:
+        case ButtonNames.TRANSFORM:
           // hidden buttons
           buttonStates[buttonName] = {
               disabled: true,
