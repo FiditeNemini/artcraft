@@ -13,6 +13,9 @@ const WEIGHTS_SUBDIRECTORY : &str = "weights";
 
 const TEMPORARY_SUBDIRECTORY : &str = "temp";
 
+/// Note: Tauri appends ".log" to the end of the filename.
+const LOG_FILE_NAME : &str = "application_debug";
+
 /// The path to the application data directory, which includes "asset" and "weights" data.
 #[derive(Clone)]
 pub struct AppDataRoot {
@@ -20,6 +23,8 @@ pub struct AppDataRoot {
   assets_dir: AppAssetsDir,
   weights_dir: AppWeightsDir,
   temp_dir: TemporaryDir,
+  log_file_name: PathBuf,
+  log_file_name_string: String,
 }
 
 #[derive(Clone)]
@@ -70,12 +75,19 @@ impl AppDataRoot {
     let assets_dir = AppAssetsDir::create_existing(dir.join(ASSETS_SUBDIRECTORY))?;
     let weights_dir = AppWeightsDir::create_existing(dir.join(WEIGHTS_SUBDIRECTORY))?;
     let temp_dir = TemporaryDir::create_existing(dir.join(TEMPORARY_SUBDIRECTORY))?;
+    let log_file_name = dir.join(LOG_FILE_NAME);
+    let log_file_name_string = log_file_name
+        .to_str()
+        .ok_or(anyhow!("couldn't convert log path to str"))?
+        .to_string();
 
     Ok(Self {
       path: dir,
       assets_dir,
       weights_dir,
       temp_dir,
+      log_file_name,
+      log_file_name_string,
     })
   }
   
@@ -93,6 +105,14 @@ impl AppDataRoot {
 
   pub fn path(&self) -> &Path {
     &self.path
+  }
+
+  pub fn log_file_name(&self) -> &Path {
+    &self.log_file_name
+  }
+
+  pub fn log_file_name_str(&self) -> &str {
+    &self.log_file_name_string
   }
 }
 
