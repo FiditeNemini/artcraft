@@ -25,6 +25,7 @@ import {
   isLoadingVisible,
   loadingProgress,
 } from "~/signals/uiEvents/loadingIndicator";
+import { ensureBase64Prefix } from "../EngineUtitlities/Base64Helpers";
 import {DecodeBase64ToImage} from "~/utilities/DecodeBase64ToImage.ts";
 
 interface ServerSettings {

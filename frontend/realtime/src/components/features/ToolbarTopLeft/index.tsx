@@ -1,7 +1,12 @@
 import { twMerge } from "tailwind-merge";
 import { TabSelector, TabItem } from "~/components/ui/TabSelector";
 import { useComputed } from "@preact/signals-react";
-import { appMode, dispatchUiEvents } from "~/signals";
+import {
+  appMode,
+  dispatchUiEvents,
+  GenerationLoadingState,
+  generationSignal,
+} from "~/signals";
 
 // import { paperWrapperStyles } from "~/components/styles";
 // import { faPlus, faQuestion } from "@fortawesome/pro-solid-svg-icons";
@@ -12,21 +17,26 @@ export const ToolbarTopLeft = () => {
   const activeTab = useComputed(() => appMode.value);
 
   const tabs: TabItem[] = [
-    { id: "image", label: "Image" },
+    { id: "realtime", label: "Realtime" },
     { id: "edit", label: "Edit" },
+    { id: "generate", label: "Generate" },
     // { id: "video", label: "Video" },
   ];
 
   const handleTabChange = (tabId: string) => {
     // Update the global signal
-    dispatchUiEvents.changeAppMode(tabId as "image" | "edit");
+    dispatchUiEvents.changeAppMode(tabId as "realtime" | "edit" | "generate");
   };
+
+  const generationState = generationSignal.value;
 
   console.log(appMode.value);
 
   return (
     <div
-      className={twMerge("z-20 flex h-fit w-fit items-center gap-8 pl-1 pr-4")}
+      className={twMerge(
+        "relative z-50 flex h-fit w-fit items-center gap-8 pl-1 pr-4",
+      )}
     >
       <img
         src="/brand/mira-logo.png"
@@ -38,6 +48,9 @@ export const ToolbarTopLeft = () => {
         tabs={tabs}
         activeTab={activeTab.value}
         onTabChange={handleTabChange}
+        disabled={
+          generationState.loadingState === GenerationLoadingState.GENERATING
+        }
       />
 
       {/* <ToolbarButton icon={faPlus}>

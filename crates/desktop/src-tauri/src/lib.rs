@@ -7,6 +7,7 @@ pub mod transfer;
 pub mod utils;
 
 use crate::endpoints::download_models::download_models;
+use crate::endpoints::inpaint_image_endpoint::inpaint_image;
 use crate::endpoints::flip_image::flip_image;
 use crate::endpoints::realtime_image_endpoint::infer_image;
 use crate::endpoints::remove_background_endpoint::remove_background;
@@ -71,6 +72,7 @@ pub fn run() {
       download_models,
       flip_image,
       infer_image,
+      inpaint_image,
       remove_background,
       text_to_image,
     ])
