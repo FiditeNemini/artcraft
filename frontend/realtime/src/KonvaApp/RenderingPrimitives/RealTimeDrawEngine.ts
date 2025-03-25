@@ -217,7 +217,6 @@ export class RealTimeDrawEngine {
     this.previewCopyListener();
 
     this.listenToServerEvents();
-
   }
 
   public async listenToServerEvents() {

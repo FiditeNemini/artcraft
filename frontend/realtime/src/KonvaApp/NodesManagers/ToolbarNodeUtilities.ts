@@ -30,6 +30,7 @@ export function calculateContextualsPosition(kNode: Konva.Transformer) {
   }
   return { x: px, y: py };
 }
+
 export function getImageNodeButtonStates(
   props: { locked?: boolean | "unknown" } = {},
 ) {
@@ -72,6 +73,50 @@ export function getImageNodeButtonStates(
     },
     {} as ContextualToolbarProps["buttonStates"],
   );
+}
+
+export function getPreviewCopyNodeButtonStates(
+    props: { locked?: boolean | "unknown" } = {},
+) {
+    const ButtonNames = ToolbarNodeButtonNames;
+    return Object.values(ButtonNames).reduce(
+        (buttonStates, buttonName) => {
+            // transform button depends on locked state
+            if (props.locked !== undefined && buttonName === ButtonNames.TRANSFORM) {
+                buttonStates.TRANSFORM = {
+                    disabled: props.locked === "unknown" || props.locked === true,
+                    hidden: false,
+                    active: true,
+                };
+                return buttonStates;
+            }
+
+            switch (buttonName) {
+                case ButtonNames.AI_STYLIZE:
+                case ButtonNames.SEGMENTATION:
+                case ButtonNames.DOWNLOAD:
+                case ButtonNames.CHROMA:
+                case ButtonNames.COLOR:
+                    // hidden buttons
+                    buttonStates[buttonName] = {
+                        disabled: true,
+                        hidden: true,
+                        active: false,
+                    };
+                    return buttonStates;
+
+                default:
+                    // all other buttons
+                    buttonStates[buttonName] = {
+                        disabled: false,
+                        hidden: false,
+                        active: false,
+                    };
+                    return buttonStates;
+            }
+        },
+        {} as ContextualToolbarProps["buttonStates"],
+    );
 }
 export function getTextNodeButtonStates(
   props: { locked?: boolean | "unknown" } = {},

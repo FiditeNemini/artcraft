@@ -4,11 +4,11 @@ import { MediaNode, Position, Transformation } from "../types";
 import { uiAccess, uiEvents } from "~/signals";
 import { NetworkedNode } from "../Nodes/NetworkedNode";
 import { LoadingBarStatus } from "~/components/ui";
-import { ImageNode, ShapeNode, TextNode, VideoNode } from "../Nodes";
+import { ImageNode, ShapeNode, TextNode, VideoNode, PreviewCopyNode } from "../Nodes";
 import {
   calculateContextualsPosition,
   getImageNodeButtonStates,
-  getMultiSelectButtonStates,
+  getMultiSelectButtonStates, getPreviewCopyNodeButtonStates,
   getShapeNodeButtonStates,
   getTextNodeButtonStates,
   getVideoNodeButtonStates,
@@ -292,8 +292,15 @@ export class SelectionManager {
           position: position
         });
       }
+      if (node instanceof PreviewCopyNode) {
+        showOrUpdate({
+          knodeIds: [node.kNode.id()],
+          locked: node.isLocked(),
+          buttonStates: getPreviewCopyNodeButtonStates({ locked: node.isLocked() }),
+          position: position
+        });
+      }
       else if (node instanceof ShapeNode) {
-        console.debug("Selected node is of type ShapeNode", node.kNode.id())
         showOrUpdate({
           knodeIds: [node.kNode.id()],
           locked: node.isLocked(),
