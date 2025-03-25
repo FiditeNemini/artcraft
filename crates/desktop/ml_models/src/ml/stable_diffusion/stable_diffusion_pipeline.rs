@@ -59,14 +59,6 @@ pub fn stable_diffusion_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>)
         clip_weights_path,
     } = args;
     
-    println!("Starting image generation with the following configuration:");
-    println!("  Model: {:?}", sd_version);
-    println!("  Prompt: {}", prompt);
-    println!("  Steps: {}", scheduler_steps);
-    println!("  Device: {:?}", device);
-
-    println!("Model dimensions: {}x{}", sd_config.width, sd_config.height);
-
     // TODO(bt,2025-02-18): The scheduler is `EulerAncestralDiscreteScheduler`, but we may want to port an LCM scheduler.
     //  This is a target for performance improvement
     //  See: https://github.com/huggingface/candle/issues/1331

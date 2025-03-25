@@ -20,11 +20,13 @@ use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::{infer_clip_text_embeddings, ClipArgs};
 use crate::ml::stable_diffusion::remap_lcm_strength_range::remap_lcm_strength_range;
 use image::DynamicImage;
-use log::info;
+use log::{debug, error, info};
 use ml_weights_registry::weights_registry::weights::{LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 use rand::Rng;
 
 const DEFAULT_STRENGTH : f64 = 75.0;
+
+const DEFAULT_SEED : u64 = 42;
 
 pub struct Args<'a, P1: AsRef<Path>, P2: AsRef<Path>, P3: AsRef<Path>, P4: AsRef<Path>> {
   pub image: &'a DynamicImage,
@@ -85,10 +87,9 @@ pub fn lcm_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>) -> Result<Rg
   // Use LCM Scheduler instead of Euler Ancestral for better speed and quality
   let mut scheduler = LCMScheduler::new(scheduler_steps, img2img_strength, LCMSchedulerConfig::default())?;
 
-  let seed = maybe_seed.unwrap_or_else(|| rand::thread_rng().gen());
+  //let seed = maybe_seed.unwrap_or_else(|| rand::thread_rng().gen());
+  let seed = maybe_seed.unwrap_or(DEFAULT_SEED);
 
-  let seed = 42;
-  
   device.set_seed(seed)?;
 
   let guidance_scale = match cfg_scale {
@@ -129,13 +130,13 @@ pub fn lcm_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>) -> Result<Rg
     tensor
   };
 
-  info!("Text embeddings shape: {:?}", text_embeddings.shape());
+  debug!("Text embeddings shape: {:?}", text_embeddings.shape());
 
-  info!("Loading input image into tensor...");
+  debug!("Loading input image into tensor...");
 
   let input_image = dynamic_image_to_tensor(image, &device, dtype)?;
 
-  info!("Reference image shape: {:?}", input_image.shape());
+  debug!("Reference image shape: {:?}", input_image.shape());
 
   let vae_scale = get_vae_scale(sd_version);
 
@@ -161,7 +162,7 @@ pub fn lcm_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>) -> Result<Rg
   let unet = match maybe_unet {
     Some(unet) => unet,
     None => {
-      info!("No unet found in cache; loading...");
+      info!("Building UNET model from file {:?}...", unet_path.as_ref());
 
       let in_channels = match sd_version {
         StableDiffusionVersion::XlInpaint | StableDiffusionVersion::V2Inpaint | StableDiffusionVersion::V1_5Inpaint => 9,
@@ -217,16 +218,17 @@ pub fn lcm_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>) -> Result<Rg
   let guidance_scale_embedding = scheduler.get_guidance_scale_embedding(guidance_scale, embedding_dim, &device, dtype)?;
 
   // Generate latents from input image using the LCM approach
-  info!("Generating latents from input image...");
+  debug!("Generating latents from input image...");
   let init_latents = (init_latent_dist.sample()? * vae_scale)?;
-  info!("Initial latents shape: {:?}", init_latents.shape());
+
+  debug!("Initial latents shape: {:?}", init_latents.shape());
 
   // Calculate timesteps for LCM with proper img2img handling
   let timesteps = LCMScheduler::get_timesteps_for_steps(scheduler_steps, img2img_strength);
   let t_start = timesteps[0]; // First denoising step
 
   // Add noise at the appropriate timestep for img2img
-  info!("Adding noise to latents for t_start={}", t_start);
+  debug!("Adding noise to latents for t_start={}", t_start);
   let noise = init_latents.randn_like(0f64, 1f64)?;
   let latents = scheduler.add_noise(&init_latents, noise, t_start)?;
 
@@ -244,7 +246,7 @@ pub fn lcm_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>) -> Result<Rg
     let mut noise_pred = match unet.forward_with_guidance(&latent_model_input, timestep as f64, &text_embeddings, Some(&guidance_scale_embedding)) {
       Ok(pred) => pred,
       Err(e) => {
-        info!("UNet inference failed with error: {}", e);
+        error!("UNet inference failed with error: {}", e);
         return Err(anyhow::anyhow!("UNet inference failed: {}", e));
       },
     };
@@ -259,21 +261,19 @@ pub fn lcm_pipeline<P1, P2, P3, P4>(args: Args<'_, P1, P2, P3, P4>) -> Result<Rg
     latents = scheduler.step(&noise_pred, timestep, &latents, timestep_index, scheduler_steps)?;
   }
 
-  info!("Diffusion process completed, decoding image...");
+  debug!("Diffusion process completed, decoding image...");
   let image = vae.decode(&(latents / vae_scale)?)?;
 
-  info!("VAE decode completed");
-
-  info!("Scaling image back");
+  debug!("Scaling image back");
   let image = ((image / 2.)? + 0.5)?;
 
-  info!("Normalized image values");
+  debug!("Normalized image values");
   let image = (image.clamp(0f32, 1.)? * 255.)?;
 
-  info!("Convert to int8");
+  debug!("Convert to int8");
   let image = image.to_dtype(DType::U8)?;
 
-  info!("Converted to 8-bit format");
+  debug!("Converted to 8-bit format");
 
   let image = tensor_to_image_buffer(&image.i(0)?)?;
 
