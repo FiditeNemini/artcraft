@@ -50,6 +50,8 @@ pub async fn infer_image(
   // TODO(bt,2025-02-17): Running out of vram with full image buffer size
   let mut image = image.resize(512, 512, FilterType::CatmullRom);
 
+  let seed = seed.or(model_config.seed);
+
   #[cfg(not(target_os = "macos"))]
   {
     let result = infer_image_impl(

@@ -29,7 +29,6 @@ pub fn run() {
   let config = AppConfig::init()
     .expect("config should load");
 
-
   let prompt_cache = PromptCache::with_capacity(8)
     .expect("prompt cache should load");
 
