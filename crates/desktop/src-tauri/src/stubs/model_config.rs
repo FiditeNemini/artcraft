@@ -1,5 +1,5 @@
 #[cfg(feature = "ml_models")]
-use ml_models::ml::model_config::ModelConfig;
+pub use ml_models::ml::model_config::ModelConfig;
 
 #[cfg(not(feature = "ml_models"))]
 pub struct ModelConfig {

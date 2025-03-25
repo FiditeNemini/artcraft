@@ -28,7 +28,7 @@ primitives = { path = "../../lib/data/primitives" }
 
 # Internal ML
 # TODO: Only on Windows and Linux
-ml_models = { path = "../ml_models", optional = true }
+#ml_models = { path = "../ml_models", optional = true }
 
 # External
 #openssl = { version = "0.10", features = ["vendored"] }
@@ -58,16 +58,24 @@ tokio-util = { version = "0.7", features = ["codec"] }
 
 # tracing-subscriber = { version = "0.3", features = [ "env-filter", "fmt" ] }
 
+[target.'cfg(not(target_os = "macos"))'.dependencies]
+ml_models = { path = "../ml_models" }
+
 [dev-dependencies]
 libloading = "0.8.6"
 serial_test = "3.2.0"
 assertor = "0.0.3"
 
-[target.'cfg(target_os = "macos")'.features]
-default  = []
+#[target.'cfg(target_os = "macos")'.features]
+#default  = []
+#ml_models = ["dep:ml_models"]
 
 [target.'cfg(not(target_os = "macos"))'.features]
-default  = ["dep:ml_models"]
+default  = ["ml_models"]
+#ml_models = ["dep:ml_models"]
+
+[features]
+ml_models = []
 
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.

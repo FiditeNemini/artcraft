@@ -1,5 +1,5 @@
 #[cfg(feature = "ml_models")]
-use ml_models::ml::model_cache::ModelCache;
+pub use ml_models::ml::model_cache::ModelCache;
 
 #[cfg(not(feature = "ml_models"))]
 pub struct ModelCache {
