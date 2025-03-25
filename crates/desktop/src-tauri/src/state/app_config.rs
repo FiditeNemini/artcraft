@@ -1,7 +1,7 @@
 use crate::state::app_dir::AppDataRoot;
 use crate::state::os_platform::OsPlatform;
 use crate::state::yaml_config::YamlConfig;
-use ml_models::ml::model_config::ModelConfig;
+use crate::stubs::model_config::ModelConfig;
 
 const DEFAULT_SD_IMAGE_WIDTH: usize = 1024;
 const DEFAULT_SD_IMAGE_HEIGHT: usize = 1024;

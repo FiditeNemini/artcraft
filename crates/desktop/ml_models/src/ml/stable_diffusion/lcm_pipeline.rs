@@ -1,6 +1,15 @@
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
+use anyhow::{anyhow, Error as E, Result};
+use candle_core::{DType, Device, IndexOp, Tensor, D};
+use candle_nn::VarBuilder;
+use candle_transformers::models::stable_diffusion::StableDiffusionConfig;
+use candle_transformers::models::stable_diffusion::lcm::{LCMScheduler, LCMSchedulerConfig};
+use candle_transformers::models::stable_diffusion::unet_2d::BlockConfig;
+use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModel;
+use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModelConfig;
+use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
 use crate::ml::image::tensor_to_image_buffer::{tensor_to_image_buffer, RgbImage};
 use crate::ml::model_cache::ModelCache;
@@ -10,18 +19,9 @@ use crate::ml::prompt_cache::PromptCache;
 use crate::ml::stable_diffusion::get_vae_scale::get_vae_scale;
 use crate::ml::stable_diffusion::infer_clip_text_embeddings::{infer_clip_text_embeddings, ClipArgs};
 use crate::ml::stable_diffusion::remap_lcm_strength_range::remap_lcm_strength_range;
-use crate::ml::weights_registry::weights::{LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
-use anyhow::{anyhow, Error as E, Result};
-use candle_core::{DType, Device, IndexOp, Tensor, D};
-use candle_nn::VarBuilder;
-use candle_transformers::models::stable_diffusion::lcm::{LCMScheduler, LCMSchedulerConfig};
-use candle_transformers::models::stable_diffusion::unet_2d::BlockConfig;
-use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModel;
-use candle_transformers::models::stable_diffusion::unet_2d::UNet2DConditionModelConfig;
-use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
-use candle_transformers::models::stable_diffusion::StableDiffusionConfig;
 use image::DynamicImage;
 use log::info;
+use ml_weights_registry::weights_registry::weights::{LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 use rand::Rng;
 
 const DEFAULT_STRENGTH : f64 = 75.0;

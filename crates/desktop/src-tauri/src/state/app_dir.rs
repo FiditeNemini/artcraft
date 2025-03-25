@@ -2,7 +2,7 @@ use crate::state::expanduser::expanduser;
 use crate::state::os_platform::OsPlatform;
 use anyhow::anyhow;
 use directories::UserDirs;
-use ml_models::ml::weights_registry::weight_descriptor::WeightDescriptor;
+use ml_weights_registry::weights_registry::weight_descriptor::WeightDescriptor;
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 use tempfile::{Builder, NamedTempFile};

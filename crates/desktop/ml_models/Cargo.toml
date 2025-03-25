@@ -21,6 +21,7 @@ normal = ["my-workspace-hack"]
 # Internal
 filesys = { path = "../../lib/files/filesys" }
 memory_caching = { path = "../../lib/caching/memory_caching" }
+ml_weights_registry = { path = "../ml_weights_registry" }
 primitives = { path = "../../lib/data/primitives" }
 
 # Bypass cudarc issues on Windows https://github.com/coreylowman/cudarc/issues/332

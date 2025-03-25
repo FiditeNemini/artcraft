@@ -5,4 +5,3 @@ pub mod model_config;
 pub mod model_file;
 pub mod prompt_cache;
 pub mod stable_diffusion;
-pub mod weights_registry;

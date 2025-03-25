@@ -1,16 +1,22 @@
+#[cfg(feature = "ml_models")]
+use {
+  ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args},
+};
+
 use crate::state::app_config::AppConfig;
 use crate::state::app_dir::AppDataRoot;
+use crate::stubs::model_cache::ModelCache;
+use crate::stubs::prompt_cache::PromptCache;
 use crate::utils::image::decode_base64_image::decode_base64_image;
+use crate::utils::image::encode_dynamic_image_base64_png::encode_dynamic_image_base64_png;
 use crate::utils::image::encode_rgb_image_base64_png::encode_rgb_image_base64_png;
 use image::imageops::FilterType;
 use image::{DynamicImage, RgbImage};
 use log::{error, info};
-use ml_models::ml::model_cache::ModelCache;
-use ml_models::ml::prompt_cache::PromptCache;
-use ml_models::ml::stable_diffusion::lcm_pipeline::{lcm_pipeline, Args};
-use ml_models::ml::weights_registry::weights::{CLIP_JSON, LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SDXL_TURBO_CLIP_TEXT_ENCODER, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
+use ml_weights_registry::weights_registry::weights::{CLIP_JSON, LYKON_DEAMSHAPER_7_TEXT_ENCODER_FP16, LYKON_DEAMSHAPER_7_VAE, SDXL_TURBO_CLIP_TEXT_ENCODER, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 use std::path::PathBuf;
 use tauri::{AppHandle, State};
+
 
 const PROMPT_FILENAME : &str = "prompt.txt";
 const PROMPT: &str = "shiba inu, cute dog, detailed, walking in a wooded forest, photorealistic, 8k";
@@ -43,27 +49,30 @@ pub async fn infer_image(
     .map_err(|err| format!("Couldn't hydrate image from base64: {}", err))?;
   
   // TODO(bt,2025-02-17): Running out of vram with full image buffer size
-  let image = image.resize(512, 512, FilterType::CatmullRom);
+  let mut image = image.resize(512, 512, FilterType::CatmullRom);
 
-  let result = do_infer_image(
-    &prompt, 
-    image, 
-    strength, 
-    &model_config, 
-    &model_cache, 
-    prompt_cache, 
-    &app_data_root
-  ).await;
-  
-  let image = match result {
-    Ok(image) => image,
-    Err(err) => {
-      error!("There was an error generating the image: {:?}", err);
-      return Err(format!("There was an error generating the image: {}", err));
-    }
-  };
+  #[cfg(feature = "ml_models")]
+  {
+    let result = infer_image_impl(
+      &prompt,
+      image,
+      strength,
+      &model_config,
+      &model_cache,
+      prompt_cache,
+      &app_data_root
+    ).await;
 
-  let bytes = encode_rgb_image_base64_png(image)
+    image = match result {
+      Ok(img) => DynamicImage::ImageRgb8(img),
+      Err(err) => {
+        error!("There was an error generating the image: {:?}", err);
+        return Err(format!("There was an error generating the image: {}", err));
+      }
+    };
+  }
+
+  let bytes = encode_dynamic_image_base64_png(image)
     .map_err(|err| format!("failure to encode image: {:?}", err))?;
 
   info!("Inference successful; image converted to base64, serving back to browser...");
@@ -71,7 +80,8 @@ pub async fn infer_image(
   Ok(bytes)
 }
 
-async fn do_infer_image(
+#[cfg(feature = "ml_models")]
+async fn infer_image_impl(
   prompt: &str,
   image: DynamicImage,
   strength: Option<f64>,

@@ -672,6 +672,7 @@ dependencies = [
  "log",
  "memory_caching",
  "ml_models",
+ "ml_weights_registry",
  "once_cell",
  "primitives",
  "rand 0.8.5",
@@ -6819,6 +6820,7 @@ dependencies = [
  "libloading 0.8.6",
  "log",
  "memory_caching",
+ "ml_weights_registry",
  "ndarray",
  "nvidia-checker",
  "once_cell",
@@ -6837,6 +6839,14 @@ dependencies = [
  "tokenizers 0.15.2",
  "tokio",
  "tokio-util",
+]
+
+[[package]]
+name = "ml_weights_registry"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "const_format",
 ]
 
 [[package]]

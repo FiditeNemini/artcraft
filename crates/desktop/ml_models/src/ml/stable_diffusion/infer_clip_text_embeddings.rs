@@ -7,7 +7,7 @@ use candle_transformers::models::stable_diffusion;
 use std::path::{Path, PathBuf};
 
 use crate::ml::model_file::{ModelFile, StableDiffusionVersion};
-use crate::ml::weights_registry::weights::{CLIP_JSON, SDXL_TURBO_CLIP_TEXT_ENCODER, SDXL_TURBO_CLIP_TEXT_ENCODER_2};
+use ml_weights_registry::weights_registry::weights::{CLIP_JSON, SDXL_TURBO_CLIP_TEXT_ENCODER, SDXL_TURBO_CLIP_TEXT_ENCODER_2};
 use anyhow::Error as E;
 use candle_core::{DType, Device, Module, Tensor, D};
 use log::info;
