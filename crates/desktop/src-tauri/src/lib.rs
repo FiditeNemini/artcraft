@@ -7,10 +7,11 @@ pub mod transfer;
 pub mod utils;
 
 use crate::endpoints::download_models::download_models;
-use crate::endpoints::inpaint_image_endpoint::inpaint_image;
 use crate::endpoints::flip_image::flip_image;
+use crate::endpoints::inpaint_image_endpoint::inpaint_image;
 use crate::endpoints::realtime_image_endpoint::infer_image;
 use crate::endpoints::remove_background_endpoint::remove_background;
+use crate::endpoints::save_image_endpoint::save_image;
 use crate::endpoints::text_to_image_endpoint::text_to_image;
 use crate::state::app_config::AppConfig;
 use crate::stubs::model_cache::ModelCache;
@@ -75,8 +76,9 @@ pub fn run() {
       flip_image,
       infer_image,
       inpaint_image,
-      text_to_image,
       remove_background,
+      save_image,
+      text_to_image,
       text_to_image,
     ])
     .run(tauri::generate_context!())

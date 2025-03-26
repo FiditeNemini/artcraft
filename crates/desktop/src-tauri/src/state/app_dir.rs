@@ -4,6 +4,7 @@ use anyhow::anyhow;
 use directories::UserDirs;
 use ml_weights_registry::weights_registry::weight_descriptor::WeightDescriptor;
 use std::path::{Path, PathBuf};
+use chrono::{DateTime, Local};
 use tempdir::TempDir;
 use tempfile::{Builder, NamedTempFile};
 
@@ -136,6 +137,18 @@ impl AppAssetsDir {
 
   pub fn path(&self) -> &Path {
     &self.path
+  }
+  
+  /// Return the current date asset directory
+  /// If it doesn't exist, create it.
+  pub fn make_or_get_current_date_dir(&self) -> anyhow::Result<PathBuf> {
+    let format: DateTime<Local> = Local::now();
+    let date_directory_name = format.format("%Y-%d-%m").to_string();
+    let full_path = self.path.join(date_directory_name);
+    if !full_path.exists() {
+      std::fs::create_dir(&full_path)?;
+    }
+    Ok(full_path)
   }
 }
 
