@@ -1,20 +1,12 @@
-import { twMerge } from "tailwind-merge";
+import {twMerge} from "tailwind-merge";
 
-import {
-  faLockKeyholeOpen,
-  faLockKeyhole,
-  faUnlockKeyhole,
-  faPalette,
-} from "@fortawesome/pro-solid-svg-icons";
-import {
-  ToolbarButton,
-  ToolbarButtonProps,
-} from "~/components/features/ToolbarButton";
-import { paperWrapperStyles, toolTipStyles } from "~/components/styles";
-import { ToolbarNodeButtonNames } from "./enums";
-import { ToolbarNodeButtonData } from "./data";
-import { ColorPicker } from "~/components/ui/TextEditor/ColorPicker";
-import { DEFAULT_PAINT_COLOR } from "~/signals/uiEvents/toolbarMain/paintMode";
+import {faPalette,} from "@fortawesome/pro-solid-svg-icons";
+import {ToolbarButton, ToolbarButtonProps,} from "~/components/features/ToolbarButton";
+import {paperWrapperStyles} from "~/components/styles";
+import {ToolbarNodeButtonNames} from "./enums";
+import {ToolbarNodeButtonData} from "./data";
+import {ColorPicker} from "~/components/ui/TextEditor/ColorPicker";
+import {DEFAULT_PAINT_COLOR} from "~/signals/uiEvents/toolbarMain/paintMode";
 
 export interface ToolbarNodeProps {
   disabled?: boolean;
@@ -39,15 +31,6 @@ export const ToolbarNode = ({
   color = DEFAULT_PAINT_COLOR,
   onColorChange = () => { },
 }: ToolbarNodeProps) => {
-  const handleOnLockClicked: React.MouseEventHandler<HTMLButtonElement> = (
-    e,
-  ) => {
-    if (onLockClicked && locked !== "unknown") {
-      onLockClicked(e, locked ?? false);
-    }
-  };
-  const lockDisabledOrUnknown = lockDisabled || locked === "unknown";
-  const lockText = locked === "unknown" ? "Unavailable" : locked ? "Unlock" : "Lock"
   return (
     <div
       className={twMerge(
@@ -56,28 +39,6 @@ export const ToolbarNode = ({
         "flex flex-col gap-1 transition",
       )}
     >
-      <ToolbarButton
-        buttonProps={{
-          className: twMerge(
-            locked && "text-primary hover:bg-primary hover:text-white",
-            lockDisabledOrUnknown &&
-            "text-secondary-300 hover:text-secondary-300",
-            "w-full p-2"
-          ),
-          disabled: lockDisabledOrUnknown,
-        }}
-        icon={
-          locked === "unknown"
-            ? faUnlockKeyhole
-            : locked
-              ? faLockKeyhole
-              : faLockKeyholeOpen
-        }
-        onClick={handleOnLockClicked}
-      >
-        <span className="text-[16px]">{lockText}</span>
-      </ToolbarButton>
-      <span className="border-r border-r-ui-border" />
       {ToolbarNodeButtonData.map((buttonDatum, idx) => {
         const buttonProps = buttonsProps?.[buttonDatum.name];
 
