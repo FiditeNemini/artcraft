@@ -27,6 +27,7 @@ import {
 } from "~/signals/uiEvents/loadingIndicator";
 import { ensureBase64Prefix } from "../EngineUtitlities/Base64Helpers";
 import { DecodeBase64ToImage } from "~/utilities/DecodeBase64ToImage.ts";
+import {EncodeImageBitmapToBase64} from "~/utilities/EncodeImageBitmapToBase64.ts";
 
 interface ServerSettings {
   model_path: string;
@@ -902,22 +903,11 @@ export class RealTimeDrawEngine {
       return;
     }
 
-    try {
-      const canvas = document.createElement("canvas");
-      canvas.width = this.outputBitmap.width;
-      canvas.height = this.outputBitmap.height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Failed to get 2D context");
+    const base64Bitmap = await EncodeImageBitmapToBase64(this.outputBitmap);
 
-      ctx.drawImage(this.outputBitmap, 0, 0);
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b!), "image/png");
-      });
-
-      await FileUtilities.blobToFileJpeg(blob, "output");
-    } catch (error) {
-      console.error("Error saving output:", error);
-    }
+    const saveResponse = await invoke("save_image", {
+      image: base64Bitmap,
+    });
   }
 
   public async render() {
