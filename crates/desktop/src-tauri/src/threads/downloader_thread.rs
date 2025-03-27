@@ -93,6 +93,7 @@ pub async fn downloader_thread(app_data_root: AppDataRoot, app: AppHandle) -> ! 
       WeightFunction::Unet => NotificationModelType::Unet,
       WeightFunction::Vae => NotificationModelType::Vae,
       WeightFunction::ImageSegmentation => NotificationModelType::ImageSegmentation,
+      WeightFunction::ImageGeneration => NotificationModelType::ImageSegmentation, // TODO FIX
     };
 
     let result = app.emit(NOTIFICATION_CHANNEL_NAME, NotificationEvent::ModelDownloadStarted {
