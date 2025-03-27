@@ -40,7 +40,6 @@ pub const LMZ_CANDLE_FLUX_SCHNELL_QUANTIZED_GGUF : WeightDescriptor = weight!(
   WeightFunction::ImageGeneration
 );
 
-// TODO: Still uploading
 /// https://huggingface.co/google/t5-v1_1-xxl/tree/main
 /// NB: I couldn't find the safetensors file here
 /// NB: This should live under "refs/pr/2"

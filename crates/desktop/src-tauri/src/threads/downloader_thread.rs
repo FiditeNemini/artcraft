@@ -13,6 +13,7 @@ use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter};
 use tempfile::NamedTempFile;
 use tokio::task::JoinHandle;
+use ml_weights_registry::weights_registry::flux_weights::{FLUX_SCHNELL, FLUX_SCHNELL_AUTOENCODER, GOOGLE_T5_V1_1_XXL_CONFIG, GOOGLE_T5_V1_1_XXL_MODEL, LMZ_CANDLE_FLUX_SCHNELL_QUANTIZED_GGUF, LMZ_T5_TOKENIZER_JSON, OPENAI_CLIP_VIT_P14_MODEL, OPENAI_CLIP_VIT_P14_TOKENIZER_JSON};
 
 const NOTIFICATION_CHANNEL_NAME : &str = "notification";
 const MAX_FILES : usize = 8;
@@ -49,6 +50,16 @@ pub async fn downloader_thread(app_data_root: AppDataRoot, app: AppHandle) -> ! 
   //download_queue.push_back(SDXL_TURBO_CLIP_TEXT_ENCODER_2); // TODO(bt): REMOVE
   //download_queue.push_back(SDXL_TURBO_VAE); // TODO(bt): REMOVE
   //download_queue.push_back(SDXL_TURBO_UNET); // TODO(bt): REMOVE
+
+  // Flux:
+  download_queue.push_back(FLUX_SCHNELL);
+  download_queue.push_back(FLUX_SCHNELL_AUTOENCODER);
+  download_queue.push_back(LMZ_CANDLE_FLUX_SCHNELL_QUANTIZED_GGUF);
+  download_queue.push_back(GOOGLE_T5_V1_1_XXL_MODEL);
+  download_queue.push_back(GOOGLE_T5_V1_1_XXL_CONFIG);
+  download_queue.push_back(LMZ_T5_TOKENIZER_JSON);
+  download_queue.push_back(OPENAI_CLIP_VIT_P14_MODEL);
+  download_queue.push_back(OPENAI_CLIP_VIT_P14_TOKENIZER_JSON);
 
   let mut handles = FuturesUnordered::new();
 
