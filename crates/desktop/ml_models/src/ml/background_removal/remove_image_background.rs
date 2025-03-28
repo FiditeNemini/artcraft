@@ -3,6 +3,7 @@ use image::{imageops, DynamicImage};
 use ndarray::{Array, CowArray};
 use ort::Value;
 use std::path::Path;
+use image_algorithms::remove_image_border::remove_image_border;
 
 pub async fn remove_image_background<P: AsRef<Path>>(model_path: P, image: DynamicImage) -> anyhow::Result<DynamicImage> {
   // NB: Real time needed cuDNN 9, but this uses cuDNN 8:
@@ -11,6 +12,10 @@ pub async fn remove_image_background<P: AsRef<Path>>(model_path: P, image: Dynam
   // update-alternatives: using /usr/include/x86_64-linux-gnu/cudnn_v8.h to provide /usr/include/cudnn.h (libcudnn) in manual mode
   let session = onnx_session(model_path.as_ref())?;
   let image = process_dynamic_image(&session, image)?;
+  
+  // Crop transparent border cruft away.
+  let image = remove_image_border(&image)?;
+  
   Ok(image)
 }
 

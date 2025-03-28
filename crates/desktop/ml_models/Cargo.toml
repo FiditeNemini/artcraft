@@ -20,6 +20,7 @@ normal = ["my-workspace-hack"]
 
 # Internal
 filesys = { path = "../../lib/files/filesys" }
+image_algorithms = { path = "../../lib/image_algorithms" }
 memory_caching = { path = "../../lib/caching/memory_caching" }
 ml_weights_registry = { path = "../ml_weights_registry" }
 primitives = { path = "../../lib/data/primitives" }
