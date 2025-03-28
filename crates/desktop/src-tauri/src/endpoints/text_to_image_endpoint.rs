@@ -1,21 +1,19 @@
 #[cfg(not(target_os = "macos"))]
-use ml_models::ml::flux::flux_pipeline::{flux_pipeline, FluxPipelineArgs, FluxModel};
+use ml_models::ml::flux::flux_pipeline::{flux_pipeline, FluxModel, FluxPipelineArgs};
 
 use crate::state::app_config::AppConfig;
-use crate::state::app_dir::AppDataRoot;
+use crate::state::app_dir::{AppDataRoot, AppWeightsDir};
 use crate::stubs::model_cache::ModelCache;
 use crate::stubs::prompt_cache::PromptCache;
 use crate::utils::image::encode_dynamic_image_base64_png::encode_dynamic_image_base64_png;
 use image::imageops::FilterType;
 use image::{DynamicImage, ImageReader, RgbImage};
 use log::{error, info};
-use ml_weights_registry::weights_registry::weights::{CLIP_JSON, LYKON_DEAMSHAPER_7_VAE, SDXL_TURBO_CLIP_TEXT_ENCODER, SIMIANLUO_LCM_DREAMSHAPER_V7_UNET};
 
+use ml_weights_registry::weights_registry::flux_weights::{FLUX_DEV, FLUX_SCHNELL, FLUX_SCHNELL_AUTOENCODER, GOOGLE_T5_V1_1_XXL_CONFIG, GOOGLE_T5_V1_1_XXL_MODEL, LMZ_CANDLE_FLUX_SCHNELL_QUANTIZED_GGUF, LMZ_T5_TOKENIZER_JSON, OPENAI_CLIP_VIT_P14_MODEL, OPENAI_CLIP_VIT_P14_TOKENIZER_JSON};
 use once_cell::sync::Lazy;
 use std::io::Cursor;
 use tauri::{AppHandle, State};
-
-const RANDOM_SEED: u32 = 42;
 
 const STRENGTH: f64 = 100.0;
 const PNG_BYTES : &[u8] = include_bytes!("../../binary_includes/1024.png");
@@ -36,6 +34,7 @@ pub async fn text_to_image(
   model_cache: State<'_, ModelCache>,
   prompt_cache: State<'_, PromptCache>,
   app: AppHandle,
+  app_data_root: State<'_, AppDataRoot>,
 ) -> Result<String, String> {
   info!("text_to_image endpoint called.");
 
@@ -50,6 +49,7 @@ pub async fn text_to_image(
       &model_config,
       &model_cache,
       prompt_cache,
+      app_data_root.weights_dir(),
       app,
     ).await;
 
@@ -78,6 +78,7 @@ async fn text_to_image_impl(
   config: &AppConfig,
   model_cache: &ModelCache,
   prompt_cache: State<'_, PromptCache>,
+  weights_dir: &AppWeightsDir,
   app: AppHandle,
 ) -> Result<RgbImage, String> {
   
@@ -96,6 +97,14 @@ async fn text_to_image_impl(
     seed: None,
     use_quantized_model: Some(true),
     model_config: &config.model_config,
+    flux_dev_or_schnell_path: &weights_dir.weight_path(&FLUX_SCHNELL),
+    flux_schnell_quantized_gguf: &weights_dir.weight_path(&LMZ_CANDLE_FLUX_SCHNELL_QUANTIZED_GGUF),
+    flux_autoencoder_path: &weights_dir.weight_path(&FLUX_SCHNELL_AUTOENCODER),
+    google_t5_model_path: &weights_dir.weight_path(&GOOGLE_T5_V1_1_XXL_MODEL),
+    google_t5_config_path: &weights_dir.weight_path(&GOOGLE_T5_V1_1_XXL_CONFIG),
+    lmz_t5_tokenizer_path: &weights_dir.weight_path(&LMZ_T5_TOKENIZER_JSON),
+    openai_clip_model_path: &weights_dir.weight_path(&OPENAI_CLIP_VIT_P14_MODEL),
+    openai_clip_tokenizer_json_path: &weights_dir.weight_path(&OPENAI_CLIP_VIT_P14_TOKENIZER_JSON),
   };
 
   let image = flux_pipeline(args)

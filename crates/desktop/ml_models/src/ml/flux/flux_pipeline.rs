@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use crate::ml::image::dynamic_image_to_tensor::dynamic_image_to_tensor;
@@ -11,7 +12,7 @@ use candle_core::{DType, IndexOp, Tensor, D, Device, Module};
 use candle_transformers::models::stable_diffusion::vae::{AutoEncoderKL, DiagonalGaussianDistribution};
 use candle_transformers::models::stable_diffusion::lcm::LCMScheduler;
 use image::DynamicImage;
-use log::info;
+use log::{debug, info};
 use rand::Rng;
 use tauri::{AppHandle, Emitter};
 use candle_transformers::models::{clip, t5, flux};
@@ -38,10 +39,41 @@ pub struct FluxPipelineArgs<'a> {
   pub seed: Option<u64>,
   pub use_quantized_model: Option<bool>,
   pub model_config: &'a ModelConfig,
+  pub flux_dev_or_schnell_path: &'a Path,
+  pub flux_schnell_quantized_gguf: &'a Path,
+  pub flux_autoencoder_path: &'a Path,
+  pub google_t5_model_path: &'a Path,
+  pub google_t5_config_path: &'a Path,
+  pub lmz_t5_tokenizer_path: &'a Path,
+  pub openai_clip_model_path: &'a Path,
+  pub openai_clip_tokenizer_json_path: &'a Path,
 }
 
 pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
-  let FluxPipelineArgs { prompt, model_cache, prompt_cache, app, image, flux_model, active_blocks, use_cuda_stream, prefetch_next_batch, use_full_gpu, img2img_strength, seed, use_quantized_model, model_config } = args;
+  let FluxPipelineArgs { 
+    prompt, 
+    model_cache, 
+    prompt_cache, 
+    app, 
+    image, 
+    flux_model, 
+    active_blocks, 
+    use_cuda_stream, 
+    prefetch_next_batch, 
+    use_full_gpu, 
+    img2img_strength, 
+    seed, 
+    use_quantized_model, 
+    model_config ,
+    flux_dev_or_schnell_path,
+    flux_schnell_quantized_gguf,
+    flux_autoencoder_path,
+    google_t5_model_path,
+    google_t5_config_path,
+    lmz_t5_tokenizer_path,
+    openai_clip_model_path,
+    openai_clip_tokenizer_json_path,
+  } = args;
 
   if use_quantized_model.unwrap_or(false) {
     #[cfg(feature = "cuda")]
@@ -55,14 +87,15 @@ pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
   let device = model_config.device.clone();
   let dtype = device.bf16_default_to_f32();
 
-  println!("Starting image generation with FLUX model:");
-  println!("  Model: {:?}", flux_model);
-  println!("  Prompt: {}", prompt);
-  println!("  Dimensions: {}x{}", width, height);
-  println!("  Device: {:?}", model_config.device);
+  info!("Starting image generation with FLUX model:");
+  info!("  Model: {:?}", flux_model);
+  info!("  Prompt: {}", prompt);
+  info!("  Dimensions: {}x{}", width, height);
+  info!("  Device: {:?}", model_config.device);
 
   let seed_value = seed.unwrap_or_else(|| rand::thread_rng().gen());
   device.set_seed(seed_value)?;
+  
   info!("Using seed: {}", seed_value);
 
   // Setup FLUX model configuration
@@ -71,48 +104,30 @@ pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
     FluxModel::Schnell => flux::model::Config::schnell(),
   };
 
-  let bf_repo = match flux_model {
-    FluxModel::Dev => model_config.hf_api.repo(hf_hub::Repo::model("black-forest-labs/FLUX.1-dev".to_string())),
-    FluxModel::Schnell => model_config.hf_api.repo(hf_hub::Repo::model("black-forest-labs/FLUX.1-schnell".to_string())),
-  };
   // Get T5 embeddings
-  println!("Generating T5 embeddings for prompt...");
   let t5_emb = {
-    let repo = model_config.hf_api.repo(hf_hub::Repo::with_revision("google/t5-v1_1-xxl".to_string(), hf_hub::RepoType::Model, "refs/pr/2".to_string()));
-    println!("Downloading model (1)");
-    let model_file = repo.get("model.safetensors")?;
-    println!("model downloaded (1)");
-    let vb = unsafe { VarBuilder::from_mmaped_safetensors(&[model_file], dtype , &device)? };
-    println!("Downloading model (2)");
-    let config_filename = repo.get("config.json")?;
-    println!("model downloaded (2)");
-    let config = std::fs::read_to_string(config_filename)?;
+    info!("Generating T5 embeddings for prompt...");
+    let vb = unsafe { VarBuilder::from_mmaped_safetensors(&[google_t5_model_path], dtype , &device)? };
+    let config = std::fs::read_to_string(google_t5_config_path)?;
     let config: t5::Config = serde_json::from_str(&config)?;
-    let mut model = t5::T5EncoderModel::load(vb, &config)?;
-    println!("Downloading model (3)");
-    let tokenizer_filename = model_config.hf_api.model("lmz/mt5-tokenizers".to_string()).get("t5-v1_1-xxl.tokenizer.json")?;
-    println!("model downloaded (3)");
-    let tokenizer = Tokenizer::from_file(tokenizer_filename).map_err(E::msg)?;
 
-    println!("encoding");
+    let mut model = t5::T5EncoderModel::load(vb, &config)?;
+    let tokenizer = Tokenizer::from_file(lmz_t5_tokenizer_path).map_err(E::msg)?;
+
     let mut tokens = tokenizer.encode(prompt.as_str(), true).map_err(E::msg)?.get_ids().to_vec();
     tokens.resize(256, 0);
     let input_token_ids = Tensor::new(&tokens[..], &device)?.unsqueeze(0)?;
 
-    println!("forward");
     model.forward(&input_token_ids)?
   };
-  println!("T5 embeddings generated");
+  
+  info!("T5 embeddings generated");
 
   // Get CLIP embeddings
-  println!("Generating CLIP embeddings for prompt...");
   let clip_emb = {
-    let repo = model_config.hf_api.repo(hf_hub::Repo::model(
-        "openai/clip-vit-large-patch14".to_string(),
-    ));
-    let model_file = repo.get("model.safetensors")?;
+    info!("Generating CLIP embeddings for prompt...");
     let vb =
-        unsafe { VarBuilder::from_mmaped_safetensors(&[model_file], dtype, &device)? };
+        unsafe { VarBuilder::from_mmaped_safetensors(&[openai_clip_model_path], dtype, &device)? };
     // https://huggingface.co/openai/clip-vit-large-patch14/blob/main/config.json
     let config = clip::text_model::ClipTextConfig {
         vocab_size: 49408,
@@ -127,37 +142,34 @@ pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
     };
     let model =
         clip::text_model::ClipTextTransformer::new(vb.pp("text_model"), &config)?;
-    let tokenizer_filename = repo.get("tokenizer.json")?;
-    let tokenizer = Tokenizer::from_file(tokenizer_filename).map_err(E::msg)?;
+    let tokenizer = Tokenizer::from_file(openai_clip_tokenizer_json_path).map_err(E::msg)?;
     let tokens = tokenizer
         .encode(prompt.as_str(), true)
         .map_err(E::msg)?
         .get_ids()
         .to_vec();
     let input_token_ids = Tensor::new(&tokens[..], &device)?.unsqueeze(0)?;
-
-
     model.forward(&input_token_ids)?
   };
-  println!("CLIP embeddings generated");
+  info!("CLIP embeddings generated");
 
   // Process input image to tensor
-  println!("Converting input image to tensor...");
+  info!("Converting input image to tensor...");
   let img_tensor = dynamic_image_to_tensor(image, &device, dtype)?;
-  println!("Image tensor shape: {:?}", img_tensor.shape());
+  info!("Image tensor shape: {:?}", img_tensor.shape());
 
   // Create initial noise - this is important to match the expected format
-  println!("Generating initial noise for FLUX...");
+  info!("Generating initial noise for FLUX...");
   let initial_tensor = flux::sampling::get_noise(1, height, width, &device)?.to_dtype(dtype)?;
-  println!("Initial tensor shape: {:?}", initial_tensor.shape());
+  info!("Initial tensor shape: {:?}", initial_tensor.shape());
   
   // Blend initial noise with input image if img2img_strength is specified
   let initial_tensor = if let Some(strength) = img2img_strength {
     if strength > 0.0 && strength < 1.0 {
-      println!("Using img2img with strength: {}", strength);
+      info!("Using img2img with strength: {}", strength);
       // Reshape the input tensor to match the noise tensor dimensions
       let adjusted_img = if img_tensor.shape() != initial_tensor.shape() {
-        println!("Reshaping input image to match noise dimensions...");
+        info!("Reshaping input image to match noise dimensions...");
         // You may need more complex reshaping logic here depending on your use case
         let (_, c, h, w) = initial_tensor.dims4()?;
         img_tensor.upsample_nearest2d(h, w)?
@@ -177,10 +189,10 @@ pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
   } else {
     initial_tensor
   };
-  println!("Final initial tensor shape: {:?}", initial_tensor.shape());
+  info!("Final initial tensor shape: {:?}", initial_tensor.shape());
 
   // Create FLUX state
-  println!("Creating FLUX state...");
+  info!("Creating FLUX state...");
   let state = if quantized {
     flux::sampling::State::new(
         &t5_emb.to_dtype(DType::F32)?,
@@ -190,7 +202,7 @@ pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
   } else {
     flux::sampling::State::new(&t5_emb, &clip_emb, &initial_tensor)?
   };
-  println!("{state:?}");
+  info!("{state:?}");
 
   // Set appropriate timesteps based on model
   let timesteps = match flux_model {
@@ -198,98 +210,88 @@ pub fn flux_pipeline(args: FluxPipelineArgs<'_>) -> Result<RgbImage> {
     FluxModel::Schnell => flux::sampling::get_schedule(4, None),
   };
 
-  println!("Starting FLUX denoising with timesteps: {:?}", timesteps);
+  info!("Starting FLUX denoising with timesteps: {:?}", timesteps);
 
   // Actual model loading and inference
   let img_latent = if quantized {
     // Quantized model path
-    println!("Loading quantized FLUX model...");
+    info!("Loading quantized FLUX model...");
     let model_file = match flux_model {
-      FluxModel::Schnell => model_config.hf_api.repo(hf_hub::Repo::model("lmz/candle-flux".to_string())).get("flux1-schnell.gguf")?,
+      FluxModel::Schnell => flux_schnell_quantized_gguf,
       FluxModel::Dev => return Err(anyhow!("Quantized model not available for FLUX.1-dev")),
     };
 
-    println!("Loading quantized model from {}", model_file.to_str().unwrap());
+    info!("Loading quantized model from {}", model_file.to_str().unwrap());
 
     let vb = candle_transformers::quantized_var_builder::VarBuilder::from_gguf(model_file, &device)?;
     let mut model = flux::quantized_model::Flux::new(&flux_config, vb)?;
-    println!("Quantized model loaded on {:?}", device);
-
+    info!("Quantized model loaded on {:?}", device);
 
     // Run denoising
-    println!("Running denoising...");
+    info!("Running denoising...");
     let img_latent = flux::sampling::denoise(&mut model, &state.img, &state.img_ids, &state.txt, &state.txt_ids, &state.vec, &timesteps, 4.)?.to_dtype(dtype)?;
-    println!("Denoising completed");
+    info!("Denoising completed");
     img_latent
   } else {
     // Full precision model
-    println!("Loading FLUX model...");
-    let model_file = match flux_model {
-      FluxModel::Schnell => bf_repo.get("flux1-schnell.safetensors")?,
-      FluxModel::Dev => bf_repo.get("flux1-dev.safetensors")?,
-    };
-
+    info!("Loading FLUX model...");
 
     let mut model = if use_full_gpu.unwrap_or(false) {
       // Load entire model on GPU
-      println!("Loading entire model directly to GPU...");
-      let gpu_vb = unsafe { VarBuilder::from_mmaped_safetensors(&[model_file], dtype, &device)? };
+      info!("Loading entire model directly to GPU...");
+      let gpu_vb = unsafe { VarBuilder::from_mmaped_safetensors(&[flux_dev_or_schnell_path], dtype, &device)? };
       let mut model = flux::model::Flux::new(&flux_config, gpu_vb)?;
       model.set_use_device_management(false);
       model
     } else {
       // Use memory-efficient approach with blocks on CPU
-      println!("Using memory-efficient approach with blocks on CPU...");
+      info!("Using memory-efficient approach with blocks on CPU...");
       let cpu_device = candle_core::Device::Cpu;
-      let cpu_vb = unsafe { VarBuilder::from_mmaped_safetensors(&[model_file], dtype, &cpu_device)? };
+      let cpu_vb = unsafe { VarBuilder::from_mmaped_safetensors(&[flux_dev_or_schnell_path], dtype, &cpu_device)? };
       let mut model = flux::model::Flux::new_with_gpu_core(&flux_config, cpu_vb, &device)?;
 
       // Set active blocks
       let active_blocks_count = active_blocks.unwrap_or(1);
       model.set_max_active_blocks(active_blocks_count);
-      println!("Using {} active blocks on GPU", active_blocks_count);
+      info!("Using {} active blocks on GPU", active_blocks_count);
 
       // Enable prefetching if requested
       if prefetch_next_batch.unwrap_or(false) {
         model.set_prefetch_next_batch(true);
-        println!("Prefetching enabled - will overlap transfers with computation");
+        info!("Prefetching enabled - will overlap transfers with computation");
       }
 
       model
     };
 
-
     // Run denoising
     flux::sampling::denoise(&mut model, &state.img, &state.img_ids, &state.txt, &state.txt_ids, &state.vec, &timesteps, 4.)?
   };
 
-  println!("FLUX denoising completed, unpacking latent image...");
+  info!("FLUX denoising completed, unpacking latent image...");
   let img_unpacked = flux::sampling::unpack(&img_latent, height, width)?;
 
   // Load autoencoder for final decoding
-  println!("Loading autoencoder for final decoding...");
+  info!("Loading autoencoder for final decoding...");
+  
   let ae_config = match flux_model {
     FluxModel::Dev => flux::autoencoder::Config::dev(),
     FluxModel::Schnell => flux::autoencoder::Config::schnell(),
   };
 
-  let model_file = bf_repo.get("ae.safetensors")?;
-
-
-  let vb = unsafe { VarBuilder::from_mmaped_safetensors(&[model_file], dtype, &device)? };
+  let vb = unsafe { VarBuilder::from_mmaped_safetensors(&[flux_autoencoder_path], dtype, &device)? };
   let ae_model = flux::autoencoder::AutoEncoder::new(&ae_config, vb)?;
 
-
-  println!("Decoding final image...");
+  info!("Decoding final image...");
   let img = ae_model.decode(&img_unpacked)?;
 
   // Convert tensor to image
-  println!("Converting tensor to image...");
+  info!("Converting tensor to image...");
   let img = ((img.clamp(-1f32, 1f32)? + 1.0)? * 127.5)?.to_dtype(candle_core::DType::U8)?;
 
   // Convert to RGB image
   let image = tensor_to_image_buffer(&img.i(0)?)?;
 
-  println!("FLUX pipeline completed successfully");
+  info!("FLUX pipeline completed successfully");
   Ok(image)
 }
