@@ -17,7 +17,7 @@ export const ToolbarTopLeft = () => {
   const activeTab = useComputed(() => appMode.value);
 
   const tabs: TabItem[] = [
-    { id: "realtime", label: "Realtime" },
+    { id: "realtime", label: "Sketch" },
     { id: "edit", label: "Edit" },
     { id: "generate", label: "Generate" },
     // { id: "video", label: "Video" },
