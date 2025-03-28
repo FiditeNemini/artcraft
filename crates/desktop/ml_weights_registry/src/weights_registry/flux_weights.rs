@@ -61,7 +61,7 @@ pub const GOOGLE_T5_V1_1_XXL_CONFIG : WeightDescriptor = weight!(
 /// https://huggingface.co/lmz/mt5-tokenizers
 pub const LMZ_T5_TOKENIZER_JSON : WeightDescriptor = weight!(
   "LMZ T5 Tokenizer",
-  "lmt_mt5_tokenizers_t5-v1_1-xxl.tokenizer.json",
+  "lmz_mt5_tokenizers_t5-v1_1-xxl.tokenizer.json",
   WeightFunction::TextTokenizer
 );
 
