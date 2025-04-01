@@ -6,6 +6,8 @@
 # https://github.com/mvila/reserved-usernames
 
 # Stuff we care about
+art_craft
+artcraft
 fakeu
 fakeyou
 fake_you

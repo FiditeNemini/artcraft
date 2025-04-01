@@ -9,6 +9,8 @@ employee
 moderator
 
 # Branding
+art_craft
+artcraft
 fake_you
 fakeu
 fakeyou
