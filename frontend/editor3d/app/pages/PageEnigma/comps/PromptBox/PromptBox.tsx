@@ -110,7 +110,7 @@ export const PromptBox = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPrompt(e.target.value.trimStart());
+    setPrompt(e.target.value);
   };
 
   const handleEnqueue = async () => {
