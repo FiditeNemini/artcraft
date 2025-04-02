@@ -105,7 +105,7 @@ export const PromptBox = () => {
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    const pastedText = e.clipboardData.getData("text").trimStart();
+    const pastedText = e.clipboardData.getData("text").trim();
     setPrompt(pastedText);
   };
 
