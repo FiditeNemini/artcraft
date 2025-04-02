@@ -22,10 +22,10 @@ export const Letterbox = ({
 }) => {
   useSignals();
 
-  if (editorState.value !== EditorStates.CAMERA_VIEW || !isShowing) {
-    //case of Letterbox should not show
-    return;
-  }
+  // if (editorState.value !== EditorStates.CAMERA_VIEW || !isShowing) {
+  //   //case of Letterbox should not show
+  //   return;
+  // }
 
   const matteOri = getMatteOrientation({
     camAspect: cameraAspectRatio.value,
@@ -73,14 +73,14 @@ const Matte = ({
   if (matteOri === MatteOrientation.TOP_BOTTOM) {
     return (
       <div
-        className="h-20 w-full bg-brand-secondary/50 brightness-75"
+        className="h-20 w-full bg-black/30 brightness-75"
         style={{ height: `${height}px` }}
       />
     );
   }
   return (
     <div
-      className="h-full w-80 bg-brand-secondary/50 brightness-75"
+      className="h-full w-80 bg-black/30 brightness-75"
       style={{ width: `${width}px` }}
     />
   );
