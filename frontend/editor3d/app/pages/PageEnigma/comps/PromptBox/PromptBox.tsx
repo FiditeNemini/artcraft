@@ -8,6 +8,7 @@ import {
   faUpload,
   faImages,
   faDownload,
+  faSpinnerThird,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PopoverItem, PopoverMenu } from "~/components/reusable/Popover";
@@ -15,6 +16,7 @@ import { Button } from "~/components";
 
 export const PromptBox = () => {
   const [prompt, setPrompt] = useState("");
+  const [isEnqueueing, setisEnqueueing] = useState(false);
   const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
     { label: "16:9", selected: true },
     { label: "3:2", selected: false },
@@ -101,6 +103,36 @@ export const PromptBox = () => {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text").trimStart();
+    setPrompt(pastedText);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(e.target.value.trimStart());
+  };
+
+  const handleEnqueue = async () => {
+    if (!prompt.trim()) return;
+
+    setisEnqueueing(true);
+    try {
+      // generate logic here
+      console.log("Enqueuing with prompt:", prompt);
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // dummy delay here
+    } finally {
+      setisEnqueueing(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleEnqueue();
+    }
+  };
+
   return (
     <div className="glass absolute bottom-4 left-1/2 w-[730px] -translate-x-1/2 rounded-xl p-4">
       <input
@@ -138,9 +170,11 @@ export const PromptBox = () => {
           ref={textareaRef}
           rows={1}
           placeholder="Describe your image..."
-          className="text-md mb-2 flex-1 resize-none overflow-hidden rounded bg-transparent px-2 pb-2 pt-1 text-white placeholder-white placeholder:text-white/60 focus:outline-none"
+          className="text-md mb-2 max-h-[5.5em] flex-1 resize-none overflow-y-auto rounded bg-transparent px-2 pb-2 pt-1 text-white placeholder-white placeholder:text-white/60 focus:outline-none"
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={handleChange}
+          onPaste={handlePaste}
+          onKeyDown={handleKeyDown}
         />
       </div>
       <div className="mt-2 flex items-center justify-between gap-2">
@@ -180,10 +214,19 @@ export const PromptBox = () => {
             Save frame
           </Button>
           <Button
-            className="flex items-center border-none bg-brand-primary px-3 text-sm text-white"
-            icon={faSparkles}
+            className="flex items-center border-none bg-brand-primary px-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
+            icon={!isEnqueueing ? faSparkles : undefined}
+            onClick={handleEnqueue}
+            disabled={isEnqueueing || !prompt.trim()}
           >
-            Generate
+            {isEnqueueing ? (
+              <FontAwesomeIcon
+                icon={faSpinnerThird}
+                className="animate-spin text-lg"
+              />
+            ) : (
+              "Generate"
+            )}
           </Button>
         </div>
       </div>
