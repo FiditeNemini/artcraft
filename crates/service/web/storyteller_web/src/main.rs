@@ -464,7 +464,7 @@ async fn main() -> AnyhowResult<()> {
       user_tokens: user_token_troll_bans,
       ip_addresses: ip_address_troll_bans,
     },
-    temp_dir_creator: ScopedTempDirCreator::for_directory(easyenv::get_env_pathbuf_or_default("TEMP_DIR", "/tmp")),
+    temp_dir_creator: ScopedTempDirCreator::auto_setup(),
     google_sign_in_cert: GoogleSignInCert::new(),
   };
 

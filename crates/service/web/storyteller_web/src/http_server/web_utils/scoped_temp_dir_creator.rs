@@ -11,6 +11,20 @@ pub struct ScopedTempDirCreator {
 }
 
 impl ScopedTempDirCreator {
+  pub fn auto_setup() -> Self {
+    // Production configuration
+    let maybe_tmp = easyenv::get_env_pathbuf_optional("TEMP_DIR");
+
+    // MacOS
+    // TODO: Only run this on macOS
+    let maybe_mac_tmp = easyenv::get_env_pathbuf_optional("TMPDIR");
+
+    let directory = maybe_tmp
+        .or(maybe_mac_tmp)
+        .unwrap_or_else(|| PathBuf::from("/tmp"));
+
+    Self::for_directory(directory)
+  }
 
   pub fn for_directory<P: AsRef<Path>>(base_dir: P) -> Self {
     Self {

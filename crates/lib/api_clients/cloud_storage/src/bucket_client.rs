@@ -234,17 +234,31 @@ impl BucketClient {
       .map(|s| s.to_string())
       .ok_or(anyhow!("could not convert object path to string"))?;
 
-    info!("downloading from bucket: {:?}", &object_path_str);
+    info!("creating file for bucket download: {:?}", filesystem_path.as_ref());
 
-    let mut output_file = tokio::fs::File::create(filesystem_path).await?;
+    let mut output_file = File::create(filesystem_path).await?;
 
-    let status_code = self.bucket.get_object_to_writer(&object_path_str, &mut output_file).await?;
+    let result = self.bucket.get_object_to_writer(&object_path_str, &mut output_file).await;
+
+    info!("downloading from bucket (named '{}'), path: {}", &self.bucket.name, &object_path_str);
+
+    let status_code = match result {
+      Ok(status_code) => status_code,
+      Err(err) => {
+        return bail!("Error downloading from bucket (named '{}'): {:?}", &self.bucket.name, err)
+      }
+    };
 
     match status_code {
-      404 => bail!("File not found in bucket: {}", &object_path_str),
-      _ => {},
+      404 => {
+        error!("File not found in bucket (named '{}'), path: {}", &self.bucket.name, &object_path_str);
+        bail!("File not found in bucket: {}", &object_path_str)
+      },
+      _ => {
+        info!("download code: {}", status_code);
+      },
     }
-    info!("download code: {}", status_code);
+
     Ok(())
   }
 }

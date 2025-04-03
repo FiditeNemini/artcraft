@@ -11,13 +11,14 @@ use actix_web::web::Json;
 use actix_web::{web, HttpRequest, HttpResponse};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
-use log::{debug, error};
+use log::{debug, error, info};
 use log::warn;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use openai_sora_client::credentials::SoraCredentials;
 use serde::Deserialize;
 use serde::Serialize;
 use sqlx::MySqlPool;
+use tempdir::TempDir;
 use utoipa::ToSchema;
 use web::Data;
 
@@ -195,7 +196,6 @@ pub async fn enqueue_studio_image_generation_handler(
     |routing_tag| routing_tag.trim().to_string()
   );
 
-
   // ==================== BANNED USERS ==================== //
 
   if let Some(ref user) = maybe_user_session {
@@ -220,7 +220,6 @@ pub async fn enqueue_studio_image_generation_handler(
   // Get up IP address
   let ip_address = get_request_ip(&http_request);
 
-
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
@@ -239,17 +238,14 @@ pub async fn enqueue_studio_image_generation_handler(
   // TODO: Maybe this moves to a job.
 
   let work_temp_dir = server_state.temp_dir_creator.new_tempdir("image_studio").unwrap();
+
   let public_bucket_client = server_state.public_bucket_client.clone();
-  let private_bucket_client = server_state.private_bucket_client.clone();
 
   let scene_media_token = request.snapshot_media_token.clone();
-  let scene_media_name = scene_media_token.to_string();
-  let scene_media_path = work_temp_dir.path().join(scene_media_name.clone());
 
-  let scene_media_path = do_download_media_file(
-    &scene_media_name,
+  let scene_media_path = query_and_download_media_file(
     &scene_media_token,
-    &scene_media_path,
+    &work_temp_dir,
     &public_bucket_client,
     &server_state.mysql_pool
   ).await.map_err(|err| {
@@ -265,13 +261,9 @@ pub async fn enqueue_studio_image_generation_handler(
   let additional_images = request.maybe_additional_images.clone().unwrap_or_else(|| vec![]);
 
   for media_file_token in &additional_images {
-    let media_file_name = media_file_token.to_string();
-    let media_file_path = work_temp_dir.path().join(media_file_name.clone());
-
-    let media_file_path = do_download_media_file(
-      &media_file_name,
+    let media_file_path = query_and_download_media_file(
       &media_file_token,
-      &media_file_path,
+      &work_temp_dir,
       &public_bucket_client,
       &server_state.mysql_pool
     ).await.map_err(|err| {
@@ -436,84 +428,51 @@ pub enum DownloadMediaFileError {
   Other(anyhow::Error),
 }
 
-impl From<GetMediaFileError> for DownloadMediaFileError {
-  fn from(err: GetMediaFileError) -> Self {
-    match err {
-      GetMediaFileError::Other(e) => DownloadMediaFileError::Other(e),
-      GetMediaFileError::NotFound => DownloadMediaFileError::MediaFileNotFound,
-    }
-  }
-}
-
 impl From<anyhow::Error> for DownloadMediaFileError {
   fn from(err: anyhow::Error) -> Self {
     DownloadMediaFileError::Other(err)
   }
 }
 
-async fn do_download_media_file(
-  media_file_name: &str,
+async fn query_and_download_media_file(
   media_file_token: &MediaFileToken,
-  download_directory: &Path,
+  download_dir: &TempDir,
   bucket_client: &BucketClient,
   mysql_pool: &MySqlPool,
-) -> Result<(PathBuf), DownloadMediaFileError> {
-  let final_download_path = download_directory.join(format!("{}", media_file_name));
-
-  if final_download_path.exists() {
-    log::debug!("Deleting existing file at {:?}", final_download_path.display().to_string());
-    std::fs::remove_file(&final_download_path)
-        .map_err(|err| DownloadMediaFileError::IoError(err))?;
-  }
-
-  let bucket_object_path = get_media_file_details(&media_file_token, mysql_pool).await?;
-
-  log::info!("Downloading media from bucket path: {:?}", &bucket_object_path);
-
-  bucket_client.download_file_to_disk(
-    &bucket_object_path,
-    &final_download_path,
-  ).await?;
-
-  Ok(final_download_path)
-}
-
-
-#[derive(Debug)]
-enum GetMediaFileError {
-  NotFound,
-  Other(anyhow::Error),
-}
-
-
-async fn get_media_file_details(media_file_token: &MediaFileToken, mysql_pool: &MySqlPool) -> Result<PathBuf, GetMediaFileError> {
+) -> Result<PathBuf, DownloadMediaFileError> {
   let media_file_result = get_media_file(
     &media_file_token,
     false,
     mysql_pool
   ).await;
 
-  let media_file_result = match media_file_result {
+  let media_file= match media_file_result {
     Ok(Some(result)) => result,
     Ok(None) => {
-      warn!("could not find media file: {:?}", media_file_token);
-      return Err(GetMediaFileError::NotFound)
+      warn!("could not find media file in database: {:?}", media_file_token);
+      return Err(DownloadMediaFileError::MediaFileNotFound)
     }
     Err(e) => {
       error!("could not query media file: {:?}", e);
-      return Err(GetMediaFileError::Other(e))
+      return Err(DownloadMediaFileError::Other(e))
     }
   };
 
   let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
-    &media_file_result.public_bucket_directory_hash,
-    media_file_result.maybe_public_bucket_prefix.as_deref(),
-    media_file_result.maybe_public_bucket_extension.as_deref());
+    &media_file.public_bucket_directory_hash,
+    media_file.maybe_public_bucket_prefix.as_deref(),
+    media_file.maybe_public_bucket_extension.as_deref());
 
-  Ok(media_file_bucket_path.to_full_object_pathbuf())
-}
+  let extension = media_file.maybe_public_bucket_extension.clone().unwrap_or_else(|| ".jpg".to_string());
+  let download_filename = format!("download_file_{}.{}", media_file.token.as_str(), extension);
+  let download_file_path = download_dir.path().join(download_filename);
 
+  info!("Downloading from bucket...");
 
-#[cfg(test)]
-mod tests {
+  bucket_client.download_file_to_disk(
+    &media_file_bucket_path.to_full_object_pathbuf(),
+    &download_file_path,
+  ).await?;
+
+  Ok(download_file_path)
 }
