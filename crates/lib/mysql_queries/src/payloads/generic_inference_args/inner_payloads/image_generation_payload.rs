@@ -1,3 +1,4 @@
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 /// Video sources can be one of several:
@@ -52,7 +53,7 @@ pub struct StableDiffusionArgs {
     #[serde(rename = "se")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_seed: Option<i64>,
-  
+
     #[serde(rename = "mu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_upload_path: Option<String>,
@@ -60,7 +61,7 @@ pub struct StableDiffusionArgs {
     #[serde(rename = "cf")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_cfg_scale: Option<u32>,
-    
+
     #[serde(rename = "lu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_upload_path: Option<String>,
