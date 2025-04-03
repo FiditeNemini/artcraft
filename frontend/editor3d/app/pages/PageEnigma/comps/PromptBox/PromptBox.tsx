@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-
+import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import { useContext } from "react";
+import { uploadImage } from "~/components/reusable/UploadModalMedia/uploadImage";
 import {
   faPlus,
   faCamera,
@@ -18,6 +20,7 @@ import {
   faSquare,
   faRectangle,
 } from "@fortawesome/pro-regular-svg-icons";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PopoverItem, PopoverMenu } from "~/components/reusable/Popover";
 import { Button } from "~/components";
@@ -31,10 +34,15 @@ interface ReferenceImage {
   id: string;
   url: string;
   file: File;
+  mediaToken: string;
 }
+import { EngineApi } from "~/Classes/ApiManager/EngineApi";
+import { scene } from "~/signals/scene";
+import { UploaderStates } from "~/enums/UploaderStates";
 
 export const PromptBox = () => {
   useSignals();
+  const editorEngine = useContext(EngineContext);
   const [prompt, setPrompt] = useState("");
   const [isEnqueueing, setisEnqueueing] = useState(false);
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
@@ -163,14 +171,25 @@ export const PromptBox = () => {
       Array.from(files).forEach((file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setReferenceImages((prev) => [
-            ...prev,
-            {
-              id: Math.random().toString(36).substring(7),
-              url: reader.result as string,
-              file,
+          uploadImage({
+            title: `reference-image-${Math.random().toString(36).substring(2, 15)}`,
+            assetFile: file,
+            progressCallback: (newState) => {
+              console.debug("Upload progress:", newState.data);
+              if (newState.status === UploaderStates.success && newState.data) {
+                const referenceImage: ReferenceImage = {
+                  id: Math.random().toString(36).substring(7),
+                  url: reader.result as string,
+                  file,
+                  mediaToken: newState.data || "",
+                };
+                setReferenceImages((prev) => [...prev, referenceImage]);
+                console.log("Reference image added:", referenceImage);
+              } else {
+                console.error("No data from uploadImage");
+              }
             },
-          ]);
+          });
         };
         reader.readAsDataURL(file);
       });
@@ -218,18 +237,36 @@ export const PromptBox = () => {
   const handleEnqueue = async () => {
     if (!prompt.trim()) return;
 
-    setisEnqueueing(true);
-    try {
-      // Here we would pass both the prompt and reference images to the generation
-      console.log(
-        "Enqueuing with prompt:",
-        prompt,
-        "and reference images:",
-        referenceImages,
-      );
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } finally {
-      setisEnqueueing(false);
+    if (editorEngine) {
+      editorEngine.positive_prompt = prompt;
+
+      const engineApi = new EngineApi();
+      const snapshot = editorEngine.snapShotOfCurrentFrame(false);
+
+      const snapshotResult = await engineApi.uploadSceneSnapshot({
+        screenshot: snapshot || "",
+        sceneMediaToken: "",
+      });
+
+      await engineApi.enqueueImageGeneration({
+        prompt: prompt,
+        snapshotMediaToken: snapshotResult.data || "",
+        additionalImages: referenceImages.map((image) => image.mediaToken),
+      });
+
+      setisEnqueueing(true);
+      try {
+        // Here we would pass both the prompt and reference images to the generation
+        console.log(
+          "Enqueuing with prompt:",
+          prompt,
+          "and reference images:",
+          referenceImages,
+        );
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } finally {
+        setisEnqueueing(false);
+      }
     }
   };
 
@@ -255,6 +292,24 @@ export const PromptBox = () => {
         return faSquare;
       default:
         return faRectangleWide;
+    }
+  };
+
+  const handleSaveFrame = async () => {
+    if (editorEngine) {
+      const snapshot = editorEngine.snapShotOfCurrentFrame(false);
+      const engineApi = new EngineApi();
+      const result = await engineApi.uploadSceneSnapshot({
+        screenshot: snapshot || "",
+        sceneMediaToken: "",
+      });
+      console.log(result);
+    }
+  };
+
+  const handleDownloadFrame = () => {
+    if (editorEngine) {
+      editorEngine.snapShotOfCurrentFrame(true);
     }
   };
 
@@ -360,6 +415,7 @@ export const PromptBox = () => {
               className="flex items-center border-none bg-[#5F5F68]/60 px-3 text-sm text-white backdrop-blur-lg hover:bg-[#5F5F68]/90"
               variant="secondary"
               icon={faDownload}
+              onClick={handleDownloadFrame}
             >
               Download frame
             </Button>
@@ -367,6 +423,7 @@ export const PromptBox = () => {
               className="flex items-center border-none bg-[#5F5F68]/60 px-3 text-sm text-white backdrop-blur-lg hover:bg-[#5F5F68]/90"
               variant="secondary"
               icon={faSave}
+              onClick={handleSaveFrame}
             >
               Save frame
             </Button>
