@@ -51,7 +51,7 @@ export const Letterbox = ({
     <div
       id="letterbox"
       className={twMerge(
-        "absolute left-0 top-0 flex h-full w-full justify-between",
+        "absolute left-0 top-0 flex h-full w-full justify-between pointer-events-none",
         matteOri === MatteOrientation.TOP_BOTTOM ? "flex-col" : null,
       )}
     >
