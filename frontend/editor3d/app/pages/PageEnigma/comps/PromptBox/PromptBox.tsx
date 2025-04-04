@@ -191,6 +191,7 @@ export const PromptBox = () => {
             },
           });
         };
+
         reader.readAsDataURL(file);
       });
     }
@@ -242,17 +243,18 @@ export const PromptBox = () => {
 
       const engineApi = new EngineApi();
       const snapshot = editorEngine.snapShotOfCurrentFrame(false);
+      if (snapshot) {
+        const snapshotResult = await engineApi.uploadSceneSnapshot({
+          screenshot: snapshot.file,
+          sceneMediaToken: "",
+        });
 
-      const snapshotResult = await engineApi.uploadSceneSnapshot({
-        screenshot: snapshot || "",
-        sceneMediaToken: "",
-      });
-
-      await engineApi.enqueueImageGeneration({
-        prompt: prompt,
-        snapshotMediaToken: snapshotResult.data || "",
-        additionalImages: referenceImages.map((image) => image.mediaToken),
-      });
+        await engineApi.enqueueImageGeneration({
+          prompt: prompt,
+          snapshotMediaToken: snapshotResult.data || "",
+          additionalImages: referenceImages.map((image) => image.mediaToken),
+        });
+      }
 
       setisEnqueueing(true);
       try {
@@ -298,12 +300,13 @@ export const PromptBox = () => {
   const handleSaveFrame = async () => {
     if (editorEngine) {
       const snapshot = editorEngine.snapShotOfCurrentFrame(false);
-      const engineApi = new EngineApi();
-      const result = await engineApi.uploadSceneSnapshot({
-        screenshot: snapshot || "",
-        sceneMediaToken: "",
-      });
-      console.log(result);
+      if (snapshot) {
+        const engineApi = new EngineApi();
+        await engineApi.uploadSceneSnapshot({
+          screenshot: snapshot.file || "",
+          sceneMediaToken: "",
+        });
+      }
     }
   };
 

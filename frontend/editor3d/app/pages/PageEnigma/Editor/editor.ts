@@ -671,7 +671,17 @@ class Editor {
       link.click();
     }
 
-    return base64Snapshot;
+    const byteString = atob(base64Snapshot);
+    const mimeString = "image/png";
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const uuid = crypto.randomUUID(); // Generate a new UUID
+    const file = new File([ab], `${uuid}.png`, { type: mimeString });
+
+    return { base64Snapshot, file };
   }
 
   public async newScene(sceneTitleInput: string) {

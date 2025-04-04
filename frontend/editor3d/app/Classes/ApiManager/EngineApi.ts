@@ -41,16 +41,19 @@ export class EngineApi extends ApiManager {
     screenshot,
     sceneMediaToken,
   }: {
-    screenshot: string; // base64 encoded PNG
+    screenshot: File; // base64 encoded PNG
     sceneMediaToken?: string;
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/image_studio/scene_snapshot`;
-
     const formData = new FormData();
     formData.append("snapshot", screenshot); // Changed from "screenshot" to "snapshot" to match API spec
     if (sceneMediaToken) {
       formData.append("scene_media_token", sceneMediaToken);
     }
+
+    // for now ...
+    const uuidIdempotencyToken = crypto.randomUUID(); // Generate a new UUID
+    formData.append("uuid_idempotency_token", uuidIdempotencyToken); // Added uuid_idempotency_token
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -93,8 +96,10 @@ export class EngineApi extends ApiManager {
     additionalImages?: string[];
   }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/image_studio/prompt`;
-
+    // for now ...
+    const uuidIdempotencyToken = crypto.randomUUID(); // Generate a new UUID
     const body = {
+      uuid_idempotency_token: uuidIdempotencyToken,
       prompt,
       snapshot_media_token: snapshotMediaToken, // Changed from scene_media_token to snapshot_media_token
       additional_images: additionalImages,
@@ -102,6 +107,7 @@ export class EngineApi extends ApiManager {
 
     const postResponse = await this.post<
       {
+        uuid_idempotency_token: string;
         prompt: string;
         snapshot_media_token: string;
         additional_images?: string[];
