@@ -121,6 +121,7 @@ pub (crate) async fn image_gen_http_request(sora_request: RawSoraImageGenRequest
   let response_body = &response.text().await?;
 
   if status != reqwest::StatusCode::OK {
+    //TODO: Kasisnu: We should parse the error response and return a custom error. status 400 + code "sentinel_block" means we should retry with new sentinel token.
     return Err(anyhow::anyhow!("the request failed; status = {:?}, message = {:?}", status, response_body));
   }
 
