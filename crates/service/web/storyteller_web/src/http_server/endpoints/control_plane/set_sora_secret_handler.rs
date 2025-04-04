@@ -1,0 +1,137 @@
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web, Either};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::{Form, Json, Path};
+use anyhow::anyhow;
+use log::{error, log, warn};
+use r2d2_redis::redis::Commands;
+use utoipa::ToSchema;
+
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::media_files::edit::update_media_file_animation_type::update_media_file_animation_type;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
+use tokens::tokens::media_files::MediaFileToken;
+
+use crate::state::server_state::ServerState;
+use crate::util::redis_sora_secrets::get_sora_credentials;
+use crate::util::redis_sora_secrets::set_sora_credential_field;
+use crate::util::redis_sora_secrets::RedisSoraCredentialSubkey;
+
+#[derive(Deserialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum SetSoraSecretType {
+  Bearer,
+  Cookie,
+  Sentinel
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct SetSoraSecretRequest {
+  pub key: SetSoraSecretType,
+  pub value: String,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct SetSoraSecretSuccessResponse {
+  pub success: bool,
+  pub bearer: String,
+  pub cookie: String,
+  pub sentinel: String,
+}
+
+// =============== Error Response ===============
+
+#[derive(Debug, Serialize, ToSchema)]
+pub enum SetSoraSecretError {
+  BadInput(String),
+  NotAuthorized,
+  ServerError,
+}
+
+impl ResponseError for SetSoraSecretError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      SetSoraSecretError::BadInput(_) => StatusCode::BAD_REQUEST,
+      SetSoraSecretError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      SetSoraSecretError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    serialize_as_json_error(self)
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for SetSoraSecretError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+// =============== Handler ===============
+
+/// Set a Sora secret
+#[utoipa::path(
+  post,
+  tag = "Control Plane",
+  path = "/v1/control_plane/sora_secret",
+  responses(
+        (status = 200, description = "Success", body = SetSoraSecretSuccessResponse),
+        (status = 400, description = "Bad input", body = SetSoraSecretError),
+        (status = 401, description = "Not authorized", body = SetSoraSecretError),
+        (status = 500, description = "Server error", body = SetSoraSecretError),
+  ),
+  params(
+        ("request" = SetSoraSecretRequest, description = "Payload for Request"),
+        ("path" = MediaFileTokenPathInfo, description = "Path for Request")
+  )
+)]
+pub async fn set_sora_secret_handler(
+  http_request: HttpRequest,
+  request: Form<SetSoraSecretRequest>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<Json<SetSoraSecretSuccessResponse>, SetSoraSecretError> {
+
+  // TODO(bt,2025-04-03): Some form of authentication should be required for this endpoint.
+  let value = request.value.trim().to_string();
+
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        error!("redis error: {:?}", e);
+        SetSoraSecretError::ServerError
+      })?;
+
+  set_sora_credential_field(
+    &mut redis,
+    match request.key {
+      SetSoraSecretType::Bearer => RedisSoraCredentialSubkey::Bearer,
+      SetSoraSecretType::Cookie => RedisSoraCredentialSubkey::Cookie,
+      SetSoraSecretType::Sentinel => RedisSoraCredentialSubkey::Sentinel,
+    },
+    &value
+  ).map_err(|e| {
+    error!("redis error: {:?}", e);
+    SetSoraSecretError::ServerError
+  })?;
+
+  let credentials = get_sora_credentials(&mut redis)
+      .map_err(|e| {
+        error!("redis error: {:?}", e);
+        SetSoraSecretError::ServerError
+      })?;
+
+  // TODO(bt,2025-04-03): Probably not smart to return, but useful for debugging.
+  Ok(Json(SetSoraSecretSuccessResponse {
+    success: true,
+    bearer: credentials.bearer_token,
+    cookie: credentials.cookie,
+    sentinel: credentials.sentinel.unwrap_or_else(|| "".to_string()),
+  }))
+}

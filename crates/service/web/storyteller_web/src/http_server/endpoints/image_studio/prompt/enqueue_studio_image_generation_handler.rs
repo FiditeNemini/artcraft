@@ -48,10 +48,13 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::http_server::endpoints::image_studio::get_sora_credentials_from_request::get_sora_credentials_from_request;
+use crate::http_server::endpoints::tts::get_tts_inference_job_status::GetTtsInferenceStatusError;
 use crate::http_server::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::state::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
+use crate::util::redis_sora_secrets::get_sora_credentials;
 
 /// This is the number of images (batch size) to generate for each request.
 /// We should allow all users to have multiple images generated at once as this
@@ -68,10 +71,6 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// The routing tag header can send workloads to particular k8s hosts.
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
-
-const SORA_BEARER_HEADER_NAME : &str = "sora-bearer";
-const SORA_COOKIE_HEADER_NAME : &str = "sora-cookie";
-const SORA_SENTINEL_HEADER_NAME : &str = "sora-sentinel";
 
 #[derive(Deserialize, ToSchema)]
 pub struct EnqueueStudioImageGenRequest {
@@ -276,30 +275,18 @@ pub async fn enqueue_studio_image_generation_handler(
 
   // ==================== HANDLE SORA CREDENTIALS ==================== //
 
-  let sora_bearer = get_request_header_optional(&http_request, SORA_BEARER_HEADER_NAME);
-  let sora_cookie = get_request_header_optional(&http_request, SORA_COOKIE_HEADER_NAME);
-  let sora_sentinel = get_request_header_optional(&http_request, SORA_SENTINEL_HEADER_NAME);
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        error!("redis error: {:?}", e);
+        EnqueueImageGenRequestError::ServerError
+      })?;
 
-  let sora_credentials;
-
-  match (sora_bearer, sora_cookie, sora_sentinel) {
-    (Some(bearer), Some(cookie), Some(sentinel)) => {
-      sora_credentials = SoraCredentials {
-        bearer_token: bearer,
-        cookie,
-        sentinel: Some(sentinel),
-      };
-    }
-    _ => {
-      sora_credentials = match SoraCredentials::from_env() {
-        Ok(creds) => creds,
-        Err(err) => {
-          error!("Failed to load Sora credentials from environment: {:?}", err);
-          return Err(EnqueueImageGenRequestError::ServerError);
-        }
-      };
-    }
-  }
+  let sora_credentials = get_sora_credentials_from_request(&http_request, &mut redis)
+      .map_err(|e| {
+        error!("sora credential error: {:?}", e);
+        EnqueueImageGenRequestError::ServerError
+      })?;
 
   // ==================== HANDLE SORA UPLOAD ==================== //
 

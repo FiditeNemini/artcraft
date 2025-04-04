@@ -10,3 +10,4 @@ pub mod weights_routes;
 pub mod workflow_routes;
 mod tag_routes;
 mod add_image_studio_routes;
+mod add_control_plane_routes;
