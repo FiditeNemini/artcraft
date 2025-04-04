@@ -62,6 +62,9 @@ export const PromptBox = () => {
   const [isEnqueueing, setisEnqueueing] = useState(false);
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+  const [uploadingImages, setUploadingImages] = useState<
+    { id: string; file: File }[]
+  >([]);
   const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
     {
       label: "3:2",
@@ -212,6 +215,9 @@ export const PromptBox = () => {
     const files = event.target.files;
     if (files) {
       Array.from(files).forEach((file) => {
+        const uploadId = Math.random().toString(36).substring(7);
+        setUploadingImages((prev) => [...prev, { id: uploadId, file }]);
+
         const reader = new FileReader();
         reader.onloadend = () => {
           uploadImage({
@@ -227,9 +233,18 @@ export const PromptBox = () => {
                   mediaToken: newState.data || "",
                 };
                 setReferenceImages((prev) => [...prev, referenceImage]);
+                setUploadingImages((prev) =>
+                  prev.filter((img) => img.id !== uploadId),
+                );
                 console.log("Reference image added:", referenceImage);
-              } else {
-                console.error("No data from uploadImage");
+              } else if (
+                newState.status === UploaderStates.assetError ||
+                newState.status === UploaderStates.imageCreateError
+              ) {
+                setUploadingImages((prev) =>
+                  prev.filter((img) => img.id !== uploadId),
+                );
+                console.error("Upload failed");
               }
             },
           });
@@ -386,7 +401,7 @@ export const PromptBox = () => {
 
   return (
     <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-col gap-3">
-      {referenceImages.length > 0 && (
+      {(referenceImages.length > 0 || uploadingImages.length > 0) && (
         <div className="flex w-full gap-2">
           {referenceImages.map((image) => (
             <div
@@ -406,6 +421,29 @@ export const PromptBox = () => {
               </button>
             </div>
           ))}
+          {uploadingImages.map(({ id, file }) => {
+            const previewUrl = URL.createObjectURL(file);
+            return (
+              <div
+                key={id}
+                className="glass relative aspect-square w-20 overflow-hidden rounded-lg"
+              >
+                <div className="absolute inset-0">
+                  <img
+                    src={previewUrl}
+                    alt="Uploading preview"
+                    className="h-full w-full object-cover blur-sm"
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <FontAwesomeIcon
+                    icon={faSpinnerThird}
+                    className="h-6 w-6 animate-spin text-white"
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
       <div className="glass w-[730px] rounded-xl p-4">
@@ -452,11 +490,9 @@ export const PromptBox = () => {
             onPaste={handlePaste}
             onKeyDown={handleKeyDown}
             onFocus={() => {
-              console.log("disabling hotkeys");
               disableHotkeyInput(DomLevels.INPUT);
             }}
             onBlur={() => {
-              console.log("enabling hotkeys");
               enableHotkeyInput(DomLevels.INPUT);
             }}
           />
