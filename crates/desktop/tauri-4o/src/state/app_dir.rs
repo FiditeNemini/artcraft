@@ -2,7 +2,6 @@ use crate::state::expanduser::expanduser;
 use crate::state::os_platform::OsPlatform;
 use anyhow::anyhow;
 use directories::UserDirs;
-use ml_weights_registry::weights_registry::weight_descriptor::WeightDescriptor;
 use std::path::{Path, PathBuf};
 use chrono::{DateTime, Local};
 use tempdir::TempDir;
@@ -172,10 +171,6 @@ impl AppWeightsDir {
 
   pub fn path(&self) -> &Path {
     &self.path
-  }
-
-  pub fn weight_path(&self, descriptor: &WeightDescriptor) -> PathBuf {
-    self.path.join(descriptor.filename)
   }
 }
 

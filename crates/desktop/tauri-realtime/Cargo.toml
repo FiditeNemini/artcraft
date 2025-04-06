@@ -16,7 +16,7 @@ name = "app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.4", features = [] }
+tauri-build = { version = "2.1.1", features = [] }
 
 [dependencies]
 
@@ -54,8 +54,8 @@ reqwest = { version = "0.12.12", features = ["stream"], default-features = false
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.9"
-tauri = { version = "2.2.4", features = [] }
-tauri-plugin-log = "2"
+tauri = { version = "2.4.1", features = [] }
+tauri-plugin-log = "2.3.1"
 tempdir = "0.3.7"
 tempfile = "3.18.0"
 tokio = { version = "1.42", features = ["rt", "rt-multi-thread", "fs"] }

@@ -1,7 +1,6 @@
 use crate::state::app_dir::AppDataRoot;
 use crate::state::os_platform::OsPlatform;
 use crate::state::yaml_config::YamlConfig;
-use crate::stubs::model_config::ModelConfig;
 
 const DEFAULT_SD_IMAGE_WIDTH: usize = 1024;
 const DEFAULT_SD_IMAGE_HEIGHT: usize = 1024;
@@ -20,8 +19,6 @@ pub struct AppConfig {
   
   /// Root location for application data.
   pub app_data_root: AppDataRoot,
-  
-  pub model_config: ModelConfig,
 }
 
 impl AppConfig {
@@ -56,7 +53,6 @@ impl AppConfig {
       seed: yaml_configs.seed,
       cfg_scale: yaml_configs.cfg_scale,
       app_data_root,
-      model_config: ModelConfig::init()?,
     })
   }
 }
