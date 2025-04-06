@@ -654,47 +654,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "assertor",
- "base64 0.22.1",
- "bytes 1.10.0",
- "chrono",
- "const_format",
- "crockford",
- "cudarc",
- "directories 6.0.0",
- "dirs 6.0.0",
- "filesys",
- "futures 0.3.29",
- "half",
- "image",
- "libloading 0.8.6",
- "log",
- "memory_caching",
- "ml_models",
- "ml_weights_registry",
- "once_cell",
- "ort",
- "primitives",
- "rand 0.8.5",
- "reqwest 0.12.15",
- "serde",
- "serde_json",
- "serde_yaml",
- "serial_test",
- "tauri",
- "tauri-build",
- "tauri-plugin-log",
- "tempdir",
- "tempfile",
- "tokio",
- "tokio-util",
-]
-
-[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12093,6 +12052,47 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-4o"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "assertor",
+ "base64 0.22.1",
+ "bytes 1.10.0",
+ "chrono",
+ "const_format",
+ "crockford",
+ "cudarc",
+ "directories 6.0.0",
+ "dirs 6.0.0",
+ "filesys",
+ "futures 0.3.29",
+ "half",
+ "image",
+ "libloading 0.8.6",
+ "log",
+ "memory_caching",
+ "ml_models",
+ "ml_weights_registry",
+ "once_cell",
+ "ort",
+ "primitives",
+ "rand 0.8.5",
+ "reqwest 0.12.15",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "serial_test",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-log",
+ "tempdir",
+ "tempfile",
+ "tokio",
+ "tokio-util",
+]
+
+[[package]]
 name = "tauri-build"
 version = "2.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12192,6 +12192,47 @@ dependencies = [
  "tauri-plugin",
  "thiserror 2.0.11",
  "time",
+]
+
+[[package]]
+name = "tauri-realtime"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "assertor",
+ "base64 0.22.1",
+ "bytes 1.10.0",
+ "chrono",
+ "const_format",
+ "crockford",
+ "cudarc",
+ "directories 6.0.0",
+ "dirs 6.0.0",
+ "filesys",
+ "futures 0.3.29",
+ "half",
+ "image",
+ "libloading 0.8.6",
+ "log",
+ "memory_caching",
+ "ml_models",
+ "ml_weights_registry",
+ "once_cell",
+ "ort",
+ "primitives",
+ "rand 0.8.5",
+ "reqwest 0.12.15",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "serial_test",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-log",
+ "tempdir",
+ "tempfile",
+ "tokio",
+ "tokio-util",
 ]
 
 [[package]]

@@ -22,9 +22,10 @@ members = [
   "crates/cli/production/migration-tool",
 
   # Desktop apps
-  "crates/desktop/src-tauri",
   "crates/desktop/ml_models",
   "crates/desktop/ml_weights_registry",
+  "crates/desktop/tauri-4o",
+  "crates/desktop/tauri-realtime",
 
   # Shared libraries
   "crates/lib/actix_cors_configs",
