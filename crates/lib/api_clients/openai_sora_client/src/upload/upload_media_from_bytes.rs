@@ -10,7 +10,7 @@ pub struct SoraMediaUploadRequest<'a> {
 
 /// Upload bytes.
 /// The underlying reqwest lib needs to own the bytes, so we can't pass as a reference.
-pub async fn sora_media_upload_from_bytes<P: AsRef<Path>>(bytes: Vec<u8>, file_name: String, creds: &SoraCredentials) -> AnyhowResult<SoraMediaUploadResponse> {
+pub async fn sora_media_upload_from_bytes(bytes: Vec<u8>, file_name: String, creds: &SoraCredentials) -> AnyhowResult<SoraMediaUploadResponse> {
   let file_path = PathBuf::from(&file_name);
 
   // TODO: Read file magic bytes first, then fall back to this.

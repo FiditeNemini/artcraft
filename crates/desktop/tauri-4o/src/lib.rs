@@ -1,10 +1,11 @@
-pub mod endpoints;
 pub mod events;
 pub mod state;
 pub mod transfer;
 pub mod utils;
+pub mod commands;
 
-use crate::endpoints::flip_image::flip_image;
+use crate::commands::flip_image::flip_image;
+use crate::commands::image_generation_command::image_generation_command;
 use crate::state::app_config::AppConfig;
 
 use tauri_plugin_log::Target;
@@ -54,6 +55,7 @@ pub fn run() {
     .manage(app_data_root)
     .invoke_handler(tauri::generate_handler![
       flip_image,
+      image_generation_command,
     ])
     .run(tauri::generate_context!("tauri.conf.json"))
     .expect("error while running tauri application");

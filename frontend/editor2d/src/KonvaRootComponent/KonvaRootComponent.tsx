@@ -63,7 +63,6 @@ export const KonvaRootComponent = ({
         openAddImage={appUiContext.openAddImage}
         openAddVideo={appUiContext.openAddVideo}
       />
-      <SignaledPromptSlider />
       <SignaledPromptText />
       <SignaledToolbarMain
         layoutSignal={layoutContext.signal}

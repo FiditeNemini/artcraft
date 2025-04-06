@@ -3,8 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "../ui";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 
-import { invoke } from '@tauri-apps/api/core';
-
 import { useNavigate } from "react-router-dom";
 
 interface HeroProps {
@@ -73,14 +71,6 @@ const Hero = ({ onFeatureClick }: HeroProps) => {
               </div>
             ))}
           </div>
-
-          <br />
-          <Button onClick={() => invoke("my_custom_command")}>Test Backend Call: Custom command</Button>
-          <br />
-          <Button onClick={() => invoke("test_round_trip")}>Test Backend Call: Round trip</Button>
-          <br />
-          <Button onClick={() => invoke("infer_image")}>Test Backend Call: Image</Button>
-          <br />
 
           {/* Creative description */}
           <p className="mx-auto mb-12 max-w-2xl text-xl leading-relaxed text-gray-600">

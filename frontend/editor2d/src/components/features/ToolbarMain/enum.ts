@@ -16,4 +16,7 @@ export enum ToolbarMainButtonNames {
   PREVIEW = "PREVIEW",
   DOWNLOAD = "DOWNLOAD",
   BACKGROUND = "BACKGROUND",
+
+  // 4o generation
+  GENERATE = "GENERATE",
 }

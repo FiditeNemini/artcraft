@@ -293,11 +293,6 @@ pub async fn enqueue_studio_image_generation_handler(
   let mut sora_media_tokens = Vec::with_capacity(files_to_upload.len());
 
   for file_path in files_to_upload {
-    let scene_media_upload_request = SoraMediaUploadRequest {
-      file_path: scene_media_path.to_string_lossy().to_string(),
-      credentials: &sora_credentials,
-    };
-
     let sora_upload_response = sora_media_upload_from_file(file_path, &sora_credentials)
         .await
         .map_err(|err| {

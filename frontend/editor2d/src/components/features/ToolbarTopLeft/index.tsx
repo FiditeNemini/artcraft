@@ -18,8 +18,8 @@ export const ToolbarTopLeft = () => {
 
   const tabs: TabItem[] = [
     { id: "realtime", label: "Sketch" },
-    { id: "edit", label: "Edit" },
-    { id: "generate", label: "Generate" },
+    //{ id: "edit", label: "Edit" },
+    //{ id: "generate", label: "Generate" },
     // { id: "video", label: "Video" },
   ];
 

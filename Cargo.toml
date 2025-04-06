@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
 
+# This block defines the workspace members.
+# When we add a library or binary crate, it needs an entry here.
 members = [
   # Types: common strongly-typed tokens, ids, payloads, etc.
   "crates/_types/composite_identifiers",
@@ -122,21 +124,33 @@ members = [
 ]
 
 [workspace.package]
+# Common inheritable settings for monorepo packages
 publish = false
 
 [workspace.dependencies]
 # Hakari workspace hack (faster compile times)
 my-workspace-hack = { path = "crates/my-workspace-hack" }
 
-# Internal libs
-errors = { path = "crates/lib/errors" }
-
 # External libs
 # Centrally pinned versions so that we can uniformly upgrade/downgrade versions across the workspace
 # If a crate needs to use an older/newer version, the dependency should be managed in that crate's own Cargo.toml
 anyhow = "1.0.97"
+chrono = "0.4.40"
 log = "0.4.27"
+once_cell = "1.21.3"
+rand = "0.9.0"
 reqwest = { version = "0.12.15", features = ["json", "cookies"] }
-serde = "1.0.219"
+serde = {  version = "1.0.219", features = ["derive"] }
 serde_derive = "1.0.219"
 serde_json = "1.0.140"
+serde_yaml = "0.9.1"
+toml = "0.7.4"
+
+# Internal libs
+crockford = { path = "crates/lib/data/crockford" }
+errors = { path = "crates/lib/errors" }
+filesys = { path = "crates/lib/files/filesys" }
+memory_caching = { path = "crates/lib/caching/memory_caching" }
+openai_sora_client = { path = "crates/lib/api_clients/openai_sora_client" }
+primitives = { path = "crates/lib/data/primitives" }
+subprocess_common = { path = "crates/lib/subprocess_common" }

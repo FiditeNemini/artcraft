@@ -3,6 +3,9 @@ import { useRef } from "react";
 import { ResizeType, Textarea } from "~/components/ui";
 import { dispatchUiEvents } from "~/signals";
 import { promptText } from "~/signals/uiEvents/promptSettings";
+import { invoke } from '@tauri-apps/api/core';
+import { dispatchers } from "~/signals/uiEvents/toolbarMain";
+import { ToolbarMainButtonNames } from "~/components/features/ToolbarMain/enum";
 
 export const SignaledPromptText = ({}) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -35,6 +38,10 @@ export const SignaledPromptText = ({}) => {
         spellCheck={false}
         forceBlurOnOutsideClick={true}
       />
+      <button 
+        onClick={dispatchers[ToolbarMainButtonNames.GENERATE]}
+        style={{backgroundColor:"#ff0000", color: "#00ff00"}}
+        >Submit</button>
     </div>
   );
 };

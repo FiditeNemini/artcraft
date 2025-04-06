@@ -67,10 +67,7 @@ export class RealTimeDrawEngine {
   public captureCanvas: Konva.Rect;
   public backgroundRasterRect: Konva.Image;
 
-
   public previewCanvas: Konva.Image;
-
-
 
   public videoLoadingCanvas: VideoNode | undefined;
 
@@ -78,6 +75,8 @@ export class RealTimeDrawEngine {
 
   public currentPrompt: string;
   public currentStrength: number;
+
+  public lastRenderedBitmap: ImageBitmap | undefined;
 
   // Paint Color
   // paint Brush Size
@@ -910,6 +909,22 @@ export class RealTimeDrawEngine {
     });
   }
 
+  public async generateImage() {
+    if (!this.lastRenderedBitmap) {
+      console.error("No rendered bitmap available to generate from");
+      return;
+    }
+      
+    const base64Bitmap = await this.imageBitmapToBase64(this.lastRenderedBitmap);
+
+    //const base64Bitmap = await EncodeImageBitmapToBase64(this.outputBitmap);
+
+    const generateResponse = await invoke("image_generation_command", {
+      image: base64Bitmap,
+      prompt: this.currentPrompt,
+    });
+  }
+
   public async render() {
     // only pick nodes that intersect wi th the canvas on screen bounds to freeze.
     if (this.isProcessing) {
@@ -939,42 +954,23 @@ export class RealTimeDrawEngine {
       test: false,
     })) as ImageBitmap;
 
-    // Test code
-    if (false) {
-      this.outputBitmap = bitmap;
-      this.previewCanvas.image(bitmap);
-      const base64Bitmap = await this.imageBitmapToBase64(bitmap);
-      console.log(this.currentStrength);
-      await this.client?.generateImage({
-        image: base64Bitmap,
-        prompt: this.currentPrompt,
-        strength: this.currentStrength,
-        guidance_scale: 2,
-        num_inference_steps: 4,
-        height: 1024,
-        width: 1024,
-        lora_strength: 1.0,
-      });
-      this.isProcessing = false
-      return;
-    }
+    this.lastRenderedBitmap = bitmap;
 
     try {
-      const base64Bitmap = await this.imageBitmapToBase64(bitmap);
+      //const base64Bitmap = await this.imageBitmapToBase64(bitmap);
 
-      const base64BitmapResponse = await invoke("infer_image", {
-        image: base64Bitmap,
-        prompt: this.currentPrompt,
-        strength: this.currentStrength * 100,
-      });
+      //const base64BitmapResponse = await invoke("image_generation_command", {
+      //  image: base64Bitmap,
+      //  prompt: this.currentPrompt,
+      //});
 
-      //console.log(base64BitmapResponse);
-      const decoded = await DecodeBase64ToImage(
-        base64BitmapResponse as string,
-      );
+      ////console.log(base64BitmapResponse);
+      //const decoded = await DecodeBase64ToImage(
+      //  base64BitmapResponse as string,
+      //);
 
-      this.outputBitmap = decoded;
-      this.previewCanvas.image(decoded);
+      //this.outputBitmap = decoded;
+      //this.previewCanvas.image(decoded);
     } catch (error) {
       console.error("Error during image processing:", error);
     } finally {

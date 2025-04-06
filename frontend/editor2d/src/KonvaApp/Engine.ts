@@ -341,7 +341,13 @@ export class Engine {
     });
 
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
+      console.log('save clicked');
       await this.realTimeDrawEngine.saveOutput();
+    });
+
+    uiEvents.toolbarMain.GENERATE.onClick(async (/*event*/) => {
+      console.log('generate clicked');
+      await this.realTimeDrawEngine.generateImage();
     });
 
     uiEvents.toolbarMain.SELECT.onClick(() => {
