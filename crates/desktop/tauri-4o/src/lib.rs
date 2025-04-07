@@ -7,6 +7,7 @@ pub mod utils;
 
 use crate::commands::flip_image::flip_image;
 use crate::commands::image_generation_command::image_generation_command;
+use crate::commands::open_login_command::open_login_command;
 use crate::state::app_config::AppConfig;
 use crate::threads::login_thread::login_thread;
 
@@ -58,6 +59,7 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       flip_image,
       image_generation_command,
+      open_login_command,
     ])
     .run(tauri::generate_context!("tauri.conf.json"))
     .expect("error while running tauri application");
