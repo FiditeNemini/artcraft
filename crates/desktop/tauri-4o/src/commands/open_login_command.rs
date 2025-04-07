@@ -2,12 +2,7 @@ use log::{error, info};
 use once_cell::sync::Lazy;
 use tauri::{AppHandle, Manager, Url, WebviewUrl, WebviewWindowBuilder, WindowBuilder};
 use errors::AnyhowResult;
-
-const LOGIN_URL_STR : &str = "https://auth.openai.com/log-in";
-
-static LOGIN_URL: Lazy<Url> = Lazy::new(|| {
-  Url::parse("https://auth.openai.com/log-in").expect("URL should parse")
-});
+use crate::threads::login_thread::{LOGIN_WINDOW_NAME, SORA_LOGIN_URL};
 
 #[tauri::command]
 pub async fn open_login_command(
@@ -28,10 +23,9 @@ pub async fn open_login_command(
 async fn do_open_login(app: &AppHandle) -> AnyhowResult<()> {
   info!("Building login window...");
 
-  let url = WebviewUrl::External(LOGIN_URL.clone());
+  let url = WebviewUrl::External(SORA_LOGIN_URL.clone());
 
-  //let window = WindowBuilder::new(app, "login")
-  let window = WebviewWindowBuilder::new(app, "login", url)
+  let _window = WebviewWindowBuilder::new(app, LOGIN_WINDOW_NAME, url)
       .always_on_top(true)
       .title("Login to OpenAI")
       .center()
@@ -39,6 +33,7 @@ async fn do_open_login(app: &AppHandle) -> AnyhowResult<()> {
       .visible(true)
       .closable(true)
       .focused(true)
+      .devtools(true)
       .build()?;
 
   //info!("Iterating webviews...");
