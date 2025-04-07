@@ -499,33 +499,48 @@ export const PromptBox = () => {
         </div>
         <div className="mt-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <PopoverMenu
-              items={aspectRatioList}
-              onSelect={handleAspectRatioSelect}
-              mode="toggle"
-              panelTitle="Aspect Ratio"
-              showIconsInList
-              triggerIcon={
-                <FontAwesomeIcon
-                  icon={getCurrentAspectRatioIcon()}
-                  className="h-4 w-4"
-                />
-              }
-            />
-            <PopoverMenu
-              items={cameraList}
-              onSelect={handleCameraSelect}
-              onAdd={handleAddCamera}
-              triggerIcon={
-                <FontAwesomeIcon icon={faCamera} className="h-4 w-4" />
-              }
-              showAddButton
-              showIconsInList
-              mode="toggle"
-              panelTitle="Camera"
-              panelActionLabel="Settings"
-              onPanelAction={() => setIsCameraSettingsOpen(true)}
-            />
+            <Tooltip
+              content="Aspect ratio"
+              position="top"
+              className="z-50"
+              closeOnClick={true}
+            >
+              <PopoverMenu
+                items={aspectRatioList}
+                onSelect={handleAspectRatioSelect}
+                mode="toggle"
+                panelTitle="Aspect Ratio"
+                showIconsInList
+                triggerIcon={
+                  <FontAwesomeIcon
+                    icon={getCurrentAspectRatioIcon()}
+                    className="h-4 w-4"
+                  />
+                }
+              />
+            </Tooltip>
+            <Tooltip
+              content="Camera"
+              position="top"
+              className="z-50"
+              delay={500}
+              closeOnClick={true}
+            >
+              <PopoverMenu
+                items={cameraList}
+                onSelect={handleCameraSelect}
+                onAdd={handleAddCamera}
+                triggerIcon={
+                  <FontAwesomeIcon icon={faCamera} className="h-4 w-4" />
+                }
+                showAddButton
+                showIconsInList
+                mode="toggle"
+                panelTitle="Camera"
+                panelActionLabel="Settings"
+                onPanelAction={() => setIsCameraSettingsOpen(true)}
+              />
+            </Tooltip>
             <Tooltip
               content={
                 useSystemPrompt
@@ -534,7 +549,7 @@ export const PromptBox = () => {
               }
               position="top"
               className="z-50"
-              delay={100}
+              delay={200}
             >
               <ToggleButton
                 isActive={useSystemPrompt}
@@ -549,7 +564,8 @@ export const PromptBox = () => {
               content="Download frame"
               position="top"
               className="z-50"
-              delay={100}
+              closeOnClick={true}
+              delay={200}
             >
               <Button
                 className="flex h-9 items-center border-none bg-[#5F5F68]/60 px-3 text-sm text-white backdrop-blur-lg hover:bg-[#5F5F68]/90"

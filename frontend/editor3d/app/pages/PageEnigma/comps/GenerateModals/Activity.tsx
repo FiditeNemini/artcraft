@@ -11,7 +11,7 @@ export function Activity() {
   useSignals();
 
   return (
-    <Tooltip content="Activity" position="bottom">
+    <Tooltip content="Activity" position="bottom" closeOnClick={true}>
       <PopoverMenu
         mode="default"
         buttonClassName="h-[38px] w-[38px] !p-0"
