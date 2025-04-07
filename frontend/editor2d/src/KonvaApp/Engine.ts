@@ -316,8 +316,6 @@ export class Engine {
       }
     });
    
-
-  
     uiEvents.toolbarNode.DELETE.onClick(() =>
       this.commandManager.deleteNodes(),
     );

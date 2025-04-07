@@ -1,3 +1,4 @@
+use std::fs::read_to_string;
 use base64::prelude::BASE64_STANDARD;
 use errors::AnyhowResult;
 use base64::Engine;
@@ -29,9 +30,10 @@ pub async fn image_generation_command(image: &str, prompt: &str) -> Result<Strin
 }
 
 pub async fn generate_image(file_bytes: Vec<u8>, prompt: &str) -> AnyhowResult<()> {
-  let sora_credentials = SoraCredentials::from_toml_file("credentials.toml")?;
+  let sora_credentials = get_credentials()?;
 
-  let filename = "credentials.toml".to_string();
+  let filename = "image.png".to_string();
+
   let response= sora_media_upload_from_bytes(file_bytes, filename, &sora_credentials)
       .await
       .map_err(|err| {
@@ -56,4 +58,21 @@ pub async fn generate_image(file_bytes: Vec<u8>, prompt: &str) -> AnyhowResult<(
   println!(">> TASK ID: {:?} ", response.task_id);
 
   Ok(())
+}
+
+fn get_credentials() -> AnyhowResult<SoraCredentials> {
+  let bearer = read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/bearer.txt")?
+      .trim()
+      .to_string();
+  let cookie= read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/cookie.txt")?
+      .trim()
+      .to_string();
+  let sentinel = read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/sentinel.txt")?
+      .trim()
+      .to_string();
+  Ok(SoraCredentials {
+    bearer_token: bearer,
+    cookie: cookie,
+    sentinel: Some(sentinel),
+  })
 }
