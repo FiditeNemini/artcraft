@@ -15,7 +15,6 @@ import { ActiveJob } from "~/pages/PageEnigma/models";
 import { Tooltip } from "~/components";
 import { JobsApi } from "~/Classes/ApiManager";
 import { PollRecentJobs } from "~/hooks/useActiveJobs/utilities";
-import { getStyleName } from "~/pages/PageEnigma/comps/GenerateModals/CompletedCard";
 interface Props {
   movie: ActiveJob;
 }
@@ -39,7 +38,6 @@ export function InProgressCard({ movie }: Props) {
     movie.status.status as JobState,
     movie.status.progress_percentage,
   );
-  const completeLength = (600 * completePercent) / 100;
 
   const deleteJob = useCallback(async (movieJob: ActiveJob) => {
     const jobsApi = new JobsApi();
@@ -74,15 +72,7 @@ export function InProgressCard({ movie }: Props) {
           <div className="font-medium">
             {movie.request.maybe_model_title || "Untitled"}
           </div>
-          <div className="font-medium">
-            {getStyleName(movie.request.maybe_style_name) || "Untitled"}
-          </div>
-          <div className="relative block h-[6px] w-[560px] overflow-hidden rounded-lg bg-white/10">
-            <div
-              className="absolute inset-0 block h-[6px] rounded-lg bg-brand-primary"
-              style={{ width: completeLength }}
-            />
-          </div>
+
           <div className="text-sm capitalize text-white/60">
             {movie.status.status.replaceAll("_", " ")}... {completePercent}%
           </div>
@@ -91,7 +81,7 @@ export function InProgressCard({ movie }: Props) {
 
       {movie.status.status !== JobState.STARTED && (
         <div className="pr-5">
-          <Tooltip content="Cancel" position="top">
+          <Tooltip content="Cancel" position="left">
             <button
               onClick={() => deleteJob(movie)}
               className="text-[15px] font-medium text-white/50 transition-all duration-150 hover:text-white/100"

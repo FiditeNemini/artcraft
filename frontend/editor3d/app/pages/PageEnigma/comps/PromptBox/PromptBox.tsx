@@ -525,7 +525,7 @@ export const PromptBox = () => {
               content="Camera"
               position="top"
               className="z-50"
-              delay={500}
+              delay={300}
               closeOnClick={true}
             >
               <PopoverMenu
