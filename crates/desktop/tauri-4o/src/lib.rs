@@ -1,12 +1,14 @@
+pub mod commands;
 pub mod events;
 pub mod state;
+pub mod threads;
 pub mod transfer;
 pub mod utils;
-pub mod commands;
 
 use crate::commands::flip_image::flip_image;
 use crate::commands::image_generation_command::image_generation_command;
 use crate::state::app_config::AppConfig;
+use crate::threads::login_thread::login_thread;
 
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;
@@ -47,7 +49,7 @@ pub fn run() {
       //}
       let app = app.handle().clone();
 
-      //tauri::async_runtime::spawn(downloader_thread(app_data_root2, app));
+      tauri::async_runtime::spawn(login_thread(app));
 
       Ok(())
     })

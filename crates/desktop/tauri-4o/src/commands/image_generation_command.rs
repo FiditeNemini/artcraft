@@ -6,6 +6,7 @@ use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
 use std::io::Cursor;
 use log::{error, info};
+use tauri::{AppHandle, Manager};
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
@@ -13,8 +14,26 @@ use openai_sora_client::upload::upload_media_from_bytes::sora_media_upload_from_
 use openai_sora_client::upload::upload_media_from_file::SoraMediaUploadRequest;
 
 #[tauri::command]
-pub async fn image_generation_command(image: &str, prompt: &str) -> Result<String, String> {
+pub async fn image_generation_command(
+  image: &str,
+  prompt: &str,
+  app: AppHandle,
+) -> Result<String, String> {
   info!("image_generation_command called; processing image...");
+
+  for (w, webview) in app.webviews() {
+    info!("sending webview: {}", w);
+    //let result = webview.eval("window.location.replace('https://google.com');"); // works
+    //let result = webview.eval("document.body.innerHTML = 'hello'"); // works
+    let result = webview.eval("document.body.innerHTML = document.cookie");
+    if let Err(err) = result {
+      error!("Error with webview: {:?}", err)
+    }
+  }
+
+  if true {
+    return Ok("true".to_string());
+  }
 
   let bytes = BASE64_STANDARD.decode(image)
     .map_err(|err| format!("Base64 decode error: {}", err))?;
