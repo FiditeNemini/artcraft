@@ -296,6 +296,8 @@ export const PromptBox = () => {
   const handleEnqueue = async () => {
     if (!prompt.trim()) return;
 
+    setisEnqueueing(true);
+
     if (editorEngine) {
       editorEngine.positive_prompt = prompt;
 
@@ -314,7 +316,6 @@ export const PromptBox = () => {
         });
       }
 
-      setisEnqueueing(true);
       try {
         // Here we would pass both the prompt and reference images to the generation
         console.log(
@@ -328,6 +329,7 @@ export const PromptBox = () => {
         setisEnqueueing(false);
       }
     }
+    setisEnqueueing(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
