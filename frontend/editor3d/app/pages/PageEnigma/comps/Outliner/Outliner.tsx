@@ -181,7 +181,7 @@ export const Outliner = () => {
     <Transition
       show={outlinerIsShowing.value}
       className={twMerge(
-        "flex max-h-[34vh] w-[240px] origin-bottom-left flex-col overflow-hidden rounded-lg bg-ui-panel/95 shadow-lg",
+        "glass flex max-h-[34vh] w-[240px] origin-bottom-left flex-col overflow-hidden rounded-lg shadow-lg",
       )}
       style={{ height: getOutlinerHeightClass() }}
       enter="transition-opacity duration-150"
