@@ -27,6 +27,7 @@ import {
 import { ensureBase64Prefix } from "../EngineUtitlities/Base64Helpers";
 import { DecodeBase64ToImage } from "~/utilities/DecodeBase64ToImage.ts";
 import { EncodeImageBitmapToBase64 } from "~/utilities/EncodeImageBitmapToBase64.ts";
+import { setCanvasRenderBitmap } from "~/signal/canvasRenderBitmap";
 
 interface ServerSettings {
   model_path: string;
@@ -789,6 +790,11 @@ export class RealTimeDrawEngine {
     const base64Bitmap = await this.imageBitmapToBase64(
       this.lastRenderedBitmap,
     );
+    
+    const generateResponse = await invoke("image_generation_command", {
+      image: base64Bitmap,
+      prompt: this.currentPrompt,
+    });
   }
 
   public async render() {
@@ -822,18 +828,9 @@ export class RealTimeDrawEngine {
 
     this.lastRenderedBitmap = bitmap;
 
+    setCanvasRenderBitmap(bitmap);
+
     try {
-      //const base64Bitmap = await this.imageBitmapToBase64(bitmap);
-      //const base64BitmapResponse = await invoke("image_generation_command", {
-      //  image: base64Bitmap,
-      //  prompt: this.currentPrompt,
-      //});
-      ////console.log(base64BitmapResponse);
-      //const decoded = await DecodeBase64ToImage(
-      //  base64BitmapResponse as string,
-      //);
-      //this.outputBitmap = decoded;
-      //this.previewCanvas.image(decoded);
     } catch (error) {
       console.error("Error during image processing:", error);
     } finally {

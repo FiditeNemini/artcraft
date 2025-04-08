@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
   UploaderStates,
@@ -33,6 +34,8 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PopoverItem } from "~/components/reusable/Popover";
+import { getCanvasRenderBitmap } from "~/signal/canvasRenderBitmap";
+import { EncodeImageBitmapToBase64 } from "~/utilities/EncodeImageBitmapToBase64";
 
 interface ReferenceImage {
   id: string;
@@ -48,6 +51,8 @@ interface ExtendedPopoverItem extends PopoverItem {
 
 export const PromptBox = () => {
   useSignals();
+  //const { lastRenderedBitmap } = useCanvasSignal();
+
   const [prompt, setPrompt] = useState("");
   const [isEnqueueing, setisEnqueueing] = useState(false);
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
@@ -253,6 +258,20 @@ export const PromptBox = () => {
         "and reference images:",
         referenceImages,
       );
+
+      let image = getCanvasRenderBitmap();
+
+      if (image === undefined) {
+        return;
+      }
+
+      const base64Bitmap = await EncodeImageBitmapToBase64(image);
+
+      const generateResponse = await invoke("image_generation_command", {
+        image: base64Bitmap,
+        prompt: prompt,
+      });
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
     } finally {
       setisEnqueueing(false);

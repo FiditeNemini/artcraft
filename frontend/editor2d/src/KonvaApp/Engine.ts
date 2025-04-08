@@ -338,8 +338,6 @@ export class Engine {
     });
 
     uiEvents.toolbarMain.SAVE.onClick(async (/*event*/) => {
-      //document.location.href = "https://auth.openai.com/log-in";
-      //console.log('save clicked');
       //await this.realTimeDrawEngine.saveOutput(); // This works.
       await invoke("open_login_command");
     });
