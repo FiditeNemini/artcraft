@@ -6,39 +6,27 @@ use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
 use std::io::Cursor;
 use log::{error, info};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, State};
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
 use openai_sora_client::upload::upload_media_from_bytes::sora_media_upload_from_bytes;
 use openai_sora_client::upload::upload_media_from_file::SoraMediaUploadRequest;
+use crate::state::app_dir::AppDataRoot;
 
 #[tauri::command]
 pub async fn image_generation_command(
   image: &str,
   prompt: &str,
   app: AppHandle,
+  app_data_root: State<'_, AppDataRoot>,
 ) -> Result<String, String> {
   info!("image_generation_command called; processing image...");
-
-  for (w, webview) in app.webviews() {
-    info!("sending webview: {}", w);
-    //let result = webview.eval("window.location.replace('https://google.com');"); // works
-    //let result = webview.eval("document.body.innerHTML = 'hello'"); // works
-    let result = webview.eval("document.body.innerHTML = document.cookie");
-    if let Err(err) = result {
-      error!("Error with webview: {:?}", err)
-    }
-  }
-
-  if true {
-    return Ok("true".to_string());
-  }
 
   let bytes = BASE64_STANDARD.decode(image)
     .map_err(|err| format!("Base64 decode error: {}", err))?;
 
-  generate_image(bytes, prompt)
+  generate_image(bytes, prompt, &app_data_root)
     .await
     .map_err(|err| {
       error!("error: {:?}", err);
@@ -48,8 +36,8 @@ pub async fn image_generation_command(
   Ok("success".to_string())
 }
 
-pub async fn generate_image(file_bytes: Vec<u8>, prompt: &str) -> AnyhowResult<()> {
-  let sora_credentials = get_credentials()?;
+pub async fn generate_image(file_bytes: Vec<u8>, prompt: &str, app_data_root: &AppDataRoot) -> AnyhowResult<()> {
+  let sora_credentials = get_credentials(app_data_root)?;
 
   let filename = "image.png".to_string();
 
@@ -79,16 +67,21 @@ pub async fn generate_image(file_bytes: Vec<u8>, prompt: &str) -> AnyhowResult<(
   Ok(())
 }
 
-fn get_credentials() -> AnyhowResult<SoraCredentials> {
+fn get_credentials(app_data_root: &AppDataRoot) -> AnyhowResult<SoraCredentials> {
+  let cookie_file = app_data_root.get_sora_cookie_file_path();
+
   let bearer = read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/bearer.txt")?
       .trim()
       .to_string();
-  let cookie= read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/cookie.txt")?
+
+  let cookie= read_to_string(cookie_file)?
       .trim()
       .to_string();
+
   let sentinel = read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/sentinel.txt")?
       .trim()
       .to_string();
+
   Ok(SoraCredentials {
     bearer_token: bearer,
     cookie: cookie,

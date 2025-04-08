@@ -114,6 +114,10 @@ impl AppDataRoot {
   pub fn log_file_name_str(&self) -> &str {
     &self.log_file_name_string
   }
+
+  pub fn get_sora_cookie_file_path(&self) -> PathBuf {
+    self.path.join("sora_cookies.txt")
+  }
 }
 
 impl AppAssetsDir {

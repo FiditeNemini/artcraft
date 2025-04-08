@@ -4,7 +4,7 @@ use serde_derive::Deserialize;
 use errors::AnyhowResult;
 
 // NB: It appears that the sentinel may require a matching user agent.
-pub (crate) const USER_AGENT : &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
+pub const USER_AGENT : &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
 
 #[derive(Clone, Deserialize)]
 pub struct SoraCredentials {

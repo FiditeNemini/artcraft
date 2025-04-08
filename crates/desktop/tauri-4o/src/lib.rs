@@ -23,7 +23,6 @@ pub fn run() {
   let config = AppConfig::init()
     .expect("config should load");
 
-
   let app_data_root = config.app_data_root.clone();
   let app_data_root2 = config.app_data_root.clone();
 
@@ -50,7 +49,7 @@ pub fn run() {
       //}
       let app = app.handle().clone();
 
-      tauri::async_runtime::spawn(login_thread(app));
+      tauri::async_runtime::spawn(login_thread(app, app_data_root2));
 
       Ok(())
     })

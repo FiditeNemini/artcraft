@@ -1,9 +1,13 @@
+use std::fs::OpenOptions;
+use std::io::Write;
 use anyhow::anyhow;
 use log::{error, info};
 use once_cell::sync::Lazy;
 use reqwest::Url;
 use tauri::{AppHandle, Manager, Webview};
 use errors::AnyhowResult;
+use crate::state::app_dir::AppDataRoot;
+use crate::utils::sora_webview_cookies::get_all_sora_cookies_as_string;
 
 pub const LOGIN_WINDOW_NAME: &str = "login_window";
 
@@ -13,11 +17,17 @@ pub static SORA_LOGIN_URL: Lazy<Url> = Lazy::new(|| {
   Url::parse(SORA_LOGIN_URL_STR).expect("URL should parse")
 });
 
-pub async fn login_thread(app: AppHandle) -> ! {
+pub const SORA_ROOT_URL_STR: &str = "https://sora.com/";
+
+pub static SORA_ROOT_URL: Lazy<Url> = Lazy::new(|| {
+  Url::parse(SORA_ROOT_URL_STR).expect("URL should parse")
+});
+
+pub async fn login_thread(app: AppHandle, app_data_root: AppDataRoot) -> ! {
   loop {
     for (window_name, webview) in app.webviews() {
       if window_name == LOGIN_WINDOW_NAME {
-        let result = check_login_window(&webview).await;
+        let result = check_login_window(&webview, &app_data_root).await;
         if let Err(err) = result {
           error!("Error checking login window: {:?}", err);
         }
@@ -28,9 +38,10 @@ pub async fn login_thread(app: AppHandle) -> ! {
   }
 }
 
-async fn check_login_window(webview: &Webview) -> AnyhowResult<()> {
+async fn check_login_window(webview: &Webview, app_data_root: &AppDataRoot) -> AnyhowResult<()> {
   clear_browsing_data_on_test_domain(webview)?;
-  keep_on_task(webview)?;
+  //keep_on_task(webview)?;
+  extract_cookies_to_file(webview, app_data_root)?;
   // TODO: Other maintenance tasks ...
   Ok(())
 }
@@ -73,29 +84,20 @@ fn clear_browsing_data_on_test_domain(webview: &Webview) -> AnyhowResult<()> {
   Ok(())
 }
 
-pub fn random_behavior(webview: &Webview) -> AnyhowResult<()> {
-  let url = webview.url();
-  //webview.navigate(url)?;
-  //webview.cookies_for_url(url)?;
+// TODO(bt,2025-04-07): Heuristic to detect when logged in. Only write when logged in.
+fn extract_cookies_to_file(webview: &Webview, app_data_root: &AppDataRoot) -> AnyhowResult<()> {
+  let cookies = get_all_sora_cookies_as_string(webview)?;
 
-  let rand = rand::random_range(0..5u8);
-  match rand {
-    0..3 => {
-      redirect_google(&webview)?;
-    }
-    _ => {
-      write_cookies_to_body(&webview)?;
-    }
-  }
-  Ok(())
-}
+  let cookie_file = app_data_root.get_sora_cookie_file_path();
 
-pub fn redirect_google(webview: &Webview) -> AnyhowResult<()> {
-  webview.eval("window.location.replace('https://google.com');")?;
-  Ok(())
-}
+  let mut file = OpenOptions::new()
+      .create(true)
+      .write(true)
+      .truncate(true)
+      .open(cookie_file)?;
 
-pub fn write_cookies_to_body(webview: &Webview) -> AnyhowResult<()> {
-  webview.eval("document.body.innerHTML = document.cookie")?;
+  file.write_all(cookies.as_bytes())?;
+  file.flush()?;
+
   Ok(())
 }
