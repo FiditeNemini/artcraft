@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "echo 'realtime' && vite",
+    "dev": "echo 'editor2d' && vite",
     "build": "tsc -b && vite build",
     "build2": "vite build",
     "lint": "eslint .",
