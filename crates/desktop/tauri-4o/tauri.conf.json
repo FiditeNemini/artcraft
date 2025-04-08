@@ -5,7 +5,7 @@
   "identifier": "com.unique.value.thing.why",
   "build": {
     "frontendDist": "../../../frontend/realtime/dist",
-    "devUrl": "http://localhost:5741",
+    "devUrl": "http://localhost:5174",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build2"
   },

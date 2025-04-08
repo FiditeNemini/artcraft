@@ -17,4 +17,4 @@ popd
 export TAURI_FRONTEND_PATH="${frontend_path}"
 export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-4o"
 
-cargo tauri dev -- -- --no-watch -p 5173
+cargo tauri dev -- -- --no-watch
