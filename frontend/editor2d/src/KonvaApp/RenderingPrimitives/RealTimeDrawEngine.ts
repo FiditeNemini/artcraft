@@ -790,7 +790,7 @@ export class RealTimeDrawEngine {
     const base64Bitmap = await this.imageBitmapToBase64(
       this.lastRenderedBitmap,
     );
-    
+
     const generateResponse = await invoke("image_generation_command", {
       image: base64Bitmap,
       prompt: this.currentPrompt,
