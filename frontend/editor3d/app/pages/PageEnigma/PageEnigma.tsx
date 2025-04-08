@@ -39,7 +39,7 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useEffect(() => {
     const { getGPUTier } = gpu;
     getGPUTier().then((gpuTier) => {
-      console.log(gpuTier);
+      console.log("GPU tier", gpuTier);
       if (gpuTier.gpu === "apple gpu (Apple GPU)") {
         setValidGpu("valid");
       }
