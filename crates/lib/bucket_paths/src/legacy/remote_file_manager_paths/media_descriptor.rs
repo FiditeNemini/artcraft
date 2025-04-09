@@ -3,6 +3,7 @@ use crate::legacy::remote_file_manager_paths::file_descriptor::FileDescriptor;
 // TODO ASK BRANDON WHAT path should this be?
 const MEDIA_FILE_DIRECTORY: &str = "/media";
 
+#[deprecated(note="DO NOT USE THIS AWFUL CLOUD BUCKET CLIENT. See `BucketClient`")]
 pub struct MediaImagePngDescriptor;
 
 impl FileDescriptor for MediaImagePngDescriptor {

@@ -27,11 +27,13 @@ impl PublicPath for MediaFileBucketPath {}
 
 impl MediaFileBucketPath {
 
+  /// NB: The `optional_extension` needs to include a "." (period) if you want it in the file.
   pub fn generate_new(optional_prefix: Option<&str>, optional_extension: Option<&str>) -> Self {
     let entropy = crockford_entropy_lower(32);
     Self::from_object_hash(&entropy, optional_prefix, optional_extension)
   }
 
+  /// NB: The `optional_extension` needs to include a "." (period) if you want it in the file.
   pub fn from_object_hash(hash: &str, optional_prefix: Option<&str>, optional_extension: Option<&str>) -> Self {
     // TODO: Path construction could be cleaner.
     let directory = MediaFileBucketDirectory::from_object_hash(hash);
