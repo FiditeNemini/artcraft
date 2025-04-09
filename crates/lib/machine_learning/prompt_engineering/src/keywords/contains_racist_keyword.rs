@@ -2,9 +2,9 @@ use std::collections::HashSet;
 
 use once_cell::sync::Lazy;
 
-const TERMS : &str = include_str!("../../../../../includes/binary_includes/dictionary_children_terms.txt");
+const TERMS : &str = include_str!("../../../../../../includes/binary_includes/dictionary_racist_terms.txt");
 
-pub (crate) fn contains_children_keyword(prompt_tokens: &[String]) -> bool {
+pub (crate) fn contains_racist_keyword(prompt_tokens: &[String]) -> bool {
   static TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
     TERMS.lines()
         .map(|line| line.trim().to_lowercase())

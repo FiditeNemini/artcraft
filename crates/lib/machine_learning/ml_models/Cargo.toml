@@ -18,6 +18,9 @@ normal = ["my-workspace-hack"]
 
 [dependencies]
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { workspace =  true }
+
 # Internal
 filesys = { path = "../../files/filesys" }
 image_algorithms = { path = "../../image_algorithms" }

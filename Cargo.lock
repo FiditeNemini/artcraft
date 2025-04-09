@@ -7007,6 +7007,7 @@ dependencies = [
  "log",
  "memory_caching",
  "ml_weights_registry",
+ "my-workspace-hack",
  "ndarray",
  "nvidia-checker",
  "once_cell",

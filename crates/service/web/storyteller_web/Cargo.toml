@@ -55,21 +55,21 @@ memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
+openai_sora_client = { path = "../../../lib/api_clients/openai_sora_client" }
 password = { path = "../../../lib/password" }
 primitives = { path = "../../../lib/data/primitives" }
-prompt_engineering = { path = "../../../lib/prompt_engineering" }
+prompt_engineering = { path = "../../../lib/machine_learning/prompt_engineering" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }
 redis_schema = { path = "../../../lib/redis_schema" }
 reusable_types = { path = "../../../_types/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
-tokens = { path = "../../../_types/tokens" }
 thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator" }
+tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 url_config = { path = "../../../lib/url_config" }
 user_input_common = { path = "../../../lib/user_input_common" }
 videos = { path = "../../../lib/files/videos" }
-openai_sora_client = { path = "../../../lib/api_clients/openai_sora_client" }
 
 # Internal Components
 billing_component = { path = "../../plugins/billing" }
