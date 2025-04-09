@@ -64,6 +64,10 @@ pub enum PublicMediaFileModelType {
   #[serde(rename = "studio")]
   StorytellerStudio,
 
+  /// NB: This is GPT4o image generation
+  #[serde(rename = "studio_ig")]
+  StorytellerStudioImageGen,
+
   #[serde(rename = "vst")]
   VideoStyleTransfer,
 
@@ -89,6 +93,7 @@ impl PublicMediaFileModelType {
       MediaFileOriginModelType::LivePortrait => Self::FaceMirror,
       MediaFileOriginModelType::SadTalker => Self::FaceAnimator,
       MediaFileOriginModelType::StyleTTS2 => Self::VoiceDesigner,
+      MediaFileOriginModelType::StorytellerStudioImageGen => Self::StorytellerStudioImageGen,
       // Conserved variants
       MediaFileOriginModelType::RvcV2 => Self::RvcV2,
       MediaFileOriginModelType::SoVitsSvc => Self::SoVitsSvc,
@@ -113,6 +118,7 @@ impl PublicMediaFileModelType {
       Self::FaceAnimator => MediaFileOriginModelType::SadTalker,
       Self::Lipsync => MediaFileOriginModelType::FaceFusion,
       Self::VoiceDesigner => MediaFileOriginModelType::StyleTTS2,
+      Self::StorytellerStudioImageGen => MediaFileOriginModelType::StorytellerStudioImageGen,
       // Conserved variants
       Self::RvcV2 => MediaFileOriginModelType::RvcV2,
       Self::SoVitsSvc => MediaFileOriginModelType::SoVitsSvc,
