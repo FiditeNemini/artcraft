@@ -32,6 +32,9 @@ target/
 crates/lib/database_queries/target/
 crates/lib/sqlite_queries/target/
 
+# Javascript build directories
+node_modules/
+
 # Vim noise
 *.swo
 *.swp
