@@ -26,7 +26,6 @@ export function CompletedCard({ movie, setMovieId }: Props) {
   useSignals();
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
-  //const downloadLink = `${environmentVariables.values.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
   const cdnOrigin = GetCdnOrigin();
   const downloadLink = `https://${cdnOrigin}${movie.public_bucket_path}`;
 

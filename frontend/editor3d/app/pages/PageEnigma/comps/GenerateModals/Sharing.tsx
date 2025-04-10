@@ -29,9 +29,6 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   const shareUrl = `https://storyteller.ai/media/${mediaFile?.token || ""}`;
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
-  // TODO: ApiManager should provide all endpoints
-  //const media_api_base_url = environmentVariables.values.GOOGLE_API;
-  //const downloadLink = `${media_api_base_url}/vocodes-public${mediaFile?.public_bucket_path}`;
   const media_api_base_url = GetCdnOrigin();
   const downloadLink = `${media_api_base_url}${mediaFile?.public_bucket_path}`;
 

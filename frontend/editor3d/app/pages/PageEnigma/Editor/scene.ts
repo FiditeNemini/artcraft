@@ -414,7 +414,6 @@ class Scene {
   async getMediaURL(media_id: string) {
     //This is for prod when we have the proper info on the url.
     const api_base_url = environmentVariables.values.BASE_API;
-    //const media_api_base_url = environmentVariables.values.GOOGLE_API;
     const url = `${api_base_url}/v1/media_files/file/${media_id}`;
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());

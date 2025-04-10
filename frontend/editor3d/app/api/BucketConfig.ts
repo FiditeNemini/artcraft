@@ -14,20 +14,13 @@ class BucketConfig {
   // TODO: Prevent callers with undefined/null paths
   // TODO pipeline works make more robust....
   getGcsUrl(bucketRelativePath: string | undefined | null): string {
-    //const bucket = this.getBucket();
     let path = bucketRelativePath;
     if (path !== undefined && path !== null && !path.startsWith("/")) {
       path = "/" + path;
     }
-    //const media_api_base_url = environmentVariables.values.GOOGLE_API;
-    //return `${media_api_base_url}/${bucket}${path}`;
     const media_api_base_url = GetCdnOrigin();
     return `${media_api_base_url}${path}`;
   }
-
-  //private getBucket(): string {
-  //  return this.isLocalDev ? "dev-vocodes-public" : "vocodes-public";
-  //}
 
   getCdnUrl(
     bucketRelativePath: string,

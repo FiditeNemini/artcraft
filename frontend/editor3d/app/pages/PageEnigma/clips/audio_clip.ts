@@ -40,16 +40,11 @@ export class AudioClip implements Ijson {
     const api_base_url = environmentVariables.values.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
 
-    //console.log(`API BASE URL? ${api_base_url}`);
-    //console.log(`CALLED URL? ${url}`);
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    //const media_api_base_url = environmentVariables.values.GOOGLE_API;
     const media_api_base_url = GetCdnOrigin();
 
-    //const media_base_url = `${media_api_base_url}/vocodes-public`;
-    //const media_url = `${media_base_url}${bucketPath}`;
     const media_url = `${media_api_base_url}${bucketPath}`;
     return media_url;
   }

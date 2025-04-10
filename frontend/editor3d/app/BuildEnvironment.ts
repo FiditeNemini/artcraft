@@ -36,6 +36,10 @@ export class BuildEnvironment {
       case "devproxy":
         environmentType = BuildEnvironmentType.DevProxy;
         break;
+      case "stage":
+      case "staging":
+        environmentType = BuildEnvironmentType.Staging;
+        break;
     }
 
     const instance = new BuildEnvironment(environmentType);

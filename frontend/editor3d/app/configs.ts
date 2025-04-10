@@ -51,6 +51,7 @@ export class Configs {
             case BuildEnvironmentType.Dev:
                 this.deployContext = "DEVELOPMENT";
                 this.uploadApiVideo = "http://localhost:12345";
+                this.baseApi = "http://localhost:12345";
                 break;
             case BuildEnvironmentType.DevProxy:
                 this.deployContext = "DEVELOPMENT";
