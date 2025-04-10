@@ -130,12 +130,22 @@ publish = false
 
 [workspace.dependencies]
 # Hakari workspace hack (faster compile times)
-# Packages to remove from hakari to ensure we can build in Netlify, Github Actions (without package installs), etc.:
+#
+# If an unrelated leaf package starts causing general build problems, 
+# for packages including hakari, look up what depends on the bad package:
+#
+#   `cargo tree --target all  -p {BAD_PACKAGE_NAME} -i`
+#
+# Packages to remove from hakari to ensure we can build in Netlify, 
+# Github Actions (without package installs), etc.:
+#
 #  - cudarc
+#  - esaxx-rs
 #  - ort
 #  - tauri
 #  - tauri-runtime-wry
 #  - tauri-utils
+#
 workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 
 # External libs

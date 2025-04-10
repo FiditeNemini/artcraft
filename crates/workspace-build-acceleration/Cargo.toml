@@ -41,7 +41,7 @@ crypto-common = { version = "0.1.6", default-features = false, features = ["std"
 deranged = { version = "0.3.11", default-features = false, features = ["powerfmt", "serde", "std"] }
 digest = { version = "0.10.7", features = ["mac", "oid", "std"] }
 either = { version = "1.12.0", features = ["serde"] }
-esaxx-rs = { version = "0.1.10", default-features = false, features = ["cpp"] }
+#esaxx-rs = { version = "0.1.10", default-features = false, features = ["cpp"] }
 flate2 = { version = "1.0.30" }
 futures = { version = "0.3.29", features = ["thread-pool"] }
 futures-channel = { version = "0.3.30", features = ["sink"] }
