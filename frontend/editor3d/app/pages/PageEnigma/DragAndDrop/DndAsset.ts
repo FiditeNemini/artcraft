@@ -11,7 +11,6 @@ import {
   currPosition,
   dragItem,
   overTimeline,
-  sidePanelWidth,
   timelineHeight,
   assetModalVisibleDuringDrag,
   reopenAfterDragSignal,
@@ -75,10 +74,10 @@ class DndAsset {
     if (positionY < 69) {
       return false;
     }
-    if (positionY > pageHeight.value - timelineHeight.value) {
+    if (positionY > pageHeight.value) {
       return false;
     }
-    return positionX <= pageWidth.value - sidePanelWidth.value - 84;
+    return positionX <= pageWidth.value;
   }
 
   onPointerUp(event: PointerEvent) {

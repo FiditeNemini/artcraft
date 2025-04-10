@@ -1,8 +1,6 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import { twMerge } from "tailwind-merge";
-
-import { EditorStates } from "~/pages/PageEnigma/enums";
-import { editorState, cameraAspectRatio } from "~/pages/PageEnigma/signals";
+import { cameraAspectRatio } from "~/pages/PageEnigma/signals";
 
 import {
   calcMatteWidth,
@@ -51,7 +49,7 @@ export const Letterbox = ({
     <div
       id="letterbox"
       className={twMerge(
-        "absolute left-0 top-0 flex h-full w-full justify-between pointer-events-none",
+        "user-select-none pointer-events-none absolute left-0 top-0 flex h-full w-full justify-between",
         matteOri === MatteOrientation.TOP_BOTTOM ? "flex-col" : null,
       )}
     >
@@ -73,14 +71,14 @@ const Matte = ({
   if (matteOri === MatteOrientation.TOP_BOTTOM) {
     return (
       <div
-        className="h-20 w-full bg-black/30 brightness-75"
+        className="pointer-events-none h-20 w-full bg-black/30 brightness-75"
         style={{ height: `${height}px` }}
       />
     );
   }
   return (
     <div
-      className="h-full w-80 bg-black/30 brightness-75"
+      className="pointer-events-none h-full w-80 bg-black/30 brightness-75"
       style={{ width: `${width}px` }}
     />
   );
