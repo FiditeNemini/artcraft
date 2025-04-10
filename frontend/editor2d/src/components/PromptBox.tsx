@@ -73,11 +73,6 @@ export const PromptBox = () => {
       selected: false,
       icon: <FontAwesomeIcon icon={faSquare} className="h-4 w-4" />,
     },
-    {
-      label: "16:9",
-      selected: false,
-      icon: <FontAwesomeIcon icon={faRectangleWide} className="h-4 w-4" />,
-    },
   ]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
