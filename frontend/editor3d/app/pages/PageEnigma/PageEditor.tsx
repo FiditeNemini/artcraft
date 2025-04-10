@@ -134,7 +134,7 @@ export const PageEditor = () => {
             <PromptBox />
 
             <LoadingDots
-              className="absolute left-0 top-0"
+              className="absolute left-0 top-0 z-50"
               isShowing={editorLoader.value.isShowing}
               type="bricks"
               message={editorLoader.value.message}

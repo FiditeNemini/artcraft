@@ -223,7 +223,7 @@ export const ControlsTopButtons = () => {
             {
               disabled:
                 !scene.value.isModified ||
-                scene.value.ownerToken !==
+                scene.value.ownerToken ===
                   authentication.userInfo.value?.user_token,
               // save scene should be disabled if there are no changes
               label: "Save scene",

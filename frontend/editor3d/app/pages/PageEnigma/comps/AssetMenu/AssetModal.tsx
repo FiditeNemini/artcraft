@@ -6,9 +6,10 @@ import {
   faLayerGroup,
   faUser,
   faSun,
-  faTree,
   faCube,
   faChevronRight,
+  faMountainCity,
+  faDog,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, CloseButton, Input, Tooltip } from "~/components";
@@ -106,11 +107,6 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
     defaultErrorMessage: "Error fetching user objects",
   });
 
-  const { userObjects: userNature } = useUserObjects({
-    filterEngineCategories: [FilterEngineCategories.SET_DRESSING],
-    defaultErrorMessage: "Error fetching user nature assets",
-  });
-
   const { featuredObjects: featuredCharacters } = useFeaturedObjects({
     filterEngineCategories: [FilterEngineCategories.CHARACTER],
     defaultErrorMessage: "Error fetching featured characters",
@@ -121,9 +117,24 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
     defaultErrorMessage: "Error fetching featured objects",
   });
 
-  const { featuredObjects: featuredNature } = useFeaturedObjects({
-    filterEngineCategories: [FilterEngineCategories.SET_DRESSING],
-    defaultErrorMessage: "Error fetching featured nature assets",
+  const { userObjects: userSets } = useUserObjects({
+    filterEngineCategories: [FilterEngineCategories.LOCATION],
+    defaultErrorMessage: "Error fetching user sets",
+  });
+
+  const { featuredObjects: featuredSets } = useFeaturedObjects({
+    filterEngineCategories: [FilterEngineCategories.LOCATION],
+    defaultErrorMessage: "Error fetching featured sets",
+  });
+
+  const { userObjects: userCreatures } = useUserObjects({
+    filterEngineCategories: [FilterEngineCategories.CREATURE],
+    defaultErrorMessage: "Error fetching user creatures",
+  });
+
+  const { featuredObjects: featuredCreatures } = useFeaturedObjects({
+    filterEngineCategories: [FilterEngineCategories.CREATURE],
+    defaultErrorMessage: "Error fetching featured creatures",
   });
 
   const libraryTabs = [
@@ -155,20 +166,30 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
           : (userObjects ?? []),
     },
     {
+      id: "sets",
+      label: "Sets",
+      icon: faMountainCity,
+      engineCategory: FilterEngineCategories.LOCATION,
+      items:
+        activeLibraryTab === "library"
+          ? (featuredSets ?? [])
+          : (userSets ?? []),
+    },
+    {
+      id: "creatures",
+      label: "Creatures",
+      icon: faDog,
+      engineCategory: FilterEngineCategories.CREATURE,
+      items:
+        activeLibraryTab === "library"
+          ? (featuredCreatures ?? [])
+          : (userCreatures ?? []),
+    },
+    {
       id: "skybox",
       label: "Skybox",
       icon: faSun,
       items: demoSkyboxItems.value,
-    },
-    {
-      id: "nature",
-      label: "Nature",
-      icon: faTree,
-      engineCategory: FilterEngineCategories.SET_DRESSING,
-      items:
-        activeLibraryTab === "library"
-          ? (featuredNature ?? [])
-          : (userNature ?? []),
     },
   ];
 
