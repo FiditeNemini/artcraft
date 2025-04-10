@@ -69,7 +69,7 @@ export const Help = () => {
           </Shortcut> */}
           <Shortcut label="Orbit View">
             <KeyGroup>
-              <Mouse button="middle" label="(Hold)" />
+              <Mouse button="left" label="(Hold)" />
             </KeyGroup>
           </Shortcut>
           <Shortcut label="Forward Backward">
@@ -97,6 +97,23 @@ export const Help = () => {
           </Shortcut>
         </ShortcutsGroup>
 
+        <ShortcutsGroup label="Interaction">
+          <Shortcut label="Select Object">
+            <Mouse button="left" label="(Click)" />
+          </Shortcut>
+          {/* <Shortcut label="Clear Selection">
+            <Key button="Esc" />
+          </Shortcut> */}
+          {/* <Shortcut label="Focus Selection">
+            <Key button="F" />
+          </Shortcut> */}
+          <Shortcut label="Delete Selection">
+            <Key button="Del" />
+          </Shortcut>
+        </ShortcutsGroup>
+      </div>
+
+      <div className="flex flex-col gap-8">
         <ShortcutsGroup label="Shortcuts">
           <Shortcut label="Transform">
             <Key button="T" />
@@ -121,69 +138,6 @@ export const Help = () => {
             <Key button="Shift" />
             <Plus></Plus>
             <Key button="V" />
-          </Shortcut>
-        </ShortcutsGroup>
-
-        <ShortcutsGroup label="Interaction">
-          <Shortcut label="Select Object">
-            <Mouse button="left" label="(Click)" />
-          </Shortcut>
-          {/* <Shortcut label="Clear Selection">
-            <Key button="Esc" />
-          </Shortcut> */}
-          {/* <Shortcut label="Focus Selection">
-            <Key button="F" />
-          </Shortcut> */}
-          <Shortcut label="Delete Selection">
-            <Key button="Del" />
-          </Shortcut>
-        </ShortcutsGroup>
-      </div>
-
-      <div className="flex flex-col gap-8">
-        <ShortcutsGroup label="Timeline">
-          <Shortcut label="Select Clip">
-            <Mouse button="left" label="(Click)" />
-          </Shortcut>
-          <Shortcut label="Move Clip">
-            <Mouse button="left" label="(Drag)" />
-          </Shortcut>
-          <Shortcut label="Delete Selection">
-            <Key button="Del" />
-          </Shortcut>
-          <Shortcut label="Scroll">
-            <Mouse button="middle" label="(Scroll)" />
-          </Shortcut>
-          <Shortcut label="Side Scroll">
-            <Key button="Shift" />
-            <Plus />
-            <Mouse button="middle" label="(Scroll)" />
-          </Shortcut>
-          {/* <Shortcut label="Zoom">
-            <Key button="Ctrl/Cmd" />
-            <Plus />
-            <Mouse button="middle" label="(Scroll)" />
-          </Shortcut> */}
-          <Shortcut label="Add Keyframe to Selected Object">
-            <Key button="K" />
-          </Shortcut>
-          <Shortcut label="Select Keyframe">
-            <Mouse button="left" label="(Click)" />
-          </Shortcut>
-          <Shortcut label="Delete Selected Keyframe">
-            <Key button="Del" />
-          </Shortcut>
-        </ShortcutsGroup>
-
-        <ShortcutsGroup label="Side Panel">
-          <Shortcut label="Add Character">
-            <Mouse button="left" label="(Drag onto scene)" />
-          </Shortcut>
-          <Shortcut label="Add Animation">
-            <Mouse button="left" label="(Drag onto timeline)" />
-          </Shortcut>
-          <Shortcut label="Add Object">
-            <Mouse button="left" label="(Drag onto scene)" />
           </Shortcut>
         </ShortcutsGroup>
       </div>
