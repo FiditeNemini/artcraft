@@ -11,6 +11,5 @@ pub mod enroll_in_studio;
 pub mod generate_random_username;
 pub mod placeholder_images;
 pub mod read_toml_file_to_struct;
-pub mod redis_sora_secrets;
 pub mod title_to_url_slug;
 pub mod troll_user_bans;

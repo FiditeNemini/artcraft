@@ -73,6 +73,7 @@ members = [
   "crates/lib/redis_common",
   "crates/lib/redis_schema",
   "crates/lib/server_environment",
+  "crates/lib/shared_service_components",
   "crates/lib/sqlx_mysql_helpers",
   "crates/lib/storyteller_root",
   "crates/lib/subprocess_common",
@@ -135,22 +136,25 @@ workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 # Centrally pinned versions so that we can uniformly upgrade/downgrade versions across the workspace
 # If a crate needs to use an older/newer version, the dependency should be managed in that crate's own Cargo.toml
 anyhow = "1.0.97"
-chrono = "0.4.40"
+chrono = { version = "0.4.40", features = ["serde"] }
 log = "0.4.27"
 once_cell = "1.21.3"
 rand = "0.9.0"
+regex = "1.11.1"
 reqwest = { version = "0.12.15", features = ["json", "cookies"] }
 serde = {  version = "1.0.219", features = ["derive"] }
 serde_derive = "1.0.219"
 serde_json = "1.0.140"
 serde_yaml = "0.9.1"
 toml = "0.7.4"
+url = "2.5.4"
 
 # Internal libs
 crockford = { path = "crates/lib/data/crockford" }
 errors = { path = "crates/lib/errors" }
 filesys = { path = "crates/lib/files/filesys" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
+shared_service_components = { path = "crates/lib/shared_service_components" }
 openai_sora_client = { path = "crates/lib/api_clients/openai_sora_client" }
 primitives = { path = "crates/lib/data/primitives" }
 subprocess_common = { path = "crates/lib/subprocess_common" }

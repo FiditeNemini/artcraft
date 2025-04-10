@@ -39,66 +39,11 @@ use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path:
 use filesys::file_read_bytes::file_read_bytes;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
+use shared_service_components::sora_redis_credentials::get_sora_credentials_from_redis::get_sora_credentials_from_redis;
 use tokens::tokens::batch_generations::BatchGenerationToken;
-
-/// Redis key
-const SORA_SECRET_REDIS_KEY : &str = "sora_secret";
-
-// Fields within the HKEY
-const BEARER_SUBKEY : &str = "bearer";
-const COOKIE_SUBKEY : &str = "cookie";
-const SENTINEL_SUBKEY : &str = "sentinel";
-
-
-/// Sora credentials stored in Redis
-
-
-#[derive(Clone,Copy,Debug)]
-pub enum RedisSoraCredentialSubkey {
-  Bearer,
-  Cookie,
-  Sentinel,
-}
-
-
-impl RedisSoraCredentialSubkey {
-  pub fn to_str(&self) -> &'static str {
-    match self {
-      RedisSoraCredentialSubkey::Bearer => BEARER_SUBKEY,
-      RedisSoraCredentialSubkey::Cookie => COOKIE_SUBKEY,
-      RedisSoraCredentialSubkey::Sentinel => SENTINEL_SUBKEY,
-    }
-  }
-}
 
 const IMAGE_PREFIX : &str = "image_";
 const IMAGE_SUFFIX : &str = ".png"; // TODO: Vary based on filetype.
-
-pub fn get_sora_credentials(
-  redis: &mut PooledConnection<RedisConnectionManager>
-) -> AnyhowResult<SoraCredentials> {
-
-  let values : HashMap<String, String> = redis.hgetall(SORA_SECRET_REDIS_KEY)
-    .map_err(|e| anyhow!("Failed to get Sora credentials from Redis: {}", e))?;
-
-  let bearer = values.get(BEARER_SUBKEY);
-  let cookie = values.get(COOKIE_SUBKEY);
-  let sentinel = values.get(SENTINEL_SUBKEY);
-
-  match (bearer, cookie, sentinel) {
-    (Some(b), Some(c), Some(s)) => {
-      Ok(
-        SoraCredentials {
-          bearer_token: b.to_string(),
-          cookie: c.to_string(),
-          sentinel: Some(s.to_string()),
-        }
-      )
-    }
-    _ => Err(anyhow!("redis sora credential values not present")),
-  }
-}
-
 
 pub struct ImageGenerationProcessArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -124,7 +69,6 @@ pub async fn ig_args_from_job(args: &ImageGenerationProcessArgs<'_>) -> Result<I
 
   let number_of_samples = job_args.maybe_number_of_samples.unwrap_or(1);
   let sora_task_id = job_args.maybe_sora_task_id.clone().ok_or_else(|| ProcessSingleJobError::from_anyhow_error(anyhow!("Missing Sora Task ID")))?;
-
 
   Ok(ImageGenerationArgs {
     number_of_samples,
@@ -165,7 +109,7 @@ pub async fn process_single_sora_job(args: &ImageGenerationProcessArgs<'_>) -> R
       .get()
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-  let sora_credentials = get_sora_credentials(redis)?;
+  let sora_credentials = get_sora_credentials_from_redis(redis)?;
 
   let sora_task_id = ig_args.sora_task_id.clone();
 

@@ -6,6 +6,7 @@ use r2d2_redis::RedisConnectionManager;
 use errors::AnyhowResult;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use openai_sora_client::credentials::SoraCredentials;
+use shared_service_components::sora_redis_credentials::get_sora_credentials_from_redis::get_sora_credentials_from_redis;
 use crate::util::redis_sora_secrets::get_sora_credentials;
 
 const SORA_BEARER_HEADER_NAME : &str = "sora-bearer";
@@ -34,7 +35,7 @@ pub fn get_sora_credentials_from_request(
     _ => {} // Fall through
   }
 
-  let redis_result = get_sora_credentials(redis);
+  let redis_result = get_sora_credentials_from_redis(redis);
 
   match redis_result {
     Ok(mut credentials) => {

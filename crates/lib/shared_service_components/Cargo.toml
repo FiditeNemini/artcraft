@@ -1,6 +1,6 @@
 [package]
-name = "logging"
-edition = "2018"
+name = "shared_service_components"
+edition = "2021"
 version = "0.0.1"
 authors = [
     "Brandon Thomas <bt@brand.io>",
@@ -9,8 +9,7 @@ authors = [
 publish = false
 
 [lib]
-# NB: Public "logging" crate is five years old and uninteresting. Stealing this name for internal use.
-name = "logging"
+name = "shared_service_components"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
@@ -21,11 +20,13 @@ normal = ["workspace-build-acceleration"]
 workspace-build-acceleration = { workspace = true }
 
 # Internal
-# (None yet)
+openai_sora_client = { workspace = true }
+errors = { workspace = true }
 
 # External
-env_logger = "0.11.3"
+anyhow = { workspace = true }
 log = { workspace = true }
+r2d2_redis = "0.14.0"
 
 [dev-dependencies]
 # None yet

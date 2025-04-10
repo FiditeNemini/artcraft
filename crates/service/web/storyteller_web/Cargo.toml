@@ -25,6 +25,8 @@ path = "src/api_doc_cli.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# cargo-hakari workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
 actix_cors_configs = { path = "../../../lib/actix_cors_configs" }
@@ -43,8 +45,8 @@ elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
 enums = { path = "../../../_types/enums" }
 enums_public = { path = "../../../_types/enums_public" }
-errors = { path = "../../../lib/errors" }
-filesys = { path = "../../../lib/files/filesys" }
+errors = { workspace = true }
+filesys = { workspace = true }
 google_sign_in = { path = "../../../lib/api_clients/google_sign_in" }
 hashing = { path = "../../../lib/files/hashing" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
@@ -64,6 +66,7 @@ redis_common = { path = "../../../lib/redis_common" }
 redis_schema = { path = "../../../lib/redis_schema" }
 reusable_types = { path = "../../../_types/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
+shared_service_components = { workspace = true }
 thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
@@ -75,20 +78,17 @@ videos = { path = "../../../lib/files/videos" }
 billing_component = { path = "../../plugins/billing" }
 user_traits_component = { path = "../../plugins/user_traits_component" }
 
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
-
 # External
 anyhow = "1.0.86"
 base64 = "0.22.1"
-chrono = { version = "0.4.22", features = ["serde"] }
+chrono = { workspace = true }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hostname = "0.4.0"
 lexical-sort = "0.3.1"
-log = "0.4.14"
-once_cell = "1.18.0"
-rand = "0.8.5"
+log = { workspace = true }
+once_cell = { workspace = true }
+rand = { workspace = true }
 regex = "1.5.4"
 strum_macros = "0.26.4"
 

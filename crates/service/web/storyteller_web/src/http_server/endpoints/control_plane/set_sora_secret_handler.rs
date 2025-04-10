@@ -15,12 +15,12 @@ use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCat
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::edit::update_media_file_animation_type::update_media_file_animation_type;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
+use shared_service_components::sora_redis_credentials::get_sora_credentials_from_redis::get_sora_credentials_from_redis;
+use shared_service_components::sora_redis_credentials::keys::RedisSoraCredentialSubkey;
+use shared_service_components::sora_redis_credentials::set_sora_credential_field_in_redis::set_sora_credential_field_in_redis;
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::state::server_state::ServerState;
-use crate::util::redis_sora_secrets::get_sora_credentials;
-use crate::util::redis_sora_secrets::set_sora_credential_field;
-use crate::util::redis_sora_secrets::RedisSoraCredentialSubkey;
 
 #[derive(Deserialize, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
@@ -108,7 +108,7 @@ pub async fn set_sora_secret_handler(
         SetSoraSecretError::ServerError
       })?;
 
-  set_sora_credential_field(
+  set_sora_credential_field_in_redis(
     &mut redis,
     match request.key {
       SetSoraSecretType::Bearer => RedisSoraCredentialSubkey::Bearer,
@@ -121,7 +121,7 @@ pub async fn set_sora_secret_handler(
     SetSoraSecretError::ServerError
   })?;
 
-  let credentials = get_sora_credentials(&mut redis)
+  let credentials = get_sora_credentials_from_redis(&mut redis)
       .map_err(|e| {
         error!("redis error: {:?}", e);
         SetSoraSecretError::ServerError
