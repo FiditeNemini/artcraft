@@ -68,7 +68,7 @@ class Scene {
     this.message_mesh = undefined;
     this.loading_placeholder = undefined;
     this.message_font = undefined;
-    this.skybox = "Default";
+    this.skybox = "m_1";
 
     // global names
     this.camera_name = camera_name;
@@ -785,7 +785,20 @@ class Scene {
   _create_skybox() {
     const loader = new THREE.CubeTextureLoader();
 
-    if (this.skybox == "m_0") {
+    if (this.skybox == "Default") {
+      const texture = loader.load([
+        "/resources/skybox/day/px.png",
+        "/resources/skybox/day/nx.png",
+        "/resources/skybox/day/py.png",
+        "/resources/skybox/day/ny.png",
+        "/resources/skybox/day/pz.png",
+        "/resources/skybox/day/nz.png",
+      ]);
+      this.scene.background = texture;
+      if (this.ambientLight) this.scene.remove(this.ambientLight);
+      if (this.directional_light) this.scene.add(this.directional_light);
+      if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
+    } else if (this.skybox == "m_0") {
       const texture = loader.load([
         "/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png",
         "/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png",
@@ -799,6 +812,17 @@ class Scene {
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     } else if (this.skybox == "m_1") {
+      // Empty skybox - just a plain color
+      this.scene.background = new THREE.Color("#282828");
+      if (this.ambientLight) this.scene.remove(this.ambientLight);
+      if (this.directional_light) this.scene.add(this.directional_light);
+      if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
+    } else if (this.skybox == "m_2") {
+      this.scene.background = new THREE.Color("#000000");
+      if (this.ambientLight) this.scene.add(this.ambientLight);
+      if (this.directional_light) this.scene.remove(this.directional_light);
+      if (this.hemisphereLight) this.scene.remove(this.hemisphereLight);
+    } else if (this.skybox == "m_3") {
       const texture = loader.load([
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
         "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_3_Right-X.png",
@@ -811,19 +835,15 @@ class Scene {
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
-    } else if (this.skybox == "m_2") {
-      this.scene.background = new THREE.Color("#000000");
-      if (this.ambientLight) this.scene.add(this.ambientLight);
-      if (this.directional_light) this.scene.remove(this.directional_light);
-      if (this.hemisphereLight) this.scene.remove(this.hemisphereLight);
     } else {
+      // Default to empty skybox if no match
       this.scene.background = new THREE.Color("#282828");
       if (this.ambientLight) this.scene.remove(this.ambientLight);
       if (this.directional_light) this.scene.add(this.directional_light);
       if (this.hemisphereLight) this.scene.add(this.hemisphereLight);
     }
 
-    console.log("Backround creation..");
+    console.log("Background creation..");
   }
 
   updateSkybox(media_id: string) {

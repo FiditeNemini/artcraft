@@ -5,6 +5,13 @@ import { AssetType } from "~/enums";
 export const demoSkyboxItems = signal<MediaItem[]>([
   {
     version: 1,
+    media_id: "SKY::m_1",
+    type: AssetType.SKYBOX,
+    name: "Empty Skybox",
+    thumbnail: "/resources/skybox/empty.jpg",
+  },
+  {
+    version: 1,
     media_id: "SKY::Default",
     type: AssetType.SKYBOX,
     name: "Day Skybox",
@@ -19,18 +26,17 @@ export const demoSkyboxItems = signal<MediaItem[]>([
   },
   {
     version: 1,
-    media_id: "SKY::m_1",
+    media_id: "SKY::m_3",
     type: AssetType.SKYBOX,
     name: "Gray Skybox",
     thumbnail:
-      "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_0_FrontZ.png",
+      "/resources/skybox/gray/Sky_AllSky_Overcast4_Low_Cam_2_LeftX.png",
   },
   {
     version: 1,
     media_id: "SKY::m_2",
     type: AssetType.SKYBOX,
     name: "Black Skybox",
-    thumbnail:
-      "/resources/skybox/black.jpg",
+    thumbnail: "/resources/skybox/black.jpg",
   },
 ]);
