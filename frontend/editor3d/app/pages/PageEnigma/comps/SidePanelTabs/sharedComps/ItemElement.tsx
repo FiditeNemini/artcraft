@@ -1,9 +1,15 @@
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
-import { SyntheticEvent } from "react";
 import { Badge } from "~/components";
 import { AssetType } from "~/enums";
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHandPointer } from "@fortawesome/pro-regular-svg-icons";
+import {
+  faArrowPointer,
+  faUpDownLeftRight,
+} from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   debug?: string;
@@ -35,12 +41,11 @@ const patchExpressionObjectType = (mediaType: string) => {
 
 export const ItemElement = ({ item }: Props) => {
   useSignals();
-  const defaultThumb = `/resources/images/default-covers/${(item.imageIndex || 0) % 24}.webp`;
-  const thumbnail = item.thumbnail ? item.thumbnail : defaultThumb;
+  const [imageError, setImageError] = useState(false);
 
   return (
     <div
-      className="group relative w-full cursor-pointer select-none overflow-hidden rounded-lg transition-all duration-200 hover:brightness-110"
+      className="group relative w-full cursor-pointer select-none overflow-hidden transition-all duration-200"
       onPointerDown={(event) => DndAsset.onPointerDown(event, item)}
     >
       {item.media_type && (
@@ -56,16 +61,24 @@ export const ItemElement = ({ item }: Props) => {
         />
       )}
 
-      <img
-        crossOrigin="anonymous"
-        src={thumbnail}
-        onError={(e: SyntheticEvent<HTMLImageElement>) => {
-          e.currentTarget.src = defaultThumb;
-        }}
-        alt={item.name}
-        className="pointer-events-none aspect-[4.5/5] w-full select-none bg-gradient-to-b from-[#CCCCCC] to-[#A0A0A0] object-cover object-center"
-      />
-      <div className="pointer-events-none w-full select-none truncate bg-brand-secondary-950 px-2 py-1 text-center text-[12px] transition-all duration-200 group-hover:bg-brand-secondary-800">
+      <div className="pointer-events-none relative aspect-[16/12] w-full select-none overflow-hidden rounded-xl border-[3px] border-white/5 bg-brand-secondary-600 object-cover object-center transition-all group-hover:border-brand-primary">
+        {item.thumbnail && !imageError && (
+          <img
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+            src={item.thumbnail}
+            alt={item.name}
+            className="h-full w-full object-cover object-center"
+            onError={() => setImageError(true)}
+          />
+        )}
+
+        <div className="text-shadow-md absolute inset-0 flex items-center justify-center bg-brand-primary-950/50 text-[13px] font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <FontAwesomeIcon icon={faUpDownLeftRight} className="mr-1.5" />
+          Drag to Scene
+        </div>
+      </div>
+      <div className="pointer-events-none w-full select-none truncate py-1.5 text-start text-[13px] text-white/80 transition-all duration-200">
         {item.name || item.media_id}
       </div>
     </div>

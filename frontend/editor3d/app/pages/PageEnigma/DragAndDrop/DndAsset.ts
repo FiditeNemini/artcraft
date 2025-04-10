@@ -13,6 +13,8 @@ import {
   overTimeline,
   sidePanelWidth,
   timelineHeight,
+  assetModalVisibleDuringDrag,
+  reopenAfterDragSignal,
 } from "~/pages/PageEnigma/signals";
 import { pageHeight, pageWidth } from "~/signals";
 import { addShape } from "~/pages/PageEnigma/signals/shape";
@@ -25,6 +27,8 @@ class DndAsset {
   public initX = 0;
   public initY = 0;
   public notDropText = "";
+  public isDragging: boolean = false;
+  public dragThreshold: number = 5;
 
   constructor() {
     this.onPointerMove = this.onPointerMove.bind(this);
@@ -40,8 +44,10 @@ class DndAsset {
       };
       this.initX = event.pageX;
       this.initY = event.pageY;
+      this.isDragging = false;
       canDrop.value = false;
       this.notDropText = "";
+      assetModalVisibleDuringDrag.value = false;
       window.addEventListener("pointerup", this.onPointerUp);
       window.addEventListener("pointermove", this.onPointerMove);
     }
@@ -54,6 +60,14 @@ class DndAsset {
       this.overElement = null;
       overTimeline.value = false;
       this.notDropText = "";
+      if (reopenAfterDragSignal.value) {
+        assetModalVisibleDuringDrag.value = true;
+      } else {
+        assetModalVisibleDuringDrag.value = true;
+        setTimeout(() => {
+          assetModalVisibleDuringDrag.value = false;
+        }, 0);
+      }
     }
   }
 
@@ -70,6 +84,14 @@ class DndAsset {
   onPointerUp(event: PointerEvent) {
     window.removeEventListener("pointerup", this.onPointerUp);
     window.removeEventListener("pointermove", this.onPointerMove);
+
+    if (!this.isDragging) {
+      // It's a click, not a drag
+      assetModalVisibleDuringDrag.value = true;
+      dragItem.value = null;
+      currPosition.value = { currX: 0, currY: 0 };
+      return;
+    }
 
     if (dragItem.value) {
       const positionX = event.pageX;
@@ -142,6 +164,12 @@ class DndAsset {
       event.preventDefault();
       const deltaX = event.pageX - this.initX;
       const deltaY = event.pageY - this.initY;
+      if (
+        Math.abs(deltaX) > this.dragThreshold ||
+        Math.abs(deltaY) > this.dragThreshold
+      ) {
+        this.isDragging = true;
+      }
       currPosition.value = {
         currX: this.initX + deltaX,
         currY: this.initY + deltaY,

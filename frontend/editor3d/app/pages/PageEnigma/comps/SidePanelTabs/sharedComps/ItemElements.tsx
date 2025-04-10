@@ -1,17 +1,18 @@
 import { ItemElement } from "./ItemElement";
 import { MediaItem } from "~/pages/PageEnigma/models";
-import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/signals";
 import { H4, P, LoadingDots } from "~/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEmptySet } from "@fortawesome/pro-solid-svg-icons";
+import { AutoSizer, Grid } from "react-virtualized";
+import "react-virtualized/styles.css";
 
 interface Props {
   busy?: boolean;
   className?: string;
   debug?: string;
-  currentPage?: number;
-  pageSize?: number;
   items: MediaItem[];
+  onLoadMore?: () => void;
+  hasMore?: boolean;
 }
 
 export const ItemElements = ({
@@ -19,40 +20,76 @@ export const ItemElements = ({
   className,
   debug,
   items,
-  currentPage,
-  pageSize = 20,
+  onLoadMore,
+  hasMore,
 }: Props) => {
-  const displayWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
+  const GRID_GAP = 12;
+  const ASPECT_RATIO = 16 / 12;
+  const TEXT_HEIGHT = 32;
+  const COLUMN_COUNT = 4;
 
-  const displayItems =
-    currentPage !== undefined
-      ? items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-      : items;
+  const rowCount = Math.ceil(items.length / COLUMN_COUNT);
 
-  function getGridColumnsClass(displayWidth: number): string {
-    if (displayWidth <= 280) {
-      return "grid-cols-2";
-    } else if (displayWidth <= 360) {
-      return "grid-cols-3";
-    } else if (displayWidth <= 440) {
-      return "grid-cols-4";
-    } else {
-      return "grid-cols-4";
+  const cellRenderer = ({
+    columnIndex,
+    rowIndex,
+    key,
+    style,
+  }: {
+    columnIndex: number;
+    rowIndex: number;
+    key: string;
+    style: React.CSSProperties;
+  }) => {
+    const index = rowIndex * COLUMN_COUNT + columnIndex;
+    if (index >= items.length) return null;
+
+    // Calculate dimensions for the container
+    const containerWidth = (style.width as number) - GRID_GAP;
+    const containerHeight = (style.height as number) - GRID_GAP;
+
+    const adjustedStyle = {
+      ...style,
+      left: `${(style.left as number) + GRID_GAP / 2}px`,
+      top: `${(style.top as number) + GRID_GAP / 2}px`,
+      width: `${containerWidth}px`,
+      height: `${containerHeight}px`,
+      padding: 0,
+    };
+
+    return (
+      <div key={key} style={adjustedStyle}>
+        <ItemElement debug={debug} item={items[index]} />
+      </div>
+    );
+  };
+
+  const handleScroll = ({
+    clientHeight,
+    scrollHeight,
+    scrollTop,
+  }: {
+    clientHeight: number;
+    scrollHeight: number;
+    scrollTop: number;
+  }) => {
+    if (!onLoadMore || !hasMore || busy) return;
+
+    const threshold = 100; // pixels from bottom
+    const bottom = scrollHeight - clientHeight - scrollTop;
+    if (bottom < threshold) {
+      onLoadMore();
     }
-  }
+  };
 
-  const gridColumnsClass = getGridColumnsClass(displayWidth);
-
-  if (busy) {
+  if (busy && items.length === 0) {
     return (
       <div className="flex h-full w-full">
         <LoadingDots className="bg-transparent" />
       </div>
     );
   }
+
   if (items.length === 0 && !busy) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center text-center">
@@ -65,13 +102,39 @@ export const ItemElements = ({
       </div>
     );
   }
+
   return (
-    <div
-      className={`grid ${gridColumnsClass} gap-2.5 ${className ? " " + className : ""}`}
-    >
-      {displayItems.map((item, index) => (
-        <ItemElement debug={debug} key={index} item={item} />
-      ))}
+    <div className={`h-full w-full ${className || ""}`}>
+      <AutoSizer className="w-full">
+        {({ height, width }) => {
+          // Calculate cell width accounting for gaps
+          const cellWidth = Math.floor(
+            (width - GRID_GAP * (COLUMN_COUNT + 1)) / COLUMN_COUNT,
+          );
+          const imageHeight = Math.floor(cellWidth / ASPECT_RATIO);
+          const cellHeight = imageHeight + TEXT_HEIGHT + GRID_GAP;
+
+          return (
+            <Grid
+              cellRenderer={cellRenderer}
+              columnCount={COLUMN_COUNT}
+              columnWidth={cellWidth + GRID_GAP}
+              height={height - GRID_GAP}
+              rowCount={rowCount}
+              rowHeight={cellHeight}
+              width={width}
+              style={{ outline: "none" }}
+              overscanRowCount={2}
+              onScroll={handleScroll}
+            />
+          );
+        }}
+      </AutoSizer>
+      {busy && hasMore && (
+        <div className="flex w-full justify-center py-4">
+          <LoadingDots className="bg-transparent" />
+        </div>
+      )}
     </div>
   );
 };
