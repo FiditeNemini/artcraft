@@ -25,9 +25,8 @@ path = "src/api_doc_cli.rs"
 #normal = ["workspace-build-acceleration"]
 
 [dependencies]
-# NB(bt,2025-04-10): Commenting out to unblock Netlify docs build
 # cargo-hakari workspace hack (faster compile times)
-#workspace-build-acceleration = { workspace = true }
+workspace-build-acceleration = { workspace = true }
 
 # Internal
 actix_cors_configs = { path = "../../../lib/actix_cors_configs" }

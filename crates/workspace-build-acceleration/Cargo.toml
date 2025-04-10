@@ -110,9 +110,9 @@ sqlx-sqlite = { version = "0.7.3", default-features = false, features = ["any", 
 strum = { version = "0.26.2", features = ["derive"] }
 subtle = { version = "2.5.0", default-features = false, features = ["i128"] }
 syn-f595c2ba2a3f28df = { package = "syn", version = "2.0.87", features = ["extra-traits", "fold", "full", "visit", "visit-mut"] }
-tauri = { version = "2.4.1", features = ["unstable"] }
-tauri-runtime-wry = { version = "2.5.1", default-features = false, features = ["unstable"] }
-tauri-utils = { version = "2.3.1", default-features = false, features = ["build", "compression", "resources"] }
+#tauri = { version = "2.4.1", features = ["unstable"] }
+#tauri-runtime-wry = { version = "2.5.1", default-features = false, features = ["unstable"] }
+#tauri-utils = { version = "2.3.1", default-features = false, features = ["build", "compression", "resources"] }
 time = { version = "0.3.36", features = ["local-offset", "macros", "serde-well-known"] }
 tokio = { version = "1.43.0", features = ["full"] }
 tokio-stream = { version = "0.1.16", features = ["fs"] }

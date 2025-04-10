@@ -130,6 +130,12 @@ publish = false
 
 [workspace.dependencies]
 # Hakari workspace hack (faster compile times)
+# Packages to remove from hakari to ensure we can build in Netlify, Github Actions (without package installs), etc.:
+#  - cudarc
+#  - ort
+#  - tauri
+#  - tauri-runtime-wry
+#  - tauri-utils
 workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 
 # External libs

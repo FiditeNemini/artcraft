@@ -11236,6 +11236,7 @@ dependencies = [
  "utoipa-swagger-ui",
  "uuid",
  "videos",
+ "workspace-build-acceleration",
  "zip 0.6.6",
 ]
 
@@ -14608,9 +14609,7 @@ dependencies = [
  "subtle",
  "syn 1.0.109",
  "syn 2.0.87",
- "tauri",
  "tauri-build",
- "tauri-runtime-wry",
  "tauri-utils",
  "time",
  "time-macros",
