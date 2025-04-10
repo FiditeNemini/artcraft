@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { LoadingDots, Toaster, TopBar } from "~/components";
-import { SidePanel } from "~/pages/PageEnigma/comps/SidePanel";
-import { Timeline } from "./comps/Timeline";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
-import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { PreviewFrameImage } from "./comps/PreviewFrameImage";
@@ -26,7 +23,7 @@ import { SceneContainer } from "./comps/SceneContainer";
 import { Outliner } from "./comps/Outliner";
 import { CameraAspectRatio } from "./enums";
 import { PromptBox } from "./comps/PromptBox";
-import { AssetMenu } from "./comps/AssetMenu";
+import { OnboardingHelper } from "./comps/OnboardingHelper";
 
 export const PageEditor = () => {
   useSignals();
@@ -84,6 +81,7 @@ export const PageEditor = () => {
   return (
     <div className="w-screen">
       <TopBar pageName="Edit Scene" />
+      <OnboardingHelper />
       <div
         className="relative flex w-screen"
         style={{ height: "calc(100vh - 68px)" }}

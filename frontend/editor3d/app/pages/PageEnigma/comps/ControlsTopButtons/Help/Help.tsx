@@ -1,6 +1,6 @@
 import { Label } from "~/components";
 
-const ShortcutsGroup = (props: {
+export const ShortcutsGroup = (props: {
   label: string;
   children?: React.ReactNode;
 }) => (
@@ -15,7 +15,10 @@ const ShortcutsGroup = (props: {
   </div>
 );
 
-const Shortcut = (props: { label: string; children: React.ReactNode }) => (
+export const Shortcut = (props: {
+  label: string;
+  children: React.ReactNode;
+}) => (
   <div className="flex items-center gap-2 ps-4">
     <span className="text-md w-[280px] font-medium opacity-80">
       {props.label}
@@ -24,19 +27,19 @@ const Shortcut = (props: { label: string; children: React.ReactNode }) => (
   </div>
 );
 
-const Key = (props: { button: string }) => (
+export const Key = (props: { button: string }) => (
   <div className="flex h-[30px] w-auto min-w-[30px] items-center justify-center rounded-md border-b-2 border-[#9E9EA6] bg-white px-2 text-center text-sm font-bold text-ui-background">
     {props.button}
   </div>
 );
 
-const KeyGroup = (props: { children: React.ReactNode }) => (
+export const KeyGroup = (props: { children: React.ReactNode }) => (
   <div className="flex gap-1">{props.children}</div>
 );
 
-const Mouse = (props: {
+export const Mouse = (props: {
   button: "left" | "middle" | "right";
-  label: string;
+  label?: string;
 }) => (
   <div className="flex items-center gap-2.5">
     <img
@@ -48,7 +51,7 @@ const Mouse = (props: {
   </div>
 );
 
-const Plus = () => <div className="text-xl font-medium">+</div>;
+export const Plus = () => <div className="text-xl font-medium">+</div>;
 
 export const Help = () => {
   return (
