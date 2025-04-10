@@ -12,6 +12,7 @@ export enum Environment {
     Production,
 }
 
+// TODO: Rename `EnvConfig` and allow a final override pass from env vars on a per-variable basis.
 export class Configs {
     // API backend (protocol + hostname)
     readonly baseApi: string = "https://api.storyteller.ai";

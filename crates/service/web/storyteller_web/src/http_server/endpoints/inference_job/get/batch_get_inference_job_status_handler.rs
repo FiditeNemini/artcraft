@@ -314,38 +314,7 @@ fn db_record_to_response_payload(
     maybe_result: record.maybe_result_details.map(|result_details| {
       // NB: Be careful here, because this varies based on the type of inference result.
       let public_bucket_media_path = match inference_category {
-        InferenceCategory::LipsyncAnimation => {
-          MediaFileBucketPath::from_object_hash(
-            &result_details.public_bucket_location_or_hash,
-            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
-            result_details.maybe_media_file_public_bucket_extension.as_deref())
-              .get_full_object_path_str()
-              .to_string()
-        }
-        InferenceCategory::Mocap => {
-          MediaFileBucketPath::from_object_hash(
-            &result_details.public_bucket_location_or_hash,
-            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
-            result_details.maybe_media_file_public_bucket_extension.as_deref())
-              .get_full_object_path_str()
-              .to_string()
-        }
-        InferenceCategory::VideoFilter => {
-          MediaFileBucketPath::from_object_hash(
-            &result_details.public_bucket_location_or_hash,
-            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
-            result_details.maybe_media_file_public_bucket_extension.as_deref())
-              .get_full_object_path_str()
-              .to_string()
-        }
-        InferenceCategory::Workflow => {
-          MediaFileBucketPath::from_object_hash(
-            &result_details.public_bucket_location_or_hash,
-            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
-            result_details.maybe_media_file_public_bucket_extension.as_deref())
-              .get_full_object_path_str()
-              .to_string()
-        }
+        // NB: TTS has to be special cased due to legacy behavior
         InferenceCategory::TextToSpeech |
         InferenceCategory::F5TTS => {
           match result_details.entity_type.as_str() {
@@ -366,6 +335,7 @@ fn db_record_to_response_payload(
             }
           }
         }
+        // NB: Voice conversion has to be special cased due to legacy behavior
         InferenceCategory::VoiceConversion | InferenceCategory::SeedVc => {
           match result_details.entity_type.as_str() {
             "media_file" => {
@@ -385,25 +355,23 @@ fn db_record_to_response_payload(
             }
           }
         }
-        InferenceCategory::LivePortrait => {
+        // Unsupported media files.
+        InferenceCategory::FormatConversion |
+        InferenceCategory::ConvertBvhToWorkflow => {
+          "".to_string()
+        }
+        // Deprecated
+        InferenceCategory::DeprecatedField => {
+          "".to_string() // TODO(bt,2024-07-16): Read job type instead
+        }
+        // The blessed path that modern media files use.
+        _ => {
           MediaFileBucketPath::from_object_hash(
             &result_details.public_bucket_location_or_hash,
             result_details.maybe_media_file_public_bucket_prefix.as_deref(),
             result_details.maybe_media_file_public_bucket_extension.as_deref())
               .get_full_object_path_str()
               .to_string()
-        }
-        InferenceCategory::ImageGeneration => { 
-          "".to_string()
-        }
-        InferenceCategory::FormatConversion => {
-          "".to_string()
-        }
-        InferenceCategory::ConvertBvhToWorkflow => {
-          "".to_string()
-        }
-        InferenceCategory::DeprecatedField => {
-          "".to_string() // TODO(bt,2024-07-16): Read job type instead
         }
       };
 
