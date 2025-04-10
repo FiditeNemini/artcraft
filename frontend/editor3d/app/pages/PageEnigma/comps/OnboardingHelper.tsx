@@ -9,12 +9,12 @@ export const OnboardingHelper = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (["W", "A", "S", "D"].includes(event.key.toUpperCase())) {
-        setTimeout(() => setKeyPressed(true), 700);
+        setTimeout(() => setKeyPressed(true), 200);
       }
     };
 
     const handleAction = () => {
-      setTimeout(() => setActionPerformed(true), 700);
+      setTimeout(() => setActionPerformed(true), 200);
     };
 
     window.addEventListener("keydown", handleKeyDown);
