@@ -33,6 +33,7 @@ production_database_voice_clone_report_download.sh
 # Scratch data
 scratch/
 test_data/temp/
+tmp/
 
 # Rust build directory
 target/
