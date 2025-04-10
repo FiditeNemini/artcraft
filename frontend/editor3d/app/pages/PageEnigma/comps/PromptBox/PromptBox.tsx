@@ -20,6 +20,7 @@ import {
   faRectangleVertical,
   faSquare,
   faRectangle,
+  faTableCellsLarge,
 } from "@fortawesome/pro-regular-svg-icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,6 +32,8 @@ import {
   disableHotkeyInput,
   DomLevels,
   enableHotkeyInput,
+  gridVisibility,
+  setGridVisibility,
 } from "~/pages/PageEnigma/signals";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
@@ -45,7 +48,6 @@ interface ReferenceImage {
   mediaToken: string;
 }
 import { EngineApi } from "~/Classes/ApiManager/EngineApi";
-import { scene } from "~/signals/scene";
 import { UploaderStates } from "~/enums/UploaderStates";
 import { CameraSettingsModal } from "../CameraSettingsModal";
 
@@ -111,6 +113,7 @@ export const PromptBox = () => {
     [],
   );
   const [activeLibraryTab, setActiveLibraryTab] = useState("my-media");
+  const [isGridVisible, setIsGridVisible] = useState(true);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -137,6 +140,10 @@ export const PromptBox = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraAspectRatio.value]);
+
+  useEffect(() => {
+    setGridVisibility(isGridVisible);
+  }, [isGridVisible]);
 
   const handleCameraSelect = (selectedItem: PopoverItem) => {
     setCameraList((prev) =>
@@ -598,6 +605,19 @@ export const PromptBox = () => {
                   icon={faMessageXmark}
                   activeIcon={faMessageCheck}
                   onClick={() => setUseSystemPrompt(!useSystemPrompt)}
+                />
+              </Tooltip>
+              <Tooltip
+                content={gridVisibility.value ? "Grid: ON" : "Grid: OFF"}
+                position="top"
+                className="z-50"
+                delay={200}
+              >
+                <ToggleButton
+                  isActive={gridVisibility.value}
+                  icon={faTableCellsLarge}
+                  activeIcon={faTableCellsLarge}
+                  onClick={() => setGridVisibility(!gridVisibility.value)}
                 />
               </Tooltip>
             </div>

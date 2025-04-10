@@ -11,3 +11,9 @@ export const setCameraAspectRatio = (newAspectRatio: CameraAspectRatio) => {
   cameraAspectRatio.value = newAspectRatio;
 };
 export const previewSrc = signal("");
+
+export const gridVisibility = signal<boolean>(true);
+
+export const setGridVisibility = (isVisible: boolean) => {
+  gridVisibility.value = isVisible;
+};

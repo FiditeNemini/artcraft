@@ -15,10 +15,13 @@ import { ClipGroup, ClipType } from "~/enums";
 import { ClipUI } from "../clips/clip_ui";
 import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 import { GetFrontendEnvironment } from "~/Classes/GetFrontendEnvironment";
+import { gridVisibility } from "../signals/engine";
+import { InfiniteGridHelper } from "./InfiniteGridHelper";
 
 class Scene {
   name: string;
-  gridHelper: THREE.GridHelper | undefined;
+  gridHelper: InfiniteGridHelper | undefined;
+  groundPlane: THREE.Mesh | undefined;
   scene: THREE.Scene;
   hot_items: THREE.Object3D[] | undefined;
 
@@ -87,6 +90,19 @@ class Scene {
 
     this.helper = new MMDAnimationHelper({ afterglow: 0.0 });
     this.scene.userData["helper"] = this.helper;
+
+    // Subscribe to grid visibility changes
+    gridVisibility.subscribe((isVisible) => {
+      if (this.gridHelper) {
+        if (isVisible) {
+          if (!this.scene.children.includes(this.gridHelper)) {
+            this.scene.add(this.gridHelper);
+          }
+        } else {
+          this.scene.remove(this.gridHelper);
+        }
+      }
+    });
   }
 
   clear() {
@@ -357,9 +373,9 @@ class Scene {
     const camera_position = new THREE.Vector3(0, 0.6, 1.5);
 
     // TODO(bt,2025-02-10): Make the local dev assets more configurable or seedable.
-    const camera_id = GetFrontendEnvironment().getIsLocalDev() ? 
-      "m_4djqzq89mbn6sdbbqm25ks6drhr55k" :  // Local development
-      "m_cxh4asqhapdz10j880755dg4yevshb"; // Production
+    const camera_id = GetFrontendEnvironment().getIsLocalDev()
+      ? "m_4djqzq89mbn6sdbbqm25ks6drhr55k" // Local development
+      : "m_cxh4asqhapdz10j880755dg4yevshb"; // Production
 
     const camera_obj = await this.loadGlbWithPlaceholder(
       camera_id,
@@ -848,16 +864,40 @@ class Scene {
   }
 
   _createGrid() {
-    const size = 25;
-    const divisions = 50;
-    this.gridHelper = new THREE.GridHelper(
-      size,
-      divisions,
-      new THREE.Color("rgb(199,195,195)"),
-      new THREE.Color("rgb(161,157,157)"),
-    );
+    // Create visual infinite grid
+    const size1 = 0.5; // Primary grid
+    const size2 = 2.5; // Secondary grid
+    const color = new THREE.Color(0x444444);
+    const distance = 80;
+
+    this.gridHelper = new InfiniteGridHelper(size1, size2, color, distance);
     this.gridHelper.layers.set(1); // Enable default layer
     this.scene.add(this.gridHelper);
+
+    // Create invisible ground plane for proper object placement
+    const planeGeometry = new THREE.PlaneGeometry(50, 50); // Same as original grid size
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      visible: false,
+      side: THREE.DoubleSide,
+    });
+    this.groundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+    this.groundPlane.rotation.x = -Math.PI / 2;
+    this.groundPlane.name = "GroundPlane";
+    this.groundPlane.layers.set(2); // Put in layer 2 to avoid selection
+    this.groundPlane.userData["selectable"] = false; // Mark as non-selectable
+    this.scene.add(this.groundPlane);
+  }
+
+  // Update grid visibility based on the signal
+  updateGridVisibility() {
+    if (gridVisibility.value) {
+      if (!this.scene.children.includes(this.gridHelper)) {
+        this.scene.add(this.gridHelper);
+      }
+    } else {
+      this.scene.remove(this.gridHelper);
+    }
+    // Keep the ground plane regardless of grid visibility
   }
 }
 
