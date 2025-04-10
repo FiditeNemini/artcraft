@@ -13,7 +13,7 @@ use actix_web::web::Json;
 use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use rand::Rng;
-use rand::seq::SliceRandom;
+use rand::seq::IndexedRandom;
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;

@@ -29,9 +29,7 @@ pub fn default_cover_image_color_from_token(token: &ModelWeightToken) -> u8 {
 #[cfg(test)]
 mod tests {
   use std::collections::HashSet;
-
-  use rand::distributions::{Alphanumeric, DistString};
-
+  use rand::distr::{Alphanumeric, SampleString};
   use tokens::tokens::model_weights::ModelWeightToken;
 
   use crate::util::placeholder_images::cover_images::default_cover_image_color_from_token::default_cover_image_color_from_token;

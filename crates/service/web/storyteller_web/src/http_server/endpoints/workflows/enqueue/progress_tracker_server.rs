@@ -125,7 +125,7 @@ impl Handler<Connect> for ChatServer {
     self.send_message("main", "Someone joined", 0);
 
     // register session with random id
-    let id = self.rng.gen::<usize>();
+    let id = self.rng.random::<u64>() as usize;
     self.sessions.insert(id, msg.addr);
 
     // auto join session to main room

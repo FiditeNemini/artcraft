@@ -7,7 +7,6 @@ use errors::AnyhowResult;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use openai_sora_client::credentials::SoraCredentials;
 use shared_service_components::sora_redis_credentials::get_sora_credentials_from_redis::get_sora_credentials_from_redis;
-use crate::util::redis_sora_secrets::get_sora_credentials;
 
 const SORA_BEARER_HEADER_NAME : &str = "sora-bearer";
 const SORA_COOKIE_HEADER_NAME : &str = "sora-cookie";

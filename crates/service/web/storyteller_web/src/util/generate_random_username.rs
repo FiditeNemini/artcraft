@@ -3,9 +3,9 @@ use collections::random_from_array::random_from_array;
 use once_cell::sync::Lazy;
 use primitives::iterators::iterate_trimmed_lines_without_comments::iterate_trimmed_lines_without_comments;
 use primitives::str::first_letter_uppercase::first_letter_uppercase;
-use rand::distributions::{Distribution, Standard};
 use rand::Rng;
 use std::collections::HashSet;
+use rand::distr::{Distribution, StandardUniform};
 
 pub const ADJECTIVES : &str = include_str!("../../../../../../includes/binary_includes/usernames/atoms/username_adjectives.txt");
 pub const NOUNS : &str = include_str!("../../../../../../includes/binary_includes/usernames/atoms/username_nouns.txt");
@@ -50,7 +50,7 @@ enum UsernameFormat {
   ScreamingSnakeCase,
 }
 
-impl Distribution<UsernameFormat> for Standard {
+impl Distribution<UsernameFormat> for StandardUniform {
   fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> UsernameFormat {
     match rng.gen_range(0..=5) {
       0 => UsernameFormat::CamelCase,

@@ -11,8 +11,8 @@ use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use actix_web::{web, HttpRequest, HttpResponse};
 use log::{info, warn};
-use rand::seq::SliceRandom;
 use rand::Rng;
+use rand::seq::IndexedRandom;
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
