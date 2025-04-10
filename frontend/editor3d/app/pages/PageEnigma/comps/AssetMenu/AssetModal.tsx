@@ -77,7 +77,7 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
   const [activeLibraryTab, setActiveLibraryTab] = useState("library");
   const [activeAssetTab, setActiveAssetTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [reopenAfterAdd, setReopenAfterAdd] = useState(true);
+  const [reopenAfterAdd, setReopenAfterAdd] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Update the signal when the preference changes

@@ -15,6 +15,7 @@ import { SceneManager, SceneObject } from "./scene_manager_api";
 import { FreeCam } from "./free_cam";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { FKHelper } from "./KinHelpers/FKHelper";
+import { selectedMode } from "../signals/selectedMode";
 
 export enum KinMode {
   FK,
@@ -84,7 +85,7 @@ export class MouseControls {
     getAssetType: Function,
     setSelected: Function,
     isMovable: Function,
-    enable_stats: Function
+    enable_stats: Function,
   ) {
     this.camera = camera;
     this.camera_person_mode = camera_person_mode;
@@ -198,7 +199,11 @@ export class MouseControls {
   }
 
   onMouseDown(event: any) {
-    if ((event.button === 0 || event.button === 1) && this.isMovable() && !this.isBoneDragged) {
+    if (
+      (event.button === 0 || event.button === 1) &&
+      this.isMovable() &&
+      !this.isBoneDragged
+    ) {
       this.isMouseClicked = true;
     }
   }
@@ -273,14 +278,17 @@ export class MouseControls {
     } else if (event.key === "t") {
       // transform
       this.control?.setMode("translate");
+      selectedMode.value = "move";
       return;
     } else if (event.key === "r" && !event.ctrlKey) {
       // rotate
       this.control?.setMode("rotate");
+      selectedMode.value = "rotate";
       return;
     } else if (event.key === "g") {
       // scale
       this.control?.setMode("scale");
+      selectedMode.value = "scale";
       return;
     } else if (event.key === "k") {
       this.toggleFKMode();

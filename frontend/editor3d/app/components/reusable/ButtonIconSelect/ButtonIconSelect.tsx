@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
@@ -14,18 +14,24 @@ interface Option {
 interface ButtonIconSelectProps {
   options: Option[];
   onOptionChange?: (value: string) => void;
+  selectedOption?: string;
 }
 
 export function ButtonIconSelect({
   options,
   onOptionChange,
+  selectedOption,
 }: ButtonIconSelectProps) {
-  const [selectedOption, setSelectedOption] = useState<string>(
-    options[0].value,
+  const [internalSelectedOption, setInternalSelectedOption] = useState<string>(
+    selectedOption || options[0].value,
   );
 
+  useEffect(() => {
+    setInternalSelectedOption(selectedOption || options[0].value);
+  }, [selectedOption, options]);
+
   const handleOptionChange = (value: string) => {
-    setSelectedOption(value);
+    setInternalSelectedOption(value);
     if (onOptionChange) {
       onOptionChange(value);
     }
@@ -44,9 +50,9 @@ export function ButtonIconSelect({
           >
             <button
               className={twMerge(
-                `flex h-9 items-center justify-center rounded-lg border text-sm transition-all duration-150`,
+                "flex h-9 items-center justify-center rounded-lg border text-sm outline-none transition-all duration-150 focus:outline-none",
                 text ? "h-auto w-auto gap-2 px-3 py-1.5" : "w-9",
-                selectedOption === value
+                internalSelectedOption === value
                   ? "border-brand-primary bg-brand-primary/20"
                   : "border-transparent hover:bg-ui-panel/[0.4]",
               )}
@@ -64,7 +70,7 @@ export function ButtonIconSelect({
             className={twMerge(
               `flex h-9 items-center justify-center rounded-lg border text-sm transition-all duration-150`,
               text ? "h-auto w-auto gap-2 px-3 py-1.5" : "w-9",
-              selectedOption === value
+              internalSelectedOption === value
                 ? "border-brand-primary bg-brand-primary/20"
                 : "border-transparent hover:bg-ui-panel/[0.4]",
             )}

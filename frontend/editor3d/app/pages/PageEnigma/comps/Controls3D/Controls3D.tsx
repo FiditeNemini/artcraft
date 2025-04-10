@@ -1,9 +1,7 @@
 import {
   faArrowsRotate,
   faArrowsUpDownLeftRight,
-  faCube,
   faMagicWandSparkles,
-  faP,
   faPlus,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -12,8 +10,11 @@ import { EngineContext } from "../../contexts/EngineContext";
 import { useContext, useState } from "react";
 import { assetModalVisibleDuringDrag } from "../../signals";
 import { AssetModal } from "../AssetMenu/AssetModal";
+import { selectedMode } from "../../signals/selectedMode";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const Controls3D = () => {
+  useSignals();
   const editorEngine = useContext(EngineContext);
 
   const handleMoveArrows = () => {
@@ -36,6 +37,7 @@ export const Controls3D = () => {
   };
 
   const handleModeChange = (value: string) => {
+    selectedMode.value = value;
     switch (value) {
       case "move":
         handleMoveArrows();
@@ -117,6 +119,7 @@ export const Controls3D = () => {
             <ButtonIconSelect
               options={modes}
               onOptionChange={handleModeChange}
+              selectedOption={selectedMode.value}
             />
           </div>
         </div>
