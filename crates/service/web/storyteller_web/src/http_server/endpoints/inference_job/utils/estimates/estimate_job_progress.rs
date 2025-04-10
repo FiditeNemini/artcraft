@@ -25,6 +25,8 @@ const F5_TTS_JOB_AVERAGE_SECONDS : u64 = 12;
 
 const SEED_VC_JOB_AVERAGE_SECONDS : u64 = 60;
 
+const IMAGE_GEN_API_AVERAGE_SECONDS: u64 = 70;
+
 pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option<&PolymorphicInferenceArgs>) -> u8 {
   match job.status {
     // Jobs that haven't started
@@ -71,10 +73,11 @@ pub fn estimate_job_progress(job: &GenericInferenceJobStatus, maybe_args: Option
     // TODO: Better estimate using video duration, params, etc.
     InferenceCategory::Workflow => comfy_workflow_estimate(maybe_args, duration_seconds),
 
+    InferenceCategory::ImageGeneration => percent(duration_seconds, IMAGE_GEN_API_AVERAGE_SECONDS),
+
     // NB: We don't run these job types anymore.
     InferenceCategory::FormatConversion => 0,
     InferenceCategory::Mocap => 0,
-    InferenceCategory::ImageGeneration => 0,
     InferenceCategory::VideoFilter => 0,
     InferenceCategory::ConvertBvhToWorkflow => 0,
     InferenceCategory::DeprecatedField => 0, // TODO(bt,2024-07-16): Read job type instead.
