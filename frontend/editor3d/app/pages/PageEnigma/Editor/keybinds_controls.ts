@@ -4,6 +4,7 @@ import {
   hotkeysStatus,
   outlinerState,
   showObjectPanel,
+  assetModalVisible,
 } from "../signals";
 import {
   OrbitControls,
@@ -292,6 +293,11 @@ export class MouseControls {
       return;
     } else if (event.key === "k") {
       this.toggleFKMode();
+    } else if (event.key === "b") {
+      // Open asset modal
+      event.preventDefault();
+      assetModalVisible.value = true;
+      return;
     }
 
     if ((event.ctrlKey || event.metaKey) && !this.isProcessing) {

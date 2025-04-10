@@ -7,8 +7,8 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button, ButtonIconSelect, Tooltip } from "~/components";
 import { EngineContext } from "../../contexts/EngineContext";
-import { useContext, useState } from "react";
-import { assetModalVisibleDuringDrag } from "../../signals";
+import { useContext } from "react";
+import { assetModalVisibleDuringDrag, assetModalVisible } from "../../signals";
 import { AssetModal } from "../AssetMenu/AssetModal";
 import { selectedMode } from "../../signals/selectedMode";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -16,6 +16,23 @@ import { useSignals } from "@preact/signals-react/runtime";
 export const Controls3D = () => {
   useSignals();
   const editorEngine = useContext(EngineContext);
+
+  const handleModeChange = (value: string) => {
+    selectedMode.value = value;
+    switch (value) {
+      case "move":
+        handleMoveArrows();
+        break;
+      case "rotate":
+        handleRotateArrows();
+        break;
+      case "scale":
+        handleZoomArrows();
+        break;
+      default:
+        console.log("Unknown option");
+    }
+  };
 
   const handleMoveArrows = () => {
     if (!editorEngine) {
@@ -34,23 +51,6 @@ export const Controls3D = () => {
       return;
     }
     editorEngine.change_mode("scale");
-  };
-
-  const handleModeChange = (value: string) => {
-    selectedMode.value = value;
-    switch (value) {
-      case "move":
-        handleMoveArrows();
-        break;
-      case "rotate":
-        handleRotateArrows();
-        break;
-      case "scale":
-        handleZoomArrows();
-        break;
-      default:
-        console.log("Unknown option");
-    }
   };
 
   const modes = [
@@ -74,11 +74,9 @@ export const Controls3D = () => {
     },
   ];
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const handleOpenModal = () => {
     assetModalVisibleDuringDrag.value = true;
-    setIsModalOpen(true);
+    assetModalVisible.value = true;
   };
 
   return (
@@ -88,7 +86,7 @@ export const Controls3D = () => {
           <div className="flex items-center justify-center gap-2.5">
             <div className="flex items-center gap-1">
               <Tooltip
-                content="Add 3D asset to scene"
+                content="Add 3D asset to scene (B)"
                 position="bottom"
                 delay={100}
                 closeOnClick
@@ -125,7 +123,7 @@ export const Controls3D = () => {
         </div>
       </div>
 
-      <AssetModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AssetModal />
     </div>
   );
 };

@@ -139,6 +139,9 @@ export const Help = () => {
             <Plus></Plus>
             <Key button="V" />
           </Shortcut>
+          <Shortcut label="Open 3D Asset Modal">
+            <Key button="B" />
+          </Shortcut>
         </ShortcutsGroup>
       </div>
     </div>

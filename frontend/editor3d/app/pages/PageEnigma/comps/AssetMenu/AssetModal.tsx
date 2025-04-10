@@ -22,6 +22,7 @@ import {
   demoCharacterItems,
   assetModalVisibleDuringDrag,
   reopenAfterDragSignal,
+  assetModalVisible,
 } from "../../signals";
 import { MediaItem } from "../../models";
 import { useUserObjects, useFeaturedObjects } from "../SidePanelTabs/hooks";
@@ -73,7 +74,7 @@ const AllTabSection = ({
   </div>
 );
 
-export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
+export const AssetModal = () => {
   useSignals();
   const [activeLibraryTab, setActiveLibraryTab] = useState("library");
   const [activeAssetTab, setActiveAssetTab] = useState("all");
@@ -81,20 +82,24 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
   const [reopenAfterAdd, setReopenAfterAdd] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const handleClose = () => {
+    assetModalVisible.value = false;
+  };
+
   // Update the signal when the preference changes
   useEffect(() => {
     reopenAfterDragSignal.value = reopenAfterAdd;
   }, [reopenAfterAdd]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (assetModalVisible.value) {
       // Small delay to ensure the modal is fully mounted
       const timer = setTimeout(() => {
         searchInputRef.current?.focus();
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [assetModalVisible.value]);
 
   // Fetch objects for different categories
   const { userObjects: userCharacters } = useUserObjects({
@@ -262,10 +267,10 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
     if (reopenAfterAdd) {
       // Small delay to allow the modal to close and reopen
       setTimeout(() => {
-        onClose();
+        handleClose();
       }, 100);
     } else {
-      onClose();
+      handleClose();
     }
   };
 
@@ -273,8 +278,8 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
 
   return (
     <TransitionDialogue
-      isOpen={isOpen && assetModalVisibleDuringDrag.value}
-      onClose={onClose}
+      isOpen={assetModalVisible.value && assetModalVisibleDuringDrag.value}
+      onClose={handleClose}
       className="h-[640px] max-w-4xl"
       childPadding={false}
     >
@@ -350,7 +355,7 @@ export const AssetModal = ({ isOpen, onClose }: AssetModalProps) => {
                     />
                   )}
                 </div>
-                <CloseButton onClick={onClose} />
+                <CloseButton onClick={handleClose} />
               </div>
               <div
                 className={twMerge(
