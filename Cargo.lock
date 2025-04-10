@@ -11236,7 +11236,6 @@ dependencies = [
  "utoipa-swagger-ui",
  "uuid",
  "videos",
- "workspace-build-acceleration",
  "zip 0.6.6",
 ]
 
