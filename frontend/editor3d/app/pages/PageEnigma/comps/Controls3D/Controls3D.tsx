@@ -84,7 +84,7 @@ export const Controls3D = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <div className="glass rounded-b-xl border  border-[#363636] p-1.5 pr-2 text-white shadow-md">
+        <div className="glass rounded-b-xl p-1.5 pr-2 text-white shadow-md">
           <div className="flex items-center justify-center gap-2.5">
             <div className="flex items-center gap-1">
               <Tooltip
