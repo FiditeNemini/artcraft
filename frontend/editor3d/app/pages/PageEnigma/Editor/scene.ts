@@ -875,16 +875,28 @@ class Scene {
     this.scene.add(this.gridHelper);
 
     // Create invisible ground plane for proper object placement
-    const planeGeometry = new THREE.PlaneGeometry(50, 50); // Same as original grid size
+    const planeGeometry = new THREE.PlaneGeometry(300, 300); // Same as original grid size
     const planeMaterial = new THREE.MeshBasicMaterial({
       visible: false,
       side: THREE.DoubleSide,
     });
     this.groundPlane = new THREE.Mesh(planeGeometry, planeMaterial);
     this.groundPlane.rotation.x = -Math.PI / 2;
-    this.groundPlane.name = "GroundPlane";
-    this.groundPlane.layers.set(2); // Put in layer 2 to avoid selection
+    this.groundPlane.name = ""; // Empty name to avoid selection
+    this.groundPlane.layers.set(0); // Put in layer 0 for placement raycasting
     this.groundPlane.userData["selectable"] = false; // Mark as non-selectable
+    this.groundPlane.userData["placementOnly"] = false; // Don't include in interactable list
+    this.groundPlane.matrixAutoUpdate = false; // Optimize performance since it never moves
+    this.groundPlane.updateMatrix();
+    this.groundPlane.receiveShadow = false;
+    // Store the original raycast function
+    const originalRaycast = this.groundPlane.raycast;
+    // Override raycast to only work when the raycaster is checking layer 0
+    this.groundPlane.raycast = function (raycaster, intersects) {
+      if (raycaster.layers.test(this.layers)) {
+        return originalRaycast.call(this, raycaster, intersects);
+      }
+    };
     this.scene.add(this.groundPlane);
   }
 
