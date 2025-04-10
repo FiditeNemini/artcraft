@@ -2,6 +2,7 @@
 *secret*sh
 .env
 .env-aichatbot-secrets
+.env-analytics-job
 .env-elasticsearch-secrets
 .env-migration-tool-secrets
 .env-secrets
@@ -11,21 +12,27 @@ crates/service/web/storyteller_web/config/storyteller-web.development-secrets.en
 db.secrets
 db_secrets.toml
 env-secrets
-production_database_secret_connect.sh
-production_database_secret_query.sh
-script/production_database_secret_backup.sh
-script/production_database_secret_connect.sh
-production_database_voice_clone_report_download.sh
+pubkeys.txt
 secrets.toml
 secrets.yaml
 twitch_secrets.toml
-.DS_Store
 
 # Old env secrets
 .*-secrets
 
 # New env secrets (per-app)
 *-secrets.env
+
+# Utilities with secrets
+script/production_database_secret_backup.sh
+script/production_database_secret_connect.sh
+production_database_secret_connect.sh
+production_database_secret_query.sh
+production_database_voice_clone_report_download.sh
+
+# Scratch data
+scratch/
+test_data/temp/
 
 # Rust build directory
 target/
@@ -64,6 +71,9 @@ models/tacotron2/python/
 
 # Stuff I want to keep around, but not commit
 scraps/
+
+# Mac nonsense
+.DS_Store
 
 # Windows build files
 # These should be built by the platform
