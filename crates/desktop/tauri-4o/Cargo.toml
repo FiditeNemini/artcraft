@@ -20,7 +20,7 @@ tauri-build = { version = "2.1.1", features = [] }
 
 [dependencies]
 # Workspace hack (faster compile times)
-my-workspace-hack = { workspace =  true }
+workspace-build-acceleration = { workspace =  true }
 
 # Internal
 crockford = { workspace = true }

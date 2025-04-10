@@ -120,7 +120,7 @@ members = [
 
   # cargo-hakari workspace hack (compilation speedup hack)
   # see usage: https://crates.io/crates/cargo-hakari
-  "crates/my-workspace-hack",
+  "crates/workspace-build-acceleration",
 ]
 
 [workspace.package]
@@ -129,7 +129,7 @@ publish = false
 
 [workspace.dependencies]
 # Hakari workspace hack (faster compile times)
-my-workspace-hack = { path = "crates/my-workspace-hack" }
+workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 
 # External libs
 # Centrally pinned versions so that we can uniformly upgrade/downgrade versions across the workspace

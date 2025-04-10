@@ -14,7 +14,7 @@ name = "errors"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # NB: This is one of the most central crates in the monorepo and everything depends on it.
@@ -23,7 +23,7 @@ normal = ["my-workspace-hack"]
 anyhow = "1.0.86"
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
 
 [dev-dependencies]
 # None yet

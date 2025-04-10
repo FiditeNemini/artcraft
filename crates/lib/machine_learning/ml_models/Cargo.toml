@@ -14,12 +14,12 @@ path = "src/lib.rs"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { workspace =  true }
+workspace-build-acceleration = { workspace =  true }
 
 # Internal
 filesys = { path = "../../files/filesys" }

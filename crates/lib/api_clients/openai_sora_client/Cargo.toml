@@ -5,7 +5,7 @@ version = "0.0.1"
 publish = false
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [lib]
 name = "openai_sora_client"
@@ -14,7 +14,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { workspace =  true }
+workspace-build-acceleration = { workspace =  true }
 
 # Internal
 crockford = { path = "../../data/crockford" }

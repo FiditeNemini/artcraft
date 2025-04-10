@@ -14,11 +14,11 @@ name = "primitives"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # NB: This is designed to be a central crate with few dependencies.
 # Consider the dependencies here wisely.

@@ -362,10 +362,10 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "log",
- "my-workspace-hack",
  "reusable_types",
  "speculoos",
  "url",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -391,10 +391,10 @@ dependencies = [
  "cidr-utils",
  "errors",
  "futures-util",
- "my-workspace-hack",
  "num-traits",
  "serde",
  "serde_json",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -539,7 +539,6 @@ dependencies = [
  "futures 0.3.29",
  "hostname 0.4.0",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "rand 0.8.5",
  "reusable_types",
@@ -549,6 +548,7 @@ dependencies = [
  "sqlx",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -682,7 +682,7 @@ name = "archives"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
+ "workspace-build-acceleration",
  "zip 0.6.6",
 ]
 
@@ -825,7 +825,6 @@ dependencies = [
  "libloading 0.8.6",
  "log",
  "memory_caching",
- "my-workspace-hack",
  "once_cell",
  "openai_sora_client",
  "primitives",
@@ -844,6 +843,7 @@ dependencies = [
  "tempfile",
  "tokio",
  "tokio-util",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -1214,7 +1214,6 @@ dependencies = [
  "http_server_common",
  "log",
  "mockall",
- "my-workspace-hack",
  "mysql_queries",
  "once_cell",
  "regex",
@@ -1228,6 +1227,7 @@ dependencies = [
  "url_config",
  "user_traits_component",
  "utoipa",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -1408,8 +1408,8 @@ dependencies = [
  "errors",
  "hostname 0.4.0",
  "log",
- "my-workspace-hack",
  "server_environment",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -1493,7 +1493,7 @@ name = "bucket_paths"
 version = "0.0.1"
 dependencies = [
  "crockford",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2133,10 +2133,10 @@ dependencies = [
  "hashing",
  "log",
  "mimetypes",
- "my-workspace-hack",
  "rust-s3",
  "storyteller_root",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2163,8 +2163,8 @@ dependencies = [
 name = "collections"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "rand 0.8.5",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2229,7 +2229,7 @@ dependencies = [
 name = "component_subsystem_inference_workloads"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2237,7 +2237,6 @@ name = "composite_identifiers"
 version = "0.0.1"
 dependencies = [
  "enums",
- "my-workspace-hack",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2246,6 +2245,7 @@ dependencies = [
  "sqlx-mysql",
  "tokens",
  "utoipa",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2253,7 +2253,7 @@ name = "concurrency"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2271,8 +2271,8 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "easyenv",
- "my-workspace-hack",
  "url",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2408,8 +2408,8 @@ dependencies = [
  "errors",
  "hmac 0.10.1",
  "jwt",
- "my-workspace-hack",
  "sha2 0.9.9",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2596,8 +2596,8 @@ dependencies = [
 name = "crockford"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "rand 0.8.5",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2913,8 +2913,8 @@ name = "datetimes"
 version = "0.0.1"
 dependencies = [
  "chrono",
- "my-workspace-hack",
  "once_cell",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2931,7 +2931,6 @@ dependencies = [
  "errors",
  "futures 0.3.29",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "serde",
  "serde_derive",
@@ -2939,6 +2938,7 @@ dependencies = [
  "sqlx",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2950,9 +2950,9 @@ dependencies = [
  "easyenv",
  "errors",
  "log",
- "my-workspace-hack",
  "serde",
  "serde_derive",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -2967,7 +2967,6 @@ dependencies = [
  "errors",
  "itertools 0.13.0",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "serde",
  "serde_derive",
@@ -2976,6 +2975,7 @@ dependencies = [
  "storyteller_root",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3125,13 +3125,13 @@ dependencies = [
  "idempotency",
  "log",
  "mimetypes",
- "my-workspace-hack",
  "mysql_queries",
  "rand 0.8.5",
  "sqlx",
  "storyteller_root",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3148,11 +3148,11 @@ dependencies = [
  "filesys",
  "log",
  "mimetypes",
- "my-workspace-hack",
  "mysql_queries",
  "sqlx",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3226,7 +3226,7 @@ name = "dimensions"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3389,7 +3389,6 @@ dependencies = [
  "jobs_common",
  "log",
  "mimetypes",
- "my-workspace-hack",
  "mysql_queries",
  "r2d2_redis",
  "reusable_types",
@@ -3403,6 +3402,7 @@ dependencies = [
  "tempdir",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
  "zip 0.6.6",
 ]
 
@@ -3467,12 +3467,12 @@ dependencies = [
  "errors",
  "futures-util",
  "hostname 0.4.0",
- "my-workspace-hack",
  "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3513,8 +3513,8 @@ dependencies = [
  "dotenv",
  "env_logger",
  "log",
- "my-workspace-hack",
  "storyteller_root",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3589,7 +3589,6 @@ dependencies = [
  "enums",
  "errors",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "primitives",
  "serde",
@@ -3600,6 +3599,7 @@ dependencies = [
  "strum",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3612,12 +3612,12 @@ dependencies = [
  "errors",
  "jsonpath_lib",
  "log",
- "my-workspace-hack",
  "once_cell",
  "regex",
  "serde",
  "serde_json",
  "tokens",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3672,7 +3672,6 @@ dependencies = [
  "hostname 0.4.0",
  "jobs_common",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "once_cell",
  "r2d2_redis",
@@ -3684,6 +3683,7 @@ dependencies = [
  "sqlx",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3698,7 +3698,7 @@ version = "0.1.0"
 dependencies = [
  "errors",
  "lettre",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3764,7 +3764,6 @@ dependencies = [
 name = "enums"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "serde",
  "serde_derive",
  "serde_json",
@@ -3774,6 +3773,7 @@ dependencies = [
  "strum",
  "toml 0.8.14",
  "utoipa",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3781,13 +3781,13 @@ name = "enums_public"
 version = "0.0.1"
 dependencies = [
  "enums",
- "my-workspace-hack",
  "serde",
  "serde_derive",
  "serde_json",
  "strum",
  "toml 0.8.14",
  "utoipa",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3844,7 +3844,7 @@ name = "errors"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -3864,7 +3864,6 @@ dependencies = [
  "futures 0.3.29",
  "hostname 0.4.0",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "once_cell",
  "primitives",
@@ -3878,6 +3877,7 @@ dependencies = [
  "storyteller_root",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -4013,9 +4013,9 @@ version = "0.0.1"
 dependencies = [
  "errors",
  "log",
- "my-workspace-hack",
  "testing",
  "walkdir",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -4829,9 +4829,9 @@ dependencies = [
  "crockford",
  "errors",
  "log",
- "my-workspace-hack",
  "subprocess_common",
  "tempdir",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -4842,12 +4842,12 @@ dependencies = [
  "coarsetime",
  "errors",
  "jwt-simple",
- "my-workspace-hack",
  "reqwest 0.12.15",
  "serde",
  "serde_derive",
  "serde_json",
  "testing",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -4992,8 +4992,8 @@ dependencies = [
  "data-encoding",
  "errors",
  "md-5 0.10.6",
- "my-workspace-hack",
  "ring",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -5263,12 +5263,12 @@ dependencies = [
  "errors",
  "language-tags",
  "log",
- "my-workspace-hack",
  "once_cell",
  "regex",
  "serde",
  "serde_derive",
  "serde_json",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -5566,8 +5566,8 @@ dependencies = [
 name = "idempotency"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "uuid",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -5646,8 +5646,8 @@ version = "0.0.1"
 dependencies = [
  "errors",
  "image",
- "my-workspace-hack",
  "testing",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -5674,8 +5674,8 @@ version = "0.0.1"
 dependencies = [
  "errors",
  "image",
- "my-workspace-hack",
  "testing",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -5790,7 +5790,6 @@ dependencies = [
  "migration",
  "mime",
  "mimetypes",
- "my-workspace-hack",
  "mysql_queries",
  "once_cell",
  "openai_sora_client",
@@ -5821,6 +5820,7 @@ dependencies = [
  "url",
  "videos",
  "walkdir",
+ "workspace-build-acceleration",
  "zip 2.1.3",
 ]
 
@@ -6014,9 +6014,9 @@ dependencies = [
  "chrono",
  "errors",
  "log",
- "my-workspace-hack",
  "r2d2_redis",
  "redis_common",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6161,10 +6161,10 @@ dependencies = [
  "easyenv",
  "errors",
  "log",
- "my-workspace-hack",
  "once_cell",
  "rand 0.8.5",
  "regex",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6402,10 +6402,10 @@ version = "0.1.1"
 dependencies = [
  "chrono",
  "futures 0.1.31",
- "my-workspace-hack",
  "redis 0.13.0",
  "time",
  "version-sync",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6504,7 +6504,7 @@ version = "0.0.1"
 dependencies = [
  "env_logger",
  "log",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6523,8 +6523,8 @@ dependencies = [
  "clap",
  "errors",
  "logging",
- "my-workspace-hack",
  "walkdir",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6614,10 +6614,10 @@ name = "markdown"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
  "once_cell",
  "pulldown-cmark 0.11.0",
  "regex",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6722,8 +6722,8 @@ version = "0.0.1"
 dependencies = [
  "errors",
  "log",
- "my-workspace-hack",
  "symphonia 0.5.0",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6773,8 +6773,8 @@ dependencies = [
  "anyhow",
  "errors",
  "lru_time_cache",
- "my-workspace-hack",
  "sieve-cache",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6818,7 +6818,6 @@ dependencies = [
  "enums",
  "errors",
  "jobs_common",
- "my-workspace-hack",
  "mysql_queries",
  "once_cell",
  "serde",
@@ -6828,6 +6827,7 @@ dependencies = [
  "tokens",
  "tokio",
  "toml 0.8.14",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6844,7 +6844,6 @@ dependencies = [
  "filesys",
  "hashing",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "serde",
  "serde_derive",
@@ -6855,6 +6854,7 @@ dependencies = [
  "tempdir",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -6878,7 +6878,7 @@ name = "mimetypes"
 version = "0.0.1"
 dependencies = [
  "infer 0.16.0",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -7007,7 +7007,6 @@ dependencies = [
  "log",
  "memory_caching",
  "ml_weights_registry",
- "my-workspace-hack",
  "ndarray",
  "nvidia-checker",
  "once_cell",
@@ -7026,6 +7025,7 @@ dependencies = [
  "tokenizers 0.15.2",
  "tokio",
  "tokio-util",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -7126,112 +7126,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03"
 
 [[package]]
-name = "my-workspace-hack"
-version = "0.1.0"
-dependencies = [
- "actix-router",
- "actix-rt",
- "ahash 0.8.11",
- "anstream",
- "arrayvec",
- "base64 0.21.7",
- "base64 0.22.1",
- "base64ct",
- "bitflags 2.5.0",
- "block-buffer 0.9.0",
- "bytemuck",
- "byteorder",
- "cc",
- "chrono",
- "clap",
- "crossbeam-utils 0.8.20",
- "crypto-common",
- "deranged",
- "derive_more",
- "digest 0.10.7",
- "either",
- "flate2",
- "flume",
- "futures 0.3.29",
- "futures-channel",
- "futures-core",
- "futures-executor",
- "futures-io",
- "futures-sink",
- "futures-task",
- "futures-util",
- "generic-array",
- "getrandom 0.2.14",
- "hashbrown 0.14.5",
- "heck 0.4.1",
- "hmac 0.12.1",
- "hyper 0.14.28",
- "hyper 1.6.0",
- "hyper-util",
- "indexmap 2.2.6",
- "itertools 0.12.1",
- "lazy_static",
- "libc",
- "log",
- "md-5 0.10.6",
- "memchr",
- "miniz_oxide 0.7.2",
- "native-tls",
- "num-bigint",
- "num-integer",
- "num-iter",
- "num-rational",
- "num-traits",
- "openssl",
- "openssl-sys",
- "proc-macro2",
- "quote",
- "rand 0.8.5",
- "rand_chacha 0.3.1",
- "rand_core 0.6.4",
- "regex",
- "regex-automata",
- "regex-syntax",
- "reqwest 0.12.15",
- "rsa",
- "rustls-pki-types",
- "semver 1.0.23",
- "serde",
- "serde_json",
- "sha1 0.10.6",
- "sha2 0.10.8",
- "simd-adler32",
- "smallvec 1.13.2",
- "socket2",
- "spin 0.9.8",
- "sqlx",
- "sqlx-core",
- "sqlx-macros",
- "sqlx-macros-core",
- "sqlx-mysql",
- "sqlx-sqlite",
- "subtle",
- "syn 1.0.109",
- "syn 2.0.87",
- "time",
- "time-macros",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tower 0.4.13",
- "tracing",
- "unicode-bidi",
- "unicode-normalization",
- "url",
- "uuid",
- "void",
- "winapi 0.3.9",
- "windows-sys 0.48.0",
- "windows-sys 0.52.0",
- "zeroize",
-]
-
-[[package]]
 name = "mysql_queries"
 version = "0.0.1"
 dependencies = [
@@ -7243,7 +7137,6 @@ dependencies = [
  "errors",
  "idempotency",
  "log",
- "my-workspace-hack",
  "num-traits",
  "once_cell",
  "primitives",
@@ -7257,6 +7150,7 @@ dependencies = [
  "sqlx",
  "tokens",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -7962,7 +7856,6 @@ dependencies = [
  "errors",
  "filesys",
  "log",
- "my-workspace-hack",
  "reqwest 0.12.15",
  "serde",
  "serde_derive",
@@ -7971,6 +7864,7 @@ dependencies = [
  "testing",
  "tokio",
  "toml 0.7.8",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -8335,7 +8229,7 @@ version = "0.0.1"
 dependencies = [
  "bcrypt",
  "errors",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -8716,8 +8610,8 @@ name = "primitives"
 version = "0.0.1"
 dependencies = [
  "assertor",
- "my-workspace-hack",
  "testing",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -8832,10 +8726,10 @@ dependencies = [
 name = "prompt_engineering"
 version = "0.1.0"
 dependencies = [
- "my-workspace-hack",
  "once_cell",
  "regex",
  "speculoos",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -9516,11 +9410,11 @@ name = "redis_caching"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
  "r2d2_redis",
  "serde",
  "serde_derive",
  "serde_json",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -9530,12 +9424,12 @@ dependencies = [
  "anyhow",
  "crockford",
  "errors",
- "my-workspace-hack",
  "serde",
  "serde_derive",
  "serde_json",
  "time",
  "url",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -9545,11 +9439,11 @@ dependencies = [
  "chrono",
  "enums",
  "errors",
- "my-workspace-hack",
  "r2d2_redis",
  "serde",
  "tokens",
  "url",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -9753,11 +9647,11 @@ name = "reusable_types"
 version = "0.0.1"
 dependencies = [
  "chrono",
- "my-workspace-hack",
  "serde",
  "serde_derive",
  "sqlx",
  "toml 0.8.14",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -10234,9 +10128,9 @@ version = "0.0.1"
 dependencies = [
  "clap",
  "errors",
- "my-workspace-hack",
  "tokio",
  "web_scrapers",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -10641,7 +10535,7 @@ dependencies = [
 name = "server_environment"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -11194,8 +11088,8 @@ name = "sqlx_mysql_helpers"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
  "sqlx",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -11287,7 +11181,6 @@ dependencies = [
  "memory_caching",
  "migration",
  "mimetypes",
- "my-workspace-hack",
  "mysql_queries",
  "native-tls",
  "once_cell",
@@ -11333,6 +11226,7 @@ dependencies = [
  "utoipa-swagger-ui",
  "uuid",
  "videos",
+ "workspace-build-acceleration",
  "zip 0.6.6",
 ]
 
@@ -11340,8 +11234,8 @@ dependencies = [
 name = "storyteller_root"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "serial_test",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -11438,9 +11332,9 @@ dependencies = [
  "errors",
  "filesys",
  "log",
- "my-workspace-hack",
  "serial_test",
  "subprocess",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -12394,7 +12288,7 @@ name = "testing"
 version = "0.0.1"
 dependencies = [
  "errors",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -12470,9 +12364,9 @@ version = "0.1.0"
 dependencies = [
  "easyenv",
  "log",
- "my-workspace-hack",
  "reqwest 0.12.15",
  "serde_json",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -12642,7 +12536,6 @@ dependencies = [
 name = "tokens"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "once_cell",
  "rand 0.8.5",
  "serde",
@@ -12654,6 +12547,7 @@ dependencies = [
  "strum",
  "toml 0.8.14",
  "utoipa",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13136,7 +13030,6 @@ dependencies = [
  "hyper 1.6.0",
  "jobs_common",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "r2d2_redis",
  "serde",
@@ -13146,6 +13039,7 @@ dependencies = [
  "subprocess",
  "tempdir",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13168,7 +13062,6 @@ dependencies = [
  "lfu",
  "log",
  "memory_caching",
- "my-workspace-hack",
  "mysql_queries",
  "r2d2_redis",
  "reqwest 0.12.15",
@@ -13179,6 +13072,7 @@ dependencies = [
  "tempdir",
  "tokio",
  "tts_common",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13189,13 +13083,13 @@ dependencies = [
  "chrono",
  "errors",
  "log",
- "my-workspace-hack",
  "once_cell",
  "regex",
  "serde",
  "serde_derive",
  "unicode-segmentation",
  "user_input_common",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13444,8 +13338,8 @@ dependencies = [
  "actix-web",
  "actix_helpers",
  "anyhow",
- "my-workspace-hack",
  "reusable_types",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13470,10 +13364,10 @@ dependencies = [
 name = "user_input_common"
 version = "0.0.1"
 dependencies = [
- "my-workspace-hack",
  "once_cell",
  "regex",
  "unicode-segmentation",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13482,7 +13376,7 @@ version = "0.0.1"
 dependencies = [
  "actix-web",
  "mockall",
- "my-workspace-hack",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13632,8 +13526,8 @@ dependencies = [
  "ffprobe",
  "log",
  "mp4",
- "my-workspace-hack",
  "testing",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13681,7 +13575,6 @@ dependencies = [
  "hyper 1.6.0",
  "jobs_common",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "r2d2_redis",
  "serde",
@@ -13691,6 +13584,7 @@ dependencies = [
  "subprocess",
  "tempdir",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13711,7 +13605,6 @@ dependencies = [
  "hyper 1.6.0",
  "jobs_common",
  "log",
- "my-workspace-hack",
  "mysql_queries",
  "r2d2_redis",
  "serde",
@@ -13721,6 +13614,7 @@ dependencies = [
  "subprocess",
  "tempdir",
  "tokio",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -13896,7 +13790,6 @@ dependencies = [
  "enums",
  "errors",
  "log",
- "my-workspace-hack",
  "once_cell",
  "reqwest 0.12.15",
  "rss",
@@ -13905,6 +13798,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "strum",
+ "workspace-build-acceleration",
 ]
 
 [[package]]
@@ -14587,6 +14481,112 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3268f3d866458b787f390cf61f4bbb563b922d091359f9608842999eaee3943c"
 dependencies = [
  "bitflags 2.5.0",
+]
+
+[[package]]
+name = "workspace-build-acceleration"
+version = "0.1.0"
+dependencies = [
+ "actix-router",
+ "actix-rt",
+ "ahash 0.8.11",
+ "anstream",
+ "arrayvec",
+ "base64 0.21.7",
+ "base64 0.22.1",
+ "base64ct",
+ "bitflags 2.5.0",
+ "block-buffer 0.9.0",
+ "bytemuck",
+ "byteorder",
+ "cc",
+ "chrono",
+ "clap",
+ "crossbeam-utils 0.8.20",
+ "crypto-common",
+ "deranged",
+ "derive_more",
+ "digest 0.10.7",
+ "either",
+ "flate2",
+ "flume",
+ "futures 0.3.29",
+ "futures-channel",
+ "futures-core",
+ "futures-executor",
+ "futures-io",
+ "futures-sink",
+ "futures-task",
+ "futures-util",
+ "generic-array",
+ "getrandom 0.2.14",
+ "hashbrown 0.14.5",
+ "heck 0.4.1",
+ "hmac 0.12.1",
+ "hyper 0.14.28",
+ "hyper 1.6.0",
+ "hyper-util",
+ "indexmap 2.2.6",
+ "itertools 0.12.1",
+ "lazy_static",
+ "libc",
+ "log",
+ "md-5 0.10.6",
+ "memchr",
+ "miniz_oxide 0.7.2",
+ "native-tls",
+ "num-bigint",
+ "num-integer",
+ "num-iter",
+ "num-rational",
+ "num-traits",
+ "openssl",
+ "openssl-sys",
+ "proc-macro2",
+ "quote",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rand_core 0.6.4",
+ "regex",
+ "regex-automata",
+ "regex-syntax",
+ "reqwest 0.12.15",
+ "rsa",
+ "rustls-pki-types",
+ "semver 1.0.23",
+ "serde",
+ "serde_json",
+ "sha1 0.10.6",
+ "sha2 0.10.8",
+ "simd-adler32",
+ "smallvec 1.13.2",
+ "socket2",
+ "spin 0.9.8",
+ "sqlx",
+ "sqlx-core",
+ "sqlx-macros",
+ "sqlx-macros-core",
+ "sqlx-mysql",
+ "sqlx-sqlite",
+ "subtle",
+ "syn 1.0.109",
+ "syn 2.0.87",
+ "time",
+ "time-macros",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tower 0.4.13",
+ "tracing",
+ "unicode-bidi",
+ "unicode-normalization",
+ "url",
+ "uuid",
+ "void",
+ "winapi 0.3.9",
+ "windows-sys 0.48.0",
+ "windows-sys 0.52.0",
+ "zeroize",
 ]
 
 [[package]]

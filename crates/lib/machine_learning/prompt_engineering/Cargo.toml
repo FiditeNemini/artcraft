@@ -10,11 +10,11 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
-# Workspace hack (faster compile times)
-my-workspace-hack = { workspace =  true }
+# Hackari workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
 #errors = { path = "../errors" }

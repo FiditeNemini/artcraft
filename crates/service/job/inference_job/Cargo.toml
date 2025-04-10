@@ -13,9 +13,11 @@ name = "inference-job"
 path = "src/main.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Hackari workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
 actix_helpers = { path = "../../../lib/actix_helpers" }
@@ -88,7 +90,6 @@ serde_json = "1.0.108"
 # The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
 # include support for async fn in traits.
 async-trait = "0.1.58"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 time = "0.3.30"
 mime = "0.3.17"
 rand = { version = "0.8.5", features = [] }

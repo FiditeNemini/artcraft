@@ -13,7 +13,7 @@ name = "config"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 # TODO: Remove these dependencies.
 #  These were introduced in refactoring. Config should have few, if any, dependencies.
@@ -22,7 +22,7 @@ normal = ["my-workspace-hack"]
 easyenv = { path = "../../../lib/easyenv" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 anyhow = "1.0.86"

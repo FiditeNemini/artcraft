@@ -23,7 +23,7 @@ tokio = { version = "1.34.0", features = ["macros"], optional = true }
 uuid = { version = "0.8.1", features = ["v4"] }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
 
 [dev-dependencies]
 rand = "0.8.5"

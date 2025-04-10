@@ -13,7 +13,7 @@ name = "lru-delete-models"
 path = "src/main.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Internal
@@ -21,7 +21,7 @@ errors = { path = "../../../lib/errors" }
 logging = { path = "../../../lib/logging" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 clap = { version = "4.4.8", features = ["derive"] }

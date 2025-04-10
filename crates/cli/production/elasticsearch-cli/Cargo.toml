@@ -13,7 +13,7 @@ name = "elasticsearch-cli"
 path = "src/main.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Internal
@@ -29,7 +29,7 @@ storyteller_root = { path = "../../../lib/storyteller_root" }
 tokens = { path = "../../../_types/tokens" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 clap = "4.4.8"

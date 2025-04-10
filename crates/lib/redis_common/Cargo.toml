@@ -13,7 +13,7 @@ name = "redis_common"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 
@@ -22,7 +22,7 @@ crockford = { path = "../data/crockford" }
 errors = { path = "../errors" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
 
 # External
 anyhow = "1.0.86"

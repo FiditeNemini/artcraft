@@ -14,11 +14,11 @@ name = "dimensions"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
 
 # Internal
 errors = { path = "../errors" }

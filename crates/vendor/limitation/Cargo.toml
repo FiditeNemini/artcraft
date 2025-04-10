@@ -18,7 +18,7 @@ Redis.
 cirrus-ci = { repository = "fnichol/limitation" }
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 chrono = "0.4.9"
@@ -27,7 +27,7 @@ redis = "0.13.0"
 time = "0.3.30"
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
 
 [dev-dependencies]
 #tokio = "1.34.0" # NB(bt,2024-05-16): Dependency fix recommends this is unused

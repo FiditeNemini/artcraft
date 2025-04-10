@@ -13,7 +13,7 @@ name = "kubectl-pod-cleanup"
 path = "src/main.rs"
 
 [package.metadata.cargo-udeps.ignore]
-normal = ["my-workspace-hack"]
+normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Internal
@@ -22,7 +22,7 @@ easyenv = { path = "../../../lib/easyenv" }
 errors = { path = "../../../lib/errors" }
 
 # Workspace hack (faster compile yytimes)
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 log = "0.4.20"
