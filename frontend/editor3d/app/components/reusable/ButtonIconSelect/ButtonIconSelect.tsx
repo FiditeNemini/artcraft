@@ -2,11 +2,13 @@ import { useState } from "react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
+import { Tooltip } from "../Tooltip"; // Adjust the path if necessary
 
 interface Option {
   value: string;
   icon: IconDefinition;
   text?: string;
+  tooltip?: string;
 }
 
 interface ButtonIconSelectProps {
@@ -31,24 +33,50 @@ export function ButtonIconSelect({
 
   return (
     <div className="flex space-x-1">
-      {options.map(({ value, icon, text }) => (
-        <button
-          key={value}
-          className={twMerge(
-            `flex h-8 items-center justify-center rounded-lg border text-sm transition-all duration-150`,
-            text ? "h-auto w-auto gap-2 px-2.5 py-1" : "w-8",
-            selectedOption === value
-              ? "border-brand-primary bg-brand-primary/20"
-              : "border-transparent hover:bg-ui-panel/[0.4]",
-          )}
-          onClick={() => handleOptionChange(value)}
-        >
-          <FontAwesomeIcon icon={icon} />
-          {text && (
-            <span className="text-nowrap text-sm font-medium">{text}</span>
-          )}
-        </button>
-      ))}
+      {options.map(({ value, icon, text, tooltip }) =>
+        tooltip ? (
+          <Tooltip
+            key={value}
+            content={tooltip}
+            position="bottom"
+            delay={300}
+            closeOnClick
+          >
+            <button
+              className={twMerge(
+                `flex h-9 items-center justify-center rounded-lg border text-sm transition-all duration-150`,
+                text ? "h-auto w-auto gap-2 px-3 py-1.5" : "w-9",
+                selectedOption === value
+                  ? "border-brand-primary bg-brand-primary/20"
+                  : "border-transparent hover:bg-ui-panel/[0.4]",
+              )}
+              onClick={() => handleOptionChange(value)}
+            >
+              <FontAwesomeIcon icon={icon} />
+              {text && (
+                <span className="text-nowrap text-sm font-medium">{text}</span>
+              )}
+            </button>
+          </Tooltip>
+        ) : (
+          <button
+            key={value}
+            className={twMerge(
+              `flex h-9 items-center justify-center rounded-lg border text-sm transition-all duration-150`,
+              text ? "h-auto w-auto gap-2 px-3 py-1.5" : "w-9",
+              selectedOption === value
+                ? "border-brand-primary bg-brand-primary/20"
+                : "border-transparent hover:bg-ui-panel/[0.4]",
+            )}
+            onClick={() => handleOptionChange(value)}
+          >
+            <FontAwesomeIcon icon={icon} />
+            {text && (
+              <span className="text-nowrap text-sm font-medium">{text}</span>
+            )}
+          </button>
+        ),
+      )}
     </div>
   );
 }

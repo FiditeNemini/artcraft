@@ -98,7 +98,6 @@ export const SceneTitleInput = ({ pageName }: Props) => {
       className={twMerge(
         "flex w-full items-center justify-center gap-1.5",
         isSaving && "ml-3",
-        currentPage.value === Pages.STYLE ? "mr-0" : "mr-[70px]",
       )}
     >
       {!showInput && (

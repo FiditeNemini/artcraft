@@ -114,8 +114,6 @@ export const PageEditor = () => {
               </div>
             </div>
 
-            <AssetMenu />
-
             {/* Bottom controls */}
             <div
               className="absolute bottom-0 left-0"

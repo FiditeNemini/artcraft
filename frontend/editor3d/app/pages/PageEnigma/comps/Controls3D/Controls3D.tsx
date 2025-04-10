@@ -1,11 +1,17 @@
 import {
   faArrowsRotate,
   faArrowsUpDownLeftRight,
+  faCube,
+  faMagicWandSparkles,
+  faP,
+  faPlus,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
-import { ButtonIconSelect } from "~/components";
+import { Button, ButtonIconSelect, Tooltip } from "~/components";
 import { EngineContext } from "../../contexts/EngineContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { assetModalVisibleDuringDrag } from "../../signals";
+import { AssetModal } from "../AssetMenu/AssetModal";
 
 export const Controls3D = () => {
   const editorEngine = useContext(EngineContext);
@@ -46,16 +52,68 @@ export const Controls3D = () => {
   };
 
   const modes = [
-    { value: "move", icon: faArrowsUpDownLeftRight, text: "Move (T)" },
-    { value: "rotate", icon: faArrowsRotate, text: "Rotate (R)" },
-    { value: "scale", icon: faUpRightAndDownLeftFromCenter, text: "Scale (G)" },
+    {
+      value: "move",
+      icon: faArrowsUpDownLeftRight,
+      text: "Move",
+      tooltip: "Move (T)",
+    },
+    {
+      value: "rotate",
+      icon: faArrowsRotate,
+      text: "Rotate",
+      tooltip: "Rotate (R)",
+    },
+    {
+      value: "scale",
+      icon: faUpRightAndDownLeftFromCenter,
+      text: "Scale",
+      tooltip: "Scale (G)",
+    },
   ];
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    assetModalVisibleDuringDrag.value = true;
+    setIsModalOpen(true);
+  };
 
   return (
     <div>
       <div className="flex justify-center">
-        <div className="rounded-b-lg border border-[#363636] bg-ui-controls p-1.5 text-white shadow-md">
-          <div className="flex items-center justify-center gap-3">
+        <div className="glass rounded-b-xl border  border-[#363636] p-1.5 pr-2 text-white shadow-md">
+          <div className="flex items-center justify-center gap-2.5">
+            <div className="flex items-center gap-1">
+              <Tooltip
+                content="Add 3D asset to scene"
+                position="bottom"
+                delay={100}
+                closeOnClick
+              >
+                <Button
+                  icon={faPlus}
+                  className="h-9 w-9 rounded-[10px] text-lg"
+                  onClick={handleOpenModal}
+                />
+              </Tooltip>
+              <Tooltip
+                content="Create 3D model from image"
+                position="bottom"
+                delay={300}
+                closeOnClick
+              >
+                <Button
+                  icon={faMagicWandSparkles}
+                  className="text-md h-9 w-9 rounded-[10px] bg-white/10"
+                  variant="secondary"
+                  disabled={true}
+                  onClick={handleOpenModal}
+                />
+              </Tooltip>
+            </div>
+
+            <span className="opacity-20">|</span>
             <ButtonIconSelect
               options={modes}
               onOptionChange={handleModeChange}
@@ -63,6 +121,8 @@ export const Controls3D = () => {
           </div>
         </div>
       </div>
+
+      <AssetModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };
