@@ -1,29 +1,61 @@
-/// <reference types='vitest' />
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
-export default defineConfig(() => ({
-  root: __dirname,
-  cacheDir: '../../node_modules/.vite/apps/editor3d',
-  server:{
-    port: 4200,
-    host: 'localhost',
+import tsconfigPaths from "vite-tsconfig-paths";
+import path from 'path';
+
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  server: {
+    port: 5741,
   },
-  preview:{
-    port: 4300,
-    host: 'localhost',
+
+  //build: {
+  //  rollupOptions: {
+  //    external: [
+  //      /^node:.*/,
+  //    ]
+  //  }
+  //},
+  resolve: {
+    alias: {
+      "~": path.resolve(__dirname, "./src"),
+      //"@tests": path.resolve(__dirname, "./tests")
+    }
   },
-  plugins: [react()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
-  build: {
-    outDir: './dist',
-    emptyOutDir: true,
-    reportCompressedSize: true,
-    commonjsOptions: {
-      transformMixedEsModules: true,
+
+  plugins: [
+    tsconfigPaths(),
+    react({
+      babel: {
+        plugins: [["module:@preact/signals-react-transform"]],
+      },
+    }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: "node_modules/onnxruntime-web/dist/*.wasm",
+          dest: "wasm/",
+        },
+        {
+          src: "src/KonvaApp/SharedWorkers/Diffusion/DiffusionSharedWorker.js",
+          dest: "assets/workers/",
+        },
+      ],
+    }),
+    {
+      name: "wasm-mime-type",
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url?.endsWith(".onnx")) {
+            res.setHeader("Content-Type", "application/wasm");
+          }
+          next();
+        });
+      },
     },
-  },
-}));
+  ],
+  assetsInclude: ["**/.onnx", "**/*.wasm"],
+});
