@@ -5,8 +5,8 @@ set -euxo pipefail
 echo "Run build script (TODO: Make strict)"
 nx build editor2d
 
-echo "Copy test files into dist"
-cp -r test/* dist/
+#echo "Copy test files into dist"
+#cp -r test/* dist/
 
 echo "Copy netlify configs into dist"
 cp _headers dist/
