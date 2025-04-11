@@ -22,4 +22,4 @@ echo "List files after build"
 find dist/
 
 echo "List other files"
-find /
+find /build
