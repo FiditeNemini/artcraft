@@ -1,6 +1,6 @@
 [build]
 #command = "./script/netlify_build.sh"
-publish = "dist/"
+publish = "apps/editor2d/dist/"
 
 #[build.environment]
 #REACT_APP_PUBLIC_POSTHOG_KEY = "phc_jBFgac0mVALAFk3negnSfYCcHgvkT00yBLQDmCDYNBb"
