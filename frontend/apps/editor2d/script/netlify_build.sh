@@ -21,5 +21,10 @@ cp apps/editor2d/404.html dist/
 echo "List files after build"
 find dist/
 
-echo "List other files"
-find /build
+echo "List other files(1)"
+ls -lA /
+
+echo "List other files(2)"
+pwd
+ls -lA .
+
