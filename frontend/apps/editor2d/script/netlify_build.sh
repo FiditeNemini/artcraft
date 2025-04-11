@@ -3,7 +3,7 @@
 set -euxo pipefail 
 
 echo "Run build script (TODO: Make strict)"
-yarn run build2
+nx build editor2d
 
 echo "Copy test files into dist"
 cp -r test/* dist/
