@@ -1,5 +1,5 @@
 [build]
-command = "./script/netlify_build.sh"
+#command = "./script/netlify_build.sh"
 publish = "dist/"
 
 #[build.environment]
