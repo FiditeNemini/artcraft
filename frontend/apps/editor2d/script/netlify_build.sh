@@ -28,3 +28,7 @@ echo "List other files(2)"
 pwd
 ls -lA .
 
+echo "Find"
+pwd
+find . | grep build
+
