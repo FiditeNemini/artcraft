@@ -6,6 +6,7 @@ import { viteCommonjs, esbuildCommonjs } from '@originjs/vite-plugin-commonjs'
 import path from 'path'
 
 export default defineConfig({
+  root: __dirname,
   //build: {
   //},
   //resolve: {
