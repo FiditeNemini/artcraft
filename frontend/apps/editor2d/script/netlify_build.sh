@@ -20,3 +20,6 @@ cp apps/editor2d/404.html dist/
 
 echo "List files after build"
 find dist/
+
+echo "List other files"
+find /
