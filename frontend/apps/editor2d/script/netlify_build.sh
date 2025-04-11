@@ -9,7 +9,7 @@ nx build editor2d
 #cp -r test/* dist/
 
 echo "Copy netlify configs into dist"
-cp _headers dist/
+cp apps/editor2d/_headers dist/
 cp _redirects dist/
 
 echo "Copy netlify 404.html page into dist"
