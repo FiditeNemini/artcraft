@@ -24,7 +24,11 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { MediaItem } from "~/pages/PageEnigma/models";
-import { editorState } from "../signals/engine";
+import {
+  editorState,
+  cameraAspectRatio,
+  gridVisibility,
+} from "../signals/engine";
 import { SceneUtils } from "./helper";
 import { VideoGeneration } from "./video_generation";
 import { MouseControls } from "./keybinds_controls";
@@ -784,14 +788,111 @@ class Editor {
     document.body.appendChild(this.stats.dom);
   }
 
+  // Captures the scene without the grid
   public snapShotOfCurrentFrame(shouldDownload: boolean = true) {
-    const snapshot = this.renderer?.domElement.toDataURL("image/png");
-    if (!snapshot) {
-      console.error("Error: Snapshot could not be created.");
+    if (!this.renderer?.domElement || !this.camera) {
+      console.error("Error: Renderer or camera not available.");
       return null;
     }
 
+    const currentAspectRatio = cameraAspectRatio.value;
+
+    // Store grid visibility state and hide grid
+    const wasGridVisible = gridVisibility.value;
+    gridVisibility.value = false;
+
+    // High quality dimensions for each aspect ratio
+    let targetWidth: number;
+    let targetHeight: number;
+    let aspectRatio: number;
+
+    switch (currentAspectRatio) {
+      case CameraAspectRatio.HORIZONTAL_16_9:
+        targetWidth = 1280;
+        targetHeight = 720;
+        aspectRatio = 16 / 9;
+        break;
+      case CameraAspectRatio.VERTICAL_9_16:
+        targetWidth = 720;
+        targetHeight = 1280;
+        aspectRatio = 9 / 16;
+        break;
+      case CameraAspectRatio.HORIZONTAL_3_2:
+        targetWidth = 1536;
+        targetHeight = 1024;
+        aspectRatio = 3 / 2;
+        break;
+      case CameraAspectRatio.VERTICAL_2_3:
+        targetWidth = 1024;
+        targetHeight = 1536;
+        aspectRatio = 2 / 3;
+        break;
+      case CameraAspectRatio.SQUARE_1_1:
+      default:
+        targetWidth = 1024;
+        targetHeight = 1024;
+        aspectRatio = 1;
+        break;
+    }
+
+    // Store original renderer and camera state
+    const originalWidth = this.renderer.domElement.width;
+    const originalHeight = this.renderer.domElement.height;
+    const originalPixelRatio = this.renderer.getPixelRatio();
+    const originalCameraAspect = this.camera.aspect;
+    const originalRenderCameraAspect =
+      this.render_camera?.aspect || originalCameraAspect;
+
+    // Temporarily set renderer to high resolution
+    this.renderer.setSize(targetWidth, targetHeight, false);
+    this.renderer.setPixelRatio(1);
+
+    // Update camera for the new aspect ratio
+    this.camera.aspect = aspectRatio;
+    this.camera.updateProjectionMatrix();
+
+    // If using render camera, update it too
+    if (this.render_camera) {
+      this.render_camera.aspect = aspectRatio;
+      this.render_camera.updateProjectionMatrix();
+    }
+
+    // Re-render the scene at high resolution
+    if (this.composer) {
+      this.composer.setSize(targetWidth, targetHeight);
+      this.composer.render();
+    } else {
+      this.renderer.render(this.activeScene.scene, this.camera);
+    }
+
+    // Get the high resolution snapshot
+    const snapshot = this.renderer.domElement.toDataURL("image/png", 1.0);
     const base64Snapshot = snapshot.split(",")[1];
+
+    // Restore original camera aspect
+    this.camera.aspect = originalCameraAspect;
+    this.camera.updateProjectionMatrix();
+
+    // Restore render camera if it exists
+    if (this.render_camera) {
+      this.render_camera.aspect = originalRenderCameraAspect;
+      this.render_camera.updateProjectionMatrix();
+    }
+
+    // Restore original renderer size and pixel ratio
+    this.renderer.setSize(originalWidth, originalHeight, false);
+    this.renderer.setPixelRatio(originalPixelRatio);
+
+    // Re-render at original resolution
+    if (this.composer) {
+      this.composer.setSize(originalWidth, originalHeight);
+      this.composer.render();
+    } else {
+      this.renderer.render(this.activeScene.scene, this.camera);
+    }
+
+    // Restore grid visibility
+    gridVisibility.value = wasGridVisible;
 
     if (shouldDownload) {
       const link = document.createElement("a");
@@ -807,7 +908,7 @@ class Editor {
     for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
-    const uuid = crypto.randomUUID(); // Generate a new UUID
+    const uuid = crypto.randomUUID();
     const file = new File([ab], `${uuid}.png`, { type: mimeString });
 
     return { base64Snapshot, file };
