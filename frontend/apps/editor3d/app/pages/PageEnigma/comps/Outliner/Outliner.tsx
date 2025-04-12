@@ -140,7 +140,7 @@ export const Outliner = () => {
 
   useEffect(() => {
     const updateEditorHeight = () => {
-      setEditorHeight(pageHeight.value - timelineHeight.value - 64);
+      setEditorHeight(pageHeight.value - timelineHeight.value - 56);
     };
 
     updateEditorHeight();

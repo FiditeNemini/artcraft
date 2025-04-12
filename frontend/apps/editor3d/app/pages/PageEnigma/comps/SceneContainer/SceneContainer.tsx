@@ -11,7 +11,7 @@ export const SceneContainer = ({ children }: { children: React.ReactNode }) => {
 
   const containerWidth = pageWidth.value;
 
-  const containerHeight = pageHeight.value - timelineHeight.value - 64;
+  const containerHeight = pageHeight.value - timelineHeight.value - 56;
 
   const callbackRef = useCallback(
     (node: HTMLDivElement) => {

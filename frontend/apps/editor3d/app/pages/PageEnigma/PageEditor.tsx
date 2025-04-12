@@ -52,11 +52,11 @@ export const PageEditor = () => {
     : pageWidth.value - 84;
   const height =
     dndTimelineHeight.value > -1
-      ? pageHeight.value - dndTimelineHeight.value - 64
-      : pageHeight.value - timelineHeight.value - 64;
+      ? pageHeight.value - dndTimelineHeight.value - 56
+      : pageHeight.value - timelineHeight.value - 56;
 
   const getScale = () => {
-    const height = pageHeight.value - timelineHeight.value - 64;
+    const height = pageHeight.value - timelineHeight.value - 56;
     const scaleHeight = height < 610 ? height / 610 : 1;
 
     if (

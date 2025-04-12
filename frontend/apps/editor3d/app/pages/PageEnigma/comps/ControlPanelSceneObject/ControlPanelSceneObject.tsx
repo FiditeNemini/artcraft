@@ -164,7 +164,7 @@ export const ControlPanelSceneObject = () => {
   };
 
   const getScale = () => {
-    const height = pageHeight.value - timelineHeight.value - 64;
+    const height = pageHeight.value - timelineHeight.value - 56;
     return height < 620 ? height / 620 : 1;
   };
 

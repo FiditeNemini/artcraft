@@ -35,7 +35,7 @@ export const SidePanelMenu = ({
         sidePanelVisible.value ? "border-transparent" : "border-[#363636]",
       )}
       style={{
-        height: pageHeight.value - 64,
+        height: pageHeight.value - 56,
       }}
     >
       <div className="flex w-full flex-col gap-2">

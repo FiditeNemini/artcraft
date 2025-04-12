@@ -27,7 +27,7 @@ export const PreviewFrameImage = () => {
               pageWidth.value -
               (sidePanelVisible.value ? sidePanelWidth.value : 0) -
               84,
-            height: pageHeight.value - timelineHeight.value - 64,
+            height: pageHeight.value - timelineHeight.value - 56,
           }}
         >
           <div className="relative flex h-full w-full flex-col items-center justify-center gap-5">
@@ -48,7 +48,7 @@ export const PreviewFrameImage = () => {
               pageWidth.value -
               (sidePanelVisible.value ? sidePanelWidth.value : 0) -
               84,
-            height: pageHeight.value - timelineHeight.value - 64,
+            height: pageHeight.value - timelineHeight.value - 56,
           }}
         />
       );

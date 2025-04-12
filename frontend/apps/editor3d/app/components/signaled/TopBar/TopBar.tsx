@@ -27,18 +27,18 @@ export const TopBar = ({ pageName }: Props) => {
 
   return (
     <>
-      <header className="fixed left-0 top-0 z-30 w-full border-b border-ui-panel-border bg-ui-background">
+      <header className="fixed left-0 top-0 z-30 w-full border-b border-white/5 bg-ui-background">
         <nav
-          className="mx-auto grid h-[64px] w-screen grid-cols-3 items-center justify-between p-3"
+          className="mx-auto grid h-[56px] w-screen grid-cols-3 items-center justify-between px-3"
           aria-label="Global"
         >
           <div className="flex gap-4">
             <a href="/" className="">
-              <span className="sr-only">Storyteller.ai</span>
+              <span className="sr-only">ArtCraft</span>
               <img
-                className="h-[39px] w-auto pb-[3px]"
-                src="/resources/images/Storyteller-Logo-1.png"
-                alt="Logo StoryTeller.ai"
+                className="h-[28px] w-auto"
+                src="/resources/images/artcraft-logo.png"
+                alt="Logo ArtCraft"
               />
             </a>
             {!isEditorPath(currentLocation) && (
