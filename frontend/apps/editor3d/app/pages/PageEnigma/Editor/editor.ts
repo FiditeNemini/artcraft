@@ -706,6 +706,18 @@ class Editor {
     const wasGridVisible = gridVisibility.value;
     gridVisibility.value = false;
 
+    // Store and hide transform controls
+    const wasControlVisible = this.control?.visible ?? false;
+    if (this.control) {
+      this.control.visible = false;
+    }
+
+    // Store and disable outline pass
+    const wasOutlineEnabled = this.outlinePass?.enabled ?? false;
+    if (this.outlinePass) {
+      this.outlinePass.enabled = false;
+    }
+
     // High quality dimensions for each aspect ratio
     let targetWidth: number;
     let targetHeight: number;
@@ -798,6 +810,16 @@ class Editor {
 
     // Restore grid visibility
     gridVisibility.value = wasGridVisible;
+
+    // Restore transform controls visibility
+    if (this.control) {
+      this.control.visible = wasControlVisible;
+    }
+
+    // Restore outline pass
+    if (this.outlinePass) {
+      this.outlinePass.enabled = wasOutlineEnabled;
+    }
 
     if (shouldDownload) {
       const link = document.createElement("a");
