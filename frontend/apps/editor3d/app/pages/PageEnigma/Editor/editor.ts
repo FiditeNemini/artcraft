@@ -197,8 +197,6 @@ class Editor {
   processingHasFailed: boolean;
   stats: Stats;
 
-  cameras: Map<string, THREE.PerspectiveCamera> = new Map();
-
   constructor() {
     this.processingHasFailed = false;
     console.log(
@@ -329,133 +327,12 @@ class Editor {
     if (this.engineFrameBuffers.frameWorkerManager) {
       this.engineFrameBuffers.frameWorkerManager.type = imageFormat;
     }
-
-    // Initialize cameras from signals
-    cameras.value.forEach((camData) => {
-      const camera = new THREE.PerspectiveCamera(
-        camData.fov,
-        this.getRenderDimensions().aspectRatio,
-        0.01,
-        200,
-      );
-      camera.position.set(
-        camData.position.x,
-        camData.position.y,
-        camData.position.z,
-      );
-      camera.rotation.set(
-        camData.rotation.x,
-        camData.rotation.y,
-        camData.rotation.z,
-      );
-      this.cameras.set(camData.id, camera);
-    });
-
-    // Set initial camera
-    this.camera = this.cameras.get("main") || null;
-    this.render_camera = this.camera;
-
-    // Subscribe to camera changes
-    this.setupCameraSignalHandlers();
   }
 
   // Add helper method to convert focal length to FOV
   focalLengthToFov(focalLength: number, sensorHeight: number = 24): number {
     // Using the formula: FOV = 2 * arctan(sensorHeight / (2 * focalLength))
     return 2 * Math.atan(sensorHeight / (2 * focalLength)) * (180 / Math.PI);
-  }
-
-  setupCameraSignalHandlers() {
-    // Handle camera selection changes
-    selectedCameraId.subscribe((id) => {
-      const newCamera = this.cameras.get(id);
-      if (newCamera) {
-        this.camera = newCamera;
-        this.render_camera = newCamera;
-
-        // Update camera properties in signals
-        const camData = cameras.value.find((c) => c.id === id);
-        if (camData) {
-          // Convert focal length to FOV
-          const fov = this.focalLengthToFov(camData.focalLength);
-          newCamera.fov = fov;
-          newCamera.updateProjectionMatrix();
-          this.renderScene(); // Force a render update
-        }
-      }
-    });
-
-    // Handle camera updates
-    cameras.subscribe((newCameras) => {
-      newCameras.forEach((camData) => {
-        let camera = this.cameras.get(camData.id);
-
-        // Create new camera if it doesn't exist
-        if (!camera) {
-          const fov = this.focalLengthToFov(camData.focalLength);
-          camera = new THREE.PerspectiveCamera(
-            fov,
-            this.getRenderDimensions().aspectRatio,
-            0.01,
-            200,
-          );
-          this.cameras.set(camData.id, camera);
-        }
-
-        // Update camera properties
-        camera.position.set(
-          camData.position.x,
-          camData.position.y,
-          camData.position.z,
-        );
-        camera.rotation.set(
-          camData.rotation.x,
-          camData.rotation.y,
-          camData.rotation.z,
-        );
-
-        // Update FOV based on focal length
-        const fov = this.focalLengthToFov(camData.focalLength);
-        camera.fov = fov;
-        camera.updateProjectionMatrix();
-
-        // Force a render update if this is the active camera
-        if (camData.id === selectedCameraId.value) {
-          this.renderScene();
-        }
-      });
-
-      // Clean up deleted cameras
-      const currentIds = new Set(newCameras.map((c) => c.id));
-      for (const [id] of this.cameras.entries()) {
-        if (!currentIds.has(id) && id !== "main") {
-          this.cameras.delete(id);
-        }
-      }
-    });
-  }
-
-  // Update camera position in signals when it changes
-  updateCameraPosition() {
-    if (this.camera && selectedCameraId.value) {
-      const pos = this.camera.position;
-      const rot = this.camera.rotation;
-
-      const camData = cameras.value.find(
-        (c) => c.id === selectedCameraId.value,
-      );
-      if (camData) {
-        cameras.value = cameras.value.map((c) =>
-          c.id === selectedCameraId.value
-            ? {
-                ...c,
-                position: { x: pos.x, y: pos.y, z: pos.z },
-                rotation: { x: rot.x, y: rot.y, z: rot.z },
-              }
-            : c,
-        );
-      }
-    }
   }
 
   getRenderDimensions() {
@@ -590,24 +467,52 @@ class Editor {
     const width = this.container.offsetWidth;
     const height = this.container.offsetHeight;
 
-    // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 200);
-    this.camera.position.z = 2.5;
-    this.camera.position.y = 2.5;
-    this.camera.position.x = -2.5;
-    this.camera.lookAt(0, 0, 0);
+    // Sets up camera and base position using camera configurations from camera.ts
+    const mainCameraConfig = cameras.value.find((cam) => cam.id === "main");
+    if (mainCameraConfig) {
+      this.camera = new THREE.PerspectiveCamera(
+        this.focalLengthToFov(mainCameraConfig.focalLength),
+        width / height,
+        0.01,
+        200,
+      );
+      this.camera.position.set(
+        mainCameraConfig.position.x,
+        mainCameraConfig.position.y,
+        mainCameraConfig.position.z,
+      );
+      this.camera.lookAt(
+        mainCameraConfig.lookAt.x,
+        mainCameraConfig.lookAt.y,
+        mainCameraConfig.lookAt.z,
+      );
+    }
 
     this.camera.layers.enable(0);
-    this.camera.layers.enable(1); // This camera does not see this layer
+    this.camera.layers.enable(1);
 
     this.timeline.camera = this.camera;
 
-    this.render_camera = new THREE.PerspectiveCamera(
-      70,
-      width / height,
-      0.01,
-      200,
-    );
+    const otherCameras = cameras.value.filter((cam) => cam.id !== "main");
+    if (otherCameras.length > 0) {
+      const renderCameraConfig = otherCameras[0];
+      this.render_camera = new THREE.PerspectiveCamera(
+        this.focalLengthToFov(renderCameraConfig.focalLength),
+        width / height,
+        0.01,
+        200,
+      );
+      this.render_camera.position.set(
+        renderCameraConfig.position.x,
+        renderCameraConfig.position.y,
+        renderCameraConfig.position.z,
+      );
+      this.render_camera.lookAt(
+        renderCameraConfig.lookAt.x,
+        renderCameraConfig.lookAt.y,
+        renderCameraConfig.lookAt.z,
+      );
+    }
 
     this.render_camera.layers.disable(1); // This camera does not see this layer      );
 

@@ -46,6 +46,7 @@ import {
   addCamera,
   deleteCamera,
   updateCamera,
+  focalLengthDragging,
 } from "~/pages/PageEnigma/signals/camera";
 
 interface ReferenceImage {
@@ -93,7 +94,6 @@ export const PromptBox = () => {
     [],
   );
   const [activeLibraryTab, setActiveLibraryTab] = useState("my-media");
-  const [isGridVisible, setIsGridVisible] = useState(true);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -121,36 +121,138 @@ export const PromptBox = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraAspectRatio.value]);
 
-  useEffect(() => {
-    setGridVisibility(isGridVisible);
-  }, [isGridVisible]);
-
   const handleCameraSelect = (selectedItem: PopoverItem) => {
     const selectedCamera = cameras.value.find(
       (cam) => cam.label === selectedItem.label,
     );
-    if (selectedCamera) {
+    if (selectedCamera && editorEngine) {
       selectedCameraId.value = selectedCamera.id;
-      // Force update camera properties
+
+      // Show focal length display temporarily
+      // TODO: Rename dragging to visible - BFlat
+      focalLengthDragging.value = {
+        isDragging: true,
+        focalLength: selectedCamera.focalLength,
+      };
+      setTimeout(() => {
+        focalLengthDragging.value = {
+          isDragging: false,
+          focalLength: selectedCamera.focalLength,
+        };
+      }, 1500);
+
+      // Update the main camera to match the selected camera's properties
+      if (editorEngine.camera) {
+        // First update position and lookAt
+        editorEngine.camera.position.set(
+          selectedCamera.position.x,
+          selectedCamera.position.y,
+          selectedCamera.position.z,
+        );
+        editorEngine.camera.lookAt(
+          selectedCamera.lookAt.x,
+          selectedCamera.lookAt.y,
+          selectedCamera.lookAt.z,
+        );
+
+        // Update FOV
+        editorEngine.camera.fov = editorEngine.focalLengthToFov(
+          selectedCamera.focalLength,
+        );
+        editorEngine.camera.updateProjectionMatrix();
+
+        // Reset and update camera controls
+        if (editorEngine.cameraViewControls) {
+          editorEngine.cameraViewControls.reset();
+          editorEngine.cameraViewControls.update(0);
+        }
+
+        // Force a render to update the view
+        editorEngine.renderScene();
+
+        // Queue an update to ensure the engine processes the camera change
+        // Queue.publish({
+        //   queueName: QueueNames.TO_ENGINE,
+        //   action: toEngineActions.CAMERA_CHANGED,
+        //   data: selectedCamera,
+        // });
+      }
+
+      // Force update camera properties in the state
       updateCamera(selectedCamera.id, {
         focalLength: selectedCamera.focalLength,
         position: selectedCamera.position,
         rotation: selectedCamera.rotation,
+        lookAt: selectedCamera.lookAt,
       });
     }
   };
 
   const handleAddCamera = () => {
+    // Check if we've reached the maximum number of cameras
+    if (cameras.value.length >= 6) {
+      console.warn("Maximum number of cameras (6) reached");
+      return;
+    }
+
     const newIndex = cameras.value.length + 1;
     const newId = `cam${newIndex}`;
+
+    // This is for generating random orbital position for the new camera using spherical coordinates
+    const radius = Math.random() * 5 + 7; // Distance from center: 7 to 12 units
+    const theta = Math.random() * Math.PI * 2; // Azimuthal angle: 0 to 2π
+    const phi = Math.PI / 3 + (Math.random() * Math.PI) / 6; // Polar angle: π/3 to π/2 (60° to 90° from horizontal)
+
+    // Convert spherical coordinates to Cartesian coordinates
+    const randomX = radius * Math.sin(phi) * Math.cos(theta);
+    const randomY = Math.abs(radius * Math.cos(phi)) + 2; // Ensure Y is positive and at least 2 units up
+    const randomZ = radius * Math.sin(phi) * Math.sin(theta);
+
     addCamera({
       id: newId,
       label: `Camera ${newIndex}`,
-      focalLength: 35,
-      fov: 70,
-      position: { x: 0, y: 2.5, z: -5 },
+      focalLength: 24,
+      position: {
+        x: randomX,
+        y: randomY,
+        z: randomZ,
+      },
       rotation: { x: 0, y: 0, z: 0 },
+      lookAt: { x: 0, y: 0, z: 0 },
     });
+
+    // Switch to the newly created camera
+    selectedCameraId.value = newId;
+
+    // Update the engine camera to match the new camera's properties
+    if (editorEngine && editorEngine.camera) {
+      editorEngine.camera.position.set(randomX, randomY, randomZ);
+      editorEngine.camera.lookAt(0, 0, 0);
+      editorEngine.camera.fov = editorEngine.focalLengthToFov(24);
+      editorEngine.camera.updateProjectionMatrix();
+
+      // Reset and update camera controls
+      if (editorEngine.cameraViewControls) {
+        editorEngine.cameraViewControls.reset();
+        editorEngine.cameraViewControls.update(0);
+      }
+
+      // Force a render to update the view
+      editorEngine.renderScene();
+
+      // Queue.publish({
+      //   queueName: QueueNames.TO_ENGINE,
+      //   action: toEngineActions.CAMERA_CHANGED,
+      //   data: {
+      //     id: newId,
+      //     label: `Camera ${newIndex}`,
+      //     focalLength: 24,
+      //     position: { x: randomX, y: randomY, z: randomZ },
+      //     rotation: { x: 0, y: 0, z: 0 },
+      //     lookAt: { x: 0, y: 0, z: 0 },
+      //   },
+      // });
+    }
   };
 
   const handleCameraNameChange = (id: string, newName: string) => {
@@ -534,6 +636,9 @@ export const PromptBox = () => {
                       <FontAwesomeIcon icon={faCamera} className="h-4 w-4" />
                     ),
                     focalLength: cam.focalLength,
+                    position: cam.position,
+                    rotation: cam.rotation,
+                    lookAt: cam.lookAt,
                   }))}
                   onSelect={handleCameraSelect}
                   onAdd={handleAddCamera}
@@ -541,11 +646,13 @@ export const PromptBox = () => {
                     <FontAwesomeIcon icon={faCamera} className="h-4 w-4" />
                   }
                   showAddButton
+                  disableAddButton={cameras.value.length >= 6}
                   showIconsInList
                   mode="toggle"
                   panelTitle="Camera"
                   panelActionLabel="Settings"
                   onPanelAction={() => setIsCameraSettingsOpen(true)}
+                  buttonClassName="max-w-[130px] h-9"
                 />
               </Tooltip>
               <Tooltip
@@ -630,12 +737,15 @@ export const PromptBox = () => {
             selected: cam.id === selectedCameraId.value,
             icon: <FontAwesomeIcon icon={faCamera} className="h-4 w-4" />,
             focalLength: cam.focalLength,
+            position: cam.position,
+            rotation: cam.rotation,
+            lookAt: cam.lookAt,
           }))}
           onCameraNameChange={handleCameraNameChange}
           onCameraFocalLengthChange={handleCameraFocalLengthChange}
           onAddCamera={handleAddCamera}
           selectedCameraId={selectedCameraId.value}
-          onSelectCamera={(id: string) => (selectedCameraId.value = id)}
+          handleCameraSelect={handleCameraSelect}
           onDeleteCamera={deleteCamera}
         />
       </div>

@@ -17,6 +17,7 @@ interface PopoverMenuProps {
   onAdd?: () => void;
   triggerIcon?: ReactNode;
   showAddButton?: boolean;
+  disableAddButton?: boolean;
   showIconsInList?: boolean;
   mode?: "default" | "toggle" | "button";
   triggerLabel?: string;
@@ -36,6 +37,7 @@ export const PopoverMenu = ({
   onAdd,
   triggerIcon,
   showAddButton = false,
+  disableAddButton = false,
   showIconsInList = false,
   mode = "default",
   triggerLabel,
@@ -84,9 +86,15 @@ export const PopoverMenu = ({
       {({ close }) => (
         <>
           <Popover.Button className={className}>
-            {triggerIcon}
-            {mode === "toggle" && selectedItem ? selectedItem.label : null}
-            {mode === "default" && triggerLabel ? triggerLabel : null}
+            <>
+              {triggerIcon}
+              {mode === "toggle" && selectedItem ? (
+                <span className="truncate">{selectedItem.label}</span>
+              ) : null}
+              {mode === "default" && triggerLabel ? (
+                <span className="truncate">{triggerLabel}</span>
+              ) : null}
+            </>
           </Popover.Button>
 
           <div
@@ -164,9 +172,9 @@ export const PopoverMenu = ({
                           variant="secondary"
                           disabled={item.disabled}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 truncate">
                             {showIconsInList && item.icon}
-                            {item.label}
+                            <span className="truncate">{item.label}</span>
                           </div>
                           {mode === "toggle" && (
                             <input
@@ -180,8 +188,14 @@ export const PopoverMenu = ({
                       {showAddButton && onAdd && (
                         <Button
                           variant="secondary"
-                          className="mb-0.5 mt-2 border-none bg-[#7B7B84] py-1 hover:bg-[#8c8c96]"
+                          className={twMerge(
+                            "mb-0.5 mt-2 border-none py-1",
+                            disableAddButton
+                              ? "cursor-not-allowed bg-[#7B7B84]/50 opacity-50"
+                              : "bg-[#7B7B84] hover:bg-[#8c8c96]",
+                          )}
                           onClick={onAdd}
+                          disabled={disableAddButton}
                         >
                           + Add
                         </Button>

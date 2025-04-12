@@ -24,16 +24,19 @@ import { CameraAspectRatio, EditorStates } from "~/pages/PageEnigma/enums";
 import { CameraViewCanvas } from "~/pages/PageEnigma/comps/EngineCanvases";
 
 import { Button, ButtonIcon, Tooltip } from "~/components";
+import { useEffect } from "react";
 
 export const PreviewEngineCamera = () => {
   useSignals();
 
   const handleButtonCameraView = () => {
+    console.log("Camera view button clicked");
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
       action: toEngineActions.TOGGLE_CAMERA_STATE,
       data: null,
     });
+    console.log("Action published to queue");
   };
 
   const getLargeScreenHeightClass = () => {
@@ -67,11 +70,15 @@ export const PreviewEngineCamera = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("Editor state changed:", editorState.value);
+  }, [editorState.value]);
+
   return (
     <div
       id="preview-engine-camera"
       className={twMerge(
-        "origin-bottom-left shadow-lg", //hidden right now with css
+        "hidden origin-bottom-left shadow-lg", //hidden right now with css
         editorState.value === EditorStates.PREVIEW
           ? "invisible h-0 w-0"
           : "visible",
