@@ -5,6 +5,7 @@ import {
   outlinerState,
   showObjectPanel,
   assetModalVisible,
+  assetModalVisibleDuringDrag,
 } from "../signals";
 import {
   OrbitControls,
@@ -293,10 +294,12 @@ export class MouseControls {
       return;
     } else if (event.key === "k") {
       this.toggleFKMode();
+      return;
     } else if (event.key === "b") {
       // Open asset modal
       event.preventDefault();
       assetModalVisible.value = true;
+      assetModalVisibleDuringDrag.value = true;
       return;
     }
 
