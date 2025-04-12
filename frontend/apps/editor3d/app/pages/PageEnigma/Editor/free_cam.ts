@@ -70,7 +70,7 @@ class FreeCam extends EventDispatcher {
   }
 
   keydown(event: KeyboardEvent) {
-    if (event.altKey || !this.enabled) {
+    if (!this.enabled) {
       return;
     }
 

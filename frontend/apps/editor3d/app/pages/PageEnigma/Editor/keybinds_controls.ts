@@ -335,8 +335,19 @@ export class MouseControls {
       }
     }
 
+    // Prevent browser shortcuts for Alt combinations
+    if (
+      event.altKey &&
+      (event.key === "Alt" || event.key.toLowerCase() === "d")
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     if (event.shiftKey) {
       this.cameraViewControls.movementSpeed = 4;
+    } else if (event.altKey) {
+      this.cameraViewControls.movementSpeed = 0.1;
     } else {
       this.cameraViewControls.movementSpeed = 1.15;
     }
