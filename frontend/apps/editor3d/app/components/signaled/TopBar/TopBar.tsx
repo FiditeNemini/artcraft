@@ -36,8 +36,8 @@ export const TopBar = ({ pageName }: Props) => {
             <a href="/" className="">
               <span className="sr-only">ArtCraft</span>
               <img
-                className="h-[28px] w-auto"
-                src="/resources/images/artcraft-logo.png"
+                className="h-[30px] w-auto"
+                src="/resources/images/artcraft-logo-3.png"
                 alt="Logo ArtCraft"
               />
             </a>
