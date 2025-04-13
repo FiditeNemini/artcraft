@@ -8,10 +8,6 @@ nx build editor2d
 echo "Change to project dir"
 pushd apps/editor2d/
 
-echo "List directory files"
-pwd
-ls -lA .
-
 echo "Copy netlify configs into dist"
 cp _headers dist/
 cp _redirects dist/

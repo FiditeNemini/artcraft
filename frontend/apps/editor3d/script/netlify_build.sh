@@ -26,8 +26,18 @@ set -euxo pipefail
 echo "Run build script (TODO: Make strict)"
 nx build editor3d
 
+echo "List directory files"
+pwd
+ls -lA .
+
+
 echo "Change to project dir"
 pushd apps/editor3d/
+
+echo "List directory files"
+pwd
+ls -lA .
+
 
 #echo "Copy netlify configs into dist"
 #cp _headers dist/
