@@ -297,6 +297,7 @@ CREATE TABLE generic_inference_jobs (
   KEY fk_maybe_input_source_token_and_type (maybe_input_source_token, maybe_input_source_token_type),
   KEY fk_on_success_result_entity_token (on_success_result_entity_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
+  KEY index_maybe_creator_anonymous_visitor_token (maybe_creator_anonymous_visitor_token),
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_priority_level (priority_level),
   KEY index_is_debug_request (is_debug_request),
