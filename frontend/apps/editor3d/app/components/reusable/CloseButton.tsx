@@ -15,7 +15,7 @@ export const CloseButton = ({
 }: CloseButtonProps) => {
   const sizeClasses = {
     sm: "h-5 w-5 text-sm",
-    md: "h-7 w-7 text-lg",
+    md: "h-7 w-7 text-md",
     lg: "h-9 w-9 text-xl",
   };
 
