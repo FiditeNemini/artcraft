@@ -15,6 +15,6 @@ cp _redirects dist/
 echo "Copy netlify 404.html page into dist"
 cp "404.html" dist/
 
-echo "List files after build"
+echo "List final files in build"
 find dist/
 
