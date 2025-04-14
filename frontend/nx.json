@@ -1,5 +1,6 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "npmScope": "storyteller",
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*",
@@ -9,7 +10,9 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/src/test-setup.[jt]s"
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.mjs"
     ],
     "sharedGlobals": []
   },
@@ -65,6 +68,12 @@
         "watchDepsTargetName": "watch-deps",
         "staticServeTargetName": "static-serve"
       }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "eslint:lint"
+      }
     }
   ],
   "generators": {
@@ -82,6 +91,13 @@
         "style": "css",
         "linter": "none"
       }
+    }
+  },
+  "targetDefaults": {
+    "test": {
+      "dependsOn": [
+        "^build"
+      ]
     }
   }
 }

@@ -21,6 +21,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@storyteller/api": "workspace:*",
     "@awesome.me/kit-fde2be5eb0": "^1.0.7",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",

@@ -8,6 +8,9 @@
     },
     {
       "path": "./apps/editor3d"
+    },
+    {
+      "path": "./libs/api"
     }
   ]
 }
