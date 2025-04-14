@@ -1,5 +1,5 @@
 [build]
-#command = "./script/netlify_build.sh"
+command = "./apps/editor2d/script/netlify_build.sh"
 publish = "apps/editor2d/dist/"
 
 #[build.environment]
@@ -16,7 +16,6 @@ publish = "apps/editor2d/dist/"
 for = "/build/*"
 
 [headers.values]
-
 "Cache-Control" = "public, max-age=31560000, immutable"
 
 # [[redirects]]
