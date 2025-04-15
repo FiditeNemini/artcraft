@@ -1,14 +1,12 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
 // Components
 import { KonvaCanvasContainer } from "./KonvaCanvasContainer";
-import { ContextualButtonRetry } from "./ContextualButtonRetry";
 import { ContextualToolbarNode } from "./ContextualToolbarNode";
-import { ContextualLoadingBar } from "./ContextualLoadingBar";
 import { SignaledCanvasDragDropFiles } from "./SignaledCanvasDragDropFiles";
 import { SignaledDialogs } from "./SignaledDialogs";
 import { SignaledToolbarMain } from "./SignaledToolbarMain";
-import { SignaledToolbarVideoExtraction } from "./SignaledToolbarVideoExtraction";
+
 import { PromptBox } from "~/components/PromptBox";
 // The KonvaApp is the root of the Konva stage
 // and only entry point for anything in Konva JS
@@ -22,9 +20,8 @@ import { useLayoutContext } from "./contextSignals/layout";
 // common hooks
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 import { useNavigate } from "react-router-dom";
-import { SignaledMagicBox } from "./SignaledMagicBox";
-import { SignaledPromptSlider } from "./SignaledPromptSlider";
-import { SignaledPromptText } from "./SignaledPromptText";
+
+import { UndoRedo } from "~/components/reusable/UndoRedo/UndoRedo";
 
 export const KonvaRootComponent = ({
   className,
@@ -39,44 +36,66 @@ export const KonvaRootComponent = ({
   const navigate = useNavigate();
   const appUiContext = useAppUiContext();
   const layoutContext = useLayoutContext();
+  
+  // Add state to track engine initialization
+  const [isEngineReady, setIsEngineReady] = useState(false);
   const engineRef = useRef<EngineType | null>(null);
-
+  
   const konvaContainerCallbackRef = useCallback((node: HTMLDivElement) => {
-    if (node !== null && engineRef.current === null) {
-      const options = {
-        navigate: navigate,
-        sceneToken: sceneToken,
-      };
-      engineRef.current = KonvaApp(node, options);
+    // Only initialize if we have a node and haven't initialized yet
+    if (node !== null && !isEngineReady && engineRef.current === null) {
+      try {
+        const options = {
+          navigate: navigate,
+          sceneToken: sceneToken,
+        };
+        engineRef.current = KonvaApp(node, options);
+        // Only set ready if initialization succeeded
+        if (engineRef.current) {
+          setIsEngineReady(true);
+        }
+      } catch (error) {
+        console.error("Failed to initialize KonvaApp:", error);
+        engineRef.current = null;
+        setIsEngineReady(false);
+      }
     }
-  }, []);
+  }, [navigate, sceneToken, isEngineReady]);
 
   return (
     <>
+      {/* Always render the canvas container */}
       <KonvaCanvasContainer
         ref={konvaContainerCallbackRef}
         className={className}
-        // retreive the classNames from the parent for sizing/styling
       />
-      {/* <SignaledMagicBox /> */}
-      <SignaledCanvasDragDropFiles
-        openAddImage={appUiContext.openAddImage}
-        openAddVideo={appUiContext.openAddVideo}
-      />
-      <PromptBox />
-      <SignaledToolbarMain
-        layoutSignal={layoutContext.signal}
-        appUiContext={appUiContext}
-      />
-      {/* <SignaledToolbarVideoExtraction /> */}
-      <SignaledDialogs
-        appUiSignal={appUiContext.signal}
-        resetAll={appUiContext.resetAll}
-      />
+      
+      {/* Conditionally render the loading overlay */}
+      {!isEngineReady && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-gray-500">Initializing canvas...</div>
+        </div>
+      )}
 
-      {/* <ContextualLoadingBar /> */}
-      <ContextualToolbarNode />
-      {/* <ContextualButtonRetry /> */}
+      {/* Conditionally render the UI components that need the engine */}
+      {isEngineReady && engineRef.current && (
+        <UndoRedo engine={engineRef.current}>
+          <SignaledCanvasDragDropFiles
+            openAddImage={appUiContext.openAddImage}
+            openAddVideo={appUiContext.openAddVideo}
+          />
+          <PromptBox />
+          <SignaledToolbarMain
+            layoutSignal={layoutContext.signal}
+            appUiContext={appUiContext}
+          />
+          <SignaledDialogs
+            appUiSignal={appUiContext.signal}
+            resetAll={appUiContext.resetAll}
+          />
+          <ContextualToolbarNode />
+        </UndoRedo>
+      )}
     </>
   );
 };
