@@ -76,6 +76,9 @@ pub struct EnqueueStudioImageGenRequest {
   /// The user's image generation prompt.
   pub prompt: String,
 
+  /// Turn off the system prompt.
+  pub disable_system_prompt: Option<bool>,
+
   /// Additional images to include (optional). Up to nine images.
   pub maybe_additional_images: Option<Vec<MediaFileToken>>,
 
@@ -283,9 +286,15 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     None => 1,
   };
 
-  let prompt = request.prompt.clone();
+  let prompt = create_prompt(&request);
 
-  let mut response = sora_image_gen_remix(SoraImageGenRemixRequest { prompt: prompt.clone(), num_images: NumImages::One, image_size: ImageSize::Square, sora_media_tokens: sora_media_tokens.clone(), credentials: &sora_credentials }).await;
+  let mut response = sora_image_gen_remix(SoraImageGenRemixRequest { 
+    prompt: prompt.clone(), 
+    num_images: NumImages::One, 
+    image_size: ImageSize::Square, 
+    sora_media_tokens: sora_media_tokens.clone(), 
+    credentials: &sora_credentials 
+  }).await;
 
   debug!("Sora image gen response: {:?}", response);
 
@@ -296,13 +305,19 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     match refresh_sentinel().await {
       Ok(new_sentinel) => {
         // Update the credentials with new sentinel
-
         let updated_sora_credentials = get_sora_credentials_from_request(&http_request, &mut redis).map_err(|e| {
           error!("sora credential error: {:?}", e);
           EnqueueImageGenRequestError::ServerError
         })?;
+
         // Retry the request with new sentinel
-        response = sora_image_gen_remix(SoraImageGenRemixRequest { prompt: prompt.clone(), num_images: NumImages::One, image_size: ImageSize::Square, sora_media_tokens: sora_media_tokens.clone(), credentials: &updated_sora_credentials }).await;
+        response = sora_image_gen_remix(SoraImageGenRemixRequest { 
+          prompt: prompt.clone(), 
+          num_images: NumImages::One, 
+          image_size: ImageSize::Square, 
+          sora_media_tokens: sora_media_tokens.clone(), 
+          credentials: &updated_sora_credentials 
+        }).await;
       },
       Err(e) => {
         error!("Failed to refresh Sora sentinel: {:?}", e);
@@ -329,7 +344,14 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
   debug!("Sora image gen response: {:?}", response);
 
   // Store the actual inference args that will go to the database
-  let inference_args = SoraImageGenArgs { prompt: Some(prompt), scene_snapshot_media_token: Some(request.snapshot_media_token.clone()), maybe_additional_media_file_tokens: Some(additional_images), maybe_number_of_samples: Some(number_of_samples), maybe_sora_media_upload_tokens: Some(sora_media_tokens), maybe_sora_task_id: Some(response.task_id) };
+  let inference_args = SoraImageGenArgs { 
+    prompt: Some(prompt), 
+    scene_snapshot_media_token: Some(request.snapshot_media_token.clone()), 
+    maybe_additional_media_file_tokens: Some(additional_images), 
+    maybe_number_of_samples: Some(number_of_samples), 
+    maybe_sora_media_upload_tokens: Some(sora_media_tokens), 
+    maybe_sora_task_id: Some(response.task_id) 
+  };
 
   // create the inference args here
   let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
@@ -348,7 +370,10 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     maybe_cover_image_media_file_token: None,
     maybe_raw_inference_text: None,
     maybe_max_duration_seconds: None,
-    maybe_inference_args: Some(GenericInferenceArgs { inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration), args: Some(PolymorphicInferenceArgs::Sg(inference_args)) }),
+    maybe_inference_args: Some(GenericInferenceArgs { 
+      inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration), 
+      args: Some(PolymorphicInferenceArgs::Sg(inference_args)),
+    }),
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_avt_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
@@ -412,7 +437,10 @@ async fn query_and_download_media_file(media_file_token: &MediaFileToken, downlo
     },
   };
 
-  let media_file_bucket_path = MediaFileBucketPath::from_object_hash(&media_file.public_bucket_directory_hash, media_file.maybe_public_bucket_prefix.as_deref(), media_file.maybe_public_bucket_extension.as_deref());
+  let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
+    &media_file.public_bucket_directory_hash,
+    media_file.maybe_public_bucket_prefix.as_deref(),
+    media_file.maybe_public_bucket_extension.as_deref());
 
   let extension = media_file.maybe_public_bucket_extension.clone().unwrap_or_else(|| ".jpg".to_string());
   let download_filename = format!("download_file_{}.{}", media_file.token.as_str(), extension);
@@ -423,4 +451,31 @@ async fn query_and_download_media_file(media_file_token: &MediaFileToken, downlo
   bucket_client.download_file_to_disk(&media_file_bucket_path.to_full_object_pathbuf(), &download_file_path).await?;
 
   Ok(download_file_path)
+}
+
+const SYSTEM_PROMPT_SINGLE_IMAGE: &str =
+  "Use the image as a reference for the composition exactly. Copy the character pose, layout, scene, and the objects exactly - no deviation.";
+
+const SYSTEM_PROMPT_MULTI_IMAGE: &str =
+  "Use the first image as a reference for the composition exactly. Copy the character pose, layout, scene, and the objects exactly from the first image - no deviation.";
+
+fn create_prompt(request: &EnqueueStudioImageGenRequest) -> String {
+  let disable_system_prompt = request.disable_system_prompt
+      .clone()
+      .unwrap_or(false);
+
+  if disable_system_prompt {
+    return request.prompt.clone();
+  }
+
+  let extra_image_count = request.maybe_additional_images
+      .as_ref()
+      .map(|v| v.len())
+      .unwrap_or(0);
+
+  if extra_image_count == 0 {
+    format!("{} {}", SYSTEM_PROMPT_SINGLE_IMAGE, request.prompt)
+  } else {
+    format!("{} {}", SYSTEM_PROMPT_MULTI_IMAGE, request.prompt)
+  }
 }
