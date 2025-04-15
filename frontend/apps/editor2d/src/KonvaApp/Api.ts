@@ -280,10 +280,12 @@ export class Api extends ApiManager {
   }
 
   public async enqueueImageGeneration({
+    disableSystemPrompt,
     prompt,
     snapshotMediaToken,
     additionalImages,
   }: {
+    disableSystemPrompt: boolean;
     prompt: string;
     snapshotMediaToken: string;
     additionalImages?: string[];
@@ -293,6 +295,7 @@ export class Api extends ApiManager {
     const uuidIdempotencyToken = crypto.randomUUID(); // Generate a new UUID
     const body = {
       uuid_idempotency_token: uuidIdempotencyToken,
+      disable_system_prompt: disableSystemPrompt,
       prompt,
       snapshot_media_token: snapshotMediaToken, // Changed from scene_media_token to snapshot_media_token
       additional_images: additionalImages,
@@ -301,6 +304,7 @@ export class Api extends ApiManager {
     const postResponse = await this.post<
       {
         uuid_idempotency_token: string;
+        disable_system_prompt: boolean;
         prompt: string;
         snapshot_media_token: string;
         additional_images?: string[];
