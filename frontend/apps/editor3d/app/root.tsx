@@ -16,7 +16,7 @@ import normalizeCss from "./styles/normalize.css?url";
 import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
 import { Environment, Configs } from "./configs";
-import { api } from "@storyteller/api";
+//import { api } from "@storyteller/api";
 
 // The following import prevents a Font Awesome icon server-side rendering bug,
 // where the icons flash from a very large icon down to a properly sized one:
@@ -73,7 +73,7 @@ export async function loader() {
       break;
   }
   
-  console.log(">>>> API LIBRARY IMPORT TEST", api());
+  //console.log(">>>> API LIBRARY IMPORT TEST", api());
 
   const env = {
     // @ts-expect-error ProvessEnv is correct
