@@ -86,6 +86,9 @@ pub async fn list_session_jobs_from_connection(
              WHERE maybe_creator_anonymous_visitor_token =
           "#);
         query_builder.push_bind(avt_token.to_string());
+        query_builder.push(r#"
+            AND maybe_creator_user_token IS NULL
+        "#);
       }
     }
 
