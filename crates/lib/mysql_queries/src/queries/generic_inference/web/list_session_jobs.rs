@@ -21,9 +21,14 @@ use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 use crate::queries::generic_inference::web::job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails, UserDetails};
 
+pub enum SessionUser<'a> {
+  User(&'a UserToken),
+  Anonymous(&'a AnonymousVisitorTrackingToken),
+}
+
 pub struct ListSessionJobsForUserArgs<'a> {
   // TODO(bt,2024-04-23): Support AnonymousVisitorToken
-  pub user_token: &'a UserToken,
+  pub user: SessionUser<'a>,
   pub maybe_include_job_statuses: Option<&'a HashSet<JobStatusPlus>>,
   pub maybe_exclude_job_statuses: Option<&'a HashSet<JobStatusPlus>>,
 }
@@ -63,14 +68,26 @@ pub async fn list_session_jobs_from_connection(
   // Furthermore, even though the join query's `created_at` lacks an index, sort
   // by id will accomplish this quickly.
   {
-    query_builder.push(r#"
-    INNER JOIN (
-       SELECT id
-       FROM generic_inference_jobs
-       WHERE maybe_creator_user_token =
-    "#);
-
-    query_builder.push_bind(args.user_token.to_string());
+    match args.user {
+      SessionUser::User(user_token) => {
+        query_builder.push(r#"
+          INNER JOIN (
+             SELECT id
+             FROM generic_inference_jobs
+             WHERE maybe_creator_user_token =
+          "#);
+        query_builder.push_bind(user_token.to_string());
+      }
+      SessionUser::Anonymous(avt_token) => {
+        query_builder.push(r#"
+          INNER JOIN (
+             SELECT id
+             FROM generic_inference_jobs
+             WHERE maybe_creator_anonymous_visitor_token =
+          "#);
+        query_builder.push_bind(avt_token.to_string());
+      }
+    }
 
     query_builder.push(r#"
        AND created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR)

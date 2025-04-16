@@ -31,7 +31,7 @@ use enums::by_table::generic_inference_jobs::inference_category::InferenceCatego
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
-use mysql_queries::queries::generic_inference::web::list_session_jobs::{list_session_jobs_from_connection, ListSessionJobsForUserArgs};
+use mysql_queries::queries::generic_inference::web::list_session_jobs::{list_session_jobs_from_connection, ListSessionJobsForUserArgs, SessionUser};
 use primitives::numerics::i64_to_u64_zero_clamped::i64_to_u64_zero_clamped;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -238,11 +238,6 @@ pub async fn list_session_jobs_handler(
         ListSessionJobsError::ServerError
       })?;
 
-  let session = match maybe_user_session {
-    Some(session) => session,
-    None => return Err(ListSessionJobsError::NotAuthorized),
-  };
-
   let include_states = query.include_states
       .as_deref()
       .map(|s| s.split(",")
@@ -255,8 +250,23 @@ pub async fn list_session_jobs_handler(
           .filter_map(|status| JobStatusPlus::from_str(status).ok())
           .collect::<HashSet<_>>());
 
+  let user;
+
+  match (maybe_user_session.as_ref(), maybe_avt_token.as_ref()) {
+    (Some(session), _) => {
+      user = SessionUser::User(&session.user_token_typed);
+    }
+    (None, Some(avt_token)) => {
+      user = SessionUser::Anonymous(avt_token);
+    }
+    (None, None) => {
+      // TODO(bt,2025-04-15): We should install an AVT cookie.
+      return Err(ListSessionJobsError::NotAuthorized);
+    }
+  }
+
   let args = ListSessionJobsForUserArgs {
-    user_token: &session.user_token_typed,
+    user,
     maybe_include_job_statuses: include_states.as_ref(),
     maybe_exclude_job_statuses: exclude_states.as_ref(),
   };
