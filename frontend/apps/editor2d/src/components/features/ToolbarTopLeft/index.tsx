@@ -41,9 +41,9 @@ export const ToolbarTopLeft = () => {
       )}
     >
       <img
-        src="/brand/mira-logo.png"
+        src="/brand/artcraft-logo.png"
         alt="logo"
-        className="h-[30px] select-none pb-1"
+        className="h-[28px] select-none"
       />
 
       <TabSelector
