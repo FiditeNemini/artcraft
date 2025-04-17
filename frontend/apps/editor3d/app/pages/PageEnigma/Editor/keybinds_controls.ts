@@ -359,6 +359,17 @@ export class MouseControls {
     } else {
       this.cameraViewControls.movementSpeed = 1.15;
     }
+
+    if (event.key === "Escape") {
+      if (poseMode.value === "pose") {
+        this.toggleFKMode();
+        return;
+      } else if (this.selected && this.selected.length > 0) {
+        this.removeTransformControls();
+        hideObjectPanel();
+        showPoseControls.value = false;
+      }
+    }
   }
 
   // Sets new mouse location usually used in raycasts.
