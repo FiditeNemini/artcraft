@@ -27,9 +27,13 @@ import { PromptBox } from "./comps/PromptBox";
 import { OnboardingHelper } from "./comps/OnboardingHelper";
 import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDisplay";
 
+import { Login } from "@frontend/login";
+import { api } from "@storyteller/api";
+
+
 export const PageEditor = () => {
   useSignals();
-
+  //console.log(api());
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
@@ -83,6 +87,7 @@ export const PageEditor = () => {
   return (
     <div className="w-screen">
       <TopBar pageName="Edit Scene" />
+      <Login />
       <OnboardingHelper />
       <div
         className="relative flex w-screen"

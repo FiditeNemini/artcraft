@@ -4,13 +4,13 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/editor2d"
+      "path": "./libs/api"
+    },
+    {
+      "path": "./libs/login"
     },
     {
       "path": "./apps/editor3d"
-    },
-    {
-      "path": "./libs/api"
     }
   ]
 }

@@ -2,8 +2,11 @@
 
 set -euxo pipefail 
 
+echo "Install packages"
+npm install
+
 echo "Build Editor 3D"
-nx build editor3d
+nx build editor3d --verbose
 
 echo "Change to project dir"
 pushd apps/editor3d/
