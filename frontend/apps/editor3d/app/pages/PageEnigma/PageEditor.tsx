@@ -27,8 +27,10 @@ import { PromptBox } from "./comps/PromptBox";
 import { OnboardingHelper } from "./comps/OnboardingHelper";
 import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDisplay";
 
-// import { Login } from "@frontend/login";
-import { api } from "@storyteller/api";
+import { Login } from "@frontend/login";
+// import { api } from "@storyteller/api";
+// import { AnalyticsApi } from "@storyteller/api";
+
 
 export const PageEditor = () => {
   useSignals();
