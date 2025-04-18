@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub enum SoraError {
-  /// Unauthorized, cookie expired. We'll need to ask for a refreshed login.
+  /// Unauthorized, cookie and/or bearer token expired. We'll need to ask for a refreshed login.
   ///
   /// Example message, e.g. from the upload endpoint:
   ///   {
@@ -14,7 +14,7 @@ pub enum SoraError {
   ///       "code": "token_expired"
   ///     }
   ///   }
-  UnauthorizedCookieExpired,
+  UnauthorizedCookieOrBearerExpired,
 
   /// Another error occurred.
   OtherBadStatus(anyhow::Error),
@@ -28,8 +28,8 @@ impl Error for SoraError {}
 impl Display for SoraError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     match self {
-      SoraError::UnauthorizedCookieExpired => {
-        write!(f, "Unauthorized: cookie expired")
+      SoraError::UnauthorizedCookieOrBearerExpired => {
+        write!(f, "Unauthorized: cookie and/or bearer token expired")
       }
       SoraError::OtherBadStatus(err) => {
         write!(f, "Other error: {}", err)

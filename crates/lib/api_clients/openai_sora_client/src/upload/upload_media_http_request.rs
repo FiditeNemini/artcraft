@@ -103,13 +103,13 @@ async fn classify_error(response: reqwest::Response) -> SoraError {
     Ok(text) => text,
     Err(err) => return SoraError::ReqwestError(err),
   };
-  
+
   let cookie_expired =
       message.contains("Your authentication token has expired. Please try signing in again.")
       || message.contains("token_expired");
 
   if cookie_expired {
-    SoraError::UnauthorizedCookieExpired
+    SoraError::UnauthorizedCookieOrBearerExpired
   } else {
     SoraError::OtherBadStatus(anyhow::anyhow!("Upload failed with status {}: {}", status, message))
   }
