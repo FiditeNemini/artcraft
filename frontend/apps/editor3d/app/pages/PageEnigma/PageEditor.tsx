@@ -27,9 +27,8 @@ import { PromptBox } from "./comps/PromptBox";
 import { OnboardingHelper } from "./comps/OnboardingHelper";
 import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDisplay";
 
-import { Login } from "@frontend/login";
+// import { Login } from "@frontend/login";
 import { api } from "@storyteller/api";
-
 
 export const PageEditor = () => {
   useSignals();
@@ -87,7 +86,7 @@ export const PageEditor = () => {
   return (
     <div className="w-screen">
       <TopBar pageName="Edit Scene" />
-      <Login />
+      {/* <Login /> */}
       <OnboardingHelper />
       <div
         className="relative flex w-screen"
