@@ -4,7 +4,6 @@
 /// NB: `sqlx::query` is spammy and dumps all queries as "info"-level log lines.
 /// NB: `hyper::proto::h1::io` is incredibly spammy and logs every chunk of bytes in very large files being downloaded.
 pub const DEFAULT_RUST_LOG: &str = concat!(
-  "debug,",
   "actix_web=info,",
   "sqlx::query=warn,",
   "hyper::proto::h1::io=warn,",
