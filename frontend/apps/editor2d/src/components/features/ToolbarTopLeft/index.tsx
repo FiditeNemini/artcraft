@@ -7,6 +7,8 @@ import {
   GenerationLoadingState,
   generationSignal,
 } from "~/signals";
+import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
+import { Button } from "~/components/ui/Button";
 
 // import { paperWrapperStyles } from "~/components/styles";
 // import { faPlus, faQuestion } from "@fortawesome/pro-solid-svg-icons";
@@ -32,6 +34,10 @@ export const ToolbarTopLeft = () => {
 
   const generationState = generationSignal.value;
 
+  const handleClick = () => {
+    window.location.href = "https://storyteller-3d.netlify.app/";
+  };
+
   console.log(appMode.value);
 
   return (
@@ -46,14 +52,25 @@ export const ToolbarTopLeft = () => {
         className="h-[28px] select-none"
       />
 
-      <TabSelector
+      <Button
+        variant="secondary"
+        icon={faChevronRight}
+        iconClassName="text-xs"
+        iconFlip={true}
+        onClick={handleClick}
+        className="bg-transparent p-0 text-sm text-white/80 hover:bg-transparent hover:text-white hover:underline hover:underline-offset-2"
+      >
+        Go to 3D Stage Editor
+      </Button>
+
+      {/* <TabSelector
         tabs={tabs}
         activeTab={activeTab.value}
         onTabChange={handleTabChange}
         disabled={
           generationState.loadingState === GenerationLoadingState.GENERATING
         }
-      />
+      /> */}
 
       {/* <ToolbarButton icon={faPlus}>
         <span className="font-semibold">New Board</span>
