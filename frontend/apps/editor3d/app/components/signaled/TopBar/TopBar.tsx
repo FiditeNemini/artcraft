@@ -1,5 +1,9 @@
 import { useLocation, useParams } from "@remix-run/react";
-import { faChevronLeft, faImages } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+  faImages,
+} from "@fortawesome/pro-solid-svg-icons";
 import { Button, ButtonLink } from "~/components";
 import { AuthButtons } from "./AuthButtons";
 import { SceneTitleInput } from "./SceneTitleInput";
@@ -25,6 +29,10 @@ export const TopBar = ({ pageName }: Props) => {
   const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
   const [activeLibraryTab, setActiveLibraryTab] = useState("my-media");
 
+  const handleClick = () => {
+    window.location.href = "https://storyteller-2d.netlify.app/";
+  };
+
   return (
     <>
       <header className="fixed left-0 top-0 z-[60] w-full border-b border-white/5 bg-ui-background">
@@ -32,7 +40,7 @@ export const TopBar = ({ pageName }: Props) => {
           className="mx-auto grid h-[56px] w-screen grid-cols-3 items-center justify-between px-3"
           aria-label="navigation"
         >
-          <div className="flex gap-4">
+          <div className="flex items-center gap-7">
             <a href="/">
               <span className="sr-only">ArtCraft</span>
               <img
@@ -46,6 +54,16 @@ export const TopBar = ({ pageName }: Props) => {
                 Back to Editor
               </ButtonLink>
             )}
+            <Button
+              variant="secondary"
+              icon={faChevronRight}
+              iconClassName="text-xs"
+              iconFlip={true}
+              onClick={handleClick}
+              className="bg-transparent p-0 text-sm text-white/80 hover:bg-transparent hover:text-white hover:underline hover:underline-offset-2"
+            >
+              Go to 2D Canvas
+            </Button>
           </div>
 
           <div className="flex items-center justify-center gap-2 font-medium">
