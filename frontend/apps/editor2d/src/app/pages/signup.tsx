@@ -75,7 +75,7 @@ export const Signup = () => {
 
   return (
     <div className="pegboard fixed flex h-full w-full flex-col items-center justify-center bg-center bg-repeat">
-      <div className="my-7 flex w-10/12 max-w-2xl items-center justify-center gap-4">
+      <div className="mb-7 flex w-10/12 max-w-2xl items-center justify-center gap-4">
         <img
           src="/brand/artcraft-logo.png"
           alt="ArtCraft Logo"
