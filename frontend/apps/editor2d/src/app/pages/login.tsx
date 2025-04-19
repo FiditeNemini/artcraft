@@ -1,12 +1,9 @@
 import { useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSignalEffect } from "@preact/signals-react/runtime";
-
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
 import { Button, Input, LoadingSpinner } from "~/components/ui";
 import { authentication } from "~/signals";
-
-import { paperWrapperStyles } from "~/components/styles";
 import { twMerge } from "tailwind-merge";
 
 export const Login = () => {
@@ -62,24 +59,21 @@ export const Login = () => {
   });
 
   return (
-    <div className="fixed flex h-full w-full flex-col items-center justify-center bg-[url('/svg/bg-dots.svg')] bg-[length:200px_200px] bg-center bg-repeat">
+    <div className="pegboard fixed flex h-full w-full flex-col items-center justify-center bg-center bg-repeat">
       <div className="my-7 flex w-10/12 max-w-2xl items-center justify-center gap-4">
         <img
-          src="/brand/Storyteller-Logo-Black.png"
-          alt="Storyteller Logo"
-          className="h-11 select-none"
+          src="/brand/artcraft-logo.png"
+          alt="ArtCraft Logo"
+          className="h-9 select-none"
         />
       </div>
       <div className="w-full max-w-xl rounded-xl shadow-lg">
         <div
           className={twMerge(
-            paperWrapperStyles,
-            "relative mx-auto w-full rounded-none rounded-t-xl p-8 shadow-none",
+            "glass glass-no-hover relative mx-auto w-full rounded-none rounded-t-xl p-6 shadow-none",
           )}
         >
-          <h1 className="mb-9 text-center text-2xl font-bold">
-            Log in to Board
-          </h1>
+          <h1 className="mb-6 text-center text-2xl font-bold">Log in</h1>
           <form
             ref={formRef}
             onSubmit={handleOnSumbit}
@@ -106,7 +100,7 @@ export const Login = () => {
               required
             />
 
-            <Button className="mt-6 py-3">Continue</Button>
+            <Button className="mt-4 py-3">Continue</Button>
           </form>
           {shouldShowLoader && (
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
@@ -114,10 +108,10 @@ export const Login = () => {
             </div>
           )}
         </div>
-        <div className="align-items flex w-full max-w-xl rounded-b-xl border border-t-0 bg-gray-100 px-8 py-4">
+        <div className="align-items flex w-full max-w-xl rounded-b-xl bg-ui-controls px-6 py-4">
           <a
             href="https://storyteller.ai/password-reset"
-            className="text-brand-primary hover:text-brand-primary-400 grow text-sm transition-all duration-150"
+            className="grow text-sm !text-primary-400 transition-all duration-150 hover:!text-primary-300"
           >
             Forgot your password?
           </a>

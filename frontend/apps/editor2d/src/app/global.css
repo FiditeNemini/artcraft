@@ -125,6 +125,10 @@
     @apply relative border border-ui-border shadow-lg backdrop-blur-xl transition-colors duration-300;
     @apply bg-ui-controls/50 hover:bg-ui-controls/90 !important;
   }
+
+  .glass-no-hover {
+    @apply hover:bg-ui-controls/50 !important;
+  }
 }
 
 @keyframes glow {
