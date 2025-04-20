@@ -1,5 +1,5 @@
 [package]
-name = "artcraft"
+name = "tauri-artcraft"
 version = "0.1.0"
 description = "Artcraft"
 authors = ["you"]
@@ -12,7 +12,7 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "app_lib"
+name = "tauri_artcraft_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

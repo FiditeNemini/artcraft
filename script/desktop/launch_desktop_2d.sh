@@ -8,13 +8,14 @@ set -euxo pipefail
 
 # TODO(bt,2025-02-13): This is not the correct way to get the root dir
 root_dir=$(pwd)
-frontend_path="${root_dir}/frontend/editor2d"
+frontend_path="${root_dir}/frontend"
 
 pushd "${frontend_path}"
+#nvm use stable
 npm install
 popd
 
 export TAURI_FRONTEND_PATH="${frontend_path}"
-export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-4o"
+export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-artcraft"
 
 cargo tauri dev --no-watch
