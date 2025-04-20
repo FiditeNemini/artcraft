@@ -15,19 +15,26 @@ export const AuthButtons = () => {
     return <ProfileDropdown />;
   } else {
     return (
-      <>
-        <ButtonLink 
-          to="/login"
-          variant="secondary" 
-          reloadDocument={true} // TODO(bt,2025-04-19): Once we have in-page routing, get rid of this.
-        >
-          Login
-        </ButtonLink>
-        <ButtonLink 
-          to="/signup"
-          reloadDocument={true} // TODO(bt,2025-04-19): Once we have in-page routing, get rid of this.
-          >Sign Up</ButtonLink>
-      </>
+      <div className="flex items-center gap-3.5">
+        <span className="text-white/20">|</span>
+        <div className="flex items-center gap-2">
+          <ButtonLink
+            to="/login"
+            variant="secondary"
+            reloadDocument={true}
+            className="h-[38px]" // TODO(bt,2025-04-19): Once we have in-page routing, get rid of this.
+          >
+            Login
+          </ButtonLink>
+          <ButtonLink
+            to="/signup"
+            reloadDocument={true}
+            className="h-[38px]" // TODO(bt,2025-04-19): Once we have in-page routing, get rid of this.
+          >
+            Sign Up
+          </ButtonLink>
+        </div>
+      </div>
     );
   }
 };

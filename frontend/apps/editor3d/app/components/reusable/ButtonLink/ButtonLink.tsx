@@ -19,7 +19,7 @@ export const ButtonLink = ({
   function getVariantClassNames(variant: string) {
     switch (variant) {
       case "secondary": {
-        return "bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
+        return "bg-brand-secondary hover:bg-brand-secondary-600 text-white focus-visible:outline-brand-secondary";
       }
       case "primary":
       default: {

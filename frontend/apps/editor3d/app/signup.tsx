@@ -1,14 +1,12 @@
 import { faEnvelope, faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
 import { GlobalSettingsManager } from "./pages/PageEnigma/GlobalSettingsManager";
-import { StrictMode } from 'react';
-import { Button, H1, Input, Link, P } from "~/components";
+import { Button, Input } from "~/components";
 import { addToast, authentication, signUp } from "~/signals";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useRef, useState, StrictMode } from "react";
 import { AUTH_STATUS, ToastTypes } from "~/enums";
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from 'react-router-dom';
 
 import "./styles/normalize.css";
 import "./styles/tailwind.css";
@@ -106,71 +104,76 @@ export default function SignUpScreen() {
   });
 
   return (
-    <div
-      className="fixed w-full overflow-scroll"
-      style={{ height: "calc(100% - 72px)" }}
-    >
-      <div className="mx-auto my-6 w-10/12 max-w-2xl">
-        <H1 className="text-center">Sign Up to Storyteller</H1>
+    <div className="fixed flex h-full w-full flex-col items-center justify-center overflow-auto bg-[#1b1b1f] bg-center bg-repeat">
+      <div className="mb-7 flex w-10/12 max-w-2xl items-center justify-center gap-4">
+        <img
+          src="/resources/images/artcraft-logo-3.png"
+          alt="ArtCraft Logo"
+          className="h-9 select-none"
+        />
       </div>
-      <div className="mx-auto my-6 w-10/12 max-w-2xl rounded-lg border border-ui-panel-border bg-ui-panel p-6">
-        <form ref={formRef} onSubmit={handleOnSubmit}>
-          <Input
-            label="Username"
-            icon={faUser}
-            placeholder="Username"
-            name="username"
-            errorMessage={usernameError}
-            required
-          />
-          <br />
-          <Input
-            type="email"
-            label="Email"
-            icon={faEnvelope}
-            placeholder="Email"
-            name="email"
-            errorMessage={emailError}
-            required
-          />
-          <br />
-          <Input
-            type="password"
-            label="Password"
-            icon={faKey}
-            name="password"
-            placeholder="Password"
-            autoComplete="current-password"
-            errorMessage={passwordError}
-            required
-          />
-          <br />
-          <Input
-            type="password"
-            label="Password Confrimation"
-            icon={faKey}
-            placeholder="Password Confirmation"
-            name="password-confirmation"
-            errorMessage={passwordConfirmationError}
-            required
-          />
-          <br />
-          <br />
-          <Button>Sign up</Button>
-          <br />
-          <div className="flex gap-2">
-            <P>Already have an account?</P>
-            <Link 
-              to="/login"
-              reloadDocument={true} // TODO(bt,2025-04-19): Once we have in-page routing, get rid of this.
-              >Log in instead</Link>
+      <div className="w-full max-w-xl rounded-xl shadow-lg">
+        <div className="glass glass-no-hover relative mx-auto w-full rounded-none rounded-t-xl p-6 shadow-none">
+          <h1 className="mb-8 text-center text-2xl font-bold">Sign up</h1>
+          <form
+            ref={formRef}
+            onSubmit={handleOnSubmit}
+            className="flex flex-col gap-4"
+          >
+            <Input
+              label="Username"
+              icon={faUser}
+              placeholder="Username"
+              name="username"
+              errorMessage={usernameError}
+              required
+            />
+            <Input
+              type="email"
+              label="Email"
+              icon={faEnvelope}
+              placeholder="Email"
+              name="email"
+              errorMessage={emailError}
+              required
+            />
+            <Input
+              type="password"
+              label="Password"
+              icon={faKey}
+              name="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              errorMessage={passwordError}
+              required
+            />
+            <Input
+              type="password"
+              label="Password Confirmation"
+              icon={faKey}
+              placeholder="Password Confirmation"
+              name="password-confirmation"
+              errorMessage={passwordConfirmationError}
+              required
+            />
+            <Button className="mt-4 py-3">Sign up</Button>
+          </form>
+        </div>
+        <div className="align-items flex w-full max-w-xl rounded-b-xl bg-ui-controls px-6 py-4">
+          <div className="flex w-full justify-end gap-1 text-sm">
+            <p className="opacity-75">Already have an account?</p>
+            <a
+              href="/login"
+              className="font-medium text-brand-primary-400 hover:text-brand-primary-300"
+            >
+              Log in
+            </a>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 }
-
 
 // TODO: Replace environment variables from `root.tsx`
 createRoot(document.getElementById("root")!).render(
@@ -181,5 +184,5 @@ createRoot(document.getElementById("root")!).render(
         <SignUpScreen />
       </BrowserRouter>
     </StrictMode>
-  </>
+  </>,
 );
