@@ -6,9 +6,7 @@ import path from 'path'
 import { dirname, resolve } from 'node:path'
 
 export default defineConfig({
-  root: __dirname,
-  //build: {
-  //},
+  root: path.resolve(__dirname, 'app'),
   //resolve: {
   //  alias: {
   //    'kalidokit': `${path.resolve(__dirname, 'src')}/`,
@@ -35,12 +33,12 @@ export default defineConfig({
   //  },
   //},
   build: {
+    outDir: path.resolve(__dirname, 'dist'),
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'index.html'),
-        login: resolve(__dirname, 'login.html'),
-        signup: resolve(__dirname, 'signup.html'),
-        //nested: resolve(__dirname, 'nested/index.html'),
+        index: resolve(__dirname, 'app/index.html'),
+        login: resolve(__dirname, 'app/login.html'),
+        signup: resolve(__dirname, 'app/signup.html'),
       },
     },
   },
