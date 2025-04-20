@@ -8,7 +8,7 @@ set -euxo pipefail
 
 # TODO(bt,2025-02-13): This is not the correct way to get the root dir
 root_dir=$(pwd)
-frontend_path="${root_dir}/frontend/editor3d"
+frontend_path="${root_dir}/frontend"
 
 pushd "${frontend_path}"
 npm install
