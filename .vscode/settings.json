@@ -1,6 +1,6 @@
 {
     "files.exclude": {
-        "*~": true,
+        "**/*~": true,
         "frontend_old/**": true
     }
 }
