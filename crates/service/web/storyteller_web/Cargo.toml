@@ -68,7 +68,7 @@ reusable_types = { path = "../../../_types/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
 shared_service_components = { workspace = true }
 thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator" }
-tokens = { path = "../../../_types/tokens" }
+tokens = { workspace = true }
 tts_common = { path = "../../../lib/tts_common" }
 url_config = { path = "../../../lib/url_config" }
 user_input_common = { path = "../../../lib/user_input_common" }

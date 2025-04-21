@@ -8,6 +8,7 @@ pub mod utils;
 use crate::commands::flip_image::flip_image;
 use crate::commands::sora::open_sora_login_command::open_sora_login_command;
 use crate::commands::sora::sora_image_generation_command::sora_image_generation_command;
+use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
 
@@ -57,8 +58,9 @@ pub fn run() {
     .manage(app_data_root)
     .invoke_handler(tauri::generate_handler![
       flip_image,
-      sora_image_generation_command,
       open_sora_login_command,
+      sora_image_generation_command,
+      sora_image_remix_command,
     ])
     .run(tauri::generate_context!("tauri.conf.json"))
     .expect("error while running tauri application");
