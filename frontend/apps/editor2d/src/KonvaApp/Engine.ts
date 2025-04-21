@@ -510,7 +510,20 @@ export class Engine {
   }
 
   private onBoardCanvasResize() {
-    this.realTimeDrawEngine.updateCaptureCanvas(undefined, undefined);
+    console.log("onBoardCanvasResize Event called");
+    // Print window dimensions for debugging
+    console.log("Window dimensions:", {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      outerWidth: window.outerWidth,
+      outerHeight: window.outerHeight,
+    });
+
+    this.realTimeDrawEngine.updateCaptureCanvas(
+      window.innerWidth,
+      window.innerHeight,
+    );
+
     this.matteBox.updateSize({
       boardCanvasSize: {
         width: this.boardCanvasRef.offsetWidth,

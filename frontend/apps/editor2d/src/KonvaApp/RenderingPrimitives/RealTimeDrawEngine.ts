@@ -516,36 +516,48 @@ export class RealTimeDrawEngine {
     width: number | undefined,
     height: number | undefined,
   ) {
+    console.log("updateCaptureCanvas");
     if (!this.captureCanvas) {
       return;
     }
-    if (width) {
-      this.width = width;
-    }
-    if (height) {
-      this.height = height;
-    }
-
-    // Ensures that all the nodes stag in the same place should
-    // there be a window resize.
-    // recompute the position
-    // to ensure that the position of this stays
-
+    const scaleFactor = 1;
+    // Store old values for calculating delta
     const oldPositionX = this.positionX;
     const oldPositionY = this.positionY;
 
-    // recompute the position
+    // If width/height aren't provided, use window dimensions
+    if (width === undefined) {
+      this.width = window.innerWidth * scaleFactor; // Using 80% of window width
+    } else {
+      this.width = width * scaleFactor;
+    }
 
+    if (height === undefined) {
+      this.height = window.innerHeight * scaleFactor; // Using 80% of window height
+    } else {
+      this.height = height * scaleFactor;
+    }
+
+    console.log("New dimensions:", this.width, this.height);
+
+    // Calculate new position to center the canvas in the window
+    this.positionX = (window.innerWidth - this.width) / 2;
+    this.positionY = (window.innerHeight - this.height) / 2;
+
+    console.log("New centered position:", this.positionX, this.positionY);
+
+    // Update the canvas position and size
     this.captureCanvas.setPosition({
-      x: this.positionX / 2,
-      y: this.positionY / 2,
+      x: this.positionX,
+      y: this.positionY,
     });
     this.captureCanvas.size({ width: this.width, height: this.height });
 
-    // this is the change in positions
+    // Calculate the change in position
     const deltaX = this.positionX - oldPositionX;
     const deltaY = this.positionY - oldPositionY;
 
+    // Update all children except the capture canvas
     var children = this.mediaLayerRef.getChildren();
     for (let i = 0; i < children.length; i++) {
       let node = children[i];

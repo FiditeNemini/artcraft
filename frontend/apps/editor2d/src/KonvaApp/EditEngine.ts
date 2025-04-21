@@ -62,6 +62,7 @@ export class EditEngine {
     this.editMode = EditModes.SELECT;
 
     this.boardCanvasRef = boardCanvasRef;
+
     this.stage = new Konva.Stage({
       container: this.boardCanvasRef,
       width: window.innerWidth,
@@ -238,13 +239,19 @@ export class EditEngine {
   }
 
   private onBoardCanvasResize() {
-    this.realTimeDrawEngine.updateCaptureCanvas(undefined, undefined);
+    this.realTimeDrawEngine.updateCaptureCanvas(0, 0);
+    console.log("onBoardCanvasResize Event called");
+    console.log("Board Canvas values below");
+    console.log(this.boardCanvasRef.offsetWidth);
+    console.log(this.boardCanvasRef.offsetHeight);
+
     this.matteBox.updateSize({
       boardCanvasSize: {
         width: this.boardCanvasRef.offsetWidth,
         height: this.boardCanvasRef.offsetHeight,
       },
     });
+
     this.uiLayer.draw();
     this.stage.width(this.boardCanvasRef.offsetWidth);
     this.stage.height(this.boardCanvasRef.offsetHeight);
