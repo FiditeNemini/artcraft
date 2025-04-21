@@ -7,6 +7,7 @@ use reqwest::Url;
 use tauri::{AppHandle, Manager, Webview};
 use errors::AnyhowResult;
 use crate::state::app_dir::AppDataRoot;
+use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use crate::utils::sora_webview_cookies::get_all_sora_cookies_as_string;
 
 pub const LOGIN_WINDOW_NAME: &str = "login_window";
@@ -23,7 +24,11 @@ pub static SORA_ROOT_URL: Lazy<Url> = Lazy::new(|| {
   Url::parse(SORA_ROOT_URL_STR).expect("URL should parse")
 });
 
-pub async fn sora_session_login_thread(app: AppHandle, app_data_root: AppDataRoot) -> ! {
+pub async fn sora_session_login_thread(
+  app: AppHandle,
+  app_data_root: AppDataRoot,
+  sora_creds_holder: SoraCredentialHolder
+) -> ! {
   loop {
     for (window_name, webview) in app.webviews() {
       if window_name == LOGIN_WINDOW_NAME {

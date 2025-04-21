@@ -1,6 +1,8 @@
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use crate::state::app_dir::AppDataRoot;
+use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
+use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use errors::AnyhowResult;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
@@ -38,10 +40,11 @@ pub async fn sora_image_remix_command(
   _app: AppHandle,
   request: SoraImageRemixCommand,
   app_data_root: State<'_, AppDataRoot>,
+  sora_creds_holder: State<'_, SoraCredentialHolder>,
 ) -> Result<String, String> {
   info!("image_generation_command called; processing image...");
 
-  generate_image(request, &app_data_root)
+  generate_image(request, &app_data_root, &sora_creds_holder)
     .await
     .map_err(|err| {
       error!("error: {:?}", err);
@@ -51,8 +54,19 @@ pub async fn sora_image_remix_command(
   Ok("success".to_string())
 }
 
-pub async fn generate_image(request: SoraImageRemixCommand, app_data_root: &AppDataRoot) -> AnyhowResult<()> {
-  let sora_credentials = get_credentials(app_data_root)?;
+pub async fn generate_image(
+  request: SoraImageRemixCommand,
+  app_data_root: &AppDataRoot,
+  sora_creds_holder: &SoraCredentialHolder,
+) -> AnyhowResult<()> {
+
+  let sora_credentials = read_sora_credentials_from_disk(app_data_root)
+    .map_err(|err| {
+      error!("Failed to read Sora credentials from disk: {:?}", err);
+      err
+    })?;
+
+  //let sora_credentials = sora_creds_holder.get_credentials()?;
 
   let sora_media_tokens = vec![];
 
@@ -75,26 +89,4 @@ pub async fn generate_image(request: SoraImageRemixCommand, app_data_root: &AppD
   println!(">> TASK ID: {:?} ", response.task_id);
 
   Ok(())
-}
-
-fn get_credentials(app_data_root: &AppDataRoot) -> AnyhowResult<SoraCredentials> {
-  let cookie_file = app_data_root.get_sora_cookie_file_path();
-
-  let bearer = read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/bearer.txt")?
-      .trim()
-      .to_string();
-
-  let cookie= read_to_string(cookie_file)?
-      .trim()
-      .to_string();
-
-  let sentinel = read_to_string("/Users/bt/dev/storyteller/storyteller-rust/test_data/temp/sentinel.txt")?
-      .trim()
-      .to_string();
-
-  Ok(SoraCredentials {
-    bearer_token: bearer,
-    cookie: cookie,
-    sentinel: Some(sentinel),
-  })
 }
