@@ -10,4 +10,8 @@ pub fn add_artcraft_3d(cors: Cors, _is_production: bool) -> Cors {
       .allowed_origin_fn(|origin, _req_head| {
         netlify_branch_domain_matches(origin, "storyteller-3d.netlify.app")
       })
+      // Tauri localhost (3D engine, first three ports)
+      .allowed_origin("http://localhost:5173")
+      .allowed_origin("http://localhost:5174") // If already started
+      .allowed_origin("http://localhost:5175") // If already started
 }
