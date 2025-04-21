@@ -42,6 +42,16 @@ npx nx build editor2d
 dev:
 npx nx dev editor3d
 npx nx dev editor2d
+
+
+
+# component build
+1.
+npx nx g @nx/react:library libs/components/toaster --import-path=@storyteller/ui-toaster --bundler=vite
+npm install
+2.import it first in code
+3.nx sync
+4.nx build
 ```
 
 
