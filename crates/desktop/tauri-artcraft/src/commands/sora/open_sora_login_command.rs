@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use tauri::{AppHandle, Manager, Url, WebviewUrl, WebviewWindowBuilder, WindowBuilder};
 use tokio::time::sleep_until;
 use errors::AnyhowResult;
-use crate::threads::login_thread::{LOGIN_WINDOW_NAME, SORA_LOGIN_URL};
+use crate::threads::sora_session_login_thread::{LOGIN_WINDOW_NAME, SORA_LOGIN_URL};
 use crate::utils::clear_all_webview_cookies::clear_all_webview_cookies;
 
 pub const START_URL_STR: &str = "https://storyteller.ai/";
@@ -20,7 +20,7 @@ pub static SORA_HOMEPAGE_URL : Lazy<Url> = Lazy::new(|| {
 });
 
 #[tauri::command]
-pub async fn open_login_command(
+pub async fn open_sora_login_command(
   app: AppHandle,
 ) -> Result<String, String> {
   info!("open_login_command called");

@@ -23,7 +23,7 @@ pub static SORA_ROOT_URL: Lazy<Url> = Lazy::new(|| {
   Url::parse(SORA_ROOT_URL_STR).expect("URL should parse")
 });
 
-pub async fn login_thread(app: AppHandle, app_data_root: AppDataRoot) -> ! {
+pub async fn sora_session_login_thread(app: AppHandle, app_data_root: AppDataRoot) -> ! {
   loop {
     for (window_name, webview) in app.webviews() {
       if window_name == LOGIN_WINDOW_NAME {

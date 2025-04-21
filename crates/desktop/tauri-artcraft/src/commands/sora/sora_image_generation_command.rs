@@ -15,7 +15,7 @@ use openai_sora_client::upload::upload_media_from_file::SoraMediaUploadRequest;
 use crate::state::app_dir::AppDataRoot;
 
 #[tauri::command]
-pub async fn image_generation_command(
+pub async fn sora_image_generation_command(
   image: &str,
   prompt: &str,
   app: AppHandle,

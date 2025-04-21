@@ -12,8 +12,8 @@ if lsof -i tcp:5741 &>/dev/null; then
 else
   echo "No process running on port 5741"
 fi
+
 # TODO(bt,2025-02-13): This is not the correct way to get the root dir
-brew install pkg-config pixman cairo pango libpng jpeg giflib librsvg
 root_dir=$(pwd)
 frontend_path="${root_dir}/frontend"
 
@@ -30,3 +30,4 @@ export CONFIG_PATH="${TAURI_APP_PATH}/tauri.artcraft_2d.conf.toml"
 
 # TODO: --no-watch
 cargo tauri dev --config "${CONFIG_PATH}"
+

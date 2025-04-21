@@ -134,7 +134,7 @@ export const Main = withProtectionRoute(() => {
             iconFlip={true}
             onClick={async () => {
               if (isTauri()) {
-                await invoke('open_login_command');
+                await invoke('open_sora_login_command');
                 setFirstTimeDialogOpen(false);
               } else {
                 console.error('Tauri is not available in this environment');

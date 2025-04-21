@@ -6,10 +6,10 @@ pub mod transfer;
 pub mod utils;
 
 use crate::commands::flip_image::flip_image;
-use crate::commands::image_generation_command::image_generation_command;
-use crate::commands::open_login_command::open_login_command;
+use crate::commands::sora::open_sora_login_command::open_sora_login_command;
+use crate::commands::sora::sora_image_generation_command::sora_image_generation_command;
 use crate::state::app_config::AppConfig;
-use crate::threads::login_thread::login_thread;
+use crate::threads::sora_session_login_thread::sora_session_login_thread;
 
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;
@@ -49,7 +49,7 @@ pub fn run() {
       //}
       let app = app.handle().clone();
 
-      tauri::async_runtime::spawn(login_thread(app, app_data_root2));
+      tauri::async_runtime::spawn(sora_session_login_thread(app, app_data_root2));
 
       Ok(())
     })
@@ -57,8 +57,8 @@ pub fn run() {
     .manage(app_data_root)
     .invoke_handler(tauri::generate_handler![
       flip_image,
-      image_generation_command,
-      open_login_command,
+      sora_image_generation_command,
+      open_sora_login_command,
     ])
     .run(tauri::generate_context!("tauri.conf.json"))
     .expect("error while running tauri application");
