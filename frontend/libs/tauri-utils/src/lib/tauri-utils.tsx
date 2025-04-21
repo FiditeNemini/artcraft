@@ -1,0 +1,1 @@
+export { IsDesktopApp } from './IsDesktopApp';
