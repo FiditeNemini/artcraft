@@ -18,6 +18,7 @@ popd
 export TAURI_FRONTEND_PATH="${frontend_path}"
 export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-artcraft"
 
-export CONFIG_PATH="${TAURI_APP_PATH}/tauri.artcraft_2d.conf.json"
+export CONFIG_PATH="${TAURI_APP_PATH}/tauri.artcraft_3d.conf.toml"
 
-cargo tauri dev --config "${TAURI_APP_PATH}/tauri.artcraft_2d.conf.json" -- --no-watch
+# TODO: --no-watch
+cargo tauri dev --config "${CONFIG_PATH}"
