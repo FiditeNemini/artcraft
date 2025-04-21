@@ -17,6 +17,27 @@
     },
     {
       "path": "./libs/components/toaster"
+    },
+    {
+      "path": "./libs/components/close-button"
+    },
+    {
+      "path": "./libs/components/modal"
+    },
+    {
+      "path": "./libs/components/settings-modal"
+    },
+    {
+      "path": "./libs/components/button"
+    },
+    {
+      "path": "./libs/components/input"
+    },
+    {
+      "path": "./libs/components/label"
+    },
+    {
+      "path": "./libs/components/select"
     }
   ]
 }
