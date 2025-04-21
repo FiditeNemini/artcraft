@@ -22,7 +22,22 @@
   },
   "references": [
     {
+      "path": "../../libs/components/input"
+    },
+    {
+      "path": "../../libs/components/close-button"
+    },
+    {
+      "path": "../../libs/components/button"
+    },
+    {
+      "path": "../../libs/components/modal"
+    },
+    {
       "path": "../../libs/components/toaster"
+    },
+    {
+      "path": "../../libs/components/tooltip"
     },
     {
       "path": "../../libs/components/settings-modal"
