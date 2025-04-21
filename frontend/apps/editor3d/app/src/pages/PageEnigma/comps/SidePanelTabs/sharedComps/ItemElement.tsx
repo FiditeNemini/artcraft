@@ -5,11 +5,7 @@ import { Badge } from "~/components";
 import { AssetType } from "~/enums";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHandPointer } from "@fortawesome/pro-regular-svg-icons";
-import {
-  faArrowPointer,
-  faUpDownLeftRight,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faUpDownLeftRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   debug?: string;
@@ -44,10 +40,7 @@ export const ItemElement = ({ item }: Props) => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div
-      className="group relative w-full cursor-pointer select-none overflow-hidden transition-all duration-200"
-      onPointerDown={(event) => DndAsset.onPointerDown(event, item)}
-    >
+    <div className="group relative w-full select-none overflow-hidden transition-all duration-200">
       {item.media_type && (
         <Badge
           label={
@@ -61,7 +54,11 @@ export const ItemElement = ({ item }: Props) => {
         />
       )}
 
-      <div className="pointer-events-none relative aspect-[16/12] w-full select-none overflow-hidden rounded-xl border-[3px] border-white/5 bg-brand-secondary-600 object-cover object-center transition-all group-hover:border-brand-primary">
+      <div
+        className="pointer-events-none relative aspect-[16/12] w-full select-none overflow-hidden rounded-xl border-[3px] border-white/5 bg-brand-secondary-600 object-cover object-center transition-all group-hover:border-brand-primary"
+        onPointerDown={(event) => DndAsset.onPointerDown(event, item)}
+        style={{ cursor: "grab", pointerEvents: "auto" }}
+      >
         {item.thumbnail && !imageError && (
           <img
             crossOrigin="anonymous"

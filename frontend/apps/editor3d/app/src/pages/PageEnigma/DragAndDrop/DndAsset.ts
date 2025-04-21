@@ -59,14 +59,7 @@ class DndAsset {
       this.overElement = null;
       overTimeline.value = false;
       this.notDropText = "";
-      if (reopenAfterDragSignal.value) {
-        assetModalVisibleDuringDrag.value = true;
-      } else {
-        assetModalVisibleDuringDrag.value = true;
-        setTimeout(() => {
-          assetModalVisibleDuringDrag.value = false;
-        }, 0);
-      }
+      assetModalVisibleDuringDrag.value = reopenAfterDragSignal.value;
     }
   }
 

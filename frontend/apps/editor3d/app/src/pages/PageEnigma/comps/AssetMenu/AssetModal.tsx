@@ -1,4 +1,4 @@
-import { TransitionDialogue } from "~/components/reusable/TransitionDialogue";
+import { Modal } from "@storyteller/ui-modal";
 import { UploadModal3D } from "~/components/reusable/UploadModal3D";
 import {
   faPlus,
@@ -77,18 +77,20 @@ export const AssetModal = () => {
   const [activeLibraryTab, setActiveLibraryTab] = useState("library");
   const [activeAssetTab, setActiveAssetTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [reopenAfterAdd, setReopenAfterAdd] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const handleReopenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.checked;
+    // Force the update to be asynchronous
+    setTimeout(() => {
+      reopenAfterDragSignal.value = newValue;
+    }, 0);
+  };
 
   const handleClose = () => {
     assetModalVisible.value = false;
   };
-
-  // Update the signal when the preference changes
-  useEffect(() => {
-    reopenAfterDragSignal.value = reopenAfterAdd;
-  }, [reopenAfterAdd]);
 
   useEffect(() => {
     if (assetModalVisible.value) {
@@ -391,7 +393,7 @@ export const AssetModal = () => {
   };
 
   const handleUploadSuccess = () => {
-    if (reopenAfterAdd) {
+    if (reopenAfterDragSignal.value) {
       // Small delay to allow the modal to close and reopen
       setTimeout(() => {
         handleClose();
@@ -405,7 +407,7 @@ export const AssetModal = () => {
 
   return (
     <>
-      <TransitionDialogue
+      <Modal
         isOpen={assetModalVisible.value && assetModalVisibleDuringDrag.value}
         onClose={handleClose}
         className="h-[640px] max-w-4xl"
@@ -448,19 +450,34 @@ export const AssetModal = () => {
               ))}
             </div>
             <div className="mt-auto flex items-center gap-2 pt-3">
-              <input
-                type="checkbox"
-                id="reopen-after-add"
-                checked={reopenAfterAdd}
-                onChange={(e) => setReopenAfterAdd(e.target.checked)}
-                className="h-4 w-4 rounded-lg border-gray-300 bg-gray-700 text-brand-primary focus:ring-brand-primary"
-              />
-              <label
-                htmlFor="reopen-after-add"
-                className="text-sm text-white/70"
+              <div
+                className="flex cursor-pointer items-center"
+                onClick={(e) => {
+                  // Prevent double-firing when clicking the checkbox itself
+                  if (e.target instanceof HTMLInputElement) return;
+                  const checkbox = document.getElementById(
+                    "reopen-after-add",
+                  ) as HTMLInputElement;
+                  if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    reopenAfterDragSignal.value = checkbox.checked;
+                  }
+                }}
               >
-                Reopen after adding
-              </label>
+                <input
+                  type="checkbox"
+                  id="reopen-after-add"
+                  checked={reopenAfterDragSignal.value}
+                  onChange={handleReopenChange}
+                  className="h-4 w-4 cursor-pointer rounded-lg border-gray-300 bg-gray-700 text-brand-primary focus:ring-brand-primary"
+                />
+                <label
+                  htmlFor="reopen-after-add"
+                  className="ml-2 cursor-pointer select-none text-sm text-white/70"
+                >
+                  Reopen after adding
+                </label>
+              </div>
             </div>
           </div>
           <div className="col-span-9 p-3 pb-0 ps-0 pt-2">
@@ -520,7 +537,7 @@ export const AssetModal = () => {
             </div>
           </div>
         </div>
-      </TransitionDialogue>
+      </Modal>
       <UploadModal3D
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={handleUploadSuccess}
