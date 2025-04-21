@@ -155,7 +155,7 @@ export const ControlPanelSceneObject = () => {
     updatedScaleValues.z = (parseFloat(localScale.z) + scale).toString();
 
     handleScaleChange(updatedScaleValues);
-  }
+  };
 
   const handleScaleChange = (xyz: Record<string, string>) => {
     if (isInvalid(xyz)) {
@@ -180,9 +180,10 @@ export const ControlPanelSceneObject = () => {
 
   return (
     <Transition
+      as="div"
       show={isShowing.value}
       className={twMerge(
-        "glass absolute bottom-0 right-0 mb-2 mr-2 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border p-3.5 text-white shadow-lg",
+        "glass absolute bottom-0 right-0 mb-4 mr-4 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border p-3.5 text-white shadow-lg",
       )}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
@@ -208,6 +209,7 @@ export const ControlPanelSceneObject = () => {
       </div>
 
       <Transition
+        as="div"
         show={!isCollapsed}
         enter="transition-all duration-200 ease-in-out"
         enterFrom="opacity-0 max-h-0"

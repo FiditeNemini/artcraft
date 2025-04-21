@@ -120,7 +120,7 @@ export const PageEditor = () => {
               onClick={handleOverlayClick}
             >
               <div
-                className="absolute bottom-0 mb-2 ml-2 flex origin-bottom-left flex-col gap-2"
+                className="absolute bottom-0 mb-4 ml-4 flex origin-bottom-left flex-col gap-2"
                 style={{ transform: `scale(${getScale()})` }}
               >
                 <Outliner />

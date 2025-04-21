@@ -2,11 +2,7 @@ import React from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import { poseMode, showPoseControls } from "../signals/selectedMode";
 import { Button, Tooltip } from "~/components";
-import {
-  faCheck,
-  faCheckDouble,
-  faPersonRunning,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faCheck, faPersonRunning } from "@fortawesome/pro-solid-svg-icons";
 
 declare global {
   interface Window {

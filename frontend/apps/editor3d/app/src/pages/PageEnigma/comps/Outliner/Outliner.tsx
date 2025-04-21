@@ -179,6 +179,7 @@ export const Outliner = () => {
 
   return (
     <Transition
+      as="div"
       show={outlinerIsShowing.value}
       className={twMerge(
         "glass flex max-h-[34vh] w-[240px] origin-bottom-left flex-col overflow-hidden rounded-lg shadow-lg",
