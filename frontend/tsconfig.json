@@ -38,6 +38,9 @@
     },
     {
       "path": "./libs/components/select"
+    },
+    {
+      "path": "./libs/components/tooltip"
     }
   ]
 }

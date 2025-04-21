@@ -13,6 +13,7 @@ import { getCurrentLocationWithoutParams } from "~/utilities";
 import { Activity } from "~/pages/PageEnigma/comps/GenerateModals/Activity";
 import { LibraryModal } from "~/pages/PageEnigma/comps/LibraryModal/LibraryModal";
 import { SettingsModal } from "@storyteller/ui-settings-modal";
+import { Tooltip } from "@storyteller/ui-tooltip";
 
 function isEditorPath(path: string) {
   if (path === "/") return true;
@@ -75,12 +76,14 @@ export const TopBar = ({ pageName }: Props) => {
 
           <div className="flex justify-end gap-3.5">
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                icon={faGear}
-                className="h-[38px] w-[38px]"
-                onClick={() => setIsSettingsModalOpen(true)}
-              />
+              <Tooltip content="Settings" position="bottom" delay={300}>
+                <Button
+                  variant="secondary"
+                  icon={faGear}
+                  className="h-[38px] w-[38px]"
+                  onClick={() => setIsSettingsModalOpen(true)}
+                />
+              </Tooltip>
               <Button
                 variant="secondary"
                 icon={faImages}

@@ -14,9 +14,18 @@ import {
   faImage,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, CloseButton, Input, Tooltip } from "~/components";
+import { Tooltip } from "@storyteller/ui-tooltip";
+import { Button } from "@storyteller/ui-button";
+import { CloseButton } from "@storyteller/ui-close-button";
+import { Input } from "@storyteller/ui-input";
 import { TabSelector } from "~/components/reusable/TabSelector";
-import { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  ChangeEvent,
+} from "react";
 import { ItemElements } from "../SidePanelTabs/sharedComps/ItemElements";
 import {
   demoSkyboxItems,
@@ -412,6 +421,7 @@ export const AssetModal = () => {
         onClose={handleClose}
         className="h-[640px] max-w-4xl"
         childPadding={false}
+        showClose={false}
       >
         <div className="grid h-full grid-cols-12 gap-3">
           <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:dark:bg-white/10">
@@ -498,7 +508,9 @@ export const AssetModal = () => {
                       inputClassName="pr-2.5"
                       icon={faSearch}
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setSearchTerm(e.target.value)
+                      }
                       iconClassName="text-white/60"
                     />
                     {searchTerm && (
