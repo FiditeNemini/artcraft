@@ -8,7 +8,8 @@ pub const DEFAULT_RUST_LOG: &str = concat!(
   "sqlx::query=warn,",
   "hyper::proto::h1::io=warn,",
   "storyteller_web::threads::db_health_checker_thread::db_health_checker_thread=warn,",
-  "http_server_common::request::get_request_ip=info," // Debug spams Rust logs
+  "http_server_common::request::get_request_ip=info,", // Debug spams Rust logs
+  "info", // Default level for everything else
 );
 
 /// The default Redis connection string for use in development
