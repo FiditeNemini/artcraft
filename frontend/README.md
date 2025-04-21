@@ -2,8 +2,7 @@
 
 This is an `nx` monorepo that can contain multiple apps and shared libraries.
 
-All commands to run these projects are performed from _this_ directory. 
-
+All commands to run these projects are performed from _this_ directory.
 
 ## Install dependencies
 
@@ -35,6 +34,10 @@ The names for @frontend and @storyteller come from the package.json file in the 
 import { Login } from "@frontend/login";
 import { api } from "@storyteller/api";
 
+For shared UI components, import from @storyteller/ui-[componentname].
+import { Button } from "@storyteller/ui-button";
+import { Modal } from "@storyteller/ui-modal";
+
 building:
 npx nx build editor3d
 npx nx build editor2d
@@ -53,5 +56,3 @@ npm install
 3.nx sync
 4.nx build
 ```
-
-
