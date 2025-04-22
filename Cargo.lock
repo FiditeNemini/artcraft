@@ -11261,6 +11261,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "tokens",
+ "tokio",
  "url",
  "workspace-build-acceleration",
 ]

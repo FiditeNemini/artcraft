@@ -2,7 +2,7 @@ use serde_derive::Deserialize;
 use url::Url;
 
 /// Cover image links can only be jpg, png, etc. No videos.
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct CoverImageLinks {
   /// Primary link to the cover image via the CDN.
   pub cdn_url: Url,

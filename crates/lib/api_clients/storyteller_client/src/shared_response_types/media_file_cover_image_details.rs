@@ -5,7 +5,7 @@ use crate::shared_response_types::cover_image_links::CoverImageLinks;
 /// Everything we need to create a cover image.
 /// Cover images are small descriptive images that can be set for any media file.
 /// If a cover image is set, this is the path to the asset.
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct MediaFileCoverImageDetails {
   //  /// (DEPRECATED) URL path to the media file
   //  #[deprecated(note="This field doesn't point to the full URL. Use media_links instead to leverage the CDN.")]
@@ -33,7 +33,7 @@ pub struct MediaFileCoverImageDetails {
 
 /// The default cover is composed of an image and color pair that are
 /// predefined by the frontend.
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct MediaFileDefaultCover {
   pub image_index: u8,
   pub color_index: u8,

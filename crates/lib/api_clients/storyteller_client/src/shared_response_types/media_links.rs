@@ -2,7 +2,7 @@ use serde_derive::Deserialize;
 use url::Url;
 
 /// Links to media file locations (bucket, CDN, etc.)
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct MediaLinks {
   /// Primary link to the asset via the CDN.
   pub cdn_url: Url,
@@ -19,7 +19,7 @@ pub struct MediaLinks {
   pub maybe_video_previews: Option<VideoPreviews>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct VideoPreviews {
   /// A static single frame preview image of the video.
   pub still: Url,

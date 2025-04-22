@@ -24,7 +24,7 @@ tokens = { workspace = true }
 
 # External
 anyhow = { workspace = true }
-chrono = { version = "0.4.22", features = ["serde"] }
+chrono = { workspace = true }
 log = { workspace = true }
 reqwest = { workspace = true, features = ["multipart", "gzip"] }
 url = { workspace = true }
@@ -36,7 +36,6 @@ serde_json = { workspace = true }
 
 # HTTP
 backoff = { version = "0.4.0", features = ["futures"] } # Exponential backoff retry
-#reqwest = { version = "0.11", features = ["json", "cookies"] } # HTTP Client
 
 [dev-dependencies]
-# None yet
+tokio = { version = "1.38.0", features = ["macros"] }

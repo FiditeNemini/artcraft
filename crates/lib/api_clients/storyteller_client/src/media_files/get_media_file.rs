@@ -1,7 +1,5 @@
-use std::num::{NonZero, NonZeroU16};
 use chrono::{DateTime, Utc};
-use log::{debug, error};
-use reqwest::{Client, StatusCode};
+use log::debug;
 use serde_derive::{Deserialize};
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
@@ -22,27 +20,18 @@ use crate::shared_response_types::simple_entity_stats::SimpleEntityStats;
 use crate::shared_response_types::user_details_light::UserDetailsLight;
 use crate::utils::api_host::ApiHost;
 use crate::utils::filter_bad_response::filter_bad_response;
-use crate::utils::status_codes::*;
+use crate::utils::http_get_anonymous::http_get_anonymous;
 
 /// Get details about a media file from our backend
 pub async fn get_media_file(api_host: &ApiHost, media_file_token: &MediaFileToken) -> Result<GetMediaFileSuccessResponse, ApiError> {
-  let client = Client::builder()
-      .gzip(true)
-      .build()?;
-
   let url = get_media_file_token_route(api_host, media_file_token);
 
   debug!("Requesting {:?}", &url);
 
-  let response = client.get(url)
-      .header("User-Agent", "storyteller-client/1.0")
-      .header("Accept", "*/*")
-      .header("Accept-Encoding", "gzip, deflate, br")
-      .send()
-      .await?;
-
+  let response = http_get_anonymous(url).await?;
   let response = filter_bad_response(response).await?;
   let response_body = &response.text().await?;
+
   let media_file = serde_json::from_str(&response_body)?;
 
   Ok(media_file)
@@ -56,13 +45,13 @@ fn get_media_file_token_route(api_host: &ApiHost, media_file_token: &MediaFileTo
 
 // TODO(bt,2025-04-22): Share API definitions between client and server in common crate.
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct GetMediaFileSuccessResponse {
   pub success: bool,
   pub media_file: MediaFileInfo,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct MediaFileInfo {
   pub token: MediaFileToken,
 
@@ -188,7 +177,7 @@ pub struct MediaFileInfo {
   pub maybe_moderator_fields: Option<GetMediaFileModeratorFields>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct GetMediaFileModeratorFields {
   /// This may become public in the future.
   pub maybe_style_transfer_source_media_file_token: Option<MediaFileToken>,
@@ -198,7 +187,7 @@ pub struct GetMediaFileModeratorFields {
   //pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct GetMediaFileModelInfo {
   pub weight_token: ModelWeightToken,
   pub weight_type: PublicWeightsType,
@@ -214,3 +203,21 @@ pub struct GetMediaFileModelInfo {
   pub maybe_weight_creator: Option<UserDetailsLight>,
 }
 
+#[cfg(test)]
+mod tests {
+  use tokens::tokens::media_files::MediaFileToken;
+  use crate::media_files::get_media_file::get_media_file;
+  use crate::utils::api_host::ApiHost;
+
+  #[tokio::test]
+  #[ignore] // Don't run in CI. Requires valid cookie
+  async fn test_request() {
+    let host = ApiHost::Storyteller;
+    let token = MediaFileToken::new_from_str("m_gff67btr810vg3ng9szj85zskztcgy");
+    let result = get_media_file(&host, &token).await.unwrap();
+
+    println!("Result: {:?}", &result);
+
+    assert_eq!(result.success, false); // NB: Will fail so we can see debug printed result.
+  }
+}
