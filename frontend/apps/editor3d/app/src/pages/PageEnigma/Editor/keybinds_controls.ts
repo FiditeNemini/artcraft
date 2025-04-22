@@ -315,7 +315,6 @@ export class MouseControls {
       return;
     } else if (event.key === "b") {
       // Open asset modal
-      event.preventDefault();
       assetModalVisible.value = true;
       assetModalVisibleDuringDrag.value = true;
       return;
