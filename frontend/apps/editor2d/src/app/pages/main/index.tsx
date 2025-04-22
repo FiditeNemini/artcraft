@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { withProtectionRoute } from "~/components/hoc";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
-import { Resource, invoke } from '@tauri-apps/api/core';
+import { Resource, invoke } from "@tauri-apps/api/core";
 
 // Components of the page
 import { ToolbarUserProfile } from "~/components/features";
@@ -103,7 +103,7 @@ export const Main = withProtectionRoute(() => {
         }}
         className="max-w-5xl"
       >
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-5">
           <div className="flex flex-col items-center gap-3">
             <h1 className="text-3xl font-bold">
               <FontAwesomeIcon
@@ -125,7 +125,7 @@ export const Main = withProtectionRoute(() => {
 
           <div className="aspect-video w-full overflow-hidden rounded-md">
             <video autoPlay muted loop controls={false}>
-              <source src="/videos/demo_video.mp4" type="video/mp4" />
+              <source src="/videos/artcraft-canvas-demo.mp4" type="video/mp4" />
             </video>
           </div>
           <Button
@@ -134,14 +134,14 @@ export const Main = withProtectionRoute(() => {
             iconFlip={true}
             onClick={async () => {
               if (isTauri()) {
-                await invoke('open_sora_login_command');
+                await invoke("open_sora_login_command");
                 setFirstTimeDialogOpen(false);
               } else {
-                console.error('Tauri is not available in this environment');
+                console.error("Tauri is not available in this environment");
               }
             }}
           >
-            Signin to OpenAI to get Started
+            Sign in to OpenAI to get Started
           </Button>
           {/* <Button
             className="font-semibold"
