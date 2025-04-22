@@ -1,8 +1,9 @@
-use base64::Engine;
-use base64::prelude::BASE64_STANDARD;
 use crate::state::app_dir::AppDataRoot;
 use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
+use crate::state::sora::sora_credential_manager::SoraCredentialManager;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use errors::AnyhowResult;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
@@ -10,6 +11,7 @@ use log::{error, info};
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
+use openai_sora_client::sentinel_refresh::refresh_sentinel;
 use openai_sora_client::upload::upload_media_from_bytes::sora_media_upload_from_bytes;
 use openai_sora_client::upload::upload_media_from_file::SoraMediaUploadRequest;
 use serde_derive::Deserialize;
@@ -40,11 +42,11 @@ pub async fn sora_image_remix_command(
   _app: AppHandle,
   request: SoraImageRemixCommand,
   app_data_root: State<'_, AppDataRoot>,
-  sora_creds_holder: State<'_, SoraCredentialHolder>,
+  sora_creds_manager: State<'_, SoraCredentialManager>,
 ) -> Result<String, String> {
   info!("image_generation_command called; processing image...");
 
-  generate_image(request, &app_data_root, &sora_creds_holder)
+  generate_image(request, &app_data_root, &sora_creds_manager)
     .await
     .map_err(|err| {
       error!("error: {:?}", err);
@@ -57,16 +59,31 @@ pub async fn sora_image_remix_command(
 pub async fn generate_image(
   request: SoraImageRemixCommand,
   app_data_root: &AppDataRoot,
-  sora_creds_holder: &SoraCredentialHolder,
+  sora_creds_manager: &SoraCredentialManager,
 ) -> AnyhowResult<()> {
 
-  let sora_credentials = read_sora_credentials_from_disk(app_data_root)
+  // TODO(bt,2025-04-21): Read from in-memory cache instead, but allow for desktop replacement.
+  let mut sora_creds = read_sora_credentials_from_disk(app_data_root)
     .map_err(|err| {
       error!("Failed to read Sora credentials from disk: {:?}", err);
       err
     })?;
 
-  //let sora_credentials = sora_creds_holder.get_credentials()?;
+  let no_sentinel = !app_data_root.get_sora_sentinel_file_path().is_file()
+      || sora_creds.sentinel.is_none();
+
+  if no_sentinel {
+    info!("Refreshing credentials...");
+
+    sora_creds = sora_creds_manager.call_sentinel_refresh()
+        .await
+        .map_err(|err| {
+          error!("Failed to refresh: {:?}", err);
+          err
+        })?;
+
+    // TODO: Write to disk.
+  }
 
   let sora_media_tokens = vec![];
 
@@ -74,13 +91,36 @@ pub async fn generate_image(
   //  Note: This is incredibly inefficient. We should keep a local cache.
   //  Also, if they've already been uploaded to OpenAI, we shouldn't continue to re-upload.
 
-  let response = sora_image_gen_remix(SoraImageGenRemixRequest {
+  let mut response = sora_image_gen_remix(SoraImageGenRemixRequest {
     prompt: request.prompt.to_string(),
     num_images: NumImages::One,
     image_size: ImageSize::Square,
     sora_media_tokens: sora_media_tokens.clone(),
-    credentials: &sora_credentials,
-  }).await
+    credentials: &sora_creds,
+  }).await;
+
+  if let Err(err) = &response {
+    error!("Error in generating image: {:?}", err);
+
+    sora_creds = sora_creds_manager.call_sentinel_refresh()
+        .await
+        .map_err(|err| {
+          error!("Failed to refresh: {:?}", err);
+          err
+        })?;
+
+    info!("Retrying request...");
+
+    response = sora_image_gen_remix(SoraImageGenRemixRequest {
+      prompt: request.prompt.to_string(),
+      num_images: NumImages::One,
+      image_size: ImageSize::Square,
+      sora_media_tokens: sora_media_tokens.clone(),
+      credentials: &sora_creds,
+    }).await;
+  }
+
+  let response = response
       .map_err(|err| {
         error!("Failed to call Sora image generation: {:?}", err);
         err

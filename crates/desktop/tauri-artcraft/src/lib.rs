@@ -11,6 +11,7 @@ use crate::commands::sora::sora_image_generation_command::sora_image_generation_
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
+use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
 
 use tauri_plugin_log::Target;
@@ -29,16 +30,9 @@ pub fn run() {
   let app_data_root = config.app_data_root.clone();
   let app_data_root2 = config.app_data_root.clone();
 
-  let sora_creds_holder = SoraCredentialHolder::new();
-  let sora_creds_holder2 = sora_creds_holder.clone();
-
   println!("Attempting to read existing credentials...");
-
-  if let Ok(creds) = read_sora_credentials_from_disk(&app_data_root) {
-    sora_creds_holder.set_credentials(creds).expect("there shouldn't be locking errors");
-  } else {
-    println!("No credentials found on disk.");
-  }
+  let sora_creds_manager = SoraCredentialManager::initialize_from_disk_infallible(&app_data_root);
+  let sora_creds_manager2 = sora_creds_manager.clone();
 
   println!("Initializing backend runtime...");
 
@@ -65,13 +59,13 @@ pub fn run() {
       //}
       let app = app.handle().clone();
 
-      tauri::async_runtime::spawn(sora_session_login_thread(app, app_data_root2, sora_creds_holder2));
+      tauri::async_runtime::spawn(sora_session_login_thread(app, app_data_root2, sora_creds_manager2));
 
       Ok(())
     })
     .manage(config)
     .manage(app_data_root)
-    .manage(sora_creds_holder)
+    .manage(sora_creds_manager)
     .invoke_handler(tauri::generate_handler![
       flip_image,
       open_sora_login_command,

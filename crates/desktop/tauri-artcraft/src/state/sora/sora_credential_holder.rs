@@ -1,4 +1,5 @@
-use std::sync::{Arc, RwLock};
+use std::ops::Deref;
+use std::sync::{Arc, RwLock, RwLockReadGuard};
 use anyhow::anyhow;
 use errors::AnyhowResult;
 use openai_sora_client::credentials::SoraCredentials;
@@ -16,11 +17,11 @@ impl SoraCredentialHolder {
     }
   }
 
-  pub fn set_credentials(&self, credentials: SoraCredentials) -> AnyhowResult<()> {
+  pub fn set_credentials(&self, credentials: &SoraCredentials) -> AnyhowResult<()> {
     match self.credentials.write() {
       Err(err) => Err(anyhow!("Failed to acquire write lock: {:?}", err)),
       Ok(mut creds) => {
-        *creds = Some(credentials);
+        *creds = Some(credentials.clone());
         Ok(())
       }
     }
@@ -41,6 +42,16 @@ impl SoraCredentialHolder {
       Err(err) => Err(anyhow!("Failed to acquire read lock: {:?}", err)),
       Ok(creds) => {
         Ok(creds.clone())
+      }
+    }
+  }
+
+  pub fn get_credentials_required(&self) -> AnyhowResult<SoraCredentials> {
+    match self.credentials.read() {
+      Err(err) => Err(anyhow!("Failed to acquire read lock: {:?}", err)),
+      Ok(creds) => match creds.deref() {
+        None => Err(anyhow!("Credentials not set")),
+        Some(creds) => Ok(creds.clone()),
       }
     }
   }
