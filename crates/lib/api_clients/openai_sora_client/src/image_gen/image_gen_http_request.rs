@@ -18,6 +18,9 @@ pub enum SoraError {
   #[error("Sora too many concurrent tasks: {0}")]
   TooManyConcurrentTasks(String),
 
+  #[error("Sora invalid JWT: {0}")]
+  InvalidJwt(String),
+
   #[error("Sora API error: {0}")]
   GenericError(String),
 
@@ -120,6 +123,7 @@ pub enum RawSoraError {
 #[serde(rename_all = "snake_case")]
 pub enum SoraErrorCode {
   SentinelBlock,
+  InvalidJwt,
   TokenExpired,
   TooManyConcurrentTasks,
   Unknown(String),
@@ -187,6 +191,9 @@ pub (crate) async fn image_gen_http_request(sora_request: RawSoraImageGenRequest
         }
         SoraErrorCode::Unknown(_) => {
           return Err(SoraError::GenericError(error_response.error.message));
+        }
+        SoraErrorCode::InvalidJwt => {
+          return Err(SoraError::InvalidJwt(error_response.error.message));
         }
       }
     }

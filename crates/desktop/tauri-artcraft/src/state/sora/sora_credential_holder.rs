@@ -1,5 +1,5 @@
 use std::ops::Deref;
-use std::sync::{Arc, RwLock, RwLockReadGuard};
+use std::sync::{Arc, RwLock};
 use anyhow::anyhow;
 use errors::AnyhowResult;
 use openai_sora_client::credentials::SoraCredentials;

@@ -2,11 +2,12 @@ use crate::state::app_dir::AppDataRoot;
 use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use errors::AnyhowResult;
-use log::{error, warn};
+use log::{error, info, warn};
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::sentinel_refresh::refresh_sentinel;
 use std::fs::OpenOptions;
 use std::io::Write;
+use openai_sora_client::sentinel_refresh::generate::token::generate_token;
 
 #[derive(Clone)]
 pub struct SoraCredentialManager {
@@ -58,12 +59,16 @@ impl SoraCredentialManager {
     // NB(bt,2025-04-21): Technically we don't need credentials to get a sentinel.
     let mut creds = self.holder.get_credentials_required()?;
 
-    let sentinel = refresh_sentinel()
+    info!("Generating token...");
+
+    let sentinel = generate_token()
         .await
         .map_err(|err| {
           error!("Failed to refresh: {:?}", err);
           err
         })?;
+
+    info!("Token obtained.");
 
     creds.sentinel = Some(sentinel.clone());
 
