@@ -1,6 +1,7 @@
 import { EventDispatcher, Quaternion, Vector3, Vector2 } from "three";
 import * as THREE from "three";
 import { cameras, selectedCameraId } from "~/pages/PageEnigma/signals/camera";
+import { isPromptBoxFocused } from "~/pages/PageEnigma/signals/promptBox";
 
 class FreeCam extends EventDispatcher {
   object: THREE.PerspectiveCamera;
@@ -70,7 +71,7 @@ class FreeCam extends EventDispatcher {
   }
 
   keydown(event: KeyboardEvent) {
-    if (!this.enabled) {
+    if (!this.enabled || isPromptBoxFocused.value) {
       return;
     }
 
@@ -115,7 +116,7 @@ class FreeCam extends EventDispatcher {
   }
 
   keyup(event: KeyboardEvent) {
-    if (!this.enabled) {
+    if (!this.enabled || isPromptBoxFocused.value) {
       return;
     }
 

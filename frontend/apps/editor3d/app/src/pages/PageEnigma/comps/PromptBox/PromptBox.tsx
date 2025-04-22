@@ -49,6 +49,7 @@ import {
   focalLengthDragging,
 } from "~/pages/PageEnigma/signals/camera";
 import { toast } from "@storyteller/ui-toaster";
+import { isPromptBoxFocused } from "~/pages/PageEnigma/signals/promptBox";
 
 interface ReferenceImage {
   id: string;
@@ -59,6 +60,7 @@ interface ReferenceImage {
 import { EngineApi } from "~/Classes/ApiManager/EngineApi";
 import { UploaderStates } from "~/enums/UploaderStates";
 import { CameraSettingsModal } from "../CameraSettingsModal";
+import { twMerge } from "tailwind-merge";
 
 export const PromptBox = () => {
   useSignals();
@@ -550,7 +552,12 @@ export const PromptBox = () => {
             })}
           </div>
         )}
-        <div className="glass w-[730px] rounded-xl p-4">
+        <div
+          className={twMerge(
+            "glass w-[730px] rounded-xl p-4",
+            isPromptBoxFocused.value ? "!border !border-primary" : "",
+          )}
+        >
           <input
             type="file"
             ref={fileInputRef}
@@ -596,9 +603,11 @@ export const PromptBox = () => {
               onKeyDown={handleKeyDown}
               onFocus={() => {
                 disableHotkeyInput(DomLevels.INPUT);
+                isPromptBoxFocused.value = true;
               }}
               onBlur={() => {
                 enableHotkeyInput(DomLevels.INPUT);
+                isPromptBoxFocused.value = false;
               }}
             />
           </div>
