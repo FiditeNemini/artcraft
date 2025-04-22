@@ -1,0 +1,33 @@
+use anyhow::anyhow;
+use crate::api_error::ApiError;
+use crate::utils::status_codes::*;
+use reqwest::StatusCode;
+
+/// Pass request errors to this method for standard error handling behavior.
+/// This function needs to take temporary ownership, but will return it to the caller.
+///
+/// Example use:
+///   let response = client.get().await?;
+///   let response = filter_bad_response(response).await?;
+///   ... 200 or other valid response
+pub async fn filter_bad_response(response: reqwest::Response) -> Result<reqwest::Response, ApiError> {
+  let status = response.status();
+
+  if !status.is_success() {
+    let response_body = match response.text().await {
+      Ok(text) => text.to_string(),
+      Err(err) => format!("Could not read response body: {:?}", err),
+    };
+
+    return match status.as_u16() {
+      STATUS_401_UNAUTHORIZED => Err(ApiError::Unauthorized(response_body)),
+      STATUS_403_FORBIDDEN => Err(ApiError::Forbidden(response_body)),
+      STATUS_404_NOT_FOUND => Err(ApiError::NotFound(response_body)),
+      STATUS_429_TOO_MANY_REQUESTS => Err(ApiError::TooManyRequests(response_body)),
+      STATUS_500_INTERNAL_SERVER_ERROR => Err(ApiError::InternalServerError(response_body)),
+      _ => Err(ApiError::Other(anyhow!("Bad status code: {}; message: {:?}", status, response_body))),
+    }
+  }
+
+  Ok(response)
+}

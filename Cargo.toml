@@ -34,6 +34,7 @@ members = [
   "crates/lib/api_clients/google_drive_common",
   "crates/lib/api_clients/google_sign_in",
   "crates/lib/api_clients/openai_sora_client",
+  "crates/lib/api_clients/storyteller_client",
   "crates/lib/api_clients/thumbnail_generator",
   "crates/lib/bootstrap",
   "crates/lib/bucket_paths",
@@ -167,10 +168,12 @@ serde_yaml = "0.9.1"
 sha3 = "0.10.8"
 thiserror = "2"
 toml = "0.7.4"
-url = "2.5.4"
+url = { version = "2.5.4", features = ["serde"] }
 
 # Internal libs
 crockford = { path = "crates/lib/data/crockford" }
+enums = { path = "crates/_types/enums" }
+enums_public = { path = "crates/_types/enums_public" }
 errors = { path = "crates/lib/errors" }
 filesys = { path = "crates/lib/files/filesys" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }

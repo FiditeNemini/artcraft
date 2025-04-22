@@ -1,0 +1,42 @@
+[package]
+name = "storyteller_client"
+edition = "2021"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "storyteller_client"
+path = "src/lib.rs"
+
+[dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace =  true }
+
+# Internal
+enums = { workspace = true }
+enums_public = { workspace = true }
+errors = { workspace = true }
+tokens = { workspace = true }
+
+# External
+anyhow = { workspace = true }
+chrono = { version = "0.4.22", features = ["serde"] }
+log = { workspace = true }
+reqwest = { workspace = true, features = ["multipart", "gzip"] }
+url = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_derive = { workspace = true }
+serde_json = { workspace = true }
+
+# HTTP
+backoff = { version = "0.4.0", features = ["futures"] } # Exponential backoff retry
+#reqwest = { version = "0.11", features = ["json", "cookies"] } # HTTP Client
+
+[dev-dependencies]
+# None yet
