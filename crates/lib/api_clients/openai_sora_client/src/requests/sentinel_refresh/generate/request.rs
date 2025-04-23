@@ -1,10 +1,10 @@
-use crate::sentinel_refresh::generate::config::{get_random_core_count, get_random_document_key, get_random_navigator_key, get_random_window_key};
+use crate::requests::sentinel_refresh::generate::config::{get_random_core_count, get_random_document_key, get_random_navigator_key, get_random_window_key};
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use chrono::FixedOffset;
 use chrono::Utc;
 use idempotency::uuid::generate_random_uuid;
 use rand::Rng;
-use base64::prelude::BASE64_STANDARD;
-use base64::Engine;
 use sha3::{Digest, Sha3_512};
 
 // [

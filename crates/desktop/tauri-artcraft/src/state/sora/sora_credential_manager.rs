@@ -1,14 +1,14 @@
 use crate::state::app_dir::AppDataRoot;
 use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
+use anyhow::anyhow;
 use errors::AnyhowResult;
 use log::{error, info, warn};
 use openai_sora_client::credentials::SoraCredentials;
-use openai_sora_client::sentinel_refresh::refresh_sentinel;
+use openai_sora_client::requests::sentinel_refresh::generate::token::generate_token;
+use openai_sora_client::requests::sentinel_refresh::refresh_sentinel;
 use std::fs::OpenOptions;
 use std::io::Write;
-use anyhow::anyhow;
-use openai_sora_client::sentinel_refresh::generate::token::generate_token;
 
 #[derive(Clone)]
 pub struct SoraCredentialManager {

@@ -1,7 +1,6 @@
-use errors::AnyhowResult;
 use crate::credentials::SoraCredentials;
-use crate::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
-use crate::image_gen::image_gen_http_request::{image_gen_http_request, InpaintItem, InpaintItemType, OperationType, RawSoraImageGenRequest, SoraError, VideoGenType};
+use crate::requests::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
+use crate::requests::image_gen::image_gen_http_request::{image_gen_http_request, InpaintItem, InpaintItemType, OperationType, RawSoraImageGenRequest, SoraError, VideoGenType};
 
 pub struct SoraImageGenRemixRequest<'a> {
   pub prompt: String,
@@ -45,12 +44,12 @@ pub async fn sora_image_gen_remix(request: SoraImageGenRemixRequest<'_>) -> Resu
 
 #[cfg(test)]
 mod tests {
-  use std::fs::read_to_string;
-  use errors::AnyhowResult;
-  use testing::test_file_path::test_file_path;
   use crate::credentials::SoraCredentials;
-  use crate::image_gen::common::{ImageSize, NumImages};
-  use crate::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
+  use crate::requests::image_gen::common::{ImageSize, NumImages};
+  use crate::requests::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
+  use errors::AnyhowResult;
+  use std::fs::read_to_string;
+  use testing::test_file_path::test_file_path;
 
   #[ignore] // You can manually run "ignore" tests in the IDE, but they won't run in CI.
   #[tokio::test]

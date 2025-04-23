@@ -1,7 +1,7 @@
-use std::path::{Path, PathBuf};
-use errors::AnyhowResult;
 use crate::credentials::SoraCredentials;
-use crate::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
+use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
+use errors::AnyhowResult;
+use std::path::PathBuf;
 
 pub struct SoraMediaUploadRequest<'a> {
   pub file_path: String,

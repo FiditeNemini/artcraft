@@ -18,7 +18,6 @@ pub async fn refresh_sentinel() -> AnyhowResult<String> {
 
     let response = client.post(url).send().await?;
 
-
     let body = response.text().await?;
 
     Ok(body)

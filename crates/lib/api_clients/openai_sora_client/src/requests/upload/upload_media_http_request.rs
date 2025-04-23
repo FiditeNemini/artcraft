@@ -1,9 +1,8 @@
 use crate::credentials::{SoraCredentials, USER_AGENT};
-use errors::AnyhowResult;
+use crate::sora_error::SoraError;
 use reqwest::multipart::{Form, Part};
 use reqwest::Client;
 use serde::Deserialize;
-use crate::sora_error::SoraError;
 
 const SORA_UPLOAD_MEDIA_URL: &str = "https://sora.com/backend/uploads";
 
