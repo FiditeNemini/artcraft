@@ -10,6 +10,7 @@ use reqwest::Url;
 use std::fs::OpenOptions;
 use std::io::Write;
 use tauri::{AppHandle, Manager, Webview};
+use crate::utils::sora::initialize_sora_jwt_bearer_token::initialize_sora_jwt_bearer_token;
 
 pub const LOGIN_WINDOW_NAME: &str = "login_window";
 
@@ -48,7 +49,7 @@ async fn check_login_window(webview: &Webview, app_data_root: &AppDataRoot) -> A
   clear_browsing_data_on_test_domain(webview)?;
   //keep_on_task(webview)?;
   extract_cookies_to_file(webview, app_data_root)?;
-  // TODO: Other maintenance tasks ...
+  //initialize_sora_jwt_bearer_token(app_data_root).await?; // TODO: This only runs once. We need better management.
   Ok(())
 }
 

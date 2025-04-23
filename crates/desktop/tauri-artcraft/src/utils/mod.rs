@@ -4,3 +4,4 @@ pub mod image;
 pub mod large_file_transfer;
 pub mod simple_http_download;
 pub mod sora_webview_cookies;
+pub mod sora;

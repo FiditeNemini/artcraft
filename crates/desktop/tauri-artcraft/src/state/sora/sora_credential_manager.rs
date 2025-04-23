@@ -7,6 +7,7 @@ use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::sentinel_refresh::refresh_sentinel;
 use std::fs::OpenOptions;
 use std::io::Write;
+use anyhow::anyhow;
 use openai_sora_client::sentinel_refresh::generate::token::generate_token;
 
 #[derive(Clone)]
@@ -55,6 +56,7 @@ impl SoraCredentialManager {
     Ok(creds)
   }
 
+  /// Refresh the sentinel token from Sora's API
   pub async fn call_sentinel_refresh(&self) -> AnyhowResult<SoraCredentials> {
     // NB(bt,2025-04-21): Technically we don't need credentials to get a sentinel.
     let mut creds = self.holder.get_credentials_required()?;
