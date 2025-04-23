@@ -2,7 +2,6 @@ pub mod commands;
 pub mod events;
 pub mod state;
 pub mod threads;
-pub mod transfer;
 pub mod utils;
 
 use crate::commands::flip_image::flip_image;
@@ -10,13 +9,11 @@ use crate::commands::sora::open_sora_login_command::open_sora_login_command;
 use crate::commands::sora::sora_image_generation_command::sora_image_generation_command;
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
-use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
 
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;
-use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

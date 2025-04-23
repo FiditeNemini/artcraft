@@ -1,9 +1,10 @@
 //! Implemented from https://github.com/huggingface/hf_transfer/blob/main/src/lib.rs
 
-use crate::transfer::error::Error;
-use crate::transfer::util::{exponential_backoff, BASE_WAIT_TIME, MAX_WAIT_TIME};
+use crate::utils::large_file_transfer::error::Error;
+use crate::utils::large_file_transfer::util::{exponential_backoff, BASE_WAIT_TIME, MAX_WAIT_TIME};
 use futures::stream::FuturesUnordered;
 use futures::StreamExt;
+use log::info;
 use reqwest::header::{
   HeaderMap, HeaderName, HeaderValue, AUTHORIZATION, CONTENT_RANGE,
   RANGE,
@@ -14,15 +15,14 @@ use std::fmt::Display;
 use std::fs::remove_file;
 use std::io::SeekFrom;
 use std::path::Path;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::Sender;
+use std::sync::Arc;
 use std::time::Duration;
-use log::info;
 use tempfile::NamedTempFile;
 use tokio::fs::OpenOptions;
-use tokio::io::AsyncWriteExt;
 use tokio::io::AsyncSeekExt;
+use tokio::io::AsyncWriteExt;
 use tokio::sync::Semaphore;
 use tokio::time::sleep;
 

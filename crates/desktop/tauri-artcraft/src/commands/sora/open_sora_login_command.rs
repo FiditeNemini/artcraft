@@ -1,11 +1,11 @@
-use std::time::Duration;
-use log::{error, info};
-use once_cell::sync::Lazy;
-use tauri::{AppHandle, Manager, Url, WebviewUrl, WebviewWindowBuilder, WindowBuilder};
-use tokio::time::sleep_until;
-use errors::AnyhowResult;
 use crate::threads::sora_session_login_thread::{LOGIN_WINDOW_NAME, SORA_LOGIN_URL};
 use crate::utils::clear_all_webview_cookies::clear_all_webview_cookies;
+use errors::AnyhowResult;
+use log::{error, info};
+use once_cell::sync::Lazy;
+use std::time::Duration;
+use tauri::{AppHandle, Manager, Url, WebviewUrl, WebviewWindowBuilder, WindowBuilder};
+use tokio::time::sleep_until;
 
 pub const START_URL_STR: &str = "https://storyteller.ai/";
 

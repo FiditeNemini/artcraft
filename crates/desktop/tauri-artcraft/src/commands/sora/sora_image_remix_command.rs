@@ -2,6 +2,8 @@ use crate::state::app_dir::AppDataRoot;
 use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
+use crate::utils::get_url_file_extension::get_url_file_extension;
+use crate::utils::simple_http_download::simple_http_download;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use errors::AnyhowResult;
@@ -17,13 +19,10 @@ use openai_sora_client::upload::upload_media_from_file::{sora_media_upload_from_
 use serde_derive::Deserialize;
 use std::fs::read_to_string;
 use std::io::Cursor;
-use tauri::{AppHandle, Manager, State};
 use storyteller_client::media_files::get_media_file::get_media_file;
 use storyteller_client::utils::api_host::ApiHost;
+use tauri::{AppHandle, Manager, State};
 use tokens::tokens::media_files::MediaFileToken;
-use crate::transfer::download::download_async;
-use crate::utils::get_url_file_extension::get_url_file_extension;
-use crate::utils::simple_http_download::simple_http_download;
 
 #[derive(Deserialize)]
 pub struct SoraImageRemixCommand {

@@ -1,7 +1,7 @@
 //! Implemented from https://github.com/huggingface/hf_transfer/blob/main/src/lib.rs
 
-use crate::transfer::error::Error;
-use crate::transfer::util::{exponential_backoff, BASE_WAIT_TIME, MAX_WAIT_TIME};
+use crate::utils::large_file_transfer::error::Error;
+use crate::utils::large_file_transfer::util::{exponential_backoff, BASE_WAIT_TIME, MAX_WAIT_TIME};
 use futures::stream::FuturesUnordered;
 use futures::StreamExt;
 use reqwest::header::CONTENT_LENGTH;

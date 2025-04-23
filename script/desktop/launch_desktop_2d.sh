@@ -2,10 +2,7 @@
 
 set -euxo pipefail
 
-# Tauri doesn't let you configure the frontend project directory statically, though they do provide an
-# environment variable to pass it to the CLI. Without doing this, the tauri cli randomly walks the
-# filesystem and finds the wrong frontend code.
-# Kill any process running on port 5741
+# Kill any process running on port 5741, which will block startup
 if lsof -i tcp:5741 &>/dev/null; then
   lsof -i tcp:5741 -t | xargs kill -9
   echo "Killed process running on port 5741"
@@ -22,6 +19,10 @@ pushd "${frontend_path}"
 #nvm use stable
 npm install
 popd
+
+# Tauri doesn't let you configure the frontend project directory statically, though they do provide an
+# environment variable to pass it to the CLI. Without doing this, the tauri cli randomly walks the
+# filesystem and finds the wrong frontend code.
 
 export TAURI_FRONTEND_PATH="${frontend_path}"
 export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-artcraft"
