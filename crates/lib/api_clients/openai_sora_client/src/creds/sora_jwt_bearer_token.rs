@@ -1,0 +1,26 @@
+use crate::utils::lightweight_jwt_parse::{lightweight_jwt_parse, SoraJwtClaims};
+use errors::AnyhowResult;
+
+/// Sora bearer tokens are JWT tokens that can be minted with a valid cookie/session.
+pub struct SoraJwtBearerToken {
+  token: String,
+  jwt_claims: SoraJwtClaims,
+}
+
+impl SoraJwtBearerToken {
+  pub fn new(token: String) -> AnyhowResult<Self> {
+    let jwt_claims = lightweight_jwt_parse(&token)?;
+    Ok(SoraJwtBearerToken {
+      token,
+      jwt_claims,
+    })
+  }
+
+  pub fn token_str(&self) -> &str {
+    &self.token
+  }
+
+  pub fn jwt_claims(&self) -> &SoraJwtClaims {
+    &self.jwt_claims
+  }
+}
