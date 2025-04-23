@@ -19,7 +19,7 @@ pub struct SoraJwtClaims {
   pub email_verified: bool,
 }
 
-pub fn lightweight_jwt_parse(token: &str) -> AnyhowResult<SoraJwtClaims> {
+pub fn lightweight_sora_jwt_parse(token: &str) -> AnyhowResult<SoraJwtClaims> {
   let [_header_str, claims_str, _signature_str] = split_components(token)?;
 
   let claims = decode_base64(claims_str)?;
@@ -100,7 +100,7 @@ fn decode_base64(raw: &str) -> AnyhowResult<String> {
 
 #[cfg(test)]
 mod tests {
-  use crate::utils::lightweight_jwt_parse::lightweight_jwt_parse;
+  use crate::utils::lightweight_sora_jwt_parse::lightweight_sora_jwt_parse;
 
   #[test]
   fn test_sora_jwt_bearer_token() {
@@ -131,7 +131,7 @@ mod tests {
     //  - "nbf": 1744936471, - not before, don't use before date
     //  - "exp": 1745800472, - in 5 days, expiry
 
-    let result = lightweight_jwt_parse(token).expect("claim should parse");
+    let result = lightweight_sora_jwt_parse(token).expect("claim should parse");
 
     assert_eq!(result.email, "vocodes2020@gmail.com");
     assert_eq!(result.email_verified, true);

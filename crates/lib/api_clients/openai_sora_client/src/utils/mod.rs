@@ -1,1 +1,1 @@
-pub mod lightweight_jwt_parse;
+pub mod lightweight_sora_jwt_parse;

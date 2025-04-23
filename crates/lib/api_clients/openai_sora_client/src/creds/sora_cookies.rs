@@ -1,5 +1,7 @@
 /// Cookies are the credential that are always required.
 /// You can mint a JWT bearer token with just the cookies.
+
+#[derive(Clone)]
 pub struct SoraCookies {
   cookies: String,
 }
