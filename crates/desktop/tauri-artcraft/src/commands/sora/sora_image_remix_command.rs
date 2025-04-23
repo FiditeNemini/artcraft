@@ -7,18 +7,23 @@ use base64::Engine;
 use errors::AnyhowResult;
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
-use log::{error, info};
+use log::{debug, error, info};
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
 use openai_sora_client::sentinel_refresh::refresh_sentinel;
 use openai_sora_client::upload::upload_media_from_bytes::sora_media_upload_from_bytes;
-use openai_sora_client::upload::upload_media_from_file::SoraMediaUploadRequest;
+use openai_sora_client::upload::upload_media_from_file::{sora_media_upload_from_file, SoraMediaUploadRequest};
 use serde_derive::Deserialize;
 use std::fs::read_to_string;
 use std::io::Cursor;
 use tauri::{AppHandle, Manager, State};
+use storyteller_client::media_files::get_media_file::get_media_file;
+use storyteller_client::utils::api_host::ApiHost;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::transfer::download::download_async;
+use crate::utils::get_url_file_extension::get_url_file_extension;
+use crate::utils::simple_http_download::simple_http_download;
 
 #[derive(Deserialize)]
 pub struct SoraImageRemixCommand {
@@ -62,6 +67,20 @@ pub async fn generate_image(
   sora_creds_manager: &SoraCredentialManager,
 ) -> AnyhowResult<()> {
 
+  let response = get_media_file(&ApiHost::Storyteller, &request.snapshot_media_token).await?;
+
+  let media_file_url = &response.media_file.media_links.cdn_url;
+  let extension_with_dot = get_url_file_extension(media_file_url)
+      .map(|ext| format!(".{}", ext))
+      .unwrap_or_else(|| ".png".to_string());
+
+  let filename = format!("{}{}", response.media_file.token.as_str(), extension_with_dot);
+  let filename = app_data_root.downloads_dir().path().join(&filename);
+
+  simple_http_download(&media_file_url, &filename).await?;
+
+  let files_to_upload = vec![filename];
+
   // TODO(bt,2025-04-21): Read from in-memory cache instead, but allow for desktop replacement.
   let mut sora_creds = read_sora_credentials_from_disk(app_data_root)
     .map_err(|err| {
@@ -85,7 +104,14 @@ pub async fn generate_image(
     // TODO: Write to disk.
   }
 
-  let sora_media_tokens = vec![];
+  let mut sora_media_tokens = Vec::with_capacity(files_to_upload.len());
+
+  for file_path in files_to_upload {
+    let sora_upload_response = sora_media_upload_from_file(file_path, &sora_creds)
+        .await?;
+
+    sora_media_tokens.push(sora_upload_response.id);
+  }
 
   // TODO(bt,2025-04-21): Download media tokens.
   //  Note: This is incredibly inefficient. We should keep a local cache.

@@ -9,6 +9,7 @@ use tempfile::{Builder, NamedTempFile};
 
 const DEFAULT_DATA_DIR : &str = "artcraft";
 const ASSETS_SUBDIRECTORY : &str = "assets";
+const DOWNLOADS_SUBDIRECTORY : &str = "downloads";
 const WEIGHTS_SUBDIRECTORY : &str = "weights";
 
 const TEMPORARY_SUBDIRECTORY : &str = "temp";
@@ -21,6 +22,7 @@ const LOG_FILE_NAME : &str = "application_debug";
 pub struct AppDataRoot {
   path: PathBuf,
   assets_dir: AppAssetsDir,
+  downloads_dir: AppDownloadsDir,
   weights_dir: AppWeightsDir,
   temp_dir: TemporaryDir,
   log_file_name: PathBuf,
@@ -29,6 +31,11 @@ pub struct AppDataRoot {
 
 #[derive(Clone)]
 pub struct AppAssetsDir {
+  path: PathBuf,
+}
+
+#[derive(Clone)]
+pub struct AppDownloadsDir {
   path: PathBuf,
 }
 
@@ -73,6 +80,7 @@ impl AppDataRoot {
     }
     
     let assets_dir = AppAssetsDir::create_existing(dir.join(ASSETS_SUBDIRECTORY))?;
+    let downloads_dir = AppDownloadsDir::create_existing(dir.join(DOWNLOADS_SUBDIRECTORY))?;
     let weights_dir = AppWeightsDir::create_existing(dir.join(WEIGHTS_SUBDIRECTORY))?;
     let temp_dir = TemporaryDir::create_existing(dir.join(TEMPORARY_SUBDIRECTORY))?;
     let log_file_name = dir.join(LOG_FILE_NAME);
@@ -84,6 +92,7 @@ impl AppDataRoot {
     Ok(Self {
       path: dir,
       assets_dir,
+      downloads_dir,
       weights_dir,
       temp_dir,
       log_file_name,
@@ -94,7 +103,11 @@ impl AppDataRoot {
   pub fn assets_dir(&self) -> &AppAssetsDir {
     &self.assets_dir
   }
-  
+
+  pub fn downloads_dir(&self) -> &AppDownloadsDir {
+    &self.downloads_dir
+  }
+
   pub fn weights_dir(&self) -> &AppWeightsDir {
     &self.weights_dir
   }
@@ -162,6 +175,30 @@ impl AppAssetsDir {
     Ok(full_path)
   }
 }
+
+impl AppDownloadsDir {
+  pub fn create_existing<P: AsRef<Path>>(dir: P) -> anyhow::Result<Self> {
+    let mut dir = dir.as_ref().to_path_buf();
+    match dir.canonicalize() {
+      Ok(d) => dir = d,
+      Err(err) => {
+        println!("Error canonicalizing {:?}: {}", dir, err);
+      }
+    }
+    if !dir.exists() {
+      println!("Creating directory {:?}", dir);
+      std::fs::create_dir(&dir)?;
+    }
+    Ok(Self {
+      path: dir,
+    })
+  }
+
+  pub fn path(&self) -> &Path {
+    &self.path
+  }
+}
+
 
 impl AppWeightsDir {
   pub fn create_existing<P: AsRef<Path>>(dir: P) -> anyhow::Result<Self> {
