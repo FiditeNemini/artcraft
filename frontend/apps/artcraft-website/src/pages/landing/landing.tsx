@@ -47,7 +47,9 @@ const Landing = () => {
             <Button
               icon={faDiscord}
               className="rounded-xl px-8 py-4 text-md border-2 border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
-              onClick={() => window.open(SOCIAL_LINKS.DISCORD, "_blank")}
+              as="link"
+              href={SOCIAL_LINKS.DISCORD}
+              target="_blank"
             >
               Join Discord
             </Button>
@@ -87,7 +89,8 @@ const Landing = () => {
             <Button
               icon={faArrowDownToLine}
               className="rounded-lg px-5 py-3.5 text-md bg-[#2D81FF] hover:bg-[#438AF6]"
-              onClick={() => window.open("/download", "_self")}
+              as="link"
+              href="/download"
             >
               Download App
             </Button>
@@ -112,7 +115,8 @@ const Landing = () => {
             <Button
               icon={faArrowDownToLine}
               className="rounded-lg px-5 py-3.5 text-md bg-[#2D81FF] hover:bg-[#438AF6]"
-              onClick={() => window.open("/download", "_self")}
+              as="link"
+              href="/download"
             >
               Download App
             </Button>
@@ -180,7 +184,9 @@ const Landing = () => {
           <Button
             icon={faDiscord}
             className="rounded-xl px-8 py-4 text-md bg-[#5865F2] hover:bg-[#6a76ff] transition-all duration-300 backdrop-blur-md"
-            onClick={() => window.open(SOCIAL_LINKS.DISCORD, "_blank")}
+            as="link"
+            href={SOCIAL_LINKS.DISCORD}
+            target="_blank"
           >
             Join Discord
           </Button>

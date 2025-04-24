@@ -66,7 +66,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center">
             <div className="hidden md:ml-4 md:flex md:shrink-0 md:items-center">
-              <Button onClick={() => window.open("/download", "_self")}>
+              <Button as="link" href="/download">
                 Download
               </Button>
             </div>

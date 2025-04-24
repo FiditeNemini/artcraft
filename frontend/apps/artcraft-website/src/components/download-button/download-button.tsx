@@ -18,17 +18,11 @@ export const DownloadButton = ({ className = "" }: DownloadButtonProps) => {
     !isMacOs &&
     navigator.platform.toLowerCase().includes("linux");
 
-  const handleDownload = () => {
-    const downloadLink = isWindows
-      ? DOWNLOAD_LINKS.WINDOWS
-      : isMacOs
-      ? DOWNLOAD_LINKS.MACOS
-      : isLinux
-      ? DOWNLOAD_LINKS.LINUX
-      : null;
-    if (downloadLink) {
-      window.open(downloadLink, "_blank");
-    }
+  const getDownloadLink = () => {
+    if (isWindows) return DOWNLOAD_LINKS.WINDOWS;
+    if (isMacOs) return DOWNLOAD_LINKS.MACOS;
+    if (isLinux) return DOWNLOAD_LINKS.LINUX;
+    return null;
   };
 
   const getIcon = () => {
@@ -39,12 +33,16 @@ export const DownloadButton = ({ className = "" }: DownloadButtonProps) => {
     return undefined;
   };
 
+  const downloadLink = getDownloadLink();
+
   return (
     <Button
       className={`rounded-xl px-8 py-4 text-md transition-all duration-300 shadow-lg hover:shadow-blue-500/25 ${className}`}
-      disabled={isMobile || (!isWindows && !isMacOs && !isLinux)}
+      disabled={isMobile || !downloadLink}
       icon={getIcon()}
-      onClick={handleDownload}
+      as="link"
+      href={downloadLink || "#"}
+      target="_blank"
     >
       {isMobile
         ? "Download on desktop"
