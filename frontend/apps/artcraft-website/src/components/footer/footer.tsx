@@ -4,6 +4,7 @@ import {
   faDiscord,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
+import { SOCIAL_LINKS } from "../../config/links";
 
 const navigation = {
   main: [
@@ -13,17 +14,17 @@ const navigation = {
   social: [
     {
       name: "Discord",
-      href: "https://discord.gg/75svZP2Vje",
+      href: SOCIAL_LINKS.DISCORD,
       icon: (props: any) => <FontAwesomeIcon icon={faDiscord} {...props} />,
     },
     {
       name: "YouTube",
-      href: "https://www.youtube.com/@OfficialArtCraftStudios",
+      href: SOCIAL_LINKS.YOUTUBE,
       icon: (props: any) => <FontAwesomeIcon icon={faYoutube} {...props} />,
     },
     {
       name: "TikTok",
-      href: "https://www.tiktok.com/@artcraft.studios",
+      href: SOCIAL_LINKS.TIKTOK,
       icon: (props: any) => <FontAwesomeIcon icon={faTiktok} {...props} />,
     },
   ],

@@ -1,60 +1,19 @@
 import { Button } from "@storyteller/ui-button";
 import { DownloadButton } from "../../components/download-button";
 import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { SOCIAL_LINKS } from "../../config/links";
 
 const Landing = () => {
-  // const features = [
-  //   {
-  //     title: "Lorem ipsum dolor sit",
-  //     description:
-  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.",
-  //     image: "/images/features/ai-creation.jpg",
-  //     tag: "Core",
-  //   },
-  //   {
-  //     title: "Ut enim ad minim",
-  //     description:
-  //       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.",
-  //     image: "/images/features/collaboration.jpg",
-  //     tag: "Workflow",
-  //   },
-  //   {
-  //     title: "Duis aute irure dolor",
-  //     description:
-  //       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla.",
-  //     image: "/images/features/style-models.jpg",
-  //     tag: "Tools",
-  //   },
-  // ];
-
-  const installationSteps = [
+  const videos = [
     {
-      step: "STEP 1",
-      title: "Download the app",
-      description:
-        "Download and install our application to start creating amazing AI-powered content.",
-      button: {
-        text: "Download App",
-        className:
-          "rounded-lg bg-[#2D81FF] px-4 py-2 text-sm font-medium hover:bg-[#438AF6]",
-        variant: "primary" as const,
-      },
+      src: "https://www.youtube.com/embed/pGn-1BKo3nY?si=q4dm0ICb6wF1JW8N",
     },
     {
-      step: "STEP 2",
-      title: "Create an account",
-      description:
-        "Sign up for an account to access all features and start your journey.",
-      button: {
-        text: "Sign up",
-        className: "text-sm font-medium",
-        variant: "secondary" as const,
-      },
+      src: "https://www.youtube.com/embed/_FkKf7sECk4?si=Jx38ZGSoyYj0hObr",
     },
     {
-      step: "STEP 3",
-      title: "Start creating",
-      description: "Begin creating with our AI editor!",
+      src: "https://www.youtube.com/embed/7x7IZkHiGD8?si=tL8nK4CULigpfHQR",
     },
   ];
 
@@ -86,10 +45,11 @@ const Landing = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
             <DownloadButton />
             <Button
+              icon={faDiscord}
               className="rounded-xl px-8 py-4 text-md border-2 border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
-              onClick={() => window.open("/download", "_self")}
+              onClick={() => window.open(SOCIAL_LINKS.DISCORD, "_blank")}
             >
-              Learn more
+              Join Discord
             </Button>
           </div>
 
@@ -170,60 +130,64 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1920px] px-4 pt-20 pb-40 sm:px-24 lg:px-32">
-        {/* Features Section */}
-        {/* <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-4xl font-bold">Features</h1>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {features.map((item, index) => (
-            <div
-              key={index}
-              className="group cursor-pointer overflow-hidden rounded-xl bg-[#1C1C20] transition hover:bg-[#27272B]"
-            >
-              <div className="aspect-video overflow-hidden">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition group-hover:scale-105"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="mb-2 text-xl font-semibold">{item.title}</h3>
-                <p className="text-gray-400">{item.description}</p>
-              </div>
-            </div>
-          ))}
-        </div> */}
-
-        {/* Installation Steps Section */}
-        <div>
-          <h1 className="mb-12 text-5xl font-bold">How to install ArtCraft</h1>
-          <div className="grid gap-6 md:grid-cols-3">
-            {installationSteps.map((step, index) => (
+      <div className="relative z-10 mx-auto max-w-[1920px] px-4 py-24 sm:px-24 lg:px-32">
+        {/* Videos Section */}
+        <div className="space-y-12">
+          <div className="text-center">
+            <h1 className="mb-4 text-5xl font-bold">
+              Made using{" "}
+              <span className="relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[6px] after:bg-primary/60 after:mb-1">
+                ArtCraft
+              </span>
+            </h1>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              See examples of artwork created using ArtCraft.
+            </p>
+          </div>
+          <div className="grid gap-8 xl:grid-cols-3">
+            {videos.map((video, index) => (
               <div
                 key={index}
-                className="rounded-xl bg-white/10 backdrop-blur-md p-8"
+                className="group relative rounded-2xl bg-white/10 backdrop-blur-md p-1.5 transition-all duration-300 hover:bg-white/20 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20"
               >
-                <div className="mb-4 w-fit rounded-full bg-white/15 px-3 py-1 text-sm font-medium text-white">
-                  {step.step}
+                <div className="aspect-video overflow-hidden rounded-xl">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={video.src}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    className="rounded-xl transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
                 </div>
-                <h3 className="mb-4 text-2xl font-semibold">{step.title}</h3>
-                <p className="mb-6 text-gray-400">{step.description}</p>
-                {step.button && (
-                  <Button
-                    className={step.button.className}
-                    variant={step.button.variant}
-                  >
-                    {step.button.text}
-                  </Button>
-                )}
+                <div className="absolute inset-0 rounded-2xl border border-white/10 group-hover:border-white/20 transition-colors duration-300 pointer-events-none" />
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      <div className="relative z-10 mx-auto max-w-[1920px] px-4 pt-20 pb-40 sm:px-24 lg:px-32">
+        {/* Discord CTA Section */}
+        <div className="flex flex-col items-center justify-center text-center p-12 py-20 rounded-[40px] bg-primary/10 backdrop-blur-md border-[6px] border-primary/30">
+          <h2 className="text-5xl font-bold mb-6">Join Our Community</h2>
+          <p className="text-lg text-gray-400 mb-8 max-w-2xl">
+            Connect with other creators, share your work, get feedback, and stay
+            updated with the latest features and updates.
+          </p>
+          <Button
+            icon={faDiscord}
+            className="rounded-xl px-8 py-4 text-md bg-[#5865F2] hover:bg-[#6a76ff] transition-all duration-300 backdrop-blur-md"
+            onClick={() => window.open(SOCIAL_LINKS.DISCORD, "_blank")}
+          >
+            Join Discord
+          </Button>
+        </div>
+      </div>
+
+      <div></div>
     </div>
   );
 };
