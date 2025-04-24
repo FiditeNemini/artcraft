@@ -1,5 +1,6 @@
 import { Button } from "@storyteller/ui-button";
 import { DownloadButton } from "../../components/download-button";
+import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
 
 const Landing = () => {
   // const features = [
@@ -97,10 +98,10 @@ const Landing = () => {
       </div>
 
       {/* Video Sections */}
-      <div className="relative z-10 mx-auto max-w-[1920px] px-4 py-20 sm:px-24 lg:px-32">
+      <div className="relative z-10 mx-auto max-w-[1920px] px-4 py-20 md:px-16 lg:px-12 xl:px-32">
         {/* First Video Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 items-center gap-16 mb-32 p-5 pr-16 bg-white/10 backdrop-blur-md rounded-[80px]">
-          <div className="lg:col-span-3 rounded-[60px] overflow-hidden bg-[#1C1C20]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 items-center gap-16 mb-32 p-5 lg:pr-16 bg-white/10 backdrop-blur-md lg:rounded-[80px] rounded-[40px]">
+          <div className="lg:col-span-3 rounded-[30px] lg:rounded-[60px] overflow-hidden bg-[#1C1C20]">
             <video
               muted
               autoPlay
@@ -123,14 +124,18 @@ const Landing = () => {
                 stunning finished pieces.
               </p>
             </div>
-            <Button className="rounded-lg px-5 py-3.5 text-md bg-[#2D81FF] hover:bg-[#438AF6]">
-              Start Creating
+            <Button
+              icon={faArrowDownToLine}
+              className="rounded-lg px-5 py-3.5 text-md bg-[#2D81FF] hover:bg-[#438AF6]"
+              onClick={() => window.open("/download", "_self")}
+            >
+              Download App
             </Button>
           </div>
         </div>
 
         {/* Second Video Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 items-center gap-16 p-5 pl-16 bg-white/10 backdrop-blur-md rounded-[80px]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 items-center gap-16 p-5 lg:pl-16 bg-white/10 backdrop-blur-md lg:rounded-[80px] rounded-[40px]">
           <div className="lg:col-span-2 order-2 lg:order-1 space-y-9">
             <div className="space-y-6">
               <h2 className="text-5xl font-bold leading-tight">
@@ -144,11 +149,15 @@ const Landing = () => {
                 throughout your scenes.
               </p>
             </div>
-            <Button className="rounded-lg px-5 py-3.5 text-md bg-[#2D81FF] hover:bg-[#438AF6]">
-              Learn More
+            <Button
+              icon={faArrowDownToLine}
+              className="rounded-lg px-5 py-3.5 text-md bg-[#2D81FF] hover:bg-[#438AF6]"
+              onClick={() => window.open("/download", "_self")}
+            >
+              Download App
             </Button>
           </div>
-          <div className="lg:col-span-3 order-1 lg:order-2 rounded-[60px] overflow-hidden bg-[#1C1C20]">
+          <div className="lg:col-span-3 order-1 lg:order-2 rounded-[30px] lg:rounded-[60px] overflow-hidden bg-[#1C1C20]">
             <video
               muted
               autoPlay
