@@ -11,7 +11,15 @@ impl SoraCookies {
     SoraCookies { cookies }
   }
 
-  pub fn get_cookies(&self) -> &str {
+  pub fn as_str(&self) -> &str {
     &self.cookies
+  }
+
+  pub fn as_bytes(&self) -> &[u8] {
+    self.cookies.as_bytes()
+  }
+
+  pub fn to_string(&self) -> String {
+    self.cookies.clone()
   }
 }

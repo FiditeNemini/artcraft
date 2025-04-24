@@ -21,7 +21,18 @@ impl SoraJwtBearerToken {
     &self.token
   }
 
+  pub fn as_bytes(&self) -> &[u8] {
+    self.token.as_bytes()
+  }
+
   pub fn jwt_claims(&self) -> &SoraJwtClaims {
     &self.jwt_claims
+  }
+
+  pub fn to_authorization_header_value(&self) -> String {
+    match self.token.get(0..6) {
+      Some("bearer") | Some("Bearer") => self.token.clone(),
+      _ => "Bearer ".to_owned() + &self.token,
+    }
   }
 }

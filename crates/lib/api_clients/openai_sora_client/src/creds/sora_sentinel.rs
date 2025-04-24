@@ -3,6 +3,9 @@
 #[derive(Clone)]
 pub struct SoraSentinel {
   sentinel: String,
+
+  // TODO(bt,2025-04-23): We may want to store the user agent alongside the sentinel
+  //  as that appears to be important for the validity of the sentinel token.
 }
 
 impl SoraSentinel {
@@ -12,5 +15,9 @@ impl SoraSentinel {
 
   pub fn get_sentinel(&self) -> &str {
     &self.sentinel
+  }
+
+  pub fn as_bytes(&self) -> &[u8] {
+    self.sentinel.as_bytes()
   }
 }

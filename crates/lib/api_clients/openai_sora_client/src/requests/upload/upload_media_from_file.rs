@@ -1,4 +1,5 @@
 use crate::credentials::SoraCredentials;
+use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
 use errors::AnyhowResult;
 use std::path::Path;
@@ -14,7 +15,7 @@ pub struct SoraMediaUploadRequest<'a> {
   pub credentials: &'a SoraCredentials,
 }
 
-pub async fn sora_media_upload_from_file<P: AsRef<Path>>(file_path: P, creds: &SoraCredentials) -> AnyhowResult<SoraMediaUploadResponse> {
+pub async fn sora_media_upload_from_file<P: AsRef<Path>>(file_path: P, creds: CredentialMigrationRef<'_>) -> AnyhowResult<SoraMediaUploadResponse> {
   let mut file = File::open(&file_path).await?;
   let mut buffer = Vec::with_capacity(INITIAL_BUFFER_SIZE);
   file.read_to_end(&mut buffer).await?;
@@ -42,7 +43,8 @@ pub async fn sora_media_upload_from_file<P: AsRef<Path>>(file_path: P, creds: &S
 #[cfg(test)]
 mod tests {
   use crate::credentials::SoraCredentials;
-  use crate::upload::upload_media_from_file::sora_media_upload_from_file;
+  use crate::creds::credential_migration::CredentialMigrationRef;
+  use crate::requests::upload::upload_media_from_file::sora_media_upload_from_file;
   use errors::AnyhowResult;
   use std::fs::read_to_string;
   use testing::test_file_path::test_file_path;
@@ -66,7 +68,7 @@ mod tests {
 
     let response = sora_media_upload_from_file(
       image_path,
-      &creds,
+      CredentialMigrationRef::Legacy(&creds),
     ).await?;
 
     println!("media: {:?}", response);

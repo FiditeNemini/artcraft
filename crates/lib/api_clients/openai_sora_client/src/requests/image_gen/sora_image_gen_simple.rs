@@ -2,12 +2,13 @@ use crate::credentials::SoraCredentials;
 use crate::requests::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
 use crate::requests::image_gen::image_gen_http_request::{image_gen_http_request, OperationType, RawSoraImageGenRequest, VideoGenType};
 use errors::AnyhowResult;
+use crate::creds::credential_migration::CredentialMigrationRef;
 
 pub struct SoraImageGenSimpleRequest<'a> {
   pub prompt: String,
   pub num_images: NumImages,
   pub image_size: ImageSize,
-  pub credentials: &'a SoraCredentials,
+  pub credentials: CredentialMigrationRef<'a>,
 }
 
 pub async fn sora_image_gen_simple(args: SoraImageGenSimpleRequest<'_>) -> AnyhowResult<SoraImageGenResponse> {
@@ -38,6 +39,7 @@ mod tests {
   use errors::AnyhowResult;
   use std::fs::read_to_string;
   use testing::test_file_path::test_file_path;
+  use crate::creds::credential_migration::CredentialMigrationRef;
 
   #[ignore] // You can manually run "ignore" tests in the IDE, but they won't run in CI.
   #[tokio::test]
@@ -61,7 +63,7 @@ mod tests {
       prompt: "A pirate and a ninja fight in a battle inside a UFO. Fully photo realistic, lifelike, lens flare".to_string(),
       num_images: NumImages::One,
       image_size: ImageSize::Square,
-      credentials: &creds,
+      credentials: CredentialMigrationRef::Legacy(&creds),
     }).await?;
 
     println!("task_id: {}", response.task_id);

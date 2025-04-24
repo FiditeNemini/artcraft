@@ -11,9 +11,9 @@ use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
 use log::{debug, error, info};
 use openai_sora_client::credentials::SoraCredentials;
+use openai_sora_client::creds::credential_migration::CredentialMigrationRef;
 use openai_sora_client::requests::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::requests::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
-use openai_sora_client::requests::sentinel_refresh::refresh_sentinel;
 use openai_sora_client::requests::upload::upload_media_from_bytes::sora_media_upload_from_bytes;
 use openai_sora_client::requests::upload::upload_media_from_file::{sora_media_upload_from_file, SoraMediaUploadRequest};
 use serde_derive::Deserialize;
@@ -22,6 +22,7 @@ use std::io::Cursor;
 use storyteller_client::media_files::get_media_file::get_media_file;
 use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Manager, State};
+use openai_sora_client::recipes::maybe_upgrade_or_renew_session::maybe_upgrade_or_renew_session;
 use tokens::tokens::media_files::MediaFileToken;
 
 #[derive(Deserialize)]
@@ -49,6 +50,8 @@ pub async fn sora_image_remix_command(
   sora_creds_manager: State<'_, SoraCredentialManager>,
 ) -> Result<String, String> {
   info!("image_generation_command called; processing image...");
+
+  // TODO(bt,2025-04-24): Better error messages to caller
 
   generate_image(request, &app_data_root, &sora_creds_manager)
     .await
@@ -80,37 +83,33 @@ pub async fn generate_image(
 
   let files_to_upload = vec![filename];
 
-  // TODO(bt,2025-04-21): Read from in-memory cache instead, but allow for desktop replacement.
-  let mut sora_creds = read_sora_credentials_from_disk(app_data_root)
-    .map_err(|err| {
-      error!("Failed to read Sora credentials from disk: {:?}", err);
-      err
-    })?;
+  let mut creds = sora_creds_manager.get_credentials_required()?;
 
-  let no_sentinel = !app_data_root.get_sora_sentinel_file_path().is_file()
-      || sora_creds.sentinel.is_none();
+  let credential_updated = maybe_upgrade_or_renew_session(&mut creds)
+      .await
+      .map_err(|err| {
+        error!("Failed to upgrade or renew session: {:?}", err);
+        err
+      })?;
 
-  if no_sentinel {
-    info!("Refreshing credentials...");
-
-    sora_creds = sora_creds_manager.call_sentinel_refresh()
-        .await
-        .map_err(|err| {
-          error!("Failed to refresh: {:?}", err);
-          err
-        })?;
-
-    // TODO: Write to disk.
+  if credential_updated {
+    info!("Storing updated credentials");
+    sora_creds_manager.set_credentials(&creds)?;
   }
 
   let mut sora_media_tokens = Vec::with_capacity(files_to_upload.len());
 
-  for file_path in files_to_upload {
-    let sora_upload_response = sora_media_upload_from_file(file_path, &sora_creds)
+  for (i, file_path) in files_to_upload.iter().enumerate() {
+    info!("Uploading image {} of {}...", (i+1), files_to_upload.len());
+
+    // TODO(bt,2025-04-24): Handle JWT reset error.
+    let sora_upload_response = sora_media_upload_from_file(file_path, CredentialMigrationRef::New(&creds))
         .await?;
 
     sora_media_tokens.push(sora_upload_response.id);
   }
+
+  info!("Calling image generation...");
 
   // TODO(bt,2025-04-21): Download media tokens.
   //  Note: This is incredibly inefficient. We should keep a local cache.
@@ -121,13 +120,15 @@ pub async fn generate_image(
     num_images: NumImages::One,
     image_size: ImageSize::Square,
     sora_media_tokens: sora_media_tokens.clone(),
-    credentials: &sora_creds,
+    credentials: CredentialMigrationRef::New(&creds),
   }).await;
+
+  // TODO(bt,2025-04-24): Handle state management better. Different errors imply different conditions.
 
   if let Err(err) = &response {
     error!("Error in generating image: {:?}", err);
 
-    sora_creds = sora_creds_manager.call_sentinel_refresh()
+    creds = sora_creds_manager.call_sentinel_refresh()
         .await
         .map_err(|err| {
           error!("Failed to refresh: {:?}", err);
@@ -141,7 +142,7 @@ pub async fn generate_image(
       num_images: NumImages::One,
       image_size: ImageSize::Square,
       sora_media_tokens: sora_media_tokens.clone(),
-      credentials: &sora_creds,
+      credentials: CredentialMigrationRef::New(&creds),
     }).await;
   }
 
