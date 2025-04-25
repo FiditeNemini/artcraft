@@ -1,11 +1,11 @@
 use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
-use errors::AnyhowResult;
+use crate::sora_error::SoraError;
 use std::path::PathBuf;
 
 /// Upload bytes.
 /// The underlying reqwest lib needs to own the bytes, so we can't pass as a reference.
-pub async fn sora_media_upload_from_bytes(bytes: Vec<u8>, file_name: String, creds: CredentialMigrationRef<'_>) -> AnyhowResult<SoraMediaUploadResponse> {
+pub async fn sora_media_upload_from_bytes(bytes: Vec<u8>, file_name: String, creds: CredentialMigrationRef<'_>) -> Result<SoraMediaUploadResponse, SoraError> {
   let file_path = PathBuf::from(&file_name);
 
   // TODO: Read file magic bytes first, then fall back to this.

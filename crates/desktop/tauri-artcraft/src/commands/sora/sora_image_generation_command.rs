@@ -12,7 +12,6 @@ use openai_sora_client::creds::credential_migration::CredentialMigrationRef;
 use openai_sora_client::requests::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::requests::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
 use openai_sora_client::requests::upload::upload_media_from_bytes::sora_media_upload_from_bytes;
-use openai_sora_client::requests::upload::upload_media_from_file::SoraMediaUploadRequest;
 use std::fs::read_to_string;
 use std::io::Cursor;
 use tauri::{AppHandle, Manager, State};

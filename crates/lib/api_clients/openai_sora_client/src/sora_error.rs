@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+use std::io;
 
+/// The single error type this crate should surface to all callers.
 #[derive(Debug)]
 pub enum SoraError {
   /// We haven't received a bearer token yet (this is our application error)
@@ -27,6 +29,12 @@ pub enum SoraError {
 
   /// Reqwest Error
   ReqwestError(reqwest::Error),
+
+  /// std::io Error that arises from our end, eg. reading from the filesystem.
+  IoError(io::Error),
+
+  /// anyhow::Error arises from our end
+  AnyhowError(anyhow::Error),
 }
 
 impl Error for SoraError {}
@@ -49,12 +57,30 @@ impl Display for SoraError {
       Self::ReqwestError(err) => {
         write!(f, "Reqwest error: {}", err)
       }
+      Self::IoError(err) => {
+        write!(f, "IO error: {}", err)
+      }
+      Self::AnyhowError(err) => {
+        write!(f, "Anyhow error: {}", err)
+      }
     }
   }
 }
 
 impl From<reqwest::Error> for SoraError {
   fn from(err: reqwest::Error) -> SoraError {
-    SoraError::ReqwestError(err)
+    Self::ReqwestError(err)
+  }
+}
+
+impl From<io::Error> for SoraError {
+  fn from(err: io::Error) -> Self {
+    Self::IoError(err)
+  }
+}
+
+impl From<anyhow::Error> for SoraError {
+  fn from(err: anyhow::Error) -> Self {
+    Self::AnyhowError(err)
   }
 }

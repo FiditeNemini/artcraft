@@ -1,7 +1,6 @@
-use crate::credentials::SoraCredentials;
 use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::requests::upload::upload_media_http_request::{upload_media_http_request, SoraMediaUploadResponse};
-use errors::AnyhowResult;
+use crate::sora_error::SoraError;
 use std::path::Path;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -10,12 +9,7 @@ use tokio::io::AsyncReadExt;
 /// There's a better way to implement this.
 const INITIAL_BUFFER_SIZE : usize = 1024*1024;
 
-pub struct SoraMediaUploadRequest<'a> {
-  pub file_path: String,
-  pub credentials: &'a SoraCredentials,
-}
-
-pub async fn sora_media_upload_from_file<P: AsRef<Path>>(file_path: P, creds: CredentialMigrationRef<'_>) -> AnyhowResult<SoraMediaUploadResponse> {
+pub async fn sora_media_upload_from_file<P: AsRef<Path>>(file_path: P, creds: CredentialMigrationRef<'_>) -> Result<SoraMediaUploadResponse, SoraError> {
   let mut file = File::open(&file_path).await?;
   let mut buffer = Vec::with_capacity(INITIAL_BUFFER_SIZE);
   file.read_to_end(&mut buffer).await?;

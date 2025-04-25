@@ -40,7 +40,7 @@ use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_
 use openai_sora_client::creds::credential_migration::CredentialMigrationRef;
 use openai_sora_client::requests::image_gen::common::{ImageSize, NumImages};
 use openai_sora_client::requests::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
-use openai_sora_client::requests::upload::upload_media_from_file::{sora_media_upload_from_file, SoraMediaUploadRequest};
+use openai_sora_client::requests::upload::upload_media_from_file::sora_media_upload_from_file;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
