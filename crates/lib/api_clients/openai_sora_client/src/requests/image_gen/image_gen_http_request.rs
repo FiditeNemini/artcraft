@@ -28,13 +28,13 @@ pub enum SoraError {
   NetworkError(String),
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub (crate) enum VideoGenType {
   ImageGen,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub (crate) enum OperationType {
   /// Simple prompt without reference images
@@ -43,13 +43,13 @@ pub (crate) enum OperationType {
   Remix,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub (crate) enum InpaintItemType {
   Image,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub (crate) struct InpaintItem {
   pub r#type: InpaintItemType,
@@ -69,7 +69,7 @@ pub (crate) struct InpaintItem {
   pub crop_bounds: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub (crate) struct RawSoraImageGenRequest {
   /// eg. "image_gen"
@@ -90,7 +90,7 @@ pub (crate) struct RawSoraImageGenRequest {
   pub inpaint_items: Vec<InpaintItem>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub (crate) struct RawSoraResponse {
   /// eg. "task_01jqsz9dsae9tvjygf1abrv3xf"

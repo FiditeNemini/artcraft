@@ -268,11 +268,16 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
 
   let mut sora_media_tokens = Vec::with_capacity(files_to_upload.len());
 
-  for file_path in files_to_upload {
-    let sora_upload_response = sora_media_upload_from_file(file_path, CredentialMigrationRef::Legacy(&sora_credentials)).await.map_err(|err| {
-      error!("Failed to upload scene media to Sora: {:?}", err);
-      EnqueueImageGenRequestError::ServerError
-    })?;
+  for (i, file_path) in files_to_upload.iter().enumerate() {
+    info!("Uploading file {} of {} to Sora...", (i+1), files_to_upload.len());
+
+    let sora_upload_response =
+        sora_media_upload_from_file(file_path, CredentialMigrationRef::Legacy(&sora_credentials))
+            .await
+            .map_err(|err| {
+              error!("Failed to upload scene media to Sora: {:?}", err);
+              EnqueueImageGenRequestError::ServerError
+            })?;
 
     debug!("Uploaded media to Sora : {:?}", sora_upload_response);
     sora_media_tokens.push(sora_upload_response.id);
@@ -294,6 +299,8 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
   };
 
   let prompt = create_prompt(&request);
+
+  info!("Sending Sora remix request with {} media tokens...", sora_media_tokens.len());
 
   let mut response = sora_image_gen_remix(SoraImageGenRemixRequest {
     prompt: prompt.clone(),
