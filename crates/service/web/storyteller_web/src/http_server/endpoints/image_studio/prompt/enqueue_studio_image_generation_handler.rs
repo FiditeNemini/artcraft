@@ -243,7 +243,11 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
 
   let additional_images = request.maybe_additional_images.clone().unwrap_or_else(|| vec![]);
 
-  for media_file_token in &additional_images {
+  info!("Additional images to download: {}", additional_images.len());
+
+  for (i, media_file_token ) in additional_images.iter().enumerate() {
+    info!("Downloading additional image {} of {} ...", (i+1), additional_images.len());
+
     let media_file_path = query_and_download_media_file(&media_file_token, &work_temp_dir, &public_bucket_client, &server_state.mysql_pool).await.map_err(|err| {
       error!("Failed to download additional media file: {:?}", err);
       EnqueueImageGenRequestError::ServerError
