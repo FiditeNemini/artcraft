@@ -1,2 +1,3 @@
 pub mod maybe_upgrade_or_renew_session;
 pub mod wait_for_image_gen_status;
+mod image_remix_with_session_auto_renew;

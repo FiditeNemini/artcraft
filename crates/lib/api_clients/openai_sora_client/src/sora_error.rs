@@ -3,8 +3,11 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub enum SoraError {
-  /// We haven't received a bearer token yet.
+  /// We haven't received a bearer token yet (this is our application error)
   NoBearerTokenAvailable,
+
+  /// We're sending too many tasks to Sora.
+  TooManyConcurrentTasks,
 
   /// Unauthorized, cookie and/or bearer token expired. We'll need to ask for a refreshed login.
   ///
@@ -33,6 +36,9 @@ impl Display for SoraError {
     match self {
       Self::NoBearerTokenAvailable => {
         write!(f, "Unauthorized: no bearer token set")
+      }
+      Self::TooManyConcurrentTasks => {
+        write!(f, "Too many concurrent tasks. Please wait.")
       }
       Self::UnauthorizedCookieOrBearerExpired => {
         write!(f, "Unauthorized: cookie and/or bearer token expired")
