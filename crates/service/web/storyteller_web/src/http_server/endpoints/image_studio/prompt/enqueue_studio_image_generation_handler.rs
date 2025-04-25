@@ -12,16 +12,16 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use log::warn;
-use log::{debug, error, info};
+use log::{debug, error};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::requests::image_gen::SoraError;
 use openai_sora_client::requests::sentinel_refresh::generate::token::generate_token;
-use shared_service_components::sora_redis_sentinel_refresh::refresh::refresh_sentinel;
 use serde::Deserialize;
 use serde::Serialize;
 use shared_service_components::sora_redis_credentials::keys::RedisSoraCredentialSubkey;
 use shared_service_components::sora_redis_credentials::set_sora_credential_field_in_redis::set_sora_credential_field_in_redis;
+use shared_service_components::sora_redis_sentinel_refresh::refresh::refresh_sentinel;
 use sqlx::MySqlPool;
 use tempdir::TempDir;
 use utoipa::ToSchema;
@@ -255,10 +255,10 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
 
   files_to_upload.push(scene_media_path.clone());
 
-  info!("Additional images to download: {}", additional_images.len());
+  debug!("Additional images to download: {}", additional_images.len());
 
   for (i, media_file_token ) in additional_images.iter().enumerate() {
-    info!("Downloading additional image {} of {} ...", (i+1), additional_images.len());
+    debug!("Downloading additional image {} of {} ...", (i+1), additional_images.len());
 
     let media_file_path = query_and_download_media_file(&media_file_token, &work_temp_dir, &public_bucket_client, &server_state.mysql_pool).await.map_err(|err| {
       error!("Failed to download additional media file: {:?}", err);
@@ -285,7 +285,7 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
   let mut sora_media_tokens = Vec::with_capacity(files_to_upload.len());
 
   for (i, file_path) in files_to_upload.iter().enumerate() {
-    info!("Uploading file {} of {} to Sora...", (i+1), files_to_upload.len());
+    debug!("Uploading file {} of {} to Sora...", (i+1), files_to_upload.len());
 
     let sora_upload_response =
         sora_media_upload_from_file(file_path, CredentialMigrationRef::Legacy(&sora_credentials))
@@ -316,7 +316,7 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
 
   let prompt = create_prompt(&request);
 
-  info!("Sending Sora remix request with {} media tokens...", sora_media_tokens.len());
+  debug!("Sending Sora remix request with {} media tokens...", sora_media_tokens.len());
 
   let mut response = sora_image_gen_remix(SoraImageGenRemixRequest {
     prompt: prompt.clone(),
@@ -509,7 +509,7 @@ async fn query_and_download_media_file(media_file_token: &MediaFileToken, downlo
   let download_filename = format!("download_file_{}.{}", media_file.token.as_str(), extension);
   let download_file_path = download_dir.path().join(download_filename);
 
-  info!("Downloading from bucket...");
+  debug!("Downloading from bucket...");
 
   bucket_client.download_file_to_disk(&media_file_bucket_path.to_full_object_pathbuf(), &download_file_path).await?;
 
