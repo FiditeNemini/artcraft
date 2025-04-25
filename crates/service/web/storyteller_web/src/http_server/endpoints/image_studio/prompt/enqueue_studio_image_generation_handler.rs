@@ -84,6 +84,9 @@ pub struct EnqueueStudioImageGenRequest {
   pub disable_system_prompt: Option<bool>,
 
   /// Additional images to include (optional). Up to nine images.
+  pub additional_images: Option<Vec<MediaFileToken>>,
+
+  #[deprecated(note="use `additional_images` instead. if both are present, `additional_images` will be used.")]
   pub maybe_additional_images: Option<Vec<MediaFileToken>>,
 
   pub maybe_number_of_samples: Option<u32>,
@@ -237,11 +240,20 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     EnqueueImageGenRequestError::ServerError
   })?;
 
-  let mut files_to_upload = Vec::with_capacity(1 + request.maybe_additional_images.as_ref().map(|v| v.len()).unwrap_or(0));
+  let additional_images;
+
+  // NB: Frontend is calling us with the wrong field name. Let's just accept both.
+  if let Some(images) = &request.additional_images {
+    additional_images = images.clone();
+  } else if let Some(images) = &request.maybe_additional_images {
+    additional_images = images.clone();
+  } else {
+    additional_images = vec![];
+  }
+
+  let mut files_to_upload = Vec::with_capacity(1 + additional_images.len());
 
   files_to_upload.push(scene_media_path.clone());
-
-  let additional_images = request.maybe_additional_images.clone().unwrap_or_else(|| vec![]);
 
   info!("Additional images to download: {}", additional_images.len());
 
