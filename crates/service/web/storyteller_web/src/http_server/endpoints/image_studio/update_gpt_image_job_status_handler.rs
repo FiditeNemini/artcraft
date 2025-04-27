@@ -9,7 +9,7 @@ use crate::http_server::web_utils::user_session::require_user_session::require_u
 use crate::state::server_state::ServerState;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::{Json, Path};
+use actix_web::web::{Data, Json, Path};
 use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
 use base64::alphabet::STANDARD;
 use base64::prelude::BASE64_STANDARD;
@@ -40,6 +40,7 @@ use sqlx::{MySqlConnection, MySqlPool};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use utoipa::ToSchema;
+use mysql_queries::queries::generic_inference::web::mark_generic_inference_job_successfully_done_by_token::mark_generic_inference_job_successfully_done_by_token;
 
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateGptImageJobStatusRequest {
@@ -149,6 +150,7 @@ pub async fn update_gpt_image_job_status_handler(
 
   match inference_job.status {
     JobStatusPlus::CompleteSuccess => {
+      // Job has already been completed. Don't replay the request.
       return Ok(Json(UpdateGptImageJobStatusSuccessResponse { success: true }))
     },
     // TODO: Handle other states as terminal states?
@@ -168,7 +170,6 @@ pub async fn update_gpt_image_job_status_handler(
         &server_state.mysql_pool,
         &server_state.public_bucket_client,
       ).await;
-
       let media_token = match result {
         Ok(media_token) => media_token,
         Err(err) => {
@@ -179,7 +180,12 @@ pub async fn update_gpt_image_job_status_handler(
     }
   }
 
-  // TODO(bt): Update job status
+  update_job_record(&request, &server_state, inference_job)
+      .await
+      .map_err(|err| {
+        error!("Error updating job: {:?}", err);
+        UpdateGptImageJobStatusError::ServerError
+      })?;
 
   Ok(Json(UpdateGptImageJobStatusSuccessResponse {
     success: true,
@@ -243,4 +249,33 @@ async fn upload_and_save_image(
       .await?;
 
   Ok(media_token)
+}
+
+async fn update_job_record(
+  request: &Json<UpdateGptImageJobStatusRequest>,
+  server_state: &Data<Arc<ServerState>>,
+  inference_job: GenericInferenceJobStatus
+) -> AnyhowResult<()> {
+
+  match inference_job.status {
+    JobStatusPlus::Pending => {}
+    JobStatusPlus::Started => {}
+    JobStatusPlus::CompleteSuccess => {
+      mark_generic_inference_job_successfully_done_by_token(
+        &server_state.mysql_pool,
+        &request.job_token,
+        None,
+        None,
+        None,
+        None,
+      ).await?;
+    }
+    // TODO: Handle terminal states
+    JobStatusPlus::CompleteFailure => {}
+    JobStatusPlus::AttemptFailed => {}
+    JobStatusPlus::Dead => {}
+    JobStatusPlus::CancelledByUser => {}
+    JobStatusPlus::CancelledBySystem => {}
+  }
+  Ok(())
 }
