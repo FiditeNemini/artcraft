@@ -12,13 +12,15 @@ use sqlx::MySqlPool;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
+use crate::queries::media_files::create::insert_builder::media_file_insert_builder_error::MediaFileInsertBuilderError;
 
 /// Builder for inserting a media files into the database.
 /// Resembles an ORM, but can still use statically type checked queries (which is probably
 /// really important since we don't have tests on database functionality yet).
 #[derive(Clone)]
 pub struct MediaFileInsertBuilder {
-  token: MediaFileToken,
+  // TODO: Allow specifying the token externally
+  // token: MediaFileToken,
 
   // Creator info
   maybe_creator_user_token: Option<UserToken>,
@@ -65,18 +67,17 @@ pub struct MediaFileInsertBuilder {
   // Storage details
   public_bucket_directory_hash: Option<MediaFileBucketPath>, // NB: Non-nullable field(s)
 
-
-
+  // Remaining fields...
 }
 
 impl MediaFileInsertBuilder {
-  pub fn generate_token() -> Self {
-    Self::with_token(&MediaFileToken::generate())
-  }
+  //pub fn generate_token() -> Self {
+  //  Self::with_token(&MediaFileToken::generate())
+  //}
 
-  pub fn with_token(token: &MediaFileToken) -> Self {
+  pub fn new() -> Self {
     MediaFileInsertBuilder {
-      token: token.clone(),
+      //token: token.clone(),
       maybe_creator_user_token: None,
       maybe_creator_anonymous_visitor_token: None,
       creator_ip_address: None,
@@ -101,8 +102,18 @@ impl MediaFileInsertBuilder {
     self
   }
 
-  pub fn anonymous_visitor_token(mut self, avt: &AnonymousVisitorTrackingToken) -> Self {
+  pub fn maybe_creator_user(mut self, maybe_user: Option<&UserToken>) -> Self {
+    self.maybe_creator_user_token = maybe_user.map(|token| token.clone());
+    self
+  }
+
+  pub fn creator_anonymous_visitor(mut self, avt: &AnonymousVisitorTrackingToken) -> Self {
     self.maybe_creator_anonymous_visitor_token = Some(avt.clone());
+    self
+  }
+
+  pub fn maybe_creator_anonymous_visitor(mut self, maybe_avt: Option<&AnonymousVisitorTrackingToken>) -> Self {
+    self.maybe_creator_anonymous_visitor_token = maybe_avt.map(|token| token.clone());
     self
   }
 
@@ -187,21 +198,30 @@ impl MediaFileInsertBuilder {
   // TODO: maybe_prompt_token
   // TODO: maybe_batch_token
 
+  pub fn public_bucket_directory_hash(mut self, public_bucket_directory_hash: &MediaFileBucketPath) -> Self {
+    self.public_bucket_directory_hash = Some(public_bucket_directory_hash.clone());
+    self
+  }
+
   // TODO(bt,2025-04-26): Other connector options.
-  pub async fn insert_pool(self, mysql_pool: &MySqlPool) -> AnyhowResult<(MediaFileToken, u64)> {
+  pub async fn insert_pool(self, mysql_pool: &MySqlPool) -> Result<MediaFileToken, MediaFileInsertBuilderError> {
     let media_file_type = self.media_file_type
-        .ok_or_else(|| anyhow!("Media file type is required"))?;
+        .ok_or_else(|| MediaFileInsertBuilderError::MissingRequiredField(
+          "Media file type is required".to_string()))?;
 
     let origin_category = self.origin_category
-        .ok_or_else(|| anyhow!("Origin category is required"))?;
+        .ok_or_else(|| MediaFileInsertBuilderError::MissingRequiredField(
+          "Origin category is required".to_string()))?;
 
     let checksum_sha2 = self.checksum_sha2
-        .ok_or_else(|| anyhow!("Checksum SHA2 is required"))?;
+        .ok_or_else(|| MediaFileInsertBuilderError::MissingRequiredField(
+          "Checksum SHA2 is required".to_string()))?;
 
     let bucket_path = self.public_bucket_directory_hash
-        .ok_or_else(|| anyhow!("Public bucket directory hash is required"))?;
+        .ok_or_else(|| MediaFileInsertBuilderError::MissingRequiredField(
+          "Public bucket directory hash is required".to_string()))?;
 
-    insert_media_file_generic(InsertArgs {
+    let result = insert_media_file_generic(InsertArgs {
       pool: mysql_pool,
       maybe_creator_user_token: self.maybe_creator_user_token.as_ref(),
       maybe_creator_anonymous_visitor_token: self.maybe_creator_anonymous_visitor_token.as_ref(),
@@ -239,6 +259,11 @@ impl MediaFileInsertBuilder {
       generated_by_worker: None, // TODO
       generated_by_cluster: None, // TODO
       maybe_mod_user_token: None, // TODO
-    }).await
+    }).await;
+
+    match result {
+      Ok(result) => Ok(result.0),
+      Err(err) => Err(MediaFileInsertBuilderError::ProbablyDatabaseError(err)),
+    }
   }
 }

@@ -1,25 +1,45 @@
 use std::fmt;
 use std::sync::Arc;
 
+use crate::http_server::endpoints::engine::create_scene_handler::CreateSceneError;
+use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::GetInferenceJobStatusError;
+use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::user_session::require_user_session::require_user_session;
+use crate::state::server_state::ServerState;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Json, Path};
 use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
-use log::{error, warn};
-use utoipa::ToSchema;
+use base64::alphabet::STANDARD;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
+use bucket_paths::legacy::typified_paths::public::media_files::bucket_file_path::MediaFileBucketPath;
+use cloud_storage::bucket_client::BucketClient;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
+use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::job_status::JobStatus;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::http_server::web_utils::user_session::require_user_session::require_user_session;
-use crate::state::server_state::ServerState;
+use enums::common::job_status_plus::JobStatusPlus;
+use errors::AnyhowResult;
+use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
+use images::image_info::image_info::ImageInfo;
+use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_completely_failed::mark_generic_inference_job_completely_failed;
 use mysql_queries::queries::generic_inference::web::dismiss_finished_jobs_for_user::dismiss_finished_jobs_for_user;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::{get_inference_job_status, get_inference_job_status_from_connection};
+use mysql_queries::queries::generic_inference::web::job_status::GenericInferenceJobStatus;
 use mysql_queries::queries::generic_inference::web::mark_generic_inference_job_cancelled_by_user::mark_generic_inference_job_cancelled_by_user;
+use mysql_queries::queries::media_files::create::generic_insert::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
+use mysql_queries::queries::media_files::create::insert_builder::media_file_insert_builder::MediaFileInsertBuilder;
+use mysql_queries::queries::media_files::create::specialized_insert::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_permanently_dead::mark_tts_inference_job_permanently_dead;
+use sqlx::{MySqlConnection, MySqlPool};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::endpoints::inference_job::get::get_inference_job_status_handler::GetInferenceJobStatusError;
+use utoipa::ToSchema;
 
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateGptImageJobStatusRequest {
@@ -105,20 +125,20 @@ pub async fn update_gpt_image_job_status_handler(
   request: Json<UpdateGptImageJobStatusRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<Json<UpdateGptImageJobStatusSuccessResponse>, UpdateGptImageJobStatusError>
 {
-  // TODO(bt,2024-06-16): Reuse connection
-  let mut mysql_connection = server_state.mysql_pool.acquire()
-      .await
-      .map_err(|e| {
-        warn!("Could not acquire DB pool: {:?}", e);
-        UpdateGptImageJobStatusError::ServerError
-      })?;
+  //// TODO(bt,2024-06-16): Reuse connection
+  //let mut mysql_connection = server_state.mysql_pool.acquire()
+  //    .await
+  //    .map_err(|e| {
+  //      warn!("Could not acquire DB pool: {:?}", e);
+  //      UpdateGptImageJobStatusError::ServerError
+  //    })?;
 
-  let maybe_status = get_inference_job_status(
+  let inference_job = get_inference_job_status(
     &request.job_token,
     &server_state.mysql_pool
   ).await;
 
-  let record = match maybe_status {
+  let inference_job = match inference_job {
     Ok(Some(record)) => record,
     Ok(None) => return Err(UpdateGptImageJobStatusError::NotFound),
     Err(err) => {
@@ -127,7 +147,37 @@ pub async fn update_gpt_image_job_status_handler(
     }
   };
 
-  // TODO(bt): Upload images if job was successful and create relevant media files
+  match inference_job.status {
+    JobStatusPlus::CompleteSuccess => {
+      return Ok(Json(UpdateGptImageJobStatusSuccessResponse { success: true }))
+    },
+    // TODO: Handle other states as terminal states?
+    //JobStatusPlus::CompleteFailure => return Err(UpdateGptImageJobStatusError::ServerError),
+    //JobStatusPlus::AttemptFailed => {}
+    //JobStatusPlus::Dead => {}
+    //JobStatusPlus::CancelledByUser => return Err(UpdateGptImageJobStatusError::ServerError),
+    //JobStatusPlus::CancelledBySystem => {}
+    _ => {} // Intentional fall through.
+  }
+
+  if let Some(images) = &request.images {
+    for image in images.iter() {
+      let result = upload_and_save_image(
+        image,
+        &inference_job,
+        &server_state.mysql_pool,
+        &server_state.public_bucket_client,
+      ).await;
+
+      let media_token = match result {
+        Ok(media_token) => media_token,
+        Err(err) => {
+          error!("Error uploading image: {:?}", err);
+          return Err(UpdateGptImageJobStatusError::ServerError);
+        }
+      };
+    }
+  }
 
   // TODO(bt): Update job status
 
@@ -136,3 +186,61 @@ pub async fn update_gpt_image_job_status_handler(
   }))
 }
 
+async fn upload_and_save_image(
+  base64_image: &str,
+  inference_job: &GenericInferenceJobStatus,
+  mysql_pool: &MySqlPool,
+  public_bucket_client: &BucketClient,
+) -> AnyhowResult<MediaFileToken> {
+
+  let image_bytes = BASE64_STANDARD.decode(base64_image)?;
+
+  // Read file metadata
+  let file_size_bytes = image_bytes.len();
+  let file_hash = sha256_hash_bytes(&image_bytes)?;
+  let image_info = ImageInfo::decode_image_from_bytes(&image_bytes)?;
+  let mimetype = image_info.mime_type();
+
+  // Upload file
+  const PREFIX : Option<&str> = Some("image_");
+
+  let extension_with_period = image_info.file_extension()
+      .map(|ext| ext.extension_with_period())
+      .unwrap_or_else(|| ".png");
+
+  let media_file_type = match mimetype {
+    "image/png" => MediaFileType::Png,
+    "image/jpeg" => MediaFileType::Jpg,
+    _ => MediaFileType::Png,
+  };
+
+  let bucket_upload_path = MediaFileBucketPath::generate_new(
+    PREFIX, Some(extension_with_period));
+
+  info!("Uploading media to bucket path: {}", bucket_upload_path.get_full_object_path_str());
+
+  public_bucket_client.upload_file_with_content_type(
+    bucket_upload_path.get_full_object_path_str(),
+    image_bytes.as_ref(),
+    mimetype
+  ).await?;
+
+  let media_token = MediaFileInsertBuilder::new()
+      .maybe_creator_user(inference_job.user_details.maybe_creator_user_token.as_ref())
+      .maybe_creator_anonymous_visitor(inference_job.user_details.maybe_creator_anonymous_visitor_token.as_ref())
+      .creator_ip_address(&inference_job.user_details.creator_ip_address)
+      .public_bucket_directory_hash(&bucket_upload_path)
+      .media_file_class(MediaFileClass::Image)
+      .media_file_type(media_file_type)
+      .media_file_origin_category(MediaFileOriginCategory::Inference)
+      .media_file_origin_product_category(MediaFileOriginProductCategory::ImageStudio)
+      .mime_type(mimetype)
+      .file_size_bytes(file_size_bytes as u64)
+      .frame_width(image_info.width())
+      .frame_height(image_info.height())
+      .checksum_sha2(&file_hash)
+      .insert_pool(mysql_pool)
+      .await?;
+
+  Ok(media_token)
+}
