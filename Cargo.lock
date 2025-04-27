@@ -5653,8 +5653,10 @@ dependencies = [
 name = "images"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "errors",
  "image",
+ "mimetypes",
  "testing",
  "workspace-build-acceleration",
 ]

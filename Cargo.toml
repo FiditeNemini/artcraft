@@ -177,7 +177,9 @@ enums = { path = "crates/_types/enums" }
 enums_public = { path = "crates/_types/enums_public" }
 errors = { path = "crates/lib/errors" }
 filesys = { path = "crates/lib/files/filesys" }
+images = { path = "crates/lib/files/images" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
+mimetypes = { path = "crates/lib/files/mimetypes" }
 openai_sora_client = { path = "crates/lib/api_clients/openai_sora_client" }
 primitives = { path = "crates/lib/data/primitives" }
 shared_service_components = { path = "crates/lib/shared_service_components" }
