@@ -21,8 +21,9 @@ normal = ["workspace-build-acceleration"]
 workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
-infer = "0.16.0" # Mimetype detection
+infer = "0.19.0" # Mimetype detection
 
 
 [dev-dependencies]
-# None yet
+testing = { path = "../../testing" }
+anyhow = { workspace = true }
