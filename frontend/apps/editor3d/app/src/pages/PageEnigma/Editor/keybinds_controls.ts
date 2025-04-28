@@ -292,6 +292,12 @@ export class MouseControls {
       if (this.selected) {
         this.selected.forEach((selected) => {
           this.deleteObject(selected.uuid);
+          this.selected = [];
+          if (this.kinMode === KinMode.FK) {
+            this.toggleFKMode();
+          }
+          this.removeTransformControls();
+          showPoseControls.value = false;
         });
       }
       return;
@@ -352,11 +358,11 @@ export class MouseControls {
     }
 
     if (event.shiftKey) {
-      this.cameraViewControls.movementSpeed = 4;
+      this.cameraViewControls.movementSpeed = 3;
     } else if (event.altKey) {
       this.cameraViewControls.movementSpeed = 0.1;
     } else {
-      this.cameraViewControls.movementSpeed = 1.15;
+      this.cameraViewControls.movementSpeed = 0.75;
     }
 
     if (event.key === "Escape") {

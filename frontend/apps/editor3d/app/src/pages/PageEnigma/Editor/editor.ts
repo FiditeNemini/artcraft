@@ -1073,41 +1073,44 @@ class Editor {
 
     this.composer.addPass(this.renderPass);
 
-    // Only enable outline pass when needed
     this.outlinePass = new OutlinePass(
       new THREE.Vector2(width, height),
       this.activeScene.scene,
       this.camera,
     );
 
-    this.outlinePass.edgeStrength = 3.0; // Reduced from 5.0
+    this.outlinePass.edgeStrength = 5.0;
     this.outlinePass.edgeGlow = 0.1;
-    this.outlinePass.edgeThickness = 1.0; // Reduced from 1.2
-    this.outlinePass.pulsePeriod = 0; // Disabled pulsing
+    this.outlinePass.edgeThickness = 1.2;
+    this.outlinePass.pulsePeriod = 3;
     this.outlinePass.usePatternTexture = false;
     this.outlinePass.visibleEdgeColor.set(0x4b9fff);
 
-    // Only add outline pass when needed
-    // this.composer.addPass(this.outlinePass);
+    this.composer.addPass(this.outlinePass);
 
     this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
-    this.saoPass.params.saoBias = 3.0; // Reduced from 4.1
-    this.saoPass.params.saoIntensity = 0.8; // Reduced from 1.0
-    this.saoPass.params.saoScale = 24.0; // Reduced from 32.0
-    this.saoPass.params.saoKernelRadius = 4.0; // Reduced from 5.0
+    this.saoPass.params.saoBias = 4.1;
+    this.saoPass.params.saoIntensity = 1.0;
+    this.saoPass.params.saoScale = 32.0;
+    this.saoPass.params.saoKernelRadius = 5.0;
     this.saoPass.params.saoMinResolution = 0.0;
 
     this.bloomPass = new UnrealBloomPass(
       new THREE.Vector2(width, height),
-      1.0, // Reduced from 1.5
-      0.3, // Reduced from 0.4
-      0.7, // Reduced from 0.85
+      1.5,
+      0.4,
+      0.85,
     );
-    this.bloomPass.strength = 0.2; // Reduced from 0.25
+    this.bloomPass.strength = 0.25;
 
-    // Only add passes when needed
-    // this.composer.addPass(this.saoPass);
-    // this.composer.addPass(this.bloomPass);
+    this.smaaPass = new SMAAPass(
+      width * this.renderer.getPixelRatio(),
+      height * this.renderer.getPixelRatio(),
+    );
+
+    this.composer.addPass(this.saoPass);
+    this.composer.addPass(this.bloomPass);
+    //this.composer.addPass(this.smaaPass);
 
     this.outputPass = new OutputPass();
     this.composer.addPass(this.outputPass);
