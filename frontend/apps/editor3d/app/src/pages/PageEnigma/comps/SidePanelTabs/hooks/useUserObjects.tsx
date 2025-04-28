@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useState, useRef } from "react";
 import { FetchStatus } from "~/pages/PageEnigma/enums";
 import { FetchMediaItemStates, fetchUserMediaItems } from "../utilities";
 import { FilterEngineCategories, FilterMediaType } from "~/enums";
 
-import { MAX_FAILED_FETCHES } from "~/constants";
+// import { MAX_FAILED_FETCHES } from "~/constants";
 
 interface useUserObjectsProps {
   defaultErrorMessage: string;
@@ -74,15 +74,15 @@ export const useUserObjects = (props: useUserObjectsProps) => {
     [props],
   );
 
-  useEffect(() => {
-    if (
-      (firstFetch.current === FetchStatus.READY ||
-        firstFetch.current === FetchStatus.ERROR) &&
-      failedFetches.current <= MAX_FAILED_FETCHES
-    ) {
-      fetchUserObjects();
-    }
-  }, [fetchUserObjects]);
+  // useEffect(() => {
+  //   if (
+  //     (firstFetch.current === FetchStatus.READY ||
+  //       firstFetch.current === FetchStatus.ERROR) &&
+  //     failedFetches.current <= MAX_FAILED_FETCHES
+  //   ) {
+  //     fetchUserObjects();
+  //   }
+  // }, [fetchUserObjects]);
 
   return {
     userObjects,
