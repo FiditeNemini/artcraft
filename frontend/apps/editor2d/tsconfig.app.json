@@ -42,6 +42,9 @@
     },
     {
       "path": "../../libs/components/demo-modal/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/api/tsconfig.lib.json"
     }
   ]
 }

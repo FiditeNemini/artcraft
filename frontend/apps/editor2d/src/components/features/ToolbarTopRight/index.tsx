@@ -1,10 +1,12 @@
 import { faGear, faImages } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import { Activity } from "~/components/ui/Activity/Activity";
+
 import { GalleryModal } from "@storyteller/ui-gallery-modal";
 import { Button } from "@storyteller/ui-button";
 import { SettingsModal } from "@storyteller/ui-settings-modal";
 import { useState } from "react";
+import { AuthButtons } from "~/components/shared_authentication/AuthButtons";
 
 export const ToolbarTopRight = () => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -29,8 +31,8 @@ export const ToolbarTopRight = () => {
           My Gallery
         </Button>
         <Activity />
+        <AuthButtons/>
       </div>
-
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}

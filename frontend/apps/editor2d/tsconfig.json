@@ -17,6 +17,9 @@
       "path": "../../libs/components/demo-modal"
     },
     {
+      "path": "../../libs/api"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

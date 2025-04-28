@@ -23,22 +23,7 @@ export function ProfileDropdown() {
   } = authentication;
 
   if (!userInfo.value) return null;
-
-  // Extract user info for better readability
-  const {
-    core_info: {
-      username,
-      gravatar_hash: emailHash,
-      display_name,
-      default_avatar: {
-        image_index: avatarIndex,
-        color_index: backgroundColorIndex,
-      },
-    },
-  } = userInfo.value;
-
-  const profileUrl = `https://storyteller.ai/profile/${display_name}`;
-
+  const profileUrl = `https://storyteller.ai/profile/${userInfo.value.display_name}`;
   const menuOptions = [
     {
       label: "Logout",
@@ -57,10 +42,10 @@ export function ProfileDropdown() {
       >
         <Gravatar
           size={34}
-          username={username}
-          email_hash={emailHash}
-          avatarIndex={avatarIndex}
-          backgroundIndex={backgroundColorIndex}
+          username={userInfo.value.display_name}
+          email_hash={userInfo.value.email_gravatar_hash}
+          avatarIndex={Number(userInfo.value.core_info.default_avatar.image_index) || 0}
+          backgroundIndex={Number(userInfo.value.core_info.default_avatar.color_index) || 0}
         />
         <FontAwesomeIcon icon={faChevronDown} />
       </MenuButton>
