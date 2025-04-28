@@ -148,6 +148,7 @@ pub async fn update_gpt_image_job_status_handler(
     }
   };
 
+
   match inference_job.status {
     JobStatusPlus::CompleteSuccess => {
       // Job has already been completed. Don't replay the request.
@@ -161,6 +162,14 @@ pub async fn update_gpt_image_job_status_handler(
     //JobStatusPlus::CancelledBySystem => {}
     _ => {} // Intentional fall through.
   }
+
+  let target_status = match request.job_status {
+    UpdatedJobStatus::Started => JobStatusPlus::Started,
+    UpdatedJobStatus::CompleteSuccess => JobStatusPlus::CompleteSuccess,
+    UpdatedJobStatus::CompleteFailure => JobStatusPlus::CompleteFailure,
+    UpdatedJobStatus::AttemptFailed => JobStatusPlus::AttemptFailed,
+    UpdatedJobStatus::Dead => JobStatusPlus::Dead,
+  };
 
   if let Some(images) = &request.images {
     for image in images.iter() {
@@ -180,12 +189,16 @@ pub async fn update_gpt_image_job_status_handler(
     }
   }
 
-  update_job_record(&request, &server_state, inference_job)
+  info!("Updating job record for job: {:?}", request.job_token);
+
+  update_job_record(&request, &server_state, inference_job, target_status)
       .await
       .map_err(|err| {
         error!("Error updating job: {:?}", err);
         UpdateGptImageJobStatusError::ServerError
       })?;
+
+  info!("Job record updated for job: {:?}", request.job_token);
 
   Ok(Json(UpdateGptImageJobStatusSuccessResponse {
     success: true,
@@ -254,13 +267,15 @@ async fn upload_and_save_image(
 async fn update_job_record(
   request: &Json<UpdateGptImageJobStatusRequest>,
   server_state: &Data<Arc<ServerState>>,
-  inference_job: GenericInferenceJobStatus
+  inference_job: GenericInferenceJobStatus,
+  target_status: JobStatusPlus,
 ) -> AnyhowResult<()> {
 
-  match inference_job.status {
+  match target_status {
     JobStatusPlus::Pending => {}
     JobStatusPlus::Started => {}
     JobStatusPlus::CompleteSuccess => {
+      info!("Matched job status complete_success");
       mark_generic_inference_job_successfully_done_by_token(
         &server_state.mysql_pool,
         &request.job_token,
