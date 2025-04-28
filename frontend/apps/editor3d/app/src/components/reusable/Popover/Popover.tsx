@@ -66,7 +66,7 @@ export const PopoverMenu = ({
     "text-sm font-medium rounded-lg px-3 py-2 shadow-sm",
     "flex gap-2 items-center justify-center outline-none",
     "transition-all duration-150",
-    "bg-[#5F5F68]/60 px-3 text-white backdrop-blur-lg hover:bg-[#5F5F68]/90",
+    "bg-[#5F5F68]/60 px-3 text-white hover:bg-[#5F5F68]/90",
     buttonClassName,
   );
 
