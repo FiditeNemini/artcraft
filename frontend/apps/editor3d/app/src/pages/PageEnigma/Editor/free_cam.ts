@@ -271,11 +271,19 @@ class FreeCam extends EventDispatcher {
   }
 
   isStationary() {
-    return this.moveVector.distanceTo(new Vector3(0, 0, 0)) === 0;
+    return (
+      this.moveVector.distanceTo(new Vector3(0, 0, 0)) === 0 &&
+      this.currentVelocity.distanceTo(new Vector3(0, 0, 0)) < 0.0001
+    );
   }
 
   update(delta: number) {
     if (!this.enabled) {
+      return;
+    }
+
+    // Skip update if there's no movement and velocity
+    if (this.isStationary()) {
       return;
     }
 
