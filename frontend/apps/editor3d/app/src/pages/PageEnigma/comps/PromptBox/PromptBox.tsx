@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useContext } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import { invoke } from "@tauri-apps/api/core";
 import { EngineContext } from "~/pages/PageEnigma/contexts/EngineContext";
+import { IsDesktopApp } from "@storyteller/tauri-utils";
 import { uploadImage } from "~/components/reusable/UploadModalMedia/uploadImage";
 import {
   faPlus,
@@ -432,6 +434,17 @@ export const PromptBox = () => {
   }
 
   const handleEnqueue = async () => {
+    const isDesktop = IsDesktopApp();
+    console.log("Is this a desktop app?", isDesktop);
+
+    if (isDesktop) {
+      await handleTauriEnqueue();
+    } else {
+      await handleWebEnqueue();
+    }
+  }
+
+  const handleWebEnqueue = async () => {
     if (!prompt.trim()) return;
 
     setisEnqueueing(true);
@@ -447,16 +460,18 @@ export const PromptBox = () => {
           screenshot: snapshot.file,
           sceneMediaToken: "",
         });
-
-      console.log("useSystemPrompt", useSystemPrompt);
-      
-      const response = await engineApi.enqueueImageGeneration({
+        
+        console.log("useSystemPrompt", useSystemPrompt);
+        
+        const response = await engineApi.enqueueImageGeneration({
           disableSystemPrompt: !useSystemPrompt,
           prompt: prompt,
           snapshotMediaToken: "",
           additionalImages: referenceImages.map((image) => image.mediaToken),
         });
+
         console.log("response", response);
+
         if (response.errorMessage) {
           handleError(response.errorMessage);
           setisEnqueueing(false);
@@ -481,10 +496,73 @@ export const PromptBox = () => {
     setisEnqueueing(false);
   };
 
+  const handleTauriEnqueue = async () => {
+    if (!prompt.trim()) return;
+
+    setisEnqueueing(true);
+
+    if (editorEngine) {
+      editorEngine.positive_prompt = prompt;
+
+      const engineApi = new EngineApi();
+      const snapshot = editorEngine.snapShotOfCurrentFrame(false);
+
+      if (snapshot) {
+        const snapshotResult = await engineApi.uploadSceneSnapshot({
+          screenshot: snapshot.file,
+          //sceneMediaToken: "",
+        });
+        
+        //const response = await engineApi.enqueueImageGeneration({
+        //  disableSystemPrompt: !useSystemPrompt,
+        //  prompt: prompt,
+        //  snapshotMediaToken: "",
+        //  additionalImages: referenceImages.map((image) => image.mediaToken),
+        //});
+
+        const generateResponse = await invoke("sora_image_remix_command", {
+          request: {
+            snapshot_media_token: snapshotResult.data!,
+            disable_system_prompt: !useSystemPrompt,
+            prompt: prompt,
+            maybe_additional_images: referenceImages.map(
+              (image) => image.mediaToken,
+            ),
+            maybe_number_of_samples: 1,
+          },
+        });
+
+
+        //console.log("response", generateResponse);
+
+        //if (generateResponse.errorMessage) {
+        //  handleError(response.errorMessage);
+        //  setisEnqueueing(false);
+        //  return;
+        //}
+      }
+    
+      try {
+        // Here we would pass both the prompt and reference images to the generation
+        console.log(
+          "Enqueuing with prompt:",
+          prompt,
+          "and reference images:",
+          referenceImages,
+        );
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } finally {
+        setisEnqueueing(false);
+        toast.success("Image added to queue");
+      }
+    }
+    setisEnqueueing(false);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleEnqueue();
+      handleWebEnqueue();
     }
   };
 
