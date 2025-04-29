@@ -142,18 +142,16 @@ impl Display for EnqueueImageGenRequestError {
   post,
   tag = "Image Studio",
   path = "/v1/image_studio/prompt",
-  responses(
-        (
-            status = 200,
-            description = "Enqueue TTS generically",
-            body = EnqueueImageGenRequestSuccessResponse,
-        ),
-        (status = 400, description = "Bad input", body = EnqueueImageGenRequestError),
-        (status = 401, description = "Not authorized", body = EnqueueImageGenRequestError),
-        (status = 429, description = "Rate limited", body = EnqueueImageGenRequestError),
-        (status = 500, description = "Server error", body = EnqueueImageGenRequestError)
+  params(
+    ("request" = EnqueueStudioImageGenRequest, description = "Payload for Image Generation Request"),
   ),
-  params(("request" = EnqueueStudioImageGenRequest, description = "Payload for Image Generation Request"))
+  responses(
+    (status = 200, description = "Success response", body = EnqueueImageGenRequestSuccessResponse),
+    (status = 400, description = "Bad input", body = EnqueueImageGenRequestError),
+    (status = 401, description = "Not authorized", body = EnqueueImageGenRequestError),
+    (status = 429, description = "Rate limited", body = EnqueueImageGenRequestError),
+    (status = 500, description = "Server error", body = EnqueueImageGenRequestError),
+  ),
 )]
 pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, request: Json<EnqueueStudioImageGenRequest>, server_state: Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueImageGenRequestError> {
   validate_request(&request)?;
