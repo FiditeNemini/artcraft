@@ -13,6 +13,7 @@ import { Tooltip } from "~/components/reusable/Tooltip";
 import { Button } from "~/components/reusable/Button";
 import { ToggleButton } from "~/components/reusable/ToggleButton";
 import { Toaster } from "~/components/ui/Toast";
+import { Modal } from "@storyteller/ui-modal";
 import {
   faMessageXmark,
   faMessageCheck,
@@ -49,13 +50,14 @@ export const PromptBox = () => {
   useSignals();
   const isDesktopApp = window.navigator.userAgent.includes("Tauri");
   console.log("Is this a desktop app?", isDesktopApp);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [content, setContent] = useState("");
   const { jobTokens, addJobToken, removeJobToken, clearJobTokens } =
     useJobContext();
 
   //const { lastRenderedBitmap } = useCanvasSignal();
   const [prompt, setPrompt] = useState("");
-  const [isEnqueueing, setisEnqueueing] = useState(false);
+  const [isEnqueueing, setIsEnqueueing] = useState(false);
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
   const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
@@ -317,10 +319,9 @@ export const PromptBox = () => {
     }
   };
   const handleEnqueue = async () => {
+    if (isEnqueueing) return;
+    setIsEnqueueing(true);
     if (!prompt.trim()) return;
-
-    setisEnqueueing(true);
-
     try {
       console.log(
         "Enqueuing with prompt:",
@@ -333,9 +334,9 @@ export const PromptBox = () => {
       console.log("Is this a desktop app?", isDesktop);
 
       if (isDesktop) {
-        handleTauriEnqueue();
+        await handleTauriEnqueue();
       } else {
-        handleWebEnqueue();
+        await handleWebEnqueue();
       }
     } catch (error) {
       console.error("Error during image generation:", error);
@@ -343,7 +344,8 @@ export const PromptBox = () => {
         "An error occurred while generating the image. Please try again.",
       );
     } finally {
-      setisEnqueueing(false);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      setIsEnqueueing(false);
     }
   };
 
@@ -363,6 +365,15 @@ export const PromptBox = () => {
 
   return (
     <>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setContent("");
+        }}
+      >
+        {content}
+      </Modal>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-col gap-3">
         {(referenceImages.length > 0 || uploadingImages.length > 0) && (
           <div className="flex w-full gap-2">
