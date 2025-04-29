@@ -5,12 +5,14 @@ use std::io;
 /// The single error type this crate should surface to all callers.
 #[derive(Debug)]
 pub enum SoraError {
-  /// We haven't received a bearer token yet (this is our application error)
+  /// We haven't received a bearer token yet
+  /// This is our own internal application state error, not something Sora returns.
   NoBearerTokenAvailable,
 
   /// We're sending too many tasks to Sora.
   TooManyConcurrentTasks,
 
+  // TODO: Try to make concrete error types for these.
   /// Unauthorized, cookie and/or bearer token expired. We'll need to ask for a refreshed login.
   ///
   /// Example message, e.g. from the upload endpoint:
@@ -27,7 +29,7 @@ pub enum SoraError {
   /// Another error occurred.
   OtherBadStatus(anyhow::Error),
 
-  /// Reqwest Error
+  /// Reqwest Error, eg. connection failures.
   ReqwestError(reqwest::Error),
 
   /// std::io Error that arises from our end, eg. reading from the filesystem.
@@ -35,6 +37,9 @@ pub enum SoraError {
 
   /// anyhow::Error arises from our end
   AnyhowError(anyhow::Error),
+
+  /// serde_json::Error, likely from JSON deserialization schema mismatch.
+  JsonError(serde_json::Error),
 }
 
 impl Error for SoraError {}
@@ -63,6 +68,9 @@ impl Display for SoraError {
       Self::AnyhowError(err) => {
         write!(f, "Anyhow error: {}", err)
       }
+      Self::JsonError(err) => {
+        write!(f, "serde_json error: {}", err)
+      }
     }
   }
 }
@@ -82,5 +90,11 @@ impl From<io::Error> for SoraError {
 impl From<anyhow::Error> for SoraError {
   fn from(err: anyhow::Error) -> Self {
     Self::AnyhowError(err)
+  }
+}
+
+impl From<serde_json::Error> for SoraError {
+  fn from(err: serde_json::Error) -> Self {
+    Self::JsonError(err)
   }
 }

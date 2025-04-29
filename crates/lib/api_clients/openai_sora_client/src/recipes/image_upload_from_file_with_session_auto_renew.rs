@@ -13,6 +13,7 @@ pub struct ImageUploadFromFileAutoRenewRequest<'a, P: AsRef<Path>> {
 }
 
 /// Image upload with retry and session auto-renewal.
+/// If a new sora credential is returned, replace the old one with the new one.
 pub async fn image_upload_from_file_with_session_auto_renew<P: AsRef<Path>>(
   request: ImageUploadFromFileAutoRenewRequest<'_, P>
 ) -> Result<(SoraMediaUploadResponse, Option<SoraCredentialSet>), SoraError> {

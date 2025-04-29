@@ -34,8 +34,6 @@ subprocess_common = { workspace = true }
 tokens = { workspace = true }
 
 # External
-#openssl = { version = "0.10", features = ["vendored"] }
-# NB(bt,2025-03-10): default-features = false on Windows while I debug openssl / rustls
 anyhow = { workspace = true }
 base64 = "0.22.1"
 bytes = "1.10"
@@ -48,6 +46,7 @@ image = "0.25.5"
 log = { workspace = true }
 once_cell = { workspace = true }
 rand = { workspace = true }
+# NB(bt,2025-03-10): default-features = false on Windows while I debug openssl / rustls
 reqwest = { workspace = true, features = ["multipart", "stream"], default-features = false }
 serde = { workspace = true }
 serde_derive = { workspace = true }

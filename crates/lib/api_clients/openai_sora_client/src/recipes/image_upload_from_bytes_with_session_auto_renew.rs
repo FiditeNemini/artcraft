@@ -23,6 +23,7 @@ pub struct ImageUploadFromBytesAutoRenewRequest<'a> {
 }
 
 /// Image upload with retry and session auto-renewal.
+/// If a new sora credential is returned, replace the old one with the new one.
 pub async fn image_upload_from_bytes_with_session_auto_renew(
   request: ImageUploadFromBytesAutoRenewRequest<'_>
 ) -> Result<(SoraMediaUploadResponse, Option<SoraCredentialSet>), SoraError> {

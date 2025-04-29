@@ -47,5 +47,5 @@ pub async fn wait_for_image_gen_status(task_id: &String, credentials: &SoraCrede
 }
 
 fn find_task_response_by_id(status_response: &VideoGenStatusResponse, task_id: String) -> Option<&TaskResponse> {
-  status_response.task_responses.iter().find(|task| task.id == task_id)
+  status_response.task_responses.iter().find(|task| task.id.0 == task_id)
 }

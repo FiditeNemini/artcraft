@@ -21,6 +21,7 @@ pub struct ImageRemixAutoRenewRequest<'a> {
 }
 
 /// Image request with retry and session auto-renewal.
+/// If a new sora credential is returned, replace the old one with the new one.
 pub async fn image_remix_with_session_auto_renew(request: ImageRemixAutoRenewRequest<'_>) -> Result<(SoraImageGenResponse, Option<SoraCredentialSet>), SoraError> {
   let result = sora_image_gen_remix(SoraImageGenRemixRequest {
     prompt: request.prompt.clone(), // NB: Clone because used again

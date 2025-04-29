@@ -1,14 +1,26 @@
-use std::{fs::File, io::Write, path::Path};
-
 use crate::credentials::SoraCredentials;
+use crate::sora_error::SoraError;
+use anyhow::anyhow;
 use errors::AnyhowResult;
 use reqwest::Url;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
+use std::fmt::{Debug, Display};
+use std::{fs::File, io::Write, path::Path};
 
 const SORA_STATUS_URL: &str = "https://sora.com/backend/video_gen";
 
 /// This user agent is tied to the sentinel generation. If we need to change it, we may need to change sentinel generation too.
 const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
+
+/// A strongly typed task ID for Sora tasks.
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Serialize, Deserialize)]
+pub struct TaskId(pub String);
+
+impl Display for TaskId {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    std::fmt::Display::fmt(&self.0, f)
+  }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum TaskStatus {
@@ -42,7 +54,7 @@ pub struct VideoGenStatusResponse {
 #[derive(Deserialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct TaskResponse {
-  pub id: String,
+  pub id: TaskId,
   pub user: String,
   pub created_at: String,
   pub status: String,
@@ -79,7 +91,7 @@ pub struct TaskResponse {
 #[serde(rename_all = "snake_case")]
 pub struct Generation {
   pub id: String,
-  pub task_id: String,
+  pub task_id: TaskId,
   pub created_at: String,
   pub deleted_at: Option<String>,
   pub url: String,
@@ -170,7 +182,7 @@ pub struct ModerationResult {
   pub results_by_frame_index: serde_json::Value,
   pub code: Option<String>,
   pub is_output_rejection: bool,
-  pub task_id: String,
+  pub task_id: TaskId,
 }
 
 pub struct StatusRequest {
@@ -186,10 +198,11 @@ impl StatusRequest {
 }
 
 /// Gets the status of image generation tasks from Sora API
-pub async fn get_image_gen_status(status_request: &StatusRequest, credentials: &SoraCredentials) -> AnyhowResult<VideoGenStatusResponse> {
+pub async fn get_image_gen_status(status_request: &StatusRequest, credentials: &SoraCredentials) -> Result<VideoGenStatusResponse, SoraError> {
   let client = reqwest::Client::new();
 
-  let mut url = reqwest::Url::parse(SORA_STATUS_URL)?;
+  let mut url = reqwest::Url::parse(SORA_STATUS_URL)
+      .map_err(|err| anyhow!("error parsing URL: {:?}", err))?;
 
   // Add query parameters
   if let Some(limit) = status_request.limit {
@@ -200,7 +213,11 @@ pub async fn get_image_gen_status(status_request: &StatusRequest, credentials: &
     url.query_pairs_mut().append_pair("before", &before);
   }
 
-  let http_request = client.get(url).header("User-Agent", USER_AGENT).header("Cookie", &credentials.cookie).header("Authorization", credentials.authorization_header_value()).header("Content-Type", "application/json");
+  let http_request = client.get(url)
+      .header("User-Agent", USER_AGENT)
+      .header("Cookie", &credentials.cookie)
+      .header("Authorization", credentials.authorization_header_value())
+      .header("Content-Type", "application/json");
 
   let http_request = http_request.build()?;
 
@@ -212,7 +229,8 @@ pub async fn get_image_gen_status(status_request: &StatusRequest, credentials: &
   println!("response_body: {}", response_body);
 
   if status != reqwest::StatusCode::OK {
-    return Err(anyhow::anyhow!("The status request failed; status = {:?}, message = {:?}", status, response_body));
+    // TODO: Handle non-200 status codes, esp. JWT errors and credential errors
+    return Err(SoraError::AnyhowError(anyhow::anyhow!("The status request failed; status = {:?}, message = {:?}", status, response_body)));
   }
 
   let response: VideoGenStatusResponse = serde_json::from_str(response_body)?;
@@ -285,7 +303,7 @@ mod tests {
 
     let task_id = response.task_responses[0].id.clone();
     let task_response = wait_for_image_gen_status(
-      &task_id,
+      &task_id.0,
       &creds,
       Some(10)
     ).await?;
