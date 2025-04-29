@@ -1921,7 +1921,7 @@ checksum = "d38f2da7a0a2c4ccf0065be06397cc26a81f4e528be095826eee9d4adbb8c60f"
 dependencies = [
  "byteorder",
  "fnv",
- "uuid",
+ "uuid 1.8.0",
 ]
 
 [[package]]
@@ -3256,6 +3256,20 @@ dependencies = [
  "option-ext",
  "redox_users 0.5.0",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "discord-rich-presence"
+version = "0.2.5"
+source = "git+https://github.com/vionya/discord-rich-presence#9c6cabe04a70cfcc822affd1bf8be51321f8a821"
+dependencies = [
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "serde_repr",
+ "thiserror 2.0.12",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -5547,7 +5561,7 @@ dependencies = [
 name = "idempotency"
 version = "0.0.1"
 dependencies = [
- "uuid",
+ "uuid 1.8.0",
  "workspace-build-acceleration",
 ]
 
@@ -7797,7 +7811,7 @@ dependencies = [
  "toml 0.8.20",
  "ureq",
  "url",
- "uuid",
+ "uuid 1.8.0",
  "walkdir",
 ]
 
@@ -9704,7 +9718,7 @@ dependencies = [
  "rkyv_derive",
  "seahash",
  "tinyvec",
- "uuid",
+ "uuid 1.8.0",
 ]
 
 [[package]]
@@ -10105,7 +10119,7 @@ dependencies = [
  "serde",
  "serde_json",
  "url",
- "uuid",
+ "uuid 1.8.0",
 ]
 
 [[package]]
@@ -11253,7 +11267,7 @@ dependencies = [
  "user_traits_component",
  "utoipa",
  "utoipa-swagger-ui",
- "uuid",
+ "uuid 1.8.0",
  "videos",
  "workspace-build-acceleration",
  "zip 0.6.6",
@@ -12047,6 +12061,7 @@ dependencies = [
  "crockford",
  "directories 6.0.0",
  "dirs 6.0.0",
+ "discord-rich-presence",
  "errors",
  "filesys",
  "futures 0.3.29",
@@ -12122,7 +12137,7 @@ dependencies = [
  "thiserror 2.0.12",
  "time",
  "url",
- "uuid",
+ "uuid 1.8.0",
  "walkdir",
 ]
 
@@ -12301,7 +12316,7 @@ dependencies = [
  "toml 0.8.20",
  "url",
  "urlpattern",
- "uuid",
+ "uuid 1.8.0",
  "walkdir",
 ]
 
@@ -13547,6 +13562,15 @@ dependencies = [
 
 [[package]]
 name = "uuid"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
+dependencies = [
+ "getrandom 0.2.14",
+]
+
+[[package]]
+name = "uuid"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a183cf7feeba97b4dd1c0d46788634f6221d87fa961b305bed08c851829efcc0"
@@ -14706,7 +14730,7 @@ dependencies = [
  "unicode-normalization",
  "ureq",
  "url",
- "uuid",
+ "uuid 1.8.0",
  "void",
  "winapi 0.3.9",
  "windows-sys 0.48.0",

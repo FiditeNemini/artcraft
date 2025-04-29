@@ -10,6 +10,7 @@ use crate::commands::sora::sora_image_generation_command::sora_image_generation_
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
+use crate::threads::discord_presence_thread::discord_presence_thread;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
 
 use tauri_plugin_log::Target;
@@ -57,6 +58,7 @@ pub fn run() {
       let app = app.handle().clone();
 
       tauri::async_runtime::spawn(sora_session_login_thread(app, app_data_root2, sora_creds_manager2));
+      tauri::async_runtime::spawn(discord_presence_thread());
 
       Ok(())
     })

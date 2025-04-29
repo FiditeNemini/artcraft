@@ -60,6 +60,10 @@ tempfile = "3.18.0"
 tokio = { version = "1.42", features = ["rt", "rt-multi-thread", "fs"] }
 tokio-util = { version = "0.7", features = ["codec"] }
 
+# NB: The version of the `discord-rich-presence` crate (0.2.5) last published has non-Send/Sync error
+# types and can't do threading. We need to wait for a new version to unpin from Git.
+discord-rich-presence = { git = "https://github.com/vionya/discord-rich-presence" }
+
 [dev-dependencies]
 libloading = "0.8.6"
 serial_test = "3.2.0"
