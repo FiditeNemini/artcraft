@@ -2,4 +2,4 @@ pub mod read_sora_credentials_from_disk;
 pub mod read_sora_credentials_from_disk_with_upgrade;
 pub mod sora_credential_holder;
 pub mod sora_credential_manager;
-mod sora_task_queue;
+pub mod sora_task_queue;
