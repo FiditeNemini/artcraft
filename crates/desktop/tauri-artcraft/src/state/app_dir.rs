@@ -139,6 +139,10 @@ impl AppDataRoot {
   pub fn get_sora_sentinel_file_path(&self) -> PathBuf {
     self.path.join("sora_sentinel.txt")
   }
+
+  pub fn get_window_size_config_file(&self) -> PathBuf {
+    self.path.join("window_size.json")
+  }
 }
 
 impl AppAssetsDir {
