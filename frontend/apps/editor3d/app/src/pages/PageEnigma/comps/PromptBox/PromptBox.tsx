@@ -431,7 +431,7 @@ export const PromptBox = () => {
   const handleError = (errorMessage: string) => {
     setContent(errorMessage);
     setIsModalOpen(true);
-  }
+  };
 
   const handleEnqueue = async () => {
     const isDesktop = IsDesktopApp();
@@ -442,7 +442,7 @@ export const PromptBox = () => {
     } else {
       await handleWebEnqueue();
     }
-  }
+  };
 
   const handleWebEnqueue = async () => {
     if (!prompt.trim()) return;
@@ -460,13 +460,13 @@ export const PromptBox = () => {
           screenshot: snapshot.file,
           sceneMediaToken: "",
         });
-        
+
         console.log("useSystemPrompt", useSystemPrompt);
-        
+
         const response = await engineApi.enqueueImageGeneration({
           disableSystemPrompt: !useSystemPrompt,
           prompt: prompt,
-          snapshotMediaToken: "",
+          snapshotMediaToken: snapshotResult.data || "",
           additionalImages: referenceImages.map((image) => image.mediaToken),
         });
 
@@ -478,7 +478,7 @@ export const PromptBox = () => {
           return;
         }
       }
-    
+
       try {
         // Here we would pass both the prompt and reference images to the generation
         console.log(
@@ -512,7 +512,7 @@ export const PromptBox = () => {
           screenshot: snapshot.file,
           //sceneMediaToken: "",
         });
-        
+
         //const response = await engineApi.enqueueImageGeneration({
         //  disableSystemPrompt: !useSystemPrompt,
         //  prompt: prompt,
@@ -532,7 +532,6 @@ export const PromptBox = () => {
           },
         });
 
-
         //console.log("response", generateResponse);
 
         //if (generateResponse.errorMessage) {
@@ -541,7 +540,7 @@ export const PromptBox = () => {
         //  return;
         //}
       }
-    
+
       try {
         // Here we would pass both the prompt and reference images to the generation
         console.log(
@@ -603,10 +602,13 @@ export const PromptBox = () => {
 
   return (
     <>
-      <Modal isOpen={isModalOpen} onClose={() => {
-        setIsModalOpen(false);
-        setContent("");
-      }}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setContent("");
+        }}
+      >
         {content}
       </Modal>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-col gap-3">
