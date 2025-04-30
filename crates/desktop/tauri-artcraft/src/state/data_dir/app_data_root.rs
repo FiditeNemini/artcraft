@@ -115,15 +115,15 @@ impl AppDataRoot {
   }
 
   pub fn get_sora_cookie_file_path(&self) -> PathBuf {
-    self.path.join("sora_cookies.txt")
+    self.credentials_dir().get_sora_cookie_file_path()
   }
 
   pub fn get_sora_bearer_token_file_path(&self) -> PathBuf {
-    self.path.join("sora_bearer_token.txt")
+    self.credentials_dir().get_sora_bearer_token_file_path()
   }
 
   pub fn get_sora_sentinel_file_path(&self) -> PathBuf {
-    self.path.join("sora_sentinel.txt")
+    self.credentials_dir().get_sora_sentinel_file_path()
   }
 
   pub fn get_window_size_config_file(&self) -> PathBuf {

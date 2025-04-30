@@ -19,3 +19,17 @@ impl DataSubdir for AppCredentialsDir {
     &self.path
   }
 }
+
+impl AppCredentialsDir {
+  pub fn get_sora_cookie_file_path(&self) -> PathBuf {
+    self.path.join("sora_cookies.txt")
+  }
+
+  pub fn get_sora_bearer_token_file_path(&self) -> PathBuf {
+    self.path.join("sora_bearer_token.txt")
+  }
+
+  pub fn get_sora_sentinel_file_path(&self) -> PathBuf {
+    self.path.join("sora_sentinel.txt")
+  }
+}
