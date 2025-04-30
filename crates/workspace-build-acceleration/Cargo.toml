@@ -33,8 +33,8 @@ bytes = { version = "1.10.0", features = ["serde"] }
 chrono = { version = "0.4.40", features = ["serde"] }
 clap = { version = "4.5.13", features = ["derive"] }
 cookie = { version = "0.18.1", default-features = false, features = ["percent-encode"] }
-core-foundation = { version = "0.9.4" }
-core-foundation-sys = { version = "0.8.7" }
+#core-foundation = { version = "0.9.4" }
+#core-foundation-sys = { version = "0.8.7" }
 crossbeam-utils = { version = "0.8.20" }
 crypto-common = { version = "0.1.6", default-features = false, features = ["std"] }
 #cudarc = { version = "0.13.7", features = ["cuda-version-from-build-system", "cudnn", "dynamic-linking", "f16", "nccl"] }

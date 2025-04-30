@@ -147,6 +147,10 @@ publish = false
 #  - tauri-runtime-wry
 #  - tauri-utils
 #
+# Broken on Windows:
+#  - core-foundation
+#  - core-foundation-sys
+#
 workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 
 # External libs
