@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { withProtectionRoute } from "~/components/hoc";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
-import { Resource, invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 //Components of the Konva App are all in the KonvaComponent
 import { KonvaRootComponent } from "~/KonvaRootComponent";
 import { ToolbarTopLeft } from "~/components/features/ToolbarTopLeft";

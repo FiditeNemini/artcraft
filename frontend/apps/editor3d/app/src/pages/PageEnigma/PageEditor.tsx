@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useSignals } from "@preact/signals-react/runtime";
 import { LoadingDots, TopBar } from "~/components";
 import { Controls3D } from "./comps/Controls3D";
@@ -22,6 +23,7 @@ import { Outliner } from "./comps/Outliner";
 import { CameraAspectRatio } from "./enums";
 import { PromptBox } from "./comps/PromptBox";
 import { OnboardingHelper } from "./comps/OnboardingHelper";
+import { IsDesktopApp } from "@storyteller/tauri-utils";
 import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDisplay";
 import { DemoModal } from "@storyteller/ui-demo-modal";
 
@@ -157,7 +159,13 @@ export const PageEditor = () => {
         description="Set up your scene by adding objects and start bringing your ideas to life!"
         videoSrc="/resources/videos/artcraft-3d-demo.mp4"
         buttonText="Sign in to OpenAI to get started"
-        buttonOnClick={() => {}}
+        buttonOnClick={async () => {
+          if (IsDesktopApp()) {
+            await invoke("open_sora_login_command");
+          } else {
+            console.error("This is not the Desktop app.");
+          }
+        }}
       />
     </div>
   );
