@@ -10,8 +10,10 @@ use crate::commands::sora::sora_image_generation_command::sora_image_generation_
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
+use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use crate::threads::discord_presence_thread::discord_presence_thread;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
+use crate::threads::sora_task_polling_thread::sora_task_polling_thread;
 
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;
@@ -26,11 +28,15 @@ pub fn run() {
     .expect("config should load");
 
   let app_data_root = config.app_data_root.clone();
-  let app_data_root2 = config.app_data_root.clone();
+  let app_data_root_2 = config.app_data_root.clone();
 
   println!("Attempting to read existing credentials...");
   let sora_creds_manager = SoraCredentialManager::initialize_from_disk_infallible(&app_data_root);
-  let sora_creds_manager2 = sora_creds_manager.clone();
+  let sora_creds_manager_2 = sora_creds_manager.clone();
+
+  // Other state
+  let sora_task_queue = SoraTaskQueue::new();
+  let sora_task_queue_2 = sora_task_queue.clone();
 
   println!("Initializing backend runtime...");
 
@@ -57,14 +63,19 @@ pub fn run() {
       //}
       let app = app.handle().clone();
 
-      tauri::async_runtime::spawn(sora_session_login_thread(app, app_data_root2, sora_creds_manager2));
+      let app_data_root_3 = app_data_root_2.clone();
+      let sora_creds_manager_3 = sora_creds_manager_2.clone();
+
+      tauri::async_runtime::spawn(sora_session_login_thread(app, app_data_root_2, sora_creds_manager_2));
+      tauri::async_runtime::spawn(sora_task_polling_thread(app_data_root_3, sora_creds_manager_3, sora_task_queue_2));
       tauri::async_runtime::spawn(discord_presence_thread());
 
       Ok(())
     })
-    .manage(config)
     .manage(app_data_root)
+    .manage(config)
     .manage(sora_creds_manager)
+    .manage(sora_task_queue)
     .invoke_handler(tauri::generate_handler![
       flip_image,
       open_sora_login_command,

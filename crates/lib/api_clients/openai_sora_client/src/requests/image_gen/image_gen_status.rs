@@ -6,6 +6,7 @@ use reqwest::Url;
 use serde_derive::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::{fs::File, io::Write, path::Path};
+use log::debug;
 
 const SORA_STATUS_URL: &str = "https://sora.com/backend/video_gen";
 
@@ -226,7 +227,8 @@ pub async fn get_image_gen_status(status_request: &StatusRequest, credentials: &
   let status = response.status();
 
   let response_body = &response.text().await?;
-  println!("response_body: {}", response_body);
+
+  debug!("response_body: {}", response_body);
 
   if status != reqwest::StatusCode::OK {
     // TODO: Handle non-200 status codes, esp. JWT errors and credential errors

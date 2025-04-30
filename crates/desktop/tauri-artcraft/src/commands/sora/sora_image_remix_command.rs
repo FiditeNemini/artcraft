@@ -2,6 +2,7 @@ use crate::state::app_dir::AppDataRoot;
 use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
+use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use crate::utils::get_url_file_extension::get_url_file_extension;
 use crate::utils::simple_http_download::simple_http_download;
 use base64::prelude::BASE64_STANDARD;
@@ -50,12 +51,13 @@ pub async fn sora_image_remix_command(
   request: SoraImageRemixCommand,
   app_data_root: State<'_, AppDataRoot>,
   sora_creds_manager: State<'_, SoraCredentialManager>,
+  sora_task_queue: State<'_, SoraTaskQueue>,
 ) -> Result<String, String> {
   info!("image_generation_command called; processing image...");
 
   // TODO(bt,2025-04-24): Better error messages to caller
 
-  generate_image(request, &app_data_root, &sora_creds_manager)
+  generate_image(request, &app_data_root, &sora_creds_manager, &sora_task_queue)
     .await
     .map_err(|err| {
       error!("error: {:?}", err);
@@ -69,6 +71,7 @@ pub async fn generate_image(
   request: SoraImageRemixCommand,
   app_data_root: &AppDataRoot,
   sora_creds_manager: &SoraCredentialManager,
+  sora_task_queue: &SoraTaskQueue,
 ) -> AnyhowResult<()> {
 
   let response = get_media_file(&ApiHost::Storyteller, &request.snapshot_media_token).await?;
@@ -84,8 +87,6 @@ pub async fn generate_image(
   simple_http_download(&media_file_url, &filename).await?;
 
   let files_to_upload = vec![filename];
-
-
 
   let mut creds = sora_creds_manager.get_credentials_required()?;
 
@@ -141,7 +142,9 @@ pub async fn generate_image(
     sora_creds_manager.set_credentials(&new_creds)?;
   }
 
-  println!(">> TASK ID: {:?} ", response.task_id);
+  info!("New Sora Task ID: {:?} ", response.task_id);
+
+  sora_task_queue.insert(&response.task_id)?;
 
   Ok(())
 }

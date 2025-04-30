@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "identifier": "ai.artcraft.app",
   "build": {
-    "frontendDist": "../../../frontend/apps/editor2d/dist",
+    "frontendDist": "../../../",
     "devUrl": "http://localhost:5741",
     "beforeDevCommand": "nx run editor2d:dev",
     "beforeBuildCommand": "nx run editor2d:build"

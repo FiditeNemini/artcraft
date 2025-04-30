@@ -84,7 +84,7 @@ mod tests {
 
     println!("task_id: {}", response.task_id);
 
-    assert!(response.task_id.starts_with("task_"));
+    assert!(response.task_id.0.starts_with("task_"));
     Ok(())
   }
 }

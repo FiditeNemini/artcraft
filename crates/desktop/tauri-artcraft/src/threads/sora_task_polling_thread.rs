@@ -7,7 +7,7 @@ use openai_sora_client::recipes::list_sora_task_status_with_session_auto_renew::
 use openai_sora_client::requests::image_gen::image_gen_status::{TaskId, TaskStatus};
 use tauri::AppHandle;
 
-pub async fn sora_session_login_thread(
+pub async fn sora_task_polling_thread(
   app_data_root: AppDataRoot,
   sora_creds_manager: SoraCredentialManager,
   sora_task_queue: SoraTaskQueue,

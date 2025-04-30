@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient};
-use log::info;
 use errors::AnyhowResult;
+use log::info;
 
 /// Our Discord App ID. Not sure if this is a secret.
 const DISCORD_APP_ID : &str = "1366596912593113138";

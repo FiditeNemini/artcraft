@@ -1,6 +1,7 @@
 use crate::creds::credential_migration::CredentialMigrationRef;
 use serde_derive::{Deserialize, Serialize};
 use thiserror::Error;
+use crate::requests::image_gen::image_gen_status::TaskId;
 
 const SORA_IMAGE_GEN_URL: &str = "https://sora.com/backend/video_gen";
 
@@ -94,7 +95,7 @@ pub (crate) struct RawSoraImageGenRequest {
 #[serde(rename_all = "snake_case")]
 pub (crate) struct RawSoraResponse {
   /// eg. "task_01jqsz9dsae9tvjygf1abrv3xf"
-  pub id: String,
+  pub id: TaskId,
   /// not known
   pub priority: Option<String>,
 }
@@ -226,4 +227,18 @@ pub (crate) async fn image_gen_http_request(sora_request: RawSoraImageGenRequest
       .map_err(|e| SoraError::GenericError(format!("Failed to parse success response: {}", e)))?;
 
   Ok(response)
+}
+
+#[cfg(test)]
+mod tests {
+  use errors::AnyhowResult;
+  use crate::requests::image_gen::image_gen_http_request::RawSoraResponse;
+
+  #[test]
+  fn deserialize_task_id() -> AnyhowResult<()> {
+    let json = "{\"id\": \"task_foobarbaz\"}";
+    let response : RawSoraResponse = serde_json::from_str(json)?;
+    assert_eq!(response.id.0, "task_foobarbaz");
+    Ok(())
+  }
 }
