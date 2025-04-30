@@ -1,4 +1,4 @@
-use crate::state::app_dir::AppDataRoot;
+use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::main_window_size::MainWindowSize;
 use errors::AnyhowResult;
 use log::{error, info};

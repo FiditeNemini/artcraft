@@ -1,4 +1,4 @@
-use crate::state::app_dir::AppDataRoot;
+use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use errors::AnyhowResult;
