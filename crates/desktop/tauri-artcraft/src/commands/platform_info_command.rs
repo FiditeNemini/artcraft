@@ -46,6 +46,8 @@ pub fn platform_info_command() -> Result<PlatformInfoResponse, String> {
     None => DetectedOs::Unknown,
   };
 
+  // These are the webviews that Tauri uses on each OS:
+  // https://tauri.app/reference/webview-versions/
   let webview_runtime = match os_platform {
     DetectedOs::Windows => WebviewRuntime::EdgeWebview2,
     DetectedOs::MacOS => WebviewRuntime::WebkitSafari,

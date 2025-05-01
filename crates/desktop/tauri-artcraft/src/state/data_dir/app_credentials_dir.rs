@@ -32,4 +32,12 @@ impl AppCredentialsDir {
   pub fn get_sora_sentinel_file_path(&self) -> PathBuf {
     self.path.join("sora_sentinel.txt")
   }
+
+  pub fn get_storyteller_avt_cookie_file_path(&self) -> PathBuf {
+    self.path.join("artcraft_avt.txt")
+  }
+  
+  pub fn get_storyteller_session_cookie_file_path(&self) -> PathBuf {
+    self.path.join("artcraft_session.txt")
+  }
 }

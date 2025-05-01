@@ -3,28 +3,38 @@ use crate::credentials::storyteller_session_cookie::StorytellerSessionCookie;
 
 #[derive(Clone)]
 pub struct StorytellerCredentialSet {
-  pub cookie: Option<StorytellerSessionCookie>,
+  pub session: Option<StorytellerSessionCookie>,
   pub avt: Option<StorytellerAvtCookie>,
 }
 
 impl StorytellerCredentialSet {
+  pub fn empty() -> Self {
+    Self {
+      session: None,
+      avt: None,
+    }
+  }
+  
   pub fn initialize(
-    cookie: Option<StorytellerSessionCookie>,
+    session: Option<StorytellerSessionCookie>,
     avt: Option<StorytellerAvtCookie>,
   ) -> Self {
-    Self { cookie, avt }
+    Self {
+      session, 
+      avt,
+    }
   }
 
-  pub fn initialize_with_just_cookie(cookie: StorytellerSessionCookie) -> Self {
+  pub fn initialize_with_just_cookie(session: StorytellerSessionCookie) -> Self {
     Self {
-      cookie: Some(cookie),
+      session: Some(session),
       avt: None,
     }
   }
 
   pub fn initialize_with_just_avt(avt: StorytellerAvtCookie) -> Self {
     Self {
-      cookie: None,
+      session: None,
       avt: Some(avt),
     }
   }
