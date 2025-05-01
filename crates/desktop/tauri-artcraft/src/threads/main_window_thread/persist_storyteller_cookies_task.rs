@@ -1,17 +1,27 @@
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
 use crate::threads::sora_session_login_thread::LOGIN_WINDOW_NAME;
-use crate::utils::cookies::storyteller_webview_cookies::get_storyteller_cookies;
 use anyhow::anyhow;
 use errors::AnyhowResult;
-use log::{error, info};
-use openai_sora_client::creds::sora_credential_set::SoraCredentialSet;
-use openai_sora_client::recipes::maybe_upgrade_or_renew_session::maybe_upgrade_or_renew_session;
-use openai_sora_client::utils::has_session_cookie::{has_session_cookie, SessionCookiePresence};
+use log::{debug, error, info};
+use once_cell::sync::Lazy;
+use reqwest::Url;
 use std::fs;
+use storyteller_client::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
+use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
+use storyteller_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
 use tauri::{AppHandle, Manager, Webview, Window};
 
 const MAIN_WEBVIEW_NAME: &str = "main";
+
+const STORYTELLER_ROOT_COOKIE_URL_STR: &str = "https://api.storyteller.ai/";
+
+static STORYTELLER_ROOT_COOKIE_URL: Lazy<Url> = Lazy::new(|| {
+  Url::parse(STORYTELLER_ROOT_COOKIE_URL_STR).expect("URL should parse")
+});
+
+const AVT_COOKIE_NAME : &str = "visitor";
+const SESSION_COOKIE_NAME : &str = "session";
 
 pub async fn persist_storyteller_cookies_task(
   window: &Window,
@@ -20,7 +30,6 @@ pub async fn persist_storyteller_cookies_task(
 ) -> AnyhowResult<()> {
   for webview in window.webviews() {
     let label = webview.label();
-    info!("Webview label: {:?}", label);
     if label == MAIN_WEBVIEW_NAME {
       persist_webview_cookies(&webview, app_data_root, storyteller_credential_manager).await?;
       break;
@@ -33,7 +42,7 @@ async fn persist_webview_cookies(
   app_data_root: &AppDataRoot,
   storyteller_credential_manager: &StorytellerCredentialManager,
 ) -> AnyhowResult<()> {
-  let current_webview_credentials = get_storyteller_cookies(webview)?;
+  let current_webview_credentials = get_storyteller_cookies(webview).await?;
 
   if current_webview_credentials.is_empty() {
     // TODO: handle logout / cookie deletion
@@ -41,7 +50,7 @@ async fn persist_webview_cookies(
   }
   
   let mut replace_credentials = true;
-  
+
   let maybe_old_credentials = storyteller_credential_manager.get_credentials()?;
   
   if let Some(old_credentials) = maybe_old_credentials {
@@ -57,4 +66,32 @@ async fn persist_webview_cookies(
   }
   
   Ok(())
+}
+
+pub async fn get_storyteller_cookies(webview: &Webview) -> AnyhowResult<StorytellerCredentialSet> {
+  debug!("Getting storyteller cookies...");
+
+  // FIXME: THIS IS A TOTAL HACK. / DO NOT REMOVE.
+  // NB: If we don't call a method on the webview, the very next call to get cookies will deadlock.
+  if let Ok(url) = webview.url() {
+    debug!("For url: {:?}", url);
+  }
+
+  let cookies = webview.cookies_for_url(STORYTELLER_ROOT_COOKIE_URL.clone())?;
+
+  let mut avt_cookie = None;
+  let mut session_cookie = None;
+
+  for cookie in cookies.into_iter() {
+    if let Some(avt) = StorytellerAvtCookie::maybe_from_cookie(&cookie) {
+      avt_cookie = Some(avt);
+    } else if let Some(session) = StorytellerSessionCookie::maybe_from_cookie(&cookie) {
+      session_cookie = Some(session);
+    }
+  }
+
+  Ok(StorytellerCredentialSet::initialize(
+    avt_cookie,
+    session_cookie,
+  ))
 }
