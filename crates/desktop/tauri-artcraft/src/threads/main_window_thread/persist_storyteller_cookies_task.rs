@@ -7,10 +7,12 @@ use log::{debug, error, info};
 use once_cell::sync::Lazy;
 use reqwest::Url;
 use std::fs;
+use chrono::TimeDelta;
 use storyteller_client::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
 use storyteller_client::credentials::storyteller_credential_set::StorytellerCredentialSet;
 use storyteller_client::credentials::storyteller_session_cookie::StorytellerSessionCookie;
 use tauri::{AppHandle, Manager, Webview, Window};
+use crate::state::app_startup_time::AppStartupTime;
 
 const MAIN_WEBVIEW_NAME: &str = "main";
 
@@ -23,11 +25,20 @@ static STORYTELLER_ROOT_COOKIE_URL: Lazy<Url> = Lazy::new(|| {
 const AVT_COOKIE_NAME : &str = "visitor";
 const SESSION_COOKIE_NAME : &str = "session";
 
+/// There's some kind of race condition that we need to wait for before inspecting cookies.
+const RACE_CONDITION_WAIT_TIME: TimeDelta = TimeDelta::milliseconds(5000);
+
 pub async fn persist_storyteller_cookies_task(
   window: &Window,
   app_data_root: &AppDataRoot,
   storyteller_credential_manager: &StorytellerCredentialManager,
+  app_startup_time: &AppStartupTime,
 ) -> AnyhowResult<()> {
+  
+  if app_startup_time.time_delta_since() < RACE_CONDITION_WAIT_TIME {
+    return Ok(())
+  }
+  
   for webview in window.webviews() {
     let label = webview.label();
     if label == MAIN_WEBVIEW_NAME {

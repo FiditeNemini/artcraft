@@ -7,6 +7,7 @@ use errors::AnyhowResult;
 use log::{error, info};
 use memory_store::clone_slot::CloneSlot;
 use tauri::{AppHandle, Manager, Webview, Window};
+use crate::state::app_startup_time::AppStartupTime;
 
 const MAIN_WINDOW_NAME : &str = "main";
 
@@ -15,7 +16,9 @@ pub async fn main_window_thread(
   app_data_root: AppDataRoot,
   storyteller_creds_manager: StorytellerCredentialManager,
 ) -> ! {
+  // TODO: Move these into some kind of dependency injection framework
   let window_size_slot: CloneSlot<MainWindowSize> = CloneSlot::empty();
+  let app_startup_time = AppStartupTime::new();
 
   loop {
     for (window_name, window) in app.windows() {
@@ -25,6 +28,7 @@ pub async fn main_window_thread(
           &app_data_root,
           &storyteller_creds_manager,
           &window_size_slot,
+          &app_startup_time,
         ).await;
         if let Err(err) = result {
           error!("Error handling main window: {:?}", err);
@@ -40,10 +44,11 @@ pub async fn handle_main_window(
   app_data_root: &AppDataRoot,
   storyteller_creds_manager: &StorytellerCredentialManager,
   window_size_slot: &CloneSlot<MainWindowSize>,
+  app_startup_time: &AppStartupTime,
 ) -> AnyhowResult<()> {
   loop {
     log_errors(persist_window_resize_task(window, app_data_root, window_size_slot).await);
-    log_errors(persist_storyteller_cookies_task(window, app_data_root, storyteller_creds_manager).await);
+    log_errors(persist_storyteller_cookies_task(window, app_data_root, storyteller_creds_manager, app_startup_time).await);
     tokio::time::sleep(std::time::Duration::from_millis(1_000)).await;
   }
 }
