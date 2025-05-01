@@ -31,8 +31,8 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use uuid::uuid;
 
-/// Get details about a media file from our backend
-pub async fn upload_image_media_file<P: AsRef<Path>>(
+/// Upload an image media file from a file.
+pub async fn upload_image_media_file_from_file<P: AsRef<Path>>(
   api_host: &ApiHost,
   maybe_creds: Option<&StorytellerCredentialSet>,
   path: P,

@@ -13,7 +13,7 @@ use std::io::Write;
 use std::path::PathBuf;
 use tauri::AppHandle;
 use tempdir::TempDir;
-use storyteller_client::media_files::upload_image_media_file::upload_image_media_file;
+use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
 use storyteller_client::utils::api_host::ApiHost;
 
 pub async fn sora_task_polling_thread(
@@ -106,7 +106,7 @@ async fn polling_loop(
         let download_path = download_generation(generation, &app_data_root).await?;
 
         info!("Uploading to backend...");
-        let result = upload_image_media_file(&api_host, Some(&creds), download_path).await?;
+        let result = upload_image_media_file_from_file(&api_host, Some(&creds), download_path).await?;
         
         info!("Uploaded to API backend: {:?}", result.media_file_token);
       }
