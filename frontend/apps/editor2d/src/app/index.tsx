@@ -11,7 +11,7 @@ import "./global.css";
 import { useRenderCounter } from "~/hooks/useRenderCounter";
 
 function PostHogInit() {
-  const apiKey = "phc_jBFgac0mVALAFk3negnSfYCcHgvkT00yBLQDmCDYNBb";
+  const apiKey = import.meta.env.VITE_POSTHOG_API_KEY;
   posthog.init(apiKey, {
     api_host: "https://us.i.posthog.com/",
     ui_host: "https://us.i.posthog.com/",
@@ -41,10 +41,12 @@ const App = () => {
   }
   return (
     <>
-      <JobProvider>
-        <RouterProvider router={router} />
-        <Toaster />
-      </JobProvider>
+      <PostHogProvider client={posthog}>
+        <JobProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </JobProvider>
+      </PostHogProvider>
     </>
   );
 };
