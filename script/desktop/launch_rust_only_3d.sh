@@ -15,7 +15,8 @@ config_path="${rust_crate_path}/tauri.artcraft_3d.no_dev.conf.toml"
 export TAURI_FRONTEND_PATH="${frontend_path}"
 export TAURI_APP_PATH="${rust_crate_path}"
 
-cargo tauri dev --no-dev-server \
+
+RUSTFLAGS="-Awarnings" cargo tauri dev --no-dev-server \
   --no-dev-server-wait \
   --no-watch \
   --config "${config_path}"
