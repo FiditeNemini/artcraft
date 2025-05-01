@@ -1,6 +1,7 @@
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
+use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
 use errors::AnyhowResult;
 use log::{error, info};
 use openai_sora_client::recipes::list_sora_task_status_with_session_auto_renew::{list_sora_task_status_with_session_auto_renew, StatusRequestArgs};
@@ -10,10 +11,11 @@ use tauri::AppHandle;
 pub async fn sora_task_polling_thread(
   app_data_root: AppDataRoot,
   sora_creds_manager: SoraCredentialManager,
+  storyteller_creds_manager: StorytellerCredentialManager,
   sora_task_queue: SoraTaskQueue,
 ) -> ! {
   loop {
-    let res = polling_loop(&sora_creds_manager, &sora_task_queue).await;
+    let res = polling_loop(&sora_creds_manager, &storyteller_creds_manager, &sora_task_queue).await;
     if let Err(err) = res {
       error!("An error occurred: {:?}", err);
     }
@@ -23,6 +25,7 @@ pub async fn sora_task_polling_thread(
 
 async fn polling_loop(
   sora_creds_manager: &SoraCredentialManager,
+  storyteller_creds_manager: &StorytellerCredentialManager,
   sora_task_queue: &SoraTaskQueue,
 ) -> AnyhowResult<()> {
   loop {
@@ -76,6 +79,9 @@ async fn polling_loop(
     sora_task_queue.remove_list(&failed_task_ids)?;
 
     // TODO: Handle succeeded tasks.
+    
+    
+    
 
     let succeeded_task_ids : Vec<&TaskId> = succeeded_tasks
         .iter()
