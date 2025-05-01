@@ -39,6 +39,7 @@ members = [
   "crates/lib/bootstrap",
   "crates/lib/bucket_paths",
   "crates/lib/caching/memory_caching",
+  "crates/lib/caching/memory_store",
   "crates/lib/caching/redis_caching",
   "crates/lib/concurrency",
   "crates/lib/cookies",
@@ -184,6 +185,7 @@ errors = { path = "crates/lib/errors" }
 filesys = { path = "crates/lib/files/filesys" }
 images = { path = "crates/lib/files/images" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
+memory_store = { path = "crates/lib/caching/memory_store" }
 mimetypes = { path = "crates/lib/files/mimetypes" }
 openai_sora_client = { path = "crates/lib/api_clients/openai_sora_client" }
 primitives = { path = "crates/lib/data/primitives" }

@@ -27,6 +27,7 @@ crockford = { workspace = true }
 errors = { workspace = true }
 filesys = { workspace = true }
 memory_caching = { workspace = true }
+memory_store = { workspace = true }
 openai_sora_client = { workspace = true }
 primitives = { workspace = true }
 storyteller_client = { workspace = true }
