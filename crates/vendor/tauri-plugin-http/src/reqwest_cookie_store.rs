@@ -9,7 +9,8 @@ use std::{
     sync::{mpsc::Receiver, Mutex},
 };
 
-use cookie_store::{CookieStore, RawCookie, RawCookieParseError};
+// NB(bt): Re-export these for reuse
+pub use cookie_store::{CookieStore, RawCookie, RawCookieParseError};
 use reqwest::header::HeaderValue;
 
 fn set_cookies(
@@ -46,8 +47,9 @@ fn cookies(cookie_store: &CookieStore, url: &url::Url) -> Option<HeaderValue> {
 #[derive(Debug)]
 pub struct CookieStoreMutex {
     pub path: PathBuf,
-    store: Mutex<CookieStore>,
-    save_task: Mutex<Option<CancellableTask>>,
+    // NB(bt): We've made both of these public so we can access them.
+    pub store: Mutex<CookieStore>,
+    pub save_task: Mutex<Option<CancellableTask>>,
 }
 
 impl CookieStoreMutex {

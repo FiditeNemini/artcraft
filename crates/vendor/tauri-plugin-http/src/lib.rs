@@ -12,18 +12,20 @@ use tauri::{
 
 pub use error::{Error, Result};
 
-mod commands;
-mod error;
+// NB(bt): We're making everything public so we can access it.
+pub mod commands;
+pub mod error;
 #[cfg(feature = "cookies")]
-mod reqwest_cookie_store;
-mod scope;
+pub mod reqwest_cookie_store;
+pub mod scope;
 
 #[cfg(feature = "cookies")]
 const COOKIES_FILENAME: &str = ".cookies";
 
-pub(crate) struct Http {
+// NB(bt): We've vendored in this library so we can poke at the cookie data store.
+pub struct Http {
     #[cfg(feature = "cookies")]
-    cookies_jar: std::sync::Arc<crate::reqwest_cookie_store::CookieStoreMutex>,
+    pub cookies_jar: std::sync::Arc<crate::reqwest_cookie_store::CookieStoreMutex>,
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
