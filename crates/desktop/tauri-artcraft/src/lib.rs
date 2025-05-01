@@ -7,11 +7,12 @@ pub mod utils;
 use tauri::{Manager};
 
 use crate::commands::flip_image::flip_image;
+use crate::commands::platform_info_command::platform_info_command;
 use crate::commands::sora::open_sora_login_command::open_sora_login_command;
-use crate::state::main_window_size::MainWindowSize;
 use crate::commands::sora::sora_image_generation_command::sora_image_generation_command;
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
+use crate::state::main_window_size::MainWindowSize;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use crate::threads::discord_presence_thread::discord_presence_thread;
@@ -101,6 +102,7 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       flip_image,
       open_sora_login_command,
+      platform_info_command,
       sora_image_generation_command,
       sora_image_remix_command,
     ])
