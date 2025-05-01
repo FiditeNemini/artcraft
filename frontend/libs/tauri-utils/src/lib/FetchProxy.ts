@@ -14,13 +14,21 @@ import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 /// former, we replace Fetch with the Tauri fetch. If the latter, we dispatch
 /// to the normal browser fetch.
 
-export function FetchProxy(args: any) : Promise<Response> {
+export function FetchProxy(args: any, additionalArgs: any) : Promise<Response> {
   if (IsDesktopApp()) {
     // Tauri proxy fetch
-    return tauriFetch(args);
+    if (additionalArgs !== undefined) {
+      return tauriFetch(args, additionalArgs);
+    } else {
+      return tauriFetch(args);
+    }
   } else {
     // Browser native fetch
-    return fetch(args);
+    if (additionalArgs !== undefined) {
+      return fetch(args, additionalArgs);
+    } else {
+      return fetch(args);
+    }
   }
 }
 
