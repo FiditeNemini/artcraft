@@ -33,10 +33,10 @@ async fn persist_webview_cookies(
   app_data_root: &AppDataRoot,
   storyteller_credential_manager: &StorytellerCredentialManager,
 ) -> AnyhowResult<()> {
-  let webview_credentials = get_storyteller_cookies(webview)?;
+  let current_webview_credentials = get_storyteller_cookies(webview)?;
 
-  if webview_credentials.is_empty() {
-    // TODO: handle logout
+  if current_webview_credentials.is_empty() {
+    // TODO: handle logout / cookie deletion
     return Ok(());
   }
   
@@ -45,13 +45,14 @@ async fn persist_webview_cookies(
   let maybe_old_credentials = storyteller_credential_manager.get_credentials()?;
   
   if let Some(old_credentials) = maybe_old_credentials {
-    if old_credentials.equals(&webview_credentials) {
+    if old_credentials.equals(&current_webview_credentials) {
       replace_credentials = false;
     }
   }
   
   if replace_credentials {
-    storyteller_credential_manager.set_credentials(&webview_credentials)?;
+    info!("Writing ArtCraft credentials to disk...");
+    storyteller_credential_manager.set_credentials(&current_webview_credentials)?;
     storyteller_credential_manager.persist_all_to_disk()?;
   }
   

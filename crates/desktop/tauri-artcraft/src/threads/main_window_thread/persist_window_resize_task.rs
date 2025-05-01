@@ -1,26 +1,32 @@
-use log::info;
-use tauri::Window;
-use errors::AnyhowResult;
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::main_window_size::MainWindowSize;
+use errors::AnyhowResult;
+use log::info;
+use memory_store::clone_slot::CloneSlot;
+use tauri::Window;
 
 pub async fn persist_window_resize_task(
   window: &Window,
   app_data_root: &AppDataRoot,
+  window_size_slot: &CloneSlot<MainWindowSize>,
 ) -> AnyhowResult<()> {
-  let mut window_size = MainWindowSize::from_window(window)?;
 
-  let new_size = window.inner_size()?;
+  let current_window_size = MainWindowSize::from_window(window)?;
+  let current_physical_size = window.inner_size()?;
 
-  // TODO: Temporary regression. This used to work, but we no longer have old state to compare against.
-  // if !window_size.matches_physical_size(&new_size) {
-  //   let old_size = window_size.to_physical_size();
-  //   info!("Window size changed from {:?} to {:?}", old_size, new_size);
-  //   window_size = MainWindowSize::from_window(&window)?;
-  //   info!("Saving window size configs to disk...");
-  //   window_size.persist_to_filesystem(app_data_root)?;
-  // }
+  let mut save_size_to_disk = true;
+  
+  if let Ok(Some(old_size)) = window_size_slot.get_clone() {
+    if old_size.matches_physical_size(&current_physical_size) {
+      save_size_to_disk = false;
+    }
+  }
+  
+  if save_size_to_disk {
+    info!("Saving window size configs to disk...");
+    current_window_size.persist_to_filesystem(app_data_root)?;
+    window_size_slot.set_clone(&current_window_size)?;
+  }
 
   Ok(())
 }
-

@@ -13,7 +13,7 @@ pub struct CloneSlot<T: Clone> {
 }
 
 impl <T: Clone> CloneSlot<T> {
-  pub fn new() -> Self {
+  pub fn empty() -> Self {
     Self {
       store: Arc::new(RwLock::new(None)),
     }
