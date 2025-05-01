@@ -48,7 +48,7 @@ pub async fn handle_main_window(
 ) -> AnyhowResult<()> {
   loop {
     log_errors(persist_window_resize_task(window, app_data_root, window_size_slot).await);
-    log_errors(persist_storyteller_cookies_task(window, app_data_root, storyteller_creds_manager, app_startup_time).await);
+    //log_errors(persist_storyteller_cookies_task(window, app_data_root, storyteller_creds_manager, app_startup_time).await);
     tokio::time::sleep(std::time::Duration::from_millis(1_000)).await;
   }
 }
