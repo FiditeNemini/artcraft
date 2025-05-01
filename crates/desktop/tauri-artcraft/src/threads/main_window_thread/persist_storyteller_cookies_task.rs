@@ -34,11 +34,16 @@ pub async fn persist_storyteller_cookies_task(
   storyteller_credential_manager: &StorytellerCredentialManager,
   app_startup_time: &AppStartupTime,
 ) -> AnyhowResult<()> {
-  
+
   if app_startup_time.time_delta_since() < RACE_CONDITION_WAIT_TIME {
+    // NB:     There's an issue when the "main window thread" inquires about the
+    //     webview cookies shortly after app startup. When it attempts to dump the
+    //     cookies within a few milliseconds of app launch, it deadlocks and the
+    //     app never launches correctly. The entire webview goes blank and the app
+    //     freezes. This hack seems to fix the problem.
     return Ok(())
   }
-  
+
   for webview in window.webviews() {
     let label = webview.label();
     if label == MAIN_WEBVIEW_NAME {
@@ -46,8 +51,10 @@ pub async fn persist_storyteller_cookies_task(
       break;
     }
   }
+  
   Ok(())
 }
+
 async fn persist_webview_cookies(
   webview: &Webview,
   app_data_root: &AppDataRoot,
@@ -63,7 +70,7 @@ async fn persist_webview_cookies(
   let mut replace_credentials = true;
 
   let maybe_old_credentials = storyteller_credential_manager.get_credentials()?;
-  
+
   if let Some(old_credentials) = maybe_old_credentials {
     if old_credentials.equals(&current_webview_credentials) {
       replace_credentials = false;
