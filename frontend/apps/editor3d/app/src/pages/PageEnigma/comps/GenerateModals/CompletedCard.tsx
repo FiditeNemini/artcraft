@@ -2,7 +2,7 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownToLine } from "@fortawesome/pro-solid-svg-icons";
-import { LightboxModal } from "~/components/reusable/LightboxModal";
+import { LightboxModal } from "@storyteller/ui-lightbox-modal";
 import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 
 interface Props {

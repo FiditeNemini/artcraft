@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { LibraryModalApi } from "./LibraryModalApi";
 import { FilterMediaClasses } from "../../../../enums";
 import { twMerge } from "tailwind-merge";
-import { LightboxModal } from "~/components/reusable/LightboxModal";
+import { LightboxModal } from "@storyteller/ui-lightbox-modal";
 import { GetCdnOrigin } from "~/api/GetCdnOrigin";
 
 export interface LibraryItem {
