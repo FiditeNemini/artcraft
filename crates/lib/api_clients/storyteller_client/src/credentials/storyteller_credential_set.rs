@@ -66,4 +66,71 @@ impl StorytellerCredentialSet {
 
     true
   }
+  
+  pub fn maybe_as_cookie_header(&self) -> Option<String> {
+    let mut cookies = Vec::new();
+    
+    if let Some(avt) = &self.avt {
+      cookies.push(avt.as_cookie_header());
+    }
+
+    if let Some(session) = &self.session {
+      cookies.push(session.as_cookie_header());
+    }
+
+    if cookies.is_empty() {
+      None
+    } else {
+      Some(cookies.join("; "))
+    }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::credentials::storyteller_avt_cookie::StorytellerAvtCookie;
+  use crate::credentials::storyteller_credential_set::StorytellerCredentialSet;
+  use crate::credentials::storyteller_session_cookie::StorytellerSessionCookie;
+
+  mod cookies_header {
+    use super::*;
+
+    #[test]
+    fn no_cookie() {
+      let creds = StorytellerCredentialSet::empty();
+      let header = creds.maybe_as_cookie_header();
+      assert_eq!(header, None);
+    }
+
+    #[test]
+    fn avt_cookies_header() {
+      let creds = StorytellerCredentialSet::initialize_with_just_avt(
+        StorytellerAvtCookie::new("bob".to_string()),
+      );
+
+      let header = creds.maybe_as_cookie_header();
+      assert_eq!(header, Some("visitor=bob".to_string()));
+    }
+    
+    #[test]
+    fn session_cookies_header() {
+      let creds = StorytellerCredentialSet::initialize_with_just_cookie(
+        StorytellerSessionCookie::new("bob".to_string()),
+      );
+
+      let header = creds.maybe_as_cookie_header();
+      assert_eq!(header, Some("session=bob".to_string()));
+    }
+    
+    #[test]
+    fn both_cookies_header() {
+      let creds = StorytellerCredentialSet::initialize(
+        Some(StorytellerAvtCookie::new("bob".to_string())),
+        Some(StorytellerSessionCookie::new("alice".to_string())),
+      );
+
+      let header = creds.maybe_as_cookie_header();
+      assert_eq!(header, Some("visitor=bob; session=alice".to_string()));
+    }
+  }
 }

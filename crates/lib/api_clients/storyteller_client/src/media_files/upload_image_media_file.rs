@@ -53,9 +53,17 @@ pub async fn upload_image_media_file<P: AsRef<Path>>(
       .file("file", path)
       .await?;
 
-  let response = client.post(url)
+  let mut request_builder = client.post(url)
       .header("User-Agent", USER_AGENT)
-      .header("Accept", APPLICATION_JSON)
+      .header("Accept", APPLICATION_JSON);
+  
+  if let Some(creds) = maybe_creds {
+    if let Some(header) = &creds.maybe_as_cookie_header() {
+      request_builder = request_builder.header("Cookie", header);
+    }
+  }
+  
+  let response = request_builder
       .multipart(form)
       .send()
       .await?;

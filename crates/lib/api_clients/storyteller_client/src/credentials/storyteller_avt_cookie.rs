@@ -37,4 +37,8 @@ impl StorytellerAvtCookie {
   pub fn equals(&self, other: &Self) -> bool {
     self.cookie == other.cookie
   }
+
+  pub fn as_cookie_header(&self) -> String {
+    format!("{}={}", AVT_COOKIE_NAME, self.cookie)
+  }
 }

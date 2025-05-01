@@ -96,6 +96,11 @@ async fn polling_loop(
     let api_host = ApiHost::Storyteller;
 
     for task in succeeded_tasks.iter() {
+      if !sora_task_queue.contains_key(&task.id)? {
+        continue;
+      }
+      info!("Task succeeded: {:?}", task.id);
+    
       for (i, generation) in task.generations.iter().enumerate() {
         info!("Downloading generated file...");
         let download_path = download_generation(generation, &app_data_root).await?;
