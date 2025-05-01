@@ -1,12 +1,20 @@
 use crate::state::data_dir::app_data_root::AppDataRoot;
+use crate::state::data_dir::trait_data_subdir::DataSubdir;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
 use errors::AnyhowResult;
 use log::{error, info};
 use openai_sora_client::recipes::list_sora_task_status_with_session_auto_renew::{list_sora_task_status_with_session_auto_renew, StatusRequestArgs};
-use openai_sora_client::requests::image_gen::image_gen_status::{TaskId, TaskStatus};
+use openai_sora_client::requests::image_gen::image_gen_status::{Generation, TaskId, TaskStatus};
+use reqwest::Url;
+use std::fs::File;
+use std::io::Write;
+use std::path::PathBuf;
 use tauri::AppHandle;
+use tempdir::TempDir;
+use storyteller_client::media_files::upload_image_media_file::upload_image_media_file;
+use storyteller_client::utils::api_host::ApiHost;
 
 pub async fn sora_task_polling_thread(
   app_data_root: AppDataRoot,
@@ -15,7 +23,12 @@ pub async fn sora_task_polling_thread(
   sora_task_queue: SoraTaskQueue,
 ) -> ! {
   loop {
-    let res = polling_loop(&sora_creds_manager, &storyteller_creds_manager, &sora_task_queue).await;
+    let res = polling_loop(
+      &sora_creds_manager, 
+      &storyteller_creds_manager, 
+      &sora_task_queue,
+      &app_data_root,
+    ).await;
     if let Err(err) = res {
       error!("An error occurred: {:?}", err);
     }
@@ -27,6 +40,7 @@ async fn polling_loop(
   sora_creds_manager: &SoraCredentialManager,
   storyteller_creds_manager: &StorytellerCredentialManager,
   sora_task_queue: &SoraTaskQueue,
+  app_data_root: &AppDataRoot,
 ) -> AnyhowResult<()> {
   loop {
     if sora_task_queue.is_empty()? {
@@ -77,11 +91,21 @@ async fn polling_loop(
         .collect();
 
     sora_task_queue.remove_list(&failed_task_ids)?;
+    
+    let creds = storyteller_creds_manager.get_credentials_required()?;
+    let api_host = ApiHost::Storyteller;
 
-    // TODO: Handle succeeded tasks.
-    
-    
-    
+    for task in succeeded_tasks.iter() {
+      for (i, generation) in task.generations.iter().enumerate() {
+        info!("Downloading generated file...");
+        let download_path = download_generation(generation, &app_data_root).await?;
+
+        info!("Uploading to backend...");
+        let result = upload_image_media_file(&api_host, Some(&creds), download_path).await?;
+        
+        info!("Uploaded to API backend: {:?}", result.media_file_token);
+      }
+    }
 
     let succeeded_task_ids : Vec<&TaskId> = succeeded_tasks
         .iter()
@@ -92,4 +116,22 @@ async fn polling_loop(
 
     tokio::time::sleep(std::time::Duration::from_millis(2_000)).await;
   }
+}
+
+async fn download_generation(generation: &Generation, app_data_root: &AppDataRoot) -> AnyhowResult<PathBuf> {
+  let url = Url::parse(&generation.url)?;
+
+  let response = reqwest::get(&generation.url).await?;
+  let image_bytes = response.bytes().await?;
+
+  let ext = url.path().split(".").last().unwrap_or("png");
+  
+  let tempdir = app_data_root.temp_dir().path();
+  let download_filename = format!("{}.{}", generation.id, ext);
+  let download_path = tempdir.join(download_filename);
+
+  let mut file = File::create(&download_path)?;
+  file.write_all(&image_bytes)?;
+
+  Ok(download_path)
 }

@@ -20,6 +20,7 @@ workspace-build-acceleration = { workspace =  true }
 enums = { workspace = true }
 enums_public = { workspace = true }
 errors = { workspace = true }
+idempotency = { workspace = true }
 tokens = { workspace = true }
 
 # External
@@ -36,7 +37,8 @@ serde_derive = { workspace = true }
 serde_json = { workspace = true }
 
 # HTTP
-backoff = { version = "0.4.0", features = ["futures"] } # Exponential backoff retry
+backoff = { version = "0.4.0", features = ["futures"] }
+uuid = { version = "1.8.0", features = ["v4"] } # Exponential backoff retry
 
 [dev-dependencies]
 tokio = { version = "1.38.0", features = ["macros"] }

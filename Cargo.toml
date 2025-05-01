@@ -185,6 +185,7 @@ enums = { path = "crates/_types/enums" }
 enums_public = { path = "crates/_types/enums_public" }
 errors = { path = "crates/lib/errors" }
 filesys = { path = "crates/lib/files/filesys" }
+idempotency = { path = "crates/lib/idempotency" }
 images = { path = "crates/lib/files/images" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
 memory_store = { path = "crates/lib/caching/memory_store" }

@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+use std::io;
 use errors::AnyhowError;
 
 #[derive(Debug)]
@@ -33,6 +34,9 @@ pub enum ApiError {
 
   /// Uncategorized reqwest error.
   OtherReqwestError(reqwest::Error),
+  
+  /// An error doing file I/O (on our side)
+  IoError(io::Error),
 
   /// Another type of error.
   Other(AnyhowError),
@@ -55,6 +59,8 @@ impl Display for ApiError {
       // Network errors
       ApiError::Timeout(msg) => write!(f, "Timeout: {}", msg),
       ApiError::NetworkError(msg) => write!(f, "Network error: {}", msg),
+      // I/O errors
+      ApiError::IoError(error) => write!(f, "IO error: {}", error),
       // Other
       ApiError::OtherReqwestError(error) => write!(f, "Reqwest error: {}", error),
       ApiError::Other(error) => write!(f, "Other error: {}", error),
@@ -77,5 +83,11 @@ impl From<reqwest::Error> for ApiError {
 impl From<serde_json::Error> for ApiError {
   fn from(error: serde_json::Error) -> Self {
     ApiError::DeserializationError(error)
+  }
+}
+
+impl From<io::Error> for ApiError {
+  fn from(error: io::Error) -> Self {
+    ApiError::IoError(error)
   }
 }

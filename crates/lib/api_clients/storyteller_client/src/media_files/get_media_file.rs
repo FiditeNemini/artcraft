@@ -1,18 +1,3 @@
-use chrono::{DateTime, Utc};
-use log::debug;
-use serde_derive::{Deserialize};
-use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
-use enums::by_table::media_files::media_file_class::MediaFileClass;
-use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
-use enums::by_table::media_files::media_file_type::MediaFileType;
-use enums::by_table::model_weights::weights_category::WeightsCategory;
-use enums::common::visibility::Visibility;
-use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
-use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
-use tokens::tokens::batch_generations::BatchGenerationToken;
-use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::model_weights::ModelWeightToken;
-use tokens::tokens::prompts::PromptToken;
 use crate::api_error::ApiError;
 use crate::shared_response_types::media_file_cover_image_details::MediaFileCoverImageDetails;
 use crate::shared_response_types::media_links::MediaLinks;
@@ -21,6 +6,21 @@ use crate::shared_response_types::user_details_light::UserDetailsLight;
 use crate::utils::api_host::ApiHost;
 use crate::utils::filter_bad_response::filter_bad_response;
 use crate::utils::http_get_anonymous::http_get_anonymous;
+use chrono::{DateTime, Utc};
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
+use enums_public::by_table::model_weights::public_weights_types::PublicWeightsType;
+use log::debug;
+use serde_derive::Deserialize;
+use tokens::tokens::batch_generations::BatchGenerationToken;
+use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::prompts::PromptToken;
 
 /// Get details about a media file from our backend
 pub async fn get_media_file(api_host: &ApiHost, media_file_token: &MediaFileToken) -> Result<GetMediaFileSuccessResponse, ApiError> {
@@ -205,9 +205,9 @@ pub struct GetMediaFileModelInfo {
 
 #[cfg(test)]
 mod tests {
-  use tokens::tokens::media_files::MediaFileToken;
   use crate::media_files::get_media_file::get_media_file;
   use crate::utils::api_host::ApiHost;
+  use tokens::tokens::media_files::MediaFileToken;
 
   #[tokio::test]
   #[ignore] // Don't run in CI. Requires valid cookie

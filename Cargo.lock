@@ -11318,6 +11318,7 @@ dependencies = [
  "enums",
  "enums_public",
  "errors",
+ "idempotency",
  "log",
  "reqwest 0.12.15",
  "serde",
@@ -11326,6 +11327,7 @@ dependencies = [
  "tokens",
  "tokio",
  "url",
+ "uuid 1.8.0",
  "workspace-build-acceleration",
 ]
 
