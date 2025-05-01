@@ -53,13 +53,15 @@ serde = { workspace = true }
 serde_derive = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
-tauri = { version = "2.4.1", features = ["unstable"] }
-tauri-plugin-http = "2.0.0"
+tauri = { workspace = true }
 tauri-plugin-log = "2.3.1"
 tempdir = "0.3.7"
 tempfile = "3.18.0"
 tokio = { version = "1.42", features = ["rt", "rt-multi-thread", "fs"] }
 tokio-util = { version = "0.7", features = ["codec"] }
+
+# NB: We need to vendor this in so that we can access the cookies inside via the private API
+tauri-plugin-http = { path = "../../vendor/tauri-plugin-http" }
 
 # NB: The version of the `discord-rich-presence` crate (0.2.5) last published has non-Send/Sync error
 # types and can't do threading. We need to wait for a new version to unpin from Git.

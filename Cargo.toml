@@ -118,6 +118,7 @@ members = [
   "crates/vendor/candle/candle-transformers",
   "crates/vendor/candle/tensor-tools",
   "crates/vendor/limitation",
+  "crates/vendor/tauri-plugin-http",
   # NB(bt,2023-12-12): Newrelic keeps breaking with upgrades. Kill for now.
   #"crates/vendor/newrelic-telemetry-sdk-rust",
 
@@ -173,6 +174,7 @@ serde_derive = "1.0.219"
 serde_json = "1.0.140"
 serde_yaml = "0.9.1"
 sha3 = "0.10.8"
+tauri = { version = "2.4.1", features = ["unstable"] }
 thiserror = "2.0.12"
 toml = "0.8.20"
 url = { version = "2.5.4", features = ["serde"] }
