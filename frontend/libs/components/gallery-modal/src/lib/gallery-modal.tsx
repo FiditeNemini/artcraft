@@ -266,14 +266,15 @@ export const GalleryModal = React.memo(
                                 </div>
                               ) : (
                                 <img
-                                  src={item.thumbnail}
+                                  //src={item.thumbnail}
+                                  src={item.fullImage || item.thumbnail}
                                   alt={item.label}
                                   className="h-full w-full object-cover"
                                   onError={() =>
                                     handleImageError(item.thumbnail!)
                                   }
-                                  //crossOrigin="anonymous"
-                                  //referrerPolicy="no-referrer"
+                                  crossOrigin="anonymous"
+                                  referrerPolicy="no-referrer"
                                 />
                               )}
                               {mode === "select" &&
