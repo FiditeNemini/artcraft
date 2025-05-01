@@ -10,6 +10,11 @@ import path from 'path';
 export default defineConfig({
   server: {
     port: 5741,
+    // Local development CORS for images
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp"
+    },
   },
 
   //build: {

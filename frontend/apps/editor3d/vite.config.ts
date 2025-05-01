@@ -60,6 +60,11 @@ export default defineConfig({
     },
   ],
   server: {
+    // Local development CORS for images
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp"
+    },
     proxy: {
       "/v1": "https://api.storyteller.ai",
       "/avatar": "https://www.gravatar.com",
