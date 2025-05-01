@@ -11280,6 +11280,7 @@ dependencies = [
  "anyhow",
  "backoff",
  "chrono",
+ "cookie 0.18.1",
  "enums",
  "enums_public",
  "errors",

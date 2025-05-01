@@ -25,6 +25,7 @@ tokens = { workspace = true }
 # External
 anyhow = { workspace = true }
 chrono = { workspace = true }
+cookie = { workspace = true }
 log = { workspace = true }
 reqwest = { workspace = true, features = ["multipart", "gzip"] }
 url = { workspace = true }

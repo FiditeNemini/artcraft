@@ -33,7 +33,7 @@ pub fn read_storyteller_credentials_from_disk(app_data_root: &AppDataRoot) -> An
   }
 
   Ok(StorytellerCredentialSet::initialize(
-    session,
     avt,
+    session,
   ))
 }

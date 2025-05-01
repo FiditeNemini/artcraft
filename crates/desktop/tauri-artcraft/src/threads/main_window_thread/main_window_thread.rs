@@ -1,5 +1,8 @@
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::main_window_size::MainWindowSize;
+use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
+use crate::threads::main_window_thread::persist_storyteller_cookies_task::persist_storyteller_cookies_task;
+use crate::threads::main_window_thread::persist_window_resize_task::persist_window_resize_task;
 use errors::AnyhowResult;
 use log::{error, info};
 use tauri::{AppHandle, Manager, Webview, Window};
@@ -9,6 +12,7 @@ const MAIN_WINDOW_NAME : &str = "main";
 pub async fn main_window_thread(
   app: AppHandle,
   app_data_root: AppDataRoot,
+  storyteller_creds_manager: StorytellerCredentialManager,
 ) -> ! {
   loop {
     for (window_name, window) in app.windows() {
@@ -16,6 +20,7 @@ pub async fn main_window_thread(
         let result = handle_main_window(
           &window,
           &app_data_root,
+          &storyteller_creds_manager,
         ).await;
         if let Err(err) = result {
           error!("Error handling main window: {:?}", err);
@@ -29,20 +34,17 @@ pub async fn main_window_thread(
 pub async fn handle_main_window(
   window: &Window,
   app_data_root: &AppDataRoot,
+  storyteller_creds_manager: &StorytellerCredentialManager,
 ) -> AnyhowResult<()> {
-  let mut window_size = MainWindowSize::from_window(window)?;
-
   loop {
-    let old_size = window_size.to_physical_size();
-    let new_size = window.inner_size()?;
+    log_errors(persist_storyteller_cookies_task(window, app_data_root, storyteller_creds_manager).await);
+    log_errors(persist_window_resize_task(window, app_data_root).await);
+    tokio::time::sleep(std::time::Duration::from_millis(1_000)).await;
+  }
+}
 
-    if !window_size.matches_physical_size(&new_size) {
-      info!("Window size changed from {:?} to {:?}", old_size, new_size);
-      window_size = MainWindowSize::from_window(&window)?;
-      info!("Saving window size configs to disk...");
-      window_size.persist_to_filesystem(app_data_root)?;
-    }
-
-    tokio::time::sleep(std::time::Duration::from_millis(10_000)).await;
+pub fn log_errors<T>(result: AnyhowResult<T>) {
+  if let Err(err) = result {
+    error!("Error persisting window size: {:?}", err);
   }
 }

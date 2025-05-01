@@ -4,7 +4,7 @@ pub mod state;
 pub mod threads;
 pub mod utils;
 
-use tauri::{Manager};
+use tauri::Manager;
 
 use crate::commands::flip_image::flip_image;
 use crate::commands::platform_info_command::platform_info_command;
@@ -15,8 +15,9 @@ use crate::state::app_config::AppConfig;
 use crate::state::main_window_size::MainWindowSize;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
+use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
 use crate::threads::discord_presence_thread::discord_presence_thread;
-use crate::threads::main_window_thread::main_window_thread;
+use crate::threads::main_window_thread::main_window_thread::main_window_thread;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
 use crate::threads::sora_task_polling_thread::sora_task_polling_thread;
 
@@ -35,6 +36,10 @@ pub fn run() {
   let app_data_root = config.app_data_root.clone();
   let app_data_root_2 = config.app_data_root.clone();
 
+  println!("Attempting to read existing artcraft credentials...");
+  let storyteller_creds_manager = StorytellerCredentialManager::initialize_from_disk_infallible(&app_data_root);
+  let storyteller_creds_manager_2 = storyteller_creds_manager.clone();
+  
   println!("Attempting to read existing credentials...");
   let sora_creds_manager = SoraCredentialManager::initialize_from_disk_infallible(&app_data_root);
   let sora_creds_manager_2 = sora_creds_manager.clone();
@@ -89,7 +94,7 @@ pub fn run() {
       }
 
       tauri::async_runtime::spawn(sora_session_login_thread(app_2, app_data_root_2, sora_creds_manager_2));
-      tauri::async_runtime::spawn(main_window_thread(app_3, app_data_root_3));
+      tauri::async_runtime::spawn(main_window_thread(app_3, app_data_root_3, storyteller_creds_manager_2));
       tauri::async_runtime::spawn(sora_task_polling_thread(app_data_root_4, sora_creds_manager_3, sora_task_queue_2));
       tauri::async_runtime::spawn(discord_presence_thread());
 
