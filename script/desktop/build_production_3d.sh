@@ -14,7 +14,6 @@ config_path="${rust_crate_path}/tauri.artcraft_3d.no_dev.conf.json"
 
 export TAURI_FRONTEND_PATH="${frontend_path}"
 export TAURI_APP_PATH="${rust_crate_path}"
+export VITE_ENVIRONMENT_TYPE="production"
 
 cargo tauri build --config "${config_path}"
-
-
