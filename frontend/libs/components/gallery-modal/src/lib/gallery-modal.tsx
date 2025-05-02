@@ -274,8 +274,6 @@ export const GalleryModal = React.memo(
                                   onError={() =>
                                     handleImageError(item.thumbnail!)
                                   }
-                                  crossOrigin="anonymous"
-                                  referrerPolicy="no-referrer"
                                 />
                               )}
                               {mode === "select" &&
