@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // import { Marquee } from "@devnomic/marquee";
-import "@devnomic/marquee/dist/index.css";
+// import "@devnomic/marquee/dist/index.css";
 
 function getRandomImages(count: number) {
   const images = Array.from({ length: count }, (_, i) => ({
