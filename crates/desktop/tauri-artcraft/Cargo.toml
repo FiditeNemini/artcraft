@@ -67,6 +67,10 @@ tauri-plugin-http = { path = "../../vendor/tauri-plugin-http" }
 # types and can't do threading. We need to wait for a new version to unpin from Git.
 discord-rich-presence = { git = "https://github.com/vionya/discord-rich-presence" }
 
+objc2-web-kit = "0.3.1"
+objc2-app-kit = "0.3.1"
+tauri-plugin-upload = "2.2.1"
+
 [dev-dependencies]
 libloading = "0.8.6"
 serial_test = "3.2.0"
