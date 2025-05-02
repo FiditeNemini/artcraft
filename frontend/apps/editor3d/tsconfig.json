@@ -65,6 +65,9 @@
     },
     {
       "path": "../../libs/tauri-utils"
+    },
+    {
+      "path": "../../libs/api"
     }
   ]
 }

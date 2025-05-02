@@ -18,6 +18,7 @@ import { GetFrontendEnvironment } from "~/Classes/GetFrontendEnvironment";
 import { gridVisibility } from "../signals/engine";
 import { InfiniteGridHelper } from "./InfiniteGridHelper";
 import { cameras, selectedCameraId } from "../signals/camera";
+import { MediaFilesApi } from "@storyteller/api";
 
 class Scene {
   name: string;
@@ -41,6 +42,8 @@ class Scene {
 
   // loading indicator manager
   placeholder_manager: LoadingPlaceHolderManager | undefined;
+
+  mediaFilesApi: MediaFilesApi;
 
   updateSurfaceIdAttributeToMesh: Function;
   helper: MMDAnimationHelper;
@@ -74,6 +77,7 @@ class Scene {
     // global names
     this.camera_name = camera_name;
     this.placeholder_manager = undefined;
+    this.mediaFilesApi = new MediaFilesApi();
     this.updateSurfaceIdAttributeToMesh = updateSurfaceIdAttributeToMesh;
 
     this.current_scene_checksum = "";
@@ -427,16 +431,11 @@ class Scene {
 
   // TODO: REPLACE
   async getMediaURL(media_id: string) {
-    //This is for prod when we have the proper info on the url.
-    const api_base_url = environmentVariables.values.BASE_API;
-    const url = `${api_base_url}/v1/media_files/file/${media_id}`;
-    const response = await fetch(url);
-    const json = await JSON.parse(await response.text());
-    const bucketPath = json["media_file"]["public_bucket_path"];
-    //const media_base_url = `${media_api_base_url}/vocodes-public`;
-    const media_base_url = GetCdnOrigin();
-    const media_url = `${media_base_url}${bucketPath}`;
-    return media_url;
+    const response = await this.mediaFilesApi.GetMediaFileByToken({
+      mediaFileToken: media_id
+    });
+
+    return response.data!.media_links.cdn_url;
   }
 
   private floatToPercent(value: number) {
