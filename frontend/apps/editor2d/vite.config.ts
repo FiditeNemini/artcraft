@@ -6,28 +6,18 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import path from 'path';
 
 
-// https://vitejs.dev/config/
+// NB(bt): This configuration file can specify bundler rollup options, compiler plugins,
+// import path resolution, dev server HTTP headers, CORS options, path rewriting, etc.
+// Read the vite docs for more: https://vitejs.dev/config/
+
 export default defineConfig({
   server: {
     port: 5741,
-    // Local development CORS for images
-    headers: {
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "require-corp"
-    },
+    headers: {},
   },
-
-  //build: {
-  //  rollupOptions: {
-  //    external: [
-  //      /^node:.*/,
-  //    ]
-  //  }
-  //},
   resolve: {
     alias: {
       "~": path.resolve(__dirname, "./src"),
-      //"@tests": path.resolve(__dirname, "./tests")
     }
   },
 

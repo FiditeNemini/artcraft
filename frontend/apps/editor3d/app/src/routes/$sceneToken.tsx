@@ -27,8 +27,8 @@ export const headers: HeadersFunction = ({
   //  - https://blog.logrocket.com/understanding-sharedarraybuffer-and-cross-origin-isolation/
   //  - https://github.com/ffmpegwasm/react-app/issues/3
   //
-  "Cross-Origin-Embedder-Policy": "require-corp",
-  "Cross-Origin-Opener-Policy": "same-origin",
+  // "Cross-Origin-Embedder-Policy": "require-corp",
+  // "Cross-Origin-Opener-Policy": "same-origin",
 });
 
 const Index = withProtectionRoute(() => {

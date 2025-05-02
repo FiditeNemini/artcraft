@@ -1,12 +1,13 @@
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { netlifyPlugin } from "@netlify/remix-edge-adapter/plugin";
-import { viteCommonjs, esbuildCommonjs } from '@originjs/vite-plugin-commonjs'
 import path from 'path'
-import { dirname, resolve } from 'node:path'
+import { resolve } from 'node:path'
 
 // NB(bt): This configuration file can specify bundler rollup options, compiler plugins,
-// dev server HTTP headers, CORS options, path rewriting, etc. Read the vite docs for more.
+// import path resolution, dev server HTTP headers, CORS options, path rewriting, etc.
+// Read the vite docs for more: https://vitejs.dev/config/
+
 export default defineConfig({
   root: path.resolve(__dirname, 'app'),
   build: {
