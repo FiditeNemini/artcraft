@@ -60,6 +60,12 @@ async fn check_login_window(
   app_data_root: &AppDataRoot,
   sora_credential_manager: &SoraCredentialManager,
 ) -> AnyhowResult<()> {
+
+
+  
+  
+  
+  
   clear_browsing_data_on_test_domain(webview)?;
   //keep_on_task(webview)?;
   extract_cookies_to_file(webview, app_data_root, sora_credential_manager).await?;

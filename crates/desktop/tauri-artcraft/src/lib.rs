@@ -14,6 +14,7 @@ use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::state::app_config::AppConfig;
 use crate::state::main_window_size::MainWindowSize;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
+use crate::utils::webview_unsafe::webview_unsafe_for_app;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
 use crate::threads::discord_presence_thread::discord_presence_thread;
@@ -74,6 +75,11 @@ pub fn run() {
       //  )?;
       //}
       let app = app.handle().clone();
+      
+      let result = webview_unsafe_for_app(&app);
+      if let Err(err) = result {
+        eprintln!("Error setting webview unsafe: {:?}", err);
+      }
 
       let app_2 = app.clone();
       let app_3 = app.clone();

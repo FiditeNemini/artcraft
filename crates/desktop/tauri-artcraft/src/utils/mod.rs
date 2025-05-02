@@ -6,3 +6,4 @@ pub mod large_file_transfer;
 pub mod object_store;
 pub mod simple_http_download;
 pub mod sora;
+pub mod webview_unsafe;
