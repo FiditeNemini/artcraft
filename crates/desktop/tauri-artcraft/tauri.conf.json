@@ -20,7 +20,13 @@
       }
     ],
     "security": {
-      "csp": null,
+      "csp": {
+        "default-src": "*",
+        "connect-src": "*",
+        "font-src": "*",
+        "img-src": "* data: blob: 'unsafe-inline'",
+        "style-src": "*"
+      },
       "headers": {
         "Cross-Origin-Opener-Policy": "same-origin",
         "Cross-Origin-Embedder-Policy": "require-corp"
