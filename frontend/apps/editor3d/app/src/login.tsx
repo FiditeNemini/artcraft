@@ -124,11 +124,17 @@ export default function LoginScreen() {
           )}
         </div>
         <div className="align-items flex w-full max-w-xl rounded-b-xl bg-ui-controls px-6 py-4">
-          <a
+          {/* <a
             href="https://storyteller.ai/password-reset"
             className="grow text-sm font-medium !text-brand-primary-400 transition-all duration-150 hover:!text-brand-primary-300"
           >
             Forgot your password?
+          </a> */}
+          <a
+            href="/"
+            className="grow text-sm font-medium !text-brand-primary-400 transition-all duration-150 hover:!text-brand-primary-300"
+          >
+            Back
           </a>
           <div className="flex justify-end gap-1 text-sm">
             <p className="opacity-75">Don&apos;t have an account?</p>

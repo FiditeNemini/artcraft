@@ -160,6 +160,15 @@ export default function SignUpScreen() {
           </form>
         </div>
         <div className="align-items flex w-full max-w-xl rounded-b-xl bg-ui-controls px-6 py-4">
+          <div className="flex w-full justify-start gap-1 text-sm">
+            <p className="opacity-75"></p>
+            <a
+              href="/"
+              className="font-medium text-brand-primary-400 hover:text-brand-primary-300"
+            >
+              Back
+            </a>
+          </div>
           <div className="flex w-full justify-end gap-1 text-sm">
             <p className="opacity-75">Already have an account?</p>
             <a
