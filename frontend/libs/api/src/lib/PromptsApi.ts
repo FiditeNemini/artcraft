@@ -194,48 +194,48 @@ export class PromptsApi extends ApiManager {
   public async uploadSceneSnapshot({
     screenshot,
     sceneMediaToken,
-}: {
+  }: {
     screenshot: File; // base64 encoded PNG
     sceneMediaToken?: string;
-}): Promise<ApiResponse<string>> {
+  }): Promise<ApiResponse<string>> {
     const endpoint = `${this.ApiTargets.BaseApi}/v1/image_studio/scene_snapshot`;
     const formData = new FormData();
     formData.append("snapshot", screenshot); // Changed from "screenshot" to "snapshot" to match API spec
     if (sceneMediaToken) {
-    formData.append("scene_media_token", sceneMediaToken);
+      formData.append("scene_media_token", sceneMediaToken);
     }
 
-    const uuidIdempotencyToken = crypto.randomUUID(); // Generate a new UUID
-    formData.append("uuid_idempotency_token", uuidIdempotencyToken); // Added uuid_idempotency_token
+    const uuidIdempotencyToken = crypto.randomUUID();
+    formData.append("uuid_idempotency_token", uuidIdempotencyToken);
 
     const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
+      method: "POST",
+      headers: {
         Accept: "application/json",
-    },
-    credentials: "include",
-    body: formData,
+      },
+      credentials: "include",
+      body: formData,
     });
 
     const postResponse = await response.json();
+
     console.log(postResponse);
+
     let result: { success: boolean; data?: string; errorMessage?: string };
 
     if (postResponse.success) {
-    result = {
+      result = {
         success: true,
         data: postResponse.snapshot_media_token,
         errorMessage: undefined,
-    };
+      };
     } else {
-    result = {
+      result = {
         success: false,
         errorMessage: "Failed to generate snapshot.",
-    };
+      };
     }
 
     return result;
-}
-
-
+  }
 }

@@ -434,7 +434,6 @@ class Scene {
     const response = await this.mediaFilesApi.GetMediaFileByToken({
       mediaFileToken: media_id
     });
-
     return response.data!.media_links.cdn_url;
   }
 

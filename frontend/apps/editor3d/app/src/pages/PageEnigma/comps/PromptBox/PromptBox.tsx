@@ -43,6 +43,7 @@ import {
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { PromptsApi } from "@storyteller/api";
 
 import {
   cameras,
@@ -452,18 +453,20 @@ export const PromptBox = () => {
     if (editorEngine) {
       editorEngine.positive_prompt = prompt;
 
-      const engineApi = new EngineApi();
+      //const engineApi = new EngineApi();
+      const promptsApi = new PromptsApi();
+
       const snapshot = editorEngine.snapShotOfCurrentFrame(false);
 
       if (snapshot) {
-        const snapshotResult = await engineApi.uploadSceneSnapshot({
+        const snapshotResult = await promptsApi.uploadSceneSnapshot({
           screenshot: snapshot.file,
           sceneMediaToken: "",
         });
 
         console.log("useSystemPrompt", useSystemPrompt);
 
-        const response = await engineApi.enqueueImageGeneration({
+        const response = await promptsApi.enqueueImageGeneration({
           disableSystemPrompt: !useSystemPrompt,
           prompt: prompt,
           snapshotMediaToken: snapshotResult.data || "",
@@ -504,21 +507,15 @@ export const PromptBox = () => {
     if (editorEngine) {
       editorEngine.positive_prompt = prompt;
 
-      const engineApi = new EngineApi();
+      const promptsApi = new PromptsApi();
+
       const snapshot = editorEngine.snapShotOfCurrentFrame(false);
 
       if (snapshot) {
-        const snapshotResult = await engineApi.uploadSceneSnapshot({
+        const snapshotResult = await promptsApi.uploadSceneSnapshot({
           screenshot: snapshot.file,
           //sceneMediaToken: "",
         });
-
-        //const response = await engineApi.enqueueImageGeneration({
-        //  disableSystemPrompt: !useSystemPrompt,
-        //  prompt: prompt,
-        //  snapshotMediaToken: "",
-        //  additionalImages: referenceImages.map((image) => image.mediaToken),
-        //});
 
         const generateResponse = await invoke("sora_image_remix_command", {
           request: {
