@@ -1,5 +1,6 @@
 import { ApiManager, ApiResponse } from  "./ApiManager.js";
 import { Prompts } from "./models/Prompts.js";
+import { FetchProxy as fetch } from "@storyteller/tauri-utils";
 
 export class PromptsApi extends ApiManager {
   
@@ -189,7 +190,6 @@ export class PromptsApi extends ApiManager {
         return { success: false, errorMessage: err.message };
       });
   }
-
 
   public async uploadSceneSnapshot({
     screenshot,
