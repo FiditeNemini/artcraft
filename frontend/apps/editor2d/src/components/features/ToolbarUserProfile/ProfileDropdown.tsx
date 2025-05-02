@@ -1,5 +1,4 @@
 import { twMerge } from "tailwind-merge";
-import { Fragment } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -8,10 +7,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Gravatar } from "../../ui/Gravatar";
-
 import { authentication } from "~/signals";
-
-// style constants
 import {
   paperWrapperStyles,
   transitionTimingStyles,
@@ -35,71 +31,79 @@ export function ProfileDropdown() {
 
   return (
     <Menu as="div" className="relative">
-      <MenuButton
-        className={twMerge(
-          "flex cursor-pointer items-center gap-1.5",
-          "data-[hover]:opacity-70",
-        )}
-      >
-        <Gravatar
-          size={34}
-          username={userInfo.value.display_name}
-          email_hash={userInfo.value.email_gravatar_hash}
-          avatarIndex={
-            Number(userInfo.value.core_info.default_avatar.image_index) || 0
-          }
-          backgroundIndex={
-            Number(userInfo.value.core_info.default_avatar.color_index) || 0
-          }
-        />
-        <FontAwesomeIcon icon={faChevronDown} />
-      </MenuButton>
-
-      <MenuItems
-        anchor="bottom end"
-        transition
-        className={twMerge(
-          paperWrapperStyles,
-          "mt-4 flex w-48 flex-col rounded-xl shadow-lg",
-          transitionTimingStyles,
-          "data-[closed]:scale-95 data-[closed]:opacity-0",
-        )}
-      >
-        <MenuItem
-          as="button"
-          href={profileUrl}
-          target="_blank"
-          rel="noreferrer"
-          className={twMerge(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2",
-            "text-md font-medium text-white hover:bg-gray-100 hover:text-gray-700",
-            "transition-colors duration-150",
-          )}
-        >
-          <FontAwesomeIcon icon={faUser} className="w-4" />
-          My Profile
-        </MenuItem>
-
-        {menuOptions.map((option, index) => (
-          <MenuItem
-            key={index}
-            as="button"
+      {({ close }) => (
+        <>
+          <MenuButton
             className={twMerge(
-              "flex w-full items-center gap-3 rounded-lg px-3 py-2",
-              "text-md font-medium text-white hover:bg-gray-100 hover:text-gray-700",
-              "transition-colors duration-150",
+              "flex cursor-pointer items-center gap-1.5",
+              "data-[hover]:opacity-70",
             )}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              option.onClick();
-            }}
           >
-            <FontAwesomeIcon icon={option.icon} className="w-4" />
-            <span>{option.label}</span>
-          </MenuItem>
-        ))}
-      </MenuItems>
+            <Gravatar
+              size={34}
+              username={userInfo.value!.display_name}
+              email_hash={userInfo.value!.email_gravatar_hash}
+              avatarIndex={
+                Number(userInfo.value!.core_info.default_avatar.image_index) ||
+                0
+              }
+              backgroundIndex={
+                Number(userInfo.value!.core_info.default_avatar.color_index) ||
+                0
+              }
+            />
+            <FontAwesomeIcon icon={faChevronDown} />
+          </MenuButton>
+
+          <MenuItems
+            anchor="bottom end"
+            transition
+            className={twMerge(
+              paperWrapperStyles,
+              "mt-4 flex w-40 flex-col rounded-lg shadow-lg",
+              transitionTimingStyles,
+              "data-[closed]:scale-95 data-[closed]:opacity-0",
+              "focus:outline-none focus:ring-0",
+            )}
+          >
+            <MenuItem
+              as="a"
+              href={profileUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={twMerge(
+                "flex w-full items-center gap-2.5 rounded-lg px-3 py-2",
+                "text-sm font-medium !text-white hover:bg-[#63636B]/60",
+                "transition-colors duration-150",
+              )}
+            >
+              <FontAwesomeIcon icon={faUser} className="w-4" />
+              My Profile
+            </MenuItem>
+
+            {menuOptions.map((option, index) => (
+              <MenuItem
+                key={index}
+                as="button"
+                className={twMerge(
+                  "flex w-full items-center gap-2.5 rounded-lg px-3 py-2",
+                  "text-sm font-medium text-white hover:bg-[#63636B]/60",
+                  "transition-colors duration-150",
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  option.onClick();
+                  close();
+                }}
+              >
+                <FontAwesomeIcon icon={option.icon} className="w-4" />
+                <span>{option.label}</span>
+              </MenuItem>
+            ))}
+          </MenuItems>
+        </>
+      )}
     </Menu>
   );
 }
