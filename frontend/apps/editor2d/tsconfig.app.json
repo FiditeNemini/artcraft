@@ -32,19 +32,25 @@
       "path": "../../libs/components/settings-modal/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/components/button/tsconfig.lib.json"
-    },
-    {
       "path": "../../libs/components/gallery-modal/tsconfig.lib.json"
     },
     {
-      "path": "../../libs/tauri-utils/tsconfig.lib.json"
+      "path": "../../libs/components/modal/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/components/button/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/components/tooltip/tsconfig.lib.json"
     },
     {
       "path": "../../libs/components/demo-modal/tsconfig.lib.json"
     },
     {
       "path": "../../libs/api/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/tauri-utils/tsconfig.lib.json"
     }
   ]
 }

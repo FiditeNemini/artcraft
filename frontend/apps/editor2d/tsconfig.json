@@ -5,19 +5,25 @@
       "path": "../../libs/components/settings-modal"
     },
     {
-      "path": "../../libs/components/button"
-    },
-    {
       "path": "../../libs/components/gallery-modal"
     },
     {
-      "path": "../../libs/tauri-utils"
+      "path": "../../libs/components/modal"
+    },
+    {
+      "path": "../../libs/components/button"
+    },
+    {
+      "path": "../../libs/components/tooltip"
     },
     {
       "path": "../../libs/components/demo-modal"
     },
     {
       "path": "../../libs/api"
+    },
+    {
+      "path": "../../libs/tauri-utils"
     },
     {
       "path": "./tsconfig.app.json"

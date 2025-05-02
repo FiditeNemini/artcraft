@@ -1,0 +1,8 @@
+{
+  "build": {
+    "frontendDist": "../../../frontend/apps/editor3d/dist",
+    "beforeDevCommand": "echo 'no dev'",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "VITE_ENVIRONMENT_TYPE=production nx run editor3d:build"
+  }
+}

@@ -54,7 +54,9 @@ pub async fn sora_image_remix_command(
   sora_creds_manager: State<'_, SoraCredentialManager>,
   sora_task_queue: State<'_, SoraTaskQueue>,
 ) -> Result<String, String> {
-  info!("image_generation_command called; processing image...");
+  
+  info!("image_generation_command called; scene media token: {:?}, additional images: {:?}", 
+    request.snapshot_media_token, request.maybe_additional_images);
 
   // TODO(bt,2025-04-24): Better error messages to caller
 
