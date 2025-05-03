@@ -80,7 +80,6 @@ function Gravatar(props: Props) {
         </div>
       )}
       <img
-        crossOrigin="anonymous"
         alt={altText}
         src={imgUrl}
         height={props.size}

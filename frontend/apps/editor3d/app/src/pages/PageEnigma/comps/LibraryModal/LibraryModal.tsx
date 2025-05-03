@@ -254,8 +254,6 @@ export const LibraryModal = React.memo(
                                   onError={() =>
                                     handleImageError(item.thumbnail!)
                                   }
-                                  crossOrigin="anonymous"
-                                  referrerPolicy="no-referrer"
                                 />
                               )}
                               {mode === "select" &&

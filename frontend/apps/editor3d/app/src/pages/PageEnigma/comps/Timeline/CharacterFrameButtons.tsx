@@ -146,7 +146,7 @@ export default function CharacterFrameButton(
       <>
         <div className={classes} style={{ minWidth: frameTrackButtonWidthPx, width: frameTrackButtonWidthPx }}>
           <div className={"rounded-md w-full h-full relative group border-2 border-gray-400"}>
-            <img crossOrigin="anonymous" src={mediaFile} alt={CharacterFrameStrings[target]} className={"rounded-md object-cover w-full h-full"} />
+            <img src={mediaFile} alt={CharacterFrameStrings[target]} className={"rounded-md object-cover w-full h-full"} />
             <button className={buttonClasses} onClick={handleDeleteFrame}>
               <FontAwesomeIcon icon={faTrashCan} size={"xs"} className={""} />
             </button>
