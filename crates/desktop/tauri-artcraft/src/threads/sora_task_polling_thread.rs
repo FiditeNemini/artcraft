@@ -8,15 +8,28 @@ use log::{error, info};
 use openai_sora_client::recipes::list_sora_task_status_with_session_auto_renew::{list_sora_task_status_with_session_auto_renew, StatusRequestArgs};
 use openai_sora_client::requests::image_gen::image_gen_status::{Generation, TaskId, TaskStatus};
 use reqwest::Url;
+use serde_derive::Serialize;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use tauri::AppHandle;
-use tempdir::TempDir;
 use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
 use storyteller_client::utils::api_host::ApiHost;
+use tauri::{AppHandle, Emitter};
+use tempdir::TempDir;
+use tokens::tokens::media_files::MediaFileToken;
+
+#[derive(Debug, Clone, Serialize)]
+pub struct SoraImageGenerationComplete {
+  pub media_file_token: MediaFileToken,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct SoraImageGenerationFailed {
+  pub prompt: String,
+}
 
 pub async fn sora_task_polling_thread(
+  app_handle: AppHandle,
   app_data_root: AppDataRoot,
   sora_creds_manager: SoraCredentialManager,
   storyteller_creds_manager: StorytellerCredentialManager,
@@ -24,6 +37,7 @@ pub async fn sora_task_polling_thread(
 ) -> ! {
   loop {
     let res = polling_loop(
+      &app_handle,
       &sora_creds_manager, 
       &storyteller_creds_manager, 
       &sora_task_queue,
@@ -37,6 +51,7 @@ pub async fn sora_task_polling_thread(
 }
 
 async fn polling_loop(
+  app_handle: &AppHandle,
   sora_creds_manager: &SoraCredentialManager,
   storyteller_creds_manager: &StorytellerCredentialManager,
   sora_task_queue: &SoraTaskQueue,
@@ -84,6 +99,14 @@ async fn polling_loop(
         TaskStatus::Unknown(_) => {}
       }
     }
+    
+    for task in failed_tasks.iter() {
+      if sora_task_queue.contains_key(&task.id)? {
+        app_handle.emit("sora-image-generation-failed", SoraImageGenerationFailed {
+          prompt: task.prompt.clone(),
+        })?;
+      }
+    }
 
     let failed_task_ids: Vec<&TaskId> = failed_tasks
         .iter()
@@ -109,6 +132,10 @@ async fn polling_loop(
         let result = upload_image_media_file_from_file(&api_host, Some(&creds), download_path).await?;
         
         info!("Uploaded to API backend: {:?}", result.media_file_token);
+        
+        app_handle.emit("sora-image-generation-complete", SoraImageGenerationComplete { 
+          media_file_token: result.media_file_token 
+        })?;
       }
     }
 

@@ -84,6 +84,7 @@ pub fn run() {
 
       let app_2 = app.clone();
       let app_3 = app.clone();
+      let app_4 = app.clone();
       let app_data_root_3 = app_data_root_2.clone();
       let app_data_root_4 = app_data_root_2.clone();
       let sora_creds_manager_3 = sora_creds_manager_2.clone();
@@ -105,7 +106,7 @@ pub fn run() {
 
       tauri::async_runtime::spawn(sora_session_login_thread(app_2, app_data_root_2, sora_creds_manager_2));
       tauri::async_runtime::spawn(main_window_thread(app_3, app_data_root_3, storyteller_creds_manager_2));
-      tauri::async_runtime::spawn(sora_task_polling_thread(app_data_root_4, sora_creds_manager_3, storyteller_creds_manager_3, sora_task_queue_2));
+      tauri::async_runtime::spawn(sora_task_polling_thread(app_4, app_data_root_4, sora_creds_manager_3, storyteller_creds_manager_3, sora_task_queue_2));
       tauri::async_runtime::spawn(discord_presence_thread());
 
       Ok(())
