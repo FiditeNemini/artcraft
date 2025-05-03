@@ -411,7 +411,7 @@ pub async fn enqueue_studio_image_generation_handler(http_request: HttpRequest, 
     maybe_additional_media_file_tokens: Some(additional_images),
     maybe_number_of_samples: Some(number_of_samples),
     maybe_sora_media_upload_tokens: Some(sora_media_tokens),
-    maybe_sora_task_id: Some(response.task_id)
+    maybe_sora_task_id: Some(response.task_id.0)
   };
 
   // create the inference args here

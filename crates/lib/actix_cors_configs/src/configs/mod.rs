@@ -7,3 +7,4 @@ pub (crate) mod storyteller;
 pub (crate) mod storyteller_board;
 pub (crate) mod storyteller_render;
 pub (crate) mod storyteller_studio;
+pub (crate) mod tauri;

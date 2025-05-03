@@ -1,7 +1,6 @@
 use actix_cors::Cors;
 use log::info;
 
-use reusable_types::server_environment::ServerEnvironment;
 use crate::configs::artcraft_2d::add_artcraft_2d;
 use crate::configs::artcraft_3d::add_artcraft_3d;
 use crate::configs::development_only::add_development_only;
@@ -11,6 +10,8 @@ use crate::configs::storyteller::{add_storyteller, add_storyteller_dev_proxy};
 use crate::configs::storyteller_board::add_storyteller_board;
 use crate::configs::storyteller_render::add_storyteller_render;
 use crate::configs::storyteller_studio::add_storyteller_studio;
+use crate::configs::tauri::add_tauri;
+use reusable_types::server_environment::ServerEnvironment;
 
 /// Return cors config for FakeYou / Vocodes / OBS / local development
 pub fn build_cors_config(server_environment: ServerEnvironment) -> Cors {
@@ -42,6 +43,7 @@ fn do_build_cors_config(is_production: bool) -> Cors {
   cors = add_storyteller_render(cors, is_production);
 
   // Artcraft
+  cors = add_tauri(cors, is_production);
   cors = add_artcraft_2d(cors, is_production);
   cors = add_artcraft_3d(cors, is_production);
 
