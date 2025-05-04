@@ -22,7 +22,9 @@ import {
   precisionSelectorValues,
   showPrecisionSelector,
 } from "./signals/precisionSelectorMenu";
-import { SoundRegistry, SoundEffect } from "@storyteller/soundboard";
+import { InstallSounds } from "~/pages/PageEnigma/InstallSounds";
+import { InstallImageGenerationFailure } from "~/pages/PageEnigma/tauri_events/SoraImageGenerationFailure";
+import { InstallImageGenerationSuccess } from "~/pages/PageEnigma/tauri_events/SoraImageGenerationSuccess";
 
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useSignals();
@@ -89,13 +91,9 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   });
 
   useEffect(() => {
-    const r = SoundRegistry.getInstance();
-    r.setSoundOnce("success", new SoundEffect("resources/sound/smrpg_flower.wav"));
-    r.setSoundOnce("bingo", new SoundEffect("resources/sound/smrpg_correct.wav"));
-    r.setSoundOnce("next", new SoundEffect("resources/sound/oot_dialogue_next.wav", 2.0));
-    r.setSoundOnce("done", new SoundEffect("resources/sound/oot_dialogue_done.wav", 2.0));
-    r.setSoundOnce("fail", new SoundEffect("resources/sound/smrpg_drybones_crumble.wav"));
-    (window as any).sounds = r;
+    InstallSounds();
+    InstallImageGenerationSuccess();
+    InstallImageGenerationFailure();
   });
 
   if (validGpu === "unknown") {

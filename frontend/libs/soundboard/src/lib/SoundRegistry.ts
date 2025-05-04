@@ -16,6 +16,10 @@ export class SoundRegistry {
     return SoundRegistry.#instance;
   }
 
+  public hasSound(key: string) : boolean {
+    return this.#sounds.has(key);
+  }
+
   public setSound(key: string, sound: SoundEffect) {
     this.#sounds.set(key, sound);
   }
@@ -24,6 +28,10 @@ export class SoundRegistry {
     if (!this.#sounds.has(key)) {
       this.#sounds.set(key, sound);
     }
+  }
+
+  public getSound(key: string) : SoundEffect | undefined {
+    return this.#sounds.get(key);
   }
 
   public playSound(key: string) {
