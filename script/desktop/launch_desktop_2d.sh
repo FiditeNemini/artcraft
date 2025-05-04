@@ -25,7 +25,7 @@ popd
 # filesystem and finds the wrong frontend code.
 
 export TAURI_FRONTEND_PATH="${frontend_path}"
-export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-artcraft"
+export TAURI_APP_PATH="${root_dir}/crates/desktop/artcraft"
 
 export CONFIG_PATH="${TAURI_APP_PATH}/tauri.artcraft_2d.conf.toml"
 

@@ -4,7 +4,7 @@ set -euxo pipefail
 
 root_dir=$(pwd)
 frontend_path="${root_dir}/frontend"
-rust_crate_path="${root_dir}/crates/desktop/tauri-artcraft"
+rust_crate_path="${root_dir}/crates/desktop/artcraft"
 
 # The tauri dev server integration is super annoying: It eats ctrl-c interrupts, 
 # it decoheres the and corrupts terminal output, and it's slow. This configuration

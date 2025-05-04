@@ -24,7 +24,7 @@ members = [
   "crates/cli/production/migration-tool",
 
   # Desktop apps
-  "crates/desktop/tauri-artcraft",
+  "crates/desktop/artcraft",
   "crates/desktop/tauri-realtime",
 
   # Shared libraries

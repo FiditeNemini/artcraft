@@ -803,6 +803,54 @@ dependencies = [
 ]
 
 [[package]]
+name = "artcraft"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "assertor",
+ "base64 0.22.1",
+ "bytes 1.10.0",
+ "chrono",
+ "const_format",
+ "crockford",
+ "directories 6.0.0",
+ "dirs 6.0.0",
+ "discord-rich-presence",
+ "errors",
+ "filesys",
+ "futures 0.3.29",
+ "image",
+ "indexmap 2.9.0",
+ "libloading 0.8.6",
+ "log",
+ "memory_caching",
+ "memory_store",
+ "once_cell",
+ "openai_sora_client",
+ "primitives",
+ "rand 0.9.0",
+ "reqwest 0.12.15",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "serde_yaml",
+ "serial_test",
+ "storyteller_client",
+ "subprocess_common",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-http",
+ "tauri-plugin-log",
+ "tauri-plugin-upload",
+ "tempdir",
+ "tempfile",
+ "tokens",
+ "tokio",
+ "tokio-util",
+ "workspace-build-acceleration",
+]
+
+[[package]]
 name = "ascii"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12106,54 +12154,6 @@ dependencies = [
  "webview2-com",
  "window-vibrancy",
  "windows 0.60.0",
-]
-
-[[package]]
-name = "tauri-artcraft"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "assertor",
- "base64 0.22.1",
- "bytes 1.10.0",
- "chrono",
- "const_format",
- "crockford",
- "directories 6.0.0",
- "dirs 6.0.0",
- "discord-rich-presence",
- "errors",
- "filesys",
- "futures 0.3.29",
- "image",
- "indexmap 2.9.0",
- "libloading 0.8.6",
- "log",
- "memory_caching",
- "memory_store",
- "once_cell",
- "openai_sora_client",
- "primitives",
- "rand 0.9.0",
- "reqwest 0.12.15",
- "serde",
- "serde_derive",
- "serde_json",
- "serde_yaml",
- "serial_test",
- "storyteller_client",
- "subprocess_common",
- "tauri",
- "tauri-build",
- "tauri-plugin-http",
- "tauri-plugin-log",
- "tauri-plugin-upload",
- "tempdir",
- "tempfile",
- "tokens",
- "tokio",
- "tokio-util",
- "workspace-build-acceleration",
 ]
 
 [[package]]

@@ -4,9 +4,9 @@ set -euxo pipefail
 
 # Tauri CLI is being bad-behaved, so just run via cargo.
 # NX will need to launch the frontend separately.
-cargo build --bin tauri-artcraft
+cargo build --bin artcraft
 
-./target/debug/tauri-artcraft
+./target/debug/artcraft
 
 # # Kill any process running on port 5741, which will block startup
 # if lsof -i tcp:5741 &>/dev/null; then
@@ -31,7 +31,7 @@ cargo build --bin tauri-artcraft
 # # filesystem and finds the wrong frontend code.
 # 
 # export TAURI_FRONTEND_PATH="${frontend_path}"
-# export TAURI_APP_PATH="${root_dir}/crates/desktop/tauri-artcraft"
+# export TAURI_APP_PATH="${root_dir}/crates/desktop/artcraft"
 # 
 # export CONFIG_PATH="${TAURI_APP_PATH}/tauri.artcraft_2d.conf.toml"
 # 
