@@ -11,17 +11,19 @@ use crate::commands::platform_info_command::platform_info_command;
 use crate::commands::sora::open_sora_login_command::open_sora_login_command;
 use crate::commands::sora::sora_image_generation_command::sora_image_generation_command;
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
-use crate::state::app_config::AppConfig;
+use crate::commands::app_preferences::get_app_preferences_command::get_app_preferences_command;
+use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::main_window_size::MainWindowSize;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
-use crate::utils::webview_unsafe::webview_unsafe_for_app;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
 use crate::state::storyteller::storyteller_credential_manager::StorytellerCredentialManager;
 use crate::threads::discord_presence_thread::discord_presence_thread;
 use crate::threads::main_window_thread::main_window_thread::main_window_thread;
 use crate::threads::sora_session_login_thread::sora_session_login_thread;
 use crate::threads::sora_task_polling_thread::sora_task_polling_thread;
+use crate::utils::webview_unsafe::webview_unsafe_for_app;
 
+use crate::state::app_preferences::app_preferences_manager::load_app_preferences_or_default;
 use tauri_plugin_http;
 use tauri_plugin_log::Target;
 use tauri_plugin_log::TargetKind;
@@ -30,14 +32,13 @@ use tauri_plugin_log::TargetKind;
 pub fn run() {
   // NB: Tauri wants to install the logger itself, so we can't rely on the logger crate
   // until the tauri runtime begins.
-  println!("Loading model config...");
+  println!("Loading config...");
+  let app_data_root = AppDataRoot::create_default().expect("data directory should be created");
+  let app_data_root_2 = app_data_root.clone();
 
-  let config = AppConfig::init()
-    .expect("config should load");
-
-  let app_data_root = config.app_data_root.clone();
-  let app_data_root_2 = config.app_data_root.clone();
-
+  println!("Loading app preferences...");
+  let app_preferences = load_app_preferences_or_default(&app_data_root);
+  
   println!("Attempting to read existing artcraft credentials...");
   let storyteller_creds_manager = StorytellerCredentialManager::initialize_from_disk_infallible(&app_data_root);
   let storyteller_creds_manager_2 = storyteller_creds_manager.clone();
@@ -112,11 +113,12 @@ pub fn run() {
       Ok(())
     })
     .manage(app_data_root)
-    .manage(config)
+    .manage(app_preferences)
     .manage(sora_creds_manager)
     .manage(sora_task_queue)
     .invoke_handler(tauri::generate_handler![
       flip_image,
+      get_app_preferences_command,
       open_sora_login_command,
       platform_info_command,
       sora_image_generation_command,
