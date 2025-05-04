@@ -1,7 +1,8 @@
-use log::info;
 use crate::credentials::{SoraCredentials, USER_AGENT};
 use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::sora_error::SoraError;
+use crate::utils::classify_general_http_error::classify_general_http_error;
+use log::info;
 use reqwest::multipart::{Form, Part};
 use reqwest::Client;
 use serde::Deserialize;
@@ -107,29 +108,11 @@ pub (crate) async fn upload_media_http_request(
   // Check response status
   if !response.status().is_success() {
     info!("Error uploading image: {:?}", response.status());
-    let error = classify_error(response).await;
+    let error = classify_general_http_error(response).await;
     return Err(error);
   }
 
   // Parse response
   let upload_response = response.json::<SoraMediaUploadResponse>().await?;
   Ok(upload_response)
-}
-
-async fn classify_error(response: reqwest::Response) -> SoraError {
-  let status = response.status();
-  let message = match response.text().await {
-    Ok(text) => text,
-    Err(err) => return SoraError::ReqwestError(err),
-  };
-
-  let cookie_expired =
-      message.contains("Your authentication token has expired. Please try signing in again.")
-      || message.contains("token_expired");
-
-  if cookie_expired {
-    SoraError::UnauthorizedCookieOrBearerExpired
-  } else {
-    SoraError::OtherBadStatus(anyhow::anyhow!("Upload failed with status {}: {}", status, message))
-  }
 }

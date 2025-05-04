@@ -1,3 +1,5 @@
+use crate::sora_error::SoraError;
+use crate::utils::classify_general_http_error::classify_general_http_error;
 use errors::AnyhowResult;
 use log::error;
 use reqwest::Client;
@@ -27,7 +29,7 @@ pub struct SoraUser {
     pub last_authorization_check: Option<i64>,
 }
 
-pub async fn generate_bearer_with_cookie(cookie: &str) -> AnyhowResult<String> {
+pub async fn generate_bearer_with_cookie(cookie: &str) -> Result<String, SoraError> {
     let client = Client::builder()
         .gzip(true)
         .build()?;
@@ -43,11 +45,11 @@ pub async fn generate_bearer_with_cookie(cookie: &str) -> AnyhowResult<String> {
 
     if !response.status().is_success() {
         error!("Failed to generate bearer token: {}", response.status());
-        return Err(anyhow::anyhow!("Failed to generate bearer token: {}", response.status()));
+        let error = classify_general_http_error(response).await;
+        return Err(error);
     }
+ 
     let response_body = &response.text().await?;
-    println!("response_body: {}", response_body);
-
     let auth_response: SoraAuthResponse = serde_json::from_str(&response_body)?;
     Ok(auth_response.access_token)
 }

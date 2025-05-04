@@ -1,9 +1,11 @@
+use super::request::GenerateSentinelRefreshRequest;
+use crate::sora_error::SoraError;
+use crate::utils::classify_general_http_error::classify_general_http_error;
 use errors::AnyhowResult;
+use idempotency::uuid::generate_random_uuid;
+use log::error;
 use serde_derive::{Deserialize, Serialize};
 use thiserror::Error;
-use idempotency::uuid::generate_random_uuid;
-
-use super::request::GenerateSentinelRefreshRequest;
 
 const SORA_IMAGE_GEN_URL: &str = "https://chatgpt.com/backend-api/sentinel/req";
 
@@ -41,7 +43,7 @@ pub struct SentinelResponse {
 }
 
 
-pub async fn generate_token() -> AnyhowResult<String> {
+pub async fn generate_token() -> Result<String, SoraError> {
   let (_request, base64_request) = GenerateSentinelRefreshRequest::new().with_fourth_and_tenth();
   let request = SentinelRequest::new(base64_request);
   let client = reqwest::Client::new();
@@ -51,6 +53,12 @@ pub async fn generate_token() -> AnyhowResult<String> {
     .json(&request)
     .send()
     .await?;
+  
+  if !response.status().is_success() {
+    error!("Failed to generate sentinel: {}", response.status());
+    let error = classify_general_http_error(response).await;
+    return Err(error);
+  }
 
   let response_json: SentinelResponse = response.json().await?;
   Ok(response_json.token)

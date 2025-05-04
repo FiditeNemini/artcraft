@@ -25,6 +25,11 @@ pub enum SoraError {
   ///     }
   ///   }
   UnauthorizedCookieOrBearerExpired,
+  
+  /// Sora is having issues.
+  /// Typically served from Cloudflare
+  /// We preserve the message for debugging.
+  BadGateway(String),
 
   /// Another error occurred.
   OtherBadStatus(anyhow::Error),
@@ -55,6 +60,9 @@ impl Display for SoraError {
       }
       Self::UnauthorizedCookieOrBearerExpired => {
         write!(f, "Unauthorized: cookie and/or bearer token expired")
+      }
+      Self::BadGateway(message) => {
+        write!(f, "Bad Gateway; Sora is likely having issues: {:?}", message)
       }
       Self::OtherBadStatus(err) => {
         write!(f, "Other error: {}", err)
