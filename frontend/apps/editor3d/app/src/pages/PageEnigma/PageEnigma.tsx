@@ -22,6 +22,7 @@ import {
   precisionSelectorValues,
   showPrecisionSelector,
 } from "./signals/precisionSelectorMenu";
+import { SoundRegistry, SoundEffect } from "@storyteller/soundboard";
 
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useSignals();
@@ -85,6 +86,16 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
 
       setValidGpu(isValid ? "valid" : "error");
     });
+  });
+
+  useEffect(() => {
+    const r = SoundRegistry.getInstance();
+    r.setSoundOnce("success", new SoundEffect("resources/sound/smrpg_flower.wav"));
+    r.setSoundOnce("bingo", new SoundEffect("resources/sound/smrpg_correct.wav"));
+    r.setSoundOnce("next", new SoundEffect("resources/sound/oot_dialogue_next.wav", 2.0));
+    r.setSoundOnce("done", new SoundEffect("resources/sound/oot_dialogue_done.wav", 2.0));
+    r.setSoundOnce("fail", new SoundEffect("resources/sound/smrpg_drybones_crumble.wav"));
+    (window as any).sounds = r;
   });
 
   if (validGpu === "unknown") {

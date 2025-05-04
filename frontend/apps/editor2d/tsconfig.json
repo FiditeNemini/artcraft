@@ -26,6 +26,9 @@
       "path": "../../libs/tauri-utils"
     },
     {
+      "path": "../../libs/soundboard"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

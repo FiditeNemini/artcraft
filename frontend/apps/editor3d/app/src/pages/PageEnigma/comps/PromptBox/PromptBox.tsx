@@ -45,6 +45,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { PromptsApi } from "@storyteller/api";
+import { SoundRegistry } from "@storyteller/soundboard";
 
 import {
   cameras,
@@ -438,6 +439,9 @@ export const PromptBox = () => {
   const handleEnqueue = async () => {
     const isDesktop = IsDesktopApp();
     console.log("Is this a desktop app?", isDesktop);
+
+    const r = SoundRegistry.getInstance();
+    r.playSound("test");
 
     if (isDesktop) {
       await handleTauriEnqueue();

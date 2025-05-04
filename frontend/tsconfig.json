@@ -59,6 +59,9 @@
     },
     {
       "path": "./libs/components/loading-spinner"
+    },
+    {
+      "path": "./libs/soundboard"
     }
   ]
 }
