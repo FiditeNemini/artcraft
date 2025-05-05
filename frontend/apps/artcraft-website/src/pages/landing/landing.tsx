@@ -7,10 +7,10 @@ import { SOCIAL_LINKS } from "../../config/links";
 const Landing = () => {
   const videos = [
     {
-      src: "https://www.youtube.com/embed/pGn-1BKo3nY?si=q4dm0ICb6wF1JW8N",
+      src: "https://www.youtube.com/embed/H4NFXGMuwpY?si=U2_m5Ic1YBn6176D",
     },
     {
-      src: "https://www.youtube.com/embed/_FkKf7sECk4?si=Jx38ZGSoyYj0hObr",
+      src: "https://www.youtube.com/embed/pGn-1BKo3nY?si=q4dm0ICb6wF1JW8N",
     },
     {
       src: "https://www.youtube.com/embed/7x7IZkHiGD8?si=tL8nK4CULigpfHQR",
