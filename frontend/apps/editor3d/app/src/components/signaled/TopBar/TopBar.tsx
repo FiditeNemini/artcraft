@@ -15,6 +15,9 @@ import { GalleryModal } from "@storyteller/ui-gallery-modal";
 import { SettingsModal } from "@storyteller/ui-settings-modal";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { downloadFileFromUrl } from "@storyteller/api";
+import { TabSelector, TabItem } from "@storyteller/ui-tab-selector";
+import { Signal } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
 function isEditorPath(path: string) {
   if (path === "/") return true;
   if (path === "/idealenigma/") return true;
@@ -22,9 +25,18 @@ function isEditorPath(path: string) {
 }
 interface Props {
   pageName: string;
+  appTabIdSignal: Signal<string>;
+  setAppTabId: (id: string) => void;
 }
 
-export const TopBar = ({ pageName }: Props) => {
+const appTabs: TabItem[] = [
+  { id: "2D", label: "2D" },
+  { id: "3D", label: "3D" },
+];
+
+export const TopBar = ({ pageName, appTabIdSignal, setAppTabId }: Props) => {
+  useSignals();
+
   const currentLocation = getCurrentLocationWithoutParams(
     useLocation().pathname,
     useParams(),
@@ -58,6 +70,12 @@ export const TopBar = ({ pageName }: Props) => {
                 Back to Editor
               </ButtonLink>
             )}
+            <TabSelector
+              tabs={appTabs}
+              activeTab={appTabIdSignal.value}
+              disabled={false}
+              onTabChange={(tabId) => setAppTabId(tabId)}
+            />
             {/* <Button
               variant="secondary"
               icon={faChevronRight}

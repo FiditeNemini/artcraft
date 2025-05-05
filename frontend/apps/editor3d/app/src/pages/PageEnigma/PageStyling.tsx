@@ -18,6 +18,7 @@ import { StyleSelection } from "~/pages/PageEnigma/comps/StyleSelection";
 import { StyleMoreOptions } from "~/pages/PageEnigma/comps/StyleMoreOptions/StyleMoreOptions";
 import Queue, { QueueNames } from "~/pages/PageEnigma/Queue";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
+import { appTabId, setAppTabId } from "~/signals/appTab";
 
 export const PageStyling = () => {
   useSignals();
@@ -59,7 +60,11 @@ export const PageStyling = () => {
 
   return (
     <div className="h-screen w-screen">
-      <TopBar pageName="Stylization" />
+      <TopBar
+        pageName="Stylization"
+        appTabIdSignal={appTabId}
+        setAppTabId={setAppTabId}
+      />
       <div className="mt-4 flex flex-col items-center gap-6">
         <PreviewImages />
       </div>
