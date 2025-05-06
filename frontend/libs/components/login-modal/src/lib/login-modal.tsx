@@ -30,11 +30,8 @@ export function LoginModal({
   const totalSteps = 3;
 
   const checkSession = async () => {
-    // Bombay: This will be replaced with actual session check
-    // For testing: return true to simulate having a session, false to simulate no session
-    const sessionExists = false;
-    setHasSession(sessionExists);
-    return sessionExists;
+    // Return the current session state
+    return hasSession;
   };
 
   // Check session on component mount
@@ -44,12 +41,10 @@ export function LoginModal({
       if (!sessionExists) {
         setIsOpen(true);
         setStep(1);
-      } else {
-        setIsOpen(false);
       }
     };
     initSession();
-  }, [hasSession]);
+  }, []);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -62,13 +57,20 @@ export function LoginModal({
       try {
         if (IsDesktopApp()) {
           await invoke("open_sora_login_command");
+          // Add 3 second delay before setting session to true
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          setHasSession(true);
           const sessionExists = await checkSession();
           if (sessionExists) {
             setStep(step + 1);
           }
         } else {
-          const sessionExists = true;
           alert("Please open the desktop app to login");
+          // Add 3 second delay before setting session to true
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          setHasSession(true);
+          const sessionExists = true;
+
           if (sessionExists) {
             setStep(step + 1);
           }

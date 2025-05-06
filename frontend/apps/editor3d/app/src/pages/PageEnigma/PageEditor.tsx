@@ -28,7 +28,6 @@ import { LoginModal } from "@storyteller/ui-login-modal";
 
 export const PageEditor = () => {
   useSignals();
-  const [showLoginModal, setShowLoginModal] = useState(true);
   //console.log(api());
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
