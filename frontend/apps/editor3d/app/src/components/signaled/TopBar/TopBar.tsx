@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   faChevronLeft,
-  faChevronRight,
   faGear,
   faImages,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -45,10 +44,6 @@ export const TopBar = ({ pageName, appTabIdSignal, setAppTabId }: Props) => {
   const [activeLibraryTab, setActiveLibraryTab] = useState("my-media");
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-  const handleClick = () => {
-    window.location.href = "https://storyteller-2d.netlify.app/";
-  };
-
   return (
     <>
       <header className="fixed left-0 top-0 z-[60] w-full border-b border-white/5 bg-ui-background">
@@ -74,7 +69,8 @@ export const TopBar = ({ pageName, appTabIdSignal, setAppTabId }: Props) => {
               tabs={appTabs}
               activeTab={appTabIdSignal.value}
               disabled={false}
-              onTabChange={(tabId) => setAppTabId(tabId)}
+              onTabChange={(tabId: string) => setAppTabId(tabId)}
+              className="w-fit"
             />
             {/* <Button
               variant="secondary"
