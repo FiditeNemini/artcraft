@@ -1,5 +1,5 @@
 use crate::state::app_preferences::app_preferences_serializable::AppPreferencesSerializable;
-use crate::state::app_preferences::preferred_download_directory::PreferredDownloadDirectory;
+use crate::state::app_preferences::preferred_download_directory::{PreferredDownloadDirectory, SystemDownloadDirectory};
 use crate::state::data_dir::app_data_root::AppDataRoot;
 
 #[derive(Clone)]
@@ -9,13 +9,26 @@ pub struct AppPreferences {
 
   /// Play sounds on events.
   pub play_sounds: bool,
+  
+  /// Key pointing to file; defined in the frontend code.
+  pub generation_success_sound: Option<String>,
+  
+  /// Key pointing to file; defined in the frontend code.
+  pub generation_failure_sound: Option<String>,
+  
+  /// Key pointing to file; defined in the frontend code.
+  pub generation_enqueue_sound: Option<String>,
 }
 
 impl Default for AppPreferences {
   fn default() -> Self {
     Self {
-      preferred_download_directory: PreferredDownloadDirectory::SystemDefault,
+      preferred_download_directory: PreferredDownloadDirectory::System(SystemDownloadDirectory::Downloads),
       play_sounds: true,
+      // NB: These are defined in the frontend.
+      generation_success_sound: Some("flower".to_string()),
+      generation_failure_sound: Some("crumble".to_string()),
+      generation_enqueue_sound: Some("done".to_string()),
     }
   }
 }
@@ -42,9 +55,6 @@ impl AppPreferences {
   }
   
   pub fn to_serializable(&self) -> AppPreferencesSerializable {
-    AppPreferencesSerializable {
-      preferred_download_directory: Some(self.preferred_download_directory.clone()),
-      play_sounds: Some(self.play_sounds),
-    }
+    AppPreferencesSerializable::from_preferences(self)
   }
 }

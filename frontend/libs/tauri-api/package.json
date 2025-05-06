@@ -1,5 +1,5 @@
 {
-  "name": "@storyteller/ui-settings-modal",
+  "name": "@storyteller/tauri-api",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,6 +15,6 @@
     }
   },
   "dependencies": {
-    "@tauri-apps/plugin-dialog": "^2.2.1"
+    "@tauri-apps/api": "^2.5.0"
   }
 }
