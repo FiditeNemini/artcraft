@@ -38,6 +38,11 @@ pub enum SoraError {
   /// Typically served from Cloudflare
   /// We preserve the message for debugging.
   BadGateway(String),
+  
+  /// HTTP 524 (Cloudflare-specific)
+  /// Cloudflare formed a TCP connection to Sora, but no payload was delivered before timeout
+  /// We preserve the message for debugging
+  CloudFlareTimeout(String),
 
   /// Another error occurred.
   OtherBadStatus(anyhow::Error),
@@ -77,6 +82,9 @@ impl Display for SoraError {
       }
       Self::BadGateway(message) => {
         write!(f, "Bad Gateway; Sora is likely having issues: {:?}", message)
+      }
+      Self::CloudFlareTimeout(message) => {
+        write!(f, "Cloudflare Timeout (524); Sora is likely having issues: {:?}", message)
       }
       Self::OtherBadStatus(err) => {
         write!(f, "Other error: {}", err)

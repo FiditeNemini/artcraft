@@ -43,8 +43,18 @@ Message: {
     return SoraError::UnauthorizedCookieOrBearerExpired
   }
 
-  if status.as_u16() == 502 {
-    return SoraError::BadGateway(message);
+  let status_code = status.as_u16();
+  
+  match status_code {
+    502 => {
+      return SoraError::BadGateway(message);
+    }
+    524 => {
+      if message.contains("cloudflare") || message.contains("Cloudflare") {
+        return SoraError::CloudFlareTimeout(message);
+      }
+    }
+    _ => {}, // Fall-through
   }
 
   SoraError::OtherBadStatus(anyhow::anyhow!("Upload failed with status {}: {}", status, message))
