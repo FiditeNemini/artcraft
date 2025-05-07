@@ -46,13 +46,10 @@
       "path": "../../libs/components/button"
     },
     {
-      "path": "../../libs/components/modal"
-    },
-    {
       "path": "../../libs/components/toaster"
     },
     {
-      "path": "../../libs/components/demo-modal"
+      "path": "../../libs/components/login-modal"
     },
     {
       "path": "../../libs/soundboard"
@@ -71,6 +68,12 @@
     },
     {
       "path": "../../libs/components/gallery-modal"
+    },
+    {
+      "path": "../../libs/components/label"
+    },
+    {
+      "path": "../../libs/components/modal"
     },
     {
       "path": "../../libs/tauri-utils"

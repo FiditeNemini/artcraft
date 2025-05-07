@@ -3,9 +3,9 @@ import { SoundRegistry, SoundEffect } from "@storyteller/soundboard";
 import { Button } from "@storyteller/ui-button";
 import { Input } from "@storyteller/ui-input";
 import { AppPreferencesPayload, CustomDirectory, GetAppPreferences, SystemDirectory } from "@storyteller/tauri-api";
-import { PreferenceName, UpdateAppPreferences } from "libs/tauri-api/src/lib/settings/UpdateAppPreference";
+import { PreferenceName, UpdateAppPreferences } from "@storyteller/tauri-api";
 import { open } from '@tauri-apps/plugin-dialog';
-import { Select, SelectValue } from "libs/components/select/src/lib/select";
+import { Select, SelectValue } from "@storyteller/ui-select";
 
 // TODO: This is maintained in two places. Here and InstallSounds.
 const SOUND_OPTIONS = [

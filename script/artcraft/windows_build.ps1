@@ -27,3 +27,10 @@ $env:TAURI_APP_PATH=".\crates\desktop\artcraft"
 
 # The config file tells Tauri more instructions for the frontend build.
 cargo tauri build --config ".\crates\desktop\artcraft\tauri.artcraft_3d.no_dev.conf.json"
+
+Write-Host ""
+Write-Host "Production Build Done!"  -ForegroundColor green -BackgroundColor white
+Write-Host ""
+Write-Host "You can find the installer in: target\release\bundle\nsis\ArtCraft_(version_info)-setup.exe"
+
+Start-Process "explorer.exe" -ArgumentList ".\target\release\bundle\nsis"
