@@ -28,6 +28,7 @@ export function LoginModal({
   const [isLoading, setIsLoading] = useState(false);
   const [hasSession, setHasSession] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginClicked, setIsLoginClicked] = useState(false);
   const totalSteps = 3;
 
   // Check session on component mount
@@ -51,6 +52,7 @@ export function LoginModal({
   const handleNext = async () => {
     if (step === 2) {
       setIsLoading(true);
+      setIsLoginClicked(true);
       try {
         if (IsDesktopApp()) {
           await invoke("open_sora_login_command");
@@ -243,15 +245,28 @@ export function LoginModal({
                     </Button>
                   ) : null}
                   {step < totalSteps ? (
-                    <Button
-                      icon={step === 2 ? faRightToBracket : faArrowRight}
-                      iconFlip={step !== 2}
-                      onClick={handleNext}
-                      loading={isLoading}
-                      disabled={isLoading}
-                    >
-                      {step === 2 ? "Login with OpenAI" : "Continue"}
-                    </Button>
+                    <>
+                      <Button
+                        icon={step === 2 ? faRightToBracket : faArrowRight}
+                        iconFlip={step !== 2}
+                        onClick={handleNext}
+                        loading={isLoading}
+                        disabled={isLoading}
+                      >
+                        {step === 2 ? "Login with OpenAI" : "Continue"}
+                      </Button>
+                      {step > 1 && step !== 3 ? (
+                        <Button
+                          variant="secondary"
+                          onClick={() => {
+                            setStep(step + 1);
+                          }}
+                          disabled={!isLoginClicked}
+                        >
+                          Next
+                        </Button>
+                      ) : null}
+                    </>
                   ) : (
                     <Button
                       icon={faArrowRight}
