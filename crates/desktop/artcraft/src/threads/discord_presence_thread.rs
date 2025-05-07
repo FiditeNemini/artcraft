@@ -21,7 +21,7 @@ async fn discord_main_loop(mut client: DiscordIpcClient) -> AnyhowResult<()> {
       .map_err(|err| anyhow!("Error connecting to Discord IPC: {:?}", err))?;
 
   loop {
-    info!("Notifying discord...");
+    info!("Notifying discord presence API...");
 
     let assets = discord_rich_presence::activity::Assets::new()
         .large_image("https://storyteller.ai/android-chrome-512x512.png")
@@ -37,6 +37,6 @@ async fn discord_main_loop(mut client: DiscordIpcClient) -> AnyhowResult<()> {
         .assets(assets))
         .map_err(|err| anyhow!("Error setting Discord activity: {:?}", err))?;
 
-    tokio::time::sleep(std::time::Duration::from_millis(30_000)).await;
+    tokio::time::sleep(std::time::Duration::from_millis(60_000)).await;
   }
 }

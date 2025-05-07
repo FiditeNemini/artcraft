@@ -146,7 +146,7 @@ async fn polling_loop(
 
     sora_task_queue.remove_list(&succeeded_task_ids)?;
 
-    tokio::time::sleep(std::time::Duration::from_millis(2_000)).await;
+    tokio::time::sleep(std::time::Duration::from_millis(6_000)).await;
   }
 }
 
