@@ -91,6 +91,7 @@ export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   });
 
   useEffect(() => {
+    console.log('installing event listeners')
     InstallSounds();
     InstallImageGenerationSuccess();
     InstallImageGenerationFailure();

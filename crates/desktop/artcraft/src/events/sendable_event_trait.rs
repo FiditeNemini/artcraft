@@ -1,3 +1,4 @@
+use log::info;
 use crate::events::sendable_event_error::SendableEventError;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
@@ -10,6 +11,7 @@ pub trait SendableEvent : Serialize {
   /// Default implementation of send(). 
   /// This serializes and sends the event to the frontend.
   fn send(&self, app: &AppHandle) -> Result<(), SendableEventError> {
+    info!("Sending event to frontend: {}", Self::FRONTEND_EVENT_NAME);
     let result = app.emit(Self::FRONTEND_EVENT_NAME, self);
     if let Err(err) = result {
       return Err(SendableEventError::from(err));
