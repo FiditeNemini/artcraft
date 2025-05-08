@@ -22,6 +22,8 @@ pushd "${frontend_path}" || exit
 
 npm install
 
+export VITE_ENVIRONMENT_TYPE="production"
+
 nx dev editor3d
 
 popd || exit
