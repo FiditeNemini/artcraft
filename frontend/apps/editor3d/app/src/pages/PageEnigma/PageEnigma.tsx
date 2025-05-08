@@ -23,8 +23,8 @@ import {
   showPrecisionSelector,
 } from "./signals/precisionSelectorMenu";
 import { InstallSounds } from "~/pages/PageEnigma/InstallSounds";
-import { InstallImageGenerationFailure } from "~/pages/PageEnigma/tauri_events/SoraImageGenerationFailure";
-import { InstallImageGenerationSuccess } from "~/pages/PageEnigma/tauri_events/SoraImageGenerationSuccess";
+import { InstallImageGenerationFailure } from "~/pages/PageEnigma/TauriEvents/SoraImageGenerationFailure";
+import { InstallImageGenerationSuccess } from "~/pages/PageEnigma/TauriEvents/SoraImageGenerationSuccess";
 
 export const PageEnigma = ({ sceneToken }: { sceneToken?: string }) => {
   useSignals();
