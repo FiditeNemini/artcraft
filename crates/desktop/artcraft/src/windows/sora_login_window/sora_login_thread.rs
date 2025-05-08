@@ -1,3 +1,5 @@
+use crate::events::sendable_event_trait::SendableEvent;
+use crate::events::sora::sora_login_success_event::SoraLoginSuccessEvent;
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::sora::sora_credential_holder::SoraCredentialHolder;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
@@ -34,6 +36,7 @@ pub async fn sora_login_thread(
     };
 
     let result = check_login_window(
+      &app,
       &login_webview_window,
       &app_data_root,
       &sora_creds_manager,
@@ -59,6 +62,7 @@ pub async fn sora_login_thread(
 
 /// Returns true if we can exit.
 async fn check_login_window(
+  app_handle: &AppHandle,
   webview_window: &WebviewWindow,
   app_data_root: &AppDataRoot,
   sora_credential_manager: &SoraCredentialManager,
@@ -137,6 +141,14 @@ async fn check_login_window(
 
   sora_credential_manager.set_credentials(&new_credentials)?;
   sora_credential_manager.persist_all_to_disk()?;
+
+  // NB: Event sent to the frontend for the login flow. We shouldn't rely on just this 
+  // alone as it could be brittle if the events aren't caught.
+  let event = SoraLoginSuccessEvent {};
+  
+  if let Err(err) = event.send(app_handle) {
+    error!("Error sending Sora login success event: {:?}", err);
+  }
   
   Ok(true)
 }
