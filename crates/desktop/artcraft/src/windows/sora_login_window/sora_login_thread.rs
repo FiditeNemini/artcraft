@@ -132,12 +132,7 @@ async fn check_login_window(
   // TODO(bt): Race conditions ahead.
 
   sora_credential_manager.clear_credentials()?;
-
-  let creds_dir = app_data_root.credentials_dir();
-  
-  let _r = fs::remove_file(creds_dir.get_sora_cookie_file_path());
-  let _r = fs::remove_file(creds_dir.get_sora_bearer_token_file_path());
-  let _r = fs::remove_file(creds_dir.get_sora_sentinel_file_path());
+  sora_credential_manager.try_purge_credentials_from_disk();
 
   sora_credential_manager.set_credentials(&new_credentials)?;
   sora_credential_manager.persist_all_to_disk()?;

@@ -15,6 +15,7 @@ use crate::commands::sora::check_sora_session_command::check_sora_session_comman
 use crate::commands::sora::open_sora_login_command::open_sora_login_command;
 use crate::commands::sora::sora_image_generation_command::sora_image_generation_command;
 use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
+use crate::commands::sora::sora_logout_command::sora_logout_command;
 use crate::state::app_preferences::app_preferences_manager::load_app_preferences_or_default;
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::main_window_size::MainWindowSize;
@@ -127,6 +128,7 @@ pub fn run() {
       platform_info_command,
       sora_image_generation_command,
       sora_image_remix_command,
+      sora_logout_command,
       update_app_preferences_command,
     ])
     .run(tauri::generate_context!("tauri.conf.json"))
