@@ -1,3 +1,6 @@
+use crate::events::sendable_event_trait::SendableEvent;
+use crate::events::sora::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
+use crate::events::sora::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
 use crate::state::data_dir::app_data_root::AppDataRoot;
 use crate::state::data_dir::trait_data_subdir::DataSubdir;
 use crate::state::sora::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
@@ -28,16 +31,6 @@ use storyteller_client::media_files::get_media_file::get_media_file;
 use storyteller_client::utils::api_host::ApiHost;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tokens::tokens::media_files::MediaFileToken;
-use crate::threads::sora_task_polling_thread::SoraImageGenerationComplete;
-
-#[derive(Debug, Clone, Serialize)]
-pub struct SoraImageEnqueueFailure {
-  // TODO: Reason.
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct SoraImageEnqueueSuccess {
-}
 
 #[derive(Deserialize)]
 pub struct SoraImageRemixCommand {
@@ -75,7 +68,9 @@ pub async fn sora_image_remix_command(
   if let Err(err) = result {
     error!("error: {:?}", err);
 
-    let result = app.emit("sora-image-enqueue-failure", SoraImageEnqueueFailure{});
+    let event = SoraImageEnqueueFailureEvent {};
+    let result = event.send(&app);
+
     if let Err(err) = result {
       error!("Failed to emit event: {:?}", err);
     }
@@ -83,7 +78,9 @@ pub async fn sora_image_remix_command(
     return Err("there was an error".to_string());
   }
 
-  let result = app.emit("sora-image-enqueue-success", SoraImageEnqueueSuccess{});
+  let event = SoraImageEnqueueSuccessEvent {};
+  let result = event.send(&app);
+
   if let Err(err) = result {
     error!("Failed to emit event: {:?}", err);
   }
