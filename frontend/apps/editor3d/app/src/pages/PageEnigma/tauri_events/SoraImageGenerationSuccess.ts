@@ -1,6 +1,7 @@
 import { SoundRegistry, SoundEffect } from "@storyteller/soundboard";
 import { listen } from '@tauri-apps/api/event';
 import { AppPreferencesPayload, CustomDirectory, GetAppPreferences, SystemDirectory } from "@storyteller/tauri-api";
+import { toast } from "@storyteller/ui-toaster";
 
 type ImageGenerationSuccess = {
   media_file_token: string,
@@ -18,6 +19,7 @@ export const InstallImageGenerationSuccess = () => {
       const registry = SoundRegistry.getInstance();
       registry.playSound(soundName);
     }
+    toast.success("Image generated!");
   });
 }
 
