@@ -6,19 +6,25 @@
       "path": "../modal"
     },
     {
+      "path": "../label"
+    },
+    {
+      "path": "../switch"
+    },
+    {
       "path": "../select"
     },
     {
       "path": "../../tauri-api"
     },
     {
+      "path": "../../soundboard"
+    },
+    {
       "path": "../input"
     },
     {
       "path": "../button"
-    },
-    {
-      "path": "../../soundboard"
     },
     {
       "path": "./tsconfig.lib.json"
