@@ -34,9 +34,6 @@
   },
   "references": [
     {
-      "path": "../../libs/tauri-api"
-    },
-    {
       "path": "../../libs/components/lightbox-modal"
     },
     {
@@ -46,16 +43,31 @@
       "path": "../../libs/components/close-button"
     },
     {
-      "path": "../../libs/components/button"
+      "path": "../../libs/tauri-api"
     },
     {
       "path": "../../libs/components/toaster"
     },
     {
+      "path": "../../libs/components/demo-modal"
+    },
+    {
       "path": "../../libs/components/login-modal"
     },
     {
+      "path": "../../libs/components/popover"
+    },
+    {
       "path": "../../libs/soundboard"
+    },
+    {
+      "path": "../../libs/components/button"
+    },
+    {
+      "path": "../../libs/components/promptbox"
+    },
+    {
+      "path": "../../libs/common"
     },
     {
       "path": "../../libs/components/tab-selector"

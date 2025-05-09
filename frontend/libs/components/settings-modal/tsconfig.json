@@ -15,10 +15,13 @@
       "path": "../select"
     },
     {
+      "path": "../../soundboard"
+    },
+    {
       "path": "../../tauri-api"
     },
     {
-      "path": "../../soundboard"
+      "path": "../../api"
     },
     {
       "path": "../input"

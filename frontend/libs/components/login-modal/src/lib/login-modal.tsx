@@ -55,7 +55,7 @@ export function LoginModal({
     return loggedIn;
   };
 
-  useSoraLoginListener((payload) => {
+  useSoraLoginListener((payload:any) => {
     console.log("Login success!", payload);
     if (isLoggedInArtCraft) {
       setStep(4);

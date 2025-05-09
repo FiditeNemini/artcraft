@@ -75,16 +75,6 @@ export const TopBar = ({ pageName, appTabIdSignal, setAppTabId }: Props) => {
               onTabChange={(tabId: string) => setAppTabId(tabId)}
               className="w-fit"
             />
-            {/* <Button
-              variant="secondary"
-              icon={faChevronRight}
-              iconClassName="text-xs"
-              iconFlip={true}
-              onClick={handleClick}
-              className="bg-transparent p-0 text-sm text-white/80 hover:bg-transparent hover:text-white hover:underline hover:underline-offset-2"
-            >
-              Go to 2D Canvas
-            </Button> */}
           </div>
 
           <div className="flex items-center justify-center gap-2 font-medium">
