@@ -1,7 +1,7 @@
 use log::info;
 use crate::creds::credential_migration::CredentialMigrationRef;
 use crate::requests::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
-use crate::requests::image_gen::image_gen_http_request::{image_gen_http_request, InpaintItem, InpaintItemType, OperationType, RawSoraImageGenRequest, SoraError, VideoGenType};
+use crate::requests::image_gen::image_gen_http_request::{image_gen_http_request, InpaintItem, InpaintItemType, OperationType, RawSoraImageGenRequest, SoraImageGenError, VideoGenType};
 
 pub struct SoraImageGenRemixRequest<'a> {
   pub prompt: String,
@@ -13,7 +13,7 @@ pub struct SoraImageGenRemixRequest<'a> {
 
 /// The "remix" commands let you supply additional images as context.
 /// Sora "media tokens" of previously uploaded images must be supplied.
-pub async fn sora_image_gen_remix(request: SoraImageGenRemixRequest<'_>) -> Result<SoraImageGenResponse, SoraError> {
+pub async fn sora_image_gen_remix(request: SoraImageGenRemixRequest<'_>) -> Result<SoraImageGenResponse, SoraImageGenError> {
   let args = RawSoraImageGenRequest {
     r#type: VideoGenType::ImageGen,
     operation: OperationType::Remix,

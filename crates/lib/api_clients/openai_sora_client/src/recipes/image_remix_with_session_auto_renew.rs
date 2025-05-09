@@ -7,7 +7,7 @@ use crate::creds::sora_jwt_bearer_token::SoraJwtBearerToken;
 use crate::creds::sora_sentinel::SoraSentinel;
 use crate::requests::bearer::generate::generate_bearer_with_cookie;
 use crate::requests::image_gen::common::{ImageSize, NumImages, SoraImageGenResponse};
-use crate::requests::image_gen::image_gen_http_request;
+use crate::requests::image_gen::{image_gen_http_request, SoraImageGenError};
 use crate::requests::image_gen::sora_image_gen_remix::{sora_image_gen_remix, SoraImageGenRemixRequest};
 use crate::requests::sentinel_refresh::generate::token::generate_token;
 use crate::sora_error::SoraError;
@@ -43,29 +43,32 @@ pub async fn image_remix_with_session_auto_renew(request: ImageRemixAutoRenewReq
 
   match err {
     // We'll fail these requests...
-    image_gen_http_request::SoraError::TooManyConcurrentTasks(_) => {
+    SoraImageGenError::TooManyConcurrentTasks(_) => {
       return Err(SoraError::TooManyConcurrentTasks);
     }
-    image_gen_http_request::SoraError::GenericError(err) => {
+    SoraImageGenError::GenericError(err) => {
       return Err(SoraError::OtherBadStatus(anyhow!("image remix failed with GenericError: {:?}", err)))
     }
-    image_gen_http_request::SoraError::NetworkError(err) => {
+    SoraImageGenError::NetworkError(err) => {
       // TODO: The underlying type should be a reqwest::Error.
       return Err(SoraError::OtherBadStatus(anyhow!("network error: {:?}", err)))
+    }
+    SoraImageGenError::UsernameRequired(_err) => {
+      return Err(SoraError::SoraUsernameNotYetCreated)
     }
 
     // We'll retry these requests...
 
-    image_gen_http_request::SoraError::SentinelBlock(err) => {
+    SoraImageGenError::SentinelBlock(err) => {
       warn!("Image generation failed due to sentinel block error: {:?}", err);
       refresh_sentinel = true;
     }
-    image_gen_http_request::SoraError::TokenExpired(err) => {
+    SoraImageGenError::TokenExpired(err) => {
       warn!("Image generation failed due to token expired error: {:?}", err);
       refresh_sentinel = true; // TODO: Not sure what this error is, actually.
       refresh_jwt = true;
     }
-    image_gen_http_request::SoraError::InvalidJwt(err) => {
+    SoraImageGenError::InvalidJwt(err) => {
       warn!("Image generation failed due to invalid jwt error: {:?}", err);
       refresh_jwt = true;
     }
@@ -128,7 +131,7 @@ pub async fn image_remix_with_session_auto_renew(request: ImageRemixAutoRenewReq
   match result {
     Ok(response) => Ok((response, Some(new_creds))),
     Err(err) => match err {
-      image_gen_http_request::SoraError::TooManyConcurrentTasks(err) => {
+      image_gen_http_request::SoraImageGenError::TooManyConcurrentTasks(err) => {
         Err(SoraError::TooManyConcurrentTasks)
       }
       _ => {
