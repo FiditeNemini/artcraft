@@ -44,8 +44,8 @@ export const DialogAddImage = ({
         <div className="flex flex-col rounded-lg border-2 border-dashed border-white/20">
           <FileUploader
             fileTypes={Object.values(IMAGE_FILE_TYPE)}
-            file={currFile}
-            setFile={(file: File | null) => {
+            file={currFile ?? undefined}
+            handleChange={(file: File) => {
               setAssetFile(file);
               if (file) {
                 onAddImage(file);
