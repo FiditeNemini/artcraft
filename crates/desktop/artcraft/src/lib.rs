@@ -18,6 +18,7 @@ use crate::commands::sora::sora_image_remix_command::sora_image_remix_command;
 use crate::commands::sora::sora_logout_command::sora_logout_command;
 use crate::state::app_preferences::app_preferences_manager::load_app_preferences_or_default;
 use crate::state::data_dir::app_data_root::AppDataRoot;
+use crate::state::main_window_position::MainWindowPosition;
 use crate::state::main_window_size::MainWindowSize;
 use crate::state::sora::sora_credential_manager::SoraCredentialManager;
 use crate::state::sora::sora_task_queue::SoraTaskQueue;
@@ -107,6 +108,20 @@ pub fn run() {
         }
         Err(err) => {
           eprintln!("Failed to read window size from disk: {:?}", err);
+        }
+      }
+
+      match MainWindowPosition::from_filesystem_configs(&app_data_root_3) {
+        Ok(None) => {}
+        Ok(Some(pos)) => {
+          println!("Moving window to: {:?}", pos);
+          let result = pos.apply_to_main_window(&app);
+          if let Err(err) = result {
+            eprintln!("Could not set window position: {:?}", err);
+          }
+        }
+        Err(err) => {
+          eprintln!("Failed to read window position from disk: {:?}", err);
         }
       }
 
