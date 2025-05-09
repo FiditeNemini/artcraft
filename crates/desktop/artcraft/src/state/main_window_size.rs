@@ -4,6 +4,7 @@ use serde_derive::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::Write;
 use tauri::{AppHandle, Manager, PhysicalSize, Window};
+use crate::utils::best_window_size_heuristic::best_window_size_heuristic;
 
 const MAIN_WINDOW_NAME: &str = "main";
 
@@ -26,7 +27,7 @@ impl MainWindowSize {
   }
 
   pub fn from_window(window: &Window) -> AnyhowResult<Self> {
-    let size = window.inner_size()?;
+    let size = best_window_size_heuristic(window)?;
     Ok(Self {
       width: size.width,
       height: size.height,
