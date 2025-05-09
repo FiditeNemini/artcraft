@@ -1,5 +1,4 @@
 import React, { useContext, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { useSignals } from "@preact/signals-react/runtime";
 import { LoadingDots, TopBar } from "~/components";
 import { Controls3D } from "./comps/Controls3D";
@@ -32,7 +31,14 @@ import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDispla
 import { appTabId, setAppTabId } from "~/signals/appTab";
 import { KonvaCanvasContainer } from "../Page2d/KonvaCanvasContainer";
 import { KonvaRootComponent } from "../Page2d/KonvaRootComponent";
-import { addCamera, cameras, deleteCamera, focalLengthDragging, selectedCameraId, updateCamera } from "./signals/camera";
+import {
+  addCamera,
+  cameras,
+  deleteCamera,
+  focalLengthDragging,
+  selectedCameraId,
+  updateCamera,
+} from "./signals/camera";
 import { isPromptBoxFocused } from "./signals/promptBox";
 import { uploadImage } from "~/components/reusable/UploadModalMedia/uploadImage";
 import { EngineContext } from "./contexts/EngineContext";
@@ -40,11 +46,7 @@ import Queue, { QueueNames } from "./Queue";
 import { toEngineActions } from "./Queue/toEngineActions";
 import { UnionedDataTypes } from "./Queue/Queue";
 import { LoginModal } from "@storyteller/ui-login-modal";
-import { DemoModal } from "@storyteller/ui-demo-modal";
-import { IsDesktopApp } from "@storyteller/tauri-utils";
-import {
-  DomLevels,
-} from "./signals/hotkeys";
+import { DomLevels } from "./signals/hotkeys";
 import { AUTH_STATUS } from "../../enums/authentication";
 import { authentication } from "../../signals/authentication/authentication";
 
@@ -247,139 +249,130 @@ export const PageEditor = () => {
       action: toEngineActions.CHANGE_CAMERA_ASPECT_RATIO,
       data: newRatio,
     });
-  }
+  };
 
   const ContentFor3D = () => {
-    return (<>
-    <OnboardingHelper />
-      <div
-        className="relative flex w-screen"
-        style={{ height: "calc(100vh - 68px)" }}
-      >
-        {/* Engine section/side panel */}
+    return (
+      <>
+        <OnboardingHelper />
         <div
-          id="engine-n-panels-wrapper"
-          className="flex"
-          style={{
-            height,
-          }}
+          className="relative flex w-screen"
+          style={{ height: "calc(100vh - 68px)" }}
         >
-          <div className="relative w-full overflow-hidden bg-transparent">
-            <SceneContainer>
-              <EditorCanvas />
-              <PreviewFrameImage />
-            </SceneContainer>
+          {/* Engine section/side panel */}
+          <div
+            id="engine-n-panels-wrapper"
+            className="flex"
+            style={{
+              height,
+            }}
+          >
+            <div className="relative w-full overflow-hidden bg-transparent">
+              <SceneContainer>
+                <EditorCanvas />
+                <PreviewFrameImage />
+              </SceneContainer>
 
-            {/* Focal Length Display */}
-            <FocalLengthDisplay />
+              {/* Focal Length Display */}
+              <FocalLengthDisplay />
 
-            {/* Pose Mode Selector */}
-            <PoseModeSelector />
+              {/* Pose Mode Selector */}
+              <PoseModeSelector />
 
-            {/* Top controls */}
-            <div
-              className="absolute left-0 top-0 w-full"
-              onClick={handleOverlayClick}
-            >
-              <div className="grid grid-cols-3 gap-4">
-                <ControlsTopButtons />
-                <Controls3D />
-              </div>
-            </div>
-
-            {/* Bottom controls */}
-            <div
-              className="absolute bottom-0 left-0"
-              style={{
-                width: pageWidth.value,
-              }}
-              onClick={handleOverlayClick}
-            >
+              {/* Top controls */}
               <div
-                className="absolute bottom-0 mb-4 ml-4 flex origin-bottom-left flex-col gap-2"
-                style={{ transform: `scale(${getScale()})` }}
+                className="absolute left-0 top-0 w-full"
+                onClick={handleOverlayClick}
               >
-                <Outliner />
-                <PreviewEngineCamera />
+                <div className="grid grid-cols-3 gap-4">
+                  <ControlsTopButtons />
+                  <Controls3D />
+                </div>
               </div>
 
-              <ControlPanelSceneObject />
+              {/* Bottom controls */}
+              <div
+                className="absolute bottom-0 left-0"
+                style={{
+                  width: pageWidth.value,
+                }}
+                onClick={handleOverlayClick}
+              >
+                <div
+                  className="absolute bottom-0 mb-4 ml-4 flex origin-bottom-left flex-col gap-2"
+                  style={{ transform: `scale(${getScale()})` }}
+                >
+                  <Outliner />
+                  <PreviewEngineCamera />
+                </div>
+
+                <ControlPanelSceneObject />
+              </div>
+
+              <PromptBox3D
+                cameras={cameras}
+                cameraAspectRatio={cameraAspectRatio}
+                disableHotkeyInput={disableHotkeyInput}
+                enableHotkeyInput={enableHotkeyInput}
+                gridVisibility={gridVisibility}
+                setGridVisibility={setGridVisibility}
+                selectedCameraId={selectedCameraId}
+                deleteCamera={deleteCamera}
+                focalLengthDragging={focalLengthDragging}
+                isPromptBoxFocused={isPromptBoxFocused}
+                uploadImage={uploadImage}
+                handleCameraSelect={handleCameraSelect}
+                handleAddCamera={handleAddCamera}
+                handleCameraNameChange={handleCameraNameChange}
+                handleCameraFocalLengthChange={handleCameraFocalLengthChange}
+                onAspectRatioSelect={onAspectRatioSelect}
+                setEnginePrompt={(prompt) => {
+                  if (!editorEngine) {
+                    return;
+                  }
+
+                  editorEngine!.positive_prompt = prompt;
+                }}
+                snapshotCurrentFrame={editorEngine?.snapShotOfCurrentFrame}
+              />
+
+              <LoadingDots
+                className="absolute left-0 top-0 z-50"
+                isShowing={editorLoader.value.isShowing}
+                type="bricks"
+                message={editorLoader.value.message}
+              />
             </div>
-
-            <PromptBox3D
-              cameras={cameras}
-              cameraAspectRatio={cameraAspectRatio}
-              disableHotkeyInput={disableHotkeyInput}
-              enableHotkeyInput={enableHotkeyInput}
-              gridVisibility={gridVisibility}
-              setGridVisibility={setGridVisibility}
-              selectedCameraId={selectedCameraId}
-              deleteCamera={deleteCamera}
-              focalLengthDragging={focalLengthDragging}
-              isPromptBoxFocused={isPromptBoxFocused}
-              uploadImage={uploadImage}
-              handleCameraSelect={handleCameraSelect}
-              handleAddCamera={handleAddCamera}
-              handleCameraNameChange={handleCameraNameChange}
-              handleCameraFocalLengthChange={handleCameraFocalLengthChange}
-              onAspectRatioSelect={onAspectRatioSelect}
-              setEnginePrompt={(prompt) => {
-                if (!editorEngine) {
-                  return;
-                }
-
-                editorEngine!.positive_prompt = prompt
-              }}
-              snapshotCurrentFrame={
-                editorEngine?.snapShotOfCurrentFrame
-              }
-            />
-
-            <LoadingDots
-              className="absolute left-0 top-0 z-50"
-              isShowing={editorLoader.value.isShowing}
-              type="bricks"
-              message={editorLoader.value.message}
-            />
           </div>
         </div>
-      </div>
-      <DemoModal
-        title="Welcome to ArtCraft 3D"
-        subTitle="Your 3D editor for digital art and design"
-        description="Set up your scene by adding objects and start bringing your ideas to life!"
-        videoSrc="/resources/videos/artcraft-3d-demo.mp4"
-        buttonText="Sign in to OpenAI to get started"
-        buttonOnClick={async () => {
-          if (IsDesktopApp()) {
-            await invoke("open_sora_login_command");
-          }
-        }}
-      />
-      <LoginModal
-        onClose={() => {}}
-        videoSrc2D="/resources/videos/artcraft-canvas-demo.mp4"
-        videoSrc3D="/resources/videos/artcraft-3d-demo.mp4"
-        openAiLogo="/resources/images/openai-logo.png"
-        onOpenChange={(isOpen: boolean) => {
-          if (isOpen) {
-            disableHotkeyInput(DomLevels.DIALOGUE);
-          } else {
-            enableHotkeyInput(DomLevels.DIALOGUE);
-          }
-        }}
-        onArtCraftAuthSuccess={(userInfo: any) => {
-          authentication.status.value = AUTH_STATUS.LOGGED_IN;
-          authentication.userInfo.value = userInfo;
-        }}
-      />
-      </>);
-  }
+
+        <LoginModal
+          onClose={() => {}}
+          videoSrc2D="/resources/videos/artcraft-canvas-demo.mp4"
+          videoSrc3D="/resources/videos/artcraft-3d-demo.mp4"
+          openAiLogo="/resources/images/openai-logo.png"
+          onOpenChange={(isOpen: boolean) => {
+            if (isOpen) {
+              disableHotkeyInput(DomLevels.DIALOGUE);
+            } else {
+              enableHotkeyInput(DomLevels.DIALOGUE);
+            }
+          }}
+          onArtCraftAuthSuccess={(userInfo: any) => {
+            authentication.status.value = AUTH_STATUS.LOGGED_IN;
+            authentication.userInfo.value = userInfo;
+          }}
+        />
+      </>
+    );
+  };
 
   const ContentFor2D = () => {
-    return <KonvaCanvasContainer>
-      <KonvaRootComponent className="w-full h-full" />
-    </KonvaCanvasContainer>;
+    return (
+      <KonvaCanvasContainer>
+        <KonvaRootComponent className="h-full w-full" />
+      </KonvaCanvasContainer>
+    );
   };
 
   return (
