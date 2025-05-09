@@ -68,13 +68,13 @@ export const TopBar = ({ pageName, appTabIdSignal, setAppTabId }: Props) => {
                 Back to Editor
               </ButtonLink>
             )}
-            <TabSelector
+            {/* <TabSelector
               tabs={appTabs}
               activeTab={appTabIdSignal.value}
               disabled={false}
               onTabChange={(tabId: string) => setAppTabId(tabId)}
               className="w-fit"
-            />
+            /> */}
           </div>
 
           <div className="flex items-center justify-center gap-2 font-medium">
