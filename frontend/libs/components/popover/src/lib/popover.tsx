@@ -157,7 +157,7 @@ export const PopoverMenu = ({
                         <Button
                           key={index}
                           className={twMerge(
-                            "flex items-center justify-between border-transparent bg-transparent px-1.5",
+                            "flex w-full items-center justify-between border-transparent bg-transparent px-1.5",
                             "hover:bg-[#63636B]/60",
                             mode === "toggle" && item.selected
                               ? "hover:bg-[#63636B]"
@@ -189,7 +189,7 @@ export const PopoverMenu = ({
                         <Button
                           variant="secondary"
                           className={twMerge(
-                            "mb-0.5 mt-2 border-none py-1",
+                            "w-full mb-0.5 mt-2 border-none py-1",
                             disableAddButton
                               ? "cursor-not-allowed bg-[#7B7B84]/50 opacity-50"
                               : "bg-[#7B7B84] hover:bg-[#8c8c96]"
