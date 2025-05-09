@@ -9,15 +9,18 @@ import { UserInfo } from "@storyteller/api";
 const usersApi = new UsersApi();
 
 export interface ArtcraftAccountBlockProps {
-  globalAccountLogoutCallback: () => void,
+  globalAccountLogoutCallback: () => void;
 }
 
 export const ArtcraftAccountBlock = ({
   globalAccountLogoutCallback,
 }: ArtcraftAccountBlockProps) => {
-  const [artcraftSession, setArtcraftSession] = useState<UserInfo| undefined>(undefined);
+  const [artcraftSession, setArtcraftSession] = useState<UserInfo | undefined>(
+    undefined
+  );
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [isCheckingArtcraftSession, setIsCheckingArtcraftSession] = useState(false);
+  const [isCheckingArtcraftSession, setIsCheckingArtcraftSession] =
+    useState(false);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -58,11 +61,11 @@ export const ArtcraftAccountBlock = ({
       <pre>{artcraftSession?.display_name}</pre>
       <Button
         variant={
-          isLoggedIn && !isCheckingArtcraftSession
+          isCheckingArtcraftSession
+            ? "secondary"
+            : isLoggedIn
             ? "destructive"
-            : !isLoggedIn
-            ? "primary"
-            : "secondary"
+            : "primary"
         }
         className="h-[30px]"
         onClick={handleArtcraftButton}
@@ -80,5 +83,5 @@ export const ArtcraftAccountBlock = ({
         )}
       </Button>
     </div>
-  )
-}
+  );
+};
