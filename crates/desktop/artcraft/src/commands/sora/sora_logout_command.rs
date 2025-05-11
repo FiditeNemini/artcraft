@@ -30,5 +30,10 @@ pub async fn sora_logout_command(
     return Err("error clearing credentials from memory".into());
   }
   
+  if let Err(err) = sora_creds_manager.reset_credential_stats() {
+    error!("Error resetting credential stats: {:?}", err);
+    return Err("error resetting credential stats".into());
+  }
+  
   Ok(().into())
 }
