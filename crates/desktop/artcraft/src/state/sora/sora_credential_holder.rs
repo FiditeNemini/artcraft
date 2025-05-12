@@ -54,4 +54,20 @@ impl SoraCredentialHolder {
       }
     }
   }
+
+  /// This does not guarantee the credentials are correct, just that they're set.
+  pub fn has_apparently_complete_credentials(&self) -> AnyhowResult<bool> {
+    match self.credentials.read() {
+      Err(err) => Err(anyhow!("Failed to acquire read lock: {:?}", err)),
+      Ok(creds) => match &*creds {
+        None => Ok(false),
+        Some(creds) => {
+          let has_cookies = !creds.cookies.as_str().is_empty();
+          let has_bearer = creds.jwt_bearer_token.is_some();
+          let has_sentinel = creds.sora_sentinel.is_some();
+          Ok(has_cookies && has_bearer && has_sentinel)
+        },
+      }
+    }
+  }
 }

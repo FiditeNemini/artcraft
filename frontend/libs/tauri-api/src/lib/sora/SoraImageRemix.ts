@@ -26,8 +26,9 @@ export interface SoraImageRemixSuccess extends CommandResult {
 export enum SoraImageRemixErrorType {
   ServerError = "server_error",
   TooManyConcurrentTasks = "too_many_concurrent_tasks",
-  SoraUsernameNotYetCreated = "sora_username_not_yet_created",
   SoraIsHavingProblems = "sora_is_having_problems",
+  SoraLoginRequired = "sora_login_required",
+  SoraUsernameNotYetCreated = "sora_username_not_yet_created",
 }
 
 export interface SoraImageRemixError extends CommandResult {

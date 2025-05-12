@@ -63,6 +63,11 @@ impl SoraCredentialManager {
     self.stats.set_owned(SoraCredentialStats::new())
   }
   
+  /// This does not guarantee the credentials are correct
+  pub fn has_apparently_complete_credentials(&self) -> AnyhowResult<bool> {
+    self.holder.has_apparently_complete_credentials()
+  }
+  
   pub fn get_credential_stats(&self) -> AnyhowResult<SoraCredentialStats> {
     self.stats.get_clone()
   }

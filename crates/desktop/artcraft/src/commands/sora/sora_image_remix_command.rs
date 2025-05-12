@@ -15,7 +15,7 @@ use base64::Engine;
 use errors::{AnyhowError, AnyhowResult};
 use image::codecs::png::{CompressionType, FilterType, PngEncoder};
 use image::{DynamicImage, ImageReader};
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 use openai_sora_client::credentials::SoraCredentials;
 use openai_sora_client::creds::credential_migration::CredentialMigrationRef;
 use openai_sora_client::recipes::image_remix_with_session_auto_renew::{image_remix_with_session_auto_renew, ImageRemixAutoRenewRequest};
@@ -29,6 +29,7 @@ use openai_sora_client::sora_error::SoraError;
 use serde_derive::{Deserialize, Serialize};
 use std::fs::read_to_string;
 use std::io::Cursor;
+use std::ops::Add;
 use std::time::Duration;
 use storyteller_client::api_error::ApiError;
 use storyteller_client::api_error::ApiError::InternalServerError;
@@ -64,7 +65,9 @@ pub enum SoraImageRemixErrorType {
   /// Generic server error
   ServerError,
   /// The user is sending too many requests
-  TooManyConcurrentTasks,
+  TooManyConcurrentTasks, 
+  /// User is not logged into Sora!
+  SoraLoginRequired,
   /// The user needs to create a Sora account
   SoraUsernameNotYetCreated,
   /// The Sora service is having problems. Try again soon.
@@ -85,6 +88,20 @@ pub async fn sora_image_remix_command(
     request.snapshot_media_token, request.maybe_additional_images);
 
   // TODO(bt,2025-04-24): Better error messages to caller
+
+  let has_credentials = sora_creds_manager
+      .has_apparently_complete_credentials()
+      .unwrap_or(true);
+  
+  if !has_credentials {
+    warn!("No apparently completed credentials found");
+    return Err(CommandErrorResponseWrapper {
+      status: CommandErrorStatus::Unauthorized,
+      error_message: Some("You need to log into Sora to continue. See the settings menu.".to_string()),
+      error_type: Some(SoraImageRemixErrorType::SoraLoginRequired),
+      error_details: None,
+    });
+  }
 
   let result = generate_image(request, &app_data_root, &sora_creds_manager, &sora_task_queue).await;
   

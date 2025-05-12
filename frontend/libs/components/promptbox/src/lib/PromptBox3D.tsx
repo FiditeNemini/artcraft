@@ -446,6 +446,9 @@ export const PromptBox3D = ({
 
           if ("error_type" in generateResponse) {
             switch (generateResponse.error_type) {
+              case SoraImageRemixErrorType.SoraLoginRequired:
+                errorMessage = "You need to log into Sora to continue. See the settings menu.";
+                break;
               case SoraImageRemixErrorType.ServerError:
                 errorMessage = "Server error. Failed to enqueue image.";
                 break;
