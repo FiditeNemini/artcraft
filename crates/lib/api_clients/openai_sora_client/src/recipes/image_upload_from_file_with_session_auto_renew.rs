@@ -31,6 +31,9 @@ pub async fn image_upload_from_file_with_session_auto_renew<P: AsRef<Path>>(
 
   let err = match result {
     Ok(response) => return Ok((response, None)),
+    // We can't retry some errors.
+    Err(err @ SoraError::SoraUsernameNotYetCreated) => return Err(err),
+    // Retry all other errors.
     Err(err) => err,
   };
 

@@ -40,7 +40,15 @@ Message: {
           || message.contains("token_expired");
 
   if cookie_expired {
-    return SoraError::UnauthorizedCookieOrBearerExpired
+    return SoraError::UnauthorizedCookieOrBearerExpired;
+  }
+  
+  let needs_onboarding = 
+      message.contains("You must onboard before using this service") 
+          || message.contains("onboarding_required");
+
+  if needs_onboarding {
+    return SoraError::SoraUsernameNotYetCreated;
   }
 
   let status_code = status.as_u16();
