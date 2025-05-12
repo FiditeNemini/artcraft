@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useSignals } from "@preact/signals-react/runtime";
-import { toast } from "sonner";
+import { toast } from "@storyteller/ui-toaster";
 import {
   JobContextType,
   MaybeCanvasRenderBitmapType,
@@ -32,6 +32,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IsDesktopApp } from "@storyteller/tauri-utils";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
 import { PromptsApi } from "@storyteller/api";
+import { CommandSuccessStatus, GetAppPreferences, SoraImageRemix, SoraImageRemixErrorType } from "@storyteller/tauri-api";
+import { SoundRegistry } from "@storyteller/soundboard";
 
 interface ReferenceImage {
   id: string;
@@ -271,19 +273,73 @@ export const PromptBox2D = ({
     console.log("useSystemPrompt", useSystemPrompt);
     console.log("Snapshot media token:", snapshotMediaToken.data);
 
-    const generateResponse = await invoke("sora_image_remix_command", {
-      request: {
-        snapshot_media_token: snapshotMediaToken.data,
-        disable_system_prompt: !useSystemPrompt,
-        prompt: prompt,
-        maybe_additional_images: referenceImages.map(
-          (image) => image.mediaToken
-        ),
-        maybe_number_of_samples: 1,
-      },
+    //const generateResponse = await invoke("sora_image_remix_command", {
+    //  request: {
+    //    snapshot_media_token: snapshotMediaToken.data,
+    //    disable_system_prompt: !useSystemPrompt,
+    //    prompt: prompt,
+    //    maybe_additional_images: referenceImages.map(
+    //      (image) => image.mediaToken
+    //    ),
+    //    maybe_number_of_samples: 1,
+    //  },
+    //});
+    //console.log("Generate response:", generateResponse);
+    //toast.success("Please wait while we process your image.");
+
+    const generateResponse = await SoraImageRemix({
+      snapshot_media_token: snapshotMediaToken.data,
+      disable_system_prompt: !useSystemPrompt,
+      prompt: prompt,
+      maybe_additional_images: referenceImages.map(
+        (image) => image.mediaToken,
+      ),
+      maybe_number_of_samples: 1,
     });
-    console.log("Generate response:", generateResponse);
-    toast.success("Please wait while we process your image.");
+
+    console.log("generateResponse", generateResponse);
+
+    if (generateResponse.status === CommandSuccessStatus.Success) {
+      const prefs = await GetAppPreferences();
+      const soundName = prefs.preferences?.enqueue_success_sound;
+      if (soundName !== undefined) {
+        const registry = SoundRegistry.getInstance();
+        registry.playSound(soundName);
+      }
+      toast.success("Image added to queue");
+
+    } else {
+      const prefs = await GetAppPreferences();
+      const soundName = prefs.preferences?.enqueue_failure_sound;
+      if (soundName !== undefined) {
+        const registry = SoundRegistry.getInstance();
+        registry.playSound(soundName);
+      }
+
+      let errorMessage = "Failed to enqueue image";
+
+      if ("error_type" in generateResponse) {
+        switch (generateResponse.error_type) {
+          case SoraImageRemixErrorType.SoraLoginRequired:
+            errorMessage = "You need to log into Sora to continue. See the settings menu.";
+            break;
+          case SoraImageRemixErrorType.ServerError:
+            errorMessage = "Server error. Failed to enqueue image.";
+            break;
+          case SoraImageRemixErrorType.TooManyConcurrentTasks:
+            errorMessage = "You have too many Sora image generation tasks running. Please wait a moment.";
+            break;
+          case SoraImageRemixErrorType.SoraUsernameNotYetCreated:
+            errorMessage = "Your Sora username is not yet created. Please visit the Sora.com website to create it first.";
+            break;
+          case SoraImageRemixErrorType.SoraIsHavingProblems:
+            errorMessage = "Sora is having problems. Please try again later.";
+            break;
+        }
+      }
+      toast.error(errorMessage);
+    }
+
   };
 
   const handleWebEnqueue = async () => {
