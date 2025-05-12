@@ -57,6 +57,7 @@ import { BufferType, EngineFrameBuffers } from "./VideoProcessor/engine_buffer";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { CharacterAnimationEngine } from "./Engines/CharacterAnimationEngine";
 import { cameras, selectedCameraId } from "~/pages/PageEnigma/signals/camera";
+import { is3DEditorInitialized, setIs3DEditorInitialized } from "~/signals/appTab";
 
 export type EditorInitializeConfig = {
   sceneToken: string;
@@ -197,6 +198,11 @@ class Editor {
   processingHasFailed: boolean;
   stats: Stats;
 
+  // Allows us to cancel the queued render
+  private renderEventToken: number;
+  private shouldRender: boolean;
+  private isMounted: boolean;
+
   constructor() {
     this.processingHasFailed = false;
     console.log(
@@ -256,6 +262,8 @@ class Editor {
     this.lastFrameTime = 0;
     this.last_selected_sum = 0;
     this.selectedCanvas = false;
+    this.renderEventToken = -1;
+    this.shouldRender = false;
     // Audio Engine Test.
 
     this.render_camera_aspect_ratio = CameraAspectRatio.HORIZONTAL_3_2;
@@ -595,13 +603,6 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
-    if (this.outliner_feature_flag) {
-      const result = this.sceneManager?.render_outliner(
-        this.timeline.characters,
-      );
-      if (result) outlinerState.items.value = result.items;
-    }
-
     this.mouse_controls = new MouseControls(
       this.camera,
       this.get_camera_person_mode.bind(this),
@@ -642,10 +643,19 @@ class Editor {
       this.mouse_controls.sceneManager = this.sceneManager;
     }
 
-    // Creates the main update loop.
-    //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
+    if (this.outliner_feature_flag) {
+      const result = this.sceneManager?.render_outliner(
+        this.timeline.characters,
+      );
+      if (result) outlinerState.items.value = result.items;
+    }
 
-    this.updateLoop();
+    // Attach freecam state controller
+    this.mouseOverEventHandler = this.mouseOverEventHandler.bind(this);
+
+    // This will enable all event and render loops
+    // We'll disable it here so the UI events can control is manually
+    // this.remountEngine();
 
     if (!this.utils.isEmpty(sceneToken)) {
       this.loadScene(sceneToken);
@@ -658,24 +668,6 @@ class Editor {
       });
     }
 
-    document.addEventListener("mouseover", (event) => {
-      if (this.cameraViewControls) {
-        if (
-          event.target instanceof HTMLCanvasElement ||
-          (event.target as HTMLElement).id == "letterbox"
-        ) {
-          this.cameraViewControls.enabled = true;
-          this.selectedCanvas = true;
-          this.focused = true;
-        } else {
-          this.cameraViewControls.reset();
-          this.focused = false;
-          this.cameraViewControls.enabled = false;
-          this.selectedCanvas = false;
-        }
-      }
-    });
-
     this._configurePostProcessingRaw();
 
     loadingBarData.value = {
@@ -683,6 +675,8 @@ class Editor {
       progress: 100,
     };
     loadingBarIsShowing.value = false;
+
+    setIs3DEditorInitialized(true);
   }
 
   public isMovable(): boolean {
@@ -691,6 +685,32 @@ class Editor {
 
   public enable_stats() {
     document.body.appendChild(this.stats.dom);
+  }
+
+  private mouseOverEventHandler(event: MouseEvent) {
+    if (this.cameraViewControls) {
+      if (
+        event.target instanceof HTMLCanvasElement ||
+        (event.target as HTMLElement).id == "letterbox"
+      ) {
+        this.cameraViewControls.enabled = true;
+        this.selectedCanvas = true;
+        this.focused = true;
+      } else {
+        this.cameraViewControls.reset();
+        this.focused = false;
+        this.cameraViewControls.enabled = false;
+        this.selectedCanvas = false;
+      }
+    }
+  }
+
+  public enableFreeCamControls() {
+    document.addEventListener("mouseover", this.mouseOverEventHandler);
+  }
+
+  public disableFreeCamControls() {
+    document.removeEventListener("mouseover", this.mouseOverEventHandler);
   }
 
   // Captures the scene without the grid
@@ -1154,10 +1174,10 @@ class Editor {
             : this.render_camera_aspect_ratio === meraAspectRatio.VERTICAL_9_16
               ? 576
               : this.render_camera_aspect_ratio ===
-                  meraAspectRatio.HORIZONTAL_3_2
+                meraAspectRatio.HORIZONTAL_3_2
                 ? 900
                 : this.render_camera_aspect_ratio ===
-                    meraAspectRatio.VERTICAL_2_3
+                  meraAspectRatio.VERTICAL_2_3
                   ? 600
                   : 1000;
         const height =
@@ -1166,10 +1186,10 @@ class Editor {
             : this.render_camera_aspect_ratio === meraAspectRatio.VERTICAL_9_16
               ? 1024
               : this.render_camera_aspect_ratio ===
-                  meraAspectRatio.HORIZONTAL_3_2
+                meraAspectRatio.HORIZONTAL_3_2
                 ? 600
                 : this.render_camera_aspect_ratio ===
-                    meraAspectRatio.VERTICAL_2_3
+                  meraAspectRatio.VERTICAL_2_3
                   ? 900
                   : 1000;
 
@@ -1376,10 +1396,15 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  async updateLoop() {
+  updateLoop() {
+    if (!this.shouldRender) {
+      console.debug("Stopping 3D render loop");
+      return;
+    }
+
     // Performance improvement: Handle frame cap
     // Request the next render already - this is necessary so the loop doesn't stop if the fps cap is hit
-    requestAnimationFrame(this.updateLoop.bind(this));
+    this.renderEventToken = requestAnimationFrame(this.updateLoop.bind(this));
     const frameTime = performance.now();
     if (frameTime - this.lastFrameTime < 1000 / this.cap_fps) {
       return;
@@ -1387,6 +1412,49 @@ class Editor {
 
     this.lastFrameTime = frameTime;
     this.renderSingleFrame();
+  }
+
+  startRenderLoop() {
+    if (this.shouldRender) {
+      console.warn("Render flag is already true");
+      return;
+    }
+
+    this.shouldRender = true;
+    this.updateLoop();
+  }
+
+  stopRenderLoop() {
+    this.shouldRender = false;
+
+    if (this.renderEventToken) {
+      cancelAnimationFrame(this.renderEventToken);
+      this.renderEventToken = -1;
+    }
+  }
+
+  remountEngine() {
+    if (!is3DEditorInitialized.peek()) {
+      console.log("3D mount: Wait for initialization");
+      return;
+    }
+
+    if (this.isMounted) {
+      console.log("3D already mounted, skipping");
+      return;
+    }
+
+    this.startRenderLoop();
+    this.sceneManager?.attachEventListeners();
+    this.enableFreeCamControls();
+    this.cameraViewControls?.attachEventListeners();
+  }
+
+  unmountEngine() {
+    this.stopRenderLoop();
+    this.sceneManager?.detachEventListeners();
+    this.disableFreeCamControls();
+    this.cameraViewControls?.detachEventListeners();
   }
 
   change_mode(type: "translate" | "rotate" | "scale") {

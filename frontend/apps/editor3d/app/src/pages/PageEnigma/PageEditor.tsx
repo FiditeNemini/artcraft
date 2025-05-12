@@ -28,7 +28,7 @@ import { PromptBox3D } from "@storyteller/ui-promptbox";
 import { PopoverItem } from "@storyteller/ui-popover";
 import { OnboardingHelper } from "./comps/OnboardingHelper";
 import { FocalLengthDisplay } from "./comps/FocalLengthDisplay/FocalLengthDisplay";
-import { appTabId, setAppTabId } from "~/signals/appTab";
+import { appTabId, is3DEditorInitialized, setAppTabId } from "~/signals/appTab";
 import { KonvaCanvasContainer } from "../Page2d/KonvaCanvasContainer";
 import { KonvaRootComponent } from "../Page2d/KonvaRootComponent";
 import {
@@ -251,13 +251,8 @@ export const PageEditor = () => {
     });
   };
 
-  const ContentFor2D = () => {
-    return (
-      <KonvaCanvasContainer>
-        <KonvaRootComponent className="h-full w-full" />
-      </KonvaCanvasContainer>
-    );
-  };
+  const display3d = appTabId.value === "3D" ? "block" : "none";
+  const display2d = appTabId.value === "2D" ? "block" : "none";
 
   return (
     <div className="w-screen">
@@ -265,109 +260,109 @@ export const PageEditor = () => {
         pageName="Edit Scene"
         appTabIdSignal={appTabId}
         setAppTabId={setAppTabId}
+        is3DInitSignal={is3DEditorInitialized}
       />
-
-      {appTabId.value === "3D" ? (
-        <>
-          <OnboardingHelper />
+      <>
+        <OnboardingHelper />
+        <div
+          className="relative flex w-screen"
+          style={{ height: "calc(100vh - 68px)", display: display3d }}
+        >
+          {/* Engine section/side panel */}
           <div
-            className="relative flex w-screen"
-            style={{ height: "calc(100vh - 68px)" }}
+            id="engine-n-panels-wrapper"
+            className="flex"
+            style={{
+              height,
+            }}
           >
-            {/* Engine section/side panel */}
-            <div
-              id="engine-n-panels-wrapper"
-              className="flex"
-              style={{
-                height,
-              }}
-            >
-              <div className="relative w-full overflow-hidden bg-transparent">
-                <SceneContainer>
-                  <EditorCanvas />
-                  <PreviewFrameImage />
-                </SceneContainer>
+            <div className="relative w-full overflow-hidden bg-transparent">
+              <SceneContainer>
+                <EditorCanvas />
+                <PreviewFrameImage />
+              </SceneContainer>
 
-                {/* Focal Length Display */}
-                <FocalLengthDisplay />
+              {/* Focal Length Display */}
+              <FocalLengthDisplay />
 
-                {/* Pose Mode Selector */}
-                <PoseModeSelector />
+              {/* Pose Mode Selector */}
+              <PoseModeSelector />
 
-                {/* Top controls */}
-                <div
-                  className="absolute left-0 top-0 w-full"
-                  onClick={handleOverlayClick}
-                >
-                  <div className="grid grid-cols-3 gap-4">
-                    <ControlsTopButtons />
-                    <Controls3D />
-                  </div>
+              {/* Top controls */}
+              <div
+                className="absolute left-0 top-0 w-full"
+                onClick={handleOverlayClick}
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  <ControlsTopButtons />
+                  <Controls3D />
                 </div>
-
-                {/* Bottom controls */}
-                <div
-                  className="absolute bottom-0 left-0"
-                  style={{
-                    width: pageWidth.value,
-                  }}
-                  onClick={handleOverlayClick}
-                >
-                  <div
-                    className="absolute bottom-0 mb-4 ml-4 flex origin-bottom-left flex-col gap-2"
-                    style={{ transform: `scale(${getScale()})` }}
-                  >
-                    <Outliner />
-                    <PreviewEngineCamera />
-                  </div>
-
-                  <ControlPanelSceneObject />
-                </div>
-
-                <PromptBox3D
-                  cameras={cameras}
-                  cameraAspectRatio={cameraAspectRatio}
-                  disableHotkeyInput={disableHotkeyInput}
-                  enableHotkeyInput={enableHotkeyInput}
-                  gridVisibility={gridVisibility}
-                  setGridVisibility={setGridVisibility}
-                  selectedCameraId={selectedCameraId}
-                  deleteCamera={deleteCamera}
-                  focalLengthDragging={focalLengthDragging}
-                  isPromptBoxFocused={isPromptBoxFocused}
-                  uploadImage={uploadImage}
-                  handleCameraSelect={handleCameraSelect}
-                  handleAddCamera={handleAddCamera}
-                  handleCameraNameChange={handleCameraNameChange}
-                  handleCameraFocalLengthChange={handleCameraFocalLengthChange}
-                  onAspectRatioSelect={onAspectRatioSelect}
-                  setEnginePrompt={(prompt) => {
-                    console.log("setEnginePrompt", prompt);
-                    if (!editorEngine) {
-                      console.log("editorEngine is not available");
-                      return;
-                    }
-                    editorEngine!.positive_prompt = prompt;
-                  }}
-                  snapshotCurrentFrame={editorEngine?.snapShotOfCurrentFrame.bind(editorEngine)}
-                />
-
-                <LoadingDots
-                  className="absolute left-0 top-0 z-50"
-                  isShowing={editorLoader.value.isShowing}
-                  type="bricks"
-                  message={editorLoader.value.message}
-                />
               </div>
+
+              {/* Bottom controls */}
+              <div
+                className="absolute bottom-0 left-0"
+                style={{
+                  width: pageWidth.value,
+                }}
+                onClick={handleOverlayClick}
+              >
+                <div
+                  className="absolute bottom-0 mb-4 ml-4 flex origin-bottom-left flex-col gap-2"
+                  style={{ transform: `scale(${getScale()})` }}
+                >
+                  <Outliner />
+                  <PreviewEngineCamera />
+                </div>
+
+                <ControlPanelSceneObject />
+              </div>
+
+              <PromptBox3D
+                cameras={cameras}
+                cameraAspectRatio={cameraAspectRatio}
+                disableHotkeyInput={disableHotkeyInput}
+                enableHotkeyInput={enableHotkeyInput}
+                gridVisibility={gridVisibility}
+                setGridVisibility={setGridVisibility}
+                selectedCameraId={selectedCameraId}
+                deleteCamera={deleteCamera}
+                focalLengthDragging={focalLengthDragging}
+                isPromptBoxFocused={isPromptBoxFocused}
+                uploadImage={uploadImage}
+                handleCameraSelect={handleCameraSelect}
+                handleAddCamera={handleAddCamera}
+                handleCameraNameChange={handleCameraNameChange}
+                handleCameraFocalLengthChange={handleCameraFocalLengthChange}
+                onAspectRatioSelect={onAspectRatioSelect}
+                setEnginePrompt={(prompt) => {
+                  console.log("setEnginePrompt", prompt);
+                  if (!editorEngine) {
+                    console.log("editorEngine is not available");
+                    return;
+                  }
+                  editorEngine!.positive_prompt = prompt;
+                }}
+                snapshotCurrentFrame={editorEngine?.snapShotOfCurrentFrame.bind(editorEngine)}
+              />
+
+              <LoadingDots
+                className="absolute left-0 top-0 z-50"
+                isShowing={editorLoader.value.isShowing}
+                type="bricks"
+                message={editorLoader.value.message}
+              />
             </div>
           </div>
-        </>
-      ) : (
-        <ContentFor2D />
-      )}
+        </div>
+      </>
+      <KonvaCanvasContainer style={{ display: display2d }}>
+        <KonvaRootComponent className="h-full w-full" />
+      </KonvaCanvasContainer>
+
 
       <LoginModal
-        onClose={() => {}}
+        onClose={() => { }}
         videoSrc2D="/resources/videos/artcraft-canvas-demo.mp4"
         videoSrc3D="/resources/videos/artcraft-3d-demo.mp4"
         openAiLogo="/resources/images/openai-logo.png"
