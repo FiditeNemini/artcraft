@@ -29,6 +29,7 @@
           "data:",
           "https://*.fakeyou.com",
           "https://*.storyteller.ai",
+          "https://www.googletagmanager.com",
           "ipc://localhost",
           "tauri://localhost"
         ], 
@@ -41,6 +42,7 @@
           "https://*.fakeyou.com",
           "https://*.storyteller.ai",
           "https://unpkg.com/detect-gpu@5.0.70/",
+          "https://www.googletagmanager.com",
           "ipc://localhost",
           "tauri://localhost"
         ],
