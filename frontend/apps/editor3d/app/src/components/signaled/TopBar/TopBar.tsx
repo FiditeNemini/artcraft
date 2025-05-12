@@ -34,8 +34,8 @@ interface Props {
 }
 
 const appTabs: TabItem[] = [
-  { id: "3D", label: "3D" },
   { id: "2D", label: "2D" },
+  { id: "3D", label: "3D" },
 ];
 
 export const TopBar = ({ pageName, appTabIdSignal, setAppTabId, is3DInitSignal }: Props) => {
