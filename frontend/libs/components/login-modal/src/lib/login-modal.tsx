@@ -55,7 +55,7 @@ export function LoginModal({
     return loggedIn;
   };
 
-  useSoraLoginListener((payload:any) => {
+  useSoraLoginListener((payload: any) => {
     console.log("Login success!", payload);
     if (isLoggedInArtCraft) {
       setStep(4);
@@ -73,6 +73,13 @@ export function LoginModal({
           // Sora session exists, but not logged in to ArtCraft
           setIsOpen(true);
           setStep(3);
+          setIsLoggedInArtCraft(false);
+        } else if (!soraSessionExists && loggedIn) {
+          // No Sora session, but logged in to ArtCraft
+          setIsOpen(true);
+          setStep(2);
+          setIsLoggedInArtCraft(true);
+          // setIsOpen(false);
         } else if (!soraSessionExists) {
           // No Sora session, start at step 1
           setIsOpen(true);
