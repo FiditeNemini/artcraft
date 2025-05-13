@@ -40,6 +40,7 @@
           "'unsafe-inline'",
           "blob:",
           "data:",
+          "http://ipc.localhost",
           "https://*.fakeyou.com",
           "https://*.storyteller.ai",
           "https://unpkg.com/detect-gpu@5.0.70/",
