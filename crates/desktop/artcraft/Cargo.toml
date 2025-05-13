@@ -25,9 +25,11 @@ workspace-build-acceleration = { workspace =  true }
 # Internal
 crockford = { workspace = true }
 errors = { workspace = true }
+fal_client = { workspace = true }
 filesys = { workspace = true }
 memory_caching = { workspace = true }
 memory_store = { workspace = true }
+mimetypes = { workspace = true }
 openai_sora_client = { workspace = true }
 primitives = { workspace = true }
 storyteller_client = { workspace = true }
