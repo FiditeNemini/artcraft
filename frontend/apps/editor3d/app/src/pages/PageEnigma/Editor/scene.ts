@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader, GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { MMDLoader } from "three/addons/loaders/MMDLoader.js";
+
 import { Font } from "three/examples/jsm/loaders/FontLoader.js";
 import { generateUUID } from "three/src/math/MathUtils.js";
 import { LoadingPlaceHolderManager } from "./placeholder_manager";
@@ -10,6 +11,9 @@ import { ChromaKeyMaterial } from "./chromakey";
 import { TimeLine } from "./timeline";
 import { ClipGroup, ClipType } from "~/enums";
 import { ClipUI } from "../clips/clip_ui";
+
+import { GetFrontendEnvironment } from "~/Classes/GetFrontendEnvironment";
+
 import { gridVisibility } from "../signals/engine";
 import { InfiniteGridHelper } from "./InfiniteGridHelper";
 import { cameras, selectedCameraId } from "../signals/camera";
@@ -423,9 +427,11 @@ class Scene {
 
   // TODO: REPLACE
   async getMediaURL(media_id: string) {
+    console.log("getMediaID!!!!!!!!!!!!!", media_id);
     const response = await this.mediaFilesApi.GetMediaFileByToken({
-      mediaFileToken: media_id
+      mediaFileToken: media_id,
     });
+    console.log("response!!!!!!!!!!!!!!", response);
     return response.data!.media_links.cdn_url;
   }
 
@@ -531,6 +537,21 @@ class Scene {
     return mmd;
   }
 
+  async loadObjectFromUrl(
+    url: string,
+    position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
+  ): Promise<THREE.Object3D> {
+    console.log("loadObjectFromUrl!!!!!!!!", url);
+    if (
+      url.includes(".png") ||
+      url.includes(".jpg") ||
+      url.includes(".jpeg") ||
+      url.includes(".mp4")
+    ) {
+      return await this.instantiate("Image::" + url);
+    }
+  }
+
   async loadObject(
     media_id: string,
     name: string,
@@ -539,6 +560,7 @@ class Scene {
     version: number = 1.0,
   ): Promise<THREE.Object3D> {
     const url = await this.getMediaURL(media_id);
+
     if (url.includes(".pmd") || url.includes(".pmx")) {
       return await this.loadMMDWithPlaceholder(
         media_id,

@@ -37,6 +37,7 @@ interface Props {
 const appTabs: TabItem[] = [
   { id: "2D", label: "2D" },
   { id: "3D", label: "3D" },
+  // { id: "VIDEO", label: "Video" },
 ];
 
 export const TopBar = ({
@@ -70,6 +71,44 @@ export const TopBar = ({
       engine3D?.remountEngine();
     }
   }, [currentAppTabId, engine3D, is3DInit]);
+
+  const handleAddToScene = async (
+    url: string,
+    media_id: string | undefined,
+  ) => {
+    console.log("add to scene", url);
+    if (currentAppTabId === "2D") {
+      console.log("Adding to 2D scene");
+
+      // from the uploaded image url.
+    } else if (currentAppTabId === "3D") {
+      console.log("Adding to 3D scene");
+
+      // from the uploaded image url.
+      // engine3D?.activeScene.loadObjectFromUrl(
+      //   "https://cdn-2.fakeyou.com/media/r/h/0/5/3/rh053gbx8yvjwk1mdvag4gkr5c0h9wbh/image_rh053gbx8yvjwk1mdvag4gkr5c0h9wbh.png",
+      // );
+
+      // from the gallery modal.
+      // engine3D?.activeScene.loadObjectFromUrl(
+      //   "https://cdn-2.fakeyou.com/media/1/t/b/0/e/1tb0e53691mdgqmtd4fmzy58wp96vwxz/image_1tb0e53691mdgqmtd4fmzy58wp96vwxz.png",
+      // );
+
+      // // working media id m_ehq8051fx4hddhja54a7zmz897cgrk
+      // engine3D?.activeScene.loadObject(
+      //   "m_ehq8051fx4hddhja54a7zmz897cgrk",
+      //   "image",
+      //   true,
+      // );
+
+      // media id from the image selected from gallery.
+      engine3D?.activeScene.loadObject(media_id, "image", true);
+    } else if (currentAppTabId === "VIDEO") {
+      console.log("Adding to Video scene");
+    } else {
+      console.warn(`Unknown tab type: ${currentAppTabId}`);
+    }
+  };
 
   return (
     <>
@@ -149,39 +188,7 @@ export const TopBar = ({
         activeTab={activeLibraryTab}
         onTabChange={setActiveLibraryTab}
         onDownloadClicked={downloadFileFromUrl}
-        onAddToSceneClicked={async (url) => {
-          console.log("add to scene", url);
-          // Download the image from the URL and convert to File
-          const downloadImage = async (url: string): Promise<File | null> => {
-            try {
-              // Fetch the image
-              const response = await fetch(url);
-              if (!response.ok) {
-                throw new Error(`Failed to fetch image: ${response.status}`);
-              }
-
-              // Get the blob data
-              const blob = await response.blob();
-
-              // Extract filename from URL or use a default name
-              const filename = url.split("/").pop() || "image.png";
-
-              // Create a File object from the blob
-              const file = new File([blob], filename, { type: blob.type });
-
-              return file;
-            } catch (error) {
-              console.error("Error downloading image:", error);
-              return null;
-            }
-          };
-          const file = await downloadImage(url);
-          if (file) {
-            console.log("file", file);
-          } else {
-            console.error("Failed to download image");
-          }
-        }}
+        onAddToSceneClicked={handleAddToScene}
       />
     </>
   );
