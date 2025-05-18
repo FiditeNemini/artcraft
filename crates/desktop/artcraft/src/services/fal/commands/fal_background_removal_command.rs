@@ -1,18 +1,20 @@
 use crate::core::commands::command_response_wrapper::{CommandErrorResponseWrapper, CommandErrorStatus, CommandResult, SerializeMarker};
 use crate::core::events::sendable_event_trait::SendableEvent;
+use crate::core::state::data_dir::app_data_root::AppDataRoot;
+use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
+use crate::core::utils::download_media_file_to_temp_dir::download_media_file_to_temp_dir;
+use crate::core::utils::get_url_file_extension::get_url_file_extension;
+use crate::core::utils::save_base64_image_to_temp_dir::save_base64_image_to_temp_dir;
+use crate::core::utils::simple_http_download::simple_http_download;
+use crate::core::utils::simple_http_download_to_tempfile::simple_http_download_to_tempfile;
+use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
 use crate::services::sora::events::sora_image_enqueue_failure_event::SoraImageEnqueueFailureEvent;
 use crate::services::sora::events::sora_image_enqueue_success_event::SoraImageEnqueueSuccessEvent;
-use crate::services::fal::state::fal_credential_manager::FalCredentialManager;
 use crate::services::sora::state::read_sora_credentials_from_disk::read_sora_credentials_from_disk;
 use crate::services::sora::state::sora_credential_holder::SoraCredentialHolder;
 use crate::services::sora::state::sora_credential_manager::SoraCredentialManager;
 use crate::services::sora::state::sora_task_queue::SoraTaskQueue;
-use crate::core::state::data_dir::app_data_root::AppDataRoot;
-use crate::core::state::data_dir::trait_data_subdir::DataSubdir;
 use crate::services::storyteller::state::storyteller_credential_manager::StorytellerCredentialManager;
-use crate::core::utils::get_url_file_extension::get_url_file_extension;
-use crate::core::utils::simple_http_download::simple_http_download;
-use crate::core::utils::simple_http_download_to_tempfile::simple_http_download_to_tempfile;
 use anyhow::anyhow;
 use base64::prelude::BASE64_STANDARD;
 use base64::{DecodeError, Engine};
@@ -41,8 +43,8 @@ use std::io::{Cursor, Read, Write};
 use std::ops::Add;
 use std::path::PathBuf;
 use std::time::Duration;
-use storyteller_client::api_error::ApiError;
-use storyteller_client::api_error::ApiError::InternalServerError;
+use storyteller_client::error::api_error::ApiError;
+use storyteller_client::error::api_error::ApiError::InternalServerError;
 use storyteller_client::media_files::get_media_file::{get_media_file, GetMediaFileSuccessResponse};
 use storyteller_client::media_files::upload_image_media_file_from_file::upload_image_media_file_from_file;
 use storyteller_client::utils::api_host::ApiHost;
@@ -73,7 +75,7 @@ impl SerializeMarker for FalBackgroundRemovalSuccessResponse {}
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "snake_case")]
-pub enum SoraImageRemixErrorType {
+pub enum BackgroundRemovalErrorType {
   /// Generic server error
   ServerError,
   /// No Fal API key available
@@ -87,7 +89,7 @@ pub async fn fal_background_removal_command(
   app_data_root: State<'_, AppDataRoot>,
   fal_creds_manager: State<'_, FalCredentialManager>,
   storyteller_creds_manager: State<'_, StorytellerCredentialManager>,
-) -> CommandResult<FalBackgroundRemovalSuccessResponse, SoraImageRemixErrorType, ()> {
+) -> CommandResult<FalBackgroundRemovalSuccessResponse, BackgroundRemovalErrorType, ()> {
   
   info!("fal_background_removal_command called; image media token: {:?}", request.image_media_token);
 
@@ -100,7 +102,7 @@ pub async fn fal_background_removal_command(
     return Err(CommandErrorResponseWrapper {
       status: CommandErrorStatus::Unauthorized,
       error_message: Some("You need to set a FAL api key".to_string()),
-      error_type: Some(SoraImageRemixErrorType::NeedsFalApiKey),
+      error_type: Some(BackgroundRemovalErrorType::NeedsFalApiKey),
       error_details: None,
     });
   }
@@ -123,7 +125,7 @@ pub async fn fal_background_removal_command(
       //}
       
       let mut status = CommandErrorStatus::ServerError;
-      let mut error_type = SoraImageRemixErrorType::ServerError;
+      let mut error_type = BackgroundRemovalErrorType::ServerError;
       let mut error_message = "A server error occurred. Please try again. If it continues, please tell our staff about the problem.";
       
       //match (err) {
@@ -205,10 +207,10 @@ pub async fn remove_background(
   let mut temp_download;
   
   if let Some(media_token) = request.image_media_token {
-    temp_download = download_media_file(&app_data_root, &media_token).await?;
+    temp_download = download_media_file_to_temp_dir(&app_data_root, &media_token).await?;
     
   } else if let Some(base64_bytes) = request.base64_image {
-    temp_download = persist_base64(&app_data_root, base64_bytes).await?;
+    temp_download = save_base64_image_to_temp_dir(&app_data_root, base64_bytes).await?;
   } else {
     return Err(InnerError::AnyhowError(anyhow!("No image media token or base64 image provided")));
   }
@@ -253,37 +255,3 @@ pub async fn remove_background(
   Ok((response, base64_bytes))
 }
 
-async fn download_media_file(app_data_root: &AppDataRoot, token: &MediaFileToken) -> Result<NamedTempFile, InnerError> {
-  let response = get_media_file(&ApiHost::Storyteller, token).await?;
-
-  let media_file_url = &response.media_file.media_links.cdn_url;
-  
-  let extension_with_dot = get_url_file_extension(media_file_url)
-      .map(|ext| format!(".{}", ext))
-      .unwrap_or_else(|| ".png".to_string());
-
-  //let filename = format!("{}{}", response.media_file.token.as_str(), extension_with_dot);
-  //let filename = app_data_root.downloads_dir().path().join(&filename);
-  
-  let mut file = app_data_root.temp_dir().new_named_temp_file_with_extension(&extension_with_dot)?;
-
-  simple_http_download_to_tempfile(&media_file_url, &mut file).await?;
-  
-  Ok(file) // NB: Must return TempFile to not drop / delete it
-}
-
-async fn persist_base64(app_data_root: &AppDataRoot, base64_image: String) -> Result<NamedTempFile, InnerError> {
-  let bytes = BASE64_STANDARD.decode(base64_image)?;
-
-  let extension = MimetypeInfo::get_for_bytes(&bytes)
-      .map(|info| info.file_extension())
-      .flatten()
-      .map(|ext| ext.extension_with_period().to_string())
-      .unwrap_or_else(|| ".png".to_string());
-  
-  let mut file = app_data_root.temp_dir().new_named_temp_file_with_extension(&extension)?;
-  
-  file.write_all(bytes.as_ref())?;
-
-  Ok(file) // NB: Must return TempFile to not drop / delete it
-}
