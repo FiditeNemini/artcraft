@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { useSignals } from "@preact/signals-react/runtime";
 import { toast } from "@storyteller/ui-toaster";
 import {
@@ -47,7 +46,7 @@ interface ReferenceImage {
   mediaToken: string;
 }
 
-interface PromptBox2DProps {
+interface PromptBoxVideoProps {
   uploadImage: ({
     title,
     assetFile,
@@ -63,13 +62,13 @@ interface PromptBox2DProps {
   onEnqueuePressed?: () => void | Promise<void>;
 }
 
-export const PromptBox2D = ({
+export const PromptBoxVideo = ({
   uploadImage,
   getCanvasRenderBitmap,
   EncodeImageBitmapToBase64,
   useJobContext,
   onEnqueuePressed,
-}: PromptBox2DProps) => {
+}: PromptBoxVideoProps) => {
   useSignals();
 
   console.log("Is this a desktop app?", IsDesktopApp());
@@ -78,7 +77,6 @@ export const PromptBox2D = ({
   const { jobTokens, addJobToken, removeJobToken, clearJobTokens } =
     useJobContext();
 
-  //const { lastRenderedBitmap } = useCanvasSignal();
   const [prompt, setPrompt] = useState("");
   const [isEnqueueing, setIsEnqueueing] = useState(false);
   const [useSystemPrompt, setUseSystemPrompt] = useState(true);
@@ -91,21 +89,16 @@ export const PromptBox2D = ({
   const [uploadingImages, setUploadingImages] = useState<
     { id: string; file: File }[]
   >([]);
-  const [aspectRatioList, setAspectRatioList] = useState<PopoverItem[]>([
+  const [resolutionList, setResolutionList] = useState<PopoverItem[]>([
     {
-      label: "3:2",
+      label: "720p",
       selected: true,
       icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
     },
     {
-      label: "2:3",
+      label: "480p",
       selected: false,
-      icon: <FontAwesomeIcon icon={faRectangleVertical} className="h-4 w-4" />,
-    },
-    {
-      label: "1:1",
-      selected: false,
-      icon: <FontAwesomeIcon icon={faSquare} className="h-4 w-4" />,
+      icon: <FontAwesomeIcon icon={faRectangle} className="h-4 w-4" />,
     },
   ]);
 
@@ -119,8 +112,8 @@ export const PromptBox2D = ({
     }
   });
 
-  const handleAspectRatioSelect = (selectedItem: PopoverItem) => {
-    setAspectRatioList((prev) =>
+  const handleResolutionSelect = (selectedItem: PopoverItem) => {
+    setResolutionList((prev) =>
       prev.map((item) => ({
         ...item,
         selected: item.label === selectedItem.label,
@@ -198,35 +191,33 @@ export const PromptBox2D = ({
   const handleImageSelect = (id: string) => {
     setSelectedGalleryImages((prev) => {
       if (prev.includes(id)) {
-        return prev.filter((imageId) => imageId !== id);
+        return [];
       }
-      if (prev.length >= 4) {
-        return prev;
-      }
-      return [...prev, id];
+      return [id];
     });
   };
 
   const handleGalleryImages = (selectedItems: GalleryItem[]) => {
-    selectedItems.forEach((item) => {
-      if (!item.fullImage) return;
-      const referenceImage: ReferenceImage = {
-        id: Math.random().toString(36).substring(7),
-        url: item.fullImage,
-        file: new File([], "library-image"),
-        mediaToken: item.id,
-      };
-      setReferenceImages((prev) => [...prev, referenceImage]);
-    });
+    // Clear existing reference images first
+    setReferenceImages([]);
+
+    // Only take the first selected item
+    const item = selectedItems[0];
+    if (!item || !item.fullImage) return;
+
+    const referenceImage: ReferenceImage = {
+      id: Math.random().toString(36).substring(7),
+      url: item.fullImage,
+      file: new File([], "library-image"),
+      mediaToken: item.id,
+    };
+    setReferenceImages([referenceImage]);
     setIsGalleryModalOpen(false);
     setSelectedGalleryImages([]);
   };
 
   const handleAction = (action: string) => {
     switch (action) {
-      case "upload":
-        handleUploadClick();
-        break;
       case "gallery":
         handleGallerySelect();
         break;
@@ -277,20 +268,6 @@ export const PromptBox2D = ({
     }
     console.log("useSystemPrompt", useSystemPrompt);
     console.log("Snapshot media token:", snapshotMediaToken.data);
-
-    //const generateResponse = await invoke("sora_image_remix_command", {
-    //  request: {
-    //    snapshot_media_token: snapshotMediaToken.data,
-    //    disable_system_prompt: !useSystemPrompt,
-    //    prompt: prompt,
-    //    maybe_additional_images: referenceImages.map(
-    //      (image) => image.mediaToken
-    //    ),
-    //    maybe_number_of_samples: 1,
-    //  },
-    //});
-    //console.log("Generate response:", generateResponse);
-    //toast.success("Please wait while we process your image.");
 
     const generateResponse = await SoraImageRemix({
       snapshot_media_token: snapshotMediaToken.data,
@@ -442,8 +419,8 @@ export const PromptBox2D = ({
     }
   };
 
-  const getCurrentAspectRatioIcon = () => {
-    const selected = aspectRatioList.find((item) => item.selected);
+  const getCurrentResolutionIcon = () => {
+    const selected = resolutionList.find((item) => item.selected);
     if (!selected || !selected.icon) return faRectangle;
     const iconElement = selected.icon as React.ReactElement;
     return iconElement.props.icon;
@@ -529,13 +506,7 @@ export const PromptBox2D = ({
               panelTitle="Add Image"
               items={[
                 {
-                  label: "Upload from device",
-                  selected: false,
-                  icon: <FontAwesomeIcon icon={faUpload} className="h-4 w-4" />,
-                  action: "upload",
-                },
-                {
-                  label: "Choose from library",
+                  label: "Choose from Assets",
                   selected: false,
                   icon: <FontAwesomeIcon icon={faImages} className="h-4 w-4" />,
                   action: "gallery",
@@ -552,7 +523,7 @@ export const PromptBox2D = ({
             <textarea
               ref={textareaRef}
               rows={1}
-              placeholder="Describe your image..."
+              placeholder="Choose the image from assets (+) and describe your what you want to happen in the video..."
               className="text-md mb-2 max-h-[5.5em] flex-1 resize-none overflow-y-auto rounded bg-transparent pb-2 pr-2 pt-1 text-white placeholder-white placeholder:text-white/60 focus:outline-none"
               value={prompt}
               onChange={handleChange}
@@ -565,20 +536,20 @@ export const PromptBox2D = ({
           <div className="mt-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Tooltip
-                content="Aspect ratio"
+                content="Resolution"
                 position="top"
                 className="z-50"
                 closeOnClick={true}
               >
                 <PopoverMenu
-                  items={aspectRatioList}
-                  onSelect={handleAspectRatioSelect}
+                  items={resolutionList}
+                  onSelect={handleResolutionSelect}
                   mode="toggle"
-                  panelTitle="Aspect Ratio"
+                  panelTitle="Resolution"
                   showIconsInList
                   triggerIcon={
                     <FontAwesomeIcon
-                      icon={getCurrentAspectRatioIcon()}
+                      icon={getCurrentResolutionIcon()}
                       className="h-4 w-4"
                     />
                   }
