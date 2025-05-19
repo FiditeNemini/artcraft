@@ -140,7 +140,11 @@ export const TopBar = ({
           </div>
 
           <div className="flex items-center justify-center gap-2 font-medium">
-            <SceneTitleInput pageName={pageName} />
+            {currentAppTabId === "3D" ? (
+              <SceneTitleInput pageName={pageName} />
+            ) : (
+              <h1>{currentAppTabId === "2D" ? "Canvas" : "Generate"}</h1>
+            )}
           </div>
 
           <div className="flex justify-end gap-3.5">
