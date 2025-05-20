@@ -250,7 +250,7 @@ export const GalleryModal = React.memo(
                     className="w-auto relative z-[51]"
                   />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-1.5">
                   <Modal.ExpandButton />
                   <CloseButton onClick={onClose} className="relative z-[51]" />
                 </div>

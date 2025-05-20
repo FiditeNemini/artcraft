@@ -12,6 +12,10 @@ import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 import { CloseButton } from "@storyteller/ui-close-button";
 import { useRef, useState, useEffect, useContext, createContext } from "react";
 import { cloneElement, isValidElement } from "react";
+import {
+  faUpRightAndDownLeftFromCenter,
+  faDownLeftAndUpRightToCenter,
+} from "@fortawesome/pro-solid-svg-icons";
 
 const DialogBackdrop = ({
   className,
@@ -60,37 +64,39 @@ const ModalExpandContext = createContext<ModalExpandContextType | undefined>(
 );
 
 // Expand button subcomponent
-const ExpandButton = ({ className }: { className?: string }) => {
+interface ExpandButtonProps {
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}
+
+const ExpandButton = ({ className, size = "md" }: ExpandButtonProps) => {
   const ctx = useContext(ModalExpandContext);
   if (!ctx) return null;
   const { expanded, toggleExpanded } = ctx;
+  const sizeClasses = {
+    sm: "h-5 w-5 text-sm",
+    md: "h-7 w-7 text-md",
+    lg: "h-9 w-9 text-xl",
+  };
   return (
     <button
       type="button"
       aria-label={expanded ? "Restore modal size" : "Expand modal"}
       onClick={toggleExpanded}
       className={twMerge(
-        "inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50",
+        "flex items-center justify-center rounded-full bg-black/40 text-white/60 transition-all hover:bg-black/70 hover:text-white",
+        sizeClasses[size],
+        "relative z-[70]",
         className
       )}
-      style={{ fontSize: 18 }}
     >
-      {/* Use a FontAwesome icon for expand/restore */}
-      <svg
-        width="1em"
-        height="1em"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        {expanded ? (
-          // Restore icon (minimize)
-          <path d="M4 8h2V6h2V4H4v4zm10-4v2h2v2h2V4h-4zm2 10h-2v2h-2v2h4v-4zm-10 4v-2H4v-2H2v4h4z" />
-        ) : (
-          // Expand icon (maximize)
-          <path d="M3 3h6v2H5v4H3V3zm14 0v6h-2V5h-4V3h6zm0 14h-6v-2h4v-4h2v6zM3 17v-6h2v4h4v2H3z" />
-        )}
-      </svg>
+      <FontAwesomeIcon
+        icon={
+          expanded
+            ? faDownLeftAndUpRightToCenter
+            : faUpRightAndDownLeftFromCenter
+        }
+      />
     </button>
   );
 };
