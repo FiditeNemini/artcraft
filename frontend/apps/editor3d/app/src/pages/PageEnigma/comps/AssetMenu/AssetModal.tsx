@@ -481,10 +481,21 @@ export const AssetModal = () => {
       <Modal
         isOpen={assetModalVisible.value && assetModalVisibleDuringDrag.value}
         onClose={handleClose}
-        className="h-[640px] max-w-4xl"
+        className="relative h-[640px] max-w-4xl"
         childPadding={false}
         showClose={false}
+        backdropClassName="bg-transparent"
+        draggable={true}
+        closeOnOutsideClick={false}
+        allowBackgroundInteraction={true}
+        // initialPosition={{
+        //   x: 100,
+        //   y: typeof window !== "undefined" ? (window.innerHeight - 640) / 2 : 0,
+        // }}
       >
+        <Modal.DragHandle>
+          <div className="absolute left-0 top-0 z-[50] h-[40px] w-full cursor-move" />
+        </Modal.DragHandle>
         <div className="grid h-full grid-cols-12 gap-3">
           <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:dark:bg-white/10">
             <div className="flex items-center justify-between gap-2.5 py-0.5">
@@ -569,7 +580,7 @@ export const AssetModal = () => {
           <div className="col-span-9 p-3 pb-0 ps-0 pt-2">
             <div className="flex h-full flex-col">
               <div className="h-full">
-                <div className="flex items-center gap-4">
+                <div className="relative z-[51] flex items-center gap-4">
                   <TabSelector
                     tabs={libraryTabs}
                     activeTab={activeLibraryTab}

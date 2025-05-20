@@ -224,11 +224,18 @@ export const GalleryModal = React.memo(
           onClose={onClose}
           className={twMerge(
             "h-[620px] max-w-4xl",
-            mode === "view" && "h-[80vh] max-h-[870px] max-w-7xl"
+            mode === "view" && "h-[640px] max-w-4xl"
           )}
           childPadding={false}
           showClose={false}
+          backdropClassName="bg-transparent"
+          draggable={true}
+          allowBackgroundInteraction={true}
+          closeOnOutsideClick={false}
         >
+          <Modal.DragHandle>
+            <div className="absolute left-0 top-0 z-[50] h-[40px] w-full cursor-move" />
+          </Modal.DragHandle>
           <div className="flex h-full flex-col">
             <div className="border-b border-white/10 p-4 py-3">
               <div className="grid grid-cols-3 items-center">
@@ -240,11 +247,12 @@ export const GalleryModal = React.memo(
                     tabs={tabs}
                     activeTab={activeTab}
                     onTabChange={onTabChange}
-                    className="w-auto"
+                    className="w-auto relative z-[51]"
                   />
                 </div>
                 <div className="flex justify-end">
-                  <CloseButton onClick={onClose} />
+                  <Modal.ExpandButton />
+                  <CloseButton onClick={onClose} className="relative z-[51]" />
                 </div>
               </div>
             </div>
