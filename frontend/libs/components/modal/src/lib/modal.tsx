@@ -248,15 +248,16 @@ export const Modal = ({
       const dy = e.clientY - mouseStart.current.y;
       const newX = dragStart.current.x + dx;
       const newY = dragStart.current.y + dy;
-      // Restrict within viewport
+      // Restrict within viewport, but allow overflow
       const modal = modalRef.current;
       const { width: mw, height: mh } = modal.getBoundingClientRect();
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const minX = 0;
-      const minY = 0;
-      const maxX = vw - mw;
-      const maxY = vh - mh;
+      const overflow = 450; // Allow dragging 450px outside each edge except top
+      const minX = -overflow;
+      const minY = 0; // Do not allow dragging above the top edge
+      const maxX = vw - mw + overflow;
+      const maxY = vh - mh + overflow;
       const clampedX = Math.max(minX, Math.min(newX, maxX));
       const clampedY = Math.max(minY, Math.min(newY, maxY));
       positionRef.current = { x: clampedX, y: clampedY };

@@ -494,7 +494,7 @@ export const AssetModal = () => {
         // }}
       >
         <Modal.DragHandle>
-          <div className="absolute left-0 top-0 z-[50] h-[40px] w-full cursor-move" />
+          <div className="absolute left-0 top-0 z-[50] h-[46px] w-full cursor-move" />
         </Modal.DragHandle>
         <div className="grid h-full grid-cols-12 gap-3">
           <div className="relative col-span-3 flex h-full flex-col p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-gray-200 after:dark:bg-white/10">
@@ -580,18 +580,18 @@ export const AssetModal = () => {
           <div className="col-span-9 p-3 pb-0 ps-0 pt-2">
             <div className="flex h-full flex-col">
               <div className="h-full">
-                <div className="relative z-[51] flex items-center gap-4">
+                <div className="flex items-center gap-4">
                   <TabSelector
                     tabs={libraryTabs}
                     activeTab={activeLibraryTab}
                     onTabChange={setActiveLibraryTab}
-                    className="w-auto"
+                    className="relative z-[51] w-auto"
                   />
                   <div className="relative grow">
                     <Input
                       ref={searchInputRef}
                       placeholder="Search"
-                      className="grow"
+                      className="relative z-[51] grow"
                       inputClassName="pr-2.5"
                       icon={faSearch}
                       value={searchTerm}
@@ -603,11 +603,14 @@ export const AssetModal = () => {
                     {searchTerm && (
                       <CloseButton
                         onClick={clearSearch}
-                        className="absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 bg-white/10 text-[10px] hover:bg-white/20"
+                        className="absolute right-2.5 top-1/2 z-[51] h-4 w-4 -translate-y-1/2 bg-white/10 text-[10px] hover:bg-white/20"
                       />
                     )}
                   </div>
-                  <CloseButton onClick={handleClose} />
+                  <CloseButton
+                    onClick={handleClose}
+                    className="relative z-[51]"
+                  />
                 </div>
                 <div
                   className={twMerge(

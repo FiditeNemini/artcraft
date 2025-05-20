@@ -234,7 +234,7 @@ export const GalleryModal = React.memo(
           closeOnOutsideClick={false}
         >
           <Modal.DragHandle>
-            <div className="absolute left-0 top-0 z-[50] h-[40px] w-full cursor-move" />
+            <div className="absolute left-0 top-0 z-[50] h-[60px] w-full cursor-move" />
           </Modal.DragHandle>
           <div className="flex h-full flex-col">
             <div className="border-b border-white/10 p-4 py-3">
