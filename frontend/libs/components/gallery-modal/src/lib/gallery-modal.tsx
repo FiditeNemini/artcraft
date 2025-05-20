@@ -131,15 +131,22 @@ export const GalleryModal = React.memo(
         if (!username) return;
         setLoading(true);
         try {
-          const response = await api.listUserMediaFiles({
-            filter_media_classes:
-              activeTab === "videos"
-                ? [FilterMediaClasses.VIDEO]
-                : [FilterMediaClasses.IMAGE],
-            username: username,
-            include_user_uploads: activeTab === "uploads",
-            user_uploads_only: activeTab === "uploads",
-          });
+          let response = null;
+          if (activeTab === "videos") {
+            response = await api.listUserMediaFiles({
+              filter_media_classes: [FilterMediaClasses.VIDEO],
+              username: username,
+              include_user_uploads: true,
+              user_uploads_only: true,
+            });
+          } else {
+            response = await api.listUserMediaFiles({
+              filter_media_classes: [FilterMediaClasses.IMAGE],
+              username: username,
+              include_user_uploads: activeTab === "uploads",
+              user_uploads_only: activeTab === "uploads",
+            });
+          }
 
           if (response.success && response.data) {
             // Print the JSON response for debugging
