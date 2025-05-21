@@ -57,7 +57,13 @@ Message: {
     502 => {
       return SoraError::BadGateway(message);
     }
+    504 => {
+      if message.contains("cloudflare") || message.contains("Cloudflare") {
+        return SoraError::CloudFlareTimeout(message);
+      }
+    }
     524 => {
+      // NB: 524 is a cloudflare specific gateway timeout error with slightly different semantics than 504.
       if message.contains("cloudflare") || message.contains("Cloudflare") {
         return SoraError::CloudFlareTimeout(message);
       }
