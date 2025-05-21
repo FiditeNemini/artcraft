@@ -50,8 +50,18 @@ import { LoginModal } from "@storyteller/ui-login-modal";
 import { DomLevels } from "./signals/hotkeys";
 import { AUTH_STATUS } from "../../enums/authentication";
 import { authentication } from "../../signals/authentication/authentication";
-import { topNavMediaId } from "~/components/signaled/TopBar/TopBar";
-import { topNavMediaUrl } from "~/components/signaled/TopBar/TopBar";
+import {
+  topNavMediaId,
+  topNavMediaUrl,
+} from "~/components/signaled/TopBar/TopBar";
+import { setOnImageDrop } from "../../../../../../libs/components/gallery-modal/src/lib/galleryDnd";
+import { uploadPlaneFromMediaToken } from "~/components/reusable/UploadModalMedia/uploadPlane";
+import { addObject } from "./signals/objectGroup/addObject";
+import { AssetType } from "~/enums";
+import { v4 as uuidv4 } from "uuid";
+import { MediaItem } from "~/pages/PageEnigma/models";
+import { GalleryItem } from "../../../../../../libs/components/gallery-modal/src/lib/gallery-modal";
+import { UploaderState } from "~/models";
 
 export const PageEditor = () => {
   useSignals();
@@ -66,6 +76,35 @@ export const PageEditor = () => {
     window.onbeforeunload = () => {
       return "You may have unsaved changes.";
     };
+  }, []);
+
+  useEffect(() => {
+    setOnImageDrop(
+      async (item: GalleryItem, _position: { x: number; y: number }) => {
+        console.log("Gallery image dropped", item, _position);
+        try {
+          await uploadPlaneFromMediaToken({
+            title: item.label || "Image Plane",
+            mediaToken: item.id,
+            progressCallback: (state: UploaderState) => {
+              if (state.status) console.log("Upload status:", state.status);
+            },
+          });
+          console.log("Upload complete, adding object to scene");
+          const mediaItem: MediaItem = {
+            version: 1,
+            type: AssetType.OBJECT,
+            media_id: item.id || uuidv4(),
+            name: item.label || "Image Plane",
+            // Add other fields as needed
+          };
+          addObject(mediaItem);
+          console.log("Object added to scene:", mediaItem);
+        } catch (err) {
+          console.error("Failed to upload and add image plane:", err);
+        }
+      },
+    );
   }, []);
 
   const height =

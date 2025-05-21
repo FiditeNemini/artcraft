@@ -1,8 +1,5 @@
 import { Modal } from "@storyteller/ui-modal";
 import { LightboxModal } from "@storyteller/ui-lightbox-modal";
-import { TabSelector } from "@storyteller/ui-tab-selector";
-import { faCheck } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@storyteller/ui-button";
 import { CloseButton } from "@storyteller/ui-close-button";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
@@ -13,6 +10,25 @@ import {
   UsersApi,
 } from "@storyteller/api";
 import { twMerge } from "tailwind-merge";
+import { GalleryDraggableItem } from "./GalleryDraggableItem";
+import { useSignals } from "@preact/signals-react/runtime";
+import {
+  galleryModalVisibleDuringDrag,
+  galleryReopenAfterDragSignal,
+} from "./galleryModalSignals";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFilter,
+  faBorderAll,
+  faImage,
+  faVideo,
+  faCube,
+  faUpload,
+  faExpand,
+  faCompress,
+} from "@fortawesome/pro-solid-svg-icons";
+import { PopoverMenu } from "@storyteller/ui-popover";
+import { SliderV2 } from "@storyteller/ui-sliderv2";
 
 export interface GalleryItem {
   id: string;
@@ -20,6 +36,7 @@ export interface GalleryItem {
   thumbnail: string | null;
   fullImage?: string | null;
   createdAt: string;
+  mediaClass?: string;
 }
 
 interface GroupedItems {
@@ -36,9 +53,6 @@ interface GalleryModalProps {
   onSelectItem?: (id: string) => void;
   maxSelections?: number;
   onUseSelected?: (selectedItems: GalleryItem[]) => void;
-  tabs: { id: string; label: string }[];
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
   onDownloadClicked?: (url: string) => Promise<void>;
   onAddToSceneClicked?: (
     url: string,
@@ -55,13 +69,9 @@ export const GalleryModal = React.memo(
     onSelectItem,
     maxSelections = 4,
     onUseSelected,
-    tabs,
-    activeTab,
-    onTabChange,
     onDownloadClicked,
     onAddToSceneClicked,
   }: GalleryModalProps) => {
-    const [groupedItems, setGroupedItems] = useState<GroupedItems>({});
     const [loading, setLoading] = useState(false);
     const [lightboxImage, setLightboxImage] = useState<GalleryItem | null>(
       null
@@ -69,6 +79,20 @@ export const GalleryModal = React.memo(
     const [isLightboxVisible, setIsLightboxVisible] = useState(false);
     const [failedImageUrls] = useState<Set<string>>(new Set());
     const [username, setUsername] = useState<string>("");
+    const [activeFilter, setActiveFilter] = useState("all");
+    const minColumns = 3;
+    const maxColumns = 12;
+    // Default gridColumns to 5
+    const defaultGridColumns = 5;
+    const [sliderValue, setSliderValue] = useState(
+      maxColumns - (defaultGridColumns - minColumns)
+    );
+    const gridColumns = maxColumns - (sliderValue - minColumns);
+    const [imageFit, setImageFit] = useState<"cover" | "contain">("contain");
+    const [allItems, setAllItems] = useState<GalleryItem[]>([]);
+    const [pageIndex, setPageIndex] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const pageSize = 25;
 
     const imageUrl = lightboxImage?.fullImage || "";
 
@@ -126,67 +150,92 @@ export const GalleryModal = React.memo(
       }
     }, [usersApi, isOpen]);
 
+    // filter state
+    const FILTERS = [
+      { id: "all", label: "All", icon: <FontAwesomeIcon icon={faBorderAll} /> },
+      { id: "image", label: "Image", icon: <FontAwesomeIcon icon={faImage} /> },
+      { id: "video", label: "Video", icon: <FontAwesomeIcon icon={faVideo} /> },
+      { id: "3d", label: "3D Object", icon: <FontAwesomeIcon icon={faCube} /> },
+      {
+        id: "uploaded",
+        label: "Uploaded",
+        icon: <FontAwesomeIcon icon={faUpload} />,
+      },
+    ];
+
+    // Map filter to API/media class
+    const getFilterMediaClass = (filter: string) => {
+      switch (filter) {
+        case "image":
+          return [FilterMediaClasses.IMAGE];
+        case "video":
+          return [FilterMediaClasses.VIDEO];
+        case "uploaded":
+          return [FilterMediaClasses.IMAGE, FilterMediaClasses.VIDEO];
+        default:
+          return undefined;
+      }
+    };
+
     useEffect(() => {
-      const loadItems = async () => {
-        if (!username) return;
-        setLoading(true);
-        try {
-          let response = null;
-          if (activeTab === "videos") {
-            response = await api.listUserMediaFiles({
-              filter_media_classes: [FilterMediaClasses.VIDEO],
-              username: username,
-              include_user_uploads: true,
-              user_uploads_only: true,
-            });
-          } else {
-            response = await api.listUserMediaFiles({
-              filter_media_classes: [FilterMediaClasses.IMAGE],
-              username: username,
-              include_user_uploads: activeTab === "uploads",
-              user_uploads_only: activeTab === "uploads",
-            });
-          }
-
-          if (response.success && response.data) {
-            // Print the JSON response for debugging
-            console.log("Media files response:", response.data);
-            const thumbnail_size = 250;
-            const newItems = response.data.map((item: any) => ({
-              id: item.token,
-              label: item.maybe_title || "Image Generation",
-              thumbnail:
-                activeTab === "videos"
-                  ? item.media_links.maybe_video_previews.still
-                  : item.media_links.maybe_thumbnail_template?.replace(
-                      "{WIDTH}",
-                      thumbnail_size.toString()
-                    ),
-              fullImage: item.media_links.cdn_url,
-              createdAt: item.created_at,
-            }));
-            console.log("Media files response:", newItems);
-            setGroupedItems(groupItemsByDate(newItems));
-          }
-        } catch (error) {
-          console.error("Failed to fetch library items:", error);
-        }
-        setLoading(false);
-      };
-
-      if (isOpen) {
-        loadItems();
+      setAllItems([]);
+      setPageIndex(0);
+      setHasMore(true);
+      if (username) {
+        loadItems(true);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeTab, isOpen, username]);
+    }, [activeFilter, username]);
 
-    // useEffect(() => {
-    //   console.log("LibraryModal render caused by:", {
-    //     isOpen,
-    //     activeTab,
-    //     selectedItemIds,
-    //   });
-    // }, [isOpen, activeTab, selectedItemIds]);
+    const loadItems = async (reset = false) => {
+      if (!username) return;
+      setLoading(true);
+      try {
+        let response = null;
+        const filterMediaClasses = getFilterMediaClass(activeFilter);
+        const query = {
+          filter_media_classes: filterMediaClasses,
+          username: username,
+          include_user_uploads:
+            activeFilter === "uploaded" || activeFilter === "all",
+          user_uploads_only: activeFilter === "uploaded",
+          page_index: reset ? 0 : pageIndex,
+          page_size: pageSize,
+        };
+        response = await api.listUserMediaFiles(query);
+
+        if (response.success && response.data) {
+          const thumbnail_size = 250;
+          const newItems = response.data.map((item: any) => ({
+            id: item.token,
+            label: item.maybe_title || "Image Generation",
+            thumbnail:
+              item.media_class === "video"
+                ? item.media_links.maybe_video_previews.still
+                : item.media_links.maybe_thumbnail_template?.replace(
+                    "{WIDTH}",
+                    thumbnail_size.toString()
+                  ),
+            fullImage: item.media_links.cdn_url,
+            createdAt: item.created_at,
+            mediaClass:
+              item.media_class ||
+              (item.filter_media_classes
+                ? item.filter_media_classes[0]
+                : "image"),
+          }));
+          setAllItems((prev) => (reset ? newItems : [...prev, ...newItems]));
+          // Pagination logic
+          const current = response.pagination?.current ?? 0;
+          const total = response.pagination?.total_page_count ?? 1;
+          setPageIndex(current + 1);
+          setHasMore(current + 1 < total);
+        }
+      } catch (error) {
+        console.error("Failed to fetch library items:", error);
+      }
+      setLoading(false);
+    };
 
     const handleItemClick = useCallback(
       (item: GalleryItem) => {
@@ -211,16 +260,83 @@ export const GalleryModal = React.memo(
     }, [selectedItemIds, onSelectItem]);
 
     const handleUseSelected = useCallback(() => {
-      const selectedItems = Object.values(groupedItems)
+      const selectedItems = Object.values(groupItemsByDate(allItems))
         .flat()
         .filter((item) => selectedItemIds.includes(item.id));
       onUseSelected?.(selectedItems);
-    }, [groupedItems, selectedItemIds, onUseSelected]);
+    }, [groupItemsByDate, selectedItemIds, onUseSelected]);
+
+    useSignals();
+
+    // Compute gap class based on gridColumns
+    let gapClass = "gap-0.5";
+    if (gridColumns <= 4) gapClass = "gap-1.5";
+    else if (gridColumns <= 7) gapClass = "gap-1";
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+      const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+      if (
+        scrollHeight - scrollTop - clientHeight < 100 &&
+        hasMore &&
+        !loading
+      ) {
+        loadItems();
+      }
+    };
+
+    // Soft refresh on open: fetch first page and prepend new items
+    useEffect(() => {
+      if (isOpen && allItems.length > 0 && username) {
+        const fetchLatest = async () => {
+          const filterMediaClasses = getFilterMediaClass(activeFilter);
+          const response = await api.listUserMediaFiles({
+            filter_media_classes: filterMediaClasses,
+            username,
+            include_user_uploads: activeFilter === "uploaded",
+            user_uploads_only: activeFilter === "uploaded",
+            page_index: 0,
+            page_size: pageSize,
+          });
+          if (response.success && response.data) {
+            const thumbnail_size = 250;
+            const newItems = response.data.map((item: any) => ({
+              id: item.token,
+              label: item.maybe_title || "Image Generation",
+              thumbnail:
+                item.media_class === "video"
+                  ? item.media_links.maybe_video_previews.still
+                  : item.media_links.maybe_thumbnail_template?.replace(
+                      "{WIDTH}",
+                      thumbnail_size.toString()
+                    ),
+              fullImage: item.media_links.cdn_url,
+              createdAt: item.created_at,
+              mediaClass:
+                item.media_class ||
+                (item.filter_media_classes
+                  ? item.filter_media_classes[0]
+                  : "image"),
+            }));
+            setAllItems((prev) => {
+              const existingIds = new Set(prev.map((i) => i.id));
+              const trulyNew = newItems.filter((i) => !existingIds.has(i.id));
+              return [...trulyNew, ...prev];
+            });
+          }
+        };
+        fetchLatest();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     return (
       <>
         <Modal
-          isOpen={isOpen}
+          isOpen={
+            mode === "view"
+              ? isOpen && galleryModalVisibleDuringDrag.value
+              : isOpen
+          }
           onClose={onClose}
           className={twMerge(
             "h-[620px] max-w-4xl",
@@ -228,37 +344,109 @@ export const GalleryModal = React.memo(
           )}
           childPadding={false}
           showClose={false}
-          backdropClassName="bg-transparent"
-          draggable={true}
-          allowBackgroundInteraction={true}
+          draggable={mode === "view"}
+          allowBackgroundInteraction={mode === "view" ? true : false}
           closeOnOutsideClick={false}
         >
-          <Modal.DragHandle>
-            <div className="absolute left-0 top-0 z-[50] h-[60px] w-full cursor-move" />
-          </Modal.DragHandle>
+          {mode === "view" && (
+            <Modal.DragHandle>
+              <div className="absolute left-0 top-0 z-[50] h-[60px] w-full cursor-move" />
+            </Modal.DragHandle>
+          )}
           <div className="flex h-full flex-col">
             <div className="border-b border-white/10 p-4 py-3">
-              <div className="grid grid-cols-3 items-center">
-                <h2 className="text-xl font-semibold">
-                  {mode === "select" ? "Select Images" : "Gallery"}
-                </h2>
-                <div className="flex items-center justify-center">
-                  <TabSelector
-                    tabs={tabs}
-                    activeTab={activeTab}
-                    onTabChange={onTabChange}
-                    className="w-auto relative z-[51]"
-                  />
+              <div className="grid grid-cols-2 items-center">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl font-semibold">
+                    {mode === "select" ? "Select Images" : "My Library"}
+                  </h2>
+                  {mode === "view" && (
+                    <div className="flex items-center relative z-[51]">
+                      <input
+                        type="checkbox"
+                        id="gallery-reopen-after-drag"
+                        checked={galleryReopenAfterDragSignal.value}
+                        onChange={(e) =>
+                          (galleryReopenAfterDragSignal.value =
+                            e.target.checked)
+                        }
+                        className="h-4 w-4 cursor-pointer rounded-lg border-gray-300 bg-gray-700 text-primary focus:ring-primary"
+                      />
+                      <label
+                        htmlFor="gallery-reopen-after-drag"
+                        className="ml-2 cursor-pointer select-none text-sm text-white/70"
+                      >
+                        Reopen after adding
+                      </label>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-end gap-1.5">
-                  <Modal.ExpandButton />
+                <div className="flex justify-end gap-2 items-center">
+                  {/* Image fit toggle button */}
+                  <Button
+                    variant="action"
+                    onClick={() =>
+                      setImageFit((fit) =>
+                        fit === "cover" ? "contain" : "cover"
+                      )
+                    }
+                    className="relative z-[51] h-9 w-9 mr-3 bg-[#5F5F68]/60 hover:bg-[#5F5F68]/90"
+                  >
+                    <FontAwesomeIcon
+                      icon={imageFit === "cover" ? faExpand : faCompress}
+                      className="text-lg text-white"
+                    />
+                  </Button>
+                  {/* Slider */}
+                  <div className="w-48 mr-3 relative z-[51] flex items-center gap-2">
+                    <SliderV2
+                      min={minColumns}
+                      max={maxColumns}
+                      value={sliderValue}
+                      onChange={setSliderValue}
+                      step={1}
+                      variant="classic"
+                      showTooltip={false}
+                      className="w-full"
+                      showProgressBar={false}
+                      tooltipContent={`${
+                        maxColumns - (sliderValue - minColumns)
+                      } columns`}
+                    />
+                  </div>
+                  {/* Filter popover */}
+                  <PopoverMenu
+                    panelTitle="Filter"
+                    position="bottom"
+                    align="end"
+                    buttonClassName="relative z-[51] mr-3"
+                    panelClassName="min-w-36"
+                    items={FILTERS.map((f) => ({
+                      label: f.label,
+                      selected: activeFilter === f.id,
+                      icon: f.icon,
+                    }))}
+                    onSelect={(item) => {
+                      const filter = FILTERS.find(
+                        (f) => f.label === item.label
+                      );
+                      if (filter) setActiveFilter(filter.id);
+                    }}
+                    triggerIcon={<FontAwesomeIcon icon={faFilter} />}
+                    triggerLabel={
+                      FILTERS.find((f) => f.id === activeFilter)?.label
+                    }
+                    mode="toggle"
+                    showIconsInList={true}
+                  />
+                  {mode === "view" && <Modal.ExpandButton />}
                   <CloseButton onClick={onClose} className="relative z-[51]" />
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
-              {loading ? (
+            <div className="flex-1 overflow-y-auto" onScroll={handleScroll}>
+              {loading && allItems.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <div className="text-white/60">
                     <LoadingSpinner className="h-12 w-12" />
@@ -266,78 +454,57 @@ export const GalleryModal = React.memo(
                 </div>
               ) : (
                 <div className="space-y-6 p-4">
-                  {Object.entries(groupedItems).map(([date, dateItems]) => (
-                    <div key={date}>
-                      <h3 className="text-md mb-2 font-medium text-white/60">
-                        {date}
-                      </h3>
-                      <div
-                        className={twMerge(
-                          activeTab === "videos"
-                            ? "grid grid-cols-3 gap-2"
-                            : "grid grid-cols-5 gap-1",
-                          mode === "view" &&
-                            (activeTab === "videos"
-                              ? "grid-cols-3"
-                              : "grid-cols-5")
-                        )}
-                      >
-                        {dateItems.map((item) => (
-                          <button
-                            key={item.id}
-                            className={twMerge(
-                              "group relative overflow-hidden rounded-md border-[3px] transition-all",
-                              activeTab === "videos"
-                                ? "aspect-video"
-                                : "aspect-square",
-                              mode === "select" &&
-                                selectedItemIds.includes(item.id)
-                                ? "border-primary"
-                                : "border-transparent hover:border-white"
-                            )}
-                            onClick={() => handleItemClick(item)}
+                  {Object.entries(groupItemsByDate(allItems)).map(
+                    ([date, dateItems]) => {
+                      const filteredItems = dateItems.filter((item) => {
+                        if (activeFilter === "3d")
+                          return item.mediaClass === "3d";
+                        if (activeFilter === "all")
+                          return item.mediaClass !== "audio";
+                        return true;
+                      });
+                      if (filteredItems.length === 0) return null;
+                      return (
+                        <div key={date}>
+                          <h3 className="text-md mb-2 font-medium text-white/60">
+                            {date}
+                          </h3>
+                          <div
+                            className={twMerge("grid", gapClass)}
+                            style={{
+                              gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
+                            }}
                           >
-                            <div className="relative h-full w-full">
-                              {!item.thumbnail ? (
-                                <div className="flex h-full w-full items-center justify-center bg-gray-800">
-                                  <span className="text-white/60">
-                                    Image not available
-                                  </span>
-                                </div>
-                              ) : (
-                                <img
-                                  src={item.thumbnail || item.fullImage || ""}
-                                  alt={item.label}
-                                  className={twMerge(
-                                    "h-full w-full bg-black/30",
-                                    activeTab === "videos"
-                                      ? "object-contain"
-                                      : "object-cover"
-                                  )}
-                                  onError={() =>
-                                    handleImageError(item.thumbnail!)
-                                  }
-                                />
-                              )}
-                              {mode === "select" &&
-                                selectedItemIds.includes(item.id) && (
-                                  <div className="absolute inset-0 bg-white/30" />
-                                )}
-                            </div>
-                            {mode === "select" &&
-                              selectedItemIds.includes(item.id) && (
-                                <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary">
-                                  <FontAwesomeIcon
-                                    icon={faCheck}
-                                    className="text-sm"
-                                  />
-                                </div>
-                              )}
-                          </button>
-                        ))}
-                      </div>
+                            {filteredItems.map((item) => (
+                              <GalleryDraggableItem
+                                key={item.id}
+                                item={item}
+                                mode={mode}
+                                activeFilter={activeFilter}
+                                selected={selectedItemIds.includes(item.id)}
+                                onClick={() => handleItemClick(item)}
+                                onImageError={() =>
+                                  handleImageError(item.thumbnail!)
+                                }
+                                disableTooltipAndBadge={mode === "select"}
+                                imageFit={imageFit}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
+                  {loading && allItems.length > 0 && (
+                    <div className="flex justify-center py-4">
+                      <LoadingSpinner className="h-8 w-8" />
                     </div>
-                  ))}
+                  )}
+                  {!hasMore && allItems.length > 0 && (
+                    <div className="flex justify-center py-4 text-white/40 text-xs">
+                      No more items
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -384,7 +551,7 @@ export const GalleryModal = React.memo(
           mediaId={lightboxImage?.id}
           onDownloadClicked={onDownloadClicked}
           onAddToSceneClicked={onAddToSceneClicked}
-          activeTab={activeTab}
+          mediaClass={lightboxImage?.mediaClass}
         />
       </>
     );
