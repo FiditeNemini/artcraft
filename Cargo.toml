@@ -34,6 +34,7 @@ members = [
   "crates/lib/api_clients/google_drive_common",
   "crates/lib/api_clients/google_sign_in",
   "crates/lib/api_clients/openai_sora_client",
+  "crates/lib/api_clients/runwayml_client",
   "crates/lib/api_clients/storyteller_client",
   "crates/lib/api_clients/thumbnail_generator",
   "crates/lib/bootstrap",
@@ -65,6 +66,7 @@ members = [
   "crates/lib/idempotency",
   "crates/lib/image_algorithms",
   "crates/lib/jobs_common",
+  "crates/lib/jwt_light",
   "crates/lib/logging",
   "crates/lib/machine_learning/ml_models",
   "crates/lib/machine_learning/ml_weights_registry",
@@ -191,6 +193,7 @@ fal_client = { path = "crates/lib/api_clients/fal_client" }
 filesys = { path = "crates/lib/files/filesys" }
 idempotency = { path = "crates/lib/idempotency" }
 images = { path = "crates/lib/files/images" }
+jwt_light = { path = "crates/lib/jwt_light" }
 memory_caching = { path = "crates/lib/caching/memory_caching" }
 memory_store = { path = "crates/lib/caching/memory_store" }
 mimetypes = { path = "crates/lib/files/mimetypes" }
