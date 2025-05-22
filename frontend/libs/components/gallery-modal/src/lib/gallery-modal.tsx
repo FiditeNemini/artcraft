@@ -456,7 +456,13 @@ export const GalleryModal = React.memo(
                   />
                   {mode === "view" && <Modal.ExpandButton />}
                   <CloseButton
-                    onClick={() => (galleryModalVisibleViewMode.value = false)}
+                    onClick={() => {
+                      if (mode === "view") {
+                        galleryModalVisibleViewMode.value = false;
+                      } else {
+                        onClose?.();
+                      }
+                    }}
                     className="relative z-[51]"
                   />
                 </div>
