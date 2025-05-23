@@ -179,14 +179,27 @@ export const GalleryModal = React.memo(
     };
 
     useEffect(() => {
-      setAllItems([]);
-      setPageIndex(0);
-      setHasMore(true);
-      if (username) {
+      // Refresh every time the modal is opened
+      const modalIsOpen =
+        mode === "view"
+          ? galleryModalVisibleViewMode.value
+          : typeof isOpen === "boolean"
+          ? isOpen
+          : true;
+      if (modalIsOpen && username) {
+        setAllItems([]);
+        setPageIndex(0);
+        setHasMore(true);
         loadItems(true);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeFilter, username]);
+    }, [
+      mode,
+      isOpen,
+      galleryModalVisibleViewMode.value,
+      username,
+      activeFilter,
+    ]);
 
     const loadItems = async (reset = false) => {
       if (!username) return;
@@ -284,56 +297,6 @@ export const GalleryModal = React.memo(
         loadItems();
       }
     };
-
-    // Soft refresh on open: fetch first page and prepend new items
-    useEffect(() => {
-      if (
-        mode === "view" &&
-        galleryModalVisibleViewMode.value &&
-        allItems.length > 0 &&
-        username
-      ) {
-        const fetchLatest = async () => {
-          const filterMediaClasses = getFilterMediaClass(activeFilter);
-          const response = await api.listUserMediaFiles({
-            filter_media_classes: filterMediaClasses,
-            username,
-            include_user_uploads: activeFilter === "uploaded",
-            user_uploads_only: activeFilter === "uploaded",
-            page_index: 0,
-            page_size: pageSize,
-          });
-          if (response.success && response.data) {
-            const thumbnail_size = 250;
-            const newItems = response.data.map((item: any) => ({
-              id: item.token,
-              label: item.maybe_title || "Image Generation",
-              thumbnail:
-                item.media_class === "video"
-                  ? item.media_links.maybe_video_previews.still
-                  : item.media_links.maybe_thumbnail_template?.replace(
-                      "{WIDTH}",
-                      thumbnail_size.toString()
-                    ),
-              fullImage: item.media_links.cdn_url,
-              createdAt: item.created_at,
-              mediaClass:
-                item.media_class ||
-                (item.filter_media_classes
-                  ? item.filter_media_classes[0]
-                  : "image"),
-            }));
-            setAllItems((prev) => {
-              const existingIds = new Set(prev.map((i) => i.id));
-              const trulyNew = newItems.filter((i) => !existingIds.has(i.id));
-              return [...trulyNew, ...prev];
-            });
-          }
-        };
-        fetchLatest();
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mode, galleryModalVisibleViewMode.value]);
 
     return (
       <>
