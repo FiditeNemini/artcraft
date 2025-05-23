@@ -92,7 +92,7 @@ export const DialogEditText = ({
   return (
     <Modal isOpen={isOpen} onClose={closeCallback} className="w-fit max-w-2xl">
       <div className="flex flex-col gap-3">
-        <DialogTitle className="text-2xl font-bold">Edit Text</DialogTitle>
+        <h2 className="text-2xl font-bold">Edit Text</h2>
         <TextEditor
           text={text}
           formatData={textFormatData}
