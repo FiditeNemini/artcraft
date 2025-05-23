@@ -27,9 +27,11 @@ import {
   faUpload,
   faExpand,
   faCompress,
+  faArrowsRotate,
 } from "@fortawesome/pro-solid-svg-icons";
 import { PopoverMenu } from "@storyteller/ui-popover";
 import { SliderV2 } from "@storyteller/ui-sliderv2";
+import { Tooltip } from "@storyteller/ui-tooltip";
 
 export interface GalleryItem {
   id: string;
@@ -178,29 +180,6 @@ export const GalleryModal = React.memo(
       }
     };
 
-    useEffect(() => {
-      // Refresh every time the modal is opened
-      const modalIsOpen =
-        mode === "view"
-          ? galleryModalVisibleViewMode.value
-          : typeof isOpen === "boolean"
-          ? isOpen
-          : true;
-      if (modalIsOpen && username) {
-        setAllItems([]);
-        setPageIndex(0);
-        setHasMore(true);
-        loadItems(true);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-      mode,
-      isOpen,
-      galleryModalVisibleViewMode.value,
-      username,
-      activeFilter,
-    ]);
-
     const loadItems = async (reset = false) => {
       if (!username) return;
       setLoading(true);
@@ -250,6 +229,34 @@ export const GalleryModal = React.memo(
       }
       setLoading(false);
     };
+
+    // refresh logic
+    const refreshGallery = useCallback(() => {
+      setAllItems([]);
+      setPageIndex(0);
+      setHasMore(true);
+      loadItems(true);
+    }, [setAllItems, setPageIndex, setHasMore, loadItems]);
+
+    useEffect(() => {
+      // Refresh every time the modal is opened
+      const modalIsOpen =
+        mode === "view"
+          ? galleryModalVisibleViewMode.value
+          : typeof isOpen === "boolean"
+          ? isOpen
+          : true;
+      if (modalIsOpen && username) {
+        refreshGallery();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+      mode,
+      isOpen,
+      galleryModalVisibleViewMode.value,
+      username,
+      activeFilter,
+    ]);
 
     const handleItemClick = useCallback(
       (item: GalleryItem) => {
@@ -360,23 +367,49 @@ export const GalleryModal = React.memo(
                   )}
                 </div>
                 <div className="flex justify-end gap-2 items-center">
-                  {/* Image fit toggle button */}
-                  <Button
-                    variant="action"
-                    onClick={() =>
-                      setImageFit((fit) =>
-                        fit === "cover" ? "contain" : "cover"
-                      )
-                    }
-                    className="relative z-[51] h-9 w-9 mr-3 bg-[#5F5F68]/60 hover:bg-[#5F5F68]/90"
+                  {/* Refresh button */}
+                  <Tooltip
+                    position="top"
+                    content="Refresh list"
+                    closeOnClick={true}
                   >
-                    <FontAwesomeIcon
-                      icon={imageFit === "cover" ? faExpand : faCompress}
-                      className="text-lg text-white"
-                    />
-                  </Button>
+                    <Button
+                      variant="action"
+                      onClick={refreshGallery}
+                      className="relative z-[51] h-9 w-9 bg-[#5F5F68]/60 hover:bg-[#5F5F68]/90"
+                      disabled={loading}
+                      aria-label="Refresh list"
+                    >
+                      <FontAwesomeIcon
+                        icon={faArrowsRotate}
+                        className="text-lg text-white"
+                      />
+                    </Button>
+                  </Tooltip>
+                  {/* Image fit toggle button */}
+                  <Tooltip
+                    position="top"
+                    content="Toggle image fit"
+                    closeOnClick={true}
+                  >
+                    <Button
+                      variant="action"
+                      onClick={() =>
+                        setImageFit((fit) =>
+                          fit === "cover" ? "contain" : "cover"
+                        )
+                      }
+                      className="relative z-[51] h-9 w-9 bg-[#5F5F68]/60 hover:bg-[#5F5F68]/90"
+                    >
+                      <FontAwesomeIcon
+                        icon={imageFit === "cover" ? faExpand : faCompress}
+                        className="text-lg text-white"
+                      />
+                    </Button>
+                  </Tooltip>
+
                   {/* Slider */}
-                  <div className="w-48 mr-3 relative z-[51] flex items-center gap-2">
+                  <div className="w-48 mx-3 relative z-[51] flex items-center gap-2">
                     <SliderV2
                       min={minColumns}
                       max={maxColumns}
@@ -393,30 +426,32 @@ export const GalleryModal = React.memo(
                     />
                   </div>
                   {/* Filter popover */}
-                  <PopoverMenu
-                    panelTitle="Filter"
-                    position="bottom"
-                    align="end"
-                    buttonClassName="relative z-[51] mr-3"
-                    panelClassName="min-w-36"
-                    items={FILTERS.map((f) => ({
-                      label: f.label,
-                      selected: activeFilter === f.id,
-                      icon: f.icon,
-                    }))}
-                    onSelect={(item) => {
-                      const filter = FILTERS.find(
-                        (f) => f.label === item.label
-                      );
-                      if (filter) setActiveFilter(filter.id);
-                    }}
-                    triggerIcon={<FontAwesomeIcon icon={faFilter} />}
-                    triggerLabel={
-                      FILTERS.find((f) => f.id === activeFilter)?.label
-                    }
-                    mode="toggle"
-                    showIconsInList={true}
-                  />
+                  <Tooltip position="top" content="Filter" closeOnClick={true}>
+                    <PopoverMenu
+                      panelTitle="Filter"
+                      position="bottom"
+                      align="end"
+                      buttonClassName="relative z-[51] mr-3"
+                      panelClassName="min-w-36"
+                      items={FILTERS.map((f) => ({
+                        label: f.label,
+                        selected: activeFilter === f.id,
+                        icon: f.icon,
+                      }))}
+                      onSelect={(item) => {
+                        const filter = FILTERS.find(
+                          (f) => f.label === item.label
+                        );
+                        if (filter) setActiveFilter(filter.id);
+                      }}
+                      triggerIcon={<FontAwesomeIcon icon={faFilter} />}
+                      triggerLabel={
+                        FILTERS.find((f) => f.id === activeFilter)?.label
+                      }
+                      mode="toggle"
+                      showIconsInList={true}
+                    />
+                  </Tooltip>
                   {mode === "view" && <Modal.ExpandButton />}
                   <CloseButton
                     onClick={() => {
