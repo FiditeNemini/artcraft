@@ -54,15 +54,18 @@ import {
   topNavMediaId,
   topNavMediaUrl,
 } from "~/components/signaled/TopBar/TopBar";
-import { setOnImageDrop } from "../../../../../../libs/components/gallery-modal/src/lib/galleryDnd";
 import { uploadPlaneFromMediaToken } from "~/components/reusable/UploadModalMedia/uploadPlane";
 import { addObject } from "./signals/objectGroup/addObject";
 import { AssetType } from "~/enums";
 import { v4 as uuidv4 } from "uuid";
 import { MediaItem } from "~/pages/PageEnigma/models";
-import { GalleryItem } from "../../../../../../libs/components/gallery-modal/src/lib/gallery-modal";
 import { UploaderState } from "~/models";
 import * as THREE from "three";
+import {
+  GalleryItem,
+  onImageDrop,
+  removeImageDropListener,
+} from "@storyteller/ui-gallery-modal";
 
 export const PageEditor = () => {
   useSignals();
@@ -247,89 +250,63 @@ export const PageEditor = () => {
 
   // Image drop from gallery/library modal
   useEffect(() => {
-    setOnImageDrop(
-      async (item: GalleryItem, _position: { x: number; y: number }) => {
-        console.log("Drop debug:", {
+    const handler = onImageDrop(
+      (item: GalleryItem, position: { x: number; y: number }) => {
+        console.log("Drop debug (event):", {
           editorEngine,
           camera: editorEngine?.camera,
           renderer: editorEngine?.renderer,
-          _position,
+          position,
         });
-        // Diagnostic log for received drop position and canvas rect
-        if (editorEngine?.renderer) {
-          const rect = editorEngine.renderer.domElement.getBoundingClientRect();
-          const canvasX = _position.x - rect.left;
-          const canvasY = _position.y - rect.top;
-          console.log(
-            "[Drop Debug] Received:",
-            _position,
-            "Canvas rect:",
-            rect,
-            "canvasX:",
-            canvasX,
-            "canvasY:",
-            canvasY,
-          );
-        }
+
         // Calculate world position from cursor immediately on drop
         let worldPosition = undefined;
-        if (editorEngine?.camera && editorEngine?.renderer && _position) {
+        if (editorEngine?.camera && editorEngine?.renderer && position) {
           const rect = editorEngine.renderer.domElement.getBoundingClientRect();
           // Convert client coordinates to canvas coordinates
-          const canvasX = _position.x - rect.left;
-          const canvasY = _position.y - rect.top;
+          const canvasX = position.x - rect.left;
+          const canvasY = position.y - rect.top;
           const ndcX = (canvasX / rect.width) * 2 - 1;
           const ndcY = -(canvasY / rect.height) * 2 + 1;
           const vector = new THREE.Vector3(ndcX, ndcY, 0.5);
           vector.unproject(editorEngine.camera);
           worldPosition = vector;
-          // Diagnostic logging
-          console.log({
-            dropPosition: _position,
-            rect: {
-              left: rect.left,
-              top: rect.top,
-              width: rect.width,
-              height: rect.height,
-            },
-            canvasX,
-            canvasY,
-            ndcX,
-            ndcY,
-            worldPosition,
-          });
         }
 
-        try {
-          // Place the object immediately to avoid upload delay affecting placement
-          const mediaItem: MediaItem = {
-            version: 1,
-            type: AssetType.OBJECT,
-            media_id: item.id || uuidv4(),
-            name: item.label || "Image Plane",
-            ...(worldPosition && {
-              position: {
-                x: worldPosition.x,
-                y: worldPosition.y,
-                z: worldPosition.z,
+        (async () => {
+          try {
+            // Place the object immediately to avoid upload delay affecting placement
+            const mediaItem: MediaItem = {
+              version: 1,
+              type: AssetType.OBJECT,
+              media_id: item.id || uuidv4(),
+              name: item.label || "Image Plane",
+              ...(worldPosition && {
+                position: {
+                  x: worldPosition.x,
+                  y: worldPosition.y,
+                  z: worldPosition.z,
+                },
+              }),
+            };
+            addObject(mediaItem);
+
+            await uploadPlaneFromMediaToken({
+              title: item.label || "Image Plane",
+              mediaToken: item.id,
+              progressCallback: (state: UploaderState) => {
+                if (state.status) console.log("Upload status:", state.status);
               },
-            }),
-          };
-          addObject(mediaItem);
-
-          await uploadPlaneFromMediaToken({
-            title: item.label || "Image Plane",
-            mediaToken: item.id,
-            progressCallback: (state: UploaderState) => {
-              if (state.status) console.log("Upload status:", state.status);
-            },
-          });
-          console.log("Upload complete");
-        } catch (err) {
-          console.error("Failed to upload and add image plane:", err);
-        }
+            });
+          } catch (err) {
+            console.error("Failed to add image plane:", err);
+          }
+        })();
       },
     );
+    return () => {
+      removeImageDropListener(handler);
+    };
   }, []);
 
   const display3d = appTabId.value === "3D" ? "block" : "none";
