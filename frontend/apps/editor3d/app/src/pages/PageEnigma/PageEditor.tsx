@@ -249,10 +249,14 @@ export const PageEditor = () => {
     });
   };
 
-  // Image drop from gallery/library modal
+  // Image drop from gallery/library modal logic
   useEffect(() => {
-    const handler = onImageDrop(
-      (item: GalleryItem, position: { x: number; y: number }) => {
+    let handler:
+      | ((item: GalleryItem, position: { x: number; y: number }) => void)
+      | undefined;
+
+    if (appTabId.value === "3D") {
+      handler = (item, position) => {
         console.log("Drop debug (event):", {
           editorEngine,
           camera: editorEngine?.camera,
@@ -303,12 +307,22 @@ export const PageEditor = () => {
             console.error("Failed to add image plane:", err);
           }
         })();
-      },
-    );
+      };
+      onImageDrop(handler);
+    } else if (appTabId.value === "2D") {
+      handler = (item, position) => {
+        // ...2D drop logic... - TODO FOR MICHAEL
+        console.log("2D drop logic here", item, position);
+      };
+      onImageDrop(handler);
+    }
+
     return () => {
-      removeImageDropListener(handler);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (handler) removeImageDropListener(handler as any);
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appTabId.value, editorEngine]);
 
   const display3d = appTabId.value === "3D" ? "block" : "none";
   const display2d = appTabId.value === "2D" ? "block" : "none";
