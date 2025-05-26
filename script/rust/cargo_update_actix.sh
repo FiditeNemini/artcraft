@@ -33,4 +33,3 @@ cargo update \
   actix-web \
   actix-web-actors \
   actix-web-lab
-
