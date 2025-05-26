@@ -20,14 +20,14 @@ normal = ["workspace-build-acceleration"]
 workspace-build-acceleration = { workspace = true }
 
 # Internal
-bucket_paths = { path = "../bucket_paths" }
-composite_identifiers = { path = "../../schema/public/composite_identifiers" }
-enums = { path = "../../schema/public/enums" }
+bucket_paths = { path = "../../../lib/bucket_paths" }
+composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
+enums = { workspace = true }
 errors = { workspace = true }
-idempotency = { path = "../idempotency" }
-primitives = { path = "../data/primitives" }
-reusable_types = { path = "../../schema/public/reusable_types" }
-tokens = { path = "../../schema/public/tokens" }
+idempotency = { workspace = true }
+primitives = { workspace = true }
+reusable_types = { path = "../../../schema/public/reusable_types" }
+tokens = { workspace = true }
 
 # External
 anyhow = { workspace = true }

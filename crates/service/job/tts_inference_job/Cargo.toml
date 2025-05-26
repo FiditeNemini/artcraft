@@ -28,7 +28,7 @@ filesys = { path = "../../../lib/files/filesys" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
-mysql_queries = { path = "../../../lib/mysql_queries" }
+mysql_queries = { path = "../../../schema/database/mysql_queries" }
 tts_common = { path = "../../../lib/tts_common" }
 
 # Workspace hack (faster compile times)

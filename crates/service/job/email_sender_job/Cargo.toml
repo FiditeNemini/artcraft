@@ -29,8 +29,8 @@ enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
 jobs_common = { path = "../../../lib/jobs_common" }
-mysql_queries = { path = "../../../lib/mysql_queries" }
-redis_common = { path = "../../../lib/redis_common" }
+mysql_queries = { path = "../../../schema/database/mysql_queries" }
+redis_common = { path = "../../../schema/database/redis_common" }
 server_environment = { path = "../../../lib/server_environment" }
 tokens = { path = "../../../schema/public/tokens" }
 

@@ -19,16 +19,15 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
-errors = { path = "../errors" }
-redis_common = { path = "../redis_common" }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
+errors = { workspace = true }
+redis_common = { path = "../../schema/database/redis_common" }
 
 # External
-anyhow = "1.0.86"
+anyhow = { workspace = true }
 chrono = { version = "0.4.22", features = ["serde"] }
 log = "0.4.14"
 r2d2_redis = "0.14.0"

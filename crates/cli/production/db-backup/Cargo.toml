@@ -16,12 +16,12 @@ path = "src/main.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
+
 # Internal
 easyenv = { path = "../../../lib/easyenv" }
 errors = { path = "../../../lib/errors" }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 anyhow = "1.0.86"

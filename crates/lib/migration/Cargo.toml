@@ -23,7 +23,7 @@ cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
 enums = { path = "../../schema/public/enums" }
 errors = { path = "../../lib/errors" }
 jobs_common = { path = "../../lib/jobs_common" }
-mysql_queries = { path = "../../lib/mysql_queries" }
+mysql_queries = { path = "../../schema/database/mysql_queries" }
 tokens = { path = "../../schema/public/tokens" }
 
 # External

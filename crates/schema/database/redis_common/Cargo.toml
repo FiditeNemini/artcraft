@@ -16,22 +16,21 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
-crockford = { path = "../data/crockford" }
-errors = { path = "../errors" }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
+crockford = { workspace = true }
+errors = { workspace = true }
 
 # External
-anyhow = "1.0.86"
+anyhow = { workspace = true }
 
 # Serialization
-serde = "1.0.125"
-serde_derive = "1.0.125"
-serde_json = "1.0.108"
+serde = { workspace = true }
+serde_derive = { workspace = true }
+serde_json = { workspace = true }
 
 # TODO: Get rid of in favor of std::time
 time = "0.3.30"
-url = "2.5.1"
+url = { workspace = true }

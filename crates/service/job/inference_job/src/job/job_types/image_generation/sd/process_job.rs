@@ -108,7 +108,7 @@ mod tests {
 // /**
 //  *
 //  *
-//  * @CrossProduct this shows the batch table usage: https://github.com/storytold/storyteller-rust/blob/master/crates/lib/mysql_queries/src/queries/batch_generations/insert_batch_generation_records.rs#L83-L96
+//  * @CrossProduct this shows the batch table usage: https://github.com/storytold/storyteller-rust/blob/master/crates/schema/database/mysql_queries/src/queries/batch_generations/insert_batch_generation_records.rs#L83-L96
 // I wrote a test to show how you can insert multiple media file tokens into the table at once
 // I tested and it works:
 

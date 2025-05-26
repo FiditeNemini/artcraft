@@ -16,13 +16,13 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
-# Internal
-enums = { path = "../../schema/public/enums" }
-errors = { path = "../errors" }
-tokens = { path = "../../schema/public/tokens" }
-
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
+workspace-build-acceleration = { workspace = true }
+
+# Internal
+enums = { workspace = true }
+errors = { workspace = true }
+tokens = { workspace = true }
 
 # External
 chrono = { version = "0.4.22", features = ["serde"] }

@@ -4,13 +4,6 @@ resolver = "2"
 # This block defines the workspace members.
 # When we add a library or binary crate, it needs an entry here.
 members = [
-  # Types: common strongly-typed tokens, ids, payloads, etc.
-  "crates/schema/public/composite_identifiers",
-  "crates/schema/public/enums",
-  "crates/schema/public/enums_public",
-  "crates/schema/public/reusable_types", # TODO(bt, 2022-12-21): Deprecate
-  "crates/schema/public/tokens",
-
   # CLI tools for operations, etc.
   "crates/cli/devenv/dev-database-seed",
   "crates/cli/devenv/dev-upload-media-file",
@@ -53,7 +46,6 @@ members = [
   "crates/lib/deprecated/http_server_common", # TODO(bt, 2023-03-20): Move useful pieces to actix_helpers
   "crates/lib/dimensions",
   "crates/lib/easyenv", # NB: Vendored version of https://github.com/echelon/easyenv.rs that we'll improve.
-  "crates/lib/elasticsearch_schema",
   "crates/lib/email_sender",
   "crates/lib/errors",
   "crates/lib/files/archives",
@@ -74,10 +66,7 @@ members = [
   "crates/lib/machine_learning/prompt_engineering",
   "crates/lib/markdown",
   "crates/lib/migration",
-  "crates/lib/mysql_queries",
   "crates/lib/password",
-  "crates/lib/redis_common",
-  "crates/lib/redis_schema",
   "crates/lib/server_environment",
   "crates/lib/shared_service_components",
   "crates/lib/sqlx_mysql_helpers",
@@ -89,7 +78,20 @@ members = [
   "crates/lib/user_input_common",
   "crates/lib/web_scrapers",
   #"crates/lib/api_clients/fakeyou_client",
-  #"crates/lib/sqlite_queries",
+
+  # Schema (database): queries, database layouts, Redis keys, etc.
+  "crates/schema/database/elasticsearch_schema",
+  "crates/schema/database/mysql_queries",
+  "crates/schema/database/redis_common",
+  "crates/schema/database/redis_schema",
+  #"crates/schema/database/sqlite_queries",
+
+  # Schema (public): common strongly-typed tokens, ids, payloads, etc.
+  "crates/schema/public/composite_identifiers",
+  "crates/schema/public/enums",
+  "crates/schema/public/enums_public",
+  "crates/schema/public/reusable_types", # TODO(bt, 2022-12-21): Deprecate
+  "crates/schema/public/tokens",
 
   # Services: API servers, jobs, workers, etc.
   "crates/service/job/analytics_job",

@@ -16,13 +16,12 @@ path = "src/main.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
 errors = { path = "../../../lib/errors" }
 web_scrapers = { path = "../../../lib/web_scrapers" }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 clap = "4.4.8"

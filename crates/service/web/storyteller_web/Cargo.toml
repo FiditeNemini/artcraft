@@ -41,7 +41,7 @@ cookies = { path = "../../../lib/cookies" }
 crockford = { path = "../../../lib/data/crockford" }
 datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
-elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
+elasticsearch_schema = { path = "../../../schema/database/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
 enums = { path = "../../../schema/public/enums" }
 enums_public = { path = "../../../schema/public/enums_public" }
@@ -57,14 +57,14 @@ media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
 migration = { path = "../../../lib/migration" }
 mimetypes = { workspace = true }
-mysql_queries = { path = "../../../lib/mysql_queries" }
+mysql_queries = { path = "../../../schema/database/mysql_queries" }
 openai_sora_client = { path = "../../../lib/api_clients/openai_sora_client" }
 password = { path = "../../../lib/password" }
 primitives = { path = "../../../lib/data/primitives" }
 prompt_engineering = { path = "../../../lib/machine_learning/prompt_engineering" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
-redis_common = { path = "../../../lib/redis_common" }
-redis_schema = { path = "../../../lib/redis_schema" }
+redis_common = { path = "../../../schema/database/redis_common" }
+redis_schema = { path = "../../../schema/database/redis_schema" }
 reusable_types = { path = "../../../schema/public/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
 shared_service_components = { workspace = true }

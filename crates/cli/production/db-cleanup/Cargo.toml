@@ -16,17 +16,17 @@ path = "src/main.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
+
 # Internal
 bucket_paths = { path = "../../../lib/bucket_paths" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../../lib/errors" }
-mysql_queries = { path = "../../../lib/mysql_queries" }
+mysql_queries = { path = "../../../schema/database/mysql_queries" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
 tokens = { path = "../../../schema/public/tokens" }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
 
 # External
 clap = "4.4.8"

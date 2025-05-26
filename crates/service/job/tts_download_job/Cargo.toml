@@ -28,7 +28,7 @@ filesys = { path = "../../../lib/files/filesys" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
-mysql_queries = { path = "../../../lib/mysql_queries" }
+mysql_queries = { path = "../../../schema/database/mysql_queries" }
 
 # Workspace hack (faster compile times)
 workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
