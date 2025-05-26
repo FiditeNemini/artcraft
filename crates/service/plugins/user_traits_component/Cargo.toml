@@ -16,15 +16,14 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
 
 # Internal
-#errors = { path = "../../../lib/errors" }
-
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
+# (None yet)
 
 # Web
-actix-web = "4.7.0"
+actix-web = { workspace = true }
 
 [dev-dependencies]
 mockall = "0.12.1"

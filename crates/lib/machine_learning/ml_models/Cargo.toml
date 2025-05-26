@@ -32,8 +32,8 @@ primitives = { path = "../../data/primitives" }
 cudarc = "0.13.7"
 
 # External
-anyhow = "1.0"
-base64 = "0.22.1"
+anyhow = { workspace = true }
+base64 = { workspace = true }
 bytes = "1.10"
 candle-core = { path = "../../../vendor/candle/candle-core", features = ["cuda"] }
 candle-nn = { path = "../../../vendor/candle/candle-nn", features = ["cuda"] }

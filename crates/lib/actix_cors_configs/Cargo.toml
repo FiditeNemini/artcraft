@@ -16,22 +16,21 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
+# Workspace hack (faster compile times)
+workspace-build-acceleration = { workspace = true }
+
 # Internal
-#errors = { path = "../../lib/errors" }
 reusable_types = { path = "../../schema/public/reusable_types" }
 
-# Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
-
 # External
-log = "0.4.14"
+log = { workspace = true }
 
 # Actix
-actix-cors = "0.6.4"
-actix-http = "3.7.0"
-actix-web = "4.7.0"
-url = { version = "2.5.0", features = [] }
+actix-cors = { workspace = true }
+actix-http = { workspace = true }
+actix-web = { workspace = true }
+url = { workspace = true }
 
 [dev-dependencies]
-actix-rt = "2.10.0"
+actix-rt = { workspace = true }
 speculoos = "0.11.0" # Fluent assertions

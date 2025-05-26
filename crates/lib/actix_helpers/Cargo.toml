@@ -17,18 +17,18 @@ path = "src/lib.rs"
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
-# Internal
-errors = { path = "../../lib/errors" }
-
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
+workspace-build-acceleration = { workspace = true }
+
+# Internal
+errors = { workspace = true }
 
 # Actix
-actix-http = "3.7.0"
-actix-rt = "2.10.0"
-actix-service = "2.0.2"
-actix-utils = "3.0.1"
-actix-web = "4.7.0"
+actix-http = { workspace = true }
+actix-rt = { workspace = true }
+actix-service = { workspace = true }
+actix-utils = { workspace = true }
+actix-web = { workspace = true }
 
 # IPv4 and v6 CIDRs (crate has few dependencies)
 cidr-utils = "0.5.11"
@@ -38,8 +38,8 @@ num-traits = "0.2.17" # for cidr-utils
 futures-util = "0.3.29"
 
 # Serialization
-serde = "1.0.125"
-serde_json = "1.0.108"
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
 # None yet

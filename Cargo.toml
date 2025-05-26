@@ -165,6 +165,16 @@ workspace-build-acceleration = { path = "crates/workspace-build-acceleration" }
 # External libs
 # Centrally pinned versions so that we can uniformly upgrade/downgrade versions across the workspace
 # If a crate needs to use an older/newer version, the dependency should be managed in that crate's own Cargo.toml
+actix = "0.13.5"
+actix-cors = "0.6.4" # TODO(bt): Carefully upgrade this. CORS broke last time.
+actix-http = "3.7.0"
+actix-multipart = "0.6.2"
+actix-rt = "2.10.0"
+actix-service = "2.0.3"
+actix-utils = "3.0.1"
+actix-web = "4.7.0" # TODO(bt): We're behind and need to bump versions.
+actix-web-actors = "4.3.1+deprecated"
+actix-web-lab = "0.20.2"
 anyhow = "1.0.98"
 base64 = "0.22.1"
 chrono = { version = "0.4.41", features = ["serde"] }
@@ -180,11 +190,11 @@ reqwest = { version = "0.12.15", features = ["json", "cookies"] }
 serde = {  version = "1.0.219", features = ["derive"] }
 serde_derive = "1.0.219"
 serde_json = "1.0.140"
-serde_yaml = "0.9.1"
+serde_yaml = "0.9.34+deprecated"
 sha3 = "0.10.8"
 tauri = { version = "2.4.1", features = ["unstable", "devtools"] } # NB: "devtools" prevents App Store distribution
 thiserror = "2.0.12"
-tokio = { version = "1.45.0", features = ["macros"] }
+tokio = { version = "1.45.1", features = ["macros"] }
 toml = "0.8.22"
 url = { version = "2.5.4", features = ["serde"] }
 
