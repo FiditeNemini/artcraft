@@ -61,7 +61,6 @@ members = [
   "crates/lib/jobs_common",
   "crates/lib/jwt_light",
   "crates/lib/logging",
-  "crates/lib/machine_learning/ml_models",
   "crates/lib/machine_learning/ml_weights_registry",
   "crates/lib/machine_learning/prompt_engineering",
   "crates/lib/markdown",
@@ -78,6 +77,7 @@ members = [
   "crates/lib/user_input_common",
   "crates/lib/web_scrapers",
   #"crates/lib/api_clients/fakeyou_client",
+  #"crates/lib/machine_learning/ml_models",
 
   # Schema (database): queries, database layouts, Redis keys, etc.
   "crates/schema/database/elasticsearch_schema",
@@ -112,19 +112,20 @@ members = [
   "crates/service/plugins/user_traits_component",
 
   # Vendored code
-  "crates/vendor/candle/candle-core",
-  "crates/vendor/candle/candle-datasets",
-  "crates/vendor/candle/candle-examples",
-  "crates/vendor/candle/candle-flash-attn",
-  "crates/vendor/candle/candle-kernels",
-  "crates/vendor/candle/candle-metal-kernels",
-  "crates/vendor/candle/candle-nn",
-  "crates/vendor/candle/candle-onnx",
-  "crates/vendor/candle/candle-pyo3",
-  "crates/vendor/candle/candle-transformers",
-  "crates/vendor/candle/tensor-tools",
   "crates/vendor/limitation",
   "crates/vendor/tauri-plugin-http",
+  # NB(bt,2025-05-25): Too many failures on Mac. Disable for now.
+  #"crates/vendor/candle/candle-core",
+  #"crates/vendor/candle/candle-datasets",
+  #"crates/vendor/candle/candle-examples",
+  #"crates/vendor/candle/candle-flash-attn",
+  #"crates/vendor/candle/candle-kernels",
+  #"crates/vendor/candle/candle-metal-kernels",
+  #"crates/vendor/candle/candle-nn",
+  #"crates/vendor/candle/candle-onnx",
+  #"crates/vendor/candle/candle-pyo3",
+  #"crates/vendor/candle/candle-transformers",
+  #"crates/vendor/candle/tensor-tools",
   # NB(bt,2023-12-12): Newrelic keeps breaking with upgrades. Kill for now.
   #"crates/vendor/newrelic-telemetry-sdk-rust",
 
