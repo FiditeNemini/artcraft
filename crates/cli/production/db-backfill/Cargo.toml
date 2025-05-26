@@ -22,10 +22,10 @@ workspace-build-acceleration = { version = "0.1", path = "../../../workspace-bui
 # Internal
 datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../_types/enums" }
+enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../../lib/errors" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
-tokens = { path = "../../../_types/tokens" }
+tokens = { path = "../../../schema/public/tokens" }
 
 # External
 anyhow = "1.0.86"

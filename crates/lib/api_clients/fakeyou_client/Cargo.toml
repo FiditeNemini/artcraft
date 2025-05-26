@@ -14,9 +14,9 @@ path = "src/lib.rs"
 
 [dependencies]
 # Internal
-enums = { path = "../../../_types/enums" }
+enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../errors" }
-tokens = { path = "../../../_types/tokens" }
+tokens = { path = "../../../schema/public/tokens" }
 
 # External
 bytes = "1.3"

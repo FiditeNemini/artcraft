@@ -21,13 +21,13 @@ workspace-build-acceleration = { workspace = true }
 
 # Internal
 bucket_paths = { path = "../bucket_paths" }
-composite_identifiers = { path = "../../_types/composite_identifiers" }
-enums = { path = "../../_types/enums" }
+composite_identifiers = { path = "../../schema/public/composite_identifiers" }
+enums = { path = "../../schema/public/enums" }
 errors = { workspace = true }
 idempotency = { path = "../idempotency" }
 primitives = { path = "../data/primitives" }
-reusable_types = { path = "../../_types/reusable_types" }
-tokens = { path = "../../_types/tokens" }
+reusable_types = { path = "../../schema/public/reusable_types" }
+tokens = { path = "../../schema/public/tokens" }
 
 # External
 anyhow = { workspace = true }

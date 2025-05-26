@@ -35,7 +35,7 @@ bootstrap = { path = "../../../lib/bootstrap" }
 bucket_paths = { path = "../../../lib/bucket_paths" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 collections = { path = "../../../lib/data/collections" }
-composite_identifiers = { path = "../../../_types/composite_identifiers" }
+composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
 cookies = { path = "../../../lib/cookies" }
 crockford = { path = "../../../lib/data/crockford" }
@@ -43,8 +43,8 @@ datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 email_sender= { path = "../../../lib/email_sender" }
-enums = { path = "../../../_types/enums" }
-enums_public = { path = "../../../_types/enums_public" }
+enums = { path = "../../../schema/public/enums" }
+enums_public = { path = "../../../schema/public/enums_public" }
 errors = { workspace = true }
 filesys = { workspace = true }
 google_sign_in = { path = "../../../lib/api_clients/google_sign_in" }
@@ -65,7 +65,7 @@ prompt_engineering = { path = "../../../lib/machine_learning/prompt_engineering"
 redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }
 redis_schema = { path = "../../../lib/redis_schema" }
-reusable_types = { path = "../../../_types/reusable_types" }
+reusable_types = { path = "../../../schema/public/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
 shared_service_components = { workspace = true }
 thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator" }

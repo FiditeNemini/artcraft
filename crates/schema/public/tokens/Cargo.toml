@@ -1,5 +1,5 @@
 [package]
-name = "composite_identifiers"
+name = "tokens"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,25 +9,29 @@ authors = [
 publish = false
 
 [lib]
-name = "composite_identifiers"
+name = "tokens"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
 normal = ["workspace-build-acceleration"]
 
 [dependencies]
-# Internal
-enums = { path = "../enums" }
-tokens = { path = "../tokens" }
-
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
+workspace-build-acceleration = { workspace = true }
+
+# Internal
+# (none)
 
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
 
-sqlx = { version = "0.7.2", features = [ "mysql", "sqlite", "runtime-tokio-native-tls", "chrono" ] }
+# Random
+rand = {  version = "0.8.5", features = ["std_rng"] }
+
+once_cell = { version = "1.18.0", features = [] }
+
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 sqlx-core = { version = "0.7.2" }
 sqlx-mysql= { version = "0.7.2" }
 
@@ -35,5 +39,9 @@ utoipa = { version = "4", features = ["chrono","actix_extras"] }
 
 [dev-dependencies]
 
+# Enum utilities
+strum = { version = "0.26", features = ["derive"] }
+
 # Test serialization
 serde_json = "1.0.108"
+toml = "0.8.14"

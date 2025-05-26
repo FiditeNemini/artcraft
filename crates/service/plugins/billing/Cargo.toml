@@ -21,7 +21,7 @@ normal = ["workspace-build-acceleration"]
 errors = { path = "../../../lib/errors" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
-reusable_types = { path = "../../../_types/reusable_types" }
+reusable_types = { path = "../../../schema/public/reusable_types" }
 url_config = { path = "../../../lib/url_config" }
 user_traits_component = { path = "../user_traits_component" }
 

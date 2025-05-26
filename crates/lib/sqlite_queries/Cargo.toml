@@ -15,9 +15,9 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-enums = { path = "../../_types/enums" }
+enums = { path = "../../schema/public/enums" }
 errors = { path = "../../lib/errors" }
-tokens = { path = "../../_types/tokens" }
+tokens = { path = "../../schema/public/tokens" }
 
 # External
 chrono = { version = "0.4.22", features = ["serde"] }

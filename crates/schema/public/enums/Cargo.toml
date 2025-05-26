@@ -1,5 +1,5 @@
 [package]
-name = "enums_public"
+name = "enums"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [lib]
-name = "enums_public"
+name = "enums"
 path = "src/lib.rs"
 
 [package.metadata.cargo-udeps.ignore]
@@ -17,14 +17,18 @@ normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Workspace hack (faster compile times)
-workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }
+workspace-build-acceleration = { workspace = true }
 
 # Internal
-enums = { path = "../enums" }
+# (None yet)
 
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
+
+sqlx = { version = "0.7.2", features = [ "mysql", "sqlite", "runtime-tokio-native-tls", "chrono" ] }
+sqlx-core = { version = "0.7.2" }
+sqlx-mysql= { version = "0.7.2" }
 
 utoipa = { version = "4", features = ["chrono","actix_extras"] }
 

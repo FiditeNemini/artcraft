@@ -19,11 +19,11 @@ normal = ["workspace-build-acceleration"]
 # Internal
 bucket_paths = { path = "../../../lib/bucket_paths" }
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../_types/enums" }
+enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../../lib/errors" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
-tokens = { path = "../../../_types/tokens" }
+tokens = { path = "../../../schema/public/tokens" }
 
 # Workspace hack (faster compile times)
 workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }

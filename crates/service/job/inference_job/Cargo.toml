@@ -25,12 +25,12 @@ bootstrap = { path = "../../../lib/bootstrap" }
 bucket_paths = { path = "../../../lib/bucket_paths" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 collections = { path = "../../../lib/data/collections" }
-composite_identifiers = { path = "../../../_types/composite_identifiers" }
+composite_identifiers = { path = "../../../schema/public/composite_identifiers" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }
 crockford = { path = "../../../lib/data/crockford" }
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../_types/enums" }
+enums = { path = "../../../schema/public/enums" }
 errors = { workspace = true }
 filesys = { workspace = true }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
@@ -49,7 +49,7 @@ redis_schema = { path = "../../../lib/redis_schema" }
 shared_service_components = { workspace = true }
 subprocess_common = { path = "../../../lib/subprocess_common" }
 thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}
-tokens = { path = "../../../_types/tokens" }
+tokens = { path = "../../../schema/public/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 videos = { path = "../../../lib/files/videos" }
 

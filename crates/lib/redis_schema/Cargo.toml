@@ -17,9 +17,9 @@ normal = ["workspace-build-acceleration"]
 
 [dependencies]
 # Internal
-enums = { path = "../../_types/enums" }
+enums = { path = "../../schema/public/enums" }
 errors = { path = "../errors" }
-tokens = { path = "../../_types/tokens" }
+tokens = { path = "../../schema/public/tokens" }
 
 # Workspace hack (faster compile times)
 workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }

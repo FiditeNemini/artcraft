@@ -20,11 +20,11 @@ normal = ["workspace-build-acceleration"]
 # Internal
 bucket_paths = { path = "../../lib/bucket_paths" }
 cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
-enums = { path = "../../_types/enums" }
+enums = { path = "../../schema/public/enums" }
 errors = { path = "../../lib/errors" }
 jobs_common = { path = "../../lib/jobs_common" }
 mysql_queries = { path = "../../lib/mysql_queries" }
-tokens = { path = "../../_types/tokens" }
+tokens = { path = "../../schema/public/tokens" }
 
 # External
 anyhow = "1.0.86"

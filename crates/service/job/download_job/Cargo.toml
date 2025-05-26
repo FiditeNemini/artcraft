@@ -25,7 +25,7 @@ concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }
 crockford = { path = "../../../lib/data/crockford" }
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../_types/enums" }
+enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
@@ -33,10 +33,10 @@ hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
-reusable_types = { path = "../../../_types/reusable_types" }
+reusable_types = { path = "../../../schema/public/reusable_types" }
 storyteller_root = { path = "../../../lib/storyteller_root" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
-tokens = { path = "../../../_types/tokens" }
+tokens = { path = "../../../schema/public/tokens" }
 
 # Workspace hack (faster compile times)
 workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }

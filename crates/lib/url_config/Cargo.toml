@@ -19,7 +19,7 @@ normal = ["workspace-build-acceleration"]
 
 # Internal
 actix_helpers = { path = "../actix_helpers" }
-reusable_types = { path = "../../_types/reusable_types" }
+reusable_types = { path = "../../schema/public/reusable_types" }
 
 # Workspace hack (faster compile times)
 workspace-build-acceleration = { version = "0.1", path = "../../workspace-build-acceleration" }

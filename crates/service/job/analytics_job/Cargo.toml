@@ -21,11 +21,11 @@ normal = ["workspace-build-acceleration"]
 config = { path = "../../../lib/deprecated/config" }
 datetimes = { path = "../../../lib/data/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
-enums = { path = "../../../_types/enums" }
+enums = { path = "../../../schema/public/enums" }
 errors = { path = "../../../lib/errors" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
-reusable_types = { path = "../../../_types/reusable_types" }
-tokens = { path = "../../../_types/tokens" }
+reusable_types = { path = "../../../schema/public/reusable_types" }
+tokens = { path = "../../../schema/public/tokens" }
 
 # Workspace hack (faster compile times)
 workspace-build-acceleration = { version = "0.1", path = "../../../workspace-build-acceleration" }
