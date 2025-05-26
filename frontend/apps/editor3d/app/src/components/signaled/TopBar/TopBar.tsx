@@ -59,11 +59,11 @@ const appMenuTabs: MenuIconItem[] = [
     label: "Prompt to Video",
     icon: <FontAwesomeIcon icon={faFilm} />,
   },
-  // {
-  //   id: "IMAGE",
-  //   label: "Prompt to Image",
-  //   icon: <FontAwesomeIcon icon={faImage} />,
-  // },
+  {
+    id: "IMAGE",
+    label: "Prompt to Image",
+    icon: <FontAwesomeIcon icon={faImage} />,
+  },
 ];
 
 export const topNavMediaId = signal<string>("");
